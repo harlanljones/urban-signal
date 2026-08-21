@@ -1,0 +1,26 @@
+{
+  "type": "record",
+  "name": "DeedEvent",
+  "namespace": "org.urbandev.events",
+  "doc": "ACRIS Property Deed / Commercial Mortgage Transaction Event",
+  "fields": [
+    { "name": "city_id", "type": "string", "default": "nyc" },
+    { "name": "doc_id", "type": "string" },
+    { "name": "doc_type", "type": "string", "default": "DEED" },
+    { "name": "bbl", "type": ["null", "string"], "default": null },
+    { "name": "borough", "type": ["null", "string"], "default": null },
+    { "name": "source_neighborhood", "type": ["null", "string"], "default": null },
+    { "name": "block", "type": ["null", "string"], "default": null },
+    { "name": "lot", "type": ["null", "string"], "default": null },
+    { "name": "document_amount", "type": "double", "default": 0.0 },
+    { "name": "recorded_date", "type": "string" },
+    { "name": "party1_grantor", "type": ["null", "string"], "default": null },
+    { "name": "party2_grantee", "type": ["null", "string"], "default": null },
+    { "name": "latitude", "type": ["null", "double"], "default": null },
+    { "name": "longitude", "type": ["null", "double"], "default": null },
+    { "name": "h3_res7", "type": ["null", "string"], "default": null },
+    { "name": "h3_res8", "type": ["null", "string"], "default": null },
+    { "name": "h3_res9", "type": ["null", "string"], "default": null },
+    { "name": "ingested_at", "type": "string" }
+  ]
+}

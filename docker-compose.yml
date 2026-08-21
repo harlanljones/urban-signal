@@ -1,0 +1,302 @@
+# =============================================================================
+# Urban Signal — Spatial Intelligence & Commercial Catalyst Forecasting Engine
+# docker-compose.yml  (repo root)
+#
+# Usage:
+#   cp .env.example .env        # populate secrets
+#   docker compose up -d        # bring up everything
+#   docker compose logs -f api  # tail a specific service
+#
+# Horizontal worker scaling (no Swarm required):
+#   docker compose up -d --scale spatial-enrichment-worker=3
+# =============================================================================
+
+x-app-env: &app-env
+  APP_ENV: ${APP_ENV:-production}
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  SERVICE_NAME: ${SERVICE_NAME:-urban-signal-predictor}
+  KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
+  KAFKA_SCHEMA_REGISTRY_URL: ${KAFKA_SCHEMA_REGISTRY_URL:-http://schema-registry:8081}
+  KAFKA_SECURITY_PROTOCOL: ${KAFKA_SECURITY_PROTOCOL:-PLAINTEXT}
+  POSTGRES_HOST: ${POSTGRES_HOST:-postgis}
+  POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+  POSTGRES_DB: ${POSTGRES_DB:-urbansignal}
+  POSTGRES_USER: ${POSTGRES_USER:-postgres}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+  MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio:9000}
+  MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+  MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+  MINIO_BUCKET_FEATURES: ${MINIO_BUCKET_FEATURES:-urban-signal-features}
+  MINIO_SECURE: ${MINIO_SECURE:-false}
+  ONNX_MODEL_DIR: ${ONNX_MODEL_DIR:-./models_storage}
+  ONNX_EXECUTION_PROVIDER: ${ONNX_EXECUTION_PROVIDER:-CPUExecutionProvider}
+  GPU_DEVICE_ID: ${GPU_DEVICE_ID:-0}
+  H3_RES_MACRO: ${H3_RES_MACRO:-7}
+  H3_RES_NEIGHBORHOOD: ${H3_RES_NEIGHBORHOOD:-8}
+  H3_RES_MICRO: ${H3_RES_MICRO:-9}
+  CAPEX_HALFLIFE_DAYS: ${CAPEX_HALFLIFE_DAYS:-180.0}
+  LIMS_THRESHOLD: ${LIMS_THRESHOLD:-85.0}
+  WEBHOOK_ALERT_URLS: ${WEBHOOK_ALERT_URLS:-[]}
+
+services:
+
+  # ── Infrastructure ──────────────────────────────────────────────────────────
+
+  # Kafka Broker (KRaft mode — no Zookeeper)
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: urbansignal-kafka
+    restart: unless-stopped
+    ports:
+      - "9092:9092"     # host-accessible for local tooling / debugging
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_PROCESS_ROLES: "broker,controller"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:29093"
+      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:29092,CONTROLLER://0.0.0.0:29093,PLAINTEXT_HOST://0.0.0.0:9092"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_LOG_DIRS: "/tmp/kraft-combined-logs"
+      CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+      # Topic auto-creation (consumers will create topics on first use)
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_RETENTION_HOURS: 168         # 7-day retention
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-cluster cluster-id --bootstrap-server localhost:9092 || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  # Confluent Schema Registry (Avro contract enforcement)
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.6.1
+    container_name: urbansignal-schema-registry
+    restart: unless-stopped
+    depends_on:
+      kafka:
+        condition: service_healthy
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "kafka:29092"
+      SCHEMA_REGISTRY_LISTENERS: "http://0.0.0.0:8081"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8081/subjects || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # PostgreSQL 16 with PostGIS 3.4
+  postgis:
+    image: postgis/postgis:16-3.4
+    container_name: urbansignal-postgis
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-urbandev}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  # MinIO S3-compatible object storage (feature store + model registry)
+  minio:
+    image: minio/minio:RELEASE.2024-05-10T01-41-38Z
+    container_name: urbansignal-minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"     # S3 API
+      - "9001:9001"     # Web console → http://localhost:9001
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9000/minio/health/live || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # MinIO bucket bootstrap (runs once and exits)
+  minio-init:
+    image: minio/mc:RELEASE.2024-05-09T17-04-24Z
+    container_name: urbansignal-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    restart: "no"
+    entrypoint: >
+      sh -c "
+        mc alias set local http://minio:9000 $${MINIO_ACCESS_KEY:-minioadmin} $${MINIO_SECRET_KEY:-minioadmin} &&
+        mc mb --ignore-existing local/$${MINIO_BUCKET_FEATURES:-urban-features} &&
+        echo 'MinIO bucket ready.'
+      "
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+      MINIO_BUCKET_FEATURES: ${MINIO_BUCKET_FEATURES:-urban-features}
+
+  # AKHQ — Kafka management UI (optional but helpful)
+  akhq:
+    image: tchiotludo/akhq:0.25.1
+    container_name: urbansignal-akhq
+    restart: unless-stopped
+    depends_on:
+      kafka:
+        condition: service_healthy
+      schema-registry:
+        condition: service_healthy
+    ports:
+      - "8080:8080"     # → http://localhost:8080
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            urbansignal:
+              properties:
+                bootstrap.servers: "kafka:29092"
+              schema-registry:
+                url: "http://schema-registry:8081"
+
+  # ── Application Services ────────────────────────────────────────────────────
+
+  # FastAPI serving layer: multi-horizon ONNX inference + MapLibre dashboard
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: urbansignal-app:latest
+    container_name: urbansignal-api
+    restart: unless-stopped
+    command: uvicorn src.serving.app:app --host 0.0.0.0 --port 8000 --workers 2
+    ports:
+      - "8000:8000"     # API docs → http://localhost:8000/docs
+                        # Dashboard → http://localhost:8000/dashboard
+    environment:
+      <<: *app-env
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      schema-registry:
+        condition: service_healthy
+    volumes:
+      # Bind-mount so ONNX models can be hot-swapped without rebuilding image
+      - ./models_storage:/app/models_storage:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # Stream consumer: H3 spatial enrichment (Res 7/8/9 join → DuckDB sink)
+  spatial-enrichment-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: urbansignal-app:latest
+    restart: unless-stopped
+    command: python -m src.consumers.spatial_enrichment_worker
+    environment:
+      <<: *app-env
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgis:
+        condition: service_healthy
+      schema-registry:
+        condition: service_healthy
+    # Scale with: docker compose up -d --scale spatial-enrichment-worker=3
+    deploy:
+      replicas: 1
+
+  # Stream consumer: feature aggregation (LIMS calc + catalyst alert emitter)
+  feature-aggregation-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: urbansignal-app:latest
+    restart: unless-stopped
+    command: python -m src.consumers.feature_aggregation_worker
+    environment:
+      <<: *app-env
+    depends_on:
+      kafka:
+        condition: service_healthy
+      schema-registry:
+        condition: service_healthy
+
+  # Stream consumer: PostGIS persistence worker (GiST/BRIN indexed upserts)
+  postgis-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: urbansignal-app:latest
+    restart: unless-stopped
+    command: python -m src.consumers.postgis_worker
+    environment:
+      <<: *app-env
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgis:
+        condition: service_healthy
+      schema-registry:
+        condition: service_healthy
+
+  # Municipal data ingestion scheduler (Socrata SODA → Kafka producers)
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: urbansignal-app:latest
+    container_name: urbansignal-scheduler
+    restart: unless-stopped
+    command: >
+      python -m src.producers.scheduler
+        --jobs permits 311 sla deeds
+        --interval 60
+        --limit 500
+    environment:
+      <<: *app-env
+      SOCRATA_APP_TOKEN: ${SOCRATA_APP_TOKEN:-}
+    depends_on:
+      kafka:
+        condition: service_healthy
+      schema-registry:
+        condition: service_healthy
+
+# ── Named Volumes ─────────────────────────────────────────────────────────────
+volumes:
+  postgis_data:
+    driver: local
+  minio_data:
+    driver: local

@@ -1,0 +1,32 @@
+{
+  "type": "record",
+  "name": "PermitEvent",
+  "namespace": "org.urbandev.events",
+  "doc": "NYC DOB / Municipal Building Permit Filing Event",
+  "fields": [
+    { "name": "city_id", "type": "string", "default": "nyc" },
+    { "name": "job_id", "type": "string" },
+    { "name": "job_type", "type": "string" },
+    { "name": "borough", "type": ["null", "string"], "default": null },
+    { "name": "source_neighborhood", "type": ["null", "string"], "default": null },
+    { "name": "block", "type": ["null", "string"], "default": null },
+    { "name": "lot", "type": ["null", "string"], "default": null },
+    { "name": "bbl", "type": ["null", "string"], "default": null },
+    { "name": "address_street", "type": ["null", "string"], "default": null },
+    { "name": "address_num", "type": ["null", "string"], "default": null },
+    { "name": "zipcode", "type": ["null", "string"], "default": null },
+    { "name": "latitude", "type": "double" },
+    { "name": "longitude", "type": "double" },
+    { "name": "estimated_cost", "type": "double", "default": 0.0 },
+    { "name": "proposed_dwelling_units", "type": ["null", "int"], "default": null },
+    { "name": "existing_dwelling_units", "type": ["null", "int"], "default": null },
+    { "name": "proposed_stories", "type": ["null", "int"], "default": null },
+    { "name": "filing_date", "type": ["null", "string"], "default": null },
+    { "name": "issuance_date", "type": ["null", "string"], "default": null },
+    { "name": "status", "type": ["null", "string"], "default": "ISSUED" },
+    { "name": "h3_res7", "type": ["null", "string"], "default": null },
+    { "name": "h3_res8", "type": ["null", "string"], "default": null },
+    { "name": "h3_res9", "type": ["null", "string"], "default": null },
+    { "name": "ingested_at", "type": "string" }
+  ]
+}

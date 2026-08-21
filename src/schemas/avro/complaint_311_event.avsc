@@ -1,0 +1,26 @@
+{
+  "type": "record",
+  "name": "Complaint311Event",
+  "namespace": "org.urbandev.events",
+  "doc": "NYC 311 Citizen Maintenance & Quality-of-Life Complaint",
+  "fields": [
+    { "name": "city_id", "type": "string", "default": "nyc" },
+    { "name": "incident_id", "type": "string" },
+    { "name": "complaint_type", "type": "string" },
+    { "name": "descriptor", "type": ["null", "string"], "default": null },
+    { "name": "category", "type": "string", "default": "OTHER" },
+    { "name": "incident_address", "type": ["null", "string"], "default": null },
+    { "name": "borough", "type": ["null", "string"], "default": null },
+    { "name": "source_neighborhood", "type": ["null", "string"], "default": null },
+    { "name": "zipcode", "type": ["null", "string"], "default": null },
+    { "name": "latitude", "type": "double" },
+    { "name": "longitude", "type": "double" },
+    { "name": "created_date", "type": "string" },
+    { "name": "closed_date", "type": ["null", "string"], "default": null },
+    { "name": "status", "type": ["null", "string"], "default": "Open" },
+    { "name": "h3_res7", "type": ["null", "string"], "default": null },
+    { "name": "h3_res8", "type": ["null", "string"], "default": null },
+    { "name": "h3_res9", "type": ["null", "string"], "default": null },
+    { "name": "ingested_at", "type": "string" }
+  ]
+}

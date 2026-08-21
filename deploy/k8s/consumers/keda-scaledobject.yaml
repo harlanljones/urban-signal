@@ -1,0 +1,50 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: h3-enrichment-scaler
+  namespace: stream-consumers
+spec:
+  scaleTargetRef:
+    name: h3-spatial-enrichment-worker
+  minReplicaCount: 1
+  maxReplicaCount: 8
+  cooldownPeriod: 300
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: kafka-cluster-kafka-bootstrap.kafka-streaming:9092
+        consumerGroup: h3-enrich-workers
+        topic: raw.municipal.permits
+        lagThreshold: "250"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: h3-spatial-enrichment-worker
+  namespace: stream-consumers
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: h3-enrichment-worker
+  template:
+    metadata:
+      labels:
+        app: h3-enrichment-worker
+    spec:
+      containers:
+        - name: worker
+          image: ghcr.io/harlan/urban-signal-enrichment-worker:latest
+          command: ["python", "-m", "src.consumers.spatial_enrichment_worker"]
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka-cluster-kafka-bootstrap.kafka-streaming:9092"
+            - name: POSTGRES_HOST
+              value: "postgis-db.data-storage"
+          resources:
+            requests:
+              cpu: "1"
+              memory: 2Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi

@@ -1,0 +1,25 @@
+{
+  "type": "record",
+  "name": "SLALicenseEvent",
+  "namespace": "org.urbandev.events",
+  "doc": "NY State Liquor Authority / Commercial Hospitality Filing",
+  "fields": [
+    { "name": "city_id", "type": "string", "default": "nyc" },
+    { "name": "license_id", "type": "string" },
+    { "name": "license_type", "type": "string" },
+    { "name": "premises_name", "type": ["null", "string"], "default": null },
+    { "name": "dba", "type": ["null", "string"], "default": null },
+    { "name": "address", "type": ["null", "string"], "default": null },
+    { "name": "borough", "type": ["null", "string"], "default": null },
+    { "name": "source_neighborhood", "type": ["null", "string"], "default": null },
+    { "name": "latitude", "type": "double" },
+    { "name": "longitude", "type": "double" },
+    { "name": "effective_date", "type": ["null", "string"], "default": null },
+    { "name": "expiration_date", "type": ["null", "string"], "default": null },
+    { "name": "license_status", "type": "string", "default": "ACTIVE" },
+    { "name": "h3_res7", "type": ["null", "string"], "default": null },
+    { "name": "h3_res8", "type": ["null", "string"], "default": null },
+    { "name": "h3_res9", "type": ["null", "string"], "default": null },
+    { "name": "ingested_at", "type": "string" }
+  ]
+}

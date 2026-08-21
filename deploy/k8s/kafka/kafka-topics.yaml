@@ -1,0 +1,104 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: raw-municipal-permits
+  namespace: kafka-streaming
+  labels:
+    strimzi.io/cluster: kafka-cluster
+spec:
+  topicName: raw.municipal.permits
+  partitions: 6
+  replicas: 2
+  config:
+    retention.ms: 1209600000 # 14 Days
+    cleanup.policy: delete
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: raw-municipal-311
+  namespace: kafka-streaming
+  labels:
+    strimzi.io/cluster: kafka-cluster
+spec:
+  topicName: raw.municipal.311
+  partitions: 6
+  replicas: 2
+  config:
+    retention.ms: 604800000 # 7 Days
+    cleanup.policy: delete
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: raw-municipal-sla
+  namespace: kafka-streaming
+  labels:
+    strimzi.io/cluster: kafka-cluster
+spec:
+  topicName: raw.municipal.sla
+  partitions: 3
+  replicas: 2
+  config:
+    cleanup.policy: compact
+    retention.ms: 2592000000 # 30 Days
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: raw-municipal-deeds
+  namespace: kafka-streaming
+  labels:
+    strimzi.io/cluster: kafka-cluster
+spec:
+  topicName: raw.municipal.deeds
+  partitions: 3
+  replicas: 2
+  config:
+    cleanup.policy: compact
+    retention.ms: 2592000000 # 30 Days
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: enriched-spatial-h3
+  namespace: kafka-streaming
+  labels:
+    strimzi.io/cluster: kafka-cluster
+spec:
+  topicName: enriched.spatial.h3
+  partitions: 12
+  replicas: 2
+  config:
+    retention.ms: 259200000 # 3 Days
+    cleanup.policy: delete
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: alerts-catalyst
+  namespace: kafka-streaming
+  labels:
+    strimzi.io/cluster: kafka-cluster
+spec:
+  topicName: alerts.catalyst
+  partitions: 3
+  replicas: 2
+  config:
+    cleanup.policy: compact
+    retention.ms: 2592000000 # 30 Days
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: dlq-schema-failures
+  namespace: kafka-streaming
+  labels:
+    strimzi.io/cluster: kafka-cluster
+spec:
+  topicName: dlq.schema.failures
+  partitions: 3
+  replicas: 2
+  config:
+    retention.ms: 7776000000 # 90 Days
+    cleanup.policy: delete

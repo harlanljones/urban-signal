@@ -1,0 +1,24 @@
+{
+  "type": "record",
+  "name": "EnrichedH3Feature",
+  "namespace": "org.urbandev.events",
+  "doc": "Spatio-Temporal Aggregated Feature Record per H3 Cell",
+  "fields": [
+    { "name": "h3_index", "type": "string" },
+    { "name": "h3_resolution", "type": "int" },
+    { "name": "timestamp", "type": "string" },
+    { "name": "capex_density_decayed", "type": "double", "default": 0.0 },
+    { "name": "permit_count_60d", "type": "int", "default": 0 },
+    { "name": "permit_count_180d", "type": "int", "default": 0 },
+    { "name": "permit_velocity", "type": "double", "default": 0.0 },
+    { "name": "complaints_neglect_count", "type": "int", "default": 0 },
+    { "name": "complaints_qol_count", "type": "int", "default": 0 },
+    { "name": "shift_ratio_311", "type": "double", "default": 1.0 },
+    { "name": "sla_active_licenses", "type": "int", "default": 0 },
+    { "name": "sla_new_filings_90d", "type": "int", "default": 0 },
+    { "name": "deed_total_volume_180d", "type": "double", "default": 0.0 },
+    { "name": "deed_transaction_count_180d", "type": "int", "default": 0 },
+    { "name": "lims_score", "type": "double", "default": 0.0 },
+    { "name": "created_at", "type": "string" }
+  ]
+}

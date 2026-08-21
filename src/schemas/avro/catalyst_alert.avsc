@@ -1,0 +1,18 @@
+{
+  "type": "record",
+  "name": "CatalystAlert",
+  "namespace": "org.urbandev.events",
+  "doc": "Catalyst High-Momentum Parcel / Submarket Alert",
+  "fields": [
+    { "name": "alert_id", "type": "string" },
+    { "name": "h3_index", "type": "string" },
+    { "name": "h3_resolution", "type": "int", "default": 9 },
+    { "name": "lims_score", "type": "double" },
+    { "name": "predicted_delta_6m", "type": "double" },
+    { "name": "predicted_delta_12m", "type": "double" },
+    { "name": "macro_outperformance_prob_18m", "type": "double" },
+    { "name": "centroid_lat", "type": "double" },
+    { "name": "centroid_lng", "type": "double" },
+    { "name": "timestamp", "type": "string" }
+  ]
+}
