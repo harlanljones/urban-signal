@@ -10,6 +10,16 @@
 [![ONNX Runtime](https://img.shields.io/badge/ONNX%20Runtime-CUDA%20FP16-005CED.svg)](https://onnxruntime.ai/)
 [![PostGIS](https://img.shields.io/badge/PostGIS-16--3.4-336791.svg)](https://postgis.net/)
 
+## Dashboard
+
+| San Francisco Bay Area | Parcel Inspector & SHAP Attribution |
+| :---: | :---: |
+| ![San Francisco Bay Area Dashboard](docs/screenshots/dashboard-san_francisco.png) | ![Parcel Inspector](docs/screenshots/dashboard-inspector.png) |
+
+| New York City (5 Boroughs) | Chicago (6 Divisions) |
+| :---: | :---: |
+| ![NYC Dashboard](docs/screenshots/dashboard-nyc.png) | ![Chicago Dashboard](docs/screenshots/dashboard-chicago.png) |
+
 ---
 
 ## 1. System Overview & Architecture
