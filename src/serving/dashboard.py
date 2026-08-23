@@ -1,13 +1,35 @@
 """Interactive Geospatial Web Visualization Dashboard HTML/JS/CSS generator for Urban Signal."""
 
+def get_favicon_svg() -> str:
+    """Brand favicon: layered-map mark in the dashboard's accent palette."""
+    return (
+        "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>"
+        "<rect width='64' height='64' rx='14' fill='#0f172a'/>"
+        "<path d='M32 12L12 22l20 10 20-10-20-10zM12 42l20 10 20-10M12 32l20 10 20-10' "
+        "fill='none' stroke='#38bdf8' stroke-width='4' "
+        "stroke-linecap='round' stroke-linejoin='round'/>"
+        "</svg>"
+    )
+
+def _favicon_data_uri() -> str:
+    return "data:image/svg+xml," + (
+        get_favicon_svg()
+        .replace("#", "%23")
+        .replace(" ", "%20")
+    )
+
 def get_dashboard_html() -> str:
-    return r"""<!DOCTYPE html>
+    favicon_link = (
+        f'  <link rel="icon" type="image/svg+xml" href="{_favicon_data_uri()}">'
+    )
+    html = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Urban Signal — Real-Time Geospatial Intelligence & Commercial Catalyst Forecasting Engine">
   <title>Urban Signal — Real-Time Geospatial Intelligence & Catalyst Forecaster</title>
+  __FAVICON_LINK__
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2475,3 +2497,4 @@ def get_dashboard_html() -> str:
 </body>
 </html>
 """
+    return html.replace("__FAVICON_LINK__", favicon_link)

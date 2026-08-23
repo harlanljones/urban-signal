@@ -6,11 +6,12 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 from prometheus_client import Counter, Histogram, make_asgi_app
 from starlette.middleware.base import BaseHTTPMiddleware
 from src.config import settings
-from src.serving.dashboard import get_dashboard_html
+from src.serving.dashboard import get_dashboard_html, get_favicon_svg
+from src.serving.llm_docs import get_llms_full_txt, get_llms_txt, get_robots_txt
 from src.serving.router import router as api_router
 
 # Prometheus Metrics Definitions
@@ -141,6 +142,10 @@ def create_app() -> FastAPI:
             "live_url": "/live",
             "metrics_url": "/metrics",
             "dashboard_url": "/dashboard",
+            "openapi_url": "/openapi.json",
+            "llms_txt_url": "/llms.txt",
+            "llms_full_txt_url": "/llms-full.txt",
+            "robots_txt_url": "/robots.txt",
             "api_v1_routes": {
                 "predict_single": "POST /api/v1/predict",
                 "predict_batch": "POST /api/v1/predict/batch",
@@ -158,6 +163,42 @@ def create_app() -> FastAPI:
     async def dashboard():
         """Interactive Geospatial Web Visualization Dashboard Endpoint."""
         return HTMLResponse(content=get_dashboard_html())
+
+    @app.get("/favicon.ico", include_in_schema=False)
+    async def favicon():
+        """Brand SVG favicon served at the browser-conventional path."""
+        return Response(
+            content=get_favicon_svg(),
+            media_type="image/svg+xml",
+            headers={"Cache-Control": "public, max-age=86400"},
+        )
+
+    @app.get("/llms.txt", include_in_schema=False)
+    async def llms_txt():
+        """LLM-friendly site index (llms.txt standard)."""
+        return Response(
+            content=get_llms_txt(),
+            media_type="text/plain; charset=utf-8",
+            headers={"Cache-Control": "public, max-age=3600"},
+        )
+
+    @app.get("/llms-full.txt", include_in_schema=False)
+    async def llms_full_txt():
+        """Complete LLM-oriented API reference in plain markdown."""
+        return Response(
+            content=get_llms_full_txt(),
+            media_type="text/plain; charset=utf-8",
+            headers={"Cache-Control": "public, max-age=3600"},
+        )
+
+    @app.get("/robots.txt", include_in_schema=False)
+    async def robots_txt():
+        """Permissive crawler policy welcoming AI agents."""
+        return Response(
+            content=get_robots_txt(),
+            media_type="text/plain; charset=utf-8",
+            headers={"Cache-Control": "public, max-age=86400"},
+        )
 
     @app.get("/health", tags=["Health"])
     async def health_check():
