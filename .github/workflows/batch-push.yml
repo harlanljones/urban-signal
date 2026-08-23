@@ -1,0 +1,83 @@
+name: batch-push-deploy
+
+# Run-based/batch deployment: each run recomputes the full snapshot (grid,
+# catalysts, submarkets, cell predictions) and pushes it to Workers KV, then
+# deploys the edge worker. Data freshness is decoupled from code releases.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *" # nightly 06:00 UTC
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-push-deploy
+  cancel-in-progress: false
+
+env:
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+jobs:
+  snapshot-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install project
+        run: |
+          uv venv .venv --python 3.12
+          uv pip install -e .
+
+      - name: Build snapshot artifacts
+        run: |
+          .venv/bin/python scripts/export_dashboard.py
+          .venv/bin/python -m src.export.snapshot_builder --out dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: snapshot
+          path: dist/
+          retention-days: 7
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Push snapshot to Workers KV
+        working-directory: workers
+        run: npm ci && npx wrangler kv bulk put ../dist/kv-bulk.json --binding SNAPSHOT --remote
+
+  deploy-worker:
+    needs: snapshot-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Export dashboard HTML into static assets
+        run: |
+          uv venv .venv --python 3.12
+          uv pip install -e .
+          .venv/bin/python scripts/export_dashboard.py
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Deploy worker
+        working-directory: workers
+        run: npm ci && npx wrangler deploy
