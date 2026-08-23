@@ -20,6 +20,8 @@
 | :---: | :---: |
 | ![NYC Dashboard](docs/screenshots/dashboard-nyc.png) | ![Chicago Dashboard](docs/screenshots/dashboard-chicago.png) |
 
+The city selector ships **all five registered metros** — San Francisco Bay Area, New York City, Chicago, Seattle Metro (4 Divisions), and Los Angeles Metro (6 Divisions) — with per-division camera presets, map-click → division resolution, and geolocation-based default-city detection.
+
 ---
 
 ## 1. System Overview & Architecture
@@ -126,7 +128,7 @@ urban-signal/
 │       │   └── keda-scaledobject.yaml      # KEDA autoscaling spatial consumer pods (1 -> 8)
 │       └── inference/
 │           └── inference-deployment.yaml   # FastAPI + ONNX Runtime (CUDA GPU)
-├── workers/                                # Cloudflare Worker (urban-signal-edge): batch push & snapshot builder
+├── workers/                                # Cloudflare Worker (urban-signal-edge): static dashboard & KV snapshot API edge
 ├── models_storage/                         # Serialized ONNX model artifacts (DCN-v2, ST-GNN)
 ├── docs/
 │   ├── adr/                                # Architecture decision records (0001 Agent Interlock)
@@ -325,7 +327,9 @@ Exposes real-time Prometheus telemetry including `prediction_requests_total`, `c
 
 ### Interactive Geospatial Dashboard
 `GET /dashboard` or `GET /` (with `Accept: text/html`)
-Serves the hardened, high-performance **MapLibre GL** web visualizer featuring multi-city selection (San Francisco, NYC, Chicago), submarket filtering, H3 hexagon inspection, LIMS heatmaps, and SHAP attribution waterfall charts.
+Serves the hardened, high-performance **MapLibre GL** web visualizer featuring multi-city selection across all five registered metros (San Francisco, NYC, Chicago, Seattle, Los Angeles), submarket filtering, H3 hexagon inspection, LIMS heatmaps, and SHAP attribution waterfall charts.
+
+The same UI is mirrored as a static asset on the Cloudflare Worker (`workers/`), where `/api/v1/*` is answered from a precomputed Workers KV snapshot (built by `src/export/snapshot_builder.py`). The FastAPI service serves all five cities live; the edge snapshot currently covers NYC, Chicago, and San Francisco.
 
 ---
 

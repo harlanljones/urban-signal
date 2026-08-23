@@ -349,6 +349,17 @@ def get_dashboard_html() -> str:
     .borough-btn.active.Peninsula, .borough-btn.active.PENINSULA { color: var(--division-peninsula); }
     .borough-btn.active.SiliconValleySouthBay, .borough-btn.active.SILICON_VALLEY_SOUTH_BAY, .borough-btn.active.SiliconValley { color: var(--division-silicon-valley); }
     .borough-btn.active.MarinNorthBay, .borough-btn.active.MARIN_NORTH_BAY, .borough-btn.active.Marin { color: var(--division-marin); }
+    .borough-btn.active.SeattleCore, .borough-btn.active.SEATTLE_CORE { color: var(--accent-primary); }
+    .borough-btn.active.NorthKing, .borough-btn.active.NORTH_KING { color: var(--accent-success); }
+    .borough-btn.active.Eastside, .borough-btn.active.EASTSIDE { color: var(--accent-purple); }
+    .borough-btn.active.SouthKing, .borough-btn.active.SOUTH_KING { color: var(--accent-warning); }
+    /* Los Angeles divisions */
+    .borough-btn.active.CentralLA, .borough-btn.active.CENTRALLA { color: var(--accent-primary); }
+    .borough-btn.active.Westside, .borough-btn.active.WESTSIDE { color: var(--accent-success); }
+    .borough-btn.active.SanFernandoValley, .borough-btn.active.SANFERNANDOVALLEY { color: var(--accent-warning); }
+    .borough-btn.active.HarborSouthBay, .borough-btn.active.HARBORSOUTHBAY { color: var(--accent-danger); }
+    .borough-btn.active.SouthLA, .borough-btn.active.SOUTHLA { color: var(--accent-purple); }
+    .borough-btn.active.EastsideSGV, .borough-btn.active.EASTSIDESGV { color: var(--accent-primary); }
 
     /* Header Actions */
     .header-actions {
@@ -689,6 +700,16 @@ def get_dashboard_html() -> str:
     .borough-tag.Peninsula, .borough-tag.PENINSULA { color: var(--division-peninsula); }
     .borough-tag.SiliconValleySouthBay, .borough-tag.SILICON_VALLEY_SOUTH_BAY, .borough-tag.SiliconValley { color: var(--division-silicon-valley); }
     .borough-tag.MarinNorthBay, .borough-tag.MARIN_NORTH_BAY, .borough-tag.Marin { color: var(--division-marin); }
+    .borough-tag.SeattleCore, .borough-tag.SEATTLE_CORE { color: var(--accent-primary); }
+    .borough-tag.NorthKing, .borough-tag.NORTH_KING { color: var(--accent-success); }
+    .borough-tag.Eastside, .borough-tag.EASTSIDE { color: var(--accent-purple); }
+    .borough-tag.SouthKing, .borough-tag.SOUTH_KING { color: var(--accent-warning); }
+    .borough-tag.CentralLA, .borough-tag.CENTRALLA { color: var(--accent-primary); }
+    .borough-tag.Westside, .borough-tag.WESTSIDE { color: var(--accent-success); }
+    .borough-tag.SanFernandoValley, .borough-tag.SANFERNANDOVALLEY { color: var(--accent-warning); }
+    .borough-tag.HarborSouthBay, .borough-tag.HARBORSOUTHBAY { color: var(--accent-danger); }
+    .borough-tag.SouthLA, .borough-tag.SOUTHLA { color: var(--accent-purple); }
+    .borough-tag.EastsideSGV, .borough-tag.EASTSIDESGV { color: var(--accent-primary); }
 
     .delta-tag {
       font-family: var(--font-mono);
@@ -1060,6 +1081,8 @@ def get_dashboard_html() -> str:
           <option value="san_francisco" selected>🌉 San Francisco Bay Area (5 Divisions)</option>
           <option value="nyc">🗽 NYC (5 Boroughs)</option>
           <option value="chicago">🏙️ Chicago (6 Divisions)</option>
+          <option value="seattle">🌲 Seattle Metro (4 Divisions)</option>
+          <option value="los_angeles">🌴 Los Angeles Metro (6 Divisions)</option>
         </select>
       </div>
     </div>
@@ -1259,6 +1282,54 @@ def get_dashboard_html() -> str:
           'Silicon Valley / South Bay': { lat: 37.3382, lng: -121.8863, zoom: 12.2, pitch: 45, bearing: -10 },
           'Marin / North Bay': { lat: 37.9735, lng: -122.5311, zoom: 12.0, pitch: 45, bearing: -10 }
         }
+      },
+      seattle: {
+        center: [-122.3321, 47.6062],
+        zoom: 10.4,
+        pitch: 48,
+        bearing: -10,
+        name: 'Seattle Metro',
+        allLabel: 'All Seattle',
+        divisions: [
+          { key: 'ALL', label: 'All Seattle', class: 'ALL' },
+          { key: 'SEATTLE_CORE', label: 'Seattle Core', class: 'SeattleCore' },
+          { key: 'NORTH_KING', label: 'North King', class: 'NorthKing' },
+          { key: 'EASTSIDE', label: 'Eastside', class: 'Eastside' },
+          { key: 'SOUTH_KING', label: 'South King', class: 'SouthKing' }
+        ],
+        presets: {
+          'ALL': { lat: 47.6062, lng: -122.3321, zoom: 10.0, pitch: 45, bearing: -10 },
+          'SEATTLE_CORE': { lat: 47.6120, lng: -122.3300, zoom: 12.5, pitch: 52, bearing: -12 },
+          'NORTH_KING': { lat: 47.6950, lng: -122.3530, zoom: 12.0, pitch: 48, bearing: -10 },
+          'EASTSIDE': { lat: 47.6350, lng: -122.1350, zoom: 11.5, pitch: 45, bearing: -10 },
+          'SOUTH_KING': { lat: 47.4400, lng: -122.2850, zoom: 11.5, pitch: 45, bearing: -10 }
+        }
+      },
+      los_angeles: {
+        center: [-118.2437, 34.0522],
+        zoom: 10.2,
+        pitch: 48,
+        bearing: -10,
+        name: 'Los Angeles Metro',
+        allLabel: 'All LA',
+        divisions: [
+          { key: 'ALL', label: 'All LA', class: 'ALL' },
+          { key: 'CENTRAL_LA', label: 'Central LA', class: 'CentralLA' },
+          { key: 'WESTSIDE', label: 'Westside', class: 'Westside' },
+          { key: 'SAN_FERNANDO_VALLEY', label: 'San Fernando Valley', class: 'SanFernandoValley' },
+          { key: 'HARBOR_SOUTH_BAY', label: 'Harbor / South Bay', class: 'HarborSouthBay' },
+          { key: 'SOUTH_LA', label: 'South LA', class: 'SouthLA' },
+          { key: 'EASTSIDE_SGV', label: 'Eastside / SGV', class: 'EastsideSGV' }
+        ],
+        presets: {
+          'ALL': { lat: 34.0522, lng: -118.2437, zoom: 10.0, pitch: 45, bearing: -10 },
+          'CENTRAL_LA': { lat: 34.07, lng: -118.28, zoom: 12.5, pitch: 48, bearing: -10 },
+          'WESTSIDE': { lat: 34.04, lng: -118.45, zoom: 12.0, pitch: 48, bearing: -10 },
+          'SAN_FERNANDO_VALLEY': { lat: 34.19, lng: -118.44, zoom: 11.5, pitch: 45, bearing: -10 },
+          'HARBOR_SOUTH_BAY': { lat: 33.81, lng: -118.29, zoom: 11.5, pitch: 45, bearing: -10 },
+          'SOUTH_LA': { lat: 33.98, lng: -118.29, zoom: 12.0, pitch: 48, bearing: -10 },
+          'EASTSIDE_SGV': { lat: 34.11, lng: -118.16, zoom: 11.5, pitch: 48, bearing: -10 }
+        }
       }
     };
     CITY_CONFIGS.sf = CITY_CONFIGS.san_francisco;
@@ -1335,7 +1406,9 @@ def get_dashboard_html() -> str:
       const cityCoordinates = {
         'san_francisco': { lat: 37.7749, lng: -122.4194 },
         'chicago': { lat: 41.8781, lng: -87.6298 },
-        'nyc': { lat: 40.7128, lng: -74.0060 }
+        'nyc': { lat: 40.7128, lng: -74.0060 },
+        'seattle': { lat: 47.6062, lng: -122.3321 },
+        'los_angeles': { lat: 34.0522, lng: -118.2437 }
       };
       let closest = 'san_francisco';
       let minDist = Infinity;
@@ -1352,7 +1425,7 @@ def get_dashboard_html() -> str:
     async function detectUserDefaultCity() {
       try {
         const saved = sessionStorage.getItem('urban_dev_user_city');
-        if (saved && (saved === 'san_francisco' || saved === 'chicago' || saved === 'nyc')) {
+        if (saved && (saved === 'san_francisco' || saved === 'chicago' || saved === 'nyc' || saved === 'seattle' || saved === 'los_angeles')) {
           return saved;
         }
       } catch (e) {}
@@ -1430,6 +1503,8 @@ def get_dashboard_html() -> str:
       if (!b) {
         if (currentCity === 'san_francisco' || currentCity === 'sf') return 'SAN_FRANCISCO_CORE';
         if (currentCity === 'chicago') return 'Central / Downtown';
+        if (currentCity === 'seattle') return 'SEATTLE_CORE';
+        if (currentCity === 'los_angeles') return 'CENTRAL_LA';
         return 'Manhattan';
       }
       const clean = b.toString().trim();
@@ -1450,6 +1525,16 @@ def get_dashboard_html() -> str:
       if (upper === 'PENINSULA') return 'PENINSULA';
       if (upper === 'SILICONVALLEYSOUTHBAY' || upper === 'SILICONVALLEY' || upper === 'SOUTHBAY') return 'SILICON_VALLEY_SOUTH_BAY';
       if (upper === 'MARINNORTHBAY' || upper === 'MARIN' || upper === 'NORTHBAY') return 'MARIN_NORTH_BAY';
+      if (upper === 'SEATTLECORE') return 'SEATTLE_CORE';
+      if (upper === 'NORTHKING') return 'NORTH_KING';
+      if (upper === 'EASTSIDE') return 'EASTSIDE';
+      if (upper === 'SOUTHKING') return 'SOUTH_KING';
+      if (upper === 'CENTRALLA') return 'CENTRAL_LA';
+      if (upper === 'WESTSIDE') return 'WESTSIDE';
+      if (upper === 'SANFERNANDOVALLEY' || upper === 'SFV') return 'SAN_FERNANDO_VALLEY';
+      if (upper === 'HARBORSOUTHBAY') return 'HARBOR_SOUTH_BAY';
+      if (upper === 'SOUTHLA') return 'SOUTH_LA';
+      if (upper === 'EASTSIDESGV') return 'EASTSIDE_SGV';
       return clean;
     }
 
@@ -2478,7 +2563,30 @@ def get_dashboard_html() -> str:
       if (!lat || !lng) {
         if (currentCity === 'san_francisco' || currentCity === 'sf') return 'SAN_FRANCISCO_CORE';
         if (currentCity === 'chicago') return 'Central / Downtown';
+        if (currentCity === 'seattle') return 'SEATTLE_CORE';
+        if (currentCity === 'los_angeles') return 'CENTRAL_LA';
         return 'Manhattan';
+      }
+      if (currentCity === 'seattle') {
+        // SEATTLE_METRO_BBOX guard: min_lat 47.28 max_lat 47.78 min_lng -122.43 max_lng -122.00
+        if (lat >= 47.28 && lat <= 47.78 && lng >= -122.43 && lng <= -122.00) {
+          if (lat >= 47.645 && lat <= 47.745 && lng >= -122.425 && lng <= -122.280) return 'NORTH_KING';
+          if (lat >= 47.500 && lat <= 47.770 && lng >= -122.260 && lng <= -122.010) return 'EASTSIDE';
+          if (lat >= 47.290 && lat <= 47.590 && lng >= -122.420 && lng <= -122.150) return 'SOUTH_KING';
+        }
+        return 'SEATTLE_CORE';
+      }
+      if (currentCity === 'los_angeles') {
+        // LA_METRO_BBOX guard: min_lat 33.7 max_lat 34.34 min_lng -118.63 max_lng -117.95
+        if (lat >= 33.7 && lat <= 34.34 && lng >= -118.63 && lng <= -117.95) {
+          if (lat >= 34.14 && lat <= 34.34 && lng >= -118.63 && lng <= -118.28) return 'SAN_FERNANDO_VALLEY';
+          if (lat >= 33.98 && lat <= 34.12 && lng >= -118.56 && lng <= -118.35) return 'WESTSIDE';
+          if (lat >= 33.7 && lat <= 33.9 && lng >= -118.45 && lng <= -118.1) return 'HARBOR_SOUTH_BAY';
+          if (lat >= 33.9 && lat <= 34.03 && lng >= -118.38 && lng <= -118.2) return 'SOUTH_LA';
+          if (lat >= 34.03 && lat <= 34.14 && lng >= -118.35 && lng <= -118.2) return 'CENTRAL_LA';
+          if (lat >= 34.03 && lat <= 34.2 && lng >= -118.28 && lng <= -117.95) return 'EASTSIDE_SGV';
+          return 'CENTRAL_LA';
+        }
       }
       if (lat >= 37.0 && lat <= 38.5 && lng >= -123.0 && lng <= -121.5) {
         if (lat >= 37.835 && lng <= -122.35) return 'MARIN_NORTH_BAY';

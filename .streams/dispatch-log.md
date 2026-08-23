@@ -18,3 +18,14 @@ durable artifact ÷ streams dispatched.
 **Yield at takeover:** 0.33 (1 of 3). **Torn-write exposure:** breached until
 takeover repair; duration unknown — no CI signal existed to date it.
 Full post-mortem: `docs/adr/0001-agent-interlock.md` sections 1 and 7.
+
+## 2026-08-23 — dashboard city wiring (Seattle / Los Angeles)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| dashboard-seattle | `.streams/dashboard-seattle.md` (spec only) | none — target `src/serving/dashboard.py` held by integrator | ~12:20 PT | completed | spec (applied same day) |
+| dashboard-los-angeles | `.streams/dashboard-los_angeles.md` (spec only) | none — same shared-file hold | ~12:20 PT | completed | spec (applied same day) |
+| interlock (orchestrator) | apply both specs serially + verify + sync `workers/public/index.html` | n/a | ~12:30 PT | completed | dashboard edit, worker static copy |
+
+**Yield:** 2 of 2 leaf streams. Shared file edited once, serially, after both
+specs landed — no concurrent write to `dashboard.py`.
