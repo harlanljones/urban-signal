@@ -44,6 +44,103 @@ Traditional real estate valuation models rely on lagging transactional comps (de
 
 Partial registrations are deliberate: cities register only feeds that exist, and `get_dataset` raises a readable error for the rest (`src/spatial/city_registry.py`). Adding a city is leaf work — see `docs/research/city-expansion-candidates.md` for the next candidates (New Orleans, Austin).
 
+### Architecture Flow
+
+```mermaid
+flowchart TD
+
+subgraph group_ingestion["Municipal Ingestion"]
+  node_city_registry["City registry<br/>city boundary<br/>[city_registry.py]"]
+  node_municipal_sources(("Socrata &amp; ArcGIS<br/>external data APIs<br/>[socrata_client.py]"))
+  node_producers["Municipal producers<br/>ingestion workers<br/>[base_producer.py]"]
+  node_avro_contracts["Avro contracts<br/>event schemas"]
+end
+
+subgraph group_streaming["Kafka Pipeline"]
+  node_kafka["Kafka topics<br/>event backbone<br/>[kafka-topics.yaml]"]
+  node_spatial_worker["Spatial enrichment<br/>Kafka worker"]
+  node_feature_worker["Feature aggregation<br/>Kafka worker"]
+  node_postgis_worker["PostGIS sync worker<br/>Kafka worker<br/>[postgis_worker.py]"]
+  node_keda{{"KEDA autoscaling<br/>consumer scaling"}}
+end
+
+subgraph group_spatial["Spatial Features"]
+  node_h3_context["H3 &amp; submarkets<br/>spatial context<br/>[graph_builder.py]"]
+  node_feature_pipeline["Feature pipeline<br/>feature engineering<br/>[pipeline.py]"]
+end
+
+subgraph group_ml["Training &amp; Storage"]
+  node_postgis[("PostGIS<br/>spatial system of record<br/>[postgis_sync.py]")]
+  node_object_store[("MinIO/S3 artifacts<br/>feature and model storage")]
+  node_retraining["Retraining job<br/>model orchestration<br/>[retraining_job.py]"]
+  node_horizon_models["Horizon models<br/>forecast models<br/>[trainer.py]"]
+  node_onnx_export["ONNX export<br/>model packaging<br/>[export_onnx.py]"]
+end
+
+subgraph group_delivery["Serving &amp; Edge"]
+  node_fastapi["FastAPI service<br/>prediction API<br/>[app.py]"]
+  node_snapshots["Snapshot builder<br/>edge export"]
+  node_cloudflare_worker{{"Cloudflare Worker<br/>edge API<br/>[index.ts]"}}
+end
+
+node_city_registry -->|"supported feeds"| node_producers
+node_municipal_sources -->|"city records"| node_producers
+node_producers -->|"typed events"| node_avro_contracts
+node_avro_contracts -->|"raw topics"| node_kafka
+node_kafka -->|"raw events"| node_spatial_worker
+node_spatial_worker -->|"H3 assignment"| node_h3_context
+node_spatial_worker -->|"enriched events"| node_kafka
+node_kafka -->|"enriched stream"| node_feature_worker
+node_h3_context -->|"cell context"| node_feature_pipeline
+node_feature_worker -->|"event windows"| node_feature_pipeline
+node_feature_pipeline -->|"features and alerts"| node_kafka
+node_kafka -->|"raw and feature topics"| node_postgis_worker
+node_postgis_worker -->|"durable sync"| node_postgis
+node_keda -.->|"scales"| node_spatial_worker
+node_keda -.->|"scales"| node_feature_worker
+node_postgis -->|"historical data"| node_retraining
+node_object_store -->|"feature partitions"| node_retraining
+node_retraining -->|"validated training"| node_horizon_models
+node_horizon_models -->|"trained models"| node_onnx_export
+node_onnx_export -->|"ONNX artifacts"| node_object_store
+node_object_store -->|"model artifacts"| node_fastapi
+node_postgis -->|"grid and catalog queries"| node_fastapi
+node_postgis -->|"queryable data"| node_snapshots
+node_snapshots -->|"precomputed snapshots"| node_object_store
+node_object_store -->|"edge snapshots"| node_cloudflare_worker
+
+click node_city_registry "https://github.com/harlanljones/urban-signal/blob/main/src/spatial/city_registry.py"
+click node_municipal_sources "https://github.com/harlanljones/urban-signal/blob/main/src/producers/socrata_client.py"
+click node_producers "https://github.com/harlanljones/urban-signal/blob/main/src/producers/base_producer.py"
+click node_kafka "https://github.com/harlanljones/urban-signal/blob/main/deploy/k8s/kafka/kafka-topics.yaml"
+click node_spatial_worker "https://github.com/harlanljones/urban-signal/blob/main/src/consumers/spatial_enrichment_worker.py"
+click node_feature_worker "https://github.com/harlanljones/urban-signal/blob/main/src/consumers/feature_aggregation_worker.py"
+click node_postgis_worker "https://github.com/harlanljones/urban-signal/blob/main/src/consumers/postgis_worker.py"
+click node_keda "https://github.com/harlanljones/urban-signal/blob/main/deploy/k8s/consumers/keda-scaledobject.yaml"
+click node_h3_context "https://github.com/harlanljones/urban-signal/blob/main/src/spatial/graph_builder.py"
+click node_feature_pipeline "https://github.com/harlanljones/urban-signal/blob/main/src/features/pipeline.py"
+click node_postgis "https://github.com/harlanljones/urban-signal/blob/main/src/storage/postgis_sync.py"
+click node_retraining "https://github.com/harlanljones/urban-signal/blob/main/src/models/retraining_job.py"
+click node_horizon_models "https://github.com/harlanljones/urban-signal/blob/main/src/models/trainer.py"
+click node_onnx_export "https://github.com/harlanljones/urban-signal/blob/main/src/models/export_onnx.py"
+click node_fastapi "https://github.com/harlanljones/urban-signal/blob/main/src/serving/app.py"
+click node_snapshots "https://github.com/harlanljones/urban-signal/blob/main/src/export/snapshot_builder.py"
+click node_cloudflare_worker "https://github.com/harlanljones/urban-signal/blob/main/workers/src/index.ts"
+
+classDef toneNeutral fill:#f8fafc,stroke:#334155,stroke-width:1.5px,color:#0f172a
+classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
+classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
+classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
+classDef toneIndigo fill:#e0e7ff,stroke:#4f46e5,stroke-width:1.5px,color:#312e81
+classDef toneTeal fill:#ccfbf1,stroke:#0f766e,stroke-width:1.5px,color:#134e4a
+class node_city_registry,node_municipal_sources,node_producers,node_avro_contracts toneBlue
+class node_kafka,node_spatial_worker,node_feature_worker,node_postgis_worker,node_keda toneAmber
+class node_h3_context,node_feature_pipeline toneMint
+class node_postgis,node_object_store,node_retraining,node_horizon_models,node_onnx_export toneRose
+class node_fastapi,node_snapshots,node_cloudflare_worker toneIndigo
+```
+
 ```
 +---------------------------------------------------------------------------------------------------+
 |              MUNICIPAL OPEN DATA INGESTION (Socrata SODA REST + ArcGIS FeatureServer)             |
