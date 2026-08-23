@@ -35,6 +35,18 @@ from src.spatial.cities.seattle import (
     SEATTLE_METRO_BBOX,
     SEATTLE_SUBMARKETS,
 )
+from src.spatial.cities.new_orleans import (
+    NEW_ORLEANS_METRO_BBOX,
+    NOLA_DIVISION_BBOXES,
+    NOLA_DIVISIONS,
+    NOLA_SUBMARKETS,
+)
+from src.spatial.cities.norfolk import (
+    NORFOLK_DIVISION_BBOXES,
+    NORFOLK_DIVISIONS,
+    NORFOLK_METRO_BBOX,
+    NORFOLK_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -53,6 +65,8 @@ class CityId(str, Enum):
     SAN_FRANCISCO = "san_francisco"
     SEATTLE = "seattle"
     LOS_ANGELES = "los_angeles"
+    NEW_ORLEANS = "new_orleans"
+    NORFOLK = "norfolk"
 
 
 class FeedType(str, Enum):
@@ -162,6 +176,21 @@ ALIASES: Dict[str, CityId] = {
     "glendale": CityId.LOS_ANGELES,
     "south_bay": CityId.LOS_ANGELES,
     "san_fernando_valley": CityId.LOS_ANGELES,
+
+    # New Orleans & Orleans Parish
+    "new_orleans": CityId.NEW_ORLEANS,
+    "new-orleans": CityId.NEW_ORLEANS,
+    "new orleans": CityId.NEW_ORLEANS,
+    "nola": CityId.NEW_ORLEANS,
+    "orleans_parish": CityId.NEW_ORLEANS,
+    "orleans-parish": CityId.NEW_ORLEANS,
+    "orleans parish": CityId.NEW_ORLEANS,
+
+    # Norfolk & Hampton Roads
+    "norfolk": CityId.NORFOLK,
+    "norfolk_va": CityId.NORFOLK,
+    "norfolk-va": CityId.NORFOLK,
+    "norfolk va": CityId.NORFOLK,
 }
 
 
@@ -439,6 +468,166 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
+            ),
+        },
+    ),
+    CityId.NEW_ORLEANS: CityRegistration(
+        city_id=CityId.NEW_ORLEANS,
+        name="New Orleans Metro",
+        state="LA",
+        center={"lat": 29.9511, "lng": -90.0715},
+        metro_bbox=NEW_ORLEANS_METRO_BBOX,
+        division_bboxes=NOLA_DIVISION_BBOXES,
+        submarkets=NOLA_SUBMARKETS,
+        divisions=NOLA_DIVISIONS,
+        job_suffix="nola",
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.socrata_nola_permits_endpoint,
+                platform="socrata",
+                watermark_col="issuedate",
+                id_keys=["numstring", "prmtid", "objectid", "id"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                # NOLA permits spell everything their own way; `pin` exists on
+                # the feed but is a parcel number — deliberately kept out of
+                # the job-id chain. See src/producers/field_maps.py.
+                extra={
+                    "field_map": {
+                        "job_id": ["numstring"],
+                        "latitude": ["location_1.latitude"],
+                        "longitude": ["location_1.longitude"],
+                        "cost": ["constrval"],
+                        "job_type": ["type"],
+                        "issuance_date": ["issuedate"],
+                        "filing_date": ["filingdate"],
+                        "status": ["currentstatus"],
+                        "borough": ["subdivision"],
+                    }
+                },
+            ),
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.socrata_nola_311_endpoint,
+                platform="socrata",
+                watermark_col="date_created",
+                id_keys=["service_request", "rowid", "id"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                extra={
+                    "field_map": {
+                        "incident_id": ["service_request", "rowid"],
+                        "created_date": ["date_created"],
+                        "closed_date": ["case_close_date"],
+                        "descriptor": ["request_reason"],
+                        "incident_address": ["final_address"],
+                        "borough": ["address_councildis"],
+                    }
+                },
+            ),
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.socrata_nola_licenses_endpoint,
+                platform="socrata",
+                watermark_col="businessstartdate",
+                id_keys=["businesslicensenumber", "id"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                # ~18% of rows sit outside the parish (metro-bbox filtering
+                # drops them) and some businessstartdate values are future-
+                # dated (max seen 2027-02-27) — tolerated, not treated as now.
+                extra={
+                    "field_map": {
+                        "license_id": ["businesslicensenumber"],
+                        "effective_date": ["businessstartdate"],
+                        "license_type": ["businesstype"],
+                        "dba": ["businessname"],
+                        "premises_name": ["ownername"],
+                    }
+                },
+            ),
+            # NORA Sold Properties is the Redevelopment Authority's own
+            # disposals, NOT a general recorded-deeds feed — it under-counts
+            # ordinary market transactions and carries no price column
+            # (document_amount parses to 0.0 by design). Registered with that
+            # caveat, like King County parcel sales for Seattle.
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.socrata_nola_deeds_endpoint,
+                platform="socrata",
+                watermark_col="sale_date",
+                id_keys=["identifier", "geopin", "id"],
+                topic=settings.topic_deeds,
+                interval_seconds=600.0,
+                producer_key="deeds",
+                extra={
+                    "field_map": {
+                        "doc_id": ["identifier"],
+                        "bbl": ["geopin"],
+                        "latitude": ["geocoded_column.latitude"],
+                        "longitude": ["geocoded_column.longitude"],
+                        "doc_type": ["disposition_channel"],
+                        "borough": ["council_district"],
+                    }
+                },
+            ),
+        },
+    ),
+    CityId.NORFOLK: CityRegistration(
+        city_id=CityId.NORFOLK,
+        name="Norfolk",
+        state="VA",
+        center={"lat": 36.8508, "lng": -76.2859},
+        metro_bbox=NORFOLK_METRO_BBOX,
+        division_bboxes=NORFOLK_DIVISION_BBOXES,
+        submarkets=NORFOLK_SUBMARKETS,
+        divisions=NORFOLK_DIVISIONS,
+        job_suffix="norfolk",
+        # Partial registration like Los Angeles: MyNorfolk 311 (`nbyu-xjez`)
+        # locates cases with an address STRING and the business-license feed
+        # (`dpi6-sct5`) has no geometry at all — both need an address-geocoding
+        # capability before they can produce H3-keyed events. Deferred rather
+        # than registered shapeless.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.socrata_norfolk_permits_endpoint,
+                platform="socrata",
+                watermark_col="issue_date",
+                id_keys=["permit_number", "gpin", "tax_account", "id"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                # Scheduled (future-dated) filings appear on this feed (max
+                # seen 2027-01-27) — tolerated as watermark skew.
+                extra={
+                    "field_map": {
+                        "cost": ["project_cost"],
+                        "filing_date": ["application_date"],
+                        # work_type before type: bare "Building" classifies to
+                        # OT; the NB/A2 signal lives in work_type.
+                        "job_type": ["work_type", "type"],
+                    }
+                },
+            ),
+            # Property Assessment and Sales publishes one dataset per fiscal
+            # year (FY23...FY27). Rotate the endpoint each July — the new FY
+            # file is a different resource ID. Rows carry no coordinates:
+            # events are null-lat/lng/null-H3 like Cook County sales, keyed on
+            # document_number + GPIN.
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.socrata_norfolk_deeds_endpoint,
+                platform="socrata",
+                watermark_col="transfer_date",
+                id_keys=["document_number", "lrsn", "gpin", "id"],
+                topic=settings.topic_deeds,
+                interval_seconds=600.0,
+                producer_key="deeds",
+                extra={
+                    "field_map": {
+                        "doc_id": ["document_number"],
+                        "bbl": ["gpin", "parcel_id"],
+                    }
+                },
             ),
         },
     ),

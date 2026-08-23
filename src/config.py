@@ -130,6 +130,34 @@ class Settings(BaseSettings):
         description="LA Office of Finance Listing of Active Businesses endpoint",
     )
 
+    # New Orleans (Socrata)
+    socrata_nola_permits_endpoint: str = Field(
+        default="https://data.nola.gov/resource/rcm3-fn58.json",
+        description="NOLA Building Permits (2012-present, supersedes nbcf-m6c2) endpoint",
+    )
+    socrata_nola_311_endpoint: str = Field(
+        default="https://data.nola.gov/resource/2jgv-pqrq.json",
+        description="NOLA 311 OPCD Calls endpoint",
+    )
+    socrata_nola_licenses_endpoint: str = Field(
+        default="https://data.nola.gov/resource/hjcd-grvu.json",
+        description="NOLA Occupational Business Licenses endpoint",
+    )
+    socrata_nola_deeds_endpoint: str = Field(
+        default="https://data.nola.gov/resource/hpm5-48nj.json",
+        description="NORA Sold Properties (redevelopment disposals, not market deeds) endpoint",
+    )
+
+    # Norfolk (Socrata)
+    socrata_norfolk_permits_endpoint: str = Field(
+        default="https://data.norfolk.gov/resource/fahm-yuh4.json",
+        description="Norfolk Permits endpoint",
+    )
+    socrata_norfolk_deeds_endpoint: str = Field(
+        default="https://data.norfolk.gov/resource/qva7-tzrf.json",
+        description="Norfolk Property Assessment and Sales FY27 endpoint (rotate ID each July)",
+    )
+
     # PostgreSQL / PostGIS Database
     postgres_host: str = Field(default="localhost")
     postgres_port: int = Field(default=5432)

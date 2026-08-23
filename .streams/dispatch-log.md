@@ -68,6 +68,29 @@ point). Uncommitted per local git policy — user commits.
 override per city — so NOLA/Austin implementation (wave C1) is geography
 modules plus mapping-table entries with zero parser edits.
 
+## 2026-08-23 — wave C1 city registrations (New Orleans / Norfolk)
+
+Per `docs/expansion-roadmap.md` §3. Pre-dispatch: all six registering datasets
+re-probed live (fresh rows confirmed); two scope corrections vs the sweep —
+Norfolk permits `fahm-yuh4` DOES carry direct lat/lng (registers), Norfolk 311
+`nbyu-xjez` location is an address STRING and licenses `dpi6-sct5` have no
+geometry (both DEFERRED until an address-geocoding capability exists; roadmap
+C1 target adjusts 8→6 feeds). Projected spine share ~10% (≤20% gate).
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-new-orleans | `src/spatial/cities/new_orleans.py`, `tests/unit/test_producers_new_orleans.py` | config.py, city_registry.py, cities/__init__.py | ~16:00 PT | completed — 9 divisions / 21 submarkets; 4 feeds registered via field maps; 311 watermark corrected to `date_created` (survey wrong) |
+| city-norfolk | `src/spatial/cities/norfolk.py`, `tests/unit/test_producers_norfolk.py` | config.py, city_registry.py, cities/__init__.py | ~16:00 PT | completed — 5 divisions / 13 submarkets; PERMITS+DEEDS registered; 311/licenses deferred (no geometry) |
+
+**Yield:** 2 of 2. Spine share ~10% as projected. Gates: interlock 17/17,
+city suites 67/67, full suite **318/318**. One interlock-review correction:
+Norfolk job_type map order flipped to `["work_type", "type"]` — bare "Building"
+classified OT and buried the NB/A2 signal. Obsolete xfail-until-spine markers
+stripped from both test files once the maps landed (now hard assertions).
+README coverage table + selector copy updated by integrator (dashboard
+`src/serving/dashboard.py` + workers static copy still pending for the two new
+cities — same shared-file hold pattern as the 2026-08-23 dashboard dispatch).
+
 **Yield:** 5 of 5 leaf streams (all durable artifacts written). Commit
 deviation amended: `git commit` is denied by local permission policy, so the
 orchestrator could not serially commit stream artifacts as planned above —

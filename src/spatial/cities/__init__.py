@@ -15,6 +15,20 @@ from src.spatial.cities.los_angeles import (
     is_in_la_metro,
     is_in_los_angeles_metro,
 )
+from src.spatial.cities.new_orleans import (
+    NEW_ORLEANS_METRO_BBOX,
+    NOLA_DIVISION_BBOXES,
+    NOLA_DIVISIONS,
+    NOLA_SUBMARKETS,
+    is_in_new_orleans_metro,
+)
+from src.spatial.cities.norfolk import (
+    NORFOLK_DIVISION_BBOXES,
+    NORFOLK_DIVISIONS,
+    NORFOLK_METRO_BBOX,
+    NORFOLK_SUBMARKETS,
+    is_in_norfolk_metro,
+)
 from src.spatial.cities.san_francisco import (
     SAN_FRANCISCO_DIVISION_BBOXES,
     SAN_FRANCISCO_DIVISIONS,
@@ -62,4 +76,14 @@ __all__ = [
     "LA_SUBMARKETS",
     "is_in_la_metro",
     "is_in_los_angeles_metro",
+    "NEW_ORLEANS_METRO_BBOX",
+    "NOLA_DIVISION_BBOXES",
+    "NOLA_DIVISIONS",
+    "NOLA_SUBMARKETS",
+    "is_in_new_orleans_metro",
+    "NORFOLK_METRO_BBOX",
+    "NORFOLK_DIVISION_BBOXES",
+    "NORFOLK_DIVISIONS",
+    "NORFOLK_SUBMARKETS",
+    "is_in_norfolk_metro",
 ]

@@ -20,13 +20,13 @@
 | :---: | :---: |
 | ![NYC Dashboard](docs/screenshots/dashboard-nyc.png) | ![Chicago Dashboard](docs/screenshots/dashboard-chicago.png) |
 
-The city selector ships **all five registered metros** — San Francisco Bay Area, New York City, Chicago, Seattle Metro (4 Divisions), and Los Angeles Metro (6 Divisions) — with per-division camera presets, map-click → division resolution, and geolocation-based default-city detection.
+The city selector ships **all seven registered metros** — San Francisco Bay Area, New York City, Chicago, Seattle Metro (4 Divisions), Los Angeles Metro (6 Divisions), New Orleans Metro (9 Divisions), and Norfolk (5 Divisions) — with per-division camera presets, map-click → division resolution, and geolocation-based default-city detection.
 
 ---
 
 ## 1. System Overview & Architecture
 
-Traditional real estate valuation models rely on lagging transactional comps (deeds, MLS closed transfers). **Urban Signal** ingests leading municipal telemetry—daily building permits (DOB A1/A2/NB / Demolitions), Liquor / Hospitality Licenses, 311 citizen maintenance & quality-of-life complaints, and property deeds / tax rolls across five registered metros—streaming them through Apache Kafka onto an **Uber H3 multi-resolution hexagonal grid** (Res 7, 8, 9) to predict appreciation ($\\Delta \\ln(P)$) **6 to 18 months ahead of public market listings**.
+Traditional real estate valuation models rely on lagging transactional comps (deeds, MLS closed transfers). **Urban Signal** ingests leading municipal telemetry—daily building permits (DOB A1/A2/NB / Demolitions), Liquor / Hospitality Licenses, 311 citizen maintenance & quality-of-life complaints, and property deeds / tax rolls across seven registered metros—streaming them through Apache Kafka onto an **Uber H3 multi-resolution hexagonal grid** (Res 7, 8, 9) to predict appreciation ($\\Delta \\ln(P)$) **6 to 18 months ahead of public market listings**.
 
 ### Registered Cities & Feeds
 
@@ -37,6 +37,8 @@ Traditional real estate valuation models rely on lagging transactional comps (de
 | San Francisco Bay Area (5 Divisions) | SAN_FRANCISCO_CORE, EAST_BAY, PENINSULA, SILICON_VALLEY_SOUTH_BAY, MARIN_NORTH_BAY | Socrata | Socrata | Socrata | Socrata (Assessor) |
 | Seattle Metro (4 Divisions) | SEATTLE_CORE, NORTH_KING, EASTSIDE, SOUTH_KING | Socrata | Socrata | Socrata (WA LCB) | ArcGIS (King County parcel sales) |
 | Los Angeles Metro (6 Divisions) | CENTRAL_LA, WESTSIDE, SAN_FERNANDO_VALLEY, HARBOR_SOUTH_BAY, SOUTH_LA, EASTSIDE_SGV | Socrata | Socrata (MyLA311) | Socrata | — no open endpoint |
+| New Orleans Metro (9 Divisions) | CBD_FRENCH_QUARTER, BYWATER_MARIGNY, UPTOWN_CARROLLTON, MID_CITY, LAKEVIEW_GENTILLY, NEW_ORLEANS_EAST, WEST_BANK_ALGIERS, JEFFERSON_METAIRIE_KENNER, ST_BERNARD_CHALMETTE | Socrata | Socrata | Socrata | Socrata (NORA disposals — no price column) |
+| Norfolk (5 Divisions) | DOWNTOWN_WATERFRONT, GHENT_WESTBURG, OCEAN_VIEW, CENTRAL_MILITARY_CIRCLE, SOUTH_NORFOLK_BERKLEY | Socrata | — address-only feed | — no geometry | Socrata (FY sales; rotate ID each July) |
 
 Partial registrations are deliberate: cities register only feeds that exist, and `get_dataset` raises a readable error for the rest (`src/spatial/city_registry.py`). Adding a city is leaf work — see `docs/research/city-expansion-candidates.md` for the next candidates (New Orleans, Austin).
 
@@ -327,7 +329,7 @@ Exposes real-time Prometheus telemetry including `prediction_requests_total`, `c
 
 ### Interactive Geospatial Dashboard
 `GET /dashboard` or `GET /` (with `Accept: text/html`)
-Serves the hardened, high-performance **MapLibre GL** web visualizer featuring multi-city selection across all five registered metros (San Francisco, NYC, Chicago, Seattle, Los Angeles), submarket filtering, H3 hexagon inspection, LIMS heatmaps, and SHAP attribution waterfall charts.
+Serves the hardened, high-performance **MapLibre GL** web visualizer featuring multi-city selection across all seven registered metros (San Francisco, NYC, Chicago, Seattle, Los Angeles, New Orleans, Norfolk), submarket filtering, H3 hexagon inspection, LIMS heatmaps, and SHAP attribution waterfall charts.
 
 The same UI is mirrored as a static asset on the Cloudflare Worker (`workers/`), where `/api/v1/*` is answered from a precomputed Workers KV snapshot (built by `src/export/snapshot_builder.py`). The FastAPI service and the edge snapshot both serve all five cities.
 
