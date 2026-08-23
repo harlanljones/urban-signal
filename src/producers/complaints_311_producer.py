@@ -76,25 +76,40 @@ class Complaints311Producer:
             ):
                 resolved_city = "san_francisco"
             elif (
+                "sr_number" in row
+                and (
+                    "sr_type" in row
+                    or "sr_short_code" in row
+                    or "ward" in row
+                    or "police_sector" in row
+                    or "community_area" in row
+                )
+            ):
+                # Chicago 311. `sr_number` alone is not distinctive enough:
+                # Austin's feed carries it too, so a corroborating Chicago-only
+                # marker (its schema's sr_type/ward/community_area family) is
+                # required before claiming the row.
+                resolved_city = "chicago"
+            elif (
                 "casenumber" in row
                 or "srnumber" in row
                 or "department_name__c" in row
             ):
-                # LA MyLA311. Checked after SF: no column collides with the SF
-                # keys, but `casenumber`/`srnumber` must not fall through to
-                # the NYC default. The 2026 "Cases" schema uses `casenumber`;
-                # the 2015-2024 yearly backfills use `srnumber`.
+                # LA MyLA311. No column collides with the SF or Chicago keys;
+                # the 2026 "Cases" schema uses `casenumber`, the 2015-2024
+                # yearly backfills use `srnumber`.
                 resolved_city = "los_angeles"
-            elif "sr_number" in row or "sr_type" in row:
-                resolved_city = "chicago"
             else:
                 resolved_city = "nyc"
 
+            from src.producers.field_maps import first_mapped, resolve_field_map
+
+            field_map = resolve_field_map(resolved_city, FeedType.COMPLAINTS_311)
+
             incident_id = str(
-                row.get("service_request_id")
-                or row.get("casenumber")
+                first_mapped(row, field_map, "incident_id")
+                or row.get("service_request_id")
                 or row.get("sr_number")
-                or row.get("srnumber")
                 or row.get("unique_key")
                 or row.get("service_request_number")
                 or row.get("id")
@@ -104,10 +119,12 @@ class Complaints311Producer:
                 return None
 
             lat_raw = (
-                row.get("geolocation__latitude__s") or row.get("latitude") or row.get("lat")
+                first_mapped(row, field_map, "latitude")
+                or row.get("latitude")
+                or row.get("lat")
             )
             lng_raw = (
-                row.get("geolocation__longitude__s")
+                first_mapped(row, field_map, "longitude")
                 or row.get("longitude")
                 or row.get("lng")
                 or row.get("long")
@@ -138,12 +155,12 @@ class Complaints311Producer:
             h3_res = self.spatial_indexer.get_multi_res_hierarchy(lat, lng)
 
             complaint_type = (
-                row.get("service_name")
+                first_mapped(row, field_map, "complaint_type")
+                or row.get("service_name")
                 or row.get("service_details")
                 or row.get("service_subtype")
                 or row.get("sr_type")
                 or row.get("complaint_type")
-                or row.get("requesttype")
                 or row.get("request_type")
                 or row.get("type")
                 or "Unknown"
@@ -160,17 +177,17 @@ class Complaints311Producer:
             )
 
             created_str = (
-                row.get("requested_datetime")
+                first_mapped(row, field_map, "created_date")
+                or row.get("requested_datetime")
                 or row.get("created_date")
-                or row.get("createddate")
                 or row.get("create_date")
                 or row.get("created_at")
             )
             created_dt = _parse_datetime(created_str) or datetime.now(timezone.utc)
 
             closed_str = (
-                row.get("closed_date")
-                or row.get("closeddate")
+                first_mapped(row, field_map, "closed_date")
+                or row.get("closed_date")
                 or row.get("closed_datetime")
                 or row.get("updated_datetime")
                 or row.get("completion_date")
@@ -179,9 +196,9 @@ class Complaints311Producer:
             closed_dt = _parse_datetime(closed_str)
 
             borough_val = (
-                row.get("neighborhoods_sffind_boundaries")
+                first_mapped(row, field_map, "borough")
+                or row.get("neighborhoods_sffind_boundaries")
                 or row.get("analysis_neighborhood")
-                or row.get("locator_sr_neigborhood_council")
                 or row.get("neighborhood")
                 or row.get("supervisor_district")
                 or row.get("borough")
@@ -198,8 +215,8 @@ class Complaints311Producer:
             )
 
             zipcode = str(
-                row.get("zipcode")
-                or row.get("zipcode__c")
+                first_mapped(row, field_map, "zipcode")
+                or row.get("zipcode")
                 or row.get("zip_code")
                 or row.get("postal_code")
                 or row.get("incident_zip")

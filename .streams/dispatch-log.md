@@ -58,6 +58,16 @@ at close-out** instead of the streams committing mid-flight.
 write window (interlock gate run immediately after edits, before any commit
 point). Uncommitted per local git policy — user commits.
 
+## 2026-08-23 — wave B field-mapping refactor (single stream holding the interlock)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| wave-b-field-maps | `src/producers/field_maps.py` (new), `tests/unit/test_field_maps.py` | city_registry.py + all four producers | ~15:10 PT | completed — gates green (`pytest -m interlock` 17/17, full suite 251/251) | Per-city `DatasetSpec.extra["field_map"]` mechanism in all four parsers; LA MyLA311 spellings migrated out of shared chains into the registry entry as proof; 311 `sr_number`⇒chicago sniff tightened (Austin no longer trips it) |
+
+**Yield:** 1 of 1. Refactor stayed additive — chains remain defaults, maps
+override per city — so NOLA/Austin implementation (wave C1) is geography
+modules plus mapping-table entries with zero parser edits.
+
 **Yield:** 5 of 5 leaf streams (all durable artifacts written). Commit
 deviation amended: `git commit` is denied by local permission policy, so the
 orchestrator could not serially commit stream artifacts as planned above —

@@ -89,8 +89,13 @@ class SLALicensesProducer:
             else:
                 resolved_city = "nyc"
 
+            from src.producers.field_maps import first_mapped, resolve_field_map
+
+            field_map = resolve_field_map(resolved_city, FeedType.SLA)
+
             license_id = str(
-                row.get("location_id")
+                first_mapped(row, field_map, "license_id")
+                or row.get("location_id")
                 or row.get("location_account")
                 or row.get("certificate_number")
                 or row.get("business_account_number")
@@ -106,8 +111,16 @@ class SLALicensesProducer:
             if not license_id:
                 return None
 
-            lat_raw = row.get("latitude") or row.get("lat")
-            lng_raw = row.get("longitude") or row.get("lng")
+            lat_raw = (
+                first_mapped(row, field_map, "latitude")
+                or row.get("latitude")
+                or row.get("lat")
+            )
+            lng_raw = (
+                first_mapped(row, field_map, "longitude")
+                or row.get("longitude")
+                or row.get("lng")
+            )
             if not lat_raw or not lng_raw:
                 loc = (
                     row.get("business_location")
@@ -141,7 +154,8 @@ class SLALicensesProducer:
             h3_res = self.spatial_indexer.get_multi_res_hierarchy(lat, lng)
 
             effective_str = (
-                row.get("business_start_date")
+                first_mapped(row, field_map, "effective_date")
+                or row.get("business_start_date")
                 or row.get("location_start_date")
                 or row.get("date_issued")
                 or row.get("license_start_date")
@@ -154,7 +168,8 @@ class SLALicensesProducer:
             effective_dt = _parse_datetime(effective_str)
 
             expiration_str = (
-                row.get("location_end_date")
+                first_mapped(row, field_map, "expiration_date")
+                or row.get("location_end_date")
                 or row.get("business_end_date")
                 or row.get("license_term_expiration_date")
                 or row.get("expiration_date")
@@ -163,7 +178,8 @@ class SLALicensesProducer:
             expiration_dt = _parse_datetime(expiration_str)
 
             license_type = (
-                row.get("naics_code_description")
+                first_mapped(row, field_map, "license_type")
+                or row.get("naics_code_description")
                 or row.get("lic_code_description")
                 or row.get("business_description")
                 or row.get("class_code_description")
@@ -208,7 +224,8 @@ class SLALicensesProducer:
             status = row.get("license_status") or row.get("status") or default_status
 
             borough_val = (
-                row.get("neighborhoods_analysis_boundaries")
+                first_mapped(row, field_map, "borough")
+                or row.get("neighborhoods_analysis_boundaries")
                 or row.get("analysis_neighborhood")
                 or row.get("neighborhood")
                 or row.get("supervisor_district")

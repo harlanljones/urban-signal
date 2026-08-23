@@ -412,6 +412,24 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
+                # MyLA311 spells every core column differently from the shared
+                # parser chains. The 2026+ "Cases" schema is Salesforce-derived
+                # (`casenumber`, `geolocation__latitude__s`); the 2015-2024
+                # yearly backfills use `srnumber`/`requesttype`. Declared here
+                # rather than grown into the shared chains — see
+                # src/producers/field_maps.py.
+                extra={
+                    "field_map": {
+                        "incident_id": ["casenumber", "srnumber"],
+                        "latitude": ["geolocation__latitude__s"],
+                        "longitude": ["geolocation__longitude__s"],
+                        "complaint_type": ["requesttype"],
+                        "created_date": ["createddate"],
+                        "closed_date": ["closeddate"],
+                        "zipcode": ["zipcode__c"],
+                        "borough": ["locator_sr_neigborhood_council"],
+                    }
+                },
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.socrata_la_licenses_endpoint,

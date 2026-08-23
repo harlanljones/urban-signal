@@ -81,8 +81,13 @@ class DOBPermitsProducer:
             else:
                 resolved_city = "nyc"
 
+            from src.producers.field_maps import first_mapped, resolve_field_map
+
+            field_map = resolve_field_map(resolved_city, FeedType.PERMITS)
+
             job_id = str(
-                row.get("permit_number")
+                first_mapped(row, field_map, "job_id")
+                or row.get("permit_number")
                 or row.get("permit_nbr")
                 or row.get("permit_")
                 or row.get("job__")
@@ -95,9 +100,15 @@ class DOBPermitsProducer:
             if not job_id:
                 return None
 
-            lat_raw = row.get("latitude") or row.get("lat") or row.get("gis_latitude")
+            lat_raw = (
+                first_mapped(row, field_map, "latitude")
+                or row.get("latitude")
+                or row.get("lat")
+                or row.get("gis_latitude")
+            )
             lng_raw = (
-                row.get("longitude")
+                first_mapped(row, field_map, "longitude")
+                or row.get("longitude")
                 or row.get("lng")
                 or row.get("lon")
                 or row.get("long")
@@ -124,7 +135,8 @@ class DOBPermitsProducer:
 
             # Job Type
             raw_job_type = (
-                row.get("permit_type_definition")
+                first_mapped(row, field_map, "job_type")
+                or row.get("permit_type_definition")
                 or row.get("permit_type")
                 or row.get("job_type")
                 or row.get("filing_type")
@@ -163,7 +175,8 @@ class DOBPermitsProducer:
 
             # Cost
             cost_raw = (
-                row.get("revised_cost")
+                first_mapped(row, field_map, "cost")
+                or row.get("revised_cost")
                 or row.get("estimated_cost")
                 or row.get("reported_cost")
                 or row.get("total_fee")
@@ -180,7 +193,8 @@ class DOBPermitsProducer:
 
             # Filing / issuance dates
             issuance_str = (
-                row.get("issued_date")
+                first_mapped(row, field_map, "issuance_date")
+                or row.get("issued_date")
                 or row.get("issue_date")
                 or row.get("issuance_date")
                 or row.get("first_construction_document_date")
@@ -191,7 +205,8 @@ class DOBPermitsProducer:
             issuance_dt = _parse_datetime(issuance_str)
 
             filing_str = (
-                row.get("filed_date")
+                first_mapped(row, field_map, "filing_date")
+                or row.get("filed_date")
                 or row.get("application_start_date")
                 or row.get("filing_date")
                 or row.get("submitted_date")
@@ -200,7 +215,8 @@ class DOBPermitsProducer:
 
             # Borough / Neighborhood / District / Community Area
             borough_val = (
-                row.get("neighborhoods_analysis_boundaries")
+                first_mapped(row, field_map, "borough")
+                or row.get("neighborhoods_analysis_boundaries")
                 or row.get("analysis_neighborhood")
                 or row.get("neighborhood")
                 or row.get("supervisor_district")
@@ -222,6 +238,7 @@ class DOBPermitsProducer:
             combined_street = " ".join(str(p).strip() for p in street_parts if p and str(p).strip())
             address_street = (
                 combined_street
+                or first_mapped(row, field_map, "address_street")
                 or row.get("street_direction_name")
                 or row.get("street_name")
                 or row.get("address")
@@ -229,11 +246,31 @@ class DOBPermitsProducer:
             )
             address_num = str(row.get("street_number") or row.get("house__") or row.get("house_number") or "") or None
 
-            zipcode = str(row.get("zip_code") or row.get("zipcode") or row.get("postcode") or row.get("zip") or "")
+            zipcode = str(
+                first_mapped(row, field_map, "zipcode")
+                or row.get("zip_code")
+                or row.get("zipcode")
+                or row.get("postcode")
+                or row.get("zip")
+                or ""
+            )
 
-            proposed_units = row.get("proposed_units") or row.get("proposed_dwelling_units")
-            existing_units = row.get("existing_units") or row.get("existing_dwelling_units")
-            proposed_stories = row.get("proposed_stories") or row.get("proposed_no_of_stories") or row.get("number_of_stories")
+            proposed_units = (
+                first_mapped(row, field_map, "proposed_units")
+                or row.get("proposed_units")
+                or row.get("proposed_dwelling_units")
+            )
+            existing_units = (
+                first_mapped(row, field_map, "existing_units")
+                or row.get("existing_units")
+                or row.get("existing_dwelling_units")
+            )
+            proposed_stories = (
+                first_mapped(row, field_map, "proposed_stories")
+                or row.get("proposed_stories")
+                or row.get("proposed_no_of_stories")
+                or row.get("number_of_stories")
+            )
 
             source_neighborhood = str(borough_val) if borough_val is not None else None
             from src.spatial.geo_utils import get_division_for_coordinate
@@ -259,7 +296,13 @@ class DOBPermitsProducer:
                 proposed_stories=int(proposed_stories) if proposed_stories else None,
                 filing_date=filing_dt,
                 issuance_date=issuance_dt,
-                status=row.get("current_status") or row.get("job_status") or row.get("status") or "ISSUED",
+                status=(
+                    first_mapped(row, field_map, "status")
+                    or row.get("current_status")
+                    or row.get("job_status")
+                    or row.get("status")
+                    or "ISSUED"
+                ),
                 h3_res7=h3_res["h3_res7"],
                 h3_res8=h3_res["h3_res8"],
                 h3_res9=h3_res["h3_res9"],

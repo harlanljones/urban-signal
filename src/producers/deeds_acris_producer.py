@@ -99,8 +99,13 @@ class DeedsACRISProducer:
             else:
                 resolved_city = "nyc"
 
+            from src.producers.field_maps import first_mapped, resolve_field_map
+
+            field_map = resolve_field_map(resolved_city, FeedType.DEEDS)
+
             doc_id = str(
-                row.get("ExciseTaxNum")
+                first_mapped(row, field_map, "doc_id")
+                or row.get("ExciseTaxNum")
                 or row.get("parcel_number")
                 or row.get("block_and_lot_number")
                 or row.get("doc_id")
@@ -116,8 +121,19 @@ class DeedsACRISProducer:
             if not doc_id:
                 return None
 
-            lat_raw = row.get("latitude") or row.get("lat") or row.get("gis_latitude")
-            lng_raw = row.get("longitude") or row.get("lng") or row.get("long") or row.get("gis_longitude")
+            lat_raw = (
+                first_mapped(row, field_map, "latitude")
+                or row.get("latitude")
+                or row.get("lat")
+                or row.get("gis_latitude")
+            )
+            lng_raw = (
+                first_mapped(row, field_map, "longitude")
+                or row.get("longitude")
+                or row.get("lng")
+                or row.get("long")
+                or row.get("gis_longitude")
+            )
             if not lat_raw or not lng_raw:
                 loc = (
                     row.get("the_geom")
@@ -143,7 +159,8 @@ class DeedsACRISProducer:
                 h3_res = self.spatial_indexer.get_multi_res_hierarchy(lat, lng)
 
             doc_type = (
-                row.get("property_class_code_definition")
+                first_mapped(row, field_map, "doc_type")
+                or row.get("property_class_code_definition")
                 or row.get("doc_type")
                 or row.get("document_type")
                 or row.get("type_of_deed")
@@ -172,6 +189,7 @@ class DeedsACRISProducer:
                 _parse_val(row.get("total_assessed_value"))
                 or _parse_val(row.get("assessed_value"))
                 or (total_assessed_calc if total_assessed_calc > 0 else 0.0)
+                or _parse_val(first_mapped(row, field_map, "document_amount"))
                 or _parse_val(row.get("document_amt"))
                 or _parse_val(row.get("doc_amount"))
                 or _parse_val(row.get("recorded_amt"))
@@ -183,7 +201,8 @@ class DeedsACRISProducer:
             )
 
             recorded_str = (
-                row.get("recording_date")
+                first_mapped(row, field_map, "recorded_date")
+                or row.get("recording_date")
                 or row.get("transfer_date")
                 or row.get("sale_date")
                 or row.get("assessment_date")
@@ -200,7 +219,8 @@ class DeedsACRISProducer:
             recorded_dt = _parse_datetime(recorded_str) or datetime.now(timezone.utc)
 
             bbl_val = str(
-                row.get("parcel_number")
+                first_mapped(row, field_map, "bbl")
+                or row.get("parcel_number")
                 or row.get("block_and_lot_number")
                 or row.get("bbl")
                 or row.get("pin")
@@ -218,7 +238,8 @@ class DeedsACRISProducer:
                     lot_val = bl_str[4:]
 
             borough_val = (
-                row.get("analysis_neighborhood")
+                first_mapped(row, field_map, "borough")
+                or row.get("analysis_neighborhood")
                 or row.get("neighborhood")
                 or row.get("supervisor_district")
                 or row.get("borough")
@@ -227,7 +248,8 @@ class DeedsACRISProducer:
                 or row.get("city")
             )
             party1 = (
-                row.get("owner_name")
+                first_mapped(row, field_map, "party1_grantor")
+                or row.get("owner_name")
                 or row.get("party1_grantor")
                 or row.get("party1_type")
                 or row.get("grantor")
@@ -236,7 +258,8 @@ class DeedsACRISProducer:
                 or row.get("Sellername")
             )
             party2 = (
-                row.get("buyer")
+                first_mapped(row, field_map, "party2_grantee")
+                or row.get("buyer")
                 or row.get("buyername")
                 or row.get("buyer_name")
                 or row.get("party2_grantee")
