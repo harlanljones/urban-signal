@@ -107,6 +107,8 @@ class DeedsACRISProducer:
                 or row.get("document_id")
                 or row.get("doc_number")
                 or row.get("document_number")
+                or row.get("doc_no")
+                or row.get("row_id")
                 or row.get("control_number")
                 or row.get("id")
                 or ""
@@ -183,6 +185,7 @@ class DeedsACRISProducer:
             recorded_str = (
                 row.get("recording_date")
                 or row.get("transfer_date")
+                or row.get("sale_date")
                 or row.get("assessment_date")
                 or row.get("closed_roll_year")
                 or row.get("roll_year")
@@ -229,11 +232,13 @@ class DeedsACRISProducer:
                 or row.get("party1_type")
                 or row.get("grantor")
                 or row.get("seller")
+                or row.get("seller_name")
                 or row.get("Sellername")
             )
             party2 = (
                 row.get("buyer")
                 or row.get("buyername")
+                or row.get("buyer_name")
                 or row.get("party2_grantee")
                 or row.get("party2_type")
                 or row.get("grantee")

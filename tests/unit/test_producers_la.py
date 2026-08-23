@@ -1,10 +1,10 @@
 """Unit tests for the Los Angeles Metro registration and its producer wiring.
 
-Los Angeles is the first city registered with an incomplete feed set: the city
-retired its open 311 endpoint and LA County publishes no open recorded-deeds
-feed, so only permits and business registrations exist. These tests pin that
-partial registration down and cover the LA-specific field names the shared
-Socrata row parsers had to learn.
+Los Angeles is a partial city by design: LA County publishes no open
+recorded-deeds feed, so permits, business registrations, and (since the 2026
+MyLA311 relaunch) 311 service requests are registered while DEEDS is absent.
+These tests pin that partial registration down and cover the LA-specific field
+names the shared Socrata row parsers had to learn.
 """
 
 from unittest.mock import patch
@@ -84,16 +84,21 @@ class TestLosAngelesRegistration:
 
 
 class TestPartialFeedRegistration:
-    """LA registers only two of the four feed types, on purpose."""
+    """LA registers three of the four feed types; DEEDS is absent on purpose."""
 
-    def test_only_permits_and_sla_are_registered(self):
-        assert set(REGISTRY[CityId.LOS_ANGELES].datasets) == {FeedType.PERMITS, FeedType.SLA}
+    def test_only_permits_sla_and_311_are_registered(self):
+        assert set(REGISTRY[CityId.LOS_ANGELES].datasets) == {
+            FeedType.PERMITS,
+            FeedType.SLA,
+            FeedType.COMPLAINTS_311,
+        }
 
     def test_watermarks_match_published_schemas(self):
         assert get_dataset(CityId.LOS_ANGELES, FeedType.PERMITS).watermark_col == "issue_date"
         assert get_dataset(CityId.LOS_ANGELES, FeedType.SLA).watermark_col == "location_start_date"
+        assert get_dataset(CityId.LOS_ANGELES, FeedType.COMPLAINTS_311).watermark_col == "createddate"
 
-    @pytest.mark.parametrize("feed", [FeedType.COMPLAINTS_311, FeedType.DEEDS])
+    @pytest.mark.parametrize("feed", [FeedType.DEEDS])
     def test_absent_feeds_raise_a_readable_error(self, feed):
         """A bare KeyError names neither the city nor the feed; this must."""
         with pytest.raises(KeyError) as exc:
@@ -228,3 +233,77 @@ class TestLosAngelesRowParsing:
         ev = sla.parse_socrata_row(sf_row)
         assert ev is not None
         assert ev.city_id == "san_francisco"
+
+    @pytest.fixture
+    def complaints(self):
+        with patch("src.producers.complaints_311_producer.BaseKafkaProducer"):
+            from src.producers.complaints_311_producer import Complaints311Producer
+
+            return Complaints311Producer()
+
+    @pytest.fixture
+    def myla311_row(self):
+        """Current-year MyLA311 'Cases' schema (Salesforce-derived, 2026+)."""
+        return {
+            "casenumber": "01-20260823-0001234",
+            "type": "Bulky Items",
+            "createddate": "2026-08-23T08:31:00.000",
+            "closeddate": "2026-08-23T14:02:00.000",
+            "status": "Closed",
+            "address": "4127 W SUNSET BLVD",
+            "zipcode__c": "90029",
+            "locator_sr_neigborhood_council": "GREATER ECHO PARK",
+            "geolocation__latitude__s": "34.08921",
+            "geolocation__longitude__s": "-118.27152",
+        }
+
+    def test_myla311_parses(self, complaints, myla311_row):
+        assert complaints.parse_socrata_row(myla311_row, city_id="los_angeles") is not None
+
+    def test_myla311_id_comes_from_casenumber(self, complaints, myla311_row):
+        ev = complaints.parse_socrata_row(myla311_row, city_id="los_angeles")
+        assert ev.incident_id == "01-20260823-0001234"
+
+    def test_myla311_reads_the_salesforce_geolocation_columns(self, complaints, myla311_row):
+        """The 2026 schema spells coordinates geolocation__latitude(s); every
+        other registered 311 feed uses latitude/longitude."""
+        ev = complaints.parse_socrata_row(myla311_row, city_id="los_angeles")
+        assert ev.latitude == pytest.approx(34.08921)
+        assert ev.longitude == pytest.approx(-118.27152)
+
+    def test_myla311_dates_map_without_underscores(self, complaints, myla311_row):
+        ev = complaints.parse_socrata_row(myla311_row, city_id="los_angeles")
+        assert str(ev.created_date).startswith("2026-08-23")
+        assert str(ev.closed_date).startswith("2026-08-23")
+
+    def test_myla311_zipcode_reads_the_c_suffix_column(self, complaints, myla311_row):
+        ev = complaints.parse_socrata_row(myla311_row, city_id="los_angeles")
+        assert ev.zipcode == "90029"
+
+    def test_myla311_resolves_to_a_division(self, complaints, myla311_row):
+        ev = complaints.parse_socrata_row(myla311_row, city_id="los_angeles")
+        assert ev.borough is not None
+
+    def test_myla311_rejects_null_island_placeholder(self, complaints, myla311_row):
+        """Same Gulf-of-Guinea guard the SLA parser already applies."""
+        myla311_row["geolocation__latitude__s"] = "0.0"
+        myla311_row["geolocation__longitude__s"] = "0.0"
+        assert complaints.parse_socrata_row(myla311_row, city_id="los_angeles") is None
+
+    def test_myla311_autodetect_beats_the_san_francisco_branch(self, complaints, myla311_row):
+        assert complaints.parse_socrata_row(myla311_row).city_id == "los_angeles"
+
+    def test_backfill_rows_with_the_pre_2025_schema_still_parse(self, complaints):
+        """The 2015-2024 yearly sets use srnumber/requesttype/latitude."""
+        backfill_row = {
+            "srnumber": "1-17470001",
+            "requesttype": "Bulky Items",
+            "createddate": "2024-12-30T09:15:00.000",
+            "zipcode": "90019",
+            "latitude": "34.07097",
+            "longitude": "-118.36744",
+        }
+        ev = complaints.parse_socrata_row(backfill_row)
+        assert ev is not None
+        assert ev.city_id == "los_angeles"
+        assert ev.incident_id == "1-17470001"

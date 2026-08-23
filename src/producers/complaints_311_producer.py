@@ -75,6 +75,16 @@ class Complaints311Producer:
                 or "supervisor_district" in row
             ):
                 resolved_city = "san_francisco"
+            elif (
+                "casenumber" in row
+                or "srnumber" in row
+                or "department_name__c" in row
+            ):
+                # LA MyLA311. Checked after SF: no column collides with the SF
+                # keys, but `casenumber`/`srnumber` must not fall through to
+                # the NYC default. The 2026 "Cases" schema uses `casenumber`;
+                # the 2015-2024 yearly backfills use `srnumber`.
+                resolved_city = "los_angeles"
             elif "sr_number" in row or "sr_type" in row:
                 resolved_city = "chicago"
             else:
@@ -82,7 +92,9 @@ class Complaints311Producer:
 
             incident_id = str(
                 row.get("service_request_id")
+                or row.get("casenumber")
                 or row.get("sr_number")
+                or row.get("srnumber")
                 or row.get("unique_key")
                 or row.get("service_request_number")
                 or row.get("id")
@@ -91,8 +103,15 @@ class Complaints311Producer:
             if not incident_id:
                 return None
 
-            lat_raw = row.get("latitude") or row.get("lat")
-            lng_raw = row.get("longitude") or row.get("lng") or row.get("long")
+            lat_raw = (
+                row.get("geolocation__latitude__s") or row.get("latitude") or row.get("lat")
+            )
+            lng_raw = (
+                row.get("geolocation__longitude__s")
+                or row.get("longitude")
+                or row.get("lng")
+                or row.get("long")
+            )
             if not lat_raw or not lng_raw:
                 loc = row.get("point") or row.get("location") or row.get("the_geom") or {}
                 if isinstance(loc, dict):
@@ -109,6 +128,13 @@ class Complaints311Producer:
             lat = float(lat_raw)
             lng = float(lng_raw)
 
+            # Some feeds (LA business registrations ~7%, MyLA311's ungeocoded
+            # remainder) carry a 0.0/0.0 placeholder rather than a real
+            # geocode. Treating that as a valid coordinate would file those
+            # rows under an H3 cell in the Gulf of Guinea.
+            if lat == 0.0 and lng == 0.0:
+                return None
+
             h3_res = self.spatial_indexer.get_multi_res_hierarchy(lat, lng)
 
             complaint_type = (
@@ -117,6 +143,7 @@ class Complaints311Producer:
                 or row.get("service_subtype")
                 or row.get("sr_type")
                 or row.get("complaint_type")
+                or row.get("requesttype")
                 or row.get("request_type")
                 or row.get("type")
                 or "Unknown"
@@ -135,6 +162,7 @@ class Complaints311Producer:
             created_str = (
                 row.get("requested_datetime")
                 or row.get("created_date")
+                or row.get("createddate")
                 or row.get("create_date")
                 or row.get("created_at")
             )
@@ -142,6 +170,7 @@ class Complaints311Producer:
 
             closed_str = (
                 row.get("closed_date")
+                or row.get("closeddate")
                 or row.get("closed_datetime")
                 or row.get("updated_datetime")
                 or row.get("completion_date")
@@ -152,6 +181,7 @@ class Complaints311Producer:
             borough_val = (
                 row.get("neighborhoods_sffind_boundaries")
                 or row.get("analysis_neighborhood")
+                or row.get("locator_sr_neigborhood_council")
                 or row.get("neighborhood")
                 or row.get("supervisor_district")
                 or row.get("borough")
@@ -169,6 +199,7 @@ class Complaints311Producer:
 
             zipcode = str(
                 row.get("zipcode")
+                or row.get("zipcode__c")
                 or row.get("zip_code")
                 or row.get("postal_code")
                 or row.get("incident_zip")

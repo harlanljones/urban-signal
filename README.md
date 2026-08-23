@@ -36,7 +36,7 @@ Traditional real estate valuation models rely on lagging transactional comps (de
 | Chicago (6 Divisions) | CENTRAL_DOWNTOWN, NORTH_SIDE, FAR_NORTH_SIDE, NORTHWEST_SIDE, SOUTH_SIDE, SOUTHWEST_SIDE | Socrata | Socrata | Socrata | Socrata (Cook County) |
 | San Francisco Bay Area (5 Divisions) | SAN_FRANCISCO_CORE, EAST_BAY, PENINSULA, SILICON_VALLEY_SOUTH_BAY, MARIN_NORTH_BAY | Socrata | Socrata | Socrata | Socrata (Assessor) |
 | Seattle Metro (4 Divisions) | SEATTLE_CORE, NORTH_KING, EASTSIDE, SOUTH_KING | Socrata | Socrata | Socrata (WA LCB) | ArcGIS (King County parcel sales) |
-| Los Angeles Metro (6 Divisions) | CENTRAL_LA, WESTSIDE, SAN_FERNANDO_VALLEY, HARBOR_SOUTH_BAY, SOUTH_LA, EASTSIDE_SGV | Socrata | — retired feed | Socrata | — no open endpoint |
+| Los Angeles Metro (6 Divisions) | CENTRAL_LA, WESTSIDE, SAN_FERNANDO_VALLEY, HARBOR_SOUTH_BAY, SOUTH_LA, EASTSIDE_SGV | Socrata | Socrata (MyLA311) | Socrata | — no open endpoint |
 
 Partial registrations are deliberate: cities register only feeds that exist, and `get_dataset` raises a readable error for the rest (`src/spatial/city_registry.py`). Adding a city is leaf work — see `docs/research/city-expansion-candidates.md` for the next candidates (New Orleans, Austin).
 

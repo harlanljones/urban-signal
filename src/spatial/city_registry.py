@@ -264,8 +264,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
             FeedType.DEEDS: DatasetSpec(
                 endpoint=settings.socrata_chicago_deeds_endpoint,
                 platform="socrata",
-                watermark_col="recorded_datetime",
-                id_keys=["doc_id", "document_id", "doc_number", "id", "pin"],
+                watermark_col="sale_date",
+                id_keys=["doc_no", "row_id", "pin"],
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
@@ -385,12 +385,15 @@ REGISTRY: Dict[CityId, CityRegistration] = {
         submarkets=LA_SUBMARKETS,
         divisions=LA_DIVISIONS,
         job_suffix="la",
-        # Only two feeds are registered. Los Angeles retired its open 311 feed
-        # (data.lacity.org carries only an archived 2013-2014 extract), and LA
-        # County's Registrar-Recorder publishes no open recorded-deeds endpoint,
-        # so FeedType.COMPLAINTS_311 and FeedType.DEEDS are deliberately absent
-        # rather than pointed at a stale or unofficial mirror. `get_dataset`
-        # raises a readable error for them; the scheduler simply skips them.
+        # DEEDS is the only feed deliberately absent. The city's 311 program
+        # relaunched in 2025 as yearly MyLA311 "Cases" datasets (the current
+        # -year set refreshes through the same day), and the former registry
+        # note about an "archived 2013-2014 extract only" is obsolete. LA
+        # County publishes no open transaction-level recorded-deeds or parcel
+        # -sales endpoint — its Assessor roll table carries no sale price — so
+        # FeedType.DEEDS stays unregistered rather than pointed at an annual
+        # assessment snapshot. `get_dataset` raises a readable error for it;
+        # the scheduler simply skips it.
         datasets={
             FeedType.PERMITS: DatasetSpec(
                 endpoint=settings.socrata_la_permits_endpoint,
@@ -400,6 +403,15 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
+            ),
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.socrata_la_311_endpoint,
+                platform="socrata",
+                watermark_col="createddate",
+                id_keys=["casenumber", "srnumber", "id"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.socrata_la_licenses_endpoint,
@@ -418,10 +430,10 @@ REGISTRY: Dict[CityId, CityRegistration] = {
 def get_dataset(city_id: CityId, feed: FeedType) -> DatasetSpec:
     """Look up one city's feed spec, failing with a readable message.
 
-    Not every city publishes every feed: Los Angeles has no open 311 or recorded
+    Not every city publishes every feed: Los Angeles has no open recorded
     -deeds endpoint, for instance. Indexing ``REGISTRY[city].datasets[feed]``
-    directly raises a bare KeyError that names neither the city nor the feed, so
-    producers should route through here instead.
+    directly raises a bare KeyError that names neither the city nor the feed,
+    so producers should route through here instead.
     """
     reg = REGISTRY.get(city_id)
     if reg is None:

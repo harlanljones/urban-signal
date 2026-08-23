@@ -79,9 +79,9 @@ directly, so a city that lacks a feed fails with a readable message.
 
 ## Partial registrations are allowed
 
-Not every city publishes every feed. Los Angeles has no open 311 or recorded
--deeds endpoint, so it registers two feeds rather than four. Register only what
-exists and let `get_dataset()` raise for the rest — never point a feed at a
+Not every city publishes every feed. Los Angeles has no open
+recorded-deeds endpoint, so it registers three feeds rather than four. Register
+only what exists and let `get_dataset()` raise for the rest — never point a feed at a
 stale or unofficial mirror to fill the shape.
 
 ## Leaving a trail

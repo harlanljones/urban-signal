@@ -71,13 +71,13 @@ class Settings(BaseSettings):
         description="Chicago Business & Hospitality Licenses endpoint",
     )
     socrata_chicago_deeds_endpoint: str = Field(
-        default="https://datacatalog.cookcountyil.gov/resource/x5kz-z7if.json",
-        description="Cook County / Chicago Property Transfers endpoint",
+        default="https://datacatalog.cookcountyil.gov/resource/wvhk-k5uv.json",
+        description="Cook County Assessor Parcel Sales endpoint",
     )
 
     # Socrata SODA OpenData APIs (San Francisco & Bay Area)
     socrata_sf_dob_endpoint: str = Field(
-        default="https://data.sfgov.org/resource/i98e-46e2.json",
+        default="https://data.sfgov.org/resource/i98e-djp9.json",
         description="SF Building Permits endpoint",
     )
     socrata_sf_311_endpoint: str = Field(
@@ -89,7 +89,7 @@ class Settings(BaseSettings):
         description="SF Registered Business Locations endpoint",
     )
     socrata_sf_deeds_endpoint: str = Field(
-        default="https://data.sfgov.org/resource/5cei-gny5.json",
+        default="https://data.sfgov.org/resource/wv5m-vpq2.json",
         description="SF Assessor Historical Secured Property endpoint",
     )
 
@@ -120,6 +120,10 @@ class Settings(BaseSettings):
     socrata_la_permits_endpoint: str = Field(
         default="https://data.lacity.org/resource/pi9x-tg5x.json",
         description="LADBS Building Permits Issued from 2020 to Present endpoint",
+    )
+    socrata_la_311_endpoint: str = Field(
+        default="https://data.lacity.org/resource/2cy6-i7zn.json",
+        description="MyLA311 Service Request Cases (current year) endpoint",
     )
     socrata_la_licenses_endpoint: str = Field(
         default="https://data.lacity.org/resource/6rrh-rzua.json",
