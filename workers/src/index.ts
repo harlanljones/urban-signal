@@ -22,6 +22,11 @@ const CITY_ALIASES: Record<string, string> = {
   chicago: "chicago",
   san_francisco: "san_francisco",
   sf: "san_francisco",
+  seattle: "seattle",
+  sea: "seattle",
+  king_county: "seattle",
+  los_angeles: "los_angeles",
+  la: "los_angeles",
 };
 
 let manifestCache: { value: Manifest | null; expires: number } = {
@@ -124,6 +129,7 @@ export default {
     }
 
     const manifest = await getManifest(env);
+    const supportedCities = (manifest?.cities ?? []).join(", ");
     const baseHeaders: Record<string, string> = {
       "cache-control": CACHE_CONTROL,
       "x-snapshot-created": manifest?.generated_at ?? "",
@@ -146,7 +152,7 @@ export default {
         if (!city) {
           return jsonError(
             400,
-            `Unsupported city_id '${url.searchParams.get("city_id")}'. Supported cities: nyc, chicago, san_francisco.`
+            `Unsupported city_id '${url.searchParams.get("city_id")}'. Supported cities: ${supportedCities}.`
           );
         }
         const entry = await kvJson(env, `submarkets/${city}`);
@@ -180,7 +186,7 @@ export default {
         if (!city) {
           return jsonError(
             400,
-            `Unsupported city_id '${url.searchParams.get("city_id")}'. Supported cities: nyc, chicago, san_francisco.`
+            `Unsupported city_id '${url.searchParams.get("city_id")}'. Supported cities: ${supportedCities}.`
           );
         }
         const entry = await kvJson(env, `grid/${city}`);
@@ -198,7 +204,7 @@ export default {
         if (!city) {
           return jsonError(
             400,
-            `Unsupported city_id '${url.searchParams.get("city_id")}'. Supported cities: nyc, chicago, san_francisco.`
+            `Unsupported city_id '${url.searchParams.get("city_id")}'. Supported cities: ${supportedCities}.`
           );
         }
         const minLimsRaw = url.searchParams.get("min_lims");

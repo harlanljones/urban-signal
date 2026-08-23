@@ -329,7 +329,7 @@ Exposes real-time Prometheus telemetry including `prediction_requests_total`, `c
 `GET /dashboard` or `GET /` (with `Accept: text/html`)
 Serves the hardened, high-performance **MapLibre GL** web visualizer featuring multi-city selection across all five registered metros (San Francisco, NYC, Chicago, Seattle, Los Angeles), submarket filtering, H3 hexagon inspection, LIMS heatmaps, and SHAP attribution waterfall charts.
 
-The same UI is mirrored as a static asset on the Cloudflare Worker (`workers/`), where `/api/v1/*` is answered from a precomputed Workers KV snapshot (built by `src/export/snapshot_builder.py`). The FastAPI service serves all five cities live; the edge snapshot currently covers NYC, Chicago, and San Francisco.
+The same UI is mirrored as a static asset on the Cloudflare Worker (`workers/`), where `/api/v1/*` is answered from a precomputed Workers KV snapshot (built by `src/export/snapshot_builder.py`). The FastAPI service and the edge snapshot both serve all five cities.
 
 ---
 
