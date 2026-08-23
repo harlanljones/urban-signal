@@ -24,7 +24,17 @@ from src.serving.engine import MultiHorizonInferenceEngine
 
 logger = logging.getLogger(__name__)
 
-SUPPORTED_CITIES = ["nyc", "chicago", "san_francisco", "seattle", "los_angeles"]
+SUPPORTED_CITIES = [
+    "nyc",
+    "chicago",
+    "san_francisco",
+    "seattle",
+    "los_angeles",
+    "new_orleans",
+    "norfolk",
+    "detroit",
+    "austin",
+]
 DEFAULT_RESOLUTION = 9
 DEFAULT_K_RING = 1
 CATALYST_THRESHOLD = 85.0

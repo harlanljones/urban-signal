@@ -229,6 +229,7 @@ Updated per wave close-out in `.streams/dispatch-log.md`; program rollup maintai
 | baseline | 5 | 19 | — | — | 1 (pre-ADR) |
 | A+B (pre-program) | 5 | 21 | 1.0 | high (by design: repairs + mechanism) | 0 |
 | C1 | 7 | 27 | 2/2 | ~10% projected | 0 |
+| C2 | 9 | 33 | 2/2 | ~10% projected | 0 (1 gate catch: arcgis client routing) |
 | C2 | | | | | |
 | F | | | | | |
 | C3 | | | | | |

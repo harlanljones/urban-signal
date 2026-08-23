@@ -55,7 +55,7 @@ def asyncio_run_build(tmp_path: Path, cities=None) -> dict[str, Any]:
 
 
 def test_manifest_shape(snapshot: dict[str, Any]):
-    assert set(snapshot["cities"]) == {"nyc", "chicago", "san_francisco", "seattle", "los_angeles"}
+    assert set(snapshot["cities"]) == {"nyc", "chicago", "san_francisco", "seattle", "los_angeles", "new_orleans", "norfolk", "detroit", "austin"}
     assert snapshot["resolution"] == DEFAULT_RESOLUTION
     assert snapshot["k_ring"] == DEFAULT_K_RING
     assert snapshot["catalyst_threshold"] == CATALYST_THRESHOLD

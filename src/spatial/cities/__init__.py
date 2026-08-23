@@ -1,11 +1,25 @@
 """City-specific spatial registry modules."""
 
+from src.spatial.cities.austin import (
+    AUSTIN_DIVISION_BBOXES,
+    AUSTIN_DIVISIONS,
+    AUSTIN_METRO_BBOX,
+    AUSTIN_SUBMARKETS,
+    is_in_austin_metro,
+)
 from src.spatial.cities.chicago import (
     CHICAGO_DIVISION_BBOXES,
     CHICAGO_DIVISIONS,
     CHICAGO_METRO_BBOX,
     CHICAGO_SUBMARKETS,
     is_in_chicago_metro,
+)
+from src.spatial.cities.detroit import (
+    DETROIT_DIVISION_BBOXES,
+    DETROIT_DIVISIONS,
+    DETROIT_METRO_BBOX,
+    DETROIT_SUBMARKETS,
+    is_in_detroit_metro,
 )
 from src.spatial.cities.los_angeles import (
     LA_DIVISION_BBOXES,
@@ -50,6 +64,11 @@ from src.spatial.cities.seattle import (
 )
 
 __all__ = [
+    "AUSTIN_METRO_BBOX",
+    "AUSTIN_DIVISION_BBOXES",
+    "AUSTIN_DIVISIONS",
+    "AUSTIN_SUBMARKETS",
+    "is_in_austin_metro",
     "CHICAGO_METRO_BBOX",
     "CHICAGO_DIVISION_BBOXES",
     "CHICAGO_DIVISIONS",
@@ -81,6 +100,11 @@ __all__ = [
     "NOLA_DIVISIONS",
     "NOLA_SUBMARKETS",
     "is_in_new_orleans_metro",
+    "DETROIT_METRO_BBOX",
+    "DETROIT_DIVISION_BBOXES",
+    "DETROIT_DIVISIONS",
+    "DETROIT_SUBMARKETS",
+    "is_in_detroit_metro",
     "NORFOLK_METRO_BBOX",
     "NORFOLK_DIVISION_BBOXES",
     "NORFOLK_DIVISIONS",

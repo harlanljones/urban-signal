@@ -8,6 +8,7 @@ from typing import Any, Dict, Optional
 from src.config import settings
 from src.features.shift_dynamics import ComplaintShiftDynamics
 from src.producers.base_producer import BaseKafkaProducer
+from src.producers.arcgis_client import ArcGISClient
 from src.producers.socrata_client import SocrataClient
 from src.schemas.models import Complaint311Event
 from src.spatial.h3_indexer import H3SpatialIndexer
@@ -53,8 +54,19 @@ class Complaints311Producer:
             dlq_topic=settings.topic_dlq,
         )
         self.socrata = SocrataClient()
+        self.arcgis = ArcGISClient()
         self.spatial_indexer = H3SpatialIndexer()
         self.shift_dynamics = ComplaintShiftDynamics()
+
+    def _client_for(self, platform: str):
+        """Select the paginating client matching a DatasetSpec's platform.
+
+        Both clients satisfy the same ``PaginatingClient`` protocol, so callers
+        only need the right instance, not a different call shape.
+        """
+        if platform == "arcgis":
+            return self.arcgis
+        return self.socrata
 
     def parse_socrata_row(self, row: Dict[str, Any], city_id: Optional[str] = None) -> Optional[Complaint311Event]:
         """Parse raw 311 record into strongly-typed Complaint311Event with category classification."""
@@ -209,7 +221,8 @@ class Complaints311Producer:
                 borough_val = str(row["community_areas"])
 
             incident_address = (
-                row.get("address")
+                first_mapped(row, field_map, "incident_address")
+                or row.get("address")
                 or row.get("street_address")
                 or row.get("incident_address")
             )
@@ -242,7 +255,11 @@ class Complaints311Producer:
                 longitude=lng,
                 created_date=created_dt,
                 closed_date=closed_dt,
-                status=row.get("status") or "Open",
+                status=(
+                    first_mapped(row, field_map, "status")
+                    or row.get("status")
+                    or "Open"
+                ),
                 h3_res7=h3_res["h3_res7"],
                 h3_res8=h3_res["h3_res8"],
                 h3_res9=h3_res["h3_res9"],
@@ -256,12 +273,14 @@ class Complaints311Producer:
         """Fetch 311 records and stream them into Kafka topic."""
         from src.spatial.city_registry import REGISTRY, CityId, FeedType, normalize_city, get_dataset
         cid = normalize_city(city_id) or CityId.NYC
-        endpoint = get_dataset(cid, FeedType.COMPLAINTS_311).endpoint
+        spec = get_dataset(cid, FeedType.COMPLAINTS_311)
+        endpoint = spec.endpoint
+        client = self._client_for(spec.platform)
 
         logger.info("Starting %s 311 Ingestion Stream (limit=%d)...", cid.value.upper(), limit)
         records_streamed = 0
 
-        for batch in self.socrata.paginate(
+        for batch in client.paginate(
             endpoint_url=endpoint,
             where_clause=where_clause,
             batch_size=1000,

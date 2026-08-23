@@ -15,6 +15,18 @@ from src.spatial.cities.chicago import (
     CHICAGO_METRO_BBOX,
     CHICAGO_SUBMARKETS,
 )
+from src.spatial.cities.austin import (
+    AUSTIN_DIVISION_BBOXES,
+    AUSTIN_DIVISIONS,
+    AUSTIN_METRO_BBOX,
+    AUSTIN_SUBMARKETS,
+)
+from src.spatial.cities.detroit import (
+    DETROIT_DIVISION_BBOXES,
+    DETROIT_DIVISIONS,
+    DETROIT_METRO_BBOX,
+    DETROIT_SUBMARKETS,
+)
 from src.spatial.cities.los_angeles import (
     LA_DIVISION_BBOXES,
     LA_DIVISIONS,
@@ -67,6 +79,8 @@ class CityId(str, Enum):
     LOS_ANGELES = "los_angeles"
     NEW_ORLEANS = "new_orleans"
     NORFOLK = "norfolk"
+    DETROIT = "detroit"
+    AUSTIN = "austin"
 
 
 class FeedType(str, Enum):
@@ -191,6 +205,18 @@ ALIASES: Dict[str, CityId] = {
     "norfolk_va": CityId.NORFOLK,
     "norfolk-va": CityId.NORFOLK,
     "norfolk va": CityId.NORFOLK,
+
+    # Detroit & Metro Detroit
+    "detroit": CityId.DETROIT,
+    "detroit_mi": CityId.DETROIT,
+    "detroit-mi": CityId.DETROIT,
+    "detroit mi": CityId.DETROIT,
+
+    # Austin & Travis County
+    "austin": CityId.AUSTIN,
+    "travis_county": CityId.AUSTIN,
+    "travis-county": CityId.AUSTIN,
+    "travis county": CityId.AUSTIN,
 }
 
 
@@ -626,6 +652,170 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                     "field_map": {
                         "doc_id": ["document_number"],
                         "bbl": ["gpin", "parcel_id"],
+                    }
+                },
+            ),
+        },
+    ),
+    CityId.DETROIT: CityRegistration(
+        city_id=CityId.DETROIT,
+        name="Detroit",
+        state="MI",
+        center={"lat": 42.3314, "lng": -83.0458},
+        metro_bbox=DETROIT_METRO_BBOX,
+        division_bboxes=DETROIT_DIVISION_BBOXES,
+        submarkets=DETROIT_SUBMARKETS,
+        divisions=DETROIT_DIVISIONS,
+        job_suffix="detroit",
+        # All four feeds are ArcGIS FeatureServers (services2 host) paged by
+        # the existing ArcGISClient. Every Detroit layer's objectIdField is
+        # `ObjectId` (camelCase — NOT King County's `OBJECTID`), so each spec
+        # carries oid_field explicitly. Permits/licenses/sales dates arrive as
+        # esriFieldTypeDateOnly strings ("YYYY-MM-DD"); the 311 feed uses true
+        # epoch-ms dates the client converts. Sales rows include a typo-year
+        # sentinel ('2925-12-24') — tolerated watermark skew.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_detroit_permits_url,
+                platform="arcgis",
+                watermark_col="issued_date",
+                id_keys=["record_id", "ObjectId", "id"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "oid_field": "ObjectId",
+                    "max_record_count": 1000,
+                    "field_map": {
+                        "job_id": ["record_id"],
+                        "cost": ["amt_permit_cost"],
+                    },
+                },
+            ),
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.arcgis_detroit_311_url,
+                platform="arcgis",
+                watermark_col="created_at",
+                id_keys=["issue_id", "ObjectId", "id"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                extra={
+                    "oid_field": "ObjectId",
+                    "max_record_count": 1000,
+                    "field_map": {
+                        "incident_id": ["issue_id"],
+                        "closed_date": ["closed_at"],
+                    },
+                },
+            ),
+            # Renewal-driven feed: `expiration_date` is the only date column,
+            # so effective_date stays None and the watermark moves slowly by
+            # design. Geocoded point layer (research's "non-spatial table"
+            # verdict was wrong).
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.arcgis_detroit_licenses_url,
+                platform="arcgis",
+                watermark_col="expiration_date",
+                id_keys=["record_id", "ObjectId", "id"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                extra={
+                    "oid_field": "ObjectId",
+                    "max_record_count": 1000,
+                    # The shared license_type chain has no bare 'license_type'
+                    # term — without the map every row falls to the
+                    # 'On-Premises Liquor' default.
+                    "field_map": {
+                        "license_id": ["record_id"],
+                        "license_type": ["license_type", "license_category"],
+                    },
+                },
+            ),
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.arcgis_detroit_sales_url,
+                platform="arcgis",
+                watermark_col="sale_date",
+                id_keys=["sale_id", "liber_page", "ObjectId", "id"],
+                topic=settings.topic_deeds,
+                interval_seconds=600.0,
+                producer_key="deeds",
+                extra={
+                    "oid_field": "ObjectId",
+                    "max_record_count": 1000,
+                    "field_map": {
+                        "doc_id": ["sale_id"],
+                        "bbl": ["parcel_id"],
+                        "document_amount": ["amt_sale_price"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.AUSTIN: CityRegistration(
+        city_id=CityId.AUSTIN,
+        name="Austin",
+        state="TX",
+        center={"lat": 30.2672, "lng": -97.7431},
+        metro_bbox=AUSTIN_METRO_BBOX,
+        division_bboxes=AUSTIN_DIVISION_BBOXES,
+        submarkets=AUSTIN_SUBMARKETS,
+        divisions=AUSTIN_DIVISIONS,
+        job_suffix="austin",
+        # Partial registration like Los Angeles: Austin registers two feeds
+        # only. No business-license or property-sales feed exists on
+        # data.austintexas.gov — the domain exited the Socrata discovery mesh
+        # after the Texas ODP migration (its catalog now serves three internal
+        # analytics views), TABC's statewide alcohol licenses carry zero
+        # geocodes, and Travis County's Socrata presence is an unreachable
+        # FedRAMP shell. FeedType.SLA and FeedType.DEEDS stay deliberately
+        # absent; `get_dataset` raises readable errors for them.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.socrata_austin_permits_endpoint,
+                platform="socrata",
+                watermark_col="issue_date",
+                id_keys=["permit_number", "objectid", "id"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                # total_job_valuation is NULL on remodel rows (accepted);
+                # work_type before permit_type so NB/Addition signal survives
+                # generic "Building Permit" values (mirror of Norfolk).
+                extra={
+                    "field_map": {
+                        "cost": ["total_job_valuation"],
+                        "filing_date": ["application_date"],
+                        "job_type": ["work_type", "permit_type"],
+                        "proposed_units": ["number_of_units"],
+                        "proposed_stories": ["number_of_floors"],
+                        "borough": ["council_district"],
+                    }
+                },
+            ),
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.socrata_austin_311_endpoint,
+                platform="socrata",
+                watermark_col="sr_created_date",
+                id_keys=["sr_number", "id"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                # sr_number is also a Chicago chain term: production always
+                # passes city_id explicitly, and the tightened chicago sniff
+                # requires corroborating markers (see complaints_311_producer).
+                extra={
+                    "field_map": {
+                        "latitude": ["sr_location_lat"],
+                        "longitude": ["sr_location_long"],
+                        "complaint_type": ["sr_type_desc"],
+                        "created_date": ["sr_created_date"],
+                        "closed_date": ["sr_closed_date"],
+                        "status": ["sr_status_desc"],
+                        "zipcode": ["sr_location_zip_code"],
+                        "incident_address": ["sr_location"],
+                        "borough": ["sr_location_council_district"],
                     }
                 },
             ),

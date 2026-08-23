@@ -158,6 +158,47 @@ class Settings(BaseSettings):
         description="Norfolk Property Assessment and Sales FY27 endpoint (rotate ID each July)",
     )
 
+    # Austin (Socrata) — partial city: SLA/DEEDS absent (TABC statewide feeds
+    # carry no geocodes; Travis County portal is unreachable)
+    socrata_austin_permits_endpoint: str = Field(
+        default="https://data.austintexas.gov/resource/quv8-5ckq.json",
+        description="Austin Issued Building Permits endpoint",
+    )
+    socrata_austin_311_endpoint: str = Field(
+        default="https://data.austintexas.gov/resource/xwdj-i9he.json",
+        description="Austin 311 Public Data endpoint",
+    )
+
+    # Detroit (ArcGIS FeatureServer — services2 host, camelCase ObjectId)
+    arcgis_detroit_permits_url: str = Field(
+        default=(
+            "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/"
+            "bseed_building_permits/FeatureServer/0"
+        ),
+        description="Detroit BSEED Building Permits FeatureServer layer URL",
+    )
+    arcgis_detroit_311_url: str = Field(
+        default=(
+            "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/"
+            "improve_detroit/FeatureServer/0"
+        ),
+        description="Detroit Improve Detroit Issues FeatureServer layer URL",
+    )
+    arcgis_detroit_licenses_url: str = Field(
+        default=(
+            "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/"
+            "bseed_active_business_licenses/FeatureServer/0"
+        ),
+        description="Detroit BSEED Active Business Licenses FeatureServer layer URL",
+    )
+    arcgis_detroit_sales_url: str = Field(
+        default=(
+            "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/"
+            "assessor_property_sales_view/FeatureServer/0"
+        ),
+        description="Detroit Assessor Property Sales FeatureServer layer URL",
+    )
+
     # PostgreSQL / PostGIS Database
     postgres_host: str = Field(default="localhost")
     postgres_port: int = Field(default=5432)

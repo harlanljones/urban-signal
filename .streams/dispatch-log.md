@@ -91,6 +91,27 @@ README coverage table + selector copy updated by integrator (dashboard
 `src/serving/dashboard.py` + workers static copy still pending for the two new
 cities — same shared-file hold pattern as the 2026-08-23 dashboard dispatch).
 
+## 2026-08-23 — wave C2 city registrations (Detroit / Austin)
+
+Per `docs/expansion-roadmap.md` §3. Austin pair re-probed live pre-dispatch
+(fresh rows confirmed); Detroit's four ArcGIS FeatureServers re-probe inside the
+stream claims. Projected spine share ~10% (≤20% gate).
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-detroit | `src/spatial/cities/detroit.py`, `tests/unit/test_producers_detroit.py` | config.py, city_registry.py, cities/__init__.py | ~16:40 PT | completed — 6 divisions / 16 submarkets; 4 ArcGIS feeds (licenses IS geocoded — research verdict corrected); ObjectId camelCase extras; typo-year sales sentinel documented |
+| city-austin | `src/spatial/cities/austin.py`, `tests/unit/test_producers_austin.py` | config.py, city_registry.py, cities/__init__.py | ~16:40 PT | completed — 6 divisions / 16 submarkets; PERMITS+311 partial registration w/ TABC/FedRAMP-shell comment |
+
+**Yield:** 2 of 2. Spine share ~10% as projected. Gates: interlock 17/17,
+city suites + field-maps 93/93, full suite **390/390**. Two interlock-phase
+findings: (1) the completeness gate correctly rejected the first spine
+application — Detroit's arcgis-platform specs exposed that only the deeds
+producer exposed an arcgis client; permits/311/SLA producers gained
+`_client_for` platform routing (mirroring deeds) and their run_streams now
+route by spec.platform. (2) Wave-B gap: 311 status/incident_address chains
+lacked first_mapped wiring — completed for Austin's sr_status_desc/sr_location.
+README coverage table + selector copy updated by integrator.
+
 **Yield:** 5 of 5 leaf streams (all durable artifacts written). Commit
 deviation amended: `git commit` is denied by local permission policy, so the
 orchestrator could not serially commit stream artifacts as planned above —

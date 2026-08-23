@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 from src.config import settings
 from src.producers.base_producer import BaseKafkaProducer
+from src.producers.arcgis_client import ArcGISClient
 from src.producers.socrata_client import SocrataClient
 from src.schemas.models import SLALicenseEvent
 from src.spatial.h3_indexer import H3SpatialIndexer
@@ -52,7 +53,18 @@ class SLALicensesProducer:
             dlq_topic=settings.topic_dlq,
         )
         self.socrata = SocrataClient()
+        self.arcgis = ArcGISClient()
         self.spatial_indexer = H3SpatialIndexer()
+
+    def _client_for(self, platform: str):
+        """Select the paginating client matching a DatasetSpec's platform.
+
+        Both clients satisfy the same ``PaginatingClient`` protocol, so callers
+        only need the right instance, not a different call shape.
+        """
+        if platform == "arcgis":
+            return self.arcgis
+        return self.socrata
 
     def parse_socrata_row(self, row: Dict[str, Any], city_id: Optional[str] = None) -> Optional[SLALicenseEvent]:
         """Convert raw SLA / business license record to strongly-typed SLALicenseEvent."""
@@ -262,12 +274,14 @@ class SLALicensesProducer:
         """Fetch SLA / license records and stream them into Kafka topic."""
         from src.spatial.city_registry import REGISTRY, CityId, FeedType, normalize_city, get_dataset
         cid = normalize_city(city_id) or CityId.NYC
-        endpoint = get_dataset(cid, FeedType.SLA).endpoint
+        spec = get_dataset(cid, FeedType.SLA)
+        endpoint = spec.endpoint
+        client = self._client_for(spec.platform)
 
         logger.info("Starting %s SLA / License Ingestion Stream (limit=%d)...", cid.value.upper(), limit)
         records_streamed = 0
 
-        for batch in self.socrata.paginate(
+        for batch in client.paginate(
             endpoint_url=endpoint,
             where_clause=where_clause,
             batch_size=1000,

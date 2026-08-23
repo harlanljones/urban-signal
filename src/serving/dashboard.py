@@ -1083,6 +1083,10 @@ def get_dashboard_html() -> str:
           <option value="chicago">🏙️ Chicago (6 Divisions)</option>
           <option value="seattle">🌲 Seattle Metro (4 Divisions)</option>
           <option value="los_angeles">🌴 Los Angeles Metro (6 Divisions)</option>
+          <option value="new_orleans">🎺 New Orleans Metro (9 Divisions)</option>
+          <option value="norfolk">⚓ Norfolk (5 Divisions)</option>
+          <option value="detroit">🏙️ Detroit (6 Divisions)</option>
+          <option value="austin">🦇 Austin (6 Divisions)</option>
         </select>
       </div>
     </div>
@@ -1330,6 +1334,118 @@ def get_dashboard_html() -> str:
           'SOUTH_LA': { lat: 33.98, lng: -118.29, zoom: 12.0, pitch: 48, bearing: -10 },
           'EASTSIDE_SGV': { lat: 34.11, lng: -118.16, zoom: 11.5, pitch: 48, bearing: -10 }
         }
+      },
+      new_orleans: {
+        center: [-90.0715, 29.9511],
+        zoom: 10.4,
+        pitch: 48,
+        bearing: -10,
+        name: 'New Orleans Metro',
+        metroBbox: { min_lat: 29.82, max_lat: 30.16, min_lng: -90.30, max_lng: -89.62 },
+        allLabel: 'All NOLA',
+        divisions: [
+          { key: 'ALL', label: 'All NOLA', class: 'ALL' },
+          { key: 'CBD_FRENCH_QUARTER', label: 'CBD / French Quarter', class: 'CBDFrenchQuarter' },
+          { key: 'BYWATER_MARIGNY', label: 'Bywater / Marigny', class: 'BywaterMarigny' },
+          { key: 'UPTOWN_CARROLLTON', label: 'Uptown / Carrollton', class: 'UptownCarrollton' },
+          { key: 'MID_CITY', label: 'Mid City', class: 'MidCity' },
+          { key: 'LAKEVIEW_GENTILLY', label: 'Lakeview / Gentilly', class: 'LakeviewGentilly' },
+          { key: 'NEW_ORLEANS_EAST', label: 'New Orleans East', class: 'NewOrleansEast' },
+          { key: 'WEST_BANK_ALGIERS', label: 'West Bank / Algiers', class: 'WestBankAlgiers' },
+          { key: 'JEFFERSON_METAIRIE_KENNER', label: 'Jefferson / Metairie / Kenner', class: 'JeffersonMetairieKenner' },
+          { key: 'ST_BERNARD_CHALMETTE', label: 'St. Bernard / Chalmette', class: 'StBernardChalmette' }
+        ],
+        presets: {
+          'ALL': { lat: 29.9511, lng: -90.0715, zoom: 10.2, pitch: 45, bearing: -10 },
+          'CBD_FRENCH_QUARTER': { lat: 29.9580, lng: -90.0660, zoom: 13.4, pitch: 52, bearing: -12 },
+          'BYWATER_MARIGNY': { lat: 29.9680, lng: -90.0280, zoom: 13.0, pitch: 50, bearing: -10 },
+          'UPTOWN_CARROLLTON': { lat: 29.9380, lng: -90.1080, zoom: 12.8, pitch: 48, bearing: -10 },
+          'MID_CITY': { lat: 29.9850, lng: -90.0950, zoom: 12.6, pitch: 48, bearing: -10 },
+          'LAKEVIEW_GENTILLY': { lat: 30.0150, lng: -90.0800, zoom: 12.4, pitch: 45, bearing: -10 },
+          'NEW_ORLEANS_EAST': { lat: 30.0250, lng: -89.9400, zoom: 11.8, pitch: 45, bearing: -10 },
+          'WEST_BANK_ALGIERS': { lat: 29.9350, lng: -90.0300, zoom: 12.2, pitch: 45, bearing: -10 },
+          'JEFFERSON_METAIRIE_KENNER': { lat: 29.9850, lng: -90.1800, zoom: 11.8, pitch: 45, bearing: -10 },
+          'ST_BERNARD_CHALMETTE': { lat: 29.8850, lng: -89.9700, zoom: 11.8, pitch: 45, bearing: -10 }
+        }
+      },
+      norfolk: {
+        center: [-76.2859, 36.8508],
+        zoom: 11.6,
+        pitch: 48,
+        bearing: -10,
+        name: 'Norfolk',
+        metroBbox: { min_lat: 36.83, max_lat: 37.04, min_lng: -76.35, max_lng: -76.17 },
+        allLabel: 'All Norfolk',
+        divisions: [
+          { key: 'ALL', label: 'All Norfolk', class: 'ALL' },
+          { key: 'DOWNTOWN_WATERFRONT', label: 'Downtown Waterfront', class: 'DowntownWaterfront' },
+          { key: 'GHENT_WESTBURG', label: 'Ghent / Westburg', class: 'GhentWestburg' },
+          { key: 'OCEAN_VIEW', label: 'Ocean View', class: 'OceanView' },
+          { key: 'CENTRAL_MILITARY_CIRCLE', label: 'Central / Military Circle', class: 'CentralMilitaryCircle' },
+          { key: 'SOUTH_NORFOLK_BERKLEY', label: 'South Norfolk / Berkley', class: 'SouthNorfolkBerkley' }
+        ],
+        presets: {
+          'ALL': { lat: 36.8800, lng: -76.2859, zoom: 11.4, pitch: 45, bearing: -10 },
+          'DOWNTOWN_WATERFRONT': { lat: 36.8560, lng: -76.2930, zoom: 13.6, pitch: 54, bearing: -12 },
+          'GHENT_WESTBURG': { lat: 36.8660, lng: -76.3000, zoom: 13.2, pitch: 50, bearing: -10 },
+          'OCEAN_VIEW': { lat: 36.9450, lng: -76.3100, zoom: 12.6, pitch: 45, bearing: -10 },
+          'CENTRAL_MILITARY_CIRCLE': { lat: 36.8850, lng: -76.2400, zoom: 12.8, pitch: 48, bearing: -10 },
+          'SOUTH_NORFOLK_BERKLEY': { lat: 36.8500, lng: -76.2650, zoom: 13.0, pitch: 48, bearing: -10 }
+        }
+      },
+      detroit: {
+        center: [-83.0458, 42.3314],
+        zoom: 10.6,
+        pitch: 48,
+        bearing: -10,
+        name: 'Detroit',
+        metroBbox: { min_lat: 42.25, max_lat: 42.49, min_lng: -83.35, max_lng: -82.88 },
+        allLabel: 'All Detroit',
+        divisions: [
+          { key: 'ALL', label: 'All Detroit', class: 'ALL' },
+          { key: 'DOWNTOWN_MIDTOWN_CORKTOWN', label: 'Downtown / Midtown / Corktown', class: 'DowntownMidtownCorktown' },
+          { key: 'EAST_SIDE_JEFFERSON', label: 'East Side / Jefferson', class: 'EastSideJefferson' },
+          { key: 'WEST_SIDE_GRAND_RIVER', label: 'West Side / Grand River', class: 'WestSideGrandRiver' },
+          { key: 'SOUTHWEST_MEXICANTOWN', label: 'Southwest / Mexicantown', class: 'SouthwestMexicantown' },
+          { key: 'NORTH_END_HIGHLAND_PARK', label: 'North End / Highland Park', class: 'NorthEndHighlandPark' },
+          { key: 'EAST_ENGLISH_VILLAGE_MORNINGSIDE', label: 'East English Village / Morningside', class: 'EastEnglishVillageMorningside' }
+        ],
+        presets: {
+          'ALL': { lat: 42.3314, lng: -83.0458, zoom: 10.4, pitch: 45, bearing: -10 },
+          'DOWNTOWN_MIDTOWN_CORKTOWN': { lat: 42.3310, lng: -83.0600, zoom: 13.2, pitch: 52, bearing: -12 },
+          'EAST_SIDE_JEFFERSON': { lat: 42.3450, lng: -82.9850, zoom: 12.6, pitch: 48, bearing: -10 },
+          'WEST_SIDE_GRAND_RIVER': { lat: 42.3950, lng: -83.2100, zoom: 12.4, pitch: 45, bearing: -10 },
+          'SOUTHWEST_MEXICANTOWN': { lat: 42.3150, lng: -83.1100, zoom: 12.8, pitch: 48, bearing: -10 },
+          'NORTH_END_HIGHLAND_PARK': { lat: 42.3950, lng: -83.0900, zoom: 12.8, pitch: 48, bearing: -10 },
+          'EAST_ENGLISH_VILLAGE_MORNINGSIDE': { lat: 42.3700, lng: -82.9550, zoom: 12.8, pitch: 48, bearing: -10 }
+        }
+      },
+      austin: {
+        center: [-97.7431, 30.2672],
+        zoom: 10.8,
+        pitch: 48,
+        bearing: -10,
+        name: 'Austin',
+        metroBbox: { min_lat: 30.10, max_lat: 30.62, min_lng: -98.05, max_lng: -97.52 },
+        allLabel: 'All Austin',
+        divisions: [
+          { key: 'ALL', label: 'All Austin', class: 'ALL' },
+          { key: 'DOWNTOWN_CAPITOL', label: 'Downtown / Capitol', class: 'DowntownCapitol' },
+          { key: 'EAST_AUSTIN_MUELLER', label: 'East Austin / Mueller', class: 'EastAustinMueller' },
+          { key: 'SOUTH_AUSTIN_SOCO', label: 'South Austin / SoCo', class: 'SouthAustinSoCo' },
+          { key: 'NORTH_AUSTIN_DOMAIN', label: 'North Austin / The Domain', class: 'NorthAustinDomain' },
+          { key: 'WEST_AUSTIN_HILLS', label: 'West Austin Hills', class: 'WestAustinHills' },
+          { key: 'PFLUGERVILLE_ROUND_ROCK_EDGE', label: 'Pflugerville / Round Rock Edge', class: 'PflugervilleRoundRockEdge' }
+        ],
+        presets: {
+          'ALL': { lat: 30.2672, lng: -97.7431, zoom: 10.6, pitch: 45, bearing: -10 },
+          'DOWNTOWN_CAPITOL': { lat: 30.2720, lng: -97.7430, zoom: 13.6, pitch: 54, bearing: -12 },
+          'EAST_AUSTIN_MUELLER': { lat: 30.2800, lng: -97.6950, zoom: 12.8, pitch: 48, bearing: -10 },
+          'SOUTH_AUSTIN_SOCO': { lat: 30.2300, lng: -97.7550, zoom: 12.8, pitch: 48, bearing: -10 },
+          'NORTH_AUSTIN_DOMAIN': { lat: 30.3950, lng: -97.7100, zoom: 12.4, pitch: 48, bearing: -10 },
+          'WEST_AUSTIN_HILLS': { lat: 30.3100, lng: -97.8000, zoom: 12.4, pitch: 45, bearing: -10 },
+          'PFLUGERVILLE_ROUND_ROCK_EDGE': { lat: 30.4500, lng: -97.6400, zoom: 12.0, pitch: 45, bearing: -10 }
+        }
       }
     };
     CITY_CONFIGS.sf = CITY_CONFIGS.san_francisco;
@@ -1408,7 +1524,11 @@ def get_dashboard_html() -> str:
         'chicago': { lat: 41.8781, lng: -87.6298 },
         'nyc': { lat: 40.7128, lng: -74.0060 },
         'seattle': { lat: 47.6062, lng: -122.3321 },
-        'los_angeles': { lat: 34.0522, lng: -118.2437 }
+        'los_angeles': { lat: 34.0522, lng: -118.2437 },
+        'new_orleans': { lat: 29.9511, lng: -90.0715 },
+        'norfolk': { lat: 36.8508, lng: -76.2859 },
+        'detroit': { lat: 42.3314, lng: -83.0458 },
+        'austin': { lat: 30.2672, lng: -97.7431 }
       };
       let closest = 'san_francisco';
       let minDist = Infinity;
@@ -1425,7 +1545,7 @@ def get_dashboard_html() -> str:
     async function detectUserDefaultCity() {
       try {
         const saved = sessionStorage.getItem('urban_dev_user_city');
-        if (saved && (saved === 'san_francisco' || saved === 'chicago' || saved === 'nyc' || saved === 'seattle' || saved === 'los_angeles')) {
+        if (saved && (saved === 'san_francisco' || saved === 'chicago' || saved === 'nyc' || saved === 'seattle' || saved === 'los_angeles' || saved === 'new_orleans' || saved === 'norfolk' || saved === 'detroit' || saved === 'austin')) {
           return saved;
         }
       } catch (e) {}
@@ -1505,6 +1625,10 @@ def get_dashboard_html() -> str:
         if (currentCity === 'chicago') return 'Central / Downtown';
         if (currentCity === 'seattle') return 'SEATTLE_CORE';
         if (currentCity === 'los_angeles') return 'CENTRAL_LA';
+        if (currentCity === 'new_orleans') return 'CBD_FRENCH_QUARTER';
+        if (currentCity === 'norfolk') return 'DOWNTOWN_WATERFRONT';
+        if (currentCity === 'detroit') return 'DOWNTOWN_MIDTOWN_CORKTOWN';
+        if (currentCity === 'austin') return 'DOWNTOWN_CAPITOL';
         return 'Manhattan';
       }
       const clean = b.toString().trim();
@@ -1528,6 +1652,32 @@ def get_dashboard_html() -> str:
       if (upper === 'SEATTLECORE') return 'SEATTLE_CORE';
       if (upper === 'NORTHKING') return 'NORTH_KING';
       if (upper === 'EASTSIDE') return 'EASTSIDE';
+      if (upper === 'CBDFRENCHQUARTER' || upper === 'FRENCHQUARTER' || upper === 'CBD') return 'CBD_FRENCH_QUARTER';
+      if (upper === 'BYWATERMARIGNY' || upper === 'BYWATER' || upper === 'MARIGNY') return 'BYWATER_MARIGNY';
+      if (upper === 'UPTOWNCARROLLTON' || upper === 'UPTOWN' || upper === 'CARROLLTON') return 'UPTOWN_CARROLLTON';
+      if (upper === 'MIDCITY') return 'MID_CITY';
+      if (upper === 'LAKEVIEWGENTILLY' || upper === 'LAKEVIEW' || upper === 'GENTILLY') return 'LAKEVIEW_GENTILLY';
+      if (upper === 'NEWORLEANSEAST' || upper === 'NOEAST') return 'NEW_ORLEANS_EAST';
+      if (upper === 'WESTBANKALGIERS' || upper === 'ALGIERS' || upper === 'WESTBANK') return 'WEST_BANK_ALGIERS';
+      if (upper === 'JEFFERSONMETAIRIEKENNER' || upper === 'METAIRIE' || upper === 'KENNER') return 'JEFFERSON_METAIRIE_KENNER';
+      if (upper === 'STBERNARDCHALMETTE' || upper === 'CHALMETTE' || upper === 'STBERNARD') return 'ST_BERNARD_CHALMETTE';
+      if (upper === 'DOWNTOWNWATERFRONT' || upper === 'DOWNTOWNNORFOLK') return 'DOWNTOWN_WATERFRONT';
+      if (upper === 'GHENTWESTBURG' || upper === 'GHENT') return 'GHENT_WESTBURG';
+      if (upper === 'OCEANVIEW') return 'OCEAN_VIEW';
+      if (upper === 'CENTRALMILITARYCIRCLE' || upper === 'MILITARYCIRCLE') return 'CENTRAL_MILITARY_CIRCLE';
+      if (upper === 'SOUTHNORFOLKBERKLEY' || upper === 'BERKLEY' || upper === 'SOUTHNORFOLK') return 'SOUTH_NORFOLK_BERKLEY';
+      if (upper === 'DOWNTOWNMIDTOWNCORKTOWN' || upper === 'CORKTOWN' || upper === 'MIDTOWNDETROIT') return 'DOWNTOWN_MIDTOWN_CORKTOWN';
+      if (upper === 'EASTSIDEJEFFERSON' || upper === 'JEFFERSONCHALMERS') return 'EAST_SIDE_JEFFERSON';
+      if (upper === 'WESTSIDEGRANDRIVER' || upper === 'GRANDRIVER') return 'WEST_SIDE_GRAND_RIVER';
+      if (upper === 'SOUTHWESTMEXICANTOWN' || upper === 'MEXICANTOWN') return 'SOUTHWEST_MEXICANTOWN';
+      if (upper === 'NORTHENDHIGHLANDPARK' || upper === 'HIGHLANDPARK') return 'NORTH_END_HIGHLAND_PARK';
+      if (upper === 'EASTENGLISHVILLAGEMORNINGSIDE' || upper === 'EASTENGLISHVILLAGE') return 'EAST_ENGLISH_VILLAGE_MORNINGSIDE';
+      if (upper === 'DOWNTOWNCAPITOL' || upper === 'CAPITOL') return 'DOWNTOWN_CAPITOL';
+      if (upper === 'EASTAUSTINMUELLER' || upper === 'MUELLER' || upper === 'EASTAUSTIN') return 'EAST_AUSTIN_MUELLER';
+      if (upper === 'SOUTHAUSTINSOCO' || upper === 'SOCO' || upper === 'SOUTHAUSTIN') return 'SOUTH_AUSTIN_SOCO';
+      if (upper === 'NORTHAUSTINDOMAIN' || upper === 'THEDOMAIN' || upper === 'DOMAIN') return 'NORTH_AUSTIN_DOMAIN';
+      if (upper === 'WESTAUSTINHILLS' || upper === 'WESTAUSTIN') return 'WEST_AUSTIN_HILLS';
+      if (upper === 'PFLUGERVILLEROUNDROCKEDGE' || upper === 'PFLUGERVILLE') return 'PFLUGERVILLE_ROUND_ROCK_EDGE';
       if (upper === 'SOUTHKING') return 'SOUTH_KING';
       if (upper === 'CENTRALLA') return 'CENTRAL_LA';
       if (upper === 'WESTSIDE') return 'WESTSIDE';
@@ -2559,13 +2709,43 @@ def get_dashboard_html() -> str:
       return minDst < 0.05 ? { name: closestName, meta: closestMeta } : null;
     }
 
+    function resolveDivisionByNearestSubmarket(lat, lng) {
+      // Mirrors server-side get_division_for_coordinate: snap to the nearest
+      // submarket within 25 km and return its division. Falls back to null so
+      // the static bbox chains below apply.
+      const subs = SUBMARKETS || {};
+      const keys = Object.keys(subs);
+      if (!keys.length) return null;
+      let bestName = null, bestMeta = null, bestDist = Infinity;
+      for (const k of keys) {
+        const m = subs[k] || {};
+        if (typeof m.lat !== 'number' || typeof m.lng !== 'number') continue;
+        const d = haversineDistance(lat, lng, m.lat, m.lng);
+        if (d < bestDist) { bestDist = d; bestName = k; bestMeta = m; }
+      }
+      if (bestMeta && bestDist <= 25.0) return bestMeta.borough;
+      return null;
+    }
+
     function getBoroughNameByCoords(lat, lng) {
       if (!lat || !lng) {
         if (currentCity === 'san_francisco' || currentCity === 'sf') return 'SAN_FRANCISCO_CORE';
         if (currentCity === 'chicago') return 'Central / Downtown';
         if (currentCity === 'seattle') return 'SEATTLE_CORE';
         if (currentCity === 'los_angeles') return 'CENTRAL_LA';
+        if (currentCity === 'new_orleans') return 'CBD_FRENCH_QUARTER';
+        if (currentCity === 'norfolk') return 'DOWNTOWN_WATERFRONT';
+        if (currentCity === 'detroit') return 'DOWNTOWN_MIDTOWN_CORKTOWN';
+        if (currentCity === 'austin') return 'DOWNTOWN_CAPITOL';
         return 'Manhattan';
+      }
+      const cfg = CITY_CONFIGS[currentCity];
+      if (cfg && cfg.metroBbox) {
+        const b = cfg.metroBbox;
+        if (lat >= b.min_lat && lat <= b.max_lat && lng >= b.min_lng && lng <= b.max_lng) {
+          const viaSubmarket = resolveDivisionByNearestSubmarket(lat, lng);
+          if (viaSubmarket) return viaSubmarket;
+        }
       }
       if (currentCity === 'seattle') {
         // SEATTLE_METRO_BBOX guard: min_lat 47.28 max_lat 47.78 min_lng -122.43 max_lng -122.00
@@ -2586,6 +2766,56 @@ def get_dashboard_html() -> str:
           if (lat >= 34.03 && lat <= 34.14 && lng >= -118.35 && lng <= -118.2) return 'CENTRAL_LA';
           if (lat >= 34.03 && lat <= 34.2 && lng >= -118.28 && lng <= -117.95) return 'EASTSIDE_SGV';
           return 'CENTRAL_LA';
+        }
+      }
+      if (currentCity === 'new_orleans') {
+        // NEW_ORLEANS_METRO_BBOX guard: min_lat 29.82 max_lat 30.16 min_lng -90.30 max_lng -89.62
+        if (lat >= 29.82 && lat <= 30.16 && lng >= -90.30 && lng <= -89.62) {
+          if (lat >= 29.93 && lat <= 30.00 && lng >= -90.10 && lng <= -90.02) return 'CBD_FRENCH_QUARTER';
+          if (lat >= 29.95 && lat <= 30.00 && lng >= -90.05 && lng <= -89.98) return 'BYWATER_MARIGNY';
+          if (lat >= 29.90 && lat <= 30.00 && lng >= -90.15 && lng <= -90.05) return 'UPTOWN_CARROLLTON';
+          if (lat >= 29.96 && lat <= 30.04 && lng >= -90.13 && lng <= -90.05) return 'MID_CITY';
+          if (lat >= 29.98 && lat <= 30.06 && lng >= -90.15 && lng <= -90.04) return 'LAKEVIEW_GENTILLY';
+          if (lat >= 29.86 && lat <= 29.98 && lng >= -90.08 && lng <= -89.95) return 'WEST_BANK_ALGIERS';
+          if (lat >= 29.99 && lat <= 30.10 && lng >= -90.08 && lng <= -89.62) return 'NEW_ORLEANS_EAST';
+          if (lat >= 29.87 && lat <= 30.05 && lng >= -90.30 && lng <= -90.10) return 'JEFFERSON_METAIRIE_KENNER';
+          if (lat >= 29.82 && lat <= 29.95 && lng >= -90.10 && lng <= -89.80) return 'ST_BERNARD_CHALMETTE';
+          return 'CBD_FRENCH_QUARTER';
+        }
+      }
+      if (currentCity === 'norfolk') {
+        // NORFOLK_METRO_BBOX guard: min_lat 36.83 max_lat 37.04 min_lng -76.35 max_lng -76.17
+        if (lat >= 36.83 && lat <= 37.04 && lng >= -76.35 && lng <= -76.17) {
+          if (lat >= 36.915 && lng <= -76.24) return 'OCEAN_VIEW';
+          if (lat >= 36.87 && lat <= 36.92 && lng >= -76.27 && lng <= -76.205) return 'CENTRAL_MILITARY_CIRCLE';
+          if (lat <= 36.88 && lng >= -76.30 && lng <= -76.23) return 'SOUTH_NORFOLK_BERKLEY';
+          if (lat >= 36.84 && lat <= 36.90 && lng >= -76.315 && lng <= -76.28) return 'DOWNTOWN_WATERFRONT';
+          if (lat >= 36.85 && lat <= 36.905 && lng >= -76.31 && lng <= -76.255) return 'GHENT_WESTBURG';
+          return 'DOWNTOWN_WATERFRONT';
+        }
+      }
+      if (currentCity === 'detroit') {
+        // DETROIT_METRO_BBOX guard: min_lat 42.25 max_lat 42.49 min_lng -83.35 max_lng -82.88
+        if (lat >= 42.25 && lat <= 42.49 && lng >= -83.35 && lng <= -82.88) {
+          if (lat >= 42.38 && lng <= -83.15) return 'WEST_SIDE_GRAND_RIVER';
+          if (lat >= 42.365 && lng >= -83.12 && lng <= -83.06) return 'NORTH_END_HIGHLAND_PARK';
+          if (lat <= 42.33 && lng >= -83.15 && lng <= -83.08) return 'SOUTHWEST_MEXICANTOWN';
+          if (lat >= 42.35 && lng >= -82.95) return 'EAST_ENGLISH_VILLAGE_MORNINGSIDE';
+          if (lat >= 42.325 && lng >= -83.03) return 'EAST_SIDE_JEFFERSON';
+          if (lat >= 42.31 && lat <= 42.365 && lng >= -83.10 && lng <= -83.02) return 'DOWNTOWN_MIDTOWN_CORKTOWN';
+          return 'DOWNTOWN_MIDTOWN_CORKTOWN';
+        }
+      }
+      if (currentCity === 'austin') {
+        // AUSTIN_METRO_BBOX guard: min_lat 30.10 max_lat 30.62 min_lng -98.05 max_lng -97.52
+        if (lat >= 30.10 && lat <= 30.62 && lng >= -98.05 && lng <= -97.52) {
+          if (lat >= 30.305 && lat <= 30.48 && lng >= -97.76 && lng <= -97.655) return 'NORTH_AUSTIN_DOMAIN';
+          if (lat >= 30.39 && lng >= -97.66) return 'PFLUGERVILLE_ROUND_ROCK_EDGE';
+          if (lat >= 30.25 && lng <= -97.755 && lat <= 30.40) return 'WEST_AUSTIN_HILLS';
+          if (lat <= 30.25 && lng <= -97.72) return 'SOUTH_AUSTIN_SOCO';
+          if (lat >= 30.25 && lat <= 30.31 && lng >= -97.72 && lng <= -97.66) return 'EAST_AUSTIN_MUELLER';
+          if (lat >= 30.25 && lat <= 30.29 && lng >= -97.765 && lng <= -97.725) return 'DOWNTOWN_CAPITOL';
+          return 'DOWNTOWN_CAPITOL';
         }
       }
       if (lat >= 37.0 && lat <= 38.5 && lng >= -123.0 && lng <= -121.5) {
