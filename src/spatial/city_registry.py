@@ -15,6 +15,12 @@ from src.spatial.cities.chicago import (
     CHICAGO_METRO_BBOX,
     CHICAGO_SUBMARKETS,
 )
+from src.spatial.cities.los_angeles import (
+    LA_DIVISION_BBOXES,
+    LA_DIVISIONS,
+    LA_METRO_BBOX,
+    LA_SUBMARKETS,
+)
 from src.spatial.cities.san_francisco import (
     SAN_FRANCISCO_DIVISION_BBOXES,
     SAN_FRANCISCO_DIVISIONS,
@@ -22,6 +28,12 @@ from src.spatial.cities.san_francisco import (
     SAN_FRANCISCO_SUBMARKETS,
     SF_DIVISION_BBOXES,
     SF_METRO_BBOX,
+)
+from src.spatial.cities.seattle import (
+    SEATTLE_DIVISION_BBOXES,
+    SEATTLE_DIVISIONS,
+    SEATTLE_METRO_BBOX,
+    SEATTLE_SUBMARKETS,
 )
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
@@ -39,6 +51,8 @@ class CityId(str, Enum):
     NYC = "nyc"
     CHICAGO = "chicago"
     SAN_FRANCISCO = "san_francisco"
+    SEATTLE = "seattle"
+    LOS_ANGELES = "los_angeles"
 
 
 class FeedType(str, Enum):
@@ -120,6 +134,34 @@ ALIASES: Dict[str, CityId] = {
     "sf_bay_area": CityId.SAN_FRANCISCO,
     "sf-bay-area": CityId.SAN_FRANCISCO,
     "sf bay area": CityId.SAN_FRANCISCO,
+
+    # Seattle & King County
+    "seattle": CityId.SEATTLE,
+    "sea": CityId.SEATTLE,
+    "king_county": CityId.SEATTLE,
+    "king-county": CityId.SEATTLE,
+    "king county": CityId.SEATTLE,
+    "puget_sound": CityId.SEATTLE,
+    "puget-sound": CityId.SEATTLE,
+    "puget sound": CityId.SEATTLE,
+    "bellevue": CityId.SEATTLE,
+
+    # Los Angeles & LA County
+    "los_angeles": CityId.LOS_ANGELES,
+    "los-angeles": CityId.LOS_ANGELES,
+    "los angeles": CityId.LOS_ANGELES,
+    "la": CityId.LOS_ANGELES,
+    "l.a.": CityId.LOS_ANGELES,
+    "socal": CityId.LOS_ANGELES,
+    "la_county": CityId.LOS_ANGELES,
+    "la-county": CityId.LOS_ANGELES,
+    "la county": CityId.LOS_ANGELES,
+    "long_beach": CityId.LOS_ANGELES,
+    "long beach": CityId.LOS_ANGELES,
+    "pasadena": CityId.LOS_ANGELES,
+    "glendale": CityId.LOS_ANGELES,
+    "south_bay": CityId.LOS_ANGELES,
+    "san_fernando_valley": CityId.LOS_ANGELES,
 }
 
 
@@ -279,7 +321,119 @@ REGISTRY: Dict[CityId, CityRegistration] = {
             ),
         },
     ),
+    CityId.SEATTLE: CityRegistration(
+        city_id=CityId.SEATTLE,
+        name="Seattle Metro",
+        state="WA",
+        center={"lat": 47.6062, "lng": -122.3321},
+        metro_bbox=SEATTLE_METRO_BBOX,
+        division_bboxes=SEATTLE_DIVISION_BBOXES,
+        submarkets=SEATTLE_SUBMARKETS,
+        divisions=SEATTLE_DIVISIONS,
+        job_suffix="seattle",
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.socrata_seattle_permits_endpoint,
+                platform="socrata",
+                watermark_col="issueddate",
+                id_keys=["permitnum", "id"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+            ),
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.socrata_seattle_311_endpoint,
+                platform="socrata",
+                watermark_col="createddate",
+                id_keys=["servicerequestnumber", "id"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+            ),
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.socrata_seattle_licenses_endpoint,
+                platform="socrata",
+                watermark_col="applicationdate",
+                id_keys=["license", "ubi", "id"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+            ),
+            # King County Assessor parcel sales stand in for recorded deeds. This
+            # is an ArcGIS FeatureServer, not Socrata: it pages by OBJECTID via
+            # resultOffset rather than by Socrata's $offset, so it needs an
+            # ArcGIS-aware PaginatingClient.
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.arcgis_kc_sales_url,
+                platform="arcgis",
+                watermark_col="SaleDate",
+                id_keys=["ExciseTaxNum", "PIN", "OBJECTID"],
+                topic=settings.topic_deeds,
+                interval_seconds=600.0,
+                producer_key="deeds",
+                extra={"oid_field": "OBJECTID", "max_record_count": 1000},
+            ),
+        },
+    ),
+    CityId.LOS_ANGELES: CityRegistration(
+        city_id=CityId.LOS_ANGELES,
+        name="Los Angeles Metro",
+        state="CA",
+        center={"lat": 34.0522, "lng": -118.2437},
+        metro_bbox=LA_METRO_BBOX,
+        division_bboxes=LA_DIVISION_BBOXES,
+        submarkets=LA_SUBMARKETS,
+        divisions=LA_DIVISIONS,
+        job_suffix="la",
+        # Only two feeds are registered. Los Angeles retired its open 311 feed
+        # (data.lacity.org carries only an archived 2013-2014 extract), and LA
+        # County's Registrar-Recorder publishes no open recorded-deeds endpoint,
+        # so FeedType.COMPLAINTS_311 and FeedType.DEEDS are deliberately absent
+        # rather than pointed at a stale or unofficial mirror. `get_dataset`
+        # raises a readable error for them; the scheduler simply skips them.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.socrata_la_permits_endpoint,
+                platform="socrata",
+                watermark_col="issue_date",
+                id_keys=["permit_nbr", "pin_nbr", "apn", "id"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+            ),
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.socrata_la_licenses_endpoint,
+                platform="socrata",
+                watermark_col="location_start_date",
+                id_keys=["location_account", "business_name", "id"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+            ),
+        },
+    ),
 }
+
+
+def get_dataset(city_id: CityId, feed: FeedType) -> DatasetSpec:
+    """Look up one city's feed spec, failing with a readable message.
+
+    Not every city publishes every feed: Los Angeles has no open 311 or recorded
+    -deeds endpoint, for instance. Indexing ``REGISTRY[city].datasets[feed]``
+    directly raises a bare KeyError that names neither the city nor the feed, so
+    producers should route through here instead.
+    """
+    reg = REGISTRY.get(city_id)
+    if reg is None:
+        raise KeyError(f"City {city_id.value!r} is not registered in REGISTRY")
+    spec = reg.datasets.get(feed)
+    if spec is None:
+        available = ", ".join(sorted(f.value for f in reg.datasets)) or "none"
+        raise KeyError(
+            f"City {city_id.value!r} has no {feed.value!r} feed registered "
+            f"(available: {available})"
+        )
+    return spec
 
 
 def get_job_name(feed: FeedType, city_id: CityId) -> str:

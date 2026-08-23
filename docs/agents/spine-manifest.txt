@@ -1,0 +1,15 @@
+# Spine manifest — files more than one concurrent stream may need to edit.
+# One path per line; blank lines and # comments ignored.
+# Everything NOT listed here is a leaf: a stream may edit it freely in parallel.
+# See docs/agents/parallel-streams.md for the rules that use this file.
+
+src/config.py
+src/spatial/city_registry.py
+src/spatial/cities/__init__.py
+src/spatial/geo_utils.py
+src/spatial/submarkets.py
+src/producers/scheduler.py
+src/producers/dob_permits_producer.py
+src/producers/complaints_311_producer.py
+src/producers/sla_licenses_producer.py
+src/producers/deeds_acris_producer.py

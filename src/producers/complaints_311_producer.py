@@ -60,7 +60,7 @@ class Complaints311Producer:
         """Parse raw 311 record into strongly-typed Complaint311Event with category classification."""
         try:
             # Determine city_id
-            from src.spatial.city_registry import CityId, ALIASES, REGISTRY, FeedType, normalize_city
+            from src.spatial.city_registry import CityId, ALIASES, REGISTRY, FeedType, normalize_city, get_dataset
             if city_id is not None:
                 norm_c = normalize_city(city_id)
                 resolved_city = norm_c.value if norm_c else city_id.lower()
@@ -206,9 +206,9 @@ class Complaints311Producer:
 
     def run_stream(self, city_id: str = "nyc", limit: int = 5000, where_clause: Optional[str] = None):
         """Fetch 311 records and stream them into Kafka topic."""
-        from src.spatial.city_registry import REGISTRY, CityId, FeedType, normalize_city
+        from src.spatial.city_registry import REGISTRY, CityId, FeedType, normalize_city, get_dataset
         cid = normalize_city(city_id) or CityId.NYC
-        endpoint = REGISTRY[cid].datasets[FeedType.COMPLAINTS_311].endpoint
+        endpoint = get_dataset(cid, FeedType.COMPLAINTS_311).endpoint
 
         logger.info("Starting %s 311 Ingestion Stream (limit=%d)...", cid.value.upper(), limit)
         records_streamed = 0

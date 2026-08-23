@@ -58,7 +58,7 @@ class DOBPermitsProducer:
         """Convert raw Socrata JSON permit dict into strongly-typed PermitEvent."""
         try:
             # Determine city_id
-            from src.spatial.city_registry import CityId, ALIASES, REGISTRY, FeedType, normalize_city
+            from src.spatial.city_registry import CityId, ALIASES, REGISTRY, FeedType, normalize_city, get_dataset
             if city_id is not None:
                 norm_c = normalize_city(city_id)
                 resolved_city = norm_c.value if norm_c else city_id.lower()
@@ -73,6 +73,9 @@ class DOBPermitsProducer:
                 or "supervisor_district" in row
             ):
                 resolved_city = "san_francisco"
+            elif "permit_nbr" in row or "cofo_date" in row or "permit_sub_type" in row:
+                # LADBS building permits (data.lacity.org).
+                resolved_city = "los_angeles"
             elif "permit_" in row or "reported_cost" in row or "community_area" in row:
                 resolved_city = "chicago"
             else:
@@ -80,6 +83,7 @@ class DOBPermitsProducer:
 
             job_id = str(
                 row.get("permit_number")
+                or row.get("permit_nbr")
                 or row.get("permit_")
                 or row.get("job__")
                 or row.get("job_number")
@@ -92,7 +96,13 @@ class DOBPermitsProducer:
                 return None
 
             lat_raw = row.get("latitude") or row.get("lat") or row.get("gis_latitude")
-            lng_raw = row.get("longitude") or row.get("lng") or row.get("long") or row.get("gis_longitude")
+            lng_raw = (
+                row.get("longitude")
+                or row.get("lng")
+                or row.get("lon")
+                or row.get("long")
+                or row.get("gis_longitude")
+            )
             if not lat_raw or not lng_raw:
                 loc = row.get("location") or row.get("point") or row.get("the_geom") or row.get("shape") or {}
                 if isinstance(loc, dict):
@@ -160,6 +170,7 @@ class DOBPermitsProducer:
                 or row.get("initial_cost")
                 or row.get("estimated_job_costs")
                 or row.get("total_est_fee")
+                or row.get("valuation")
                 or 0.0
             )
             try:
@@ -183,6 +194,7 @@ class DOBPermitsProducer:
                 row.get("filed_date")
                 or row.get("application_start_date")
                 or row.get("filing_date")
+                or row.get("submitted_date")
             )
             filing_dt = _parse_datetime(filing_str)
 
@@ -259,9 +271,9 @@ class DOBPermitsProducer:
 
     def run_stream(self, city_id: str = "nyc", limit: int = 5000, where_clause: Optional[str] = None):
         """Fetch permit records and stream them into Kafka topic."""
-        from src.spatial.city_registry import REGISTRY, CityId, FeedType, normalize_city
+        from src.spatial.city_registry import REGISTRY, CityId, FeedType, normalize_city, get_dataset
         cid = normalize_city(city_id) or CityId.NYC
-        endpoint = REGISTRY[cid].datasets[FeedType.PERMITS].endpoint
+        endpoint = get_dataset(cid, FeedType.PERMITS).endpoint
 
         logger.info("Starting %s DOB Permits Ingestion Stream (limit=%d)...", cid.value.upper(), limit)
         records_streamed = 0

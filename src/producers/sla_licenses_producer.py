@@ -58,13 +58,18 @@ class SLALicensesProducer:
         """Convert raw SLA / business license record to strongly-typed SLALicenseEvent."""
         try:
             # Determine city_id
-            from src.spatial.city_registry import CityId, ALIASES, REGISTRY, FeedType, normalize_city
+            from src.spatial.city_registry import CityId, ALIASES, REGISTRY, FeedType, normalize_city, get_dataset
             if city_id is not None:
                 norm_c = normalize_city(city_id)
                 resolved_city = norm_c.value if norm_c else city_id.lower()
             elif row.get("city_id"):
                 norm_c = normalize_city(row["city_id"])
                 resolved_city = norm_c.value if norm_c else str(row["city_id"]).lower()
+            elif "location_account" in row or "primary_naics_description" in row:
+                # LA Office of Finance active-business registrations. Checked
+                # before San Francisco: LA shares dba_name and location_start_date
+                # with the SF registry, so only these two columns discriminate.
+                resolved_city = "los_angeles"
             elif (
                 "location_id" in row
                 or "dba_name" in row
@@ -86,6 +91,7 @@ class SLALicensesProducer:
 
             license_id = str(
                 row.get("location_id")
+                or row.get("location_account")
                 or row.get("certificate_number")
                 or row.get("business_account_number")
                 or row.get("license_id")
@@ -105,6 +111,7 @@ class SLALicensesProducer:
             if not lat_raw or not lng_raw:
                 loc = (
                     row.get("business_location")
+                    or row.get("location_1")
                     or row.get("georeference")
                     or row.get("location")
                     or row.get("point")
@@ -124,6 +131,12 @@ class SLALicensesProducer:
 
             lat = float(lat_raw)
             lng = float(lng_raw)
+
+            # Roughly 7% of LA's business-registration rows carry a 0.0/0.0
+            # placeholder rather than a real geocode. Treating that as a valid
+            # coordinate would file them under an H3 cell in the Gulf of Guinea.
+            if lat == 0.0 and lng == 0.0:
+                return None
 
             h3_res = self.spatial_indexer.get_multi_res_hierarchy(lat, lng)
 
@@ -230,9 +243,9 @@ class SLALicensesProducer:
 
     def run_stream(self, city_id: str = "nyc", limit: int = 5000, where_clause: Optional[str] = None):
         """Fetch SLA / license records and stream them into Kafka topic."""
-        from src.spatial.city_registry import REGISTRY, CityId, FeedType, normalize_city
+        from src.spatial.city_registry import REGISTRY, CityId, FeedType, normalize_city, get_dataset
         cid = normalize_city(city_id) or CityId.NYC
-        endpoint = REGISTRY[cid].datasets[FeedType.SLA].endpoint
+        endpoint = get_dataset(cid, FeedType.SLA).endpoint
 
         logger.info("Starting %s SLA / License Ingestion Stream (limit=%d)...", cid.value.upper(), limit)
         records_streamed = 0

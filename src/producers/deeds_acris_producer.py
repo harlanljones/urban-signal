@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 from src.config import settings
 from src.producers.base_producer import BaseKafkaProducer
+from src.producers.arcgis_client import ArcGISClient
 from src.producers.socrata_client import SocrataClient
 from src.schemas.models import DeedEvent
 from src.spatial.h3_indexer import H3SpatialIndexer
@@ -57,13 +58,24 @@ class DeedsACRISProducer:
             dlq_topic=settings.topic_dlq,
         )
         self.socrata = SocrataClient()
+        self.arcgis = ArcGISClient()
         self.spatial_indexer = H3SpatialIndexer()
+
+    def _client_for(self, platform: str):
+        """Select the paginating client matching a DatasetSpec's platform.
+
+        Both clients satisfy the same ``PaginatingClient`` protocol, so callers
+        only need the right instance, not a different call shape.
+        """
+        if platform == "arcgis":
+            return self.arcgis
+        return self.socrata
 
     def parse_socrata_row(self, row: Dict[str, Any], city_id: Optional[str] = None) -> Optional[DeedEvent]:
         """Convert raw ACRIS / Cook County / SF Assessor deed record into strongly-typed DeedEvent."""
         try:
             # Determine city_id
-            from src.spatial.city_registry import CityId, ALIASES, REGISTRY, FeedType, normalize_city
+            from src.spatial.city_registry import CityId, ALIASES, REGISTRY, FeedType, normalize_city, get_dataset
             if city_id is not None:
                 norm_c = normalize_city(city_id)
                 resolved_city = norm_c.value if norm_c else city_id.lower()
@@ -79,13 +91,17 @@ class DeedsACRISProducer:
                 or "closed_roll_year" in row
             ):
                 resolved_city = "san_francisco"
+            elif "ExciseTaxNum" in row or "SalePrice" in row or "Principal_Use" in row:
+                # King County ArcGIS parcel sales (PascalCase attribute names).
+                resolved_city = "seattle"
             elif "pin" in row or "township" in row or "sale_price" in row or "municipality" in row:
                 resolved_city = "chicago"
             else:
                 resolved_city = "nyc"
 
             doc_id = str(
-                row.get("parcel_number")
+                row.get("ExciseTaxNum")
+                or row.get("parcel_number")
                 or row.get("block_and_lot_number")
                 or row.get("doc_id")
                 or row.get("document_id")
@@ -130,6 +146,7 @@ class DeedsACRISProducer:
                 or row.get("document_type")
                 or row.get("type_of_deed")
                 or row.get("deed_type")
+                or row.get("Property_Type")
                 or "DEED"
             ).upper()
 
@@ -157,6 +174,7 @@ class DeedsACRISProducer:
                 or _parse_val(row.get("doc_amount"))
                 or _parse_val(row.get("recorded_amt"))
                 or _parse_val(row.get("sale_price"))
+                or _parse_val(row.get("SalePrice"))
                 or _parse_val(row.get("amount"))
                 or _parse_val(row.get("consideration"))
                 or 0.0
@@ -174,6 +192,7 @@ class DeedsACRISProducer:
                 or row.get("date_recorded")
                 or row.get("exec_date")
                 or row.get("good_through_date")
+                or row.get("SaleDate")
             )
             recorded_dt = _parse_datetime(recorded_str) or datetime.now(timezone.utc)
 
@@ -182,6 +201,7 @@ class DeedsACRISProducer:
                 or row.get("block_and_lot_number")
                 or row.get("bbl")
                 or row.get("pin")
+                or row.get("PIN")
                 or row.get("property_index_number")
                 or ""
             ) or None
@@ -209,9 +229,11 @@ class DeedsACRISProducer:
                 or row.get("party1_type")
                 or row.get("grantor")
                 or row.get("seller")
+                or row.get("Sellername")
             )
             party2 = (
                 row.get("buyer")
+                or row.get("buyername")
                 or row.get("party2_grantee")
                 or row.get("party2_type")
                 or row.get("grantee")
@@ -247,14 +269,16 @@ class DeedsACRISProducer:
 
     def run_stream(self, city_id: str = "nyc", limit: int = 5000, where_clause: Optional[str] = None):
         """Fetch deed records and stream to Kafka topic."""
-        from src.spatial.city_registry import REGISTRY, CityId, FeedType, normalize_city
+        from src.spatial.city_registry import REGISTRY, CityId, FeedType, normalize_city, get_dataset
         cid = normalize_city(city_id) or CityId.NYC
-        endpoint = REGISTRY[cid].datasets[FeedType.DEEDS].endpoint
+        spec = get_dataset(cid, FeedType.DEEDS)
+        endpoint = spec.endpoint
+        client = self._client_for(spec.platform)
 
         logger.info("Starting %s Deeds Ingestion Stream (limit=%d)...", cid.value.upper(), limit)
         records_streamed = 0
 
-        for batch in self.socrata.paginate(
+        for batch in client.paginate(
             endpoint_url=endpoint,
             where_clause=where_clause,
             batch_size=1000,

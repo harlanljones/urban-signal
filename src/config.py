@@ -93,6 +93,39 @@ class Settings(BaseSettings):
         description="SF Assessor Historical Secured Property endpoint",
     )
 
+    # Seattle / Puget Sound (Socrata + WA State LCB)
+    socrata_seattle_permits_endpoint: str = Field(
+        default="https://data.seattle.gov/resource/76t5-zqzr.json",
+        description="Seattle SDCI Building Permits endpoint (2005+)",
+    )
+    socrata_seattle_311_endpoint: str = Field(
+        default="https://data.seattle.gov/resource/5ngg-rpne.json",
+        description="Seattle Customer Service Requests (Find It Fix It) endpoint",
+    )
+    socrata_seattle_licenses_endpoint: str = Field(
+        default="https://data.wa.gov/resource/vgcw-qfjm.json",
+        description="WA State LCB Local Authority Letters - liquor license applications endpoint",
+    )
+
+    # ArcGIS Feature Services (King County)
+    arcgis_kc_sales_url: str = Field(
+        default=(
+            "https://services.arcgis.com/Ej0PsM5Aw677QF1W/arcgis/rest/services/"
+            "PARCEL_SALES3YR_AREA_287/FeatureServer/0"
+        ),
+        description="King County Parcel Sales Last 3 Years ArcGIS FeatureServer layer URL",
+    )
+
+    # Los Angeles (Socrata)
+    socrata_la_permits_endpoint: str = Field(
+        default="https://data.lacity.org/resource/pi9x-tg5x.json",
+        description="LADBS Building Permits Issued from 2020 to Present endpoint",
+    )
+    socrata_la_licenses_endpoint: str = Field(
+        default="https://data.lacity.org/resource/6rrh-rzua.json",
+        description="LA Office of Finance Listing of Active Businesses endpoint",
+    )
+
     # PostgreSQL / PostGIS Database
     postgres_host: str = Field(default="localhost")
     postgres_port: int = Field(default=5432)

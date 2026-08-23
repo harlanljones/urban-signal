@@ -518,7 +518,8 @@ class TestSpatialDistanceAndBoroughs:
         assert get_city_for_coordinate(sample_sf_coords["palo_alto"]["lat"], sample_sf_coords["palo_alto"]["lng"]) == "san_francisco"
 
         assert get_city_for_coordinate(0.0, 0.0) is None
-        assert get_city_for_coordinate(34.0522, -118.2437) is None  # Los Angeles
+        assert get_city_for_coordinate(34.0522, -118.2437) == "los_angeles"
+        assert get_city_for_coordinate(25.7617, -80.1918) is None  # Miami, unregistered
         assert get_city_for_coordinate(51.5074, -0.1278) is None  # London
 
     def test_is_in_sf_metro(self, sample_sf_coords, sample_chicago_coords, sample_nyc_coords):
@@ -569,6 +570,7 @@ class TestSpatialDistanceAndBoroughs:
     def test_registry_invariant_and_namespacing(self):
         """Verify registry invariant: no key collision when merging all cities, keys are properly namespaced."""
         from src.spatial.city_registry import REGISTRY
+        registered_ids = {cid.value for cid in REGISTRY}
         all_subs = get_all_submarkets("all")
         total_expected = sum(len(reg.submarkets) for reg in REGISTRY.values())
         assert len(all_subs) == total_expected
@@ -577,7 +579,7 @@ class TestSpatialDistanceAndBoroughs:
         for k in all_subs:
             assert ":" in k, f"Key {k} is not namespaced"
             cid, name = k.split(":", 1)
-            assert cid in ("nyc", "chicago", "san_francisco")
+            assert cid in registered_ids
 
         # Chinatown and Financial District exist across cities without collision
         assert "nyc:Chinatown" in all_subs

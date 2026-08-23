@@ -36,6 +36,11 @@ def is_in_nyc_metro(lat: float, lng: float) -> bool:
 
 def get_city_for_coordinate(lat: float, lng: float) -> Optional[str]:
     """Determine the city identifier ('nyc', 'chicago', or 'san_francisco') for a given coordinate."""
+    # Records frequently arrive without geocoding; treat a missing coordinate
+    # as "no match" rather than letting the bbox comparison raise TypeError.
+    if lat is None or lng is None:
+        return None
+
     for cid, reg in REGISTRY.items():
         bbox = reg.metro_bbox
         if (
@@ -76,6 +81,11 @@ def get_borough_for_coordinate(lat: float, lng: float) -> Optional[str]:
     Returns:
         One of 'MANHATTAN', 'BROOKLYN', 'QUEENS', 'BRONX', 'STATEN_ISLAND', or None if outside NYC.
     """
+    # Records frequently arrive without geocoding; treat a missing coordinate
+    # as "no match" rather than letting the bbox comparison raise TypeError.
+    if lat is None or lng is None:
+        return None
+
     return get_division_for_coordinate(lat, lng, city_id="nyc")
 
 
@@ -93,6 +103,11 @@ def get_division_for_coordinate(
     Returns:
         NYC Borough name, Chicago Division name, or SF Division name, or None if outside city bounds.
     """
+    # Records frequently arrive without geocoding; treat a missing coordinate
+    # as "no match" rather than letting the bbox comparison raise TypeError.
+    if lat is None or lng is None:
+        return None
+
     norm_city = normalize_city(city_id)
     if not norm_city or norm_city not in REGISTRY:
         return None

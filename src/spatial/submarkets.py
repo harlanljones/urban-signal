@@ -1242,6 +1242,11 @@ def find_nearest_submarket(
     from src.spatial.city_registry import REGISTRY, normalize_city
     from src.spatial.geo_utils import get_city_for_coordinate
 
+    # Records frequently arrive without geocoding; treat a missing coordinate as
+    # "no match at infinite distance" rather than raising on the haversine maths.
+    if lat is None or lng is None:
+        return None, float("inf")
+
     if city_id:
         cid = normalize_city(city_id)
         if cid and cid in REGISTRY:
