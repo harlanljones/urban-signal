@@ -34,7 +34,6 @@ tests/
 # Docs
 *.md
 urban_signal_prospectus_k8s_kafka.md
-urban_development_prospectus_k8s_kafka.md
 
 # K8s deploy (not needed in image)
 deploy/k8s/

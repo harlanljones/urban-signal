@@ -195,6 +195,20 @@ class MunicipalIngestionScheduler:
                 return f"{job_name}:{str(val).strip()}"
         return f"{job_name}:hash_{hash(frozenset(row.items()))}"
 
+    def _paginating_client_for(self, job_name: str):
+        """Select the paginating client matching a job's registered platform.
+
+        Jobs registered with platform='arcgis' (e.g. King County parcel sales)
+        page by OBJECTID via resultOffset and must not be handed to the Socrata
+        client. The invariant suite asserts every producer exposes the client
+        its registered specs need.
+        """
+        meta = self.job_metadata[job_name]
+        producer_wrapper = self.producers[meta.get("producer_key", job_name)]
+        if meta.get("platform") == "arcgis":
+            return producer_wrapper.arcgis
+        return producer_wrapper.socrata
+
     def configure_job(
         self,
         name: str,
@@ -253,7 +267,7 @@ class MunicipalIngestionScheduler:
         new_high_watermark = met.high_watermark
 
         try:
-            for batch in producer_wrapper.socrata.paginate(
+            for batch in self._paginating_client_for(job_name).paginate(
                 endpoint_url=meta["endpoint"],
                 where_clause=active_where,
                 batch_size=min(fetch_limit, 1000),

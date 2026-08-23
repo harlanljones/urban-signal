@@ -24,11 +24,23 @@
 
 ## 1. System Overview & Architecture
 
-Traditional real estate valuation models rely on lagging transactional comps (deeds, MLS closed transfers). **Urban Signal** ingests leading municipal telemetry—daily building permits (DOB A1/A2/NB / Demolitions), Liquor / Hospitality Licenses, 311 citizen maintenance & quality-of-life complaints, and property deeds / tax rolls across **New York City (5 Boroughs)**, **Chicago (6 Divisions)**, and the **San Francisco Bay Area (5 Divisions)**—streaming them through Apache Kafka onto an **Uber H3 multi-resolution hexagonal grid** (Res 7, 8, 9) to predict appreciation ($\\Delta \\ln(P)$) **6 to 18 months ahead of public market listings**.
+Traditional real estate valuation models rely on lagging transactional comps (deeds, MLS closed transfers). **Urban Signal** ingests leading municipal telemetry—daily building permits (DOB A1/A2/NB / Demolitions), Liquor / Hospitality Licenses, 311 citizen maintenance & quality-of-life complaints, and property deeds / tax rolls across five registered metros—streaming them through Apache Kafka onto an **Uber H3 multi-resolution hexagonal grid** (Res 7, 8, 9) to predict appreciation ($\\Delta \\ln(P)$) **6 to 18 months ahead of public market listings**.
+
+### Registered Cities & Feeds
+
+| Metro | Divisions | Permits | 311 | Licenses | Deeds |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| New York City (5 Boroughs) | MANHATTAN, BROOKLYN, QUEENS, BRONX, STATEN_ISLAND | Socrata | Socrata | Socrata | Socrata (ACRIS) |
+| Chicago (6 Divisions) | CENTRAL_DOWNTOWN, NORTH_SIDE, FAR_NORTH_SIDE, NORTHWEST_SIDE, SOUTH_SIDE, SOUTHWEST_SIDE | Socrata | Socrata | Socrata | Socrata (Cook County) |
+| San Francisco Bay Area (5 Divisions) | SAN_FRANCISCO_CORE, EAST_BAY, PENINSULA, SILICON_VALLEY_SOUTH_BAY, MARIN_NORTH_BAY | Socrata | Socrata | Socrata | Socrata (Assessor) |
+| Seattle Metro (4 Divisions) | SEATTLE_CORE, NORTH_KING, EASTSIDE, SOUTH_KING | Socrata | Socrata | Socrata (WA LCB) | ArcGIS (King County parcel sales) |
+| Los Angeles Metro (6 Divisions) | CENTRAL_LA, WESTSIDE, SAN_FERNANDO_VALLEY, HARBOR_SOUTH_BAY, SOUTH_LA, EASTSIDE_SGV | Socrata | — retired feed | Socrata | — no open endpoint |
+
+Partial registrations are deliberate: cities register only feeds that exist, and `get_dataset` raises a readable error for the rest (`src/spatial/city_registry.py`). Adding a city is leaf work — see `docs/research/city-expansion-candidates.md` for the next candidates (New Orleans, Austin).
 
 ```
 +---------------------------------------------------------------------------------------------------+
-|                        MUNICIPAL OPEN DATA INGESTION (Socrata SODA REST APIs)                     |
+|              MUNICIPAL OPEN DATA INGESTION (Socrata SODA REST + ArcGIS FeatureServer)             |
 |         DOB Permits (A1/A2/NB) | 311 Complaints | SLA Liquor Licenses | ACRIS Property Deeds      |
 +-------------------------------------------------+-------------------------------------------------+
                                                   | Ingest & Deduplicate
@@ -114,20 +126,29 @@ urban-signal/
 │       │   └── keda-scaledobject.yaml      # KEDA autoscaling spatial consumer pods (1 -> 8)
 │       └── inference/
 │           └── inference-deployment.yaml   # FastAPI + ONNX Runtime (CUDA GPU)
+├── workers/                                # Cloudflare Worker (urban-signal-edge): batch push & snapshot builder
 ├── models_storage/                         # Serialized ONNX model artifacts (DCN-v2, ST-GNN)
+├── docs/
+│   ├── adr/                                # Architecture decision records (0001 Agent Interlock)
+│   ├── agents/                             # Agent-facing conventions: spine manifest, stream rules
+│   ├── research/                           # City expansion candidate surveys
+│   └── screenshots/                        # Dashboard captures
+├── scripts/
+│   └── interlock_gap.py                    # Interlock-gap metric over a git diff range
+├── .streams/                               # Agent stream logs & dispatch log (see AGENTS.md)
 ├── src/
 │   ├── config.py                           # Central Pydantic Settings & environment config
 │   ├── schemas/                            # Pydantic models & Avro binary schema contracts (.avsc)
-│   ├── spatial/                            # Uber H3 indexing, graph Laplacians, GIS utilities
+│   ├── spatial/                            # Uber H3 indexing, per-city modules, city registry, GIS utilities
 │   ├── features/                           # Time-decay, 311 shift dynamics, LIMS calculator, DuckDB
-│   ├── producers/                          # Socrata scrapers (DOB, 311, SLA, Deeds) & Scheduler
+│   ├── producers/                          # Socrata/ArcGIS clients, per-feed producers, scheduler
 │   ├── consumers/                          # Base Kafka consumer, H3 enrichment, aggregation, PostGIS
 │   ├── storage/                            # PostGIS synchronization engine & table schemas
 │   ├── models/                             # LightGBM, ST-GNN, DCN-v2, Walk-Forward CV, ONNX exporter
-│   └── serving/                            # FastAPI app, inference engine, dashboard, webhooks
+│   └── serving/                            # FastAPI app, router, inference engine, dashboard, webhooks
 ├── tests/
 │   ├── conftest.py                         # Pytest fixtures & sample NYC geospatial payloads
-│   ├── unit/                               # 10 unit test suites
+│   ├── unit/                               # 16 unit suites incl. the interlock invariant gate
 │   └── e2e/                                # End-to-end integration test suite
 ├── pyproject.toml                          # Project packaging and dependency specifications
 ├── LICENSE                                 # Apache 2.0 Open Source License
@@ -148,11 +169,11 @@ All settings are managed via `src/config.py` using `pydantic-settings` and can b
 | `KAFKA_BOOTSTRAP_SERVERS` | `localhost:9092` | Kafka broker endpoints (`kafka-cluster-kafka-bootstrap.kafka-streaming:9092` in K8s) |
 | `KAFKA_SCHEMA_REGISTRY_URL` | `http://localhost:8081` | Schema Registry endpoint |
 | `KAFKA_SECURITY_PROTOCOL` | `PLAINTEXT` | Security protocol (`PLAINTEXT`, `SASL_PLAINTEXT`, `SSL`) |
-| `POSTGRES_HOST` / `PORT` / `DB` | `localhost` / `5432` / `urbansignal` | PostGIS database connection parameters |
+| `POSTGRES_HOST` / `PORT` / `DB` | `localhost` / `5432` / `urbandev` | PostGIS database connection parameters |
 | `POSTGRES_USER` / `PASSWORD` | `postgres` / `postgres` | PostGIS authentication credentials |
 | `MINIO_ENDPOINT` | `localhost:9000` | MinIO S3 object storage endpoint |
 | `MINIO_ACCESS_KEY` / `SECRET_KEY` | `minioadmin` / `minioadmin` | MinIO S3 credentials |
-| `MINIO_BUCKET_FEATURES` | `urban-signal-features` | S3 bucket for feature partitions & model registry |
+| `MINIO_BUCKET_FEATURES` | `urban-features` | S3 bucket for feature partitions & model registry |
 | `SOCRATA_APP_TOKEN` | `None` | Optional Socrata API token for elevated rate limits |
 | `H3_RES_MACRO` / `NEIGHBORHOOD` / `MICRO` | `7` / `8` / `9` | Multi-resolution Uber H3 grid levels |
 | `CAPEX_HALFLIFE_DAYS` | `180.0` | Half-life parameter ($\\lambda = \\ln(2)/180$) for CapEx time decay |
@@ -196,17 +217,18 @@ docker compose -f deploy/docker/docker-compose.dev.yml up -d
 
 ### Running Ingestion Producers & Poller Scheduler
 
-You can stream data using individual one-off producer runs or the continuous polling scheduler:
+You can stream data using individual one-off producer runs or the continuous polling scheduler. Every producer accepts `--city` with any registered alias (e.g. `seattle`, `king county`, `la`):
 
 ```bash
-# Option A: Continuous Municipal Ingestion Scheduler (with deduplication & DLQ)
-python -m src.producers.scheduler --jobs permits 311 sla deeds --interval 60 --limit 500
+# Option A: Continuous Municipal Ingestion Scheduler (with deduplication & DLQ).
+# Jobs are city-namespaced: permits, 311, sla, deeds (NYC) + <feed>_<suffix> per other city.
+python -m src.producers.scheduler --jobs permits sla deeds permits_seattle deeds_seattle permits_la sla_la --interval 60 --limit 500
 
 # Option B: Run individual one-off streams
-python -m src.producers.dob_permits_producer --limit 2000
-python -m src.producers.complaints_311_producer --limit 2000
-python -m src.producers.sla_licenses_producer --limit 1000
-python -m src.producers.deeds_acris_producer --limit 1000
+python -m src.producers.dob_permits_producer --city nyc --limit 2000
+python -m src.producers.complaints_311_producer --city chicago --limit 2000
+python -m src.producers.sla_licenses_producer --city san_francisco --limit 1000
+python -m src.producers.deeds_acris_producer --city seattle --limit 1000
 ```
 
 ---
@@ -354,9 +376,30 @@ Serves the hardened, high-performance **MapLibre GL** web visualizer featuring m
 
 ---
 
+### City & Division Catalogs
+`GET /api/v1/cities`
+Returns the catalog of all registered metropolitan regions with centers, bounding boxes, divisions, and available feeds.
+
+`GET /api/v1/spatial/divisions?city_id=seattle`
+Returns the structured division/borough catalog for a metro, including per-division bounding boxes and submarket rosters.
+
+---
+
 ### Submarket Catalog Discovery
 `GET /api/v1/submarkets?city_id=san_francisco&borough=SAN_FRANCISCO_CORE`
 Returns the catalog of commercial/residential submarkets across divisions with centroid coordinates, camera presets, and baseline momentum profiles.
+
+---
+
+### Submarket Prediction
+`GET /api/v1/predictions/submarket/SoHo?city_id=nyc&include_shap=true`
+Multi-horizon forecast aggregated to a named submarket, with SHAP driver attributions.
+
+---
+
+### Dashboard Metrics Rollup
+`GET /api/v1/dashboard/metrics?city_id=chicago`
+Aggregated summary statistics powering the dashboard header cards.
 
 ---
 
@@ -385,15 +428,36 @@ Run the automated test suite with pytest:
 pytest tests/ -v
 ```
 
-The test suite includes **118 automated unit and end-to-end integration tests** covering:
-- **Spatial Indexing & Submarket Registries**: Multi-city coverage across San Francisco Bay Area (5 Divisions), NYC (5 Boroughs), and Chicago (6 Divisions).
+The test suite includes **222 automated unit and end-to-end integration tests** across 16 unit suites plus one end-to-end pipeline suite, covering:
+- **Spatial Indexing & Submarket Registries**: Multi-city coverage across NYC (5 Boroughs), Chicago (6 Divisions), San Francisco Bay Area, Seattle Metro, and Los Angeles.
 - **Stream Processing & Avro Serialization**: Schema enforcement and dead-letter queue routing.
 - **Out-of-core Feature Engineering**: DuckDB spatio-temporal joins and exponential CapEx decay.
 - **Model Inference & Validation**: LightGBM Quantile Pinball loss, ST-GNN ONNX, DCN-v2 ONNX, and TreeSHAP explainability.
 - **Serving & Hardened UI**: Security middleware, health/readiness/liveness probes, coordinate validation, error banners, and client state resilience.
 
+### Agent Interlock Invariant Gate
+
+The repository also carries a standalone spine-invariant gate used when multiple agents work in parallel (see `docs/adr/0001-agent-interlock.md`):
+```bash
+pytest -m interlock
+```
+It asserts **closure** (every alias resolves to a registration), **completeness** (registered specs have every field consumers index unguarded; endpoints exist in settings), and **containment** (divisions nest inside metro bboxes, submarkets inside their division) across all five cities — in about two seconds. `python scripts/interlock_gap.py <base>` reports whether a diff range is leaf-shaped before parallel dispatch.
+
 ---
 
-## 10. License
+## 10. Documentation Index
+
+| Path | Contents |
+| :--- | :--- |
+| `AGENTS.md` | Entry point for coding agents: conventions, gate command, stream logs |
+| `docs/adr/0001-agent-interlock.md` | Design doc: parallel agent streams, spine/leaf, six metrics |
+| `docs/agents/parallel-streams.md` | Normative short form of the interlock rules |
+| `docs/agents/spine-manifest.txt` | Files more than one concurrent stream may edit |
+| `docs/research/city-expansion-candidates.md` | Verified survey of next-city candidates |
+| `.streams/dispatch-log.md` | Orchestrator dispatch record & stream yield |
+
+---
+
+## 11. License
 
 Urban Signal is licensed under the [Apache 2.0 License](LICENSE).

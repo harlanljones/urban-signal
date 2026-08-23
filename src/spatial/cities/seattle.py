@@ -168,7 +168,7 @@ SEATTLE_SUBMARKETS: Dict[str, SubmarketMeta] = {
     ),
     "Queen Anne/Magnolia": SubmarketMeta(
         name="Queen Anne/Magnolia",
-        borough="NORTH_KING",
+        borough="SEATTLE_CORE",
         lat=47.6350,
         lng=-122.3600,
         zoom=14.0,
