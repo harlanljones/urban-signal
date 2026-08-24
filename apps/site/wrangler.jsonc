@@ -1,6 +1,7 @@
 {
   "name": "urban-signal-site",
   "compatibility_date": "2026-08-24",
+  "send_metrics": false,
   "assets": {
     "directory": "./dist"
   },

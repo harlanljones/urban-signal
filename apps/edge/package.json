@@ -5,10 +5,10 @@
   "description": "Urban Signal edge worker serving precomputed snapshots from Workers KV",
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
-    "build": "WRANGLER_LOG_PATH=.wrangler/wrangler.log wrangler deploy --dry-run --outdir dist",
+    "dev": "WRANGLER_SEND_METRICS=false wrangler dev",
+    "build": "WRANGLER_SEND_METRICS=false WRANGLER_LOG_PATH=.wrangler/wrangler.log wrangler deploy --dry-run --outdir dist",
     "test": "bun test tests",
-    "deploy": "wrangler deploy",
+    "deploy": "WRANGLER_SEND_METRICS=false wrangler deploy",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
