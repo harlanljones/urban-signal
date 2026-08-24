@@ -1149,10 +1149,7 @@ def get_dashboard_html() -> str:
         <button id="compare-toggle" class="compare-toggle" type="button" onclick="toggleCompareMenu()" aria-expanded="false">+ Compare</button>
         <div id="compare-menu" class="compare-menu" hidden>
           <div class="compare-menu-title">Compare regions</div>
-          <label><input type="checkbox" name="compare-city" value="washington_dc"> Washington DC</label>
-          <label><input type="checkbox" name="compare-city" value="montgomery"> Montgomery County</label>
-          <label><input type="checkbox" name="compare-city" value="baltimore"> Baltimore</label>
-          <label><input type="checkbox" name="compare-city" value="philadelphia"> Philadelphia</label>
+          <div id="compare-options"></div>
           <button class="compare-apply" type="button" onclick="applyComparison()">Show selected regions</button>
         </div>
       </div>
@@ -1702,10 +1699,43 @@ def get_dashboard_html() -> str:
       return (CITY_CONFIGS[cityId] || {}).name || cityId.replace(/_/g, ' ');
     }
 
+    const COMPARE_RADIUS_MILES = 175;
+    const CITY_COORDINATES = {
+      san_francisco: { lat: 37.7749, lng: -122.4194 }, chicago: { lat: 41.8781, lng: -87.6298 },
+      nyc: { lat: 40.7128, lng: -74.0060 }, seattle: { lat: 47.6062, lng: -122.3321 },
+      los_angeles: { lat: 34.0522, lng: -118.2437 }, new_orleans: { lat: 29.9511, lng: -90.0715 },
+      norfolk: { lat: 36.8508, lng: -76.2859 }, detroit: { lat: 42.3314, lng: -83.0458 },
+      austin: { lat: 30.2672, lng: -97.7431 }, philadelphia: { lat: 39.9526, lng: -75.1652 },
+      washington_dc: { lat: 38.9072, lng: -77.0369 }, baltimore: { lat: 39.2904, lng: -76.6122 },
+      montgomery: { lat: 39.0840, lng: -77.1528 }, boston: { lat: 42.3601, lng: -71.0589 },
+      cincinnati: { lat: 39.1031, lng: -84.5120 }, baton_rouge: { lat: 30.4515, lng: -91.1871 },
+      denver: { lat: 39.7392, lng: -104.9903 }
+    };
+
+    function renderCompareOptions() {
+      const options = document.getElementById('compare-options');
+      const toggle = document.getElementById('compare-toggle');
+      if (!options || !toggle) return;
+      const origin = CITY_COORDINATES[currentCity];
+      const nearby = origin ? Object.entries(CITY_COORDINATES)
+        .filter(([cityId, coords]) => cityId !== currentCity && haversineDistance(origin.lat, origin.lng, coords.lat, coords.lng) <= COMPARE_RADIUS_MILES)
+        .sort(([a], [b]) => cityDisplayName(a).localeCompare(cityDisplayName(b))) : [];
+      options.replaceChildren(...nearby.map(([cityId]) => {
+        const label = document.createElement('label');
+        label.innerHTML = `<input type="checkbox" name="compare-city" value="${cityId}"> ${escapeHtml(cityDisplayName(cityId))}`;
+        label.querySelector('input').checked = activeCities.includes(cityId);
+        return label;
+      }));
+      toggle.disabled = nearby.length === 0;
+      toggle.title = nearby.length ? `Compare with nearby regions within ${COMPARE_RADIUS_MILES} miles` : 'No nearby regions available for comparison';
+      if (!nearby.length) options.innerHTML = '<div style="color:var(--text-secondary);font-size:11px;padding:4px 0 7px;">No nearby regions available</div>';
+    }
+
     function toggleCompareMenu() {
       const menu = document.getElementById('compare-menu');
       const toggle = document.getElementById('compare-toggle');
       if (!menu || !toggle) return;
+      renderCompareOptions();
       menu.hidden = !menu.hidden;
       toggle.classList.toggle('active', !menu.hidden);
       toggle.setAttribute('aria-expanded', String(!menu.hidden));
@@ -1779,7 +1809,7 @@ def get_dashboard_html() -> str:
     }
 
     function haversineDistance(lat1, lon1, lat2, lon2) {
-      const R = 6371; // km
+      const R = 3958.8; // miles
       const dLat = (lat2 - lat1) * Math.PI / 180;
       const dLon = (lon2 - lon1) * Math.PI / 180;
       const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -1999,6 +2029,7 @@ def get_dashboard_html() -> str:
       activeCities = activeCities.length > 1
         ? [currentCity, ...activeCities.filter((city) => city !== currentCity)]
         : [currentCity];
+      renderCompareOptions();
       try { sessionStorage.setItem('urban_dev_user_city', currentCity); } catch (e) {}
       activeBoroughFilter = 'ALL';
       renderDivisionTabs();

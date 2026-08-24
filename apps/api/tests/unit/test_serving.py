@@ -453,6 +453,17 @@ def test_dashboard_html_sf_integration():
     assert 'PENINSULA' in html
 
 
+def test_dashboard_compare_menu_is_populated_from_nearby_regions():
+    """The compare menu must not expose a fixed cross-country city list."""
+    res = client.get("/dashboard")
+    assert res.status_code == 200
+    html = res.text
+    assert 'id="compare-options"' in html
+    assert "renderCompareOptions" in html
+    assert "COMPARE_RADIUS_MILES" in html
+    assert 'name="compare-city" value="washington_dc"' not in html
+
+
 def test_dashboard_html_geolocation_default_city():
     """Verify dashboard defaults to the user's closest city via a one-time
     geolocation request, falling back to San Francisco when denied."""
