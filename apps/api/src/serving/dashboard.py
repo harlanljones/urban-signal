@@ -297,6 +297,48 @@ def get_dashboard_html() -> str:
       border-color: var(--accent-primary);
     }
 
+    .compare-control {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .compare-toggle {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 8px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+
+    .compare-toggle:hover, .compare-toggle.active {
+      color: var(--text-main);
+      border-color: var(--accent-primary);
+      background: var(--accent-primary-dim);
+    }
+
+    .compare-menu {
+      position: absolute;
+      top: 34px;
+      left: 0;
+      z-index: 200;
+      width: 220px;
+      padding: 10px;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-active);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 12px 30px rgba(0,0,0,.35);
+    }
+
+    .compare-menu[hidden] { display: none; }
+    .compare-menu label { display: flex; gap: 8px; align-items: center; padding: 6px 2px; color: var(--text-secondary); font-size: 11px; }
+    .compare-menu label:hover { color: var(--text-main); }
+    .compare-menu input { accent-color: var(--accent-primary); }
+    .compare-apply { width: 100%; margin-top: 7px; padding: 6px; border: 0; border-radius: var(--radius-sm); background: var(--accent-primary); color: var(--bg-base); font-size: 11px; font-weight: 700; }
+
     /* Borough / Division Navigation Selector */
     .borough-nav {
       display: flex;
@@ -1097,6 +1139,17 @@ def get_dashboard_html() -> str:
           <option value="washington_dc">🏛️ Washington DC (8 Divisions)</option>
         </select>
       </div>
+      <div class="compare-control">
+        <button id="compare-toggle" class="compare-toggle" type="button" onclick="toggleCompareMenu()" aria-expanded="false">+ Compare</button>
+        <div id="compare-menu" class="compare-menu" hidden>
+          <div style="font-size:10px;color:var(--text-secondary);margin-bottom:5px;">Show regions together</div>
+          <label><input type="checkbox" name="compare-city" value="washington_dc"> Washington DC</label>
+          <label><input type="checkbox" name="compare-city" value="montgomery"> Montgomery County</label>
+          <label><input type="checkbox" name="compare-city" value="baltimore"> Baltimore</label>
+          <label><input type="checkbox" name="compare-city" value="philadelphia"> Philadelphia</label>
+          <button class="compare-apply" type="button" onclick="applyComparison()">Show selected regions</button>
+        </div>
+      </div>
     </div>
 
     <!-- Borough / Division Navigation Selector -->
@@ -1629,6 +1682,7 @@ def get_dashboard_html() -> str:
     CITY_CONFIGS.sf = CITY_CONFIGS.san_francisco;
 
     let currentCity = 'san_francisco';
+    let activeCities = ['san_francisco'];
     let map = null;
     let gridGeoJSON = null;
     let shapChart = null;
@@ -1637,6 +1691,39 @@ def get_dashboard_html() -> str:
     let selectedH3Index = null;
     let activeBoroughFilter = 'ALL';
     let catalystAlerts = [];
+
+    function cityDisplayName(cityId) {
+      return (CITY_CONFIGS[cityId] || {}).name || cityId.replace(/_/g, ' ');
+    }
+
+    function toggleCompareMenu() {
+      const menu = document.getElementById('compare-menu');
+      const toggle = document.getElementById('compare-toggle');
+      if (!menu || !toggle) return;
+      menu.hidden = !menu.hidden;
+      toggle.classList.toggle('active', !menu.hidden);
+      toggle.setAttribute('aria-expanded', String(!menu.hidden));
+      document.querySelectorAll('input[name="compare-city"]').forEach((input) => {
+        input.checked = activeCities.includes(input.value) && input.value !== currentCity;
+      });
+    }
+
+    async function applyComparison() {
+      const selected = Array.from(document.querySelectorAll('input[name="compare-city"]:checked')).map((input) => input.value);
+      activeCities = [currentCity, ...selected.filter((city) => city !== currentCity)];
+      const menu = document.getElementById('compare-menu');
+      const toggle = document.getElementById('compare-toggle');
+      if (menu) menu.hidden = true;
+      if (toggle) {
+        toggle.classList.toggle('active', activeCities.length > 1);
+        toggle.innerText = activeCities.length > 1 ? `${activeCities.length} regions` : '+ Compare';
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+      activeBoroughFilter = 'ALL';
+      renderDivisionTabs();
+      await fetchGridData();
+      await fetchCatalysts();
+    }
 
     // Defensive String and Number Helpers
     function escapeHtml(str) {
@@ -1903,6 +1990,9 @@ def get_dashboard_html() -> str:
     async function changeCity(cityId) {
       currentCity = (cityId || 'san_francisco').toLowerCase().trim();
       if (currentCity === 'sf') currentCity = 'san_francisco';
+      activeCities = activeCities.length > 1
+        ? [currentCity, ...activeCities.filter((city) => city !== currentCity)]
+        : [currentCity];
       try { sessionStorage.setItem('urban_dev_user_city', currentCity); } catch (e) {}
       activeBoroughFilter = 'ALL';
       renderDivisionTabs();
@@ -2149,6 +2239,30 @@ def get_dashboard_html() -> str:
     }
 
     async function fetchGridData() {
+      if (activeCities.length > 1) {
+        const grids = await Promise.all(activeCities.map(async (cityId) => {
+          try {
+            const resp = await fetch(`/api/v1/grid?city_id=${cityId}`);
+            if (!resp.ok) return { type: 'FeatureCollection', features: [] };
+            const data = await resp.json();
+            return {
+              ...data,
+              features: (data.features || []).map((feature) => ({
+                ...feature,
+                properties: { ...(feature.properties || {}), city_id: cityId, city_name: cityDisplayName(cityId) }
+              }))
+            };
+          } catch (e) {
+            return { type: 'FeatureCollection', features: [] };
+          }
+        }));
+        gridGeoJSON = { type: 'FeatureCollection', features: grids.flatMap((grid) => grid.features || []) };
+        if (map && map.getSource('h3-grid-source')) {
+          map.getSource('h3-grid-source').setData(gridGeoJSON);
+          fitMapToFeatures(gridGeoJSON.features);
+        }
+        return;
+      }
       try {
         const resp = await fetch(`/api/v1/grid?city_id=${currentCity}`);
         if (resp.ok) {
@@ -2163,6 +2277,13 @@ def get_dashboard_html() -> str:
       if (map && map.getSource('h3-grid-source')) {
         map.getSource('h3-grid-source').setData(gridGeoJSON);
       }
+    }
+
+    function fitMapToFeatures(features) {
+      if (!map || !features || !features.length) return;
+      const bounds = new maplibregl.LngLatBounds();
+      features.forEach((feature) => (feature.geometry?.coordinates?.[0] || []).forEach(([lng, lat]) => bounds.extend([lng, lat])));
+      if (!bounds.isEmpty()) map.fitBounds(bounds, { padding: 90, maxZoom: 11.6, duration: 1100 });
     }
 
     function buildFeature(cell, name, meta, boundary, lat, lng, lims) {
@@ -2461,6 +2582,19 @@ def get_dashboard_html() -> str:
     }
 
     async function fetchCatalysts() {
+      if (activeCities.length > 1) {
+        const responses = await Promise.all(activeCities.map(async (cityId) => {
+          try {
+            const resp = await fetch(`/api/v1/catalysts?city_id=${cityId}&min_lims=85.0`);
+            if (!resp.ok) return [];
+            const data = await resp.json();
+            return (data.catalysts || []).map((c) => ({ ...c, city_id: cityId, city_name: cityDisplayName(cityId) }));
+          } catch (e) { return []; }
+        }));
+        catalystAlerts = responses.flat();
+        renderCatalystFeed();
+        return;
+      }
       try {
         const resp = await fetch(`/api/v1/catalysts?city_id=${currentCity}&min_lims=85.0`);
         if (resp.ok) {
@@ -2530,6 +2664,7 @@ def get_dashboard_html() -> str:
             </div>
             <div class="catalyst-item-bottom">
               <span class="borough-tag ${bClass}">${borough}</span>
+              ${c.city_name ? `<span class="borough-tag">${c.city_name}</span>` : ''}
               <span class="delta-tag">+${(Number(c.delta_6m_p50 || 0.14) * 100).toFixed(1)}% 6M</span>
             </div>
           </div>
