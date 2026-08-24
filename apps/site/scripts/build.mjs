@@ -11,4 +11,5 @@ await cp(resolve(root, "public"), resolve(dist, "public"), { recursive: true });
 for (const asset of ["facts.json", "llms.txt", "llms-full.txt", "robots.txt"]) {
   await cp(resolve(root, "public", asset), resolve(dist, asset));
 }
+await cp(resolve(root, "public", "_redirects"), resolve(dist, "_redirects"));
 console.log("SITE_BUILD_OK");

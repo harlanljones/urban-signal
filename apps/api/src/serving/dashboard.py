@@ -48,14 +48,14 @@ def get_dashboard_html() -> str:
 
   <style>
     :root {
-      --bg-base: #080c14;
-      --bg-surface: #0f172a;
-      --bg-surface-elevated: #1e293b;
-      --bg-glass: rgba(15, 23, 42, 0.88);
+      --bg-base: #080d17;
+      --bg-surface: #0d1626;
+      --bg-surface-elevated: #17253a;
+      --bg-glass: rgba(13, 22, 38, 0.92);
       
-      --border-subtle: rgba(255, 255, 255, 0.07);
-      --border-focus: rgba(56, 189, 248, 0.5);
-      --border-active: rgba(56, 189, 248, 0.3);
+      --border-subtle: rgba(148, 163, 184, 0.14);
+      --border-focus: rgba(56, 189, 248, 0.65);
+      --border-active: rgba(56, 189, 248, 0.42);
       
       --accent-primary: #38bdf8;
       --accent-primary-dim: rgba(56, 189, 248, 0.12);
@@ -81,17 +81,17 @@ def get_dashboard_html() -> str:
       --division-marin: #f43f5e;
       
       --text-main: #f8fafc;
-      --text-secondary: #94a3b8;
-      --text-muted: #64748b;
+      --text-secondary: #a7b5c9;
+      --text-muted: #718198;
       
       --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-mono: 'IBM Plex Mono', monospace;
       
       --glass-blur: blur(12px);
-      --radius-sm: 6px;
-      --radius-md: 8px;
-      --radius-lg: 12px;
-      --shadow-dropdown: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+      --radius-sm: 5px;
+      --radius-md: 7px;
+      --radius-lg: 10px;
+      --shadow-dropdown: 0 18px 42px rgba(0, 0, 0, 0.48), 0 4px 12px rgba(0, 0, 0, 0.28);
     }
 
     * {
@@ -216,13 +216,13 @@ def get_dashboard_html() -> str:
 
     /* Top Navigation Header */
     header {
-      height: 52px;
+      height: 56px;
       background: var(--bg-surface);
       border-bottom: 1px solid var(--border-subtle);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 16px;
+      padding: 0 18px;
       z-index: 100;
       gap: 16px;
       flex-shrink: 0;
@@ -231,12 +231,13 @@ def get_dashboard_html() -> str:
     .brand-section {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 11px;
+      min-width: 0;
     }
 
     .brand-icon {
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       background: var(--accent-primary-dim);
       border: 1px solid var(--border-active);
       border-radius: var(--radius-sm);
@@ -277,6 +278,7 @@ def get_dashboard_html() -> str:
     .city-selector-wrapper {
       display: flex;
       align-items: center;
+      margin-left: 3px;
     }
 
     .city-select-dropdown {
@@ -286,7 +288,7 @@ def get_dashboard_html() -> str:
       font-family: var(--font-sans);
       font-size: 12px;
       font-weight: 600;
-      padding: 4px 8px;
+      padding: 6px 28px 6px 10px;
       border-radius: var(--radius-sm);
       outline: none;
       cursor: pointer;
@@ -301,15 +303,16 @@ def get_dashboard_html() -> str:
       position: relative;
       display: flex;
       align-items: center;
+      margin-left: -3px;
     }
 
     .compare-toggle {
-      background: transparent;
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
+      background: var(--accent-primary-dim);
+      border: 1px solid var(--border-active);
+      color: var(--accent-primary);
       font-size: 11px;
       font-weight: 600;
-      padding: 5px 8px;
+      padding: 6px 10px;
       border-radius: var(--radius-sm);
       cursor: pointer;
     }
@@ -325,19 +328,22 @@ def get_dashboard_html() -> str:
       top: 34px;
       left: 0;
       z-index: 200;
-      width: 220px;
-      padding: 10px;
+      width: 246px;
+      padding: 13px;
       background: var(--bg-surface-elevated);
       border: 1px solid var(--border-active);
-      border-radius: var(--radius-sm);
-      box-shadow: 0 12px 30px rgba(0,0,0,.35);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-dropdown);
     }
 
     .compare-menu[hidden] { display: none; }
-    .compare-menu label { display: flex; gap: 8px; align-items: center; padding: 6px 2px; color: var(--text-secondary); font-size: 11px; }
-    .compare-menu label:hover { color: var(--text-main); }
-    .compare-menu input { accent-color: var(--accent-primary); }
-    .compare-apply { width: 100%; margin-top: 7px; padding: 6px; border: 0; border-radius: var(--radius-sm); background: var(--accent-primary); color: var(--bg-base); font-size: 11px; font-weight: 700; }
+    .compare-menu-title { margin: 0 2px 7px; color: var(--text-main); font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+    .compare-menu label { display: flex; gap: 9px; align-items: center; padding: 8px 7px; border-radius: var(--radius-sm); color: var(--text-secondary); font-size: 11px; cursor: pointer; transition: background .15s ease, color .15s ease; }
+    .compare-menu label:hover { color: var(--text-main); background: rgba(255, 255, 255, .05); }
+    .compare-menu input { width: 14px; height: 14px; accent-color: var(--accent-primary); }
+    .compare-apply { width: 100%; margin-top: 10px; padding: 8px; border: 0; border-radius: var(--radius-sm); background: var(--accent-primary); color: var(--bg-base); font-size: 11px; font-weight: 700; cursor: pointer; transition: filter .15s ease, transform .15s ease; }
+    .compare-apply:hover { filter: brightness(1.08); }
+    .compare-apply:active { transform: translateY(1px); }
 
     /* Borough / Division Navigation Selector */
     .borough-nav {
@@ -345,7 +351,7 @@ def get_dashboard_html() -> str:
       align-items: center;
       background: var(--bg-base);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-sm);
       padding: 2px;
       gap: 2px;
     }
@@ -407,13 +413,13 @@ def get_dashboard_html() -> str:
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     /* Unified Global Search & Jump */
     .search-wrapper {
       position: relative;
-      width: 240px;
+      width: 260px;
     }
 
     .search-input-box {
@@ -505,10 +511,10 @@ def get_dashboard_html() -> str:
       gap: 6px;
       font-size: 11px;
       font-weight: 500;
-      color: var(--text-secondary);
+      color: var(--accent-success);
       padding: 4px 8px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border-subtle);
+      background: var(--accent-success-dim);
+      border: 1px solid rgba(52, 211, 153, .24);
       border-radius: var(--radius-sm);
       white-space: nowrap;
     }
@@ -530,7 +536,7 @@ def get_dashboard_html() -> str:
 
     /* Left Sidebar: Controls & Live Catalysts */
     .sidebar-left {
-      width: 310px;
+      width: 294px;
       background: var(--bg-surface);
       border-right: 1px solid var(--border-subtle);
       display: flex;
@@ -541,7 +547,7 @@ def get_dashboard_html() -> str:
 
     /* Right Sidebar: Parcel Inspector */
     .sidebar-right {
-      width: 360px;
+      width: 344px;
       background: var(--bg-surface);
       border-left: 1px solid var(--border-subtle);
       display: flex;
@@ -571,7 +577,7 @@ def get_dashboard_html() -> str:
 
     /* Left Panel Sections */
     .panel-section {
-      padding: 14px 16px;
+      padding: 16px 15px 14px;
       border-bottom: 1px solid var(--border-subtle);
     }
 
@@ -587,7 +593,7 @@ def get_dashboard_html() -> str:
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--text-muted);
+      color: var(--text-secondary);
     }
 
     /* Controls Bar */
@@ -647,7 +653,7 @@ def get_dashboard_html() -> str:
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      padding: 14px 16px 8px 16px;
+      padding: 16px 15px 10px;
     }
 
     .feed-count-badge {
@@ -671,10 +677,10 @@ def get_dashboard_html() -> str:
     }
 
     .catalyst-item {
-      background: rgba(255, 255, 255, 0.02);
+      background: rgba(255, 255, 255, 0.025);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      padding: 11px 12px;
       cursor: pointer;
       transition: all 0.15s ease;
     }
@@ -782,7 +788,7 @@ def get_dashboard_html() -> str:
       justify-content: center;
       cursor: pointer;
       transition: all 0.15s ease;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.32);
     }
 
     .map-tool-btn:hover {
@@ -805,7 +811,7 @@ def get_dashboard_html() -> str:
       background: var(--bg-glass);
       backdrop-filter: var(--glass-blur);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-sm);
       padding: 10px 14px;
       z-index: 50;
       min-width: 200px;
@@ -1142,7 +1148,7 @@ def get_dashboard_html() -> str:
       <div class="compare-control">
         <button id="compare-toggle" class="compare-toggle" type="button" onclick="toggleCompareMenu()" aria-expanded="false">+ Compare</button>
         <div id="compare-menu" class="compare-menu" hidden>
-          <div style="font-size:10px;color:var(--text-secondary);margin-bottom:5px;">Show regions together</div>
+          <div class="compare-menu-title">Compare regions</div>
           <label><input type="checkbox" name="compare-city" value="washington_dc"> Washington DC</label>
           <label><input type="checkbox" name="compare-city" value="montgomery"> Montgomery County</label>
           <label><input type="checkbox" name="compare-city" value="baltimore"> Baltimore</label>
