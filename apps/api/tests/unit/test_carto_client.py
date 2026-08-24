@@ -292,6 +292,23 @@ class TestKeysetPaging:
         assert "ORDER BY cartodb_id ASC, cartodb_id ASC" in q0
         assert "LIMIT 2" in q0
 
+    def test_descending_order_uses_descending_keyset_cursor(self):
+        pages = [
+            _page([_row(5, "2026-08-23"), _row(4, "2026-08-22")]),
+            _page([_row(3, "2026-08-21")]),
+        ]
+        ctx, calls = _patch_http(pages)
+        with ctx:
+            list(
+                CartoClient().paginate(
+                    CARTO_URI,
+                    order_by="permitissuedate DESC",
+                    batch_size=2,
+                )
+            )
+        assert "ORDER BY permitissuedate DESC, cartodb_id DESC" in calls["params"][0]["q"]
+        assert "(permitissuedate, cartodb_id) < ('2026-08-22', '4')" in calls["params"][1]["q"]
+
     def test_stops_on_empty_result(self):
         ctx, _ = _patch_http([_page([])])
         with ctx:

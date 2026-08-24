@@ -22,14 +22,10 @@
 
 ### Comparison mode
 
-The comparison captures are shown at full reading width so the controls and map
-state remain legible in rendered documentation.
-
-**DC + Montgomery County comparison**
+The live dashboard supports layered region comparison through the **+ Compare**
+control. The populated DC + Montgomery County comparison is shown below.
 
 ![DC and Montgomery County comparison](docs/screenshots/dashboard-dc-montgomery.png)
-
-**Comparison control**
 
 ![Dashboard comparison menu](docs/screenshots/dashboard-comparison-menu.png)
 

@@ -948,7 +948,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
             FeedType.PERMITS: DatasetSpec(
                 endpoint=settings.socrata_cincinnati_permits_endpoint,
                 platform="socrata",
-                watermark_col="issued",
+                watermark_col="issueddate",
                 id_keys=["permit_number", "permitnumber", "pin", "id"],
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
@@ -956,45 +956,45 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 extra={
                     "field_map": {
                         "job_id": ["permit_number", "permitnumber", "pin"],
-                        "issuance_date": ["issued"],
+                        "issuance_date": ["issueddate"],
                         "filing_date": ["applieddate"],
-                        "address_street": ["address"],
-                        "zipcode": ["zip"],
+                        "address_street": ["originaladdress1"],
+                        "zipcode": ["originalzip"],
                     }
                 },
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.socrata_cincinnati_311_endpoint,
                 platform="socrata",
-                watermark_col="created_on",
+                watermark_col="date_time_received",
                 id_keys=["service_request_id", "sr_number", "id"],
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
                 extra={
                     "field_map": {
-                        "incident_id": ["service_request_id", "sr_number"],
-                        "created_date": ["created_on"],
+                        "incident_id": ["sr_number"],
+                        "created_date": ["date_time_received"],
                         "incident_address": ["address"],
-                        "complaint_type": ["service_name", "service_request_type"],
+                        "complaint_type": ["sr_type_desc", "sr_type"],
                     }
                 },
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.socrata_cincinnati_licenses_endpoint,
                 platform="socrata",
-                watermark_col="entered",
+                watermark_col="entered_date",
                 id_keys=["license_number", "license_id", "id"],
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
                 extra={
                     "field_map": {
-                        "license_id": ["license_number", "license_id"],
-                        "effective_date": ["entered"],
+                        "license_id": ["number_key", "uniqueid"],
+                        "effective_date": ["entered_date"],
                         "latitude": ["latitude"],
                         "longitude": ["longitude"],
-                        "status": ["status"],
+                        "status": ["data_status", "status_class"],
                     }
                 },
             ),

@@ -143,6 +143,7 @@ class CartoClient:
         table: str,
         order_col: str,
         id_col: str,
+        direction: str,
         where_clause: Optional[str],
         limit: int,
         last_keyset: Optional[tuple],
@@ -153,8 +154,9 @@ class CartoClient:
             parts.append(f"({where_clause})")
         if last_keyset is not None:
             last_order, last_id = last_keyset
+            comparator = "<" if direction == "DESC" else ">"
             parts.append(
-                f"({order_col}, {id_col}) > ({self._quote(last_order)}, "
+                f"({order_col}, {id_col}) {comparator} ({self._quote(last_order)}, "
                 f"{self._quote(last_id)})"
             )
 
@@ -162,7 +164,7 @@ class CartoClient:
         select_sql = select or "*"
         return (
             f"SELECT {select_sql} FROM {table} WHERE {where_sql} "
-            f"ORDER BY {order_col} ASC, {id_col} ASC LIMIT {limit}"
+            f"ORDER BY {order_col} {direction}, {id_col} {direction} LIMIT {limit}"
         )
 
     def _request_json(self, url: str, params: Dict[str, Any]) -> Dict[str, Any]:
@@ -274,7 +276,12 @@ class CartoClient:
         auto-enables for date-named order columns (see module docstring).
         """
         sql_api_url, resolved_table = self._parse_endpoint(endpoint_url, table)
-        order_col = order_by or "updated_at"
+        order_spec = (order_by or "updated_at").strip()
+        order_parts = order_spec.rsplit(None, 1)
+        if len(order_parts) == 2 and order_parts[1].upper() in {"ASC", "DESC"}:
+            order_col, direction = order_parts[0], order_parts[1].upper()
+        else:
+            order_col, direction = order_spec, "ASC"
         id_column = id_col or self.id_col
 
         total_fetched = 0
@@ -291,6 +298,7 @@ class CartoClient:
                 table=resolved_table,
                 order_col=order_col,
                 id_col=id_column,
+                direction=direction,
                 where_clause=self._join_where(where_clause, order_col, exclude_sentinel_dates),
                 limit=fetch_limit,
                 last_keyset=last_keyset,

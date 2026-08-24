@@ -37,9 +37,9 @@ def test_cincinnati_registers_three_verified_feeds_and_no_sales_feed():
         FeedType.COMPLAINTS_311,
         FeedType.SLA,
     }
-    assert REGISTRY[city].datasets[FeedType.PERMITS].watermark_col == "issued"
-    assert REGISTRY[city].datasets[FeedType.COMPLAINTS_311].watermark_col == "created_on"
-    assert REGISTRY[city].datasets[FeedType.SLA].watermark_col == "entered"
+    assert REGISTRY[city].datasets[FeedType.PERMITS].watermark_col == "issueddate"
+    assert REGISTRY[city].datasets[FeedType.COMPLAINTS_311].watermark_col == "date_time_received"
+    assert REGISTRY[city].datasets[FeedType.SLA].watermark_col == "entered_date"
     with pytest.raises(KeyError, match="no.*feed"):
         from src.spatial.city_registry import get_dataset
 
@@ -49,9 +49,9 @@ def test_cincinnati_registers_three_verified_feeds_and_no_sales_feed():
 @pytest.mark.parametrize(
     ("feed", "endpoint", "watermark"),
     [
-        (FeedType.PERMITS, "uhjb-xac9", "issued"),
-        (FeedType.COMPLAINTS_311, "gcej-gmiw", "created_on"),
-        (FeedType.SLA, "ehdi-ajku", "entered"),
+        (FeedType.PERMITS, "uhjb-xac9", "issueddate"),
+        (FeedType.COMPLAINTS_311, "gcej-gmiw", "date_time_received"),
+        (FeedType.SLA, "ehdi-ajku", "entered_date"),
     ],
 )
 def test_cincinnati_specs_pin_researched_socrata_sources(feed, endpoint, watermark):
