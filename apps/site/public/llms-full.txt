@@ -1,0 +1,38 @@
+# Urban Signal — agent context
+
+## Purpose
+
+Urban Signal normalizes heterogeneous municipal records, assigns events to multi-resolution H3 cells, computes interpretable momentum features, and supports 6-, 12-, and 18-month model horizons. The product is designed to expose the evidence path rather than present an unexplained score.
+
+## Audiences
+
+1. Prospective users, partners, and investors evaluating whether the system offers credible spatial intelligence.
+2. Technical evaluators and contributors tracing municipal records through ingestion, normalization, spatial enrichment, feature computation, models, snapshots, and edge delivery.
+
+## Evidence path
+
+1. City-specific source contracts: `apps/api/src/spatial/city_registry.py` and `apps/api/src/spatial/cities/`
+2. Normalized events: `apps/api/src/schemas/models.py`
+3. H3 indexing: `apps/api/src/spatial/h3_indexer.py`
+4. Interpretable score composition: `apps/api/src/features/lims_calculator.py`
+5. Snapshot delivery: `apps/api/src/export/snapshot_builder.py`
+
+Repository: https://github.com/harlanljones/urban-signal
+
+## Product truth
+
+The city registry is authoritative. A machine-readable projection for the marketing surface is available at `/facts.json` and is verified against registry IDs during site checks. Feed availability differs by city.
+
+## Claims and limitations
+
+- The site does not claim customers, adoption metrics, commercial availability, or independently validated forecast performance.
+- The hero inspection field and the displayed 68/100 composition are explicitly illustrative.
+- Model horizons are 6, 12, and 18 months.
+- Missing municipal sources are product facts, not hidden blanks.
+
+## Evaluation routes
+
+- Human product evaluation: `/dashboard`
+- Structured facts: `/facts.json`
+- Repository overview: `README.md`
+- Architecture and domain context: `CONTEXT.md`, `docs/adr/`, and the source paths above

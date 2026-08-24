@@ -1,0 +1,17 @@
+# Urban Signal
+
+> Urban Signal is an open-source spatial-intelligence system that turns municipal permits, 311 requests, licenses, deeds, and related records into explainable H3-based signals.
+
+## Canonical resources
+
+- [Machine-readable product facts](/facts.json): metros, feed availability, limitations, horizons, and repository evidence paths.
+- [Full agent context](/llms-full.txt): product purpose, processing path, limitations, and evaluation routes.
+- [Live dashboard](/dashboard): interactive spatial product surface.
+- [Source repository](https://github.com/harlanljones/urban-signal): implementation and documentation.
+- [City registry](https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/spatial/city_registry.py): authoritative registered-city and feed contracts.
+
+## Important limitations
+
+- Feed coverage varies by metro; never infer uniform four-feed coverage.
+- Hero cell values and the 68/100 score composition are illustrative UI examples, not live model-performance claims.
+- No customer, adoption, or independently validated performance claims are published.

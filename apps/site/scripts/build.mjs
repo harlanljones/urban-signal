@@ -8,4 +8,7 @@ await mkdir(dist, { recursive: true });
 await cp(resolve(root, "index.html"), resolve(dist, "index.html"));
 await cp(resolve(root, "src"), resolve(dist, "src"), { recursive: true });
 await cp(resolve(root, "public"), resolve(dist, "public"), { recursive: true });
+for (const asset of ["facts.json", "llms.txt", "llms-full.txt", "robots.txt"]) {
+  await cp(resolve(root, "public", asset), resolve(dist, asset));
+}
 console.log("SITE_BUILD_OK");

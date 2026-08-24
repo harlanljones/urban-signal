@@ -82,13 +82,23 @@ class BaseKafkaConsumer:
             futures = admin_client.create_topics(new_topics)
             for topic, future in futures.items():
                 try:
-                    future.result()
+                    # Topic provisioning is best-effort.  An unavailable broker must
+                    # not prevent workers that are used for local processing/tests
+                    # from being constructed indefinitely.
+                    future.result(timeout=1.0)
                     logger.info("Created topic '%s'", topic)
                 except KafkaException as e:
                     if e.args[0].code() != KafkaError.TOPIC_ALREADY_EXISTS:
                         logger.debug("Topic '%s' note: %s", topic, e)
+                except Exception as e:
+                    logger.debug("Topic '%s' provisioning timed out or failed: %s", topic, e)
         except Exception as e:
             logger.warning("Could not pre-verify/create topics: %s", e)
+
+    def close(self):
+        """Close the underlying Kafka consumer when a worker is not started."""
+        self.running = False
+        self.consumer.close()
 
     def _load_schema(self, schema_path: Union[str, Path]):
         with open(schema_path, "r", encoding="utf-8") as f:

@@ -1,11 +1,39 @@
 """Unit and integration tests for FastAPI serving endpoints."""
 
-from fastapi.testclient import TestClient
+import asyncio
+
+import httpx
 import pytest
 from src.serving.app import create_app
 
+
+class SyncASGIClient:
+    """Small synchronous adapter for HTTPX's async ASGI transport."""
+
+    def __init__(self, app):
+        self._app = app
+
+    def request(self, method, url, **kwargs):
+        async def send():
+            transport = httpx.ASGITransport(app=self._app)
+            async with httpx.AsyncClient(
+                transport=transport,
+                base_url="http://testserver",
+                follow_redirects=True,
+            ) as client:
+                return await client.request(method, url, **kwargs)
+
+        return asyncio.run(send())
+
+    def get(self, url, **kwargs):
+        return self.request("GET", url, **kwargs)
+
+    def post(self, url, **kwargs):
+        return self.request("POST", url, **kwargs)
+
+
 app = create_app()
-client = TestClient(app)
+client = SyncASGIClient(app)
 
 
 def test_health_check():
@@ -501,5 +529,3 @@ def test_no_cross_city_leakage():
     assert res_nyc_ct.status_code == 200
     assert res_nyc_ct.json()["city_id"] == "nyc"
     assert res_nyc_ct.json()["borough"] == "MANHATTAN"
-
-

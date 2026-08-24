@@ -6,12 +6,12 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "dev": "python3 -m http.server 4173 -d .",
-    "lint": "node ../../scripts/verify-site-content.mjs",
+    "dev": "node scripts/build.mjs && python3 -m http.server 4173 -d dist",
+    "lint": "node ../../scripts/verify-site-content.mjs && node scripts/verify-agent-surface.mjs",
     "typecheck": "node --check src/main.js",
     "deploy": "wrangler deploy"
   },
   "devDependencies": {
-    "wrangler": "^3"
+    "wrangler": "^4"
   }
 }

@@ -144,7 +144,24 @@ Exact spec each city stream implements (feeds, ids, watermarks, map budgets). ID
 | **Baltimore** `baltimore` | PERMITS Housing&Building 2019– · 311 current-year · SLA Liquor Licenses (narrow, WA-LCB precedent) | arcgis ×3 | ~4 | year rollover on 311; narrow liquor feed pinned as notifications-grade |
 | **Montgomery Co.** `montgomery` | PERMITS point-geocoded families · SLA liquor licensees | socrata ×2 | ~2 | **MC311 excluded**: zip-only, fails G5 by construction; document exclusion in registry comment |
 
-Feed totals: 38 new jobs → 57 program target (±2 if Denver/Baltimore third feeds pass their G5 probes).
+Feed totals: the city table below defines **36 new jobs**, producing the currently
+registered total of **55 jobs** (19 existing + 36 new). The 57-job figure remains
+an aspirational program target, not a registration requirement: Denver currently
+has two feeds because its licenses and sales sources do not satisfy the current
+spatial contract, while Baltimore already has the three feeds listed above. A
+third Denver feed would make the total 56; reaching 57 requires one additional
+feed to be independently re-probed and pass the same spatial/freshness gates.
+
+#### Feed-count reconciliation (2026-08-23)
+
+The executable registry was measured with `len(REGISTRY) == 17` and
+`sum(len(city.datasets) for city in REGISTRY.values()) == 55`. Montgomery
+contributes exactly PERMITS + SLA (2). MC311 (`xtyh-brr2`) remains intentionally
+excluded because the source exposes zip/city/district fields rather than point
+coordinates; DEEDS is not available as a verified Montgomery feed. No stale or
+unofficial endpoint is being used to close the count. The 55-job count is
+therefore accepted as the safe current total; do not register a speculative
+56th/57th job until a source is re-probed and passes the feed gates.
 
 ---
 

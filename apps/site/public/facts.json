@@ -1,0 +1,276 @@
+{
+  "schema_version": 1,
+  "product": {
+    "name": "Urban Signal",
+    "summary": "Open-source spatial intelligence that turns municipal permits, 311 requests, licenses, deeds, and related public records into explainable H3-based signals.",
+    "positioning": "Leading municipal telemetry is treated as evidence of change before conventional transaction-based indicators.",
+    "repository": "https://github.com/harlanljones/urban-signal",
+    "dashboard": "/dashboard"
+  },
+  "limitations": [
+    "Feed coverage varies by metro and must not be treated as uniform.",
+    "The hero cell and the 68/100 score composition are illustrative interface examples, not live forecast-performance claims.",
+    "No customer, adoption, or independently validated model-performance claims are published."
+  ],
+  "feed_labels": [
+    "Permits",
+    "311",
+    "Licenses",
+    "Deeds"
+  ],
+  "metros": [
+    {
+      "id": "nyc",
+      "name": "New York City",
+      "state": "NY",
+      "divisions": "5 boroughs",
+      "feeds": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "evidence_path": "apps/api/src/spatial/city_registry.py"
+    },
+    {
+      "id": "chicago",
+      "name": "Chicago",
+      "state": "IL",
+      "divisions": "6 divisions",
+      "feeds": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "evidence_path": "apps/api/src/spatial/cities/chicago.py"
+    },
+    {
+      "id": "san_francisco",
+      "name": "San Francisco Bay Area",
+      "state": "CA",
+      "divisions": "5 divisions",
+      "feeds": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "evidence_path": "apps/api/src/spatial/cities/san_francisco.py"
+    },
+    {
+      "id": "seattle",
+      "name": "Seattle Metro",
+      "state": "WA",
+      "divisions": "4 divisions",
+      "feeds": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "evidence_path": "apps/api/src/spatial/cities/seattle.py"
+    },
+    {
+      "id": "los_angeles",
+      "name": "Los Angeles Metro",
+      "state": "CA",
+      "divisions": "6 divisions",
+      "feeds": [
+        true,
+        true,
+        true,
+        false
+      ],
+      "evidence_path": "apps/api/src/spatial/cities/los_angeles.py"
+    },
+    {
+      "id": "new_orleans",
+      "name": "New Orleans Metro",
+      "state": "LA",
+      "divisions": "9 divisions",
+      "feeds": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "evidence_path": "apps/api/src/spatial/cities/new_orleans.py"
+    },
+    {
+      "id": "norfolk",
+      "name": "Norfolk",
+      "state": "VA",
+      "divisions": "5 divisions",
+      "feeds": [
+        true,
+        false,
+        false,
+        true
+      ],
+      "evidence_path": "apps/api/src/spatial/cities/norfolk.py"
+    },
+    {
+      "id": "detroit",
+      "name": "Detroit",
+      "state": "MI",
+      "divisions": "6 divisions",
+      "feeds": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "evidence_path": "apps/api/src/spatial/cities/detroit.py"
+    },
+    {
+      "id": "austin",
+      "name": "Austin",
+      "state": "TX",
+      "divisions": "6 divisions",
+      "feeds": [
+        true,
+        true,
+        false,
+        false
+      ],
+      "evidence_path": "apps/api/src/spatial/cities/austin.py"
+    },
+    {
+      "id": "cincinnati",
+      "name": "Cincinnati",
+      "state": "OH",
+      "divisions": "1 division",
+      "feeds": [
+        true,
+        true,
+        true,
+        false
+      ],
+      "evidence_path": "apps/api/src/spatial/cities/cincinnati.py"
+    },
+    {
+      "id": "boston",
+      "name": "Boston",
+      "state": "MA",
+      "divisions": "4 divisions",
+      "feeds": [
+        true,
+        true,
+        true,
+        false
+      ],
+      "evidence_path": "apps/api/src/spatial/cities/boston.py"
+    },
+    {
+      "id": "baltimore",
+      "name": "Baltimore",
+      "state": "MD",
+      "divisions": "1 division",
+      "feeds": [
+        true,
+        true,
+        true,
+        false
+      ],
+      "evidence_path": "apps/api/src/spatial/cities/baltimore.py"
+    },
+    {
+      "id": "montgomery",
+      "name": "Montgomery County",
+      "state": "MD",
+      "divisions": "1 division",
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "evidence_path": "apps/api/src/spatial/cities/montgomery.py"
+    },
+    {
+      "id": "baton_rouge",
+      "name": "Baton Rouge",
+      "state": "LA",
+      "divisions": "1 division",
+      "feeds": [
+        true,
+        true,
+        true,
+        false
+      ],
+      "evidence_path": "apps/api/src/spatial/cities/baton_rouge.py"
+    },
+    {
+      "id": "denver",
+      "name": "Denver",
+      "state": "CO",
+      "divisions": "1 division",
+      "feeds": [
+        true,
+        true,
+        true,
+        false
+      ],
+      "evidence_path": "apps/api/src/spatial/cities/denver.py"
+    },
+    {
+      "id": "philadelphia",
+      "name": "Philadelphia",
+      "state": "PA",
+      "divisions": "8 divisions",
+      "feeds": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "evidence_path": "apps/api/src/spatial/cities/philadelphia.py"
+    },
+    {
+      "id": "washington_dc",
+      "name": "Washington DC",
+      "state": "DC",
+      "divisions": "8 divisions",
+      "feeds": [
+        true,
+        true,
+        false,
+        true
+      ],
+      "evidence_path": "apps/api/src/spatial/cities/washington_dc.py"
+    }
+  ],
+  "pipeline": [
+    {
+      "id": "ingest",
+      "label": "Ingest",
+      "source_path": "apps/api/src/producers"
+    },
+    {
+      "id": "normalize",
+      "label": "Normalize",
+      "source_path": "apps/api/src/schemas/models.py"
+    },
+    {
+      "id": "spatial",
+      "label": "Spatialize",
+      "source_path": "apps/api/src/spatial/h3_indexer.py"
+    },
+    {
+      "id": "features",
+      "label": "Features",
+      "source_path": "apps/api/src/features/lims_calculator.py"
+    },
+    {
+      "id": "serve",
+      "label": "Serve",
+      "source_path": "apps/api/src/export/snapshot_builder.py"
+    }
+  ],
+  "model_horizons_months": [
+    6,
+    12,
+    18
+  ]
+}

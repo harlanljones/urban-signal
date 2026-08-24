@@ -97,6 +97,10 @@ class SpatialFeaturePipeline:
             );
         """)
 
+    def close(self):
+        """Close the DuckDB connection owned by this pipeline."""
+        self.con.close()
+
     def insert_permits(self, df: pd.DataFrame):
         """Batch insert DOB permits into DuckDB."""
         if not df.empty:

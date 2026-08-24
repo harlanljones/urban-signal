@@ -117,6 +117,13 @@ class SpatialEnrichmentWorker:
             batch_size=200,
         )
 
+    def close(self):
+        """Release Kafka and analytical resources owned by this worker."""
+        self.consumer.close()
+        close = getattr(self.feature_pipeline, "close", None)
+        if close:
+            close()
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)

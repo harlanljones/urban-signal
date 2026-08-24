@@ -52,7 +52,11 @@ def shared_app_client():
 
 @pytest.fixture
 def spatial_pipeline():
-    return SpatialFeaturePipeline(db_path=":memory:")
+    pipeline = SpatialFeaturePipeline(db_path=":memory:")
+    try:
+        yield pipeline
+    finally:
+        pipeline.close()
 
 
 # -----------------------------------------------------------------------------
@@ -84,43 +88,46 @@ def test_e2e_streaming_ingestion_and_avro_serialization(sample_permit_event, sam
 # -----------------------------------------------------------------------------
 def test_e2e_spatial_enrichment_worker(spatial_pipeline, sample_nyc_coords):
     worker = SpatialEnrichmentWorker(feature_pipeline=spatial_pipeline)
-    soho = sample_nyc_coords["soho"]
-    williamsburg = sample_nyc_coords["williamsburg"]
+    try:
+        soho = sample_nyc_coords["soho"]
+        williamsburg = sample_nyc_coords["williamsburg"]
 
-    # 1. Feed raw un-indexed DOB permit
-    permit_record = {
-        "job_id": "JOB-NYC-E2E-001",
-        "job_type": "NB",
-        "latitude": soho["lat"],
-        "longitude": soho["lng"],
-        "estimated_cost": 5000000.0,
-        "issuance_date": datetime.now(timezone.utc).isoformat(),
-        "ingested_at": datetime.now(timezone.utc).isoformat(),
-    }
-    worker.process_record(permit_record, topic=settings.topic_permits, key=permit_record["job_id"])
+        # 1. Feed raw un-indexed DOB permit
+        permit_record = {
+            "job_id": "JOB-NYC-E2E-001",
+            "job_type": "NB",
+            "latitude": soho["lat"],
+            "longitude": soho["lng"],
+            "estimated_cost": 5000000.0,
+            "issuance_date": datetime.now(timezone.utc).isoformat(),
+            "ingested_at": datetime.now(timezone.utc).isoformat(),
+        }
+        worker.process_record(permit_record, topic=settings.topic_permits, key=permit_record["job_id"])
 
-    # Verify H3 indexing occurred
-    df_permits = spatial_pipeline.con.execute("SELECT * FROM raw_permits WHERE job_id = 'JOB-NYC-E2E-001'").df()
-    assert len(df_permits) == 1
-    assert df_permits["h3_res7"].iloc[0].startswith("87")
-    assert df_permits["h3_res8"].iloc[0].startswith("88")
-    assert df_permits["h3_res9"].iloc[0].startswith("89")
+        # Verify H3 indexing occurred
+        df_permits = spatial_pipeline.con.execute("SELECT * FROM raw_permits WHERE job_id = 'JOB-NYC-E2E-001'").df()
+        assert len(df_permits) == 1
+        assert df_permits["h3_res7"].iloc[0].startswith("87")
+        assert df_permits["h3_res8"].iloc[0].startswith("88")
+        assert df_permits["h3_res9"].iloc[0].startswith("89")
 
-    # 2. Feed raw 311 complaint
-    complaint_record = {
-        "incident_id": "SR-NYC-E2E-002",
-        "complaint_type": "Noise - Commercial",
-        "category": "QOL",
-        "latitude": williamsburg["lat"],
-        "longitude": williamsburg["lng"],
-        "created_date": datetime.now(timezone.utc).isoformat(),
-        "ingested_at": datetime.now(timezone.utc).isoformat(),
-    }
-    worker.process_record(complaint_record, topic=settings.topic_311, key=complaint_record["incident_id"])
+        # 2. Feed raw 311 complaint
+        complaint_record = {
+            "incident_id": "SR-NYC-E2E-002",
+            "complaint_type": "Noise - Commercial",
+            "category": "QOL",
+            "latitude": williamsburg["lat"],
+            "longitude": williamsburg["lng"],
+            "created_date": datetime.now(timezone.utc).isoformat(),
+            "ingested_at": datetime.now(timezone.utc).isoformat(),
+        }
+        worker.process_record(complaint_record, topic=settings.topic_311, key=complaint_record["incident_id"])
 
-    df_complaints = spatial_pipeline.con.execute("SELECT * FROM raw_complaints WHERE incident_id = 'SR-NYC-E2E-002'").df()
-    assert len(df_complaints) == 1
-    assert df_complaints["category"].iloc[0] == "QOL"
+        df_complaints = spatial_pipeline.con.execute("SELECT * FROM raw_complaints WHERE incident_id = 'SR-NYC-E2E-002'").df()
+        assert len(df_complaints) == 1
+        assert df_complaints["category"].iloc[0] == "QOL"
+    finally:
+        worker.close()
 
 
 # -----------------------------------------------------------------------------
