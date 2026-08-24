@@ -25,6 +25,9 @@
         "wrangler": "^4.125.0",
       },
     },
+    "apps/webhook": {
+      "name": "@urban-signal/webhook-receiver",
+    },
     "packages/typescript-config": {
       "name": "@urban-signal/typescript-config",
       "version": "2.0.0",
@@ -190,6 +193,8 @@
     "@urban-signal/site": ["@urban-signal/site@workspace:apps/site"],
 
     "@urban-signal/typescript-config": ["@urban-signal/typescript-config@workspace:packages/typescript-config"],
+
+    "@urban-signal/webhook-receiver": ["@urban-signal/webhook-receiver@workspace:apps/webhook"],
 
     "blake3-wasm": ["blake3-wasm@2.1.5", "", {}, "sha512-F1+K8EbfOZE49dtoPtmxUQrpXaBIl3ICvasLh+nJta0xkz+9kF/7uet9fLnwKqhDrmj6g+6K3Tw9yQPUg2ka5g=="],
 
