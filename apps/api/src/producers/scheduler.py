@@ -16,20 +16,32 @@ import logging
 import os
 import threading
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
+
+from prometheus_client import Counter
 
 from src.config import settings
 from src.producers.base_producer import BaseKafkaProducer
 from src.producers.complaints_311_producer import Complaints311Producer
+from src.producers.crime_incidents_producer import CrimeIncidentsProducer
 from src.producers.deeds_acris_producer import DeedsACRISProducer
 from src.producers.dob_permits_producer import DOBPermitsProducer
 from src.producers.sla_licenses_producer import SLALicensesProducer
 from src.producers.watermarks import typed_watermark_entry, watermark_exclude_clause
 
 logger = logging.getLogger(__name__)
+
+# Year-slice feed rollover events (US-70): a job switched from one calendar
+# year's layer/resource to the next. Scraped via the serving /metrics mount.
+FEED_ROLLOVER = Counter(
+    "urban_signal_feed_rollover_total",
+    "Year-slice feed rollover events (endpoint switched to the next year's layer)",
+    ["city_id", "feed"],
+)
 
 
 class DeduplicationFilter:
@@ -135,6 +147,10 @@ class JobMetrics:
     last_status: str = "IDLE"
     last_error: str | None = None
     high_watermark: str | None = None
+    # Year-slice rollover telemetry (US-70): how many times the job switched
+    # layers at New Year and when the most recent switch happened.
+    rollovers: int = 0
+    last_rollover: str | None = None
 
 
 class MunicipalIngestionScheduler:
@@ -146,11 +162,15 @@ class MunicipalIngestionScheduler:
         dlq_producer: BaseKafkaProducer | None = None,
         rate_limit_delay_seconds: float = 0.2,
         dedup_capacity: int = 100_000,
+        today_provider: Callable[[], date] | None = None,
     ):
         self.bootstrap_servers = bootstrap_servers or settings.kafka_bootstrap_servers
         self.rate_limit_delay = rate_limit_delay_seconds
         self.dedup = DeduplicationFilter(max_capacity=dedup_capacity)
         self._stop_event = threading.Event()
+        # Injectable calendar clock (US-70): the rollover drill freezes this at
+        # Jan 2 to prove the next-year layer is resolved at New Year.
+        self._today_provider = today_provider or (lambda: datetime.now(UTC).date())
 
         # Shared DLQ Producer
         self.dlq_producer = dlq_producer or BaseKafkaProducer(
@@ -164,6 +184,7 @@ class MunicipalIngestionScheduler:
             "311": Complaints311Producer(bootstrap_servers=self.bootstrap_servers),
             "sla": SLALicensesProducer(bootstrap_servers=self.bootstrap_servers),
             "deeds": DeedsACRISProducer(bootstrap_servers=self.bootstrap_servers),
+            "crime": CrimeIncidentsProducer(bootstrap_servers=self.bootstrap_servers),
         }
 
         # Socrata Endpoints & Target Topics mapping derived from city registry
@@ -177,6 +198,11 @@ class MunicipalIngestionScheduler:
                 job_name = get_job_name(feed_type, city_id)
                 self.job_metadata[job_name] = {
                     "endpoint": resolve_endpoint(ds),
+                    # Year-slice metadata (ADR 0002 / US-70): kept so the job
+                    # can re-resolve its layer at poll time and detect the New
+                    # Year switch instead of polling last year's layer forever.
+                    "endpoint_by_year": dict(ds.extra.get("endpoint_by_year") or {}),
+                    "endpoint_base": ds.endpoint,
                     "topic": ds.topic,
                     "watermark_col": ds.watermark_col,
                     "id_keys": ds.id_keys,
@@ -321,6 +347,45 @@ class MunicipalIngestionScheduler:
         if where_clause is not None:
             cfg.where_clause = where_clause
 
+    def _rollover_check(self, job_name: str, today: date | None = None) -> bool:
+        """Detect a year-slice layer switch and apply the New Year rollover reset.
+
+        Year-sliced feeds (DC permits/311, Boston 311, Baltimore 311 — ADR
+        0002) publish one layer/resource per calendar year. At New Year the
+        resolved endpoint changes; the job must switch to the new layer, reset
+        its watermark baseline (the new layer starts fresh), and emit a
+        ``rollover`` metric event so the staleness monitor re-baselines
+        instead of paging on the reset. Returns True when a rollover occurred.
+        """
+        from src.spatial.city_registry import DatasetSpec, resolve_endpoint
+
+        meta = self.job_metadata[job_name]
+        by_year = meta.get("endpoint_by_year")
+        if not by_year:
+            return False
+        today = today or self._today_provider()
+        resolved = resolve_endpoint(
+            DatasetSpec(
+                endpoint=meta["endpoint_base"],
+                extra={"endpoint_by_year": by_year},
+            ),
+            today=today,
+        )
+        if resolved == meta["endpoint"]:
+            return False
+        met = self.metrics[job_name]
+        old_watermark = met.high_watermark
+        meta["endpoint"] = resolved
+        met.high_watermark = None
+        met.rollovers += 1
+        met.last_rollover = today.isoformat()
+        FEED_ROLLOVER.labels(meta.get("city_id", "unknown"), meta.get("producer_key", job_name)).inc()
+        logger.warning(
+            "Job '%s' rolled over to %s; watermark baseline reset (was %r)",
+            job_name, resolved, old_watermark,
+        )
+        return True
+
     def poll_job(
         self,
         job_name: str,
@@ -341,6 +406,12 @@ class MunicipalIngestionScheduler:
         met.total_runs += 1
         met.last_run_timestamp = datetime.now(UTC)
         fetch_limit = limit or cfg.batch_limit
+
+        # US-70: New Year rollover for year-sliced feeds. Re-resolve the job's
+        # endpoint against the calendar before building the watermark clause so
+        # a layer switch repoints this poll to the new year's resource with a
+        # reset baseline.
+        self._rollover_check(job_name)
 
         # Build dynamic where clause for incremental watermark. Snapshot-mode
         # feeds (no watermark column — e.g. Baton Rouge's business registry)
@@ -629,6 +700,8 @@ class MunicipalIngestionScheduler:
                     "last_status": m.last_status,
                     "last_error": m.last_error,
                     "high_watermark": m.high_watermark,
+                    "rollovers": m.rollovers,
+                    "last_rollover": m.last_rollover,
                     "last_run_timestamp": m.last_run_timestamp.isoformat() if m.last_run_timestamp else None,
                 }
                 for name, m in self.metrics.items()

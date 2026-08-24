@@ -59,8 +59,11 @@ class FeatureAggregationWorker:
             as_of_date=as_of_date,
         )
 
-        # Emit enriched feature event
+        # Emit enriched feature event. Keyed city_id:h3_index (US-72, scaling
+        # notes): all records for one cell share a partition so per-cell
+        # ordering survives as the topic count and partition count grow.
         enriched_feature = EnrichedH3Feature(
+            city_id=effective_city_id,
             h3_index=h3_index,
             h3_resolution=resolution,
             timestamp=as_of_date,
@@ -73,6 +76,8 @@ class FeatureAggregationWorker:
             shift_ratio_311=feat_dict["shift_ratio_311"],
             sla_active_licenses=feat_dict["sla_active_licenses"],
             sla_new_filings_90d=feat_dict["sla_new_filings_90d"],
+            sla_move_ins_90d=feat_dict.get("sla_move_ins_90d", 0),
+            sla_move_outs_90d=feat_dict.get("sla_move_outs_90d", 0),
             deed_total_volume_180d=feat_dict["deed_total_volume_180d"],
             deed_transaction_count_180d=feat_dict["deed_transaction_count_180d"],
             lims_score=feat_dict["lims_score"],
@@ -81,7 +86,7 @@ class FeatureAggregationWorker:
 
         self.enriched_producer.produce(
             topic=settings.topic_enriched_h3,
-            key=h3_index,
+            key=f"{effective_city_id}:{h3_index}",
             payload=enriched_feature,
         )
 

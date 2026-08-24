@@ -314,31 +314,31 @@ plan's waves but shares its subject.
 
 Evidence: `docs/research/metro-expansion-and-new-signals.md` §2–3.
 
-| Ticket | Work | Note |
+| Ticket | Work | Status / Note |
 |---|---|---|
-| **HJ-126** | Extend `FeedType` + raw topic taxonomy | Spine prereq; `FeedType` is closed at 4 members today |
-| **HJ-127** | License move-in/move-out flow from existing SLA feeds | **Highest value, lowest cost in the survey** — no new endpoint, no new `FeedType`; converts SLA from a stock to a flow signal |
-| **HJ-128** | Crime incidents (CHI/SF/SEA live, NYC monthly, LA blocked by NIBRS gap) | Real LIMS-input candidate, but correlates with 311 — ship behind an ablation |
+| **HJ-126** (US-72) | Extend `FeedType` + raw topic taxonomy | **Delivered 2026-08-24** — `CRIME`, `STREET_CUT`, `EVICTIONS`, `STR` added to `FeedType`; raw topics added; enriched H3 keyed `city_id:h3_index` |
+| **HJ-127** (US-27) | License move-in/move-out flow from existing SLA feeds | **Delivered 2026-08-24** — `sla_move_ins_90d` and `sla_move_outs_90d` derived in DuckDB pipeline behind `sla_flow_ablation_enabled` flag (LIMS untouched) |
+| **HJ-128** (US-71) | Crime incidents (CHI/SF/SEA live, NYC monthly, LA blocked by NIBRS gap) | **Delivered 2026-08-24** — CHI/SF/SEA/NYC registered; `CrimeEvent` with Part-1/Part-2 classification flows to `raw_crime` behind ablation |
 | **HJ-129** | Street-cut permits (NYC/CHI) | Disruption context only; 2 of 5 metros, overlaps CapEx density |
 | **HJ-130** | NYC executed evictions | Context/validation only — single-metro features create cross-city asymmetry. Needs the geocoder |
 | **HJ-131** | STR registrations + transit ridership | May close as "not worth it"; that is a valid outcome |
 
 ### Geography
 
-| Ticket | Work | Note |
+| Ticket | Work | Status / Note |
 |---|---|---|
-| **HJ-138** | **Decision (ADR): multi-source metro vs separate registration** | Blocks Pierce. Three separate registrations now cover one metropolitan area (DC, MontCo, +PG proposed) while the product sells metros |
-| **HJ-132** | Register Pierce County WA (permits) | The only "yes" in the entire adjacent-county survey; richer date model than any registered city |
+| **HJ-138** (US-68) | **Decision (ADR): multi-source metro vs separate registration** | **Accepted 2026-08-24 (ADR 0007)** — Separate registration retained for ingestion; multi-source metro deferred until division-level feed funded |
+| **HJ-132** (US-80) | Register Pierce County WA (permits) | **Delivered 2026-08-24** — 22nd registered metro (`CityId.PIERCE`); ArcGIS permits + WA LCB SLA; dashboard wired |
 | **HJ-133** | Register Minneapolis MN (permits + year-sliced 311) | Ready via existing ArcGIS client; never scheduled into the 5→17 program |
 | **HJ-134** | Row-level probe: Sacramento, Charlotte, Portland, Tampa | Holds, not rejections. Also the contingency pool for plan risk W6 |
 
 ### Hardening and recurring maintenance
 
-| Ticket | Work | Note |
+| Ticket | Work | Status / Note |
 |---|---|---|
-| **HJ-135** | Annual New Year rollover drill | Risk R3 is rated *"Certain (if unmitigated)"* — DC, Boston, Baltimore, +Minneapolis |
+| **HJ-135** (US-70) | Annual New Year rollover drill | **Delivered 2026-08-24** — Dynamic scheduler layer rollover detection, watermark reset, Prometheus metric, and `scripts/rollover_drill.py` CLI + tests |
 | **HJ-136** | Standing calendar for rotating source IDs | Norfolk FY (July), Alameda (annual), King County parcel sales (quarterly). The weekly probe cannot catch these — the endpoint is *replaced*, not staled |
-| **HJ-137** | Verify Kafka partitioning + 2× replay lag target | Both were 5→17 checklist lines with no recorded result; cheap to change before the feed count grows, disruptive after |
+| **HJ-137** (US-69) | Verify Kafka partitioning + 2× replay lag target | **Verified 2026-08-24** — Full report in `docs/replay-lag-verification.md`; 12 partitions verified on compose; consumer lag target missed due to backlog (gates further feed growth) |
 
 ### Deliberately not ticketed
 

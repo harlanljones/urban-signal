@@ -5,6 +5,7 @@ from typing import Dict, List, Optional
 import duckdb
 import pandas as pd
 import polars as pl
+from src.config import settings
 from src.features.lims_calculator import LIMSCalculator
 from src.features.shift_dynamics import ComplaintShiftDynamics
 from src.features.time_decay import TimeDecayedCapExCalculator
@@ -57,6 +58,7 @@ class SpatialFeaturePipeline:
                 latitude DOUBLE,
                 longitude DOUBLE,
                 effective_date TIMESTAMP,
+                expiration_date TIMESTAMP,
                 license_status VARCHAR,
                 h3_res7 VARCHAR,
                 h3_res8 VARCHAR,
@@ -77,6 +79,19 @@ class SpatialFeaturePipeline:
                 ingested_at TIMESTAMP
             );
 
+            CREATE TABLE IF NOT EXISTS raw_crime (
+                incident_id VARCHAR PRIMARY KEY,
+                offense_type VARCHAR,
+                offense_class VARCHAR,
+                latitude DOUBLE,
+                longitude DOUBLE,
+                occurred_date TIMESTAMP,
+                h3_res7 VARCHAR,
+                h3_res8 VARCHAR,
+                h3_res9 VARCHAR,
+                ingested_at TIMESTAMP
+            );
+
             CREATE TABLE IF NOT EXISTS feature_store_h3 (
                 h3_index VARCHAR,
                 h3_resolution INTEGER,
@@ -90,6 +105,8 @@ class SpatialFeaturePipeline:
                 shift_ratio_311 DOUBLE,
                 sla_active_licenses INTEGER,
                 sla_new_filings_90d INTEGER,
+                sla_move_ins_90d INTEGER,
+                sla_move_outs_90d INTEGER,
                 deed_total_volume_180d DOUBLE,
                 deed_transaction_count_180d INTEGER,
                 lims_score DOUBLE,
@@ -128,8 +145,14 @@ class SpatialFeaturePipeline:
     def insert_sla(self, df: pd.DataFrame):
         """Batch insert SLA licenses into DuckDB."""
         if not df.empty:
-            cols = ["license_id", "license_type", "latitude", "longitude", "effective_date", "license_status", "h3_res7", "h3_res8", "h3_res9", "ingested_at"]
+            cols = ["license_id", "license_type", "latitude", "longitude", "effective_date", "expiration_date", "license_status", "h3_res7", "h3_res8", "h3_res9", "ingested_at"]
             filtered = df[[c for c in cols if c in df.columns]].copy()
+            # raw_sla fixed 11-column shape: backfill any missing lifecycle
+            # column (expiration_date) so SELECT * column counts always match.
+            for c in cols:
+                if c not in filtered.columns:
+                    filtered[c] = None
+            filtered = filtered[cols]
             self.con.register("df_sla_temp", filtered)
             self.con.execute("""
                 INSERT OR REPLACE INTO raw_sla
@@ -149,6 +172,22 @@ class SpatialFeaturePipeline:
             """)
             self.con.unregister("df_deeds_temp")
 
+    def insert_crime(self, df: pd.DataFrame):
+        """Batch insert crime incidents into DuckDB (US-71)."""
+        if not df.empty:
+            cols = ["incident_id", "offense_type", "offense_class", "latitude", "longitude", "occurred_date", "h3_res7", "h3_res8", "h3_res9", "ingested_at"]
+            filtered = df[[c for c in cols if c in df.columns]].copy()
+            for c in cols:
+                if c not in filtered.columns:
+                    filtered[c] = None
+            filtered = filtered[cols]
+            self.con.register("df_crime_temp", filtered)
+            self.con.execute("""
+                INSERT OR REPLACE INTO raw_crime
+                SELECT * FROM df_crime_temp
+            """)
+            self.con.unregister("df_crime_temp")
+
     def compute_h3_cell_features(
         self,
         h3_index: str,
@@ -162,6 +201,7 @@ class SpatialFeaturePipeline:
         col_name = f"h3_res{resolution}"
         dt_str = as_of_date.strftime("%Y-%m-%d %H:%M:%S")
         dt_60d = (as_of_date - timedelta(days=60)).strftime("%Y-%m-%d %H:%M:%S")
+        dt_90d = (as_of_date - timedelta(days=90)).strftime("%Y-%m-%d %H:%M:%S")
         dt_180d = (as_of_date - timedelta(days=180)).strftime("%Y-%m-%d %H:%M:%S")
         dt_360d = (as_of_date - timedelta(days=360)).strftime("%Y-%m-%d %H:%M:%S")
 
@@ -217,6 +257,28 @@ class SpatialFeaturePipeline:
         active_sla = sla_res[0] or 0
         new_sla_90d = sla_res[1] or 0
 
+        # 3b. SLA flow signals (US-27, S1): first-seen vs closed per hex per
+        # 90d window, derived over the same raw_sla rows. move_ins = licenses
+        # whose effective_date falls in the window; move_outs = licenses whose
+        # lifecycle-end (expiration_date) falls in the window. Feed-agnostic
+        # date-only derivation: feeds without a lifecycle-end column contribute
+        # 0 move-outs. Gated behind settings.sla_flow_ablation_enabled — the
+        # survey standing rule requires ablating derived signals before
+        # promoting them into LIMS, so these counts are computed (and stored/
+        # emitted) for ablation evaluation but never feed lims_score.
+        sla_move_ins_90d = 0
+        sla_move_outs_90d = 0
+        if settings.sla_flow_ablation_enabled:
+            flow_res = self.con.execute(f"""
+                SELECT
+                    SUM(CASE WHEN effective_date >= ? AND effective_date <= ? THEN 1 ELSE 0 END) AS move_ins,
+                    SUM(CASE WHEN expiration_date >= ? AND expiration_date <= ? THEN 1 ELSE 0 END) AS move_outs
+                FROM raw_sla
+                WHERE {col_name} = ?
+            """, [dt_90d, dt_str, dt_90d, dt_str, h3_index]).fetchone()
+            sla_move_ins_90d = flow_res[0] or 0
+            sla_move_outs_90d = flow_res[1] or 0
+
         # 4. Deeds query
         deeds_res = self.con.execute(f"""
             SELECT
@@ -250,6 +312,8 @@ class SpatialFeaturePipeline:
             "shift_ratio_311": round(float(shift_ratio), 4),
             "sla_active_licenses": int(active_sla),
             "sla_new_filings_90d": int(new_sla_90d),
+            "sla_move_ins_90d": int(sla_move_ins_90d),
+            "sla_move_outs_90d": int(sla_move_outs_90d),
             "deed_total_volume_180d": round(float(deed_vol), 2),
             "deed_transaction_count_180d": int(deed_cnt),
             "lims_score": lims,

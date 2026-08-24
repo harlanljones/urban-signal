@@ -16,6 +16,8 @@
     { "name": "shift_ratio_311", "type": "double", "default": 1.0 },
     { "name": "sla_active_licenses", "type": "int", "default": 0 },
     { "name": "sla_new_filings_90d", "type": "int", "default": 0 },
+    { "name": "sla_move_ins_90d", "type": "int", "default": 0 },
+    { "name": "sla_move_outs_90d", "type": "int", "default": 0 },
     { "name": "deed_total_volume_180d", "type": "double", "default": 0.0 },
     { "name": "deed_transaction_count_180d", "type": "int", "default": 0 },
     { "name": "lims_score", "type": "double", "default": 0.0 },

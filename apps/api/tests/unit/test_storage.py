@@ -432,12 +432,13 @@ def test_sync_from_duckdb(in_memory_storage, sample_permit_event, sample_complai
     # Compute features for H3 cell
     feats = pipeline.compute_h3_cell_features(sample_permit_event.h3_res9, resolution=9)
     pipeline.con.execute("""
-        INSERT INTO feature_store_h3 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO feature_store_h3 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, [
         feats["h3_index"], feats["h3_resolution"], feats["as_of_date"],
         feats["capex_density_decayed"], feats["permit_count_60d"], feats["permit_count_180d"],
         feats["permit_velocity"], feats["complaints_neglect_count"], feats["complaints_qol_count"],
         feats["shift_ratio_311"], feats["sla_active_licenses"], feats["sla_new_filings_90d"],
+        feats["sla_move_ins_90d"], feats["sla_move_outs_90d"],
         feats["deed_total_volume_180d"], feats["deed_transaction_count_180d"], feats["lims_score"]
     ])
 

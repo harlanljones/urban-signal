@@ -259,3 +259,11 @@ Updated per wave close-out in `.streams/dispatch-log.md`; program rollup maintai
 | C4 | | | | | |
 | C5 | | | | | |
 | C6 | | | | | |
+
+> **US-69 verification (2026-08-24):** 2×-replay consumer-lag target **not met** —
+> p95 lag ≈ 7,300–7,600 s (vs < 60 s) on both consumer groups; a pre-existing
+> multi-million-record backfill backlog plus 2× replay keeps the groups ~2 h behind.
+> Raw topics are at 12 partitions on the compose broker (target met), but the
+> Strimzi manifests and the consumer default still declare 6/3/3; keying is
+> `city_id:record_id`, not `city_id+h3`. Full evidence:
+> `docs/replay-lag-verification.md`. Per US-69, the miss gates further feed growth.

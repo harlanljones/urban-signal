@@ -152,7 +152,7 @@ def test_probe_registry_uses_registered_city_feeds_without_manual_config():
         metadata_fetcher=lambda spec: datetime(2026, 8, 22, tzinfo=UTC),
     )
     assert {result.city_id for result in results} == {"nyc"}
-    assert len(results) == 4
+    assert len(results) == 5  # permits, 311, sla, deeds, crime (US-71)
     assert all(not result.stale for result in results)
 
 
@@ -210,6 +210,44 @@ def test_missing_or_invalid_declaration_falls_back():
     for bad in ({"expected_cadence_days": 0}, {"expected_cadence_days": "soon"}):
         spec = DatasetSpec(endpoint="u", extra=bad)
         assert declared_staleness_threshold(spec, fallback=timedelta(days=3)) == timedelta(days=3)
+
+
+def test_rollover_rebaseline_does_not_page_staleness_monitor():
+    """US-70: at New Year the probe re-baselines against the NEXT year's layer
+    (resolve_endpoint is date-aware); a fresh new-year source must not page."""
+    from dataclasses import asdict
+
+    from scripts.feed_staleness_probe import declared_staleness_threshold
+
+    from src.spatial.city_registry import resolve_endpoint
+
+    by_year = {
+        "2026": "https://fake.example/FeatureServer/18",
+        "2027": "https://fake.example/FeatureServer/19",
+    }
+    spec = DatasetSpec(
+        endpoint="https://fake.example/base",
+        watermark_col="ADDDATE",
+        extra={"endpoint_by_year": by_year, "expected_cadence_days": 7},
+    )
+    now = datetime(2027, 1, 2, 12, 0, tzinfo=UTC)
+    rolled = DatasetSpec(**{**asdict(spec), "endpoint": resolve_endpoint(spec, today=now.date())})
+
+    client = MagicMock()
+    client.paginate.return_value = [[{"ADDDATE": "2027-01-02T08:00:00"}]]
+    result = probe_feed(
+        "washington_dc",
+        FeedType.COMPLAINTS_311,
+        rolled,
+        now=now,
+        client=client,
+        source_updated_at=datetime(2027, 1, 2, 9, 0, tzinfo=UTC),
+        threshold=declared_staleness_threshold(rolled),
+    )
+    assert result.endpoint == "https://fake.example/FeatureServer/19"
+    assert result.newest_watermark == datetime(2027, 1, 2, 8, 0, tzinfo=UTC)
+    assert result.age_days is not None and result.age_days < 0.5
+    assert result.stale is False
 
 
 def test_probe_alarms_at_twice_declared_cadence_not_global_seven():

@@ -42,6 +42,13 @@ from src.spatial.cities.kansas_city import (
     KANSAS_CITY_SUBMARKETS,
     is_in_kansas_city_metro,
 )
+from src.spatial.cities.pierce import (
+    PIERCE_DIVISION_BBOXES,
+    PIERCE_DIVISIONS,
+    PIERCE_METRO_BBOX,
+    PIERCE_SUBMARKETS,
+    is_in_pierce_metro,
+)
 from src.spatial.cities.austin import (
     AUSTIN_DIVISION_BBOXES,
     AUSTIN_DIVISIONS,
@@ -148,6 +155,11 @@ from src.spatial.cities.seattle import (
 )
 
 __all__ = [
+    "PIERCE_METRO_BBOX",
+    "PIERCE_DIVISION_BBOXES",
+    "PIERCE_DIVISIONS",
+    "PIERCE_SUBMARKETS",
+    "is_in_pierce_metro",
     "AUSTIN_METRO_BBOX",
     "AUSTIN_DIVISION_BBOXES",
     "AUSTIN_DIVISIONS",

@@ -1,0 +1,25 @@
+{
+  "type": "record",
+  "name": "CrimeEvent",
+  "namespace": "org.urbandev.events",
+  "doc": "Municipal crime incident (NIBRS-classified)",
+  "fields": [
+    { "name": "city_id", "type": "string", "default": "nyc" },
+    { "name": "incident_id", "type": "string" },
+    { "name": "offense_type", "type": "string", "default": "Unknown" },
+    { "name": "offense_class", "type": "string", "default": "PART2" },
+    { "name": "description", "type": ["null", "string"], "default": null },
+    { "name": "borough", "type": ["null", "string"], "default": null },
+    { "name": "source_neighborhood", "type": ["null", "string"], "default": null },
+    { "name": "address", "type": ["null", "string"], "default": null },
+    { "name": "latitude", "type": ["null", "double"], "default": null },
+    { "name": "longitude", "type": ["null", "double"], "default": null },
+    { "name": "occurred_date", "type": ["null", "string"], "default": null },
+    { "name": "reported_date", "type": ["null", "string"], "default": null },
+    { "name": "resolution", "type": ["null", "string"], "default": null },
+    { "name": "h3_res7", "type": ["null", "string"], "default": null },
+    { "name": "h3_res8", "type": ["null", "string"], "default": null },
+    { "name": "h3_res9", "type": ["null", "string"], "default": null },
+    { "name": "ingested_at", "type": "string" }
+  ]
+}

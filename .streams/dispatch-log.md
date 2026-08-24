@@ -263,3 +263,46 @@ No spine files were touched at any point.
 |---|---|---|---|---|---|
 | rejection-recheck-r2 | scripts/rejection_recheck.py, test_rejection_recheck.py, docs/research/rejection-recheck-report.json | .github/workflows/rejection-recheck.yml (quarterly cron) | ~22:30 PT | completed — interlock 20 passed; suite 683/0; acceptance case kc_311 re-finds from 2026-08-23 list | self-correcting rejection watch (10 entries, 4 probe kinds) |
 | us107-stagger | apps/api/tests/unit/test_scheduler_stagger.py (6 tests) | scheduler.py (poll_due + start tick loop) | ~15:00 PT | completed — interlock 20 passed, suite 689 passed; live: only-due-jobs ticks, 311_chicago published fresh rows inside its 180s cadence | per-feed interval staggering (next_due monotonic deadlines), freshness bounded per feed |
+
+## 2026-08-24 — US-69 Kafka partitioning + 2× replay consumer-lag verification — Linear US-69
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| us69-replay-lag | `docs/replay-lag-verification.md`, `scripts/replay_lag_measure.py`, `scripts/replay_load.py` | none | ~15:30 PT | completed — 12 partitions verified on compose; consumer lag p95 ~7,300–7,600s vs <60s target (gates feed growth per US-69) | replay load and lag measurement scripts + verification doc |
+
+## 2026-08-24 — ADR 0007 Multi-Source Metro vs Separate Registration — Linear US-68
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| adr0007-multi-source-metro | `docs/adr/0007-multi-source-metro-vs-separate-registration.md` | none | ~15:45 PT | completed — Accepted: separate registration retained for ingestion; multi-source metro deferred; unblocks Pierce | ADR 0007 recording decision & consequences |
+
+## 2026-08-24 — City registration (Pierce County WA) — Linear US-80
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-pierce | `apps/api/src/spatial/cities/pierce.py`, `apps/api/tests/unit/test_producers_pierce.py` | config.py, city_registry.py, cities/__init__.py, dashboard.py, index.html | ~16:00 PT | completed — interlock 20 passed; suite green; 22nd registered metro | Pierce County geometry, ArcGIS permits + WA LCB SLA contract, dashboard wiring |
+
+## 2026-08-24 — US-70 Annual New Year rollover drill — Linear US-70
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| us70-rollover-drill | `apps/api/src/producers/rollover.py`, `scripts/rollover_drill.py`, `apps/api/tests/unit/test_rollover_drill.py`, `apps/api/tests/unit/test_feed_staleness_probe.py` | scheduler.py | ~16:15 PT | completed — interlock 20 passed; suite green; dynamic layer rollover detection + loud-fail drill | scheduler layer rollover detection + CLI drill tool + tests |
+
+## 2026-08-24 — US-72 FeedType taxonomy extension — Linear US-72
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| us72-feedtype-taxonomy | `apps/api/tests/unit/test_feedtype_taxonomy.py`, `apps/api/tests/unit/test_interlock_gate.py`, `apps/api/src/consumers/feature_aggregation_worker.py` | city_registry.py, config.py | ~16:25 PT | completed — interlock 20 passed; suite 719/0; CRIME, STREET_CUT, EVICTIONS, STR added to FeedType; enriched keyed city_id:h3 | FeedType enum extension + raw topics + enriched keying fix |
+
+## 2026-08-24 — US-71 Crime incident feeds — Linear US-71
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| us71-crime-feeds | `apps/api/src/producers/crime_incidents_producer.py`, `apps/api/src/schemas/models.py`, `apps/api/src/schemas/avro/crime_event.avsc`, `apps/api/src/features/pipeline.py`, `apps/api/src/consumers/spatial_enrichment_worker.py`, `apps/api/tests/unit/test_producers_crime.py`, `apps/api/tests/unit/test_schemas.py` | config.py, city_registry.py, scheduler.py | ~16:30 PT | completed — interlock 20 passed; suite 730/0; CHI/SF/SEA/NYC crime registered into raw_crime behind ablation | Crime incident producer + Avro schema + UCR Part-1/Part-2 classification + DuckDB table |
+
+## 2026-08-24 — US-27 Business license move-in / move-out flow — Linear US-27
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| us27-sla-flow | `apps/api/src/features/pipeline.py`, `apps/api/src/consumers/spatial_enrichment_worker.py`, `apps/api/src/consumers/feature_aggregation_worker.py`, `apps/api/src/schemas/models.py`, `apps/api/src/schemas/avro/enriched_h3_feature.avsc`, `apps/api/tests/unit/test_features.py`, `apps/api/tests/unit/test_schemas.py` | config.py (sla_flow_ablation_enabled flag) | ~16:35 PT | completed — interlock 20 passed; suite 730/0; sla_move_ins_90d + sla_move_outs_90d derived in pipeline behind ablation | SLA flow derivation in DuckDB feature pipeline + EnrichedH3Feature model & Avro schema |
+

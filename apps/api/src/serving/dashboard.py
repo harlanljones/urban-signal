@@ -1147,6 +1147,7 @@ def get_dashboard_html() -> str:
           <option value="columbus">⚓ Columbus (1 Division)</option>
           <option value="nashville">🎸 Nashville (1 Division)</option>
           <option value="kansas_city">🎷 Kansas City (1 Division)</option>
+          <option value="pierce">🏔️ Pierce County (1 Division)</option>
         </select>
       </div>
       <div class="compare-control">
@@ -1752,6 +1753,23 @@ def get_dashboard_html() -> str:
           'ALL': { lat: 39.10, lng: -94.58, zoom: 10.6, pitch: 45, bearing: -10 },
           'KANSAS_CITY_CORE': { lat: 39.10, lng: -94.58, zoom: 11.2, pitch: 48, bearing: -10 }
         }
+      },
+      pierce: {
+        center: [-122.4443, 47.2529],
+        zoom: 9.6,
+        pitch: 48,
+        bearing: -10,
+        name: 'Pierce County',
+        metroBbox: { min_lat: 46.73, max_lat: 47.42, min_lng: -122.85, max_lng: -121.46 },
+        allLabel: 'All Pierce County',
+        divisions: [
+          { key: 'ALL', label: 'All Pierce County', class: 'ALL' },
+          { key: 'PIERCE_COUNTY', label: 'Pierce County', class: 'PierceCounty' }
+        ],
+        presets: {
+          'ALL': { lat: 47.2529, lng: -122.4443, zoom: 9.4, pitch: 45, bearing: -10 },
+          'PIERCE_COUNTY': { lat: 47.2529, lng: -122.4443, zoom: 10.0, pitch: 48, bearing: -10 }
+        }
       }
     };
     CITY_CONFIGS.sf = CITY_CONFIGS.san_francisco;
@@ -1783,7 +1801,7 @@ def get_dashboard_html() -> str:
       cincinnati: { lat: 39.1031, lng: -84.5120 }, baton_rouge: { lat: 30.4515, lng: -91.1871 },
       denver: { lat: 39.7392, lng: -104.9903 }, prince_georges: { lat: 38.72, lng: -76.75 },
       columbus: { lat: 39.9612, lng: -83.0007 }, nashville: { lat: 36.1627, lng: -86.7818 },
-      kansas_city: { lat: 39.10, lng: -94.58 }
+      kansas_city: { lat: 39.10, lng: -94.58 }, pierce: { lat: 47.2529, lng: -122.4443 }
     };
 
     function renderCompareOptions() {
@@ -1909,7 +1927,8 @@ def get_dashboard_html() -> str:
         'prince_georges': { lat: 38.72, lng: -76.75 },
         'columbus': { lat: 39.9612, lng: -83.0007 },
         'nashville': { lat: 36.1627, lng: -86.7818 },
-        'kansas_city': { lat: 39.10, lng: -94.58 }
+        'kansas_city': { lat: 39.10, lng: -94.58 },
+        'pierce': { lat: 47.2529, lng: -122.4443 }
       };
       let closest = 'san_francisco';
       let minDist = Infinity;

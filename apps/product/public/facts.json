@@ -843,6 +843,36 @@
         "lng": -94.58
       },
       "evidence_path": "apps/api/src/spatial/cities/kansas_city.py"
+    },
+    {
+      "id": "pierce",
+      "name": "Pierce County",
+      "state": "WA",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 6,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "issuedDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 47.2529,
+        "lng": -122.4443
+      },
+      "evidence_path": "apps/api/src/spatial/cities/pierce.py"
     }
   ],
   "pipeline": [

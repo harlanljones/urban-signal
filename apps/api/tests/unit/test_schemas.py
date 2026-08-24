@@ -2,12 +2,14 @@
 
 import io
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 import fastavro
 import pytest
 from src.schemas.models import (
     CatalystAlert,
     Complaint311Event,
+    CrimeEvent,
     DeedEvent,
     EnrichedH3Feature,
     PermitEvent,
@@ -62,6 +64,38 @@ def test_deed_event_avro_serialization(sample_deed_event):
     deserialized = _validate_avro_roundtrip("deed_event.avsc", data)
     assert deserialized["doc_id"] == sample_deed_event.doc_id
     assert deserialized["document_amount"] == sample_deed_event.document_amount
+
+
+def test_crime_event_avro_serialization():
+    event = CrimeEvent(
+        city_id="chicago",
+        incident_id="14295750",
+        offense_type="THEFT",
+        offense_class="PART1",
+        latitude=41.744201882,
+        longitude=-87.665713523,
+        h3_res9="89275936477ffff",
+    )
+    data = event.model_dump(mode="json")
+    deserialized = _validate_avro_roundtrip("crime_event.avsc", data)
+    assert deserialized["incident_id"] == "14295750"
+    assert deserialized["offense_class"] == "PART1"
+    assert deserialized["latitude"] == 41.744201882
+
+
+def test_enriched_h3_feature_avro_serialization():
+    feature = EnrichedH3Feature(
+        h3_index="892a1072893ffff",
+        h3_resolution=9,
+        timestamp=datetime.now(timezone.utc),
+        sla_move_ins_90d=3,
+        sla_move_outs_90d=2,
+    )
+    data = feature.model_dump(mode="json")
+    deserialized = _validate_avro_roundtrip("enriched_h3_feature.avsc", data)
+    assert deserialized["h3_index"] == "892a1072893ffff"
+    assert deserialized["sla_move_ins_90d"] == 3
+    assert deserialized["sla_move_outs_90d"] == 2
 
 
 def test_pydantic_cost_parsing():

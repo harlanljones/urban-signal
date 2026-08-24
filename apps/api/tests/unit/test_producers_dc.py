@@ -187,7 +187,14 @@ class TestWashingtonDcRegistration:
         from src.spatial.city_registry import REGISTRY, CityId, FeedType
 
         datasets = REGISTRY[CityId.WASHINGTON_DC].datasets
-        assert set(datasets) == set(FeedType)
+        # The four original feeds; signal-survey FeedTypes (US-72) are
+        # registered by their own tickets, not here.
+        assert set(datasets) == {
+            FeedType.PERMITS,
+            FeedType.COMPLAINTS_311,
+            FeedType.SLA,
+            FeedType.DEEDS,
+        }
         for feed, spec in datasets.items():
             assert spec.platform == "arcgis", feed
 
@@ -228,10 +235,10 @@ class TestWashingtonDcRegistration:
         """objectIdField is OBJECTID everywhere; maxRecordCount is 2000 on
         FEEDS/DCRA and Property_and_Land, 1000 on ServiceRequests (live layer
         JSON, 2026-08-23)."""
-        from src.spatial.city_registry import CityId, FeedType, get_dataset
+        from src.spatial.city_registry import REGISTRY, CityId, FeedType, get_dataset
 
         dc = CityId.WASHINGTON_DC
-        for feed in FeedType:
+        for feed in set(REGISTRY[dc].datasets):
             spec = get_dataset(dc, feed)
             assert spec.extra["oid_field"] == "OBJECTID", feed
         assert get_dataset(dc, FeedType.PERMITS).extra["max_record_count"] == 2000

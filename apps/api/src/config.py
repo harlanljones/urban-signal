@@ -40,6 +40,13 @@ class Settings(BaseSettings):
     topic_311: str = Field(default="raw.municipal.311")
     topic_sla: str = Field(default="raw.municipal.sla")
     topic_deeds: str = Field(default="raw.municipal.deeds")
+    # Signal-survey raw topics (US-72): the taxonomy members beyond the four
+    # original feeds. Registered by their own tickets (US-71/81/92/93); an
+    # unregistered member simply has no jobs and no topics until then.
+    topic_crime: str = Field(default="raw.municipal.crime", description="Crime incident records topic")
+    topic_street_cut: str = Field(default="raw.municipal.street_cut", description="Street-cut/utility permit records topic")
+    topic_evictions: str = Field(default="raw.municipal.evictions", description="Eviction filings/executions topic")
+    topic_str: str = Field(default="raw.municipal.str", description="Short-term rental registrations topic")
     topic_enriched_h3: str = Field(default="enriched.spatial.h3")
     topic_catalyst_alerts: str = Field(default="alerts.catalyst")
     topic_dlq: str = Field(default="dlq.schema.failures")
@@ -137,6 +144,26 @@ class Settings(BaseSettings):
     socrata_la_licenses_endpoint: str = Field(
         default="https://data.lacity.org/resource/6rrh-rzua.json",
         description="LA Office of Finance Listing of Active Businesses endpoint",
+    )
+
+    # Crime incident feeds (US-71): NIBRS-classified incident rows per metro.
+    # LA stays out (mid-NIBRS-transition series break). NYC's YTD dataset
+    # publishes monthly (G11 cadence declaration in the registry spec).
+    socrata_nyc_crime_endpoint: str = Field(
+        default="https://data.cityofnewyork.us/resource/5uac-w243.json",
+        description="NYC crime current-year YTD incidents endpoint",
+    )
+    socrata_chicago_crime_endpoint: str = Field(
+        default="https://data.cityofchicago.org/resource/ijzp-q8t2.json",
+        description="Chicago crime incidents endpoint",
+    )
+    socrata_sf_crime_endpoint: str = Field(
+        default="https://data.sfgov.org/resource/wg3w-h783.json",
+        description="SF crime incident reports endpoint",
+    )
+    socrata_seattle_crime_endpoint: str = Field(
+        default="https://data.seattle.gov/resource/tazs-3rd5.json",
+        description="Seattle SPD crime data endpoint",
     )
 
     # New Orleans (Socrata)
@@ -368,6 +395,18 @@ class Settings(BaseSettings):
         description="Columbus Building Permits FeatureServer layer URL",
     )
 
+    # Pierce County, WA (ArcGIS): county applications and permits across six
+    # departments (Building, Development Engineering, Environmental, Fire,
+    # Land Use, Sewer). Point layer in WA State Plane; the client's outSR=4326
+    # yields WGS84 directly. The permits spec filters to Building/Land-Use.
+    arcgis_pierce_permits_url: str = Field(
+        default=(
+            "https://services2.arcgis.com/1UvBaQ5y1ubjUPmd/arcgis/rest/services/"
+            "Permits_Pierce_County/FeatureServer/0"
+        ),
+        description="Pierce County permits and applications FeatureServer layer URL",
+    )
+
     # Nashville, TN (ArcGIS): issued building permits plus residential STR
     # permits as the SLA-class signal; hubNashville 311 stays excluded (HJ-119).
     arcgis_nashville_permits_url: str = Field(
@@ -437,6 +476,18 @@ class Settings(BaseSettings):
     # Feature Decay Parameters
     capex_halflife_days: float = Field(default=180.0, description="Half-life in days for exponential CapEx time decay")
     lims_threshold: float = Field(default=85.0, description="Leading Indicator Momentum Score threshold for catalyst alert")
+
+    # Ablation gate for the S1 license flow signals (US-27). Off (default):
+    # the pipeline computes the derived move-in/move-out counts as 0 and the
+    # enriched record emits 0 defaults — behavior identical to before S1. On:
+    # first-seen/closed counts per hex per 90d window are derived, stored in
+    # feature_store_h3, and emitted for ablation evaluation. Either way these
+    # features never feed the LIMS score (survey standing rule: ablate derived
+    # signals before promoting them into LIMS).
+    sla_flow_ablation_enabled: bool = Field(
+        default=False,
+        description="Ablation gate for S1 license move-in/move-out flow signals",
+    )
 
     # ML Inference & Hardware
     onnx_model_dir: str = Field(default="./models_storage")

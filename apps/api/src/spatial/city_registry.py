@@ -52,6 +52,12 @@ from src.spatial.cities.kansas_city import (
     KANSAS_CITY_METRO_BBOX,
     KANSAS_CITY_SUBMARKETS,
 )
+from src.spatial.cities.pierce import (
+    PIERCE_DIVISION_BBOXES,
+    PIERCE_DIVISIONS,
+    PIERCE_METRO_BBOX,
+    PIERCE_SUBMARKETS,
+)
 from src.spatial.cities.austin import (
     AUSTIN_DIVISION_BBOXES,
     AUSTIN_DIVISIONS,
@@ -166,6 +172,7 @@ class CityId(str, Enum):
     COLUMBUS = "columbus"
     NASHVILLE = "nashville"
     KANSAS_CITY = "kansas_city"
+    PIERCE = "pierce"
 
 
 class FeedType(str, Enum):
@@ -174,6 +181,14 @@ class FeedType(str, Enum):
     COMPLAINTS_311 = "311"
     SLA = "sla"
     DEEDS = "deeds"
+    # Signal-survey families (US-72). These make a feed *ingestible* — a
+    # registration only lands via its own ticket once the feed clears its
+    # family gate, and each signal carries its own ablation requirement
+    # before it may enter LIMS.
+    CRIME = "crime"
+    STREET_CUT = "street_cut"
+    EVICTIONS = "evictions"
+    STR = "str"
 
 
 @runtime_checkable
@@ -376,6 +391,14 @@ ALIASES: Dict[str, CityId] = {
     "kansas_city": CityId.KANSAS_CITY,
     "kc_mo": CityId.KANSAS_CITY,
     "kcmo": CityId.KANSAS_CITY,
+
+    # Pierce County, WA
+    "pierce": CityId.PIERCE,
+    "pierce_county": CityId.PIERCE,
+    "pierce-county": CityId.PIERCE,
+    "pierce county": CityId.PIERCE,
+    "tacoma": CityId.PIERCE,
+    "tac": CityId.PIERCE,
 }
 
 
@@ -439,6 +462,18 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 producer_key="deeds",
                 extra={"expected_cadence_days": 7},
             ),
+            # US-71: current-year YTD incident set (monthly publishing -> G11
+            # cadence declaration; the staleness monitor alarms at 60d).
+            FeedType.CRIME: DatasetSpec(
+                endpoint=settings.socrata_nyc_crime_endpoint,
+                platform="socrata",
+                watermark_col="cmplnt_fr_dt",
+                id_keys=["cmplnt_num"],
+                topic=settings.topic_crime,
+                interval_seconds=1800.0,
+                producer_key="crime",
+                extra={"expected_cadence_days": 30},
+            ),
         },
     ),
     CityId.CHICAGO: CityRegistration(
@@ -492,6 +527,17 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 producer_key="deeds",
                 extra={"expected_cadence_days": 7},
             ),
+            # US-71: CPD crime incidents (lat/lon verified 2026-08-24).
+            FeedType.CRIME: DatasetSpec(
+                endpoint=settings.socrata_chicago_crime_endpoint,
+                platform="socrata",
+                watermark_col="date",
+                id_keys=["id", "case_number"],
+                topic=settings.topic_crime,
+                interval_seconds=1800.0,
+                producer_key="crime",
+                extra={"expected_cadence_days": 7},
+            ),
         },
     ),
     CityId.SAN_FRANCISCO: CityRegistration(
@@ -543,6 +589,17 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
+                extra={"expected_cadence_days": 7},
+            ),
+            # US-71: SFPD incident reports (point + intersection fields).
+            FeedType.CRIME: DatasetSpec(
+                endpoint=settings.socrata_sf_crime_endpoint,
+                platform="socrata",
+                watermark_col="incident_datetime",
+                id_keys=["incident_number", "row_id"],
+                topic=settings.topic_crime,
+                interval_seconds=1800.0,
+                producer_key="crime",
                 extra={"expected_cadence_days": 7},
             ),
         },
@@ -614,6 +671,17 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=600.0,
                 producer_key="deeds",
                 extra={"expected_cadence_days": 7, "oid_field": "OBJECTID", "max_record_count": 1000},
+            ),
+            # US-71: SPD crime incidents (lat/lon verified 2026-08-24).
+            FeedType.CRIME: DatasetSpec(
+                endpoint=settings.socrata_seattle_crime_endpoint,
+                platform="socrata",
+                watermark_col="offense_date",
+                id_keys=["offense_id", "report_number"],
+                topic=settings.topic_crime,
+                interval_seconds=1800.0,
+                producer_key="crime",
+                extra={"expected_cadence_days": 7},
             ),
         },
     ),
@@ -1965,6 +2033,57 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                         "complaint_type": ["issue_type"],
                         "created_date": ["open_date_time"],
                         "status": ["current_status"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.PIERCE: CityRegistration(
+        city_id=CityId.PIERCE,
+        name="Pierce County",
+        state="WA",
+        center={"lat": 47.2529, "lng": -122.4443},
+        metro_bbox=PIERCE_METRO_BBOX,
+        division_bboxes=PIERCE_DIVISION_BBOXES,
+        submarkets=PIERCE_SUBMARKETS,
+        divisions=PIERCE_DIVISIONS,
+        job_suffix="pco",
+        # Permits-only ArcGIS registration (US-80 / ADR 0007: separate
+        # CityId, never a Seattle division). Point layer in WA State Plane;
+        # outSR=4326 lifts WGS84 onto latitude/longitude before parsing.
+        # Six departments share the layer; the where-clause filter keeps
+        # Building/Land-Use so CapEx density reads clean (survey §1).
+        # Watermark rides issuedDate so an accepted application that later
+        # issues is re-ingested with its real issuance date; the two-date
+        # field-map fallback keeps issuance_date populated on the ~13% of
+        # rows still under review (issuedDate null).
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_pierce_permits_url,
+                platform="arcgis",
+                watermark_col="issuedDate",
+                id_keys=["applicationNumber", "projectId", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "where": (
+                        "applicationDept LIKE '%BUILDING%' OR "
+                        "applicationDept LIKE '%LAND USE%'"
+                    ),
+                    "field_map": {
+                        "job_id": ["applicationNumber"],
+                        "issuance_date": ["issuedDate", "applicationDate"],
+                        "filing_date": ["applicationDate"],
+                        "cost": ["buildingValuation", "projectValue"],
+                        "address_street": ["siteAddress"],
+                        "status": ["applicationStatus"],
+                        "job_type": ["applicationType", "workType", "buildingType"],
+                        "proposed_units": ["dwellingUnits"],
+                        "proposed_stories": ["stories"],
                     },
                 },
             ),

@@ -125,6 +125,7 @@ class SpatialEnrichmentWorker:
                 "latitude": float(record["latitude"]),
                 "longitude": float(record["longitude"]),
                 "effective_date": pd.to_datetime(record.get("effective_date") or datetime.now(timezone.utc)),
+                "expiration_date": pd.to_datetime(record.get("expiration_date")) if record.get("expiration_date") else None,
                 "license_status": record.get("license_status", "ACTIVE"),
                 "h3_res7": record.get("h3_res7"),
                 "h3_res8": record.get("h3_res8"),
@@ -147,6 +148,23 @@ class SpatialEnrichmentWorker:
                 "ingested_at": pd.to_datetime(record.get("ingested_at") or datetime.now(timezone.utc)),
             }])
             self.feature_pipeline.insert_deeds(df)
+
+        elif topic == settings.topic_crime:
+            # US-71: crime incidents persist to raw_crime for ablation
+            # experiments; nothing here feeds the LIMS score.
+            df = pd.DataFrame([{
+                "incident_id": record.get("incident_id"),
+                "offense_type": record.get("offense_type"),
+                "offense_class": record.get("offense_class", "PART2"),
+                "latitude": float(record["latitude"]) if record.get("latitude") else None,
+                "longitude": float(record["longitude"]) if record.get("longitude") else None,
+                "occurred_date": pd.to_datetime(record.get("occurred_date")) if record.get("occurred_date") else None,
+                "h3_res7": record.get("h3_res7"),
+                "h3_res8": record.get("h3_res8"),
+                "h3_res9": record.get("h3_res9"),
+                "ingested_at": pd.to_datetime(record.get("ingested_at") or datetime.now(timezone.utc)),
+            }])
+            self.feature_pipeline.insert_crime(df)
 
     def start(self):
         """Start the spatial enrichment consumer loop."""

@@ -140,6 +140,31 @@ class DeedEvent(BaseModel):
     ingested_at: datetime = Field(default_factory=_utc_now)
 
 
+class CrimeEvent(BaseModel):
+    """Municipal crime incident (NIBRS-classified)."""
+
+    city_id: str = Field(default="nyc")
+    incident_id: str = Field(..., description="Unique incident / offense report number")
+    offense_type: str = Field(default="Unknown", description="Offense description (e.g. THEFT, FELONY ASSAULT)")
+    # UCR Part-1 vs Part-2 (US-71): carried on the event so the model stage can
+    # drop Part-2 noise before the signal ever reaches LIMS. Best-effort
+    # keyword classification; NOT itself a LIMS input.
+    offense_class: str = Field(default="PART2", description="PART1 (UCR Part-I) or PART2 (everything else)")
+    description: Optional[str] = None
+    borough: Optional[str] = None
+    source_neighborhood: Optional[str] = None
+    address: Optional[str] = None
+    latitude: Optional[float] = Field(default=None, ge=-90.0, le=90.0)
+    longitude: Optional[float] = Field(default=None, ge=-180.0, le=180.0)
+    occurred_date: Optional[datetime] = None
+    reported_date: Optional[datetime] = None
+    resolution: Optional[str] = None
+    h3_res7: Optional[str] = None
+    h3_res8: Optional[str] = None
+    h3_res9: Optional[str] = None
+    ingested_at: datetime = Field(default_factory=_utc_now)
+
+
 class EnrichedH3Feature(BaseModel):
     """Spatio-Temporal Aggregated Feature Record per H3 Cell."""
 
@@ -156,6 +181,10 @@ class EnrichedH3Feature(BaseModel):
     shift_ratio_311: float = Field(default=1.0, description="(QoL + eps) / (Neglect + eps)")
     sla_active_licenses: int = Field(default=0)
     sla_new_filings_90d: int = Field(default=0)
+    # S1 license flow signals (US-27): first-seen (move-ins) and closed
+    # (move-outs) per hex per 90d window. Ablation-gated — never feed LIMS.
+    sla_move_ins_90d: int = Field(default=0)
+    sla_move_outs_90d: int = Field(default=0)
     deed_total_volume_180d: float = Field(default=0.0)
     deed_transaction_count_180d: int = Field(default=0)
     lims_score: float = Field(default=0.0, description="Leading Indicator Momentum Score [0..100]")

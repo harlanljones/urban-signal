@@ -118,7 +118,15 @@ class TestSeattleRegistration:
         assert reg.division_bboxes is SEATTLE_DIVISION_BBOXES
         assert reg.submarkets is SEATTLE_SUBMARKETS
         assert reg.divisions is SEATTLE_DIVISIONS
-        assert set(reg.datasets) == set(FeedType)
+        # The four original feeds plus the US-71 crime signal; signal-survey
+        # FeedTypes register via their own tickets.
+        assert set(reg.datasets) == {
+            FeedType.PERMITS,
+            FeedType.COMPLAINTS_311,
+            FeedType.SLA,
+            FeedType.DEEDS,
+            FeedType.CRIME,
+        }
 
     def test_center_is_inside_metro_bbox(self):
         reg = REGISTRY[CityId.SEATTLE]

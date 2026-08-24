@@ -102,3 +102,64 @@ def test_duckdb_spatial_feature_pipeline(sample_permit_event, sample_complaint_e
     assert feats["permit_count_60d"] >= 1
     assert feats["capex_density_decayed"] > 0.0
     assert "lims_score" in feats
+    # S1 flow signals present and zeroed while the ablation gate is off.
+    assert feats["sla_move_ins_90d"] == 0
+    assert feats["sla_move_outs_90d"] == 0
+
+
+SLA_CELL = "892a1072893ffff"
+
+
+def _sla_row(license_id, effective_date, expiration_date, now):
+    return {
+        "license_id": license_id,
+        "license_type": "OP - On-Premises Liquor",
+        "latitude": 40.7185,
+        "longitude": -73.9590,
+        "effective_date": effective_date,
+        "expiration_date": expiration_date,
+        "license_status": "ACTIVE" if expiration_date is None else "INACTIVE",
+        "h3_res7": "872a1072bffffff",
+        "h3_res8": "882a107289fffff",
+        "h3_res9": SLA_CELL,
+        "ingested_at": now,
+    }
+
+
+def test_sla_flow_derivation_is_ablation_gated(monkeypatch):
+    # Off by default: the flow counts are computed as 0 even with lifecycle
+    # dates present, so default behavior is identical to pre-S1.
+    monkeypatch.setattr("src.features.pipeline.settings.sla_flow_ablation_enabled", False)
+    pipeline = SpatialFeaturePipeline(db_path=":memory:")
+    now = datetime.now(timezone.utc)
+    rows = [
+        _sla_row("L1", now - timedelta(days=30), None, now),
+        _sla_row("L2", now - timedelta(days=200), now - timedelta(days=10), now),
+    ]
+    pipeline.insert_sla(pd.DataFrame(rows))
+    feats = pipeline.compute_h3_cell_features(SLA_CELL, resolution=9, as_of_date=now)
+    assert feats["sla_move_ins_90d"] == 0
+    assert feats["sla_move_outs_90d"] == 0
+    assert feats["sla_new_filings_90d"] == 1  # legacy LIMS input unchanged
+
+
+def test_sla_flow_derivation_counts_first_seen_and_closed(monkeypatch):
+    monkeypatch.setattr("src.features.pipeline.settings.sla_flow_ablation_enabled", True)
+    pipeline = SpatialFeaturePipeline(db_path=":memory:")
+    now = datetime.now(timezone.utc)
+    rows = [
+        # move-in: effective within window, still active
+        _sla_row("L1", now - timedelta(days=30), None, now),
+        # move-out: expired within window (effective outside it)
+        _sla_row("L2", now - timedelta(days=200), now - timedelta(days=10), now),
+        # neither: effective outside window, no lifecycle end
+        _sla_row("L3", now - timedelta(days=200), None, now),
+        # neither: expiry far in the future, not yet closed
+        _sla_row("L4", now - timedelta(days=120), now + timedelta(days=100), now),
+    ]
+    pipeline.insert_sla(pd.DataFrame(rows))
+    feats = pipeline.compute_h3_cell_features(SLA_CELL, resolution=9, as_of_date=now)
+    assert feats["sla_move_ins_90d"] == 1   # only L1 first-seen inside window
+    assert feats["sla_move_outs_90d"] == 1  # only L2 closed inside window
+    # LIMS score never reads the flow signals (ablation boundary).
+    assert feats["lims_score"] >= 0.0

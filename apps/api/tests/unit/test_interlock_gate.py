@@ -35,6 +35,12 @@ FEED_TOPICS = {
     FeedType.COMPLAINTS_311: settings.topic_311,
     FeedType.SLA: settings.topic_sla,
     FeedType.DEEDS: settings.topic_deeds,
+    # US-72 signal-survey members: unregistered until their own tickets, but
+    # the topic mapping is fixed now so a future registration can't drift.
+    FeedType.CRIME: settings.topic_crime,
+    FeedType.STREET_CUT: settings.topic_street_cut,
+    FeedType.EVICTIONS: settings.topic_evictions,
+    FeedType.STR: settings.topic_str,
 }
 
 KNOWN_PLATFORMS = {"socrata", "arcgis", "carto", "ckan"}
