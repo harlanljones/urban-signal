@@ -54,7 +54,7 @@ jobs:
       - name: Install API dependencies
         run: |
           uv venv .venv --python 3.12
-          uv pip install -e apps/api
+          uv pip install -e "apps/api[dev]"
 
       - name: Check Python quality
         run: |
