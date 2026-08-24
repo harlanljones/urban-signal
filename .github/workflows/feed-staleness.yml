@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      WEBHOOK_ALERT_URLS: ${{ secrets.WEBHOOK_ALERT_URLS }}
+      WEBHOOK_ALERT_URLS: ${{ secrets.WEBHOOK_ALERT_URLS || '[]' }}
     steps:
       - uses: actions/checkout@v4
 

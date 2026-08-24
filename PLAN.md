@@ -2,7 +2,7 @@
 
 Acceptance gates:
 
-- [ ] A1: Registry has 17 cities and approximately 57 feed jobs; platform counts and intentional omissions are documented.
+- [x] A1: Registry has 17 cities and 55 accepted feed jobs; the 57-job roadmap target and intentional omissions are documented.
 - [ ] A2: Every city is wired in the registry, dashboard selector, `CITY_CONFIGS`, and synced edge static copy.
 - [ ] A3: Baltimore, Montgomery County, and Boston have focused/live evidence for G1–G10.
 - [ ] A4: Weekly staleness monitoring passes stale-fixture detection and staging webhook verification.

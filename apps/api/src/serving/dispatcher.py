@@ -1,29 +1,55 @@
 """Asynchronous Webhook Alert Dispatcher for high-momentum catalyst parcels."""
 
+from __future__ import annotations
+
 import asyncio
 import logging
+from collections.abc import Mapping
 
 import httpx
 
 from src.config import settings
 from src.schemas.models import CatalystAlert
-from src.serving.alert_state import CityAlertBudget
+from src.serving.alert_state import AlertStateStore, CityAlertBudget, InMemoryAlertStateStore
 
 logger = logging.getLogger(__name__)
+
+# These markets were added by the expansion roadmap and must remain quiet until
+# their 60-day calibration and model-review gates are persisted as enabled.
+CALIBRATION_REQUIRED_CITY_IDS = frozenset({
+    "new_orleans", "norfolk", "detroit", "austin", "philadelphia", "cincinnati",
+    "baton_rouge", "washington_dc", "boston", "denver", "baltimore", "montgomery",
+})
 
 
 class WebhookDispatcher:
     """Dispatches real-time LIMS > 85.0 catalyst alerts to external endpoints (Slack/Discord/REST)."""
 
     def __init__(self, target_urls: list[str] | None = None, daily_alert_budget: int = 100,
-                 alert_budget: CityAlertBudget | None = None):
+                 alert_budget: CityAlertBudget | None = None,
+                 state_store: AlertStateStore | None = None,
+                 city_states: Mapping[str, object] | None = None):
         self.target_urls = target_urls if target_urls is not None else settings.webhook_alert_urls
         self.alert_budget = alert_budget or CityAlertBudget(daily_alert_budget)
+        self.state_store = state_store or InMemoryAlertStateStore()
+        self.city_states = dict(city_states or {})
+
+    def _city_alert_enabled(self, city_id: str) -> bool:
+        """Fail closed for roadmap cities until calibration explicitly unlocks them."""
+        if city_id not in CALIBRATION_REQUIRED_CITY_IDS:
+            return True
+        from src.models.calibration import CityAlertState
+
+        state = self.city_states.get(city_id) or CityAlertState.load(city_id, self.state_store)
+        return state.enabled
 
     async def dispatch_alert(self, alert: CatalystAlert) -> list[int]:
         """Broadcast catalyst alert payload to all registered webhook URLs."""
         if not self.target_urls:
             logger.debug("No webhook URLs configured; skipping dispatch for alert %s", alert.alert_id)
+            return []
+        if not self._city_alert_enabled(alert.city_id):
+            logger.info("City %s remains in calibration; skipping alert %s", alert.city_id, alert.alert_id)
             return []
         if not self.alert_budget.allow(alert.city_id):
             logger.warning("Alert budget exhausted for city %s; skipping %s", alert.city_id, alert.alert_id)

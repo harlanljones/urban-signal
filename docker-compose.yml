@@ -104,7 +104,7 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-urbandev}
+      POSTGRES_DB: ${POSTGRES_DB:-urbansignal}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     volumes:
@@ -148,13 +148,13 @@ services:
     entrypoint: >
       sh -c "
         mc alias set local http://minio:9000 $${MINIO_ACCESS_KEY:-minioadmin} $${MINIO_SECRET_KEY:-minioadmin} &&
-        mc mb --ignore-existing local/$${MINIO_BUCKET_FEATURES:-urban-features} &&
+        mc mb --ignore-existing local/$${MINIO_BUCKET_FEATURES:-urban-signal-features} &&
         echo 'MinIO bucket ready.'
       "
     environment:
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
-      MINIO_BUCKET_FEATURES: ${MINIO_BUCKET_FEATURES:-urban-features}
+      MINIO_BUCKET_FEATURES: ${MINIO_BUCKET_FEATURES:-urban-signal-features}
 
   # AKHQ — Kafka management UI (optional but helpful)
   akhq:

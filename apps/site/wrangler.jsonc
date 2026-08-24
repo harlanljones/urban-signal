@@ -1,5 +1,6 @@
 {
-  "name": "urban-signal-site",
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "urban-signal-product",
   "compatibility_date": "2026-08-24",
   "send_metrics": false,
   "assets": {

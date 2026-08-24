@@ -1,9 +1,8 @@
 from datetime import UTC, date, datetime
 
-from src.models.calibration import CityAlertState, calibration_report
+from src.models.calibration import CityAlertState, calibration_report, record_calibration_decision
 from src.models.explainability import CatalystExplainer
-from src.serving.alert_state import CityAlertBudget
-from src.serving.alert_state import JsonAlertStateStore
+from src.serving.alert_state import CityAlertBudget, JsonAlertStateStore
 
 
 def test_city_stays_disabled_during_60_day_warmup():
@@ -44,3 +43,14 @@ def test_city_alert_state_round_trips_through_durable_adapter(tmp_path):
     restored = CityAlertState.load("boston", store)
     assert restored.first_feature_date == date(2026, 1, 1)
     assert restored.enabled is False
+
+
+def test_calibration_decision_is_recorded_and_unlocks_after_all_gates(tmp_path):
+    store = JsonAlertStateStore(tmp_path / "decision.json")
+    report = calibration_report("boston", date(2026, 1, 1), date(2026, 3, 1), 1, 1, 1, 1)
+
+    decision = record_calibration_decision(report, store)
+
+    assert decision.enabled is True
+    assert decision.decision == "unlock"
+    assert JsonAlertStateStore(tmp_path / "decision.json").load("boston")["calibration_decision"]["decision"] == "unlock"

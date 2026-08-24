@@ -1,7 +1,8 @@
 """Per-city calibration gates for model and LIMS alert unlocks."""
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import date
+
 from src.serving.alert_state import AlertStateStore, InMemoryAlertStateStore
 
 
@@ -76,6 +77,41 @@ class CityAlertState:
         if not report.lims_gate:
             return "lims_gate_failed"
         return "attribution_drift_review"
+
+
+@dataclass(frozen=True)
+class CalibrationDecision:
+    """Durable, auditable outcome of applying a report to a city."""
+
+    city_id: str
+    report: CalibrationReport
+    enabled: bool
+    decision: str
+
+
+def record_calibration_decision(
+    report: CalibrationReport,
+    store: AlertStateStore,
+) -> CalibrationDecision:
+    """Apply and persist one calibration decision for later audit/replay."""
+    state = CityAlertState.load(report.city_id, store)
+    state.apply_report(report)
+    state.persist(store)
+    decision = CalibrationDecision(
+        city_id=report.city_id,
+        report=report,
+        enabled=state.enabled,
+        decision="unlock" if state.enabled else state.review_reason or "calibration_required",
+    )
+    # Keep the decision fields in the adapter payload without changing the
+    # small AlertStateStore protocol or requiring a database migration.
+    store.save(report.city_id, {
+        "first_feature_date": state.first_feature_date.isoformat() if state.first_feature_date else None,
+        "enabled": state.enabled,
+        "review_reason": state.review_reason,
+        "calibration_decision": asdict(decision),
+    })
+    return decision
 
 
 def warmup_days(first_feature_date: date, as_of: date) -> int:

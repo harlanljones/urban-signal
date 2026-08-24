@@ -112,7 +112,7 @@ jobs:
         working-directory: apps/edge
         run: bunx wrangler kv bulk put ../../dist/kv-bulk.json --binding SNAPSHOT --remote
 
-  deploy-worker:
+  deploy-dashboard:
     if: github.event_name != 'pull_request'
     needs: snapshot-push
     runs-on: ubuntu-latest
@@ -136,6 +136,6 @@ jobs:
       - name: Install JS dependencies
         run: bun install --frozen-lockfile
 
-      - name: Deploy worker
+      - name: Deploy dashboard Worker
         working-directory: apps/edge
         run: bun run deploy

@@ -30,7 +30,7 @@ spec:
                 secretKeyRef:
                   name: postgis-credentials
                   key: password
-                  optional: true
+                  optional: false
           resources:
             requests:
               cpu: "2"

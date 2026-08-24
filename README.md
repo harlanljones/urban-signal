@@ -278,6 +278,10 @@ urban-signal/
 
 All settings are managed via `apps/api/src/config.py` using `pydantic-settings` and can be overridden via `.env` or container environment variables:
 
+See [`docs/environment.md`](docs/environment.md) for precedence, local Compose,
+Kubernetes Secrets, and production credential requirements. Start from
+[`.env.example`](.env.example); replace every `CHANGE_ME` value before using it.
+
 | Variable | Default Value | Description |
 | :--- | :--- | :--- |
 | `APP_ENV` | `development` | Environment mode (`development`, `staging`, `production`) |
@@ -286,17 +290,17 @@ All settings are managed via `apps/api/src/config.py` using `pydantic-settings` 
 | `KAFKA_BOOTSTRAP_SERVERS` | `localhost:9092` | Kafka broker endpoints (`kafka-cluster-kafka-bootstrap.kafka-streaming:9092` in K8s) |
 | `KAFKA_SCHEMA_REGISTRY_URL` | `http://localhost:8081` | Schema Registry endpoint |
 | `KAFKA_SECURITY_PROTOCOL` | `PLAINTEXT` | Security protocol (`PLAINTEXT`, `SASL_PLAINTEXT`, `SSL`) |
-| `POSTGRES_HOST` / `PORT` / `DB` | `localhost` / `5432` / `urbandev` | PostGIS database connection parameters |
+| `POSTGRES_HOST` / `PORT` / `DB` | `localhost` / `5432` / `urbansignal` | PostGIS database connection parameters |
 | `POSTGRES_USER` / `PASSWORD` | `postgres` / `postgres` | PostGIS authentication credentials |
 | `MINIO_ENDPOINT` | `localhost:9000` | MinIO S3 object storage endpoint |
 | `MINIO_ACCESS_KEY` / `SECRET_KEY` | `minioadmin` / `minioadmin` | MinIO S3 credentials |
-| `MINIO_BUCKET_FEATURES` | `urban-features` | S3 bucket for feature partitions & model registry |
+| `MINIO_BUCKET_FEATURES` | `urban-signal-features` | S3 bucket for feature partitions & model registry |
 | `SOCRATA_APP_TOKEN` | `None` | Optional Socrata API token for elevated rate limits |
 | `H3_RES_MACRO` / `NEIGHBORHOOD` / `MICRO` | `7` / `8` / `9` | Multi-resolution Uber H3 grid levels |
 | `CAPEX_HALFLIFE_DAYS` | `180.0` | Half-life parameter ($\\lambda = \\ln(2)/180$) for CapEx time decay |
 | `LIMS_THRESHOLD` | `85.0` | Minimum LIMS score triggering a Catalyst Alert |
 | `ONNX_MODEL_DIR` | `./models_storage` | Local path to exported ONNX model files |
-| `ONNX_EXECUTION_PROVIDER` | `CUDAExecutionProvider` | ONNX Provider (`CUDAExecutionProvider` or `CPUExecutionProvider`) |
+| `ONNX_EXECUTION_PROVIDER` | `CPUExecutionProvider` | ONNX Provider (`CPUExecutionProvider`; use CUDA explicitly on GPU hosts) |
 | `WEBHOOK_ALERT_URLS` | `[]` | JSON array of URLs for real-time catalyst alert dispatching |
 
 ### GitHub Actions deployment and monitoring
@@ -418,7 +422,7 @@ kubectl apply -f deploy/k8s/kafka/kafka-topics.yaml
 
 # 3. Create database credentials & deploy PostGIS StatefulSet
 kubectl create secret generic postgis-credentials \
-  --from-literal=password=postgres \
+  --from-literal=password="$POSTGRES_PASSWORD" \
   -n data-storage \
   --dry-run=client -o yaml | kubectl apply -f -
 kubectl apply -f deploy/k8s/storage/postgis-statefulset.yaml

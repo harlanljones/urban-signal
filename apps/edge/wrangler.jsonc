@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "urban-signal",
+  "name": "urban-signal-dashboard",
   "main": "src/index.ts",
   "compatibility_date": "2026-08-01",
   "send_metrics": false,

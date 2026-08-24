@@ -1,8 +1,10 @@
 """Configuration module using Pydantic Settings for Urban Signal."""
 
-from typing import List, Optional
-from pydantic import Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
+import json
+from typing import Annotated
+
+from pydantic import Field, field_validator, model_validator
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -29,9 +31,9 @@ class Settings(BaseSettings):
         description="Confluent/Apicurio Schema Registry endpoint",
     )
     kafka_security_protocol: str = Field(default="PLAINTEXT")
-    kafka_sasl_mechanism: Optional[str] = None
-    kafka_sasl_username: Optional[str] = None
-    kafka_sasl_password: Optional[str] = None
+    kafka_sasl_mechanism: str | None = None
+    kafka_sasl_username: str | None = None
+    kafka_sasl_password: str | None = None
 
     # Kafka Topic Definitions
     topic_permits: str = Field(default="raw.municipal.permits")
@@ -51,7 +53,7 @@ class Settings(BaseSettings):
     cg_alerts: str = Field(default="webhook-dispatchers")
 
     # Socrata SODA OpenData APIs (NYC Defaults)
-    socrata_app_token: Optional[str] = Field(default=None, description="Socrata App Token for high rate limits")
+    socrata_app_token: str | None = Field(default=None, description="Socrata App Token for high rate limits")
     socrata_dob_endpoint: str = Field(default="https://data.cityofnewyork.us/resource/ipu4-2q9a.json")
     socrata_311_endpoint: str = Field(default="https://data.cityofnewyork.us/resource/erm2-nwe9.json")
     socrata_sla_endpoint: str = Field(default="https://data.ny.gov/resource/9s3h-dpkz.json")
@@ -338,7 +340,7 @@ class Settings(BaseSettings):
     # PostgreSQL / PostGIS Database
     postgres_host: str = Field(default="localhost")
     postgres_port: int = Field(default=5432)
-    postgres_db: str = Field(default="urbandev")
+    postgres_db: str = Field(default="urbansignal")
     postgres_user: str = Field(default="postgres")
     postgres_password: str = Field(default="postgres")
 
@@ -354,7 +356,7 @@ class Settings(BaseSettings):
     minio_endpoint: str = Field(default="localhost:9000")
     minio_access_key: str = Field(default="minioadmin")
     minio_secret_key: str = Field(default="minioadmin")
-    minio_bucket_features: str = Field(default="urban-features")
+    minio_bucket_features: str = Field(default="urban-signal-features")
     minio_secure: bool = Field(default=False)
 
     # Uber H3 Spatial Grid Settings
@@ -368,11 +370,46 @@ class Settings(BaseSettings):
 
     # ML Inference & Hardware
     onnx_model_dir: str = Field(default="./models_storage")
-    onnx_execution_provider: str = Field(default="CUDAExecutionProvider")  # or CPUExecutionProvider
+    onnx_execution_provider: str = Field(default="CPUExecutionProvider")  # CUDAExecutionProvider is an explicit GPU opt-in
     gpu_device_id: int = Field(default=0)
 
     # Webhook Alert Dispatcher
-    webhook_alert_urls: List[str] = Field(default_factory=list, description="Endpoints to dispatch catalyst alerts")
+    webhook_alert_urls: Annotated[list[str], NoDecode] = Field(
+        default_factory=list,
+        description="Endpoints to dispatch catalyst alerts",
+    )
+
+    @field_validator("webhook_alert_urls", mode="before")
+    @classmethod
+    def parse_webhook_alert_urls(cls, value: object) -> object:
+        """Treat an unset secret as an empty destination list."""
+        if value is None or (isinstance(value, str) and not value.strip()):
+            return []
+        if isinstance(value, str):
+            return json.loads(value)
+        return value
+
+    @model_validator(mode="after")
+    def reject_production_placeholder_credentials(self) -> "Settings":
+        """Prevent an accidental production deployment with development credentials."""
+        if self.app_env.lower() == "production":
+            placeholders = {
+                "POSTGRES_PASSWORD": self.postgres_password,
+                "MINIO_ACCESS_KEY": self.minio_access_key,
+                "MINIO_SECRET_KEY": self.minio_secret_key,
+            }
+            unsafe = [
+                name
+                for name, value in placeholders.items()
+                if value.lower() in {"postgres", "minioadmin", "change-me", "replace-me"}
+                or value.lower().startswith(("change_me", "replace_me"))
+            ]
+            if unsafe:
+                names = ", ".join(unsafe)
+                raise ValueError(
+                    f"Production requires non-placeholder credentials for: {names}"
+                )
+        return self
 
 
 settings = Settings()
