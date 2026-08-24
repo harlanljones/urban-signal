@@ -293,6 +293,21 @@ All settings are managed via `apps/api/src/config.py` using `pydantic-settings` 
 | `ONNX_EXECUTION_PROVIDER` | `CUDAExecutionProvider` | ONNX Provider (`CUDAExecutionProvider` or `CPUExecutionProvider`) |
 | `WEBHOOK_ALERT_URLS` | `[]` | JSON array of URLs for real-time catalyst alert dispatching |
 
+### GitHub Actions deployment and monitoring
+
+The repository ships two workflows under `.github/workflows/`:
+
+- `batch-push-deploy` validates pull requests, deploys the edge worker and refreshed
+  Workers KV snapshot on pushes to `main`, and runs the batch refresh nightly.
+- `feed-staleness-monitor` validates pull requests, probes every registered feed weekly,
+  and supports manual city, threshold, and dry-run inputs.
+
+Configure these repository secrets before enabling deployment or webhook delivery:
+
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+- `WEBHOOK_ALERT_URLS` as a JSON array, for example `["https://staging.example/hooks/feed-staleness"]`
+
 ---
 
 ## 6. Quickstart & Local Development

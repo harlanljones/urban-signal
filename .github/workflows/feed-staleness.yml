@@ -1,7 +1,34 @@
 name: feed-staleness-monitor
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/api/**"
+      - "scripts/feed_staleness_probe.py"
+      - ".github/workflows/feed-staleness.yml"
+  pull_request:
+    paths:
+      - "apps/api/**"
+      - "scripts/feed_staleness_probe.py"
+      - "apps/api/tests/unit/test_feed_staleness_probe.py"
+      - ".github/workflows/feed-staleness.yml"
   workflow_dispatch:
+    inputs:
+      city:
+        description: "Optional city id to probe"
+        required: false
+        type: string
+      threshold_days:
+        description: "Age in days before a feed is stale"
+        required: false
+        default: "7"
+        type: string
+      dry_run:
+        description: "Skip webhook delivery"
+        required: false
+        default: false
+        type: boolean
   schedule:
     - cron: "0 7 * * 1" # weekly Monday 07:00 UTC
 
@@ -9,8 +36,30 @@ permissions:
   contents: read
 
 jobs:
-  probe:
+  validate:
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install API dependencies
+        run: |
+          uv venv .venv --python 3.12
+          uv pip install -e apps/api
+
+      - name: Test feed staleness monitor
+        run: |
+          .venv/bin/ruff check scripts/feed_staleness_probe.py apps/api/src/producers/watermarks.py apps/api/tests/unit/test_feed_staleness_probe.py
+          PYTHONPATH=apps/api .venv/bin/python -m pytest -q apps/api/tests/unit/test_feed_staleness_probe.py
+          PYTHONPATH=apps/api .venv/bin/python -m py_compile scripts/feed_staleness_probe.py
+
+  probe:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
       WEBHOOK_ALERT_URLS: ${{ secrets.WEBHOOK_ALERT_URLS }}
     steps:
@@ -24,4 +73,12 @@ jobs:
           uv pip install -e apps/api
 
       - name: Probe registered feed freshness
-        run: PYTHONPATH=apps/api .venv/bin/python scripts/feed_staleness_probe.py
+        env:
+          PROBE_CITY: ${{ inputs.city }}
+          PROBE_THRESHOLD_DAYS: ${{ inputs.threshold_days || '7' }}
+          PROBE_DRY_RUN: ${{ inputs.dry_run || false }}
+        run: |
+          args=(--threshold-days "$PROBE_THRESHOLD_DAYS")
+          if [[ -n "$PROBE_CITY" ]]; then args+=(--city "$PROBE_CITY"); fi
+          if [[ "$PROBE_DRY_RUN" == "true" ]]; then args+=(--dry-run); fi
+          PYTHONPATH=apps/api .venv/bin/python scripts/feed_staleness_probe.py "${args[@]}"

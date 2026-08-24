@@ -5,6 +5,23 @@ name: batch-push-deploy
 # deploys the edge worker. Data freshness is decoupled from code releases.
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/api/**"
+      - "apps/edge/**"
+      - "scripts/export_dashboard.py"
+      - "scripts/**"
+      - "src/**"
+      - ".github/workflows/batch-push.yml"
+  pull_request:
+    paths:
+      - "apps/api/**"
+      - "apps/edge/**"
+      - "scripts/export_dashboard.py"
+      - "scripts/**"
+      - "src/**"
+      - ".github/workflows/batch-push.yml"
   workflow_dispatch:
   schedule:
     - cron: "0 6 * * *" # nightly 06:00 UTC
@@ -21,7 +38,41 @@ env:
   CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
 jobs:
+  validate:
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install API dependencies
+        run: |
+          uv venv .venv --python 3.12
+          uv pip install -e apps/api
+
+      - name: Check Python quality
+        run: |
+          .venv/bin/ruff check scripts/feed_staleness_probe.py apps/api/src/producers/watermarks.py apps/api/tests/unit/test_feed_staleness_probe.py
+          PYTHONPATH=apps/api .venv/bin/python -m pytest -q apps/api/tests/unit/test_feed_staleness_probe.py
+          PYTHONPATH=apps/api .venv/bin/python -m pytest -q -m interlock apps/api/tests/unit/test_interlock_gate.py
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install JavaScript dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Check web packages
+        run: bun run build && bun run typecheck && bun run lint
+
   snapshot-push:
+    if: always() && github.event_name != 'pull_request' && (needs.validate.result == 'success' || needs.validate.result == 'skipped')
+    needs: validate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -58,6 +109,7 @@ jobs:
         run: bunx wrangler kv bulk put ../../dist/kv-bulk.json --binding SNAPSHOT --remote
 
   deploy-worker:
+    if: github.event_name != 'pull_request'
     needs: snapshot-push
     runs-on: ubuntu-latest
     steps:
