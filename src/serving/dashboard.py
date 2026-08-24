@@ -1087,6 +1087,8 @@ def get_dashboard_html() -> str:
           <option value="norfolk">⚓ Norfolk (5 Divisions)</option>
           <option value="detroit">🏙️ Detroit (6 Divisions)</option>
           <option value="austin">🦇 Austin (6 Divisions)</option>
+          <option value="philadelphia">🔔 Philadelphia (8 Divisions)</option>
+          <option value="washington_dc">🏛️ Washington DC (8 Divisions)</option>
         </select>
       </div>
     </div>
@@ -1446,6 +1448,68 @@ def get_dashboard_html() -> str:
           'WEST_AUSTIN_HILLS': { lat: 30.3100, lng: -97.8000, zoom: 12.4, pitch: 45, bearing: -10 },
           'PFLUGERVILLE_ROUND_ROCK_EDGE': { lat: 30.4500, lng: -97.6400, zoom: 12.0, pitch: 45, bearing: -10 }
         }
+      },
+      philadelphia: {
+        center: [-75.1652, 39.9526],
+        zoom: 11.0,
+        pitch: 48,
+        bearing: -10,
+        name: 'Philadelphia',
+        metroBbox: { min_lat: 39.87, max_lat: 40.14, min_lng: -75.28, max_lng: -74.95 },
+        allLabel: 'All Philly',
+        divisions: [
+          { key: 'ALL', label: 'All Philly', class: 'ALL' },
+          { key: 'CENTER_CITY_RITTENHOUSE', label: 'Center City / Rittenhouse', class: 'CenterCityRittenhouse' },
+          { key: 'OLD_CITY_NORTHERN_LIBERTIES', label: 'Old City / NoLibs', class: 'OldCityNorthernLiberties' },
+          { key: 'SOUTH_PHILLY_PASSYUNK', label: 'South Philly / Passyunk', class: 'SouthPhillyPassyunk' },
+          { key: 'WEST_PHILLY_UNIVERSITY_CITY', label: 'West Philly / University City', class: 'WestPhillyUniversityCity' },
+          { key: 'NORTH_PHILLY_TEMPLE', label: 'North Philly / Temple', class: 'NorthPhillyTemple' },
+          { key: 'NORTHEAST_ROOSEVELT_BLVD', label: 'Northeast / Roosevelt Blvd', class: 'NortheastRooseveltBlvd' },
+          { key: 'GERMANTOWN_MT_AIRY', label: 'Germantown / Mt. Airy', class: 'GermantownMtAiry' },
+          { key: 'RIVER_WARDS_KENSINGTON', label: 'River Wards / Kensington', class: 'RiverWardsKensington' }
+        ],
+        presets: {
+          'ALL': { lat: 39.9526, lng: -75.1652, zoom: 10.8, pitch: 45, bearing: -10 },
+          'CENTER_CITY_RITTENHOUSE': { lat: 39.9500, lng: -75.1700, zoom: 13.6, pitch: 54, bearing: -12 },
+          'OLD_CITY_NORTHERN_LIBERTIES': { lat: 39.9600, lng: -75.1400, zoom: 13.2, pitch: 50, bearing: -10 },
+          'SOUTH_PHILLY_PASSYUNK': { lat: 39.9300, lng: -75.1750, zoom: 12.8, pitch: 48, bearing: -10 },
+          'WEST_PHILLY_UNIVERSITY_CITY': { lat: 39.9500, lng: -75.2100, zoom: 13.0, pitch: 48, bearing: -10 },
+          'NORTH_PHILLY_TEMPLE': { lat: 39.9950, lng: -75.1800, zoom: 12.4, pitch: 45, bearing: -10 },
+          'NORTHEAST_ROOSEVELT_BLVD': { lat: 40.0450, lng: -75.0750, zoom: 12.2, pitch: 45, bearing: -10 },
+          'GERMANTOWN_MT_AIRY': { lat: 40.0650, lng: -75.1850, zoom: 12.4, pitch: 45, bearing: -10 },
+          'RIVER_WARDS_KENSINGTON': { lat: 39.9850, lng: -75.1250, zoom: 12.8, pitch: 48, bearing: -10 }
+        }
+      },
+      washington_dc: {
+        center: [-77.0369, 38.9072],
+        zoom: 11.2,
+        pitch: 48,
+        bearing: -10,
+        name: 'Washington DC',
+        metroBbox: { min_lat: 38.79, max_lat: 38.995, min_lng: -77.12, max_lng: -76.909 },
+        allLabel: 'All DC',
+        divisions: [
+          { key: 'ALL', label: 'All DC', class: 'ALL' },
+          { key: 'DOWNTOWN_NOMA_CAPITOL_RIVERFRONT', label: 'Downtown / NoMa / Riverfront', class: 'DowntownNomaCapitolRiverfront' },
+          { key: 'CAPITOL_HILL_EAST_END', label: 'Capitol Hill / East End', class: 'CapitolHillEastEnd' },
+          { key: 'DUPONT_KALORAMA_UPTOWN', label: 'Dupont / Kalorama / Uptown', class: 'DupontKaloramaUptown' },
+          { key: 'GEORGETOWN_FOGGY_BOTTOM', label: 'Georgetown / Foggy Bottom', class: 'GeorgetownFoggyBottom' },
+          { key: 'COLUMBIA_HEIGHTS_PETWORTH', label: 'Columbia Heights / Petworth', class: 'ColumbiaHeightsPetworth' },
+          { key: 'BROOKLAND_RHODE_ISLAND_AVE', label: 'Brookland / Rhode Island Ave', class: 'BrooklandRhodeIslandAve' },
+          { key: 'HILL_EAST_FAIRLINTON', label: 'Hill East / Fairlinton', class: 'HillEastFairlinton' },
+          { key: 'ANACOSTIA_EAST_OF_THE_RIVER', label: 'Anacostia / East of the River', class: 'AnacostiaEastOfTheRiver' }
+        ],
+        presets: {
+          'ALL': { lat: 38.9072, lng: -77.0369, zoom: 11.0, pitch: 45, bearing: -10 },
+          'DOWNTOWN_NOMA_CAPITOL_RIVERFRONT': { lat: 38.8950, lng: -77.0160, zoom: 13.6, pitch: 54, bearing: -12 },
+          'CAPITOL_HILL_EAST_END': { lat: 38.8890, lng: -76.9840, zoom: 13.4, pitch: 50, bearing: -10 },
+          'DUPONT_KALORAMA_UPTOWN': { lat: 38.9130, lng: -77.0420, zoom: 13.2, pitch: 48, bearing: -10 },
+          'GEORGETOWN_FOGGY_BOTTOM': { lat: 38.9030, lng: -77.0680, zoom: 13.2, pitch: 48, bearing: -10 },
+          'COLUMBIA_HEIGHTS_PETWORTH': { lat: 38.9380, lng: -77.0250, zoom: 12.8, pitch: 48, bearing: -10 },
+          'BROOKLAND_RHODE_ISLAND_AVE': { lat: 38.9330, lng: -76.9780, zoom: 13.0, pitch: 48, bearing: -10 },
+          'HILL_EAST_FAIRLINTON': { lat: 38.8760, lng: -76.9700, zoom: 13.0, pitch: 45, bearing: -10 },
+          'ANACOSTIA_EAST_OF_THE_RIVER': { lat: 38.8620, lng: -76.9650, zoom: 12.6, pitch: 45, bearing: -10 }
+        }
       }
     };
     CITY_CONFIGS.sf = CITY_CONFIGS.san_francisco;
@@ -1528,7 +1592,9 @@ def get_dashboard_html() -> str:
         'new_orleans': { lat: 29.9511, lng: -90.0715 },
         'norfolk': { lat: 36.8508, lng: -76.2859 },
         'detroit': { lat: 42.3314, lng: -83.0458 },
-        'austin': { lat: 30.2672, lng: -97.7431 }
+        'austin': { lat: 30.2672, lng: -97.7431 },
+        'philadelphia': { lat: 39.9526, lng: -75.1652 },
+        'washington_dc': { lat: 38.9072, lng: -77.0369 }
       };
       let closest = 'san_francisco';
       let minDist = Infinity;
@@ -1545,7 +1611,7 @@ def get_dashboard_html() -> str:
     async function detectUserDefaultCity() {
       try {
         const saved = sessionStorage.getItem('urban_dev_user_city');
-        if (saved && (saved === 'san_francisco' || saved === 'chicago' || saved === 'nyc' || saved === 'seattle' || saved === 'los_angeles' || saved === 'new_orleans' || saved === 'norfolk' || saved === 'detroit' || saved === 'austin')) {
+        if (saved && (saved === 'san_francisco' || saved === 'chicago' || saved === 'nyc' || saved === 'seattle' || saved === 'los_angeles' || saved === 'new_orleans' || saved === 'norfolk' || saved === 'detroit' || saved === 'austin' || saved === 'philadelphia' || saved === 'washington_dc')) {
           return saved;
         }
       } catch (e) {}
@@ -1629,6 +1695,8 @@ def get_dashboard_html() -> str:
         if (currentCity === 'norfolk') return 'DOWNTOWN_WATERFRONT';
         if (currentCity === 'detroit') return 'DOWNTOWN_MIDTOWN_CORKTOWN';
         if (currentCity === 'austin') return 'DOWNTOWN_CAPITOL';
+        if (currentCity === 'philadelphia') return 'CENTER_CITY_RITTENHOUSE';
+        if (currentCity === 'washington_dc') return 'DOWNTOWN_NOMA_CAPITOL_RIVERFRONT';
         return 'Manhattan';
       }
       const clean = b.toString().trim();
@@ -1678,6 +1746,22 @@ def get_dashboard_html() -> str:
       if (upper === 'NORTHAUSTINDOMAIN' || upper === 'THEDOMAIN' || upper === 'DOMAIN') return 'NORTH_AUSTIN_DOMAIN';
       if (upper === 'WESTAUSTINHILLS' || upper === 'WESTAUSTIN') return 'WEST_AUSTIN_HILLS';
       if (upper === 'PFLUGERVILLEROUNDROCKEDGE' || upper === 'PFLUGERVILLE') return 'PFLUGERVILLE_ROUND_ROCK_EDGE';
+      if (upper === 'CENTERCITYRITTENHOUSE' || upper === 'RITTENHOUSE' || upper === 'CENTERCITY') return 'CENTER_CITY_RITTENHOUSE';
+      if (upper === 'OLDCITYNORTHERNLIBERTIES' || upper === 'OLDCITY' || upper === 'FISHTOWN') return 'OLD_CITY_NORTHERN_LIBERTIES';
+      if (upper === 'SOUTHPHILLYPASSYUNK' || upper === 'SOUTHPHILLY' || upper === 'PASSYUNK') return 'SOUTH_PHILLY_PASSYUNK';
+      if (upper === 'WESTPHILLYUNIVERSITYCITY' || upper === 'UNIVERSITYCITY' || upper === 'WESTPHILLY') return 'WEST_PHILLY_UNIVERSITY_CITY';
+      if (upper === 'NORTHPHILLYTEMPLE' || upper === 'NORTHPHILLY') return 'NORTH_PHILLY_TEMPLE';
+      if (upper === 'NORTHEASTEROOSEVELTBLVD' || upper === 'ROOSEVELTBLVD' || upper === 'NORTHEASTPHILLY') return 'NORTHEAST_ROOSEVELT_BLVD';
+      if (upper === 'GERMANTOWNMTAIRY' || upper === 'GERMANTOWN' || upper === 'MTAIRY') return 'GERMANTOWN_MT_AIRY';
+      if (upper === 'RIVERWARDSKENSINGTON' || upper === 'KENSINGTON' || upper === 'RIVERWARDS') return 'RIVER_WARDS_KENSINGTON';
+      if (upper === 'DOWNTOWNNOMACAPITOLRIVERFRONT' || upper === 'NOMA' || upper === 'DOWNTOWNDC') return 'DOWNTOWN_NOMA_CAPITOL_RIVERFRONT';
+      if (upper === 'CAPITOLHILLEASTEEND' || upper === 'CAPITOLHILL') return 'CAPITOL_HILL_EAST_END';
+      if (upper === 'DUPONTKALORAMAUPTOWN' || upper === 'DUPONTCIRCLE') return 'DUPONT_KALORAMA_UPTOWN';
+      if (upper === 'GEORGETOWNFOGGYBOTTOM' || upper === 'GEORGETOWN' || upper === 'FOGGYBOTTOM') return 'GEORGETOWN_FOGGY_BOTTOM';
+      if (upper === 'COLUMBIAHEIGHTSPETWORTH' || upper === 'PETWORTH' || upper === 'COLUMBIAHEIGHTS') return 'COLUMBIA_HEIGHTS_PETWORTH';
+      if (upper === 'BROOKLANDRHODEISLANDAVE' || upper === 'BROOKLAND') return 'BROOKLAND_RHODE_ISLAND_AVE';
+      if (upper === 'HILLEASTFAIRLINTON' || upper === 'HILLEAST') return 'HILL_EAST_FAIRLINTON';
+      if (upper === 'ANACOSTIAEASTOFTHERIVER' || upper === 'ANACOSTIA') return 'ANACOSTIA_EAST_OF_THE_RIVER';
       if (upper === 'SOUTHKING') return 'SOUTH_KING';
       if (upper === 'CENTRALLA') return 'CENTRAL_LA';
       if (upper === 'WESTSIDE') return 'WESTSIDE';
@@ -2737,6 +2821,8 @@ def get_dashboard_html() -> str:
         if (currentCity === 'norfolk') return 'DOWNTOWN_WATERFRONT';
         if (currentCity === 'detroit') return 'DOWNTOWN_MIDTOWN_CORKTOWN';
         if (currentCity === 'austin') return 'DOWNTOWN_CAPITOL';
+        if (currentCity === 'philadelphia') return 'CENTER_CITY_RITTENHOUSE';
+        if (currentCity === 'washington_dc') return 'DOWNTOWN_NOMA_CAPITOL_RIVERFRONT';
         return 'Manhattan';
       }
       const cfg = CITY_CONFIGS[currentCity];
@@ -2816,6 +2902,33 @@ def get_dashboard_html() -> str:
           if (lat >= 30.25 && lat <= 30.31 && lng >= -97.72 && lng <= -97.66) return 'EAST_AUSTIN_MUELLER';
           if (lat >= 30.25 && lat <= 30.29 && lng >= -97.765 && lng <= -97.725) return 'DOWNTOWN_CAPITOL';
           return 'DOWNTOWN_CAPITOL';
+        }
+      }
+      if (currentCity === 'philadelphia') {
+        // PHILADELPHIA_METRO_BBOX guard: min_lat 39.87 max_lat 40.14 min_lng -75.28 max_lng -74.95
+        if (lat >= 39.87 && lat <= 40.14 && lng >= -75.28 && lng <= -74.95) {
+          if (lat >= 40.005 && lng >= -75.115) return 'NORTHEAST_ROOSEVELT_BLVD';
+          if (lat >= 40.032 && lng <= -75.16) return 'GERMANTOWN_MT_AIRY';
+          if (lat >= 39.96 && lat <= 40.01 && lng >= -75.15 && lng <= -75.105) return 'RIVER_WARDS_KENSINGTON';
+          if (lat >= 39.963 && lng <= -75.235) return 'NORTH_PHILLY_TEMPLE';
+          if (lat >= 39.933 && lat <= 39.972 && lng <= -75.188) return 'WEST_PHILLY_UNIVERSITY_CITY';
+          if (lat <= 39.952 && lng >= -75.20) return 'SOUTH_PHILLY_PASSYUNK';
+          if (lat >= 39.946 && lng <= -75.152) return 'OLD_CITY_NORTHERN_LIBERTIES';
+          if (lat >= 39.938 && lng <= -75.195) return 'CENTER_CITY_RITTENHOUSE';
+          return 'CENTER_CITY_RITTENHOUSE';
+        }
+      }
+      if (currentCity === 'washington_dc') {
+        // DC_METRO_BBOX guard: min_lat 38.79 max_lat 38.995 min_lng -77.12 max_lng -76.909
+        if (lat >= 38.79 && lat <= 38.995 && lng >= -77.12 && lng <= -76.909) {
+          if (lat <= 38.884 && lng >= -76.986) return 'HILL_EAST_FAIRLINTON';
+          if (lat <= 38.878 && lng >= -76.988) return 'ANACOSTIA_EAST_OF_THE_RIVER';
+          if (lat >= 38.926 && lng <= -77.00 && lng >= -77.04) return 'COLUMBIA_HEIGHTS_PETWORTH';
+          if (lat >= 38.926 && lng >= -77.00) return 'BROOKLAND_RHODE_ISLAND_AVE';
+          if (lat >= 38.90 && lng <= -77.045) return 'GEORGETOWN_FOGGY_BOTTOM';
+          if (lat >= 38.90 && lng <= -77.022) return 'DUPONT_KALORAMA_UPTOWN';
+          if (lat <= 38.90 && lng >= -76.995 && lng <= -76.972) return 'CAPITOL_HILL_EAST_END';
+          return 'DOWNTOWN_NOMA_CAPITOL_RIVERFRONT';
         }
       }
       if (lat >= 37.0 && lat <= 38.5 && lng >= -123.0 && lng <= -121.5) {

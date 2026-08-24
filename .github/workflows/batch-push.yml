@@ -48,13 +48,14 @@ jobs:
           path: dist/
           retention-days: 7
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install JS dependencies
+        run: bun install --frozen-lockfile
 
       - name: Push snapshot to Workers KV
-        working-directory: workers
-        run: npm ci && npx wrangler kv bulk put ../dist/kv-bulk.json --binding SNAPSHOT --remote
+        working-directory: apps/edge
+        run: bunx wrangler kv bulk put ../../dist/kv-bulk.json --binding SNAPSHOT --remote
 
   deploy-worker:
     needs: snapshot-push
@@ -74,10 +75,11 @@ jobs:
           uv pip install -e .
           .venv/bin/python scripts/export_dashboard.py
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install JS dependencies
+        run: bun install --frozen-lockfile
 
       - name: Deploy worker
-        working-directory: workers
-        run: npm ci && npx wrangler deploy
+        working-directory: apps/edge
+        run: bun run deploy

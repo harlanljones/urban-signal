@@ -160,7 +160,7 @@ class MunicipalIngestionScheduler:
         }
 
         # Socrata Endpoints & Target Topics mapping derived from city registry
-        from src.spatial.city_registry import REGISTRY, get_job_name
+        from src.spatial.city_registry import REGISTRY, get_job_name, resolve_endpoint
 
         self.job_metadata: dict[str, dict[str, Any]] = {}
         self.configs: dict[str, JobConfig] = {}
@@ -169,13 +169,21 @@ class MunicipalIngestionScheduler:
             for feed_type, ds in reg.datasets.items():
                 job_name = get_job_name(feed_type, city_id)
                 self.job_metadata[job_name] = {
-                    "endpoint": ds.endpoint,
+                    "endpoint": resolve_endpoint(ds),
                     "topic": ds.topic,
                     "watermark_col": ds.watermark_col,
                     "id_keys": ds.id_keys,
                     "city_id": city_id.value,
                     "producer_key": ds.producer_key or feed_type.value,
                     "platform": ds.platform,
+                    "ingestion_mode": ds.extra.get("ingestion_mode", "incremental"),
+                    # Platform-specific pagination knobs forwarded verbatim to
+                    # clients that accept them (e.g. CartoClient select/
+                    # order_by/id_col; socrata accepts order_by only). Clients
+                    # that don't take a key simply never receive it.
+                    "order_by": ds.extra.get("order_by"),
+                    "id_col": ds.extra.get("id_col"),
+                    "select": ds.extra.get("select"),
                 }
                 self.configs[job_name] = JobConfig(
                     name=job_name,
@@ -198,16 +206,35 @@ class MunicipalIngestionScheduler:
     def _paginating_client_for(self, job_name: str):
         """Select the paginating client matching a job's registered platform.
 
-        Jobs registered with platform='arcgis' (e.g. King County parcel sales)
-        page by OBJECTID via resultOffset and must not be handed to the Socrata
-        client. The invariant suite asserts every producer exposes the client
-        its registered specs need.
+        Routing is a dict dispatch so new platform clients (carto, ckan, ...)
+        plug in by adding a producer attribute — no scheduler edit. The
+        invariant suite asserts every producer exposes the client its
+        registered specs need; an unregistered platform here is a readable
+        error, never a silent fallthrough to Socrata.
         """
         meta = self.job_metadata[job_name]
         producer_wrapper = self.producers[meta.get("producer_key", job_name)]
-        if meta.get("platform") == "arcgis":
-            return producer_wrapper.arcgis
-        return producer_wrapper.socrata
+        clients = {
+            "socrata": getattr(producer_wrapper, "socrata", None),
+            "arcgis": getattr(producer_wrapper, "arcgis", None),
+            "carto": getattr(producer_wrapper, "carto", None),
+            "ckan": getattr(producer_wrapper, "ckan", None),
+        }
+        platform = meta.get("platform", "socrata")
+        client = clients.get(platform)
+        if client is None:
+            if platform not in clients:
+                available = ", ".join(sorted(k for k, v in clients.items() if v is not None))
+                raise ValueError(
+                    f"Job '{job_name}': platform {platform!r} has no client "
+                    f"registered (available: {available}); add a client module "
+                    f"and expose it on the producer before registering this spec"
+                )
+            raise ValueError(
+                f"Job '{job_name}': producer lacks the {platform!r} client its "
+                f"spec requires — expose it as an attribute (see DeedsACRISProducer)"
+            )
+        return client
 
     def configure_job(
         self,
@@ -252,11 +279,21 @@ class MunicipalIngestionScheduler:
         met.last_run_timestamp = datetime.now(UTC)
         fetch_limit = limit or cfg.batch_limit
 
-        # Build dynamic where clause for incremental watermark
+        # Build dynamic where clause for incremental watermark. Snapshot-mode
+        # feeds (no watermark column — e.g. Baton Rouge's business registry)
+        # pull the full table every cycle; the cross-run dedup cache makes the
+        # re-poll a diff (only unseen ids are emitted), so mutations surface as
+        # new ids and are tracked by the row-parity acceptance gate instead.
         where_parts = []
         if cfg.where_clause:
             where_parts.append(f"({cfg.where_clause})")
-        if cfg.incremental and met.high_watermark and meta["watermark_col"]:
+        is_snapshot = meta.get("ingestion_mode") == "snapshot"
+        if (
+            cfg.incremental
+            and not is_snapshot
+            and met.high_watermark
+            and meta["watermark_col"]
+        ):
             where_parts.append(f"{meta['watermark_col']} > '{met.high_watermark}'")
 
         active_where = " AND ".join(where_parts) if where_parts else None
@@ -267,11 +304,15 @@ class MunicipalIngestionScheduler:
         new_high_watermark = met.high_watermark
 
         try:
+            client_kwargs = {
+                k: meta[k] for k in ("order_by", "id_col", "select") if meta.get(k)
+            }
             for batch in self._paginating_client_for(job_name).paginate(
                 endpoint_url=meta["endpoint"],
                 where_clause=active_where,
                 batch_size=min(fetch_limit, 1000),
                 max_records=fetch_limit,
+                **client_kwargs,
             ):
                 if self._stop_event.is_set():
                     break

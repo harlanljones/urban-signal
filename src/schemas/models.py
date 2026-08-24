@@ -104,8 +104,10 @@ class SLALicenseEvent(BaseModel):
     address: Optional[str] = None
     borough: Optional[str] = None
     source_neighborhood: Optional[str] = None
-    latitude: float = Field(..., ge=-90.0, le=90.0)
-    longitude: float = Field(..., ge=-180.0, le=180.0)
+    # Optional: non-spatial license registries (DC Basic Business Licenses)
+    # emit null-coordinate events, mirroring DeedEvent below.
+    latitude: Optional[float] = Field(default=None, ge=-90.0, le=90.0)
+    longitude: Optional[float] = Field(default=None, ge=-180.0, le=180.0)
     effective_date: Optional[datetime] = None
     expiration_date: Optional[datetime] = None
     license_status: str = Field(default="ACTIVE")

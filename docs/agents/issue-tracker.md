@@ -3,9 +3,9 @@
 Issues and specs for this repo live in **Linear**. Agents drive it through the repo's
 `bun run linear` wrapper rather than by calling the Linear API directly.
 
-> **Setup gap (2026-08-23):** no `linear` script exists in this repo yet. The only
-> `package.json` is `workers/package.json`, whose scripts are `dev`, `deploy` and
-> `typecheck`. Until that script is added, `bun run linear` will fail.
+> **Resolved (2026-08-23):** the `linear` script exists in the root `package.json`
+> (added with the Turborepo conversion); it delegates to the `linear` CLI
+> (`@schpet/linear-cli`, on PATH at `~/.cache/.bun/bin/linear`).
 > **If the command is not available, do not improvise an alternative** — no `gh issue`,
 > no `.scratch/` markdown files, no direct API calls. Stop and tell the human, and
 > carry on with whatever part of the task does not need the tracker.

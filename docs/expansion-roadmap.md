@@ -50,7 +50,7 @@ A city is "registered" only when **every** line below is checked. No partial cre
 | G7 | Freshness lag | source `rowsUpdatedAt`/`lastEditDate` → Postgres row p95 < 15 min for ≤300 s-interval feeds over a 24 h soak | staging metrics |
 | G8 | Pipeline hygiene | DLQ rate < 0.5%/feed first week; duplicate events < 0.1%; null-H3 share ≤ geocode gap (deeds-class may be 100% null where documented, e.g. Cook County sales) | Kafka/PostGIS counters |
 | G9 | Division resolution | ≥ 90% of geocoded rows resolve to a declared division | PostGIS group-by audit |
-| G10 | Docs | README coverage-table row; dashboard selector row applied by integrator; research doc cross-linked | integrator checklist |
+| G10 | Docs **+ map** | README coverage-table row; dashboard selector row + `CITY_CONFIGS` entry applied by integrator; workers static copy synced if the deployment surface exists — **enforced by `TestDashboardWiring` in the interlock gate** (AGENTS.md "City registration rule": never register a city without verifying it appears on the map); research doc cross-linked | `pytest -m interlock` |
 
 ### 1.3 Program-level quality metrics (weekly scorecard)
 
@@ -230,6 +230,8 @@ Updated per wave close-out in `.streams/dispatch-log.md`; program rollup maintai
 | A+B (pre-program) | 5 | 21 | 1.0 | high (by design: repairs + mechanism) | 0 |
 | C1 | 7 | 27 | 2/2 | ~10% projected | 0 |
 | C2 | 9 | 33 | 2/2 | ~10% projected | 0 (1 gate catch: arcgis client routing) |
+| F | — | — | 3/3 | spine hold as planned | 0 |
+| C3 | 11 | 41 | 2/2 | ~12% projected | 0 (1 gate catch: producer-level carto routing) |
 | C2 | | | | | |
 | F | | | | | |
 | C3 | | | | | |

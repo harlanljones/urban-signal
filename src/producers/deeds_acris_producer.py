@@ -8,6 +8,7 @@ from typing import Any, Dict, Optional
 from src.config import settings
 from src.producers.base_producer import BaseKafkaProducer
 from src.producers.arcgis_client import ArcGISClient
+from src.producers.carto_client import CartoClient
 from src.producers.socrata_client import SocrataClient
 from src.schemas.models import DeedEvent
 from src.spatial.h3_indexer import H3SpatialIndexer
@@ -59,6 +60,7 @@ class DeedsACRISProducer:
         )
         self.socrata = SocrataClient()
         self.arcgis = ArcGISClient()
+        self.carto = CartoClient()
         self.spatial_indexer = H3SpatialIndexer()
 
     def _client_for(self, platform: str):
@@ -67,9 +69,20 @@ class DeedsACRISProducer:
         Both clients satisfy the same ``PaginatingClient`` protocol, so callers
         only need the right instance, not a different call shape.
         """
-        if platform == "arcgis":
-            return self.arcgis
-        return self.socrata
+        clients = {
+            "socrata": getattr(self, "socrata", None),
+            "arcgis": getattr(self, "arcgis", None),
+            "carto": getattr(self, "carto", None),
+            "ckan": getattr(self, "ckan", None),
+        }
+        client = clients.get(platform)
+        if client is None:
+            available = ", ".join(sorted(k for k, v in clients.items() if v is not None))
+            raise ValueError(
+                f"platform {platform!r} has no client on this producer "
+                f"(available: {available}); wire it before registering the spec"
+            )
+        return client
 
     def parse_socrata_row(self, row: Dict[str, Any], city_id: Optional[str] = None) -> Optional[DeedEvent]:
         """Convert raw ACRIS / Cook County / SF Assessor deed record into strongly-typed DeedEvent."""
@@ -302,12 +315,16 @@ class DeedsACRISProducer:
         spec = get_dataset(cid, FeedType.DEEDS)
         endpoint = spec.endpoint
         client = self._client_for(spec.platform)
+        client_kwargs = {
+            k: v for k, v in spec.extra.items() if k in ("order_by", "id_col", "select") and v
+        }
 
         logger.info("Starting %s Deeds Ingestion Stream (limit=%d)...", cid.value.upper(), limit)
         records_streamed = 0
 
         for batch in client.paginate(
             endpoint_url=endpoint,
+            **client_kwargs,
             where_clause=where_clause,
             batch_size=1000,
             max_records=limit,

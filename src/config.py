@@ -199,6 +199,49 @@ class Settings(BaseSettings):
         description="Detroit Assessor Property Sales FeatureServer layer URL",
     )
 
+    # Philadelphia (CARTO SQL API — opaque client-parsed URIs)
+    carto_phl_permits_endpoint: str = Field(
+        default="carto://phl.carto.com/permits",
+        description="Philadelphia Building Permits CARTO table",
+    )
+    carto_phl_311_endpoint: str = Field(
+        default="carto://phl.carto.com/public_cases_fc",
+        description="Philadelphia 311 Public Cases CARTO table",
+    )
+    carto_phl_licenses_endpoint: str = Field(
+        default="carto://phl.carto.com/business_licenses",
+        description="Philadelphia Business Licenses CARTO table",
+    )
+    carto_phl_deeds_endpoint: str = Field(
+        default="carto://phl.carto.com/rtt_summary",
+        description="Philadelphia Real Estate Transfer Tax summary CARTO table",
+    )
+
+    # Washington DC (ArcGIS FeatureServers — year-sliced layers resolved via
+    # endpoint_by_year in the registry; defaults below are current-year)
+    arcgis_dc_permits_url: str = Field(
+        default="https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/18",
+        description="DC Building Permits (2026) FeatureServer layer URL",
+    )
+    arcgis_dc_311_url: str = Field(
+        default=(
+            "https://maps2.dcgis.dc.gov/dcgis/rest/services/"
+            "DCGIS_DATA/ServiceRequests/FeatureServer/21"
+        ),
+        description="DC 311 City Service Requests (2026) FeatureServer layer URL",
+    )
+    arcgis_dc_licenses_url: str = Field(
+        default="https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/0",
+        description="DC Basic Business Licenses FeatureServer layer URL",
+    )
+    arcgis_dc_sales_url: str = Field(
+        default=(
+            "https://maps2.dcgis.dc.gov/dcgis/rest/services/"
+            "DCGIS_DATA/Property_and_Land_WebMercator/FeatureServer/57"
+        ),
+        description="DC Tax System Property Sales CAMA FeatureServer layer URL",
+    )
+
     # PostgreSQL / PostGIS Database
     postgres_host: str = Field(default="localhost")
     postgres_port: int = Field(default=5432)

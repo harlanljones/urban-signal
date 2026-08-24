@@ -5,6 +5,7 @@ geographic boundaries, submarkets, division catalogs, and municipal dataset endp
 """
 
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, Generator, List, Optional, Protocol, Tuple, Union, runtime_checkable
 
@@ -14,6 +15,18 @@ from src.spatial.cities.chicago import (
     CHICAGO_DIVISIONS,
     CHICAGO_METRO_BBOX,
     CHICAGO_SUBMARKETS,
+)
+from src.spatial.cities.philadelphia import (
+    PHILADELPHIA_METRO_BBOX,
+    PHL_DIVISION_BBOXES,
+    PHL_DIVISIONS,
+    PHL_SUBMARKETS,
+)
+from src.spatial.cities.washington_dc import (
+    DC_DIVISION_BBOXES,
+    DC_DIVISIONS,
+    DC_METRO_BBOX,
+    DC_SUBMARKETS,
 )
 from src.spatial.cities.austin import (
     AUSTIN_DIVISION_BBOXES,
@@ -81,6 +94,8 @@ class CityId(str, Enum):
     NORFOLK = "norfolk"
     DETROIT = "detroit"
     AUSTIN = "austin"
+    PHILADELPHIA = "philadelphia"
+    WASHINGTON_DC = "washington_dc"
 
 
 class FeedType(str, Enum):
@@ -217,6 +232,19 @@ ALIASES: Dict[str, CityId] = {
     "travis_county": CityId.AUSTIN,
     "travis-county": CityId.AUSTIN,
     "travis county": CityId.AUSTIN,
+
+    # Philadelphia
+    "philadelphia": CityId.PHILADELPHIA,
+    "philly": CityId.PHILADELPHIA,
+    "phl": CityId.PHILADELPHIA,
+
+    # Washington DC
+    "washington_dc": CityId.WASHINGTON_DC,
+    "washington-dc": CityId.WASHINGTON_DC,
+    "washington dc": CityId.WASHINGTON_DC,
+    "dc": CityId.WASHINGTON_DC,
+    "district_of_columbia": CityId.WASHINGTON_DC,
+    "district of columbia": CityId.WASHINGTON_DC,
 }
 
 
@@ -821,7 +849,260 @@ REGISTRY: Dict[CityId, CityRegistration] = {
             ),
         },
     ),
+    CityId.PHILADELPHIA: CityRegistration(
+        city_id=CityId.PHILADELPHIA,
+        name="Philadelphia",
+        state="PA",
+        center={"lat": 39.9526, "lng": -75.1652},
+        metro_bbox=PHILADELPHIA_METRO_BBOX,
+        division_bboxes=PHL_DIVISION_BBOXES,
+        submarkets=PHL_SUBMARKETS,
+        divisions=PHL_DIVISIONS,
+        job_suffix="philadelphia",
+        # All four feeds are CARTO tables (phl.carto.com) paged by the
+        # CartoClient's keyset on (date, cartodb_id); sentinel dates
+        # (year-3200 seen live on mostrecentissuedate, year-9798 on
+        # rtt_summary.document_date) are excluded CLIENT-side. permits/
+        # business_licenses/rtt_summary carry geometry only as the_geom hex
+        # WKB — their select extras project ST_X/ST_Y to plain
+        # latitude/longitude keys so shared parser chains match.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.carto_phl_permits_endpoint,
+                platform="carto",
+                watermark_col="permitissuedate",
+                id_keys=["cartodb_id", "permitnumber", "id"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "id_col": "cartodb_id",
+                    "order_by": "permitissuedate",
+                    "select": "*, ST_Y(the_geom) AS latitude, ST_X(the_geom) AS longitude",
+                    "field_map": {
+                        "job_id": ["permitnumber"],
+                        "issuance_date": ["permitissuedate"],
+                        "borough": ["council_district"],
+                        "zipcode": ["zip"],
+                    },
+                },
+            ),
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.carto_phl_311_endpoint,
+                platform="carto",
+                watermark_col="requested_datetime",
+                id_keys=["service_request_id", "cartodb_id", "id"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                extra={
+                    "id_col": "cartodb_id",
+                    "order_by": "requested_datetime",
+                    "field_map": {
+                        "latitude": ["lat"],
+                        "longitude": ["lon"],
+                        "closed_date": ["closed_datetime"],
+                    },
+                },
+            ),
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.carto_phl_licenses_endpoint,
+                platform="carto",
+                watermark_col="mostrecentissuedate",
+                id_keys=["licensenum", "cartodb_id", "id"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                extra={
+                    "id_col": "cartodb_id",
+                    "order_by": "mostrecentissuedate",
+                    "select": "*, ST_Y(the_geom) AS latitude, ST_X(the_geom) AS longitude",
+                    "field_map": {
+                        "license_id": ["licensenum"],
+                        "license_type": ["licensetype"],
+                        "effective_date": ["initialissuedate"],
+                        "expiration_date": ["expirationdate"],
+                        "status": ["licensestatus"],
+                    },
+                },
+            ),
+            # Real Estate Transfer Tax summary includes mortgages and
+            # satisfactions: NULL consideration parses to amount 0.0 by
+            # design, and recorded_date maps to recording_date because
+            # document_date is frequently NULL/sentinel. See
+            # docs/research/non-socrata-platforms.md §Philadelphia.
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.carto_phl_deeds_endpoint,
+                platform="carto",
+                watermark_col="document_date",
+                id_keys=["document_id", "cartodb_id", "id"],
+                topic=settings.topic_deeds,
+                interval_seconds=600.0,
+                producer_key="deeds",
+                extra={
+                    "id_col": "cartodb_id",
+                    "order_by": "document_date",
+                    "select": "*, ST_Y(the_geom) AS latitude, ST_X(the_geom) AS longitude",
+                    "field_map": {
+                        "recorded_date": ["recording_date"],
+                        "document_amount": ["total_consideration"],
+                        "bbl": ["opa_account_num"],
+                        "party1_grantor": ["grantors"],
+                        "party2_grantee": ["grantees"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.WASHINGTON_DC: CityRegistration(
+        city_id=CityId.WASHINGTON_DC,
+        name="Washington DC",
+        state="DC",
+        center={"lat": 38.9072, "lng": -77.0369},
+        metro_bbox=DC_METRO_BBOX,
+        division_bboxes=DC_DIVISION_BBOXES,
+        submarkets=DC_SUBMARKETS,
+        divisions=DC_DIVISIONS,
+        job_suffix="dc",
+        # All four feeds are ArcGIS FeatureServers; permits and 311 publish
+        # one layer PER CALENDAR YEAR — endpoint_by_year maps below resolve
+        # via resolve_endpoint at scheduler build; run the December rollover
+        # drill before each New Year (roadmap §8.2) and append the new year's
+        # layer id here. Basic Business Licenses and Property Sales CAMA are
+        # NON-SPATIAL: events carry null lat/lng/null H3 keyed by SSL /
+        # customer number (deeds-precedent tolerance); joining CAMA sales to
+        # Parcel Lots (layer 33) for geometry is future work.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_dc_permits_url,
+                platform="arcgis",
+                watermark_col="ISSUE_DATE",
+                id_keys=["PERMIT_ID", "DCRAINTERNALNUMBER", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "endpoint_by_year": {
+                        "2023": "https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/15",
+                        "2024": "https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/16",
+                        "2025": "https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/17",
+                        "2026": "https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/18",
+                    },
+                    "field_map": {
+                        "job_id": ["PERMIT_ID"],
+                        "latitude": ["LATITUDE"],
+                        "longitude": ["LONGITUDE"],
+                        "issuance_date": ["ISSUE_DATE"],
+                        "job_type": ["PERMIT_TYPE_NAME", "PERMIT_SUBTYPE_NAME"],
+                        "cost": ["FEES_PAID"],
+                        "borough": ["WARD"],
+                        "zipcode": ["ZIPCODE"],
+                    },
+                },
+            ),
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.arcgis_dc_311_url,
+                platform="arcgis",
+                watermark_col="ADDDATE",
+                id_keys=["SERVICEREQUESTID", "GLOBALID", "OBJECTID"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                extra={
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 1000,
+                    "endpoint_by_year": {
+                        "2022": "https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/14",
+                        "2023": "https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/15",
+                        "2024": "https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/16",
+                        "2025": "https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/18",
+                        "2026": "https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/21",
+                    },
+                    "field_map": {
+                        "incident_id": ["SERVICEREQUESTID"],
+                        "latitude": ["LATITUDE"],
+                        "longitude": ["LONGITUDE"],
+                        "complaint_type": ["SERVICECODEDESCRIPTION"],
+                        "created_date": ["ADDDATE"],
+                        "closed_date": ["RESOLUTIONDATE"],
+                        "status": ["SERVICEORDERSTATUS"],
+                        "incident_address": ["STREETADDRESS"],
+                        "borough": ["WARD"],
+                        "zipcode": ["ZIPCODE"],
+                    },
+                },
+            ),
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.arcgis_dc_licenses_url,
+                platform="arcgis",
+                watermark_col="INITIALISSUEDATE",
+                id_keys=["CUSTOMERNUMBER", "GLOBALID", "OBJECTID"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                extra={
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "non_spatial": True,
+                    "field_map": {
+                        "license_id": ["CUSTOMERNUMBER"],
+                        "license_type": ["LICENSETYPE"],
+                        "effective_date": ["LICENSESTARTDATE"],
+                        "expiration_date": ["LICENSEENDDATE"],
+                        "borough": ["WARD"],
+                    },
+                },
+            ),
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.arcgis_dc_sales_url,
+                platform="arcgis",
+                watermark_col="SALE_DATE",
+                id_keys=["SSL", "ROW_NUMBER", "OBJECTID", "id"],
+                topic=settings.topic_deeds,
+                interval_seconds=600.0,
+                producer_key="deeds",
+                extra={
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "non_spatial": True,
+                    "field_map": {
+                        "doc_id": ["ROW_NUMBER"],
+                        "bbl": ["SSL"],
+                        "document_amount": ["SALE_PRICE"],
+                        "recorded_date": ["SALE_DATE"],
+                        "doc_type": ["QUALIFIED"],
+                    },
+                },
+            ),
+        },
+    ),
 }
+
+
+def resolve_endpoint(spec: DatasetSpec, today: Optional[Any] = None) -> str:
+    """Resolve a spec's endpoint for "today", honoring year-sliced datasets.
+
+    Some jurisdictions publish one layer/resource per calendar year
+    (`extra={"endpoint_by_year": {"2026": "...FeatureServer/18", ...}}`).
+    Returns the current year's entry when present, else the newest year not
+    in the future, else the lexicographically latest entry. Annual rollover
+    drill: see docs/expansion-roadmap.md §8.2.
+    """
+    by_year = spec.extra.get("endpoint_by_year")
+    if not by_year:
+        return spec.endpoint
+    if today is None:
+        today = datetime.now(timezone.utc).date()
+    year = getattr(today, "year", None)
+    if year is None:
+        year = int(str(today)[:4])
+    for candidate in range(year, -1, -1):
+        key = str(candidate)
+        if key in by_year:
+            return by_year[key]
+    return by_year[max(by_year)]
 
 
 def get_dataset(city_id: CityId, feed: FeedType) -> DatasetSpec:

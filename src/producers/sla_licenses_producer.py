@@ -8,6 +8,7 @@ from typing import Any, Dict, Optional
 from src.config import settings
 from src.producers.base_producer import BaseKafkaProducer
 from src.producers.arcgis_client import ArcGISClient
+from src.producers.carto_client import CartoClient
 from src.producers.socrata_client import SocrataClient
 from src.schemas.models import SLALicenseEvent
 from src.spatial.h3_indexer import H3SpatialIndexer
@@ -54,6 +55,7 @@ class SLALicensesProducer:
         )
         self.socrata = SocrataClient()
         self.arcgis = ArcGISClient()
+        self.carto = CartoClient()
         self.spatial_indexer = H3SpatialIndexer()
 
     def _client_for(self, platform: str):
@@ -62,9 +64,20 @@ class SLALicensesProducer:
         Both clients satisfy the same ``PaginatingClient`` protocol, so callers
         only need the right instance, not a different call shape.
         """
-        if platform == "arcgis":
-            return self.arcgis
-        return self.socrata
+        clients = {
+            "socrata": getattr(self, "socrata", None),
+            "arcgis": getattr(self, "arcgis", None),
+            "carto": getattr(self, "carto", None),
+            "ckan": getattr(self, "ckan", None),
+        }
+        client = clients.get(platform)
+        if client is None:
+            available = ", ".join(sorted(k for k, v in clients.items() if v is not None))
+            raise ValueError(
+                f"platform {platform!r} has no client on this producer "
+                f"(available: {available}); wire it before registering the spec"
+            )
+        return client
 
     def parse_socrata_row(self, row: Dict[str, Any], city_id: Optional[str] = None) -> Optional[SLALicenseEvent]:
         """Convert raw SLA / business license record to strongly-typed SLALicenseEvent."""
@@ -151,19 +164,24 @@ class SLALicensesProducer:
                         loc.get("coordinates", [None, None])[0] if "coordinates" in loc else None
                     )
 
-            if not lat_raw or not lng_raw:
-                return None
-
-            lat = float(lat_raw)
-            lng = float(lng_raw)
+            lat = float(lat_raw) if lat_raw is not None else None
+            lng = float(lng_raw) if lng_raw is not None else None
 
             # Roughly 7% of LA's business-registration rows carry a 0.0/0.0
             # placeholder rather than a real geocode. Treating that as a valid
             # coordinate would file them under an H3 cell in the Gulf of Guinea.
-            if lat == 0.0 and lng == 0.0:
+            if lat is not None and lng is not None and lat == 0.0 and lng == 0.0:
                 return None
 
-            h3_res = self.spatial_indexer.get_multi_res_hierarchy(lat, lng)
+            # Non-spatial license registries (DC Basic Business Licenses) have
+            # no coordinates at all: emit null-lat/lng/null-H3 events keyed on
+            # the license id, mirroring the deeds producer's tolerance for
+            # coordinate-less sources — rather than dropping every row.
+            h3_res = (
+                self.spatial_indexer.get_multi_res_hierarchy(lat, lng)
+                if lat is not None and lng is not None
+                else {"h3_res7": None, "h3_res8": None, "h3_res9": None}
+            )
 
             effective_str = (
                 first_mapped(row, field_map, "effective_date")
@@ -233,7 +251,13 @@ class SLALicensesProducer:
                 default_status = "INACTIVE"
             else:
                 default_status = "ACTIVE"
-            status = row.get("license_status") or row.get("status") or default_status
+            status = (
+                first_mapped(row, field_map, "status")
+                or row.get("license_status")
+                or row.get("licensestatus")
+                or row.get("status")
+                or default_status
+            )
 
             borough_val = (
                 first_mapped(row, field_map, "borough")
@@ -277,12 +301,16 @@ class SLALicensesProducer:
         spec = get_dataset(cid, FeedType.SLA)
         endpoint = spec.endpoint
         client = self._client_for(spec.platform)
+        client_kwargs = {
+            k: v for k, v in spec.extra.items() if k in ("order_by", "id_col", "select") and v
+        }
 
         logger.info("Starting %s SLA / License Ingestion Stream (limit=%d)...", cid.value.upper(), limit)
         records_streamed = 0
 
         for batch in client.paginate(
             endpoint_url=endpoint,
+            **client_kwargs,
             where_clause=where_clause,
             batch_size=1000,
             max_records=limit,

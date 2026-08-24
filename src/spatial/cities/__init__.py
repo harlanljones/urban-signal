@@ -1,5 +1,19 @@
 """City-specific spatial registry modules."""
 
+from src.spatial.cities.philadelphia import (
+    PHILADELPHIA_METRO_BBOX,
+    PHL_DIVISION_BBOXES,
+    PHL_DIVISIONS,
+    PHL_SUBMARKETS,
+    is_in_philadelphia_metro,
+)
+from src.spatial.cities.washington_dc import (
+    DC_DIVISION_BBOXES,
+    DC_DIVISIONS,
+    DC_METRO_BBOX,
+    DC_SUBMARKETS,
+    is_in_dc_metro,
+)
 from src.spatial.cities.austin import (
     AUSTIN_DIVISION_BBOXES,
     AUSTIN_DIVISIONS,
@@ -105,6 +119,16 @@ __all__ = [
     "DETROIT_DIVISIONS",
     "DETROIT_SUBMARKETS",
     "is_in_detroit_metro",
+    "PHILADELPHIA_METRO_BBOX",
+    "PHL_DIVISION_BBOXES",
+    "PHL_DIVISIONS",
+    "PHL_SUBMARKETS",
+    "is_in_philadelphia_metro",
+    "DC_METRO_BBOX",
+    "DC_DIVISION_BBOXES",
+    "DC_DIVISIONS",
+    "DC_SUBMARKETS",
+    "is_in_dc_metro",
     "NORFOLK_METRO_BBOX",
     "NORFOLK_DIVISION_BBOXES",
     "NORFOLK_DIVISIONS",
