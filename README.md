@@ -12,6 +12,8 @@
 
 ## Dashboard
 
+> **Live Production Dashboard:** [**https://us-dash.harlanljones.com/**](https://us-dash.harlanljones.com/)
+
 | San Francisco Bay Area | Parcel Inspector & SHAP Attribution |
 | :---: | :---: |
 | ![San Francisco Bay Area Dashboard](docs/screenshots/dashboard-san_francisco.png) | ![Parcel Inspector](docs/screenshots/dashboard-inspector.png) |
@@ -25,13 +27,13 @@
 The live dashboard supports layered region comparison through the **+ Compare**
 control. The populated DC + Montgomery County comparison is shown below.
 
-![DC and Montgomery County comparison](docs/screenshots/dashboard-dc-montgomery.png)
-
-![Dashboard comparison menu](docs/screenshots/dashboard-comparison-menu.png)
+| DC & Montgomery County Layered Comparison | Comparison Menu Selector |
+| :---: | :---: |
+| ![DC and Montgomery County comparison](docs/screenshots/dashboard-dc-montgomery.png) | ![Dashboard comparison menu](docs/screenshots/dashboard-comparison-menu.png) |
 
 The dashboard supports **all seventeen registered metros** — San Francisco Bay Area, New York City, Chicago, Seattle Metro (4 Divisions), Los Angeles Metro (6 Divisions), New Orleans Metro (9 Divisions), Norfolk (5 Divisions), Detroit (6 Divisions), Austin (6 Divisions), Cincinnati (1 Division), Boston (4 Divisions), Baltimore (1 Division), Montgomery County (1 Division), Baton Rouge (1 Division), Denver (1 Division), Philadelphia (8 Divisions), and Washington DC (8 Divisions) — with per-division camera presets, map-click → division resolution, and geolocation-based default-city detection. The **+ Compare** control can layer multiple regions in one viewport; the primary region remains the inspector context while the grid and catalyst feed merge the selected cities.
 
-See [docs/dashboard.md](docs/dashboard.md) for the current dashboard behavior, export path, API surfaces, and screenshot evidence.
+Explore the live interface at [https://us-dash.harlanljones.com/](https://us-dash.harlanljones.com/) or see [docs/dashboard.md](docs/dashboard.md) for the current dashboard behavior, export path, API surfaces, and screenshot evidence.
 
 ---
 
@@ -128,22 +130,22 @@ node_postgis -->|"queryable data"| node_snapshots
 node_snapshots -->|"precomputed snapshots"| node_object_store
 node_object_store -->|"edge snapshots"| node_cloudflare_worker
 
-click node_city_registry "https://github.com/harlanljones/urban-signal/blob/main/src/spatial/city_registry.py"
-click node_municipal_sources "https://github.com/harlanljones/urban-signal/blob/main/src/producers/socrata_client.py"
-click node_producers "https://github.com/harlanljones/urban-signal/blob/main/src/producers/base_producer.py"
+click node_city_registry "https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/spatial/city_registry.py"
+click node_municipal_sources "https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/producers/socrata_client.py"
+click node_producers "https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/producers/base_producer.py"
 click node_kafka "https://github.com/harlanljones/urban-signal/blob/main/deploy/k8s/kafka/kafka-topics.yaml"
-click node_spatial_worker "https://github.com/harlanljones/urban-signal/blob/main/src/consumers/spatial_enrichment_worker.py"
-click node_feature_worker "https://github.com/harlanljones/urban-signal/blob/main/src/consumers/feature_aggregation_worker.py"
-click node_postgis_worker "https://github.com/harlanljones/urban-signal/blob/main/src/consumers/postgis_worker.py"
+click node_spatial_worker "https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/consumers/spatial_enrichment_worker.py"
+click node_feature_worker "https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/consumers/feature_aggregation_worker.py"
+click node_postgis_worker "https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/consumers/postgis_worker.py"
 click node_keda "https://github.com/harlanljones/urban-signal/blob/main/deploy/k8s/consumers/keda-scaledobject.yaml"
-click node_h3_context "https://github.com/harlanljones/urban-signal/blob/main/src/spatial/graph_builder.py"
-click node_feature_pipeline "https://github.com/harlanljones/urban-signal/blob/main/src/features/pipeline.py"
-click node_postgis "https://github.com/harlanljones/urban-signal/blob/main/src/storage/postgis_sync.py"
-click node_retraining "https://github.com/harlanljones/urban-signal/blob/main/src/models/retraining_job.py"
-click node_horizon_models "https://github.com/harlanljones/urban-signal/blob/main/src/models/trainer.py"
-click node_onnx_export "https://github.com/harlanljones/urban-signal/blob/main/src/models/export_onnx.py"
-click node_fastapi "https://github.com/harlanljones/urban-signal/blob/main/src/serving/app.py"
-click node_snapshots "https://github.com/harlanljones/urban-signal/blob/main/src/export/snapshot_builder.py"
+click node_h3_context "https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/spatial/graph_builder.py"
+click node_feature_pipeline "https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/features/pipeline.py"
+click node_postgis "https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/storage/postgis_sync.py"
+click node_retraining "https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/models/retraining_job.py"
+click node_horizon_models "https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/models/trainer.py"
+click node_onnx_export "https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/models/export_onnx.py"
+click node_fastapi "https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/serving/app.py"
+click node_snapshots "https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/export/snapshot_builder.py"
 click node_cloudflare_worker "https://github.com/harlanljones/urban-signal/blob/main/apps/dashboard/src/index.ts"
 
 classDef toneNeutral fill:#f8fafc,stroke:#334155,stroke-width:1.5px,color:#0f172a
@@ -234,6 +236,34 @@ Parcel predictions incorporate **TreeSHAP** (`CatalystExplainer`) decompositions
 
 ```
 urban-signal/
+├── apps/
+│   ├── api/                                # FastAPI + Kafka + PostGIS + H3 ML core service
+│   │   ├── src/
+│   │   │   ├── config.py                   # Central Pydantic Settings & environment config
+│   │   │   ├── schemas/                    # Pydantic models & Avro binary schema contracts (.avsc)
+│   │   │   ├── spatial/                    # Uber H3 indexing, per-city modules, city registry, GIS utilities
+│   │   │   ├── features/                   # Time-decay, 311 shift dynamics, LIMS calculator, DuckDB
+│   │   │   ├── producers/                  # Socrata/ArcGIS clients, per-feed producers, scheduler
+│   │   │   ├── consumers/                  # Base Kafka consumer, H3 enrichment, aggregation, PostGIS
+│   │   │   ├── storage/                    # PostGIS synchronization engine & table schemas
+│   │   │   ├── models/                     # LightGBM, ST-GNN, DCN-v2, Walk-Forward CV, ONNX exporter
+│   │   │   ├── serving/                    # FastAPI app, router, inference engine, dashboard, webhooks
+│   │   │   └── export/                     # Static edge snapshot builder & JSON exporter
+│   │   ├── tests/
+│   │   │   ├── conftest.py                 # Pytest fixtures & sample geospatial payloads
+│   │   │   ├── unit/                       # Unit suites incl. interlock invariant gate (20 tests)
+│   │   │   └── e2e/                        # End-to-end integration test suite
+│   │   └── pyproject.toml                  # Python packaging and dependency specifications
+│   ├── dashboard/                          # Cloudflare Worker (@urban-signal/dashboard): static UI & KV snapshot edge
+│   │   ├── public/                         # Synchronized dashboard HTML asset
+│   │   ├── src/                            # Edge router and KV snapshot proxy
+│   │   └── wrangler.jsonc                  # Cloudflare Worker configuration
+│   ├── product/                            # Product landing and interactive architecture learning site
+│   │   ├── public/                         # Static assets, llms.txt, facts.json
+│   │   └── src/                            # Interactive client scripts
+│   └── webhook/                            # Real-time webhook receiver worker (hooks.harlanljones.com)
+├── packages/
+│   └── typescript-config/                  # Shared TypeScript configuration
 ├── deploy/
 │   ├── docker/
 │   │   └── docker-compose.dev.yml          # Local Kafka (KRaft), Schema Registry, PostGIS, MinIO, AKHQ
@@ -248,31 +278,19 @@ urban-signal/
 │       │   └── keda-scaledobject.yaml      # KEDA autoscaling spatial consumer pods (1 -> 8)
 │       └── inference/
 │           └── inference-deployment.yaml   # FastAPI + ONNX Runtime (CUDA GPU)
-├── apps/dashboard/                              # Cloudflare Worker (@urban-signal/dashboard): static dashboard & KV snapshot API edge
 ├── models_storage/                         # Serialized ONNX model artifacts (DCN-v2, ST-GNN)
 ├── docs/
 │   ├── adr/                                # Architecture decision records (0001 Agent Interlock)
 │   ├── agents/                             # Agent-facing conventions: spine manifest, stream rules
-│   ├── research/                           # City expansion candidate surveys
-│   └── screenshots/                        # Dashboard captures
+│   ├── research/                           # City expansion candidate surveys & data source sweeps
+│   └── screenshots/                        # Dashboard captures from live production
 ├── scripts/
-│   └── interlock_gap.py                    # Interlock-gap metric over a git diff range
+│   ├── export_dashboard.py                 # Exports dashboard HTML to Worker public asset
+│   ├── interlock_gap.py                    # Interlock-gap metric over a git diff range
+│   └── feed_staleness_probe.py             # Registered feed freshness probe
 ├── .streams/                               # Agent stream logs & dispatch log (see AGENTS.md)
-├── apps/api/src/
-│   ├── config.py                           # Central Pydantic Settings & environment config
-│   ├── schemas/                            # Pydantic models & Avro binary schema contracts (.avsc)
-│   ├── spatial/                            # Uber H3 indexing, per-city modules, city registry, GIS utilities
-│   ├── features/                           # Time-decay, 311 shift dynamics, LIMS calculator, DuckDB
-│   ├── producers/                          # Socrata/ArcGIS clients, per-feed producers, scheduler
-│   ├── consumers/                          # Base Kafka consumer, H3 enrichment, aggregation, PostGIS
-│   ├── storage/                            # PostGIS synchronization engine & table schemas
-│   ├── models/                             # LightGBM, ST-GNN, DCN-v2, Walk-Forward CV, ONNX exporter
-│   └── serving/                            # FastAPI app, router, inference engine, dashboard, webhooks
-├── apps/api/tests/
-│   ├── conftest.py                         # Pytest fixtures & sample NYC geospatial payloads
-│   ├── unit/                               # 16 unit suites incl. the interlock invariant gate
-│   └── e2e/                                # End-to-end integration test suite
-├── apps/api/pyproject.toml                 # Python packaging and dependency specifications
+├── turbo.json                              # Turborepo task pipeline configuration
+├── package.json                            # Bun workspaces and root package scripts
 ├── LICENSE                                 # Apache 2.0 Open Source License
 └── urban_signal_prospectus_k8s_kafka.md    # Full technical design prospectus
 ```
@@ -338,21 +356,24 @@ Configure these repository secrets before enabling deployment or webhook deliver
 git clone https://github.com/harlanljones/urban-signal.git
 cd urban-signal
 
-# 2. Create virtual environment and install dependencies
+# 2. Set up Python API workspace
+cd apps/api
 uv venv --python 3.12
 source .venv/bin/activate
 uv pip install -e ".[dev]"
+cd ../..
 
 # 3. Launch local Kafka (KRaft), Schema Registry, PostGIS, MinIO & AKHQ
 docker compose -f deploy/docker/docker-compose.dev.yml up -d
 ```
 
-### Local UI Endpoints
+### Endpoints & Dashboards
+- **Live Production Dashboard:** [https://us-dash.harlanljones.com/](https://us-dash.harlanljones.com/)
+- **FastAPI Interactive API Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
+- **Local Geospatial Catalyst Dashboard:** [http://localhost:8000/dashboard](http://localhost:8000/dashboard)
 - **AKHQ Kafka Visualizer:** [http://localhost:8080](http://localhost:8080)
 - **Schema Registry:** [http://localhost:8081](http://localhost:8081)
 - **MinIO S3 Console:** [http://localhost:9001](http://localhost:9001) (`minioadmin` / `minioadmin`)
-- **FastAPI Interactive API Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
-- **Geospatial Catalyst Dashboard:** [http://localhost:8000/dashboard](http://localhost:8000/dashboard)
 
 ---
 
@@ -468,7 +489,7 @@ Exposes real-time Prometheus telemetry including `prediction_requests_total`, `c
 `GET /dashboard` or `GET /` (with `Accept: text/html`)
 Serves the hardened, high-performance **MapLibre GL** web visualizer featuring single-region selection and multi-region comparison across all seventeen registered metros (San Francisco, NYC, Chicago, Seattle, Los Angeles, New Orleans, Norfolk, Detroit, Austin, Cincinnati, Boston, Baltimore, Montgomery County, Baton Rouge, Denver, Philadelphia, Washington DC), submarket filtering, H3 hexagon inspection, LIMS heatmaps, and SHAP attribution waterfall charts.
 
-The same UI is mirrored as a static asset on the Cloudflare Worker (`apps/dashboard/`), where `/api/v1/*` is answered from a precomputed Workers KV snapshot (built by `src/export/snapshot_builder.py`). The FastAPI service and the edge snapshot both serve all seventeen registered metros.
+The same UI is mirrored as a static asset on the Cloudflare Worker (`apps/dashboard/`), deployed live to [https://us-dash.harlanljones.com/](https://us-dash.harlanljones.com/), where `/api/v1/*` is answered from a precomputed Workers KV snapshot (built by `src/export/snapshot_builder.py`). The FastAPI service and the edge snapshot both serve all seventeen registered metros.
 
 ---
 

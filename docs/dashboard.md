@@ -35,7 +35,7 @@ Washington DC and Montgomery County to be viewed together.
 
 ## Screenshot evidence
 
-These captures were taken from the live dashboard on 2026-08-23 after selecting
+These captures were taken from the live dashboard on 2026-08-24 after selecting
 Washington DC as the primary region and adding Montgomery County through the
 comparison control:
 
