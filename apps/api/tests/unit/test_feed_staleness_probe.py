@@ -11,11 +11,11 @@ def test_parse_timestamp_handles_mixed_text_watermarks():
     assert parse_timestamp("20260821") == datetime(2026, 8, 21, tzinfo=UTC)
 
 
-def test_probe_feed_pages_deliberately_stale_fixture():
+def test_probe_feed_catches_deliberately_stale_fixture():
     client = MagicMock()
     client.paginate.return_value = [[
         {"issued": "2026-08-01"},
-        {"issued": "2026-08-20"},
+        {"issued": "2026-08-10"},
     ]]
     now = datetime(2026, 8, 23, tzinfo=UTC)
     result = probe_feed(
@@ -24,11 +24,11 @@ def test_probe_feed_pages_deliberately_stale_fixture():
         DatasetSpec(endpoint="https://data.example/resource/test.json", watermark_col="issued"),
         now=now,
         client=client,
-        source_updated_at=datetime(2026, 8, 22, tzinfo=UTC),
+        source_updated_at=datetime(2026, 8, 10, tzinfo=UTC),
     )
-    assert result.newest_watermark == datetime(2026, 8, 20, tzinfo=UTC)
-    assert result.age_days == 3
-    assert not result.stale
+    assert result.newest_watermark == datetime(2026, 8, 10, tzinfo=UTC)
+    assert result.age_days == 13
+    assert result.stale
     client.paginate.assert_called_once()
 
 
@@ -76,7 +76,7 @@ def test_probe_registry_uses_registered_city_feeds_without_manual_config():
     assert all(not result.stale for result in results)
 
 
-def test_page_stale_serializes_timestamps_and_posts_json(monkeypatch):
+def test_page_stale_serializes_timestamps_and_posts_to_every_webhook(monkeypatch):
     captured = []
 
     class FakeClient:
@@ -100,6 +100,12 @@ def test_page_stale_serializes_timestamps_and_posts_json(monkeypatch):
         source_updated_at=datetime(2026, 8, 1, tzinfo=UTC),
     )
 
-    assert page_stale([result], ["https://staging.example/hooks/feed-staleness"]) == [202]
+    webhook_urls = [
+        "https://staging.example/hooks/feed-staleness",
+        "https://staging.example/hooks/backup-staleness",
+    ]
+    assert page_stale([result], webhook_urls) == [202, 202]
+    assert [url for url, _ in captured] == webhook_urls
     assert captured[0][1]["event"] == "feed_staleness"
     assert captured[0][1]["stale_feeds"][0]["source_updated_at"] == "2026-08-01T00:00:00+00:00"
+    assert captured[0][1] == captured[1][1]

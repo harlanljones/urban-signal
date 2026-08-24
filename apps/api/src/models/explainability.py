@@ -1,17 +1,18 @@
 """SHAP (SHapley Additive exPlanations) attribution module for catalyst driver decomposition."""
 
-from typing import Dict, List, Optional
+
 import lightgbm as lgb
 import numpy as np
 import pandas as pd
 import shap
+
 from src.models.quantile_lgbm import FEATURE_COLUMNS
 
 
 class CatalystExplainer:
     """Computes SHAP values and identifies primary municipal catalyst drivers for individual parcels."""
 
-    def __init__(self, booster: Optional[lgb.Booster] = None):
+    def __init__(self, booster: lgb.Booster | None = None):
         self.booster = booster
         self.explainer = None
         if booster:
@@ -22,7 +23,7 @@ class CatalystExplainer:
         self.booster = booster
         self.explainer = shap.TreeExplainer(booster)
 
-    def explain_instance(self, feature_row: pd.Series) -> Dict[str, float]:
+    def explain_instance(self, feature_row: pd.Series) -> dict[str, float]:
         """Compute SHAP attribution values for a single parcel/cell instance."""
         if self.explainer is None:
             # Fallback heuristic attribution based on normalized feature magnitudes
@@ -48,9 +49,9 @@ class CatalystExplainer:
 
     def get_top_catalyst_drivers(
         self,
-        attributions: Dict[str, float],
+        attributions: dict[str, float],
         top_k: int = 4,
-    ) -> List[Dict[str, float]]:
+    ) -> list[dict[str, float]]:
         """Sort and return top positive catalyst drivers."""
         sorted_drivers = sorted(
             attributions.items(),
@@ -58,3 +59,14 @@ class CatalystExplainer:
             reverse=True,
         )
         return [{k: v} for k, v in sorted_drivers[:top_k]]
+
+    @staticmethod
+    def attribution_drift(current: dict[str, float], baseline: dict[str, float]) -> float:
+        """Maximum relative TreeSHAP weight change; >25% requires model review."""
+        keys = set(current) | set(baseline)
+        return max((abs(current.get(k, 0.0) - baseline.get(k, 0.0)) /
+                    max(abs(baseline.get(k, 0.0)), 1e-12) for k in keys), default=0.0)
+
+    @classmethod
+    def requires_attribution_review(cls, current: dict[str, float], baseline: dict[str, float]) -> bool:
+        return cls.attribution_drift(current, baseline) > 0.25

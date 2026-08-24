@@ -22,8 +22,10 @@ class FeatureAggregationWorker:
         self,
         bootstrap_servers: Optional[str] = None,
         feature_pipeline: Optional[SpatialFeaturePipeline] = None,
+        city_id: str = "nyc",
     ):
         self.feature_pipeline = feature_pipeline or SpatialFeaturePipeline()
+        self.city_id = city_id
         self.indexer = H3SpatialIndexer()
 
         # Producer for enriched features & alerts
@@ -44,10 +46,12 @@ class FeatureAggregationWorker:
         h3_index: str,
         resolution: int = 9,
         as_of_date: Optional[datetime] = None,
+        city_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Compute enriched feature dict for H3 cell and publish to Kafka."""
         if as_of_date is None:
             as_of_date = datetime.now(timezone.utc)
+        effective_city_id = city_id or self.city_id
 
         feat_dict = self.feature_pipeline.compute_h3_cell_features(
             h3_index=h3_index,
@@ -85,6 +89,7 @@ class FeatureAggregationWorker:
         if feat_dict["lims_score"] >= settings.lims_threshold:
             lat, lng = self.indexer.h3_to_latlng(h3_index)
             alert = CatalystAlert(
+                city_id=effective_city_id,
                 alert_id=f"alert-{uuid.uuid4().hex[:8]}",
                 h3_index=h3_index,
                 h3_resolution=resolution,

@@ -1,5 +1,9 @@
 # Expansion Roadmap: 5 → 17 metros
 
+> **Current status (2026-08-23): complete.** The repository and dashboard now carry all
+> seventeen registered metros. The remaining work in this document is historical
+> rollout context or future feed/model hardening, not pending city registration.
+
 **Status:** Approved plan · **Created:** 2026-08-23 · **Horizon:** ~5 weeks (target finish 2026-09-26)
 **Scope:** New Orleans, Norfolk, Detroit, Austin, Philadelphia, Cincinnati, Baton Rouge, Washington DC, Boston, Denver, Baltimore, Montgomery County MD
 **Evidence base:** `docs/research/{new-orleans-austin-verification,socrata-sweep,non-socrata-platforms,metro-expansion-and-new-signals,current-city-feed-gaps}.md` — every endpoint below was live-probed 2026-08-23.

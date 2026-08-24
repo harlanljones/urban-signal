@@ -1,24 +1,25 @@
-# Gates: HAR-43 marketing and learning site
+# Gates: documentation and screenshot refresh
 
-OWNS: apps/site/**, GATES.md, DESIGN.md, .impeccable/review/**
+OWNS: README.md, apps/api/README.md, docs/**, GATES.md
 
-Scope: Deliver the standalone Urban Signal marketing and learning site with product-truth content, city coverage, architecture exploration, responsive behavior, and production checks.
+Scope: Refresh current-codebase documentation and capture live dashboard evidence for multi-region comparison.
 
-- [x] G1: The site package builds successfully
-  CHECK: bun run build
-  EXPECT: SITE_BUILD_OK
-  CWD: apps/site
-  EVIDENCE: `bun run build` in `apps/site` exited 0 and printed `SITE_BUILD_OK`.
+- [x] G1: Documentation references the current dashboard comparison behavior
+  CHECK: rg -n "Washington DC|Montgomery|comparison|screenshot|dashboard" docs README.md apps/api/README.md
+  EXPECT: dashboard comparison references found
+  EVIDENCE: G1 command returned current references in README.md, apps/api/README.md, docs/dashboard.md, and docs/expansion-roadmap.md.
 
-- [x] G2: All registered cities and required product sections are present in the source
-  CHECK: node scripts/verify-site-content.mjs
-  EXPECT: SITE_CONTENT_OK
-  EVIDENCE: `node scripts/verify-site-content.mjs` exited 0 and printed `SITE_CONTENT_OK`.
+- [x] G2: Dashboard source and static copy pass the interlock wiring gate
+  CHECK: ./.venv/bin/python -m pytest -m interlock apps/api/tests/unit/test_interlock_gate.py
+  EXPECT: 20 passed
+  EVIDENCE: 20 passed in 1.12s; CWD /home/harlan/dev/urban-signal.
 
-- [x] G3: The changed UI passes the mechanical design detector
-  CHECK: node /home/harlan/.agents/skills/impeccable/scripts/detect.mjs --json apps/site/index.html apps/site/src/main.js apps/site/src/styles.css
-  EXPECT: detector completed
-  EVIDENCE: Detector exited 0 with no findings; it ran in degraded regex-only mode because optional parser modules are unavailable.
+- [x] G3: Captured screenshots exist and are non-empty
+  CHECK: node -e "const fs=require('fs'); for (const p of ['docs/screenshots/dashboard-dc-montgomery.png','docs/screenshots/dashboard-comparison-menu.png']) { if (!fs.existsSync(p) || fs.statSync(p).size < 10000) process.exit(1) } console.log('screenshots present')"
+  EXPECT: screenshots present
+  EVIDENCE: screenshots present; live browser captures are 1920x1080 PNGs.
 
-- [x] G4: Desktop and mobile renders are visually inspectable and show the complete first surface
-  EVIDENCE: Captured and inspected `.impeccable/review/desktop.png` at 1440px and `.impeccable/review/mobile.png` at 390px after fixing the clipped hero field.
+- [x] G4: Changed files have no whitespace errors
+  CHECK: git diff --check
+  EXPECT: command exits 0
+  EVIDENCE: command exited 0.

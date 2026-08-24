@@ -1,21 +1,20 @@
-# HAR-41 migration plan
+# HJ-44 Completion Plan
 
-Objective: make `apps/api` the canonical Turborepo location for the Python core while preserving the existing `src` import namespace and updating every supported execution surface.
+Acceptance gates:
 
-## Depth tree
+- [ ] A1: Registry has 17 cities and approximately 57 feed jobs; platform counts and intentional omissions are documented.
+- [ ] A2: Every city is wired in the registry, dashboard selector, `CITY_CONFIGS`, and synced edge static copy.
+- [ ] A3: Baltimore, Montgomery County, and Boston have focused/live evidence for G1–G10.
+- [ ] A4: Weekly staleness monitoring passes stale-fixture detection and staging webhook verification.
+- [ ] A5: Model calibration implements warm-up, per-city gates, attribution drift checks, and city alert rate limiting.
+- [ ] A6: `pytest -m interlock` and the full suite pass, or every environmental blocker is resolved and recorded.
+- [ ] A7: Scorecard and `.streams/dispatch-log.md` contain final yield, spine share, and incident evidence.
 
-1. Contract and ownership
-   - [completed] claim HAR-41 in Linear and establish the migration ledger
-   - [completed] declare the dedicated interlock stream
-2. Relocate Python package
-   - [completed] move `src/`, `tests/`, `pyproject.toml`, and `uv.lock` under `apps/api`
-   - [completed] update Python tooling and root scripts to execute from `apps/api`
-3. Integrate execution surfaces
-   - [completed] update Docker, Compose, Kubernetes, and CI paths
-   - [completed] add the package to the workspace without duplicating Python ownership
-4. Verify and report
-   - [completed] run the migration gates and recheck Linear state
+Streams:
 
-Verification note: the migrated unit and interlock suites are green. Existing serving/e2e tests require a reachable Kafka listener and stall in this sandbox, so they remain an environment-dependent follow-up rather than a migration failure.
-
-Boundary: root `scripts/` remains in place because it is repository orchestration code; commands that import the API package will set their working directory or `PYTHONPATH` explicitly. Existing unrelated dirty files remain untouched.
+- `closeout-baltimore`: audit/fix Baltimore evidence and closeout artifacts.
+- `closeout-montgomery`: audit/fix Montgomery evidence and closeout artifacts.
+- `closeout-boston`: audit/fix Boston evidence and closeout artifacts.
+- `verify-staleness`: finish staging/fixture verification for the monitor.
+- `model-calibration`: implement HJ-29 model and alert gates.
+- `integration`: parent agent reruns gates, reconciles counts, and updates Linear.

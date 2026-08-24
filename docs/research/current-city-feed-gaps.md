@@ -246,6 +246,22 @@ Monitoring (no code change required to start):
    pause. The probe recipes are the `$select=count(*)` +
    newest-by-watermark calls described under Method.
 
+The implemented monitor is `scripts/feed_staleness_probe.py`. Its focused
+fixture test freezes the clock and deliberately makes both source metadata and
+the newest watermark 13 days old, so the default seven-day threshold must page
+the feed. Its webhook test uses two endpoints and verifies identical JSON is
+posted to both. Pull requests run these tests and Ruff; scheduled or manually
+dispatched workflow runs perform the live probe.
+
+Staging webhook verification is intentionally not claimed by CI: the endpoint
+URL(s) are supplied through the `WEBHOOK_ALERT_URLS` repository secret, and a
+pull request has no safe, deterministic staging receiver to assert against.
+Run the workflow manually with `dry_run=false` and a staging secret, then
+confirm the returned HTTP status and receiver record. Use `dry_run=true` for a
+live feed freshness check when delivery should not be attempted. A successful
+unit test proves request construction and fan-out only; it does not prove
+staging credentials, network reachability, or receiver-side acceptance.
+
 Unverified / open questions, stated plainly: whether KC's sales pause is a
 publishing lapse or a lag (needs a message to King County GIS — not probed);
 whether `ipu4-2q9a`'s post-2020 rows are complete or exclude some DOB NOW-only

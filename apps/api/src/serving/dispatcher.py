@@ -2,10 +2,12 @@
 
 import asyncio
 import logging
-from typing import List, Optional
+
 import httpx
+
 from src.config import settings
 from src.schemas.models import CatalystAlert
+from src.serving.alert_state import CityAlertBudget
 
 logger = logging.getLogger(__name__)
 
@@ -13,13 +15,18 @@ logger = logging.getLogger(__name__)
 class WebhookDispatcher:
     """Dispatches real-time LIMS > 85.0 catalyst alerts to external endpoints (Slack/Discord/REST)."""
 
-    def __init__(self, target_urls: Optional[List[str]] = None):
+    def __init__(self, target_urls: list[str] | None = None, daily_alert_budget: int = 100,
+                 alert_budget: CityAlertBudget | None = None):
         self.target_urls = target_urls if target_urls is not None else settings.webhook_alert_urls
+        self.alert_budget = alert_budget or CityAlertBudget(daily_alert_budget)
 
-    async def dispatch_alert(self, alert: CatalystAlert) -> List[int]:
+    async def dispatch_alert(self, alert: CatalystAlert) -> list[int]:
         """Broadcast catalyst alert payload to all registered webhook URLs."""
         if not self.target_urls:
             logger.debug("No webhook URLs configured; skipping dispatch for alert %s", alert.alert_id)
+            return []
+        if not self.alert_budget.allow(alert.city_id):
+            logger.warning("Alert budget exhausted for city %s; skipping %s", alert.city_id, alert.alert_id)
             return []
 
         payload = alert.model_dump(mode="json")

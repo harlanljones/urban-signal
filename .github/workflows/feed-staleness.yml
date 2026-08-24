@@ -12,6 +12,7 @@ on:
       - "apps/api/**"
       - "scripts/feed_staleness_probe.py"
       - "apps/api/tests/unit/test_feed_staleness_probe.py"
+      - "docs/research/current-city-feed-gaps.md"
       - ".github/workflows/feed-staleness.yml"
   workflow_dispatch:
     inputs:
