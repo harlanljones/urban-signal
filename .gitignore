@@ -102,7 +102,6 @@ retraining_report_*.json
 .turbo/
 node_modules/
 apps/dashboard/.wrangler/
-apps/dashboard/public/index.html
 .wrangler/
 
 # ==============================================================================
