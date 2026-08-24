@@ -8,8 +8,8 @@
         "turbo": "^2.10.11",
       },
     },
-    "apps/edge": {
-      "name": "@urban-signal/edge",
+    "apps/product": {
+      "name": "@urban-signal/product",
       "version": "2.0.0",
       "devDependencies": {
         "@cloudflare/workers-types": "^5.20260823.0",
@@ -18,8 +18,8 @@
         "wrangler": "^4.125.0",
       },
     },
-    "apps/site": {
-      "name": "@urban-signal/site",
+    "apps/dashboard": {
+      "name": "@urban-signal/dashboard",
       "version": "2.0.0",
       "devDependencies": {
         "wrangler": "^4.125.0",
@@ -188,9 +188,9 @@
 
     "@turbo/windows-arm64": ["@turbo/windows-arm64@2.10.11", "", { "os": "win32", "cpu": "arm64" }, "sha512-m8tJkIrTrbQ9O1uHxV0GUq623Zg1678xGna8eMsy4KbygUX/wVFgdZDYV/AxyoyaW/U7nyKoBvaDVwm22p9xqA=="],
 
-    "@urban-signal/edge": ["@urban-signal/edge@workspace:apps/edge"],
+    "@urban-signal/product": ["@urban-signal/product@workspace:apps/product"],
 
-    "@urban-signal/site": ["@urban-signal/site@workspace:apps/site"],
+    "@urban-signal/dashboard": ["@urban-signal/dashboard@workspace:apps/dashboard"],
 
     "@urban-signal/typescript-config": ["@urban-signal/typescript-config@workspace:packages/typescript-config"],
 

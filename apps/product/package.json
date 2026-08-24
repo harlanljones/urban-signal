@@ -1,5 +1,5 @@
 {
-  "name": "@urban-signal/edge",
+  "name": "@urban-signal/product",
   "version": "2.0.0",
   "private": true,
   "description": "Urban Signal edge worker serving precomputed snapshots from Workers KV",

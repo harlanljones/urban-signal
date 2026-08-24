@@ -101,8 +101,8 @@ retraining_report_*.json
 # ==============================================================================
 .turbo/
 node_modules/
-apps/edge/.wrangler/
-apps/edge/public/index.html
+apps/product/.wrangler/
+apps/product/public/index.html
 .wrangler/
 
 # ==============================================================================

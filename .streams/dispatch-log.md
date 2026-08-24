@@ -144,7 +144,7 @@ caught it); (2) `SLALicenseEvent` lat/lng made Optional + SLA parser tolerates
 missing coordinates (deeds precedent) unlocking DC's non-spatial licenses;
 (3) scheduler forwards order_by/id_col/select extras to clients; (4) gate
 endpoint check now platform-scheme aware (carto://ckan://); (5) workers/ moved
-to apps/edge upstream of this wave — static-copy invariant repointed and
+to apps/product upstream of this wave — static-copy invariant repointed and
 re-synced with all eleven cities. Dashboard map wired for both cities in the
 same spine hold per the AGENTS.md city registration rule.
 

@@ -3,7 +3,7 @@
 This document is the implementation-facing guide to the Urban Signal dashboard. The
 FastAPI HTML response is the source of truth at
 `apps/api/src/serving/dashboard.py`; `scripts/export_dashboard.py` copies that
-response to `apps/edge/public/index.html` for the Cloudflare Worker static asset.
+response to `apps/product/public/index.html` for the Cloudflare Worker static asset.
 
 ## Current interaction model
 
@@ -29,7 +29,7 @@ Washington DC and Montgomery County to be viewed together.
 | Comparison state | `activeCities`, `toggleCompareMenu()`, `applyComparison()` |
 | Grid snapshots | `GET /api/v1/grid?city_id=<id>` |
 | Catalyst snapshots | `GET /api/v1/catalysts?city_id=<id>&min_lims=85.0` |
-| Edge static asset | `apps/edge/public/index.html` |
+| Edge static asset | `apps/product/public/index.html` |
 | Static export | `python scripts/export_dashboard.py` |
 | Interlock verification | `pytest -m interlock apps/api/tests/unit/test_interlock_gate.py` |
 

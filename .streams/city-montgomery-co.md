@@ -4,7 +4,7 @@
 
 - **Stream id:** city-montgomery-co
 - **Leaf files:** `src/spatial/cities/montgomery.py`, `tests/unit/test_producers_montgomery.py`
-- **Spine files expected:** `src/config.py`, `src/spatial/city_registry.py`, `src/spatial/cities/__init__.py`, `src/serving/dashboard.py`, `src/export/snapshot_builder.py`, `apps/edge/public/index.html`, `apps/site/src/main.js`, `README.md`
+- **Spine files expected:** `src/config.py`, `src/spatial/city_registry.py`, `src/spatial/cities/__init__.py`, `src/serving/dashboard.py`, `src/export/snapshot_builder.py`, `apps/product/public/index.html`, `apps/dashboard/src/main.js`, `README.md`
 
 ## Intent
 

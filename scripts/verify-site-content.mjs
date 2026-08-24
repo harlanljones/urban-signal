@@ -1,10 +1,10 @@
 import { readFile } from "node:fs/promises";
 
 const repo = new URL("../", import.meta.url);
-const html = await readFile(new URL("apps/site/index.html", repo), "utf8");
-const js = await readFile(new URL("apps/site/src/main.js", repo), "utf8");
+const html = await readFile(new URL("apps/dashboard/index.html", repo), "utf8");
+const js = await readFile(new URL("apps/dashboard/src/main.js", repo), "utf8");
 const registry = await readFile(new URL("apps/api/src/spatial/city_registry.py", repo), "utf8");
-const facts = JSON.parse(await readFile(new URL("apps/site/public/facts.json", repo), "utf8"));
+const facts = JSON.parse(await readFile(new URL("apps/dashboard/public/facts.json", repo), "utf8"));
 const product = await readFile(new URL("PRODUCT.md", repo), "utf8");
 
 const registryIds = [...registry.matchAll(/^    CityId\.([A-Z_]+): CityRegistration\(/gm)].map((match) => match[1].toLowerCase()).sort();

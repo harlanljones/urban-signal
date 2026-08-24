@@ -144,7 +144,7 @@ click node_horizon_models "https://github.com/harlanljones/urban-signal/blob/mai
 click node_onnx_export "https://github.com/harlanljones/urban-signal/blob/main/src/models/export_onnx.py"
 click node_fastapi "https://github.com/harlanljones/urban-signal/blob/main/src/serving/app.py"
 click node_snapshots "https://github.com/harlanljones/urban-signal/blob/main/src/export/snapshot_builder.py"
-click node_cloudflare_worker "https://github.com/harlanljones/urban-signal/blob/main/apps/edge/src/index.ts"
+click node_cloudflare_worker "https://github.com/harlanljones/urban-signal/blob/main/apps/product/src/index.ts"
 
 classDef toneNeutral fill:#f8fafc,stroke:#334155,stroke-width:1.5px,color:#0f172a
 classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
@@ -248,7 +248,7 @@ urban-signal/
 │       │   └── keda-scaledobject.yaml      # KEDA autoscaling spatial consumer pods (1 -> 8)
 │       └── inference/
 │           └── inference-deployment.yaml   # FastAPI + ONNX Runtime (CUDA GPU)
-├── apps/edge/                              # Cloudflare Worker (@urban-signal/edge): static dashboard & KV snapshot API edge
+├── apps/product/                              # Cloudflare Worker (@urban-signal/product): static dashboard & KV snapshot API edge
 ├── models_storage/                         # Serialized ONNX model artifacts (DCN-v2, ST-GNN)
 ├── docs/
 │   ├── adr/                                # Architecture decision records (0001 Agent Interlock)
@@ -468,7 +468,7 @@ Exposes real-time Prometheus telemetry including `prediction_requests_total`, `c
 `GET /dashboard` or `GET /` (with `Accept: text/html`)
 Serves the hardened, high-performance **MapLibre GL** web visualizer featuring single-region selection and multi-region comparison across all seventeen registered metros (San Francisco, NYC, Chicago, Seattle, Los Angeles, New Orleans, Norfolk, Detroit, Austin, Cincinnati, Boston, Baltimore, Montgomery County, Baton Rouge, Denver, Philadelphia, Washington DC), submarket filtering, H3 hexagon inspection, LIMS heatmaps, and SHAP attribution waterfall charts.
 
-The same UI is mirrored as a static asset on the Cloudflare Worker (`apps/edge/`), where `/api/v1/*` is answered from a precomputed Workers KV snapshot (built by `src/export/snapshot_builder.py`). The FastAPI service and the edge snapshot both serve all seventeen registered metros.
+The same UI is mirrored as a static asset on the Cloudflare Worker (`apps/product/`), where `/api/v1/*` is answered from a precomputed Workers KV snapshot (built by `src/export/snapshot_builder.py`). The FastAPI service and the edge snapshot both serve all seventeen registered metros.
 
 ---
 

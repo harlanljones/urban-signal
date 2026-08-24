@@ -33,9 +33,9 @@ Visitors evaluate the project through a public product site, a live geospatial d
 - Feed coverage varies by city. Missing or incomplete municipal sources must be described honestly; the site must never imply uniform four-feed coverage.
 - Processing spans source-specific Socrata, ArcGIS, Carto, and CKAN ingestion; schema normalization; Kafka event streams; H3 spatial enrichment; time-decayed feature aggregation; PostGIS and object storage; multi-horizon model training and ONNX inference; snapshots; and edge delivery.
 - The city registry and dashboard wiring are authoritative for which cities appear in the product.
-- The marketing site will be a standalone web app inside the existing Turborepo, separate from `apps/edge`.
+- The marketing site will be a standalone web app inside the existing Turborepo, separate from `apps/product`.
 - Product and model claims must remain traceable to repository evidence. Do not invent customers, performance results, testimonials, or commercial availability.
-- Machine readers can discover a concise guide at `apps/site/public/llms.txt`, expanded context at `apps/site/public/llms-full.txt`, and structured product facts at `apps/site/public/facts.json`.
+- Machine readers can discover a concise guide at `apps/dashboard/public/llms.txt`, expanded context at `apps/dashboard/public/llms-full.txt`, and structured product facts at `apps/dashboard/public/facts.json`.
 
 ## Brand Commitments
 

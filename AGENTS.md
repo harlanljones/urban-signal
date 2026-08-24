@@ -34,7 +34,7 @@ whether planned work is leaf-shaped.
 **Never register a city without verifying it appears on the map.** A
 registration is not done when `REGISTRY` accepts it — it is done when the city
 shows up in the dashboard: selector option, `CITY_CONFIGS` entry, and the
-synced `apps/edge/public/index.html` static copy. This is enforced, not
+synced `apps/product/public/index.html` static copy. This is enforced, not
 conventional: `apps/api/tests/unit/test_interlock_gate.py::TestDashboardWiring` fails
 any `pytest -m interlock` run where a registered city is missing from the map.
 Wire the dashboard (or accept a red gate) in the same spine hold as the

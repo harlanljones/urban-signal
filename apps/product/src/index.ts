@@ -12,7 +12,7 @@ interface Env {
   ASSETS: Fetcher;
 }
 
-const SERVICE_NAME = "urban-signal-edge";
+const SERVICE_NAME = "urban-signal-product";
 const APP_VERSION = "2.0.0";
 const CACHE_CONTROL = "public, max-age=300";
 const MANIFEST_TTL_MS = 60_000;

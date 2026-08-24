@@ -4,7 +4,7 @@
 
 - **Stream id:** city-denver
 - **Leaf files I will create/edit:** `src/spatial/cities/denver.py`, `tests/unit/test_producers_denver.py`
-- **Spine files I expect to need:** `src/config.py`, `src/spatial/city_registry.py`, `src/spatial/cities/__init__.py`, `src/serving/dashboard.py`, `apps/edge/public/index.html`, `README.md`, `src/export/snapshot_builder.py`, `tests/unit/test_export_snapshot.py`
+- **Spine files I expect to need:** `src/config.py`, `src/spatial/city_registry.py`, `src/spatial/cities/__init__.py`, `src/serving/dashboard.py`, `apps/product/public/index.html`, `README.md`, `src/export/snapshot_builder.py`, `tests/unit/test_export_snapshot.py`
 
 ## Intent
 

@@ -9,7 +9,7 @@ on:
     branches: [main]
     paths:
       - "apps/api/**"
-      - "apps/edge/**"
+      - "apps/product/**"
       - "scripts/export_dashboard.py"
       - "scripts/**"
       - "src/**"
@@ -17,7 +17,7 @@ on:
   pull_request:
     paths:
       - "apps/api/**"
-      - "apps/edge/**"
+      - "apps/product/**"
       - "scripts/export_dashboard.py"
       - "scripts/**"
       - "src/**"
@@ -109,7 +109,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Push snapshot to Workers KV
-        working-directory: apps/edge
+        working-directory: apps/product
         run: bunx wrangler kv bulk put ../../dist/kv-bulk.json --binding SNAPSHOT --remote
 
   deploy-dashboard:
@@ -137,5 +137,5 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Deploy dashboard Worker
-        working-directory: apps/edge
+        working-directory: apps/product
         run: bun run deploy

@@ -4,7 +4,7 @@
 
 - **Stream id:** `closeout-baltimore` (ticket HJ-25)
 - **Leaf files I will create/edit:** `.streams/closeout-baltimore.md`, Baltimore-specific `apps/api/tests/unit/test_producers_baltimore.py` only if a leaf coverage gap is found, and Baltimore closeout evidence/docs under `docs/` only if disjoint.
-- **Spine files I will not edit:** registry/config/city exports, producer implementations, dashboard sources, README coverage table, and `apps/edge/public/index.html`; report exact required patches to the parent interlock instead.
+- **Spine files I will not edit:** registry/config/city exports, producer implementations, dashboard sources, README coverage table, and `apps/product/public/index.html`; report exact required patches to the parent interlock instead.
 
 ## Intent
 
@@ -14,7 +14,7 @@ Audit the existing Baltimore implementation against roadmap gates G1–G10 and t
 
 - 2026-08-23 — Shared worktree has unrelated modified files and an earlier Baltimore implementation; preserve all existing edits and do not duplicate ownership.
 - 2026-08-23 — Existing `.streams/city-baltimore.md` and `.streams/har-25-baltimore.md` are historical trails; this closeout owns only this evidence trail.
-- 2026-08-23 — Codebase graph generation is current and reports no parse-partial/skipped files for the relied-on source; `apps/edge/public/index.html` remains intentionally excluded and was inspected directly.
+- 2026-08-23 — Codebase graph generation is current and reports no parse-partial/skipped files for the relied-on source; `apps/product/public/index.html` remains intentionally excluded and was inspected directly.
 - 2026-08-23 — Focused Baltimore tests: 5 passed. Root-targeted `test_interlock_gate.py`: 20 passed. Edge tests: 2 passed. Compileall and `git diff --check`: passed.
 - 2026-08-23 — `pytest -m interlock` from `apps/api` is blocked during collection by `ModuleNotFoundError: scripts` in `tests/unit/test_feed_staleness_probe.py`; root-targeted interlock tests provide the runnable Baltimore gate evidence.
 - 2026-08-23 — No staging credentials, database metrics, backfill probe output, or 24-hour soak evidence are present in this worktree; G5–G9 remain open/unevidenced.
