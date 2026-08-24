@@ -1,0 +1,123 @@
+{
+  "title": "Choose Urban Signal’s visual world",
+  "question": "Which world should turn a complex civic-data system into an experience worth exploring?",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "The Urban Observatory",
+      "kicker": "THE ROLL",
+      "lineage": "municipal cartography light tables and layered planning transparencies",
+      "thesis": "The city becomes a luminous evidence surface, with every signal revealed as a physical layer.",
+      "palette": ["#071713", "#B8F34A", "#E8F0E8", "#F06A47", "#174C43"],
+      "materials": ["smoked glass", "tracing film", "registration marks", "phosphor ink"],
+      "viewport": "A dark cartographic field fills the first screen while stacked civic-data layers peel apart under the headline.",
+      "risk": "It demands disciplined restraint so atmosphere never obscures technical proof.",
+      "raised": [
+        {"from": "Terminal Wayfinding", "raise": "Every deep dive now begins with a single unmistakable next decision."},
+        {"from": "VU Signal Bridge", "raise": "Live and derived signals gain honest, kinetic state rather than decorative motion."},
+        {"from": "Greiman Hybrid", "raise": "Scale shifts are allowed to become genuinely monumental at narrative turns."}
+      ],
+      "comp": ".impeccable/mocks/decision/assigned.webp"
+    },
+    {
+      "id": "model-pick",
+      "label": "The Civic Evidence Atlas",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "metropolitan planning atlases, survey plates, and annotated field books",
+      "thesis": "Urban Signal reads like the definitive atlas of how cities disclose change.",
+      "palette": ["#F2EBD8", "#17251F", "#C64B2C", "#497A6A", "#D3B766"],
+      "materials": ["uncoated paper", "survey ink", "fold marks", "index tabs"],
+      "viewport": "An oversized metro plate, marginal notes, and a red evidence thread introduce the system as a browsable field atlas.",
+      "risk": "This is the most familiar high-craft direction for an explanatory civic-data product.",
+      "comp": ".impeccable/mocks/decision/model-pick.webp"
+    },
+    {
+      "id": "challenger-terminal",
+      "label": "Terminal Wayfinding",
+      "verdict": "competitive",
+      "lineage": "international airport sign systems",
+      "thesis": "The pipeline becomes a chain of precise decisions, always showing where the visitor is and what comes next.",
+      "palette": ["#FFD400", "#111111", "#FFFFFF", "#686868"],
+      "materials": ["enamel sign panels", "black inset pictograms", "split-flap state bands"],
+      "viewport": "A monumental yellow sign routes visitors toward Live demo, Explore the system, or Choose a city in under ten seconds.",
+      "case": "Wins product clarity, but identifies less strongly with spatial intelligence than the observatory.",
+      "risk": "Strict wayfinding can make long-form explanation feel like transit instructions.",
+      "comp": ".impeccable/mocks/decision/challenger-terminal.webp",
+      "hero": "https://impeccable.style/worlds/cards/wayfinding-cartography-signage-terminal-yellow-wayfinding-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/wayfinding-cartography-signage-terminal-yellow-wayfinding.webp"
+    },
+    {
+      "id": "challenger-vu",
+      "label": "VU Signal Bridge",
+      "verdict": "competitive",
+      "lineage": "recording-console meter bridges",
+      "thesis": "Nine cities become live channels whose needles reveal momentum, coverage, and pipeline activity at a glance.",
+      "palette": ["#EFE4C8", "#171A17", "#B4382F", "#70513A", "#7A9A7B"],
+      "materials": ["ivory meter faces", "warm glass", "walnut rails", "steel channel strips"],
+      "viewport": "A panoramic row of nine calibrated city meters responds as the visitor scrubs across the municipal signal timeline.",
+      "case": "Strong audience identification through the product name and mechanism; weaker for quiet reading and source documentation.",
+      "risk": "The signal metaphor becomes novelty if every value cannot be explained honestly.",
+      "comp": ".impeccable/mocks/decision/challenger-vu.webp",
+      "hero": "https://impeccable.style/worlds/cards/signals-instruments-vu-meter-bridge-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/signals-instruments-vu-meter-bridge.webp"
+    },
+    {
+      "id": "challenger-sleeping-city",
+      "label": "The Sleeping City Fold",
+      "verdict": "competitive",
+      "lineage": "surreal night maps folded like quilts",
+      "thesis": "The city’s hidden activity rises from a night map as neighborhoods fold open into their data stories.",
+      "palette": ["#08152D", "#F2C86B", "#E9EEF5", "#6FA8A1", "#AD6B82"],
+      "materials": ["embroidered street grids", "quilt seams", "window-light points", "weather washes"],
+      "viewport": "A recognizable night city folds upward into permit, complaint, license, and deed layers as dawn moves across the page.",
+      "case": "Wins emotional identification with cities, but cannot match the observatory’s technical clarity.",
+      "risk": "The poetic world may imply speculative storytelling where the product needs evidence.",
+      "comp": ".impeccable/mocks/decision/challenger-sleeping-city.webp",
+      "hero": "https://impeccable.style/worlds/cards/dream-surreal-impossible-worlds-sleeping-city-fold-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/dream-surreal-impossible-worlds-sleeping-city-fold.webp"
+    },
+    {
+      "id": "challenger-greiman",
+      "label": "Hybrid Data Collage",
+      "verdict": "declined",
+      "lineage": "April Greiman hybrid posters",
+      "thesis": "Code, maps, formulas, and screenshots collide as a single layered digital broadside.",
+      "palette": ["#1E9E9A", "#EF3D88", "#F1EEE4", "#232326"],
+      "materials": ["coarse bitmap dither", "video stills", "angled type ramps"],
+      "viewport": "A wall-scale collage makes the repository’s technical layers physically overlap.",
+      "case": "The form carries ambition but loses both audiences when dense evidence competes for the same plane.",
+      "kept": "Monumental scale changes at the moments when the pipeline changes meaning.",
+      "risk": "Layer collision can make source provenance harder to follow.",
+      "hero": "https://impeccable.style/worlds/cards/digital-design-canon-greiman-hybrid-collage-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/digital-design-canon-greiman-hybrid-collage.webp"
+    },
+    {
+      "id": "challenger-ikebana",
+      "label": "Seasonal Signal Arrangement",
+      "verdict": "declined",
+      "lineage": "ikebana composition and active emptiness",
+      "thesis": "Each city is a restrained arrangement whose few visible signals reveal balance, season, and change.",
+      "palette": ["#E8E1D2", "#51483E", "#345F7B", "#253D32"],
+      "materials": ["pale plaster", "weathered branch", "bronze vessel", "seasonal stems"],
+      "viewport": "One asymmetric city signal arrangement occupies a field of charged negative space.",
+      "case": "Beautiful for one city, but loses clarity and scalability across the full codebase and nine metros.",
+      "kept": "Protect negative space so dense explanations arrive in deliberate breaths.",
+      "risk": "Metaphorical sparsity conflicts with the request for thorough explanation.",
+      "hero": "https://impeccable.style/worlds/cards/growth-metamorphosis-branching-ikebana-ma-arrangement-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/growth-metamorphosis-branching-ikebana-ma-arrangement.webp"
+    }
+  ],
+  "reroll": {"registers": ["safer", "bolder"]},
+  "buildPath": {"value": "comp", "toggle": true},
+  "canon": true,
+  "canonCard": {
+    "label": "The polished geospatial SaaS standard",
+    "thesis": "A dark map hero, crisp product cards, architecture diagram, city grid, and clear demo CTA executed at full craft.",
+    "palette": ["#07111F", "#FFFFFF", "#33D6A6", "#6EA8FE"],
+    "materials": ["glass panels", "map glow", "clean grid", "dashboard crops"],
+    "viewport": "A split hero pairs a direct product promise with a polished dashboard preview and immediate demo action.",
+    "risk": "It is legible and credible but intentionally resembles the category it belongs to.",
+    "comp": ".impeccable/mocks/decision/canon.webp"
+  },
+  "steer": true
+}

@@ -27,6 +27,10 @@ const CITY_ALIASES: Record<string, string> = {
   king_county: "seattle",
   los_angeles: "los_angeles",
   la: "los_angeles",
+  new_orleans: "new_orleans",
+  norfolk: "norfolk",
+  detroit: "detroit",
+  austin: "austin",
 };
 
 let manifestCache: { value: Manifest | null; expires: number } = {

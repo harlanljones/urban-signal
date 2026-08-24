@@ -199,3 +199,110 @@ def test_scheduler_start_stop(mock_scheduler):
     metrics = mock_scheduler.get_metrics()
     assert metrics["jobs"]["permits"]["total_runs"] == 1
     assert mock_scheduler._stop_event.is_set()
+
+
+class TestPlatformRouting:
+    """D1: client routing is a dict dispatch with readable failures."""
+
+    def test_unknown_platform_raises_readable_error(self, mock_scheduler):
+        mock_scheduler.job_metadata["permits"]["platform"] = "ftp"
+        try:
+            with pytest.raises(ValueError, match="platform 'ftp' has no client"):
+                mock_scheduler._paginating_client_for("permits")
+        finally:
+            mock_scheduler.job_metadata["permits"]["platform"] = "socrata"
+
+    def test_missing_client_attribute_raises_readable_error(self, mock_scheduler):
+        # permits producer has no .arcgis attribute-level client registered? It
+        # does since Wave C2 — remove it to simulate an unwired producer.
+        try:
+            saved = mock_scheduler.producers["permits"].arcgis
+            del mock_scheduler.producers["permits"].arcgis
+            mock_scheduler.job_metadata["permits"]["platform"] = "arcgis"
+            with pytest.raises(ValueError, match="lacks the 'arcgis' client"):
+                mock_scheduler._paginating_client_for("permits")
+        finally:
+            mock_scheduler.producers["permits"].arcgis = saved
+            mock_scheduler.job_metadata["permits"]["platform"] = "socrata"
+
+
+class TestYearSliceEndpoints:
+    """D3: endpoint_by_year resolves at poll-time metadata build."""
+
+    def _spec(self, by_year):
+        from src.spatial.city_registry import DatasetSpec
+
+        return DatasetSpec(endpoint="https://default.example", extra={"endpoint_by_year": by_year})
+
+    def test_current_year_wins(self):
+        import datetime as dt
+
+        from src.spatial.city_registry import resolve_endpoint
+
+        spec = self._spec({"2024": "u/24", "2025": "u/25", "2026": "u/26"})
+        assert resolve_endpoint(spec, dt.date(2026, 6, 1)) == "u/26"
+
+    def test_newest_past_year_when_current_missing(self):
+        import datetime as dt
+
+        from src.spatial.city_registry import resolve_endpoint
+
+        spec = self._spec({"2025": "u/25", "2027": "u/27"})
+        assert resolve_endpoint(spec, dt.date(2026, 6, 1)) == "u/25"
+
+    def test_future_only_falls_back_to_latest(self):
+        import datetime as dt
+
+        from src.spatial.city_registry import resolve_endpoint
+
+        spec = self._spec({"2030": "u/30"})
+        assert resolve_endpoint(spec, dt.date(2026, 6, 1)) == "u/30"
+
+    def test_plain_spec_passthrough(self):
+        from src.spatial.city_registry import DatasetSpec, resolve_endpoint
+
+        assert resolve_endpoint(DatasetSpec(endpoint="u/plain")) == "u/plain"
+
+    def test_scheduler_metadata_uses_resolver(self, mock_scheduler):
+        """Every job's endpoint came through resolve_endpoint (year-sliced
+        specs would show their resolved layer)."""
+        for meta in mock_scheduler.job_metadata.values():
+            assert isinstance(meta["endpoint"], str) and meta["endpoint"]
+            assert meta.get("ingestion_mode") in ("incremental", "snapshot")
+
+
+class TestSnapshotMode:
+    """D4: snapshot feeds skip the watermark clause; dedup cache diffs pulls."""
+
+    def test_snapshot_job_skips_watermark_after_first_run(self, mock_scheduler):
+        meta = mock_scheduler.job_metadata["sla"]
+        cfg = mock_scheduler.configs["sla"]
+        met = mock_scheduler.metrics["sla"]
+        producer = mock_scheduler.producers[meta["producer_key"]]
+
+        saved_platform = meta["platform"]
+        saved_mode = meta.get("ingestion_mode")
+        try:
+            meta["platform"] = "socrata"
+            meta["ingestion_mode"] = "snapshot"
+            producer.socrata.paginate = MagicMock(return_value=iter([]))
+
+            met.high_watermark = "2020-01-01T00:00:00"
+            cfg.incremental = True
+            mock_scheduler.poll_job("sla", limit=10)
+            _, kwargs = producer.socrata.paginate.call_args
+            assert not kwargs.get("where_clause")
+
+            # incremental control: same state emits a watermark clause
+            meta["ingestion_mode"] = "incremental"
+            producer.socrata.paginate = MagicMock(return_value=iter([]))
+            mock_scheduler.poll_job("sla", limit=10)
+            _, kwargs = producer.socrata.paginate.call_args
+            wc = kwargs.get("where_clause") or ""
+            assert f"{meta['watermark_col']} > '2020-01-01T00:00:00'" == wc
+        finally:
+            meta["platform"] = saved_platform
+            if saved_mode is None:
+                meta.pop("ingestion_mode", None)
+            else:
+                meta["ingestion_mode"] = saved_mode

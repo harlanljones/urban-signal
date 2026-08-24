@@ -1,0 +1,4 @@
+{
+  "extends": "@urban-signal/typescript-config/cloudflare-worker.json",
+  "include": ["src/**/*.ts"]
+}

@@ -12,7 +12,7 @@ from src.serving.dashboard import get_dashboard_html
 
 
 def main() -> None:
-    out_dir = Path(__file__).resolve().parent.parent / "workers" / "public"
+    out_dir = Path(__file__).resolve().parent.parent / "apps" / "edge" / "public"
     out_dir.mkdir(parents=True, exist_ok=True)
     out_file = out_dir / "index.html"
     out_file.write_text(get_dashboard_html(), encoding="utf-8")

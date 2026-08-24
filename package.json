@@ -1,0 +1,23 @@
+{
+  "name": "urban-signal",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Urban Signal — real-time spatial intelligence & commercial catalyst forecasting (Python core + Turborepo-managed TypeScript apps)",
+  "license": "Apache-2.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "packageManager": "bun@1.4.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "deploy": "turbo run deploy",
+    "linear": "linear"
+  }
+}

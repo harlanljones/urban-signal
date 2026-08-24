@@ -6,8 +6,8 @@ Urban Signal — agent-facing conventions for this repo.
 
 ### Issue tracker
 
-Issues live in **Linear**, driven through the repo's `bun run linear` wrapper (that script
-does not exist yet — see the setup gap note). See `docs/agents/issue-tracker.md`.
+Issues live in **Linear**, driven through the repo's `bun run linear` wrapper
+(delegates to the `linear` CLI). See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
@@ -28,3 +28,14 @@ Before releasing a spine edit run the gate: `pytest -m interlock`. Stream
 claims live in `.streams/<id>.md`; dispatches are recorded in
 `.streams/dispatch-log.md`; `python scripts/interlock_gap.py <base>` reports
 whether planned work is leaf-shaped.
+
+### City registration rule
+
+**Never register a city without verifying it appears on the map.** A
+registration is not done when `REGISTRY` accepts it — it is done when the city
+shows up in the dashboard: selector option, `CITY_CONFIGS` entry, and the
+synced `apps/edge/public/index.html` static copy. This is enforced, not
+conventional: `tests/unit/test_interlock_gate.py::TestDashboardWiring` fails
+any `pytest -m interlock` run where a registered city is missing from the map.
+Wire the dashboard (or accept a red gate) in the same spine hold as the
+registry entry — never "docs later".

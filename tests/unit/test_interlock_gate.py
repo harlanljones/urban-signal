@@ -37,7 +37,16 @@ FEED_TOPICS = {
     FeedType.DEEDS: settings.topic_deeds,
 }
 
-KNOWN_PLATFORMS = {"socrata", "arcgis"}
+KNOWN_PLATFORMS = {"socrata", "arcgis", "carto", "ckan"}
+
+# URI scheme each platform's endpoint must carry (carto/ckan use opaque
+# client-parsed URIs; see the client modules).
+PLATFORM_SCHEMES = {
+    "socrata": "https://",
+    "arcgis": "https://",
+    "carto": "carto://",
+    "ckan": "ckan://",
+}
 
 # Which invariant class guards each spine file. A manifest path absent from
 # this map is a torn write waiting to ship undetected.
@@ -68,6 +77,8 @@ CITY_EXPORT_NAMES = {
     CityId.NORFOLK: ("NORFOLK_METRO_BBOX", "NORFOLK_DIVISION_BBOXES", "NORFOLK_DIVISIONS", "NORFOLK_SUBMARKETS"),
     CityId.DETROIT: ("DETROIT_METRO_BBOX", "DETROIT_DIVISION_BBOXES", "DETROIT_DIVISIONS", "DETROIT_SUBMARKETS"),
     CityId.AUSTIN: ("AUSTIN_METRO_BBOX", "AUSTIN_DIVISION_BBOXES", "AUSTIN_DIVISIONS", "AUSTIN_SUBMARKETS"),
+    CityId.PHILADELPHIA: ("PHILADELPHIA_METRO_BBOX", "PHL_DIVISION_BBOXES", "PHL_DIVISIONS", "PHL_SUBMARKETS"),
+    CityId.WASHINGTON_DC: ("DC_METRO_BBOX", "DC_DIVISION_BBOXES", "DC_DIVISIONS", "DC_SUBMARKETS"),
 }
 
 EXPORT_ATTR_MAP = {
@@ -93,10 +104,11 @@ def _point_inside(bbox: dict, lat: float, lng: float) -> bool:
 
 def _declared_endpoint_defaults() -> set[str]:
     fields = Settings.model_fields
+    schemes = tuple(PLATFORM_SCHEMES.values())
     return {
         f.default
         for f in fields.values()
-        if isinstance(f.default, str) and f.default.startswith("http")
+        if isinstance(f.default, str) and f.default.startswith(schemes)
     }
 
 
@@ -158,8 +170,11 @@ class TestCompleteness:
         for cid, reg in REGISTRY.items():
             for feed, spec in reg.datasets.items():
                 label = f"{cid.value}/{feed.value}"
-                assert spec.endpoint.startswith("https://"), label
                 assert spec.platform in KNOWN_PLATFORMS, label
+                scheme = PLATFORM_SCHEMES[spec.platform]
+                assert spec.endpoint.startswith(scheme), (
+                    f"{label}: {spec.platform} endpoint must start with {scheme!r}"
+                )
                 assert spec.watermark_col, label
                 assert spec.id_keys and all(isinstance(k, str) and k for k in spec.id_keys), label
                 assert spec.interval_seconds > 0, label
@@ -267,3 +282,61 @@ class TestSpineCoverage:
 def _manifest_paths() -> list[str]:
     lines = MANIFEST_PATH.read_text().splitlines()
     return [ln.strip() for ln in lines if ln.strip() and not ln.strip().startswith("#")]
+
+
+@pytest.mark.interlock
+class TestDashboardWiring:
+    """A registration is done when the city appears on the map — not when
+    REGISTRY accepts it (AGENTS.md, "City registration rule").
+
+    The map is three layers: the dashboard's selector option, its CITY_CONFIGS
+    entry (divisions/presets), and the synced workers static copy. A registry
+    entry missing from any layer fails the gate in the same run.
+    """
+
+    DASHBOARD = REPO_ROOT / "src" / "serving" / "dashboard.py"
+    WORKER_STATIC = REPO_ROOT / "apps" / "edge" / "public" / "index.html"
+
+    def _dashboard(self) -> str:
+        assert self.DASHBOARD.exists(), f"{self.DASHBOARD} missing — the map was deleted?"
+        return self.DASHBOARD.read_text()
+
+    def test_every_registered_city_has_a_selector_option(self):
+        src = self._dashboard()
+        missing = [
+            cid.value
+            for cid in REGISTRY
+            if f'<option value="{cid.value}"' not in src
+        ]
+        assert not missing, (
+            f"registered but not on the map selector: {missing}. "
+            f"Wire dashboard options in the same spine hold as the REGISTRY entry."
+        )
+
+    def test_every_registered_city_has_a_config_entry(self):
+        import re
+
+        src = self._dashboard()
+        missing = [
+            cid.value
+            for cid in REGISTRY
+            if not re.search(rf"(?m)^\s+{re.escape(cid.value)}: \{{", src)
+        ]
+        assert not missing, (
+            f"registered but missing from CITY_CONFIGS: {missing}. "
+            f"A city without center/divisions/presets cannot render."
+        )
+
+    def test_worker_static_copy_carries_every_city(self):
+        if not (REPO_ROOT / "apps" / "edge").exists():
+            pytest.skip("apps/edge deployment surface removed from the tree — no static copy to keep in sync")
+        assert self.WORKER_STATIC.exists(), (
+            f"{self.WORKER_STATIC} missing while the rest of apps/edge exists — "
+            f"regenerate it from get_dashboard_html()"
+        )
+        static = self.WORKER_STATIC.read_text()
+        stale = [cid.value for cid in REGISTRY if f'"{cid.value}"' not in static]
+        assert not stale, (
+            f"apps/edge/public/index.html is a stale static copy — missing {stale}. "
+            f"Re-sync it from get_dashboard_html() before closing the wave."
+        )

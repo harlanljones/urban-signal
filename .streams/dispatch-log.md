@@ -110,7 +110,43 @@ producer exposed an arcgis client; permits/311/SLA producers gained
 `_client_for` platform routing (mirroring deeds) and their run_streams now
 route by spec.platform. (2) Wave-B gap: 311 status/incident_address chains
 lacked first_mapped wiring — completed for Austin's sr_status_desc/sr_location.
-README coverage table + selector copy updated by integrator.
+README coverage table + selector copy updated by integrator. 
+
+## 2026-08-23 — wave F foundations (spine hold + two client leaves) — Linear HAR-16/17/18
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| wave-f-foundations | `tests/unit/test_scheduler.py` additions | scheduler.py (D1 dict dispatch, D3 metadata resolution), city_registry.py (`resolve_endpoint`) | ~23:30 PT | completed — interlock 17/17, scheduler 16/16 | D1 readable-failure routing; D3 `endpoint_by_year`; D4 snapshot mode |
+| carto-client | `src/producers/carto_client.py` + tests | none | ~23:35 PT | completed — 27 unit + live contract green | keyset paging, NULL+sentinel exclusion (rtt_summary NULL dates found live) |
+| ckan-client | `src/producers/ckan_client.py` + tests | none | ~23:35 PT | completed — 15 unit + 2 live green | offset paging; range clauses must route to datastore_search_sql; year-rollover hook |
+
+**Yield:** 3 of 3. Gates: full suite **440 passed / 3 skipped / exit 0**.
+C3/C5 note recorded on tickets: producers gain `.carto`/`.ckan` attributes at
+their city registrations, not before.
+
+## 2026-08-23 — wave C3 city registrations (Philadelphia / Washington DC) — Linear HAR-19/20
+
+Per roadmap §3. Pre-dispatch probes: Philly CARTO SQL API live (nulls-first
+DESC reconfirmed on permits), DC DCRA FeatureServer/18 live (ISSUE_DATE,
+OBJECTID). Projected spine share ~12% (≤20% gate): enum/aliases/registry/
+config + `.carto` producer attributes (first carto wiring) + DC year-slice map.
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-philadelphia | `src/spatial/cities/philadelphia.py`, `tests/unit/test_producers_philadelphia.py` | config.py, city_registry.py, cities/__init__.py, 4 producers (.carto attr) | ~23:50 PT | completed — 8 divisions / 18 submarkets; 4 CARTO feeds; WKB geometry projected client-side via select extras; rtt NULL/sentinel date caveats documented |
+| city-dc | `src/spatial/cities/washington_dc.py`, `tests/unit/test_producers_dc.py` | config.py, city_registry.py, cities/__init__.py | ~23:50 PT | completed — 8 divisions / 18 submarkets; 4 ArcGIS feeds incl. full endpoint_by_year maps (2022–2026); non-spatial SLA/DEEDS via null-coord tolerance |
+
+**Yield:** 2 of 2. Gates: interlock **20/20** (incl. new TestDashboardWiring),
+city suites 75/75, full suite **518 passed / 3 skipped / exit 0**. Spine-phase
+findings: (1) producers' own `_client_for` still hardcoded arcgis/socrata —
+converted to the same dict dispatch as the scheduler (Philly's wiring test
+caught it); (2) `SLALicenseEvent` lat/lng made Optional + SLA parser tolerates
+missing coordinates (deeds precedent) unlocking DC's non-spatial licenses;
+(3) scheduler forwards order_by/id_col/select extras to clients; (4) gate
+endpoint check now platform-scheme aware (carto://ckan://); (5) workers/ moved
+to apps/edge upstream of this wave — static-copy invariant repointed and
+re-synced with all eleven cities. Dashboard map wired for both cities in the
+same spine hold per the AGENTS.md city registration rule.
 
 **Yield:** 5 of 5 leaf streams (all durable artifacts written). Commit
 deviation amended: `git commit` is denied by local permission policy, so the

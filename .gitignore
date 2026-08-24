@@ -96,11 +96,12 @@ models_storage/*
 retraining_report_*.json
 
 # ==============================================================================
-# Cloudflare Workers Edge Deployment
+# Turborepo / JS workspaces
 # ==============================================================================
-workers/node_modules/
-workers/.wrangler/
-workers/public/index.html
+.turbo/
+node_modules/
+apps/edge/.wrangler/
+apps/edge/public/index.html
 .wrangler/
 
 # ==============================================================================
