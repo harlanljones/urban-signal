@@ -1,0 +1,97 @@
+"""Boston metro spatial registry and dashboard geometry."""
+
+from src.spatial.submarkets import BoroughMeta, SubmarketMeta
+
+BOSTON_METRO_BBOX: dict[str, float] = {
+    "min_lat": 42.15,
+    "max_lat": 42.55,
+    "min_lng": -71.30,
+    "max_lng": -70.75,
+}
+
+BOSTON_DIVISION_BBOXES: dict[str, dict[str, float]] = {
+    "BOSTON_CORE": {"min_lat": 42.28, "max_lat": 42.40, "min_lng": -71.15, "max_lng": -70.95},
+    "CAMBRIDGE_SOMERVILLE": {"min_lat": 42.34, "max_lat": 42.43, "min_lng": -71.18, "max_lng": -71.05},
+    "INNER_NORTH": {"min_lat": 42.35, "max_lat": 42.52, "min_lng": -71.30, "max_lng": -70.85},
+    "INNER_SOUTH": {"min_lat": 42.15, "max_lat": 42.35, "min_lng": -71.25, "max_lng": -70.80},
+}
+
+
+def is_in_boston_metro(lat: float, lng: float) -> bool:
+    """Return whether a coordinate is inside the registered Boston extent."""
+    if lat is None or lng is None:
+        return False
+    return (
+        BOSTON_METRO_BBOX["min_lat"] <= lat <= BOSTON_METRO_BBOX["max_lat"]
+        and BOSTON_METRO_BBOX["min_lng"] <= lng <= BOSTON_METRO_BBOX["max_lng"]
+    )
+
+
+BOSTON_SUBMARKETS: dict[str, SubmarketMeta] = {
+    "Downtown & Seaport": SubmarketMeta(
+        name="Downtown & Seaport", borough="BOSTON_CORE", lat=42.355, lng=-71.055,
+        zoom=13.8, pitch=48.0, base_lims=0.90, capex=10500000.0, permit_vel=52.0,
+        shift_ratio=1.58, sla=68.0,
+        description="Financial District, Downtown Crossing, and Seaport growth corridors.",
+        city_id="boston",
+    ),
+    "Back Bay & Fenway": SubmarketMeta(
+        name="Back Bay & Fenway", borough="BOSTON_CORE", lat=42.347, lng=-71.095,
+        zoom=14.0, pitch=46.0, base_lims=0.86, capex=8800000.0, permit_vel=44.0,
+        shift_ratio=1.48, sla=63.0,
+        description="Dense institutional, residential, and hospitality redevelopment spine.",
+        city_id="boston",
+    ),
+    "Harvard Square": SubmarketMeta(
+        name="Harvard Square", borough="CAMBRIDGE_SOMERVILLE", lat=42.373, lng=-71.119,
+        zoom=14.0, pitch=45.0, base_lims=0.88, capex=7600000.0, permit_vel=38.0,
+        shift_ratio=1.45, sla=61.0,
+        description="University, biotech, and mixed-use demand around Harvard Square.",
+        city_id="boston",
+    ),
+    "Union Square": SubmarketMeta(
+        name="Union Square", borough="CAMBRIDGE_SOMERVILLE", lat=42.379, lng=-71.095,
+        zoom=14.0, pitch=45.0, base_lims=0.82, capex=6200000.0, permit_vel=35.0,
+        shift_ratio=1.40, sla=57.0,
+        description="Somerville transit-oriented infill and neighborhood commercial corridor.",
+        city_id="boston",
+    ),
+    "Waltham Innovation District": SubmarketMeta(
+        name="Waltham Innovation District", borough="INNER_NORTH", lat=42.376, lng=-71.236,
+        zoom=13.2, pitch=42.0, base_lims=0.76, capex=5400000.0, permit_vel=29.0,
+        shift_ratio=1.34, sla=54.0,
+        description="Route 128 office, research, and adaptive-reuse corridor.",
+        city_id="boston",
+    ),
+    "Quincy Center": SubmarketMeta(
+        name="Quincy Center", borough="INNER_SOUTH", lat=42.252, lng=-71.003,
+        zoom=13.4, pitch=43.0, base_lims=0.74, capex=4800000.0, permit_vel=31.0,
+        shift_ratio=1.36, sla=52.0,
+        description="South Shore transit hub with residential and civic redevelopment pressure.",
+        city_id="boston",
+    ),
+}
+
+
+BOSTON_DIVISIONS: dict[str, BoroughMeta] = {
+    "BOSTON_CORE": BoroughMeta(
+        name="Boston Core", center_lat=42.351, center_lng=-71.065, zoom=12.8,
+        bbox=BOSTON_DIVISION_BBOXES["BOSTON_CORE"],
+        submarkets=["Downtown & Seaport", "Back Bay & Fenway"], city_id="boston",
+    ),
+    "CAMBRIDGE_SOMERVILLE": BoroughMeta(
+        name="Cambridge & Somerville", center_lat=42.376, center_lng=-71.107, zoom=12.8,
+        bbox=BOSTON_DIVISION_BBOXES["CAMBRIDGE_SOMERVILLE"],
+        submarkets=["Harvard Square", "Union Square"], city_id="boston",
+    ),
+    "INNER_NORTH": BoroughMeta(
+        name="Inner North & Route 128", center_lat=42.425, center_lng=-71.075, zoom=11.8,
+        bbox=BOSTON_DIVISION_BBOXES["INNER_NORTH"],
+        submarkets=["Waltham Innovation District"], city_id="boston",
+    ),
+    "INNER_SOUTH": BoroughMeta(
+        name="Inner South", center_lat=42.245, center_lng=-71.030, zoom=11.8,
+        bbox=BOSTON_DIVISION_BBOXES["INNER_SOUTH"],
+        submarkets=["Quincy Center"], city_id="boston",
+    ),
+}

@@ -12,6 +12,7 @@
 # =============================================================================
 
 x-app-env: &app-env
+  PYTHONPATH: /app/apps/api
   APP_ENV: ${APP_ENV:-production}
   LOG_LEVEL: ${LOG_LEVEL:-INFO}
   SERVICE_NAME: ${SERVICE_NAME:-urban-signal-predictor}

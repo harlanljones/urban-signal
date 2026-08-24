@@ -20,13 +20,13 @@
 | :---: | :---: |
 | ![NYC Dashboard](docs/screenshots/dashboard-nyc.png) | ![Chicago Dashboard](docs/screenshots/dashboard-chicago.png) |
 
-The city selector ships **all eleven registered metros** — San Francisco Bay Area, New York City, Chicago, Seattle Metro (4 Divisions), Los Angeles Metro (6 Divisions), New Orleans Metro (9 Divisions), Norfolk (5 Divisions), Detroit (6 Divisions), and Austin (6 Divisions) — with per-division camera presets, map-click → division resolution, and geolocation-based default-city detection.
+The city selector ships **all seventeen registered metros** — San Francisco Bay Area, New York City, Chicago, Seattle Metro (4 Divisions), Los Angeles Metro (6 Divisions), New Orleans Metro (9 Divisions), Norfolk (5 Divisions), Detroit (6 Divisions), Austin (6 Divisions), Cincinnati (1 Division), Boston (4 Divisions), Baltimore (1 Division), Montgomery County (1 Division), Baton Rouge (1 Division), Denver (1 Division), Philadelphia (8 Divisions), and Washington DC (8 Divisions) — with per-division camera presets, map-click → division resolution, and geolocation-based default-city detection.
 
 ---
 
 ## 1. System Overview & Architecture
 
-Traditional real estate valuation models rely on lagging transactional comps (deeds, MLS closed transfers). **Urban Signal** ingests leading municipal telemetry—daily building permits (DOB A1/A2/NB / Demolitions), Liquor / Hospitality Licenses, 311 citizen maintenance & quality-of-life complaints, and property deeds / tax rolls across eleven registered metros—streaming them through Apache Kafka onto an **Uber H3 multi-resolution hexagonal grid** (Res 7, 8, 9) to predict appreciation ($\\Delta \\ln(P)$) **6 to 18 months ahead of public market listings**.
+Traditional real estate valuation models rely on lagging transactional comps (deeds, MLS closed transfers). **Urban Signal** ingests leading municipal telemetry—daily building permits (DOB A1/A2/NB / Demolitions), Liquor / Hospitality Licenses, 311 citizen maintenance & quality-of-life complaints, and property deeds / tax rolls across seventeen registered metros—streaming them through Apache Kafka onto an **Uber H3 multi-resolution hexagonal grid** (Res 7, 8, 9) to predict appreciation ($\\Delta \\ln(P)$) **6 to 18 months ahead of public market listings**.
 
 ### Registered Cities & Feeds
 
@@ -41,10 +41,16 @@ Traditional real estate valuation models rely on lagging transactional comps (de
 | Norfolk (5 Divisions) | DOWNTOWN_WATERFRONT, GHENT_WESTBURG, OCEAN_VIEW, CENTRAL_MILITARY_CIRCLE, SOUTH_NORFOLK_BERKLEY | Socrata | — address-only feed | — no geometry | Socrata (FY sales; rotate ID each July) |
 | Detroit (6 Divisions) | DOWNTOWN_MIDTOWN_CORKTOWN, EAST_SIDE_JEFFERSON, WEST_SIDE_GRAND_RIVER, SOUTHWEST_MEXICANTOWN, NORTH_END_HIGHLAND_PARK, EAST_ENGLISH_VILLAGE_MORNINGSIDE | ArcGIS | ArcGIS | ArcGIS | ArcGIS (Assessor sales; typo-year sentinel tolerated) |
 | Austin (6 Divisions) | DOWNTOWN_CAPITOL, EAST_AUSTIN_MUELLER, SOUTH_AUSTIN_SOCO, NORTH_AUSTIN_DOMAIN, WEST_AUSTIN_HILLS, PFLUGERVILLE_ROUND_ROCK_EDGE | Socrata | Socrata | — TABC un-geocoded | — county shell |
+| Cincinnati (1 Division) | CINCINNATI_CORE | [Socrata](docs/research/socrata-sweep.md#cincinnati) | [Socrata](docs/research/socrata-sweep.md#cincinnati) | [Socrata](docs/research/socrata-sweep.md#cincinnati) | — no verified sales feed |
+| Boston (4 Divisions) | BOSTON_CORE, CAMBRIDGE_SOMERVILLE, INNER_NORTH, INNER_SOUTH | [CKAN](docs/research/non-socrata-platforms.md#boston--ckan--permits-and-311-strong-no-sales) | [CKAN](docs/research/non-socrata-platforms.md#boston--ckan--permits-and-311-strong-no-sales) | [CKAN](docs/research/non-socrata-platforms.md#boston--ckan--permits-and-311-strong-no-sales) | — no verified sales feed |
+| Baltimore (1 Division) | BALTIMORE_CORE | ArcGIS | ArcGIS (year-sliced) | ArcGIS (notifications-grade) | — no verified sales feed |
+| Montgomery County, MD (1 Division) | MONTGOMERY_CORE | [Socrata](docs/research/socrata-sweep.md#montgomery-county-md--data-montgomerycountymdgov--2-solid--1-weak) | — MC311 excluded: no coordinates | [Socrata](docs/research/socrata-sweep.md#montgomery-county-md--data-montgomerycountymdgov--2-solid--1-weak) | — no verified sales feed |
+| Baton Rouge / EBR (1 Division) | BATON_ROUGE_CORE | [Socrata](docs/research/socrata-sweep.md#baton-rouge-east-baton-rouge-parish-la-data-brlagov-34) | [Socrata](docs/research/socrata-sweep.md#baton-rouge-east-baton-rouge-parish-la-data-brlagov-34) | [Socrata snapshot](docs/research/socrata-sweep.md#baton-rouge-east-baton-rouge-parish-la-data-brlagov-34) | — no market sales feed |
+| Denver (1 Division) | DENVER_CORE | [ArcGIS](docs/research/non-socrata-platforms.md#denver--arcgis-hub--three-usable-feeds-licenses-weak-sales-not-geocoded) | [ArcGIS](docs/research/non-socrata-platforms.md#denver--arcgis-hub--three-usable-feeds-licenses-weak-sales-not-geocoded) | — licenses lack issue dates | — sales ungeocoded; $0 transfer quirk documented |
 | Philadelphia (8 Divisions) | CENTER_CITY_RITTENHOUSE, OLD_CITY_NORTHERN_LIBERTIES, SOUTH_PHILLY_PASSYUNK, WEST_PHILLY_UNIVERSITY_CITY, NORTH_PHILLY_TEMPLE, NORTHEAST_ROOSEVELT_BLVD, GERMANTOWN_MT_AIRY, RIVER_WARDS_KENSINGTON | CARTO | CARTO | CARTO | CARTO (RTT summary; mortgages → amount 0.0) |
 | Washington DC (8 Divisions) | DOWNTOWN_NOMA_CAPITOL_RIVERFRONT, CAPITOL_HILL_EAST_END, DUPONT_KALORAMA_UPTOWN, GEORGETOWN_FOGGY_BOTTOM, COLUMBIA_HEIGHTS_PETWORTH, BROOKLAND_RHODE_ISLAND_AVE, HILL_EAST_FAIRLINTON, ANACOSTIA_EAST_OF_THE_RIVER | ArcGIS (year-sliced) | ArcGIS (year-sliced) | ArcGIS (non-spatial) | ArcGIS CAMA (non-spatial; parcel-join future work) |
 
-Partial registrations are deliberate: cities register only feeds that exist, and `get_dataset` raises a readable error for the rest (`src/spatial/city_registry.py`). Adding a city is leaf work — see `docs/research/city-expansion-candidates.md` for the next candidates (New Orleans, Austin).
+Partial registrations are deliberate: cities register only feeds that exist, and `get_dataset` raises a readable error for the rest (`apps/api/src/spatial/city_registry.py`).
 
 ### Architecture Flow
 
@@ -241,7 +247,7 @@ urban-signal/
 ├── scripts/
 │   └── interlock_gap.py                    # Interlock-gap metric over a git diff range
 ├── .streams/                               # Agent stream logs & dispatch log (see AGENTS.md)
-├── src/
+├── apps/api/src/
 │   ├── config.py                           # Central Pydantic Settings & environment config
 │   ├── schemas/                            # Pydantic models & Avro binary schema contracts (.avsc)
 │   ├── spatial/                            # Uber H3 indexing, per-city modules, city registry, GIS utilities
@@ -251,11 +257,11 @@ urban-signal/
 │   ├── storage/                            # PostGIS synchronization engine & table schemas
 │   ├── models/                             # LightGBM, ST-GNN, DCN-v2, Walk-Forward CV, ONNX exporter
 │   └── serving/                            # FastAPI app, router, inference engine, dashboard, webhooks
-├── tests/
+├── apps/api/tests/
 │   ├── conftest.py                         # Pytest fixtures & sample NYC geospatial payloads
 │   ├── unit/                               # 16 unit suites incl. the interlock invariant gate
 │   └── e2e/                                # End-to-end integration test suite
-├── pyproject.toml                          # Project packaging and dependency specifications
+├── apps/api/pyproject.toml                 # Python packaging and dependency specifications
 ├── LICENSE                                 # Apache 2.0 Open Source License
 └── urban_signal_prospectus_k8s_kafka.md    # Full technical design prospectus
 ```
@@ -264,7 +270,7 @@ urban-signal/
 
 ## 5. Configuration & Environment Variables
 
-All settings are managed via `src/config.py` using `pydantic-settings` and can be overridden via `.env` or container environment variables:
+All settings are managed via `apps/api/src/config.py` using `pydantic-settings` and can be overridden via `.env` or container environment variables:
 
 | Variable | Default Value | Description |
 | :--- | :--- | :--- |
@@ -430,9 +436,9 @@ Exposes real-time Prometheus telemetry including `prediction_requests_total`, `c
 
 ### Interactive Geospatial Dashboard
 `GET /dashboard` or `GET /` (with `Accept: text/html`)
-Serves the hardened, high-performance **MapLibre GL** web visualizer featuring multi-city selection across all eleven registered metros (San Francisco, NYC, Chicago, Seattle, Los Angeles, New Orleans, Norfolk, Detroit, Austin, Philadelphia, Washington DC), submarket filtering, H3 hexagon inspection, LIMS heatmaps, and SHAP attribution waterfall charts.
+Serves the hardened, high-performance **MapLibre GL** web visualizer featuring multi-city selection across all seventeen registered metros (San Francisco, NYC, Chicago, Seattle, Los Angeles, New Orleans, Norfolk, Detroit, Austin, Cincinnati, Boston, Baltimore, Montgomery County, Baton Rouge, Denver, Philadelphia, Washington DC), submarket filtering, H3 hexagon inspection, LIMS heatmaps, and SHAP attribution waterfall charts.
 
-The same UI is mirrored as a static asset on the Cloudflare Worker (`apps/edge/`), where `/api/v1/*` is answered from a precomputed Workers KV snapshot (built by `src/export/snapshot_builder.py`). The FastAPI service and the edge snapshot both serve all five cities.
+The same UI is mirrored as a static asset on the Cloudflare Worker (`apps/edge/`), where `/api/v1/*` is answered from a precomputed Workers KV snapshot (built by `src/export/snapshot_builder.py`). The FastAPI service and the edge snapshot both serve all seventeen registered metros.
 
 ---
 
@@ -530,9 +536,9 @@ Returns raw spatio-temporal feature attributes, centroid coordinates, and GeoJSO
 
 ## 9. Testing & Quality Assurance
 
-Run the automated test suite with pytest:
+Run the automated test suite with pytest from the API workspace:
 ```bash
-pytest tests/ -v
+cd apps/api && pytest tests/ -v
 ```
 
 The test suite includes **222 automated unit and end-to-end integration tests** across 16 unit suites plus one end-to-end pipeline suite, covering:
@@ -546,9 +552,9 @@ The test suite includes **222 automated unit and end-to-end integration tests** 
 
 The repository also carries a standalone spine-invariant gate used when multiple agents work in parallel (see `docs/adr/0001-agent-interlock.md`):
 ```bash
-pytest -m interlock
+cd apps/api && pytest -m interlock
 ```
-It asserts **closure** (every alias resolves to a registration), **completeness** (registered specs have every field consumers index unguarded; endpoints exist in settings), and **containment** (divisions nest inside metro bboxes, submarkets inside their division) across all five cities — in about two seconds. `python scripts/interlock_gap.py <base>` reports whether a diff range is leaf-shaped before parallel dispatch.
+It asserts **closure** (every alias resolves to a registration), **completeness** (registered specs have every field consumers index unguarded; endpoints exist in settings), and **containment** (divisions nest inside metro bboxes, submarkets inside their division) across all registered metros — in about two seconds. `python scripts/interlock_gap.py <base>` reports whether a diff range is leaf-shaped before parallel dispatch.
 
 ---
 

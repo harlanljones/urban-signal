@@ -10,7 +10,7 @@ short form that agents follow.
 `docs/agents/spine-manifest.txt` lists the **spine**: files more than one
 concurrent stream may need to edit. Everything else is a **leaf**.
 
-For a new city, the leaf is `src/spatial/cities/<city>.py` and its tests —
+For a new city, the leaf is `apps/api/src/spatial/cities/<city>.py` and its tests —
 400 to 900 lines, roughly 88% of the work. The spine edits are small and
 mechanical: an enum member, an alias block, a registry entry, endpoint fields,
 and whatever field-name fallbacks the city's schema needs in the shared
@@ -58,7 +58,7 @@ for alias, cid in ALIASES.items():
 #   every division bbox inside the metro bbox.
 ```
 
-Run the gate — `pytest -m interlock` (`tests/unit/test_interlock_gate.py`,
+Run the gate — `pytest -m interlock` from `apps/api` (`apps/api/tests/unit/test_interlock_gate.py`,
 closure + completeness + containment across every registered city, seconds to
 run) — then the full suite before finishing. A spine file not covered by any
 gate invariant fails the `TestSpineCoverage` check; extend the gate before
@@ -73,7 +73,7 @@ should be merged into one.
 
 **Completeness** is the third class: if you register an entity, either give it
 every field its consumers index without a guard, or route those consumers
-through a guarded accessor. `get_dataset()` in `src/spatial/city_registry.py`
+through a guarded accessor. `get_dataset()` in `apps/api/src/spatial/city_registry.py`
 is the accessor for feeds — use it rather than indexing `.datasets[...]`
 directly, so a city that lacks a feed fails with a readable message.
 

@@ -1,0 +1,13 @@
+{
+  "name": "@urban-signal/site",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Urban Signal marketing and learning site",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "python3 -m http.server 4173 -d .",
+    "lint": "node ../../scripts/verify-site-content.mjs",
+    "typecheck": "node --check src/main.js"
+  }
+}

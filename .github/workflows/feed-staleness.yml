@@ -1,0 +1,27 @@
+name: feed-staleness-monitor
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 7 * * 1" # weekly Monday 07:00 UTC
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    env:
+      WEBHOOK_ALERT_URLS: ${{ secrets.WEBHOOK_ALERT_URLS }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install project
+        run: |
+          uv venv .venv --python 3.12
+          uv pip install -e apps/api
+
+      - name: Probe registered feed freshness
+        run: PYTHONPATH=apps/api .venv/bin/python scripts/feed_staleness_probe.py

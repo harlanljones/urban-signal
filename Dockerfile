@@ -6,18 +6,18 @@
 # ── Stage 1: dependency resolver ─────────────────────────────────────────────
 FROM python:3.12-slim AS builder
 
-WORKDIR /build
+WORKDIR /build/apps/api
 
 # Install uv for fast, reproducible installs
 RUN pip install --no-cache-dir uv==0.4.29
 
 # Copy dependency manifests only — cache this layer aggressively
-COPY pyproject.toml uv.lock ./
+COPY apps/api/pyproject.toml apps/api/uv.lock ./
 
 # Install all dependencies (including optional cpu onnxruntime; omit gpu extra)
 # We use --system so the venv lands in /usr/local and is re-used in the final stage
-RUN uv pip install --system --no-cache -e . 2>/dev/null || \
-    pip install --no-cache-dir -e .
+RUN uv pip install --system --no-cache . 2>/dev/null || \
+    pip install --no-cache-dir .
 
 
 # ── Stage 2: runtime image ───────────────────────────────────────────────────
@@ -31,13 +31,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+ENV PYTHONPATH=/app/apps/api
 
 # Pull installed packages from builder
 COPY --from=builder /usr/local/lib/python3.12 /usr/local/lib/python3.12
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Application source
-COPY src/ ./src/
+COPY apps/api/src/ ./apps/api/src/
 
 # ONNX model artifacts (bind-mounted in compose for easy hot-swap)
 COPY models_storage/ ./models_storage/

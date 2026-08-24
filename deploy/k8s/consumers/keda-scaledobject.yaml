@@ -31,8 +31,11 @@ spec:
     metadata:
       labels:
         app: h3-enrichment-worker
-    spec:
-      containers:
+        spec:
+          env:
+            - name: PYTHONPATH
+              value: /app/apps/api
+          containers:
         - name: worker
           image: ghcr.io/harlan/urban-signal-enrichment-worker:latest
           command: ["python", "-m", "src.consumers.spatial_enrichment_worker"]

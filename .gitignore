@@ -65,6 +65,7 @@ MANIFEST
 *.pem
 *.key
 *.crt
+.linear.toml
 
 # ==============================================================================
 # Databases, Object Storage & Local Data

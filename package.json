@@ -19,5 +19,8 @@
     "typecheck": "turbo run typecheck",
     "deploy": "turbo run deploy",
     "linear": "linear"
+  },
+  "devDependencies": {
+    "turbo": "^2.10.11"
   }
 }

@@ -19,10 +19,10 @@ If any of these files don't exist, **proceed silently**. Don't flag their absenc
 ├── docs/adr/
 │   ├── 0001-....md
 │   └── 0002-....md
-└── src/
+└── apps/api/src/
 ```
 
-If this repo ever splits into multiple bounded contexts, add a `CONTEXT-MAP.md` at the root pointing at one `CONTEXT.md` per context (with `src/<context>/docs/adr/` for context-scoped decisions), and update this file to say so.
+If this repo ever splits into multiple bounded contexts, add a `CONTEXT-MAP.md` at the root pointing at one `CONTEXT.md` per context (with `apps/api/src/<context>/docs/adr/` for context-scoped decisions), and update this file to say so.
 
 ## Use the glossary's vocabulary
 
