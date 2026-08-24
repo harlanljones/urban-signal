@@ -56,6 +56,9 @@ jobs:
           uv venv .venv --python 3.12
           uv pip install -e "apps/api[dev]"
 
+      - name: Generate dashboard static copy
+        run: PYTHONPATH=apps/api .venv/bin/python scripts/export_dashboard.py
+
       - name: Check Python quality
         run: |
           .venv/bin/ruff check scripts/feed_staleness_probe.py apps/api/src/producers/watermarks.py apps/api/tests/unit/test_feed_staleness_probe.py
