@@ -7,8 +7,8 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "dev": "bun run facts:export && node scripts/build.mjs && python3 -m http.server 4173 -d dist",
-    "facts:export": "sh -c 'PY=\"../../apps/api/.venv/bin/python\"; [ -x \"$PY\" ] || PY=python3; \"$PY\" ../../scripts/export_site_facts.py'",
-    "facts:check": "sh -c 'PY=\"../../apps/api/.venv/bin/python\"; [ -x \"$PY\" ] || PY=python3; \"$PY\" ../../scripts/export_site_facts.py --check'",
+    "facts:export": "sh -c 'PY=\"\"; if [ -n \"$VIRTUAL_ENV\" ] && [ -x \"$VIRTUAL_ENV/bin/python\" ]; then PY=\"$VIRTUAL_ENV/bin/python\"; elif [ -x \"../../.venv/bin/python\" ]; then PY=\"../../.venv/bin/python\"; elif [ -x \"../../apps/api/.venv/bin/python\" ]; then PY=\"../../apps/api/.venv/bin/python\"; else PY=python3; fi; PYTHONPATH=../../apps/api \"$PY\" ../../scripts/export_site_facts.py'",
+    "facts:check": "sh -c 'PY=\"\"; if [ -n \"$VIRTUAL_ENV\" ] && [ -x \"$VIRTUAL_ENV/bin/python\" ]; then PY=\"$VIRTUAL_ENV/bin/python\"; elif [ -x \"../../.venv/bin/python\" ]; then PY=\"../../.venv/bin/python\"; elif [ -x \"../../apps/api/.venv/bin/python\" ]; then PY=\"../../apps/api/.venv/bin/python\"; else PY=python3; fi; PYTHONPATH=../../apps/api \"$PY\" ../../scripts/export_site_facts.py --check'",
     "lint": "bun run facts:check && node scripts/build.mjs && node ../../scripts/verify-site-content.mjs && node scripts/verify-agent-surface.mjs && node scripts/verify-multi-page.mjs",
     "typecheck": "node --check src/main.js && node --check scripts/shell.mjs",
     "deploy": "WRANGLER_SEND_METRICS=false wrangler deploy"
