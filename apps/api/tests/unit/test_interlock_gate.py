@@ -301,7 +301,7 @@ class TestDashboardWiring:
     """
 
     DASHBOARD = REPO_ROOT / "apps" / "api" / "src" / "serving" / "dashboard.py"
-    WORKER_STATIC = REPO_ROOT / "apps" / "product" / "public" / "index.html"
+    WORKER_STATIC = REPO_ROOT / "apps" / "dashboard" / "public" / "index.html"
 
     def _dashboard(self) -> str:
         assert self.DASHBOARD.exists(), f"{self.DASHBOARD} missing — the map was deleted?"
@@ -334,15 +334,15 @@ class TestDashboardWiring:
         )
 
     def test_worker_static_copy_carries_every_city(self):
-        if not (REPO_ROOT / "apps" / "product").exists():
-            pytest.skip("apps/product deployment surface removed from the tree — no static copy to keep in sync")
+        if not (REPO_ROOT / "apps" / "dashboard").exists():
+            pytest.skip("apps/dashboard deployment surface removed from the tree — no static copy to keep in sync")
         assert self.WORKER_STATIC.exists(), (
-            f"{self.WORKER_STATIC} missing while the rest of apps/product exists — "
+            f"{self.WORKER_STATIC} missing while the rest of apps/dashboard exists — "
             f"regenerate it from get_dashboard_html()"
         )
         static = self.WORKER_STATIC.read_text()
         stale = [cid.value for cid in REGISTRY if f'"{cid.value}"' not in static]
         assert not stale, (
-            f"apps/product/public/index.html is a stale static copy — missing {stale}. "
+            f"apps/dashboard/public/index.html is a stale static copy — missing {stale}. "
             f"Re-sync it from get_dashboard_html() before closing the wave."
         )

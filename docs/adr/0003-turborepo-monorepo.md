@@ -23,7 +23,7 @@ Adopt **Turborepo** with **bun workspaces**, minimal-move:
 - The Python core stays at the repository root (`src/`, `tests/`, `pyproject.toml`,
   `deploy/` untouched) — every path is a spine file per the interlock manifest,
   so moving it now would force a full-gate refactor for zero product value.
-- `workers/` moves to `apps/product/` (package `@urban-signal/product`); CI
+- `workers/` moves to `apps/dashboard/` (package `@urban-signal/dashboard`); CI
   (`batch-push.yml`) switches from `npm ci` to `bun install --frozen-lockfile`.
 - Shared TypeScript config lives in `packages/typescript-config`.
 - Full Python → `apps/api` migration is deferred (tracked as HAR-41).

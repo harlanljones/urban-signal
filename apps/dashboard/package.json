@@ -2,16 +2,19 @@
   "name": "@urban-signal/dashboard",
   "version": "2.0.0",
   "private": true,
-  "description": "Urban Signal marketing and learning site",
+  "description": "Urban Signal edge worker serving precomputed snapshots from Workers KV",
   "type": "module",
   "scripts": {
-    "build": "node scripts/build.mjs",
-    "dev": "node scripts/build.mjs && python3 -m http.server 4173 -d dist",
-    "lint": "node ../../scripts/verify-site-content.mjs && node scripts/verify-agent-surface.mjs",
-    "typecheck": "node --check src/main.js",
-    "deploy": "WRANGLER_SEND_METRICS=false wrangler deploy"
+    "dev": "WRANGLER_SEND_METRICS=false wrangler dev",
+    "build": "WRANGLER_SEND_METRICS=false WRANGLER_LOG_PATH=.wrangler/wrangler.log wrangler deploy --dry-run --outdir dist",
+    "test": "bun test tests",
+    "deploy": "WRANGLER_SEND_METRICS=false wrangler deploy",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@urban-signal/typescript-config": "workspace:*",
+    "@cloudflare/workers-types": "^5.20260823.0",
+    "typescript": "^5.5.0",
     "wrangler": "^4.125.0"
   }
 }

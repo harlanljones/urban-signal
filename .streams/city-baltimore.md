@@ -4,7 +4,7 @@
 
 - **Stream id:** city-baltimore
 - **Leaf files already present in the shared worktree:** `src/spatial/cities/baltimore.py`, `tests/unit/test_producers_baltimore.py`
-- **Spine files already wired in the shared worktree:** `src/config.py`, `src/spatial/city_registry.py`, `src/spatial/cities/__init__.py`, `src/serving/dashboard.py`, `apps/product/public/index.html`, `README.md`
+- **Spine files already wired in the shared worktree:** `src/config.py`, `src/spatial/city_registry.py`, `src/spatial/cities/__init__.py`, `src/serving/dashboard.py`, `apps/dashboard/public/index.html`, `README.md`
 
 ## Intent
 

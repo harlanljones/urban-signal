@@ -3,7 +3,7 @@
 Scope: resolve all five critique priorities in order, then expose the same product truth to humans and machine readers
 
 - [x] G1: evidence claims resolve to concrete repository-backed sources
-  CHECK: node apps/dashboard/scripts/verify-agent-surface.mjs
+  CHECK: node apps/product/scripts/verify-agent-surface.mjs
   EXPECT: AGENT_SURFACE_OK
   CWD: .
   EVIDENCE: exit=0; shell=/bin/sh; cwd=/home/harlan/dev/urban-signal; path=8ad731cfae8c/31 entries; output=AGENT_SURFACE_OK
@@ -21,13 +21,13 @@ Scope: resolve all five critique priorities in order, then expose the same produ
   EVIDENCE: terminal-browser at 390x844 measured min essential text=12px and min visible interactive target=43.99px (44px CSS floor); no horizontal overflow; desktop/intermediate/mobile visual inspection completed
 
 - [x] G5: machine readers receive product facts, evidence links, and explicit limitations
-  CHECK: node apps/dashboard/scripts/verify-agent-surface.mjs
+  CHECK: node apps/product/scripts/verify-agent-surface.mjs
   EXPECT: AGENT_SURFACE_OK
   CWD: .
   EVIDENCE: exit=0; shell=/bin/sh; cwd=/home/harlan/dev/urban-signal; path=8ad731cfae8c/31 entries; output=AGENT_SURFACE_OK
 
 - [x] G6: the marketing site builds and its JavaScript parses
-  CHECK: bun run --cwd apps/dashboard typecheck && node --check apps/dashboard/src/observatory.js && bun run --cwd apps/dashboard build
+  CHECK: bun run --cwd apps/product typecheck && node --check apps/product/src/observatory.js && bun run --cwd apps/product build
   EXPECT: SITE_BUILD_OK
   CWD: .
   EVIDENCE: exit=0; shell=/bin/sh; cwd=/home/harlan/dev/urban-signal; path=8ad731cfae8c/31 entries; output=$ node --check src/main.js | $ node scripts/build.mjs

@@ -1,21 +1,12 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "urban-signal-dashboard",
-  "main": "src/index.ts",
-  "compatibility_date": "2026-08-01",
+  "name": "urban-signal-product",
+  "compatibility_date": "2026-08-24",
   "send_metrics": false,
   "assets": {
-    "directory": "./public",
-    "binding": "ASSETS",
-    "run_worker_first": ["/api/*"]
+    "directory": "./dist"
   },
-  "kv_namespaces": [
-    {
-      "binding": "SNAPSHOT",
-      "id": "cea91d937ff344bf9ae70f62734f5ae5"
-    }
-  ],
   "observability": {
-    "enabled": true
+    "enabled": false
   }
 }
