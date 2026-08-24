@@ -20,9 +20,18 @@
 | :---: | :---: |
 | ![NYC Dashboard](docs/screenshots/dashboard-nyc.png) | ![Chicago Dashboard](docs/screenshots/dashboard-chicago.png) |
 
-| DC + Montgomery County comparison | Comparison control |
-| :---: | :---: |
-| ![DC and Montgomery County comparison](docs/screenshots/dashboard-dc-montgomery.png) | ![Dashboard comparison menu](docs/screenshots/dashboard-comparison-menu.png) |
+### Comparison mode
+
+The comparison captures are shown at full reading width so the controls and map
+state remain legible in rendered documentation.
+
+**DC + Montgomery County comparison**
+
+![DC and Montgomery County comparison](docs/screenshots/dashboard-dc-montgomery.png)
+
+**Comparison control**
+
+![Dashboard comparison menu](docs/screenshots/dashboard-comparison-menu.png)
 
 The dashboard supports **all seventeen registered metros** — San Francisco Bay Area, New York City, Chicago, Seattle Metro (4 Divisions), Los Angeles Metro (6 Divisions), New Orleans Metro (9 Divisions), Norfolk (5 Divisions), Detroit (6 Divisions), Austin (6 Divisions), Cincinnati (1 Division), Boston (4 Divisions), Baltimore (1 Division), Montgomery County (1 Division), Baton Rouge (1 Division), Denver (1 Division), Philadelphia (8 Divisions), and Washington DC (8 Divisions) — with per-division camera presets, map-click → division resolution, and geolocation-based default-city detection. The **+ Compare** control can layer multiple regions in one viewport; the primary region remains the inspector context while the grid and catalyst feed merge the selected cities.
 

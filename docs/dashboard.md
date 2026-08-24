@@ -42,6 +42,12 @@ comparison control:
 - [DC + Montgomery County map](screenshots/dashboard-dc-montgomery.png)
 - [Comparison menu state](screenshots/dashboard-comparison-menu.png)
 
+The current DC comparison captures intentionally preserve the dashboard's empty
+map state when no grid snapshot is available for the selected regions; they should
+not be read as evidence of rendered DC geometry. Use the NYC, Chicago, or San
+Francisco captures for a populated-map example until a fresh DC snapshot is
+available.
+
 The live API may have uneven snapshot coverage by city. A comparison remains valid
 when a selected region has no current snapshot: the UI preserves the selected region
 state and renders available grid/catalyst data without presenting another city's data
