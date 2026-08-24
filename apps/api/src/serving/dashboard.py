@@ -1924,6 +1924,10 @@ def get_dashboard_html() -> str:
     }
 
     async function loadSubmarkets() {
+      // Never let a failed city request render the previously selected city's data.
+      // The edge API can reject a stale/missing snapshot; retaining SUBMARKETS here
+      // makes the grid and catalyst fallbacks silently show the wrong city.
+      SUBMARKETS = {};
       try {
         const resp = await fetch(`/api/v1/submarkets?city_id=${currentCity}`);
         if (resp.ok) {

@@ -31,6 +31,16 @@ const CITY_ALIASES: Record<string, string> = {
   norfolk: "norfolk",
   detroit: "detroit",
   austin: "austin",
+  cincinnati: "cincinnati",
+  boston: "boston",
+  baltimore: "baltimore",
+  montgomery: "montgomery",
+  baton_rouge: "baton_rouge",
+  denver: "denver",
+  philadelphia: "philadelphia",
+  philly: "philadelphia",
+  washington_dc: "washington_dc",
+  dc: "washington_dc",
 };
 
 let manifestCache: { value: Manifest | null; expires: number } = {
