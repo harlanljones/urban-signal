@@ -1,0 +1,9 @@
+{
+  "name": "@urban-signal/webhook-receiver",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy": "wrangler deploy --config wrangler.jsonc",
+    "dev": "wrangler dev --config wrangler.jsonc"
+  }
+}
