@@ -28,6 +28,30 @@ from src.spatial.cities.washington_dc import (
     DC_METRO_BBOX,
     DC_SUBMARKETS,
 )
+from src.spatial.cities.prince_georges import (
+    PRINCE_GEORGES_DIVISION_BBOXES,
+    PRINCE_GEORGES_DIVISIONS,
+    PRINCE_GEORGES_METRO_BBOX,
+    PRINCE_GEORGES_SUBMARKETS,
+)
+from src.spatial.cities.columbus import (
+    COLUMBUS_DIVISION_BBOXES,
+    COLUMBUS_DIVISIONS,
+    COLUMBUS_METRO_BBOX,
+    COLUMBUS_SUBMARKETS,
+)
+from src.spatial.cities.nashville import (
+    NASHVILLE_DIVISION_BBOXES,
+    NASHVILLE_DIVISIONS,
+    NASHVILLE_METRO_BBOX,
+    NASHVILLE_SUBMARKETS,
+)
+from src.spatial.cities.kansas_city import (
+    KANSAS_CITY_DIVISION_BBOXES,
+    KANSAS_CITY_DIVISIONS,
+    KANSAS_CITY_METRO_BBOX,
+    KANSAS_CITY_SUBMARKETS,
+)
 from src.spatial.cities.austin import (
     AUSTIN_DIVISION_BBOXES,
     AUSTIN_DIVISIONS,
@@ -138,6 +162,10 @@ class CityId(str, Enum):
     DENVER = "denver"
     PHILADELPHIA = "philadelphia"
     WASHINGTON_DC = "washington_dc"
+    PRINCE_GEORGES = "prince_georges"
+    COLUMBUS = "columbus"
+    NASHVILLE = "nashville"
+    KANSAS_CITY = "kansas_city"
 
 
 class FeedType(str, Enum):
@@ -327,6 +355,27 @@ ALIASES: Dict[str, CityId] = {
     "dc": CityId.WASHINGTON_DC,
     "district_of_columbia": CityId.WASHINGTON_DC,
     "district of columbia": CityId.WASHINGTON_DC,
+
+    # Prince George's County
+    "prince_georges": CityId.PRINCE_GEORGES,
+    "prince georges": CityId.PRINCE_GEORGES,
+    "prince_georges_county": CityId.PRINCE_GEORGES,
+    "prince george's county": CityId.PRINCE_GEORGES,
+    "pgco": CityId.PRINCE_GEORGES,
+    "pgcounty": CityId.PRINCE_GEORGES,
+
+    # Columbus
+    "columbus": CityId.COLUMBUS,
+    "columbus_oh": CityId.COLUMBUS,
+
+    # Nashville
+    "nashville": CityId.NASHVILLE,
+    "nashville_tn": CityId.NASHVILLE,
+
+    # Kansas City
+    "kansas_city": CityId.KANSAS_CITY,
+    "kc_mo": CityId.KANSAS_CITY,
+    "kcmo": CityId.KANSAS_CITY,
 }
 
 
@@ -358,6 +407,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
+                extra={"expected_cadence_days": 7},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.socrata_311_endpoint,
@@ -367,6 +417,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
+                extra={"expected_cadence_days": 7},
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.socrata_sla_endpoint,
@@ -376,6 +427,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
+                extra={"expected_cadence_days": 7},
             ),
             FeedType.DEEDS: DatasetSpec(
                 endpoint=settings.socrata_deeds_endpoint,
@@ -385,6 +437,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
+                extra={"expected_cadence_days": 7},
             ),
         },
     ),
@@ -407,6 +460,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
+                extra={"expected_cadence_days": 7},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.socrata_chicago_311_endpoint,
@@ -416,6 +470,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
+                extra={"expected_cadence_days": 7},
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.socrata_chicago_licenses_endpoint,
@@ -425,6 +480,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
+                extra={"expected_cadence_days": 7},
             ),
             FeedType.DEEDS: DatasetSpec(
                 endpoint=settings.socrata_chicago_deeds_endpoint,
@@ -434,6 +490,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
+                extra={"expected_cadence_days": 7},
             ),
         },
     ),
@@ -456,6 +513,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
+                extra={"expected_cadence_days": 7},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.socrata_sf_311_endpoint,
@@ -465,6 +523,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
+                extra={"expected_cadence_days": 7},
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.socrata_sf_licenses_endpoint,
@@ -474,15 +533,17 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
+                extra={"expected_cadence_days": 7},
             ),
             FeedType.DEEDS: DatasetSpec(
                 endpoint=settings.socrata_sf_deeds_endpoint,
                 platform="socrata",
-                watermark_col="closed_roll_year",
+                watermark_col="data_loaded_at",
                 id_keys=["parcel_number", "block_and_lot_number", "id", "doc_id"],
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
+                extra={"expected_cadence_days": 7},
             ),
         },
     ),
@@ -505,6 +566,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
+                extra={"expected_cadence_days": 7},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.socrata_seattle_311_endpoint,
@@ -514,6 +576,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
+                extra={"expected_cadence_days": 7},
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.socrata_seattle_licenses_endpoint,
@@ -523,11 +586,25 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
+                extra={"expected_cadence_days": 7},
             ),
             # King County Assessor parcel sales stand in for recorded deeds. This
             # is an ArcGIS FeatureServer, not Socrata: it pages by OBJECTID via
             # resultOffset rather than by Socrata's $offset, so it needs an
             # ArcGIS-aware PaginatingClient.
+            #
+            # KNOWN-DEAD PUBLICATION (verified 2026-08-24, kept registered as
+            # the honest staleness signal): both public copies — this service
+            # and its on-prem twin gismaps.kingcounty.gov Property/
+            # KingCo_PropertyInfo MapServer/3 — froze at SaleDate 2025-11-20
+            # (lastEditDate 2025-11-28). The live replacement target is the
+            # Assessor's weekly rpsale_extr table (AGO item 96ff1f46173541b9
+            # a021a5fef1fdb8a9), which is access-restricted (403 GWM_0003,
+            # absent from the org's anonymous directory) and carries
+            # obtainer-only terms — see
+            # docs/research/seattle-deeds-replacement.md for the full audit
+            # and the two unblock paths (KC public sharing vs bulk-file
+            # producer). Do not repoint this spec at either frozen copy.
             FeedType.DEEDS: DatasetSpec(
                 endpoint=settings.arcgis_kc_sales_url,
                 platform="arcgis",
@@ -536,7 +613,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
-                extra={"oid_field": "OBJECTID", "max_record_count": 1000},
+                extra={"expected_cadence_days": 7, "oid_field": "OBJECTID", "max_record_count": 1000},
             ),
         },
     ),
@@ -568,6 +645,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
+                extra={"expected_cadence_days": 7},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.socrata_la_311_endpoint,
@@ -584,6 +662,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 # rather than grown into the shared chains — see
                 # src/producers/field_maps.py.
                 extra={
+                    "expected_cadence_days": 7,
                     "field_map": {
                         "incident_id": ["casenumber", "srnumber"],
                         "latitude": ["geolocation__latitude__s"],
@@ -604,6 +683,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
+                extra={"expected_cadence_days": 7},
             ),
         },
     ),
@@ -630,6 +710,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 # the feed but is a parcel number — deliberately kept out of
                 # the job-id chain. See src/producers/field_maps.py.
                 extra={
+                    "expected_cadence_days": 7,
                     "field_map": {
                         "job_id": ["numstring"],
                         "latitude": ["location_1.latitude"],
@@ -652,6 +733,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=180.0,
                 producer_key="311",
                 extra={
+                    "expected_cadence_days": 7,
                     "field_map": {
                         "incident_id": ["service_request", "rowid"],
                         "created_date": ["date_created"],
@@ -674,6 +756,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 # drops them) and some businessstartdate values are future-
                 # dated (max seen 2027-02-27) — tolerated, not treated as now.
                 extra={
+                    "expected_cadence_days": 7,
                     "field_map": {
                         "license_id": ["businesslicensenumber"],
                         "effective_date": ["businessstartdate"],
@@ -697,6 +780,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=600.0,
                 producer_key="deeds",
                 extra={
+                    "expected_cadence_days": 7,
                     "field_map": {
                         "doc_id": ["identifier"],
                         "bbl": ["geopin"],
@@ -736,6 +820,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 # Scheduled (future-dated) filings appear on this feed (max
                 # seen 2027-01-27) — tolerated as watermark skew.
                 extra={
+                    "expected_cadence_days": 7,
                     "field_map": {
                         "cost": ["project_cost"],
                         "filing_date": ["application_date"],
@@ -759,10 +844,46 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=600.0,
                 producer_key="deeds",
                 extra={
+                    "expected_cadence_days": 7,
                     "field_map": {
                         "doc_id": ["document_number"],
                         "bbl": ["gpin", "parcel_id"],
                     }
+                },
+            ),
+            # MyNorfolk 311 locates cases with an address STRING only — the
+            # original registration deferred these two feeds until an
+            # address-geocoding capability existed (now ADR 0004). Rows carry
+            # no coordinates on the wire from Socrata; producers geocode at
+            # parse time because the declaration below flips the coordinate
+            # requirement, keeping Avro doubles real.
+            #
+            # The SLA feed (dpi6-sct5) was evaluated under Wave G2 and is
+            # deliberately NOT registered: ~34% of newest rows carry the
+            # literal placeholder 'NO NORFOLK ADDRESS REQUIRED' (special-event
+            # licenses), so the feed lands at ~65% resolved coordinates —
+            # far above the G8' 5% null-H3 ceiling. Revisit only alongside a
+            # scope filter that excludes non-addressable license classes.
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.socrata_norfolk_311_endpoint,
+                platform="socrata",
+                watermark_col="creation_date",
+                id_keys=["service_request_number", "id"],
+                topic=settings.topic_311,
+                interval_seconds=600.0,
+                producer_key="311",
+                extra={
+                    "expected_cadence_days": 7,
+                    "needs_geocode": True,
+                    "geocode_context": "Norfolk, VA",
+                    "scope": "MyNorfolk 311 cases; located by address string",
+                    "field_map": {
+                        "incident_id": ["service_request_number"],
+                        "complaint_type": ["service_request_type", "service_request_category"],
+                        "created_date": ["creation_date"],
+                        "status": ["status"],
+                        "incident_address": ["location"],
+                    },
                 },
             ),
         },
@@ -794,6 +915,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=300.0,
                 producer_key="permits",
                 extra={
+                    "expected_cadence_days": 7,
                     "oid_field": "ObjectId",
                     "max_record_count": 1000,
                     "field_map": {
@@ -811,6 +933,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=180.0,
                 producer_key="311",
                 extra={
+                    "expected_cadence_days": 7,
                     "oid_field": "ObjectId",
                     "max_record_count": 1000,
                     "field_map": {
@@ -832,6 +955,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=600.0,
                 producer_key="sla",
                 extra={
+                    "expected_cadence_days": 7,
                     "oid_field": "ObjectId",
                     "max_record_count": 1000,
                     # The shared license_type chain has no bare 'license_type'
@@ -852,6 +976,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=600.0,
                 producer_key="deeds",
                 extra={
+                    "expected_cadence_days": 7,
                     "oid_field": "ObjectId",
                     "max_record_count": 1000,
                     "field_map": {
@@ -894,6 +1019,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 # work_type before permit_type so NB/Addition signal survives
                 # generic "Building Permit" values (mirror of Norfolk).
                 extra={
+                    "expected_cadence_days": 7,
                     "field_map": {
                         "cost": ["total_job_valuation"],
                         "filing_date": ["application_date"],
@@ -916,6 +1042,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 # passes city_id explicitly, and the tightened chicago sniff
                 # requires corroborating markers (see complaints_311_producer).
                 extra={
+                    "expected_cadence_days": 7,
                     "field_map": {
                         "latitude": ["sr_location_lat"],
                         "longitude": ["sr_location_long"],
@@ -954,6 +1081,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=300.0,
                 producer_key="permits",
                 extra={
+                    "expected_cadence_days": 7,
                     "field_map": {
                         "job_id": ["permit_number", "permitnumber", "pin"],
                         "issuance_date": ["issueddate"],
@@ -972,6 +1100,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=180.0,
                 producer_key="311",
                 extra={
+                    "expected_cadence_days": 7,
                     "field_map": {
                         "incident_id": ["sr_number"],
                         "created_date": ["date_time_received"],
@@ -989,6 +1118,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=600.0,
                 producer_key="sla",
                 extra={
+                    "expected_cadence_days": 7,
                     "field_map": {
                         "license_id": ["number_key", "uniqueid"],
                         "effective_date": ["entered_date"],
@@ -1010,6 +1140,13 @@ REGISTRY: Dict[CityId, CityRegistration] = {
         submarkets=BOSTON_SUBMARKETS,
         divisions=BOSTON_DIVISIONS,
         job_suffix="boston",
+        # No sales/deeds dataset exists on the Boston portal (research:
+        # non-socrata-platforms.md, Boston section — "Deeds/sales: none
+        # found"). The Licensing Board feed (04dc653b) is deliberately
+        # excluded: its only coordinate columns, gpsx/gpsy, are Massachusetts
+        # State Plane meters (EPSG:26986), not WGS84 degrees, so ~99.6% of
+        # rows fail spatial parsing and it fails G5 by construction. CRS
+        # transformation is deferred to the geocoding wave (HJ-113).
         datasets={
             FeedType.PERMITS: DatasetSpec(
                 endpoint=settings.ckan_boston_permits_endpoint,
@@ -1020,6 +1157,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=300.0,
                 producer_key="permits",
                 extra={
+                    "expected_cadence_days": 7,
                     "field_map": {
                         "job_id": ["permitnumber"],
                         "issuance_date": ["issued_date"],
@@ -1043,6 +1181,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=180.0,
                 producer_key="311",
                 extra={
+                    "expected_cadence_days": 7,
                     "field_map": {
                         "incident_id": ["case_enquiry_id"],
                         "latitude": ["latitude"],
@@ -1062,28 +1201,6 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                     "rollover": "manual-verify",
                 },
             ),
-            FeedType.SLA: DatasetSpec(
-                endpoint=settings.ckan_boston_licenses_endpoint,
-                platform="ckan",
-                watermark_col="issued",
-                id_keys=["license_num", "_id"],
-                topic=settings.topic_sla,
-                interval_seconds=600.0,
-                producer_key="sla",
-                extra={
-                    "field_map": {
-                        "license_id": ["license_num"],
-                        "latitude": ["gpsy"],
-                        "longitude": ["gpsx"],
-                        "effective_date": ["issued"],
-                        "expiration_date": ["expires"],
-                        "license_type": ["license_type"],
-                        "status": ["status"],
-                        "address_street": ["address"],
-                        "zipcode": ["zip"],
-                    }
-                },
-            ),
         },
     ),
     CityId.MONTGOMERY: CityRegistration(
@@ -1099,6 +1216,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
         # MC311 (xtyh-brr2) is deliberately excluded: it has only zip/city/
         # district fields and no street or coordinates, so it fails G5 by
         # construction. Deeds/sales were not found in the county portal.
+        # Permits publishes a 4.97% geocode gap (9,244 of 186,140 rows lack
+        # location coordinates; probed 2026-08-24); G5 is adjudicated against
+        # that published gap (newest-500 drop 4.8%).
         datasets={
             FeedType.PERMITS: DatasetSpec(
                 endpoint=settings.socrata_montgomery_permits_endpoint,
@@ -1109,6 +1229,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=300.0,
                 producer_key="permits",
                 extra={
+                    "expected_cadence_days": 7,
                     "field_map": {
                         "job_id": ["permitno"],
                         "issuance_date": ["issueddate"],
@@ -1136,6 +1257,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=900.0,
                 producer_key="sla",
                 extra={
+                    "expected_cadence_days": 7,
                     "ingestion_mode": "snapshot",
                     "scope": "ABS liquor licensees only",
                     "field_map": {
@@ -1175,6 +1297,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=300.0,
                 producer_key="permits",
                 extra={
+                    "expected_cadence_days": 7,
                     "field_map": {
                         "job_id": ["permitnumber", "permitid"],
                         "issuance_date": ["issueddate"],
@@ -1196,6 +1319,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=180.0,
                 producer_key="311",
                 extra={
+                    "expected_cadence_days": 7,
                     "field_map": {
                         "incident_id": ["id"],
                         "latitude": ["latitude"],
@@ -1217,6 +1341,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=600.0,
                 producer_key="sla",
                 extra={
+                    "expected_cadence_days": 7,
                     "ingestion_mode": "snapshot",
                     "field_map": {
                         "license_id": ["taccount"],
@@ -1253,6 +1378,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=300.0,
                 producer_key="permits",
                 extra={
+                    "expected_cadence_days": 7,
                     "oid_field": "OBJECTID",
                     "max_record_count": 2000,
                     "companion_endpoints": {
@@ -1282,6 +1408,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=180.0,
                 producer_key="311",
                 extra={
+                    "expected_cadence_days": 7,
                     "oid_field": "OBJECTID",
                     "max_record_count": 2000,
                     "field_map": {
@@ -1313,6 +1440,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
         # Baltimore's liquor table is intentionally notifications-grade:
         # it is a narrow license inventory rather than a complete hospitality
         # activity feed. No transaction/deeds feed is registered.
+        # 311 publishes a 25.07% geocode gap (585,130 of 780,954 rows carry
+        # coordinates; probed 2026-08-24). G5 is adjudicated against that
+        # published gap: newest-500 drop 35%, mature-window drop 22.6% — the
+        # live newest window skews to freshly created, still-ungeocoded
+        # requests. Address-only rows remain dropped until the geocoding wave.
         datasets={
             FeedType.PERMITS: DatasetSpec(
                 endpoint=settings.arcgis_baltimore_permits_url,
@@ -1323,6 +1455,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=300.0,
                 producer_key="permits",
                 extra={
+                    "expected_cadence_days": 7,
                     "oid_field": "OBJECTID",
                     "max_record_count": 1000,
                     "field_map": {
@@ -1345,6 +1478,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=180.0,
                 producer_key="311",
                 extra={
+                    "expected_cadence_days": 7,
                     "oid_field": "RowID",
                     "max_record_count": 2000,
                     "field_map": {
@@ -1375,6 +1509,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=600.0,
                 producer_key="sla",
                 extra={
+                    "expected_cadence_days": 7,
                     "oid_field": "ESRI_OID",
                     "max_record_count": 2000,
                     "field_map": {
@@ -1418,6 +1553,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=300.0,
                 producer_key="permits",
                 extra={
+                    "expected_cadence_days": 7,
                     "id_col": "cartodb_id",
                     "order_by": "permitissuedate",
                     "select": "*, ST_Y(the_geom) AS latitude, ST_X(the_geom) AS longitude",
@@ -1438,6 +1574,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=180.0,
                 producer_key="311",
                 extra={
+                    "expected_cadence_days": 7,
                     "id_col": "cartodb_id",
                     "order_by": "requested_datetime",
                     "field_map": {
@@ -1456,6 +1593,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=600.0,
                 producer_key="sla",
                 extra={
+                    "expected_cadence_days": 7,
                     "id_col": "cartodb_id",
                     "order_by": "mostrecentissuedate",
                     "select": "*, ST_Y(the_geom) AS latitude, ST_X(the_geom) AS longitude",
@@ -1471,19 +1609,23 @@ REGISTRY: Dict[CityId, CityRegistration] = {
             # Real Estate Transfer Tax summary includes mortgages and
             # satisfactions: NULL consideration parses to amount 0.0 by
             # design, and recorded_date maps to recording_date because
-            # document_date is frequently NULL/sentinel. See
+            # document_date is frequently NULL/sentinel (years 9798, 2066
+            # mortgage-assignment loan terms).  Watermark and keyset order
+            # sit on recording_date for the same reason — see
+            # docs/research/deeds-watermark-audit.md and
             # docs/research/non-socrata-platforms.md §Philadelphia.
             FeedType.DEEDS: DatasetSpec(
                 endpoint=settings.carto_phl_deeds_endpoint,
                 platform="carto",
-                watermark_col="document_date",
+                watermark_col="recording_date",
                 id_keys=["document_id", "cartodb_id", "id"],
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
                 extra={
+                    "expected_cadence_days": 7,
                     "id_col": "cartodb_id",
-                    "order_by": "document_date",
+                    "order_by": "recording_date",
                     "select": "*, ST_Y(the_geom) AS latitude, ST_X(the_geom) AS longitude",
                     "field_map": {
                         "recorded_date": ["recording_date"],
@@ -1524,6 +1666,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=300.0,
                 producer_key="permits",
                 extra={
+                    "expected_cadence_days": 7,
                     "oid_field": "OBJECTID",
                     "max_record_count": 2000,
                     "endpoint_by_year": {
@@ -1553,6 +1696,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=180.0,
                 producer_key="311",
                 extra={
+                    "expected_cadence_days": 7,
                     "oid_field": "OBJECTID",
                     "max_record_count": 1000,
                     "endpoint_by_year": {
@@ -1585,15 +1729,30 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=600.0,
                 producer_key="sla",
                 extra={
+                    "expected_cadence_days": 7,
                     "oid_field": "OBJECTID",
                     "max_record_count": 2000,
-                    "non_spatial": True,
+                    # US-74: premises-string feed (ADR 0004). PREMISEADDRESS
+                    # geocodes at parse time so Avro doubles stay real; the
+                    # layer's own LATITUDE/LONGITUDE are null or 39/-77
+                    # sentinels and stay unmapped, and BILLINGADDRESS is
+                    # mailing-only (never the premises) so it never maps.
+                    # ~24% of premises sit out-of-state — true-site semantics
+                    # are kept wherever they are.
+                    "needs_geocode": True,
+                    "geocode_context": "Washington, DC",
+                    # The spatial product registers DC premises only: ~24% of
+                    # watermark-window rows are out-of-state premises whose
+                    # addresses would neither geocode against DC context nor
+                    # belong in DC cells.
+                    "where": "PREMISEINDC = 'Yes'",
                     "field_map": {
                         "license_id": ["CUSTOMERNUMBER"],
                         "license_type": ["LICENSETYPE"],
                         "effective_date": ["LICENSESTARTDATE"],
                         "expiration_date": ["LICENSEENDDATE"],
                         "borough": ["WARD"],
+                        "address_street": ["PREMISEADDRESS"],
                     },
                 },
             ),
@@ -1606,6 +1765,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=600.0,
                 producer_key="deeds",
                 extra={
+                    "expected_cadence_days": 7,
                     "oid_field": "OBJECTID",
                     "max_record_count": 2000,
                     "non_spatial": True,
@@ -1615,6 +1775,196 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                         "document_amount": ["SALE_PRICE"],
                         "recorded_date": ["SALE_DATE"],
                         "doc_type": ["QUALIFIED"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.PRINCE_GEORGES: CityRegistration(
+        city_id=CityId.PRINCE_GEORGES,
+        name="Prince George's County",
+        state="MD",
+        center={"lat": 38.72, "lng": -76.75},
+        metro_bbox=PRINCE_GEORGES_METRO_BBOX,
+        division_bboxes=PRINCE_GEORGES_DIVISION_BBOXES,
+        submarkets=PRINCE_GEORGES_SUBMARKETS,
+        divisions=PRINCE_GEORGES_DIVISIONS,
+        job_suffix="pgmd",
+        # National Capital Region cluster with DC and Montgomery. 311
+        # publishes in monthly batches (newest row 38d old at the 2026-07-17
+        # survey while the catalog read fresh), so it carries a G11 cadence
+        # exception instead of paging forever.
+        #
+        # The qzrv-2tnv parcel table ("Property", 353k rows) is deliberately
+        # NOT registered yet: it is one row per tax account (a snapshot
+        # candidate), but DeedsACRISProducer.parse_socrata_row extracts
+        # coordinates only from POINT geometries and crashes with
+        # "list index out of range" on the table's MultiPolygon parcel
+        # shapes — every row would parse to None (verified live 2026-08-24).
+        # Registering it now would page G5 forever; harden the geometry
+        # extraction (centroid or ring-walk) first, then register in D4
+        # snapshot mode with field_map doc_id=account,
+        # document_amount=sales_price, recorded_date=transfer_date.
+        datasets={
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.socrata_prince_georges_311_endpoint,
+                platform="socrata",
+                watermark_col="date_request_opened",
+                id_keys=["service_request", "id"],
+                topic=settings.topic_311,
+                interval_seconds=600.0,
+                producer_key="311",
+                extra={
+                    "expected_cadence_days": 30,
+                    "scope": "CountyRun 311 service requests (monthly batch publishing)",
+                    "field_map": {
+                        "incident_id": ["service_request"],
+                        "complaint_type": ["request_name"],
+                        "created_date": ["date_request_opened"],
+                        "status": ["request_status"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.COLUMBUS: CityRegistration(
+        city_id=CityId.COLUMBUS,
+        name="Columbus",
+        state="OH",
+        center={"lat": 39.9612, "lng": -83.0007},
+        metro_bbox=COLUMBUS_METRO_BBOX,
+        division_bboxes=COLUMBUS_DIVISION_BBOXES,
+        submarkets=COLUMBUS_SUBMARKETS,
+        divisions=COLUMBUS_DIVISIONS,
+        job_suffix="cmoh",
+        # Accela-derived uppercase schema. B1_ALT_ID identifies the permit;
+        # OBJECTID stays out of the id chain because it is an edit counter,
+        # not a business key. G3_VALUE_TTL = 0 is a legitimate zero-cost
+        # permit, not a parse failure (~63% of newest rows).
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_columbus_permits_url,
+                platform="arcgis",
+                watermark_col="ISSUED_DT",
+                id_keys=["B1_ALT_ID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "field_map": {
+                        "job_id": ["B1_ALT_ID"],
+                        "issuance_date": ["ISSUED_DT"],
+                        "cost": ["G3_VALUE_TTL"],
+                        "address_street": ["SITE_ADDRESS"],
+                        "zipcode": ["B1_SITUS_ZIP"],
+                        "status": ["PERMIT_STATUS"],
+                        "job_type": ["B1_PER_TYPE"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.NASHVILLE: CityRegistration(
+        city_id=CityId.NASHVILLE,
+        name="Nashville / Davidson County",
+        state="TN",
+        center={"lat": 36.1627, "lng": -86.7818},
+        metro_bbox=NASHVILLE_METRO_BBOX,
+        division_bboxes=NASHVILLE_DIVISION_BBOXES,
+        submarkets=NASHVILLE_SUBMARKETS,
+        divisions=NASHVILLE_DIVISIONS,
+        job_suffix="bna",
+        # Mixed-case Lat/Lon attributes ride no fallback chain, so the field
+        # map carries them; the two-date model keeps Date_Entered (application)
+        # distinct from Date_Issued. Residential STR permits register as the
+        # SLA-class signal (investor-buyout pressure), verified at 100% parse.
+        # hubNashville 311 stays excluded per HJ-119 -- note the Current_Year
+        # view began carrying 2026 rows after the survey; re-adjudicate before
+        # ever adding it.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_nashville_permits_url,
+                platform="arcgis",
+                watermark_col="Date_Issued",
+                id_keys=["Permit__", "ObjectId"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "ObjectId",
+                    "max_record_count": 1000,
+                    "field_map": {
+                        "job_id": ["Permit__"],
+                        "issuance_date": ["Date_Issued"],
+                        "filing_date": ["Date_Entered"],
+                        "cost": ["Const_Cost"],
+                        "latitude": ["Lat"],
+                        "longitude": ["Lon"],
+                    },
+                },
+            ),
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.arcgis_nashville_str_url,
+                platform="arcgis",
+                watermark_col="Date_Issued",
+                id_keys=["Permit__", "ObjectId"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                extra={
+                    "expected_cadence_days": 14,
+                    "oid_field": "ObjectId",
+                    "max_record_count": 1000,
+                    "scope": "Residential Short Term Rental permits (STR investor-pressure signal)",
+                    "field_map": {
+                        "license_id": ["Permit__"],
+                        "effective_date": ["Date_Issued"],
+                        "expiration_date": ["Expiration_Date"],
+                        "license_type": ["Permit_Subtype_Description", "Permit_Type"],
+                        "status": ["Permit_Status"],
+                        "latitude": ["Lat"],
+                        "longitude": ["Lon"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.KANSAS_CITY: CityRegistration(
+        city_id=CityId.KANSAS_CITY,
+        name="Kansas City",
+        state="MO",
+        center={"lat": 39.10, "lng": -94.58},
+        metro_bbox=KANSAS_CITY_METRO_BBOX,
+        division_bboxes=KANSAS_CITY_DIVISION_BBOXES,
+        submarkets=KANSAS_CITY_SUBMARKETS,
+        divisions=KANSAS_CITY_DIVISIONS,
+        job_suffix="kcmo",
+        # Corrects the 2026-08-23 rejection: the feed was live under a name
+        # that survey query missed. Publishes intraday (14/14 consecutive days
+        # at the claim-time probe), so the standard G11 window applies. KC
+        # permits survive only as dead annual archives and SLA pnm4-68wg has
+        # no date column at all -- both stay unregistered.
+        datasets={
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.socrata_kansas_city_311_endpoint,
+                platform="socrata",
+                watermark_col="open_date_time",
+                id_keys=["reported_issue"],
+                topic=settings.topic_311,
+                interval_seconds=600.0,
+                producer_key="311",
+                extra={
+                    "expected_cadence_days": 7,
+                    "scope": "KCMO 311 Call Center Reported Issues (intraday publishing)",
+                    "field_map": {
+                        "incident_id": ["reported_issue"],
+                        "complaint_type": ["issue_type"],
+                        "created_date": ["open_date_time"],
+                        "status": ["current_status"],
                     },
                 },
             ),

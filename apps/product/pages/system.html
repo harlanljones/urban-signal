@@ -1,0 +1,129 @@
+    <h1 class="sr-only">System: from a city's noise to a useful shape</h1>
+    <section id="how-it-works" class="section-wrap section-block" aria-labelledby="system-title">
+      <div class="section-heading">
+        <h2 id="system-title">From a city’s noise<br>to a <em>useful shape.</em></h2>
+        <p>Every layer has a job. Select a stage for the short version — or scroll for the full contracts, failure modes, and source paths.</p>
+      </div>
+      <p class="pipeline-cue" aria-hidden="true">Swipe through five stages <span>→</span></p>
+      <div class="pipeline" role="list" aria-label="Urban Signal processing pipeline">
+        <button class="pipeline-step active" data-step="ingest" role="listitem" aria-pressed="true"><span class="step-index">01</span><svg class="step-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3v26M3 16h26M7 7l18 18M25 7 7 25"/></svg><strong>Ingest</strong><small>Municipal feeds</small></button><span class="pipeline-arrow" aria-hidden="true"></span>
+        <button class="pipeline-step" data-step="normalize" role="listitem" aria-pressed="false"><span class="step-index">02</span><svg class="step-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M6 9h20M6 16h20M6 23h20M10 6v6M22 13v6M14 20v6"/></svg><strong>Normalize</strong><small>Shared contracts</small></button><span class="pipeline-arrow" aria-hidden="true"></span>
+        <button class="pipeline-step" data-step="spatial" role="listitem" aria-pressed="false"><span class="step-index">03</span><svg class="step-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="m16 3 11 6v14l-11 6-11-6V9l11-6Z"/><path d="m16 10 5 3v6l-5 3-5-3v-6l5-3Z"/></svg><strong>Spatialize</strong><small>H3 context</small></button><span class="pipeline-arrow" aria-hidden="true"></span>
+        <button class="pipeline-step" data-step="features" role="listitem" aria-pressed="false"><span class="step-index">04</span><svg class="step-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 23c5-15 8 8 13-6s8-3 11-8"/></svg><strong>Features</strong><small>Momentum</small></button><span class="pipeline-arrow" aria-hidden="true"></span>
+        <button class="pipeline-step" data-step="serve" role="listitem" aria-pressed="false"><span class="step-index">05</span><svg class="step-icon" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="11"/><path d="M16 9v7l5 4"/></svg><strong>Serve</strong><small>Actionable view</small></button>
+      </div>
+      <div class="pipeline-detail" aria-live="polite">
+        <div><span class="mono detail-kicker">STAGE <span id="detail-index">01</span> OF 05</span><h3 id="detail-title">Start with the records nobody designed for you.</h3><p id="detail-copy">Socrata, ArcGIS, Carto, and CKAN endpoints arrive with different names, shapes, watermarks, and gaps. City-specific producers keep those facts intact while making the event contract consistent.</p><a id="detail-source" class="source-link" href="https://github.com/harlanljones/urban-signal/tree/main/apps/api/src/producers" target="_blank" rel="noreferrer">Inspect this stage in source</a></div>
+        <div class="detail-code" id="detail-code"><span class="code-comment">// illustrative record shape</span><code>{ <b>"source"</b>: "socrata",<br>&nbsp;&nbsp;<b>"type"</b>: "permit",<br>&nbsp;&nbsp;<b>"city_id"</b>: "sf" }</code></div>
+      </div>
+    </section>
+
+    <section id="stage-ingest" class="section-wrap stage-block" aria-labelledby="stage-ingest-title">
+      <div class="stage-grid">
+        <div class="stage-copy">
+          <span class="mono stage-kicker">STAGE 01 · <a class="stage-source" href="https://github.com/harlanljones/urban-signal/tree/main/apps/api/src/producers" target="_blank" rel="noreferrer">apps/api/src/producers</a></span>
+          <h3 id="stage-ingest-title">Start with the records nobody designed for you.</h3>
+          <p><strong>What enters.</strong> Socrata, ArcGIS, Carto, and CKAN endpoints — each city publishes on its own platform, with its own column names, watermark behavior, pagination style, and update rhythm.</p>
+          <p><strong>What it produces.</strong> A consistent event envelope — <code>{"source", "type", "city_id"}</code> — that preserves which platform a record came from while making downstream stages city-agnostic.</p>
+          <p><strong>Why it holds up.</strong></p>
+          <ul class="stage-modes">
+            <li>City-specific producers keep source quirks intact instead of flattening them away.</li>
+            <li>Watermark columns differ per dataset; each registration declares its own, with id-key fallback chains when a column renames (<code>job__ → job_number → id</code>).</li>
+            <li>Text watermarks are normalized with sentinel exclusion, so placeholder rows never masquerade as fresh data.</li>
+            <li>Feeds that cannot stream (snapshot-mode endpoints, year-sliced publications) are ingested honestly as snapshots, not pretending to be realtime.</li>
+          </ul>
+        </div>
+        <div class="detail-code"><span class="code-comment">// illustrative record shape</span><code>{ <b>"source"</b>: "socrata",<br>&nbsp;&nbsp;<b>"type"</b>: "permit",<br>&nbsp;&nbsp;<b>"city_id"</b>: "sf" }</code></div>
+      </div>
+    </section>
+
+    <section id="stage-normalize" class="section-wrap stage-block" aria-labelledby="stage-normalize-title">
+      <div class="stage-grid">
+        <div class="stage-copy">
+          <span class="mono stage-kicker">STAGE 02 · <a class="stage-source" href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/schemas/models.py" target="_blank" rel="noreferrer">apps/api/src/schemas/models.py</a></span>
+          <h3 id="stage-normalize-title">Make different vocabularies comparable.</h3>
+          <p><strong>What enters.</strong> Raw records speaking city dialect: a Chicago permit and a Philly permit share a concept, not a schema.</p>
+          <p><strong>What it produces.</strong> Typed events — permit, complaint, license, deed — with validated <code>occurred_at</code>, coordinates, and typed fields, enforced by pydantic models.</p>
+          <p><strong>Why it holds up.</strong></p>
+          <ul class="stage-modes">
+            <li>Field maps resolve city-specific columns into the shared contract.</li>
+            <li>Unknown fields are preserved for inspection, never dropped into a generic bucket.</li>
+            <li>Malformed rows fail loudly at the type boundary instead of poisoning aggregates downstream.</li>
+          </ul>
+        </div>
+        <div class="detail-code"><span class="code-comment">// illustrative normalized event</span><code>{ <b>"event_type"</b>: "permit",<br>&nbsp;&nbsp;<b>"occurred_at"</b>: "2026-08-23",<br>&nbsp;&nbsp;<b>"lat"</b>: 37.7749 }</code></div>
+      </div>
+    </section>
+
+    <section id="stage-spatial" class="section-wrap stage-block" aria-labelledby="stage-spatial-title">
+      <div class="stage-grid">
+        <div class="stage-copy">
+          <span class="mono stage-kicker">STAGE 03 · <a class="stage-source" href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/spatial/h3_indexer.py" target="_blank" rel="noreferrer">apps/api/src/spatial/h3_indexer.py</a></span>
+          <h3 id="stage-spatial-title">Give every event a neighborhood-sized address.</h3>
+          <p><strong>What enters.</strong> Typed events carrying WGS84 coordinates.</p>
+          <p><strong>What it produces.</strong> H3 cells at resolutions 7, 8, and 9 — macro context, submarket, and neighborhood scale — plus division and submarket joins from the city registry.</p>
+          <p><strong>Why it holds up.</strong></p>
+          <ul class="stage-modes">
+            <li>The multi-resolution hierarchy lets the same event answer a metro question and a block question.</li>
+            <li>Division and submarket boundaries come from the registry, not ad-hoc polygons.</li>
+            <li>A flat record becomes a place with exactly one canonical address per resolution.</li>
+          </ul>
+        </div>
+        <div class="detail-code"><span class="code-comment">// illustrative spatial output</span><code>{ <b>"h3_res_9"</b>: "8928…",<br>&nbsp;&nbsp;<b>"division"</b>: "SF_CORE",<br>&nbsp;&nbsp;<b>"resolution"</b>: 9 }</code></div>
+      </div>
+    </section>
+
+    <section id="stage-features" class="section-wrap stage-block" aria-labelledby="stage-features-title">
+      <div class="stage-grid">
+        <div class="stage-copy">
+          <span class="mono stage-kicker">STAGE 04 · <a class="stage-source" href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/features/lims_calculator.py" target="_blank" rel="noreferrer">apps/api/src/features/lims_calculator.py</a></span>
+          <h3 id="stage-features-title">Let time and type change the meaning.</h3>
+          <p><strong>What enters.</strong> Spatially-addressed event streams, arriving at each feed’s real cadence.</p>
+          <p><strong>What it produces.</strong> Time-decayed, interpretable features — CapEx density, permit velocity, 311 shift dynamics, license activity — composed into the Leading Indicator Momentum Score.</p>
+          <p><strong>Why it holds up.</strong></p>
+          <ul class="stage-modes">
+            <li>Every ingredient stays inspectable; the score can always be decomposed into its parts.</li>
+            <li>Decay windows respect feed cadence — a 3-minute feed and a snapshot feed are not treated as equals.</li>
+            <li>Feature definitions live in one auditable calculator, not scattered across consumers.</li>
+          </ul>
+        </div>
+        <div class="detail-code"><span class="code-comment">// illustrative feature vector</span><code>{ <b>"capex_density"</b>: 0.82,<br>&nbsp;&nbsp;<b>"permit_velocity"</b>: 0.61,<br>&nbsp;&nbsp;<b>"lims"</b>: 68.0 }</code></div>
+      </div>
+    </section>
+
+    <section id="stage-serve" class="section-wrap stage-block" aria-labelledby="stage-serve-title">
+      <div class="stage-grid">
+        <div class="stage-copy">
+          <span class="mono stage-kicker">STAGE 05 · <a class="stage-source" href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/export/snapshot_builder.py" target="_blank" rel="noreferrer">apps/api/src/export/snapshot_builder.py</a></span>
+          <h3 id="stage-serve-title">Put the signal where a person can use it.</h3>
+          <p><strong>What enters.</strong> Features and model artifacts spanning 6-, 12-, and 18-month horizons.</p>
+          <p><strong>What it produces.</strong> Versioned edge snapshots for fast reach, a FastAPI serving surface for queries, and the live dashboard view.</p>
+          <p><strong>Why it holds up.</strong></p>
+          <ul class="stage-modes">
+            <li>Snapshots are versioned — nothing at the edge silently overwrites its own provenance.</li>
+            <li>The serving layer exposes the same contracts the site documents; no parallel truth.</li>
+            <li>Model horizons answer three different questions (6m tactical, 12m swing, 18m structural) instead of one overfit number.</li>
+          </ul>
+        </div>
+        <div class="detail-code"><span class="code-comment">// illustrative served prediction</span><code>{ <b>"horizon"</b>: "12m",<br>&nbsp;&nbsp;<b>"prediction"</b>: 0.68,<br>&nbsp;&nbsp;<b>"explain"</b>: true }</code></div>
+      </div>
+    </section>
+
+    <section class="system-data" aria-labelledby="matrix-title">
+      <div class="section-wrap">
+        <div class="section-heading">
+          <span class="mono label">THE FEEDS, IN NUMBERS</span>
+          <h2 id="matrix-title">Platforms, <em>counted.</em></h2>
+          <p>Counted live from <a href="/facts.json"><code>facts.json</code></a> — the registry-derived file every coverage page uses. Nothing on this page is hand-typed.</p>
+        </div>
+        <div id="platform-matrix" aria-live="polite"><p class="city-loading">Counting platforms and cadence from registry facts…</p></div>
+        <noscript><p class="system-noscript">Platform counts require JavaScript. The registry-derived numbers live in <a href="/facts.json">facts.json</a>, and every metro’s page carries its own feed matrix.</p></noscript>
+      </div>
+    </section>
+
+    <section class="section-wrap section-block" aria-label="Continue reading">
+      <div class="closing-routes system-next">
+        <a class="route-primary" href="/evidence/"><span>Trace one record end-to-end</span><small>Evidence: five inspectable contracts, linked to source</small></a>
+        <a class="route-secondary" href="/architecture/"><span>See the whole system map</span><small>Architecture: every node, its role, its exact code</small></a>
+      </div>
+    </section>

@@ -19,9 +19,11 @@ class SpatialEnrichmentWorker:
         self,
         bootstrap_servers: Optional[str] = None,
         feature_pipeline: Optional[SpatialFeaturePipeline] = None,
+        geocoder: Optional[Any] = None,
     ):
         self.feature_pipeline = feature_pipeline or SpatialFeaturePipeline()
         self.indexer = H3SpatialIndexer()
+        self.geocoder = geocoder
         self.topics = [
             settings.topic_permits,
             settings.topic_311,
@@ -34,14 +36,51 @@ class SpatialEnrichmentWorker:
             bootstrap_servers=bootstrap_servers,
         )
 
+    # Address-ish fields scanned in order when a record arrives without
+    # coordinates (ADR 0004). First non-trivial string wins.
+    ADDRESS_KEYS = (
+        "incident_address",
+        "address",
+        "street_address",
+        "site_address",
+        "location",
+        "property_address",
+    )
+    MIN_ADDRESS_LENGTH = 6
+
+    def _geocode_record(self, record: Dict[str, Any]) -> Optional[Any]:
+        """Resolve a coordinate from the record's address fields, if any."""
+        if self.geocoder is None:
+            return None
+        for key in self.ADDRESS_KEYS:
+            value = record.get(key)
+            if isinstance(value, str) and len(value.strip()) >= self.MIN_ADDRESS_LENGTH:
+                try:
+                    return self.geocoder.geocode(value)
+                except Exception:  # noqa: BLE001  # geocoding must never kill enrichment
+                    logger.warning("Geocoding failed for key field=%s", key)
+                    return None
+        return None
+
     def process_record(self, record: Dict[str, Any], topic: str, key: str):
         """Process incoming raw record and index into H3 hierarchy."""
         lat = record.get("latitude")
         lng = record.get("longitude")
 
         if lat is None or lng is None:
-            logger.debug("Skipping non-geocoded record key=%s", key)
-            return
+            point = self._geocode_record(record)
+            if point is None:
+                logger.debug("Skipping non-geocoded record key=%s", key)
+                return
+            # Geocoder-derived coordinate (ADR 0004): provenance flag rides
+            # the enriched record so downstream consumers can distinguish it
+            # from survey-provided geometry.
+            record["latitude"] = point.lat
+            record["longitude"] = point.lon
+            record["coord_source"] = point.source
+            lat, lng = point.lat, point.lon
+        else:
+            record.setdefault("coord_source", "native")
 
         # Ensure H3 fields exist
         if not record.get("h3_res9"):

@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "id": "nashville",
+  "name": "Nashville / Davidson County",
+  "state": "TN",
+  "center": {
+    "lat": 36.1627,
+    "lng": -86.7818
+  },
+  "metro_bbox": {
+    "min_lat": 35.94,
+    "max_lat": 36.44,
+    "min_lng": -87.16,
+    "max_lng": -86.46
+  },
+  "divisions": {
+    "NASHVILLE_CORE": {
+      "name": "Davidson County",
+      "center": {
+        "lat": 36.1627,
+        "lng": -86.7818
+      },
+      "bbox": {
+        "min_lat": 35.98,
+        "max_lat": 36.4,
+        "min_lng": -87.1,
+        "max_lng": -86.5
+      },
+      "submarkets": [
+        "Downtown & Riverfront",
+        "The Gulch & Midtown",
+        "East Nashville & Five Points",
+        "Belmont & Hillsboro Village",
+        "Antioch & Southeast Corridor"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Riverfront": {
+      "name": "Downtown & Riverfront",
+      "division": "NASHVILLE_CORE",
+      "center": {
+        "lat": 36.1612,
+        "lng": -86.7775
+      },
+      "description": "Cumberland River core spanning Broadway honky-tonk blocks, the East Bank stadium district, and high-rise hotel and multifamily redevelopment."
+    },
+    "The Gulch & Midtown": {
+      "name": "The Gulch & Midtown",
+      "division": "NASHVILLE_CORE",
+      "center": {
+        "lat": 36.15,
+        "lng": -86.8
+      },
+      "description": "Transit-adjacent mixed-use corridor between the Gulch towers, Music Row, and the Vanderbilt-adjacent Midtown bar and residential strip."
+    },
+    "East Nashville & Five Points": {
+      "name": "East Nashville & Five Points",
+      "division": "NASHVILLE_CORE",
+      "center": {
+        "lat": 36.18,
+        "lng": -86.751
+      },
+      "description": "River-east bungalow neighborhoods anchored by the Five Points commercial node with steady residential infill and renovation demand."
+    },
+    "Belmont & Hillsboro Village": {
+      "name": "Belmont & Hillsboro Village",
+      "division": "NASHVILLE_CORE",
+      "center": {
+        "lat": 36.1285,
+        "lng": -86.801
+      },
+      "description": "University-district market between Belmont and Vanderbilt campuses with student rental demand, retail frontage, and older-stock renovation."
+    },
+    "Antioch & Southeast Corridor": {
+      "name": "Antioch & Southeast Corridor",
+      "division": "NASHVILLE_CORE",
+      "center": {
+        "lat": 36.0545,
+        "lng": -86.601
+      },
+      "description": "Southeast Davidson growth belt along Antioch Pike and the Cullum/Percy Priest corridors with townhome and big-box repositioning activity."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "Date_Issued",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "Date_Issued",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/nashville.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

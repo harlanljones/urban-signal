@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+Sitemap: https://urban-signal.harlanljones.com/sitemap.xml

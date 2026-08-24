@@ -86,9 +86,9 @@ The lone true CKAN site. Resources are datastore-active and, unusually,
 
 | Feed family | Dataset (resource) | Platform detail | Updated | Geocoding | Client fit |
 |---|---|---|---|---|---|
-| Permits | Approved Building Permits (`6ddcd912…`), 660,839 rows | CKAN datastore | max `issued_date` = 2026-08-22 | `y_latitude`/`x_longitude`, `gpsx`/`gpsy` | Needs new CKAN client (~Socrata-sized) |
+| Permits | Approved Building Permits (`6ddcd912…`), 660,839 rows | CKAN datastore | max `issued_date` = 2026-08-22 | `y_latitude`/`x_longitude`, `gpsx`/`gpsy`; 15,697 rows (2.37%) carry no `y_latitude` — published gap, G5 passes under gap+2pp tolerance (newest-500 drop 1.8%, live-probed 2026-08-24) | Needs new CKAN client (~Socrata-sized) |
 | 311 | 311 Service Requests (`254adca6…` current-year slice) | CKAN datastore, one resource per year | July 2026 rows in current slice | `longitude`/`latitude` | Same; year-resource rollover at New Year |
-| Licenses | Licensing Board Licenses (`04dc653b…`), 3,659 rows; also Active Food Establishment Licenses | CKAN datastore | modified 2026-08-19 / 2026-08-23 | `gpsx`/`gpsy` | Same; narrow (liquor board) feed |
+| Licenses | Licensing Board Licenses (`04dc653b…`), 3,659 rows; also Active Food Establishment Licenses | CKAN datastore | modified 2026-08-19 / 2026-08-23 | `gpsx`/`gpsy` — **State Plane meters (EPSG:26986), not degrees** (live-probed 2026-08-24: 498/500 newest rows rejected) | **Excluded from registration**: fails G5 by construction; CRS transform deferred to the geocoding wave |
 | Deeds/sales | none found | — | — | — | — |
 
 ### Detroit — ArcGIS Hub — ready now, all four families
@@ -144,8 +144,8 @@ city-to-city transfers that need filtering.
 | Feed family | Dataset/layer | Platform detail | Updated | Geocoding | Client fit |
 |---|---|---|---|---|---|
 | Permits | Housing and Building Permits 2019–Present (`DHCD_Open_Baltimore_Datasets/FeatureServer/3`) | Points, maxRecordCount 1000 | item modified 2026-08-21 | point geometry (+Address) | Existing client |
-| 311 | 311 Customer Service Requests 2026 (`311_Customer_Service_Requests_current/FeatureServer/0`) | Points | row created 2026-08-22 seen | `Latitude`/`Longitude` attrs | Existing client; year rollover |
-| Licenses | Liquor Licenses | FeatureServer | item modified 2026-08-19 | unverified | Narrow; weak sla fit |
+| 311 | 311 Customer Service Requests 2026 (`311_Customer_Service_Requests_current/FeatureServer/0`) | Points | row created 2026-08-22 seen | `Latitude`/`Longitude` attrs; **published geocode gap 25.07%** (585,130/780,954 rows carry real coords, probed 2026-08-24); newest-500 drop 35%, mature-window (≥9d old) drop 22.6% — G5 passes under gap+2pp tolerance against the published gap; newest window skews to freshly-created, still-ungeocoded requests. Address-only rows stay dropped until the geocoding wave | Existing client; year rollover |
+| Licenses | Liquor Licenses | FeatureServer | item modified 2026-08-19 | verified: 500/500 newest rows parse (live-probed 2026-08-24) | Narrow; pinned notifications-grade |
 | Sales/deeds | tax-lien sale lists only | — | stale (2021 lists) | — | Not a deeds feed |
 
 ### Nashville, Louisville, Tempe — partial; Hartford — dead

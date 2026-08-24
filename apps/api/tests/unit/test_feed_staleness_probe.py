@@ -1,7 +1,13 @@
 from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock
 
-from scripts.feed_staleness_probe import page_stale, parse_timestamp, probe_feed, probe_registry
+from scripts.feed_staleness_probe import (
+    newest_watermark,
+    page_stale,
+    parse_timestamp,
+    probe_feed,
+    probe_registry,
+)
 
 from src.spatial.city_registry import DatasetSpec, FeedType
 
@@ -46,6 +52,80 @@ def test_probe_feed_pages_when_both_sources_are_stale():
     )
     assert result.stale
     assert result.age_days == 22
+
+
+def test_newest_watermark_excludes_declared_sentinels_server_side():
+    client = MagicMock()
+    client.paginate.return_value = [[
+        {"transfer_date": "ZZZZZZZZ"},
+        {"transfer_date": "20260815"},
+    ]]
+    spec = DatasetSpec(
+        endpoint="https://data.example/resource/test.json",
+        watermark_col="transfer_date",
+        extra={
+            "watermark_type": "text",
+            "watermark_format": "%Y%m%d",
+            "watermark_exclude": ["ZZZZZZZZ"],
+        },
+    )
+    now = datetime(2026, 8, 23, tzinfo=UTC)
+    assert newest_watermark(client, spec, now=now) == datetime(2026, 8, 15, tzinfo=UTC)
+    _, kwargs = client.paginate.call_args
+    assert kwargs["where_clause"] == "transfer_date NOT IN ('ZZZZZZZZ')"
+
+
+def test_newest_watermark_without_declarations_passes_no_guard():
+    client = MagicMock()
+    client.paginate.return_value = [[{"issued": "2026-08-01"}]]
+    spec = DatasetSpec(endpoint="https://data.example/resource/test.json", watermark_col="issued")
+    newest_watermark(client, spec, now=datetime(2026, 8, 23, tzinfo=UTC))
+    _, kwargs = client.paginate.call_args
+    assert kwargs["where_clause"] is None
+
+
+def test_newest_watermark_ignores_future_rows():
+    client = MagicMock()
+    client.paginate.return_value = [[
+        {"issued": "2026-08-21"},
+        {"issued": "2027-05-01"},
+    ]]
+    spec = DatasetSpec(endpoint="https://data.example/resource/test.json", watermark_col="issued")
+    newest = newest_watermark(client, spec, now=datetime(2026, 8, 23, tzinfo=UTC))
+    assert newest == datetime(2026, 8, 21, tzinfo=UTC)
+
+
+def test_probe_feed_ignores_future_rows_and_reports_fresh():
+    client = MagicMock()
+    client.paginate.return_value = [[
+        {"issued": "2026-08-21"},
+        {"issued": "2027-05-01"},
+    ]]
+    result = probe_feed(
+        "nyc",
+        FeedType.PERMITS,
+        DatasetSpec(endpoint="https://data.example/resource/test.json", watermark_col="issued"),
+        now=datetime(2026, 8, 23, tzinfo=UTC),
+        client=client,
+        source_updated_at=datetime(2026, 8, 21, tzinfo=UTC),
+    )
+    assert result.newest_watermark == datetime(2026, 8, 21, tzinfo=UTC)
+    assert result.age_days == 2
+    assert not result.stale
+
+
+def test_probe_feed_treats_all_future_watermarks_as_stale():
+    client = MagicMock()
+    client.paginate.return_value = [[{"issued": "2027-05-01"}]]
+    result = probe_feed(
+        "nyc",
+        FeedType.PERMITS,
+        DatasetSpec(endpoint="https://data.example/resource/test.json", watermark_col="issued"),
+        now=datetime(2026, 8, 23, tzinfo=UTC),
+        client=client,
+    )
+    assert result.newest_watermark is None
+    assert result.stale
 
 
 def test_probe_feed_reports_client_failure_as_stale():
@@ -109,3 +189,77 @@ def test_page_stale_serializes_timestamps_and_posts_to_every_webhook(monkeypatch
     assert captured[0][1]["event"] == "feed_staleness"
     assert captured[0][1]["stale_feeds"][0]["source_updated_at"] == "2026-08-01T00:00:00+00:00"
     assert captured[0][1] == captured[1][1]
+
+
+def test_declared_cadence_sets_alarm_window():
+    from scripts.feed_staleness_probe import declared_staleness_threshold
+
+    spec = DatasetSpec(
+        endpoint="https://data.example/resource/test.json",
+        watermark_col="issued",
+        extra={"expected_cadence_days": 30},
+    )
+    assert declared_staleness_threshold(spec) == timedelta(days=60)
+
+
+def test_missing_or_invalid_declaration_falls_back():
+    from scripts.feed_staleness_probe import STALE_AFTER, declared_staleness_threshold
+
+    plain = DatasetSpec(endpoint="https://data.example/resource/test.json")
+    assert declared_staleness_threshold(plain) is STALE_AFTER
+    for bad in ({"expected_cadence_days": 0}, {"expected_cadence_days": "soon"}):
+        spec = DatasetSpec(endpoint="u", extra=bad)
+        assert declared_staleness_threshold(spec, fallback=timedelta(days=3)) == timedelta(days=3)
+
+
+def test_probe_alarms_at_twice_declared_cadence_not_global_seven():
+    from scripts.feed_staleness_probe import declared_staleness_threshold
+
+    client = MagicMock()
+    client.paginate.return_value = [[{"issued": "2026-07-01"}]]
+    monthly = DatasetSpec(
+        endpoint="https://data.example/resource/test.json",
+        watermark_col="issued",
+        extra={"expected_cadence_days": 30},
+    )
+    now = datetime(2026, 8, 23, tzinfo=UTC)
+    # 53 days old: beyond the old global 7-day window, inside 2 x 30
+    result = probe_feed(
+        "nyc",
+        FeedType.PERMITS,
+        monthly,
+        now=now,
+        client=client,
+        threshold=declared_staleness_threshold(monthly),
+    )
+    assert result.stale is False
+
+    stale = probe_feed(
+        "nyc",
+        FeedType.PERMITS,
+        monthly,
+        now=now,
+        client=client,
+        threshold=declared_staleness_threshold(monthly),
+        source_updated_at=datetime(2026, 6, 1, tzinfo=UTC),
+    )
+    assert stale.stale is True
+
+
+def test_probe_registry_applies_per_feed_declared_thresholds():
+    """Wiring proof: an 8-day-old NYC feed is healthy under the backfilled
+    N=7 declaration (alarm at 14d) though the legacy global 7 flagged it."""
+    from scripts.feed_staleness_probe import probe_registry
+
+    client = MagicMock()
+    client.paginate.return_value = [[{"issuance_date": "2026-08-15"}]]
+    results = probe_registry(
+        now=datetime(2026, 8, 23, tzinfo=UTC),
+        city_ids={"nyc"},
+        client_factory=lambda spec: client,
+        metadata_fetcher=lambda spec: None,
+    )
+    # Only permits matches the mocked watermark column; others read stale
+    # because their columns are absent from the fixture rows.
+    permits = next(result for result in results if result.feed == "permits")
+    assert permits.stale is False and abs(permits.age_days - 8.0) < 1e-9

@@ -91,7 +91,7 @@ target-version = "py312"
 minversion = "8.0"
 addopts = "-ra -q --import-mode=importlib"
 testpaths = ["tests"]
-pythonpath = ["."]
+pythonpath = [".", "../.."]
 asyncio_mode = "auto"
 markers = [
     "interlock: fast spine-invariant gate run before releasing the interlock (pytest -m interlock)",

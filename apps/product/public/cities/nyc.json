@@ -1,0 +1,773 @@
+{
+  "schema_version": 2,
+  "id": "nyc",
+  "name": "New York City",
+  "state": "NY",
+  "center": {
+    "lat": 40.7128,
+    "lng": -74.006
+  },
+  "metro_bbox": {
+    "min_lat": 40.48,
+    "max_lat": 40.93,
+    "min_lng": -74.28,
+    "max_lng": -73.68
+  },
+  "divisions": {
+    "MANHATTAN": {
+      "name": "MANHATTAN",
+      "center": {
+        "lat": 40.7831,
+        "lng": -73.9712
+      },
+      "bbox": {
+        "min_lat": 40.7,
+        "max_lat": 40.882,
+        "min_lng": -74.02,
+        "max_lng": -73.907
+      },
+      "submarkets": [
+        "SoHo",
+        "Tribeca",
+        "West Village",
+        "Greenwich Village",
+        "East Village",
+        "Lower East Side",
+        "Chinatown",
+        "Financial District",
+        "Chelsea",
+        "Flatiron / NoMad",
+        "Hell's Kitchen",
+        "Midtown East",
+        "Upper East Side",
+        "Upper West Side",
+        "Harlem",
+        "East Harlem",
+        "Washington Heights",
+        "Inwood"
+      ]
+    },
+    "BROOKLYN": {
+      "name": "BROOKLYN",
+      "center": {
+        "lat": 40.6782,
+        "lng": -73.9442
+      },
+      "bbox": {
+        "min_lat": 40.57,
+        "max_lat": 40.74,
+        "min_lng": -74.05,
+        "max_lng": -73.83
+      },
+      "submarkets": [
+        "Williamsburg",
+        "Greenpoint",
+        "Bushwick",
+        "DUMBO",
+        "Downtown Brooklyn",
+        "Brooklyn Heights",
+        "Cobble Hill / Boerum Hill",
+        "Fort Greene",
+        "Clinton Hill",
+        "Bed-Stuy",
+        "Crown Heights",
+        "Park Slope",
+        "Gowanus",
+        "Prospect Heights",
+        "Prospect Lefferts Gardens",
+        "Sunset Park",
+        "Bay Ridge",
+        "Flatbush",
+        "Red Hook",
+        "Coney Island"
+      ]
+    },
+    "QUEENS": {
+      "name": "QUEENS",
+      "center": {
+        "lat": 40.7282,
+        "lng": -73.7949
+      },
+      "bbox": {
+        "min_lat": 40.54,
+        "max_lat": 40.8,
+        "min_lng": -73.96,
+        "max_lng": -73.7
+      },
+      "submarkets": [
+        "Long Island City",
+        "Astoria",
+        "Sunnyside",
+        "Woodside",
+        "Jackson Heights",
+        "Elmhurst",
+        "Corona",
+        "Flushing",
+        "Ridgewood",
+        "Forest Hills",
+        "Jamaica",
+        "Long Island City / Sunnyside Yards"
+      ]
+    },
+    "BRONX": {
+      "name": "BRONX",
+      "center": {
+        "lat": 40.8448,
+        "lng": -73.8648
+      },
+      "bbox": {
+        "min_lat": 40.785,
+        "max_lat": 40.915,
+        "min_lng": -73.935,
+        "max_lng": -73.765
+      },
+      "submarkets": [
+        "Mott Haven",
+        "Port Morris",
+        "South Bronx / Hub",
+        "Grand Concourse",
+        "Highbridge",
+        "Fordham / Belmont (Arthur Ave)",
+        "Kingsbridge",
+        "Riverdale",
+        "Pelham Bay"
+      ]
+    },
+    "STATEN_ISLAND": {
+      "name": "STATEN_ISLAND",
+      "center": {
+        "lat": 40.5795,
+        "lng": -74.1502
+      },
+      "bbox": {
+        "min_lat": 40.495,
+        "max_lat": 40.65,
+        "min_lng": -74.255,
+        "max_lng": -74.05
+      },
+      "submarkets": [
+        "St. George",
+        "Tompkinsville",
+        "Stapleton",
+        "Port Richmond",
+        "New Dorp",
+        "Tottenville"
+      ]
+    }
+  },
+  "submarkets": {
+    "SoHo": {
+      "name": "SoHo",
+      "division": "MANHATTAN",
+      "center": {
+        "lat": 40.7233,
+        "lng": -74.003
+      },
+      "description": "Cast-iron historic district with luxury retail, high capex conversions, and thriving hospitality."
+    },
+    "Tribeca": {
+      "name": "Tribeca",
+      "division": "MANHATTAN",
+      "center": {
+        "lat": 40.7163,
+        "lng": -74.0086
+      },
+      "description": "Cobblestone enclave featuring ultra-luxury residential lofts and Michelin-caliber dining."
+    },
+    "West Village": {
+      "name": "West Village",
+      "division": "MANHATTAN",
+      "center": {
+        "lat": 40.7358,
+        "lng": -74.0036
+      },
+      "description": "Historic brownstone core with premier pedestrian retail corridors and boutique nightlife."
+    },
+    "Greenwich Village": {
+      "name": "Greenwich Village",
+      "division": "MANHATTAN",
+      "center": {
+        "lat": 40.7336,
+        "lng": -73.9969
+      },
+      "description": "Academic and cultural hub centered around Washington Square Park with high retail footfall."
+    },
+    "East Village": {
+      "name": "East Village",
+      "division": "MANHATTAN",
+      "center": {
+        "lat": 40.7265,
+        "lng": -73.9815
+      },
+      "description": "High-density nightlife corridor with dense tenement stock and active hospitality licensing."
+    },
+    "Lower East Side": {
+      "name": "Lower East Side",
+      "division": "MANHATTAN",
+      "center": {
+        "lat": 40.715,
+        "lng": -73.9843
+      },
+      "description": "Dynamic submarket undergoing rapid mixed-use redevelopment and nightlife densification."
+    },
+    "Chinatown": {
+      "name": "Chinatown",
+      "division": "MANHATTAN",
+      "center": {
+        "lat": 40.7158,
+        "lng": -73.997
+      },
+      "description": "Historic cultural district with dense ground-floor commercial activity and adaptive reuse."
+    },
+    "Financial District": {
+      "name": "Financial District",
+      "division": "MANHATTAN",
+      "center": {
+        "lat": 40.7075,
+        "lng": -74.009
+      },
+      "description": "Downtown financial center transitioning rapidly into 24/7 mixed-use residential towers."
+    },
+    "Chelsea": {
+      "name": "Chelsea",
+      "division": "MANHATTAN",
+      "center": {
+        "lat": 40.7465,
+        "lng": -74.0014
+      },
+      "description": "Art gallery epicenter adjacent to High Line with high-value residential and tech offices."
+    },
+    "Flatiron / NoMad": {
+      "name": "Flatiron / NoMad",
+      "division": "MANHATTAN",
+      "center": {
+        "lat": 40.7411,
+        "lng": -73.9897
+      },
+      "description": "Premier commercial innovation and lifestyle corridor with Michelin dining and luxury hotels."
+    },
+    "Hell's Kitchen": {
+      "name": "Hell's Kitchen",
+      "division": "MANHATTAN",
+      "center": {
+        "lat": 40.7638,
+        "lng": -73.9918
+      },
+      "description": "Theater-adjacent hospitality and residential corridor with sustained permit activity."
+    },
+    "Midtown East": {
+      "name": "Midtown East",
+      "division": "MANHATTAN",
+      "center": {
+        "lat": 40.7527,
+        "lng": -73.9772
+      },
+      "description": "Global corporate headquarters hub anchored by Grand Central Terminal redevelopment."
+    },
+    "Upper East Side": {
+      "name": "Upper East Side",
+      "division": "MANHATTAN",
+      "center": {
+        "lat": 40.7736,
+        "lng": -73.9566
+      },
+      "description": "Established affluent residential enclave along Central Park and Museum Mile."
+    },
+    "Upper West Side": {
+      "name": "Upper West Side",
+      "division": "MANHATTAN",
+      "center": {
+        "lat": 40.787,
+        "lng": -73.9754
+      },
+      "description": "Historic residential district flanked by Central and Riverside Parks with strong family demographics."
+    },
+    "Harlem": {
+      "name": "Harlem",
+      "division": "MANHATTAN",
+      "center": {
+        "lat": 40.8116,
+        "lng": -73.9465
+      },
+      "description": "Historic cultural hub with active 125th Street commercial corridor and brownstone revitalization."
+    },
+    "East Harlem": {
+      "name": "East Harlem",
+      "division": "MANHATTAN",
+      "center": {
+        "lat": 40.7957,
+        "lng": -73.9389
+      },
+      "description": "Up-zoned residential corridor experiencing influx of affordable and market-rate developments."
+    },
+    "Washington Heights": {
+      "name": "Washington Heights",
+      "division": "MANHATTAN",
+      "center": {
+        "lat": 40.8417,
+        "lng": -73.9387
+      },
+      "description": "Uptown medical and educational anchor centered around Columbia University Irving Medical Center."
+    },
+    "Inwood": {
+      "name": "Inwood",
+      "division": "MANHATTAN",
+      "center": {
+        "lat": 40.8677,
+        "lng": -73.9212
+      },
+      "description": "Northernmost tip of Manhattan with significant rezoning-driven multifamily development."
+    },
+    "Williamsburg": {
+      "name": "Williamsburg",
+      "division": "BROOKLYN",
+      "center": {
+        "lat": 40.7145,
+        "lng": -73.9555
+      },
+      "description": "Global creative epicenter with waterfront high-rises, thriving retail, and dense entertainment."
+    },
+    "Greenpoint": {
+      "name": "Greenpoint",
+      "division": "BROOKLYN",
+      "center": {
+        "lat": 40.7305,
+        "lng": -73.9515
+      },
+      "description": "North Brooklyn waterfront neighborhood seeing massive luxury residential expansion along the East River."
+    },
+    "Bushwick": {
+      "name": "Bushwick",
+      "division": "BROOKLYN",
+      "center": {
+        "lat": 40.6944,
+        "lng": -73.9213
+      },
+      "description": "Industrial-to-creative conversion zone with high nightlife velocity and loft conversions."
+    },
+    "DUMBO": {
+      "name": "DUMBO",
+      "division": "BROOKLYN",
+      "center": {
+        "lat": 40.7033,
+        "lng": -73.989
+      },
+      "description": "Boutique tech, advertising, and luxury residential enclave beneath the Manhattan & Brooklyn Bridges."
+    },
+    "Downtown Brooklyn": {
+      "name": "Downtown Brooklyn",
+      "division": "BROOKLYN",
+      "center": {
+        "lat": 40.6925,
+        "lng": -73.987
+      },
+      "description": "Brooklyn's civic and commercial core undergoing skyscraper residential boom."
+    },
+    "Brooklyn Heights": {
+      "name": "Brooklyn Heights",
+      "division": "BROOKLYN",
+      "center": {
+        "lat": 40.696,
+        "lng": -73.9933
+      },
+      "description": "Historic landmarked district with premier promenade views and high-value brownstones."
+    },
+    "Cobble Hill / Boerum Hill": {
+      "name": "Cobble Hill / Boerum Hill",
+      "division": "BROOKLYN",
+      "center": {
+        "lat": 40.6865,
+        "lng": -73.993
+      },
+      "description": "Charming tree-lined rowhouse district with flourishing boutique dining corridors along Atlantic and Court."
+    },
+    "Fort Greene": {
+      "name": "Fort Greene",
+      "division": "BROOKLYN",
+      "center": {
+        "lat": 40.692,
+        "lng": -73.9742
+      },
+      "description": "Cultural hub anchored by BAM and Fort Greene Park with active historic conversions."
+    },
+    "Clinton Hill": {
+      "name": "Clinton Hill",
+      "division": "BROOKLYN",
+      "center": {
+        "lat": 40.6894,
+        "lng": -73.9644
+      },
+      "description": "Victorian mansion and Pratt-adjacent enclave experiencing sustained residential demand."
+    },
+    "Bed-Stuy": {
+      "name": "Bed-Stuy",
+      "division": "BROOKLYN",
+      "center": {
+        "lat": 40.6872,
+        "lng": -73.9418
+      },
+      "description": "Historic brownstone district undergoing extensive gut rehabilitation and commercial revitalization."
+    },
+    "Crown Heights": {
+      "name": "Crown Heights",
+      "division": "BROOKLYN",
+      "center": {
+        "lat": 40.6694,
+        "lng": -73.9422
+      },
+      "description": "Franklin and Nostrand corridor renewal with accelerating food/beverage and multifamily investments."
+    },
+    "Park Slope": {
+      "name": "Park Slope",
+      "division": "BROOKLYN",
+      "center": {
+        "lat": 40.671,
+        "lng": -73.9777
+      },
+      "description": "Prime residential community along Prospect Park with exceptional school districts and high property equity."
+    },
+    "Gowanus": {
+      "name": "Gowanus",
+      "division": "BROOKLYN",
+      "center": {
+        "lat": 40.6734,
+        "lng": -73.9903
+      },
+      "description": "Post-industrial canal corridor undergoing massive city rezoning for thousands of new residential units."
+    },
+    "Prospect Heights": {
+      "name": "Prospect Heights",
+      "division": "BROOKLYN",
+      "center": {
+        "lat": 40.6774,
+        "lng": -73.9665
+      },
+      "description": "Vibrant enclave anchored by Barclays Center, Brooklyn Museum, and Vanderbilt Avenue dining."
+    },
+    "Prospect Lefferts Gardens": {
+      "name": "Prospect Lefferts Gardens",
+      "division": "BROOKLYN",
+      "center": {
+        "lat": 40.659,
+        "lng": -73.9514
+      },
+      "description": "Historic manor district seeing new mid-rise multifamily development near Prospect Park's east side."
+    },
+    "Sunset Park": {
+      "name": "Sunset Park",
+      "division": "BROOKLYN",
+      "center": {
+        "lat": 40.6455,
+        "lng": -74.0124
+      },
+      "description": "Waterfront innovation campus (Industry City) and vibrant multi-ethnic commercial corridors."
+    },
+    "Bay Ridge": {
+      "name": "Bay Ridge",
+      "division": "BROOKLYN",
+      "center": {
+        "lat": 40.6262,
+        "lng": -74.0329
+      },
+      "description": "Stable southwestern waterfront neighborhood with commercial avenues (3rd & 5th) and harbor views."
+    },
+    "Flatbush": {
+      "name": "Flatbush",
+      "division": "BROOKLYN",
+      "center": {
+        "lat": 40.652,
+        "lng": -73.959
+      },
+      "description": "Central Brooklyn hub with high transit connectivity, commercial density, and major mid-rise development."
+    },
+    "Red Hook": {
+      "name": "Red Hook",
+      "division": "BROOKLYN",
+      "center": {
+        "lat": 40.675,
+        "lng": -74.01
+      },
+      "description": "Maritime and artisanal warehouse district with strong destination retail and last-mile logistics."
+    },
+    "Coney Island": {
+      "name": "Coney Island",
+      "division": "BROOKLYN",
+      "center": {
+        "lat": 40.5749,
+        "lng": -73.9859
+      },
+      "description": "Iconic oceanfront amusement and residential area with large-scale affordable and market developments."
+    },
+    "Long Island City": {
+      "name": "Long Island City",
+      "division": "QUEENS",
+      "center": {
+        "lat": 40.7447,
+        "lng": -73.9485
+      },
+      "description": "Rapidly expanding high-density waterfront skyline with unmatched transit proximity to Midtown."
+    },
+    "Astoria": {
+      "name": "Astoria",
+      "division": "QUEENS",
+      "center": {
+        "lat": 40.7644,
+        "lng": -73.9235
+      },
+      "description": "Premier cultural and culinary enclave with resilient retail corridors and steady multifamily infill."
+    },
+    "Sunnyside": {
+      "name": "Sunnyside",
+      "division": "QUEENS",
+      "center": {
+        "lat": 40.7433,
+        "lng": -73.9196
+      },
+      "description": "Close-knit residential enclave featuring Sunnyside Gardens historic planned community and Queens Blvd retail."
+    },
+    "Woodside": {
+      "name": "Woodside",
+      "division": "QUEENS",
+      "center": {
+        "lat": 40.7454,
+        "lng": -73.903
+      },
+      "description": "Key transit interchange with diverse commercial spine along Roosevelt Avenue."
+    },
+    "Jackson Heights": {
+      "name": "Jackson Heights",
+      "division": "QUEENS",
+      "center": {
+        "lat": 40.7557,
+        "lng": -73.8831
+      },
+      "description": "Historic garden apartment district renowned for multicultural gastronomy and commercial vitality."
+    },
+    "Elmhurst": {
+      "name": "Elmhurst",
+      "division": "QUEENS",
+      "center": {
+        "lat": 40.7368,
+        "lng": -73.8784
+      },
+      "description": "Major commercial center with Queens Center Mall anchor and medical institutional presence."
+    },
+    "Corona": {
+      "name": "Corona",
+      "division": "QUEENS",
+      "center": {
+        "lat": 40.7448,
+        "lng": -73.8643
+      },
+      "description": "Dense family community bordering Flushing Meadows Corona Park with vibrant street retail."
+    },
+    "Flushing": {
+      "name": "Flushing",
+      "division": "QUEENS",
+      "center": {
+        "lat": 40.7675,
+        "lng": -73.8331
+      },
+      "description": "Major Asian commercial, financial, and residential hub with intense development around Main Street."
+    },
+    "Ridgewood": {
+      "name": "Ridgewood",
+      "division": "QUEENS",
+      "center": {
+        "lat": 40.7081,
+        "lng": -73.9015
+      },
+      "description": "National historic brick rowhouse district attracting Bushwick spillover and artisanal retail."
+    },
+    "Forest Hills": {
+      "name": "Forest Hills",
+      "division": "QUEENS",
+      "center": {
+        "lat": 40.7181,
+        "lng": -73.8448
+      },
+      "description": "Prestigious neighborhood with Austin Street commercial core and historic Forest Hills Gardens."
+    },
+    "Jamaica": {
+      "name": "Jamaica",
+      "division": "QUEENS",
+      "center": {
+        "lat": 40.7027,
+        "lng": -73.789
+      },
+      "description": "Key intermodal transit hub (JFK AirTrain / LIRR) driving major high-density downtown redevelopment."
+    },
+    "Long Island City / Sunnyside Yards": {
+      "name": "Long Island City / Sunnyside Yards",
+      "division": "QUEENS",
+      "center": {
+        "lat": 40.7505,
+        "lng": -73.935
+      },
+      "description": "Strategic master-planned corridor linking Queensboro Plaza with Sunnyside Yards rail infrastructure."
+    },
+    "Mott Haven": {
+      "name": "Mott Haven",
+      "division": "BRONX",
+      "center": {
+        "lat": 40.809,
+        "lng": -73.9225
+      },
+      "description": "Waterfront renaissance corridor with high-volume luxury rental developments and creative conversions."
+    },
+    "Port Morris": {
+      "name": "Port Morris",
+      "division": "BRONX",
+      "center": {
+        "lat": 40.801,
+        "lng": -73.914
+      },
+      "description": "Industrial waterfront district featuring craft breweries, film studios, and commercial conversion."
+    },
+    "South Bronx / Hub": {
+      "name": "South Bronx / Hub",
+      "division": "BRONX",
+      "center": {
+        "lat": 40.8175,
+        "lng": -73.918
+      },
+      "description": "The historic 'Hub' retail core at 149th & 3rd Avenue with major civic and retail foot traffic."
+    },
+    "Grand Concourse": {
+      "name": "Grand Concourse",
+      "division": "BRONX",
+      "center": {
+        "lat": 40.838,
+        "lng": -73.9185
+      },
+      "description": "Grand Art Deco residential boulevard anchored by the Bronx Museum of the Arts and courthouse district."
+    },
+    "Highbridge": {
+      "name": "Highbridge",
+      "division": "BRONX",
+      "center": {
+        "lat": 40.8375,
+        "lng": -73.927
+      },
+      "description": "Hilly residential community adjacent to High Bridge pedestrian span and Harlem River crossings."
+    },
+    "Fordham / Belmont (Arthur Ave)": {
+      "name": "Fordham / Belmont (Arthur Ave)",
+      "division": "BRONX",
+      "center": {
+        "lat": 40.853,
+        "lng": -73.8885
+      },
+      "description": "Arthur Avenue 'Little Italy' food corridor and Fordham University institutional anchor."
+    },
+    "Kingsbridge": {
+      "name": "Kingsbridge",
+      "division": "BRONX",
+      "center": {
+        "lat": 40.881,
+        "lng": -73.9035
+      },
+      "description": "Broadway commercial shopping corridor with Kingsbridge Armory redevelopment potential."
+    },
+    "Riverdale": {
+      "name": "Riverdale",
+      "division": "BRONX",
+      "center": {
+        "lat": 40.893,
+        "lng": -73.9125
+      },
+      "description": "Scenic estate and cooperative residential community overlooking the Hudson River and Palisades."
+    },
+    "Pelham Bay": {
+      "name": "Pelham Bay",
+      "division": "BRONX",
+      "center": {
+        "lat": 40.8505,
+        "lng": -73.832
+      },
+      "description": "Eastern Bronx coastal neighborhood near Pelham Bay Park and City Island with strong residential stability."
+    },
+    "St. George": {
+      "name": "St. George",
+      "division": "STATEN_ISLAND",
+      "center": {
+        "lat": 40.6437,
+        "lng": -74.0764
+      },
+      "description": "Civic capital and Staten Island Ferry terminal district with waterfront outlet retail and bay views."
+    },
+    "Tompkinsville": {
+      "name": "Tompkinsville",
+      "division": "STATEN_ISLAND",
+      "center": {
+        "lat": 40.6275,
+        "lng": -74.0775
+      },
+      "description": "North Shore transit corridor undergoing Bay Street zoning-led revitalization."
+    },
+    "Stapleton": {
+      "name": "Stapleton",
+      "division": "STATEN_ISLAND",
+      "center": {
+        "lat": 40.6269,
+        "lng": -74.0772
+      },
+      "description": "Historic maritime waterfront district seeing modern URBY residential development and craft culinary scene."
+    },
+    "Port Richmond": {
+      "name": "Port Richmond",
+      "division": "STATEN_ISLAND",
+      "center": {
+        "lat": 40.635,
+        "lng": -74.125
+      },
+      "description": "Kill Van Kull waterfront neighborhood with commercial avenue retail and industrial legacy."
+    },
+    "New Dorp": {
+      "name": "New Dorp",
+      "division": "STATEN_ISLAND",
+      "center": {
+        "lat": 40.5735,
+        "lng": -74.1165
+      },
+      "description": "East Shore commercial center anchored by New Dorp Lane dining and shopping."
+    },
+    "Tottenville": {
+      "name": "Tottenville",
+      "division": "STATEN_ISLAND",
+      "center": {
+        "lat": 40.5125,
+        "lng": -74.247
+      },
+      "description": "South Shore historic residential community on the Arthur Kill with single-family suburban character."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "socrata",
+      "watermark_col": "issuance_date",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "socrata",
+      "watermark_col": "created_date",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "socrata",
+      "watermark_col": "effectivedate",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": {
+      "platform": "socrata",
+      "watermark_col": "recorded_datetime",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/city_registry.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

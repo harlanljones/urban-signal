@@ -219,18 +219,17 @@ class TestCompleteness:
                 assert cid.value in message and feed.value in message
 
     def test_platform_clients_exposed(self, scheduler):
-        keys_with_arcgis = {
-            spec.producer_key
-            for reg in REGISTRY.values()
-            for spec in reg.datasets.values()
-            if spec.platform == "arcgis"
-        }
+        keys_by_platform: dict[str, set[str]] = {}
+        for reg in REGISTRY.values():
+            for spec in reg.datasets.values():
+                keys_by_platform.setdefault(spec.platform, set()).add(spec.producer_key)
         for key, wrapper in scheduler.producers.items():
             assert hasattr(wrapper, "socrata"), f"producer {key!r} lacks socrata client"
-            if key in keys_with_arcgis:
-                assert hasattr(wrapper, "arcgis"), (
-                    f"producer {key!r} lacks arcgis client but arcgis specs register against it"
-                )
+            for platform, keys in keys_by_platform.items():
+                if key in keys:
+                    assert getattr(wrapper, platform, None) is not None, (
+                        f"producer {key!r} lacks a {platform} client instance but {platform} specs register against it"
+                    )
 
 
 @pytest.mark.interlock

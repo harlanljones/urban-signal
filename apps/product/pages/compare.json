@@ -1,0 +1,5 @@
+{
+  "title": "Compare — Urban Signal",
+  "description": "Side-by-side comparison of any two registered metros, rendered from facts.json: feed families, publishing platforms, poll cadence, division and submarket counts, and each metro's source contract.",
+  "noscript": "<div class=\"no-script\"><p>The side-by-side comparison requires JavaScript. Coverage facts remain available:</p><a href=\"/facts.json\">Machine-readable facts</a> · <a href=\"/llms-full.txt\">Full agent context</a> · <a href=\"https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/spatial/city_registry.py\">City registry</a></div>"
+}

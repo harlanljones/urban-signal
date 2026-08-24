@@ -31,7 +31,7 @@ Washington DC and Montgomery County to be viewed together.
 | Catalyst snapshots | `GET /api/v1/catalysts?city_id=<id>&min_lims=85.0` |
 | Edge static asset | `apps/dashboard/public/index.html` |
 | Static export | `python scripts/export_dashboard.py` |
-| Interlock verification | `pytest -m interlock apps/api/tests/unit/test_interlock_gate.py` |
+| Interlock verification | `uv run pytest -m interlock apps/api/tests/unit/test_interlock_gate.py` |
 
 ## Screenshot evidence
 

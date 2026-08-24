@@ -1,0 +1,67 @@
+name: rejection-recheck
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/rejection_recheck.py"
+      - ".github/workflows/rejection-recheck.yml"
+  pull_request:
+    paths:
+      - "scripts/rejection_recheck.py"
+      - ".github/workflows/rejection-recheck.yml"
+  workflow_dispatch:
+    inputs:
+      write_report:
+        description: "Persist JSON report to docs/research/"
+        required: false
+        default: false
+        type: boolean
+  schedule:
+    - cron: "0 8 1 */3 *" # quarterly, first day of every 3rd month 08:00 UTC
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install API dependencies
+        run: |
+          uv venv .venv --python 3.12
+          uv pip install -e "apps/api[dev]"
+
+      - name: Test rejection recheck
+        run: |
+          .venv/bin/ruff check scripts/rejection_recheck.py apps/api/tests/unit/test_rejection_recheck.py
+          PYTHONPATH=apps/api .venv/bin/python -m pytest -q apps/api/tests/unit/test_rejection_recheck.py
+          PYTHONPATH=apps/api .venv/bin/python -m py_compile scripts/rejection_recheck.py
+
+  recheck:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install project
+        run: |
+          uv venv .venv --python 3.12
+          uv pip install -e apps/api
+
+      - name: Re-probe rejected feed candidates
+        env:
+          WRITE_REPORT: ${{ inputs.write_report || false }}
+        run: |
+          args=()
+          if [[ "$WRITE_REPORT" == "true" ]]; then args+=(--write-report); fi
+          PYTHONPATH=apps/api .venv/bin/python scripts/rejection_recheck.py "${args[@]}"

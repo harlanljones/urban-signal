@@ -115,6 +115,7 @@ class SLALicensesProducer:
                 resolved_city = "nyc"
 
             from src.producers.field_maps import first_mapped, resolve_field_map
+            from src.spatial.geocoder import geocode_row_if_declared
 
             field_map = resolve_field_map(resolved_city, FeedType.SLA)
 
@@ -163,6 +164,21 @@ class SLALicensesProducer:
                     lng_raw = loc.get("longitude") or loc.get("lng") or (
                         loc.get("coordinates", [None, None])[0] if "coordinates" in loc else None
                     )
+
+            if not lat_raw or not lng_raw:
+                # Address-string feeds declaring extra["needs_geocode"]
+                # (ADR 0004) resolve coordinates at parse time so the wire
+                # event carries real doubles; coordinate-less registries
+                # without the declaration keep emitting null-coord events.
+                addr_candidate = (
+                    first_mapped(row, field_map, "address_street")
+                    or row.get("location_address")
+                    or row.get("address")
+                    or row.get("street_address")
+                )
+                resolved = geocode_row_if_declared(resolved_city, "sla", addr_candidate)
+                if resolved is not None:
+                    lat_raw, lng_raw = resolved
 
             lat = float(lat_raw) if lat_raw is not None else None
             lng = float(lng_raw) if lng_raw is not None else None

@@ -11,11 +11,14 @@ Provides continuous, rate-limited polling from Socrata NYC Open Data endpoints
 
 import argparse
 import collections
+import json
 import logging
+import os
 import threading
 import time
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 from src.config import settings
@@ -24,6 +27,7 @@ from src.producers.complaints_311_producer import Complaints311Producer
 from src.producers.deeds_acris_producer import DeedsACRISProducer
 from src.producers.dob_permits_producer import DOBPermitsProducer
 from src.producers.sla_licenses_producer import SLALicensesProducer
+from src.producers.watermarks import typed_watermark_entry, watermark_exclude_clause
 
 logger = logging.getLogger(__name__)
 
@@ -112,6 +116,9 @@ class JobConfig:
     enabled: bool = True
     incremental: bool = True
     where_clause: str | None = None
+    # Monotonic deadline before which the job must not run again (US-107).
+    # 0.0 means immediately due — every job runs on the first tick after boot.
+    next_due: float = 0.0
     watermark_column: str | None = None
 
 
@@ -184,6 +191,14 @@ class MunicipalIngestionScheduler:
                     "order_by": ds.extra.get("order_by"),
                     "id_col": ds.extra.get("id_col"),
                     "select": ds.extra.get("select"),
+                    # D7 text-watermark declarations (ADR 0005): sentinels
+                    # become a server-side NOT-IN guard and the high
+                    # watermark is tracked as the raw declared-format string
+                    # instead of an ISO reformat of a parsed event attribute.
+                    "watermark_type": ds.extra.get("watermark_type"),
+                    "watermark_format": ds.extra.get("watermark_format"),
+                    "watermark_exclude": ds.extra.get("watermark_exclude") or [],
+                    "base_where": ds.extra.get("where"),
                 }
                 self.configs[job_name] = JobConfig(
                     name=job_name,
@@ -193,6 +208,54 @@ class MunicipalIngestionScheduler:
 
         self.metrics: dict[str, JobMetrics] = {k: JobMetrics() for k in self.configs}
         self.backoffs: dict[str, ExponentialBackoffTracker] = {k: ExponentialBackoffTracker() for k in self.configs}
+
+        # Durable watermark state (US-106): restore per-job high watermarks
+        # across restarts; persistence is disabled until a state file is
+        # configured via SCHEDULER_STATE_FILE.
+        self.state_file: str | None = settings.scheduler_state_file or None
+        if self.state_file:
+            self._load_state()
+
+    def _load_state(self) -> None:
+        """Restore persisted high watermarks into job metrics (US-106)."""
+        try:
+            with open(self.state_file, encoding="utf-8") as fh:
+                data = json.load(fh)
+        except FileNotFoundError:
+            logger.info("No watermark state file at %s; starting fresh", self.state_file)
+            return
+        except (OSError, json.JSONDecodeError) as exc:
+            logger.warning("Ignoring unreadable watermark state %s: %s", self.state_file, exc)
+            return
+        restored = 0
+        for job_name, entry in data.items():
+            met = self.metrics.get(job_name)
+            wm = (entry or {}).get("high_watermark")
+            if met is not None and wm and met.high_watermark is None:
+                met.high_watermark = str(wm)
+                restored += 1
+        logger.info("Restored %d job watermarks from %s", restored, self.state_file)
+
+    def _save_state(self) -> None:
+        """Atomically persist non-None high watermarks (US-106)."""
+        if not self.state_file:
+            return
+        payload = {
+            job: {"high_watermark": met.high_watermark, "updated_at": datetime.now(UTC).isoformat()}
+            for job, met in self.metrics.items()
+            if met.high_watermark
+        }
+        try:
+            state_path = Path(self.state_file)
+            state_path.parent.mkdir(parents=True, exist_ok=True)
+            tmp = state_path.with_suffix(state_path.suffix + ".tmp")
+            tmp.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+            os.replace(tmp, state_path)
+        except OSError as exc:
+            # Best-effort persistence mirrors the tolerant read side: an
+            # unwritable location (host runs with a container-only path,
+            # read-only mount) must not kill polling.
+            logger.warning("Ignoring unwritable watermark state %s: %s", self.state_file, exc)
 
     def _extract_record_id(self, job_name: str, row: dict[str, Any]) -> str:
         """Extract a unique record identifier from raw Socrata JSON row."""
@@ -285,6 +348,8 @@ class MunicipalIngestionScheduler:
         # re-poll a diff (only unseen ids are emitted), so mutations surface as
         # new ids and are tracked by the row-parity acceptance gate instead.
         where_parts = []
+        if meta.get("base_where"):
+            where_parts.append(f"({meta['base_where']})")
         if cfg.where_clause:
             where_parts.append(f"({cfg.where_clause})")
         is_snapshot = meta.get("ingestion_mode") == "snapshot"
@@ -295,6 +360,13 @@ class MunicipalIngestionScheduler:
             and meta["watermark_col"]
         ):
             where_parts.append(f"{meta['watermark_col']} > '{met.high_watermark}'")
+        exclude_guard = (
+            watermark_exclude_clause(meta["watermark_col"], meta.get("watermark_exclude") or [])
+            if meta["watermark_col"]
+            else None
+        )
+        if exclude_guard:
+            where_parts.append(exclude_guard)
 
         active_where = " AND ".join(where_parts) if where_parts else None
 
@@ -302,6 +374,13 @@ class MunicipalIngestionScheduler:
         records_published = 0
         duplicates_skipped = 0
         new_high_watermark = met.high_watermark
+        # Typed comparison state for text-typed watermarks (ADR 0005): the
+        # stored high watermark stays the raw declared-format string so the
+        # server-side `>` filter remains format-consistent across runs.
+        new_hw_parsed: datetime | None = None
+        if meta.get("watermark_type") == "text" and new_high_watermark:
+            stored = typed_watermark_entry(new_high_watermark, fmt=meta.get("watermark_format"))
+            new_hw_parsed = stored[1] if stored else None
 
         try:
             client_kwargs = {
@@ -329,6 +408,20 @@ class MunicipalIngestionScheduler:
                     # Rate limiting throttle
                     if self.rate_limit_delay > 0:
                         time.sleep(self.rate_limit_delay)
+
+                    # Text-typed watermarks track the RAW column value before
+                    # row parsing (ADR 0005): a sentinel-free declared-format
+                    # value advances ingestion recency even if event parsing
+                    # later routes the row to the DLQ.
+                    if meta.get("watermark_type") == "text":
+                        entry = typed_watermark_entry(
+                            row.get(meta["watermark_col"]),
+                            fmt=meta.get("watermark_format"),
+                            exclude=meta.get("watermark_exclude") or [],
+                        )
+                        if entry and (new_hw_parsed is None or entry[1] > new_hw_parsed):
+                            new_high_watermark = entry[0]
+                            new_hw_parsed = entry[1]
 
                     # Parse & Validate
                     try:
@@ -362,13 +455,17 @@ class MunicipalIngestionScheduler:
                         )
                         records_published += 1
 
-                        # Update high watermark
-                        wm_val = (
-                            getattr(event, "issuance_date", None)
-                            or getattr(event, "created_date", None)
-                            or getattr(event, "effective_date", None)
-                            or getattr(event, "recorded_date", None)
-                        )
+                        # Update high watermark. Text-typed feeds (ADR 0005)
+                        # are tracked from the raw column before parsing, so
+                        # skip the event-attr path here.
+                        wm_val: Any = None
+                        if meta.get("watermark_type") != "text":
+                            wm_val = (
+                                getattr(event, "issuance_date", None)
+                                or getattr(event, "created_date", None)
+                                or getattr(event, "effective_date", None)
+                                or getattr(event, "recorded_date", None)
+                            )
                         if wm_val:
                             wm_str = wm_val.strftime("%Y-%m-%dT%H:%M:%S")
                             if new_high_watermark is None or wm_str > new_high_watermark:
@@ -420,6 +517,10 @@ class MunicipalIngestionScheduler:
                 error_msg=str(poll_err),
             )
 
+        # Persist watermark progress after every job attempt (US-106) so a
+        # restart resumes from the latest watermark instead of the beginning.
+        self._save_state()
+
         return {
             "job": job_name,
             "status": met.last_status,
@@ -429,6 +530,27 @@ class MunicipalIngestionScheduler:
             "high_watermark": met.high_watermark,
             "error": met.last_error,
         }
+
+    def poll_due(self, batch_limit: int | None = None) -> dict[str, dict[str, Any]]:
+        """Run every enabled job whose per-feed interval has elapsed (US-107).
+
+        Each job carries its own ``next_due`` monotonic deadline derived from
+        the registry's ``interval_seconds``; due jobs run sequentially, so the
+        politeness cap is one in-flight portal request per scheduler. Feed
+        freshness is bounded by the feed's own cadence instead of the full
+        rotation.
+        """
+        now = time.monotonic()
+        due = [name for name, cfg in self.configs.items() if cfg.enabled and cfg.next_due <= now]
+        results: dict[str, dict[str, Any]] = {}
+        for name in due:
+            if self._stop_event.is_set():
+                break
+            results[name] = self.poll_job(job_name=name, limit=batch_limit)
+            self.configs[name].next_due = time.monotonic() + self.configs[name].interval_seconds
+        if due:
+            logger.info("Ran %d/%d due jobs this tick", len(due), len(self.configs))
+        return results
 
     def poll_all(self, batch_limit: int | None = None) -> dict[str, dict[str, Any]]:
         """Executes a single poll cycle across all enabled municipal jobs."""
@@ -447,24 +569,29 @@ class MunicipalIngestionScheduler:
         interval_seconds: float | None = None,
         max_cycles: int | None = None,
     ):
-        """Runs the continuous polling scheduler loop."""
+        """Runs the continuous polling scheduler loop (staggered, US-107).
+
+        ``interval_seconds`` is the tick granularity: every tick selects the
+        jobs whose per-feed cadence (registry ``interval_seconds``) has
+        elapsed and runs only those. A feed's freshness is therefore bounded
+        by its own interval plus one tick, not by the size of the rotation.
+        """
         self._stop_event.clear()
-        cycle = 0
-        logger.info("Municipal Ingestion Scheduler started.")
+        tick = max(1.0, min(interval_seconds or 60.0, 60.0))
+        tick_count = 0
+        logger.info("Municipal Ingestion Scheduler started (per-feed intervals, %.0fs tick).", tick)
 
         try:
             while not self._stop_event.is_set():
-                cycle += 1
-                logger.info("Starting Polling Cycle #%d", cycle)
-                self.poll_all()
+                tick_count += 1
+                self.poll_due()
 
-                if max_cycles and cycle >= max_cycles:
+                if max_cycles and tick_count >= max_cycles:
                     logger.info("Reached max_cycles=%d. Stopping scheduler.", max_cycles)
                     break
 
-                sleep_time = interval_seconds or 60.0
                 # Interruptible sleep
-                for _ in range(int(sleep_time * 10)):
+                for _ in range(int(tick * 10)):
                     if self._stop_event.is_set():
                         break
                     time.sleep(0.1)

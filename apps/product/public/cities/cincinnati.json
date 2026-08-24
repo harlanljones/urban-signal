@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "id": "cincinnati",
+  "name": "Cincinnati",
+  "state": "OH",
+  "center": {
+    "lat": 39.1031,
+    "lng": -84.512
+  },
+  "metro_bbox": {
+    "min_lat": 38.8,
+    "max_lat": 39.45,
+    "min_lng": -84.95,
+    "max_lng": -84.15
+  },
+  "divisions": {
+    "CINCINNATI_CORE": {
+      "name": "Cincinnati Core",
+      "center": {
+        "lat": 39.1085,
+        "lng": -84.5145
+      },
+      "bbox": {
+        "min_lat": 39.0,
+        "max_lat": 39.2,
+        "min_lng": -84.7,
+        "max_lng": -84.35
+      },
+      "submarkets": [
+        "Downtown & Over-the-Rhine",
+        "Uptown & Clifton",
+        "West End & Queensgate"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Over-the-Rhine": {
+      "name": "Downtown & Over-the-Rhine",
+      "division": "CINCINNATI_CORE",
+      "center": {
+        "lat": 39.1085,
+        "lng": -84.5145
+      },
+      "description": "Historic central-city blocks spanning the downtown business core and Over-the-Rhine mixed-use corridor."
+    },
+    "Uptown & Clifton": {
+      "name": "Uptown & Clifton",
+      "division": "CINCINNATI_CORE",
+      "center": {
+        "lat": 39.139,
+        "lng": -84.515
+      },
+      "description": "University and medical-institution district north of downtown with dense rental and neighborhood retail demand."
+    },
+    "West End & Queensgate": {
+      "name": "West End & Queensgate",
+      "division": "CINCINNATI_CORE",
+      "center": {
+        "lat": 39.105,
+        "lng": -84.538
+      },
+      "description": "West-side redevelopment edge between the central city, stadium district, and industrial riverfront."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "socrata",
+      "watermark_col": "issueddate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "socrata",
+      "watermark_col": "date_time_received",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "socrata",
+      "watermark_col": "entered_date",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/cincinnati.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

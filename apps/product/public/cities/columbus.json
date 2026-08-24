@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "id": "columbus",
+  "name": "Columbus",
+  "state": "OH",
+  "center": {
+    "lat": 39.9612,
+    "lng": -83.0007
+  },
+  "metro_bbox": {
+    "min_lat": 39.75,
+    "max_lat": 40.2,
+    "min_lng": -83.3,
+    "max_lng": -82.7
+  },
+  "divisions": {
+    "COLUMBUS_CORE": {
+      "name": "Columbus Core",
+      "center": {
+        "lat": 39.9612,
+        "lng": -83.0007
+      },
+      "bbox": {
+        "min_lat": 39.85,
+        "max_lat": 40.12,
+        "min_lng": -83.15,
+        "max_lng": -82.8
+      },
+      "submarkets": [
+        "Downtown & Scioto Mile",
+        "Short North & Italian Village",
+        "German Village & Brewery District",
+        "Easton & Northeast Corridor",
+        "Hilltop"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Scioto Mile": {
+      "name": "Downtown & Scioto Mile",
+      "division": "COLUMBUS_CORE",
+      "center": {
+        "lat": 39.9612,
+        "lng": -83.0007
+      },
+      "description": "Central business and riverfront district with office conversions, civic investment, and high-density residential demand."
+    },
+    "Short North & Italian Village": {
+      "name": "Short North & Italian Village",
+      "division": "COLUMBUS_CORE",
+      "center": {
+        "lat": 39.978,
+        "lng": -83.008
+      },
+      "description": "High Street arts and gallery corridor with mixed-use infill, boutique hospitality, and historic rowhouse renovation."
+    },
+    "German Village & Brewery District": {
+      "name": "German Village & Brewery District",
+      "division": "COLUMBUS_CORE",
+      "center": {
+        "lat": 39.941,
+        "lng": -83.006
+      },
+      "description": "Preserved south-side brick neighborhoods with restoration-driven permit activity and adaptive brewery reuse."
+    },
+    "Easton & Northeast Corridor": {
+      "name": "Easton & Northeast Corridor",
+      "division": "COLUMBUS_CORE",
+      "center": {
+        "lat": 40.043,
+        "lng": -82.92
+      },
+      "description": "Northeast retail and employment anchor with continued commercial buildout and surrounding residential growth."
+    },
+    "Hilltop": {
+      "name": "Hilltop",
+      "division": "COLUMBUS_CORE",
+      "center": {
+        "lat": 39.951,
+        "lng": -83.088
+      },
+      "description": "West-side neighborhood corridor targeted by reinvestment programs with infill housing and rehab activity."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "ISSUED_DT",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/columbus.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

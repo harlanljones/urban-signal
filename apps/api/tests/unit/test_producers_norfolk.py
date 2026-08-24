@@ -30,7 +30,6 @@ from src.spatial.cities.norfolk import (
     is_in_norfolk_metro,
 )
 from src.spatial.city_registry import (
-    ALIASES,
     REGISTRY,
     CityId,
     FeedType,
@@ -97,25 +96,34 @@ class TestNorfolkRegistration:
 
 
 class TestPartialFeedRegistration:
-    """Norfolk registers two feeds; 311 and licenses are deferred by design."""
+    """Wave G2 (US-75) outcome: 311 registered behind the geocoder; SLA
+    evaluated and reverted under G8' (placeholder-address share)."""
 
-    def test_only_permits_and_deeds_are_registered(self):
+    def test_registered_feed_set(self):
         assert set(REGISTRY[CityId.NORFOLK].datasets) == {
             FeedType.PERMITS,
             FeedType.DEEDS,
+            FeedType.COMPLAINTS_311,
         }
 
     def test_watermarks_match_published_schemas(self):
         assert get_dataset(CityId.NORFOLK, FeedType.PERMITS).watermark_col == "issue_date"
         assert get_dataset(CityId.NORFOLK, FeedType.DEEDS).watermark_col == "transfer_date"
+        assert get_dataset(CityId.NORFOLK, FeedType.COMPLAINTS_311).watermark_col == "creation_date"
 
-    @pytest.mark.parametrize("feed", [FeedType.COMPLAINTS_311, FeedType.SLA])
-    def test_deferred_feeds_raise_a_readable_error(self, feed):
-        with pytest.raises(KeyError) as exc:
-            get_dataset(CityId.NORFOLK, feed)
-        message = str(exc.value)
-        assert "norfolk" in message
-        assert feed.value in message
+    def test_geocoded_feed_declares_its_address_contract(self):
+        extra = get_dataset(CityId.NORFOLK, FeedType.COMPLAINTS_311).extra
+        assert extra["needs_geocode"] is True
+        assert extra["geocode_context"] == "Norfolk, VA"
+        assert extra["expected_cadence_days"] >= 1
+
+    def test_sla_reverted_under_g8_prime(self):
+        """US-75 finding: ~34% of newest dpi6-sct5 rows carry the literal
+        placeholder 'NO NORFOLK ADDRESS REQUIRED' (special-event licenses),
+        so the feed resolves ~65% of coordinates — far above the 5%
+        null-H3 ceiling. Reverted, not documented-and-registered."""
+        with pytest.raises(KeyError):
+            get_dataset(CityId.NORFOLK, FeedType.SLA)
 
 
 class TestNorfolkRowParsing:
@@ -243,3 +251,135 @@ class TestNorfolkRowParsing:
     def test_deed_bbl_comes_from_gpin_or_parcel_id(self, deeds, deed_row):
         ev = deeds.parse_socrata_row(deed_row, city_id="norfolk")
         assert ev.bbl == "1437889293"
+
+
+class TestGeocodedFeedParsing:
+    """US-75: address-string rows resolve coordinates at parse time for specs
+    declaring needs_geocode (ADR 0004); everyone else keeps legacy behavior."""
+
+    @pytest.fixture
+    def complaints(self):
+        with patch("src.producers.complaints_311_producer.BaseKafkaProducer"):
+            from src.producers.complaints_311_producer import Complaints311Producer
+
+            return Complaints311Producer()
+
+    def test_norfolk_311_address_row_geocodes_at_parse(self, complaints, monkeypatch):
+
+        calls = []
+
+        def fake_resolve(city_id, feed_value, address, context=None):
+            calls.append((city_id, feed_value, address, context))
+            return (36.8508, -76.2859)
+
+        monkeypatch.setattr(
+            "src.spatial.geocoder.geocode_row_if_declared", fake_resolve
+        )
+        row = {
+            "service_request_number": "NR-1",
+            "service_request_type": "Missed Trash Pickup",
+            "service_request_category": "Waste Services",
+            "status": "OPEN",
+            "creation_date": "2026-08-21T22:39:12.000",
+            "location": "8020 MEADOW CREEK ROAD, NORFOLK, VA",
+        }
+        event = complaints.parse_socrata_row(row, city_id="norfolk")
+        assert event is not None
+        assert event.latitude == 36.8508 and event.longitude == -76.2859
+        assert event.incident_id == "NR-1"
+        assert event.h3_res7 is not None  # real coords index into H3
+        # The hook receives the registry context suffix decision internally;
+        # the producer passes the raw address string.
+        assert calls == [("norfolk", "311", "8020 MEADOW CREEK ROAD, NORFOLK, VA", None)]
+
+    def test_undeclared_city_still_drops_coordinate_less_rows(self, complaints, monkeypatch):
+        monkeypatch.setattr(
+            "src.spatial.geocoder.geocode_row_if_declared",
+            lambda city_id, feed_value, address, context=None: None,
+        )
+        row = {
+            "unique_key": "NYC-1",
+            "complaint_type": "Noise",
+            "created_date": "2026-08-21T10:00:00.000",
+            "incident_address": "1 Static Ave",
+        }
+        assert complaints.parse_socrata_row(row, city_id="nyc") is None
+
+    def test_geocode_failure_drops_declared_rows(self, complaints, monkeypatch):
+        monkeypatch.setattr(
+            "src.spatial.geocoder.geocode_row_if_declared",
+            lambda city_id, feed_value, address, context=None: None,
+        )
+        row = {
+            "service_request_number": "NR-2",
+            "creation_date": "2026-08-21T10:00:00.000",
+            "location": "INTERSECTION OF UNKNOWN AND VOID",
+        }
+        assert complaints.parse_socrata_row(row, city_id="norfolk") is None
+
+
+NORFOLK_SLA_CANDIDATE_MAP = {
+    "license_id": ["trading_as_name", "primary_owner"],
+    "premises_name": ["trading_as_name"],
+    "license_type": ["naics"],
+    "effective_date": ["business_opened_date"],
+    "address_street": ["location_address"],
+}
+
+
+class TestNorfolkSlaParsing:
+    """Producer-capability pins for the reverted dpi6-sct5 registration: with
+    the candidate field map supplied (and coordinates resolved), rows parse;
+    placeholder-address rows fall through to null-coord events."""
+
+    @pytest.fixture
+    def sla(self, monkeypatch):
+        monkeypatch.setattr(
+            "src.producers.field_maps.resolve_field_map",
+            lambda city_value, feed: NORFOLK_SLA_CANDIDATE_MAP
+            if getattr(feed, "value", feed) == "sla"
+            else {},
+        )
+        with patch("src.producers.sla_licenses_producer.BaseKafkaProducer"):
+            from src.producers.sla_licenses_producer import SLALicensesProducer
+
+            return SLALicensesProducer()
+
+    def test_norfolk_license_row_geocodes_and_maps(self, sla, monkeypatch):
+
+        monkeypatch.setattr(
+            "src.spatial.geocoder.geocode_row_if_declared",
+            lambda city_id, feed_value, address, context=None: (
+                (36.87, -76.29)
+                if address == "3549 SHARPLEY AVE 23513"
+                else None
+            ),
+        )
+        row = {
+            "trading_as_name": "MEEKINS FIELD SERVICES",
+            "location_address": "3549 SHARPLEY AVE 23513",
+            "business_opened_date": "2026-08-24T00:00:00.000",
+            "naics": "561790",
+            "primary_owner": "J MEEKINS",
+        }
+        event = sla.parse_socrata_row(row, city_id="norfolk")
+        assert event is not None
+        assert event.latitude == 36.87 and event.longitude == -76.29
+        assert event.effective_date is not None and event.effective_date.year == 2026
+        assert event.h3_res9 is not None
+
+    def test_placeholder_address_falls_through_to_null_coord_event(self, sla, monkeypatch):
+        """'NO NORFOLK ADDRESS REQUIRED' rows cannot geocode; the SLA producer's
+        coordinate-less tolerance (DC precedent) keeps them as null-H3 events."""
+        monkeypatch.setattr(
+            "src.spatial.geocoder.geocode_row_if_declared",
+            lambda city_id, feed_value, address, context=None: None,
+        )
+        row = {
+            "trading_as_name": "SUNDAE SCOOP (SPECIAL EVENT)",
+            "location_address": "NO NORFOLK ADDRESS REQUIRED 99999",
+            "business_opened_date": "2026-08-24T00:00:00.000",
+        }
+        event = sla.parse_socrata_row(row, city_id="norfolk")
+        assert event is not None
+        assert event.latitude is None and event.h3_res7 is None

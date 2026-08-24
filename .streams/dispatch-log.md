@@ -183,3 +183,83 @@ No spine files were touched at any point.
 | Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
 |---|---|---|---|---|---|
 | migration-apps-api | `apps/api/**` plus Python execution surfaces | all relocated Python core paths; no concurrent stream authorized | ~02:00 PT | completed — GATES-HAR-41 6/6 green; Linear HAR-41 Done | package/test relocation and execution-surface updates |
+
+## 2026-08-24 — feed-staleness probe: future-watermark guard + deeds audit — CI run 32703690250
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| probe-future-guard | `scripts/feed_staleness_probe.py`, `apps/api/tests/unit/test_feed_staleness_probe.py` | none | ~09:xx PT | completed — 9 probe tests, ruff clean, interlock 20 passed | `newest_watermark` ignores watermarks after `now`; all-future feeds now report stale |
+| deeds-watermark-audit | `docs/research/deeds-watermark-audit.md` (read-only stream) | none | ~09:xx PT | completed — all 7 endpoints verified live | per-feed verdicts: nyc/chicago/nola genuinely slow, seattle dead publication, SF+philly wrong watermark_col (spine recs in doc, not applied) |
+| deeds-watermark-cols | `apps/api/tests/unit/test_producers_philadelphia.py` (pinned watermark assertion) | city_registry.py | ~10:xx PT | completed — interlock 20 passed, full suite 561 passed (2 pre-existing HEAD failures verified via worktree) | SF deeds watermark `closed_roll_year`→`data_loaded_at`; Philly deeds watermark+keyset `document_date`→`recording_date` |
+| deeds-seattle-replacement | `docs/research/seattle-deeds-replacement.md` (read-only stream) | none | ~10:xx PT | completed — all portals checked live | verdict: no live anonymous official KC transaction API exists; winner candidate `rpsale_extr` ArcGIS table (auth-gated item lookup, non-spatial, needs field map) or bulk-zip producer path; registration out of scope |
+| seattle-deeds-interim | none (comment-only spine edit) | city_registry.py | ~11:xx PT | completed — access ruled out anonymously with live evidence (AGO directory, gismaps folders); interlock 20 passed, suite 567 passed | KNOWN-DEAD PUBLICATION comment on SEATTLE DEEDS spec; registration deferred pending KC access + terms sign-off |
+
+## 2026-08-24 — D7 text-watermark normalization + sentinel exclusion — Linear HJ-114
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| d7-text-watermark | `apps/api/src/producers/watermarks.py`, `apps/api/tests/unit/test_watermarks.py`, `scripts/feed_staleness_probe.py`, `apps/api/tests/unit/test_feed_staleness_probe.py`, `docs/adr/0005-typed-text-watermarks.md` | scheduler.py | ~12:xx PT | completed — interlock 20 passed; full suite 573 passed / 0 failed; ruff clean on touched files (4 BLE001 pre-existing on HEAD); live PG `qzrv-2tnv` verified: guarded top-of-order returns real dates | typed watermark helpers (`typed_watermark_entry`, `newest_typed_watermark`, `watermark_exclude_clause`), scheduler NOT-IN guard + raw-string text high watermark, probe guard plumbing, ADR 0005 |
+
+## 2026-08-24 — G11 per-feed expected_cadence_days declaration — Linear HJ-115
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| g11-cadence | `scripts/feed_staleness_probe.py`, `apps/api/tests/unit/test_feed_staleness_probe.py`, `apps/api/tests/unit/test_registry_cadence.py` (new) | city_registry.py (data-only backfill) | ~13:xx PT | completed — interlock 20 passed; full suite 579 passed / 0 failed; runtime audit 54/54 registry feeds declare cadence | probe alarms at 2 × declared N (CLI flag now fallback), all feeds backfilled N=7, registry invariant test |
+
+## 2026-08-24 — HJ-44 close-out: live G5/G6 adjudication + Boston SLA exclusion — Linear HJ-44
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| hj44-closeout | `scripts/backfill_probe.py` (new G5/G6 leaf), `apps/api/tests/unit/test_backfill_probe.py` (5 tests) | city_registry.py, test_producers_boston.py, config.py description, README row, research docs, wave-2 scorecard | ~15:xx PT | completed — interlock 20 passed; full suite green; live probes: Baltimore permits/sla 1.0 + 311 0.65 newest / 0.774 mature (gap 25.07% published); Montgomery permits 0.952 (gap 4.97% published) + sla snapshot 1.0; Boston permits 0.982 (gap 2.37% published) + 311 1.0; Boston Licensing Board 0.004 → root-caused gpsx/gpsy = EPSG:26986 meters, excluded per MC311 precedent | `scripts/backfill_probe.py` (Kafka-free producer construction via `__new__`+injected indexer/shift_dynamics, snapshot-mode sampling, per-platform source_count), registry exclusion comment + published-gap annotations (BAL/MOC/BOS), README + research-doc updates, scorecard baseline corrected to 17 cities / 54 jobs with incident |
+
+## 2026-08-24 — city registration (Prince George's County MD) — Linear HJ-125
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-pg-county | `src/spatial/cities/prince_georges.py`, `tests/unit/test_producers_prince_georges.py` | config.py, city_registry.py, cities/__init__.py, serving/dashboard.py, apps/dashboard/public/index.html, `_parse_datetime` %Y%m%d in both producers | ~14:xx PT | completed — interlock 20 passed; full suite 587 passed / 0 failed; live parse 25/25; parcel table deferred with pinned findings (MultiPolygon crash + account id gap) | PG 311 registration w/ G11 cadence exception, dashboard wiring, %Y%m%d date fix, D9 finding evidence |
+
+## 2026-08-24 — C7/C8 city registrations (Columbus, Nashville, Kansas City) — HJ-118/119/120
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-columbus (subagent) | cities/columbus.py, test_producers_columbus.py | config.py, city_registry.py, cities/__init__.py, dashboard.py, index.html | ~18:30 PT | completed — interlock 20 passed; suite 615/0; live parse 300/300 | Columbus PERMITS registration (B1_ALT_ID-only id chain, G3_VALUE_TTL=0 pin) |
+| city-nashville (subagent) | cities/nashville.py, test_producers_nashville.py | same spine set | ~18:30 PT | completed — interlock 20 passed; suite 615/0; permits+STR 100% parse each | Nashville PERMITS + SLA(STR) registrations; 311 re-adjudication flagged |
+| city-kansas-city (subagent) | cities/kansas_city.py, test_producers_kansas_city.py | same spine set | ~18:30 PT | completed — interlock 20 passed; suite 615/0; live parse 25/25 | KC COMPLAINTS_311 registration correcting prior rejection |
+
+## 2026-08-24 — Wave G1 geocoder core — Linear US-28
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| geocoder-core | src/spatial/geocoder.py, test_geocoder.py, test_spatial_enrichment_worker.py, docs/adr/0004-address-geocoding.md | spatial_enrichment_worker.py, config.py | ~19:00 PT | completed — interlock 20 passed; suite 636/0; Norfolk 500-row acceptance 95.13%; determinism 350/350 across cache flush | deterministic cached geocoder + confidence gating + coord_source provenance |
+
+## 2026-08-24 — Wave G2 Norfolk 311 registration — Linear US-75
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| norfolk-g2 | test_producers_norfolk.py extensions, ADR-free (covered by 0004) | city_registry.py, config.py, complaints_311_producer.py, sla_licenses_producer.py, spatial_enrichment_worker.py (cross-stream repair), scheduler.py (cross-stream repair) | ~20:00 PT | completed — interlock 20 passed; suite 650/0; 311 G5'/G8' PASS at 95.8%/4.2%; SLA reverted under G8' (34% placeholders) | Norfolk 311 geocoded registration; CensusBackend + geocode_backend setting; producer parse-time geocode hook; SLA revert evidence |
+
+## 2026-08-24 — Wave G3 (DC upgrade + Denver evaluation) — US-74 / US-73
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| dc-g3 (subagent) | test_producers_dc.py rewrite | city_registry.py (DC SLA upgrade + where scope), spatial_enrichment n/a, geocoder.py normalizer v2 + state-guard | ~21:00 PT | completed — interlock 20; suite 671/0; SLA G5'/G8' PASS 96.2%/3.8% live | DC SLA geocoded upgrade; DEEDS stays non-spatial with finding |
+| denver-g3 (subagent) | test_producers_denver.py rewrite | none (dual descope) | ~21:00 PT | completed — licenses descoped (no watermark), sales reverted (G8', zero addresses); candidate recipe + ADR-0005 warning pinned | evidence-pinned descope; quoted-watermark verification |
+
+## 2026-08-24 — Wave G4 MC311 geocode evaluation — Linear US-94
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| montgomery-g4 | docs/research/mc311-geocode-evaluation.md, test_producers_montgomery.py pin | none (rejection branch) | ~22:00 PT | completed — rejection branch: 0/294 zip-only resolutions measured live; G5' fails at 0% | measured confidence-distribution evidence + test pin |
+
+## 2026-08-24 — Staging bring-up + US-104 ingestion readiness — Linear US-104
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| staging-bringup | docker-compose.override.yml (local), .env (gitignored), Dockerfile build fix | Dockerfile (deps-only install), scheduler.py (US-106 state), config.py (SCHEDULER_STATE_FILE), dob/complaints producers (ckan client), test_interlock_gate.py (platform enforcement) | ~18:30 PT | stack up 10 svc healthy; loader full windowed run 7.45M fetched / 5.39M published / 381k gap-drops; scheduler resume proven ("Restored 46 job watermarks"); PostGIS parity spot-verified (NYC 311 952k, BAL 311 229k); backlog draining ~364/s after partition bump to 12 | scripts/backfill_loader.py + 7 tests, scheduler watermark persistence + 5 tests, ckan clients on permits/311 producers, interlock all-platform enforcement, US-105/106 Done, US-109/110/111 filed |
+
+## 2026-08-24 — Wave R2 rejection recheck — Linear US-86
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| rejection-recheck-r2 | scripts/rejection_recheck.py, test_rejection_recheck.py, docs/research/rejection-recheck-report.json | .github/workflows/rejection-recheck.yml (quarterly cron) | ~22:30 PT | completed — interlock 20 passed; suite 683/0; acceptance case kc_311 re-finds from 2026-08-23 list | self-correcting rejection watch (10 entries, 4 probe kinds) |
+| us107-stagger | apps/api/tests/unit/test_scheduler_stagger.py (6 tests) | scheduler.py (poll_due + start tick loop) | ~15:00 PT | completed — interlock 20 passed, suite 689 passed; live: only-due-jobs ticks, 311_chicago published fresh rows inside its 180s cadence | per-feed interval staggering (next_due monotonic deadlines), freshness bounded per feed |

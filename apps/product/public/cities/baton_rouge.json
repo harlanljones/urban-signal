@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "id": "baton_rouge",
+  "name": "Baton Rouge / East Baton Rouge Parish",
+  "state": "LA",
+  "center": {
+    "lat": 30.4505,
+    "lng": -91.187
+  },
+  "metro_bbox": {
+    "min_lat": 30.25,
+    "max_lat": 30.65,
+    "min_lng": -91.35,
+    "max_lng": -90.85
+  },
+  "divisions": {
+    "BATON_ROUGE_CORE": {
+      "name": "Baton Rouge Core",
+      "center": {
+        "lat": 30.4505,
+        "lng": -91.187
+      },
+      "bbox": {
+        "min_lat": 30.3,
+        "max_lat": 30.6,
+        "min_lng": -91.25,
+        "max_lng": -90.95
+      },
+      "submarkets": [
+        "Downtown & North Boulevard",
+        "Mid City & North Baton Rouge",
+        "South Baton Rouge & Perkins"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & North Boulevard": {
+      "name": "Downtown & North Boulevard",
+      "division": "BATON_ROUGE_CORE",
+      "center": {
+        "lat": 30.4505,
+        "lng": -91.187
+      },
+      "description": "Central Baton Rouge civic and riverfront corridor with downtown offices, government uses, and adaptive-reuse demand."
+    },
+    "Mid City & North Baton Rouge": {
+      "name": "Mid City & North Baton Rouge",
+      "division": "BATON_ROUGE_CORE",
+      "center": {
+        "lat": 30.475,
+        "lng": -91.16
+      },
+      "description": "Established north-of-downtown neighborhoods with neighborhood retail, infill, and public-realm investment signals."
+    },
+    "South Baton Rouge & Perkins": {
+      "name": "South Baton Rouge & Perkins",
+      "division": "BATON_ROUGE_CORE",
+      "center": {
+        "lat": 30.395,
+        "lng": -91.105
+      },
+      "description": "South-parish growth corridor around Perkins Road and LSU-adjacent employment, retail, and residential demand."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "socrata",
+      "watermark_col": "issueddate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "socrata",
+      "watermark_col": "createdate",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "socrata",
+      "watermark_col": "",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/baton_rouge.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

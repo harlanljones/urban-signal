@@ -9,6 +9,32 @@ Urban Signal normalizes heterogeneous municipal records, assigns events to multi
 1. Prospective users, partners, and investors evaluating whether the system offers credible spatial intelligence.
 2. Technical evaluators and contributors tracing municipal records through ingestion, normalization, spatial enrichment, feature computation, models, snapshots, and edge delivery.
 
+## Page guide
+
+### / (home)
+
+Product overview: what the system does, which metros are registered, and where to evaluate it. Links the agent surfaces (`/llms.txt`, `/llms-full.txt`, `/facts.json`) and routes into each section page.
+
+### /system/
+
+The ingestion and normalization pipeline: how Socrata, ArcGIS, Carto, and CKAN feeds are contracted per city, normalized onto an H3 grid, and served as actionable momentum.
+
+### /evidence/
+
+An end-to-end trace of one permit-shaped record through five inspectable contracts: city registry, normalized event schema, H3 indexing, LIMS feature composition, and versioned edge snapshot delivery. Each stage names its repository path.
+
+### /methodology/
+
+How the Leading Indicator Momentum Score is composed (CapEx density, permit velocity, 311 shift dynamics, license activity) across 6-, 12-, and 18-month horizons. Also discloses which on-site values are illustrative interface examples rather than live predictions.
+
+### /architecture/
+
+The system architecture map from source producers through city registry, Kafka consumers, H3 enrichment, feature aggregation, PostGIS storage, ONNX horizons, and edge snapshots.
+
+### /cities/
+
+Index of registered metros with per-feed platform, cadence, and source-contract links. Each metro links to its generated page at `/cities/<id>/` and its machine brief at `/public/cities/<id>.json`.
+
 ## Evidence path
 
 1. City-specific source contracts: `apps/api/src/spatial/city_registry.py` and `apps/api/src/spatial/cities/`
@@ -23,6 +49,21 @@ Repository: https://github.com/harlanljones/urban-signal
 
 The city registry is authoritative. A machine-readable projection for the marketing surface is available at `/facts.json` and is verified against registry IDs during site checks. Feed availability differs by city.
 
+## Per-city machine briefs
+
+Every registered metro has a generated JSON brief at `/public/cities/<id>.json`, where `<id>` matches the metro ids in `/facts.json` and `/cities/`. The 21 briefs are generated directly from `REGISTRY` in `apps/api/src/spatial/city_registry.py`; they are not hand-authored. Schema:
+
+- `schema_version`: integer version of this document shape.
+- `id`, `name`, `state`: registry identity for the metro.
+- `center`: `{lat, lng}` metropolitan centroid.
+- `metro_bbox`: `{min_lat, max_lat, min_lng, max_lng}` coverage box.
+- `divisions`: map of division key to `{name, center {lat, lng}, bbox {min_lat, max_lat, min_lng, max_lng}, submarkets []}`.
+- `feeds`: keyed by feed name (`permits`, `311`, `sla`, `deeds`). Each non-null entry carries `platform`, `watermark_col`, `interval_seconds`, and `topic`. A `null` value means that feed is absent for the metro — absence is a fact, not a gap.
+- `evidence_path`: repository path of the metro's source-contract module (for example `apps/api/src/spatial/cities/austin.py`).
+- `generated_from`: provenance string, always `"apps/api/src/spatial/city_registry.py REGISTRY"`.
+
+Consume these briefs instead of scraping rendered pages; if a metro or feed is missing from a brief, it is not registered, not temporarily unavailable.
+
 ## Claims and limitations
 
 - The site does not claim customers, adoption metrics, commercial availability, or independently validated forecast performance.
@@ -34,5 +75,6 @@ The city registry is authoritative. A machine-readable projection for the market
 
 - Human product evaluation: `/dashboard`
 - Structured facts: `/facts.json`
+- Per-city machine briefs: `/public/cities/<id>.json`
 - Repository overview: `README.md`
 - Architecture and domain context: `CONTEXT.md`, `docs/adr/`, and the source paths above

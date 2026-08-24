@@ -37,6 +37,7 @@ def _parse_datetime(val: Any) -> Optional[datetime]:
             "%Y-%m-%d",
             "%m/%d/%Y %H:%M:%S",
             "%Y-%m-%d %H:%M:%S",
+            "%Y%m%d",
             "%m/%d/%Y %I:%M:%S %p",
             "%Y-%m-%dT%H:%M:%S",
             "%Y",

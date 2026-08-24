@@ -1,0 +1,248 @@
+{
+  "schema_version": 2,
+  "id": "norfolk",
+  "name": "Norfolk",
+  "state": "VA",
+  "center": {
+    "lat": 36.8508,
+    "lng": -76.2859
+  },
+  "metro_bbox": {
+    "min_lat": 36.83,
+    "max_lat": 37.04,
+    "min_lng": -76.35,
+    "max_lng": -76.17
+  },
+  "divisions": {
+    "DOWNTOWN_WATERFRONT": {
+      "name": "DOWNTOWN_WATERFRONT",
+      "center": {
+        "lat": 36.858,
+        "lng": -76.293
+      },
+      "bbox": {
+        "min_lat": 36.84,
+        "max_lat": 36.9,
+        "min_lng": -76.315,
+        "max_lng": -76.28
+      },
+      "submarkets": [
+        "Downtown Norfolk & Waterfront",
+        "NEON Arts District",
+        "Lamberts Point"
+      ]
+    },
+    "GHENT_WESTBURG": {
+      "name": "GHENT_WESTBURG",
+      "center": {
+        "lat": 36.877,
+        "lng": -76.282
+      },
+      "bbox": {
+        "min_lat": 36.85,
+        "max_lat": 36.905,
+        "min_lng": -76.31,
+        "max_lng": -76.255
+      },
+      "submarkets": [
+        "Ghent",
+        "West Ghent & Page Point",
+        "Wards Corner"
+      ]
+    },
+    "OCEAN_VIEW": {
+      "name": "OCEAN_VIEW",
+      "center": {
+        "lat": 36.945,
+        "lng": -76.295
+      },
+      "bbox": {
+        "min_lat": 36.915,
+        "max_lat": 37.04,
+        "min_lng": -76.35,
+        "max_lng": -76.24
+      },
+      "submarkets": [
+        "Ocean View",
+        "East Beach",
+        "Willoughby Spit"
+      ]
+    },
+    "CENTRAL_MILITARY_CIRCLE": {
+      "name": "CENTRAL_MILITARY_CIRCLE",
+      "center": {
+        "lat": 36.893,
+        "lng": -76.238
+      },
+      "bbox": {
+        "min_lat": 36.87,
+        "max_lat": 36.92,
+        "min_lng": -76.27,
+        "max_lng": -76.205
+      },
+      "submarkets": [
+        "Military Circle",
+        "Norview"
+      ]
+    },
+    "SOUTH_NORFOLK_BERKLEY": {
+      "name": "SOUTH_NORFOLK_BERKLEY",
+      "center": {
+        "lat": 36.855,
+        "lng": -76.274
+      },
+      "bbox": {
+        "min_lat": 36.83,
+        "max_lat": 36.88,
+        "min_lng": -76.3,
+        "max_lng": -76.23
+      },
+      "submarkets": [
+        "Berkley",
+        "Campostella"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Norfolk & Waterfront": {
+      "name": "Downtown Norfolk & Waterfront",
+      "division": "DOWNTOWN_WATERFRONT",
+      "center": {
+        "lat": 36.8505,
+        "lng": -76.293
+      },
+      "description": "Elizabeth River waterfront CBD anchored by USS Wisconsin, Nauticus, Waterside District, and the Dominion Enterprises tower boom along Main Street."
+    },
+    "NEON Arts District": {
+      "name": "NEON Arts District",
+      "division": "DOWNTOWN_WATERFRONT",
+      "center": {
+        "lat": 36.862,
+        "lng": -76.2905
+      },
+      "description": "Gallery-and-mural arts corridor on Granby Street's north end converting warehouses into studios, breweries, and infill apartments."
+    },
+    "Lamberts Point": {
+      "name": "Lamberts Point",
+      "division": "DOWNTOWN_WATERFRONT",
+      "center": {
+        "lat": 36.872,
+        "lng": -76.306
+      },
+      "description": "Coal-pier and rail-front neighborhood beside Old Dominion University rebuilding its rowhouse stock amid industrial-buffer redevelopment."
+    },
+    "Ghent": {
+      "name": "Ghent",
+      "division": "GHENT_WESTBURG",
+      "center": {
+        "lat": 36.864,
+        "lng": -76.282
+      },
+      "description": "Historic brick rowhouse district around the Harrison Opera House and Colley Avenue retail spine with relentless renovation demand."
+    },
+    "West Ghent & Page Point": {
+      "name": "West Ghent & Page Point",
+      "division": "GHENT_WESTBURG",
+      "center": {
+        "lat": 36.87,
+        "lng": -76.3
+      },
+      "description": "Colonial Place-adjacent enclave of craftsman homes fronting the Elizabeth River with steady high-end remodel activity."
+    },
+    "Wards Corner": {
+      "name": "Wards Corner",
+      "division": "GHENT_WESTBURG",
+      "center": {
+        "lat": 36.898,
+        "lng": -76.265
+      },
+      "description": "Mid-century commercial crossroads of Hampton Blvd and Granby undergoing planned mixed-use redevelopment at the Talbot Park edge."
+    },
+    "Ocean View": {
+      "name": "Ocean View",
+      "division": "OCEAN_VIEW",
+      "center": {
+        "lat": 36.945,
+        "lng": -76.33
+      },
+      "description": "Chesapeake Bay beach-strip cottages and condo corridors along Ocean View Avenue with Naval Station Norfolk visible across Willoughby Bay."
+    },
+    "East Beach": {
+      "name": "East Beach",
+      "division": "OCEAN_VIEW",
+      "center": {
+        "lat": 36.967,
+        "lng": -76.285
+      },
+      "description": "New Urbanist master-planned bayfront community of cottage courts and marina village commanding premium coastal pricing."
+    },
+    "Willoughby Spit": {
+      "name": "Willoughby Spit",
+      "division": "OCEAN_VIEW",
+      "center": {
+        "lat": 36.923,
+        "lng": -76.318
+      },
+      "description": "Slim sand-spit peninsula of bungalow stock between the Bay and the HRBT approach with flood-resilience retrofit demand."
+    },
+    "Military Circle": {
+      "name": "Military Circle",
+      "division": "CENTRAL_MILITARY_CIRCLE",
+      "center": {
+        "lat": 36.888,
+        "lng": -76.245
+      },
+      "description": "Mall-redevelopment district near Sentara Norfolk General Hospital's Janaf corridor pivoting from retail boxes to medical-adjacent mixed use."
+    },
+    "Norview": {
+      "name": "Norview",
+      "division": "CENTRAL_MILITARY_CIRCLE",
+      "center": {
+        "lat": 36.899,
+        "lng": -76.23
+      },
+      "description": "Post-war starter-home neighborhoods under the NAS Norfolk flight path with affordable entry pricing and steady investor rehab flow."
+    },
+    "Berkley": {
+      "name": "Berkley",
+      "division": "SOUTH_NORFOLK_BERKLEY",
+      "center": {
+        "lat": 36.852,
+        "lng": -76.283
+      },
+      "description": "Historic shipyard-worker grid south of the Elizabeth River with century-old foursquares and early-stage riverfront reinvestment."
+    },
+    "Campostella": {
+      "name": "Campostella",
+      "division": "SOUTH_NORFOLK_BERKLEY",
+      "center": {
+        "lat": 36.858,
+        "lng": -76.264
+      },
+      "description": "Riverside residential district near the Virginia Zoo and Campostella Bridge anchoring South Norfolk's gradual appreciation curve."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "socrata",
+      "watermark_col": "issue_date",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "socrata",
+      "watermark_col": "creation_date",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": {
+      "platform": "socrata",
+      "watermark_col": "transfer_date",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/norfolk.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

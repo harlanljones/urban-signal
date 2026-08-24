@@ -1,0 +1,158 @@
+/* Extras: glossary, changelog, and secondary footer navigation.
+   Loaded after polish.css; mirrors its ink/lime/mono/serif vocabulary. */
+
+/* Secondary footer nav — Glossary · Changelog. Deliberately quieter than
+   .agent-links (muted, not lime) so machine resources stay primary. */
+.site-links {
+  display: flex;
+  gap: 22px;
+  font: 500 .75rem var(--mono);
+  text-transform: uppercase;
+}
+
+.site-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--muted);
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+}
+
+.site-links a:hover { color: var(--lime); }
+
+@media (max-width: 900px) {
+  .site-links { flex-wrap: wrap; gap: 14px 18px; }
+}
+
+/* Glossary */
+.glossary-list {
+  max-width: 78ch;
+  margin: 65px 0 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.glossary-entry {
+  display: grid;
+  grid-template-columns: minmax(13rem, 17rem) 1fr;
+  gap: 14px 48px;
+  padding: 34px 0;
+  border-bottom: 1px solid var(--line);
+  scroll-margin-top: 90px;
+}
+
+.glossary-entry dt {
+  color: var(--paper);
+  font: 400 1.35rem/1.25 var(--serif);
+}
+
+.glossary-tag {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--lime);
+  font-size: .63rem;
+}
+
+.glossary-entry dd {
+  margin: 0;
+}
+
+.glossary-entry dd p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: .92rem;
+  line-height: 1.7;
+}
+
+.glossary-entry code,
+.glossary-more code {
+  padding: 2px 6px;
+  background: var(--ink2);
+  font: .8rem var(--mono);
+  color: var(--gold);
+}
+
+.glossary-more {
+  font-size: .68rem !important;
+  letter-spacing: .06em;
+}
+
+.glossary-more a {
+  color: var(--lime);
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .glossary-entry { grid-template-columns: 1fr; }
+}
+
+/* Changelog */
+.changelog-body {
+  max-width: 78ch;
+  margin-top: 65px;
+  border-top: 1px solid var(--line);
+}
+
+.changelog-body h2 {
+  margin: 72px 0 18px;
+  font: 400 clamp(1.7rem, 2.6vw, 2.4rem)/1.15 var(--serif);
+  letter-spacing: -.01em;
+}
+
+.changelog-body > h2:first-child { margin-top: 55px; }
+
+.changelog-body h3 {
+  margin: 38px 0 12px;
+  color: var(--lime);
+  font: 500 .75rem var(--mono);
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.changelog-body p {
+  max-width: 70ch;
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: .92rem;
+  line-height: 1.7;
+}
+
+.changelog-body ul {
+  max-width: 70ch;
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.changelog-body li {
+  position: relative;
+  padding: 9px 0 9px 26px;
+  border-bottom: 1px solid #24352f;
+  color: var(--muted);
+  font-size: .88rem;
+  line-height: 1.65;
+}
+
+.changelog-body li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: var(--line);
+  font: 500 .85rem var(--mono);
+}
+
+.changelog-body a {
+  color: var(--lime);
+  text-decoration: underline;
+}
+
+.changelog-body strong { color: var(--paper); }
+
+.changelog-body code {
+  padding: 2px 5px;
+  background: var(--ink2);
+  font: .78rem var(--mono);
+  color: var(--gold);
+}

@@ -1143,6 +1143,10 @@ def get_dashboard_html() -> str:
           <option value="denver">🏔️ Denver (1 Division)</option>
           <option value="philadelphia">🔔 Philadelphia (8 Divisions)</option>
           <option value="washington_dc">🏛️ Washington DC (8 Divisions)</option>
+          <option value="prince_georges">🐎 Prince George's County (1 Division)</option>
+          <option value="columbus">⚓ Columbus (1 Division)</option>
+          <option value="nashville">🎸 Nashville (1 Division)</option>
+          <option value="kansas_city">🎷 Kansas City (1 Division)</option>
         </select>
       </div>
       <div class="compare-control">
@@ -1680,6 +1684,74 @@ def get_dashboard_html() -> str:
           'HILL_EAST_FAIRLINTON': { lat: 38.8760, lng: -76.9700, zoom: 13.0, pitch: 45, bearing: -10 },
           'ANACOSTIA_EAST_OF_THE_RIVER': { lat: 38.8620, lng: -76.9650, zoom: 12.6, pitch: 45, bearing: -10 }
         }
+      },
+      prince_georges: {
+        center: [-76.75, 38.72],
+        zoom: 10.6,
+        pitch: 48,
+        bearing: -10,
+        name: "Prince George's County",
+        metroBbox: { min_lat: 38.55, max_lat: 39.22, min_lng: -77.12, max_lng: -76.62 },
+        allLabel: 'All Prince Georges',
+        divisions: [
+          { key: 'ALL', label: 'All Prince Georges', class: 'ALL' },
+          { key: 'PRINCE_GEORGES_CORE', label: 'Prince Georges County', class: 'PrinceGeorgesCore' }
+        ],
+        presets: {
+          'ALL': { lat: 38.72, lng: -76.75, zoom: 10.4, pitch: 45, bearing: -10 },
+          'PRINCE_GEORGES_CORE': { lat: 38.72, lng: -76.75, zoom: 10.6, pitch: 48, bearing: -10 }
+        }
+      },
+      columbus: {
+        center: [-83.0007, 39.9612],
+        zoom: 11.4,
+        pitch: 48,
+        bearing: -10,
+        name: 'Columbus',
+        metroBbox: { min_lat: 39.75, max_lat: 40.20, min_lng: -83.30, max_lng: -82.70 },
+        allLabel: 'All Columbus',
+        divisions: [
+          { key: 'ALL', label: 'All Columbus', class: 'ALL' },
+          { key: 'COLUMBUS_CORE', label: 'Columbus Core', class: 'ColumbusCore' }
+        ],
+        presets: {
+          'ALL': { lat: 39.9612, lng: -83.0007, zoom: 11.2, pitch: 45, bearing: -10 },
+          'COLUMBUS_CORE': { lat: 39.9612, lng: -83.0007, zoom: 11.8, pitch: 48, bearing: -10 }
+        }
+      },
+      nashville: {
+        center: [-86.7818, 36.1627],
+        zoom: 10.4,
+        pitch: 48,
+        bearing: -10,
+        name: 'Nashville',
+        metroBbox: { min_lat: 35.94, max_lat: 36.44, min_lng: -87.16, max_lng: -86.46 },
+        allLabel: 'All Nashville',
+        divisions: [
+          { key: 'ALL', label: 'All Nashville', class: 'ALL' },
+          { key: 'NASHVILLE_CORE', label: 'Davidson County', class: 'NashvilleCore' }
+        ],
+        presets: {
+          'ALL': { lat: 36.1627, lng: -86.7818, zoom: 10.2, pitch: 45, bearing: -10 },
+          'NASHVILLE_CORE': { lat: 36.1627, lng: -86.7818, zoom: 10.8, pitch: 48, bearing: -10 }
+        }
+      },
+      kansas_city: {
+        center: [-94.58, 39.10],
+        zoom: 10.8,
+        pitch: 48,
+        bearing: -10,
+        name: 'Kansas City',
+        metroBbox: { min_lat: 38.75, max_lat: 39.40, min_lng: -94.80, max_lng: -94.30 },
+        allLabel: 'All Kansas City',
+        divisions: [
+          { key: 'ALL', label: 'All Kansas City', class: 'ALL' },
+          { key: 'KANSAS_CITY_CORE', label: 'Kansas City Core', class: 'KansasCityCore' }
+        ],
+        presets: {
+          'ALL': { lat: 39.10, lng: -94.58, zoom: 10.6, pitch: 45, bearing: -10 },
+          'KANSAS_CITY_CORE': { lat: 39.10, lng: -94.58, zoom: 11.2, pitch: 48, bearing: -10 }
+        }
       }
     };
     CITY_CONFIGS.sf = CITY_CONFIGS.san_francisco;
@@ -1709,7 +1781,9 @@ def get_dashboard_html() -> str:
       washington_dc: { lat: 38.9072, lng: -77.0369 }, baltimore: { lat: 39.2904, lng: -76.6122 },
       montgomery: { lat: 39.0840, lng: -77.1528 }, boston: { lat: 42.3601, lng: -71.0589 },
       cincinnati: { lat: 39.1031, lng: -84.5120 }, baton_rouge: { lat: 30.4515, lng: -91.1871 },
-      denver: { lat: 39.7392, lng: -104.9903 }
+      denver: { lat: 39.7392, lng: -104.9903 }, prince_georges: { lat: 38.72, lng: -76.75 },
+      columbus: { lat: 39.9612, lng: -83.0007 }, nashville: { lat: 36.1627, lng: -86.7818 },
+      kansas_city: { lat: 39.10, lng: -94.58 }
     };
 
     function renderCompareOptions() {
@@ -1831,7 +1905,11 @@ def get_dashboard_html() -> str:
         'detroit': { lat: 42.3314, lng: -83.0458 },
         'austin': { lat: 30.2672, lng: -97.7431 },
         'philadelphia': { lat: 39.9526, lng: -75.1652 },
-        'washington_dc': { lat: 38.9072, lng: -77.0369 }
+        'washington_dc': { lat: 38.9072, lng: -77.0369 },
+        'prince_georges': { lat: 38.72, lng: -76.75 },
+        'columbus': { lat: 39.9612, lng: -83.0007 },
+        'nashville': { lat: 36.1627, lng: -86.7818 },
+        'kansas_city': { lat: 39.10, lng: -94.58 }
       };
       let closest = 'san_francisco';
       let minDist = Infinity;

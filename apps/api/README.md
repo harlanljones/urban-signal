@@ -23,9 +23,9 @@ inference workers.
 ## Architecture & Subpackages
 
 - **`src/schemas/`**: Pydantic models for incoming telemetry and Avro schema definitions (`.avsc`) for Kafka event contracts.
-- **`src/spatial/`**: Uber H3 spatial indexing (Res 7 macro, Res 8 submarket, Res 9 micro), per-city coordinate definitions, and the central `city_registry.py`.
+- **`src/spatial/`**: Uber H3 spatial indexing (Res 7 macro, Res 8 submarket, Res 9 micro), 21 per-city coordinate modules, address geocoding fallback (`geocoder.py`), and the central `city_registry.py`.
 - **`src/features/`**: Time-decayed CapEx density (180-day half-life), 311 shift dynamics ratio ($QoL / Neglect$), and Leading Indicator Momentum Score (LIMS) calculator.
-- **`src/producers/`**: Socrata SODA, ArcGIS REST, CARTO, and CKAN clients, municipal ingestion producers, and poller scheduler.
+- **`src/producers/`**: Socrata SODA, ArcGIS REST, CARTO, and CKAN clients, municipal ingestion producers, typed text watermarks, durable watermark state, and poller scheduler.
 - **`src/consumers/`**: Stream enrichment workers (H3 spatial indexing, feature aggregation, alerts publisher, PostGIS persistence).
 - **`src/storage/`**: PostGIS 16 spatial synchronization engine with GiST/BRIN indexing.
 - **`src/models/`**: Multi-horizon forecasting models (LightGBM Quantile pinball loss, SpatioTemporal GNN, MultiScale DCN-v2, and ONNX exporter).
@@ -49,13 +49,13 @@ uv pip install -e ".[dev]"
 
 ```bash
 # Run all unit tests
-pytest tests/unit -v
+uv run pytest tests/unit -v
 
-# Run the interlock invariant gate (closure, completeness, containment across all 17 metros)
-pytest -m interlock
+# Run the interlock invariant gate (closure, completeness, containment across all 21 metros)
+uv run pytest -m interlock
 
 # Run end-to-end integration tests
-pytest tests/e2e -v
+uv run pytest tests/e2e -v
 ```
 
 ### 3. Launching the API & Local Dashboard

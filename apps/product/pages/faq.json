@@ -1,0 +1,5 @@
+{
+  "title": "FAQ — Urban Signal",
+  "description": "Answers grounded in the repository and facts.json: why metros differ, what a limited feed means, refresh cadence, where data comes from, running locally, how a city gets registered, and what the scores do not claim.",
+  "noscript": "<div class=\"no-script\"><p>This page is fully readable without JavaScript. Machine-readable context:</p><a href=\"/facts.json\">Machine-readable facts</a> · <a href=\"/llms-full.txt\">Full agent context</a> · <a href=\"https://github.com/harlanljones/urban-signal\">Repository</a></div>"
+}

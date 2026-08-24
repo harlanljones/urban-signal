@@ -2,13 +2,15 @@
 
 import argparse
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
+
 from src.config import settings
-from src.producers.base_producer import BaseKafkaProducer
 from src.producers.arcgis_client import ArcGISClient
+from src.producers.base_producer import BaseKafkaProducer
 from src.producers.carto_client import CartoClient
+from src.producers.ckan_client import CkanClient
 from src.producers.socrata_client import SocrataClient
 from src.schemas.models import JobType, PermitEvent
 from src.spatial.h3_indexer import H3SpatialIndexer
@@ -16,12 +18,12 @@ from src.spatial.h3_indexer import H3SpatialIndexer
 logger = logging.getLogger(__name__)
 
 
-def _parse_datetime(val: Any) -> Optional[datetime]:
+def _parse_datetime(val: Any) -> datetime | None:
     """Parse various ISO and common municipal date formats into a timezone-aware datetime."""
     if not val:
         return None
     if isinstance(val, datetime):
-        return val if val.tzinfo else val.replace(tzinfo=timezone.utc)
+        return val if val.tzinfo else val.replace(tzinfo=UTC)
     if isinstance(val, str):
         val_clean = val.replace("Z", "+00:00").strip()
         try:
@@ -37,7 +39,7 @@ def _parse_datetime(val: Any) -> Optional[datetime]:
             "%Y-%m-%dT%H:%M:%S",
         ):
             try:
-                return datetime.strptime(val.strip(), fmt).replace(tzinfo=timezone.utc)
+                return datetime.strptime(val.strip(), fmt).replace(tzinfo=UTC)
             except ValueError:
                 pass
     return None
@@ -46,7 +48,7 @@ def _parse_datetime(val: Any) -> Optional[datetime]:
 class DOBPermitsProducer:
     """Ingests NYC, Chicago, and San Francisco building permit filings and streams to Kafka."""
 
-    def __init__(self, bootstrap_servers: Optional[str] = None):
+    def __init__(self, bootstrap_servers: str | None = None):
         schema_path = Path(__file__).parent.parent / "schemas" / "avro" / "permit_event.avsc"
         self.producer = BaseKafkaProducer(
             bootstrap_servers=bootstrap_servers,
@@ -56,6 +58,7 @@ class DOBPermitsProducer:
         self.socrata = SocrataClient()
         self.arcgis = ArcGISClient()
         self.carto = CartoClient()
+        self.ckan = CkanClient()
         self.spatial_indexer = H3SpatialIndexer()
 
     def _client_for(self, platform: str):
@@ -79,11 +82,14 @@ class DOBPermitsProducer:
             )
         return client
 
-    def parse_socrata_row(self, row: Dict[str, Any], city_id: Optional[str] = None) -> Optional[PermitEvent]:
+    def parse_socrata_row(self, row: dict[str, Any], city_id: str | None = None) -> PermitEvent | None:
         """Convert raw Socrata JSON permit dict into strongly-typed PermitEvent."""
         try:
             # Determine city_id
-            from src.spatial.city_registry import CityId, ALIASES, REGISTRY, FeedType, normalize_city, get_dataset
+            from src.spatial.city_registry import (
+                FeedType,
+                normalize_city,
+            )
             if city_id is not None:
                 norm_c = normalize_city(city_id)
                 resolved_city = norm_c.value if norm_c else city_id.lower()
@@ -331,15 +337,20 @@ class DOBPermitsProducer:
                 h3_res7=h3_res["h3_res7"],
                 h3_res8=h3_res["h3_res8"],
                 h3_res9=h3_res["h3_res9"],
-                ingested_at=datetime.now(timezone.utc),
+                ingested_at=datetime.now(UTC),
             )
         except Exception as e:
             logger.warning("Error parsing permit row: %s", e)
             return None
 
-    def run_stream(self, city_id: str = "nyc", limit: int = 5000, where_clause: Optional[str] = None):
+    def run_stream(self, city_id: str = "nyc", limit: int = 5000, where_clause: str | None = None):
         """Fetch permit records and stream them into Kafka topic."""
-        from src.spatial.city_registry import REGISTRY, CityId, FeedType, normalize_city, get_dataset
+        from src.spatial.city_registry import (
+            CityId,
+            FeedType,
+            get_dataset,
+            normalize_city,
+        )
         cid = normalize_city(city_id) or CityId.NYC
         spec = get_dataset(cid, FeedType.PERMITS)
         endpoint = spec.endpoint

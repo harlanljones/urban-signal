@@ -1,0 +1,288 @@
+{
+  "schema_version": 2,
+  "id": "austin",
+  "name": "Austin",
+  "state": "TX",
+  "center": {
+    "lat": 30.2672,
+    "lng": -97.7431
+  },
+  "metro_bbox": {
+    "min_lat": 30.1,
+    "max_lat": 30.62,
+    "min_lng": -98.05,
+    "max_lng": -97.52
+  },
+  "divisions": {
+    "DOWNTOWN_CAPITOL": {
+      "name": "DOWNTOWN_CAPITOL",
+      "center": {
+        "lat": 30.267,
+        "lng": -97.74
+      },
+      "bbox": {
+        "min_lat": 30.25,
+        "max_lat": 30.29,
+        "min_lng": -97.765,
+        "max_lng": -97.725
+      },
+      "submarkets": [
+        "Rainey Street & Riverfront",
+        "Warehouse District",
+        "Congress Ave & Capitol Complex"
+      ]
+    },
+    "EAST_AUSTIN_MUELLER": {
+      "name": "EAST_AUSTIN_MUELLER",
+      "center": {
+        "lat": 30.28,
+        "lng": -97.69
+      },
+      "bbox": {
+        "min_lat": 30.25,
+        "max_lat": 30.31,
+        "min_lng": -97.72,
+        "max_lng": -97.66
+      },
+      "submarkets": [
+        "East Cesar Chavez & Holly",
+        "East 6th Street Corridor",
+        "Mueller & Cherrywood"
+      ]
+    },
+    "SOUTH_AUSTIN_SOCO": {
+      "name": "SOUTH_AUSTIN_SOCO",
+      "center": {
+        "lat": 30.21,
+        "lng": -97.75
+      },
+      "bbox": {
+        "min_lat": 30.16,
+        "max_lat": 30.25,
+        "min_lng": -97.81,
+        "max_lng": -97.72
+      },
+      "submarkets": [
+        "South Congress (SoCo)",
+        "Travis Heights",
+        "Bouldin Creek"
+      ]
+    },
+    "NORTH_AUSTIN_DOMAIN": {
+      "name": "NORTH_AUSTIN_DOMAIN",
+      "center": {
+        "lat": 30.36,
+        "lng": -97.72
+      },
+      "bbox": {
+        "min_lat": 30.305,
+        "max_lat": 30.48,
+        "min_lng": -97.76,
+        "max_lng": -97.655
+      },
+      "submarkets": [
+        "The Domain & North Burnet",
+        "Hyde Park & North Loop"
+      ]
+    },
+    "WEST_AUSTIN_HILLS": {
+      "name": "WEST_AUSTIN_HILLS",
+      "center": {
+        "lat": 30.28,
+        "lng": -97.79
+      },
+      "bbox": {
+        "min_lat": 30.25,
+        "max_lat": 30.4,
+        "min_lng": -97.865,
+        "max_lng": -97.755
+      },
+      "submarkets": [
+        "Westlake Hills Edge",
+        "Barton Hills & Zilker",
+        "South Lamar Corridor"
+      ]
+    },
+    "PFLUGERVILLE_ROUND_ROCK_EDGE": {
+      "name": "PFLUGERVILLE_ROUND_ROCK_EDGE",
+      "center": {
+        "lat": 30.46,
+        "lng": -97.65
+      },
+      "bbox": {
+        "min_lat": 30.39,
+        "max_lat": 30.55,
+        "min_lng": -97.72,
+        "max_lng": -97.52
+      },
+      "submarkets": [
+        "Tech Ridge & Pflugerville South",
+        "Round Rock Edge & La Frontera"
+      ]
+    }
+  },
+  "submarkets": {
+    "Rainey Street & Riverfront": {
+      "name": "Rainey Street & Riverfront",
+      "division": "DOWNTOWN_CAPITOL",
+      "center": {
+        "lat": 30.2565,
+        "lng": -97.737
+      },
+      "description": "Bungalow-to-tower conversion district on Lady Bird Lake's north shore, where hotel and residential towers dominate the permit pipeline."
+    },
+    "Warehouse District": {
+      "name": "Warehouse District",
+      "division": "DOWNTOWN_CAPITOL",
+      "center": {
+        "lat": 30.2685,
+        "lng": -97.7505
+      },
+      "description": "Historic supply-warehouse blocks west of Congress now carrying office-to-residential conversions and ground-floor hospitality."
+    },
+    "Congress Ave & Capitol Complex": {
+      "name": "Congress Ave & Capitol Complex",
+      "division": "DOWNTOWN_CAPITOL",
+      "center": {
+        "lat": 30.2745,
+        "lng": -97.7355
+      },
+      "description": "Capitol-view office spine with the Texas Capitol complex and state-tenant demand anchoring the state government economy."
+    },
+    "East Cesar Chavez & Holly": {
+      "name": "East Cesar Chavez & Holly",
+      "division": "EAST_AUSTIN_MUELLER",
+      "center": {
+        "lat": 30.2575,
+        "lng": -97.7165
+      },
+      "description": "Former industrial riverfront edge east of I-35 with townhome infill, music-venue adaptive reuse, and sustained small-lot development."
+    },
+    "East 6th Street Corridor": {
+      "name": "East 6th Street Corridor",
+      "division": "EAST_AUSTIN_MUELLER",
+      "center": {
+        "lat": 30.2645,
+        "lng": -97.7105
+      },
+      "description": "Bar-and-venue strip turned mixed-use corridor with mid-rise multifamily replacing single-story commercial east of the highway."
+    },
+    "Mueller & Cherrywood": {
+      "name": "Mueller & Cherrywood",
+      "division": "EAST_AUSTIN_MUELLER",
+      "center": {
+        "lat": 30.2975,
+        "lng": -97.7075
+      },
+      "description": "Master-planned airport redevelopment with continued buildout phases adjacent to Cherrywood and Windsor Park bungalow stock."
+    },
+    "South Congress (SoCo)": {
+      "name": "South Congress (SoCo)",
+      "division": "SOUTH_AUSTIN_SOCO",
+      "center": {
+        "lat": 30.2455,
+        "lng": -97.7505
+      },
+      "description": "Hotel-and-retail flagship corridor with boutique lodging conversions and skyline-view multifamily on its side streets."
+    },
+    "Travis Heights": {
+      "name": "Travis Heights",
+      "division": "SOUTH_AUSTIN_SOCO",
+      "center": {
+        "lat": 30.2395,
+        "lng": -97.7415
+      },
+      "description": "Historic district of craftsman and mid-century stock south of Lake Shore Drive, with renovation-heavy permitting and strict tree ordinances."
+    },
+    "Bouldin Creek": {
+      "name": "Bouldin Creek",
+      "division": "SOUTH_AUSTIN_SOCO",
+      "center": {
+        "lat": 30.2475,
+        "lng": -97.7625
+      },
+      "description": "Cottage-grid neighbourhood between S 1st and Lamar with teardown/rebuild pressure and independent retail spines."
+    },
+    "The Domain & North Burnet": {
+      "name": "The Domain & North Burnet",
+      "division": "NORTH_AUSTIN_DOMAIN",
+      "center": {
+        "lat": 30.4005,
+        "lng": -97.7245
+      },
+      "description": "Apple-, Amazon- and Meta-anchored secondary downtown under the Burnet/Braker overlay, with the metro's densest office pipeline outside the core."
+    },
+    "Hyde Park & North Loop": {
+      "name": "Hyde Park & North Loop",
+      "division": "NORTH_AUSTIN_DOMAIN",
+      "center": {
+        "lat": 30.3135,
+        "lng": -97.7255
+      },
+      "description": "Streetcar-era bungalow historic district meeting the North Loop indie-retail strip, with renovation-led permits and neighborhood-conservation overlays."
+    },
+    "Westlake Hills Edge": {
+      "name": "Westlake Hills Edge",
+      "division": "WEST_AUSTIN_HILLS",
+      "center": {
+        "lat": 30.2905,
+        "lng": -97.8055
+      },
+      "description": "Hill-country estate stock at the Westlake village boundary with teardown-rebuild mansions dominating a low-volume, high-value permit mix."
+    },
+    "Barton Hills & Zilker": {
+      "name": "Barton Hills & Zilker",
+      "division": "WEST_AUSTIN_HILLS",
+      "center": {
+        "lat": 30.2535,
+        "lng": -97.7805
+      },
+      "description": "Park-adjacent post-war residential hills beside Zilker Park, drawing renovation capital from greenbelt access."
+    },
+    "South Lamar Corridor": {
+      "name": "South Lamar Corridor",
+      "division": "WEST_AUSTIN_HILLS",
+      "center": {
+        "lat": 30.2625,
+        "lng": -97.7725
+      },
+      "description": "Strip-retail arterial undergoing station-area densification with multifamily replacements of aging retail and motel stock."
+    },
+    "Tech Ridge & Pflugerville South": {
+      "name": "Tech Ridge & Pflugerville South",
+      "division": "PFLUGERVILLE_ROUND_ROCK_EDGE",
+      "center": {
+        "lat": 30.4155,
+        "lng": -97.6835
+      },
+      "description": "Transit-oriented park-and-ride node shading into Pflugerville's southern subdivisions along the I-35 growth spine."
+    },
+    "Round Rock Edge & La Frontera": {
+      "name": "Round Rock Edge & La Frontera",
+      "division": "PFLUGERVILLE_ROUND_ROCK_EDGE",
+      "center": {
+        "lat": 30.5055,
+        "lng": -97.7005
+      },
+      "description": "Williamson County commercial edge at the metro's northern boundary, permitted through Round Rock rather than the City of Austin."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "socrata",
+      "watermark_col": "issue_date",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "socrata",
+      "watermark_col": "sr_created_date",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/austin.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

@@ -1,0 +1,42 @@
+    <h1 class="sr-only">Frequently asked questions</h1>
+    <section class="section-wrap section-block" aria-labelledby="faq-title">
+      <div class="section-heading">
+        <span class="mono label">QUESTIONS</span>
+        <h2 id="faq-title">Asked,<br><em>answered honestly.</em></h2>
+        <p>Every answer below traces to the repository or to <a href="/facts.json"><code>facts.json</code></a>. Where the honest answer is a limitation, the answer states the limitation.</p>
+      </div>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>Why do metros differ from each other?</summary>
+          <p>Because their registry entries declare different datasets. The <a href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/spatial/city_registry.py" target="_blank" rel="noreferrer">city registry</a> records, per metro, which feed families publish, on which platform (Socrata, ArcGIS, Carto, CKAN), at what cadence, and with which divisions and submarkets. One metro publishes all four families; another publishes fewer. Coverage is stated per metro on <a href="/cities/">/cities</a> — never averaged into a single number.</p>
+        </details>
+        <details class="faq-item">
+          <summary>What does “limited” mean on a feed token?</summary>
+          <p>A struck-through token means the metro's registry entry currently declares no dataset spec for that feed family — the pipeline does not ingest that family there yet. It is a statement about declared sources, not about data quality, and it can change only by changing the registry, never the copy.</p>
+        </details>
+        <details class="faq-item">
+          <summary>How often does each feed refresh?</summary>
+          <p>Refresh cadence is declared per feed in the registry as an interval — the poll cadence of the upstream platform — and surfaced in the coverage matrix and cadence table on <a href="/cities/">/cities</a>, counted from facts.json. Intervals differ across platforms and metros. Signals move at feed cadence: minutes for some feeds, snapshots for others. Cadence is declared, never implied realtime.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Where does the data come from?</summary>
+          <p>Municipal open-data portals. Source-specific producers read Socrata, ArcGIS, Carto, and CKAN endpoints declared in the city registry, preserving each city's field names before normalization. The registry is the contract: if a dataset is not declared there, it does not exist downstream. Every metro page links its exact source contract under “Inspect this metro's source contract.”</p>
+        </details>
+        <details class="faq-item">
+          <summary>How do I run this locally?</summary>
+          <p>The repository README covers it end-to-end in its Quickstart &amp; Local Development section — infrastructure, ingestion producers, stream consumers, the serving API, and the dashboard. Commands are kept in one place, next to the code they run, so they cannot drift from it: <a href="https://github.com/harlanljones/urban-signal#6-quickstart--local-development" target="_blank" rel="noreferrer">README → Quickstart &amp; Local Development</a>.</p>
+        </details>
+        <details class="faq-item">
+          <summary>How does a city get registered?</summary>
+          <p>Through four gates, enforced by the repository rather than by goodwill: <strong>declare</strong> a registry entry (endpoints, watermark column, divisions, submarkets); <strong>project</strong> it — <code>facts:export</code> regenerates the site's facts so hand-edited coverage cannot drift; <strong>wire</strong> it — the dashboard map must show the city, and the interlock gate fails any run where it does not; <strong>publish</strong> — site pages regenerate from the same facts. A city that skips a gate does not ship. The walkthrough lives on <a href="/architecture/">/architecture</a>.</p>
+        </details>
+        <details class="faq-item">
+          <summary>What do the scores NOT mean?</summary>
+          <p>The boundary stated on <a href="/methodology/">/methodology</a> applies everywhere. LIMS is <strong>not a price forecast</strong> — it measures momentum in municipal activity, not transaction prices or returns. It is <strong>not a performance claim</strong> — no accuracy, precision, or ROI numbers are published anywhere on this site, by policy rather than omission. And the 68/100 panel shown there is an illustrative interface example: only its ingredient weights are the calculator's real defaults.</p>
+        </details>
+      </div>
+      <div class="closing-routes system-next">
+        <a class="route-primary" href="/cities/"><span>See per-metro coverage</span><small>Cities: every feed family stated, including gaps</small></a>
+        <a class="route-secondary" href="/architecture/"><span>Read how cities join</span><small>Architecture: the four enforced gates</small></a>
+      </div>
+    </section>

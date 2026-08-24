@@ -2,14 +2,16 @@
 
 import argparse
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
+
 from src.config import settings
 from src.features.shift_dynamics import ComplaintShiftDynamics
-from src.producers.base_producer import BaseKafkaProducer
 from src.producers.arcgis_client import ArcGISClient
+from src.producers.base_producer import BaseKafkaProducer
 from src.producers.carto_client import CartoClient
+from src.producers.ckan_client import CkanClient
 from src.producers.socrata_client import SocrataClient
 from src.schemas.models import Complaint311Event
 from src.spatial.h3_indexer import H3SpatialIndexer
@@ -17,12 +19,12 @@ from src.spatial.h3_indexer import H3SpatialIndexer
 logger = logging.getLogger(__name__)
 
 
-def _parse_datetime(val: Any) -> Optional[datetime]:
+def _parse_datetime(val: Any) -> datetime | None:
     """Parse various ISO and common municipal date formats into a timezone-aware datetime."""
     if not val:
         return None
     if isinstance(val, datetime):
-        return val if val.tzinfo else val.replace(tzinfo=timezone.utc)
+        return val if val.tzinfo else val.replace(tzinfo=UTC)
     if isinstance(val, str):
         val_clean = val.replace("Z", "+00:00").strip()
         try:
@@ -34,11 +36,12 @@ def _parse_datetime(val: Any) -> Optional[datetime]:
             "%Y-%m-%d",
             "%m/%d/%Y %H:%M:%S",
             "%Y-%m-%d %H:%M:%S",
+            "%Y%m%d",
             "%m/%d/%Y %I:%M:%S %p",
             "%Y-%m-%dT%H:%M:%S",
         ):
             try:
-                return datetime.strptime(val.strip(), fmt).replace(tzinfo=timezone.utc)
+                return datetime.strptime(val.strip(), fmt).replace(tzinfo=UTC)
             except ValueError:
                 pass
     return None
@@ -47,7 +50,7 @@ def _parse_datetime(val: Any) -> Optional[datetime]:
 class Complaints311Producer:
     """Ingests NYC, Chicago, and San Francisco 311 service complaints, classifies them, and streams to Kafka."""
 
-    def __init__(self, bootstrap_servers: Optional[str] = None):
+    def __init__(self, bootstrap_servers: str | None = None):
         schema_path = Path(__file__).parent.parent / "schemas" / "avro" / "complaint_311_event.avsc"
         self.producer = BaseKafkaProducer(
             bootstrap_servers=bootstrap_servers,
@@ -57,6 +60,7 @@ class Complaints311Producer:
         self.socrata = SocrataClient()
         self.arcgis = ArcGISClient()
         self.carto = CartoClient()
+        self.ckan = CkanClient()
         self.spatial_indexer = H3SpatialIndexer()
         self.shift_dynamics = ComplaintShiftDynamics()
 
@@ -81,11 +85,14 @@ class Complaints311Producer:
             )
         return client
 
-    def parse_socrata_row(self, row: Dict[str, Any], city_id: Optional[str] = None) -> Optional[Complaint311Event]:
+    def parse_socrata_row(self, row: dict[str, Any], city_id: str | None = None) -> Complaint311Event | None:
         """Parse raw 311 record into strongly-typed Complaint311Event with category classification."""
         try:
             # Determine city_id
-            from src.spatial.city_registry import CityId, ALIASES, REGISTRY, FeedType, normalize_city, get_dataset
+            from src.spatial.city_registry import (
+                FeedType,
+                normalize_city,
+            )
             if city_id is not None:
                 norm_c = normalize_city(city_id)
                 resolved_city = norm_c.value if norm_c else city_id.lower()
@@ -128,6 +135,7 @@ class Complaints311Producer:
                 resolved_city = "nyc"
 
             from src.producers.field_maps import first_mapped, resolve_field_map
+            from src.spatial.geocoder import geocode_row_if_declared
 
             field_map = resolve_field_map(resolved_city, FeedType.COMPLAINTS_311)
 
@@ -165,7 +173,22 @@ class Complaints311Producer:
                     )
 
             if not lat_raw or not lng_raw:
-                return None
+                # Address-string feeds declaring extra["needs_geocode"]
+                # (ADR 0004) resolve coordinates at parse time so the wire
+                # event carries real doubles; everything else keeps the
+                # legacy hard drop.
+                addr_candidate = (
+                    first_mapped(row, field_map, "incident_address")
+                    or row.get("address")
+                    or row.get("street_address")
+                    or row.get("location")
+                )
+                if isinstance(addr_candidate, dict):
+                    addr_candidate = None
+                resolved = geocode_row_if_declared(resolved_city, "311", addr_candidate)
+                if resolved is None:
+                    return None
+                lat_raw, lng_raw = resolved
 
             lat = float(lat_raw)
             lng = float(lng_raw)
@@ -208,7 +231,7 @@ class Complaints311Producer:
                 or row.get("create_date")
                 or row.get("created_at")
             )
-            created_dt = _parse_datetime(created_str) or datetime.now(timezone.utc)
+            created_dt = _parse_datetime(created_str) or datetime.now(UTC)
 
             closed_str = (
                 first_mapped(row, field_map, "closed_date")
@@ -276,15 +299,20 @@ class Complaints311Producer:
                 h3_res7=h3_res["h3_res7"],
                 h3_res8=h3_res["h3_res8"],
                 h3_res9=h3_res["h3_res9"],
-                ingested_at=datetime.now(timezone.utc),
+                ingested_at=datetime.now(UTC),
             )
         except Exception as e:
             logger.warning("Error parsing 311 row: %s", e)
             return None
 
-    def run_stream(self, city_id: str = "nyc", limit: int = 5000, where_clause: Optional[str] = None):
+    def run_stream(self, city_id: str = "nyc", limit: int = 5000, where_clause: str | None = None):
         """Fetch 311 records and stream them into Kafka topic."""
-        from src.spatial.city_registry import REGISTRY, CityId, FeedType, normalize_city, get_dataset
+        from src.spatial.city_registry import (
+            CityId,
+            FeedType,
+            get_dataset,
+            normalize_city,
+        )
         cid = normalize_city(city_id) or CityId.NYC
         spec = get_dataset(cid, FeedType.COMPLAINTS_311)
         endpoint = spec.endpoint

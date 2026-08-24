@@ -44,6 +44,13 @@ class Settings(BaseSettings):
     topic_catalyst_alerts: str = Field(default="alerts.catalyst")
     topic_dlq: str = Field(default="dlq.schema.failures")
 
+    # Scheduler durable watermark state (US-106): JSON file holding per-job
+    # high watermarks so restarts resume instead of re-paging from the start.
+    scheduler_state_file: str = Field(
+        default="",
+        description="Optional path to the scheduler watermark state file; empty disables persistence",
+    )
+
     # Consumer Group Configurations
     cg_h3_enrichment: str = Field(default="h3-enrich-workers")
     cg_complaints: str = Field(default="spatial-complaint-grp")
@@ -159,6 +166,10 @@ class Settings(BaseSettings):
         default="https://data.norfolk.gov/resource/qva7-tzrf.json",
         description="Norfolk Property Assessment and Sales FY27 endpoint (rotate ID each July)",
     )
+    socrata_norfolk_311_endpoint: str = Field(
+        default="https://data.norfolk.gov/resource/nbyu-xjez.json",
+        description="MyNorfolk 311 service requests (address-string located, ADR 0004 geocoded)",
+    )
 
     # Austin (Socrata) — partial city: SLA/DEEDS absent (TABC statewide feeds
     # carry no geocodes; Travis County portal is unreachable)
@@ -201,7 +212,10 @@ class Settings(BaseSettings):
     )
     ckan_boston_licenses_endpoint: str = Field(
         default="ckan://data.boston.gov/04dc653b-1789-4374-9669-b07df7233344",
-        description="Boston Licensing Board licenses CKAN resource",
+        description=(
+            "Boston Licensing Board licenses CKAN resource "
+            "(not ingested: gpsx/gpsy are State Plane meters, fails G5)"
+        ),
     )
 
     # Baton Rouge / East Baton Rouge Parish (Socrata).
@@ -335,6 +349,62 @@ class Settings(BaseSettings):
             "DCGIS_DATA/Property_and_Land_WebMercator/FeatureServer/57"
         ),
         description="DC Tax System Property Sales CAMA FeatureServer layer URL",
+    )
+
+    # Prince George's County, MD (Socrata): 311 service requests. The
+    # qzrv-2tnv parcel table stays unregistered pending producer geometry
+    # hardening (HJ-125 finding — MultiPolygon shapes crash deed parsing).
+    socrata_prince_georges_311_endpoint: str = Field(
+        default="https://data.princegeorgescountymd.gov/resource/2ywx-ipcd.json",
+        description="Prince George's County 311 service requests endpoint",
+    )
+
+    # Columbus, OH (ArcGIS): Accela-derived building permits (uppercase schema).
+    arcgis_columbus_permits_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/9yy6msODkIBzkUXU/arcgis/rest/services/"
+            "Building_Permits/FeatureServer/0"
+        ),
+        description="Columbus Building Permits FeatureServer layer URL",
+    )
+
+    # Nashville, TN (ArcGIS): issued building permits plus residential STR
+    # permits as the SLA-class signal; hubNashville 311 stays excluded (HJ-119).
+    arcgis_nashville_permits_url: str = Field(
+        default=(
+            "https://services2.arcgis.com/HdTo6HJqh92wn4D8/arcgis/rest/services/"
+            "Building_Permits_Issued_2/FeatureServer/0"
+        ),
+        description="Nashville Building Permits Issued FeatureServer layer URL",
+    )
+    arcgis_nashville_str_url: str = Field(
+        default=(
+            "https://services2.arcgis.com/HdTo6HJqh92wn4D8/arcgis/rest/services/"
+            "Residential_Short_Term_Rental_Permits_view/FeatureServer/0"
+        ),
+        description="Nashville Residential Short Term Rental Permits FeatureServer layer URL",
+    )
+
+    # Kansas City, MO (Socrata): 311 Call Center Reported Issues. Corrects the
+    # 2026-08-23 rejection (HJ-120); permits/SLA stay unregistered.
+    socrata_kansas_city_311_endpoint: str = Field(
+        default="https://data.kcmo.org/resource/d4px-6rwg.json",
+        description="Kansas City 311 Call Center Reported Issues endpoint",
+    )
+
+    # Address geocoding (ADR 0004): confidence floor gates wrong-cell risk —
+    # below it, events keep null H3 rather than a guessed coordinate.
+    geocode_confidence_floor: float = Field(
+        default=0.9,
+        description="Minimum confidence for a geocoded coordinate to be used",
+    )
+    geocode_backend: str = Field(
+        default="census",
+        description="Geocoder backend: 'census' (TIGER range interpolation) or 'nominatim'",
+    )
+    nominatim_base_url: str = Field(
+        default="https://nominatim.openstreetmap.org",
+        description="Nominatim base URL (self-host in production backfills)",
     )
 
     # PostgreSQL / PostGIS Database

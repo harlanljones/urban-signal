@@ -1,0 +1,308 @@
+{
+  "schema_version": 2,
+  "id": "seattle",
+  "name": "Seattle Metro",
+  "state": "WA",
+  "center": {
+    "lat": 47.6062,
+    "lng": -122.3321
+  },
+  "metro_bbox": {
+    "min_lat": 47.28,
+    "max_lat": 47.78,
+    "min_lng": -122.43,
+    "max_lng": -122.0
+  },
+  "divisions": {
+    "SEATTLE_CORE": {
+      "name": "SEATTLE_CORE",
+      "center": {
+        "lat": 47.612,
+        "lng": -122.33
+      },
+      "bbox": {
+        "min_lat": 47.58,
+        "max_lat": 47.645,
+        "min_lng": -122.37,
+        "max_lng": -122.29
+      },
+      "submarkets": [
+        "Downtown Core & Waterfront",
+        "South Lake Union",
+        "Belltown/Denny Triangle",
+        "Capitol Hill/First Hill",
+        "Pioneer Square/Chinatown-ID",
+        "Queen Anne/Magnolia"
+      ]
+    },
+    "NORTH_KING": {
+      "name": "NORTH_KING",
+      "center": {
+        "lat": 47.695,
+        "lng": -122.353
+      },
+      "bbox": {
+        "min_lat": 47.645,
+        "max_lat": 47.745,
+        "min_lng": -122.425,
+        "max_lng": -122.28
+      },
+      "submarkets": [
+        "Ballard",
+        "Fremont/Wallingford",
+        "University District/Roosevelt",
+        "Northgate/Lake City"
+      ]
+    },
+    "EASTSIDE": {
+      "name": "EASTSIDE",
+      "center": {
+        "lat": 47.635,
+        "lng": -122.135
+      },
+      "bbox": {
+        "min_lat": 47.5,
+        "max_lat": 47.77,
+        "min_lng": -122.26,
+        "max_lng": -122.01
+      },
+      "submarkets": [
+        "Downtown Bellevue",
+        "Kirkland Waterfront",
+        "Redmond/Overlake",
+        "Woodinville Wine Country",
+        "Issaquah/Sammamish"
+      ]
+    },
+    "SOUTH_KING": {
+      "name": "SOUTH_KING",
+      "center": {
+        "lat": 47.44,
+        "lng": -122.285
+      },
+      "bbox": {
+        "min_lat": 47.29,
+        "max_lat": 47.59,
+        "min_lng": -122.42,
+        "max_lng": -122.15
+      },
+      "submarkets": [
+        "West Seattle/Junction",
+        "Beacon Hill/Columbia City",
+        "Georgetown/South Park",
+        "Renton/Southcenter",
+        "Kent Valley"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Core & Waterfront": {
+      "name": "Downtown Core & Waterfront",
+      "division": "SEATTLE_CORE",
+      "center": {
+        "lat": 47.6097,
+        "lng": -122.333
+      },
+      "description": "Pike Place-Third Avenue retail spine, office towers, and waterfront redevelopment core anchored by the Convention Center expansion and waterfront park rebuild."
+    },
+    "South Lake Union": {
+      "name": "South Lake Union",
+      "division": "SEATTLE_CORE",
+      "center": {
+        "lat": 47.6264,
+        "lng": -122.3381
+      },
+      "description": "Amazon headquarters biotech and life-science district with the region's densest construction crane count and streetcar-served mixed-use infill."
+    },
+    "Belltown/Denny Triangle": {
+      "name": "Belltown/Denny Triangle",
+      "division": "SEATTLE_CORE",
+      "center": {
+        "lat": 47.615,
+        "lng": -122.345
+      },
+      "description": "Condo towers, nightlife corridors, and convention-center expansion infill between Denny Park and Elliott Bay."
+    },
+    "Capitol Hill/First Hill": {
+      "name": "Capitol Hill/First Hill",
+      "division": "SEATTLE_CORE",
+      "center": {
+        "lat": 47.618,
+        "lng": -122.315
+      },
+      "description": "Dense mixed-use nightlife and medical-institutional ridge including Swedish Medical Center, Seattle University, and Link light-rail station areas."
+    },
+    "Pioneer Square/Chinatown-ID": {
+      "name": "Pioneer Square/Chinatown-ID",
+      "division": "SEATTLE_CORE",
+      "center": {
+        "lat": 47.5995,
+        "lng": -122.3315
+      },
+      "description": "Historic loft and stadium-district adaptive reuse with light-rail gateway traffic, Climate Pledge Arena demand, and SODO industrial edge dynamics."
+    },
+    "Ballard": {
+      "name": "Ballard",
+      "division": "NORTH_KING",
+      "center": {
+        "lat": 47.6685,
+        "lng": -122.3862
+      },
+      "description": "Maritime-industrial heritage converting to Nordic-themed retail, brewery corridors, and multifamily development along Ballard Avenue and Leary Way."
+    },
+    "Fremont/Wallingford": {
+      "name": "Fremont/Wallingford",
+      "division": "NORTH_KING",
+      "center": {
+        "lat": 47.658,
+        "lng": -122.343
+      },
+      "description": "Eccentric creative corridor under the Aurora Bridge with tech satellite offices, canal-front retail, and Google campus expansion."
+    },
+    "University District/Roosevelt": {
+      "name": "University District/Roosevelt",
+      "division": "NORTH_KING",
+      "center": {
+        "lat": 47.6605,
+        "lng": -122.313
+      },
+      "description": "University of Washington anchor economy with Link-rail transit-oriented upzoning along Roosevelt Avenue and the Ave commercial spine."
+    },
+    "Queen Anne/Magnolia": {
+      "name": "Queen Anne/Magnolia",
+      "division": "SEATTLE_CORE",
+      "center": {
+        "lat": 47.635,
+        "lng": -122.36
+      },
+      "description": "Hilltop residential enclaves overlooking Uptown arts retail, Seattle Center, and Interbay rail-served industrial land."
+    },
+    "Northgate/Lake City": {
+      "name": "Northgate/Lake City",
+      "division": "NORTH_KING",
+      "center": {
+        "lat": 47.712,
+        "lng": -122.312
+      },
+      "description": "Transit-oriented mall redevelopment into the NHL Kraken practice facility and ped-friendly district plus north-end affordable infill frontier."
+    },
+    "Downtown Bellevue": {
+      "name": "Downtown Bellevue",
+      "division": "EASTSIDE",
+      "center": {
+        "lat": 47.6101,
+        "lng": -122.2015
+      },
+      "description": "Second CBD of the metro with Amazon and Microsoft towers, Bellevue Square luxury retail, and East Link light-rail expansion."
+    },
+    "Kirkland Waterfront": {
+      "name": "Kirkland Waterfront",
+      "division": "EASTSIDE",
+      "center": {
+        "lat": 47.6815,
+        "lng": -122.2087
+      },
+      "description": "Lakeside Google-corridor office market with MarinaPark civic frontage and boutique downtown retail along Lake Washington."
+    },
+    "Redmond/Overlake": {
+      "name": "Redmond/Overlake",
+      "division": "EASTSIDE",
+      "center": {
+        "lat": 47.658,
+        "lng": -122.125
+      },
+      "description": "Microsoft campus belt plus light-rail-linked downtown village redevelopment along the Redmond Technology Station corridor."
+    },
+    "Woodinville Wine Country": {
+      "name": "Woodinville Wine Country",
+      "division": "EASTSIDE",
+      "center": {
+        "lat": 47.7546,
+        "lng": -122.1589
+      },
+      "description": "Wine-country tourism district with Hollywood Hill tasting rooms, Tourist Mill light-industrial, and SR-522 logistics frontage."
+    },
+    "Issaquah/Sammamish": {
+      "name": "Issaquah/Sammamish",
+      "division": "EASTSIDE",
+      "center": {
+        "lat": 47.54,
+        "lng": -122.035
+      },
+      "description": "I-90 master-planned growth engine combining Grand Ridge tech campuses, Highlands rooftops, and Costco headquarters roots."
+    },
+    "West Seattle/Junction": {
+      "name": "West Seattle/Junction",
+      "division": "SOUTH_KING",
+      "center": {
+        "lat": 47.5612,
+        "lng": -122.3868
+      },
+      "description": "Beach-community retail node on California Avenue SW with bridge-constrained supply dynamics and Alki waterfront demand."
+    },
+    "Beacon Hill/Columbia City": {
+      "name": "Beacon Hill/Columbia City",
+      "division": "SOUTH_KING",
+      "center": {
+        "lat": 47.568,
+        "lng": -122.296
+      },
+      "description": "Link light-rail multicultural corridor with rapid Rainier Valley gentrification, landmark Columbia City historic district, and upzoned station areas."
+    },
+    "Georgetown/South Park": {
+      "name": "Georgetown/South Park",
+      "division": "SOUTH_KING",
+      "center": {
+        "lat": 47.545,
+        "lng": -122.314
+      },
+      "description": "Artist-industrial enclave amid Duwamish heavy manufacturing, airport freight corridors, and Airport Way adaptive reuse."
+    },
+    "Renton/Southcenter": {
+      "name": "Renton/Southcenter",
+      "division": "SOUTH_KING",
+      "center": {
+        "lat": 47.462,
+        "lng": -122.24
+      },
+      "description": "Boeing 737 plant plus Southcenter regional mall and the I-405 hotel-office cluster on the Cedar River waterfront."
+    },
+    "Kent Valley": {
+      "name": "Kent Valley",
+      "division": "SOUTH_KING",
+      "center": {
+        "lat": 47.3809,
+        "lng": -122.2348
+      },
+      "description": "Puget Sound's largest warehouse and logistics submarket along Valley Freeway and the BNSF rail line."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "socrata",
+      "watermark_col": "issueddate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "socrata",
+      "watermark_col": "createddate",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "socrata",
+      "watermark_col": "applicationdate",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SaleDate",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/seattle.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

@@ -1,0 +1,453 @@
+{
+  "schema_version": 2,
+  "id": "los_angeles",
+  "name": "Los Angeles Metro",
+  "state": "CA",
+  "center": {
+    "lat": 34.0522,
+    "lng": -118.2437
+  },
+  "metro_bbox": {
+    "min_lat": 33.7,
+    "max_lat": 34.34,
+    "min_lng": -118.63,
+    "max_lng": -117.95
+  },
+  "divisions": {
+    "CENTRAL_LA": {
+      "name": "CENTRAL_LA",
+      "center": {
+        "lat": 34.07,
+        "lng": -118.28
+      },
+      "bbox": {
+        "min_lat": 34.03,
+        "max_lat": 34.14,
+        "min_lng": -118.35,
+        "max_lng": -118.2
+      },
+      "submarkets": [
+        "Downtown Core & Bunker Hill",
+        "Arts District & Warehouse",
+        "Koreatown",
+        "Hollywood",
+        "Silver Lake & Echo Park",
+        "Mid-Wilshire & Miracle Mile"
+      ]
+    },
+    "WESTSIDE": {
+      "name": "WESTSIDE",
+      "center": {
+        "lat": 34.04,
+        "lng": -118.45
+      },
+      "bbox": {
+        "min_lat": 33.98,
+        "max_lat": 34.12,
+        "min_lng": -118.56,
+        "max_lng": -118.35
+      },
+      "submarkets": [
+        "Santa Monica",
+        "Venice",
+        "Culver City",
+        "Westwood & UCLA",
+        "Brentwood",
+        "Playa Vista & Silicon Beach"
+      ]
+    },
+    "SAN_FERNANDO_VALLEY": {
+      "name": "SAN_FERNANDO_VALLEY",
+      "center": {
+        "lat": 34.19,
+        "lng": -118.44
+      },
+      "bbox": {
+        "min_lat": 34.14,
+        "max_lat": 34.34,
+        "min_lng": -118.63,
+        "max_lng": -118.28
+      },
+      "submarkets": [
+        "Sherman Oaks",
+        "Studio City",
+        "Van Nuys",
+        "North Hollywood & NoHo Arts",
+        "Woodland Hills & Warner Center",
+        "Burbank Media District"
+      ]
+    },
+    "SOUTH_LA": {
+      "name": "SOUTH_LA",
+      "center": {
+        "lat": 33.98,
+        "lng": -118.29
+      },
+      "bbox": {
+        "min_lat": 33.9,
+        "max_lat": 34.03,
+        "min_lng": -118.38,
+        "max_lng": -118.2
+      },
+      "submarkets": [
+        "Crenshaw & Leimert Park",
+        "Exposition Park & USC",
+        "Inglewood & SoFi",
+        "Watts"
+      ]
+    },
+    "HARBOR_SOUTH_BAY": {
+      "name": "HARBOR_SOUTH_BAY",
+      "center": {
+        "lat": 33.81,
+        "lng": -118.29
+      },
+      "bbox": {
+        "min_lat": 33.7,
+        "max_lat": 33.9,
+        "min_lng": -118.45,
+        "max_lng": -118.1
+      },
+      "submarkets": [
+        "San Pedro & Waterfront",
+        "Long Beach Downtown",
+        "Torrance",
+        "Redondo & Hermosa Beach",
+        "Carson"
+      ]
+    },
+    "EASTSIDE_SGV": {
+      "name": "EASTSIDE_SGV",
+      "center": {
+        "lat": 34.11,
+        "lng": -118.16
+      },
+      "bbox": {
+        "min_lat": 34.03,
+        "max_lat": 34.2,
+        "min_lng": -118.28,
+        "max_lng": -117.95
+      },
+      "submarkets": [
+        "Boyle Heights",
+        "Highland Park",
+        "Pasadena Old Town",
+        "Glendale",
+        "Alhambra & San Gabriel"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Core & Bunker Hill": {
+      "name": "Downtown Core & Bunker Hill",
+      "division": "CENTRAL_LA",
+      "center": {
+        "lat": 34.0522,
+        "lng": -118.2437
+      },
+      "description": "Financial District towers, Grand Avenue cultural corridor, and the adaptive-reuse pipeline converting pre-war office stock to residential."
+    },
+    "Arts District & Warehouse": {
+      "name": "Arts District & Warehouse",
+      "division": "CENTRAL_LA",
+      "center": {
+        "lat": 34.041,
+        "lng": -118.235
+      },
+      "description": "Former produce and warehouse blocks east of Alameda now carrying creative-office conversions and ground-floor food and beverage."
+    },
+    "Koreatown": {
+      "name": "Koreatown",
+      "division": "CENTRAL_LA",
+      "center": {
+        "lat": 34.0577,
+        "lng": -118.3009
+      },
+      "description": "Densest submarket in the county by units per acre, with mid-rise podium construction along Wilshire and Vermont transit stops."
+    },
+    "Hollywood": {
+      "name": "Hollywood",
+      "division": "CENTRAL_LA",
+      "center": {
+        "lat": 34.0983,
+        "lng": -118.3267
+      },
+      "description": "Entertainment-anchored corridor along Hollywood and Sunset with studio-adjacent office and tourism-driven ground-floor retail."
+    },
+    "Silver Lake & Echo Park": {
+      "name": "Silver Lake & Echo Park",
+      "division": "CENTRAL_LA",
+      "center": {
+        "lat": 34.087,
+        "lng": -118.26
+      },
+      "description": "Hillside residential neighbourhoods with small-lot subdivision activity and independent retail along Sunset and Silver Lake Boulevard."
+    },
+    "Mid-Wilshire & Miracle Mile": {
+      "name": "Mid-Wilshire & Miracle Mile",
+      "division": "CENTRAL_LA",
+      "center": {
+        "lat": 34.0624,
+        "lng": -118.34
+      },
+      "description": "Museum Row and the Purple Line extension corridor, with pre-war office towers and institutional expansion around LACMA."
+    },
+    "Santa Monica": {
+      "name": "Santa Monica",
+      "division": "WESTSIDE",
+      "center": {
+        "lat": 34.0195,
+        "lng": -118.4912
+      },
+      "description": "Coastal office and creative-tech cluster with strict rent-control and development-agreement overlays constraining new supply."
+    },
+    "Venice": {
+      "name": "Venice",
+      "division": "WESTSIDE",
+      "center": {
+        "lat": 33.985,
+        "lng": -118.4695
+      },
+      "description": "Abbot Kinney retail spine and canal-adjacent residential, with coastal-commission review lengthening entitlement timelines."
+    },
+    "Culver City": {
+      "name": "Culver City",
+      "division": "WESTSIDE",
+      "center": {
+        "lat": 34.0211,
+        "lng": -118.3965
+      },
+      "description": "Studio and streaming-tenant campus growth around the Expo Line with the county's most active creative-office pipeline."
+    },
+    "Westwood & UCLA": {
+      "name": "Westwood & UCLA",
+      "division": "WESTSIDE",
+      "center": {
+        "lat": 34.0635,
+        "lng": -118.4455
+      },
+      "description": "University-anchored village with institutional medical expansion and student-housing demand outpacing entitled supply."
+    },
+    "Brentwood": {
+      "name": "Brentwood",
+      "division": "WESTSIDE",
+      "center": {
+        "lat": 34.052,
+        "lng": -118.476
+      },
+      "description": "Low-density hillside single-family stock with San Vicente retail and limited multifamily entitlement capacity."
+    },
+    "Playa Vista & Silicon Beach": {
+      "name": "Playa Vista & Silicon Beach",
+      "division": "WESTSIDE",
+      "center": {
+        "lat": 33.981,
+        "lng": -118.42
+      },
+      "description": "Master-planned campus district built on the former Hughes airfield, carrying the Westside's largest contiguous office blocks."
+    },
+    "Sherman Oaks": {
+      "name": "Sherman Oaks",
+      "division": "SAN_FERNANDO_VALLEY",
+      "center": {
+        "lat": 34.1508,
+        "lng": -118.449
+      },
+      "description": "Ventura Boulevard retail and office corridor with hillside residential above and steady small-scale infill."
+    },
+    "Studio City": {
+      "name": "Studio City",
+      "division": "SAN_FERNANDO_VALLEY",
+      "center": {
+        "lat": 34.1436,
+        "lng": -118.396
+      },
+      "description": "Studio-adjacent commercial strip along Ventura with production-support tenancy and low-rise multifamily."
+    },
+    "Van Nuys": {
+      "name": "Van Nuys",
+      "division": "SAN_FERNANDO_VALLEY",
+      "center": {
+        "lat": 34.1866,
+        "lng": -118.4487
+      },
+      "description": "Civic-centre and light-industrial core of the central Valley, with airport-adjacent logistics and older multifamily stock."
+    },
+    "North Hollywood & NoHo Arts": {
+      "name": "North Hollywood & NoHo Arts",
+      "division": "SAN_FERNANDO_VALLEY",
+      "center": {
+        "lat": 34.172,
+        "lng": -118.376
+      },
+      "description": "Red Line terminus and the Valley's densest transit-oriented pipeline, anchored by the NoHo Arts District redevelopment."
+    },
+    "Woodland Hills & Warner Center": {
+      "name": "Woodland Hills & Warner Center",
+      "division": "SAN_FERNANDO_VALLEY",
+      "center": {
+        "lat": 34.1683,
+        "lng": -118.6059
+      },
+      "description": "Warner Center specific-plan area carrying the west Valley's only high-rise entitlements and largest office concentration."
+    },
+    "Burbank Media District": {
+      "name": "Burbank Media District",
+      "division": "SAN_FERNANDO_VALLEY",
+      "center": {
+        "lat": 34.1808,
+        "lng": -118.329
+      },
+      "description": "Studio-owned campuses and post-production tenancy with municipal review handled by Burbank rather than the City of LA."
+    },
+    "Crenshaw & Leimert Park": {
+      "name": "Crenshaw & Leimert Park",
+      "division": "SOUTH_LA",
+      "center": {
+        "lat": 34.009,
+        "lng": -118.335
+      },
+      "description": "Historic cultural district along the new K Line, with transit-adjacent parcels drawing first-wave redevelopment interest."
+    },
+    "Exposition Park & USC": {
+      "name": "Exposition Park & USC",
+      "division": "SOUTH_LA",
+      "center": {
+        "lat": 34.018,
+        "lng": -118.286
+      },
+      "description": "Museum and stadium cluster with university-driven student housing and the Lucas Museum construction anchoring the park."
+    },
+    "Inglewood & SoFi": {
+      "name": "Inglewood & SoFi",
+      "division": "SOUTH_LA",
+      "center": {
+        "lat": 33.956,
+        "lng": -118.34
+      },
+      "description": "Stadium and arena district driving the county's steepest land-value reset, with hospitality and mixed-use following."
+    },
+    "Watts": {
+      "name": "Watts",
+      "division": "SOUTH_LA",
+      "center": {
+        "lat": 33.94,
+        "lng": -118.24
+      },
+      "description": "Predominantly single-family and public-housing stock with Blue Line access and long-running redevelopment initiatives."
+    },
+    "San Pedro & Waterfront": {
+      "name": "San Pedro & Waterfront",
+      "division": "HARBOR_SOUTH_BAY",
+      "center": {
+        "lat": 33.7361,
+        "lng": -118.2922
+      },
+      "description": "Port-adjacent downtown with the West Harbor waterfront redevelopment and working-waterfront industrial tenancy."
+    },
+    "Long Beach Downtown": {
+      "name": "Long Beach Downtown",
+      "division": "HARBOR_SOUTH_BAY",
+      "center": {
+        "lat": 33.7701,
+        "lng": -118.1937
+      },
+      "description": "Independent-jurisdiction downtown with high-rise residential delivery and convention and port-office tenancy."
+    },
+    "Torrance": {
+      "name": "Torrance",
+      "division": "HARBOR_SOUTH_BAY",
+      "center": {
+        "lat": 33.8358,
+        "lng": -118.3406
+      },
+      "description": "Automotive and aerospace employment base with large-format retail and low-rise industrial parks."
+    },
+    "Redondo & Hermosa Beach": {
+      "name": "Redondo & Hermosa Beach",
+      "division": "HARBOR_SOUTH_BAY",
+      "center": {
+        "lat": 33.8492,
+        "lng": -118.3884
+      },
+      "description": "Coastal beach cities with height-limited zoning, pier-adjacent retail, and constrained multifamily supply."
+    },
+    "Carson": {
+      "name": "Carson",
+      "division": "HARBOR_SOUTH_BAY",
+      "center": {
+        "lat": 33.8317,
+        "lng": -118.282
+      },
+      "description": "Logistics and refinery-adjacent industrial land serving port drayage, with limited residential entitlement activity."
+    },
+    "Boyle Heights": {
+      "name": "Boyle Heights",
+      "division": "EASTSIDE_SGV",
+      "center": {
+        "lat": 34.034,
+        "lng": -118.21
+      },
+      "description": "Gold Line-served eastside neighbourhood with historic multifamily stock and active anti-displacement policy overlays."
+    },
+    "Highland Park": {
+      "name": "Highland Park",
+      "division": "EASTSIDE_SGV",
+      "center": {
+        "lat": 34.112,
+        "lng": -118.192
+      },
+      "description": "York and Figueroa retail corridors with craftsman residential stock and sustained small-scale renovation permitting."
+    },
+    "Pasadena Old Town": {
+      "name": "Pasadena Old Town",
+      "division": "EASTSIDE_SGV",
+      "center": {
+        "lat": 34.1466,
+        "lng": -118.15
+      },
+      "description": "Independent-jurisdiction historic core with institutional and biotech tenancy and design-review-heavy entitlement."
+    },
+    "Glendale": {
+      "name": "Glendale",
+      "division": "EASTSIDE_SGV",
+      "center": {
+        "lat": 34.1425,
+        "lng": -118.2551
+      },
+      "description": "Brand Boulevard retail and animation-studio office base, permitted through Glendale's own development services."
+    },
+    "Alhambra & San Gabriel": {
+      "name": "Alhambra & San Gabriel",
+      "division": "EASTSIDE_SGV",
+      "center": {
+        "lat": 34.0953,
+        "lng": -118.127
+      },
+      "description": "San Gabriel Valley commercial corridors with dense low-rise multifamily and cross-border investment demand."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "socrata",
+      "watermark_col": "issue_date",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "socrata",
+      "watermark_col": "createddate",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "socrata",
+      "watermark_col": "location_start_date",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/los_angeles.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

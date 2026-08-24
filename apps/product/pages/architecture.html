@@ -1,0 +1,118 @@
+    <h1 class="sr-only">Architecture: complexity made navigable</h1>
+    <section id="explorer" class="section-wrap section-block" aria-labelledby="explorer-title">
+      <div class="section-heading">
+        <h2 id="explorer-title">Complexity,<br><em>made navigable.</em></h2>
+        <p>Select a node for its role and exact implementation — or scroll for the whole spine, the serving surface, and what happens when a city joins.</p>
+      </div>
+      <div class="arch-map"><div class="arch-column"><span class="mono column-label">SOURCE</span><button class="arch-node selected" data-arch="sources" aria-pressed="true">Source producers</button><button class="arch-node" data-arch="registry" aria-pressed="false">City registry</button></div><div class="arch-connector" aria-hidden="true"></div><div class="arch-column"><span class="mono column-label">PROCESS</span><button class="arch-node" data-arch="kafka" aria-pressed="false">Kafka consumers</button><button class="arch-node" data-arch="h3" aria-pressed="false">H3 enrichment</button><button class="arch-node" data-arch="features" aria-pressed="false">Feature aggregation</button></div><div class="arch-connector" aria-hidden="true"></div><div class="arch-column"><span class="mono column-label">DELIVERY</span><button class="arch-node" data-arch="storage" aria-pressed="false">Spatial storage</button><button class="arch-node" data-arch="models" aria-pressed="false">ONNX horizons</button><button class="arch-node" data-arch="edge" aria-pressed="false">Edge snapshots</button></div></div>
+      <div class="arch-note" id="arch-note"><span class="mono">SELECTED NODE</span><strong>Different inputs. One honest contract.</strong><p>Source-specific producers preserve municipal differences before normalization.</p><a class="source-link" href="https://github.com/harlanljones/urban-signal/tree/main/apps/api/src/producers" target="_blank" rel="noreferrer">Inspect source producers</a></div>
+    </section>
+
+    <section class="section-wrap section-block" aria-labelledby="spine-title">
+      <div class="section-heading">
+        <span class="mono label">THE SPINE</span>
+        <h2 id="spine-title">Node by node,<br><em>with its contracts.</em></h2>
+        <p>The machine behind the journey — for the data’s path stage by stage, read <a href="/system/">/system</a>.</p>
+      </div>
+      <div class="spine-list">
+        <div class="spine-node">
+          <h3>Source producers</h3>
+          <p>One producer per platform family — Socrata, ArcGIS, Carto, CKAN — plus city-specific field maps, so municipal dialects survive to the normalization boundary.</p>
+          <ul><li>Per-feed watermark + id-key declarations</li><li>Snapshot and year-sliced ingestion modes</li><li>Scheduler with per-city job names</li></ul>
+          <a class="stage-source" href="https://github.com/harlanljones/urban-signal/tree/main/apps/api/src/producers" target="_blank" rel="noreferrer">apps/api/src/producers</a>
+        </div>
+        <div class="spine-node">
+          <h3>City registry</h3>
+          <p>The authoritative contract: canonical city ids, aliases, boundaries, divisions, submarkets, and every dataset spec. If it is not in the registry, it does not exist.</p>
+          <ul><li><code>CityRegistration</code>: center, bbox, divisions, submarkets</li><li><code>DatasetSpec</code>: endpoint, platform, watermark, cadence</li><li>Readable failures via <code>get_dataset</code></li></ul>
+          <a class="stage-source" href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/spatial/city_registry.py" target="_blank" rel="noreferrer">apps/api/src/spatial/city_registry.py</a>
+        </div>
+        <div class="spine-node">
+          <h3>Kafka backbone</h3>
+          <p>Typed municipal events move through per-family topics; consumers enrich and aggregate without coupling to producers.</p>
+          <ul><li>Permits / 311 / licenses / deeds topics</li><li>Consumers: spatial enrichment, feature aggregation, PostGIS sync</li><li>Offsets support replay and reprocessing</li></ul>
+          <a class="stage-source" href="https://github.com/harlanljones/urban-signal/tree/main/apps/api/src/consumers" target="_blank" rel="noreferrer">apps/api/src/consumers</a>
+        </div>
+        <div class="spine-node">
+          <h3>H3 enrichment</h3>
+          <p>Assigns every event to H3 cells at resolutions 7, 8, and 9, joining division and submarket context from the registry.</p>
+          <ul><li>Multi-resolution hierarchy per event</li><li>DuckDB out-of-core sink for heavy joins</li><li>Boundaries and rosters come from the registry</li></ul>
+          <a class="stage-source" href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/spatial/h3_indexer.py" target="_blank" rel="noreferrer">apps/api/src/spatial/h3_indexer.py</a>
+        </div>
+        <div class="spine-node">
+          <h3>Feature aggregation</h3>
+          <p>Time-decayed, interpretable features per cell — the LIMS ingredients — plus catalyst alerts at the public threshold.</p>
+          <ul><li>180-day half-life CapEx decay</li><li>Permit velocity, 311 shift dynamics, license activity</li><li>Catalyst alerts at LIMS ≥ 85.0</li></ul>
+          <a class="stage-source" href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/features/lims_calculator.py" target="_blank" rel="noreferrer">apps/api/src/features/lims_calculator.py</a>
+        </div>
+        <div class="spine-node">
+          <h3>Spatial storage</h3>
+          <p>PostGIS is the spatial system of record; object storage holds partitions and model artifacts.</p>
+          <ul><li>Events, features, divisions, snapshots — queryable</li><li>GiST/BRIN indices on spatial columns</li><li>Object store for partitions + ONNX artifacts</li></ul>
+          <a class="stage-source" href="https://github.com/harlanljones/urban-signal/tree/main/apps/api/src/storage" target="_blank" rel="noreferrer">apps/api/src/storage</a>
+        </div>
+        <div class="spine-node">
+          <h3>Models</h3>
+          <p>Three horizons (6/12/18m) across a spatio-temporal GNN, a cross-network macro model, and a quantile LGBM — walk-forward validated, exported to ONNX.</p>
+          <ul><li>Leakage-controlled splits (<code>validation.py</code>)</li><li>SHAP attribution feeding the dashboard</li><li>Calibration before export</li></ul>
+          <a class="stage-source" href="https://github.com/harlanljones/urban-signal/tree/main/apps/api/src/models" target="_blank" rel="noreferrer">apps/api/src/models</a>
+        </div>
+        <div class="spine-node">
+          <h3>Edge delivery</h3>
+          <p>Versioned snapshots land on Workers KV; the dashboard reads precomputed views without hiding their origin.</p>
+          <ul><li>Versioned artifacts with provenance attached</li><li>FastAPI serves the same contracts live</li><li>The site’s own facts are registry-projected</li></ul>
+          <a class="stage-source" href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/export/snapshot_builder.py" target="_blank" rel="noreferrer">apps/api/src/export/snapshot_builder.py</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="system-data" aria-labelledby="serving-title">
+      <div class="section-wrap">
+        <div class="section-heading">
+          <span class="mono label">THE SERVING SURFACE</span>
+          <h2 id="serving-title">One API,<br><em>no parallel truth.</em></h2>
+          <p>The FastAPI surface the dashboard calls — read from <a href="https://github.com/harlanljones/urban-signal/tree/main/apps/api/src/serving" target="_blank" rel="noreferrer">apps/api/src/serving</a>. The edge snapshot answers the same contracts.</p>
+        </div>
+        <div class="matrix-wrap">
+          <table class="coverage-table serving-table">
+            <caption class="sr-only">FastAPI endpoints and what they return</caption>
+            <thead><tr><th scope="col">Method</th><th scope="col">Path</th><th scope="col">Returns</th></tr></thead>
+            <tbody>
+              <tr><td>GET</td><td>/cities</td><td>Registered metros with feed availability — the registry, projected</td></tr>
+              <tr><td>GET</td><td>/submarkets</td><td>A metro’s submarket catalog (the dashboard’s selector)</td></tr>
+              <tr><td>GET</td><td>/spatial/divisions</td><td>Division metadata and boundaries for a metro</td></tr>
+              <tr><td>GET</td><td>/grid</td><td>H3 cells with metric overlay for map rendering</td></tr>
+              <tr><td>GET</td><td>/hex/{h3_index}/features</td><td>The full feature vector for one H3 cell</td></tr>
+              <tr><td>GET</td><td>/catalysts</td><td>High-momentum areas above the public LIMS 85.0 threshold</td></tr>
+              <tr><td>POST</td><td>/predict</td><td>Model prediction for a target, with explanation</td></tr>
+              <tr><td>POST</td><td>/predict/batch</td><td>Batch predictions</td></tr>
+              <tr><td>GET</td><td>/predictions/submarket/{name}</td><td>Prediction series for one submarket</td></tr>
+              <tr><td>GET</td><td>/dashboard/metrics</td><td>Metric catalog for the dashboard’s selector</td></tr>
+              <tr><td>GET</td><td>/health · /ready · /live</td><td>Health probes</td></tr>
+              <tr><td>GET</td><td>/llms.txt · /llms-full.txt</td><td>Agent surfaces — served by the API too</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-wrap section-block" aria-labelledby="join-title">
+      <div class="section-heading">
+        <span class="mono label">GOVERNANCE, IN PUBLIC</span>
+        <h2 id="join-title">When a city joins,<br><em>four gates.</em></h2>
+        <p>New metros are not added by marketing copy. The repository enforces the sequence — a city that skips a gate does not ship.</p>
+      </div>
+      <div class="horizon-grid join-grid">
+        <div class="horizon-card"><span class="mono">01</span><h3>Declare</h3><p>A registry entry: city module or inline spec — endpoints, watermark column, id keys, divisions, submarkets.</p></div>
+        <div class="horizon-card"><span class="mono">02</span><h3>Project</h3><p><code style="font-family:var(--mono)">facts:export</code> regenerates the site’s facts and per-city JSON from the registry. Hand-edited coverage cannot drift.</p></div>
+        <div class="horizon-card"><span class="mono">03</span><h3>Wire</h3><p>The dashboard map must show the city. The interlock gate (<code style="font-family:var(--mono)">pytest -m interlock</code>) fails any run where a registered city is missing from the map.</p></div>
+        <div class="horizon-card"><span class="mono">04</span><h3>Publish</h3><p>Site pages regenerate from the same facts. A city cannot appear here without appearing there — and vice versa.</p></div>
+      </div>
+      <div class="model-note">
+        <p><strong>Read the enforcement.</strong> The policy lives in the repository’s agent docs (<a href="https://github.com/harlanljones/urban-signal/blob/main/AGENTS.md" target="_blank" rel="noreferrer">AGENTS.md</a>), the contract in <a href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/spatial/city_registry.py" target="_blank" rel="noreferrer">city_registry.py</a>, and the teeth in <a href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/tests/unit/test_interlock_gate.py" target="_blank" rel="noreferrer">test_interlock_gate.py</a> — closure, completeness, containment, registry-export match, and dashboard wiring.</p>
+      </div>
+      <div class="closing-routes system-next">
+        <a class="route-primary" href="/system/"><span>Follow the data’s journey</span><small>System: five stages, contracts and failure modes</small></a>
+        <a class="route-secondary" href="/cities/"><span>See the result</span><small>Cities: the coverage this machine produces</small></a>
+      </div>
+    </section>

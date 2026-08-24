@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "id": "denver",
+  "name": "Denver",
+  "state": "CO",
+  "center": {
+    "lat": 39.7392,
+    "lng": -104.9903
+  },
+  "metro_bbox": {
+    "min_lat": 39.55,
+    "max_lat": 39.95,
+    "min_lng": -105.2,
+    "max_lng": -104.5
+  },
+  "divisions": {
+    "DENVER_CORE": {
+      "name": "Denver Core",
+      "center": {
+        "lat": 39.7527,
+        "lng": -104.9992
+      },
+      "bbox": {
+        "min_lat": 39.6,
+        "max_lat": 39.85,
+        "min_lng": -105.1,
+        "max_lng": -104.7
+      },
+      "submarkets": [
+        "Downtown & Union Station",
+        "RiNo & Five Points",
+        "Capitol Hill & Cheesman Park",
+        "Cherry Creek & Congress Park"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Union Station": {
+      "name": "Downtown & Union Station",
+      "division": "DENVER_CORE",
+      "center": {
+        "lat": 39.7527,
+        "lng": -104.9992
+      },
+      "description": "Central business and transit district with office, hospitality, and high-density residential redevelopment."
+    },
+    "RiNo & Five Points": {
+      "name": "RiNo & Five Points",
+      "division": "DENVER_CORE",
+      "center": {
+        "lat": 39.769,
+        "lng": -104.978
+      },
+      "description": "North-central creative and industrial-reuse corridor with continuing mixed-use infill activity."
+    },
+    "Capitol Hill & Cheesman Park": {
+      "name": "Capitol Hill & Cheesman Park",
+      "division": "DENVER_CORE",
+      "center": {
+        "lat": 39.734,
+        "lng": -104.975
+      },
+      "description": "Established central neighborhoods with renovation, multifamily, and neighborhood-retail permit signals."
+    },
+    "Cherry Creek & Congress Park": {
+      "name": "Cherry Creek & Congress Park",
+      "division": "DENVER_CORE",
+      "center": {
+        "lat": 39.717,
+        "lng": -104.953
+      },
+      "description": "Retail and residential corridor east of the core with redevelopment and high-value renovation activity."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "DATE_ISSUED",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "Case_Created_Date",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/denver.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

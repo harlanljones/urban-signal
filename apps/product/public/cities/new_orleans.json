@@ -1,0 +1,393 @@
+{
+  "schema_version": 2,
+  "id": "new_orleans",
+  "name": "New Orleans Metro",
+  "state": "LA",
+  "center": {
+    "lat": 29.9511,
+    "lng": -90.0715
+  },
+  "metro_bbox": {
+    "min_lat": 29.82,
+    "max_lat": 30.16,
+    "min_lng": -90.3,
+    "max_lng": -89.62
+  },
+  "divisions": {
+    "CBD_FRENCH_QUARTER": {
+      "name": "CBD_FRENCH_QUARTER",
+      "center": {
+        "lat": 29.96,
+        "lng": -90.07
+      },
+      "bbox": {
+        "min_lat": 29.93,
+        "max_lat": 30.0,
+        "min_lng": -90.1,
+        "max_lng": -90.02
+      },
+      "submarkets": [
+        "French Quarter & CBD Towers",
+        "BioDistrict & University Medical",
+        "Warehouse & Arts District"
+      ]
+    },
+    "BYWATER_MARIGNY": {
+      "name": "BYWATER_MARIGNY",
+      "center": {
+        "lat": 29.97,
+        "lng": -90.03
+      },
+      "bbox": {
+        "min_lat": 29.95,
+        "max_lat": 30.0,
+        "min_lng": -90.05,
+        "max_lng": -89.98
+      },
+      "submarkets": [
+        "Bywater & St. Claude Corridor",
+        "Marigny & Frenchmen Street"
+      ]
+    },
+    "UPTOWN_CARROLLTON": {
+      "name": "UPTOWN_CARROLLTON",
+      "center": {
+        "lat": 29.94,
+        "lng": -90.1
+      },
+      "bbox": {
+        "min_lat": 29.9,
+        "max_lat": 30.0,
+        "min_lng": -90.15,
+        "max_lng": -90.05
+      },
+      "submarkets": [
+        "Magazine Street Retail Corridor",
+        "Audubon & Riverbend",
+        "Carrollton & Oak Street"
+      ]
+    },
+    "MID_CITY": {
+      "name": "MID_CITY",
+      "center": {
+        "lat": 29.99,
+        "lng": -90.09
+      },
+      "bbox": {
+        "min_lat": 29.96,
+        "max_lat": 30.04,
+        "min_lng": -90.13,
+        "max_lng": -90.05
+      },
+      "submarkets": [
+        "City Park & Bayou St. John",
+        "Tulane-Canal Corridor"
+      ]
+    },
+    "LAKEVIEW_GENTILLY": {
+      "name": "LAKEVIEW_GENTILLY",
+      "center": {
+        "lat": 30.01,
+        "lng": -90.09
+      },
+      "bbox": {
+        "min_lat": 29.98,
+        "max_lat": 30.06,
+        "min_lng": -90.15,
+        "max_lng": -90.04
+      },
+      "submarkets": [
+        "Lakeview & Lakeshore",
+        "Gentilly & Dillard"
+      ]
+    },
+    "NEW_ORLEANS_EAST": {
+      "name": "NEW_ORLEANS_EAST",
+      "center": {
+        "lat": 30.04,
+        "lng": -89.92
+      },
+      "bbox": {
+        "min_lat": 29.99,
+        "max_lat": 30.1,
+        "min_lng": -90.08,
+        "max_lng": -89.62
+      },
+      "submarkets": [
+        "New Orleans East I-10 Corridor",
+        "Village de l'Est & Lake Forest"
+      ]
+    },
+    "WEST_BANK_ALGIERS": {
+      "name": "WEST_BANK_ALGIERS",
+      "center": {
+        "lat": 29.93,
+        "lng": -90.01
+      },
+      "bbox": {
+        "min_lat": 29.86,
+        "max_lat": 29.98,
+        "min_lng": -90.08,
+        "max_lng": -89.95
+      },
+      "submarkets": [
+        "Algiers Point",
+        "English Turn & Tall Timbers"
+      ]
+    },
+    "JEFFERSON_METAIRIE_KENNER": {
+      "name": "JEFFERSON_METAIRIE_KENNER",
+      "center": {
+        "lat": 29.97,
+        "lng": -90.2
+      },
+      "bbox": {
+        "min_lat": 29.87,
+        "max_lat": 30.05,
+        "min_lng": -90.3,
+        "max_lng": -90.1
+      },
+      "submarkets": [
+        "Metairie Causeway Boulevard Retail",
+        "Kenner Esplanade & Airport District",
+        "Harahan & River Ridge"
+      ]
+    },
+    "ST_BERNARD_CHALMETTE": {
+      "name": "ST_BERNARD_CHALMETTE",
+      "center": {
+        "lat": 29.89,
+        "lng": -89.97
+      },
+      "bbox": {
+        "min_lat": 29.82,
+        "max_lat": 29.95,
+        "min_lng": -90.1,
+        "max_lng": -89.8
+      },
+      "submarkets": [
+        "Chalmette Refinery Corridor",
+        "Arabi & Meraux"
+      ]
+    }
+  },
+  "submarkets": {
+    "French Quarter & CBD Towers": {
+      "name": "French Quarter & CBD Towers",
+      "division": "CBD_FRENCH_QUARTER",
+      "center": {
+        "lat": 29.9555,
+        "lng": -90.0685
+      },
+      "description": "Historic Quarter grid beside the Poydras Street high-rise core, where hospitality-driven ground floor demand meets limited entitled supply."
+    },
+    "BioDistrict & University Medical": {
+      "name": "BioDistrict & University Medical",
+      "division": "CBD_FRENCH_QUARTER",
+      "center": {
+        "lat": 29.9665,
+        "lng": -90.0885
+      },
+      "description": "University Medical Center and the VA hospital anchoring a bioscience district with institutional expansion and supporting multifamily."
+    },
+    "Warehouse & Arts District": {
+      "name": "Warehouse & Arts District",
+      "division": "CBD_FRENCH_QUARTER",
+      "center": {
+        "lat": 29.9455,
+        "lng": -90.0825
+      },
+      "description": "Julia Row galleries and converted cotton warehouses carrying condo conversions and hotel-adjacent adaptive reuse."
+    },
+    "Bywater & St. Claude Corridor": {
+      "name": "Bywater & St. Claude Corridor",
+      "division": "BYWATER_MARIGNY",
+      "center": {
+        "lat": 29.9685,
+        "lng": -90.0285
+      },
+      "description": "Shotgun-grid neighbourhood along the St. Claude arts corridor with sustained small-scale renovation permitting."
+    },
+    "Marigny & Frenchmen Street": {
+      "name": "Marigny & Frenchmen Street",
+      "division": "BYWATER_MARIGNY",
+      "center": {
+        "lat": 29.9725,
+        "lng": -90.0425
+      },
+      "description": "Music-venue economy around Frenchmen Street with Creole-cottage stock and short-term-rental policy shaping values."
+    },
+    "Magazine Street Retail Corridor": {
+      "name": "Magazine Street Retail Corridor",
+      "division": "UPTOWN_CARROLLTON",
+      "center": {
+        "lat": 29.9325,
+        "lng": -90.0925
+      },
+      "description": "Six miles of independent retail and antiques through the Garden District edge, with historic-district review constraining change."
+    },
+    "Audubon & Riverbend": {
+      "name": "Audubon & Riverbend",
+      "division": "UPTOWN_CARROLLTON",
+      "center": {
+        "lat": 29.9185,
+        "lng": -90.1185
+      },
+      "description": "Zoo- and university-adjacent residential stock with the deepest-demand single-family market in Orleans Parish."
+    },
+    "Carrollton & Oak Street": {
+      "name": "Carrollton & Oak Street",
+      "division": "UPTOWN_CARROLLTON",
+      "center": {
+        "lat": 29.9485,
+        "lng": -90.1325
+      },
+      "description": "Streetcar-served neighbourhood commercial node with levee-adjacent housing and steady infill renovation."
+    },
+    "City Park & Bayou St. John": {
+      "name": "City Park & Bayou St. John",
+      "division": "MID_CITY",
+      "center": {
+        "lat": 29.9825,
+        "lng": -90.0925
+      },
+      "description": "Park-edge bungalow stock beside the bayou waterway, drawing renovation capital from the museum and festival economy."
+    },
+    "Tulane-Canal Corridor": {
+      "name": "Tulane-Canal Corridor",
+      "division": "MID_CITY",
+      "center": {
+        "lat": 29.9785,
+        "lng": -90.1085
+      },
+      "description": "Hospital-and-streetcar spine toward Carrollton Avenue with older multifamily stock and clinic-driven demand."
+    },
+    "Lakeview & Lakeshore": {
+      "name": "Lakeview & Lakeshore",
+      "division": "LAKEVIEW_GENTILLY",
+      "center": {
+        "lat": 30.0105,
+        "lng": -90.1105
+      },
+      "description": "Post-Katrina rebuilt lakefront neighbourhoods behind the outfall canals, with elevated new construction dominating permits."
+    },
+    "Gentilly & Dillard": {
+      "name": "Gentilly & Dillard",
+      "division": "LAKEVIEW_GENTILLY",
+      "center": {
+        "lat": 30.0025,
+        "lng": -90.0725
+      },
+      "description": "Mid-century tract housing between the university campuses and the Industrial Canal with gradual redevelopment interest."
+    },
+    "New Orleans East I-10 Corridor": {
+      "name": "New Orleans East I-10 Corridor",
+      "division": "NEW_ORLEANS_EAST",
+      "center": {
+        "lat": 30.0355,
+        "lng": -89.9455
+      },
+      "description": "Read Boulevard and I-10 service-road retail with the Michoud industrial reserve driving long-run logistics growth."
+    },
+    "Village de l'Est & Lake Forest": {
+      "name": "Village de l'Est & Lake Forest",
+      "division": "NEW_ORLEANS_EAST",
+      "center": {
+        "lat": 30.0605,
+        "lng": -89.9155
+      },
+      "description": "Vietnamese-American commercial nodes along Alcee Fortier and Chef Menteur with large-lot residential recovery."
+    },
+    "Algiers Point": {
+      "name": "Algiers Point",
+      "division": "WEST_BANK_ALGIERS",
+      "center": {
+        "lat": 29.9555,
+        "lng": -90.0225
+      },
+      "description": "Ferry-connected historic district across from the Quarter with Victorian stock and skyline-view demand."
+    },
+    "English Turn & Tall Timbers": {
+      "name": "English Turn & Tall Timbers",
+      "division": "WEST_BANK_ALGIERS",
+      "center": {
+        "lat": 29.9085,
+        "lng": -90.0085
+      },
+      "description": "Golf-course and subdivision growth downriver on the West Bank with parish-edge land supply."
+    },
+    "Metairie Causeway Boulevard Retail": {
+      "name": "Metairie Causeway Boulevard Retail",
+      "division": "JEFFERSON_METAIRIE_KENNER",
+      "center": {
+        "lat": 29.9885,
+        "lng": -90.1725
+      },
+      "description": "Jefferson Parish's dominant strip-retail and office corridor running Lakeside Shopping Center to the lakefront."
+    },
+    "Kenner Esplanade & Airport District": {
+      "name": "Kenner Esplanade & Airport District",
+      "division": "JEFFERSON_METAIRIE_KENNER",
+      "center": {
+        "lat": 29.9845,
+        "lng": -90.2465
+      },
+      "description": "Esplanade mall district and Louis Armstrong International adjacency with hospitality and logistics tenancy."
+    },
+    "Harahan & River Ridge": {
+      "name": "Harahan & River Ridge",
+      "division": "JEFFERSON_METAIRIE_KENNER",
+      "center": {
+        "lat": 29.9415,
+        "lng": -90.1965
+      },
+      "description": "River-bend single-family suburbs of East-Bank Jefferson with stable owner-occupant demand and Old Jefferson retail edges."
+    },
+    "Chalmette Refinery Corridor": {
+      "name": "Chalmette Refinery Corridor",
+      "division": "ST_BERNARD_CHALMETTE",
+      "center": {
+        "lat": 29.8885,
+        "lng": -89.9585
+      },
+      "description": "Refinery-adjacent parish seat with buyout-zone land dynamics and petrochemical payroll underpinning demand."
+    },
+    "Arabi & Meraux": {
+      "name": "Arabi & Meraux",
+      "division": "ST_BERNARD_CHALMETTE",
+      "center": {
+        "lat": 29.9185,
+        "lng": -89.9985
+      },
+      "description": "River-road communities nearest the Orleans line absorbing first-ring spillover demand from the Bywater."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "socrata",
+      "watermark_col": "issuedate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "socrata",
+      "watermark_col": "date_created",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "socrata",
+      "watermark_col": "businessstartdate",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": {
+      "platform": "socrata",
+      "watermark_col": "sale_date",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/new_orleans.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

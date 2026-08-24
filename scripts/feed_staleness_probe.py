@@ -30,7 +30,13 @@ from src.producers.arcgis_client import ArcGISClient
 from src.producers.carto_client import CartoClient
 from src.producers.ckan_client import CkanClient
 from src.producers.socrata_client import SocrataClient
-from src.producers.watermarks import parse_watermark as parse_timestamp
+from src.producers.watermarks import (
+    parse_watermark as parse_timestamp,
+)
+from src.producers.watermarks import (
+    typed_watermark_entry,
+    watermark_exclude_clause,
+)
 from src.spatial.city_registry import (
     REGISTRY,
     DatasetSpec,
@@ -42,6 +48,29 @@ from src.spatial.city_registry import (
 logger = logging.getLogger(__name__)
 
 STALE_AFTER = timedelta(days=7)
+
+
+def declared_staleness_threshold(
+    spec: DatasetSpec,
+    fallback: timedelta = STALE_AFTER,
+) -> timedelta:
+    """Resolve one feed's staleness alarm window from its declared cadence.
+
+    G11 (wave-2 §2.3): every feed declares ``extra={"expected_cadence_days":
+    N}`` and alarms at ``2 × N`` days instead of a global 7 — PG County 311
+    publishes ~monthly and would page forever under the old assumption.
+    Missing, non-numeric, or non-positive declarations fall back to
+    ``fallback``; the registry invariant test keeps that path empty for
+    registered feeds.
+    """
+    raw = spec.extra.get("expected_cadence_days") if spec.extra else None
+    try:
+        days = float(raw)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return fallback
+    if days <= 0:
+        return fallback
+    return timedelta(days=2 * days)
 
 FEED_AGE_DAYS = Gauge(
     "urban_signal_feed_age_days",
@@ -127,25 +156,59 @@ def client_for(spec: DatasetSpec) -> Any:
     except KeyError as exc:
         raise ValueError(f"Unsupported feed platform {spec.platform!r}") from exc
 
-
-def newest_watermark(client: Any, spec: DatasetSpec) -> datetime | None:
+def newest_watermark(
+    client: Any,
+    spec: DatasetSpec,
+    *,
+    now: datetime | None = None,
+) -> datetime | None:
     """Fetch a bounded newest-row sample and compare values after typed parsing.
 
     Comparing parsed values matters for NYC's mixed ISO and ``MM/DD/YYYY``
     permit watermark.  A bounded sample keeps the weekly probe cheap while
     retaining the source client's normal pagination and retry behavior.
+
+    Feeds declaring a text watermark type (``spec.extra`` keys
+    ``watermark_type`` / ``watermark_format`` / ``watermark_exclude`` — see
+    ADR 0005) get their sentinels excluded server-side via a NOT-IN guard so
+    garbage rows like PG County's ``ZZZZZZZZ`` cannot crowd out the real
+    newest rows, and are compared under the declared strptime format.
+
+    Values strictly after ``now`` are ignored: a future watermark is a source
+    data artifact (license expirations and the like), not evidence of
+    freshness, so a feed whose only watermarks are future-dated yields
+    ``None`` here and ``probe_feed`` treats ``None`` as stale.
     """
     if not spec.watermark_col:
         return None
+    now = now or datetime.now(UTC)
+    extra = spec.extra or {}
+    exclude = extra.get("watermark_exclude") or ()
+    is_text = extra.get("watermark_type") == "text"
+    fmt = extra.get("watermark_format") if is_text else None
     pages: Iterable[list[dict[str, Any]]] = client.paginate(
         endpoint_url=spec.endpoint,
         order_by=f"{spec.watermark_col} DESC",
         batch_size=1000,
         max_records=1000,
+        where_clause=watermark_exclude_clause(spec.watermark_col, exclude),
     )
-    values = [parse_timestamp(row.get(spec.watermark_col)) for page in pages for row in page]
-    values = [value for value in values if value is not None]
-    return max(values) if values else None
+    entries = [
+        entry
+        for page in pages
+        for row in page
+        if (
+            entry := typed_watermark_entry(
+                row.get(spec.watermark_col),
+                fmt=fmt,
+                exclude=exclude,
+            )
+        )
+        is not None
+    ]
+    valid = [entry for entry in entries if entry[1] <= now]
+    best = max(valid, key=lambda entry: entry[1]) if valid else None
+    return best[1] if best else None
 
 
 def probe_feed(
@@ -162,7 +225,7 @@ def probe_feed(
     """Probe one feed; source metadata errors do not hide row freshness."""
     row_error = None
     try:
-        newest = newest_watermark(client, spec)
+        newest = newest_watermark(client, spec, now=now)
     except Exception as exc:  # noqa: BLE001  # client errors vary by platform
         newest = None
         row_error = str(exc)
@@ -225,7 +288,7 @@ def probe_registry(
                     client=client_factory(spec),
                     source_updated_at=source_updated_at,
                     source_error=source_error,
-                    threshold=threshold,
+                    threshold=declared_staleness_threshold(spec, fallback=threshold),
                 )
             except Exception as exc:  # noqa: BLE001  # defensive boundary
                 result = ProbeResult(
@@ -274,7 +337,16 @@ def _json_default(value: Any) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--city", action="append", dest="cities", help="Limit to a city id")
-    parser.add_argument("--threshold-days", type=float, default=7.0)
+    parser.add_argument(
+        "--threshold-days",
+        type=float,
+        default=7.0,
+        help=(
+            "Fallback staleness threshold in days for feeds without a "
+            "declared expected_cadence_days (feeds with a declaration "
+            "alarm at 2 x N days instead)"
+        ),
+    )
     parser.add_argument("--dry-run", action="store_true", help="Do not send webhook pages")
     args = parser.parse_args()
 

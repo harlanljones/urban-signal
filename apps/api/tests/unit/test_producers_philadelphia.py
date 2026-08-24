@@ -157,11 +157,14 @@ class TestFeedRegistration:
             assert spec.endpoint.startswith("carto://phl.carto.com/"), feed
 
     def test_watermarks_match_verified_keyset_columns(self):
-        """Pinned against live CARTO table schemas on 2026-08-23."""
+        """Pinned against live CARTO table schemas on 2026-08-23; deeds moved
+        to recording_date per docs/research/deeds-watermark-audit.md
+        (2026-08-24) after document_date sentinels poisoned the watermark."""
         assert get_dataset(CityId.PHILADELPHIA, FeedType.PERMITS).watermark_col == "permitissuedate"
         assert get_dataset(CityId.PHILADELPHIA, FeedType.COMPLAINTS_311).watermark_col == "requested_datetime"
         assert get_dataset(CityId.PHILADELPHIA, FeedType.SLA).watermark_col == "mostrecentissuedate"
-        assert get_dataset(CityId.PHILADELPHIA, FeedType.DEEDS).watermark_col == "document_date"
+        assert get_dataset(CityId.PHILADELPHIA, FeedType.DEEDS).watermark_col == "recording_date"
+        assert get_dataset(CityId.PHILADELPHIA, FeedType.DEEDS).extra["order_by"] == "recording_date"
 
     def test_extras_pin_keyset_id_and_geometry_select(self):
         """Keyset tie-breaker is cartodb_id (every CARTO table carries it);
@@ -533,6 +536,7 @@ class TestPhiladelphiaWithProposedFieldMap(PhillyParsingBase):
             where_clause=client._join_where(None, "mostrecentissuedate", None),
             limit=1000,
             last_keyset=None,
+            direction="ASC",
         )
         assert fragment in q
 

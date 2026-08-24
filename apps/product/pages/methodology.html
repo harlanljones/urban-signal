@@ -1,0 +1,102 @@
+    <h1 class="sr-only">Methodology: how momentum signals are composed</h1>
+    <section class="signal-section" aria-labelledby="score-title">
+      <div class="section-wrap signal-layout">
+        <div class="signal-copy"><h2 id="score-title">Momentum is a<br><em>composition,</em> not a verdict.</h2><p>Leading Indicator Momentum Score combines time-decayed CapEx, permit velocity, 311 shift dynamics, and license activity. The parts stay visible — on this page, all the way down to the formula.</p><a class="text-link" href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/features/lims_calculator.py" target="_blank" rel="noreferrer">Read the calculation <svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5"/></svg></a></div>
+        <div class="score-panel">
+          <div class="score-top"><span class="mono">ILLUSTRATIVE H3 CELL</span><span class="status"><span class="dot lime"></span> EXAMPLE COMPOSITION</span></div>
+          <div class="score-number">68<span>/100</span></div>
+          <div class="score-bars"><div><span>CapEx density <b>35%</b></span><i style="--value:82%"></i></div><div><span>Permit velocity <b>25%</b></span><i style="--value:61%"></i></div><div><span>311 shift ratio <b>20%</b></span><i style="--value:73%"></i></div><div><span>License activity <b>20%</b></span><i style="--value:49%"></i></div></div>
+          <details class="score-disclosure"><summary>What this example means</summary><p>The bar values demonstrate the interface’s score composition and are not a live prediction or a performance claim. The weights shown are the calculator’s actual defaults.</p></details>
+          <div class="score-foot mono"><span>EXAMPLE ONLY</span><span>6m / 12m / 18m horizons</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-wrap section-block" aria-labelledby="ingredients-title">
+      <div class="section-heading">
+        <span class="mono label">THE INGREDIENTS</span>
+        <h2 id="ingredients-title">Four inputs,<br><em>each with a job.</em></h2>
+        <p>Every ingredient is a municipal signal family with a different lead time. The weights below are the calculator’s defaults (<a href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/features/lims_calculator.py" target="_blank" rel="noreferrer">lims_calculator.py</a>).</p>
+      </div>
+      <div class="ingredient-grid">
+        <div class="ingredient-card">
+          <span class="mono ingredient-weight">α · 0.35</span>
+          <h3>CapEx density</h3>
+          <p>Recorded construction value, time-decayed with a 180-day half-life. Money that owners commit today is the slowest, loudest signal on the board.</p>
+        </div>
+        <div class="ingredient-card">
+          <span class="mono ingredient-weight">β · 0.25</span>
+          <h3>Permit velocity</h3>
+          <p>The acceleration of permit filings — not the count, the direction of its change. Filing surges precede visible construction by months.</p>
+        </div>
+        <div class="ingredient-card">
+          <span class="mono ingredient-weight">γ · 0.20</span>
+          <h3>311 shift dynamics</h3>
+          <p>The changing mix of service requests. Complaint categories lead neighborhood transitions — renovation complaints arrive before scaffolding does.</p>
+        </div>
+        <div class="ingredient-card">
+          <span class="mono ingredient-weight">δ · 0.20</span>
+          <h3>License activity</h3>
+          <p>Hospitality license activations from SLA feeds. New licenses trace where commercial foot traffic is expected, before leases are public.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="system-data" aria-labelledby="math-title">
+      <div class="section-wrap">
+        <div class="section-heading">
+          <span class="mono label">THE SHAPE OF THE MATH</span>
+          <h2 id="math-title">Comparable, <em>decayed, decomposable.</em></h2>
+          <p>The score is a weighted combination of standardized ingredients — the same formulation documented in the <a href="https://github.com/harlanljones/urban-signal#leading-indicator-momentum-score-lims" target="_blank" rel="noreferrer">repository README</a> and implemented in <a href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/features/lims_calculator.py" target="_blank" rel="noreferrer">lims_calculator.py</a>.</p>
+        </div>
+        <div class="formula-card" role="img" aria-label="LIMS formula: weighted combination of Z-scored CapEx, permit velocity, 311 shift ratio, and license activity">
+LIMS<sub>h</sub> = α·Z(CapEx<sub>h</sub>) + β·Z(PermitVelocity<sub>h</sub>) + γ·Z(ΔR<sub>311,h</sub>) + δ·Z(Lic<sub>SLA,h</sub>)
+        </div>
+        <div class="math-notes">
+          <div class="watermark-item"><h3>Z-scores, not raw counts</h3><p>Each ingredient is standardized, so a busy metro and a quiet one are comparable — the score measures deviation from typical, not volume.</p></div>
+          <div class="watermark-item"><h3>Decay is explicit</h3><p>CapEx decays with a 180-day half-life (λ = ln 2 / 180, tunable via <code>CAPEX_HALFLIFE_DAYS</code>). Old money fades; the math says so out loud.</p></div>
+          <div class="watermark-item"><h3>Thresholds are public</h3><p>Catalyst alerts fire at LIMS ≥ 85.0 (<code>LIMS_THRESHOLD</code>). The same threshold the dashboard’s catalyst feed uses — no private dial.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-wrap section-block" aria-labelledby="horizons-title">
+      <div class="section-heading">
+        <span class="mono label">THE HORIZONS</span>
+        <h2 id="horizons-title">Three horizons,<br><em>three questions.</em></h2>
+        <p>Model implementations cover 6-, 12-, and 18-month horizons with spatio-temporal leakage controls. Described at contract level; no performance claims are published.</p>
+      </div>
+      <div class="horizon-grid">
+        <div class="horizon-card"><span class="mono">6M</span><h3>Tactical</h3><p>Which cells are moving now — the dashboard’s heatmap and catalyst feed operate here.</p></div>
+        <div class="horizon-card"><span class="mono">12M</span><h3>Swing</h3><p>Where momentum is building toward a change of state within a market cycle.</p></div>
+        <div class="horizon-card"><span class="mono">18M</span><h3>Structural</h3><p>Which submarkets are compounding into durable regime shifts.</p></div>
+      </div>
+      <div class="model-note">
+        <p><strong>The model contract.</strong> Implementations live in <a href="https://github.com/harlanljones/urban-signal/tree/main/apps/api/src/models" target="_blank" rel="noreferrer">apps/api/src/models</a>: a spatio-temporal GNN (<code>st_gnn.py</code>), a cross-network macro model (<code>dcn_v2.py</code>), and a quantile LGBM (<code>quantile_lgbm.py</code>), with <code>calibration.py</code>, SHAP-based attribution (<code>explainability.py</code> — the dashboard’s waterfall), and leakage controls in <code>validation.py</code>. Retraining runs walk-forward cross-validation and exports ONNX artifacts (the shipped <code>st_gnn_12m.onnx</code>, <code>dcn_v2_macro.onnx</code>). Splits respect both space and time — models are evaluated on later periods and areas they did not train on.</p>
+      </div>
+    </section>
+
+    <section class="evidence-section" aria-labelledby="not-title">
+      <div class="section-wrap">
+        <div class="section-heading">
+          <span class="mono label">THE BOUNDARY</span>
+          <h2 id="not-title">What LIMS <em>is not.</em></h2>
+        </div>
+        <ul class="not-list">
+          <li><strong>Not a price forecast.</strong> LIMS measures momentum in municipal activity. It does not predict transaction prices or returns.</li>
+          <li><strong>Not a performance claim.</strong> No accuracy, precision, or ROI numbers are published anywhere on this site — by policy, not omission.</li>
+          <li><strong>Not uniform across metros.</strong> Feed mix differs by city; a licenses-led metro and a permits-led metro are read differently. Coverage is stated per metro.</li>
+          <li><strong>Not realtime.</strong> Signals move at feed cadence — minutes for some feeds, snapshots for others. Cadence is declared, never implied.</li>
+          <li><strong>Not the number on the hero.</strong> The 68/100 panel above is an interface example with illustrative values. Only its weights are the calculator’s real defaults.</li>
+        </ul>
+        <div class="limitations-block">
+          <h3 class="mono">PUBLISHED LIMITATIONS</h3>
+          <ul id="limitations-list" aria-live="polite"><li class="city-loading">Loading published limitations from facts.json…</li></ul>
+          <noscript><p class="system-noscript">The published limitations list requires JavaScript; it lives verbatim in <a href="/facts.json">facts.json</a>.</p></noscript>
+        </div>
+        <div class="closing-routes system-next">
+          <a class="route-primary" href="/evidence/"><span>Trace one record end-to-end</span><small>Evidence: the path from raw row to this score</small></a>
+          <a class="route-secondary" href="/cities/"><span>Check your metro’s feed mix</span><small>Cities: registry-backed coverage and honest limits</small></a>
+        </div>
+      </div>
+    </section>

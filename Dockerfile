@@ -14,10 +14,11 @@ RUN pip install --no-cache-dir uv==0.4.29
 # Copy dependency manifests only — cache this layer aggressively
 COPY apps/api/pyproject.toml apps/api/uv.lock ./
 
-# Install all dependencies (including optional cpu onnxruntime; omit gpu extra)
-# We use --system so the venv lands in /usr/local and is re-used in the final stage
-RUN uv pip install --system --no-cache . 2>/dev/null || \
-    pip install --no-cache-dir .
+# Install all dependencies (including optional cpu onnxruntime; omit gpu extra).
+# The app itself is run from copied source in the runtime stage, so only the
+# dependency set is installed here (-r reads PEP 621 deps without building
+# the project wheel, which would need the source tree and README).
+RUN uv pip install --system --no-cache -r pyproject.toml
 
 
 # ── Stage 2: runtime image ───────────────────────────────────────────────────

@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "id": "prince_georges",
+  "name": "Prince George's County",
+  "state": "MD",
+  "center": {
+    "lat": 38.72,
+    "lng": -76.75
+  },
+  "metro_bbox": {
+    "min_lat": 38.55,
+    "max_lat": 39.22,
+    "min_lng": -77.12,
+    "max_lng": -76.62
+  },
+  "divisions": {
+    "PRINCE_GEORGES_CORE": {
+      "name": "Prince Georges County",
+      "center": {
+        "lat": 38.72,
+        "lng": -76.75
+      },
+      "bbox": {
+        "min_lat": 38.6,
+        "max_lat": 39.05,
+        "min_lng": -77.05,
+        "max_lng": -76.7
+      },
+      "submarkets": [
+        "National Harbor & Oxon Hill",
+        "Largo & Landover Core",
+        "Bowie & South Laurel",
+        "College Park & Route 1"
+      ]
+    }
+  },
+  "submarkets": {
+    "National Harbor & Oxon Hill": {
+      "name": "National Harbor & Oxon Hill",
+      "division": "PRINCE_GEORGES_CORE",
+      "center": {
+        "lat": 38.783,
+        "lng": -76.982
+      },
+      "description": "Potomac waterfront mixed-use district anchored by the convention center and casino, with hotel-adjacent retail and residential demand."
+    },
+    "Largo & Landover Core": {
+      "name": "Largo & Landover Core",
+      "division": "PRINCE_GEORGES_CORE",
+      "center": {
+        "lat": 38.87,
+        "lng": -76.84
+      },
+      "description": "Blue Line office and medical corridor around Largo Town Center and the new regional hospital, with county-government anchoring."
+    },
+    "Bowie & South Laurel": {
+      "name": "Bowie & South Laurel",
+      "division": "PRINCE_GEORGES_CORE",
+      "center": {
+        "lat": 38.942,
+        "lng": -76.73
+      },
+      "description": "Suburban family belt along the Route 197 and US-1 north corridors, dominated by single-family stock and town-center retail."
+    },
+    "College Park & Route 1": {
+      "name": "College Park & Route 1",
+      "division": "PRINCE_GEORGES_CORE",
+      "center": {
+        "lat": 38.99,
+        "lng": -76.93
+      },
+      "description": "University of Maryland anchor market with student rental demand, research-park employment, and Purple Line construction activity."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": {
+      "platform": "socrata",
+      "watermark_col": "date_request_opened",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/prince_georges.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

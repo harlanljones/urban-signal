@@ -14,6 +14,34 @@ from src.spatial.cities.washington_dc import (
     DC_SUBMARKETS,
     is_in_dc_metro,
 )
+from src.spatial.cities.prince_georges import (
+    PRINCE_GEORGES_DIVISION_BBOXES,
+    PRINCE_GEORGES_DIVISIONS,
+    PRINCE_GEORGES_METRO_BBOX,
+    PRINCE_GEORGES_SUBMARKETS,
+    is_in_prince_georges_metro,
+)
+from src.spatial.cities.columbus import (
+    COLUMBUS_DIVISION_BBOXES,
+    COLUMBUS_DIVISIONS,
+    COLUMBUS_METRO_BBOX,
+    COLUMBUS_SUBMARKETS,
+    is_in_columbus_metro,
+)
+from src.spatial.cities.nashville import (
+    NASHVILLE_DIVISION_BBOXES,
+    NASHVILLE_DIVISIONS,
+    NASHVILLE_METRO_BBOX,
+    NASHVILLE_SUBMARKETS,
+    is_in_nashville_metro,
+)
+from src.spatial.cities.kansas_city import (
+    KANSAS_CITY_DIVISION_BBOXES,
+    KANSAS_CITY_DIVISIONS,
+    KANSAS_CITY_METRO_BBOX,
+    KANSAS_CITY_SUBMARKETS,
+    is_in_kansas_city_metro,
+)
 from src.spatial.cities.austin import (
     AUSTIN_DIVISION_BBOXES,
     AUSTIN_DIVISIONS,
@@ -196,6 +224,26 @@ __all__ = [
     "DC_DIVISIONS",
     "DC_SUBMARKETS",
     "is_in_dc_metro",
+    "PRINCE_GEORGES_METRO_BBOX",
+    "PRINCE_GEORGES_DIVISION_BBOXES",
+    "PRINCE_GEORGES_DIVISIONS",
+    "PRINCE_GEORGES_SUBMARKETS",
+    "is_in_prince_georges_metro",
+    "COLUMBUS_METRO_BBOX",
+    "COLUMBUS_DIVISION_BBOXES",
+    "COLUMBUS_DIVISIONS",
+    "COLUMBUS_SUBMARKETS",
+    "is_in_columbus_metro",
+    "NASHVILLE_METRO_BBOX",
+    "NASHVILLE_DIVISION_BBOXES",
+    "NASHVILLE_DIVISIONS",
+    "NASHVILLE_SUBMARKETS",
+    "is_in_nashville_metro",
+    "KANSAS_CITY_METRO_BBOX",
+    "KANSAS_CITY_DIVISION_BBOXES",
+    "KANSAS_CITY_DIVISIONS",
+    "KANSAS_CITY_SUBMARKETS",
+    "is_in_kansas_city_metro",
     "NORFOLK_METRO_BBOX",
     "NORFOLK_DIVISION_BBOXES",
     "NORFOLK_DIVISIONS",

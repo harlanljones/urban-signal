@@ -1,0 +1,18 @@
+{
+  "title": "Methodology — Urban Signal",
+  "description": "How the Leading Indicator Momentum Score is composed: CapEx density, permit velocity, 311 shift dynamics, license activity across 6-, 12-, and 18-month horizons.",
+  "jsonLd": {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Momentum is a composition, not a verdict",
+    "description": "How the Leading Indicator Momentum Score is composed: CapEx density, permit velocity, 311 shift dynamics, license activity across 6-, 12-, and 18-month horizons.",
+    "about": "How the Leading Indicator Momentum Score is composed: Z-scored ingredients, explicit time decay, public thresholds, three horizons.",
+    "keywords": "LIMS, momentum score, time decay, forecast horizons, leakage controls",
+    "isAccessibleForFree": true,
+    "author": {
+      "@type": "Organization",
+      "name": "Urban Signal",
+      "url": "https://github.com/harlanljones/urban-signal"
+    }
+  }
+}

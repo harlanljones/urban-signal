@@ -289,6 +289,10 @@ services:
     environment:
       <<: *app-env
       SOCRATA_APP_TOKEN: ${SOCRATA_APP_TOKEN:-}
+      SCHEDULER_STATE_FILE: ${SCHEDULER_STATE_FILE:-}
+    volumes:
+      # Durable per-job watermark state (US-106) survives container restarts.
+      - ./data/scheduler:/data
     depends_on:
       kafka:
         condition: service_healthy

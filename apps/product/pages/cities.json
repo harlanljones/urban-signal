@@ -1,0 +1,5 @@
+{
+  "title": "Cities — Urban Signal",
+  "description": "Registered metro coverage across permits, 311, licenses, and deeds feeds — platform, cadence, and the exact source contract for every registered metro.",
+  "noscript": "<div class=\"no-script\"><p>The interactive metro grid requires JavaScript. Coverage facts remain available:</p><a href=\"/facts.json\">Machine-readable facts</a> · <a href=\"/llms-full.txt\">Full agent context</a> · <a href=\"https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/spatial/city_registry.py\">City registry</a></div>"
+}

@@ -75,6 +75,10 @@ MANIFEST
 *.db
 *.sqlite
 *.sqlite3
+*.ses
+:memory:.ses
+*.session
+*.session-journal
 data/
 datasets/
 *.parquet
@@ -140,3 +144,8 @@ ehthumbs.db
 .project
 .pydevproject
 .settings/
+
+# Design & Quality Review Artifacts
+.impeccable/*
+!.impeccable/review/
+

@@ -1,0 +1,19 @@
+{
+  "title": "System — Urban Signal",
+  "description": "From a city's noise to a useful shape: how Urban Signal ingests Socrata, ArcGIS, Carto, and CKAN feeds, normalizes them onto an H3 grid, and serves actionable momentum.",
+  "noscript": "<div class=\"no-script\"><p>The interactive pipeline selector requires JavaScript. The stage-by-stage source map remains available:</p><a href=\"https://github.com/harlanljones/urban-signal/tree/main/apps/api/src/producers\">Producers</a> · <a href=\"/llms-full.txt\">Full agent context</a> · <a href=\"https://github.com/harlanljones/urban-signal\">Repository</a></div>",
+  "jsonLd": {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "From a city's noise to a useful shape",
+    "description": "From a city's noise to a useful shape: how Urban Signal ingests Socrata, ArcGIS, Carto, and CKAN feeds, normalizes them onto an H3 grid, and serves actionable momentum.",
+    "about": "How Urban Signal ingests heterogeneous municipal feeds, normalizes them onto an H3 grid, and serves actionable momentum.",
+    "keywords": "municipal data pipeline, Socrata, ArcGIS, Carto, CKAN, H3, normalization",
+    "isAccessibleForFree": true,
+    "author": {
+      "@type": "Organization",
+      "name": "Urban Signal",
+      "url": "https://github.com/harlanljones/urban-signal"
+    }
+  }
+}

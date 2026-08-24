@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "id": "kansas_city",
+  "name": "Kansas City",
+  "state": "MO",
+  "center": {
+    "lat": 39.1,
+    "lng": -94.58
+  },
+  "metro_bbox": {
+    "min_lat": 38.75,
+    "max_lat": 39.4,
+    "min_lng": -94.8,
+    "max_lng": -94.3
+  },
+  "divisions": {
+    "KANSAS_CITY_CORE": {
+      "name": "Kansas City Core",
+      "center": {
+        "lat": 39.1,
+        "lng": -94.58
+      },
+      "bbox": {
+        "min_lat": 38.85,
+        "max_lat": 39.3,
+        "min_lng": -94.72,
+        "max_lng": -94.42
+      },
+      "submarkets": [
+        "Downtown & River Market",
+        "Country Club Plaza & Westport",
+        "Brookside & Waldo",
+        "Northland & Zona Rosa",
+        "18th & Vine Crossroads"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & River Market": {
+      "name": "Downtown & River Market",
+      "division": "KANSAS_CITY_CORE",
+      "center": {
+        "lat": 39.1,
+        "lng": -94.58
+      },
+      "description": "CBD civic core and riverfront loft district linked by the streetcar loop, with office conversions, arena-adjacent hospitality, and infill demand."
+    },
+    "Country Club Plaza & Westport": {
+      "name": "Country Club Plaza & Westport",
+      "division": "KANSAS_CITY_CORE",
+      "center": {
+        "lat": 39.048,
+        "lng": -94.5885
+      },
+      "description": "Signature retail and nightlife corridors spanning the Spanish-styled Plaza and Westport entertainment district, anchored by sustained commercial reinvestment."
+    },
+    "Brookside & Waldo": {
+      "name": "Brookside & Waldo",
+      "division": "KANSAS_CITY_CORE",
+      "center": {
+        "lat": 38.998,
+        "lng": -94.586
+      },
+      "description": "Tree-lined inner-ring neighborhood business districts along Wornall and Holmes with stable single-family stock and boutique retail demand."
+    },
+    "Northland & Zona Rosa": {
+      "name": "Northland & Zona Rosa",
+      "division": "KANSAS_CITY_CORE",
+      "center": {
+        "lat": 39.21,
+        "lng": -94.618
+      },
+      "description": "Fast-growing Clay County suburbs around Zona Rosa and Barry Road, mixing town-center retail, logistics employment, and greenfield residential buildout."
+    },
+    "18th & Vine Crossroads": {
+      "name": "18th & Vine Crossroads",
+      "division": "KANSAS_CITY_CORE",
+      "center": {
+        "lat": 39.082,
+        "lng": -94.572
+      },
+      "description": "Historic jazz district and Crossroads arts corridor east of downtown, with adaptive-reuse warehouses, gallery retail, and cultural-anchor investment."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": {
+      "platform": "socrata",
+      "watermark_col": "open_date_time",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/kansas_city.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

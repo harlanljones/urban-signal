@@ -25,6 +25,13 @@ const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const sourceUrl = (path) => `${REPOSITORY}/${path.includes(".") ? "blob" : "tree"}/main/${path}`;
 let siteFacts = null;
 let showAllCities = false;
+let cityFilters = { feed: -1, platform: "all" };
+
+function metroMatchesFilters({ feeds, platforms }) {
+  if (cityFilters.feed !== -1 && !feeds[cityFilters.feed]) return false;
+  if (cityFilters.platform !== "all" && !platforms.some((entry) => entry && entry.platform === cityFilters.platform)) return false;
+  return true;
+}
 
 function feedSummary(feeds) {
   const available = layers.filter((_, index) => feeds[index]);
@@ -38,7 +45,10 @@ function feedSummary(feeds) {
 function renderCities(filter = "") {
   if (!siteFacts) return;
   const query = filter.trim().toLocaleLowerCase();
-  const matches = siteFacts.metros.filter(({ id, name, state }) => [id, name, state].some((value) => value.toLocaleLowerCase().includes(query)));
+  const matches = siteFacts.metros.filter(({ id, name, state, feeds, platforms }) => {
+    const matchesQuery = [id, name, state].some((value) => value.toLocaleLowerCase().includes(query));
+    return matchesQuery && metroMatchesFilters({ feeds, platforms });
+  });
   const isCompact = matchMedia("(max-width: 600px)").matches;
   const visible = isCompact && !query && !showAllCities ? matches.slice(0, 5) : matches;
   const cityGrid = $("#city-grid");
@@ -62,7 +72,7 @@ function renderCities(filter = "") {
     return;
   }
 
-  visible.forEach(({ name, state, divisions, feeds, evidence_path: evidencePath }) => {
+  visible.forEach(({ id, name, state, divisions, feeds, platforms, evidence_path: evidencePath }) => {
     const card = document.createElement("details");
     card.className = "city-card";
     const summary = document.createElement("summary");
@@ -95,20 +105,221 @@ function renderCities(filter = "") {
     link.target = "_blank";
     link.rel = "noreferrer";
     link.textContent = "Inspect this metro’s source contract";
-    evidence.append(availability, link);
+    const twin = document.createElement("a");
+    twin.href = `/cities/${id}/`;
+    twin.textContent = `Open ${name}’s page`;
+    const twinData = document.createElement("a");
+    twinData.href = `/public/cities/${id}.json`;
+    twinData.target = "_blank";
+    twinData.rel = "noreferrer";
+    twinData.textContent = "Machine-readable coverage";
+    evidence.append(availability, link, twin, twinData);
     card.append(summary, evidence);
     cityGrid.append(card);
   });
 }
 
+function renderPlatformMatrix() {
+  const host = $("#platform-matrix");
+  if (!host || !siteFacts) return;
+  const platforms = new Map();
+  const cadence = layers.map(() => ({ metros: 0, intervals: new Set(), platforms: new Set() }));
+  siteFacts.metros.forEach(({ id, platforms: feeds }) => {
+    feeds.forEach((entry, index) => {
+      if (!entry) return;
+      if (!platforms.has(entry.platform)) platforms.set(entry.platform, new Set());
+      platforms.get(entry.platform).add(id);
+      cadence[index].metros += 1;
+      cadence[index].intervals.add(entry.interval_seconds);
+      cadence[index].platforms.add(entry.platform);
+    });
+  });
+  const cadenceLabel = (intervals) => {
+    const fmt = (seconds) => (seconds % 60 === 0 ? `${seconds / 60} min` : `${seconds}s`);
+    const values = [...intervals];
+    return values.length === 1 ? `every ${fmt(values[0])}` : values.map(fmt).join(" / ");
+  };
+  const platformBlocks = [...platforms.entries()]
+    .sort((a, b) => b[1].size - a[1].size)
+    .map(([name, metros]) => `<span class="platform-stat"><b>${metros.size}</b><small>${name}<br>metros</small></span>`)
+    .join("");
+  const cadenceRows = layers
+    .map((label, index) => {
+      const row = cadence[index];
+      if (!row.metros) return `<tr><td>${label}</td><td>—</td><td>not published</td><td>—</td></tr>`;
+      return `<tr><td>${label}</td><td>${row.metros}</td><td>${cadenceLabel(row.intervals)}</td><td>${[...row.platforms].join(", ")}</td></tr>`;
+    })
+    .join("");
+  host.innerHTML = `
+    <div class="platform-stats">${platformBlocks}</div>
+    <table class="cadence-table">
+      <caption class="sr-only">Feed families with publishing metro counts, poll cadence, and platforms</caption>
+      <thead><tr><th scope="col">Feed family</th><th scope="col">Metros publishing</th><th scope="col">Poll cadence</th><th scope="col">Platforms</th></tr></thead>
+      <tbody>${cadenceRows}</tbody>
+    </table>
+    <p class="matrix-note mono">DERIVED FROM REGISTRY FACTS · <a href="/facts.json">FACTS.JSON</a></p>`;
+}
+
+function renderLimitations() {
+  const host = $("#limitations-list");
+  if (!host || !siteFacts) return;
+  host.replaceChildren();
+  siteFacts.limitations.forEach((limitation) => {
+    const item = document.createElement("li");
+    item.textContent = limitation;
+    host.append(item);
+  });
+}
+
+function refreshCityViews() {
+  buildCityChips();
+  renderCities($("#city-filter")?.value || "");
+  renderCoverageMatrix();
+}
+
+function buildCityChips() {
+  const feedRow = $("#feed-chips");
+  const platformRow = $("#platform-chips");
+  if (!feedRow || !platformRow || !siteFacts) return;
+  const chip = (parent, label, pressed, apply) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "chip";
+    button.setAttribute("aria-pressed", String(pressed));
+    button.textContent = label;
+    button.addEventListener("click", () => { apply(); refreshCityViews(); });
+    parent.append(button);
+  };
+  feedRow.replaceChildren();
+  chip(feedRow, "All", cityFilters.feed === -1, () => { cityFilters.feed = -1; });
+  layers.forEach((label, index) => chip(feedRow, label, cityFilters.feed === index, () => { cityFilters.feed = cityFilters.feed === index ? -1 : index; }));
+  platformRow.replaceChildren();
+  chip(platformRow, "All", cityFilters.platform === "all", () => { cityFilters.platform = "all"; });
+  const platformNames = [...new Set(siteFacts.metros.flatMap(({ platforms: list }) => list.filter(Boolean).map((entry) => entry.platform)))];
+  platformNames.forEach((name) => chip(platformRow, name, cityFilters.platform === name, () => { cityFilters.platform = cityFilters.platform === name ? "all" : name; }));
+}
+
+function formatAge(hours) {
+  return hours >= 48 ? `${Math.round(hours / 24)}d` : `${Math.round(hours)}h`;
+}
+
+function freshTokens(metro) {
+  const cityFresh = siteFacts.freshness?.[metro.id];
+  if (!cityFresh || typeof cityFresh !== "object") return '<span class="fresh-missing" aria-label="no sync data">—</span>';
+  const tokens = metro.platforms.flatMap((entry, index) => {
+    if (!entry) return [];
+    const key = siteFacts.feed_labels?.[index] ?? layers[index].toLowerCase();
+    const record = cityFresh[key];
+    if (!record || typeof record.age_hours !== "number") return [`<span class="fresh-token fresh-missing">${key} —</span>`];
+    const stale = record.age_hours > 48;
+    return [`<span class="fresh-token${stale ? " fresh-stale" : ""}" title="last synced ${record.last_synced_at ?? "unknown"}">${key} ${formatAge(record.age_hours)}</span>`];
+  });
+  return tokens.length ? tokens.join("") : '<span class="fresh-missing" aria-label="no sync data">—</span>';
+}
+
+function renderCoverageMatrix() {
+  const host = $("#coverage-matrix");
+  if (!host || !siteFacts) return;
+  const query = ($("#city-filter")?.value || "").trim().toLocaleLowerCase();
+  const metros = siteFacts.metros.filter(({ id, name, state, feeds, platforms }) => {
+    const matchesQuery = [id, name, state].some((value) => value.toLocaleLowerCase().includes(query));
+    return matchesQuery && metroMatchesFilters({ feeds, platforms });
+  });
+  const cadenceLabel = (seconds) => (seconds % 60 === 0 ? `${seconds / 60}m` : `${seconds}s`);
+  const showFreshness = Boolean(siteFacts.freshness);
+  const head = `<tr><th scope="col">Metro</th>${layers.map((label) => `<th scope="col">${label}</th>`).join("")}${showFreshness ? '<th scope="col">Freshness</th>' : ""}</tr>`;
+  const rows = metros
+    .map(({ id, name, state, platforms }) => {
+      const cells = platforms
+        .map((entry) => entry
+          ? `<td><span class="cell-platform">${entry.platform}</span><span class="cell-cadence">${cadenceLabel(entry.interval_seconds)}</span></td>`
+          : '<td class="cell-none"><span aria-label="not published">—</span></td>')
+        .join("");
+      const freshness = showFreshness ? `<td class="cell-fresh">${freshTokens({ id, platforms })}</td>` : "";
+      return `<tr><th scope="row"><a class="matrix-metro" href="/cities/${id}/">${name}</a><span class="matrix-state">/ ${state}</span></th>${cells}${freshness}</tr>`;
+    })
+    .join("");
+  host.innerHTML = `
+    <div class="matrix-wrap">
+      <table class="coverage-table">
+        <caption class="sr-only">Coverage matrix: ${metros.length} metros by feed family, with platform and poll cadence</caption>
+        <thead>${head}</thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <p class="matrix-note mono">${metros.length} OF ${siteFacts.metros.length} METROS · <a href="/facts.json">FACTS.JSON</a></p>`;
+}
+
+function renderCompareColumns() {
+  const host = $("#compare-host");
+  if (!host || !siteFacts) return;
+  const picks = ["#compare-select-a", "#compare-select-b"].map((selector) => $(selector)?.value);
+  if (picks.some((id) => !id)) return;
+  const fmt = (seconds) => (seconds % 60 === 0 ? `${seconds / 60} min` : `${seconds}s`);
+  const columns = picks
+    .map((id) => siteFacts.metros.find((metro) => metro.id === id))
+    .filter(Boolean)
+    .map((metro) => {
+      const rows = layers
+        .map((label, index) => {
+          const entry = metro.platforms[index];
+          return `<tr><th scope="row">${label}</th>${entry
+            ? `<td><span class="cell-platform">${entry.platform}</span><span class="cell-cadence">every ${fmt(entry.interval_seconds)}</span></td>`
+            : '<td class="cell-none"><span aria-label="not published">—</span></td>'}</tr>`;
+        })
+        .join("");
+      return `
+      <article class="compare-col">
+        <header class="compare-head"><h3><a href="/cities/${metro.id}/">${metro.name}</a><span class="matrix-state">/ ${metro.state}</span></h3><span class="mono compare-id">${metro.id}</span></header>
+        <table class="cadence-table compare-table">
+          <caption class="sr-only">${metro.name}: coverage by feed family</caption>
+          <thead><tr><th scope="col">Feed family</th><th scope="col">Platform · cadence</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <p class="compare-counts mono">${metro.divisions.toUpperCase()} · ${metro.submarket_count} SUBMARKETS</p>
+        <div class="compare-links">
+          <a href="${sourceUrl(metro.evidence_path)}" target="_blank" rel="noreferrer">Inspect this metro’s source contract</a>
+          <a href="/public/cities/${metro.id}.json" target="_blank" rel="noreferrer">Machine-readable coverage</a>
+        </div>
+      </article>`;
+    });
+  host.innerHTML = `<div class="compare-grid">${columns.join("")}</div><p class="matrix-note mono">RENDERED FROM REGISTRY FACTS · <a href="/facts.json">FACTS.JSON</a></p>`;
+}
+
+function renderCompare() {
+  const host = $("#compare-host");
+  const selects = [$("#compare-select-a"), $("#compare-select-b")];
+  if (!host || !siteFacts || selects.some((select) => !select)) return;
+  if (!selects[0].options.length) {
+    siteFacts.metros.forEach(({ id, name, state }) => {
+      selects.forEach((select) => {
+        const option = document.createElement("option");
+        option.value = id;
+        option.textContent = `${name}, ${state}`;
+        select.append(option);
+      });
+    });
+    selects.forEach((select, index) => {
+      select.selectedIndex = index;
+      select.addEventListener("change", renderCompareColumns);
+    });
+  }
+  renderCompareColumns();
+}
+
 async function loadFacts() {
   const cityGrid = $("#city-grid");
   try {
-    const response = await fetch("facts.json", { headers: { Accept: "application/json" } });
+    const response = await fetch("/facts.json", { headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     siteFacts = await response.json();
     $$('[data-metro-count]').forEach((node) => { node.textContent = siteFacts.metros.length; });
     renderCities($("#city-filter")?.value || "");
+    renderPlatformMatrix();
+    renderLimitations();
+    buildCityChips();
+    renderCoverageMatrix();
+    renderCompare();
   } catch {
     if (!cityGrid) return;
     cityGrid.setAttribute("aria-busy", "false");
@@ -182,7 +393,7 @@ function init() {
   $$('[data-observatory-layer]').forEach((control) => control.addEventListener("click", () => setObservatoryLayer(Number(control.dataset.observatoryLayer))));
   sync();
 
-  $("#city-filter")?.addEventListener("input", (event) => renderCities(event.target.value));
+  $("#city-filter")?.addEventListener("input", (event) => { renderCities(event.target.value); renderCoverageMatrix(); });
   $("#city-toggle")?.addEventListener("click", () => { showAllCities = !showAllCities; renderCities(); });
   matchMedia("(max-width: 600px)").addEventListener("change", () => { showAllCities = false; renderCities($("#city-filter")?.value || ""); });
   $$(".pipeline-step").forEach((button) => button.addEventListener("click", () => { selectLayer(button); button.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "nearest", inline: "center" }); }));

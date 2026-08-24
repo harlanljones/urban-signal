@@ -1,0 +1,663 @@
+{
+  "schema_version": 2,
+  "id": "san_francisco",
+  "name": "San Francisco Bay Area",
+  "state": "CA",
+  "center": {
+    "lat": 37.7749,
+    "lng": -122.4194
+  },
+  "metro_bbox": {
+    "min_lat": 37.15,
+    "max_lat": 38.1,
+    "min_lng": -122.65,
+    "max_lng": -121.75
+  },
+  "divisions": {
+    "SAN_FRANCISCO_CORE": {
+      "name": "SAN_FRANCISCO_CORE",
+      "center": {
+        "lat": 37.7749,
+        "lng": -122.4194
+      },
+      "bbox": {
+        "min_lat": 37.7,
+        "max_lat": 37.835,
+        "min_lng": -122.525,
+        "max_lng": -122.355
+      },
+      "submarkets": [
+        "Downtown",
+        "SoMa",
+        "Financial District",
+        "Mission",
+        "Hayes Valley",
+        "Marina",
+        "Mission Bay",
+        "Dogpatch",
+        "Potrero Hill",
+        "North Beach",
+        "Pacific Heights",
+        "Castro",
+        "Sunset",
+        "Richmond",
+        "Nob Hill",
+        "Tenderloin",
+        "Presidio"
+      ]
+    },
+    "EAST_BAY": {
+      "name": "EAST_BAY",
+      "center": {
+        "lat": 37.8044,
+        "lng": -122.2711
+      },
+      "bbox": {
+        "min_lat": 37.45,
+        "max_lat": 38.05,
+        "min_lng": -122.4,
+        "max_lng": -121.75
+      },
+      "submarkets": [
+        "Downtown Oakland",
+        "Uptown Oakland",
+        "Jack London Square",
+        "Berkeley Downtown",
+        "West Berkeley",
+        "Rockridge",
+        "Temescal",
+        "Emeryville",
+        "Alameda",
+        "Fremont Downtown",
+        "Hayward Downtown",
+        "San Leandro Downtown",
+        "Richmond CA",
+        "Walnut Creek Downtown",
+        "Concord Downtown",
+        "Pleasanton Downtown",
+        "Dublin Downtown",
+        "Livermore Downtown"
+      ]
+    },
+    "PENINSULA": {
+      "name": "PENINSULA",
+      "center": {
+        "lat": 37.5485,
+        "lng": -122.315
+      },
+      "bbox": {
+        "min_lat": 37.42,
+        "max_lat": 37.7,
+        "min_lng": -122.52,
+        "max_lng": -122.18
+      },
+      "submarkets": [
+        "San Mateo Downtown",
+        "Burlingame Ave",
+        "Redwood City Downtown",
+        "Menlo Park",
+        "South San Francisco",
+        "Daly City",
+        "San Bruno"
+      ]
+    },
+    "SILICON_VALLEY_SOUTH_BAY": {
+      "name": "SILICON_VALLEY_SOUTH_BAY",
+      "center": {
+        "lat": 37.3688,
+        "lng": -122.0363
+      },
+      "bbox": {
+        "min_lat": 37.15,
+        "max_lat": 37.46,
+        "min_lng": -122.2,
+        "max_lng": -121.75
+      },
+      "submarkets": [
+        "Palo Alto University Ave",
+        "Mountain View Castro St",
+        "Sunnyvale Downtown",
+        "Downtown San Jose",
+        "Santana Row",
+        "Cupertino",
+        "Santa Clara",
+        "North San Jose"
+      ]
+    },
+    "MARIN_NORTH_BAY": {
+      "name": "MARIN_NORTH_BAY",
+      "center": {
+        "lat": 37.915,
+        "lng": -122.518
+      },
+      "bbox": {
+        "min_lat": 37.835,
+        "max_lat": 38.1,
+        "min_lng": -122.65,
+        "max_lng": -122.4
+      },
+      "submarkets": [
+        "Sausalito",
+        "Mill Valley",
+        "San Rafael Downtown",
+        "Corte Madera"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown": {
+      "name": "Downtown",
+      "division": "SAN_FRANCISCO_CORE",
+      "center": {
+        "lat": 37.7879,
+        "lng": -122.4074
+      },
+      "description": "San Francisco central retail and commercial corridor anchored by Union Square, Market Street transit, and high-density hotel flagships."
+    },
+    "SoMa": {
+      "name": "SoMa",
+      "division": "SAN_FRANCISCO_CORE",
+      "center": {
+        "lat": 37.7785,
+        "lng": -122.395
+      },
+      "description": "South of Market tech campus core and cultural anchor with high-density residential towers, Moscone Center, and adaptive warehouse conversions."
+    },
+    "Financial District": {
+      "name": "Financial District",
+      "division": "SAN_FRANCISCO_CORE",
+      "center": {
+        "lat": 37.7946,
+        "lng": -122.4
+      },
+      "description": "West Coast banking capital and high-rise commercial hub featuring the Transamerica Pyramid, Salesforce Tower, and premium office towers."
+    },
+    "Mission": {
+      "name": "Mission",
+      "division": "SAN_FRANCISCO_CORE",
+      "center": {
+        "lat": 37.7599,
+        "lng": -122.4148
+      },
+      "description": "Historic cultural and culinary corridor centered on Valencia and Mission streets with vibrant murals, Michelin-starred dining, and transit access."
+    },
+    "Hayes Valley": {
+      "name": "Hayes Valley",
+      "division": "SAN_FRANCISCO_CORE",
+      "center": {
+        "lat": 37.7758,
+        "lng": -122.4245
+      },
+      "description": "Boutique shopping and arts enclave adjacent to the Civic Center performing arts complex with high pedestrian activity and designer retail."
+    },
+    "Marina": {
+      "name": "Marina",
+      "division": "SAN_FRANCISCO_CORE",
+      "center": {
+        "lat": 37.8037,
+        "lng": -122.4368
+      },
+      "description": "Scenic bayfront district featuring Mediterranean-style architecture, Chestnut Street shopping, Palace of Fine Arts, and Marina Green parkland."
+    },
+    "Mission Bay": {
+      "name": "Mission Bay",
+      "division": "SAN_FRANCISCO_CORE",
+      "center": {
+        "lat": 37.771,
+        "lng": -122.3912
+      },
+      "description": "Master-planned life sciences and healthcare district anchored by UCSF Mission Bay medical campus and the Golden State Warriors Chase Center."
+    },
+    "Dogpatch": {
+      "name": "Dogpatch",
+      "division": "SAN_FRANCISCO_CORE",
+      "center": {
+        "lat": 37.7587,
+        "lng": -122.3876
+      },
+      "description": "Historic maritime and industrial neighborhood along Third Street transformed into an artisanal manufacturing, brewery, and contemporary loft district."
+    },
+    "Potrero Hill": {
+      "name": "Potrero Hill",
+      "division": "SAN_FRANCISCO_CORE",
+      "center": {
+        "lat": 37.758,
+        "lng": -122.4005
+      },
+      "description": "Sunny residential neighborhood with dramatic skyline vistas, 18th Street village retail, and design showroom conversions."
+    },
+    "North Beach": {
+      "name": "North Beach",
+      "division": "SAN_FRANCISCO_CORE",
+      "center": {
+        "lat": 37.8005,
+        "lng": -122.4098
+      },
+      "description": "San Francisco's historic Little Italy and Beat Generation enclave along Columbus Avenue with dense trattorias, cafes, and historic nightlife."
+    },
+    "Pacific Heights": {
+      "name": "Pacific Heights",
+      "division": "SAN_FRANCISCO_CORE",
+      "center": {
+        "lat": 37.7925,
+        "lng": -122.4352
+      },
+      "description": "Prestigious hilltop enclave known for Billionaire's Row mansions, Fillmore Street upscale retail, and sweeping views of the Golden Gate."
+    },
+    "Castro": {
+      "name": "Castro",
+      "division": "SAN_FRANCISCO_CORE",
+      "center": {
+        "lat": 37.7609,
+        "lng": -122.435
+      },
+      "description": "World-renowned historic LGBTQ+ cultural capital centered on Castro and 18th streets with iconic Victorian architecture and active retail corridors."
+    },
+    "Sunset": {
+      "name": "Sunset",
+      "division": "SAN_FRANCISCO_CORE",
+      "center": {
+        "lat": 37.7535,
+        "lng": -122.483
+      },
+      "description": "Expansive coastal residential district bordered by Golden Gate Park and Ocean Beach with vibrant commercial spines on Irving, Judah, and Noriega."
+    },
+    "Richmond": {
+      "name": "Richmond",
+      "division": "SAN_FRANCISCO_CORE",
+      "center": {
+        "lat": 37.7795,
+        "lng": -122.474
+      },
+      "description": "Northwest residential district along Clement and Geary boulevards featuring exceptional culinary diversity, park access, and multi-family infill."
+    },
+    "Nob Hill": {
+      "name": "Nob Hill",
+      "division": "SAN_FRANCISCO_CORE",
+      "center": {
+        "lat": 37.792,
+        "lng": -122.415
+      },
+      "description": "Historic luxury hilltop neighborhood crowned by landmark hotels (Fairmont, Mark Hopkins), Grace Cathedral, and historic cable car lines."
+    },
+    "Tenderloin": {
+      "name": "Tenderloin",
+      "division": "SAN_FRANCISCO_CORE",
+      "center": {
+        "lat": 37.7833,
+        "lng": -122.4167
+      },
+      "description": "Historic central district featuring dense SRO and apartment stock, Little Saigon culinary spine, and emerging arts venues."
+    },
+    "Presidio": {
+      "name": "Presidio",
+      "division": "SAN_FRANCISCO_CORE",
+      "center": {
+        "lat": 37.7989,
+        "lng": -122.4662
+      },
+      "description": "Former military garrison turned iconic national parkland with historic officer quarters, Lucasfilm campus, and Presidio Tunnel Tops."
+    },
+    "Downtown Oakland": {
+      "name": "Downtown Oakland",
+      "division": "EAST_BAY",
+      "center": {
+        "lat": 37.8044,
+        "lng": -122.2711
+      },
+      "description": "Civic and commercial heart of the East Bay centered around City Center, BART transit hub, and major residential high-rises."
+    },
+    "Uptown Oakland": {
+      "name": "Uptown Oakland",
+      "division": "EAST_BAY",
+      "center": {
+        "lat": 37.8105,
+        "lng": -122.2685
+      },
+      "description": "Premier entertainment and arts district featuring the Fox and Paramount Theatres, Telegraph Avenue dining, and creative headquarters."
+    },
+    "Jack London Square": {
+      "name": "Jack London Square",
+      "division": "EAST_BAY",
+      "center": {
+        "lat": 37.7946,
+        "lng": -122.2764
+      },
+      "description": "Historic waterfront dining, ferry terminal, and logistics-adjacent development corridor along the Oakland Estuary."
+    },
+    "Berkeley Downtown": {
+      "name": "Berkeley Downtown",
+      "division": "EAST_BAY",
+      "center": {
+        "lat": 37.8703,
+        "lng": -122.2681
+      },
+      "description": "UC Berkeley gateway and transit center with Shattuck Avenue retail, Berkeley Rep arts anchors, and dense student housing development."
+    },
+    "West Berkeley": {
+      "name": "West Berkeley",
+      "division": "EAST_BAY",
+      "center": {
+        "lat": 37.868,
+        "lng": -122.298
+      },
+      "description": "Artisanal, biotech, and retail corridor along Fourth Street with light industrial conversions and innovative makerspaces."
+    },
+    "Rockridge": {
+      "name": "Rockridge",
+      "division": "EAST_BAY",
+      "center": {
+        "lat": 37.8444,
+        "lng": -122.2518
+      },
+      "description": "Affluent North Oakland neighborhood along College Avenue featuring gourmet dining, bookstore boutiques, and BART transit connectivity."
+    },
+    "Temescal": {
+      "name": "Temescal",
+      "division": "EAST_BAY",
+      "center": {
+        "lat": 37.8347,
+        "lng": -122.2638
+      },
+      "description": "Trendy culinary corridor along Telegraph Avenue featuring Temescal Alleys, artisanal food scene, and transit-oriented infill."
+    },
+    "Emeryville": {
+      "name": "Emeryville",
+      "division": "EAST_BAY",
+      "center": {
+        "lat": 37.8313,
+        "lng": -122.2852
+      },
+      "description": "Biotech, animation (Pixar), and major retail center between Oakland and Berkeley with high-density mixed-use development."
+    },
+    "Alameda": {
+      "name": "Alameda",
+      "division": "EAST_BAY",
+      "center": {
+        "lat": 37.7652,
+        "lng": -122.2416
+      },
+      "description": "Island city community known for Victorian architecture, historic Park and Webster street retail, and Alameda Point waterfront reuse."
+    },
+    "Fremont Downtown": {
+      "name": "Fremont Downtown",
+      "division": "EAST_BAY",
+      "center": {
+        "lat": 37.5485,
+        "lng": -121.9886
+      },
+      "description": "Major East Bay tech manufacturing and residential hub centered around Capitol Avenue, BART, and Tesla Gigafactory corridor."
+    },
+    "Hayward Downtown": {
+      "name": "Hayward Downtown",
+      "division": "EAST_BAY",
+      "center": {
+        "lat": 37.6688,
+        "lng": -122.0808
+      },
+      "description": "Central East Bay transit corridor featuring historic B Street revitalization, Cal State East Bay connectivity, and mixed-use housing."
+    },
+    "San Leandro Downtown": {
+      "name": "San Leandro Downtown",
+      "division": "EAST_BAY",
+      "center": {
+        "lat": 37.7249,
+        "lng": -122.1561
+      },
+      "description": "Tech campus and 3D printing/industrial tech center along East 14th Street with TOD development near BART."
+    },
+    "Richmond CA": {
+      "name": "Richmond CA",
+      "division": "EAST_BAY",
+      "center": {
+        "lat": 37.9358,
+        "lng": -122.3477
+      },
+      "description": "North Bay / East Bay gateway featuring Macdonald Avenue revitalization, Richmond Ferry Terminal, and waterfront industrial reuse."
+    },
+    "Walnut Creek Downtown": {
+      "name": "Walnut Creek Downtown",
+      "division": "EAST_BAY",
+      "center": {
+        "lat": 37.9101,
+        "lng": -122.0652
+      },
+      "description": "Premier Contra Costa commercial and luxury shopping destination anchored by Broadway Plaza, high-density residential, and BART."
+    },
+    "Concord Downtown": {
+      "name": "Concord Downtown",
+      "division": "EAST_BAY",
+      "center": {
+        "lat": 37.978,
+        "lng": -122.0311
+      },
+      "description": "Todos Santos Plaza dining and community core with major BART connectivity and regional transit-oriented infill."
+    },
+    "Pleasanton Downtown": {
+      "name": "Pleasanton Downtown",
+      "division": "EAST_BAY",
+      "center": {
+        "lat": 37.6624,
+        "lng": -121.8747
+      },
+      "description": "Historic Main Street Tri-Valley enclave and Hacienda Business Park corporate campus anchor with affluent demographics."
+    },
+    "Dublin Downtown": {
+      "name": "Dublin Downtown",
+      "division": "EAST_BAY",
+      "center": {
+        "lat": 37.7021,
+        "lng": -121.9358
+      },
+      "description": "Rapidly expanding Tri-Valley commercial core at the I-580/I-680 junction with modern master-planned residential communities."
+    },
+    "Livermore Downtown": {
+      "name": "Livermore Downtown",
+      "division": "EAST_BAY",
+      "center": {
+        "lat": 37.6819,
+        "lng": -121.768
+      },
+      "description": "Eastern Tri-Valley wine country and national laboratory (LLNL) technology anchor featuring a vibrant First Street cultural corridor."
+    },
+    "San Mateo Downtown": {
+      "name": "San Mateo Downtown",
+      "division": "PENINSULA",
+      "center": {
+        "lat": 37.563,
+        "lng": -122.3255
+      },
+      "description": "Vibrant Peninsula dining hub centered on 3rd and 4th avenues with Central Park, Caltrain station, and tech office infill."
+    },
+    "Burlingame Ave": {
+      "name": "Burlingame Ave",
+      "division": "PENINSULA",
+      "center": {
+        "lat": 37.5779,
+        "lng": -122.3481
+      },
+      "description": "Upscale Peninsula retail and dining corridor known for tree-lined streetscapes, luxury boutiques, and affluent demographics."
+    },
+    "Redwood City Downtown": {
+      "name": "Redwood City Downtown",
+      "division": "PENINSULA",
+      "center": {
+        "lat": 37.4852,
+        "lng": -122.2281
+      },
+      "description": "'Climate Best by Government Test' county seat experiencing significant downtown tech office expansion and transit-oriented housing."
+    },
+    "Menlo Park": {
+      "name": "Menlo Park",
+      "division": "PENINSULA",
+      "center": {
+        "lat": 37.4538,
+        "lng": -122.1822
+      },
+      "description": "Venture capital capital on Sand Hill Road with Santa Cruz Avenue downtown retail and Meta global headquarters."
+    },
+    "South San Francisco": {
+      "name": "South San Francisco",
+      "division": "PENINSULA",
+      "center": {
+        "lat": 37.6547,
+        "lng": -122.4077
+      },
+      "description": "'The Birthplace of Biotechnology' featuring the world's premier life sciences cluster around Oyster Point and Grand Avenue downtown."
+    },
+    "Daly City": {
+      "name": "Daly City",
+      "division": "PENINSULA",
+      "center": {
+        "lat": 37.6879,
+        "lng": -122.4702
+      },
+      "description": "'Gateway to the Peninsula' with Westlake Shopping Center, major BART transit hub, and dense multi-family residential communities."
+    },
+    "San Bruno": {
+      "name": "San Bruno",
+      "division": "PENINSULA",
+      "center": {
+        "lat": 37.6305,
+        "lng": -122.4111
+      },
+      "description": "YouTube global headquarters campus and San Mateo Avenue commercial district adjacent to SFO International Airport."
+    },
+    "Palo Alto University Ave": {
+      "name": "Palo Alto University Ave",
+      "division": "SILICON_VALLEY_SOUTH_BAY",
+      "center": {
+        "lat": 37.4444,
+        "lng": -122.1609
+      },
+      "description": "Stanford University commercial anchor and global startup epicenter with prestigious University Avenue dining and tech office presence."
+    },
+    "Mountain View Castro St": {
+      "name": "Mountain View Castro St",
+      "division": "SILICON_VALLEY_SOUTH_BAY",
+      "center": {
+        "lat": 37.391,
+        "lng": -122.0808
+      },
+      "description": "Castro Street dining corridor and Caltrain/VTA transit hub anchored by Googleplex and surrounding tech innovation hubs."
+    },
+    "Sunnyvale Downtown": {
+      "name": "Sunnyvale Downtown",
+      "division": "SILICON_VALLEY_SOUTH_BAY",
+      "center": {
+        "lat": 37.377,
+        "lng": -122.03
+      },
+      "description": "Historic Murphy Avenue and modern CityLine town center development in the heart of Silicon Valley defense and aerospace/tech corridor."
+    },
+    "Downtown San Jose": {
+      "name": "Downtown San Jose",
+      "division": "SILICON_VALLEY_SOUTH_BAY",
+      "center": {
+        "lat": 37.3382,
+        "lng": -121.8863
+      },
+      "description": "Capital of Silicon Valley featuring San Pedro Square Market, Adobe headquarters towers, SAP Center, and major high-rise housing."
+    },
+    "Santana Row": {
+      "name": "Santana Row",
+      "division": "SILICON_VALLEY_SOUTH_BAY",
+      "center": {
+        "lat": 37.3216,
+        "lng": -121.9478
+      },
+      "description": "Premier European-style luxury lifestyle district combining flagship luxury retail, fine dining, Class A creative office, and residential lofts."
+    },
+    "Cupertino": {
+      "name": "Cupertino",
+      "division": "SILICON_VALLEY_SOUTH_BAY",
+      "center": {
+        "lat": 37.323,
+        "lng": -122.0322
+      },
+      "description": "Global headquarters of Apple Inc. featuring Apple Park, Main Street Cupertino mixed-use core, and top-tier educational institutions."
+    },
+    "Santa Clara": {
+      "name": "Santa Clara",
+      "division": "SILICON_VALLEY_SOUTH_BAY",
+      "center": {
+        "lat": 37.3541,
+        "lng": -121.9552
+      },
+      "description": "Silicon Valley technology powerhouse anchored by Intel headquarters, Nvidia campus, Santa Clara University, and Levi's Stadium corridor."
+    },
+    "North San Jose": {
+      "name": "North San Jose",
+      "division": "SILICON_VALLEY_SOUTH_BAY",
+      "center": {
+        "lat": 37.3888,
+        "lng": -121.9214
+      },
+      "description": "Major technology innovation corridor along North First Street featuring Cisco headquarters, major R&D campuses, and VTA transit."
+    },
+    "Sausalito": {
+      "name": "Sausalito",
+      "division": "MARIN_NORTH_BAY",
+      "center": {
+        "lat": 37.859,
+        "lng": -122.4853
+      },
+      "description": "Picturesque waterfront town across the Golden Gate with Bridgeway promenade shopping, ferry connectivity, and historic houseboat enclaves."
+    },
+    "Mill Valley": {
+      "name": "Mill Valley",
+      "division": "MARIN_NORTH_BAY",
+      "center": {
+        "lat": 37.906,
+        "lng": -122.545
+      },
+      "description": "Redwood-canopied enclave at the base of Mount Tamalpais with historic downtown plaza, boutique retail, and outdoor recreation access."
+    },
+    "San Rafael Downtown": {
+      "name": "San Rafael Downtown",
+      "division": "MARIN_NORTH_BAY",
+      "center": {
+        "lat": 37.9735,
+        "lng": -122.5311
+      },
+      "description": "Marin County's economic and transit center along Fourth Street with SMART rail station, cultural district, and bio/gaming development."
+    },
+    "Corte Madera": {
+      "name": "Corte Madera",
+      "division": "MARIN_NORTH_BAY",
+      "center": {
+        "lat": 37.9256,
+        "lng": -122.5275
+      },
+      "description": "North Bay retail powerhouse featuring The Village at Corte Madera and Town Center shopping centers with marshland preservation."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "socrata",
+      "watermark_col": "issued_date",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "socrata",
+      "watermark_col": "requested_datetime",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "socrata",
+      "watermark_col": "location_start_date",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": {
+      "platform": "socrata",
+      "watermark_col": "data_loaded_at",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/san_francisco.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

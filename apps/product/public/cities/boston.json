@@ -1,0 +1,158 @@
+{
+  "schema_version": 2,
+  "id": "boston",
+  "name": "Boston",
+  "state": "MA",
+  "center": {
+    "lat": 42.355,
+    "lng": -71.065
+  },
+  "metro_bbox": {
+    "min_lat": 42.15,
+    "max_lat": 42.55,
+    "min_lng": -71.3,
+    "max_lng": -70.75
+  },
+  "divisions": {
+    "BOSTON_CORE": {
+      "name": "Boston Core",
+      "center": {
+        "lat": 42.351,
+        "lng": -71.065
+      },
+      "bbox": {
+        "min_lat": 42.28,
+        "max_lat": 42.4,
+        "min_lng": -71.15,
+        "max_lng": -70.95
+      },
+      "submarkets": [
+        "Downtown & Seaport",
+        "Back Bay & Fenway"
+      ]
+    },
+    "CAMBRIDGE_SOMERVILLE": {
+      "name": "Cambridge & Somerville",
+      "center": {
+        "lat": 42.376,
+        "lng": -71.107
+      },
+      "bbox": {
+        "min_lat": 42.34,
+        "max_lat": 42.43,
+        "min_lng": -71.18,
+        "max_lng": -71.05
+      },
+      "submarkets": [
+        "Harvard Square",
+        "Union Square"
+      ]
+    },
+    "INNER_NORTH": {
+      "name": "Inner North & Route 128",
+      "center": {
+        "lat": 42.425,
+        "lng": -71.075
+      },
+      "bbox": {
+        "min_lat": 42.35,
+        "max_lat": 42.52,
+        "min_lng": -71.3,
+        "max_lng": -70.85
+      },
+      "submarkets": [
+        "Waltham Innovation District"
+      ]
+    },
+    "INNER_SOUTH": {
+      "name": "Inner South",
+      "center": {
+        "lat": 42.245,
+        "lng": -71.03
+      },
+      "bbox": {
+        "min_lat": 42.15,
+        "max_lat": 42.35,
+        "min_lng": -71.25,
+        "max_lng": -70.8
+      },
+      "submarkets": [
+        "Quincy Center"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Seaport": {
+      "name": "Downtown & Seaport",
+      "division": "BOSTON_CORE",
+      "center": {
+        "lat": 42.355,
+        "lng": -71.055
+      },
+      "description": "Financial District, Downtown Crossing, and Seaport growth corridors."
+    },
+    "Back Bay & Fenway": {
+      "name": "Back Bay & Fenway",
+      "division": "BOSTON_CORE",
+      "center": {
+        "lat": 42.347,
+        "lng": -71.095
+      },
+      "description": "Dense institutional, residential, and hospitality redevelopment spine."
+    },
+    "Harvard Square": {
+      "name": "Harvard Square",
+      "division": "CAMBRIDGE_SOMERVILLE",
+      "center": {
+        "lat": 42.373,
+        "lng": -71.119
+      },
+      "description": "University, biotech, and mixed-use demand around Harvard Square."
+    },
+    "Union Square": {
+      "name": "Union Square",
+      "division": "CAMBRIDGE_SOMERVILLE",
+      "center": {
+        "lat": 42.379,
+        "lng": -71.095
+      },
+      "description": "Somerville transit-oriented infill and neighborhood commercial corridor."
+    },
+    "Waltham Innovation District": {
+      "name": "Waltham Innovation District",
+      "division": "INNER_NORTH",
+      "center": {
+        "lat": 42.376,
+        "lng": -71.236
+      },
+      "description": "Route 128 office, research, and adaptive-reuse corridor."
+    },
+    "Quincy Center": {
+      "name": "Quincy Center",
+      "division": "INNER_SOUTH",
+      "center": {
+        "lat": 42.252,
+        "lng": -71.003
+      },
+      "description": "South Shore transit hub with residential and civic redevelopment pressure."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "ckan",
+      "watermark_col": "issued_date",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "ckan",
+      "watermark_col": "open_dt",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/boston.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

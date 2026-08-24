@@ -6,9 +6,11 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "dev": "node scripts/build.mjs && python3 -m http.server 4173 -d dist",
-    "lint": "node ../../scripts/verify-site-content.mjs && node scripts/verify-agent-surface.mjs",
-    "typecheck": "node --check src/main.js",
+    "dev": "bun run facts:export && node scripts/build.mjs && python3 -m http.server 4173 -d dist",
+    "facts:export": "sh -c 'PY=\"../../apps/api/.venv/bin/python\"; [ -x \"$PY\" ] || PY=python3; \"$PY\" ../../scripts/export_site_facts.py'",
+    "facts:check": "sh -c 'PY=\"../../apps/api/.venv/bin/python\"; [ -x \"$PY\" ] || PY=python3; \"$PY\" ../../scripts/export_site_facts.py --check'",
+    "lint": "bun run facts:check && node scripts/build.mjs && node ../../scripts/verify-site-content.mjs && node scripts/verify-agent-surface.mjs && node scripts/verify-multi-page.mjs",
+    "typecheck": "node --check src/main.js && node --check scripts/shell.mjs",
     "deploy": "WRANGLER_SEND_METRICS=false wrangler deploy"
   },
   "devDependencies": {

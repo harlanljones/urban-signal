@@ -1,0 +1,24 @@
+    <h1 class="sr-only">Compare metros side-by-side</h1>
+    <section class="section-wrap section-block" aria-labelledby="compare-title">
+      <div class="section-heading">
+        <span class="mono label">SIDE BY SIDE</span>
+        <h2 id="compare-title">Two metros,<br><em>same facts.</em></h2>
+        <p>Pick any two registered metros and read their coverage next to each other — feed family, platform, poll cadence, division and submarket counts, and each metro's source contract. Everything below is rendered from <a href="/facts.json"><code>facts.json</code></a>; nothing on this page is hand-written.</p>
+      </div>
+      <div class="compare-controls" role="group" aria-label="Choose the metros to compare">
+        <label class="compare-pick"><span class="mono">METRO A</span><select id="compare-select-a"></select></label>
+        <label class="compare-pick"><span class="mono">METRO B</span><select id="compare-select-b"></select></label>
+      </div>
+      <div id="compare-host" aria-live="polite"><p class="city-loading">Building the comparison from registry facts…</p></div>
+      <noscript><p class="system-noscript">The comparison view requires JavaScript. The registry-derived numbers live in <a href="/facts.json">facts.json</a>, with per-metro detail under <a href="/public/cities/">/public/cities/</a>.</p></noscript>
+    </section>
+
+    <section class="evidence-section" aria-labelledby="compare-notes-title">
+      <div class="section-wrap">
+        <div class="section-heading">
+          <span class="mono label">READING A COMPARISON</span>
+          <h2 id="compare-notes-title">Differences are<br><em>declarations, not grades.</em></h2>
+          <p>Metros differ because their registry entries declare different datasets — different portals, platforms, and cadences. A dash means the metro does not publish that feed family here; it is a statement about declared sources, not data quality. Coverage is stated per metro and never averaged away. The boundary section on <a href="/methodology/">/methodology</a> applies to every column above.</p>
+        </div>
+      </div>
+    </section>

@@ -152,7 +152,7 @@ NOLA's NORA feed.
 
 | Feed | Dataset | Updated | Rows/60d | Coordinates |
 |---|---|---|---|---|
-| Permits | `m88u-pqki` Residential Permit (also `i26v-w6bd` Commercial, `b6ht-fw3x` Demolition, `qxie-8qnp` Electrical) | added 2026-08-20 | 1,201 (res.) | `location` point |
+| Permits | `m88u-pqki` Residential Permit (also `i26v-w6bd` Commercial, `b6ht-fw3x` Demolition, `qxie-8qnp` Electrical) | added 2026-08-20 | 1,201 (res.) | `location` point; **published geocode gap 4.97%** (9,244/186,140 rows without coordinates, probed 2026-08-24); newest-500 drop 4.8% — G5 passes under gap+2pp tolerance |
 | 311 | `xtyh-brr2` MC311 Service Requests | created 2026-08-22 | n/a (7.9M total) | **none** — `x_city`/`x_zipcode`/districts only |
 | Licenses | `c6rw-fazn` ABS Licensee Data (liquor); many vendor-license sets | quarterly (2026-04-01) | n/a (1,132 rows) | `location` point |
 | Deeds/Sales | none found | — | — | — |

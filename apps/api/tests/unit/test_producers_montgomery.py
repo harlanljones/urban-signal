@@ -31,7 +31,7 @@ def test_montgomery_registers_only_geocoded_permits_and_liquor():
     reg = REGISTRY[CityId.MONTGOMERY]
     assert set(reg.datasets) == {FeedType.PERMITS, FeedType.SLA}
     assert all(spec.platform == "socrata" for spec in reg.datasets.values())
-    assert FeedType.COMPLAINTS_311 not in reg.datasets  # MC311 xtyh-brr2 fails G5: no coordinates.
+    assert FeedType.COMPLAINTS_311 not in reg.datasets  # MC311 xtyh-brr2: see US-94 evaluation.
     assert FeedType.DEEDS not in reg.datasets
     permits = reg.datasets[FeedType.PERMITS]
     assert permits.endpoint.endswith("/resource/m88u-pqki.json")
@@ -72,3 +72,17 @@ def test_montgomery_license_row_parses_nested_location():
     assert event is not None
     assert event.license_id == "ABS-0001"
     assert event.latitude == pytest.approx(39.140)
+
+
+def test_mc311_rejection_rests_on_measurement():
+    """US-94 (Wave G4): MC311 carries polygon attributes only (x_zipcode,
+    x_city, x_state - no street address, no coordinates). Measured live
+    2026-08-24 over the newest 300 rows through the real Census backend:
+    0/294 zip-only queries resolved ANY coordinate (Census onelineaddress
+    requires a house number), 6 rows had no zip at all. G5' fails at 0%,
+    and the plan-risk W2 zip-centroid workaround is refused by design.
+    Evidence: docs/research/mc311-geocode-evaluation.md."""
+    from src.spatial.city_registry import get_dataset
+
+    with pytest.raises(KeyError, match="no.*feed"):
+        get_dataset(CityId.MONTGOMERY, FeedType.COMPLAINTS_311)

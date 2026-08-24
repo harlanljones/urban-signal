@@ -151,7 +151,7 @@ POSTGIS_DDL_STATEMENTS = [
     CREATE TABLE IF NOT EXISTS municipal_deeds (
         doc_id VARCHAR(64) PRIMARY KEY,
         city_id VARCHAR(32) DEFAULT 'nyc',
-        doc_type VARCHAR(32),
+        doc_type VARCHAR(256),
         bbl VARCHAR(32),
         borough VARCHAR(64),
         block VARCHAR(32),

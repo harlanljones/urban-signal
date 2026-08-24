@@ -3,14 +3,29 @@
 DC is the first YEAR-SLICED ArcGIS city: PERMITS and COMPLAINTS_311 publish
 one layer per calendar year on maps2.dcgis.dc.gov and resolve through
 ``city_registry.resolve_endpoint``; SLA (Basic Business Licenses) and DEEDS
-(Property Sales CAMA) are NON-SPATIAL tables whose events carry null
-lat/lng/H3 (Cook County precedent). Live-probed 2026-08-23:
+(Property Sales CAMA) are coordinate-less TABLES. US-74 split their fates:
+
+* SLA   upgrades to a geocoded-premises feed: PREMISEADDRESS resolves at
+  parse time via extra={"needs_geocode": True, "geocode_context":
+  "Washington, DC"} (ADR 0004), keeping Avro doubles real. The layer's own
+  LATITUDE/LONGITUDE columns are null or sentinel junk (39/-77) on every
+  sampled row, so the field_map must NOT bridge them.
+* DEEDS stays as-is: the CAMA layer publishes ZERO address-like fields
+  (verified in ?f=pjson metadata and over the 300 newest rows, 2026-08-24)
+  so the pure-address path cannot exist; parcel-join geocoding remains out
+  of scope. DeedEvent's Avro lat/lng ARE nullable unions, so its null-coord
+  events serialize fine — unlike SLA's non-null "double" columns, which DLQ
+  any event that fails to geocode (why the >=95% resolution bar matters).
+
+Live-probed 2026-08-24:
 
 * PERMITS   FEEDS/DCRA/FeatureServer/18            (points, newest ISSUE_DATE 2026-08-17)
 * 311       DCGIS_DATA/ServiceRequests/FeatureServer/21 (points, newest ADDDATE 2026-08-23)
-* SLA       FEEDS/DCRA/FeatureServer/0             (table; LATITUDE null/sentinel garbage)
+* SLA       FEEDS/DCRA/FeatureServer/0             (table; PREMISEADDRESS 97.7-100%
+            usable over 300-row windows; BILLINGADDRESS is mailing-only and never mapped;
+            PREMISEINDC='No' rows carry out-of-state premises ~24% of the watermark window)
 * DEEDS     DCGIS_DATA/Property_and_Land_WebMercator/FeatureServer/57
-            (table; SSL parcel key only — H3 needs a future parcel join)
+            (table; SSL parcel key only; newest-by-OBJECTID rows carry SALE_DATE=1900 sentinels)
 
 Quirks pinned here:
 * Coordinate attrs are UPPERCASE (LATITUDE/LONGITUDE) — chains are lowercase,
@@ -22,7 +37,7 @@ Quirks pinned here:
 
 Registration tests are expected RED until the orchestrator applies the spine
 (registry edits are not leaf files). Parser tests run against LIVE fixtures
-captured from the FeatureServers on 2026-08-23.
+captured from the FeatureServers on 2026-08-23/24.
 """
 
 from types import SimpleNamespace
@@ -141,7 +156,7 @@ class TestWashingtonDcRegistration:
     """RED until the orchestrator applies the spine (expected)."""
 
     def test_registered_under_washington_dc_enum_name(self):
-        from src.spatial.city_registry import CityId, REGISTRY
+        from src.spatial.city_registry import REGISTRY, CityId
 
         assert CityId.WASHINGTON_DC.value == "washington_dc"
         assert CityId.WASHINGTON_DC in REGISTRY
@@ -153,12 +168,12 @@ class TestWashingtonDcRegistration:
         assert ALIASES.get(alias) is CityId.WASHINGTON_DC
 
     def test_registration_shape(self):
-        from src.spatial.city_registry import CityId, REGISTRY
         from src.spatial.cities.washington_dc import (
             DC_DIVISIONS,
             DC_METRO_BBOX,
             DC_SUBMARKETS,
         )
+        from src.spatial.city_registry import REGISTRY, CityId
 
         reg = REGISTRY[CityId.WASHINGTON_DC]
         assert reg.state == "DC"
@@ -169,7 +184,7 @@ class TestWashingtonDcRegistration:
         assert len(reg.divisions) == 8
 
     def test_all_four_feeds_are_arcgis(self):
-        from src.spatial.city_registry import CityId, FeedType, REGISTRY
+        from src.spatial.city_registry import REGISTRY, CityId, FeedType
 
         datasets = REGISTRY[CityId.WASHINGTON_DC].datasets
         assert set(datasets) == set(FeedType)
@@ -224,20 +239,44 @@ class TestWashingtonDcRegistration:
         assert get_dataset(dc, FeedType.DEEDS).extra["max_record_count"] == 2000
         assert get_dataset(dc, FeedType.COMPLAINTS_311).extra["max_record_count"] == 1000
 
-    def test_non_spatial_feeds_document_null_coordinate_limitations(self):
-        """SLA: LATITUDE/LONGITUDE columns exist but are null or sentinel junk
-        (live row carried 39/-77); DEEDS: SSL parcel key only — H3 needs a
-        future join to the Parcel Lots layer. Both must be noted in the spec
-        extras so downstream consumers don't expect geometry."""
+    def test_sla_declares_geocoded_premises_contract(self):
+        """US-74: SLA upgrades from non_spatial to address-string geocoding
+        (ADR 0004). RED until the spine swaps the extra dict — the registry
+        still carries non_spatial=True."""
         from src.spatial.city_registry import CityId, FeedType, get_dataset
 
-        dc = CityId.WASHINGTON_DC
-        sla_notes = get_dataset(dc, FeedType.SLA).extra
-        deeds_notes = get_dataset(dc, FeedType.DEEDS).extra
-        assert sla_notes.get("non_spatial") is True
-        assert deeds_notes.get("non_spatial") is True
+        extra = get_dataset(CityId.WASHINGTON_DC, FeedType.SLA).extra
+        assert extra.get("needs_geocode") is True
+        assert extra["geocode_context"] == "Washington, DC"
+        assert extra.get("expected_cadence_days", 0) >= 1
+        assert extra.get("non_spatial") is not True
+        assert extra["field_map"]["address_street"] == ["PREMISEADDRESS"]
+
+    def test_sla_field_map_never_bridges_sentinel_coordinate_columns(self):
+        """The layer's LATITUDE/LONGITUDE columns hold null or the sentinel
+        pair 39/-77 on every sampled row (300-row windows, 2026-08-24) —
+        mapping them would file DC licenses under an H3 cell in Pennsylvania.
+        Holds pre-spine (nothing mapped) and must hold after it."""
+        from src.spatial.city_registry import CityId, FeedType, get_dataset
+
+        field_map = get_dataset(CityId.WASHINGTON_DC, FeedType.SLA).extra["field_map"]
+        for canonical, keys in field_map.items():
+            assert "LATITUDE" not in keys, canonical
+            assert "LONGITUDE" not in keys, canonical
+
+    def test_deeds_stays_non_spatial_no_addressable_fields(self):
+        """US-74 finding: the CAMA sales layer publishes ZERO address-like
+        fields (metadata + 300-newest-row field union, 2026-08-24), so no
+        pure-address geocoding contract can be declared; parcel-key SSL only,
+        and a parcel join stays out of scope. The feed keeps its non_spatial
+        declaration rather than DLQ-ing on a spec that cannot resolve."""
+        from src.spatial.city_registry import CityId, FeedType, get_dataset
+
+        extra = get_dataset(CityId.WASHINGTON_DC, FeedType.DEEDS).extra
+        assert extra.get("non_spatial") is True
+        assert extra.get("needs_geocode") is not True
         assert any(
-            "ssl" in str(v).lower() for v in deeds_notes.get("field_map", {}).values()
+            "ssl" in str(v).lower() for v in extra.get("field_map", {}).values()
         )
 
 
@@ -276,6 +315,10 @@ DC_FIELD_MAPS = {
         "effective_date": ["LICENSESTARTDATE"],
         "expiration_date": ["LICENSEENDDATE"],
         "borough": ["WARD"],
+        # US-74: premises address only. BILLINGADDRESS is a mailing address
+        # and must never feed the geocoder; LATITUDE/LONGITUDE stay unmapped
+        # (null/sentinel 39/-77 junk).
+        "address_street": ["PREMISEADDRESS"],
     },
     FeedType.DEEDS: {
         "doc_id": ["ROW_NUMBER"],
@@ -492,41 +535,14 @@ class TestDcWithProposedFieldMap(DcParsingBase):
         complaint_row["LONGITUDE"] = 0.0
         assert complaints.parse_socrata_row(complaint_row, city_id="washington_dc") is None
 
-    # -- SLA (non-spatial) ------------------------------------------------------
-
-    def test_license_events_carry_null_coordinates_and_h3(self, sla, sla_row):
-        """Cook County precedent: the Basic Business License table has no
-        usable geometry — LATITUDE/LONGITUDE columns are null (or sentinel
-        junk like the live 39/-77 row) so events carry null lat/lng and null
-        H3 cells rather than fabricated ones."""
-        ev = sla.parse_socrata_row(sla_row, city_id="washington_dc")
-        assert ev.license_id == "410526000684"
-        assert ev.license_type == "Business License"
-        assert ev.latitude is None
-        assert ev.longitude is None
-        assert ev.h3_res7 is None
-        assert ev.h3_res8 is None
-        assert ev.h3_res9 is None
-
-    def test_license_effective_and_expiration_dates_parse(self, sla, sla_row):
-        ev = sla.parse_socrata_row(sla_row, city_id="washington_dc")
-        assert str(ev.effective_date).startswith("2026-08-06")
-        assert str(ev.expiration_date).startswith("2028")
-
-    def test_license_sentinel_junk_coordinates_stay_null(self, sla, sla_row):
-        """The live sentinel row (LATITUDE=39, LONGITUDE=-77 — Maryland, not
-        DC) must not leak into events as a real location."""
-        sla_row["LATITUDE"] = 39
-        sla_row["LONGITUDE"] = -77
-        ev = sla.parse_socrata_row(sla_row, city_id="washington_dc")
-        assert ev.h3_res9 is None
-
     # -- DEEDS (non-spatial) -----------------------------------------------------
 
     def test_deed_events_carry_null_coordinates_and_h3(self, deeds, deed_row):
-        """Property Sales CAMA carries NO coordinate fields at all — SSL
-        parcel key only. Events parse with null lat/lng/H3 until a parcel
-        join exists (registry comment documents the limitation)."""
+        """Property Sales CAMA carries NO coordinate fields AND no address
+        fields (US-74 verified the field union over 300 newest rows) — SSL
+        parcel key only. Events parse with null lat/lng/H3; DeedEvent's Avro
+        lat/lng are nullable unions so these serialize and reach the topic
+        (no DLQ). A parcel join stays out of scope."""
         ev = deeds.parse_socrata_row(deed_row, city_id="washington_dc")
         assert ev.doc_id == "414660"
         assert ev.bbl == "6093    0808"
@@ -538,3 +554,150 @@ class TestDcWithProposedFieldMap(DcParsingBase):
     def test_deed_sale_date_parses_from_epoch_ms(self, deeds, deed_row):
         ev = deeds.parse_socrata_row(deed_row, city_id="washington_dc")
         assert str(ev.recorded_date).startswith("2026-08-12")
+
+
+GEOCODED_ANSWERS = {
+    # Live premises strings -> census-quality coordinates captured 2026-08-24
+    # through the real Census backend (conf 1.0).
+    "915 ELDER ST NW, Washington, DC, 20012, USA": (38.977339493805, -77.025759511774),
+    "4210 Deer Park RD, Randallstown, MD, 21133, USA": (39.38644, -76.827902),
+}
+
+
+class TestDcGeocodedSlaParsing(DcParsingBase):
+    """US-74: SLA rows resolve PREMISEADDRESS at parse time for specs
+    declaring needs_geocode (ADR 0004), mirroring Norfolk's 311 contract.
+
+    The geocoder stub bypasses the registry's declaration gate, so these
+    parser pins run green before the spine lands; the registration-side
+    counterpart lives in TestWashingtonDcRegistration."""
+
+    @pytest.fixture(autouse=True)
+    def _geocoded_contract(self, monkeypatch):
+        import src.producers.field_maps as fm
+
+        monkeypatch.setattr(
+            fm,
+            "resolve_field_map",
+            lambda city_value, feed: DC_FIELD_MAPS.get(feed, {}),
+            raising=True,
+        )
+        self.calls = []
+
+        def fake_resolve(city_id, feed_value, address, context=None):
+            self.calls.append((city_id, feed_value, address, context))
+            return GEOCODED_ANSWERS.get(address)
+
+        monkeypatch.setattr(
+            "src.spatial.geocoder.geocode_row_if_declared", fake_resolve
+        )
+
+    @pytest.fixture
+    def in_dc_license_row(self):
+        # Live newest-by-OBJECTID row from FEEDS/DCRA/FeatureServer/0
+        # (2026-08-24): in-DC premises, VA mailing billing address, sentinel
+        # LATITUDE/LONGITUDE junk — the exact shape the geocode path must
+        # handle. Dates mirror ArcGISClient._flatten_feature isoformat output.
+        return {
+            "CUSTOMERNUMBER": "500521801716",
+            "LICENSESTATUS": "Expired - Enforcement",
+            "LICENSETYPE": "Business License",
+            "LICENSESTATUSDATE": "2025-10-02T04:00:00+00:00",
+            "LICENSESTARTDATE": "2020-12-01T05:00:00+00:00",
+            "LICENSEENDDATE": "2022-11-30T05:00:00+00:00",
+            "INITIALISSUEDATE": "2020-12-02T05:00:00+00:00",
+            "BUSINESSACTIVITY": "One Family Rental",
+            "PREMISEADDRESS": "915 ELDER ST NW, Washington, DC, 20012, USA",
+            "PREMISEINDC": "Yes",
+            "ENTITYNAME": "FENGYONG LIN",
+            "ENTITYTRADENAME": None,
+            "CATEGORYSERVICETYPE": "Housing and Lodging Services",
+            "BILLINGADDRESS": "1350 Beverly Road #115-345, MCLEAN, VA, 22101, USA",
+            "WARD": "Ward 4",
+            "MAR_ID": 314089.0,
+            "SSL": "2964    0061,2964    2059,2964    2058,2964    2060",
+            "LATITUDE": 39,
+            "LONGITUDE": -77,
+            "OBJECTID": 3608719,
+        }
+
+    def test_in_dc_premises_geocodes_at_parse_with_h3(self, sla, in_dc_license_row):
+        ev = sla.parse_socrata_row(in_dc_license_row, city_id="washington_dc")
+        assert ev is not None
+        assert ev.license_id == "500521801716"
+        assert ev.latitude == pytest.approx(38.977339493805)
+        assert ev.longitude == pytest.approx(-77.025759511774)
+        assert ev.h3_res7 is not None
+        assert ev.h3_res8 is not None
+        assert ev.h3_res9 is not None
+        assert self.calls == [
+            ("washington_dc", "sla", "915 ELDER ST NW, Washington, DC, 20012, USA", None)
+        ]
+
+    def test_billing_address_is_never_geocoded(self, sla, in_dc_license_row):
+        """BILLINGADDRESS is a mailing address (this live row bills to
+        McLean, VA) — only PREMISEADDRESS may feed the geocoder."""
+        sla.parse_socrata_row(in_dc_license_row, city_id="washington_dc")
+        assert all("MCLEAN" not in str(call[2]) for call in self.calls)
+
+    def test_dates_still_map_on_geocoded_rows(self, sla, in_dc_license_row):
+        ev = sla.parse_socrata_row(in_dc_license_row, city_id="washington_dc")
+        assert str(ev.effective_date).startswith("2020-12-01")
+        assert str(ev.expiration_date).startswith("2022-11-30")
+        assert ev.license_type == "Business License"
+
+    def test_sentinel_coordinate_columns_never_leak_into_events(
+        self, sla, in_dc_license_row
+    ):
+        """The layer's own LATITUDE=39/LONGITUDE=-77 junk must lose to the
+        geocoded premises point — events carry resolved coords, not sentinels."""
+        ev = sla.parse_socrata_row(in_dc_license_row, city_id="washington_dc")
+        assert ev.latitude != 39
+        assert ev.longitude != -77
+        assert ev.h3_res9 is not None
+
+    def test_out_of_state_premises_flows_to_geocoder_verbatim(
+        self, sla, sla_row, monkeypatch
+    ):
+        """PREMISEINDC='No' rows (~24% of the watermark window) license
+        premises OUTSIDE DC. The premises string is still the site address,
+        so it geocodes to its true location; whether to filter those rows
+        upstream is a separate spine decision."""
+        monkeypatch.setattr(
+            "src.spatial.geocoder.geocode_row_if_declared",
+            lambda city_id, feed_value, address, context=None: (
+                GEOCODED_ANSWERS.get(address) if address else None
+            ),
+        )
+        ev = sla.parse_socrata_row(sla_row, city_id="washington_dc")
+        assert ev is not None
+        assert ev.latitude == pytest.approx(39.38644)
+        assert ev.longitude == pytest.approx(-76.827902)
+
+    def test_missing_address_yields_null_coord_event(self, sla, sla_row):
+        """Rows without any address candidate parse through the producer's
+        coordinate-less tolerance as null-lat/lng/null-H3 events — but SLA's
+        Avro doubles are NON-null, so they DLQ at produce time. Every point
+        of address completeness is G5' headroom."""
+        sla_row["PREMISEADDRESS"] = None
+        ev = sla.parse_socrata_row(sla_row, city_id="washington_dc")
+        assert ev is not None
+        assert ev.latitude is None
+        assert ev.longitude is None
+        assert ev.h3_res7 is None
+        assert ev.h3_res9 is None
+
+    def test_geocode_failure_falls_back_to_null_coord_event(
+        self, sla, in_dc_license_row, monkeypatch
+    ):
+        """An unresolvable premises string must degrade to the null-coord
+        event, never kill parsing or fabricate coordinates."""
+        monkeypatch.setattr(
+            "src.spatial.geocoder.geocode_row_if_declared",
+            lambda city_id, feed_value, address, context=None: None,
+        )
+        ev = sla.parse_socrata_row(in_dc_license_row, city_id="washington_dc")
+        assert ev is not None
+        assert ev.latitude is None
+        assert ev.longitude is None
+        assert ev.h3_res7 is None

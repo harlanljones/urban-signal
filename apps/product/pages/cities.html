@@ -1,0 +1,25 @@
+    <h1 class="sr-only">Cities: registered metro coverage</h1>
+    <section id="cities" class="section-wrap section-block cities-section" aria-labelledby="cities-title">
+      <div class="section-heading split"><div><h2 id="cities-title">Different cities.<br><em>Different truths.</em></h2></div><p>Coverage is not a marketing footnote. Every metro page states exactly which feed families publish, on which platform, at what cadence — and which don't.</p><a class="text-link" href="/compare/">Compare metros side-by-side <svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5"/></svg></a></div>
+      <div class="city-toolbar"><label for="city-filter" class="sr-only">Filter cities by metro or state</label><input id="city-filter" type="search" placeholder="Filter by metro or state…" autocomplete="off"><span class="mono" id="city-count" aria-live="polite">LOADING METROS</span></div>
+      <div class="filter-row" role="group" aria-label="Filter metros by feed family">
+        <span class="mono filter-label">FEED</span>
+        <div id="feed-chips" class="chip-row"></div>
+      </div>
+      <div class="filter-row" role="group" aria-label="Filter metros by platform">
+        <span class="mono filter-label">PLATFORM</span>
+        <div id="platform-chips" class="chip-row"></div>
+      </div>
+      <div id="city-grid" class="city-grid" aria-busy="true"><p class="city-loading">Loading registry-backed coverage…</p></div>
+      <button id="city-toggle" class="city-toggle" type="button" hidden aria-expanded="false">Show all registered metros</button>
+    </section>
+
+    <section class="section-wrap section-block" aria-labelledby="matrix-title">
+      <div class="section-heading">
+        <span class="mono label">THE FULL MATRIX</span>
+        <h2 id="matrix-title">Every metro,<br><em>every feed.</em></h2>
+        <p>The complete coverage picture, counted from <a href="/facts.json"><code>facts.json</code></a>. A cell shows the publishing platform and its poll cadence; a dash means the metro does not publish that feed — stated, never smoothed.</p>
+      </div>
+      <div id="coverage-matrix" aria-live="polite"><p class="city-loading">Building the coverage matrix from registry facts…</p></div>
+      <noscript><p class="system-noscript">The coverage matrix requires JavaScript. The registry-derived numbers live in <a href="/facts.json">facts.json</a> and per-metro files under <a href="/public/cities/">/public/cities/</a>.</p></noscript>
+    </section>

@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "id": "baltimore",
+  "name": "Baltimore",
+  "state": "MD",
+  "center": {
+    "lat": 39.29,
+    "lng": -76.612
+  },
+  "metro_bbox": {
+    "min_lat": 39.15,
+    "max_lat": 39.75,
+    "min_lng": -76.85,
+    "max_lng": -76.25
+  },
+  "divisions": {
+    "BALTIMORE_CORE": {
+      "name": "Baltimore Core",
+      "center": {
+        "lat": 39.29,
+        "lng": -76.612
+      },
+      "bbox": {
+        "min_lat": 39.2,
+        "max_lat": 39.45,
+        "min_lng": -76.75,
+        "max_lng": -76.45
+      },
+      "submarkets": [
+        "Downtown & Inner Harbor",
+        "Fells Point & Canton",
+        "Mount Vernon & Bolton Hill",
+        "North Baltimore"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Inner Harbor": {
+      "name": "Downtown & Inner Harbor",
+      "division": "BALTIMORE_CORE",
+      "center": {
+        "lat": 39.287,
+        "lng": -76.612
+      },
+      "description": "Downtown, Inner Harbor, and waterfront redevelopment corridor."
+    },
+    "Fells Point & Canton": {
+      "name": "Fells Point & Canton",
+      "division": "BALTIMORE_CORE",
+      "center": {
+        "lat": 39.282,
+        "lng": -76.58
+      },
+      "description": "Historic waterfront neighborhoods with residential and hospitality investment."
+    },
+    "Mount Vernon & Bolton Hill": {
+      "name": "Mount Vernon & Bolton Hill",
+      "division": "BALTIMORE_CORE",
+      "center": {
+        "lat": 39.305,
+        "lng": -76.62
+      },
+      "description": "Historic central neighborhoods with adaptive reuse and institutional demand."
+    },
+    "North Baltimore": {
+      "name": "North Baltimore",
+      "division": "BALTIMORE_CORE",
+      "center": {
+        "lat": 39.345,
+        "lng": -76.625
+      },
+      "description": "North-side residential and education corridor with steady permit activity."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "IssuedDate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "CreatedDate",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "LicenseDate",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/baltimore.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

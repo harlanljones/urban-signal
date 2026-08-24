@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "id": "montgomery",
+  "name": "Montgomery County",
+  "state": "MD",
+  "center": {
+    "lat": 39.14,
+    "lng": -77.19
+  },
+  "metro_bbox": {
+    "min_lat": 38.9,
+    "max_lat": 39.35,
+    "min_lng": -77.6,
+    "max_lng": -76.8
+  },
+  "divisions": {
+    "MONTGOMERY_CORE": {
+      "name": "Montgomery County",
+      "center": {
+        "lat": 39.14,
+        "lng": -77.19
+      },
+      "bbox": {
+        "min_lat": 38.98,
+        "max_lat": 39.3,
+        "min_lng": -77.45,
+        "max_lng": -77.0
+      },
+      "submarkets": [
+        "Bethesda & Friendship Heights",
+        "Rockville & Gaithersburg",
+        "Silver Spring & Wheaton",
+        "Upcounty"
+      ]
+    }
+  },
+  "submarkets": {
+    "Bethesda & Friendship Heights": {
+      "name": "Bethesda & Friendship Heights",
+      "division": "MONTGOMERY_CORE",
+      "center": {
+        "lat": 38.995,
+        "lng": -77.095
+      },
+      "description": "Dense urban and mixed-use corridor along the District boundary."
+    },
+    "Rockville & Gaithersburg": {
+      "name": "Rockville & Gaithersburg",
+      "division": "MONTGOMERY_CORE",
+      "center": {
+        "lat": 39.12,
+        "lng": -77.19
+      },
+      "description": "County employment and civic center with sustained permit activity."
+    },
+    "Silver Spring & Wheaton": {
+      "name": "Silver Spring & Wheaton",
+      "division": "MONTGOMERY_CORE",
+      "center": {
+        "lat": 39.045,
+        "lng": -77.045
+      },
+      "description": "Transit-oriented inner-county neighborhoods with redevelopment pressure."
+    },
+    "Upcounty": {
+      "name": "Upcounty",
+      "division": "MONTGOMERY_CORE",
+      "center": {
+        "lat": 39.235,
+        "lng": -77.3
+      },
+      "description": "Growing northern county communities and lower-density development belt."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "socrata",
+      "watermark_col": "issueddate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "socrata",
+      "watermark_col": "",
+      "interval_seconds": 900.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/montgomery.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

@@ -5,7 +5,13 @@
 ## Canonical resources
 
 - [Machine-readable product facts](/facts.json): metros, feed availability, limitations, horizons, and repository evidence paths.
-- [Full agent context](/llms-full.txt): product purpose, processing path, limitations, and evaluation routes.
+- [Full agent context](/llms-full.txt): product purpose, page guide, processing path, per-city brief schema, and limitations.
+- [System overview](/system/): how Socrata, ArcGIS, Carto, and CKAN feeds are ingested, normalized onto an H3 grid, and served as momentum signals.
+- [Evidence trace](/evidence/): one permit-shaped record followed through five inspectable contracts, from city registry to versioned edge snapshot.
+- [Methodology](/methodology/): Leading Indicator Momentum Score composition across 6-, 12-, and 18-month horizons, including which values on the site are illustrative.
+- [Architecture](/architecture/): source producers, city registry, Kafka consumers, H3 enrichment, feature aggregation, PostGIS storage, ONNX horizons, edge snapshots.
+- [Cities index](/cities/): registered metros with per-feed platform, cadence, and source-contract links.
+- [Per-city machine briefs](/public/cities/austin.json): JSON at `/public/cities/<id>.json` for all 21 metros (ids listed on [/cities/](/cities/)); generated from the city registry.
 - [Live dashboard](/dashboard): interactive spatial product surface.
 - [Source repository](https://github.com/harlanljones/urban-signal): implementation and documentation.
 - [City registry](https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/spatial/city_registry.py): authoritative registered-city and feed contracts.

@@ -1,0 +1,488 @@
+{
+  "schema_version": 2,
+  "id": "chicago",
+  "name": "Chicago",
+  "state": "IL",
+  "center": {
+    "lat": 41.8781,
+    "lng": -87.6298
+  },
+  "metro_bbox": {
+    "min_lat": 41.64,
+    "max_lat": 42.03,
+    "min_lng": -87.94,
+    "max_lng": -87.52
+  },
+  "divisions": {
+    "CENTRAL_DOWNTOWN": {
+      "name": "CENTRAL_DOWNTOWN",
+      "center": {
+        "lat": 41.8819,
+        "lng": -87.6278
+      },
+      "bbox": {
+        "min_lat": 41.845,
+        "max_lat": 41.91,
+        "min_lng": -87.67,
+        "max_lng": -87.6
+      },
+      "submarkets": [
+        "Loop",
+        "Fulton Market",
+        "River North",
+        "Streeterville",
+        "South Loop",
+        "West Loop"
+      ]
+    },
+    "NORTH_SIDE": {
+      "name": "NORTH_SIDE",
+      "center": {
+        "lat": 41.93,
+        "lng": -87.65
+      },
+      "bbox": {
+        "min_lat": 41.9,
+        "max_lat": 41.97,
+        "min_lng": -87.71,
+        "max_lng": -87.62
+      },
+      "submarkets": [
+        "Lincoln Park",
+        "Lakeview",
+        "Old Town",
+        "Roscoe Village",
+        "Lincoln Square",
+        "North Center"
+      ]
+    },
+    "NORTHWEST_SIDE": {
+      "name": "NORTHWEST_SIDE",
+      "center": {
+        "lat": 41.92,
+        "lng": -87.7
+      },
+      "bbox": {
+        "min_lat": 41.88,
+        "max_lat": 41.96,
+        "min_lng": -87.75,
+        "max_lng": -87.66
+      },
+      "submarkets": [
+        "Wicker Park",
+        "Bucktown",
+        "Logan Square",
+        "Avondale",
+        "West Town",
+        "Humboldt Park",
+        "Ukrainian Village"
+      ]
+    },
+    "SOUTH_SIDE": {
+      "name": "SOUTH_SIDE",
+      "center": {
+        "lat": 41.81,
+        "lng": -87.61
+      },
+      "bbox": {
+        "min_lat": 41.74,
+        "max_lat": 41.865,
+        "min_lng": -87.66,
+        "max_lng": -87.57
+      },
+      "submarkets": [
+        "Hyde Park",
+        "Bronzeville",
+        "Kenwood",
+        "Woodlawn",
+        "Chinatown",
+        "Bridgeport"
+      ]
+    },
+    "FAR_NORTH_SIDE": {
+      "name": "FAR_NORTH_SIDE",
+      "center": {
+        "lat": 41.985,
+        "lng": -87.67
+      },
+      "bbox": {
+        "min_lat": 41.96,
+        "max_lat": 42.03,
+        "min_lng": -87.75,
+        "max_lng": -87.64
+      },
+      "submarkets": [
+        "Rogers Park",
+        "Edgewater",
+        "Andersonville",
+        "Uptown",
+        "Albany Park"
+      ]
+    },
+    "SOUTHWEST_SIDE": {
+      "name": "SOUTHWEST_SIDE",
+      "center": {
+        "lat": 41.835,
+        "lng": -87.69
+      },
+      "bbox": {
+        "min_lat": 41.78,
+        "max_lat": 41.87,
+        "min_lng": -87.74,
+        "max_lng": -87.64
+      },
+      "submarkets": [
+        "Pilsen",
+        "McKinley Park",
+        "Brighton Park",
+        "Little Village",
+        "Back of the Yards"
+      ]
+    }
+  },
+  "submarkets": {
+    "Loop": {
+      "name": "Loop",
+      "division": "CENTRAL_DOWNTOWN",
+      "center": {
+        "lat": 41.8819,
+        "lng": -87.6278
+      },
+      "description": "Chicago's historic central business district featuring major commercial towers, Millennium Park, and adaptive residential conversions."
+    },
+    "Fulton Market": {
+      "name": "Fulton Market",
+      "division": "CENTRAL_DOWNTOWN",
+      "center": {
+        "lat": 41.8867,
+        "lng": -87.6536
+      },
+      "description": "Former meatpacking district transformed into premier tech headquarters, Michelin-starred dining, and luxury mid-rise development."
+    },
+    "River North": {
+      "name": "River North",
+      "division": "CENTRAL_DOWNTOWN",
+      "center": {
+        "lat": 41.8924,
+        "lng": -87.6341
+      },
+      "description": "High-density entertainment and design district with prominent art galleries, luxury high-rises, and vibrant nightlife."
+    },
+    "Streeterville": {
+      "name": "Streeterville",
+      "division": "CENTRAL_DOWNTOWN",
+      "center": {
+        "lat": 41.8956,
+        "lng": -87.6197
+      },
+      "description": "Lakefront high-rise neighborhood home to Northwestern Memorial Hospital, Magnificent Mile shopping, and Navy Pier."
+    },
+    "South Loop": {
+      "name": "South Loop",
+      "division": "CENTRAL_DOWNTOWN",
+      "center": {
+        "lat": 41.8566,
+        "lng": -87.6258
+      },
+      "description": "Cultural campus gateway near Museum Campus with extensive residential high-rise infill and transit connectivity."
+    },
+    "West Loop": {
+      "name": "West Loop",
+      "division": "CENTRAL_DOWNTOWN",
+      "center": {
+        "lat": 41.8825,
+        "lng": -87.6475
+      },
+      "description": "Vibrant dining and creative office corridor along Randolph Street with extensive timber loft and high-density residential projects."
+    },
+    "Lincoln Park": {
+      "name": "Lincoln Park",
+      "division": "NORTH_SIDE",
+      "center": {
+        "lat": 41.9214,
+        "lng": -87.6513
+      },
+      "description": "Affluent historic lakefront neighborhood with historic rowhouses, DePaul University, and prime retail along Armitage and Halsted."
+    },
+    "Lakeview": {
+      "name": "Lakeview",
+      "division": "NORTH_SIDE",
+      "center": {
+        "lat": 41.943,
+        "lng": -87.6534
+      },
+      "description": "Dense, vibrant North Side community encompassing Wrigleyville and Boystown with high pedestrian activity and entertainment."
+    },
+    "Old Town": {
+      "name": "Old Town",
+      "division": "NORTH_SIDE",
+      "center": {
+        "lat": 41.9077,
+        "lng": -87.6373
+      },
+      "description": "Historic Victorian neighborhood known for Wells Street dining, comedy clubs (The Second City), and boutique streetscapes."
+    },
+    "Roscoe Village": {
+      "name": "Roscoe Village",
+      "division": "NORTH_SIDE",
+      "center": {
+        "lat": 41.9427,
+        "lng": -87.6784
+      },
+      "description": "'Village in the City' with tree-lined streets, local shops on Roscoe Street, and family-oriented multifamily infill."
+    },
+    "Lincoln Square": {
+      "name": "Lincoln Square",
+      "division": "NORTH_SIDE",
+      "center": {
+        "lat": 41.9686,
+        "lng": -87.6888
+      },
+      "description": "German-heritage commercial square with brick-paved pedestrian corridors, independent retailers, and cultural anchors."
+    },
+    "North Center": {
+      "name": "North Center",
+      "division": "NORTH_SIDE",
+      "center": {
+        "lat": 41.9515,
+        "lng": -87.6825
+      },
+      "description": "Thriving North Side residential enclave with top-rated school districts, craft breweries, and steady residential redevelopment."
+    },
+    "Wicker Park": {
+      "name": "Wicker Park",
+      "division": "NORTHWEST_SIDE",
+      "center": {
+        "lat": 41.9088,
+        "lng": -87.6796
+      },
+      "description": "Creative and commercial corridor centered at Six Corners (Milwaukee/Damen/North) with vibrant nightlife, dining, and boutique retail."
+    },
+    "Bucktown": {
+      "name": "Bucktown",
+      "division": "NORTHWEST_SIDE",
+      "center": {
+        "lat": 41.9178,
+        "lng": -87.6792
+      },
+      "description": "Trendy residential and retail district along the Bloomingdale Trail (The 606) with modern residential architectural conversions."
+    },
+    "Logan Square": {
+      "name": "Logan Square",
+      "division": "NORTHWEST_SIDE",
+      "center": {
+        "lat": 41.9288,
+        "lng": -87.7077
+      },
+      "description": "Historic boulevard district experiencing rapid transit-oriented development, artisanal cocktail lounges, and culinary renewal."
+    },
+    "Avondale": {
+      "name": "Avondale",
+      "division": "NORTHWEST_SIDE",
+      "center": {
+        "lat": 41.9415,
+        "lng": -87.712
+      },
+      "description": "Industrial-to-creative transition zone along Belmont and Milwaukee avenues with acclaimed dining and craft manufacturing."
+    },
+    "West Town": {
+      "name": "West Town",
+      "division": "NORTHWEST_SIDE",
+      "center": {
+        "lat": 41.8936,
+        "lng": -87.6862
+      },
+      "description": "Dynamic mixed-use community along Chicago Avenue featuring design showrooms, independent galleries, and residential conversions."
+    },
+    "Humboldt Park": {
+      "name": "Humboldt Park",
+      "division": "NORTHWEST_SIDE",
+      "center": {
+        "lat": 41.9022,
+        "lng": -87.7212
+      },
+      "description": "Cultural hub centered around the 207-acre park and Paseo Boricua with expanding commercial and residential rehabilitation."
+    },
+    "Ukrainian Village": {
+      "name": "Ukrainian Village",
+      "division": "NORTHWEST_SIDE",
+      "center": {
+        "lat": 41.8994,
+        "lng": -87.6847
+      },
+      "description": "Historic brick rowhouse and cathedral district with mature tree canopy and active commercial nodes on Chicago Avenue."
+    },
+    "Rogers Park": {
+      "name": "Rogers Park",
+      "division": "FAR_NORTH_SIDE",
+      "center": {
+        "lat": 42.0094,
+        "lng": -87.6695
+      },
+      "description": "Lakefront academic anchor community at Chicago's northern border with Loyola University and diverse multifamily housing."
+    },
+    "Edgewater": {
+      "name": "Edgewater",
+      "division": "FAR_NORTH_SIDE",
+      "center": {
+        "lat": 41.9872,
+        "lng": -87.6612
+      },
+      "description": "Scenic shoreline neighborhood featuring high-rise lakefront condos, antique shopping on Broadway, and historic Bryn Mawr."
+    },
+    "Andersonville": {
+      "name": "Andersonville",
+      "division": "FAR_NORTH_SIDE",
+      "center": {
+        "lat": 41.9798,
+        "lng": -87.6684
+      },
+      "description": "Historic Swedish-heritage commercial district along Clark Street famous for locally-owned independent businesses and vibrant dining."
+    },
+    "Uptown": {
+      "name": "Uptown",
+      "division": "FAR_NORTH_SIDE",
+      "center": {
+        "lat": 41.9664,
+        "lng": -87.6564
+      },
+      "description": "Historic entertainment and theater district anchored by the Riviera, Aragon Ballroom, and major transit infrastructure upgrades."
+    },
+    "Albany Park": {
+      "name": "Albany Park",
+      "division": "FAR_NORTH_SIDE",
+      "center": {
+        "lat": 41.9683,
+        "lng": -87.728
+      },
+      "description": "Multicultural commercial core along Lawrence Avenue with extensive culinary diversity and Brown Line terminus connectivity."
+    },
+    "Hyde Park": {
+      "name": "Hyde Park",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 41.7943,
+        "lng": -87.5907
+      },
+      "description": "Prestigious academic and institutional hub anchored by the University of Chicago, Museum of Science & Industry, and 53rd St retail."
+    },
+    "Bronzeville": {
+      "name": "Bronzeville",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 41.8252,
+        "lng": -87.6186
+      },
+      "description": "Historic Black Metropolis seeing massive mixed-use revitalization, historic greystone restorations, and Bronzeville Lakefront redevelopment."
+    },
+    "Kenwood": {
+      "name": "Kenwood",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 41.8095,
+        "lng": -87.5925
+      },
+      "description": "Historic residential district featuring grand mansions, leafy boulevards, and proximity to Lake Michigan parkland."
+    },
+    "Woodlawn": {
+      "name": "Woodlawn",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 41.7801,
+        "lng": -87.5956
+      },
+      "description": "South Side community adjacent to Jackson Park and the Obama Presidential Center with accelerating residential investments."
+    },
+    "Chinatown": {
+      "name": "Chinatown",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 41.8517,
+        "lng": -87.6322
+      },
+      "description": "Bustling cultural and gastronomic destination centered on Wentworth and Archer avenues with high commercial density."
+    },
+    "Bridgeport": {
+      "name": "Bridgeport",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 41.8364,
+        "lng": -87.6511
+      },
+      "description": "Historic working-class neighborhood evolving into an arts and culinary corridor with Bridgeport Art Center and Morgan Street retail."
+    },
+    "Pilsen": {
+      "name": "Pilsen",
+      "division": "SOUTHWEST_SIDE",
+      "center": {
+        "lat": 41.8562,
+        "lng": -87.6563
+      },
+      "description": "Vibrant cultural corridor along 18th Street known for historic murals, award-winning culinary scene, and creative adaptive reuse."
+    },
+    "McKinley Park": {
+      "name": "McKinley Park",
+      "division": "SOUTHWEST_SIDE",
+      "center": {
+        "lat": 41.8315,
+        "lng": -87.6728
+      },
+      "description": "Centrally located southwest neighborhood with strong park anchor, Orange Line transit access, and industrial-loft conversions."
+    },
+    "Brighton Park": {
+      "name": "Brighton Park",
+      "division": "SOUTHWEST_SIDE",
+      "center": {
+        "lat": 41.8194,
+        "lng": -87.699
+      },
+      "description": "Densely populated commercial district along Archer Avenue with steady neighborhood retail and logistics services."
+    },
+    "Little Village": {
+      "name": "Little Village",
+      "division": "SOUTHWEST_SIDE",
+      "center": {
+        "lat": 41.8458,
+        "lng": -87.7058
+      },
+      "description": "'Mexico of the Midwest' featuring 26th Street, one of the highest grossing shopping districts in Chicago, with vibrant street commerce."
+    },
+    "Back of the Yards": {
+      "name": "Back of the Yards",
+      "division": "SOUTHWEST_SIDE",
+      "center": {
+        "lat": 41.8067,
+        "lng": -87.6678
+      },
+      "description": "Historic Union Stockyards heritage district undergoing modern sustainable manufacturing, food innovation, and community development."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "socrata",
+      "watermark_col": "issue_date",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "socrata",
+      "watermark_col": "created_date",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "socrata",
+      "watermark_col": "date_issued",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": {
+      "platform": "socrata",
+      "watermark_col": "sale_date",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/chicago.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

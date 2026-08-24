@@ -1,0 +1,18 @@
+{
+  "title": "Evidence — Urban Signal",
+  "description": "One signal, five inspectable contracts: follow a permit-shaped record from city registry through normalization, H3 spatialization, LIMS features, to the versioned edge snapshot.",
+  "jsonLd": {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "One signal, five inspectable contracts",
+    "description": "One signal, five inspectable contracts: follow a permit-shaped record from city registry through normalization, H3 spatialization, LIMS features, to the versioned edge snapshot.",
+    "about": "A permit-shaped record traced end-to-end from source row to versioned edge snapshot, every transformation linked to source.",
+    "keywords": "traceability, watermark normalization, data provenance, reproducibility",
+    "isAccessibleForFree": true,
+    "author": {
+      "@type": "Organization",
+      "name": "Urban Signal",
+      "url": "https://github.com/harlanljones/urban-signal"
+    }
+  }
+}

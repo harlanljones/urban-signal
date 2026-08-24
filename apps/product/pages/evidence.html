@@ -1,0 +1,144 @@
+    <h1 class="sr-only">Evidence: follow one signal through five inspectable contracts</h1>
+    <section id="evidence" class="evidence-section" aria-labelledby="evidence-title">
+      <div class="section-wrap evidence-layout">
+        <div class="evidence-intro">
+          <h2 id="evidence-title">One signal.<br><em>Five inspectable contracts.</em></h2>
+          <p>This is an illustrative permit-shaped record. The values are examples; every linked transformation is repository-backed. Follow it all the way down.</p>
+          <span class="evidence-status mono">EXAMPLE VALUES · REAL CODE PATHS</span>
+        </div>
+        <ol class="trace-list">
+          <li><a class="trace-jump" href="#contract-source"><span>Source contract</span><strong>City registry preserves feed differences.</strong></a><a href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/spatial/city_registry.py" target="_blank" rel="noreferrer">city_registry.py</a></li>
+          <li><a class="trace-jump" href="#contract-event"><span>Normalized event</span><strong>Typed fields create a comparable contract.</strong></a><a href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/schemas/models.py" target="_blank" rel="noreferrer">schemas/models.py</a></li>
+          <li><a class="trace-jump" href="#contract-spatial"><span>Spatial address</span><strong>WGS84 coordinates become H3 cells.</strong></a><a href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/spatial/h3_indexer.py" target="_blank" rel="noreferrer">h3_indexer.py</a></li>
+          <li><a class="trace-jump" href="#contract-features"><span>Interpretable features</span><strong>Time-decayed ingredients remain visible.</strong></a><a href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/features/lims_calculator.py" target="_blank" rel="noreferrer">lims_calculator.py</a></li>
+          <li><a class="trace-jump" href="#contract-snapshot"><span>Delivered snapshot</span><strong>The edge receives a versioned artifact.</strong></a><a href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/export/snapshot_builder.py" target="_blank" rel="noreferrer">snapshot_builder.py</a></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section-wrap section-block" aria-label="The record, contract by contract">
+      <div class="section-heading">
+        <span class="mono label">THE WALK</span>
+        <h2>One row’s journey,<br><em>contract by contract.</em></h2>
+        <p>A single New York permit, as it moves through the pipeline. Record values are illustrative; the contracts and code paths are the real ones.</p>
+      </div>
+
+      <div id="contract-source" class="stage-block">
+        <div class="stage-grid">
+          <div class="stage-copy">
+            <span class="mono stage-kicker">CONTRACT 01 · <a class="stage-source" href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/spatial/city_registry.py" target="_blank" rel="noreferrer">city_registry.py</a></span>
+            <h3>The source contract: a DOB row, exactly as published.</h3>
+            <p>Our record is a New York building permit from the Department of Buildings Socrata endpoint. It arrives with the city’s own column names, a watermark column the registry has declared (<code>issuance_date</code>), and an id-key fallback chain (<code>job__ → job_number → id</code>) for resilience against renames.</p>
+            <p>Nothing is renamed yet. The registry’s job is to <em>declare</em> the feed’s truth — platform, endpoint, watermark, cadence — so every later stage can trust the declaration instead of guessing.</p>
+          </div>
+          <div class="code-pair">
+            <div class="detail-code"><span class="code-label mono">AS PUBLISHED · ILLUSTRATIVE</span><code>{ <b>"job__"</b>: 123456789,<br>&nbsp;&nbsp;<b>"issuance_date"</b>: "2026-08-21T00:00:00",<br>&nbsp;&nbsp;<b>"borough"</b>: "BROOKLYN",<br>&nbsp;&nbsp;<b>"gis_latitude"</b>: 40.6782,<br>&nbsp;&nbsp;<b>"gis_longitude"</b>: -73.9442 }</code></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="contract-event" class="stage-block">
+        <div class="stage-grid">
+          <div class="stage-copy">
+            <span class="mono stage-kicker">CONTRACT 02 · <a class="stage-source" href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/schemas/models.py" target="_blank" rel="noreferrer">schemas/models.py</a></span>
+            <h3>The normalized event: typed, validated, still inspectable.</h3>
+            <p>The producer’s field map resolves the city dialect into a typed permit event. <code>issuance_date</code> becomes <code>occurred_at</code>; the borough name and coordinates survive intact; the raw <code>job__</code> stays attached as provenance.</p>
+            <p>Columns the model does not know are preserved on the event for inspection — normalization never deletes context, it adds structure. Malformed rows fail loudly here, at the type boundary, before they can poison any aggregate.</p>
+          </div>
+          <div class="code-pair">
+            <div class="detail-code"><span class="code-label mono">NORMALIZED EVENT · ILLUSTRATIVE</span><code>{ <b>"event_type"</b>: "permit",<br>&nbsp;&nbsp;<b>"city_id"</b>: "nyc",<br>&nbsp;&nbsp;<b>"occurred_at"</b>: "2026-08-21T00:00:00Z",<br>&nbsp;&nbsp;<b>"lat"</b>: 40.6782, <b>"lng"</b>: -73.9442,<br>&nbsp;&nbsp;<b>"source_id"</b>: "123456789" }</code></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="contract-spatial" class="stage-block">
+        <div class="stage-grid">
+          <div class="stage-copy">
+            <span class="mono stage-kicker">CONTRACT 03 · <a class="stage-source" href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/spatial/h3_indexer.py" target="_blank" rel="noreferrer">h3_indexer.py</a></span>
+            <h3>The spatial address: one event, three canonical cells.</h3>
+            <p>The indexer assigns the event to H3 cells at resolutions 7, 8, and 9 — metro context, submarket grain, and neighborhood cell — then joins the division and submarket names declared in the registry for New York.</p>
+            <p>After this stage the record can answer a metro-scale question and a block-scale question from the same row, always with one canonical address per resolution.</p>
+          </div>
+          <div class="code-pair">
+            <div class="detail-code"><span class="code-label mono">SPATIALLY ADDRESSED · ILLUSTRATIVE</span><code>{ <b>"h3_res_9"</b>: "8a2a1072b59ffff",<br>&nbsp;&nbsp;<b>"h3_res_8"</b>: "892a1072893ffff",<br>&nbsp;&nbsp;<b>"division"</b>: "BROOKLYN",<br>&nbsp;&nbsp;<b>"submarket"</b>: "BED_STUY" }</code></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="contract-features" class="stage-block">
+        <div class="stage-grid">
+          <div class="stage-copy">
+            <span class="mono stage-kicker">CONTRACT 04 · <a class="stage-source" href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/features/lims_calculator.py" target="_blank" rel="noreferrer">lims_calculator.py</a></span>
+            <h3>The features: decayed, weighted, decomposable.</h3>
+            <p>The calculator folds the event into time-decayed ingredients — CapEx density, permit velocity, 311 shift ratio, license activity — each windowed by its feed’s real cadence, then composes the Leading Indicator Momentum Score for the cell.</p>
+            <p>The ingredients are stored beside the score. Any LIMS value on the dashboard can be decomposed back into the exact inputs that produced it — that is the point of the composition.</p>
+          </div>
+          <div class="code-pair">
+            <div class="detail-code"><span class="code-label mono">FEATURE STATE · ILLUSTRATIVE</span><code>{ <b>"capex_density"</b>: 0.74,<br>&nbsp;&nbsp;<b>"permit_velocity"</b>: 0.61,<br>&nbsp;&nbsp;<b>"lims"</b>: 68.0,<br>&nbsp;&nbsp;<b>"horizons"</b>: [6, 12, 18] }</code></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="contract-snapshot" class="stage-block">
+        <div class="stage-grid">
+          <div class="stage-copy">
+            <span class="mono stage-kicker">CONTRACT 05 · <a class="stage-source" href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/export/snapshot_builder.py" target="_blank" rel="noreferrer">snapshot_builder.py</a></span>
+            <h3>The snapshot: versioned, provenance attached.</h3>
+            <p>The builder packages features and model views into a versioned snapshot. The live dashboard reads that artifact; the FastAPI surface (<code>/api/v1/*</code>) serves the same contracts from the spatial store.</p>
+            <p>Because snapshots are versioned, the edge never silently overwrites its own history — and any number a visitor sees can be traced back through this page to the row that started it.</p>
+          </div>
+          <div class="code-pair">
+            <div class="detail-code"><span class="code-label mono">EDGE ARTIFACT · ILLUSTRATIVE</span><code>{ <b>"snapshot"</b>: "nyc@v42",<br>&nbsp;&nbsp;<b>"built_from"</b>: "features@…",<br>&nbsp;&nbsp;<b>"served_at"</b>: "/api/v1/grid?city_id=nyc" }</code></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="evidence-section" aria-labelledby="watermark-title">
+      <div class="section-wrap">
+        <div class="section-heading">
+          <span class="mono label">THE HARD PART</span>
+          <h2 id="watermark-title">Watermarks, <em>honestly.</em></h2>
+          <p>Incremental ingestion needs a cursor: “give me everything after this timestamp.” Municipal feeds make that hard in practice — and pretending otherwise is how dashboards end up confidently stale.</p>
+        </div>
+        <div class="watermark-grid">
+          <div class="watermark-item">
+            <h3>Columns drift</h3>
+            <p>A feed’s <code>watermark_col</code> can hold text where a timestamp belongs — “Updated Aug 2023” is a real pattern the NYC deeds and permits feeds produced. A naive cursor stalls forever on the first text value.</p>
+          </div>
+          <div class="watermark-item">
+            <h3>Sentinels get excluded</h3>
+            <p><a href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/producers/watermarks.py" target="_blank" rel="noreferrer">watermarks.py</a> normalizes typed text watermarks and excludes sentinel values, so placeholder rows never masquerade as fresh data. The decision is recorded in <a href="https://github.com/harlanljones/urban-signal/blob/main/docs/adr/0005-typed-text-watermarks.md" target="_blank" rel="noreferrer">ADR 0005</a>.</p>
+          </div>
+          <div class="watermark-item">
+            <h3>Staleness is audited</h3>
+            <p>A standing probe compares feed age against declared cadence. When deeds looked stale across six cities, the audit asked: slow source, wrong column, or dead service? The method and findings are public: <a href="https://github.com/harlanljones/urban-signal/blob/main/docs/research/deeds-watermark-audit.md" target="_blank" rel="noreferrer">deeds-watermark-audit.md</a>, <a href="https://github.com/harlanljones/urban-signal/blob/main/docs/research/nyc-watermark-normalization.md" target="_blank" rel="noreferrer">nyc-watermark-normalization.md</a>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-wrap section-block" aria-labelledby="reproduce-title">
+      <div class="section-heading">
+        <span class="mono label">REPRODUCE IT</span>
+        <h2 id="reproduce-title">Run the same path <em>locally.</em></h2>
+        <p>With the repository’s local Kafka + PostGIS stack running (setup in the repository README), the exact commands below re-walk this page’s pipeline against live city feeds.</p>
+      </div>
+      <div class="term-card" role="img" aria-label="Terminal commands to reproduce the pipeline locally">
+<span class="code-comment"># from apps/api/ — ingest one feed, exactly as scheduled in production</span>
+python -m src.producers.dob_permits_producer --city nyc --limit 2000
+
+<span class="code-comment"># enrich, aggregate, persist (three workers, three terminals)</span>
+python -m src.consumers.spatial_enrichment_worker
+python -m src.consumers.feature_aggregation_worker
+python -m src.consumers.postgis_worker
+
+<span class="code-comment"># serve the same contracts this page documents</span>
+uvicorn src.serving.app:app --host 0.0.0.0 --port 8000 --reload
+      </div>
+      <p class="reproduce-note">The edge snapshot the dashboard reads is built by <a href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/export/snapshot_builder.py" target="_blank" rel="noreferrer">snapshot_builder.py</a>; the API surface under <code>/api/v1/*</code> answers from the same spatial store the workers persist to.</p>
+      <div class="closing-routes system-next">
+        <a class="route-primary" href="/system/"><span>See every stage in context</span><small>System: contracts and failure modes, stage by stage</small></a>
+        <a class="route-secondary" href="/methodology/"><span>Read how the score is composed</span><small>Methodology: LIMS ingredients, horizons, limits</small></a>
+      </div>
+    </section>

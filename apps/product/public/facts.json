@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "product": {
     "name": "Urban Signal",
     "summary": "Open-source spatial intelligence that turns municipal permits, 311 requests, licenses, deeds, and related public records into explainable H3-based signals.",
@@ -13,10 +13,10 @@
     "No customer, adoption, or independently validated model-performance claims are published."
   ],
   "feed_labels": [
-    "Permits",
+    "permits",
     "311",
-    "Licenses",
-    "Deeds"
+    "sla",
+    "deeds"
   ],
   "metros": [
     {
@@ -24,12 +24,44 @@
       "name": "New York City",
       "state": "NY",
       "divisions": "5 boroughs",
+      "division_count": 5,
+      "submarket_count": 65,
       "feeds": [
         true,
         true,
         true,
         true
       ],
+      "platforms": [
+        {
+          "platform": "socrata",
+          "watermark_col": "issuance_date",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "created_date",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "effectivedate",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "recorded_datetime",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 40.7128,
+        "lng": -74.006
+      },
       "evidence_path": "apps/api/src/spatial/city_registry.py"
     },
     {
@@ -37,12 +69,44 @@
       "name": "Chicago",
       "state": "IL",
       "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 35,
       "feeds": [
         true,
         true,
         true,
         true
       ],
+      "platforms": [
+        {
+          "platform": "socrata",
+          "watermark_col": "issue_date",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "created_date",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "date_issued",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "sale_date",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 41.8781,
+        "lng": -87.6298
+      },
       "evidence_path": "apps/api/src/spatial/cities/chicago.py"
     },
     {
@@ -50,12 +114,44 @@
       "name": "San Francisco Bay Area",
       "state": "CA",
       "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 54,
       "feeds": [
         true,
         true,
         true,
         true
       ],
+      "platforms": [
+        {
+          "platform": "socrata",
+          "watermark_col": "issued_date",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "requested_datetime",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "location_start_date",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "data_loaded_at",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 37.7749,
+        "lng": -122.4194
+      },
       "evidence_path": "apps/api/src/spatial/cities/san_francisco.py"
     },
     {
@@ -63,12 +159,44 @@
       "name": "Seattle Metro",
       "state": "WA",
       "divisions": "4 divisions",
+      "division_count": 4,
+      "submarket_count": 20,
       "feeds": [
         true,
         true,
         true,
         true
       ],
+      "platforms": [
+        {
+          "platform": "socrata",
+          "watermark_col": "issueddate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "createddate",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "applicationdate",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "SaleDate",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 47.6062,
+        "lng": -122.3321
+      },
       "evidence_path": "apps/api/src/spatial/cities/seattle.py"
     },
     {
@@ -76,12 +204,39 @@
       "name": "Los Angeles Metro",
       "state": "CA",
       "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 32,
       "feeds": [
         true,
         true,
         true,
         false
       ],
+      "platforms": [
+        {
+          "platform": "socrata",
+          "watermark_col": "issue_date",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "createddate",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "location_start_date",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 34.0522,
+        "lng": -118.2437
+      },
       "evidence_path": "apps/api/src/spatial/cities/los_angeles.py"
     },
     {
@@ -89,12 +244,44 @@
       "name": "New Orleans Metro",
       "state": "LA",
       "divisions": "9 divisions",
+      "division_count": 9,
+      "submarket_count": 21,
       "feeds": [
         true,
         true,
         true,
         true
       ],
+      "platforms": [
+        {
+          "platform": "socrata",
+          "watermark_col": "issuedate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "date_created",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "businessstartdate",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "sale_date",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 29.9511,
+        "lng": -90.0715
+      },
       "evidence_path": "apps/api/src/spatial/cities/new_orleans.py"
     },
     {
@@ -102,12 +289,39 @@
       "name": "Norfolk",
       "state": "VA",
       "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 13,
       "feeds": [
         true,
-        false,
+        true,
         false,
         true
       ],
+      "platforms": [
+        {
+          "platform": "socrata",
+          "watermark_col": "issue_date",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "creation_date",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        {
+          "platform": "socrata",
+          "watermark_col": "transfer_date",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 36.8508,
+        "lng": -76.2859
+      },
       "evidence_path": "apps/api/src/spatial/cities/norfolk.py"
     },
     {
@@ -115,12 +329,44 @@
       "name": "Detroit",
       "state": "MI",
       "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 16,
       "feeds": [
         true,
         true,
         true,
         true
       ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "issued_date",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "created_at",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "expiration_date",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "sale_date",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 42.3314,
+        "lng": -83.0458
+      },
       "evidence_path": "apps/api/src/spatial/cities/detroit.py"
     },
     {
@@ -128,12 +374,34 @@
       "name": "Austin",
       "state": "TX",
       "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 16,
       "feeds": [
         true,
         true,
         false,
         false
       ],
+      "platforms": [
+        {
+          "platform": "socrata",
+          "watermark_col": "issue_date",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "sr_created_date",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 30.2672,
+        "lng": -97.7431
+      },
       "evidence_path": "apps/api/src/spatial/cities/austin.py"
     },
     {
@@ -141,12 +409,39 @@
       "name": "Cincinnati",
       "state": "OH",
       "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 3,
       "feeds": [
         true,
         true,
         true,
         false
       ],
+      "platforms": [
+        {
+          "platform": "socrata",
+          "watermark_col": "issueddate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "date_time_received",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "entered_date",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 39.1031,
+        "lng": -84.512
+      },
       "evidence_path": "apps/api/src/spatial/cities/cincinnati.py"
     },
     {
@@ -154,51 +449,109 @@
       "name": "Boston",
       "state": "MA",
       "divisions": "4 divisions",
+      "division_count": 4,
+      "submarket_count": 6,
       "feeds": [
         true,
         true,
-        true,
+        false,
         false
       ],
+      "platforms": [
+        {
+          "platform": "ckan",
+          "watermark_col": "issued_date",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "ckan",
+          "watermark_col": "open_dt",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 42.355,
+        "lng": -71.065
+      },
       "evidence_path": "apps/api/src/spatial/cities/boston.py"
-    },
-    {
-      "id": "baltimore",
-      "name": "Baltimore",
-      "state": "MD",
-      "divisions": "1 division",
-      "feeds": [
-        true,
-        true,
-        true,
-        false
-      ],
-      "evidence_path": "apps/api/src/spatial/cities/baltimore.py"
     },
     {
       "id": "montgomery",
       "name": "Montgomery County",
       "state": "MD",
       "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 4,
       "feeds": [
         true,
         false,
         true,
         false
       ],
+      "platforms": [
+        {
+          "platform": "socrata",
+          "watermark_col": "issueddate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "socrata",
+          "watermark_col": "",
+          "interval_seconds": 900.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 39.14,
+        "lng": -77.19
+      },
       "evidence_path": "apps/api/src/spatial/cities/montgomery.py"
     },
     {
       "id": "baton_rouge",
-      "name": "Baton Rouge",
+      "name": "Baton Rouge / East Baton Rouge Parish",
       "state": "LA",
       "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 3,
       "feeds": [
         true,
         true,
         true,
         false
       ],
+      "platforms": [
+        {
+          "platform": "socrata",
+          "watermark_col": "issueddate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "createdate",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 30.4505,
+        "lng": -91.187
+      },
       "evidence_path": "apps/api/src/spatial/cities/baton_rouge.py"
     },
     {
@@ -206,25 +559,119 @@
       "name": "Denver",
       "state": "CO",
       "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 4,
+      "feeds": [
+        true,
+        true,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "DATE_ISSUED",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "Case_Created_Date",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 39.7392,
+        "lng": -104.9903
+      },
+      "evidence_path": "apps/api/src/spatial/cities/denver.py"
+    },
+    {
+      "id": "baltimore",
+      "name": "Baltimore",
+      "state": "MD",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 4,
       "feeds": [
         true,
         true,
         true,
         false
       ],
-      "evidence_path": "apps/api/src/spatial/cities/denver.py"
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "IssuedDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "CreatedDate",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "LicenseDate",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 39.29,
+        "lng": -76.612
+      },
+      "evidence_path": "apps/api/src/spatial/cities/baltimore.py"
     },
     {
       "id": "philadelphia",
       "name": "Philadelphia",
       "state": "PA",
       "divisions": "8 divisions",
+      "division_count": 8,
+      "submarket_count": 18,
       "feeds": [
         true,
         true,
         true,
         true
       ],
+      "platforms": [
+        {
+          "platform": "carto",
+          "watermark_col": "permitissuedate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "carto",
+          "watermark_col": "requested_datetime",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "carto",
+          "watermark_col": "mostrecentissuedate",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "carto",
+          "watermark_col": "recording_date",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 39.9526,
+        "lng": -75.1652
+      },
       "evidence_path": "apps/api/src/spatial/cities/philadelphia.py"
     },
     {
@@ -232,13 +679,170 @@
       "name": "Washington DC",
       "state": "DC",
       "divisions": "8 divisions",
+      "division_count": 8,
+      "submarket_count": 18,
       "feeds": [
         true,
         true,
-        false,
+        true,
         true
       ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "ISSUE_DATE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "ADDDATE",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "INITIALISSUEDATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALE_DATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 38.9072,
+        "lng": -77.0369
+      },
       "evidence_path": "apps/api/src/spatial/cities/washington_dc.py"
+    },
+    {
+      "id": "prince_georges",
+      "name": "Prince George's County",
+      "state": "MD",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 4,
+      "feeds": [
+        false,
+        true,
+        false,
+        false
+      ],
+      "platforms": [
+        null,
+        {
+          "platform": "socrata",
+          "watermark_col": "date_request_opened",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 38.72,
+        "lng": -76.75
+      },
+      "evidence_path": "apps/api/src/spatial/cities/prince_georges.py"
+    },
+    {
+      "id": "columbus",
+      "name": "Columbus",
+      "state": "OH",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "ISSUED_DT",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 39.9612,
+        "lng": -83.0007
+      },
+      "evidence_path": "apps/api/src/spatial/cities/columbus.py"
+    },
+    {
+      "id": "nashville",
+      "name": "Nashville / Davidson County",
+      "state": "TN",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "Date_Issued",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "Date_Issued",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 36.1627,
+        "lng": -86.7818
+      },
+      "evidence_path": "apps/api/src/spatial/cities/nashville.py"
+    },
+    {
+      "id": "kansas_city",
+      "name": "Kansas City",
+      "state": "MO",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        false,
+        true,
+        false,
+        false
+      ],
+      "platforms": [
+        null,
+        {
+          "platform": "socrata",
+          "watermark_col": "open_date_time",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 39.1,
+        "lng": -94.58
+      },
+      "evidence_path": "apps/api/src/spatial/cities/kansas_city.py"
     }
   ],
   "pipeline": [

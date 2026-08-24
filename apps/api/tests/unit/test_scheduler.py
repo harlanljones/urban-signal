@@ -175,6 +175,37 @@ def test_poll_job_socrata_error_dlq(mock_scheduler):
     assert mock_scheduler.dlq_producer.route_to_dlq.call_count == 1
 
 
+def test_text_watermark_guard_and_raw_high_watermark(mock_scheduler):
+    """D7 (ADR 0005): declared sentinels are excluded server-side and text
+    high watermarks stay raw declared-format strings, calendar-compared."""
+    job_name = "permits"
+    mock_producer = mock_scheduler.producers[job_name]
+    mock_scheduler.job_metadata[job_name].update(
+        watermark_type="text",
+        watermark_format="%Y%m%d",
+        watermark_exclude=["ZZZZZZZZ"],
+    )
+    mock_scheduler.metrics[job_name].high_watermark = "20260810"
+
+    mock_rows = [
+        {"job__": "M010", "latitude": "40.7", "longitude": "-73.9", "issuance_date": "ZZZZZZZZ"},
+        {"job__": "M011", "latitude": "40.7", "longitude": "-73.9", "issuance_date": "20260915"},
+        {"job__": "M012", "latitude": "40.7", "longitude": "-73.9", "issuance_date": "20260801"},
+    ]
+    mock_producer.socrata.paginate = MagicMock(return_value=[mock_rows])
+
+    result = mock_scheduler.poll_job(job_name, limit=100)
+
+    _, kwargs = mock_producer.socrata.paginate.call_args
+    assert kwargs["where_clause"] == (
+        "issuance_date > '20260810' AND issuance_date NOT IN ('ZZZZZZZZ')"
+    )
+    # Raw declared-format string stored; sentinel dropped; calendar max wins
+    # even though 20260801 sorts above it lexically.
+    assert result["high_watermark"] == "20260915"
+    assert mock_scheduler.metrics[job_name].high_watermark == "20260915"
+
+
 def test_poll_all_and_metrics(mock_scheduler):
     # Disable deeds
     mock_scheduler.configs["deeds"].enabled = False

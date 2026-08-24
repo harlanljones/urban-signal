@@ -72,3 +72,67 @@ def newest_watermark(values: Iterable[Any]) -> datetime | None:
 def sort_watermarks(values: Iterable[Any]) -> list[Any]:
     """Sort raw values by their typed meaning, preserving the raw values."""
     return sorted(values, key=cmp_to_key(compare_watermarks))
+
+
+def typed_watermark_entry(
+    value: Any,
+    *,
+    fmt: str | None = None,
+    exclude: Iterable[str] = (),
+) -> tuple[str, datetime] | None:
+    """Validate one raw column value as a declared-type watermark.
+
+    Returns ``(raw_text, parsed_utc)`` or ``None`` when the value is empty,
+    named on the sentinel exclusion list, or unparseable under ``fmt`` (a
+    declared strptime format) or the default multi-format parser. Sentinels
+    such as PG County's ``ZZZZZZZZ`` sort above every real date, so they
+    must be dropped before any max/ORDER-BY comparison, not parsed.
+    """
+    if value is None:
+        return None
+    raw = str(value).strip()
+    if not raw or raw in set(exclude):
+        return None
+    if fmt:
+        try:
+            parsed = datetime.strptime(raw, fmt).replace(tzinfo=UTC)
+        except ValueError:
+            return None
+    else:
+        parsed = parse_watermark(raw)
+    if parsed is None:
+        return None
+    return raw, parsed
+
+
+def newest_typed_watermark(
+    values: Iterable[Any],
+    *,
+    fmt: str | None = None,
+    exclude: Iterable[str] = (),
+) -> tuple[str, datetime] | None:
+    """Return the (raw, parsed) watermark with the greatest calendar value.
+
+    Typed comparison matters when a text column mixes formats (NYC's
+    ``issuance_date`` carries ISO and ``MM/DD/YYYY`` in one column): lexical
+    max would pick by string order, not by date.
+    """
+    entries = [
+        entry
+        for value in values
+        if (entry := typed_watermark_entry(value, fmt=fmt, exclude=exclude)) is not None
+    ]
+    return max(entries, key=lambda entry: entry[1]) if entries else None
+
+
+def watermark_exclude_clause(column: str, exclude: Iterable[str]) -> str | None:
+    """Build a SQL ``NOT IN`` fragment excluding sentinel watermark values.
+
+    Usable in Socrata ``$where``, ArcGIS ``where``, and Carto WHERE clauses.
+    Returns ``None`` when nothing is excluded so callers can skip the param.
+    """
+    values = [str(value).replace("'", "''") for value in exclude if str(value).strip()]
+    if not values:
+        return None
+    listed = ", ".join(f"'{value}'" for value in values)
+    return f"{column} NOT IN ({listed})"

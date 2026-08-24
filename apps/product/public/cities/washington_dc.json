@@ -1,0 +1,347 @@
+{
+  "schema_version": 2,
+  "id": "washington_dc",
+  "name": "Washington DC",
+  "state": "DC",
+  "center": {
+    "lat": 38.9072,
+    "lng": -77.0369
+  },
+  "metro_bbox": {
+    "min_lat": 38.79,
+    "max_lat": 38.995,
+    "min_lng": -77.12,
+    "max_lng": -76.909
+  },
+  "divisions": {
+    "DOWNTOWN_NOMA_CAPITOL_RIVERFRONT": {
+      "name": "DOWNTOWN_NOMA_CAPITOL_RIVERFRONT",
+      "center": {
+        "lat": 38.897,
+        "lng": -77.012
+      },
+      "bbox": {
+        "min_lat": 38.877,
+        "max_lat": 38.913,
+        "min_lng": -77.036,
+        "max_lng": -76.995
+      },
+      "submarkets": [
+        "Penn Quarter",
+        "Southwest Waterfront/The Wharf",
+        "NoMa/H Street NE",
+        "Union Market"
+      ]
+    },
+    "CAPITOL_HILL_EAST_END": {
+      "name": "CAPITOL_HILL_EAST_END",
+      "center": {
+        "lat": 38.8895,
+        "lng": -76.9835
+      },
+      "bbox": {
+        "min_lat": 38.879,
+        "max_lat": 38.9,
+        "min_lng": -76.995,
+        "max_lng": -76.972
+      },
+      "submarkets": [
+        "Capitol Hill",
+        "Eastern Market"
+      ]
+    },
+    "DUPONT_KALORAMA_UPTOWN": {
+      "name": "DUPONT_KALORAMA_UPTOWN",
+      "center": {
+        "lat": 38.914,
+        "lng": -77.042
+      },
+      "bbox": {
+        "min_lat": 38.9,
+        "max_lat": 38.926,
+        "min_lng": -77.062,
+        "max_lng": -77.022
+      },
+      "submarkets": [
+        "Dupont Circle",
+        "Kalorama Heights",
+        "Adams Morgan",
+        "U Street Corridor"
+      ]
+    },
+    "GEORGETOWN_FOGGY_BOTTOM": {
+      "name": "GEORGETOWN_FOGGY_BOTTOM",
+      "center": {
+        "lat": 38.9025,
+        "lng": -77.062
+      },
+      "bbox": {
+        "min_lat": 38.893,
+        "max_lat": 38.915,
+        "min_lng": -77.1,
+        "max_lng": -77.045
+      },
+      "submarkets": [
+        "Georgetown Waterfront",
+        "Foggy Bottom/West End"
+      ]
+    },
+    "COLUMBIA_HEIGHTS_PETWORTH": {
+      "name": "COLUMBIA_HEIGHTS_PETWORTH",
+      "center": {
+        "lat": 38.941,
+        "lng": -77.02
+      },
+      "bbox": {
+        "min_lat": 38.926,
+        "max_lat": 38.962,
+        "min_lng": -77.04,
+        "max_lng": -77.0
+      },
+      "submarkets": [
+        "Columbia Heights",
+        "Petworth",
+        "Takoma DC"
+      ]
+    },
+    "BROOKLAND_RHODE_ISLAND_AVE": {
+      "name": "BROOKLAND_RHODE_ISLAND_AVE",
+      "center": {
+        "lat": 38.937,
+        "lng": -76.978
+      },
+      "bbox": {
+        "min_lat": 38.926,
+        "max_lat": 38.948,
+        "min_lng": -77.0,
+        "max_lng": -76.955
+      },
+      "submarkets": [
+        "Brookland/CUA"
+      ]
+    },
+    "HILL_EAST_FAIRLINTON": {
+      "name": "HILL_EAST_FAIRLINTON",
+      "center": {
+        "lat": 38.876,
+        "lng": -76.969
+      },
+      "bbox": {
+        "min_lat": 38.868,
+        "max_lat": 38.884,
+        "min_lng": -76.986,
+        "max_lng": -76.952
+      },
+      "submarkets": []
+    },
+    "ANACOSTIA_EAST_OF_THE_RIVER": {
+      "name": "ANACOSTIA_EAST_OF_THE_RIVER",
+      "center": {
+        "lat": 38.858,
+        "lng": -76.962
+      },
+      "bbox": {
+        "min_lat": 38.845,
+        "max_lat": 38.878,
+        "min_lng": -76.988,
+        "max_lng": -76.93
+      },
+      "submarkets": [
+        "Anacostia Historic District",
+        "Congress Heights/St. Elizabeths"
+      ]
+    }
+  },
+  "submarkets": {
+    "Penn Quarter": {
+      "name": "Penn Quarter",
+      "division": "DOWNTOWN_NOMA_CAPITOL_RIVERFRONT",
+      "center": {
+        "lat": 38.8963,
+        "lng": -77.023
+      },
+      "description": "Museum-and-theater core between the Mall and Gallery Place with Capital One Arena foot traffic, office-to-residential conversions, and the heaviest downtown permit velocity."
+    },
+    "Southwest Waterfront/The Wharf": {
+      "name": "Southwest Waterfront/The Wharf",
+      "division": "DOWNTOWN_NOMA_CAPITOL_RIVERFRONT",
+      "center": {
+        "lat": 38.8795,
+        "lng": -77.0185
+      },
+      "description": "Phased mixed-use waterfront rebuild along Maine Avenue with The Wharf's concert piers, hotel inventory, and continued phase-two infill toward the Arena Stage axis."
+    },
+    "NoMa/H Street NE": {
+      "name": "NoMa/H Street NE",
+      "division": "DOWNTOWN_NOMA_CAPITOL_RIVERFRONT",
+      "center": {
+        "lat": 38.9065,
+        "lng": -77.0015
+      },
+      "description": "Red Line-anchored high-density residential boom north of Union Station feeding the H Street NE streetcar nightlife spine across the Florida Avenue gap."
+    },
+    "Union Market": {
+      "name": "Union Market",
+      "division": "DOWNTOWN_NOMA_CAPITOL_RIVERFRONT",
+      "center": {
+        "lat": 38.9085,
+        "lng": -77.0055
+      },
+      "description": "Food-hall epicenter of a master-planned five-million-square-foot development district where Edison-era warehouse fabric meets tower cranes along Neal Place."
+    },
+    "Capitol Hill": {
+      "name": "Capitol Hill",
+      "division": "CAPITOL_HILL_EAST_END",
+      "center": {
+        "lat": 38.885,
+        "lng": -76.989
+      },
+      "description": "Rowhouse historic district of congressional staff housing east of the Capitol grounds with Barracks Row retail and tight single-family supply."
+    },
+    "Eastern Market": {
+      "name": "Eastern Market",
+      "division": "CAPITOL_HILL_EAST_END",
+      "center": {
+        "lat": 38.8843,
+        "lng": -76.993
+      },
+      "description": "Landmark 1873 public-market square anchoring weekend vendor crowds, 7th Street SE boutiques, and premium rowhouse renovations on Capitol Hill's north slope."
+    },
+    "Dupont Circle": {
+      "name": "Dupont Circle",
+      "division": "DUPONT_KALORAMA_UPTOWN",
+      "center": {
+        "lat": 38.9097,
+        "lng": -77.0444
+      },
+      "description": "Embassy-row traffic circle with Connecticut Avenue Class-B office stock converting to residential, gallery retail, and Metro Red Line density."
+    },
+    "Kalorama Heights": {
+      "name": "Kalorama Heights",
+      "division": "DUPONT_KALORAMA_UPTOWN",
+      "center": {
+        "lat": 38.9145,
+        "lng": -77.05
+      },
+      "description": "Mansion-belt enclave of presidential residencies and embassy compounds where turnover is rare and renovation permits carry outsized contract values."
+    },
+    "Adams Morgan": {
+      "name": "Adams Morgan",
+      "division": "DUPONT_KALORAMA_UPTOWN",
+      "center": {
+        "lat": 38.9165,
+        "lng": -77.0437
+      },
+      "description": "Nightlife-and-immigration commercial strip on 18th Street with aging walk-up stock primed for repositioning and Columbia Road corridor investment."
+    },
+    "U Street Corridor": {
+      "name": "U Street Corridor",
+      "division": "DUPONT_KALORAMA_UPTOWN",
+      "center": {
+        "lat": 38.916,
+        "lng": -77.028
+      },
+      "description": "Black Broadway heritage corridor of music venues and Victorian rowhouses now ringed by Green/Yellow Line transit-oriented tower development."
+    },
+    "Georgetown Waterfront": {
+      "name": "Georgetown Waterfront",
+      "division": "GEORGETOWN_FOGGY_BOTTOM",
+      "center": {
+        "lat": 38.905,
+        "lng": -77.069
+      },
+      "description": "Federal-row retail and Washington Harbour park frontage on the Potomac with luxury condo scarcity value and C&O Canal-adjacent restoration work."
+    },
+    "Foggy Bottom/West End": {
+      "name": "Foggy Bottom/West End",
+      "division": "GEORGETOWN_FOGGY_BOTTOM",
+      "center": {
+        "lat": 38.9,
+        "lng": -77.051
+      },
+      "description": "George Washington University hospital-and-dormitory economy beside the Kennedy Center, with State Department demand and West End condo redevelopment."
+    },
+    "Columbia Heights": {
+      "name": "Columbia Heights",
+      "division": "COLUMBIA_HEIGHTS_PETWORTH",
+      "center": {
+        "lat": 38.9288,
+        "lng": -77.0277
+      },
+      "description": "Green/Yellow Line retail hub around DC USA with dense multifamily conversion pipeline along 14th Street NW's northern stretch."
+    },
+    "Petworth": {
+      "name": "Petworth",
+      "division": "COLUMBIA_HEIGHTS_PETWORTH",
+      "center": {
+        "lat": 38.9378,
+        "lng": -77.0234
+      },
+      "description": "Porched-rowhouse family market around Upshur Street strip retail with steady gut-renovation velocity and Georgia Avenue investment frontage."
+    },
+    "Takoma DC": {
+      "name": "Takoma DC",
+      "division": "COLUMBIA_HEIGHTS_PETWORTH",
+      "center": {
+        "lat": 38.9565,
+        "lng": -77.014
+      },
+      "description": "Historic bungalow quarter at the Maryland line around the Takoma Metro station with craftsman restoration work and small-lot infill."
+    },
+    "Brookland/CUA": {
+      "name": "Brookland/CUA",
+      "division": "BROOKLAND_RHODE_ISLAND_AVE",
+      "center": {
+        "lat": 38.9332,
+        "lng": -76.986
+      },
+      "description": "Little Rome university district where Catholic University institutional demand meets Arts Walk mixed-use build-out on the Rhode Island Avenue bridge."
+    },
+    "Anacostia Historic District": {
+      "name": "Anacostia Historic District",
+      "division": "ANACOSTIA_EAST_OF_THE_RIVER",
+      "center": {
+        "lat": 38.8676,
+        "lng": -76.9846
+      },
+      "description": "Frederick Douglass home-side cottage district around the 11th Street Bridge landing where the Bridge District waterfront project resets East-of-the-River values."
+    },
+    "Congress Heights/St. Elizabeths": {
+      "name": "Congress Heights/St. Elizabeths",
+      "division": "ANACOSTIA_EAST_OF_THE_RIVER",
+      "center": {
+        "lat": 38.849,
+        "lng": -76.9665
+      },
+      "description": "Camp Simms retail rebuild and the St. Elizabeths campus conversion — DHS headquarters, hospital shell reuse, and the district's largest land-bank opportunity."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "ISSUE_DATE",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "ADDDATE",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "INITIALISSUEDATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SALE_DATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/washington_dc.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

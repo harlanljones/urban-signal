@@ -495,7 +495,7 @@ def test_dashboard_html_geolocation_default_city():
 
 def test_unknown_city_rejection_400():
     """Verify endpoints reject unknown/unsupported city_id with HTTP 400 Bad Request."""
-    res1 = client.get("/api/v1/submarkets?city_id=boston")
+    res1 = client.get("/api/v1/submarkets?city_id=atlanta")
     assert res1.status_code == 400
     assert "Unsupported city_id" in res1.json()["detail"]
 

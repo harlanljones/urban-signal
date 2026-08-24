@@ -1,0 +1,126 @@
+    <h1 class="sr-only">Glossary: Urban Signal terms defined against the implementation</h1>
+    <section class="signal-section" aria-labelledby="glossary-title">
+      <div class="section-wrap">
+        <div class="section-heading">
+          <span class="mono label">THE VOCABULARY</span>
+          <h2 id="glossary-title">Every term,<br><em>traced to code.</em></h2>
+          <p>Plain-language definitions, each pointing at where the thing is implemented or documented. No entry on this page exists only in copy — if a term cannot be traced, it does not ship.</p>
+        </div>
+        <dl class="glossary-list">
+          <div class="glossary-entry" id="h3-resolutions">
+            <dt>
+              <span class="mono glossary-tag">SPATIAL INDEX</span>
+              H3 resolutions 7 / 8 / 9
+            </dt>
+            <dd>
+              <p>Every event lands on Uber’s H3 hexagonal grid three times at once. A resolution-7 cell covers roughly 5.2 km² and answers metro-scale questions; resolution 8 (~0.74 km²) matches submarket grain; resolution 9 (~0.10 km²) is the neighborhood cell where block-scale movement shows up first. One record, three comparable scales.</p>
+              <p class="glossary-more mono">READ MORE: <a href="/evidence/">Evidence, the spatial stage</a> · <a href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/spatial/h3_indexer.py" target="_blank" rel="noreferrer">apps/api/src/spatial/h3_indexer.py</a></p>
+            </dd>
+          </div>
+          <div class="glossary-entry" id="division">
+            <dt>
+              <span class="mono glossary-tag">REGISTRY UNIT</span>
+              Division
+            </dt>
+            <dd>
+              <p>The top spatial grouping inside a metro: a borough in New York (Manhattan is one), a city division elsewhere (Chicago runs six). Each division declares a center, a bounding box that must nest inside the metro’s, and the roster of submarkets it contains.</p>
+              <p class="glossary-more mono">READ MORE: <a href="/cities/">Cities</a> · <a href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/spatial/city_registry.py" target="_blank" rel="noreferrer">apps/api/src/spatial/city_registry.py</a></p>
+            </dd>
+          </div>
+          <div class="glossary-entry" id="submarket">
+            <dt>
+              <span class="mono glossary-tag">REGISTRY UNIT</span>
+              Submarket
+            </dt>
+            <dd>
+              <p>A named corridor inside a division — SoHo, Tribeca, River North — declared in the registry with metadata rather than guessed from a heatmap. Features aggregate to this grain, so “the submarket is compounding” means one of these declared units, not an analyst’s highlighter.</p>
+              <p class="glossary-more mono">READ MORE: <a href="/cities/nyc/">Cities / NYC</a> · <a href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/spatial/submarkets.py" target="_blank" rel="noreferrer">apps/api/src/spatial/submarkets.py</a></p>
+            </dd>
+          </div>
+          <div class="glossary-entry" id="lims">
+            <dt>
+              <span class="mono glossary-tag">SCORE</span>
+              LIMS — Leading Indicator Momentum Score
+            </dt>
+            <dd>
+              <p>The composite momentum measure built from four time-decayed municipal signal families across 6-, 12-, and 18-month horizons — composition, decay, and thresholds documented on the Methodology page.</p>
+              <p class="glossary-more mono">READ MORE: <a href="/methodology/">Methodology</a></p>
+            </dd>
+          </div>
+          <div class="glossary-entry" id="watermark-column">
+            <dt>
+              <span class="mono glossary-tag">INGESTION</span>
+              Watermark column
+            </dt>
+            <dd>
+              <p>The timestamp column each feed declares — <code>issuance_date</code> for permits, <code>created_date</code> for 311 — that sync reads as a high-water mark, so restarts resume where they left off instead of re-paging from the start. Comparison is typed, so a malformed row cannot become the newest watermark by accident. Every feed’s column is exposed in facts.json.</p>
+              <p class="glossary-more mono">READ MORE: <a href="/facts.json">facts.json (<code>feeds.*.watermark_col</code>)</a> · <a href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/producers/watermarks.py" target="_blank" rel="noreferrer">apps/api/src/producers/watermarks.py</a></p>
+            </dd>
+          </div>
+          <div class="glossary-entry" id="sla-feed">
+            <dt>
+              <span class="mono glossary-tag">FEED FAMILY</span>
+              SLA feed
+            </dt>
+            <dd>
+              <p>Hospitality licenses: activations from the New York State Liquor Authority, plus Chicago business licenses. New licenses trace where commercial foot traffic is expected before leases are public — one of the four ingredients of license activity in LIMS.</p>
+              <p class="glossary-more mono">READ MORE: <a href="/methodology/">Methodology, license activity</a> · <a href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/producers/sla_licenses_producer.py" target="_blank" rel="noreferrer">apps/api/src/producers/sla_licenses_producer.py</a></p>
+            </dd>
+          </div>
+          <div class="glossary-entry" id="snapshot-mode">
+            <dt>
+              <span class="mono glossary-tag">INGESTION</span>
+              Snapshot mode
+            </dt>
+            <dd>
+              <p>Some municipal datasets publish as full-table snapshots with no reliable incremental timestamp. The registry declares those feeds <code>ingestion_mode: snapshot</code>: each refresh diffs IDs against the previous full pull instead of trusting a watermark, so nothing slips through between refreshes.</p>
+              <p class="glossary-more mono">READ MORE: <a href="/system/">System, ingestion contracts</a> · <a href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/spatial/city_registry.py" target="_blank" rel="noreferrer">city_registry.py (<code>ingestion_mode</code>)</a></p>
+            </dd>
+          </div>
+          <div class="glossary-entry" id="year-sliced-feeds">
+            <dt>
+              <span class="mono glossary-tag">INGESTION</span>
+              Year-sliced feeds
+            </dt>
+            <dd>
+              <p>Jurisdictions that publish one dataset layer per calendar year instead of one growing table. The registry stores the year map (<code>endpoint_by_year</code>) and resolves today’s endpoint to the current year’s slice — rotating automatically at each New Year rather than silently reading last year’s file.</p>
+              <p class="glossary-more mono">READ MORE: <a href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/spatial/city_registry.py" target="_blank" rel="noreferrer">city_registry.py (<code>endpoint_by_year</code>)</a></p>
+            </dd>
+          </div>
+          <div class="glossary-entry" id="catalyst-alert">
+            <dt>
+              <span class="mono glossary-tag">SIGNAL</span>
+              Catalyst alert
+            </dt>
+            <dd>
+              <p>Fires when a cell’s LIMS reaches 85.0 or higher — the <code>LIMS_THRESHOLD</code> default, published in configuration like every other dial. The dashboard’s catalyst feed uses the same threshold; there is no private number.</p>
+              <p class="glossary-more mono">READ MORE: <a href="/methodology/">Methodology, public thresholds</a> · <a href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/config.py" target="_blank" rel="noreferrer">apps/api/src/config.py (<code>lims_threshold</code>)</a></p>
+            </dd>
+          </div>
+          <div class="glossary-entry" id="interlock-gate">
+            <dt>
+              <span class="mono glossary-tag">ENFORCEMENT</span>
+              Interlock gate
+            </dt>
+            <dd>
+              <p>The test suite (<code>pytest -m interlock</code>) that enforces how a city joins: closure, completeness, containment, registry-export match, and dashboard wiring. Registration is not done when the registry accepts an entry — it is done when the city appears on the map. A registered metro missing from the dashboard fails the gate.</p>
+              <p class="glossary-more mono">READ MORE: <a href="/architecture/">Architecture, the four gates</a> · <a href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/tests/unit/test_interlock_gate.py" target="_blank" rel="noreferrer">apps/api/tests/unit/test_interlock_gate.py</a></p>
+            </dd>
+          </div>
+          <div class="glossary-entry" id="machine-twin">
+            <dt>
+              <span class="mono glossary-tag">ARTIFACT</span>
+              Machine twin
+            </dt>
+            <dd>
+              <p>The per-metro JSON twin at <code>/cities/&lt;id&gt;.json</code>, generated at build time from the same registry entry as the page — coverage, divisions, submarkets, and feed detail included. Each file carries its provenance (<code>generated_from</code>), so hand-edited numbers are detectable by inspection.</p>
+              <p class="glossary-more mono">READ MORE: <a href="/cities/nyc.json">cities/nyc.json</a> · <a href="/llms-full.txt">Full agent context</a></p>
+            </dd>
+          </div>
+        </dl>
+        <div class="closing-routes system-next">
+          <a class="route-primary" href="/methodology/"><span>See how the score is composed</span><small>Methodology: ingredients, decay, thresholds</small></a>
+          <a class="route-secondary" href="/evidence/"><span>Trace a record end-to-end</span><small>Evidence: raw row to score, five stages</small></a>
+        </div>
+      </div>
+    </section>
