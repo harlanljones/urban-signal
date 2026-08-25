@@ -257,11 +257,11 @@ class SpatialFeaturePipeline:
             as_of_date = datetime.now(timezone.utc)
 
         col_name = f"h3_res{resolution}"
-        dt_str = as_of_date.strftime("%Y-%m-%d %H:%M:%S")
-        dt_60d = (as_of_date - timedelta(days=60)).strftime("%Y-%m-%d %H:%M:%S")
-        dt_90d = (as_of_date - timedelta(days=90)).strftime("%Y-%m-%d %H:%M:%S")
-        dt_180d = (as_of_date - timedelta(days=180)).strftime("%Y-%m-%d %H:%M:%S")
-        dt_360d = (as_of_date - timedelta(days=360)).strftime("%Y-%m-%d %H:%M:%S")
+        dt_str = as_of_date.strftime("%Y-%m-%d %H:%M:%S.%f")
+        dt_60d = (as_of_date - timedelta(days=60)).strftime("%Y-%m-%d %H:%M:%S.%f")
+        dt_90d = (as_of_date - timedelta(days=90)).strftime("%Y-%m-%d %H:%M:%S.%f")
+        dt_180d = (as_of_date - timedelta(days=180)).strftime("%Y-%m-%d %H:%M:%S.%f")
+        dt_360d = (as_of_date - timedelta(days=360)).strftime("%Y-%m-%d %H:%M:%S.%f")
 
         # 1. Permits query
         permits_df = self.con.execute(f"""

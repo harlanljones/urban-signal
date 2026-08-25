@@ -99,7 +99,10 @@ for (const [route, page] of Object.entries(pages)) {
   if (!page.includes(`<meta property="og:url" content="${SITE_ORIGIN}${path}">`)) throw new Error(`Missing og:url on ${path}`);
   if (!page.includes('<meta name="twitter:card" content="summary">')) throw new Error(`Missing twitter:card on ${path}`);
   const blocks = [...page.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)].map((m) => JSON.parse(m[1]));
-  const types = blocks.map((block) => block["@type"]);
+  const types = blocks.flatMap((block) => [
+    block["@type"],
+    ...(block["@graph"] ?? []).map((entity) => entity["@type"]),
+  ]).filter(Boolean);
   for (const expected of expectedTypes[route]) {
     if (!types.includes(expected)) throw new Error(`Missing ${expected} JSON-LD on ${path} (found: ${types.join(",")})`);
   }

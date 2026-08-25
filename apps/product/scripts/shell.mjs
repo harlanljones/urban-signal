@@ -14,18 +14,77 @@ export const SITE_ORIGIN = "https://urban-signal.harlanljones.com";
 const JSON_LD = `  <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "Urban Signal",
-      "description": "Open-source, evidence-traceable spatial intelligence built from municipal telemetry.",
-      "isAccessibleForFree": true,
-      "sameAs": "${REPOSITORY}",
-      "about": {
-        "@type": "SoftwareSourceCode",
-        "name": "Urban Signal",
-        "codeRepository": "${REPOSITORY}",
-        "programmingLanguage": ["Python", "JavaScript"]
-      },
-      "keywords": ["municipal data", "spatial intelligence", "H3", "permits", "311", "open source"]
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://urban-signal.harlanljones.com/#website",
+          "name": "Urban Signal",
+          "url": "${SITE_ORIGIN}/",
+          "description": "Open-source, evidence-traceable spatial intelligence built from municipal telemetry.",
+          "inLanguage": "en-US",
+          "sameAs": "${REPOSITORY}",
+          "isPartOf": {
+            "@type": "WebSite",
+            "@id": "https://www.harlanljones.com/#website",
+            "name": "Harlan Jones Portfolio",
+            "url": "https://www.harlanljones.com/"
+          },
+          "publisher": {
+            "@id": "https://www.harlanljones.com/#person"
+          },
+          "author": {
+            "@id": "https://www.harlanljones.com/#person"
+          }
+        },
+        {
+          "@type": "WebApplication",
+          "@id": "https://urban-signal.harlanljones.com/#app",
+          "name": "Urban Signal",
+          "url": "${SITE_ORIGIN}/",
+          "description": "Real-time spatio-temporal forecasting and municipal telemetry engine utilizing Apache Kafka, Uber H3 geospatial indexing, and ML models to predict hyper-local real estate appreciation.",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "All modern browsers",
+          "isAccessibleForFree": true,
+          "codeRepository": "${REPOSITORY}",
+          "programmingLanguage": ["Python", "JavaScript", "TypeScript"],
+          "author": {
+            "@id": "https://www.harlanljones.com/#person"
+          },
+          "creator": {
+            "@id": "https://www.harlanljones.com/#person"
+          },
+          "keywords": ["municipal data", "spatial intelligence", "H3", "permits", "311", "open source", "Apache Kafka", "real estate analytics"],
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "Person",
+          "@id": "https://www.harlanljones.com/#person",
+          "name": "Harlan Jones",
+          "alternateName": "Harlan L. Jones",
+          "givenName": "Harlan",
+          "familyName": "Jones",
+          "jobTitle": "Software Developer",
+          "url": "https://www.harlanljones.com/",
+          "sameAs": [
+            "https://github.com/harlanljones",
+            "https://www.linkedin.com/in/harlanljones/"
+          ],
+          "worksFor": {
+            "@type": "Organization",
+            "name": "PrimeIQ.ai",
+            "url": "https://primeiq.ai"
+          },
+          "alumniOf": {
+            "@type": "EducationalOrganization",
+            "name": "Boston University",
+            "url": "https://www.bu.edu"
+          }
+        }
+      ]
     }
   </script>`;
 
@@ -53,13 +112,20 @@ export function renderPage({ route = "", title, description, content, noscript, 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#07110f">
   <meta name="description" content="${description}">
+  <meta name="author" content="Harlan Jones">
+  <meta name="creator" content="Harlan Jones">
+  <meta name="publisher" content="Harlan Jones">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <link rel="canonical" href="${canonical}">
   <meta property="og:title" content="${title}">
   <meta property="og:description" content="${description}">
   <meta property="og:url" content="${canonical}">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Urban Signal">
+  <meta property="og:site_name" content="Urban Signal by Harlan Jones">
+  <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="${title}">
+  <meta name="twitter:description" content="${description}">
   <link rel="icon" href="/public/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
