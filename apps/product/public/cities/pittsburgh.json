@@ -89,9 +89,19 @@
       "interval_seconds": 300.0,
       "topic": "raw.municipal.permits"
     },
-    "311": null,
+    "311": {
+      "platform": "ckan",
+      "watermark_col": "created_date_utc",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
     "sla": null,
-    "deeds": null
+    "deeds": {
+      "platform": "ckan",
+      "watermark_col": "RECORDDATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
   },
   "evidence_path": "apps/api/src/spatial/cities/pittsburgh.py",
   "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"

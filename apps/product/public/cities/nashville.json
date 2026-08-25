@@ -89,7 +89,12 @@
       "interval_seconds": 300.0,
       "topic": "raw.municipal.permits"
     },
-    "311": null,
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "Date_Time_Opened",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
     "sla": {
       "platform": "arcgis",
       "watermark_col": "Date_Issued",

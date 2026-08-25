@@ -234,8 +234,18 @@
       "interval_seconds": 1800.0,
       "topic": "raw.municipal.permits"
     },
-    "311": null,
-    "sla": null,
+    "311": {
+      "platform": "csv",
+      "watermark_col": "date_requested",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "csv",
+      "watermark_col": "date_account_creation",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
     "deeds": null
   },
   "evidence_path": "apps/api/src/spatial/cities/san_diego.py",

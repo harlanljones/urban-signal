@@ -294,7 +294,7 @@
       "feeds": [
         true,
         true,
-        false,
+        true,
         true
       ],
       "platforms": [
@@ -310,7 +310,12 @@
           "interval_seconds": 600.0,
           "topic": "raw.municipal.311"
         },
-        null,
+        {
+          "platform": "socrata",
+          "watermark_col": "business_opened_date",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
         {
           "platform": "socrata",
           "watermark_col": "transfer_date",
@@ -415,7 +420,7 @@
         true,
         true,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -436,7 +441,12 @@
           "interval_seconds": 600.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "csv",
+          "watermark_col": "SaleDate",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 39.1031,
@@ -490,7 +500,7 @@
         true,
         false,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -506,7 +516,12 @@
           "interval_seconds": 900.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "socrata",
+          "watermark_col": "sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 39.14,
@@ -599,7 +614,7 @@
       "feeds": [
         true,
         true,
-        false,
+        true,
         false
       ],
       "platforms": [
@@ -615,7 +630,12 @@
           "interval_seconds": 180.0,
           "topic": "raw.municipal.311"
         },
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "issueDate",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
       "center": {
@@ -635,7 +655,7 @@
         true,
         true,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -656,7 +676,12 @@
           "interval_seconds": 600.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "socrata",
+          "watermark_col": "sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 39.29,
@@ -765,7 +790,7 @@
         false,
         true,
         false,
-        false
+        true
       ],
       "platforms": [
         null,
@@ -776,7 +801,12 @@
           "topic": "raw.municipal.311"
         },
         null,
-        null
+        {
+          "platform": "socrata",
+          "watermark_col": "sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 38.72,
@@ -795,7 +825,7 @@
         true,
         false,
         false,
-        false
+        true
       ],
       "platforms": [
         {
@@ -806,7 +836,12 @@
         },
         null,
         null,
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALEDATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 39.9612,
@@ -823,7 +858,7 @@
       "submarket_count": 5,
       "feeds": [
         true,
-        false,
+        true,
         true,
         false
       ],
@@ -834,7 +869,12 @@
           "interval_seconds": 300.0,
           "topic": "raw.municipal.permits"
         },
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "Date_Time_Opened",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "Date_Issued",
@@ -859,7 +899,7 @@
       "feeds": [
         false,
         true,
-        false,
+        true,
         false
       ],
       "platforms": [
@@ -870,7 +910,12 @@
           "interval_seconds": 600.0,
           "topic": "raw.municipal.311"
         },
-        null,
+        {
+          "platform": "socrata",
+          "watermark_col": "",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
       "center": {
@@ -978,9 +1023,9 @@
       "submarket_count": 5,
       "feeds": [
         true,
+        true,
         false,
-        false,
-        false
+        true
       ],
       "platforms": [
         {
@@ -989,9 +1034,19 @@
           "interval_seconds": 300.0,
           "topic": "raw.municipal.permits"
         },
+        {
+          "platform": "ckan",
+          "watermark_col": "created_date_utc",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
         null,
-        null,
-        null
+        {
+          "platform": "ckan",
+          "watermark_col": "RECORDDATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 40.4417,
@@ -1008,8 +1063,8 @@
       "submarket_count": 12,
       "feeds": [
         true,
-        false,
-        false,
+        true,
+        true,
         false
       ],
       "platforms": [
@@ -1019,8 +1074,18 @@
           "interval_seconds": 1800.0,
           "topic": "raw.municipal.permits"
         },
-        null,
-        null,
+        {
+          "platform": "csv",
+          "watermark_col": "date_requested",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "csv",
+          "watermark_col": "date_account_creation",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
       "center": {

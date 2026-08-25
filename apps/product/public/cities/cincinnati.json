@@ -81,7 +81,12 @@
       "interval_seconds": 600.0,
       "topic": "raw.municipal.sla"
     },
-    "deeds": null
+    "deeds": {
+      "platform": "csv",
+      "watermark_col": "SaleDate",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.deeds"
+    }
   },
   "evidence_path": "apps/api/src/spatial/cities/cincinnati.py",
   "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"

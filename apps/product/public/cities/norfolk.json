@@ -235,7 +235,12 @@
       "interval_seconds": 600.0,
       "topic": "raw.municipal.311"
     },
-    "sla": null,
+    "sla": {
+      "platform": "socrata",
+      "watermark_col": "business_opened_date",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
     "deeds": {
       "platform": "socrata",
       "watermark_col": "transfer_date",
