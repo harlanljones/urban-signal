@@ -11,11 +11,35 @@ from src.producers.arcgis_client import ArcGISClient
 from src.producers.base_producer import BaseKafkaProducer
 from src.producers.carto_client import CartoClient
 from src.producers.ckan_client import CkanClient
+from src.producers.csv_client import CSVClient
 from src.producers.socrata_client import SocrataClient
 from src.schemas.models import JobType, PermitEvent
 from src.spatial.h3_indexer import H3SpatialIndexer
 
 logger = logging.getLogger(__name__)
+
+# US-91: San Diego's approvals table is broader than permits — it also carries
+# process agreements, zone-history letters, use certificates, easement maps,
+# Mills Act agreements, etc. Only construction/permit-class rows are the
+# building-permit signal; everything else is dropped at parse time.
+PERMIT_LIKE_KEYWORDS = (
+    "PERMIT",
+    "PMT",
+    "BUILDING",
+    "CONSTRUCTION",
+    "DEMOLITION",
+    "ELECTRICAL",
+    "PLUMBING",
+    "MECHANICAL",
+    "PHOTOVOLTAIC",
+    "GRADING",
+    "FIRE",
+)
+
+
+def _is_permit_like_approval(approval_type: Any) -> bool:
+    text = str(approval_type or "").upper()
+    return any(keyword in text for keyword in PERMIT_LIKE_KEYWORDS)
 
 
 def _parse_datetime(val: Any) -> datetime | None:
@@ -59,6 +83,7 @@ class DOBPermitsProducer:
         self.arcgis = ArcGISClient()
         self.carto = CartoClient()
         self.ckan = CkanClient()
+        self.csv = CSVClient()
         self.spatial_indexer = H3SpatialIndexer()
 
     def _client_for(self, platform: str):
@@ -72,6 +97,7 @@ class DOBPermitsProducer:
             "arcgis": getattr(self, "arcgis", None),
             "carto": getattr(self, "carto", None),
             "ckan": getattr(self, "ckan", None),
+            "csv": getattr(self, "csv", None),
         }
         client = clients.get(platform)
         if client is None:
@@ -109,8 +135,22 @@ class DOBPermitsProducer:
                 resolved_city = "los_angeles"
             elif "permit_" in row or "reported_cost" in row or "community_area" in row:
                 resolved_city = "chicago"
+            elif (
+                "approval_id" in row
+                or "development_id" in row
+                or "gis_apn" in row
+            ):
+                # San Diego Development Services approvals (US-91, flat CSV).
+                resolved_city = "san_diego"
             else:
                 resolved_city = "nyc"
+
+            if resolved_city == "san_diego" and not _is_permit_like_approval(
+                row.get("approval_type")
+            ):
+                # The approvals table is broader than permits (process
+                # agreements, zone letters, use certificates, easement maps).
+                return None
 
             from src.producers.field_maps import first_mapped, resolve_field_map
 

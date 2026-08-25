@@ -29,9 +29,9 @@ Visitors evaluate the project through a public product site, a live geospatial d
 
 ## Capabilities and Constraints
 
-- Twenty-two metros are currently registered: New York City, Chicago, San Francisco Bay Area, Seattle, Los Angeles, New Orleans, Norfolk, Detroit, Austin, Cincinnati, Boston, Baltimore, Montgomery County, Baton Rouge, Denver, Philadelphia, Washington DC, Prince George's County, Columbus, Nashville / Davidson County, Kansas City, and Pierce County. The city registry remains authoritative; the marketing build verifies its machine-readable city projection against that registry.
+- Twenty-seven metros are currently registered: New York City, Chicago, San Francisco Bay Area, Seattle, Los Angeles, New Orleans, Norfolk, Detroit, Austin, Cincinnati, Boston, Baltimore, Montgomery County, Baton Rouge, Denver, Philadelphia, Washington DC, Prince George's County, Columbus, Nashville / Davidson County, Kansas City, Pierce County, Minneapolis, Milwaukee, Charlotte, Pittsburgh, and San Diego. The city registry remains authoritative; the marketing build verifies its machine-readable city projection against that registry.
 - Feed coverage varies by city. Missing or incomplete municipal sources must be described honestly; the site must never imply uniform four-feed coverage.
-- Processing spans source-specific Socrata, ArcGIS, Carto, and CKAN ingestion; schema normalization; Kafka event streams; H3 spatial enrichment; time-decayed feature aggregation; PostGIS and object storage; multi-horizon model training and ONNX inference; snapshots; and edge delivery.
+- Processing spans source-specific Socrata, ArcGIS, CARTO, CKAN, and static CSV ingestion; schema normalization; Kafka event streams; H3 spatial enrichment; time-decayed feature aggregation; PostGIS and object storage; multi-horizon model training and ONNX inference; snapshots; and edge delivery.
 - The city registry and dashboard wiring are authoritative for which cities appear in the product.
 - The marketing site will be a standalone web app inside the existing Turborepo, separate from `apps/dashboard`.
 - Product and model claims must remain traceable to repository evidence. Do not invent customers, performance results, testimonials, or commercial availability.

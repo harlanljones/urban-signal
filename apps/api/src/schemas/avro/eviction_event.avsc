@@ -1,0 +1,21 @@
+{
+  "type": "record",
+  "name": "EvictionEvent",
+  "namespace": "org.urbandev.events",
+  "doc": "NYC Marshal's executed eviction (context/validation)",
+  "fields": [
+    { "name": "city_id", "type": "string", "default": "nyc" },
+    { "name": "eviction_id", "type": "string" },
+    { "name": "address", "type": ["null", "string"], "default": null },
+    { "name": "borough", "type": ["null", "string"], "default": null },
+    { "name": "zipcode", "type": ["null", "string"], "default": null },
+    { "name": "residential_commercial", "type": ["null", "string"], "default": null },
+    { "name": "executed_date", "type": ["null", "string"], "default": null },
+    { "name": "latitude", "type": ["null", "double"], "default": null },
+    { "name": "longitude", "type": ["null", "double"], "default": null },
+    { "name": "h3_res7", "type": ["null", "string"], "default": null },
+    { "name": "h3_res8", "type": ["null", "string"], "default": null },
+    { "name": "h3_res9", "type": ["null", "string"], "default": null },
+    { "name": "ingested_at", "type": "string" }
+  ]
+}

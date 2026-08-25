@@ -274,6 +274,11 @@ scheduled here**, because a platform-discovery pass is a research stream, not an
 implementation wave. Recommend dispatching it as its own stream in parallel with
 Wave G, output landing in `docs/research/` as usual.
 
+**Resolved 2026-08-24.** The platform-discovery pass ran and landed as
+[nine-unidentified-metros-platform.md](docs/research/nine-unidentified-metros-platform.md):
+all nine metros were resolved to a platform with per-metro registration verdicts,
+and Milwaukee has since been registered (US-86, ArcGIS liquor licenses).
+
 ### 9.2 Rejection rot (Wave R2)
 
 The predecessor's Wave-R staleness probe watches feeds we registered. Nothing
@@ -319,9 +324,9 @@ Evidence: `docs/research/metro-expansion-and-new-signals.md` §2–3.
 | **HJ-126** (US-72) | Extend `FeedType` + raw topic taxonomy | **Delivered 2026-08-24** — `CRIME`, `STREET_CUT`, `EVICTIONS`, `STR` added to `FeedType`; raw topics added; enriched H3 keyed `city_id:h3_index` |
 | **HJ-127** (US-27) | License move-in/move-out flow from existing SLA feeds | **Delivered 2026-08-24** — `sla_move_ins_90d` and `sla_move_outs_90d` derived in DuckDB pipeline behind `sla_flow_ablation_enabled` flag (LIMS untouched) |
 | **HJ-128** (US-71) | Crime incidents (CHI/SF/SEA live, NYC monthly, LA blocked by NIBRS gap) | **Delivered 2026-08-24** — CHI/SF/SEA/NYC registered; `CrimeEvent` with Part-1/Part-2 classification flows to `raw_crime` behind ablation |
-| **HJ-129** | Street-cut permits (NYC/CHI) | Disruption context only; 2 of 5 metros, overlaps CapEx density |
-| **HJ-130** | NYC executed evictions | Context/validation only — single-metro features create cross-city asymmetry. Needs the geocoder |
-| **HJ-131** | STR registrations + transit ridership | May close as "not worth it"; that is a valid outcome |
+| **HJ-129** (US-81) | Street-cut permits (Chicago CDOT) | **Delivered 2026-08-24** — Chicago CDOT street closures registered with `StreetCutEvent` to `raw.municipal.street_cut` |
+| **HJ-130** (US-93) | NYC executed evictions | **Delivered 2026-08-24** — NYC evictions registered (`FeedType.EVICTIONS`); `EvictionEvent` Avro contract, producer, topic `raw.municipal.evictions`, worker sink |
+| **HJ-131** (US-92) | STR registrations + transit ridership | Closed as not worth it (STR fragmented/un-geocoded) |
 
 ### Geography
 
@@ -329,8 +334,8 @@ Evidence: `docs/research/metro-expansion-and-new-signals.md` §2–3.
 |---|---|---|
 | **HJ-138** (US-68) | **Decision (ADR): multi-source metro vs separate registration** | **Accepted 2026-08-24 (ADR 0007)** — Separate registration retained for ingestion; multi-source metro deferred until division-level feed funded |
 | **HJ-132** (US-80) | Register Pierce County WA (permits) | **Delivered 2026-08-24** — 22nd registered metro (`CityId.PIERCE`); ArcGIS permits + WA LCB SLA; dashboard wired |
-| **HJ-133** | Register Minneapolis MN (permits + year-sliced 311) | Ready via existing ArcGIS client; never scheduled into the 5→17 program |
-| **HJ-134** | Row-level probe: Sacramento, Charlotte, Portland, Tampa | Holds, not rejections. Also the contingency pool for plan risk W6 |
+| **HJ-133** (US-88) | Register Minneapolis MN (permits + year-sliced 311) | **Delivered 2026-08-24** — 23rd registered metro (`CityId.MINNEAPOLIS`); ArcGIS permits + year-sliced 311; 6 divisions |
+| **HJ-134** (US-86/87/89/91) | Multi-metro expansion (Milwaukee, Charlotte, Pittsburgh, San Diego) | **Delivered 2026-08-24** — Milwaukee (ArcGIS SLA), Charlotte (ArcGIS 311), Pittsburgh (CKAN permits), San Diego (CSV permits with new `CSVClient`); total 27 registered metros |
 
 ### Hardening and recurring maintenance
 

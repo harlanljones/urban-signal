@@ -1,0 +1,258 @@
+{
+  "schema_version": 2,
+  "id": "minneapolis",
+  "name": "Minneapolis",
+  "state": "MN",
+  "center": {
+    "lat": 44.9778,
+    "lng": -93.265
+  },
+  "metro_bbox": {
+    "min_lat": 44.85,
+    "max_lat": 45.08,
+    "min_lng": -93.36,
+    "max_lng": -93.15
+  },
+  "divisions": {
+    "NORTH": {
+      "name": "North Minneapolis",
+      "center": {
+        "lat": 45.01,
+        "lng": -93.28
+      },
+      "bbox": {
+        "min_lat": 44.97,
+        "max_lat": 45.06,
+        "min_lng": -93.34,
+        "max_lng": -93.22
+      },
+      "submarkets": [
+        "Camden",
+        "Near North"
+      ]
+    },
+    "NORTHEAST": {
+      "name": "Northeast",
+      "center": {
+        "lat": 45.02,
+        "lng": -93.23
+      },
+      "bbox": {
+        "min_lat": 44.98,
+        "max_lat": 45.08,
+        "min_lng": -93.26,
+        "max_lng": -93.18
+      },
+      "submarkets": [
+        "Northeast",
+        "Nicollet Island-East Bank"
+      ]
+    },
+    "CENTRAL": {
+      "name": "Central Minneapolis",
+      "center": {
+        "lat": 44.977,
+        "lng": -93.265
+      },
+      "bbox": {
+        "min_lat": 44.95,
+        "max_lat": 45.02,
+        "min_lng": -93.3,
+        "max_lng": -93.24
+      },
+      "submarkets": [
+        "Downtown West",
+        "Downtown East",
+        "Cedar-Riverside"
+      ]
+    },
+    "SOUTH": {
+      "name": "South Minneapolis",
+      "center": {
+        "lat": 44.94,
+        "lng": -93.26
+      },
+      "bbox": {
+        "min_lat": 44.89,
+        "max_lat": 44.97,
+        "min_lng": -93.3,
+        "max_lng": -93.22
+      },
+      "submarkets": [
+        "Powderhorn",
+        "Phillips"
+      ]
+    },
+    "SOUTHWEST": {
+      "name": "Southwest Minneapolis",
+      "center": {
+        "lat": 44.94,
+        "lng": -93.31
+      },
+      "bbox": {
+        "min_lat": 44.9,
+        "max_lat": 44.98,
+        "min_lng": -93.35,
+        "max_lng": -93.27
+      },
+      "submarkets": [
+        "Uptown",
+        "Linden Hills"
+      ]
+    },
+    "SOUTHEAST": {
+      "name": "Southeast Minneapolis",
+      "center": {
+        "lat": 44.975,
+        "lng": -93.22
+      },
+      "bbox": {
+        "min_lat": 44.94,
+        "max_lat": 45.02,
+        "min_lng": -93.24,
+        "max_lng": -93.19
+      },
+      "submarkets": [
+        "University / Marcy-Holmes",
+        "Prospect Park"
+      ]
+    }
+  },
+  "submarkets": {
+    "Camden": {
+      "name": "Camden",
+      "division": "NORTH",
+      "center": {
+        "lat": 45.043,
+        "lng": -93.303
+      },
+      "description": "Northern residential district along the Mississippi with modest redevelopment and home-renovation permit activity."
+    },
+    "Near North": {
+      "name": "Near North",
+      "division": "NORTH",
+      "center": {
+        "lat": 44.996,
+        "lng": -93.277
+      },
+      "description": "North-central neighborhood corridor with mixed-use infill, senior-housing and commercial rehab signals."
+    },
+    "Northeast": {
+      "name": "Northeast",
+      "division": "NORTHEAST",
+      "center": {
+        "lat": 45.013,
+        "lng": -93.218
+      },
+      "description": "Arts-district river community with dense multifamily infill and ongoing warehouse-to-residential conversions."
+    },
+    "Nicollet Island-East Bank": {
+      "name": "Nicollet Island-East Bank",
+      "division": "NORTHEAST",
+      "center": {
+        "lat": 44.985,
+        "lng": -93.256
+      },
+      "description": "Historic river-island enclave with boutique multifamily and adaptive-reuse development."
+    },
+    "Downtown West": {
+      "name": "Downtown West",
+      "division": "CENTRAL",
+      "center": {
+        "lat": 44.977,
+        "lng": -93.273
+      },
+      "description": "Central business district with the region's densest office, hospitality, and high-rise residential permit pipeline."
+    },
+    "Downtown East": {
+      "name": "Downtown East",
+      "division": "CENTRAL",
+      "center": {
+        "lat": 44.975,
+        "lng": -93.257
+      },
+      "description": "East-of-Mississippi downtown pocket anchored by stadium, medical, and emerging residential development."
+    },
+    "Cedar-Riverside": {
+      "name": "Cedar-Riverside",
+      "division": "CENTRAL",
+      "center": {
+        "lat": 44.97,
+        "lng": -93.247
+      },
+      "description": "Vibrant, densely populated neighborhood with ongoing housing rehabilitation and institutional anchors."
+    },
+    "Powderhorn": {
+      "name": "Powderhorn",
+      "division": "SOUTH",
+      "center": {
+        "lat": 44.941,
+        "lng": -93.256
+      },
+      "description": "Established residential district with steady single-family rehab and neighborhood commercial renewal."
+    },
+    "Phillips": {
+      "name": "Phillips",
+      "division": "SOUTH",
+      "center": {
+        "lat": 44.956,
+        "lng": -93.268
+      },
+      "description": "Inner-south neighborhood with concentrated community-driven housing and small-biz revitalization."
+    },
+    "Uptown": {
+      "name": "Uptown",
+      "division": "SOUTHWEST",
+      "center": {
+        "lat": 44.951,
+        "lng": -93.298
+      },
+      "description": "High-street retail and multifamily district with steady mixed-use infill and commercial renovation activity."
+    },
+    "Linden Hills": {
+      "name": "Linden Hills",
+      "division": "SOUTHWEST",
+      "center": {
+        "lat": 44.933,
+        "lng": -93.307
+      },
+      "description": "Lake-adjacent residential village with upscale renovation and small commercial reinvestment."
+    },
+    "University / Marcy-Holmes": {
+      "name": "University / Marcy-Holmes",
+      "division": "SOUTHEAST",
+      "center": {
+        "lat": 44.982,
+        "lng": -93.24
+      },
+      "description": "U of M-adjacent corridor with dense student-housing infill and institutional-adjacent development."
+    },
+    "Prospect Park": {
+      "name": "Prospect Park",
+      "division": "SOUTHEAST",
+      "center": {
+        "lat": 44.973,
+        "lng": -93.215
+      },
+      "description": "Tower-side neighborhood with planned infill and ongoing single-family and duplex renovation."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "issueDate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "OPENEDDATETIME",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/minneapolis.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

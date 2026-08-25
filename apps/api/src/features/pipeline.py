@@ -92,6 +92,18 @@ class SpatialFeaturePipeline:
                 ingested_at TIMESTAMP
             );
 
+            CREATE TABLE IF NOT EXISTS raw_evictions (
+                eviction_id VARCHAR PRIMARY KEY,
+                residential_commercial VARCHAR,
+                latitude DOUBLE,
+                longitude DOUBLE,
+                executed_date TIMESTAMP,
+                h3_res7 VARCHAR,
+                h3_res8 VARCHAR,
+                h3_res9 VARCHAR,
+                ingested_at TIMESTAMP
+            );
+
             CREATE TABLE IF NOT EXISTS raw_street_cut (
                 permit_id VARCHAR PRIMARY KEY,
                 permit_type VARCHAR,
@@ -201,6 +213,22 @@ class SpatialFeaturePipeline:
                 SELECT * FROM df_crime_temp
             """)
             self.con.unregister("df_crime_temp")
+
+    def insert_evictions(self, df: pd.DataFrame):
+        """Batch insert executed evictions into DuckDB (US-93, context-only)."""
+        if not df.empty:
+            cols = ["eviction_id", "residential_commercial", "latitude", "longitude", "executed_date", "h3_res7", "h3_res8", "h3_res9", "ingested_at"]
+            filtered = df[[c for c in cols if c in df.columns]].copy()
+            for c in cols:
+                if c not in filtered.columns:
+                    filtered[c] = None
+            filtered = filtered[cols]
+            self.con.register("df_evictions_temp", filtered)
+            self.con.execute("""
+                INSERT OR REPLACE INTO raw_evictions
+                SELECT * FROM df_evictions_temp
+            """)
+            self.con.unregister("df_evictions_temp")
 
     def insert_street_cut(self, df: pd.DataFrame):
         """Batch insert street-cut/closure events into DuckDB (US-81)."""

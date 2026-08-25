@@ -12,6 +12,7 @@ from src.schemas.models import (
     CrimeEvent,
     DeedEvent,
     EnrichedH3Feature,
+    EvictionEvent,
     PermitEvent,
     SLALicenseEvent,
     StreetCutEvent,
@@ -82,6 +83,22 @@ def test_crime_event_avro_serialization():
     assert deserialized["incident_id"] == "14295750"
     assert deserialized["offense_class"] == "PART1"
     assert deserialized["latitude"] == 41.744201882
+
+
+def test_eviction_event_avro_serialization():
+    event = EvictionEvent(
+        city_id="nyc",
+        eviction_id="302444/23B",
+        residential_commercial="Residential",
+        latitude=40.646197,
+        longitude=-73.894456,
+        h3_res9="892a1072893ffff",
+    )
+    data = event.model_dump(mode="json")
+    deserialized = _validate_avro_roundtrip("eviction_event.avsc", data)
+    assert deserialized["eviction_id"] == "302444/23B"
+    assert deserialized["residential_commercial"] == "Residential"
+    assert deserialized["latitude"] == 40.646197
 
 
 def test_street_cut_event_avro_serialization():

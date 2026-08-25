@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "id": "milwaukee",
+  "name": "Milwaukee",
+  "state": "WI",
+  "center": {
+    "lat": 43.0389,
+    "lng": -87.9065
+  },
+  "metro_bbox": {
+    "min_lat": 42.85,
+    "max_lat": 43.2,
+    "min_lng": -88.1,
+    "max_lng": -87.8
+  },
+  "divisions": {
+    "MILWAUKEE_CORE": {
+      "name": "Milwaukee",
+      "center": {
+        "lat": 43.0389,
+        "lng": -87.9065
+      },
+      "bbox": {
+        "min_lat": 42.9,
+        "max_lat": 43.18,
+        "min_lng": -88.08,
+        "max_lng": -87.85
+      },
+      "submarkets": [
+        "Downtown & East Town",
+        "Bay View",
+        "Walker's Point",
+        "Riverwest & Brewers Hill",
+        "Westown & Washington Heights"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & East Town": {
+      "name": "Downtown & East Town",
+      "division": "MILWAUKEE_CORE",
+      "center": {
+        "lat": 43.0389,
+        "lng": -87.9065
+      },
+      "description": "Lakefront central business district with the Deer District, arena-adjacent hospitality, and dense bar/restaurant license activity."
+    },
+    "Bay View": {
+      "name": "Bay View",
+      "division": "MILWAUKEE_CORE",
+      "center": {
+        "lat": 42.9998,
+        "lng": -87.9057
+      },
+      "description": "South-side historic mill district with a strong independent tavern and restaurant corridor along Kinnickinnic Avenue."
+    },
+    "Walker's Point": {
+      "name": "Walker's Point",
+      "division": "MILWAUKEE_CORE",
+      "center": {
+        "lat": 43.022,
+        "lng": -87.9147
+      },
+      "description": "South-of-downtown food-and-beverage hub with concentrated liquor license turnover and adaptive reuse of industrial buildings."
+    },
+    "Riverwest & Brewers Hill": {
+      "name": "Riverwest & Brewers Hill",
+      "division": "MILWAUKEE_CORE",
+      "center": {
+        "lat": 43.0604,
+        "lng": -87.9179
+      },
+      "description": "North-side river neighborhoods with neighborhood taverns, music venues, and owner-operator license density."
+    },
+    "Westown & Washington Heights": {
+      "name": "Westown & Washington Heights",
+      "division": "MILWAUKEE_CORE",
+      "center": {
+        "lat": 43.052,
+        "lng": -87.97
+      },
+      "description": "West-side corridor with mixed commercial-residential stock and steady service-sector license renewal activity."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "GIS_DATETIME",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/milwaukee.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

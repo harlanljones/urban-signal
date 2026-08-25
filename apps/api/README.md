@@ -22,10 +22,10 @@ inference workers.
 
 ## Architecture & Subpackages
 
-- **`src/schemas/`**: Pydantic models for incoming telemetry (permits, 311, SLA licenses, deeds, crime incidents) and Avro schema definitions (`.avsc`) for Kafka event contracts.
-- **`src/spatial/`**: Uber H3 spatial indexing (Res 7 macro, Res 8 submarket, Res 9 micro), 22 per-city coordinate modules, address geocoding fallback (`geocoder.py`), and the central `city_registry.py`.
+- **`src/schemas/`**: Pydantic models for incoming telemetry (permits, 311, SLA licenses, deeds, crime incidents, evictions) and Avro schema definitions (`.avsc`) for Kafka event contracts.
+- **`src/spatial/`**: Uber H3 spatial indexing (Res 7 macro, Res 8 submarket, Res 9 micro), 27 per-city coordinate modules, address geocoding fallback (`geocoder.py`), and the central `city_registry.py`.
 - **`src/features/`**: Time-decayed CapEx density (180-day half-life), 311 shift dynamics ratio ($QoL / Neglect$), SLA move-in/move-out flow counts, and Leading Indicator Momentum Score (LIMS) calculator.
-- **`src/producers/`**: Socrata SODA, ArcGIS REST, CARTO, and CKAN clients, municipal ingestion producers (permits, 311, SLA, deeds, crime), typed text watermarks, durable watermark state, year-slice rollover detection, and poller scheduler.
+- **`src/producers/`**: Socrata SODA, ArcGIS REST, CARTO, CKAN, and CSV clients, municipal ingestion producers (permits, 311, SLA, deeds, crime, evictions), typed text watermarks, durable watermark state, year-slice rollover detection, and poller scheduler.
 - **`src/consumers/`**: Stream enrichment workers (H3 spatial indexing, feature aggregation, alerts publisher, PostGIS persistence).
 - **`src/storage/`**: PostGIS 16 spatial synchronization engine with GiST/BRIN indexing.
 - **`src/models/`**: Multi-horizon forecasting models (LightGBM Quantile pinball loss, SpatioTemporal GNN, MultiScale DCN-v2, and ONNX exporter).
@@ -51,7 +51,7 @@ uv pip install -e ".[dev]"
 # Run all unit tests
 uv run pytest tests/unit -v
 
-# Run the interlock invariant gate (closure, completeness, containment across all 22 metros)
+# Run the interlock invariant gate (closure, completeness, containment across all 27 metros)
 uv run pytest -m interlock
 
 # Run end-to-end integration tests

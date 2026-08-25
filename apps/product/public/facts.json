@@ -590,6 +590,41 @@
       "evidence_path": "apps/api/src/spatial/cities/denver.py"
     },
     {
+      "id": "minneapolis",
+      "name": "Minneapolis",
+      "state": "MN",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 13,
+      "feeds": [
+        true,
+        true,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "issueDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "OPENEDDATETIME",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 44.9778,
+        "lng": -93.265
+      },
+      "evidence_path": "apps/api/src/spatial/cities/minneapolis.py"
+    },
+    {
       "id": "baltimore",
       "name": "Baltimore",
       "state": "MD",
@@ -873,6 +908,126 @@
         "lng": -122.4443
       },
       "evidence_path": "apps/api/src/spatial/cities/pierce.py"
+    },
+    {
+      "id": "milwaukee",
+      "name": "Milwaukee",
+      "state": "WI",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "GIS_DATETIME",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 43.0389,
+        "lng": -87.9065
+      },
+      "evidence_path": "apps/api/src/spatial/cities/milwaukee.py"
+    },
+    {
+      "id": "charlotte",
+      "name": "Charlotte",
+      "state": "NC",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        false,
+        true,
+        false,
+        false
+      ],
+      "platforms": [
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "RECEIVED_DATE",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 35.2271,
+        "lng": -80.8431
+      },
+      "evidence_path": "apps/api/src/spatial/cities/charlotte.py"
+    },
+    {
+      "id": "pittsburgh",
+      "name": "Pittsburgh",
+      "state": "PA",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "ckan",
+          "watermark_col": "issue_date",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 40.4417,
+        "lng": -80.0
+      },
+      "evidence_path": "apps/api/src/spatial/cities/pittsburgh.py"
+    },
+    {
+      "id": "san_diego",
+      "name": "San Diego",
+      "state": "CA",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 12,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "csv",
+          "watermark_col": "approval_issue_date",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 32.7157,
+        "lng": -117.1611
+      },
+      "evidence_path": "apps/api/src/spatial/cities/san_diego.py"
     }
   ],
   "pipeline": [

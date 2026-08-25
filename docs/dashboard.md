@@ -11,6 +11,7 @@ The dashboard has two related modes:
 
 - **Single region:** the city selector changes the map, division tabs, grid, catalyst
   feed, and inspector context to one registered region.
+- **Deep-linking:** deep links via query parameter (`?city=<id>`, e.g. `?city=pittsburgh` or `?city=sf`) preselect the specified city immediately on load, falling back to browser geolocation if unspecified or invalid.
 - **Comparison:** choose a primary region, open **+ Compare**, select one or more
   additional regions, and choose **Show selected regions**. Grid snapshots are fetched
   per city and merged into one GeoJSON source. The viewport fits the combined geometry.

@@ -1151,6 +1151,8 @@ def get_dashboard_html() -> str:
           <option value="pierce">🏔️ Pierce County (1 Division)</option>
           <option value="milwaukee">🍺 Milwaukee (1 Division)</option>
           <option value="charlotte">🏙️ Charlotte (1 Division)</option>
+          <option value="pittsburgh">⚙️ Pittsburgh (1 Division)</option>
+          <option value="san_diego">🌴 San Diego (6 Divisions)</option>
         </select>
       </div>
       <div class="compare-control">
@@ -1654,6 +1656,33 @@ def get_dashboard_html() -> str:
           'SOUTHEAST': { lat: 44.9750, lng: -93.2200, zoom: 11.8, pitch: 48, bearing: -10 }
         }
       },
+      san_diego: {
+        center: [-117.1611, 32.7157],
+        zoom: 10.4,
+        pitch: 48,
+        bearing: -10,
+        name: 'San Diego',
+        metroBbox: { min_lat: 32.50, max_lat: 33.10, min_lng: -117.35, max_lng: -116.85 },
+        allLabel: 'All San Diego',
+        divisions: [
+          { key: 'ALL', label: 'All San Diego', class: 'ALL' },
+          { key: 'NORTH', label: 'North San Diego', class: 'North' },
+          { key: 'COASTAL', label: 'Coastal San Diego', class: 'Coastal' },
+          { key: 'CENTRAL', label: 'Central San Diego', class: 'Central' },
+          { key: 'EAST', label: 'East San Diego', class: 'East' },
+          { key: 'SOUTHEAST', label: 'Southeast San Diego', class: 'Southeast' },
+          { key: 'SOUTHWEST', label: 'South Bay San Diego', class: 'Southwest' }
+        ],
+        presets: {
+          'ALL': { lat: 32.7157, lng: -117.1611, zoom: 10.2, pitch: 45, bearing: -10 },
+          'NORTH': { lat: 32.8700, lng: -117.2000, zoom: 11.6, pitch: 48, bearing: -10 },
+          'COASTAL': { lat: 32.7900, lng: -117.2500, zoom: 11.6, pitch: 48, bearing: -10 },
+          'CENTRAL': { lat: 32.7400, lng: -117.1600, zoom: 11.4, pitch: 48, bearing: -10 },
+          'EAST': { lat: 32.8200, lng: -117.0500, zoom: 11.6, pitch: 48, bearing: -10 },
+          'SOUTHEAST': { lat: 32.6800, lng: -117.0300, zoom: 11.6, pitch: 48, bearing: -10 },
+          'SOUTHWEST': { lat: 32.5500, lng: -117.0300, zoom: 11.4, pitch: 48, bearing: -10 }
+        }
+      },
       philadelphia: {
         center: [-75.1652, 39.9526],
         zoom: 11.0,
@@ -1834,6 +1863,23 @@ def get_dashboard_html() -> str:
           'ALL': { lat: 35.2271, lng: -80.8431, zoom: 10.8, pitch: 45, bearing: -10 },
           'CHARLOTTE_CORE': { lat: 35.2271, lng: -80.8431, zoom: 11.4, pitch: 48, bearing: -10 }
         }
+      },
+      pittsburgh: {
+        center: [-80.0000, 40.4417],
+        zoom: 11.6,
+        pitch: 48,
+        bearing: -10,
+        name: 'Pittsburgh',
+        metroBbox: { min_lat: 40.35, max_lat: 40.55, min_lng: -80.10, max_lng: -79.80 },
+        allLabel: 'All Pittsburgh',
+        divisions: [
+          { key: 'ALL', label: 'All Pittsburgh', class: 'ALL' },
+          { key: 'PITTSBURGH_CORE', label: 'Pittsburgh', class: 'PittsburghCore' }
+        ],
+        presets: {
+          'ALL': { lat: 40.4417, lng: -80.0000, zoom: 11.4, pitch: 45, bearing: -10 },
+          'PITTSBURGH_CORE': { lat: 40.4417, lng: -80.0000, zoom: 12.0, pitch: 48, bearing: -10 }
+        }
       }
     };
     CITY_CONFIGS.sf = CITY_CONFIGS.san_francisco;
@@ -1867,7 +1913,9 @@ def get_dashboard_html() -> str:
       columbus: { lat: 39.9612, lng: -83.0007 }, nashville: { lat: 36.1627, lng: -86.7818 },
       kansas_city: { lat: 39.10, lng: -94.58 }, pierce: { lat: 47.2529, lng: -122.4443 },
       milwaukee: { lat: 43.0389, lng: -87.9065 }, minneapolis: { lat: 44.9778, lng: -93.2650 },
-      charlotte: { lat: 35.2271, lng: -80.8431 }
+      charlotte: { lat: 35.2271, lng: -80.8431 },
+      pittsburgh: { lat: 40.4417, lng: -80.0000 },
+      san_diego: { lat: 32.7157, lng: -117.1611 }
     };
 
     function renderCompareOptions() {
@@ -1996,7 +2044,8 @@ def get_dashboard_html() -> str:
         'kansas_city': { lat: 39.10, lng: -94.58 },
         'pierce': { lat: 47.2529, lng: -122.4443 },
         'milwaukee': { lat: 43.0389, lng: -87.9065 },
-        'charlotte': { lat: 35.2271, lng: -80.8431 }
+        'charlotte': { lat: 35.2271, lng: -80.8431 },
+        'pittsburgh': { lat: 40.4417, lng: -80.0000 }
       };
       let closest = 'san_francisco';
       let minDist = Infinity;
@@ -2233,12 +2282,32 @@ def get_dashboard_html() -> str:
       }
     }
 
-    window.addEventListener('DOMContentLoaded', async () => {
+    function deepLinkedCity() {
+      // US-31: /dashboard?city=<id> deep links (city pages, /compare) land
+      // preselected. Validate against CITY_CONFIGS so unknown or absent
+      // params fall through to the geolocation default untouched.
       try {
-        const detected = await detectUserDefaultCity();
-        currentCity = detected || 'san_francisco';
+        const requested = new URLSearchParams(window.location.search).get('city');
+        if (!requested) return null;
+        let candidate = String(requested).toLowerCase().trim();
+        if (candidate === 'sf') candidate = 'san_francisco';
+        return CITY_CONFIGS[candidate] ? candidate : null;
       } catch (e) {
-        currentCity = 'san_francisco';
+        return null;
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const linked = deepLinkedCity();
+      if (linked) {
+        currentCity = linked;
+      } else {
+        try {
+          const detected = await detectUserDefaultCity();
+          currentCity = detected || 'san_francisco';
+        } catch (e) {
+          currentCity = 'san_francisco';
+        }
       }
 
       const citySelect = document.getElementById('city-select');

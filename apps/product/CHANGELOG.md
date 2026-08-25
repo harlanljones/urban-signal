@@ -5,6 +5,10 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+### Added
+- Direct deep-links from metro compare cards (`/compare/`) to the live dashboard with preselected city query param (`/dashboard?city=<id>`).
+- Auto-generated deep-dive pages and machine-readable JSON twins for 6 additional metros: Minneapolis, Pierce County WA, Milwaukee, Charlotte, Pittsburgh, and San Diego (bringing total to 27 registered metros and 37 sitemap URLs).
+
 ## Site v2 — multi-page information architecture (2026-08-24)
 
 ### Added

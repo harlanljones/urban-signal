@@ -167,6 +167,21 @@ class SpatialEnrichmentWorker:
             }])
             self.feature_pipeline.insert_crime(df)
 
+        elif topic == settings.topic_evictions:
+            # US-93: NYC-only context/validation evictions; never a LIMS input.
+            df = pd.DataFrame([{
+                "eviction_id": record.get("eviction_id"),
+                "residential_commercial": record.get("residential_commercial"),
+                "latitude": float(record["latitude"]) if record.get("latitude") else None,
+                "longitude": float(record["longitude"]) if record.get("longitude") else None,
+                "executed_date": pd.to_datetime(record.get("executed_date")) if record.get("executed_date") else None,
+                "h3_res7": record.get("h3_res7"),
+                "h3_res8": record.get("h3_res8"),
+                "h3_res9": record.get("h3_res9"),
+                "ingested_at": pd.to_datetime(record.get("ingested_at") or datetime.now(timezone.utc)),
+            }])
+            self.feature_pipeline.insert_evictions(df)
+
         elif topic == settings.topic_street_cut:
             # US-81: street-cut/closure events persist to raw_street_cut as a
             # disruption context signal; nothing here feeds the LIMS score.

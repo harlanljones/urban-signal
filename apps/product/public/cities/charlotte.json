@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "id": "charlotte",
+  "name": "Charlotte",
+  "state": "NC",
+  "center": {
+    "lat": 35.2271,
+    "lng": -80.8431
+  },
+  "metro_bbox": {
+    "min_lat": 34.98,
+    "max_lat": 35.55,
+    "min_lng": -81.1,
+    "max_lng": -80.45
+  },
+  "divisions": {
+    "CHARLOTTE_CORE": {
+      "name": "Charlotte",
+      "center": {
+        "lat": 35.2271,
+        "lng": -80.8431
+      },
+      "bbox": {
+        "min_lat": 35.05,
+        "max_lat": 35.4,
+        "min_lng": -81.0,
+        "max_lng": -80.6
+      },
+      "submarkets": [
+        "Uptown",
+        "South End",
+        "Plaza Midwood",
+        "NoDa & Plaza Hills",
+        "Elizabeth & Dilworth"
+      ]
+    }
+  },
+  "submarkets": {
+    "Uptown": {
+      "name": "Uptown",
+      "division": "CHARLOTTE_CORE",
+      "center": {
+        "lat": 35.2271,
+        "lng": -80.8431
+      },
+      "description": "Central business district with banks, towers, transit, and dense mixed-use residential development."
+    },
+    "South End": {
+      "name": "South End",
+      "division": "CHARLOTTE_CORE",
+      "center": {
+        "lat": 35.215,
+        "lng": -80.855
+      },
+      "description": "Former mill district along the rail line with explosive apartment and brewery-driven redevelopment."
+    },
+    "Plaza Midwood": {
+      "name": "Plaza Midwood",
+      "division": "CHARLOTTE_CORE",
+      "center": {
+        "lat": 35.218,
+        "lng": -80.8
+      },
+      "description": "Historic bungalow district with restaurant/retail corridors and steady infill and renovation activity."
+    },
+    "NoDa & Plaza Hills": {
+      "name": "NoDa & Plaza Hills",
+      "division": "CHARLOTTE_CORE",
+      "center": {
+        "lat": 35.245,
+        "lng": -80.8
+      },
+      "description": "Arts district north of Uptown with galleries, music venues, and infill townhomes along the Blue Line."
+    },
+    "Elizabeth & Dilworth": {
+      "name": "Elizabeth & Dilworth",
+      "division": "CHARLOTTE_CORE",
+      "center": {
+        "lat": 35.214,
+        "lng": -80.832
+      },
+      "description": "Leafy streetcar-era neighborhoods with boutique multifamily infill and active renovation permits."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "RECEIVED_DATE",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/charlotte.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

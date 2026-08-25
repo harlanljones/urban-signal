@@ -50,14 +50,14 @@ def test_unregistered_new_feeds_raise_readable_get_dataset_error():
 
 def test_only_cleared_signal_feeds_are_registered():
     """US-72 made the taxonomy ingestible; US-71 registered crime in the four
-    metros with a verified live feed, and US-81 registered street-cut in the
+    metros with a verified live feed, US-81 registered street-cut in the
     one metro with a geocodable feed (Chicago CDOT street closures; NYC's
-    current rows are address-only). Evictions and STR remain unregistered
-    until their own tickets."""
+    current rows are address-only), and US-93 registered NYC-only evictions
+    as context/validation. STR remains unregistered (US-92 closed not-worth-it)."""
     registered_for = {
         FeedType.CRIME: {CityId.NYC, CityId.CHICAGO, CityId.SAN_FRANCISCO, CityId.SEATTLE},
         FeedType.STREET_CUT: {CityId.CHICAGO},
-        FeedType.EVICTIONS: set(),
+        FeedType.EVICTIONS: {CityId.NYC},
         FeedType.STR: set(),
     }
     for city, reg in REGISTRY.items():

@@ -173,6 +173,31 @@ they disagreed with row reality in all four cases.
 These four were the designated Wave-2 contingency swaps (plan risk W6); the
 Tier-1 promotions above expand the swap pool with point-geocoded, current feeds.
 
+## US-91 — San Diego registered (permits-only, flat CSV)
+
+Row-level research 2026-08-24 against `data.sandiego.gov` (COSD-PANDA
+inventory, 122 datasets):
+
+- **Platform finding:** San Diego's open-data portal is a **static-CSV
+  host** (`seshat.datasd.org`) — no Socrata/ArcGIS/CARTO/CKAN API for any of
+  the three target families. A fifth platform client (`CSVClient`,
+  download-once + client-side watermark filter) was required to ingest it.
+- **PERMITS — "Approvals for development projects"**: geocoded
+  (`GIS_LATITUDE`/`GIS_LONGITUDE`), year-scoped CSV (2026 file: 34,638 issued,
+  ~18 MB). Registered as a `FeedType.PERMITS` spec with D3 year rollover
+  (`endpoint_by_year`). The approvals table is broader than permits, so
+  parse-time filtering keeps only permit-like classes
+  (`*_Permit` / `*_Pmt` / Building / Construction / trade types) and drops
+  process agreements, zone-history letters, use certificates, easement maps.
+- **311 — Get It Done** and **SLA — Business Tax Certificates** are live and
+  daily but also CSV-only; deferred rather than multiplying the CSV surface in
+  one registration.
+- **DEEDS — no source.** No property-sales or parcel-transaction dataset
+  exists anywhere in the inventory; confirmed absent, not unverified.
+
+Registered as a **permits-only partial city** (`san_diego`, job `permits_sd`),
+the same shape as Pittsburgh (US-89).
+
 ## The geocoding argument
 
 Counting only feeds already identified and verified as carrying real, current

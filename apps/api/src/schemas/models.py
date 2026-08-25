@@ -194,6 +194,24 @@ class StreetCutEvent(BaseModel):
     ingested_at: datetime = Field(default_factory=_utc_now)
 
 
+class EvictionEvent(BaseModel):
+    """NYC Marshal's executed eviction (context/validation only, US-93)."""
+
+    city_id: str = Field(default="nyc")
+    eviction_id: str = Field(..., description="Court index / docket number")
+    address: Optional[str] = None
+    borough: Optional[str] = None
+    zipcode: Optional[str] = None
+    residential_commercial: Optional[str] = Field(default=None, description="Residential or Commercial")
+    executed_date: Optional[datetime] = None
+    latitude: Optional[float] = Field(default=None, ge=-90.0, le=90.0)
+    longitude: Optional[float] = Field(default=None, ge=-180.0, le=180.0)
+    h3_res7: Optional[str] = None
+    h3_res8: Optional[str] = None
+    h3_res9: Optional[str] = None
+    ingested_at: datetime = Field(default_factory=_utc_now)
+
+
 class EnrichedH3Feature(BaseModel):
     """Spatio-Temporal Aggregated Feature Record per H3 Cell."""
 

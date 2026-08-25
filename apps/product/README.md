@@ -6,10 +6,10 @@ The interactive product overview and architectural learning site for Urban Signa
 
 ## Overview
 
-- **Multi-Page Static Site (ADR 0006):** 10 core section routes (`/`, `/system/`, `/evidence/`, `/methodology/`, `/architecture/`, `/cities/`, `/compare/`, `/glossary/`, `/changelog/`, `/faq/`) plus 21 dedicated city deep-dive pages (`/cities/<id>/`).
+- **Multi-Page Static Site (ADR 0006):** 10 core section routes (`/`, `/system/`, `/evidence/`, `/methodology/`, `/architecture/`, `/cities/`, `/compare/`, `/glossary/`, `/changelog/`, `/faq/`) plus 27 dedicated city deep-dive pages (`/cities/<id>/`).
 - **Single Source of Truth (`facts.json`):** Generated directly from the authoritative Python `REGISTRY` via `scripts/export_site_facts.py`.
 - **Agent Context & Discovery:** Hosts `llms.txt`, `llms-full.txt`, and structured `facts.json` for agent-facing knowledge discovery.
-- **Direct Link to Live Dashboard:** Contains routing and deep links to the production dashboard at [https://us-dash.harlanljones.com/](https://us-dash.harlanljones.com/).
+- **Direct Link & Deep Links to Live Dashboard:** Contains routing and deep links (`/dashboard?city=<id>`) to the production dashboard at [https://us-dash.harlanljones.com/](https://us-dash.harlanljones.com/).
 
 ---
 

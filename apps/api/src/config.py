@@ -153,6 +153,12 @@ class Settings(BaseSettings):
         default="https://data.cityofnewyork.us/resource/5uac-w243.json",
         description="NYC crime current-year YTD incidents endpoint",
     )
+    # NYC Marshal's executed evictions (US-93): context/validation only, never
+    # a LIMS input (single-metro asymmetry rule). Carries lat/lon directly.
+    socrata_nyc_evictions_endpoint: str = Field(
+        default="https://data.cityofnewyork.us/resource/6z8x-wfk4.json",
+        description="NYC Marshal's executed evictions endpoint",
+    )
     socrata_chicago_crime_endpoint: str = Field(
         default="https://data.cityofchicago.org/resource/ijzp-q8t2.json",
         description="Chicago crime incidents endpoint",
@@ -173,6 +179,13 @@ class Settings(BaseSettings):
     socrata_chicago_street_cut_endpoint: str = Field(
         default="https://data.cityofchicago.org/resource/jdis-5sry.json",
         description="Chicago CDOT street closures endpoint",
+    )
+
+    # San Diego (US-91): static-CSV open-data portal (seshat.datasd.org) — no
+    # Socrata/ArcGIS API. Year-scoped approvals file; rotate per year (D3).
+    csv_san_diego_permits_endpoint: str = Field(
+        default="https://seshat.datasd.org/development_permits/approvals_issued_2026_datasd.csv",
+        description="San Diego Development Services issued approvals (2026) CSV endpoint",
     )
 
     # New Orleans (Socrata)
@@ -231,6 +244,14 @@ class Settings(BaseSettings):
     socrata_cincinnati_licenses_endpoint: str = Field(
         default="https://data.cincinnati-oh.gov/resource/ehdi-ajku.json",
         description="Cincinnati business licenses endpoint",
+    )
+
+    # Pittsburgh, PA (CKAN): WPRDC PLI permits. Native lat/lng + issue_date
+    # watermark (US-89). 311 archive / county sales / licensed businesses are
+    # address-only or ungeocodable and stay unregistered.
+    ckan_pittsburgh_permits_endpoint: str = Field(
+        default="ckan://data.wprdc.org/f4d1177a-f597-4c32-8cbf-7885f56253f6",
+        description="WPRDC PLI Permits datastore resource (City of Pittsburgh)",
     )
 
     # Boston (CKAN) — permits, current-year 311, and licensing board

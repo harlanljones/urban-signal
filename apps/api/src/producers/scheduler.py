@@ -30,6 +30,7 @@ from src.producers.complaints_311_producer import Complaints311Producer
 from src.producers.crime_incidents_producer import CrimeIncidentsProducer
 from src.producers.deeds_acris_producer import DeedsACRISProducer
 from src.producers.dob_permits_producer import DOBPermitsProducer
+from src.producers.evictions_producer import EvictionsProducer
 from src.producers.sla_licenses_producer import SLALicensesProducer
 from src.producers.street_cut_permits_producer import StreetCutPermitsProducer
 from src.producers.watermarks import (
@@ -218,9 +219,10 @@ class MunicipalIngestionScheduler:
             "permits": DOBPermitsProducer(bootstrap_servers=self.bootstrap_servers),
             "311": Complaints311Producer(bootstrap_servers=self.bootstrap_servers),
             "sla": SLALicensesProducer(bootstrap_servers=self.bootstrap_servers),
-            "deeds": DeedsACRISProducer(bootstrap_servers=self.bootstrap_servers),
+"deeds": DeedsACRISProducer(bootstrap_servers=self.bootstrap_servers),
             "crime": CrimeIncidentsProducer(bootstrap_servers=self.bootstrap_servers),
             "street_cut": StreetCutPermitsProducer(bootstrap_servers=self.bootstrap_servers),
+            "evictions": EvictionsProducer(bootstrap_servers=self.bootstrap_servers),
         }
 
         # Socrata Endpoints & Target Topics mapping derived from city registry
@@ -360,6 +362,7 @@ class MunicipalIngestionScheduler:
             "arcgis": getattr(producer_wrapper, "arcgis", None),
             "carto": getattr(producer_wrapper, "carto", None),
             "ckan": getattr(producer_wrapper, "ckan", None),
+            "csv": getattr(producer_wrapper, "csv", None),
         }
         platform = meta.get("platform", "socrata")
         client = clients.get(platform)

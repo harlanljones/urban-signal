@@ -31,7 +31,7 @@ control. The populated DC + Montgomery County comparison is shown below.
 | :---: | :---: |
 | ![DC and Montgomery County comparison](docs/screenshots/dashboard-dc-montgomery.png) | ![Dashboard comparison menu](docs/screenshots/dashboard-comparison-menu.png) |
 
-The dashboard supports **all twenty-four registered metros** — San Francisco Bay Area, New York City, Chicago, Seattle Metro (4 Divisions), Los Angeles Metro (6 Divisions), New Orleans Metro (9 Divisions), Norfolk (5 Divisions), Detroit (6 Divisions), Austin (6 Divisions), Cincinnati (1 Division), Boston (4 Divisions), Baltimore (1 Division), Montgomery County (1 Division), Baton Rouge (1 Division), Denver (1 Division), Philadelphia (8 Divisions), Washington DC (8 Divisions), Prince George's County (1 Division), Columbus (1 Division), Nashville (1 Division), Kansas City (1 Division), Pierce County (1 Division), Milwaukee (1 Division), and Charlotte (1 Division) — with per-division camera presets, map-click → division resolution, and geolocation-based default-city detection. The **+ Compare** control can layer multiple regions in one viewport; the primary region remains the inspector context while the grid and catalyst feed merge the selected cities.
+The dashboard supports **all twenty-seven registered metros** — San Francisco Bay Area, New York City, Chicago, Seattle Metro (4 Divisions), Los Angeles Metro (6 Divisions), New Orleans Metro (9 Divisions), Norfolk (5 Divisions), Detroit (6 Divisions), Austin (6 Divisions), Cincinnati (1 Division), Boston (4 Divisions), Baltimore (1 Division), Montgomery County (1 Division), Baton Rouge (1 Division), Denver (1 Division), Philadelphia (8 Divisions), Washington DC (8 Divisions), Prince George's County (1 Division), Columbus (1 Division), Nashville (1 Division), Kansas City (1 Division), Pierce County (1 Division), Minneapolis (6 Divisions), Milwaukee (1 Division), Charlotte (1 Division), Pittsburgh (1 Division), and San Diego (6 Divisions) — with per-division camera presets, map-click → division resolution, geolocation-based default-city detection, and `?city=<id>` deep links. The **+ Compare** control can layer multiple regions in one viewport; the primary region remains the inspector context while the grid and catalyst feed merge the selected cities.
 
 Explore the live interface at [https://us-dash.harlanljones.com/](https://us-dash.harlanljones.com/) or see [docs/dashboard.md](docs/dashboard.md) for the current dashboard behavior, export path, API surfaces, and screenshot evidence.
 
@@ -39,7 +39,7 @@ Explore the live interface at [https://us-dash.harlanljones.com/](https://us-das
 
 ## 1. System Overview & Architecture
 
-Traditional real estate valuation models rely on lagging transactional comps (deeds, MLS closed transfers). **Urban Signal** ingests leading municipal telemetry—daily building permits (DOB A1/A2/NB / Demolitions), Liquor / Hospitality Licenses, 311 citizen maintenance & quality-of-life complaints, and property deeds / tax rolls across twenty-four registered metros—streaming them through Apache Kafka onto an **Uber H3 multi-resolution hexagonal grid** (Res 7, 8, 9) to predict appreciation ($\Delta \ln(P)$) **6 to 18 months ahead of public market listings**.
+Traditional real estate valuation models rely on lagging transactional comps (deeds, MLS closed transfers). **Urban Signal** ingests leading municipal telemetry—daily building permits (DOB A1/A2/NB / Demolitions), Liquor / Hospitality Licenses, 311 citizen maintenance & quality-of-life complaints, and property deeds / tax rolls across twenty-seven registered metros—streaming them through Apache Kafka onto an **Uber H3 multi-resolution hexagonal grid** (Res 7, 8, 9) to predict appreciation ($\Delta \ln(P)$) **6 to 18 months ahead of public market listings**.
 
 ### Registered Cities & Feeds
 
@@ -67,8 +67,11 @@ Traditional real estate valuation models rely on lagging transactional comps (de
 | Nashville / Davidson County (1 Division) | NASHVILLE_CORE | ArcGIS (issued) | — hubNashville excluded | ArcGIS (Residential STR) | — no verified sales feed |
 | Kansas City (1 Division) | KANSAS_CITY_CORE | — no open endpoint | Socrata | — no open endpoint | — no verified sales feed |
 | Pierce County, WA (1 Division) | PIERCE_COUNTY | [ArcGIS](docs/research/metro-expansion-and-new-signals.md#seattle-metro--pierce-snohomish) | — no 311 feed | — state-level WA LCB (Seattle model) | — no verified sales feed |
+| Minneapolis (6 Divisions) | MINNEAPOLIS_CORE, CALHOUN_ISLES, CAMDEN_UPPER_NORTH, NORTHEAST, SOUTHEAST_UNIVERSITY, SOUTH_SOUTHWEST | ArcGIS | ArcGIS (year-sliced) | — no open endpoint | — no open endpoint |
 | Milwaukee (1 Division) | MILWAUKEE_CORE | — monthly CSV, 2-mo lag (not registered) | — no open 311 feed | [ArcGIS](docs/research/nine-unidentified-metros-platform.md#milwaukee-wi--register-liquor-licenses--with-a-2-month-lag-caveat) (liquor licenses) | — yearly archive (not registered) |
 | Charlotte (1 Division) | CHARLOTTE_CORE | — Accela portal (no bulk API) | ArcGIS (native coords) | — no verified feed | — Mecklenburg Hub unverified |
+| Pittsburgh (1 Division) | PITTSBURGH_CORE | [CKAN](docs/research/socrata-sweep.md#skipped-and-dead-ends) (WPRDC PLI) | — address-only archive | — licensed businesses lack addresses | — county sales address-only |
+| San Diego (6 Divisions) | CENTRAL_SAN_DIEGO, COASTAL, CORONA_NORTH_COUNTY, EAST_COUNTY_SAN_DIEGO, MID_CITY, SOUTH_BAY | CSV (Development Services approvals) | — Get It Done CSV deferred | — Business Tax CSV deferred | — no open endpoint |
 
 Partial registrations are deliberate: cities register only feeds that exist, and `get_dataset` raises a readable error for the rest (`apps/api/src/spatial/city_registry.py`).
 
@@ -249,9 +252,9 @@ urban-signal/
 │   │   ├── src/
 │   │   │   ├── config.py                   # Central Pydantic Settings & environment config
 │   │   │   ├── schemas/                    # Pydantic models & Avro binary schema contracts (.avsc)
-│   │   │   ├── spatial/                    # Uber H3 indexing, 22 city modules, city registry, geocoder (ADR 0004)
+│   │   │   ├── spatial/                    # Uber H3 indexing, 27 city modules, city registry, geocoder (ADR 0004)
 │   │   │   ├── features/                   # Time-decay, 311 shift dynamics, LIMS calculator, DuckDB
-│   │   │   ├── producers/                  # Socrata/ArcGIS/CKAN/CARTO clients, per-feed producers, watermarks, rollover, scheduler
+│   │   │   ├── producers/                  # Socrata/ArcGIS/CARTO/CKAN/CSV clients, per-feed producers, watermarks, rollover, scheduler
 │   │   │   ├── consumers/                  # Base Kafka consumer, H3 enrichment, aggregation, PostGIS
 │   │   │   ├── storage/                    # PostGIS synchronization engine & table schemas
 │   │   │   ├── models/                     # LightGBM, ST-GNN, DCN-v2, Walk-Forward CV, ONNX exporter
@@ -290,7 +293,7 @@ urban-signal/
 │           └── inference-deployment.yaml   # FastAPI + ONNX Runtime (CUDA GPU)
 ├── models_storage/                         # Serialized ONNX model artifacts (DCN-v2, ST-GNN)
 ├── docs/
-│   ├── adr/                                # ADRs (0001 Interlock, 0002 Multi-Platform, 0003 Turborepo, 0004 Geocoder, 0005 Watermarks, 0006 Multi-Page Site, 0007 Multi-Source Metro)
+│   ├── adr/                                # ADRs (0001 Interlock, 0002 Multi-Platform, 0003 Turborepo, 0004 Geocoder, 0005 Watermarks, 0006 Multi-Page Site, 0007 Multi-Source Metro, 0008 Real-Time Aggregation)
 │   ├── agents/                             # Agent conventions: spine manifest, stream rules, domain glossary
 │   ├── product/                            # Product persona specifications
 │   ├── research/                           # City expansion candidate surveys & data source sweeps
@@ -506,9 +509,9 @@ Exposes real-time Prometheus telemetry including `prediction_requests_total`, `c
 
 ### Interactive Geospatial Dashboard
 `GET /dashboard` or `GET /` (with `Accept: text/html`)
-Serves the hardened, high-performance **MapLibre GL** web visualizer featuring single-region selection and multi-region comparison across all twenty-four registered metros (San Francisco, NYC, Chicago, Seattle, Los Angeles, New Orleans, Norfolk, Detroit, Austin, Cincinnati, Boston, Baltimore, Montgomery County, Baton Rouge, Denver, Philadelphia, Washington DC, Prince George's County, Columbus, Nashville, Kansas City, Pierce County, Milwaukee, Charlotte), submarket filtering, H3 hexagon inspection, LIMS heatmaps, and SHAP attribution waterfall charts.
+Serves the hardened, high-performance **MapLibre GL** web visualizer featuring single-region selection and multi-region comparison across all twenty-seven registered metros (San Francisco, NYC, Chicago, Seattle, Los Angeles, New Orleans, Norfolk, Detroit, Austin, Cincinnati, Boston, Baltimore, Montgomery County, Baton Rouge, Denver, Philadelphia, Washington DC, Prince George's County, Columbus, Nashville, Kansas City, Pierce County, Minneapolis, Milwaukee, Charlotte, Pittsburgh, San Diego), submarket filtering, H3 hexagon inspection, LIMS heatmaps, and SHAP attribution waterfall charts.
 
-The same UI is mirrored as a static asset on the Cloudflare Worker (`apps/dashboard/`), deployed live to [https://us-dash.harlanljones.com/](https://us-dash.harlanljones.com/), where `/api/v1/*` is answered from a precomputed Workers KV snapshot (built by `src/export/snapshot_builder.py`). The FastAPI service and the edge snapshot both serve all twenty-four registered metros.
+The same UI is mirrored as a static asset on the Cloudflare Worker (`apps/dashboard/`), deployed live to [https://us-dash.harlanljones.com/](https://us-dash.harlanljones.com/), where `/api/v1/*` is answered from a precomputed Workers KV snapshot (built by `src/export/snapshot_builder.py`). The FastAPI service and the edge snapshot both serve all twenty-seven registered metros.
 
 ---
 
@@ -611,8 +614,8 @@ Run the automated test suite with pytest from the API workspace:
 cd apps/api && uv run pytest tests/ -v
 ```
 
-The test suite includes **730 automated unit and end-to-end integration tests** across 37 test suites covering:
-- **Spatial Indexing & Multi-City Registries**: Full coverage across 24 registered metros with geometry containment, submarkets, and geocoder fallback.
+The test suite includes **784 automated unit and end-to-end integration tests** across 60 test modules (59 unit + 1 e2e; 781 pass, 3 skipped live probes) covering:
+- **Spatial Indexing & Multi-City Registries**: Full coverage across 27 registered metros with geometry containment, submarkets, and geocoder fallback.
 - **Stream Processing & Avro Serialization**: Schema enforcement, watermark persistence, and dead-letter queue routing.
 - **Out-of-core Feature Engineering**: DuckDB spatio-temporal joins and exponential CapEx decay.
 - **Model Inference & Validation**: LightGBM Quantile Pinball loss, ST-GNN ONNX, DCN-v2 ONNX, and TreeSHAP explainability.
@@ -624,7 +627,7 @@ The repository also carries a standalone spine-invariant gate used when multiple
 ```bash
 cd apps/api && uv run pytest -m interlock
 ```
-It asserts **closure** (every alias resolves to a registration), **completeness** (registered specs have every field consumers index unguarded; endpoints exist in settings), and **containment** (divisions nest inside metro bboxes, submarkets inside their division) across all 24 registered metros — in about two seconds. `python scripts/interlock_gap.py <base>` reports whether a diff range is leaf-shaped before parallel dispatch.
+It asserts **closure** (every alias resolves to a registration), **completeness** (registered specs have every field consumers index unguarded; endpoints exist in settings), and **containment** (divisions nest inside metro bboxes, submarkets inside their division) across all 27 registered metros — in about two seconds. `python scripts/interlock_gap.py <base>` reports whether a diff range is leaf-shaped before parallel dispatch.
 
 ---
 
@@ -640,10 +643,11 @@ It asserts **closure** (every alias resolves to a registration), **completeness*
 | `docs/adr/0005-typed-text-watermarks.md` | High-watermark typing and text watermark normalization |
 | `docs/adr/0006-multi-page-product-site-routing.md` | Multi-page static architecture and canonical routing |
 | `docs/adr/0007-multi-source-metro-vs-separate-registration.md` | Ingestion architecture: separate registration vs multi-source metro |
+| `docs/adr/0008-realtime-aggregation-and-alert-dispatch.md` | Real-time aggregation and webhook alert dispatch architecture |
 | `docs/agents/parallel-streams.md` | Normative short form of the interlock rules |
 | `docs/agents/spine-manifest.txt` | Files more than one concurrent stream may edit |
 | `docs/expansion-roadmap.md` | Expansion roadmap: 5 → 17 metros (completed) |
-| `docs/expansion-roadmap-wave-2.md` | Wave-2 expansion roadmap (17 → 24 metros and beyond) |
+| `docs/expansion-roadmap-wave-2.md` | Wave-2 expansion roadmap (17 → 27 metros and beyond) |
 | `docs/replay-lag-verification.md` | Kafka partitioning and 2× replay consumer-lag verification (US-69) |
 | `docs/product/personas.md` | Product persona profiles and user stories |
 | `docs/research/` | Research surveys, candidate city evaluations, watermark audits |

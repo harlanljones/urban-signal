@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "id": "pittsburgh",
+  "name": "Pittsburgh",
+  "state": "PA",
+  "center": {
+    "lat": 40.4417,
+    "lng": -80.0
+  },
+  "metro_bbox": {
+    "min_lat": 40.35,
+    "max_lat": 40.55,
+    "min_lng": -80.1,
+    "max_lng": -79.8
+  },
+  "divisions": {
+    "PITTSBURGH_CORE": {
+      "name": "Pittsburgh",
+      "center": {
+        "lat": 40.4417,
+        "lng": -80.0
+      },
+      "bbox": {
+        "min_lat": 40.4,
+        "max_lat": 40.5,
+        "min_lng": -80.05,
+        "max_lng": -79.9
+      },
+      "submarkets": [
+        "Downtown (Golden Triangle)",
+        "North Side & Allegheny Center",
+        "East Liberty & Shadyside",
+        "South Side Flats",
+        "Lawrenceville & Strip District"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown (Golden Triangle)": {
+      "name": "Downtown (Golden Triangle)",
+      "division": "PITTSBURGH_CORE",
+      "center": {
+        "lat": 40.4417,
+        "lng": -80.0
+      },
+      "description": "Confluence of the three rivers with towers, transit, and dense mixed-use residential conversion activity."
+    },
+    "North Side & Allegheny Center": {
+      "name": "North Side & Allegheny Center",
+      "division": "PITTSBURGH_CORE",
+      "center": {
+        "lat": 40.4564,
+        "lng": -80.0064
+      },
+      "description": "Stadium-adjacent historic district with the Mexican War Streets, infill townhomes, and civic redevelopment."
+    },
+    "East Liberty & Shadyside": {
+      "name": "East Liberty & Shadyside",
+      "division": "PITTSBURGH_CORE",
+      "center": {
+        "lat": 40.4609,
+        "lng": -79.9164
+      },
+      "description": "East-end transit corridor with the most concentrated multifamily construction pipeline in the city."
+    },
+    "South Side Flats": {
+      "name": "South Side Flats",
+      "division": "PITTSBURGH_CORE",
+      "center": {
+        "lat": 40.4305,
+        "lng": -79.986
+      },
+      "description": "Riverfront entertainment corridor with dense commercial streets, adaptive reuse, and bar/restaurant turnover."
+    },
+    "Lawrenceville & Strip District": {
+      "name": "Lawrenceville & Strip District",
+      "division": "PITTSBURGH_CORE",
+      "center": {
+        "lat": 40.4707,
+        "lng": -79.9664
+      },
+      "description": "Butler Street arts corridor with rapid retail, brewery, and residential loft conversion activity."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "ckan",
+      "watermark_col": "issue_date",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/pittsburgh.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

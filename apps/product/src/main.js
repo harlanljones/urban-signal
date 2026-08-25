@@ -278,6 +278,7 @@ function renderCompareColumns() {
         </table>
         <p class="compare-counts mono">${metro.divisions.toUpperCase()} · ${metro.submarket_count} SUBMARKETS</p>
         <div class="compare-links">
+          <a href="/dashboard?city=${encodeURIComponent(metro.id)}">Open ${metro.name} on the live map</a>
           <a href="${sourceUrl(metro.evidence_path)}" target="_blank" rel="noreferrer">Inspect this metro’s source contract</a>
           <a href="/public/cities/${metro.id}.json" target="_blank" rel="noreferrer">Machine-readable coverage</a>
         </div>

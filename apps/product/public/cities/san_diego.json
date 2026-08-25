@@ -1,0 +1,243 @@
+{
+  "schema_version": 2,
+  "id": "san_diego",
+  "name": "San Diego",
+  "state": "CA",
+  "center": {
+    "lat": 32.7157,
+    "lng": -117.1611
+  },
+  "metro_bbox": {
+    "min_lat": 32.5,
+    "max_lat": 33.1,
+    "min_lng": -117.35,
+    "max_lng": -116.85
+  },
+  "divisions": {
+    "NORTH": {
+      "name": "North San Diego",
+      "center": {
+        "lat": 32.87,
+        "lng": -117.2
+      },
+      "bbox": {
+        "min_lat": 32.8,
+        "max_lat": 33.08,
+        "min_lng": -117.3,
+        "max_lng": -117.05
+      },
+      "submarkets": [
+        "La Jolla",
+        "Mira Mesa"
+      ]
+    },
+    "COASTAL": {
+      "name": "Coastal San Diego",
+      "center": {
+        "lat": 32.79,
+        "lng": -117.25
+      },
+      "bbox": {
+        "min_lat": 32.68,
+        "max_lat": 32.9,
+        "min_lng": -117.3,
+        "max_lng": -117.18
+      },
+      "submarkets": [
+        "Pacific Beach",
+        "Ocean Beach"
+      ]
+    },
+    "CENTRAL": {
+      "name": "Central San Diego",
+      "center": {
+        "lat": 32.74,
+        "lng": -117.16
+      },
+      "bbox": {
+        "min_lat": 32.7,
+        "max_lat": 32.8,
+        "min_lng": -117.2,
+        "max_lng": -117.1
+      },
+      "submarkets": [
+        "Downtown",
+        "North Park"
+      ]
+    },
+    "EAST": {
+      "name": "East San Diego",
+      "center": {
+        "lat": 32.82,
+        "lng": -117.05
+      },
+      "bbox": {
+        "min_lat": 32.74,
+        "max_lat": 33.05,
+        "min_lng": -117.15,
+        "max_lng": -116.9
+      },
+      "submarkets": [
+        "Kearny Mesa",
+        "Mission Valley"
+      ]
+    },
+    "SOUTHEAST": {
+      "name": "Southeast San Diego",
+      "center": {
+        "lat": 32.68,
+        "lng": -117.03
+      },
+      "bbox": {
+        "min_lat": 32.6,
+        "max_lat": 32.75,
+        "min_lng": -117.15,
+        "max_lng": -116.9
+      },
+      "submarkets": [
+        "Logan Heights",
+        "Encanto"
+      ]
+    },
+    "SOUTHWEST": {
+      "name": "South Bay San Diego",
+      "center": {
+        "lat": 32.55,
+        "lng": -117.03
+      },
+      "bbox": {
+        "min_lat": 32.5,
+        "max_lat": 32.68,
+        "min_lng": -117.2,
+        "max_lng": -116.9
+      },
+      "submarkets": [
+        "Otay Mesa",
+        "San Ysidro"
+      ]
+    }
+  },
+  "submarkets": {
+    "La Jolla": {
+      "name": "La Jolla",
+      "division": "NORTH",
+      "center": {
+        "lat": 32.8328,
+        "lng": -117.2713
+      },
+      "description": "Coastal science-and-affluence district with biotech labs, low-rise multifamily, and high-value residential redevelopment."
+    },
+    "Mira Mesa": {
+      "name": "Mira Mesa",
+      "division": "NORTH",
+      "center": {
+        "lat": 32.9167,
+        "lng": -117.1433
+      },
+      "description": "Tech-corridor residential plateau with steady infill, office-to-residential conversions, and planning-permit activity."
+    },
+    "Pacific Beach": {
+      "name": "Pacific Beach",
+      "division": "COASTAL",
+      "center": {
+        "lat": 32.7977,
+        "lng": -117.2408
+      },
+      "description": "Beach-adjacent rental district with multifamily infill, short-term-rental churn, and steady interior renovation."
+    },
+    "Ocean Beach": {
+      "name": "Ocean Beach",
+      "division": "COASTAL",
+      "center": {
+        "lat": 32.7513,
+        "lng": -117.2498
+      },
+      "description": "Bohemian coastal village with modest single-family rehab, cottage infill, and long-standing neighborhood retail."
+    },
+    "Downtown": {
+      "name": "Downtown",
+      "division": "CENTRAL",
+      "center": {
+        "lat": 32.7157,
+        "lng": -117.1611
+      },
+      "description": "CBD and East Village high-rise pipeline — office, hospitality, residential towers, and the densest permitting in the metro."
+    },
+    "North Park": {
+      "name": "North Park",
+      "division": "CENTRAL",
+      "center": {
+        "lat": 32.7365,
+        "lng": -117.1228
+      },
+      "description": "Urban-village commercial corridor with dense multifamily infill, adaptive reuse, and steady mixed-use permitting."
+    },
+    "Kearny Mesa": {
+      "name": "Kearny Mesa",
+      "division": "EAST",
+      "center": {
+        "lat": 32.8135,
+        "lng": -117.1331
+      },
+      "description": "Auto-row and light-industrial district with warehouse conversions, commercial buildouts, and logistics infill."
+    },
+    "Mission Valley": {
+      "name": "Mission Valley",
+      "division": "EAST",
+      "center": {
+        "lat": 32.7761,
+        "lng": -117.1113
+      },
+      "description": "River-valley corridor of large mixed-use and commercial redevelopment along the transit spine."
+    },
+    "Logan Heights": {
+      "name": "Logan Heights",
+      "division": "SOUTHEAST",
+      "center": {
+        "lat": 32.7008,
+        "lng": -117.1077
+      },
+      "description": "Historic barrio east of downtown with community-driven infill, ADU programs, and small commercial renewal."
+    },
+    "Encanto": {
+      "name": "Encanto",
+      "division": "SOUTHEAST",
+      "center": {
+        "lat": 32.7092,
+        "lng": -117.0775
+      },
+      "description": "Inner-southeast residential district with single-family rehab, ADU activity, and modest retail reinvestment."
+    },
+    "Otay Mesa": {
+      "name": "Otay Mesa",
+      "division": "SOUTHWEST",
+      "center": {
+        "lat": 32.5537,
+        "lng": -117.044
+      },
+      "description": "Border industrial and logistics mesa with warehouse construction, distribution centers, and border-economy churn."
+    },
+    "San Ysidro": {
+      "name": "San Ysidro",
+      "division": "SOUTHWEST",
+      "center": {
+        "lat": 32.543,
+        "lng": -117.052
+      },
+      "description": "Border gateway neighborhood with mixed-use infill around the port of entry and steady small-commercial permits."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "csv",
+      "watermark_col": "approval_issue_date",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/san_diego.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

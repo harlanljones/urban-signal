@@ -63,6 +63,13 @@ from src.spatial.cities.charlotte import (
     CHARLOTTE_SUBMARKETS,
     is_in_charlotte_metro,
 )
+from src.spatial.cities.pittsburgh import (
+    PITTSBURGH_DIVISION_BBOXES,
+    PITTSBURGH_DIVISIONS,
+    PITTSBURGH_METRO_BBOX,
+    PITTSBURGH_SUBMARKETS,
+    is_in_pittsburgh_metro,
+)
 from src.spatial.cities.austin import (
     AUSTIN_DIVISION_BBOXES,
     AUSTIN_DIVISIONS,
@@ -155,6 +162,13 @@ from src.spatial.cities.norfolk import (
     NORFOLK_SUBMARKETS,
     is_in_norfolk_metro,
 )
+from src.spatial.cities.san_diego import (
+    SAN_DIEGO_DIVISION_BBOXES,
+    SAN_DIEGO_DIVISIONS,
+    SAN_DIEGO_METRO_BBOX,
+    SAN_DIEGO_SUBMARKETS,
+    is_in_san_diego_metro,
+)
 from src.spatial.cities.san_francisco import (
     SAN_FRANCISCO_DIVISION_BBOXES,
     SAN_FRANCISCO_DIVISIONS,
@@ -191,6 +205,11 @@ __all__ = [
     "CHARLOTTE_DIVISIONS",
     "CHARLOTTE_SUBMARKETS",
     "is_in_charlotte_metro",
+    "PITTSBURGH_METRO_BBOX",
+    "PITTSBURGH_DIVISION_BBOXES",
+    "PITTSBURGH_DIVISIONS",
+    "PITTSBURGH_SUBMARKETS",
+    "is_in_pittsburgh_metro",
     "AUSTIN_METRO_BBOX",
     "AUSTIN_DIVISION_BBOXES",
     "AUSTIN_DIVISIONS",
@@ -297,4 +316,9 @@ __all__ = [
     "NORFOLK_DIVISIONS",
     "NORFOLK_SUBMARKETS",
     "is_in_norfolk_metro",
+    "SAN_DIEGO_METRO_BBOX",
+    "SAN_DIEGO_DIVISION_BBOXES",
+    "SAN_DIEGO_DIVISIONS",
+    "SAN_DIEGO_SUBMARKETS",
+    "is_in_san_diego_metro",
 ]

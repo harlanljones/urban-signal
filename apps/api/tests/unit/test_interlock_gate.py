@@ -43,7 +43,7 @@ FEED_TOPICS = {
     FeedType.STR: settings.topic_str,
 }
 
-KNOWN_PLATFORMS = {"socrata", "arcgis", "carto", "ckan"}
+KNOWN_PLATFORMS = {"socrata", "arcgis", "carto", "ckan", "csv"}
 
 # URI scheme each platform's endpoint must carry (carto/ckan use opaque
 # client-parsed URIs; see the client modules).
@@ -52,6 +52,7 @@ PLATFORM_SCHEMES = {
     "arcgis": "https://",
     "carto": "carto://",
     "ckan": "ckan://",
+    "csv": "https://",
 }
 
 # Which invariant class guards each spine file. A manifest path absent from
@@ -92,6 +93,7 @@ CITY_EXPORT_NAMES = {
     CityId.PHILADELPHIA: ("PHILADELPHIA_METRO_BBOX", "PHL_DIVISION_BBOXES", "PHL_DIVISIONS", "PHL_SUBMARKETS"),
     CityId.WASHINGTON_DC: ("DC_METRO_BBOX", "DC_DIVISION_BBOXES", "DC_DIVISIONS", "DC_SUBMARKETS"),
     CityId.MINNEAPOLIS: ("MINNEAPOLIS_METRO_BBOX", "MINNEAPOLIS_DIVISION_BBOXES", "MINNEAPOLIS_DIVISIONS", "MINNEAPOLIS_SUBMARKETS"),
+    CityId.SAN_DIEGO: ("SAN_DIEGO_METRO_BBOX", "SAN_DIEGO_DIVISION_BBOXES", "SAN_DIEGO_DIVISIONS", "SAN_DIEGO_SUBMARKETS"),
 }
 
 EXPORT_ATTR_MAP = {

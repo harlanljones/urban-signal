@@ -70,6 +70,12 @@ from src.spatial.cities.charlotte import (
     CHARLOTTE_METRO_BBOX,
     CHARLOTTE_SUBMARKETS,
 )
+from src.spatial.cities.pittsburgh import (
+    PITTSBURGH_DIVISION_BBOXES,
+    PITTSBURGH_DIVISIONS,
+    PITTSBURGH_METRO_BBOX,
+    PITTSBURGH_SUBMARKETS,
+)
 from src.spatial.cities.austin import (
     AUSTIN_DIVISION_BBOXES,
     AUSTIN_DIVISIONS,
@@ -156,6 +162,12 @@ from src.spatial.cities.norfolk import (
     NORFOLK_METRO_BBOX,
     NORFOLK_SUBMARKETS,
 )
+from src.spatial.cities.san_diego import (
+    SAN_DIEGO_DIVISION_BBOXES,
+    SAN_DIEGO_DIVISIONS,
+    SAN_DIEGO_METRO_BBOX,
+    SAN_DIEGO_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -194,6 +206,8 @@ class CityId(str, Enum):
     PIERCE = "pierce"
     MILWAUKEE = "milwaukee"
     CHARLOTTE = "charlotte"
+    PITTSBURGH = "pittsburgh"
+    SAN_DIEGO = "san_diego"
 
 
 class FeedType(str, Enum):
@@ -436,6 +450,17 @@ ALIASES: Dict[str, CityId] = {
     "charlotte_nc": CityId.CHARLOTTE,
     "charlotte_mecklenburg": CityId.CHARLOTTE,
     "mecklenburg": CityId.CHARLOTTE,
+
+    # Pittsburgh, PA
+    "pittsburgh": CityId.PITTSBURGH,
+    "pgh": CityId.PITTSBURGH,
+    "pittsburgh_pa": CityId.PITTSBURGH,
+    "burgh": CityId.PITTSBURGH,
+    "san_diego": CityId.SAN_DIEGO,
+    "sandiego": CityId.SAN_DIEGO,
+    "san diego": CityId.SAN_DIEGO,
+    "san-diego": CityId.SAN_DIEGO,
+    "sd": CityId.SAN_DIEGO,
 }
 
 
@@ -510,6 +535,31 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=1800.0,
                 producer_key="crime",
                 extra={"expected_cadence_days": 30},
+            ),
+            # US-93: Marshal's executed evictions — NYC-only context/validation,
+            # never a LIMS input (single-metro asymmetry rule). Feed carries
+            # lat/lon directly (verified 2026-08-24); ~8.4% newest-window geocode
+            # gap == published gap, G5 passes.
+            FeedType.EVICTIONS: DatasetSpec(
+                endpoint=settings.socrata_nyc_evictions_endpoint,
+                platform="socrata",
+                watermark_col="executed_date",
+                id_keys=["court_index_number", "docket_number"],
+                topic=settings.topic_evictions,
+                interval_seconds=900.0,
+                producer_key="evictions",
+                extra={
+                    "expected_cadence_days": 7,
+                    "field_map": {
+                        "eviction_id": ["court_index_number", "docket_number"],
+                        "latitude": ["latitude"],
+                        "longitude": ["longitude"],
+                        "executed_date": ["executed_date"],
+                        "borough": ["borough"],
+                        "zipcode": ["eviction_zip"],
+                        "residential_commercial": ["residential_commercial_ind"],
+                    },
+                },
             ),
         },
     ),
@@ -2310,6 +2360,93 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                         "complaint_type": ["REQUEST_TYPE"],
                         "incident_address": ["FULL_ADDRESS"],
                         "borough": ["COUNCIL_DISTRICT"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.PITTSBURGH: CityRegistration(
+        city_id=CityId.PITTSBURGH,
+        name="Pittsburgh",
+        state="PA",
+        center={"lat": 40.4417, "lng": -80.0000},
+        metro_bbox=PITTSBURGH_METRO_BBOX,
+        division_bboxes=PITTSBURGH_DIVISION_BBOXES,
+        submarkets=PITTSBURGH_SUBMARKETS,
+        divisions=PITTSBURGH_DIVISIONS,
+        job_suffix="pgh",
+        # Permits-only CKAN registration (US-89): WPRDC PLI Permits is the
+        # verified live feed (native lat/lng, issue_date watermark, 1,705
+        # rows/60d). 311 Data Archive is address-only + historical; Allegheny
+        # County sales are county-wide and address-only; Licensed Businesses
+        # lacks usable addresses — all stay unregistered.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.ckan_pittsburgh_permits_endpoint,
+                platform="ckan",
+                watermark_col="issue_date",
+                id_keys=["permit_id", "parcel_num", "_id"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 7,
+                    "scope": "City of Pittsburgh PLI Permits (WPRDC)",
+                    "field_map": {
+                        "job_id": ["permit_id"],
+                        "issuance_date": ["issue_date"],
+                        "cost": ["total_project_value"],
+                        "address_street": ["address"],
+                        "status": ["status"],
+                        "job_type": ["permit_type", "work_type"],
+                        "zipcode": ["zip_code"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.SAN_DIEGO: CityRegistration(
+        city_id=CityId.SAN_DIEGO,
+        name="San Diego",
+        state="CA",
+        center={"lat": 32.7157, "lng": -117.1611},
+        metro_bbox=SAN_DIEGO_METRO_BBOX,
+        division_bboxes=SAN_DIEGO_DIVISION_BBOXES,
+        submarkets=SAN_DIEGO_SUBMARKETS,
+        divisions=SAN_DIEGO_DIVISIONS,
+        job_suffix="sd",
+        # Permits-only partial registration (US-91). data.sandiego.gov is a
+        # static-CSV portal (seshat.datasd.org) with no Socrata/ArcGIS API.
+        # The issued-approvals CSV is geocoded (GIS_LATITUDE/GIS_LONGITUDE)
+        # and year-scoped (D3 endpoint_by_year). Get It Done (311) and
+        # Business Tax Certificates are also CSV-only; no property/deeds
+        # source exists in the 122-dataset inventory — all stay unregistered.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.csv_san_diego_permits_endpoint,
+                platform="csv",
+                watermark_col="approval_issue_date",
+                id_keys=["approval_id", "development_id", "project_id"],
+                topic=settings.topic_permits,
+                interval_seconds=1800.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 7,
+                    "scope": "San Diego Development Services issued approvals (permit-like types only)",
+                    "endpoint_by_year": {
+                        "2026": "https://seshat.datasd.org/development_permits/approvals_issued_2026_datasd.csv",
+                        "2027": "https://seshat.datasd.org/development_permits/approvals_issued_2027_datasd.csv",
+                    },
+                    "field_map": {
+                        "job_id": ["approval_id"],
+                        "issuance_date": ["approval_issue_date"],
+                        "filing_date": ["approval_create_date"],
+                        "cost": ["approval_valuation"],
+                        "latitude": ["gis_latitude"],
+                        "longitude": ["gis_longitude"],
+                        "address_street": ["gis_address"],
+                        "job_type": ["approval_type"],
+                        "status": ["approval_status"],
                     },
                 },
             ),
