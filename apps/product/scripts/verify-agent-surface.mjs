@@ -1,4 +1,5 @@
-import { access, readFile } from "node:fs/promises";
+import { access, readdir, readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { resolve } from "node:path";
 import { SITE_ORIGIN } from "./shell.mjs";
 
@@ -111,5 +112,136 @@ const expectedPaths = ["/", "/system/", "/evidence/", "/methodology/", "/archite
 for (const expected of expectedPaths) {
   if (!sitemapLocs.includes(`${SITE_ORIGIN}${expected}`)) throw new Error(`Sitemap missing ${expected}`);
 }
+
+// ---------------------------------------------------------------------------
+// Agent discovery surface: markdown twins, .well-known documents, MCP/WebMCP.
+// The scanner-facing contract lives in scripts/generate-agent-surfaces.mjs and
+// worker.mjs; these checks pin what will actually be served.
+// ---------------------------------------------------------------------------
+
+// Every HTML route must have its text/markdown twin next to it, fronted by an
+// H1 and the canonical provenance note.
+const SECTION_DIRS = ["system", "evidence", "methodology", "architecture", "cities", "compare", "glossary", "changelog", "faq"];
+const routeDirs = [
+  resolve(site, "dist"),
+  ...SECTION_DIRS.map((dir) => resolve(site, "dist", dir)),
+  ...facts.metros.map((metro) => resolve(site, "dist", "cities", metro.id)),
+];
+for (const dir of routeDirs) {
+  const twin = resolve(dir, "index.md");
+  try {
+    await access(twin);
+  } catch {
+    throw new Error(`Missing markdown twin at ${twin.replace(site, "")}`);
+  }
+  const md = await readFile(twin, "utf8");
+  if (!md.startsWith("# ") || !md.includes("the HTML page is canonical")) {
+    throw new Error(`Malformed markdown twin at ${twin.replace(site, "")}`);
+  }
+}
+
+// RFC 9727 api-catalog: linkset entries carry anchors and service relations.
+const catalog = JSON.parse(await readFile(resolve(site, "dist/.well-known/api-catalog"), "utf8"));
+if (!Array.isArray(catalog.linkset) || catalog.linkset.length < 2) {
+  throw new Error("api-catalog must list the site anchor and the edge data API");
+}
+for (const entry of catalog.linkset) {
+  if (!entry.anchor?.startsWith("https://")) throw new Error("api-catalog entry missing absolute anchor");
+  for (const rel of ["service-desc", "service-doc"]) {
+    if (!entry[rel]?.[0]?.href) throw new Error(`api-catalog ${entry.anchor} omits ${rel}`);
+  }
+}
+
+// The site's own OpenAPI spec must enumerate the real static JSON surface.
+const openApi = JSON.parse(await readFile(resolve(site, "dist/.well-known/openapi.json"), "utf8"));
+if (openApi.servers?.[0]?.url !== SITE_ORIGIN) throw new Error("openapi.json server origin mismatch");
+const briefPath = "/public/cities/{city_id}.json";
+for (const path of ["/facts.json", briefPath, "/healthz"]) {
+  if (!openApi.paths?.[path]) throw new Error(`openapi.json omits ${path}`);
+}
+const briefEnum = openApi.paths[briefPath].get.parameters[0].schema.enum;
+const metroIds = facts.metros.map(({ id }) => id).sort();
+if (JSON.stringify([...briefEnum].sort()) !== JSON.stringify(metroIds)) {
+  throw new Error("openapi.json city_id enum differs from facts.json metros");
+}
+
+// RFC 9728 protected resource metadata: public site, no authorization servers.
+const prm = JSON.parse(await readFile(resolve(site, "dist/.well-known/oauth-protected-resource"), "utf8"));
+if (prm.resource !== `${SITE_ORIGIN}/` || !Array.isArray(prm.authorization_servers)) {
+  throw new Error("oauth-protected-resource must state the resource origin and authorization_servers");
+}
+if (prm.authorization_servers.length !== 0) {
+  throw new Error("No OAuth AS exists — advertising one would mislead agents");
+}
+if (!prm.resource_documentation?.endsWith("/auth.md")) {
+  throw new Error("oauth-protected-resource must point at auth.md");
+}
+
+// auth.md: self-contained statement with the required heading.
+const authMd = await readFile(resolve(site, "dist/auth.md"), "utf8");
+if (!/^# .*auth\.md/m.test(authMd)) throw new Error("auth.md H1 must contain 'auth.md'");
+for (const required of ["Authentication methods", "Registration / provisioning", "Credentials"]) {
+  if (!authMd.includes(required)) throw new Error(`auth.md omits '${required}'`);
+}
+
+// MCP server card: serverInfo, transport endpoint, capabilities.
+const card = JSON.parse(await readFile(resolve(site, "dist/.well-known/mcp/server-card.json"), "utf8"));
+if (!card.serverInfo?.name || !card.serverInfo?.version) throw new Error("server-card.json missing serverInfo name/version");
+if (!card.transport?.endpoint?.startsWith("https://") || !card.transport.endpoint.endsWith("/mcp")) {
+  throw new Error("server-card.json transport endpoint must be the /mcp URL");
+}
+if (!card.capabilities?.tools) throw new Error("server-card.json missing capabilities.tools");
+const cardToolNames = card.tools.map((tool) => tool.name);
+const workerSource = await readFile(resolve(site, "worker.mjs"), "utf8");
+for (const toolName of cardToolNames) {
+  if (!workerSource.includes(`case "${toolName}"`)) throw new Error(`Worker does not implement advertised tool '${toolName}'`);
+}
+
+// Skills discovery index: schema field, digest matches the artifact bytes.
+const skillsIndex = JSON.parse(await readFile(resolve(site, "dist/.well-known/agent-skills/index.json"), "utf8"));
+if (skillsIndex.$schema !== "https://schemas.agentskills.io/discovery/0.2.0/schema.json") {
+  throw new Error("agent-skills/index.json $schema must be the v0.2.0 schema");
+}
+for (const skill of skillsIndex.skills) {
+  if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(skill.name)) throw new Error(`Invalid skill name '${skill.name}'`);
+  if (skill.type !== "skill-md" || !skill.description || !skill.url) throw new Error(`Incomplete skill entry '${skill.name}'`);
+  const artifact = await readFile(resolve(site, "dist/.well-known/agent-skills", skill.name, "SKILL.md"), "utf8");
+  const digest = createHash("sha256").update(artifact, "utf8").digest("hex");
+  if (skill.digest !== `sha256:${digest}`) throw new Error(`Digest mismatch for skill '${skill.name}'`);
+  if (!/^---\nname: /.test(artifact)) throw new Error(`Skill '${skill.name}' lacks YAML frontmatter`);
+}
+
+// ARD manifest: exactly one of url|data per entry, urn identifiers, queries.
+const ard = JSON.parse(await readFile(resolve(site, "dist/.well-known/ai-catalog.json"), "utf8"));
+const host = new URL(SITE_ORIGIN).hostname;
+if (!ard.specVersion || ard.host?.identifier !== `did:web:${host}`) throw new Error("ai-catalog.json host block malformed");
+if (!Array.isArray(ard.entries) || !ard.entries.length) throw new Error("ai-catalog.json has no entries");
+for (const entry of ard.entries) {
+  const hasUrl = typeof entry.url === "string";
+  const hasData = entry.data !== undefined;
+  if (hasUrl === hasData) throw new Error(`${entry.identifier}: exactly one of url|data is required`);
+  if (!entry.identifier?.startsWith(`urn:air:${host}:`)) throw new Error(`Bad ARD identifier: ${entry.identifier}`);
+  if (!entry.displayName || !entry.type) throw new Error(`${entry.identifier} needs displayName and type`);
+  const queries = entry.representativeQueries ?? [];
+  if (queries.length < 2 || queries.length > 5) throw new Error(`${entry.identifier} needs 2-5 representativeQueries`);
+}
+
+// robots.txt must advertise the manifest; head/footer must link it.
+const robots = await readFile(resolve(site, "dist/robots.txt"), "utf8");
+if (!robots.includes(`Agentmap: ${SITE_ORIGIN}/.well-known/ai-catalog.json`)) {
+  throw new Error("robots.txt missing Agentmap directive");
+}
+for (const [, page] of Object.entries(pages)) {
+  for (const marker of ['rel="ai-catalog"', '/src/webmcp.js']) {
+    if (!page.includes(marker)) throw new Error(`Page missing agent surface marker: ${marker}`);
+  }
+}
+
+// Edge worker tripwires: Link relations, negotiation, healthz, MCP endpoint.
+for (const wire of ['rel="api-catalog"', 'rel="describedby"', 'rel="service-doc"', 'rel="service-desc"', 'rel="alternate"; type="text/markdown"', 'text/markdown', "x-markdown-tokens", "/healthz", '"/mcp"']) {
+  if (!workerSource.includes(wire)) throw new Error(`worker.mjs missing agent surface: ${wire}`);
+}
+const webmcpSource = await readFile(resolve(site, "src/webmcp.js"), "utf8");
+if (!webmcpSource.includes("navigator.modelContext")) throw new Error("webmcp.js never checks navigator.modelContext");
 
 console.log("AGENT_SURFACE_OK");

@@ -66,6 +66,8 @@ export function renderPage({ route = "", title, description, content, noscript, 
   <link href="${FONTS}" rel="stylesheet">
   <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM summary">
   <link rel="alternate" type="application/json" href="/facts.json" title="Machine-readable product facts">
+  <link rel="alternate" type="application/linkset+json" href="/.well-known/api-catalog" title="API catalog (RFC 9727)">
+  <link rel="ai-catalog" href="/.well-known/ai-catalog.json" title="Agentic capability manifest">
   <link rel="stylesheet" href="/src/styles.css">
   <link rel="stylesheet" href="/src/overdrive.css">
   <link rel="stylesheet" href="/src/polish.css">
@@ -93,12 +95,13 @@ ${content}
 
   <footer class="footer section-wrap">
     <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">${BRAND_MARK}</span><span>Urban Signal</span></a>
-    <nav class="agent-links" aria-label="Machine-readable resources"><a href="/llms.txt">LLM guide</a><a href="/facts.json">Product facts</a><a href="/llms-full.txt">Agent context</a></nav>
+    <nav class="agent-links" aria-label="Machine-readable resources"><a href="/llms.txt">LLM guide</a><a href="/facts.json">Product facts</a><a href="/llms-full.txt">Agent context</a><a href="/.well-known/api-catalog">API catalog</a><a href="/.well-known/mcp/server-card.json">MCP</a></nav>
     <nav class="site-links" aria-label="Site reference"><a href="/glossary/">Glossary</a><a href="/changelog/">Changelog</a></nav>
     <span class="mono">OPEN SOURCE / EVIDENCE FIRST</span>
   </footer>
 </div>
 <noscript>${noscript || DEFAULT_NOSCRIPT}</noscript>
+<script type="module" src="/src/webmcp.js"></script>
 <script type="module" src="/src/main.js"></script>
 </body>
 </html>

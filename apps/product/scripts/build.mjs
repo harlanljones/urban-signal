@@ -1,7 +1,9 @@
 import { cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import { renderPage, SITE_ORIGIN } from "./shell.mjs";
 import { renderCityPage } from "./render-city.mjs";
+import { pageToMarkdown } from "./html-to-markdown.mjs";
+import { generateAgentSurfaces } from "./generate-agent-surfaces.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const dist = resolve(root, "dist");
@@ -122,6 +124,21 @@ for (const file of (await readdir(citiesSource)).filter((name) => name.endsWith(
   console.log(`CITY_OK /cities/${detail.id}/`);
 }
 
+// Markdown twins: one text/markdown rendering per HTML route, served by the
+// edge worker when a request carries `Accept: text/markdown`.
+const mdRoutes = [
+  { path: "/", file: resolve(dist, "index.html") },
+  ...pageRoutes
+    .filter(Boolean)
+    .map((route) => ({ path: `/${route}`, file: resolve(dist, route, "index.html") })),
+  ...cityIds.map((id) => ({ path: `/cities/${id}/`, file: resolve(dist, "cities", id, "index.html") })),
+];
+for (const { path, file } of mdRoutes) {
+  const html = await readFile(file, "utf8");
+  await writeFile(resolve(dirname(file), "index.md"), pageToMarkdown(html, { origin: SITE_ORIGIN, path }));
+}
+console.log(`MD_TWINS_OK (${mdRoutes.length} routes)`);
+
 // Sitemap: every route, home first, then sections, then city pages.
 const sitemapEntries = [...pageRoutes, ...cityIds.map((id) => `cities/${id}/`)]
   .map((route) => `  <url><loc>${SITE_ORIGIN}/${route}</loc></url>`)
@@ -132,9 +149,14 @@ await writeFile(
 );
 console.log(`SITEMAP_OK (${pageRoutes.length + cityIds.length} urls)`);
 
+// Agent discovery documents: RFC 9727 catalog, RFC 9728 protected-resource
+// metadata, MCP server card, skills index + artifacts, ARD manifest.
+await generateAgentSurfaces(dist, facts);
+console.log("AGENT_SURFACES_OK");
+
 await cp(resolve(root, "src"), resolve(dist, "src"), { recursive: true });
 await cp(resolve(root, "public"), resolve(dist, "public"), { recursive: true });
-for (const asset of ["facts.json", "llms.txt", "llms-full.txt", "robots.txt"]) {
+for (const asset of ["facts.json", "llms.txt", "llms-full.txt", "robots.txt", "auth.md"]) {
   await cp(resolve(root, "public", asset), resolve(dist, asset));
 }
 await cp(resolve(root, "public", "_redirects"), resolve(dist, "_redirects"));

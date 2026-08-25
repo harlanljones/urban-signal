@@ -21,3 +21,14 @@
 - Feed coverage varies by metro; never infer uniform four-feed coverage.
 - Hero cell values and the 68/100 score composition are illustrative UI examples, not live model-performance claims.
 - No customer, adoption, or independently validated performance claims are published.
+
+## Agent discovery
+
+- [API catalog](/.well-known/api-catalog): RFC 9727 linkset describing this site's documents and the edge data API (`application/linkset+json`).
+- [OpenAPI spec](/.well-known/openapi.json): machine contract for `/facts.json`, `/public/cities/<id>.json`, and the text guides.
+- [MCP server card](/.well-known/mcp/server-card.json): Streamable HTTP MCP server at `/mcp` with read-only tools (`list_cities`, `get_product_facts`, `get_city_brief`, `get_site_guide`).
+- [Skills index](/.well-known/agent-skills/index.json): sha256-digested SKILL.md artifacts for product facts and methodology.
+- [Capability manifest](/.well-known/ai-catalog.json): ARD entries for every machine resource on this host.
+- [Protected resource metadata](/.well-known/oauth-protected-resource) and [/auth.md](/auth.md): everything here is public and unauthenticated; no registration step exists.
+- Markdown rendering: request any page with `Accept: text/markdown` (each HTML response advertises its twin via `Link; rel="alternate"`); responses carry `x-markdown-tokens`.
+- Status: [/healthz](/healthz).

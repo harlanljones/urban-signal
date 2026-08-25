@@ -30,6 +30,7 @@ def get_dashboard_html() -> str:
   <meta name="description" content="Urban Signal — Real-Time Geospatial Intelligence & Commercial Catalyst Forecasting Engine">
   <title>Urban Signal — Real-Time Geospatial Intelligence & Catalyst Forecaster</title>
   __FAVICON_LINK__
+  <link rel="ai-catalog" href="/.well-known/ai-catalog.json">
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -3468,6 +3469,68 @@ def get_dashboard_html() -> str:
       if (lat >= 40.570 && lat <= 40.740 && lng >= -74.050 && lng <= -73.830) return 'Brooklyn';
       return 'Manhattan';
     }
+  </script>
+  <script>
+    // WebMCP (feature-detected): expose read-only site tools to AI agents via
+    // the browser. Tools mirror the edge data API (/api/v1/*) — no auth needed.
+    (function () {
+      var modelContext = navigator.modelContext;
+      if (!modelContext || typeof modelContext.registerTool !== 'function') return;
+      async function callApi(path, init) {
+        var res = await fetch(path, init);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return JSON.stringify(await res.json());
+      }
+      try {
+        modelContext.registerTool({
+          name: 'urban_signal_list_cities',
+          description: 'List the metropolitan regions available on the Urban Signal dashboard.',
+          inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+          execute: async function () {
+            return callApi('/api/v1/cities');
+          }
+        });
+        modelContext.registerTool({
+          name: 'urban_signal_get_catalysts',
+          description: 'Get the strongest commercial catalyst cells (H3 index + LIMS score) for one metro.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              city_id: { type: 'string', description: 'Metro id from urban_signal_list_cities.' },
+              limit: { type: 'integer', minimum: 1, maximum: 500, description: 'Max cells to return.' }
+            },
+            required: ['city_id'],
+            additionalProperties: false
+          },
+          execute: async function (args) {
+            var params = new URLSearchParams({ city_id: String(args.city_id), limit: String(args.limit || 25) });
+            return callApi('/api/v1/catalysts?' + params.toString());
+          }
+        });
+        modelContext.registerTool({
+          name: 'urban_signal_predict_cell',
+          description: 'Look up the precomputed catalyst forecast for one resolution-9 H3 cell.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              h3_index: { type: 'string', description: 'Resolution-9 H3 cell index.' },
+              include_shap: { type: 'boolean', description: 'Include SHAP attributions (default true).' }
+            },
+            required: ['h3_index'],
+            additionalProperties: false
+          },
+          execute: async function (args) {
+            return callApi('/api/v1/predict', {
+              method: 'POST',
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({ h3_index: String(args.h3_index), include_shap: args.include_shap !== false })
+            });
+          }
+        });
+      } catch (err) {
+        console.debug('WebMCP registration skipped:', err);
+      }
+    })();
   </script>
 </body>
 </html>
