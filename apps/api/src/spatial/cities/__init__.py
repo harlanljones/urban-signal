@@ -49,6 +49,20 @@ from src.spatial.cities.pierce import (
     PIERCE_SUBMARKETS,
     is_in_pierce_metro,
 )
+from src.spatial.cities.milwaukee import (
+    MILWAUKEE_DIVISION_BBOXES,
+    MILWAUKEE_DIVISIONS,
+    MILWAUKEE_METRO_BBOX,
+    MILWAUKEE_SUBMARKETS,
+    is_in_milwaukee_metro,
+)
+from src.spatial.cities.charlotte import (
+    CHARLOTTE_DIVISION_BBOXES,
+    CHARLOTTE_DIVISIONS,
+    CHARLOTTE_METRO_BBOX,
+    CHARLOTTE_SUBMARKETS,
+    is_in_charlotte_metro,
+)
 from src.spatial.cities.austin import (
     AUSTIN_DIVISION_BBOXES,
     AUSTIN_DIVISIONS,
@@ -97,6 +111,13 @@ from src.spatial.cities.denver import (
     DENVER_METRO_BBOX,
     DENVER_SUBMARKETS,
     is_in_denver_metro,
+)
+from src.spatial.cities.minneapolis import (
+    MINNEAPOLIS_DIVISION_BBOXES,
+    MINNEAPOLIS_DIVISIONS,
+    MINNEAPOLIS_METRO_BBOX,
+    MINNEAPOLIS_SUBMARKETS,
+    is_in_minneapolis_metro,
 )
 from src.spatial.cities.chicago import (
     CHICAGO_DIVISION_BBOXES,
@@ -160,6 +181,16 @@ __all__ = [
     "PIERCE_DIVISIONS",
     "PIERCE_SUBMARKETS",
     "is_in_pierce_metro",
+    "MILWAUKEE_METRO_BBOX",
+    "MILWAUKEE_DIVISION_BBOXES",
+    "MILWAUKEE_DIVISIONS",
+    "MILWAUKEE_SUBMARKETS",
+    "is_in_milwaukee_metro",
+    "CHARLOTTE_METRO_BBOX",
+    "CHARLOTTE_DIVISION_BBOXES",
+    "CHARLOTTE_DIVISIONS",
+    "CHARLOTTE_SUBMARKETS",
+    "is_in_charlotte_metro",
     "AUSTIN_METRO_BBOX",
     "AUSTIN_DIVISION_BBOXES",
     "AUSTIN_DIVISIONS",
@@ -190,6 +221,11 @@ __all__ = [
     "DENVER_DIVISIONS",
     "DENVER_SUBMARKETS",
     "is_in_denver_metro",
+    "MINNEAPOLIS_METRO_BBOX",
+    "MINNEAPOLIS_DIVISION_BBOXES",
+    "MINNEAPOLIS_DIVISIONS",
+    "MINNEAPOLIS_SUBMARKETS",
+    "is_in_minneapolis_metro",
     "CHICAGO_METRO_BBOX",
     "CHICAGO_DIVISION_BBOXES",
     "CHICAGO_DIVISIONS",

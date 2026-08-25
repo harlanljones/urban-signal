@@ -48,18 +48,22 @@ def test_unregistered_new_feeds_raise_readable_get_dataset_error():
         assert "boston" in message and feed.value in message
 
 
-def test_only_crime_is_registered_and_only_in_four_metros():
-    """US-72 made the taxonomy ingestible; US-71 registered crime in exactly
-    the four metros with a verified live feed. Street-cut, evictions, and STR
-    remain unregistered until their own tickets."""
-    crime_cities = {CityId.NYC, CityId.CHICAGO, CityId.SAN_FRANCISCO, CityId.SEATTLE}
+def test_only_cleared_signal_feeds_are_registered():
+    """US-72 made the taxonomy ingestible; US-71 registered crime in the four
+    metros with a verified live feed, and US-81 registered street-cut in the
+    one metro with a geocodable feed (Chicago CDOT street closures; NYC's
+    current rows are address-only). Evictions and STR remain unregistered
+    until their own tickets."""
+    registered_for = {
+        FeedType.CRIME: {CityId.NYC, CityId.CHICAGO, CityId.SAN_FRANCISCO, CityId.SEATTLE},
+        FeedType.STREET_CUT: {CityId.CHICAGO},
+        FeedType.EVICTIONS: set(),
+        FeedType.STR: set(),
+    }
     for city, reg in REGISTRY.items():
         for feed in NEW_SIGNAL_FEEDS:
             registered = feed in reg.datasets
-            if feed == FeedType.CRIME:
-                assert registered == (city in crime_cities), (city, feed)
-            else:
-                assert not registered, (city, feed)
+            assert registered == (city in registered_for[feed]), (city, feed)
 
 
 # ---------------------------------------------------------------------------

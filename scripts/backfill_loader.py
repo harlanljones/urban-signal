@@ -43,7 +43,9 @@ if str(API_ROOT) not in sys.path:
 
 from src.producers.scheduler import MunicipalIngestionScheduler
 from src.producers.watermarks import (
+    ANSI_DATE_LITERAL_HOSTS,
     typed_watermark_entry,
+    watermark_comparison,
     watermark_exclude_clause,
 )
 
@@ -95,41 +97,34 @@ def build_query_shape(
 
     parts: list[str] = []
     if since_dt is not None:
-        parts.append(f"{wm} >= {_watermark_literal(meta, since_dt)}")
+        parts.append(
+            watermark_comparison(
+                wm,
+                ">=",
+                since_dt.strftime("%Y-%m-%dT%H:%M:%S"),
+                str(meta.get("endpoint", "")),
+            )
+        )
     guard = watermark_exclude_clause(wm, meta.get("watermark_exclude") or [])
     if guard:
         parts.append(guard)
 
     client_kwargs: dict[str, Any] = {}
-    if not _is_dc_arcgis(meta):
+    if not _is_ansi_date_literal_server(meta):
         client_kwargs["order_by"] = f"{wm} DESC"
     return " AND ".join(parts) or None, client_kwargs
 
 
-_DC_ARCGIS_HOSTS = ("maps2.dcgis.dc.gov",)
+def _is_ansi_date_literal_server(meta: dict[str, Any]) -> bool:
+    """Whether the feed's server rejects ISO-string date comparisons.
 
-
-def _is_dc_arcgis(meta: dict[str, Any]) -> bool:
-    """Whether the feed's server is the Washington DC ArcGIS server.
-
-    ``maps2.dcgis.dc.gov`` is unlike every other registered server: it rejects
-    ISO-string date comparisons in ``where`` (400 "Unable to complete
-    operation") and the ``where + orderByFields`` combination. Its working
-    query shape is ``where <date_col> >= date 'YYYY-MM-DD'`` with no
-    orderByFields (OID paging) — the shape the scheduler uses (US-109).
+    The DC (``maps2.dcgis.dc.gov``) and Milwaukee (``milwaukeemaps.
+    milwaukee.gov``) ArcGIS servers reject ISO-string date comparisons in
+    ``where`` AND the ``where + orderByFields`` combination (US-109 / US-87).
+    Their working shape is ``where <col> >= date 'YYYY-MM-DD'`` with no
+    orderByFields (OID paging) — the shape ``watermark_comparison`` emits.
     """
-    return any(host in str(meta.get("endpoint", "")) for host in _DC_ARCGIS_HOSTS)
-
-
-def _watermark_literal(meta: dict[str, Any], since_dt: datetime) -> str:
-    """Render a watermark lower-bound literal the server accepts.
-
-    The DC ArcGIS server only accepts ANSI ``date 'YYYY-MM-DD'`` literals for
-    date columns; every other registered platform accepts the ISO 8601 string.
-    """
-    if _is_dc_arcgis(meta):
-        return f"date '{since_dt.strftime('%Y-%m-%d')}'"
-    return f"'{since_dt.strftime('%Y-%m-%dT%H:%M:%S')}'"
+    return any(host in str(meta.get("endpoint", "")) for host in ANSI_DATE_LITERAL_HOSTS)
 
 
 def backfill_job(

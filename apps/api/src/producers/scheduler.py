@@ -31,7 +31,12 @@ from src.producers.crime_incidents_producer import CrimeIncidentsProducer
 from src.producers.deeds_acris_producer import DeedsACRISProducer
 from src.producers.dob_permits_producer import DOBPermitsProducer
 from src.producers.sla_licenses_producer import SLALicensesProducer
-from src.producers.watermarks import typed_watermark_entry, watermark_exclude_clause
+from src.producers.street_cut_permits_producer import StreetCutPermitsProducer
+from src.producers.watermarks import (
+    typed_watermark_entry,
+    watermark_comparison,
+    watermark_exclude_clause,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -215,6 +220,7 @@ class MunicipalIngestionScheduler:
             "sla": SLALicensesProducer(bootstrap_servers=self.bootstrap_servers),
             "deeds": DeedsACRISProducer(bootstrap_servers=self.bootstrap_servers),
             "crime": CrimeIncidentsProducer(bootstrap_servers=self.bootstrap_servers),
+            "street_cut": StreetCutPermitsProducer(bootstrap_servers=self.bootstrap_servers),
         }
 
         # Socrata Endpoints & Target Topics mapping derived from city registry
@@ -476,7 +482,14 @@ class MunicipalIngestionScheduler:
             and met.high_watermark
             and meta["watermark_col"]
         ):
-            where_parts.append(f"{meta['watermark_col']} > '{met.high_watermark}'")
+            where_parts.append(
+                watermark_comparison(
+                    meta["watermark_col"],
+                    ">",
+                    met.high_watermark,
+                    meta["endpoint"],
+                )
+            )
         exclude_guard = (
             watermark_exclude_clause(meta["watermark_col"], meta.get("watermark_exclude") or [])
             if meta["watermark_col"]

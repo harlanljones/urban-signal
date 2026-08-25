@@ -1,0 +1,25 @@
+{
+  "type": "record",
+  "name": "StreetCutEvent",
+  "namespace": "org.urbandev.events",
+  "doc": "Street-cut / utility permit / street-closure event (US-81 disruption context signal)",
+  "fields": [
+    { "name": "city_id", "type": "string", "default": "chicago" },
+    { "name": "permit_id", "type": "string" },
+    { "name": "permit_type", "type": "string", "default": "Unknown" },
+    { "name": "work_type", "type": ["null", "string"], "default": null },
+    { "name": "status", "type": ["null", "string"], "default": null },
+    { "name": "street_name", "type": ["null", "string"], "default": null },
+    { "name": "address", "type": ["null", "string"], "default": null },
+    { "name": "latitude", "type": ["null", "double"], "default": null },
+    { "name": "longitude", "type": ["null", "double"], "default": null },
+    { "name": "issued_date", "type": ["null", "string"], "default": null },
+    { "name": "start_date", "type": ["null", "string"], "default": null },
+    { "name": "end_date", "type": ["null", "string"], "default": null },
+    { "name": "fees", "type": ["null", "double"], "default": null },
+    { "name": "h3_res7", "type": ["null", "string"], "default": null },
+    { "name": "h3_res8", "type": ["null", "string"], "default": null },
+    { "name": "h3_res9", "type": ["null", "string"], "default": null },
+    { "name": "ingested_at", "type": "string" }
+  ]
+}

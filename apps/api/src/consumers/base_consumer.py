@@ -60,6 +60,7 @@ class BaseKafkaConsumer:
             settings.topic_311: "complaint_311_event.avsc",
             settings.topic_sla: "sla_license_event.avsc",
             settings.topic_deeds: "deed_event.avsc",
+            settings.topic_street_cut: "street_cut_event.avsc",
             settings.topic_enriched_h3: "enriched_h3_feature.avsc",
             settings.topic_catalyst_alerts: "catalyst_alert.avsc",
         }

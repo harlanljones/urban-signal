@@ -1146,8 +1146,11 @@ def get_dashboard_html() -> str:
           <option value="prince_georges">🐎 Prince George's County (1 Division)</option>
           <option value="columbus">⚓ Columbus (1 Division)</option>
           <option value="nashville">🎸 Nashville (1 Division)</option>
+          <option value="minneapolis">🌽 Minneapolis (6 Divisions)</option>
           <option value="kansas_city">🎷 Kansas City (1 Division)</option>
           <option value="pierce">🏔️ Pierce County (1 Division)</option>
+          <option value="milwaukee">🍺 Milwaukee (1 Division)</option>
+          <option value="charlotte">🏙️ Charlotte (1 Division)</option>
         </select>
       </div>
       <div class="compare-control">
@@ -1624,6 +1627,33 @@ def get_dashboard_html() -> str:
           'DENVER_CORE': { lat: 39.7527, lng: -104.9992, zoom: 11.8, pitch: 48, bearing: -10 }
         }
       },
+      minneapolis: {
+        center: [-93.2650, 44.9778],
+        zoom: 10.8,
+        pitch: 48,
+        bearing: -10,
+        name: 'Minneapolis',
+        metroBbox: { min_lat: 44.85, max_lat: 45.08, min_lng: -93.36, max_lng: -93.15 },
+        allLabel: 'All Minneapolis',
+        divisions: [
+          { key: 'ALL', label: 'All Minneapolis', class: 'ALL' },
+          { key: 'NORTH', label: 'North Minneapolis', class: 'North' },
+          { key: 'NORTHEAST', label: 'Northeast', class: 'Northeast' },
+          { key: 'CENTRAL', label: 'Central Minneapolis', class: 'Central' },
+          { key: 'SOUTH', label: 'South Minneapolis', class: 'South' },
+          { key: 'SOUTHWEST', label: 'Southwest Minneapolis', class: 'Southwest' },
+          { key: 'SOUTHEAST', label: 'Southeast Minneapolis', class: 'Southeast' }
+        ],
+        presets: {
+          'ALL': { lat: 44.9778, lng: -93.2650, zoom: 10.6, pitch: 45, bearing: -10 },
+          'NORTH': { lat: 45.0100, lng: -93.2800, zoom: 11.8, pitch: 48, bearing: -10 },
+          'NORTHEAST': { lat: 45.0200, lng: -93.2300, zoom: 11.8, pitch: 48, bearing: -10 },
+          'CENTRAL': { lat: 44.9770, lng: -93.2650, zoom: 11.6, pitch: 48, bearing: -10 },
+          'SOUTH': { lat: 44.9400, lng: -93.2600, zoom: 11.8, pitch: 48, bearing: -10 },
+          'SOUTHWEST': { lat: 44.9400, lng: -93.3100, zoom: 11.8, pitch: 48, bearing: -10 },
+          'SOUTHEAST': { lat: 44.9750, lng: -93.2200, zoom: 11.8, pitch: 48, bearing: -10 }
+        }
+      },
       philadelphia: {
         center: [-75.1652, 39.9526],
         zoom: 11.0,
@@ -1770,6 +1800,40 @@ def get_dashboard_html() -> str:
           'ALL': { lat: 47.2529, lng: -122.4443, zoom: 9.4, pitch: 45, bearing: -10 },
           'PIERCE_COUNTY': { lat: 47.2529, lng: -122.4443, zoom: 10.0, pitch: 48, bearing: -10 }
         }
+      },
+      milwaukee: {
+        center: [-87.9065, 43.0389],
+        zoom: 11.0,
+        pitch: 48,
+        bearing: -10,
+        name: 'Milwaukee',
+        metroBbox: { min_lat: 42.85, max_lat: 43.20, min_lng: -88.10, max_lng: -87.80 },
+        allLabel: 'All Milwaukee',
+        divisions: [
+          { key: 'ALL', label: 'All Milwaukee', class: 'ALL' },
+          { key: 'MILWAUKEE_CORE', label: 'Milwaukee', class: 'MilwaukeeCore' }
+        ],
+        presets: {
+          'ALL': { lat: 43.0389, lng: -87.9065, zoom: 10.8, pitch: 45, bearing: -10 },
+          'MILWAUKEE_CORE': { lat: 43.0389, lng: -87.9065, zoom: 11.4, pitch: 48, bearing: -10 }
+        }
+      },
+      charlotte: {
+        center: [-80.8431, 35.2271],
+        zoom: 11.0,
+        pitch: 48,
+        bearing: -10,
+        name: 'Charlotte',
+        metroBbox: { min_lat: 34.98, max_lat: 35.55, min_lng: -81.10, max_lng: -80.45 },
+        allLabel: 'All Charlotte',
+        divisions: [
+          { key: 'ALL', label: 'All Charlotte', class: 'ALL' },
+          { key: 'CHARLOTTE_CORE', label: 'Charlotte', class: 'CharlotteCore' }
+        ],
+        presets: {
+          'ALL': { lat: 35.2271, lng: -80.8431, zoom: 10.8, pitch: 45, bearing: -10 },
+          'CHARLOTTE_CORE': { lat: 35.2271, lng: -80.8431, zoom: 11.4, pitch: 48, bearing: -10 }
+        }
       }
     };
     CITY_CONFIGS.sf = CITY_CONFIGS.san_francisco;
@@ -1801,7 +1865,9 @@ def get_dashboard_html() -> str:
       cincinnati: { lat: 39.1031, lng: -84.5120 }, baton_rouge: { lat: 30.4515, lng: -91.1871 },
       denver: { lat: 39.7392, lng: -104.9903 }, prince_georges: { lat: 38.72, lng: -76.75 },
       columbus: { lat: 39.9612, lng: -83.0007 }, nashville: { lat: 36.1627, lng: -86.7818 },
-      kansas_city: { lat: 39.10, lng: -94.58 }, pierce: { lat: 47.2529, lng: -122.4443 }
+      kansas_city: { lat: 39.10, lng: -94.58 }, pierce: { lat: 47.2529, lng: -122.4443 },
+      milwaukee: { lat: 43.0389, lng: -87.9065 }, minneapolis: { lat: 44.9778, lng: -93.2650 },
+      charlotte: { lat: 35.2271, lng: -80.8431 }
     };
 
     function renderCompareOptions() {
@@ -1928,7 +1994,9 @@ def get_dashboard_html() -> str:
         'columbus': { lat: 39.9612, lng: -83.0007 },
         'nashville': { lat: 36.1627, lng: -86.7818 },
         'kansas_city': { lat: 39.10, lng: -94.58 },
-        'pierce': { lat: 47.2529, lng: -122.4443 }
+        'pierce': { lat: 47.2529, lng: -122.4443 },
+        'milwaukee': { lat: 43.0389, lng: -87.9065 },
+        'charlotte': { lat: 35.2271, lng: -80.8431 }
       };
       let closest = 'san_francisco';
       let minDist = Infinity;

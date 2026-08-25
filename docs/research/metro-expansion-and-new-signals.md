@@ -230,6 +230,15 @@ here before building permits do, but the semantics overlap CapEx density, so
 the safe use is a separate "disruption index" context feature rather than a
 fourth term in LIMS.
 
+> **US-81 row-level update (2026-08-24):** the geocodable feed is Chicago's
+> **street closures** (`jdis-5sry`, native `latitude`/`longitude`, 99.9%
+> coverage, registered as `FeedType.STREET_CUT`). NYC's `tqtj-sjs8` is **not
+> registered**: current rows are address-only — the `wkt` State-Plane geometry
+> exists only on 2016-2023 rows (128 of 448k 2026 rows), blocked on geocoding
+> like LA crime / Sacramento permits. Chicago's `pubx-yq2d` (CDOT permit
+> master, no coordinates) and `hr8i-6s6s` (current/future, ~32% coordinates)
+> stay deferred.
+
 **Business move-ins/move-outs** need no new source at all: every registered
 metro already ingests a licenses feed whose rows carry issuance dates and
 status/lifecycle fields. First-appearance vs. closure counts per hex per

@@ -58,6 +58,18 @@ from src.spatial.cities.pierce import (
     PIERCE_METRO_BBOX,
     PIERCE_SUBMARKETS,
 )
+from src.spatial.cities.milwaukee import (
+    MILWAUKEE_DIVISION_BBOXES,
+    MILWAUKEE_DIVISIONS,
+    MILWAUKEE_METRO_BBOX,
+    MILWAUKEE_SUBMARKETS,
+)
+from src.spatial.cities.charlotte import (
+    CHARLOTTE_DIVISION_BBOXES,
+    CHARLOTTE_DIVISIONS,
+    CHARLOTTE_METRO_BBOX,
+    CHARLOTTE_SUBMARKETS,
+)
 from src.spatial.cities.austin import (
     AUSTIN_DIVISION_BBOXES,
     AUSTIN_DIVISIONS,
@@ -99,6 +111,12 @@ from src.spatial.cities.denver import (
     DENVER_DIVISIONS,
     DENVER_METRO_BBOX,
     DENVER_SUBMARKETS,
+)
+from src.spatial.cities.minneapolis import (
+    MINNEAPOLIS_DIVISION_BBOXES,
+    MINNEAPOLIS_DIVISIONS,
+    MINNEAPOLIS_METRO_BBOX,
+    MINNEAPOLIS_SUBMARKETS,
 )
 from src.spatial.cities.detroit import (
     DETROIT_DIVISION_BBOXES,
@@ -172,7 +190,10 @@ class CityId(str, Enum):
     COLUMBUS = "columbus"
     NASHVILLE = "nashville"
     KANSAS_CITY = "kansas_city"
+    MINNEAPOLIS = "minneapolis"
     PIERCE = "pierce"
+    MILWAUKEE = "milwaukee"
+    CHARLOTTE = "charlotte"
 
 
 class FeedType(str, Enum):
@@ -392,6 +413,11 @@ ALIASES: Dict[str, CityId] = {
     "kc_mo": CityId.KANSAS_CITY,
     "kcmo": CityId.KANSAS_CITY,
 
+    # Minneapolis
+    "minneapolis": CityId.MINNEAPOLIS,
+    "mpls": CityId.MINNEAPOLIS,
+    "minneapolis_mn": CityId.MINNEAPOLIS,
+
     # Pierce County, WA
     "pierce": CityId.PIERCE,
     "pierce_county": CityId.PIERCE,
@@ -399,6 +425,17 @@ ALIASES: Dict[str, CityId] = {
     "pierce county": CityId.PIERCE,
     "tacoma": CityId.PIERCE,
     "tac": CityId.PIERCE,
+
+    # Milwaukee, WI
+    "milwaukee": CityId.MILWAUKEE,
+    "mke": CityId.MILWAUKEE,
+    "mke_wi": CityId.MILWAUKEE,
+
+    # Charlotte / Mecklenburg, NC
+    "charlotte": CityId.CHARLOTTE,
+    "charlotte_nc": CityId.CHARLOTTE,
+    "charlotte_mecklenburg": CityId.CHARLOTTE,
+    "mecklenburg": CityId.CHARLOTTE,
 }
 
 
@@ -536,6 +573,21 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_crime,
                 interval_seconds=1800.0,
                 producer_key="crime",
+                extra={"expected_cadence_days": 7},
+            ),
+            # US-81: CDOT street closures (native coordinates, 99.9% coverage,
+            # daily cadence). Disruption context only — never a LIMS term.
+            # NYC's DOT street-construction permits (tqtj-sjs8) are NOT
+            # registered: current rows are address-only (wkt State-Plane
+            # geometry exists only on 2016-2023 rows), blocked on geocoding.
+            FeedType.STREET_CUT: DatasetSpec(
+                endpoint=settings.socrata_chicago_street_cut_endpoint,
+                platform="socrata",
+                watermark_col="applicationissueddate",
+                id_keys=["applicationnumber", "uniquekey", "id"],
+                topic=settings.topic_street_cut,
+                interval_seconds=600.0,
+                producer_key="street_cut",
                 extra={"expected_cadence_days": 7},
             ),
         },
@@ -1506,6 +1558,88 @@ REGISTRY: Dict[CityId, CityRegistration] = {
             ),
         },
     ),
+    CityId.MINNEAPOLIS: CityRegistration(
+        city_id=CityId.MINNEAPOLIS,
+        name="Minneapolis",
+        state="MN",
+        center={"lat": 44.9778, "lng": -93.2650},
+        metro_bbox=MINNEAPOLIS_METRO_BBOX,
+        division_bboxes=MINNEAPOLIS_DIVISION_BBOXES,
+        submarkets=MINNEAPOLIS_SUBMARKETS,
+        divisions=MINNEAPOLIS_DIVISIONS,
+        job_suffix="minneapolis",
+        # Partial registration like Denver: permits + year-sliced 311. The
+        # liquor feeds (On/Off_Sale_Liquor) are narrow license inventories and
+        # Property_Sales_2021_to_2025 is stale (max SALE_DATE 2025-09-30) and
+        # ungeocoded (county-coordinate X/Y) — both deliberately unregistered.
+        # 311 publishes one Public_311_<year> layer per year; the rollover
+        # drill (US-70) requires the current year to be mapped, so a 2027
+        # layer must be appended each New Year like DC/Boston/Baltimore.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_minneapolis_permits_url,
+                platform="arcgis",
+                watermark_col="issueDate",
+                id_keys=["permitNumber"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 16000,
+                    "field_map": {
+                        "job_id": ["permitNumber"],
+                        "issuance_date": ["issueDate"],
+                        "cost": ["value"],
+                        "job_type": ["permitType", "workType"],
+                        "status": ["status", "milestone"],
+                        "proposed_units": ["dwellingUnitsNew"],
+                        "existing_units": ["dwellingUnitsEliminated"],
+                        "borough": ["Neighborhoods_Desc", "Wards"],
+                    },
+                },
+            ),
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.arcgis_minneapolis_311_url,
+                platform="arcgis",
+                watermark_col="OPENEDDATETIME",
+                id_keys=["CASEID"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 16000,
+                    "endpoint_by_year": {
+                        "2015": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2015/FeatureServer/0",
+                        "2016": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2016/FeatureServer/0",
+                        "2017": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2017/FeatureServer/0",
+                        "2018": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2018/FeatureServer/0",
+                        "2019": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2019/FeatureServer/0",
+                        "2020": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2020/FeatureServer/0",
+                        "2021": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2021/FeatureServer/0",
+                        "2022": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2022/FeatureServer/0",
+                        "2023": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2023/FeatureServer/0",
+                        "2024": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2024/FeatureServer/0",
+                        "2025": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2025/FeatureServer/0",
+                        "2026": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2026/FeatureServer/0",
+                    },
+                    # CASESTATUS is a raw int with unclear open/closed
+                    # semantics; leave it unmapped (status defaults "Open",
+                    # closed_date carries closure).
+                    "field_map": {
+                        "incident_id": ["CASEID"],
+                        "complaint_type": ["TYPENAME", "REASONNAME", "SUBJECTNAME"],
+                        "created_date": ["OPENEDDATETIME"],
+                        "closed_date": ["CLOSEDDATETIME"],
+                        "incident_address": ["TITLE"],
+                    },
+                },
+            ),
+        },
+    ),
     CityId.BALTIMORE: CityRegistration(
         city_id=CityId.BALTIMORE,
         name="Baltimore",
@@ -2095,6 +2229,87 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                         "job_type": ["applicationType", "workType", "buildingType"],
                         "proposed_units": ["dwellingUnits"],
                         "proposed_stories": ["stories"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.MILWAUKEE: CityRegistration(
+        city_id=CityId.MILWAUKEE,
+        name="Milwaukee",
+        state="WI",
+        center={"lat": 43.0389, "lng": -87.9065},
+        metro_bbox=MILWAUKEE_METRO_BBOX,
+        division_bboxes=MILWAUKEE_DIVISION_BBOXES,
+        submarkets=MILWAUKEE_SUBMARKETS,
+        divisions=MILWAUKEE_DIVISIONS,
+        job_suffix="mke",
+        # SLA-only registration (US-87): the city's liquor-license registry is
+        # the verified machine-readable feed with point geometry + dates.
+        # Permits are a monthly CSV with ~2-month lag and address-only coords
+        # (G5/G11 reject); no open 311 dataset; deeds are yearly archives —
+        # all deliberately unregistered. ANSI-date-literal server, so the
+        # shared watermark_comparison renders the incremental where.
+        datasets={
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.arcgis_milwaukee_licenses_url,
+                platform="arcgis",
+                watermark_col="GIS_DATETIME",
+                id_keys=["LICENSE_ID", "OBJECTID"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "scope": "Milwaukee liquor license registry (active licenses, point geometry)",
+                    "field_map": {
+                        "license_id": ["LICENSE_ID"],
+                        "effective_date": ["EFFECTIVE_DATE"],
+                        "expiration_date": ["EXPIRATION_DATE"],
+                        "license_type": ["LIC_TYPE_ABBR", "PROFESSION_FULL_NAME"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.CHARLOTTE: CityRegistration(
+        city_id=CityId.CHARLOTTE,
+        name="Charlotte",
+        state="NC",
+        center={"lat": 35.2271, "lng": -80.8431},
+        metro_bbox=CHARLOTTE_METRO_BBOX,
+        division_bboxes=CHARLOTTE_DIVISION_BBOXES,
+        submarkets=CHARLOTTE_SUBMARKETS,
+        divisions=CHARLOTTE_DIVISIONS,
+        job_suffix="clt",
+        # 311-only registration (US-88): Charlotte's ODP ServiceRequests311
+        # layer is the verified machine-readable feed (native LATITUDE/
+        # LONGITUDE + point geometry, RECEIVED_DATE watermark). Mecklenburg
+        # County permits/parcels sit on an ArcGIS Hub surface with no
+        # quickly-verifiable bulk feed; city permits live in Accela ACA;
+        # no verified licenses or sales feeds — all unregistered.
+        datasets={
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.arcgis_charlotte_311_url,
+                platform="arcgis",
+                watermark_col="RECEIVED_DATE",
+                id_keys=["REQUEST_NO", "OBJECTID"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 7500,
+                    "scope": "Charlotte ODP 311 service requests (native coords)",
+                    "field_map": {
+                        "incident_id": ["REQUEST_NO"],
+                        "created_date": ["RECEIVED_DATE"],
+                        "complaint_type": ["REQUEST_TYPE"],
+                        "incident_address": ["FULL_ADDRESS"],
+                        "borough": ["COUNCIL_DISTRICT"],
                     },
                 },
             ),

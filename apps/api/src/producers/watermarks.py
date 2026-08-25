@@ -136,3 +136,29 @@ def watermark_exclude_clause(column: str, exclude: Iterable[str]) -> str | None:
         return None
     listed = ", ".join(f"'{value}'" for value in values)
     return f"{column} NOT IN ({listed})"
+
+
+# ArcGIS servers that reject ISO-string date comparisons in ``where`` and only
+# accept ANSI ``date 'YYYY-MM-DD'`` literals for date columns. US-109 (DC) /
+# US-87 (Milwaukee) / US-88 (Charlotte): verified live — ``col >= '2026-08-
+# 01T00:00:00'`` returns 400 "Unable to complete operation" while
+# ``col >= date '2026-08-01'`` works.
+ANSI_DATE_LITERAL_HOSTS = (
+    "maps2.dcgis.dc.gov",
+    "milwaukeemaps.milwaukee.gov",
+    "gis.charlottenc.gov",
+)
+
+
+def watermark_comparison(watermark_col: str, op: str, value: str, endpoint: str) -> str:
+    """Render a ``col OP <value>`` predicate with a server-appropriate literal.
+
+    Most registered servers accept the ISO 8601 string the scheduler stores;
+    the ANSI-literal hosts above reject it, so for those the value is
+    truncated to its date component and wrapped in an ANSI ``date '...'``
+    literal. Shared by the scheduler's incremental filter and the backfill
+    loader's windowed filter so both stay query-shape compatible.
+    """
+    if any(host in endpoint for host in ANSI_DATE_LITERAL_HOSTS):
+        return f"{watermark_col} {op} date '{value[:10]}'"
+    return f"{watermark_col} {op} '{value}'"

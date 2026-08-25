@@ -92,6 +92,20 @@ class SpatialFeaturePipeline:
                 ingested_at TIMESTAMP
             );
 
+            CREATE TABLE IF NOT EXISTS raw_street_cut (
+                permit_id VARCHAR PRIMARY KEY,
+                permit_type VARCHAR,
+                work_type VARCHAR,
+                status VARCHAR,
+                latitude DOUBLE,
+                longitude DOUBLE,
+                issued_date TIMESTAMP,
+                h3_res7 VARCHAR,
+                h3_res8 VARCHAR,
+                h3_res9 VARCHAR,
+                ingested_at TIMESTAMP
+            );
+
             CREATE TABLE IF NOT EXISTS feature_store_h3 (
                 h3_index VARCHAR,
                 h3_resolution INTEGER,
@@ -187,6 +201,22 @@ class SpatialFeaturePipeline:
                 SELECT * FROM df_crime_temp
             """)
             self.con.unregister("df_crime_temp")
+
+    def insert_street_cut(self, df: pd.DataFrame):
+        """Batch insert street-cut/closure events into DuckDB (US-81)."""
+        if not df.empty:
+            cols = ["permit_id", "permit_type", "work_type", "status", "latitude", "longitude", "issued_date", "h3_res7", "h3_res8", "h3_res9", "ingested_at"]
+            filtered = df[[c for c in cols if c in df.columns]].copy()
+            for c in cols:
+                if c not in filtered.columns:
+                    filtered[c] = None
+            filtered = filtered[cols]
+            self.con.register("df_street_cut_temp", filtered)
+            self.con.execute("""
+                INSERT OR REPLACE INTO raw_street_cut
+                SELECT * FROM df_street_cut_temp
+            """)
+            self.con.unregister("df_street_cut_temp")
 
     def compute_h3_cell_features(
         self,

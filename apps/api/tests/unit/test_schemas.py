@@ -14,6 +14,7 @@ from src.schemas.models import (
     EnrichedH3Feature,
     PermitEvent,
     SLALicenseEvent,
+    StreetCutEvent,
 )
 
 
@@ -81,6 +82,25 @@ def test_crime_event_avro_serialization():
     assert deserialized["incident_id"] == "14295750"
     assert deserialized["offense_class"] == "PART1"
     assert deserialized["latitude"] == 41.744201882
+
+
+def test_street_cut_event_avro_serialization():
+    event = StreetCutEvent(
+        city_id="chicago",
+        permit_id="320086",
+        permit_type="DOT_PWO",
+        work_type="Opening in the Public Way",
+        status="Open",
+        latitude=41.9124265497,
+        longitude=-87.7571380905,
+        issued_date=datetime(2026, 8, 23, 12, 54, 52, tzinfo=timezone.utc),
+        h3_res9="89c28c0a26fffff",
+    )
+    data = event.model_dump(mode="json")
+    deserialized = _validate_avro_roundtrip("street_cut_event.avsc", data)
+    assert deserialized["permit_id"] == "320086"
+    assert deserialized["work_type"] == "Opening in the Public Way"
+    assert deserialized["latitude"] == 41.9124265497
 
 
 def test_enriched_h3_feature_avro_serialization():

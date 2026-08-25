@@ -165,6 +165,35 @@ class CrimeEvent(BaseModel):
     ingested_at: datetime = Field(default_factory=_utc_now)
 
 
+class StreetCutEvent(BaseModel):
+    """Street-cut / utility permit / street-closure event (US-81).
+
+    Disruption context signal only: never a fourth term in LIMS. Chicago's
+    CDOT street-closure feed is the registered source (native coordinates).
+    NYC's DOT street-construction permits stay deferred — current rows are
+    address-only (the ``wkt`` State-Plane geometry exists only on 2016-2023
+    rows), so they cannot produce H3 events until geocoding lands.
+    """
+
+    city_id: str = Field(default="chicago")
+    permit_id: str = Field(..., description="Unique permit / application number")
+    permit_type: str = Field(default="Unknown", description="Application type (e.g. DOT_PWO)")
+    work_type: Optional[str] = Field(default=None, description="Work-type description (e.g. GenOpening)")
+    status: Optional[str] = Field(default=None, description="Application status / current milestone")
+    street_name: Optional[str] = None
+    address: Optional[str] = None
+    latitude: Optional[float] = Field(default=None, ge=-90.0, le=90.0)
+    longitude: Optional[float] = Field(default=None, ge=-180.0, le=180.0)
+    issued_date: Optional[datetime] = None
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    fees: Optional[float] = None
+    h3_res7: Optional[str] = None
+    h3_res8: Optional[str] = None
+    h3_res9: Optional[str] = None
+    ingested_at: datetime = Field(default_factory=_utc_now)
+
+
 class EnrichedH3Feature(BaseModel):
     """Spatio-Temporal Aggregated Feature Record per H3 Cell."""
 

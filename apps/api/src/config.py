@@ -166,6 +166,15 @@ class Settings(BaseSettings):
         description="Seattle SPD crime data endpoint",
     )
 
+    # Street-cut / utility permit feeds (US-81): disruption context signal.
+    # Chicago CDOT street closures (native coordinates) is the registered feed;
+    # NYC's DOT street-construction permits (tqtj-sjs8) stay deferred — current
+    # rows are address-only.
+    socrata_chicago_street_cut_endpoint: str = Field(
+        default="https://data.cityofchicago.org/resource/jdis-5sry.json",
+        description="Chicago CDOT street closures endpoint",
+    )
+
     # New Orleans (Socrata)
     socrata_nola_permits_endpoint: str = Field(
         default="https://data.nola.gov/resource/rcm3-fn58.json",
@@ -305,6 +314,25 @@ class Settings(BaseSettings):
         description="Baltimore liquor licenses FeatureServer table",
     )
 
+    # Minneapolis (ArcGIS Hub "OpenDataMPLS"): construction/CCS permits and
+    # year-sliced 311 (one Public_311_<year> layer per year; endpoint_by_year
+    # in the registry resolves the current year and the annual rollover drill
+    # guards New Year). Both layers are point-geocoded (outSR=4326).
+    arcgis_minneapolis_permits_url: str = Field(
+        default=(
+            "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/"
+            "CCS_Permits/FeatureServer/0"
+        ),
+        description="Minneapolis CCS permits FeatureServer layer URL",
+    )
+    arcgis_minneapolis_311_url: str = Field(
+        default=(
+            "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/"
+            "Public_311_2026/FeatureServer/0"
+        ),
+        description="Minneapolis current-year Public 311 FeatureServer layer URL",
+    )
+
     # Detroit (ArcGIS FeatureServer — services2 host, camelCase ObjectId)
     arcgis_detroit_permits_url: str = Field(
         default=(
@@ -405,6 +433,29 @@ class Settings(BaseSettings):
             "Permits_Pierce_County/FeatureServer/0"
         ),
         description="Pierce County permits and applications FeatureServer layer URL",
+    )
+
+    # Milwaukee, WI (ArcGIS): active liquor-license registry with point
+    # geometry. ANSI-date-literal server (US-87): rejects ISO-string date
+    # comparisons; the shared watermark_comparison handles it.
+    arcgis_milwaukee_licenses_url: str = Field(
+        default=(
+            "https://milwaukeemaps.milwaukee.gov/arcgis/rest/services/"
+            "regulation/license/MapServer/0"
+        ),
+        description="Milwaukee liquor license MapServer layer URL",
+    )
+
+    # Charlotte, NC (ArcGIS): city 311 service requests with native
+    # LATITUDE/LONGITUDE + point geometry. Mecklenburg County permits/parcels
+    # live on an ArcGIS Hub surface with no quickly-verifiable bulk feed
+    # (US-88); the registration is 311-only.
+    arcgis_charlotte_311_url: str = Field(
+        default=(
+            "https://gis.charlottenc.gov/arcgis/rest/services/"
+            "ODP/ServiceRequests311/MapServer/0"
+        ),
+        description="Charlotte ODP 311 service requests layer URL",
     )
 
     # Nashville, TN (ArcGIS): issued building permits plus residential STR
