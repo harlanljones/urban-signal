@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="Urban Signal — Real-Time Geospatial Intelligence & Commercial Catalyst Forecasting Engine">
   <title>Urban Signal — Real-Time Geospatial Intelligence & Catalyst Forecaster</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'><rect%20width='64'%20height='64'%20rx='14'%20fill='%230f172a'/><path%20d='M32%2012L12%2022l20%2010%2020-10-20-10zM12%2042l20%2010%2020-10M12%2032l20%2010%2020-10'%20fill='none'%20stroke='%2338bdf8'%20stroke-width='4'%20stroke-linecap='round'%20stroke-linejoin='round'/></svg>">
@@ -1074,10 +1074,198 @@
       border-top-color: var(--bg-surface) !important;
     }
 
+    /* Tablet / small-desktop shrink — sidebars stay visible */
     @media (max-width: 1024px) {
       .sidebar-left { width: 260px; }
       .sidebar-right { width: 300px; }
-      .search-wrapper { width: 160px; }
+      .search-wrapper { width: 180px; }
+    }
+
+    /* ---------------------------------------------------------------------------
+       Mobile chrome — inert on desktop (<=860px activates it).
+       The always-visible sidebars become off-canvas drawers; the header
+       reflows to a brand row plus a horizontally-scrollable division strip;
+       search collapses to a top sheet; a thumb-reachable toolbar toggles
+       layers / search / inspector.
+       --------------------------------------------------------------------------- */
+    .drawer-scrim,
+    .mobile-toolbar,
+    .drawer-grip,
+    .drawer-compare-slot { display: none; }
+
+    body.drawer-left-open .drawer-scrim,
+    body.drawer-right-open .drawer-scrim,
+    body.search-open .drawer-scrim { display: block; }
+
+    .drawer-grip {
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+    .drawer-grip-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+    }
+    .drawer-close {
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      font-size: 20px; line-height: 1;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .drawer-close:hover, .drawer-close:focus-visible {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+    }
+
+    .mobile-toolbar {
+      position: absolute;
+      bottom: max(12px, env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 4px;
+      padding: 5px;
+      background: var(--bg-glass);
+      backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-dropdown);
+      z-index: 95;
+    }
+    .mt-btn {
+      min-width: 44px; min-height: 44px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+      padding: 6px 10px;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .mt-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+    .mt-btn span { font-size: 9px; font-weight: 600; letter-spacing: 0.02em; }
+    .mt-btn:hover, .mt-btn:focus-visible { background: rgba(255, 255, 255, 0.06); color: var(--text-main); }
+    .mt-btn.active { background: var(--accent-primary-dim); color: var(--accent-primary); }
+
+    .drawer-scrim {
+      position: absolute; inset: 0;
+      background: rgba(4, 8, 16, 0.55);
+      backdrop-filter: blur(2px);
+      z-index: 85;
+      animation: scrimIn 0.2s ease both;
+    }
+    @keyframes scrimIn { from { opacity: 0; } to { opacity: 1; } }
+
+    @media (max-width: 860px) {
+      /* Header: two rows — brand + city + stream above, division chips below */
+      header {
+        height: auto;
+        flex-wrap: wrap;
+        padding: max(8px, env(safe-area-inset-top)) 12px 0;
+        gap: 8px;
+      }
+      .brand-section { flex: 0 0 auto; min-width: 0; gap: 8px; }
+      .brand-icon { width: 28px; height: 28px; flex-shrink: 0; }
+      .brand-title { font-size: 12px; }
+      .brand-badge { display: none; }
+      .city-selector-wrapper { flex: 1 1 auto; min-width: 0; margin-left: 0; }
+      .city-select-dropdown {
+        width: 100%; min-width: 0;
+        font-size: 11px; padding: 7px 26px 7px 9px;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+      .borough-nav {
+        flex: 1 1 100%;
+        order: 5;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        background: transparent;
+        border: none; border-radius: 0;
+        border-top: 1px solid var(--border-subtle);
+        padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+        gap: 6px;
+      }
+      .borough-nav::-webkit-scrollbar { display: none; }
+      .borough-btn { padding: 8px 12px; font-size: 12px; flex-shrink: 0; }
+      .header-actions { flex: 0 0 auto; gap: 8px; }
+      .telemetry-indicator { padding: 5px 7px; font-size: 10px; }
+      .telemetry-indicator #stream-status-text { display: none; }
+
+      /* Workspace: sidebars leave flow as off-canvas drawers */
+      .app-workspace { position: relative; }
+      .sidebar-left, .sidebar-right {
+        position: absolute;
+        top: 0; bottom: 0;
+        width: min(294px, 86vw);
+        z-index: 90;
+        transform: translateX(-100%);
+        transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: var(--shadow-dropdown);
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+      .sidebar-left { overflow: hidden; }
+      .sidebar-right {
+        width: min(344px, 92vw);
+        transform: translateX(100%);
+      }
+      body.drawer-left-open .sidebar-left { transform: translateX(0); }
+      body.drawer-right-open .sidebar-right { transform: translateX(0); }
+      .drawer-grip { display: flex; }
+      .drawer-compare-slot { display: block; padding: 12px 15px 0; }
+      #inspector-content { height: auto !important; flex: 1 1 auto; min-height: 0 !important; }
+      .mobile-toolbar { display: flex; }
+
+      /* Search collapses to a slide-down top sheet */
+      .search-wrapper {
+        position: fixed;
+        top: var(--header-h, 56px);
+        left: 0; right: 0; width: auto;
+        z-index: 95;
+        padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+        background: var(--bg-surface);
+        border-bottom: 1px solid var(--border-subtle);
+        transform: translateY(-130%);
+        transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: none;
+      }
+      body.search-open .search-wrapper { transform: translateY(0); pointer-events: auto; }
+      .search-input-box { height: 40px; }
+      .search-dropdown { top: 50px; max-height: 50vh; }
+
+      /* Map fills full width; floating tools enlarge; legend becomes a slim bar */
+      .map-container { width: 100%; }
+      .map-controls-group { top: max(12px, env(safe-area-inset-top)); right: 12px; gap: 8px; }
+      .map-tool-btn { width: 44px; height: 44px; }
+      .map-tool-btn svg { width: 18px; height: 18px; }
+      .map-legend-card {
+        left: 12px; right: 12px;
+        bottom: calc(76px + env(safe-area-inset-bottom));
+        min-width: 0; width: auto;
+        padding: 8px 12px;
+      }
+      .map-legend-card .legend-bar { margin-bottom: 6px; }
+
+      .inspector-content { padding: 14px; }
+      .inspector-empty-state { padding: 40px 18px; }
+    }
+
+    @media (max-width: 860px) and (prefers-reduced-motion: reduce) {
+      .sidebar-left, .sidebar-right, .search-wrapper { transition: none; }
+      .drawer-scrim { animation: none; }
     }
   </style>
 </head>
@@ -1176,8 +1364,31 @@
   <!-- Main Application Workspace -->
   <div class="app-workspace">
 
+    <!-- Mobile drawer scrim + thumb-reachable toolbar (desktop-inert) -->
+    <div class="drawer-scrim" aria-hidden="true"></div>
+    <nav class="mobile-toolbar" role="navigation" aria-label="Map panels">
+      <button class="mt-btn" type="button" data-drawer="left" aria-expanded="false" aria-label="Open layer controls and catalysts">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 22 8 12 14 2 8"/><polyline points="2 12 12 18 22 12"/></svg>
+        <span>Layers</span>
+      </button>
+      <button class="mt-btn" type="button" data-drawer="search" aria-expanded="false" aria-label="Open search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span>Search</span>
+      </button>
+      <button class="mt-btn" type="button" data-drawer="right" aria-expanded="false" aria-label="Open parcel inspector">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="3" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="3" y1="12" x2="7" y2="12"/><line x1="17" y1="12" x2="21" y2="12"/></svg>
+        <span>Inspect</span>
+      </button>
+    </nav>
+
     <!-- Left Sidebar: Layer Controls & Active Catalysts -->
     <aside class="sidebar-left">
+      <!-- Mobile drawer header (desktop-inert) -->
+      <div class="drawer-grip">
+        <span class="drawer-grip-title">Layers &amp; Catalysts</span>
+        <button class="drawer-close" type="button" data-close aria-label="Close layers panel">&times;</button>
+      </div>
+      <div class="drawer-compare-slot"></div>
       <!-- Map Controls Panel -->
       <div class="panel-section">
         <div class="panel-header-row">
@@ -1239,6 +1450,11 @@
 
     <!-- Right Sidebar: Parcel & Submarket Inspector -->
     <aside class="sidebar-right" id="inspector-panel">
+      <!-- Mobile drawer header (desktop-inert) -->
+      <div class="drawer-grip">
+        <span class="drawer-grip-title">Parcel Inspector</span>
+        <button class="drawer-close" type="button" data-close aria-label="Close inspector">&times;</button>
+      </div>
       <div id="inspector-content" style="height: 100%;">
         <div class="inspector-empty-state">
           <div class="inspector-empty-icon">
@@ -2293,6 +2509,7 @@
       }
 
       renderDivisionTabs();
+      wireMobileChrome();
       initMap();
       await loadSubmarkets();
 
@@ -2307,7 +2524,102 @@
 
     window.addEventListener('resize', () => {
       if (map) map.resize();
+      if (!isMobileLayout()) closeMobilePanels();
+      syncMobileChrome();
     });
+
+    // ----- Mobile drawer / search-sheet orchestration -----
+    function isMobileLayout() {
+      return window.matchMedia('(max-width: 860px)').matches;
+    }
+
+    // Relocate the compare control between the header (desktop) and the layers
+    // drawer (mobile) so the header row stays uncluttered on phones.
+    function syncComparePlacement() {
+      const compare = document.querySelector('.compare-control');
+      const slot = document.querySelector('.sidebar-left .drawer-compare-slot');
+      const brandSection = document.querySelector('.brand-section');
+      if (!compare || !slot || !brandSection) return;
+      if (isMobileLayout()) {
+        if (!slot.contains(compare)) slot.appendChild(compare);
+      } else if (!brandSection.contains(compare)) {
+        brandSection.appendChild(compare);
+      }
+    }
+
+    // Publish the live header height so the fixed search sheet lands below it.
+    function syncHeaderHeight() {
+      const header = document.querySelector('header');
+      if (header) {
+        document.documentElement.style.setProperty('--header-h', header.offsetHeight + 'px');
+      }
+    }
+
+    function syncMobileChrome() {
+      syncComparePlacement();
+      syncHeaderHeight();
+    }
+
+    function syncToolbarActive() {
+      document.querySelectorAll('.mobile-toolbar .mt-btn').forEach((btn) => {
+        const which = btn.dataset.drawer;
+        const cls = which === 'left' ? 'drawer-left-open'
+          : which === 'right' ? 'drawer-right-open'
+          : which === 'search' ? 'search-open' : '';
+        const open = cls ? document.body.classList.contains(cls) : false;
+        btn.classList.toggle('active', open);
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    }
+
+    function closeMobilePanels() {
+      const wasOpen = document.body.classList.contains('drawer-left-open')
+        || document.body.classList.contains('drawer-right-open')
+        || document.body.classList.contains('search-open');
+      document.body.classList.remove('drawer-left-open', 'drawer-right-open', 'search-open');
+      syncToolbarActive();
+      if (wasOpen && map) map.resize();
+    }
+
+    function openMobilePanel(which) {
+      if (!isMobileLayout()) return;
+      document.body.classList.remove('drawer-left-open', 'drawer-right-open', 'search-open');
+      const cls = which === 'left' ? 'drawer-left-open'
+        : which === 'right' ? 'drawer-right-open'
+        : which === 'search' ? 'search-open' : '';
+      if (!cls) return;
+      document.body.classList.add(cls);
+      syncToolbarActive();
+      if (map) requestAnimationFrame(() => map.resize());
+      if (which === 'search') {
+        const input = document.getElementById('global-search-input');
+        if (input) setTimeout(() => input.focus(), 60);
+      }
+    }
+
+    function toggleMobilePanel(which) {
+      if (!isMobileLayout()) return;
+      const cls = which === 'left' ? 'drawer-left-open'
+        : which === 'right' ? 'drawer-right-open'
+        : which === 'search' ? 'search-open' : '';
+      if (cls && document.body.classList.contains(cls)) closeMobilePanels();
+      else openMobilePanel(which);
+    }
+
+    function wireMobileChrome() {
+      const scrim = document.querySelector('.drawer-scrim');
+      if (scrim) scrim.addEventListener('click', closeMobilePanels);
+      document.querySelectorAll('.mobile-toolbar .mt-btn').forEach((btn) => {
+        btn.addEventListener('click', () => toggleMobilePanel(btn.dataset.drawer));
+      });
+      document.querySelectorAll('[data-close]').forEach((el) => {
+        el.addEventListener('click', closeMobilePanels);
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeMobilePanels();
+      });
+      syncMobileChrome();
+    }
 
     function selectBoroughFilter(borough) {
       activeBoroughFilter = normalizeBorough(borough === 'ALL' ? 'ALL' : borough);
@@ -2995,6 +3307,12 @@
     function handleHexSelection(props) {
       if (!props) return;
       selectedH3Index = props.h3_index;
+      // Mobile: the inspector is an off-canvas drawer, so surface it on every
+      // selection (map click, catalyst item, or search) — otherwise the user
+      // taps a hex and sees nothing change.
+      if (isMobileLayout() && !document.body.classList.contains('drawer-right-open')) {
+        openMobilePanel('right');
+      }
       if (map && map.getLayer('h3-hex-selected')) {
         map.setFilter('h3-hex-selected', ['==', ['get', 'h3_index'], props.h3_index]);
       }
