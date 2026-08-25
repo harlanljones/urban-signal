@@ -354,3 +354,28 @@ class TestDashboardWiring:
             f"apps/dashboard/public/index.html is a stale static copy — missing {stale}. "
             f"Re-sync it from get_dashboard_html() before closing the wave."
         )
+
+
+@pytest.mark.interlock
+class TestSnapshotWiring:
+    """A registration is not done while the batch export skips the city: the KV
+    snapshot is the map's only data source, so a city missing from the export
+    list renders as an empty grid with "No active catalysts" (2026-08 prod
+    incident — san_diego was wired into the dashboard but never exported).
+    """
+
+    def test_snapshot_export_covers_every_registered_city(self):
+        from src.export.snapshot_builder import SUPPORTED_CITIES
+
+        exported = set(SUPPORTED_CITIES)
+        registered = {cid.value for cid in REGISTRY}
+        missing = [cid for cid in registered if cid not in exported]
+        extra = sorted(exported - registered)
+        assert not missing, (
+            f"registered but never exported to the KV snapshot: {missing}. "
+            f"Derive SUPPORTED_CITIES from CityId in the same spine hold as the REGISTRY entry."
+        )
+        assert not extra, (
+            f"exported to the KV snapshot but not registered: {extra}. "
+            f"Drop the stale entry or register the city."
+        )

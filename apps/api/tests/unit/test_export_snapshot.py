@@ -12,6 +12,7 @@ from src.export.snapshot_builder import (
     DEFAULT_RESOLUTION,
     build_snapshot,
 )
+from src.spatial.city_registry import CityId
 
 
 class StubEngine:
@@ -55,7 +56,7 @@ def asyncio_run_build(tmp_path: Path, cities=None) -> dict[str, Any]:
 
 
 def test_manifest_shape(snapshot: dict[str, Any]):
-    assert set(snapshot["cities"]) == {"nyc", "chicago", "san_francisco", "seattle", "los_angeles", "norfolk", "detroit", "austin", "new_orleans", "cincinnati", "boston", "baltimore", "montgomery", "baton_rouge", "denver", "philadelphia", "washington_dc"}
+    assert set(snapshot["cities"]) == {city.value for city in CityId}
     assert snapshot["resolution"] == DEFAULT_RESOLUTION
     assert snapshot["k_ring"] == DEFAULT_K_RING
     assert snapshot["catalyst_threshold"] == CATALYST_THRESHOLD

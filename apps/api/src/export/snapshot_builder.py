@@ -19,30 +19,13 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from src.spatial.city_registry import CityId
 from src.serving import router as api_router
 from src.serving.engine import MultiHorizonInferenceEngine
 
 logger = logging.getLogger(__name__)
 
-SUPPORTED_CITIES = [
-    "nyc",
-    "chicago",
-    "san_francisco",
-    "seattle",
-    "los_angeles",
-    "new_orleans",
-    "norfolk",
-    "detroit",
-    "austin",
-    "cincinnati",
-    "boston",
-    "baltimore",
-    "montgomery",
-    "baton_rouge",
-    "denver",
-    "philadelphia",
-    "washington_dc",
-]
+SUPPORTED_CITIES = [city.value for city in CityId]
 DEFAULT_RESOLUTION = 9
 DEFAULT_K_RING = 1
 CATALYST_THRESHOLD = 85.0
