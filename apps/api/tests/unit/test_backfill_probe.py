@@ -111,10 +111,10 @@ def test_probe_registry_scopes_to_requested_city(monkeypatch):
 
     monkeypatch.setattr("scripts.backfill_probe.probe_feed", fake_probe_feed)
     results = probe_registry(city_ids={"baltimore"}, want_count=False)
-    # Baltimore registers permits, 311, and sla.
-    assert len(results) == 3
+    # Baltimore registers permits, 311, sla, and deeds (MD SDAT).
+    assert len(results) == 4
     assert all(city == "baltimore" for city, _ in captured)
-    assert {feed for _, feed in captured} == {"permits", "311", "sla"}
+    assert {feed for _, feed in captured} == {"permits", "311", "sla", "deeds"}
 
 
 def test_drop_reason_classification():

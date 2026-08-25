@@ -29,16 +29,19 @@ def test_baltimore_geometry_is_self_consistent():
     assert {meta.city_id for meta in BALTIMORE_SUBMARKETS.values()} == {"baltimore"}
 
 
-def test_baltimore_registers_arcgis_three_feeds_without_sales():
+def test_baltimore_registers_arcgis_feeds_plus_socrata_sdat_deeds():
     city = CityId.BALTIMORE
     assert REGISTRY[city].job_suffix == "baltimore"
     assert set(REGISTRY[city].datasets) == {
         FeedType.PERMITS,
         FeedType.COMPLAINTS_311,
         FeedType.SLA,
+        FeedType.DEEDS,
     }
-    assert all(spec.platform == "arcgis" for spec in REGISTRY[city].datasets.values())
-    assert FeedType.DEEDS not in REGISTRY[city].datasets
+    for feed in (FeedType.PERMITS, FeedType.COMPLAINTS_311, FeedType.SLA):
+        assert REGISTRY[city].datasets[feed].platform == "arcgis", feed
+    assert REGISTRY[city].datasets[FeedType.DEEDS].platform == "socrata"
+    assert REGISTRY[city].datasets[FeedType.DEEDS].extra["ingestion_mode"] == "snapshot"
 
 
 def test_baltimore_specs_pin_live_fields_and_311_rollover():
@@ -105,3 +108,72 @@ def test_baltimore_311_row_parses_with_current_layer_fields():
     assert event.incident_id == "2026-000042"
     assert event.latitude == pytest.approx(39.290)
     assert event.incident_address == "100 N CHARLES ST"
+
+
+BALTIMORE_SDAT_DEED = {
+    # Live shaped row from opendata.maryland.gov/resource/3x3p-xk2v (2026-08-25);
+    # the point arrives as a WKT string and the native WGS84 columns are numbers.
+    "account_id_mdp_field_acctid": "13113438055A",
+    "sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89": "2026.07.24",
+    "sales_segment_1_consideration_mdp_field_considr1_sdat_field_90": "215000",
+    "sales_segment_1_grantor_name_mdp_field_grntnam1_sdat_field_80": "BALTIMORE HOLDINGS LLC",
+    "sales_segment_1_transfer_number_mdp_field_transno1_sdat_field_79": "000123",
+    "mdp_latitude_mdp_field_digycord_converted_to_wgs84": 39.311834646402595,
+    "mdp_longitude_mdp_field_digxcord_converted_to_wgs84": -76.62346538375218,
+    "mappable_latitude_and_longitude": "POINT (-76.62346538375218 39.311834646402595)",
+    "county_name_mdp_field_cntyname": "Baltimore City",
+}
+
+
+class TestBaltimoreSdatDeeds:
+    """US-128: MD SDAT real-property deeds for Baltimore City."""
+
+    @pytest.fixture
+    def deeds(self):
+        with patch("src.producers.deeds_acris_producer.BaseKafkaProducer"):
+            from src.producers.deeds_acris_producer import DeedsACRISProducer
+
+            return DeedsACRISProducer()
+
+    def test_live_shaped_row_parses_through_field_map(self, deeds):
+        event = deeds.parse_socrata_row(dict(BALTIMORE_SDAT_DEED), city_id="baltimore")
+        assert event is not None
+        assert event.city_id == "baltimore"
+        assert event.doc_id == "13113438055A"
+        assert event.bbl == "13113438055A"
+        assert event.document_amount == pytest.approx(215000.0)
+        assert event.party1_grantor == "BALTIMORE HOLDINGS LLC"
+        assert event.party2_grantee is None  # SDAT records grantor only
+        assert event.latitude == pytest.approx(39.311834646402595)
+        assert event.longitude == pytest.approx(-76.62346538375218)
+
+    def test_dotted_watermark_parses_to_real_recorded_date(self, deeds):
+        event = deeds.parse_socrata_row(dict(BALTIMORE_SDAT_DEED), city_id="baltimore")
+        assert event is not None
+        assert (event.recorded_date.year, event.recorded_date.month, event.recorded_date.day) == (
+            2026,
+            7,
+            24,
+        )
+
+    def test_wkt_point_string_geocodes_when_native_columns_absent(self, deeds):
+        row = dict(BALTIMORE_SDAT_DEED)
+        row.pop("mdp_latitude_mdp_field_digycord_converted_to_wgs84")
+        row.pop("mdp_longitude_mdp_field_digxcord_converted_to_wgs84")
+        event = deeds.parse_socrata_row(row, city_id="baltimore")
+        assert event is not None
+        assert event.latitude == pytest.approx(39.311834646402595)
+        assert event.longitude == pytest.approx(-76.62346538375218)
+
+    def test_row_autodetects_baltimore_by_county_name(self, deeds):
+        event = deeds.parse_socrata_row(dict(BALTIMORE_SDAT_DEED))
+        assert event is not None
+        assert event.city_id == "baltimore"
+
+    def test_snapshot_mode_registered(self):
+        spec = REGISTRY[CityId.BALTIMORE].datasets[FeedType.DEEDS]
+        assert spec.extra["ingestion_mode"] == "snapshot"
+        assert spec.extra["expected_cadence_days"] == 30
+        assert spec.watermark_col == (
+            "sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89"
+        )

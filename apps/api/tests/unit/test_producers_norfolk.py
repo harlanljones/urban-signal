@@ -1,10 +1,12 @@
 """Unit tests for the Norfolk registration and its producer wiring.
 
-Norfolk is a partial city by design: the 2026-08 re-probe registered exactly
-TWO Socrata feeds on data.norfolk.gov — building permits (fahm-yuh4) and
-property deeds/sales (qva7-tzrf). The 311 feed (nbyu-xjez) locates incidents
-by bare address string and the business-license feed (dpi6-sct5) has no
-geometry at all; both are deferred pending address-geocoding capability.
+Norfolk is a city registered across its Socrata feeds on data.norfolk.gov:
+building permits (fahm-yuh4), property deeds/sales (qva7-tzrf), MyNorfolk 311
+(nbyu-xjez), and business licenses (dpi6-sct5). The 311 feed locates incidents
+by bare address string (ADR 0004 geocoded at parse time); the business-license
+feed carries NATIVE lat/lng/geocoded_point and is registered with a where-filter
+that drops the 'NO NORFOLK ADDRESS REQUIRED 99999' placeholder rows, leaving
+>96% geocoded.
 
 FY rotation caveat: Norfolk publishes sales as annual fiscal-year datasets
 (FY23...FY27); the registry pins the current-year file and its dataset ID must
@@ -93,23 +95,27 @@ class TestNorfolkRegistration:
 
     def test_job_names_are_namespaced(self):
         assert get_job_name(FeedType.PERMITS, CityId.NORFOLK) == "permits_norfolk"
+        assert get_job_name(FeedType.SLA, CityId.NORFOLK) == "sla_norfolk"
 
 
 class TestPartialFeedRegistration:
-    """Wave G2 (US-75) outcome: 311 registered behind the geocoder; SLA
-    evaluated and reverted under G8' (placeholder-address share)."""
+    """303 deferred; 311 registered behind the geocoder (ADR 0004); SLA
+    registered under US-133 once the city added native lat/lng and the
+    placeholder-address where-filter clears the G8' null-H3 ceiling."""
 
     def test_registered_feed_set(self):
         assert set(REGISTRY[CityId.NORFOLK].datasets) == {
             FeedType.PERMITS,
             FeedType.DEEDS,
             FeedType.COMPLAINTS_311,
+            FeedType.SLA,
         }
 
     def test_watermarks_match_published_schemas(self):
         assert get_dataset(CityId.NORFOLK, FeedType.PERMITS).watermark_col == "issue_date"
         assert get_dataset(CityId.NORFOLK, FeedType.DEEDS).watermark_col == "transfer_date"
         assert get_dataset(CityId.NORFOLK, FeedType.COMPLAINTS_311).watermark_col == "creation_date"
+        assert get_dataset(CityId.NORFOLK, FeedType.SLA).watermark_col == "business_opened_date"
 
     def test_geocoded_feed_declares_its_address_contract(self):
         extra = get_dataset(CityId.NORFOLK, FeedType.COMPLAINTS_311).extra
@@ -117,13 +123,29 @@ class TestPartialFeedRegistration:
         assert extra["geocode_context"] == "Norfolk, VA"
         assert extra["expected_cadence_days"] >= 1
 
-    def test_sla_reverted_under_g8_prime(self):
-        """US-75 finding: ~34% of newest dpi6-sct5 rows carry the literal
-        placeholder 'NO NORFOLK ADDRESS REQUIRED' (special-event licenses),
-        so the feed resolves ~65% of coordinates — far above the 5%
-        null-H3 ceiling. Reverted, not documented-and-registered."""
-        with pytest.raises(KeyError):
-            get_dataset(CityId.NORFOLK, FeedType.SLA)
+    def test_sla_declares_socrata_watermark_and_ids(self):
+        """US-133: the Wave G2 "no geometry" verdict is obsolete — the city
+        geocodes location_address into native latitude/longitude. The feed
+        carries a Socrata DateTime watermark and a three-key id tuple."""
+        spec = get_dataset(CityId.NORFOLK, FeedType.SLA)
+        assert spec.platform == "socrata"
+        assert spec.watermark_col == "business_opened_date"
+        assert spec.id_keys == ["trading_as_name", "primary_owner", "business_opened_date"]
+        assert spec.producer_key == "sla"
+
+    def test_sla_registration_where_clause_drops_placeholder_addresses(self):
+        extra = get_dataset(CityId.NORFOLK, FeedType.SLA).extra
+        assert extra["where"] == "location_address != 'NO NORFOLK ADDRESS REQUIRED 99999'"
+
+    def test_sla_registration_field_map_maps_native_columns(self):
+        fm = get_dataset(CityId.NORFOLK, FeedType.SLA).extra["field_map"]
+        assert fm["license_id"] == ["trading_as_name", "primary_owner"]
+        assert fm["dba"] == ["trading_as_name"]
+        assert fm["premises_name"] == ["primary_owner"]
+        assert fm["license_type"] == ["naics"]
+        assert fm["effective_date"] == ["business_opened_date"]
+        assert fm["latitude"] == ["latitude"]
+        assert fm["longitude"] == ["longitude"]
 
 
 class TestNorfolkRowParsing:
@@ -318,68 +340,75 @@ class TestGeocodedFeedParsing:
         assert complaints.parse_socrata_row(row, city_id="norfolk") is None
 
 
-NORFOLK_SLA_CANDIDATE_MAP = {
-    "license_id": ["trading_as_name", "primary_owner"],
-    "premises_name": ["trading_as_name"],
-    "license_type": ["naics"],
-    "effective_date": ["business_opened_date"],
-    "address_street": ["location_address"],
-}
-
-
 class TestNorfolkSlaParsing:
-    """Producer-capability pins for the reverted dpi6-sct5 registration: with
-    the candidate field map supplied (and coordinates resolved), rows parse;
-    placeholder-address rows fall through to null-coord events."""
+    """US-133: the business-license feed (dpi6-sct5) carries native
+    latitude/longitude, so rows parse against the registered field map without
+    any geocoding hook. The where-filter excludes the placeholder-address
+    rows server-side, but a coordinate-less row that slips through still
+    parses to a null-H3 event (DC-precedent tolerance)."""
 
     @pytest.fixture
-    def sla(self, monkeypatch):
-        monkeypatch.setattr(
-            "src.producers.field_maps.resolve_field_map",
-            lambda city_value, feed: NORFOLK_SLA_CANDIDATE_MAP
-            if getattr(feed, "value", feed) == "sla"
-            else {},
-        )
+    def sla(self):
         with patch("src.producers.sla_licenses_producer.BaseKafkaProducer"):
             from src.producers.sla_licenses_producer import SLALicensesProducer
 
             return SLALicensesProducer()
 
-    def test_norfolk_license_row_geocodes_and_maps(self, sla, monkeypatch):
-
-        monkeypatch.setattr(
-            "src.spatial.geocoder.geocode_row_if_declared",
-            lambda city_id, feed_value, address, context=None: (
-                (36.87, -76.29)
-                if address == "3549 SHARPLEY AVE 23513"
-                else None
-            ),
-        )
+    def test_norfolk_license_row_parses_with_native_coords(self, sla):
+        # Live-shaped row from dpi6-sct5 (native geocoded_point): the city
+        # geocodes location_address itself into latitude/longitude strings.
         row = {
-            "trading_as_name": "MEEKINS FIELD SERVICES",
-            "location_address": "3549 SHARPLEY AVE 23513",
-            "business_opened_date": "2026-08-24T00:00:00.000",
-            "naics": "561790",
-            "primary_owner": "J MEEKINS",
+            "trading_as_name": "MARY SHAUNA DOWNING",
+            "naics": "School, Misc Instruction",
+            "primary_owner": "DOWNING, MARY SHAUNA",
+            "location_address": "409 E LITTLE CREEK RD 23505",
+            "business_opened_date": "2026-08-25T00:00:00.000",
+            "latitude": "36.9176",
+            "longitude": "-76.2609",
+            "geocoded_point": {"type": "Point", "coordinates": [-76.2609, 36.9176]},
+            "census_tract": "51710005701",
         }
         event = sla.parse_socrata_row(row, city_id="norfolk")
         assert event is not None
-        assert event.latitude == 36.87 and event.longitude == -76.29
+        assert event.city_id == "norfolk"
+        assert event.latitude == pytest.approx(36.9176)
+        assert event.longitude == pytest.approx(-76.2609)
+        assert event.license_id == "MARY SHAUNA DOWNING"
+        assert event.dba == "MARY SHAUNA DOWNING"
+        assert event.premises_name == "DOWNING, MARY SHAUNA"
+        assert event.license_type == "School, Misc Instruction"
         assert event.effective_date is not None and event.effective_date.year == 2026
-        assert event.h3_res9 is not None
+        assert event.h3_res7 is not None
+        assert event.h3_res9 is not None  # native coords index into H3
+        assert event.borough in {"DOWNTOWN_WATERFRONT", "GHENT_WESTBURG", "OCEAN_VIEW",
+                                 "CENTRAL_MILITARY_CIRCLE", "SOUTH_NORFOLK_BERKLEY"}
 
-    def test_placeholder_address_falls_through_to_null_coord_event(self, sla, monkeypatch):
-        """'NO NORFOLK ADDRESS REQUIRED' rows cannot geocode; the SLA producer's
-        coordinate-less tolerance (DC precedent) keeps them as null-H3 events."""
-        monkeypatch.setattr(
-            "src.spatial.geocoder.geocode_row_if_declared",
-            lambda city_id, feed_value, address, context=None: None,
-        )
+    def test_license_id_falls_back_to_owner_when_business_name_missing(self, sla):
+        row = {
+            "naics": "Contractor, Roofing, Sheet Metal",
+            "primary_owner": "SEABOARD CONSTRUCTION LLC",
+            "business_opened_date": "2026-08-25T00:00:00.000",
+            "latitude": "36.9176",
+            "longitude": "-76.2609",
+        }
+        event = sla.parse_socrata_row(row, city_id="norfolk")
+        assert event is not None
+        assert event.license_id == "SEABOARD CONSTRUCTION LLC"
+
+    def test_coordinate_less_row_parses_to_null_h3_event(self, sla):
+        """Without native coords (and no needs_geocode declaration) the SLA
+        producer keeps the row as a null-lat/lng/null-H3 event — the DC
+        precedent. The extra where-filter normally excludes the placeholder
+        rows server-side, but the producer must not drop them if one arrives."""
         row = {
             "trading_as_name": "SUNDAE SCOOP (SPECIAL EVENT)",
             "location_address": "NO NORFOLK ADDRESS REQUIRED 99999",
-            "business_opened_date": "2026-08-24T00:00:00.000",
+            "business_opened_date": "2026-08-25T00:00:00.000",
+            "naics": "Special Event",
+            "primary_owner": "SUNDAE SCOOP LLC",
         }
         event = sla.parse_socrata_row(row, city_id="norfolk")
         assert event is not None
-        assert event.latitude is None and event.h3_res7 is None
+        assert event.latitude is None
+        assert event.longitude is None
+        assert event.h3_res7 is None and event.h3_res9 is None

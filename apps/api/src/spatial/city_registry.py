@@ -984,11 +984,13 @@ REGISTRY: Dict[CityId, CityRegistration] = {
         submarkets=NORFOLK_SUBMARKETS,
         divisions=NORFOLK_DIVISIONS,
         job_suffix="norfolk",
-        # Partial registration like Los Angeles: MyNorfolk 311 (`nbyu-xjez`)
-        # locates cases with an address STRING and the business-license feed
-        # (`dpi6-sct5`) has no geometry at all — both need an address-geocoding
-        # capability before they can produce H3-keyed events. Deferred rather
-        # than registered shapeless.
+        # Partial registration: MyNorfolk 311 (`nbyu-xjez`) locates cases with
+        # an address STRING (ADR 0004 geocoded at parse time), while the
+        # business-license feed (`dpi6-sct5`) carries NATIVE lat/lng/geocoded_point
+        # columns (the city geocodes `location_address` itself) — the Wave G2
+        # "no geometry" verdict is obsolete. Registered with a where-filter that
+        # drops the `'NO NORFOLK ADDRESS REQUIRED 99999'` placeholder rows
+        # (special-event/no-fixed-premises licenses), leaving ~96% geocoded.
         datasets={
             FeedType.PERMITS: DatasetSpec(
                 endpoint=settings.socrata_norfolk_permits_endpoint,
@@ -1039,12 +1041,38 @@ REGISTRY: Dict[CityId, CityRegistration] = {
             # parse time because the declaration below flips the coordinate
             # requirement, keeping Avro doubles real.
             #
-            # The SLA feed (dpi6-sct5) was evaluated under Wave G2 and is
-            # deliberately NOT registered: ~34% of newest rows carry the
-            # literal placeholder 'NO NORFOLK ADDRESS REQUIRED' (special-event
-            # licenses), so the feed lands at ~65% resolved coordinates —
-            # far above the G8' 5% null-H3 ceiling. Revisit only alongside a
-            # scope filter that excludes non-addressable license classes.
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.socrata_norfolk_licenses_endpoint,
+                platform="socrata",
+                watermark_col="business_opened_date",
+                id_keys=["trading_as_name", "primary_owner", "business_opened_date"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                # The city geocodes `location_address` itself into
+                # latitude/longitude (and geocoded_point), so the Wave G2
+                # "no geometry" verdict is obsolete. ~25% of raw rows carry
+                # the literal placeholder 'NO NORFOLK ADDRESS REQUIRED 99999'
+                # (special-event/no-fixed-premises licenses); excluding them
+                # server-side leaves >96% native-geocoded, well under the G8'
+                # 5% null-H3 ceiling. Business names double as a license
+                # identity (no numeric license id on the feed); the three
+                # id_keys form the watermark/dedup tuple.
+                extra={
+                    "expected_cadence_days": 7,
+                    "where": "location_address != 'NO NORFOLK ADDRESS REQUIRED 99999'",
+                    "field_map": {
+                        "license_id": ["trading_as_name", "primary_owner"],
+                        "dba": ["trading_as_name"],
+                        "premises_name": ["primary_owner"],
+                        "license_type": ["naics"],
+                        "effective_date": ["business_opened_date"],
+                        "address_street": ["location_address"],
+                        "latitude": ["latitude"],
+                        "longitude": ["longitude"],
+                    },
+                },
+            ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.socrata_norfolk_311_endpoint,
                 platform="socrata",
@@ -1249,9 +1277,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
         submarkets=CINCINNATI_SUBMARKETS,
         divisions=CINCINNATI_DIVISIONS,
         job_suffix="cinci",
-        # The verified Cincinnati catalog has permits, 311, and business
-        # licenses. No transaction-level sales/deeds feed was identified;
-        # leave DEEDS absent instead of inventing a source.
+        # The verified Cincinnati catalog has permits, 311, business licenses,
+        # and the Hamilton County Auditor property-transfers CSV (US-126). The
+        # deeds feed is a static-CSV download (no REST API) that publishes the
+        # current month's sales daily; SaleDate is synthesized from the three
+        # int columns, so the spec runs as a snapshot window re-pulled each
+        # poll and deduped on ConveyanceNumber+PropertyNumber.
         datasets={
             FeedType.PERMITS: DatasetSpec(
                 endpoint=settings.socrata_cincinnati_permits_endpoint,
@@ -1307,6 +1338,39 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                         "longitude": ["longitude"],
                         "status": ["data_status", "status_class"],
                     }
+                },
+            ),
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.csv_cincinnati_deeds_endpoint,
+                platform="csv",
+                watermark_col="SaleDate",
+                id_keys=["conveyancenumber", "propertynumber"],
+                topic=settings.topic_deeds,
+                interval_seconds=1800.0,
+                producer_key="deeds",
+                extra={
+                    "expected_cadence_days": 7,
+                    "ingestion_mode": "snapshot",
+                    "where": "valid = 'Y'",
+                    "needs_geocode": True,
+                    "geocode_context": "Hamilton County, OH",
+                    "scope": (
+                        "Hamilton County Auditor daily property-transfers "
+                        "(arm's-length Valid='Y' rows; SaleDate synthesized "
+                        "from MonthSale/DaySale/YearSale; address-only, "
+                        "geocode deferred to ADR 0004)"
+                    ),
+                    "field_map": {
+                        "doc_id": ["conveyancenumber"],
+                        "bbl": ["propertynumber"],
+                        "document_amount": ["saleamount"],
+                        "party1_grantor": ["previousowner"],
+                        "party2_grantee": ["ownername1", "ownername2"],
+                        "doc_type": ["deedtype"],
+                        "incident_address": ["house#", "streetname", "streetsuffix"],
+                        "zipcode": ["locationzipcode"],
+                        "borough": ["appraisalarea"],
+                    },
                 },
             ),
         },
@@ -1396,7 +1460,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
         job_suffix="montgomery",
         # MC311 (xtyh-brr2) is deliberately excluded: it has only zip/city/
         # district fields and no street or coordinates, so it fails G5 by
-        # construction. Deeds/sales were not found in the county portal.
+        # construction. Deeds/sales were not found in the county portal — the
+        # registered DEEDS feed (US-128) comes from the state-level MD SDAT
+        # real-property snapshot on opendata.maryland.gov instead.
         # Permits publishes a 4.97% geocode gap (9,244 of 186,140 rows lack
         # location coordinates; probed 2026-08-24); G5 is adjudicated against
         # that published gap (newest-500 drop 4.8%).
@@ -1449,6 +1515,36 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                         "zipcode": ["zip"],
                         "latitude": ["location.latitude"],
                         "longitude": ["location.longitude"],
+                    },
+                },
+            ),
+            # US-128: MD SDAT real-property deeds — per-parcel assessment
+            # snapshot (one row per parcel; segment 1 = most recent sale, with
+            # the prior two in _segment_2_/_3_). Point-geocoded natively via the
+            # WKT mappable_latitude_and_longitude + the MDP WGS84 numeric
+            # columns; monthly snapshot. No grantee (SDAT records grantor only);
+            # the new-sale watermark is the dotted YYYY.MM.DD text, so the feed
+            # runs snapshot (SF roll precedent) rather than incremental.
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.socrata_montgomery_deeds_endpoint,
+                platform="socrata",
+                watermark_col="sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89",
+                id_keys=["account_id_mdp_field_acctid", "sales_segment_1_transfer_number_mdp_field_transno1_sdat_field_79"],
+                topic=settings.topic_deeds,
+                interval_seconds=600.0,
+                producer_key="deeds",
+                extra={
+                    "expected_cadence_days": 30,
+                    "ingestion_mode": "snapshot",
+                    "scope": "MD SDAT per-parcel assessment snapshot (last 3 sales; segment 1 = most recent)",
+                    "field_map": {
+                        "doc_id": ["account_id_mdp_field_acctid"],
+                        "bbl": ["account_id_mdp_field_acctid"],
+                        "document_amount": ["sales_segment_1_consideration_mdp_field_considr1_sdat_field_90"],
+                        "recorded_date": ["sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89"],
+                        "party1_grantor": ["sales_segment_1_grantor_name_mdp_field_grntnam1_sdat_field_80"],
+                        "latitude": ["mdp_latitude_mdp_field_digycord_converted_to_wgs84"],
+                        "longitude": ["mdp_longitude_mdp_field_digxcord_converted_to_wgs84"],
                     },
                 },
             ),
@@ -1618,10 +1714,13 @@ REGISTRY: Dict[CityId, CityRegistration] = {
         submarkets=MINNEAPOLIS_SUBMARKETS,
         divisions=MINNEAPOLIS_DIVISIONS,
         job_suffix="minneapolis",
-        # Partial registration like Denver: permits + year-sliced 311. The
-        # liquor feeds (On/Off_Sale_Liquor) are narrow license inventories and
-        # Property_Sales_2021_to_2025 is stale (max SALE_DATE 2025-09-30) and
-        # ungeocoded (county-coordinate X/Y) — both deliberately unregistered.
+        # Partial registration like Denver: permits + year-sliced 311 + the
+        # narrow On/Off-Sale liquor license inventory (US-135). The licensee
+        # type is notifications-grade (a license registry, not a hospitality
+        # activity feed — Milwaukee SLA precedent), point-geocoded via native
+        # `lat`/`long` attributes. The Off_Sale_Liquor companion layer rides
+        # companion_endpoints. Property_Sales_2021_to_2025 stays unregistered
+        # (stale max SALE_DATE 2025-09-30, county-coordinate X/Y not lat/lng).
         # 311 publishes one Public_311_<year> layer per year; the rollover
         # drill (US-70) requires the current year to be mapped, so a 2027
         # layer must be appended each New Year like DC/Boston/Baltimore.
@@ -1688,6 +1787,41 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                     },
                 },
             ),
+            # US-135: On/Off-Sale liquor license inventory (AGOL item
+            # 5042131de56d44749f6e43c0b5738b21). Point layer with native
+            # `lat`/`long` attributes; `issueDate` is the watermark
+            # (epoch-ms, esriFieldTypeDate -> ISO by ArcGISClient). The
+            # Off_Sale_Liquor layer is registered as the companion endpoint
+            # (Montgomery-partner precedent); the feed is a narrow liquor
+            # registry, not a hospitality-activity feed (Milwaukee scope).
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.arcgis_minneapolis_licenses_url,
+                platform="arcgis",
+                watermark_col="issueDate",
+                id_keys=["licenseNumber", "OBJECTID"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 16000,
+                    "companion_endpoints": {
+                        "off_sale": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Off_Sale_Liquor/FeatureServer/0",
+                    },
+                    "field_map": {
+                        "license_id": ["licenseNumber"],
+                        "license_type": ["licenseType", "liquorType"],
+                        "effective_date": ["issueDate"],
+                        "expiration_date": ["expirationDate"],
+                        "dba": ["licenseName"],
+                        "latitude": ["lat"],
+                        "longitude": ["long"],
+                        "incident_address": ["address"],
+                        "borough": ["ward", "neighborhood"],
+                    },
+                },
+            ),
         },
     ),
     CityId.BALTIMORE: CityRegistration(
@@ -1702,7 +1836,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
         job_suffix="baltimore",
         # Baltimore's liquor table is intentionally notifications-grade:
         # it is a narrow license inventory rather than a complete hospitality
-        # activity feed. No transaction/deeds feed is registered.
+        # activity feed. The DEEDS feed (US-128) comes from the state-level
+        # MD SDAT real-property snapshot on opendata.maryland.gov — no
+        # county/city transaction feed exists.
         # 311 publishes a 25.07% geocode gap (585,130 of 780,954 rows carry
         # coordinates; probed 2026-08-24). G5 is adjudicated against that
         # published gap: newest-500 drop 35%, mature-window drop 22.6% — the
@@ -1787,6 +1923,36 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                     "scope": "notifications-grade",
                 },
             ),
+            # US-128: MD SDAT real-property deeds — per-parcel assessment
+            # snapshot (one row per parcel; segment 1 = most recent sale, with
+            # the prior two in _segment_2_/_3_). Point-geocoded natively via the
+            # WKT mappable_latitude_and_longitude + the MDP WGS84 numeric
+            # columns; monthly snapshot. No grantee (SDAT records grantor only);
+            # the new-sale watermark is the dotted YYYY.MM.DD text, so the feed
+            # runs snapshot (SF roll precedent) rather than incremental.
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.socrata_baltimore_deeds_endpoint,
+                platform="socrata",
+                watermark_col="sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89",
+                id_keys=["account_id_mdp_field_acctid", "sales_segment_1_transfer_number_mdp_field_transno1_sdat_field_79"],
+                topic=settings.topic_deeds,
+                interval_seconds=600.0,
+                producer_key="deeds",
+                extra={
+                    "expected_cadence_days": 30,
+                    "ingestion_mode": "snapshot",
+                    "scope": "MD SDAT per-parcel assessment snapshot (last 3 sales; segment 1 = most recent)",
+                    "field_map": {
+                        "doc_id": ["account_id_mdp_field_acctid"],
+                        "bbl": ["account_id_mdp_field_acctid"],
+                        "document_amount": ["sales_segment_1_consideration_mdp_field_considr1_sdat_field_90"],
+                        "recorded_date": ["sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89"],
+                        "party1_grantor": ["sales_segment_1_grantor_name_mdp_field_grntnam1_sdat_field_80"],
+                        "latitude": ["mdp_latitude_mdp_field_digycord_converted_to_wgs84"],
+                        "longitude": ["mdp_longitude_mdp_field_digxcord_converted_to_wgs84"],
+                    },
+                },
+            ),
         },
     ),
     CityId.PHILADELPHIA: CityRegistration(
@@ -1869,12 +2035,16 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                     },
                 },
             ),
-            # Real Estate Transfer Tax summary includes mortgages and
-            # satisfactions: NULL consideration parses to amount 0.0 by
-            # design, and recorded_date maps to recording_date because
+            # Real Estate Transfer Tax summary is a price-bearing recorded-deeds
+            # source (Office of Realty Transfer Tax) once scoped to actual
+            # deeds: the where filter below keeps document_type='DEED', whose
+            # rows are ~95% price-bearing (vs. the mortgages/satisfactions that
+            # the table as a whole mixes in, mostly NULL consideration →
+            # document_amount 0.0). recorded_date maps to recording_date because
             # document_date is frequently NULL/sentinel (years 9798, 2066
-            # mortgage-assignment loan terms).  Watermark and keyset order
-            # sit on recording_date for the same reason — see
+            # mortgage-assignment loan terms); watermark and keyset order sit
+            # on recording_date for the same reason — see
+            # docs/research/data-coverage-sweep-2026-08-25.md §7,
             # docs/research/deeds-watermark-audit.md and
             # docs/research/non-socrata-platforms.md §Philadelphia.
             FeedType.DEEDS: DatasetSpec(
@@ -1887,6 +2057,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 producer_key="deeds",
                 extra={
                     "expected_cadence_days": 7,
+                    "where": "document_type = 'DEED'",
                     "id_col": "cartodb_id",
                     "order_by": "recording_date",
                     "select": "*, ST_Y(the_geom) AS latitude, ST_X(the_geom) AS longitude",
@@ -2058,6 +2229,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
         # survey while the catalog read fresh), so it carries a G11 cadence
         # exception instead of paging forever.
         #
+        # DEEDS (US-128) is the state-level MD SDAT real-property snapshot on
+        # opendata.maryland.gov. It is Point-geocoded (WKT
+        # mappable_latitude_and_longitude + MDP WGS84 numeric columns) and
+        # parses cleanly, so it deliberately SIDESTEPS the held qzrv-2tnv
+        # parcel table below — no geometry-hardening needed for this feed.
+        #
         # The qzrv-2tnv parcel table ("Property", 353k rows) is deliberately
         # NOT registered yet: it is one row per tax account (a snapshot
         # candidate), but DeedsACRISProducer.parse_socrata_row extracts
@@ -2085,6 +2262,36 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                         "complaint_type": ["request_name"],
                         "created_date": ["date_request_opened"],
                         "status": ["request_status"],
+                    },
+                },
+            ),
+            # US-128: MD SDAT real-property deeds — per-parcel assessment
+            # snapshot (one row per parcel; segment 1 = most recent sale, with
+            # the prior two in _segment_2_/_3_). Point-geocoded natively via the
+            # WKT mappable_latitude_and_longitude + the MDP WGS84 numeric
+            # columns; monthly snapshot. No grantee (SDAT records grantor only);
+            # the new-sale watermark is the dotted YYYY.MM.DD text, so the feed
+            # runs snapshot (SF roll precedent) rather than incremental.
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.socrata_pg_deeds_endpoint,
+                platform="socrata",
+                watermark_col="sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89",
+                id_keys=["account_id_mdp_field_acctid", "sales_segment_1_transfer_number_mdp_field_transno1_sdat_field_79"],
+                topic=settings.topic_deeds,
+                interval_seconds=600.0,
+                producer_key="deeds",
+                extra={
+                    "expected_cadence_days": 30,
+                    "ingestion_mode": "snapshot",
+                    "scope": "MD SDAT per-parcel assessment snapshot (last 3 sales; segment 1 = most recent)",
+                    "field_map": {
+                        "doc_id": ["account_id_mdp_field_acctid"],
+                        "bbl": ["account_id_mdp_field_acctid"],
+                        "document_amount": ["sales_segment_1_consideration_mdp_field_considr1_sdat_field_90"],
+                        "recorded_date": ["sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89"],
+                        "party1_grantor": ["sales_segment_1_grantor_name_mdp_field_grntnam1_sdat_field_80"],
+                        "latitude": ["mdp_latitude_mdp_field_digycord_converted_to_wgs84"],
+                        "longitude": ["mdp_longitude_mdp_field_digxcord_converted_to_wgs84"],
                     },
                 },
             ),
@@ -2128,6 +2335,44 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                     },
                 },
             ),
+            # US-127: Franklin County Auditor (FCAO) sales-dashboard points
+            # layer — an annual-snapshot ArcGIS FeatureServer, point-geocoded
+            # natively via outSR=4326. The layer ships a dual old/new column
+            # set (SALEPRICE vs Sale_Price, OWNERNME1 vs OWN1/OWN2), so the
+            # field map declares both with the fully-populated new side first.
+            # Instrument_Number and MUNINAME/NHBDNAME are empty layer-wide
+            # (probed 2026-08-25), so doc_id resolves to PARCELID and borough
+            # falls back to coordinate->division (COLUMBUS_CORE). expected_
+            # cadence=365 reflects the annual snapshot refresh.
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.arcgis_columbus_deeds_url,
+                platform="arcgis",
+                watermark_col="SALEDATE",
+                id_keys=["PARCELID", "Instrument_Number", "OBJECTID"],
+                topic=settings.topic_deeds,
+                interval_seconds=600.0,
+                producer_key="deeds",
+                extra={
+                    "expected_cadence_days": 365,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "scope": (
+                        "Franklin County Auditor annual sales snapshot "
+                        "(point-geocoded; dual SALEPRICE/Sale_Price schema)"
+                    ),
+                    "field_map": {
+                        "doc_id": ["Instrument_Number", "PARCELID"],
+                        "bbl": ["PARCELID"],
+                        "document_amount": ["Sale_Price", "SALEPRICE"],
+                        "recorded_date": ["SALEDATE"],
+                        "party1_grantor": ["OWNERNME1"],
+                        "party2_grantee": ["OWN1", "OWN2"],
+                        "incident_address": ["SITEADDRESS"],
+                        "zipcode": ["ZIPCD"],
+                        "borough": ["MUNINAME", "NHBDNAME"],
+                    },
+                },
+            ),
         },
     ),
     CityId.NASHVILLE: CityRegistration(
@@ -2144,9 +2389,10 @@ REGISTRY: Dict[CityId, CityRegistration] = {
         # map carries them; the two-date model keeps Date_Entered (application)
         # distinct from Date_Issued. Residential STR permits register as the
         # SLA-class signal (investor-buyout pressure), verified at 100% parse.
-        # hubNashville 311 stays excluded per HJ-119 -- note the Current_Year
-        # view began carrying 2026 rows after the survey; re-adjudicate before
-        # ever adding it.
+        # hubNashville 311 re-adjudicated positive from the HJ-119 exclusion
+        # (US-131): the Current_Year view now carries 2026 rows and publishes a
+        # 28.5% Latitude gap (52,997 of 185,902 rows), so the where-clause
+        # `Latitude IS NOT NULL` filters to a 100%-geocoded stream.
         datasets={
             FeedType.PERMITS: DatasetSpec(
                 endpoint=settings.arcgis_nashville_permits_url,
@@ -2194,6 +2440,33 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                     },
                 },
             ),
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.arcgis_nashville_311_url,
+                platform="arcgis",
+                watermark_col="Date_Time_Opened",
+                id_keys=["Request__", "GlobalID", "OBJECTID"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "where": "Latitude IS NOT NULL",
+                    "field_map": {
+                        "incident_id": ["Request__"],
+                        "latitude": ["Latitude"],
+                        "longitude": ["Longitude"],
+                        "created_date": ["Date_Time_Opened"],
+                        "closed_date": ["Date_Time_Closed"],
+                        "status": ["Status"],
+                        "complaint_type": ["Request_Type", "Subrequest_Type"],
+                        "incident_address": ["Address"],
+                        "zipcode": ["ZIP"],
+                        "borough": ["Council_District"],
+                    },
+                },
+            ),
         },
     ),
     CityId.KANSAS_CITY: CityRegistration(
@@ -2209,8 +2482,13 @@ REGISTRY: Dict[CityId, CityRegistration] = {
         # Corrects the 2026-08-23 rejection: the feed was live under a name
         # that survey query missed. Publishes intraday (14/14 consecutive days
         # at the claim-time probe), so the standard G11 window applies. KC
-        # permits survive only as dead annual archives and SLA pnm4-68wg has
-        # no date column at all -- both stay unregistered.
+        # permits survive only as dead annual archives and stay unregistered.
+        # The SLA feed pnm4-68wg (US-134) is registered as a snapshot: native
+        # GeoJSON point geometry (96.4%) plus a valid_license_for YYYYMMDD
+        # expiration column, and a 90-day cadence given the ~7m publishing
+        # lapse. Its location column is a GeoJSON Point (coordinates), so the
+        # producer's generic location-container fallback resolves it rather
+        # than the dotted field_map keys.
         datasets={
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.socrata_kansas_city_311_endpoint,
@@ -2228,6 +2506,31 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                         "complaint_type": ["issue_type"],
                         "created_date": ["open_date_time"],
                         "status": ["current_status"],
+                    },
+                },
+            ),
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.socrata_kansas_city_licenses_endpoint,
+                platform="socrata",
+                watermark_col="",
+                id_keys=["id"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                extra={
+                    "expected_cadence_days": 90,
+                    "ingestion_mode": "snapshot",
+                    "scope": "KCMO Business License Holders (snapshot; native GeoJSON point geometry)",
+                    "field_map": {
+                        "license_id": ["id"],
+                        "license_type": ["business_type"],
+                        "expiration_date": ["valid_license_for"],
+                        "dba": ["dba_name"],
+                        "latitude": ["location.latitude"],
+                        "longitude": ["location.longitude"],
+                        "incident_address": ["address"],
+                        "borough": ["city"],
+                        "zipcode": ["zipcode"],
                     },
                 },
             ),
@@ -2375,11 +2678,16 @@ REGISTRY: Dict[CityId, CityRegistration] = {
         submarkets=PITTSBURGH_SUBMARKETS,
         divisions=PITTSBURGH_DIVISIONS,
         job_suffix="pgh",
-        # Permits-only CKAN registration (US-89): WPRDC PLI Permits is the
-        # verified live feed (native lat/lng, issue_date watermark, 1,705
-        # rows/60d). 311 Data Archive is address-only + historical; Allegheny
-        # County sales are county-wide and address-only; Licensed Businesses
-        # lacks usable addresses — all stay unregistered.
+        # WPRDC CKAN registration. Permits (US-89) is the native-lat/lng feed;
+        # 311 (US-132) is the post-transition "Pittsburgh 311 Data" resource —
+        # native lat/lng as TEXT (5-dec EXACT / 2-dec APPROXIMATE, cast to float
+        # by the producer; ~99.8% geocoded in the newest window, legacy 2015-25
+        # rows null). deeds (US-129) is the Allegheny County Property Sale
+        # Transactions package — price-bearing but address-only / PARID-only, so
+        # events are null-H3 like Cook County sales. The old 311 Data Archive is
+        # a frozen separate package (the source of the obsolete "address-only
+        # archive" verdict) and Licensed Businesses lacks usable addresses —
+        # both stay unregistered.
         datasets={
             FeedType.PERMITS: DatasetSpec(
                 endpoint=settings.ckan_pittsburgh_permits_endpoint,
@@ -2403,6 +2711,51 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                     },
                 },
             ),
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.ckan_pittsburgh_deeds_endpoint,
+                platform="ckan",
+                watermark_col="RECORDDATE",
+                id_keys=["PARID", "RECORDDATE", "SALEDATE", "DEEDBOOK", "DEEDPAGE"],
+                topic=settings.topic_deeds,
+                interval_seconds=600.0,
+                producer_key="deeds",
+                extra={
+                    "expected_cadence_days": 7,
+                    "scope": "Allegheny County property-sale transactions (WPRDC; address-only)",
+                    "field_map": {
+                        "doc_id": ["PARID", "DEEDBOOK", "DEEDPAGE"],
+                        "bbl": ["PARID"],
+                        "document_amount": ["PRICE"],
+                        "recorded_date": ["RECORDDATE"],
+                        "doc_type": ["INSTRTYP"],
+                        "borough": ["MUNIDESC", "PROPERTYCITY"],
+                        "incident_address": ["FULL_ADDRESS"],
+                    },
+                },
+            ),
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.ckan_pittsburgh_311_endpoint,
+                platform="ckan",
+                watermark_col="created_date_utc",
+                id_keys=["unique_id", "case_number"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                extra={
+                    "expected_cadence_days": 7,
+                    "scope": "City of Pittsburgh 311 requests (WPRDC Pittsburgh 311 Data; native lat/lng)",
+                    "field_map": {
+                        "incident_id": ["unique_id", "case_number"],
+                        "latitude": ["latitude"],
+                        "longitude": ["longitude"],
+                        "created_date": ["created_date_utc"],
+                        "closed_date": ["closed_date_utc"],
+                        "complaint_type": ["subject"],
+                        "incident_address": ["street"],
+                        "borough": ["neighborhood", "council_district", "ward"],
+                    },
+                },
+            ),
         },
     ),
     CityId.SAN_DIEGO: CityRegistration(
@@ -2415,12 +2768,14 @@ REGISTRY: Dict[CityId, CityRegistration] = {
         submarkets=SAN_DIEGO_SUBMARKETS,
         divisions=SAN_DIEGO_DIVISIONS,
         job_suffix="sd",
-        # Permits-only partial registration (US-91). data.sandiego.gov is a
-        # static-CSV portal (seshat.datasd.org) with no Socrata/ArcGIS API.
-        # The issued-approvals CSV is geocoded (GIS_LATITUDE/GIS_LONGITUDE)
-        # and year-scoped (D3 endpoint_by_year). Get It Done (311) and
-        # Business Tax Certificates are also CSV-only; no property/deeds
-        # source exists in the 122-dataset inventory — all stay unregistered.
+        # Partial registration (US-91 permits, US-124 311, US-125 SLA).
+        # data.sandiego.gov is a static-CSV portal (seshat.datasd.org) with no
+        # Socrata/ArcGIS API. Permits, Get It Done 311, and Business Tax
+        # Certificates are CSV-only and geocoded (native lat/lng); the first
+        # two are year-scoped (D3 endpoint_by_year), the SLA one a full
+        # SNAPSHOT re-pulled each poll and deduped on account_key. No
+        # property/deeds source exists in the 122-dataset inventory — DEEDS
+        # stays unregistered.
         datasets={
             FeedType.PERMITS: DatasetSpec(
                 endpoint=settings.csv_san_diego_permits_endpoint,
@@ -2447,6 +2802,72 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                         "address_street": ["gis_address"],
                         "job_type": ["approval_type"],
                         "status": ["approval_status"],
+                    },
+                },
+            ),
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.csv_san_diego_311_endpoint,
+                platform="csv",
+                watermark_col="date_requested",
+                id_keys=["service_request_id"],
+                topic=settings.topic_311,
+                interval_seconds=1800.0,
+                producer_key="311",
+                extra={
+                    "expected_cadence_days": 7,
+                    "scope": "San Diego Get It Done 311 requests (closed-year + open queue)",
+                    "endpoint_by_year": {
+                        "2016": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2016_datasd.csv",
+                        "2017": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2017_datasd.csv",
+                        "2018": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2018_datasd.csv",
+                        "2019": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2019_datasd.csv",
+                        "2020": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2020_datasd.csv",
+                        "2021": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2021_datasd.csv",
+                        "2022": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2022_datasd.csv",
+                        "2023": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2023_datasd.csv",
+                        "2024": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2024_datasd.csv",
+                        "2025": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2025_datasd.csv",
+                        "2026": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2026_datasd.csv",
+                        "2027": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2027_datasd.csv",
+                    },
+                    "companion_endpoints": {
+                        "open": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_open_datasd.csv",
+                    },
+                    "field_map": {
+                        "incident_id": ["service_request_id"],
+                        "created_date": ["date_requested"],
+                        "closed_date": ["date_closed"],
+                        "complaint_type": ["service_name", "service_name_detail"],
+                        "latitude": ["lat"],
+                        "longitude": ["lng"],
+                        "incident_address": ["street_address"],
+                        "zipcode": ["zipcode"],
+                        "borough": ["council_district", "comm_plan_name"],
+                    },
+                },
+            ),
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.csv_san_diego_licenses_endpoint,
+                platform="csv",
+                watermark_col="date_account_creation",
+                id_keys=["account_key"],
+                topic=settings.topic_sla,
+                interval_seconds=1800.0,
+                producer_key="sla",
+                extra={
+                    "expected_cadence_days": 7,
+                    "ingestion_mode": "snapshot",
+                    "scope": "San Diego Business Tax Certificates active-business registry (snapshot; NAICS 72 = hospitality for the LIMS SLA term)",
+                    "field_map": {
+                        "license_id": ["account_key"],
+                        "effective_date": ["date_cert_effective"],
+                        "expiration_date": ["date_cert_expiration"],
+                        "license_type": ["naics_description", "naics_sector"],
+                        "dba": ["dba_name"],
+                        "latitude": ["lat"],
+                        "longitude": ["lng"],
+                        "borough": ["council_district", "bid"],
+                        "address_street": ["address_road"],
                     },
                 },
             ),

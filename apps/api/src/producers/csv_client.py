@@ -29,6 +29,11 @@ def _row_matches(where_clause: str | None, row: Dict[str, Any]) -> bool:
     if not where_clause:
         return True
     for part in where_clause.split(" AND "):
+        # The scheduler wraps base_where / the job where clause in parentheses
+        # before joining, so a bare predicate arrives as "(valid = 'Y')".
+        part = part.strip()
+        if len(part) >= 2 and part.startswith("(") and part.endswith(")"):
+            part = part[1:-1].strip()
         m = _CMP.match(part)
         if m:
             col, op, literal = m.group(1), m.group(2), m.group(3)

@@ -12,6 +12,7 @@ from src.producers.arcgis_client import ArcGISClient
 from src.producers.base_producer import BaseKafkaProducer
 from src.producers.carto_client import CartoClient
 from src.producers.ckan_client import CkanClient
+from src.producers.csv_client import CSVClient
 from src.producers.socrata_client import SocrataClient
 from src.schemas.models import Complaint311Event
 from src.spatial.h3_indexer import H3SpatialIndexer
@@ -61,6 +62,7 @@ class Complaints311Producer:
         self.arcgis = ArcGISClient()
         self.carto = CartoClient()
         self.ckan = CkanClient()
+        self.csv = CSVClient()
         self.spatial_indexer = H3SpatialIndexer()
         self.shift_dynamics = ComplaintShiftDynamics()
 
@@ -75,6 +77,7 @@ class Complaints311Producer:
             "arcgis": getattr(self, "arcgis", None),
             "carto": getattr(self, "carto", None),
             "ckan": getattr(self, "ckan", None),
+            "csv": getattr(self, "csv", None),
         }
         client = clients.get(platform)
         if client is None:
@@ -99,6 +102,19 @@ class Complaints311Producer:
             elif row.get("city_id"):
                 norm_c = normalize_city(row["city_id"])
                 resolved_city = norm_c.value if norm_c else str(row["city_id"]).lower()
+            elif (
+                "service_request_id" in row
+                and (
+                    "date_requested" in row
+                    or "sap_notification_number" in row
+                    or "comm_plan_name" in row
+                )
+            ):
+                # San Diego Get It Done (US-124, flat CSV). SF 311 also uses
+                # `service_request_id`, so an SD-only corroborating marker
+                # (its date_requested / sap_notification_number / comm_plan
+                # family) is required before claiming the row.
+                resolved_city = "san_diego"
             elif (
                 "service_request_id" in row
                 or "service_name" in row

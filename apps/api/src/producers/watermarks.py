@@ -12,6 +12,7 @@ _TEXT_FORMATS = (
     "%m/%d/%Y %H:%M:%S",
     "%Y%m%d",
     "%Y-%m-%d",
+    "%Y.%m.%d",
 )
 
 
@@ -19,7 +20,8 @@ def parse_watermark(value: Any) -> datetime | None:
     """Parse supported API watermark values into UTC-aware datetimes.
 
     Municipal APIs expose watermarks as ISO/RFC3339 strings, NYC's historical
-    ``MM/DD/YYYY`` text, compact ``YYYYMMDD`` text, dates, datetimes, or epoch
+    ``MM/DD/YYYY`` text, compact ``YYYYMMDD`` text, MD SDAT's dotted
+    ``YYYY.MM.DD`` text (US-128), dates, datetimes, or epoch
     seconds/milliseconds. Invalid and empty values are ignored explicitly so a
     malformed row cannot become the newest watermark by accident.
     """

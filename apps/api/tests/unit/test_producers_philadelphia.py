@@ -8,7 +8,8 @@ Live-probed 2026-08-23 via ``GET /api/v2/sql?q=SELECT * ... LIMIT 1``
 * PERMITS   permits            (~932k rows; keyset permitissuedate)
 * 311       public_cases_fc    (~5.9M rows; keyset requested_datetime)
 * SLA       business_licenses  (keyset mostrecentissuedate — year-3200 sentinel SEEN LIVE)
-* DEEDS     rtt_summary        (~1.16M real docs incl. mortgages; document_date frequently NULL)
+* DEEDS     rtt_summary        (~1.16M real docs incl. mortgages; document_date frequently NULL;
+                                  scoped to document_type='DEED' per US-130)
 
 Pinned quirks (all observed live):
 * geocode_x/geocode_y on permits/business_licenses are PA South state-plane
@@ -165,6 +166,20 @@ class TestFeedRegistration:
         assert get_dataset(CityId.PHILADELPHIA, FeedType.SLA).watermark_col == "mostrecentissuedate"
         assert get_dataset(CityId.PHILADELPHIA, FeedType.DEEDS).watermark_col == "recording_date"
         assert get_dataset(CityId.PHILADELPHIA, FeedType.DEEDS).extra["order_by"] == "recording_date"
+
+    def test_deeds_where_filter_scopes_to_price_bearing_document_type(self):
+        """US-130: the deeds feed must not over-ingest mortgages/satisfactions
+        (mostly NULL total_consideration → amount 0.0). The registry's DEEDS
+        spec carries a where filter pinning document_type='DEED', a ~95%
+        price-bearing subset of rtt_summary (live-probed 2026-08-25)."""
+        spec = get_dataset(CityId.PHILADELPHIA, FeedType.DEEDS)
+        assert spec.extra["where"] == "document_type = 'DEED'"
+        # The where flows into the scheduler's base_where and from there into
+        # the CartoClient WHERE clause (scheduler.py `base_where`).
+        from src.producers.carto_client import CartoClient
+
+        fragment = CartoClient()._join_where("document_type = 'DEED'", "recording_date", None)
+        assert "document_type = 'DEED'" in fragment
 
     def test_extras_pin_keyset_id_and_geometry_select(self):
         """Keyset tie-breaker is cartodb_id (every CARTO table carries it);

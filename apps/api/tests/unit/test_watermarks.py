@@ -60,6 +60,22 @@ def test_newest_typed_watermark_uses_calendar_order_not_lexical():
     assert newest_typed_watermark(["ZZZZZZZZ"], fmt="%Y%m%d", exclude=("ZZZZZZZZ",)) is None
 
 
+def test_sdat_yyyy_mm_dd_text_watermark_parses_under_default_formats():
+    """US-128 (MD SDAT deeds): the transfer-date watermark is dotted text
+    ``YYYY.MM.DD``. It must parse through the default multi-format parser AND
+    the caller must be able to declare it via fmt, while the no-sale sentinel
+    ``0000.00.00`` stays None (month 0 is unparseable) rather than becoming a date."""
+    from src.producers.watermarks import parse_watermark
+
+    parsed = parse_watermark("2026.07.24")
+    assert parsed == datetime(2026, 7, 24, tzinfo=UTC)
+    with_sentinel = parse_watermark("0000.00.00")
+    assert with_sentinel is None
+    entry = typed_watermark_entry("2018.08.03", fmt="%Y.%m.%d")
+    assert entry == ("2018.08.03", datetime(2018, 8, 3, tzinfo=UTC))
+    assert newest_watermark(["0000.00.00", "2026.07.24", "2026.07.06"]) == datetime(2026, 7, 24, tzinfo=UTC)
+
+
 def test_exclude_clause_quotes_and_skips_empty():
     assert (
         watermark_exclude_clause("transfer_date", ["ZZZZZZZZ"])

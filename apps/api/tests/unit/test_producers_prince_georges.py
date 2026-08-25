@@ -29,14 +29,14 @@ def test_prince_georges_geometry_is_self_consistent():
     assert {meta.city_id for meta in PRINCE_GEORGES_SUBMARKETS.values()} == {"prince_georges"}
 
 
-def test_prince_georges_registers_311_and_defers_parcel_snapshot():
+def test_prince_georges_registers_311_and_sdat_deeds():
     from src.spatial.city_registry import REGISTRY, get_dataset, normalize_city
 
     city = CityId.PRINCE_GEORGES
     assert normalize_city("pgco") is city
     assert normalize_city("prince george's county") is city
     assert REGISTRY[city].job_suffix == "pgmd"
-    assert set(REGISTRY[city].datasets) == {FeedType.COMPLAINTS_311}
+    assert set(REGISTRY[city].datasets) == {FeedType.COMPLAINTS_311, FeedType.DEEDS}
 
     c311 = REGISTRY[city].datasets[FeedType.COMPLAINTS_311]
     assert c311.watermark_col == "date_request_opened"
@@ -45,10 +45,19 @@ def test_prince_georges_registers_311_and_defers_parcel_snapshot():
     assert c311.extra["field_map"]["incident_id"] == ["service_request"]
     assert c311.extra["field_map"]["created_date"] == ["date_request_opened"]
 
-    # HJ-125 finding: qzrv-2tnv stays unregistered until deed geometry
-    # extraction handles MultiPolygon parcel shapes (see parse test below).
-    with pytest.raises(KeyError, match="no.*feed"):
-        get_dataset(city, FeedType.DEEDS)
+    # US-128: the MD SDAT deeds feed (opendata.maryland.gov/w3eb-4mzd) is
+    # registered Point-geocoded and sidesteps the held qzrv-2tnv parcel table.
+    deeds = REGISTRY[city].datasets[FeedType.DEEDS]
+    assert deeds.endpoint.endswith("/resource/w3eb-4mzd.json")
+    assert deeds.platform == "socrata"
+    assert deeds.watermark_col == (
+        "sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89"
+    )
+    assert deeds.extra["ingestion_mode"] == "snapshot"
+    assert deeds.extra["field_map"]["doc_id"] == ["account_id_mdp_field_acctid"]
+
+    # The held qzrv-2tnv parcel table stays unregistered (HJ-125: deed geometry
+    # extraction missing MultiPolygon handling — see TestPrinceGeorgesParcelSnapshotFinding).
     with pytest.raises(KeyError, match="no.*feed"):
         get_dataset(city, FeedType.PERMITS)
 
@@ -147,3 +156,63 @@ class TestPrinceGeorgesParcelSnapshotFinding:
         # Sentinel spellings stay unparseable rather than becoming dates.
         assert _parse_datetime("ZZZZZZZZ") is None
         assert _parse_datetime("XXXXXXXX") is None
+
+
+PG_SDAT_DEED = {
+    # Live shaped row from opendata.maryland.gov/resource/w3eb-4mzd (2026-08-25).
+    "account_id_mdp_field_acctid": "17125627082",
+    "sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89": "2026.07.13",
+    "sales_segment_1_consideration_mdp_field_considr1_sdat_field_90": "10",
+    "sales_segment_1_grantor_name_mdp_field_grntnam1_sdat_field_80": "NH HAVEN APARTMENTS LLC",
+    "sales_segment_1_transfer_number_mdp_field_transno1_sdat_field_79": "000789",
+    "mdp_latitude_mdp_field_digycord_converted_to_wgs84": 38.78358949000099,
+    "mdp_longitude_mdp_field_digxcord_converted_to_wgs84": -77.01234729604383,
+    "mappable_latitude_and_longitude": "POINT (-77.01234729604383 38.78358949000099)",
+    "county_name_mdp_field_cntyname": "Prince George's County",
+}
+
+
+class TestPrinceGeorgesSdatDeeds:
+    """US-128: MD SDAT real-property deeds for Prince George's County — the
+    Point-geocoded SDAT feed that sidesteps the held qzrv-2tnv parcel table."""
+
+    @pytest.fixture
+    def deeds(self):
+        with patch("src.producers.deeds_acris_producer.BaseKafkaProducer"):
+            from src.producers.deeds_acris_producer import DeedsACRISProducer
+
+            return DeedsACRISProducer()
+
+    def test_live_shaped_row_parses_through_field_map(self, deeds):
+        event = deeds.parse_socrata_row(dict(PG_SDAT_DEED), city_id="prince_georges")
+        assert event is not None
+        assert event.city_id == "prince_georges"
+        assert event.doc_id == "17125627082"
+        assert event.bbl == "17125627082"
+        assert event.document_amount == pytest.approx(10.0)
+        assert event.party1_grantor == "NH HAVEN APARTMENTS LLC"
+        assert event.latitude == pytest.approx(38.78358949000099)
+        assert event.longitude == pytest.approx(-77.01234729604383)
+
+    def test_dotted_watermark_parses_to_real_recorded_date(self, deeds):
+        event = deeds.parse_socrata_row(dict(PG_SDAT_DEED), city_id="prince_georges")
+        assert event is not None
+        assert (event.recorded_date.year, event.recorded_date.month, event.recorded_date.day) == (
+            2026,
+            7,
+            13,
+        )
+
+    def test_wkt_point_string_geocodes_when_native_columns_absent(self, deeds):
+        row = dict(PG_SDAT_DEED)
+        row.pop("mdp_latitude_mdp_field_digycord_converted_to_wgs84")
+        row.pop("mdp_longitude_mdp_field_digxcord_converted_to_wgs84")
+        event = deeds.parse_socrata_row(row, city_id="prince_georges")
+        assert event is not None
+        assert event.latitude == pytest.approx(38.78358949000099)
+        assert event.longitude == pytest.approx(-77.01234729604383)
+
+    def test_row_autodetects_prince_georges_by_county_name(self, deeds):
+        event = deeds.parse_socrata_row(dict(PG_SDAT_DEED))
+        assert event is not None
+        assert event.city_id == "prince_georges"

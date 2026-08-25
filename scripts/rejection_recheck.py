@@ -197,25 +197,32 @@ REJECTIONS: list[dict[str, Any]] = [
         },
     },
     {
+        # Superseded by US-134: the feed now carries a valid_license_for date
+        # column and native GeoJSON point geometry, so this watch is a closure
+        # until it flips to SUPERSEDED. The obsolete "no date column at all"
+        # claim is corrected in data-coverage-sweep-2026-08-25.md §11.
         "id": "kc_sla",
-        "source": "wave-2-city-candidates.md §Tier2",
+        "source": "wave-2-city-candidates.md §Tier2 (corrected: data-coverage-sweep-2026-08-25.md §11)",
         "rejected_on": "2026-08-23",
         "claim": "location field only, no date column at all",
+        "superseded_by": "US-134",
         "probe": {
             "kind": "socrata_schema",
             "domain": "data.kcmo.org",
             "id": "pnm4-68wg",
-            "watch_patterns": ["date", "issued", "opened"],
+            "watch_patterns": ["date", "issued", "opened", "valid_license"],
         },
     },
     {
         # Flagged during US-75: hubNashville's Current-Year view began
         # carrying 2026 rows after the survey called it stuck at 2025.
+        # Superseded by US-131: the hubNashville Current_Year 311 view is now
+        # registered (ArcGIS, native coords, Latitude IS NOT NULL bucket).
         "id": "nashville_311",
         "source": "US-75 resolution note (survey said stuck at 2025)",
         "rejected_on": "2026-08-20",
         "claim": "latest hubNashville slice is 2025; no 2026 layer",
-        "superseded_by": None,  # still unregistered - deliberately watched
+        "superseded_by": "US-131",
         "probe": {
             "kind": "socrata_catalog",
             "domain": "data.nashville.gov",

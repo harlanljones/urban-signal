@@ -211,6 +211,36 @@ class Settings(BaseSettings):
         description="San Diego Development Services issued approvals (2026) CSV endpoint",
     )
 
+    # San Diego Get It Done 311 (US-124): static-CSV portal. Year-scoped closed
+    # file (rolls `_2027_` per year); the open queue (`companion_endpoints`) is
+    # regenerated daily and holds the freshest still-open cases. Native lat/lng.
+    csv_san_diego_311_endpoint: str = Field(
+        default="https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2026_datasd.csv",
+        description="San Diego Get It Done 311 closed-requests (2026) CSV endpoint",
+    )
+
+    # San Diego Business Tax Certificates (US-125): static-CSV portal. Active
+    # business-registry SNAPSHOT — re-pulled fully each poll and deduped on
+    # account_key; judge freshness by file refresh, not per-row dates (the
+    # cert effective/expiration dates are future-dated by design). Native
+    # lat/lng; account_key arrives as a float-string that the producer
+    # normalizes to integer digits.
+    csv_san_diego_licenses_endpoint: str = Field(
+        default="https://seshat.datasd.org/business_tax_certificates/sd_businesses_active_datasd.csv",
+        description="San Diego Business Tax Certificates active-business CSV endpoint",
+    )
+
+    # Cincinnati (US-126): Hamilton County Auditor property-transfers CSV —
+    # static-file download (no REST API), current-month sales published daily.
+    # SaleDate is synthesized from the three int columns (MonthSale/DaySale/
+    # YearSale), so the feed is a snapshot window re-pulled each poll and
+    # deduped on ConveyanceNumber+PropertyNumber rather than filtered
+    # incrementally; non-arm's-length rows are dropped via the Valid flag.
+    csv_cincinnati_deeds_endpoint: str = Field(
+        default="https://www.hamiltoncountyauditor.org/download/transfer_dailysales_new.csv",
+        description="Hamilton County (Cincinnati) Auditor daily property-transfers CSV endpoint",
+    )
+
     # New Orleans (Socrata)
     socrata_nola_permits_endpoint: str = Field(
         default="https://data.nola.gov/resource/rcm3-fn58.json",
@@ -242,6 +272,10 @@ class Settings(BaseSettings):
         default="https://data.norfolk.gov/resource/nbyu-xjez.json",
         description="MyNorfolk 311 service requests (address-string located, ADR 0004 geocoded)",
     )
+    socrata_norfolk_licenses_endpoint: str = Field(
+        default="https://data.norfolk.gov/resource/dpi6-sct5.json",
+        description="Norfolk Business Licenses endpoint (native lat/lng; placeholder-address rows excluded via extra where)",
+    )
 
     # Austin (Socrata) — partial city: SLA/DEEDS absent (TABC statewide feeds
     # carry no geocodes; Travis County portal is unreachable)
@@ -270,11 +304,34 @@ class Settings(BaseSettings):
     )
 
     # Pittsburgh, PA (CKAN): WPRDC PLI permits. Native lat/lng + issue_date
-    # watermark (US-89). 311 archive / county sales / licensed businesses are
-    # address-only or ungeocodable and stay unregistered.
+    # watermark (US-89). 311 archive / licensed businesses are address-only or
+    # ungeocodable and stay unregistered.
     ckan_pittsburgh_permits_endpoint: str = Field(
         default="ckan://data.wprdc.org/f4d1177a-f597-4c32-8cbf-7885f56253f6",
         description="WPRDC PLI Permits datastore resource (City of Pittsburgh)",
+    )
+
+    # Pittsburgh deeds (US-129): WPRDC "Allegheny County Property Sale
+    # Transactions" (package real-estate-sales, datastore-active, SQL enabled).
+    # Schema is all-uppercase (PARID/DEEDBOOK/PRICE/RECORDDATE/SALEDATE), so the
+    # CKAN SQL endpoint needs quoted identifiers. Address-only / PARID-only (no
+    # lat/lng) — the deeds producer tolerates null coordinates (Cook County
+    # wvhk-k5uv precedent). watermark_col is RECORDDATE (record-the-deed date,
+    # with SALEDATE trailing by pub/recording lag).
+    ckan_pittsburgh_deeds_endpoint: str = Field(
+        default="ckan://data.wprdc.org/5bbe6c55-bce6-4edb-9d04-68edeb6bf7b1",
+        description="WPRDC Allegheny County property-sales datastore resource",
+    )
+
+    # Pittsburgh 311 (US-132): WPRDC "Pittsburgh 311 Data" resource (the city's
+    # post-transition replay of 311 requests, datastore-active). Native
+    # lat/lng as TEXT (5-dec EXACT or 2-dec APPROXIMATE — the producer casts to
+    # float); `created_date_utc` watermark; ~99.8% geocoded in the newest window.
+    # The old `311-data` archive is a separate frozen package (newest 2025-03-10)
+    # and the source of the obsolete "address-only archive" verdict.
+    ckan_pittsburgh_311_endpoint: str = Field(
+        default="ckan://data.wprdc.org/5202679a-d243-402e-b82a-63189995a942",
+        description="WPRDC Pittsburgh 311 Data datastore resource",
     )
 
     # Boston (CKAN) — permits, current-year 311, and licensing board
@@ -321,6 +378,14 @@ class Settings(BaseSettings):
         default="https://data.montgomerycountymd.gov/resource/c6rw-fazn.json",
         description="Montgomery County ABS liquor licensee endpoint",
     )
+    # Montgomery County MD SDAT real-property deeds (US-128): per-parcel
+    # assessment snapshot on `opendata.maryland.gov`; point-geocoded
+    # (mappable_latitude_and_longitude WKT POINT + native MDP WGS84 numbers);
+    # monthly snapshot.
+    socrata_montgomery_deeds_endpoint: str = Field(
+        default="https://opendata.maryland.gov/resource/kb22-is2w.json",
+        description="Montgomery County MD SDAT real-property deeds snapshot endpoint",
+    )
 
     # Denver (ArcGIS Hub): construction permits and ODC 311 only. Licenses
     # have no issue date and sales are ungeocoded, so both remain excluded.
@@ -357,6 +422,14 @@ class Settings(BaseSettings):
         default="https://opendata.baltimorecity.gov/egis/rest/services/NonSpatialTables/Licenses/FeatureServer/0",
         description="Baltimore liquor licenses FeatureServer table",
     )
+    # Baltimore MD SDAT real-property deeds (US-128): per-parcel assessment
+    # snapshot on `opendata.maryland.gov` (NOT federated under data.maryland.gov).
+    # Point-geocoded via mappable_latitude_and_longitude (WKT POINT) plus native
+    # mdp_latitude/_longitude MDP WGS84 numbers; monthly snapshot.
+    socrata_baltimore_deeds_endpoint: str = Field(
+        default="https://opendata.maryland.gov/resource/3x3p-xk2v.json",
+        description="Baltimore City MD SDAT real-property deeds snapshot endpoint",
+    )
 
     # Minneapolis (ArcGIS Hub "OpenDataMPLS"): construction/CCS permits and
     # year-sliced 311 (one Public_311_<year> layer per year; endpoint_by_year
@@ -375,6 +448,13 @@ class Settings(BaseSettings):
             "Public_311_2026/FeatureServer/0"
         ),
         description="Minneapolis current-year Public 311 FeatureServer layer URL",
+    )
+    arcgis_minneapolis_licenses_url: str = Field(
+        default=(
+            "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/"
+            "On_Sale_Liquor/FeatureServer/0"
+        ),
+        description="Minneapolis On-Sale liquor licenses FeatureServer layer URL (companion Off_Sale registered as companion_endpoints)",
     )
 
     # Detroit (ArcGIS FeatureServer — services2 host, camelCase ObjectId)
@@ -457,6 +537,15 @@ class Settings(BaseSettings):
         default="https://data.princegeorgescountymd.gov/resource/2ywx-ipcd.json",
         description="Prince George's County 311 service requests endpoint",
     )
+    # Prince George's MD SDAT real-property deeds (US-128): per-parcel
+    # assessment snapshot on `opendata.maryland.gov`; point-geocoded. This
+    # sidesteps the held qzrv-2tnv parcel table (MultiPolygon geometry crash)
+    # entirely — the SDAT dataset is Point-geocoded and parses cleanly.
+    # monthly snapshot.
+    socrata_pg_deeds_endpoint: str = Field(
+        default="https://opendata.maryland.gov/resource/w3eb-4mzd.json",
+        description="Prince George's County MD SDAT real-property deeds snapshot endpoint",
+    )
 
     # Columbus, OH (ArcGIS): Accela-derived building permits (uppercase schema).
     arcgis_columbus_permits_url: str = Field(
@@ -465,6 +554,20 @@ class Settings(BaseSettings):
             "Building_Permits/FeatureServer/0"
         ),
         description="Columbus Building Permits FeatureServer layer URL",
+    )
+
+    # Columbus, OH (ArcGIS, US-127): Franklin County Auditor sales-dashboard
+    # points layer. Annual snapshot of validated arms-length sales with native
+    # point geometry (outSR=4326); carries a dual old/new column set
+    # (SALEPRICE vs Sale_Price, OWNERNME1 vs OWN1/OWN2). Instrument_Number and
+    # MUNINAME/NHBDNAME are empty layer-wide, so the effective id is
+    # PARCELID+OBJECTID and borough resolves by coordinate.
+    arcgis_columbus_deeds_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/7r2Wl09a1Apy459r/arcgis/rest/services/"
+            "FCAO_Sales_Dashboard_Last_Years_Sales_Points/FeatureServer/0"
+        ),
+        description="Franklin County (Columbus) Auditor deeds/sales FeatureServer layer URL",
     )
 
     # Pierce County, WA (ArcGIS): county applications and permits across six
@@ -503,7 +606,8 @@ class Settings(BaseSettings):
     )
 
     # Nashville, TN (ArcGIS): issued building permits plus residential STR
-    # permits as the SLA-class signal; hubNashville 311 stays excluded (HJ-119).
+    # permits as the SLA-class signal; hubNashville 311 registers as the
+    # COMPLAINTS_311 feed (US-131, re-adjudicated positive from HJ-119).
     arcgis_nashville_permits_url: str = Field(
         default=(
             "https://services2.arcgis.com/HdTo6HJqh92wn4D8/arcgis/rest/services/"
@@ -518,12 +622,28 @@ class Settings(BaseSettings):
         ),
         description="Nashville Residential Short Term Rental Permits FeatureServer layer URL",
     )
+    arcgis_nashville_311_url: str = Field(
+        default=(
+            "https://services2.arcgis.com/HdTo6HJqh92wn4D8/arcgis/rest/services/"
+            "hubNashville_311_Service_Requests_Current_Year_view/FeatureServer/0"
+        ),
+        description="Nashville hubNashville 311 Service Requests Current Year FeatureServer layer URL",
+    )
 
     # Kansas City, MO (Socrata): 311 Call Center Reported Issues. Corrects the
     # 2026-08-23 rejection (HJ-120); permits/SLA stay unregistered.
     socrata_kansas_city_311_endpoint: str = Field(
         default="https://data.kcmo.org/resource/d4px-6rwg.json",
         description="Kansas City 311 Call Center Reported Issues endpoint",
+    )
+
+    # Kansas City, MO (Socrata): Business License Holders (US-134). Snapshot
+    # feed carrying native GeoJSON point geometry (96.4% non-null) and a
+    # valid_license_for YYYYMMDD expiration column; publication had lapsed
+    # ~7mo at registration, hence the 90-day cadence.
+    socrata_kansas_city_licenses_endpoint: str = Field(
+        default="https://data.kcmo.org/resource/pnm4-68wg.json",
+        description="Kansas City Business License Holders endpoint",
     )
 
     # Address geocoding (ADR 0004): confidence floor gates wrong-cell risk —

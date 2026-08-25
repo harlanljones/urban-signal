@@ -128,9 +128,9 @@ class TestRun:
         assert result["superseded_by"] == "HJ-120"
 
     def test_entry_registered_reflects_live_registry(self):
-        # Kansas City 311 registered today (HJ-120); SLA never was.
+        # Kansas City 311 registered (HJ-120); business licenses now too (US-134).
         assert entry_registered("kc_311") is True
-        assert entry_registered("kc_sla") is False
+        assert entry_registered("kc_sla") is True
 
 
 class TestLiveAcceptance:

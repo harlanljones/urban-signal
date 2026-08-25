@@ -9,6 +9,7 @@ from src.config import settings
 from src.producers.base_producer import BaseKafkaProducer
 from src.producers.arcgis_client import ArcGISClient
 from src.producers.carto_client import CartoClient
+from src.producers.csv_client import CSVClient
 from src.producers.socrata_client import SocrataClient
 from src.schemas.models import SLALicenseEvent
 from src.spatial.h3_indexer import H3SpatialIndexer
@@ -31,6 +32,7 @@ def _parse_datetime(val: Any) -> Optional[datetime]:
         for fmt in (
             "%m/%d/%Y",
             "%Y-%m-%d",
+            "%Y%m%d",  # KC SLA valid_license_for (e.g. 20251231)
             "%m/%d/%Y %H:%M:%S",
             "%Y-%m-%d %H:%M:%S",
             "%m/%d/%Y %I:%M:%S %p",
@@ -56,6 +58,7 @@ class SLALicensesProducer:
         self.socrata = SocrataClient()
         self.arcgis = ArcGISClient()
         self.carto = CartoClient()
+        self.csv = CSVClient()
         self.spatial_indexer = H3SpatialIndexer()
 
     def _client_for(self, platform: str):
@@ -69,6 +72,7 @@ class SLALicensesProducer:
             "arcgis": getattr(self, "arcgis", None),
             "carto": getattr(self, "carto", None),
             "ckan": getattr(self, "ckan", None),
+            "csv": getattr(self, "csv", None),
         }
         client = clients.get(platform)
         if client is None:
@@ -95,6 +99,19 @@ class SLALicensesProducer:
                 # before San Francisco: LA shares dba_name and location_start_date
                 # with the SF registry, so only these two columns discriminate.
                 resolved_city = "los_angeles"
+            elif (
+                "account_key" in row
+                and (
+                    "date_cert_effective" in row
+                    or "date_cert_expiration" in row
+                    or "naics_sector" in row
+                )
+            ):
+                # San Diego Business Tax Certificates (US-125, flat CSV snapshot).
+                # account_key is the id; the cert/NAICS corroborators keep it from
+                # being captured by the SF branch below (SD also ships dba_name /
+                # naics_description). account_key is a float-string, normalized below.
+                resolved_city = "san_diego"
             elif (
                 "location_id" in row
                 or "dba_name" in row
@@ -136,6 +153,16 @@ class SLALicensesProducer:
             ).strip()
             if not license_id:
                 return None
+
+            if resolved_city == "san_diego":
+                # seshat.datasd.org publishes account_key as a float-string
+                # ("1974000024.0"); normalize to canonical integer digits
+                # ("1974000024") so the id-dedup key is stable and readable.
+                # Scoped to the SD branch so other cities' ids are untouched.
+                try:
+                    license_id = str(int(float(license_id)))
+                except (ValueError, TypeError):
+                    pass
 
             lat_raw = (
                 first_mapped(row, field_map, "latitude")
@@ -239,7 +266,8 @@ class SLALicensesProducer:
             )
 
             premises_name = (
-                row.get("ownership_name")
+                first_mapped(row, field_map, "premises_name")
+                or row.get("ownership_name")
                 or row.get("legal_name")
                 or row.get("legalname")
                 or row.get("premises_name")
@@ -247,7 +275,8 @@ class SLALicensesProducer:
             )
 
             dba = (
-                row.get("dba_name")
+                first_mapped(row, field_map, "dba")
+                or row.get("dba_name")
                 or row.get("doing_business_as_name")
                 or row.get("dba")
                 or row.get("doing_business_as")

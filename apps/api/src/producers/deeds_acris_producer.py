@@ -1,14 +1,16 @@
-"""NYC ACRIS & Cook County/Chicago Deeds and Commercial Mortgages Ingestion Stream Producer."""
+"""NYC ACRIS, Cook County/Chicago, San Francisco, Denver, Cincinnati, Columbus, Pittsburgh & MD SDAT (Baltimore/Montgomery/Prince George's) Deeds Ingestion Stream Producer."""
 
 import argparse
 import logging
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
 from src.config import settings
 from src.producers.base_producer import BaseKafkaProducer
 from src.producers.arcgis_client import ArcGISClient
 from src.producers.carto_client import CartoClient
+from src.producers.ckan_client import CkanClient
+from src.producers.csv_client import CSVClient
 from src.producers.socrata_client import SocrataClient
 from src.schemas.models import DeedEvent
 from src.spatial.h3_indexer import H3SpatialIndexer
@@ -40,6 +42,7 @@ def _parse_datetime(val: Any) -> Optional[datetime]:
             "%Y%m%d",
             "%m/%d/%Y %I:%M:%S %p",
             "%Y-%m-%dT%H:%M:%S",
+            "%Y.%m.%d",
             "%Y",
         ):
             try:
@@ -49,8 +52,67 @@ def _parse_datetime(val: Any) -> Optional[datetime]:
     return None
 
 
+def _to_int(val: Any) -> int | None:
+    """Coerce a CSV cell into an int, tolerating float-like and blank values."""
+    if val is None or str(val).strip() == "":
+        return None
+    try:
+        return int(float(str(val)))
+    except (ValueError, TypeError):
+        return None
+
+
+def _compose_hamilton_sale_date(row: dict[str, Any]) -> str | None:
+    """Compose ``YYYY-MM-DD`` from Hamilton County's split sale-date columns.
+
+    The Auditor CSV ships ``MonthSale``/``DaySale``/``YearSale`` as separate
+    integer cells with no single sale-date column (US-126). Returns ``None``
+    so the production chain falls through to its existing date handling when
+    any of the three is missing or unparseable.
+    """
+    year = _to_int(row.get("yearsale"))
+    month = _to_int(row.get("monthsale"))
+    day = _to_int(row.get("daysale"))
+    if not (year and month and day and 1900 <= year <= 2100):
+        return None
+    try:
+        return date(year, month, day).strftime("%Y-%m-%d")
+    except ValueError:
+        return None
+
+
+def _parse_wkt_point(value: Any) -> tuple[float | None, float | None]:
+    """Parse a WKT ``POINT (x y)`` string into ``(lng, lat)`` or ``(None, None)``.
+
+    MD SDAT real-property rows (US-128) expose their ``point`` column over
+    Socrata JSON as a WKT string ``"POINT (-76.62 39.31)"`` in WGS84 — the
+    first coordinate is longitude, matching ``geo_utils.point_to_wkt``. Returns
+    ``(None, None)`` for non-POINT/column values so the caller's existing null
+    coordinate handling is unchanged.
+    """
+    if not isinstance(value, str):
+        return None, None
+    text = value.strip()
+    upper = text.upper()
+    if not upper.startswith("POINT") or "(" not in text or ")" not in text:
+        return None, None
+    inner = text[text.find("(") + 1 : text.rfind(")")].strip()
+    parts = inner.split()
+    if len(parts) < 2:
+        return None, None
+    try:
+        lng = float(parts[0])
+        lat = float(parts[1])
+    except (ValueError, TypeError):
+        return None, None
+    return lng, lat
+
+
 class DeedsACRISProducer:
-    """Ingests NYC ACRIS, Cook County/Chicago, and San Francisco property deeds and assessor records."""
+    """Ingests NYC ACRIS, Cook County/Chicago, San Francisco, Denver,
+    Cincinnati/Hamilton County, Columbus/Franklin County, Pittsburgh/WPRDC,
+    and MD SDAT (Baltimore/Montgomery/Prince George's) property deeds
+    and assessor records."""
 
     def __init__(self, bootstrap_servers: Optional[str] = None):
         schema_path = Path(__file__).parent.parent / "schemas" / "avro" / "deed_event.avsc"
@@ -62,6 +124,8 @@ class DeedsACRISProducer:
         self.socrata = SocrataClient()
         self.arcgis = ArcGISClient()
         self.carto = CartoClient()
+        self.ckan = CkanClient()
+        self.csv = CSVClient()
         self.spatial_indexer = H3SpatialIndexer()
 
     def _client_for(self, platform: str):
@@ -75,6 +139,7 @@ class DeedsACRISProducer:
             "arcgis": getattr(self, "arcgis", None),
             "carto": getattr(self, "carto", None),
             "ckan": getattr(self, "ckan", None),
+            "csv": getattr(self, "csv", None),
         }
         client = clients.get(platform)
         if client is None:
@@ -110,6 +175,34 @@ class DeedsACRISProducer:
                 resolved_city = "seattle"
             elif "pin" in row or "township" in row or "sale_price" in row or "municipality" in row:
                 resolved_city = "chicago"
+            elif "conveyancenumber" in row and "propertynumber" in row:
+                # Hamilton County Auditor (Cincinnati) property-transfers CSV
+                # (US-126): static file with ConveyanceNumber + PropertyNumber.
+                resolved_city = "cincinnati"
+            elif "PARCELID" in row and ("OWN1" in row or "OWNERNME1" in row):
+                # Franklin County Auditor (Columbus) ArcGIS sales points
+                # (US-127): all-uppercase schema; the effective id key is
+                # PARCELID (+OBJECTID) because Instrument_Number is null
+                # layer-wide.
+                resolved_city = "columbus"
+            elif "PARID" in row and "DEEDBOOK" in row:
+                # WPRDC Allegheny County property-sale transactions (Pittsburgh
+                # deeds, US-129): CKAN datastore, all-uppercase schema. No
+                # lat/lng on the wire (address-only/PARID-only) — the deeds
+                # producer tolerates null coordinates (Cook County precedent).
+                resolved_city = "pittsburgh"
+            elif "account_id_mdp_field_acctid" in row:
+                # MD SDAT real-property assessment snapshot (US-128) shared by
+                # Baltimore/Montgomery/Prince George's. All three counties carry
+                # the identical schema; autodetect distinguishes them by the
+                # county_name column (defaulting to baltimore when absent).
+                county = str(row.get("county_name_mdp_field_cntyname", "")).lower()
+                if "montgomery" in county:
+                    resolved_city = "montgomery"
+                elif "prince" in county or "george" in county:
+                    resolved_city = "prince_georges"
+                else:
+                    resolved_city = "baltimore"
             else:
                 resolved_city = "nyc"
 
@@ -130,6 +223,8 @@ class DeedsACRISProducer:
                 or row.get("row_id")
                 or row.get("control_number")
                 or row.get("id")
+                or row.get("Instrument_Number")
+                or row.get("PARCELID")
                 or ""
             ).strip()
             if not doc_id:
@@ -155,6 +250,7 @@ class DeedsACRISProducer:
                     or row.get("location")
                     or row.get("georeference")
                     or row.get("shape")
+                    or row.get("mappable_latitude_and_longitude")
                     or {}
                 )
                 if isinstance(loc, dict):
@@ -164,6 +260,12 @@ class DeedsACRISProducer:
                     lng_raw = loc.get("longitude") or loc.get("lng") or (
                         loc.get("coordinates", [None, None])[0] if "coordinates" in loc else None
                     )
+                elif isinstance(loc, str):
+                    # MD SDAT (US-128) point column is a WKT string over Socrata
+                    # JSON: "POINT (lng lat)" in WGS84 (see _parse_wkt_point).
+                    lng_wkt, lat_wkt = _parse_wkt_point(loc)
+                    lat_raw = lat_raw if lat_raw else lat_wkt
+                    lng_raw = lng_raw if lng_raw else lng_wkt
 
             lat = float(lat_raw) if lat_raw is not None else None
             lng = float(lng_raw) if lng_raw is not None else None
@@ -214,9 +316,14 @@ class DeedsACRISProducer:
                 or 0.0
             )
 
-            recorded_str = (
-                first_mapped(row, field_map, "recorded_date")
-                or row.get("recording_date")
+            recorded_str = first_mapped(row, field_map, "recorded_date")
+            if not recorded_str and resolved_city == "cincinnati":
+                # US-126: Hamilton County Auditor splits the sale date across
+                # three int columns (YearSale/MonthSale/DaySale) with no single
+                # sale-date column, so compose it before the generic chains.
+                recorded_str = _compose_hamilton_sale_date(row)
+            recorded_str = recorded_str or (
+                row.get("recording_date")
                 or row.get("transfer_date")
                 or row.get("sale_date")
                 or row.get("assessment_date")
@@ -240,6 +347,7 @@ class DeedsACRISProducer:
                 or row.get("pin")
                 or row.get("PIN")
                 or row.get("property_index_number")
+                or row.get("PARCELID")
                 or ""
             ) or None
 
@@ -270,6 +378,7 @@ class DeedsACRISProducer:
                 or row.get("seller")
                 or row.get("seller_name")
                 or row.get("Sellername")
+                or row.get("OWNERNME1")
             )
             party2 = (
                 first_mapped(row, field_map, "party2_grantee")
@@ -279,6 +388,8 @@ class DeedsACRISProducer:
                 or row.get("party2_grantee")
                 or row.get("party2_type")
                 or row.get("grantee")
+                or row.get("OWN1")
+                or row.get("OWN2")
             )
 
             source_neighborhood = str(borough_val) if borough_val is not None else None

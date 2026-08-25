@@ -32,6 +32,19 @@ SLA_FIELD_MAP = {
     "longitude": ["Lon"],
 }
 
+COMPLAINTS_311_FIELD_MAP = {
+    "incident_id": ["Request__"],
+    "latitude": ["Latitude"],
+    "longitude": ["Longitude"],
+    "created_date": ["Date_Time_Opened"],
+    "closed_date": ["Date_Time_Closed"],
+    "status": ["Status"],
+    "complaint_type": ["Request_Type", "Subrequest_Type"],
+    "incident_address": ["Address"],
+    "zipcode": ["ZIP"],
+    "borough": ["Council_District"],
+}
+
 
 def test_nashville_geometry_is_self_consistent():
     assert is_in_nashville_metro(36.1627, -86.7818)
@@ -52,14 +65,14 @@ def test_nashville_geometry_is_self_consistent():
     assert {meta.borough for meta in NASHVILLE_SUBMARKETS.values()} == set(NASHVILLE_DIVISIONS)
 
 
-def test_nashville_registers_permits_and_str_licenses_only():
+def test_nashville_registers_permits_str_and_311_feeds():
     from src.spatial.city_registry import REGISTRY, normalize_city
 
     city = CityId.NASHVILLE
     assert normalize_city("nashville") is city
     assert normalize_city("nashville_tn") is city
     assert REGISTRY[city].job_suffix == "bna"
-    assert set(REGISTRY[city].datasets) == {FeedType.PERMITS, FeedType.SLA}
+    assert set(REGISTRY[city].datasets) == {FeedType.PERMITS, FeedType.SLA, FeedType.COMPLAINTS_311}
 
 
 def test_nashville_permit_spec_pins_the_live_schema():
@@ -90,13 +103,29 @@ def test_nashville_str_spec_pins_the_live_schema():
     assert spec.extra["field_map"] == SLA_FIELD_MAP
 
 
-def test_nashville_hard_excludes_hubnashville_311_and_deeds():
-    """HJ-119 excludes hubNashville 311 (orchestrator decision); see report note
-    on the Current_Year view carrying 2026 rows despite the survey claim."""
+def test_nashville_311_spec_pins_the_live_schema():
     from src.spatial.city_registry import get_dataset
 
-    with pytest.raises(KeyError, match="no.*feed"):
-        get_dataset(CityId.NASHVILLE, FeedType.COMPLAINTS_311)
+    spec = get_dataset(CityId.NASHVILLE, FeedType.COMPLAINTS_311)
+    assert spec.platform == "arcgis"
+    assert spec.endpoint.endswith("/hubNashville_311_Service_Requests_Current_Year_view/FeatureServer/0")
+    assert spec.watermark_col == "Date_Time_Opened"
+    assert spec.id_keys == ["Request__", "GlobalID", "OBJECTID"]
+    assert spec.extra["expected_cadence_days"] == 7
+    assert spec.extra["oid_field"] == "OBJECTID"
+    assert spec.extra["max_record_count"] == 2000
+    assert spec.extra["where"] == "Latitude IS NOT NULL"
+    assert spec.extra["field_map"] == COMPLAINTS_311_FIELD_MAP
+
+
+def test_nashville_registers_hubnashville_311_and_hard_excludes_deeds():
+    """US-131 re-adjudicated the HJ-119 hubNashville 311 exclusion positive: the
+    Current_Year view now carries 2026 rows, so COMPLAINTS_311 registers.
+    DEEDS stays hard-excluded (no verified sales feed)."""
+    from src.spatial.city_registry import get_dataset
+
+    spec = get_dataset(CityId.NASHVILLE, FeedType.COMPLAINTS_311)
+    assert spec.platform == "arcgis"
     with pytest.raises(KeyError, match="no.*feed"):
         get_dataset(CityId.NASHVILLE, FeedType.DEEDS)
 
@@ -157,6 +186,28 @@ STR_ROW = {
     "ZIP": "37211",
 }
 STR_GEOMETRY = {"x": -86.76200546978785, "y": 36.12424520967618}
+
+
+COMPLAINTS_311_ROW = {
+    # Live newest-by-Date_Time_Opened geocoded row (OBJECTID 186947) via REST
+    # on 2026-08-25; boilerplate elided, asserted fields verbatim. ArcGISClient
+    # converts Date_Time_Opened/Date_Time_Closed epoch-ms to ISO on flatten.
+    "Request__": "2270024",
+    "GlobalID": "f6832cb7-45f6-4c61-a392-34be2afe45ba",
+    "OBJECTID": 186947,
+    "Latitude": 36.0546092,
+    "Longitude": -86.65544,
+    "Date_Time_Opened": 1787639972000,
+    "Date_Time_Closed": 1787639972000,
+    "Status": "Closed",
+    "Request_Type": "Public Safety",
+    "Subrequest_Type": "Control Number Request for Towing",
+    "Address": "1421 Rural Hill Rd, Antioch, TN 37013, USA",
+    "City": "ANTIOCH",
+    "ZIP": "37013",
+    "Council_District": 28,
+}
+COMPLAINTS_311_GEOMETRY = {"x": -86.65544, "y": 36.0546092}
 
 
 class TestNashvillePermitParsing:
@@ -291,3 +342,61 @@ class TestNashvilleStrLicenseParsing:
         event = sla.parse_socrata_row(row, city_id="nashville")
         assert event.latitude == pytest.approx(36.12424521)
         assert event.longitude == pytest.approx(-86.76200547)
+
+
+class TestNashville311Parsing:
+    @pytest.fixture
+    def complaints(self):
+        with patch("src.producers.complaints_311_producer.BaseKafkaProducer"):
+            from src.producers.complaints_311_producer import Complaints311Producer
+
+            return Complaints311Producer()
+
+    def _row(self):
+        return _flatten_feature(
+            COMPLAINTS_311_ROW,
+            COMPLAINTS_311_GEOMETRY,
+            extra_date_fields=("Date_Time_Opened", "Date_Time_Closed"),
+        )
+
+    def test_live_newest_row_parses(self, complaints):
+        event = complaints.parse_socrata_row(self._row(), city_id="nashville")
+        assert event is not None
+        assert event.city_id == "nashville"
+        assert event.incident_id == "2270024"
+
+    def test_lat_lon_resolve_from_capital_columns_without_the_geometry_lift(self, complaints):
+        row = self._row()
+        row.pop("latitude", None)
+        row.pop("longitude", None)
+        event = complaints.parse_socrata_row(row, city_id="nashville")
+        assert event.latitude == pytest.approx(36.0546092)
+        assert event.longitude == pytest.approx(-86.65544)
+
+    def test_watermark_and_closed_dates_map_from_epoch_ms(self, complaints):
+        event = complaints.parse_socrata_row(self._row(), city_id="nashville")
+        assert event.created_date.date().isoformat() == "2026-08-25"
+        assert event.created_date.hour == 6
+        assert event.closed_date == event.created_date
+
+    def test_status_and_request_type_map_via_field_map(self, complaints):
+        event = complaints.parse_socrata_row(self._row(), city_id="nashville")
+        assert event.status == "Closed"
+        assert event.complaint_type == "Public Safety"
+
+    def test_address_zip_and_borough_map(self, complaints):
+        event = complaints.parse_socrata_row(self._row(), city_id="nashville")
+        assert event.incident_address == "1421 Rural Hill Rd, Antioch, TN 37013, USA"
+        assert event.zipcode == "37013"
+        assert event.borough is not None
+
+    def test_null_latitude_row_drops_without_geometry(self, complaints):
+        """The `where: Latitude IS NOT NULL` filter keeps the stream 100%
+        geocoded; a row that still carries NULL coords (e.g. the 28.5%
+        published gap) must be dropped at parse, not filed under a bogus H3."""
+        row = dict(self._row())
+        row.pop("latitude", None)
+        row.pop("longitude", None)
+        row.pop("Latitude", None)
+        row.pop("Longitude", None)
+        assert complaints.parse_socrata_row(row, city_id="nashville") is None

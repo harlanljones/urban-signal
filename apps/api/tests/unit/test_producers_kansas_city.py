@@ -1,9 +1,10 @@
-"""Contract tests for Kansas City, MO (311 only, HJ-120)."""
+"""Contract tests for Kansas City, MO (311 HJ-120 + business licenses US-134)."""
 
 from unittest.mock import patch
 
 import pytest
 
+from src.producers.sla_licenses_producer import SLALicensesProducer
 from src.spatial.cities.kansas_city import (
     KANSAS_CITY_DIVISION_BBOXES,
     KANSAS_CITY_DIVISIONS,
@@ -22,6 +23,22 @@ KC_SPEC_FIELD_MAP = {
     "complaint_type": ["issue_type"],
     "created_date": ["open_date_time"],
     "status": ["current_status"],
+}
+
+# The exact field_map the US-134 SLA registration carries (see
+# data-coverage-sweep-2026-08-25.md §11). The producer's generic
+# location-container fallback resolves the GeoJSON Point's coordinates,
+# so those dotted lat/lng keys are declared-but-currently-latent.
+KC_SLA_SPEC_FIELD_MAP = {
+    "license_id": ["id"],
+    "license_type": ["business_type"],
+    "expiration_date": ["valid_license_for"],
+    "dba": ["dba_name"],
+    "latitude": ["location.latitude"],
+    "longitude": ["location.longitude"],
+    "incident_address": ["address"],
+    "borough": ["city"],
+    "zipcode": ["zipcode"],
 }
 
 
@@ -47,7 +64,7 @@ def test_kansas_city_geometry_is_self_consistent():
         assert bbox["min_lng"] <= meta.lng <= bbox["max_lng"], meta.name
 
 
-def test_kansas_city_registers_311_only():
+def test_kansas_city_registers_311_and_sla():
     from src.spatial.city_registry import REGISTRY, get_dataset, normalize_city
 
     city = CityId.KANSAS_CITY
@@ -55,7 +72,10 @@ def test_kansas_city_registers_311_only():
     assert normalize_city("kansas_city") is city
     assert normalize_city("kc_mo") is city
     assert REGISTRY[city].job_suffix == "kcmo"
-    assert set(REGISTRY[city].datasets) == {FeedType.COMPLAINTS_311}
+    assert set(REGISTRY[city].datasets) == {
+        FeedType.COMPLAINTS_311,
+        FeedType.SLA,
+    }
 
     c311 = REGISTRY[city].datasets[FeedType.COMPLAINTS_311]
     assert c311.watermark_col == "open_date_time"
@@ -64,13 +84,20 @@ def test_kansas_city_registers_311_only():
     assert c311.extra["expected_cadence_days"] == 7
     assert c311.extra["field_map"] == KC_SPEC_FIELD_MAP
 
-    # HJ-120 exclusions: KC permits survive only as dead annual archives
-    # (2019-2023), and the SLA table pnm4-68wg has no date column at all --
-    # registering either would page G5 forever.
+    # US-134: business license snapshot. No usable open-date watermark, so D4
+    # snapshot mode diffs ids across full refreshes (Baton Rouge precedent).
+    sla = REGISTRY[city].datasets[FeedType.SLA]
+    assert sla.watermark_col == ""
+    assert sla.platform == "socrata"
+    assert sla.id_keys == ["id"]
+    assert sla.extra["expected_cadence_days"] == 90  # ~7m publishing lapse
+    assert sla.extra["ingestion_mode"] == "snapshot"
+    assert sla.extra["field_map"] == KC_SLA_SPEC_FIELD_MAP
+
+    # HJ-120 exclusion that still holds: KC permits survive only as dead
+    # annual archives (2019-2023) -- registering would page G5 forever.
     with pytest.raises(KeyError, match="no.*feed"):
         get_dataset(city, FeedType.PERMITS)
-    with pytest.raises(KeyError, match="no.*feed"):
-        get_dataset(city, FeedType.SLA)
 
 
 KC_311_ROW = {
@@ -185,3 +212,69 @@ class TestKansasCity311Parsing:
         # (only point/location/the_geom containers are); geocode-less rows
         # must drop rather than file under a null island cell.
         assert complaints.parse_socrata_row(row, city_id="kansas_city") is None
+
+
+# Live US-134 SLA row via REST on 2026-08-25 ($limit=1): id 7344768. The
+# location column is a GeoJSON Point (coordinates [lng, lat]) -- NOT a
+# {latitude, longitude} dict -- so the producer's generic location-container
+# fallback resolves it rather than the dotted field_map keys.
+KC_SLA_ROW = {
+    "id": "7344768",
+    "business_type": "Flat Rate 16",
+    "address": "4734 HEINTZ ST",
+    "city": "KANSAS CITY",
+    "state": "MO",
+    "zipcode": "64133",
+    "dba_name": "3DDILLARD ESTATES LLC",
+    "valid_license_for": "20251231",
+    "location": {"type": "Point", "coordinates": [-94.44894, 39.03537]},
+}
+
+
+class TestKansasCitySLAParsing:
+    @pytest.fixture
+    def sla(self):
+        with patch("src.producers.sla_licenses_producer.BaseKafkaProducer"):
+            return SLALicensesProducer(bootstrap_servers="localhost:9092")
+
+    def test_live_row_parses_through_field_map_and_point(self, sla):
+        event = sla.parse_socrata_row(dict(KC_SLA_ROW), city_id="kansas_city")
+        assert event is not None
+        assert event.city_id == "kansas_city"
+        assert event.license_id == "7344768"  # field_map license_id <- id
+        assert event.license_type == "Flat Rate 16"  # license_type <- business_type
+        assert event.dba == "3DDILLARD ESTATES LLC"  # dba <- dba_name
+        assert event.address == "4734 HEINTZ ST"  # generic address chain
+        # GeoJSON location: coordinates = [lng, lat], resolved by the
+        # producer's location-container fallback.
+        assert event.latitude == pytest.approx(39.03537)
+        assert event.longitude == pytest.approx(-94.44894)
+        assert event.h3_res7 is not None
+        # valid_license_for YYYYMMDD expiration parsed (2025-12-31); no
+        # effective column on this feed, so effective_date stays None.
+        assert event.expiration_date is not None
+        assert (event.expiration_date.year, event.expiration_date.month, event.expiration_date.day) == (2025, 12, 31)
+        assert event.effective_date is None
+        assert event.license_status == "ACTIVE"
+
+    def test_missing_id_returns_none(self, sla):
+        row = dict(KC_SLA_ROW)
+        row.pop("id")
+        # No chain fallback spells KC's license id; without the id the row is
+        # unrepresentable and must drop.
+        assert sla.parse_socrata_row(row, city_id="kansas_city") is None
+
+    def test_null_location_emits_null_coord_event(self, sla):
+        row = dict(KC_SLA_ROW)
+        row.pop("location")
+        # Non-spatial tolerance (DC Basic Business Licenses precedent): rows
+        # with a valid id but no point still emit as null-lat/lng/null-H3
+        # events rather than being dropped.
+        event = sla.parse_socrata_row(row, city_id="kansas_city")
+        assert event is not None
+        assert event.license_id == "7344768"
+        assert event.latitude is None
+        assert event.longitude is None
+        assert event.h3_res7 is None
+        assert event.h3_res8 is None
+        assert event.h3_res9 is None
