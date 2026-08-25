@@ -19,6 +19,16 @@ const CITY_IDS = [
   "denver",
   "philadelphia",
   "washington_dc",
+  "prince_georges",
+  "columbus",
+  "nashville",
+  "kansas_city",
+  "minneapolis",
+  "pierce",
+  "milwaukee",
+  "charlotte",
+  "pittsburgh",
+  "san_diego",
 ] as const;
 
 const ORIGIN = "https://urban-signal.test";
@@ -35,6 +45,21 @@ function testEnv(options: { html?: string } = {}) {
             resolution: 9,
             k_ring: 1,
             catalyst_threshold: 85,
+          });
+        }
+        if (key.startsWith("grid/")) {
+          const city = key.slice("grid/".length);
+          return JSON.stringify({
+            type: "FeatureCollection",
+            city_id: city,
+            features: [
+              {
+                type: "Feature",
+                id: "892a10708b7ffff",
+                geometry: { type: "Polygon", coordinates: [[[-74.0, 40.7], [-74.0, 40.8], [-73.9, 40.8], [-74.0, 40.7]]] },
+                properties: { h3_index: "892a10708b7ffff", city_id: city, lims_score: 97.5 },
+              },
+            ],
           });
         }
         if (key.startsWith("submarkets/")) {
@@ -114,6 +139,26 @@ test("accepts the common Boston alias without changing the city", async () => {
 
   expect(response.status).toBe(200);
   expect(await response.json()).toMatchObject({ city_id: "boston" });
+});
+
+test("accepts a manifest city with no alias entry on every data route", async () => {
+  for (const route of ["submarkets", "grid", "catalysts"]) {
+    const response = await worker.fetch(
+      new Request(`${ORIGIN}/api/v1/${route}?city_id=san_diego`),
+      testEnv() as never,
+    );
+
+    expect([route, response.status]).toEqual([route, 200]);
+  }
+});
+
+test("still rejects a city absent from the snapshot manifest", async () => {
+  const response = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/submarkets?city_id=atlantis`),
+    testEnv() as never,
+  );
+
+  expect(response.status).toBe(400);
 });
 
 // ---------------------------------------------------------------------------

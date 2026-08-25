@@ -105,9 +105,13 @@ function jsonError(status: number, detail: string): Response {
   });
 }
 
-function normalizeCity(raw: string | null): string | null {
+function normalizeCity(raw: string | null, manifest: Manifest | null): string | null {
   if (!raw) return "nyc";
-  return CITY_ALIASES[raw.trim().toLowerCase()] ?? null;
+  const key = raw.trim().toLowerCase();
+  const alias = CITY_ALIASES[key];
+  if (alias) return alias;
+  if (manifest && manifest.cities.includes(key)) return key;
+  return null;
 }
 
 async function sha256Hex(input: string): Promise<string> {
@@ -417,7 +421,8 @@ async function callTool(
       return { content: [{ type: "text", text: await text({ count: cities.length, cities }) }] };
     }
     case "get_submarkets": {
-      const city = normalizeCity(strParam(args, "city_id"));
+      const manifest = await getManifest(env);
+      const city = normalizeCity(strParam(args, "city_id"), manifest);
       if (!city) {
         return {
           content: [{ type: "text", text: `Unsupported city_id '${String(args.city_id)}'. Call list_cities first.` }],
@@ -438,7 +443,8 @@ async function callTool(
       };
     }
     case "get_catalysts": {
-      const city = normalizeCity(strParam(args, "city_id"));
+      const manifest = await getManifest(env);
+      const city = normalizeCity(strParam(args, "city_id"), manifest);
       if (!city) {
         return {
           content: [{ type: "text", text: `Unsupported city_id '${String(args.city_id)}'. Call list_cities first.` }],
@@ -1117,7 +1123,7 @@ export default {
 
       // GET /api/v1/submarkets?city_id=
       if (url.pathname === "/api/v1/submarkets") {
-        const city = normalizeCity(url.searchParams.get("city_id"));
+        const city = normalizeCity(url.searchParams.get("city_id"), manifest);
         if (!city) {
           return jsonError(
             400,
@@ -1151,7 +1157,7 @@ export default {
 
       // GET /api/v1/grid?city_id=
       if (url.pathname === "/api/v1/grid") {
-        const city = normalizeCity(url.searchParams.get("city_id"));
+        const city = normalizeCity(url.searchParams.get("city_id"), manifest);
         if (!city) {
           return jsonError(
             400,
@@ -1169,7 +1175,7 @@ export default {
 
       // GET /api/v1/catalysts?city_id=&min_lims=&limit=&borough=&resolution=
       if (url.pathname === "/api/v1/catalysts") {
-        const city = normalizeCity(url.searchParams.get("city_id"));
+        const city = normalizeCity(url.searchParams.get("city_id"), manifest);
         if (!city) {
           return jsonError(
             400,
