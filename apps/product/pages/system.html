@@ -31,6 +31,7 @@
             <li>Watermark columns differ per dataset; each registration declares its own, with id-key fallback chains when a column renames (<code>job__ → job_number → id</code>).</li>
             <li>Text watermarks are normalized with sentinel exclusion, so placeholder rows never masquerade as fresh data.</li>
             <li>Feeds that cannot stream (snapshot-mode endpoints, year-sliced publications) are ingested honestly as snapshots, not pretending to be realtime.</li>
+            <li>NYC-only context feeds ride the same registry, with their own platform and cadence: the Marshal’s executed evictions endpoint (<code>6z8x-wfk4</code>) polls on Socrata every 15 minutes, a validation signal that never feeds the LIMS score.</li>
           </ul>
         </div>
         <div class="detail-code"><span class="code-comment">// illustrative record shape</span><code>{ <b>"source"</b>: "socrata",<br>&nbsp;&nbsp;<b>"type"</b>: "permit",<br>&nbsp;&nbsp;<b>"city_id"</b>: "sf" }</code></div>

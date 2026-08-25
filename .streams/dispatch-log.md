@@ -313,3 +313,15 @@ No spine files were touched at any point.
 | Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
 |---|---|---|---|---|---|
 | us108-aggregation-loop | `apps/api/src/consumers/feature_aggregation_worker.py`, `apps/api/src/consumers/alert_dispatcher_worker.py` (new), `apps/api/src/schemas/avro/catalyst_alert.avsc`, `apps/api/tests/unit/test_feature_aggregation_worker.py` (new), `apps/api/tests/unit/test_alert_dispatcher_worker.py` (new), `docker-compose.yml` | config.py (aggregation_cell_cooldown_seconds, alert_state_file — additive) | ~18:20 PT | implemented — interlock 20 passed; suite 807/0; ADR 0008 contract live; AC#3 staging verification pending | cg_inference aggregation loop (cooldown/DLQ/metrics) + cg_alerts webhook dispatcher + avsc city_id fix |
+
+## 2026-08-24 — product-site parity with dashboard v2 (US-119 / US-120 / US-121)
+
+All three streams target `apps/product` with **disjoint leaf files**. Shared files — `apps/product/CHANGELOG.md`, `apps/product/public/llms.txt`, `apps/product/public/llms-full.txt`, and the `dist/` build output (`build.mjs` `rm`+write — concurrent builds would tear it) — are **not** written by streams; each stream proposes its shared-file edits in its claim log and the orchestrator applies them serially at close-out (same hold pattern as the 2026-08-23 dashboard wiring dispatch). Full `bun run build`/`lint`/verifier gate also runs serially at close-out. Artifacts stay uncommitted (local git policy).
+
+| Stream id | Leaf claim | Shared files needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| us119-compare-surface | `apps/product/pages/compare.html`, `apps/product/scripts/render-city.mjs` | CHANGELOG.md, llms-full.txt (page-guide), dist/ | ~in-flight | completed — typecheck green; compare state confirmed NOT URL-addressable (deep-linked `?city=` only); copy-only section added | nearby-region comparison copy on /compare/ + city CTA sublabel |
+| us120-evictions-content | `apps/product/pages/system.html`, `apps/product/pages/evidence.html`, `apps/product/pages/cities.html`, `scripts/export_site_facts.py` (FEED_ORDER decision) | CHANGELOG.md, llms.txt/llms-full.txt (feed descriptions), public/facts.json (regenerated), dist/ | ~in-flight | completed — FEED_ORDER NOT extended (verify-site-content.mjs:33 + main.js:4 hard-assert 4 feeds; NYC-only asymmetry); hand-authored prose only; facts:check green | evictions stream documented on system/evidence/cities pages |
+| us121-architecture-alerts | `apps/product/pages/architecture.html` | CHANGELOG.md, llms.txt/llms-full.txt (architecture lines), dist/ | ~in-flight | completed — typecheck green; new Alert dispatch spine node + feature aggregation loop rewrite per ADR 0008 | architecture.html aggregation/alert narrative |
+
+**Orchestrator close-out:** shared edits applied serially (CHANGELOG ×3, llms.txt ×2, llms-full.txt ×3); `bun run build` + `bun run lint` green (SITE_BUILD_OK, SITE_CONTENT_OK, AGENT_SURFACE_OK, MULTI_PAGE_OK, 37 routes). Artifacts left uncommitted per local git policy. Yield: 3 of 3.

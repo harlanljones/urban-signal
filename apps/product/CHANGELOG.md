@@ -6,6 +6,9 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## Unreleased
 
 ### Added
+- Documented the live dashboard's nearby-region comparison mode on `/compare/` and metro city pages: registered metros within 175 miles (haversine) are selectable and layered over the current city, sorted by display name, with an empty-state when no neighbor is in range, and the selection is preserved across export.
+- Documented the NYC Marshal's executed evictions stream (`6z8x-wfk4`) across the system, evidence, and cities pages as a context-only validation signal — Socrata, 15-minute poll, `executed_date` watermark — explicitly not a LIMS input.
+- `/architecture/` now describes the realtime aggregation loop and catalyst alert dispatch: the feature aggregation worker recomputes touched H3 cells on a five-minute cooldown and emits catalyst alerts at LIMS ≥ 85.0 to `alerts.catalyst`, which the alert dispatcher consumer fans out to webhooks behind a per-city calibration gate and daily budget (ADR 0008).
 - Direct deep-links from metro compare cards (`/compare/`) to the live dashboard with preselected city query param (`/dashboard?city=<id>`).
 - Auto-generated deep-dive pages and machine-readable JSON twins for 6 additional metros: Minneapolis, Pierce County WA, Milwaukee, Charlotte, Pittsburgh, and San Diego (bringing total to 27 registered metros and 37 sitemap URLs).
 

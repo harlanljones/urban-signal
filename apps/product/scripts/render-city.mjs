@@ -73,7 +73,7 @@ export function renderCityPage(detail, facts) {
       <h1 id="city-title">${esc(detail.name)}<em class="city-state-em"> / ${esc(detail.state)}</em></h1>
       <p class="city-coords mono">CENTER ${coord(detail.center.lat, "N", "S")} · ${coord(detail.center.lng, "E", "W")} · REGISTRY-DERIVED COVERAGE</p>
       <div class="closing-routes city-actions">
-        <a class="route-primary" href="/dashboard?city=${encodeURIComponent(detail.id)}"><span>Open the live map</span><small>The dashboard precomputes this metro’s signals</small></a>
+        <a class="route-primary" href="/dashboard?city=${encodeURIComponent(detail.id)}"><span>Open the live map</span><small>The dashboard precomputes this metro’s signals and layers nearby regions within 175 miles</small></a>
         <a class="route-secondary" href="${REPOSITORY}/blob/main/${detail.evidence_path}" target="_blank" rel="noreferrer"><span>Audit the source contract</span><small>${esc(detail.evidence_path)}</small></a>
       </div>
     </section>

@@ -30,6 +30,7 @@
             <h3>The source contract: a DOB row, exactly as published.</h3>
             <p>Our record is a New York building permit from the Department of Buildings Socrata endpoint. It arrives with the city’s own column names, a watermark column the registry has declared (<code>issuance_date</code>), and an id-key fallback chain (<code>job__ → job_number → id</code>) for resilience against renames.</p>
             <p>Nothing is renamed yet. The registry’s job is to <em>declare</em> the feed’s truth — platform, endpoint, watermark, cadence — so every later stage can trust the declaration instead of guessing.</p>
+            <p>Not every registry entry drives the score. New York also registers the Marshal’s executed evictions endpoint (<code>6z8x-wfk4</code>) on Socrata, polling every 15 minutes with <code>executed_date</code> as its watermark — a NYC-only context/validation stream that is deliberately excluded from LIMS composition.</p>
           </div>
           <div class="code-pair">
             <div class="detail-code"><span class="code-label mono">AS PUBLISHED · ILLUSTRATIVE</span><code>{ <b>"job__"</b>: 123456789,<br>&nbsp;&nbsp;<b>"issuance_date"</b>: "2026-08-21T00:00:00",<br>&nbsp;&nbsp;<b>"borough"</b>: "BROOKLYN",<br>&nbsp;&nbsp;<b>"gis_latitude"</b>: 40.6782,<br>&nbsp;&nbsp;<b>"gis_longitude"</b>: -73.9442 }</code></div>

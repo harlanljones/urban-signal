@@ -1,4 +1,4 @@
 {
   "title": "Architecture — Urban Signal",
-  "description": "The Urban Signal architecture map: source producers, city registry, Kafka consumers, H3 enrichment, feature aggregation, PostGIS storage, ONNX horizons, edge snapshots."
+  "description": "The Urban Signal architecture map: source producers, city registry, Kafka consumers, H3 enrichment, feature aggregation, catalyst alert dispatch, PostGIS storage, ONNX horizons, edge snapshots."
 }

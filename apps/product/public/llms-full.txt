@@ -17,7 +17,7 @@ Product overview: what the system does, which metros are registered, and where t
 
 ### /system/
 
-The ingestion and normalization pipeline: how Socrata, ArcGIS, Carto, CKAN, and static-CSV feeds are contracted per city, normalized onto an H3 grid, and served as actionable momentum.
+The ingestion and normalization pipeline: how Socrata, ArcGIS, Carto, CKAN, and static-CSV feeds are contracted per city, normalized onto an H3 grid, and served as actionable momentum. New York additionally registers a context-only executed-evictions stream (`6z8x-wfk4`, Socrata, 15-minute poll) that never feeds the LIMS score.
 
 ### /evidence/
 
@@ -29,7 +29,7 @@ How the Leading Indicator Momentum Score is composed (CapEx density, permit velo
 
 ### /architecture/
 
-The system architecture map from source producers through city registry, Kafka consumers, H3 enrichment, feature aggregation, PostGIS storage, ONNX horizons, and edge snapshots.
+The system architecture map from source producers through city registry, Kafka consumers, H3 enrichment, feature aggregation, catalyst alert dispatch, PostGIS storage, ONNX horizons, and edge snapshots.
 
 ### /cities/
 
@@ -73,7 +73,7 @@ Consume these briefs instead of scraping rendered pages; if a metro or feed is m
 
 ## Evaluation routes
 
-- Human product evaluation: `/dashboard`
+- Human product evaluation: `/dashboard` (per-city `?city=<id>` deep links; compare control layers registered metros within 175 miles over the current city — compare set is not URL-addressable)
 - Structured facts: `/facts.json`
 - Per-city machine briefs: `/public/cities/<id>.json`
 - Repository overview: `README.md`

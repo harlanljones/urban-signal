@@ -30,7 +30,7 @@
         <div class="spine-node">
           <h3>Kafka backbone</h3>
           <p>Typed municipal events move through per-family topics; consumers enrich and aggregate without coupling to producers.</p>
-          <ul><li>Permits / 311 / licenses / deeds topics</li><li>Consumers: spatial enrichment, feature aggregation, PostGIS sync</li><li>Offsets support replay and reprocessing</li></ul>
+          <ul><li>Permits / 311 / licenses / deeds topics + <code>alerts.catalyst</code></li><li>Consumers: spatial enrichment, feature aggregation, alert dispatch, PostGIS sync</li><li>Offsets support replay and reprocessing</li></ul>
           <a class="stage-source" href="https://github.com/harlanljones/urban-signal/tree/main/apps/api/src/consumers" target="_blank" rel="noreferrer">apps/api/src/consumers</a>
         </div>
         <div class="spine-node">
@@ -41,9 +41,15 @@
         </div>
         <div class="spine-node">
           <h3>Feature aggregation</h3>
-          <p>Time-decayed, interpretable features per cell — the LIMS ingredients — plus catalyst alerts at the public threshold.</p>
-          <ul><li>180-day half-life CapEx decay</li><li>Permit velocity, 311 shift dynamics, license activity</li><li>Catalyst alerts at LIMS ≥ 85.0</li></ul>
-          <a class="stage-source" href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/features/lims_calculator.py" target="_blank" rel="noreferrer">apps/api/src/features/lims_calculator.py</a>
+          <p>A live consume loop turns permits, 311, license, and deed records into rolling per-cell features — the LIMS ingredients. Each touched cell recomputes at most once per five minutes; a record landing on a hot cell is absorbed, and catalyst alerts at LIMS ≥ 85.0 ride the same cooldown window.</p>
+          <ul><li>180-day half-life CapEx decay</li><li>Permit velocity, 311 shift dynamics, license activity</li><li>Backfill records skipped; failures route to the DLQ</li></ul>
+          <a class="stage-source" href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/consumers/feature_aggregation_worker.py" target="_blank" rel="noreferrer">apps/api/src/consumers/feature_aggregation_worker.py</a>
+        </div>
+        <div class="spine-node">
+          <h3>Alert dispatch</h3>
+          <p>Consumes <code>alerts.catalyst</code> and fans each alert out to webhooks behind a per-city calibration gate and a daily budget; calibration and budget skips are not failures, and a real failure routes the record to the DLQ while the loop continues. The contract is recorded in <a href="https://github.com/harlanljones/urban-signal/blob/main/docs/adr/0008-realtime-aggregation-and-alert-dispatch.md" target="_blank" rel="noreferrer">ADR 0008</a>.</p>
+          <ul><li>Webhook fan-out via <code>WebhookDispatcher</code></li><li>Calibration gate + daily budget, keyed per city</li><li>Restart-safe alert state; failures to the DLQ</li></ul>
+          <a class="stage-source" href="https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/consumers/alert_dispatcher_worker.py" target="_blank" rel="noreferrer">apps/api/src/consumers/alert_dispatcher_worker.py</a>
         </div>
         <div class="spine-node">
           <h3>Spatial storage</h3>
