@@ -107,6 +107,27 @@ Per US-69 acceptance, **this missed target gates further feed growth** (Wave 2 /
 signal-expansion tickets) until the backlog is drained and the keying/partition
 declaration drift in §1 is reconciled.
 
+## Reconciliation (2026-08-24, later same day)
+
+Both halves of the gating finding are resolved:
+
+1. **Backlog drained.** After the partition bump (12) + worker scaling drained
+   the ~5.3M-event backlog, live `kafka-consumer-groups` shows total lag of
+   ~1.2k records (`h3-enrich-workers`, permits/311 fresh tail only) and ~0.3k
+   (`postgis-spatial-sync-workers`) — versus the ~3.9M peak at test time.
+2. **Declaration drift reconciled.** `deploy/k8s/kafka/kafka-topics.yaml`
+   declares 12 partitions on all four raw topics (was 6/6/3/3), and
+   `base_consumer.py` auto-provisioning now uses
+   `settings.kafka_topic_partitions` (default 12, was hardcoded 3).
+   `apps/api/tests/unit/test_kafka_partition_wiring.py` locks settings ==
+   manifest == provisioning count so a fresh stack cannot recreate the drift.
+3. **Keying deviation resolved by decision.** ADR 0008 rejects `city_id+h3`
+   raw-keying while the aggregation worker is single-instance (in-memory
+   store); it is recorded as a future precondition for a shared feature store.
+
+With the backlog drained and declarations reconciled, the G7 soak precondition
+is met; only starting the 24-hour freshness clock remains.
+
 ## Reproducing
 
 ```bash

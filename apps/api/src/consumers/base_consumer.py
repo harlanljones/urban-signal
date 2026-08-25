@@ -79,7 +79,10 @@ class BaseKafkaConsumer:
         """Pre-create subscribed topics if they don't already exist on the broker."""
         try:
             admin_client = AdminClient({"bootstrap.servers": self.bootstrap_servers})
-            new_topics = [NewTopic(t, num_partitions=3, replication_factor=1) for t in self.topics]
+            new_topics = [
+                NewTopic(t, num_partitions=settings.kafka_topic_partitions, replication_factor=1)
+                for t in self.topics
+            ]
             futures = admin_client.create_topics(new_topics)
             for topic, future in futures.items():
                 try:

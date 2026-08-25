@@ -34,6 +34,14 @@ class Settings(BaseSettings):
     kafka_sasl_mechanism: str | None = None
     kafka_sasl_username: str | None = None
     kafka_sasl_password: str | None = None
+    # Partition count used when a consumer pre-creates a missing topic (US-69:
+    # the scaling plan targets >= 12 partitions on raw.municipal.*; a 3-partition
+    # creation default was the drift that concentrated backfill load on 0/1/2).
+    kafka_topic_partitions: int = Field(
+        default=12,
+        description="Partitions assigned to topics created by consumer auto-provisioning",
+        ge=1,
+    )
 
     # Kafka Topic Definitions
     topic_permits: str = Field(default="raw.municipal.permits")
@@ -58,6 +66,13 @@ class Settings(BaseSettings):
         description="Optional path to the scheduler watermark state file; empty disables persistence",
     )
 
+    # Dispatcher durable calibration state (ADR 0008 §6): JSON store backing
+    # the per-city calibration gate so it survives dispatcher restarts.
+    alert_state_file: str = Field(
+        default="",
+        description="Optional path to the alert-dispatcher calibration state file; empty uses in-memory",
+    )
+
     # Consumer Group Configurations
     cg_h3_enrichment: str = Field(default="h3-enrich-workers")
     cg_complaints: str = Field(default="spatial-complaint-grp")
@@ -65,6 +80,14 @@ class Settings(BaseSettings):
     cg_deeds: str = Field(default="deed-financial-grp")
     cg_inference: str = Field(default="ml-inference-workers")
     cg_alerts: str = Field(default="webhook-dispatchers")
+
+    # Aggregation consume-loop cadence (ADR 0008 §2): bounds per-cell recompute
+    # (≈5 DuckDB window queries) to once per window; records touching a hot
+    # cell are absorbed. Single-instance worker; per-instance store.
+    aggregation_cell_cooldown_seconds: int = Field(
+        default=300,
+        description="Per-cell aggregation cooldown window in seconds",
+    )
 
     # Socrata SODA OpenData APIs (NYC Defaults)
     socrata_app_token: str | None = Field(default=None, description="Socrata App Token for high rate limits")

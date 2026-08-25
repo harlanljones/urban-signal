@@ -253,6 +253,24 @@ services:
       schema-registry:
         condition: service_healthy
 
+  # Stream consumer: catalyst-alert webhook dispatcher (cg_alerts → webhooks)
+  # Single-instance: the daily budget is in-memory (ADR 0008 §6).
+  alert-dispatcher-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: urbansignal-app:latest
+    restart: unless-stopped
+    command: python -m src.consumers.alert_dispatcher_worker
+    environment:
+      <<: *app-env
+    depends_on:
+      kafka:
+        condition: service_healthy
+      schema-registry:
+        condition: service_healthy
+
   # Stream consumer: PostGIS persistence worker (GiST/BRIN indexed upserts)
   postgis-worker:
     build:

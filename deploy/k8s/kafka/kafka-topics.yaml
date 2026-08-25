@@ -7,7 +7,7 @@ metadata:
     strimzi.io/cluster: kafka-cluster
 spec:
   topicName: raw.municipal.permits
-  partitions: 6
+  partitions: 12
   replicas: 2
   config:
     retention.ms: 1209600000 # 14 Days
@@ -22,7 +22,7 @@ metadata:
     strimzi.io/cluster: kafka-cluster
 spec:
   topicName: raw.municipal.311
-  partitions: 6
+  partitions: 12
   replicas: 2
   config:
     retention.ms: 604800000 # 7 Days
@@ -37,7 +37,7 @@ metadata:
     strimzi.io/cluster: kafka-cluster
 spec:
   topicName: raw.municipal.sla
-  partitions: 3
+  partitions: 12
   replicas: 2
   config:
     cleanup.policy: compact
@@ -52,7 +52,7 @@ metadata:
     strimzi.io/cluster: kafka-cluster
 spec:
   topicName: raw.municipal.deeds
-  partitions: 3
+  partitions: 12
   replicas: 2
   config:
     cleanup.policy: compact

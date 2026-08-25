@@ -5,6 +5,7 @@
   "doc": "Catalyst High-Momentum Parcel / Submarket Alert",
   "fields": [
     { "name": "alert_id", "type": "string" },
+    { "name": "city_id", "type": "string", "default": "nyc" },
     { "name": "h3_index", "type": "string" },
     { "name": "h3_resolution", "type": "int", "default": 9 },
     { "name": "lims_score", "type": "double" },

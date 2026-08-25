@@ -267,3 +267,10 @@ Updated per wave close-out in `.streams/dispatch-log.md`; program rollup maintai
 > Strimzi manifests and the consumer default still declare 6/3/3; keying is
 > `city_id:record_id`, not `city_id+h3`. Full evidence:
 > `docs/replay-lag-verification.md`. Per US-69, the miss gates further feed growth.
+>
+> **Reconciled (2026-08-24, same day):** backlog drained (live lag ~1.2k +
+> ~0.3k records vs ~3.9M peak); Strimzi manifests and the consumer
+> auto-provision default now declare 12 partitions, locked by
+> `test_kafka_partition_wiring.py`; keying stays `city_id:record_id` per ADR
+> 0008 (single-instance aggregation worker). G7 soak precondition met — clock
+> start pending. Evidence: `docs/replay-lag-verification.md` "Reconciliation".
