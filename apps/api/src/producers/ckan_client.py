@@ -74,6 +74,31 @@ _TERM_RE = re.compile(
 )
 
 
+def _quote_order_by(order_by: str) -> str:
+    """Quote ORDER BY columns for ``datastore_search_sql``.
+
+    CKAN's SQL grammar treats a double-quoted string as ONE identifier, so
+    ``ORDER BY "issued_date DESC"`` is a 409 ("column does not exist") — the
+    direction must stay outside the quotes. Accepts ``col``, ``col DESC``,
+    ``col ASC``, and comma-separated combinations; already-quoted columns pass
+    through unchanged.
+    """
+    terms = []
+    for term in order_by.split(","):
+        term = term.strip()
+        if not term:
+            continue
+        parts = term.split()
+        col = parts[0]
+        direction = parts[1].upper() if len(parts) > 1 else ""
+        if direction not in ("ASC", "DESC"):
+            direction = ""
+        if not col.startswith('"'):
+            col = f'"{col}"'
+        terms.append(f"{col} {direction}".rstrip())
+    return ", ".join(terms) if terms else '"_id"'
+
+
 def _parse_where_terms(where_clause: str) -> Optional[List[Tuple[str, str, str]]]:
     """Split an AND-combined where clause into ``(field, op, value)`` terms.
 
@@ -232,9 +257,7 @@ class CkanClient:
                     for field, op, value in terms
                 ]
                 sql += " WHERE " + " AND ".join(conds)
-            order = order_by or "_id"
-            if not order.startswith('"'):
-                order = ", ".join(f'"{c.strip()}"' for c in order.split(","))
+            order = _quote_order_by(order_by or "_id")
             sql += f" ORDER BY {order} LIMIT {int(limit)} OFFSET {int(offset)}"
             payload = self._request_json(f"{action_base}/datastore_search_sql", {"sql": sql})
             return list(payload["result"]["records"])

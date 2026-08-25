@@ -19,6 +19,7 @@ from src.producers.ckan_client import (
     CkanError,
     NonDatastoreResourceError,
     _parse_where_terms,
+    _quote_order_by,
 )
 
 PERMITS_URI = "ckan://data.boston.gov/6ddcd912-32a0-43df-9908-63574f8c7e77"
@@ -180,6 +181,34 @@ def test_range_clause_routes_to_search_sql(client, monkeypatch):
     assert 'WHERE "issued_date" > \'2026-08-20T00:00:00\'' in seen["sql"]
     assert 'ORDER BY "_id"' in seen["sql"]
     assert len(records) == 2
+
+
+def test_desc_order_by_quotes_column_not_direction(client, monkeypatch):
+    """US-109: datastore_search_sql must not quote ``issued_date DESC`` as one
+    identifier (Boston permits/311 409). The direction stays outside quotes."""
+    seen = {}
+
+    def fake_request_json(url, params):
+        seen["sql"] = params["sql"]
+        return SQL_WATERMARK_RESULT
+
+    monkeypatch.setattr(client, "_request_json", fake_request_json)
+    client.fetch_records(
+        PERMITS_URI,
+        where_clause="issued_date > '2026-08-20T00:00:00'",
+        order_by="issued_date DESC",
+    )
+    assert 'ORDER BY "issued_date" DESC' in seen["sql"]
+
+
+def test_quote_order_by_variants():
+    assert _quote_order_by("issued_date DESC") == '"issued_date" DESC'
+    assert _quote_order_by("issued_date") == '"issued_date"'
+    assert _quote_order_by("issued_date ASC, recorded_date DESC") == (
+        '"issued_date" ASC, "recorded_date" DESC'
+    )
+    assert _quote_order_by('"_id"') == '"_id"'
+    assert _quote_order_by("") == '"_id"'
 
 
 def test_equality_clause_uses_search_filters_param(client, monkeypatch):

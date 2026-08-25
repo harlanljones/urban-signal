@@ -157,6 +157,66 @@ class TestSeattleRegistration:
         assert datasets[FeedType.SLA].watermark_col == "applicationdate"
         assert datasets[FeedType.DEEDS].watermark_col == "SaleDate"
 
+    def test_311_field_map_covers_seattle_spellings(self):
+        """US-110: Seattle spells the SR id `servicerequestnumber` (no
+        underscore) and the created date `createddate` — the generic chains
+        missed both, so every 311 row dropped at parse. The field map is the
+        pin that keeps this fixed."""
+        spec = REGISTRY[CityId.SEATTLE].datasets[FeedType.COMPLAINTS_311]
+        fm = spec.extra.get("field_map", {})
+        assert "servicerequestnumber" in fm.get("incident_id", [])
+        assert "createddate" in fm.get("created_date", [])
+
+
+SEATTLE_311_ROW = {
+    # Live newest-rows sample via SODA on 2026-08-24, as SocrataClient
+    # delivers it (JSON object, ISO timestamp, numeric lat/lng).
+    "servicerequestnumber": "13-00000004",
+    "webintakeservicerequests": "Abandoned Vehicle",
+    "servicerequeststatusname": "New",
+    "createddate": "2013-01-01T11:49:03",
+    "departmentname": "Seattle Public Utilities",
+    "latitude": 47.6985,
+    "longitude": -122.3773,
+    "zipcode": "98144",
+    "councildistrict": 2,
+}
+
+
+class TestSeattle311Parsing:
+    """Parse pin against the shared Complaints311Producer (US-110)."""
+
+    @pytest.fixture
+    def producer(self):
+        with (
+            patch("src.producers.complaints_311_producer.BaseKafkaProducer"),
+            patch(
+                "src.producers.field_maps.resolve_field_map",
+                return_value={
+                    "incident_id": ["servicerequestnumber"],
+                    "created_date": ["createddate"],
+                    "complaint_type": ["webintakeservicerequests"],
+                },
+            ),
+        ):
+            from src.producers.complaints_311_producer import Complaints311Producer
+
+            yield Complaints311Producer()
+
+    def test_seattle_row_parses_with_field_map(self, producer):
+        event = producer.parse_socrata_row(dict(SEATTLE_311_ROW), city_id="seattle")
+        assert event is not None
+        assert event.city_id == "seattle"
+        assert event.incident_id == "13-00000004"
+        assert event.complaint_type == "Abandoned Vehicle"
+        assert event.latitude == pytest.approx(47.6985)
+        assert event.longitude == pytest.approx(-122.3773)
+
+    def test_missing_servicerequestnumber_returns_none(self, producer):
+        row = dict(SEATTLE_311_ROW)
+        row.pop("servicerequestnumber")
+        assert producer.parse_socrata_row(row, city_id="seattle") is None
+
 
 class TestArcGISClient:
     """Paging, date coercion, and geometry reduction specific to ArcGIS."""

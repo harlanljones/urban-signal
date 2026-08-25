@@ -1,5 +1,6 @@
 """Unit tests for Live Municipal Ingestion Scheduler & Poller."""
 
+import json
 from unittest.mock import MagicMock
 
 import pytest
@@ -189,7 +190,7 @@ def test_text_watermark_guard_and_raw_high_watermark(mock_scheduler):
 
     mock_rows = [
         {"job__": "M010", "latitude": "40.7", "longitude": "-73.9", "issuance_date": "ZZZZZZZZ"},
-        {"job__": "M011", "latitude": "40.7", "longitude": "-73.9", "issuance_date": "20260915"},
+        {"job__": "M011", "latitude": "40.7", "longitude": "-73.9", "issuance_date": "20260815"},
         {"job__": "M012", "latitude": "40.7", "longitude": "-73.9", "issuance_date": "20260801"},
     ]
     mock_producer.socrata.paginate = MagicMock(return_value=[mock_rows])
@@ -202,8 +203,82 @@ def test_text_watermark_guard_and_raw_high_watermark(mock_scheduler):
     )
     # Raw declared-format string stored; sentinel dropped; calendar max wins
     # even though 20260801 sorts above it lexically.
-    assert result["high_watermark"] == "20260915"
-    assert mock_scheduler.metrics[job_name].high_watermark == "20260915"
+    assert result["high_watermark"] == "20260815"
+    assert mock_scheduler.metrics[job_name].high_watermark == "20260815"
+
+
+def test_future_dated_row_does_not_advance_high_watermark(mock_scheduler):
+    """US-111: a future/sentinel-dated row must not pin the high watermark —
+    sla_sf was poisoned by a 2028 row, filtering `> '2028-...'` until 2028."""
+    job_name = "permits"
+    mock_producer = mock_scheduler.producers[job_name]
+    mock_rows = [
+        {
+            "job__": "M001",
+            "latitude": "40.725",
+            "longitude": "-73.997",
+            "job_type": "A1",
+            "initial_cost": "100000",
+            "issuance_date": "2028-02-26T00:00:00.000",  # future row
+        },
+        {
+            "job__": "M002",
+            "latitude": "40.725",
+            "longitude": "-73.997",
+            "job_type": "A1",
+            "initial_cost": "100000",
+            "issuance_date": "2026-08-01T10:00:00.000",  # current row
+        },
+    ]
+    mock_producer.socrata.paginate = MagicMock(return_value=[mock_rows])
+
+    result = mock_scheduler.poll_job(job_name, limit=100)
+
+    # Both rows published; the watermark advances only to the non-future row.
+    assert result["records_published"] == 2
+    assert result["high_watermark"] == "2026-08-01T10:00:00"
+
+
+def test_future_text_watermark_not_advanced(mock_scheduler):
+    """US-111: the ADR-0005 text-watermark path ignores future declared-format
+    values the same way the event-attr path does."""
+    job_name = "permits"
+    mock_producer = mock_scheduler.producers[job_name]
+    mock_scheduler.job_metadata[job_name].update(
+        watermark_type="text",
+        watermark_format="%Y%m%d",
+        watermark_exclude=[],
+    )
+    mock_scheduler.metrics[job_name].high_watermark = "20260810"
+    mock_rows = [
+        {"job__": "M010", "latitude": "40.7", "longitude": "-73.9", "issuance_date": "20280226"},
+        {"job__": "M011", "latitude": "40.7", "longitude": "-73.9", "issuance_date": "20260820"},
+    ]
+    mock_producer.socrata.paginate = MagicMock(return_value=[mock_rows])
+
+    result = mock_scheduler.poll_job(job_name, limit=100)
+
+    assert result["high_watermark"] == "20260820"
+
+
+def test_load_state_skips_future_watermark(mock_scheduler, tmp_path):
+    """US-111: a poisoned state file self-heals — a future watermark is not
+    restored, so the feed resumes incremental ingestion."""
+    state = tmp_path / "state.json"
+    state.write_text(
+        json.dumps(
+            {
+                "permits": {"high_watermark": "2028-02-26T00:00:00"},
+                "sla": {"high_watermark": "2026-08-01T00:00:00"},
+            }
+        ),
+        encoding="utf-8",
+    )
+    mock_scheduler.state_file = str(state)
+    mock_scheduler._load_state()
+
+    assert mock_scheduler.metrics["permits"].high_watermark is None  # future ignored
+    assert mock_scheduler.metrics["sla"].high_watermark == "2026-08-01T00:00:00"
 
 
 def test_poll_all_and_metrics(mock_scheduler):

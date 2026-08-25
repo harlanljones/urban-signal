@@ -153,6 +153,36 @@ class JobMetrics:
     last_rollover: str | None = None
 
 
+def _is_future_watermark(value: Any, now_dt: datetime) -> bool:
+    """Whether a watermark datetime falls strictly after ``now_dt``.
+
+    Mirrors the staleness probe's future-row treatment (US-111): a single
+    future/sentinel row must not pin a feed's high watermark. Naive datetimes
+    are treated as UTC so the comparison never raises.
+    """
+    if value is None:
+        return False
+    ts = value
+    if ts.tzinfo is None:
+        ts = ts.replace(tzinfo=UTC)
+    return ts > now_dt
+
+
+def _parse_state_watermark(raw: str, fmt: str | None) -> datetime | None:
+    """Parse a persisted high-watermark string for the future guard.
+
+    Text-typed feeds (ADR 0005) store the raw declared-format string; all
+    others store ISO. Returns ``None`` when unparseable so an unknown format
+    is never mistaken for the future.
+    """
+    try:
+        if fmt:
+            return datetime.strptime(raw, fmt).replace(tzinfo=UTC)
+        return datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    except (ValueError, TypeError):
+        return None
+
+
 class MunicipalIngestionScheduler:
     """Continuous, rate-limited polling orchestrator for NYC Socrata datasets."""
 
@@ -254,13 +284,29 @@ class MunicipalIngestionScheduler:
             logger.warning("Ignoring unreadable watermark state %s: %s", self.state_file, exc)
             return
         restored = 0
+        skipped_future = 0
+        now_dt = datetime.now(UTC)
         for job_name, entry in data.items():
             met = self.metrics.get(job_name)
             wm = (entry or {}).get("high_watermark")
             if met is not None and wm and met.high_watermark is None:
+                meta = self.job_metadata.get(job_name)
+                fmt = meta.get("watermark_format") if meta else None
+                parsed = _parse_state_watermark(str(wm), fmt)
+                if parsed is not None and _is_future_watermark(parsed, now_dt):
+                    # US-111: a poisoned state file (e.g. sla_sf seeded with a
+                    # 2028 row) must not pin the feed's watermark on restore.
+                    skipped_future += 1
+                    logger.warning("Ignoring future watermark %r for job %s (US-111)", wm, job_name)
+                    continue
                 met.high_watermark = str(wm)
                 restored += 1
-        logger.info("Restored %d job watermarks from %s", restored, self.state_file)
+        logger.info(
+            "Restored %d job watermarks from %s%s",
+            restored,
+            self.state_file,
+            f" (ignored {skipped_future} future)" if skipped_future else "",
+        )
 
     def _save_state(self) -> None:
         """Atomically persist non-None high watermarks (US-106)."""
@@ -445,6 +491,11 @@ class MunicipalIngestionScheduler:
         records_published = 0
         duplicates_skipped = 0
         new_high_watermark = met.high_watermark
+        # US-111 future-watermark guard: advance the high watermark only with
+        # values at or before now (mirrors the staleness probe), so one
+        # future/sentinel row cannot pin the feed's incremental filter.
+        now_dt = datetime.now(UTC)
+        future_watermarks = 0
         # Typed comparison state for text-typed watermarks (ADR 0005): the
         # stored high watermark stays the raw declared-format string so the
         # server-side `>` filter remains format-consistent across runs.
@@ -490,7 +541,14 @@ class MunicipalIngestionScheduler:
                             fmt=meta.get("watermark_format"),
                             exclude=meta.get("watermark_exclude") or [],
                         )
-                        if entry and (new_hw_parsed is None or entry[1] > new_hw_parsed):
+                        if entry and _is_future_watermark(entry[1], now_dt):
+                            future_watermarks += 1
+                            logger.warning(
+                                "Job '%s': ignoring future text watermark %r (US-111)",
+                                job_name,
+                                entry[0],
+                            )
+                        elif entry and (new_hw_parsed is None or entry[1] > new_hw_parsed):
                             new_high_watermark = entry[0]
                             new_hw_parsed = entry[1]
 
@@ -538,9 +596,17 @@ class MunicipalIngestionScheduler:
                                 or getattr(event, "recorded_date", None)
                             )
                         if wm_val:
-                            wm_str = wm_val.strftime("%Y-%m-%dT%H:%M:%S")
-                            if new_high_watermark is None or wm_str > new_high_watermark:
-                                new_high_watermark = wm_str
+                            if _is_future_watermark(wm_val, now_dt):
+                                future_watermarks += 1
+                                logger.warning(
+                                    "Job '%s': ignoring future watermark %s (US-111)",
+                                    job_name,
+                                    wm_val,
+                                )
+                            else:
+                                wm_str = wm_val.strftime("%Y-%m-%dT%H:%M:%S")
+                                if new_high_watermark is None or wm_str > new_high_watermark:
+                                    new_high_watermark = wm_str
 
                     except Exception as parse_err:
                         logger.warning("Error processing row in %s: %s", job_name, parse_err)

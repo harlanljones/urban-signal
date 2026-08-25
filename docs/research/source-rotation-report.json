@@ -1,0 +1,80 @@
+{
+  "generated_at": "2026-08-24T23:44:23.809566+00:00",
+  "checks": [
+    {
+      "id": "norfolk_deeds_fy",
+      "cadence": "every July",
+      "owner": "reliability",
+      "next_due": "2027-07-01",
+      "due": true,
+      "status": "CURRENT",
+      "reason": "current FY27 id alive (74331 rows, newest transfer_date=2026-08-21T00:00:00.000); no newer FY in family (7tu9-2ytx, 8bfx-a5g8, 9gmp-9x4c, g7sg-tivf, m5ya-5grb, pdf2-gh9c, qva7-tzrf, th3n-jr9u, yvpm-8aid)",
+      "evidence": {
+        "id": "qva7-tzrf",
+        "rows": "74331",
+        "newest_transfer_date": "2026-08-21T00:00:00.000",
+        "family": [
+          "7tu9-2ytx",
+          "8bfx-a5g8",
+          "9gmp-9x4c",
+          "g7sg-tivf",
+          "m5ya-5grb",
+          "pdf2-gh9c",
+          "qva7-tzrf",
+          "th3n-jr9u",
+          "yvpm-8aid"
+        ],
+        "successors": []
+      },
+      "probed_at": "2026-08-24T23:44:22.650067+00:00"
+    },
+    {
+      "id": "alameda_transfer",
+      "cadence": "annually",
+      "owner": "reliability",
+      "next_due": "2027-08-24",
+      "due": true,
+      "status": "UNCHANGED",
+      "reason": "newest transfer_dt 2025-03-31 still <= baseline 2025-07-07",
+      "evidence": {
+        "reachable": true,
+        "rows": 187908,
+        "newest_raw": 1743379200000,
+        "newest_iso": "2025-03-31T00:00:00+00:00"
+      },
+      "probed_at": "2026-08-24T23:44:23.049304+00:00"
+    },
+    {
+      "id": "kingco_parcel_sales",
+      "cadence": "quarterly",
+      "owner": "reliability",
+      "next_due": "2026-11-23",
+      "due": true,
+      "status": "UNCHANGED",
+      "reason": "newest SaleDate 2025-11-20 still <= baseline 2025-11-20",
+      "evidence": {
+        "reachable": true,
+        "rows": 110857,
+        "newest_raw": 1763596800000,
+        "newest_iso": "2025-11-20T00:00:00+00:00"
+      },
+      "probed_at": "2026-08-24T23:44:23.475968+00:00"
+    },
+    {
+      "id": "snohomish_recent_sales",
+      "cadence": "annually",
+      "owner": "reliability",
+      "next_due": "2027-08-24",
+      "due": true,
+      "status": "UNCHANGED",
+      "reason": "newest TRNSF_DATE 2026-08-01 still <= baseline 2026-08-19",
+      "evidence": {
+        "reachable": true,
+        "rows": 21734,
+        "newest_raw": "Aug-2026",
+        "newest_iso": "2026-08-01T00:00:00+00:00"
+      },
+      "probed_at": "2026-08-24T23:44:23.809532+00:00"
+    }
+  ]
+}

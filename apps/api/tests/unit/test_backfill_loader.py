@@ -76,6 +76,32 @@ def test_build_query_shape_snapshot_feed_has_no_where():
     assert kwargs == {}
 
 
+def test_build_query_shape_dc_arcgis_uses_date_literal_and_no_order_by():
+    # US-109: the DC server (maps2.dcgis.dc.gov) rejects ISO-string date
+    # comparisons and the where+orderByFields combination; the loader must
+    # emit an ANSI date literal and page by OID.
+    meta = _meta(
+        watermark_col="ISSUE_DATE",
+        platform="arcgis",
+        endpoint="https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/18",
+    )
+    where, kwargs = build_query_shape(meta, datetime(2026, 5, 26, tzinfo=UTC))
+    assert "ISSUE_DATE >= date '2026-05-26'" in where
+    assert "2026-05-26T" not in where
+    assert kwargs == {}
+
+
+def test_build_query_shape_non_dc_arcgis_keeps_iso_and_order():
+    meta = _meta(
+        watermark_col="ISSUED_DT",
+        platform="arcgis",
+        endpoint="https://services1.arcgis.com/9yy6msODkIBzkUXU/arcgis/rest/services/Building_Permits/FeatureServer/0",
+    )
+    where, kwargs = build_query_shape(meta, datetime(2026, 5, 26, tzinfo=UTC))
+    assert "ISSUED_DT >= '2026-05-26T00:00:00'" in where
+    assert kwargs == {"order_by": "ISSUED_DT DESC"}
+
+
 def test_backfill_job_counts_and_watermark():
     fake = _FakeScheduler({"permits_baltimore": _meta()})
     client = MagicMock()

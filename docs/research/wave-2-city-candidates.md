@@ -56,6 +56,9 @@ Limits, stated plainly:
 | **Nashville, TN** | PERMITS | `services2.arcgis.com/HdTo6HJqh92wn4D8/.../Building_Permits_Issued_2/FeatureServer/0` | arcgis | `Date_Issued` = 2026-08-20 | `Lat`/`Lon` attrs + point | 1,270 issued since 2026-07-01 |
 | **Prince George's Co., MD** | 311 | `data.princegeorgescountymd.gov/resource/2ywx-ipcd` | socrata | `date_request_opened` = 2026-07-17 | `latitude`/`longitude` | 444,109 rows |
 | **Kansas City, MO** | 311 | `data.kcmo.org/resource/d4px-6rwg` | socrata | `open_date_time` = 2026-08-17 | `latitude`/`longitude`, `lat_long` | 816,428 rows |
+| **Portland, OR** | PERMITS | `www.portlandmaps.com/od/rest/services/COP_OpenData_PlanningDevelopment/MapServer/89` | arcgis | `ISSUEDATE` = 2026-08-10 | point geometry | 36,408 rows |
+| **Tampa, FL** | PERMITS | `arcgis.tampagov.net/arcgis/rest/services/OpenData/Planning/MapServer/32` | arcgis | `OPENED_DATE` = 2026-07-21 | point geometry | 1,028 rows (single-family only, 710 Issued) |
+| **Sacramento, CA** | 311 | `services5.arcgis.com/54falWtcpty3V47Z/.../SalesForce311_View/FeatureServer/0` | arcgis | `DateCreated` = 2026-08-24 | point geometry | 1,606,782 rows |
 
 Field detail worth pinning in tests:
 
@@ -85,6 +88,7 @@ Field detail worth pinning in tests:
 | Orlando, FL | SLA | `7388-4re5` Business Tax Receipts; `ssrj-rbua` STR Licenses | Both refreshed 2026-08-23 — genuinely live. Address-only, no coordinates. Geocoding required. STR feed is also a **new signal type** (investor-buyout pressure), not just an SLA. |
 | Oakland, CA | 311 | `data.oaklandca.gov/resource/quth-gb8e` | Live 2026-08-23, but no coordinate fields. Also a **geography conflict**: Oakland is already the EAST_BAY division of the registered `san_francisco` metro, so this is division-level data, not a new registration (shape 1 vs shape 2, `metro-expansion-and-new-signals.md` §1). |
 | Kansas City, MO | SLA | `data.kcmo.org/resource/pnm4-68wg` | `location` field only, and **no date column at all** — no watermark, no snapshot diff key worth trusting. Reject unless re-probed. |
+| Sacramento, CA | PERMITS | `services5.arcgis.com/54falWtcpty3V47Z/.../BldgPermitIssued_CurrentYear/FeatureServer/0` | Current (11,775 rows, newest `Status_Date` 2026-07-30) but **no geometry and no lat/lon fields** — address-only (`Address` + `Site_Location`). Needs geocoding. |
 
 **Seven of these blockers are the same blocker.** See the geocoding argument
 below; it is the highest-leverage finding in this survey.
@@ -94,10 +98,10 @@ below; it is the highest-leverage finding in this survey.
 | City | Verdict | Evidence |
 |---|---|---|
 | Kansas City, MO — permits | Dead, confirming prior survey | Newest permit listings 2019–2023; the live hits are annual archive tables |
-| Sacramento, CA | Hold | Hub carries "Issued Building Permits Current Year" but item metadata is 2024-03-25 and 311 slices stop at 2016. Needs a row-level probe before any verdict |
-| Portland, OR | Weak | Only "Residential Demolition Permits" is current (2026-08-22); the main residential permits item last moved 2023-08-31 |
-| Charlotte, NC | Unresolved | 347-dataset Hub, but the family queries returned only zoning/floodplain layers. Search quality problem, not a proven absence — needs targeted probing |
-| Tampa, FL | Weak | Best hit is "Construction Inspections" (2024-12-18) |
+| Sacramento, CA | **Resolved by US-78 → Tier 1 (311) / Tier 2 (permits)** | See [US-78 row-level re-probe](#us-78-row-level-re-probe-2026-08-24). The 311 "slices stop at 2016" reading missed the live `SalesForce311_View` (1.6 M rows, newest 2026-08-24) |
+| Portland, OR | **Resolved by US-78 → Tier 1 (permits)** | See [US-78 row-level re-probe](#us-78-row-level-re-probe-2026-08-24). Main residential permits feed alive (newest 2026-08-10); 2023-08-31 was stale metadata |
+| Charlotte, NC | **Resolved by US-78 → reject for permits** | See [US-78 row-level re-probe](#us-78-row-level-re-probe-2026-08-24). Genuine absence — Accela permit records are not in open data |
+| Tampa, FL | **Resolved by US-78 → Tier 1 (permits, single-family only)** | See [US-78 row-level re-probe](#us-78-row-level-re-probe-2026-08-24). Real permits feed found under a different name |
 | Providence, RI · Richmond, VA · Fort Worth, TX · Miami, FL | Reject on this evidence | All four Socrata catalogs answer, but every feed-family hit is 2020–2025 stale. Miami's permits item last moved 2022-06-01 |
 | Buffalo, NY · Mesa, AZ | Reject | Socrata catalogs answer (106 / 41 datasets); zero hits on all four families |
 | Cambridge, MA · Bloomington, IN | Not applicable | Cambridge is already an alias of the registered `boston` metro |
@@ -121,6 +125,54 @@ cities by population.
 | **Milwaukee, WI** | `data.milwaukee.gov` — 404 on Hub API |
 | **Las Vegas, NV** | `opendata.lasvegasnevada.gov` — DNS does not resolve |
 
+## US-78 row-level re-probe (2026-08-24)
+
+The four cities above that catalog metadata could not resolve were re-probed at
+row level: newest row by watermark descending, column list, geocoding fields,
+and a current-window count. Metadata timestamps were not treated as evidence —
+they disagreed with row reality in all four cases.
+
+| City | Feed found | Endpoint | Newest row (watermark) | Geometry | Volume | Verdict |
+|---|---|---|---|---|---|---|
+| **Portland, OR** | PERMITS — Residential Building Permits | `www.portlandmaps.com/od/rest/services/COP_OpenData_PlanningDevelopment/MapServer/89` | `ISSUEDATE` = **2026-08-10** (`YEAR_`=2026, `STATUS`=Issued) | point | 36,408 rows | **Tier 1** — the 2023-08-31 reading was stale item metadata; the feed is current |
+| **Tampa, FL** | PERMITS — Single Family Permits | `arcgis.tampagov.net/arcgis/rest/services/OpenData/Planning/MapServer/32` | `OPENED_DATE` = **2026-07-21**; `LASTUPDATE` 2026-08-22 | point | 1,028 rows (710 Issued) | **Tier 1** — live, point-geocoded; **single-family only** (partial, Austin/LA-style registration) |
+| **Sacramento, CA** | 311 — SalesForce311 View | `services5.arcgis.com/54falWtcpty3V47Z/.../SalesForce311_View/FeatureServer/0` | `DateCreated` = **2026-08-24** | point | 1,606,782 rows | **Tier 1** — the "slices stop at 2016" reading missed this live current view |
+| **Sacramento, CA** | PERMITS — Issued/Applied Current Year | `services5.arcgis.com/54falWtcpty3V47Z/.../BldgPermitIssued_CurrentYear/FeatureServer/0` | `Status_Date` = **2026-07-30** | **none** (address-only) | 11,775 / 12,877 rows | **Tier 2** — current, but no geometry/lat-lon; geocoding blocker |
+| **Charlotte, NC** | (no permits feed) | Accela MapServer = reference/area layers + parcel tables only | — | — | — | **Reject for permits** — genuine absence, not a search miss |
+
+### Per-city notes
+
+- **Portland** — `Residential Building Permits` (MapServer 89) is current at row
+  level (`ISSUEDATE` 2026-08-10), point geometry, `VALUATION`/`PROP_ADDRE`
+  present. The DCAT item "Building Permit Milestone" is a dead layer id (404 on
+  the service); `Residential Demolition Permits` (MapServer 126) is also current.
+  Caveat: `portlandmaps.com` is slow — windowed `count` queries time out (503);
+  newest-row reads are reliable.
+- **Tampa** — the survey's best hit ("Construction Inspections", DCAT mod
+  2024-12-18) is stale *metadata* only; row-level `LASTUPDATE` is 2026-08-21.
+  The real find is `Single Family Permits` (Accela schema: `B1_PER_ID*`,
+  `APPLICATION_STATUS`, `OPENED_DATE`, point geometry). 1,028 rows is
+  active-window-sized; single-family coverage only, so a partial registration
+  like Austin/LA. `Construction Inspections` (MapServer 30) is a second live
+  point layer.
+- **Sacramento** — permits are current (`Status_Date` 2026-07-30) but the layers
+  carry **no geometry and no lat/lon fields** (`Address` + `Site_Location` only),
+  so permits needs geocoding (Tier 2). 311 resolves the Hold outright: the
+  current Salesforce view is live (1.6 M rows, `DateCreated` 2026-08-24, point
+  geometry, `ReferenceNumber`/`CategoryLevel1-2`/`CouncilDistrictNumber`).
+- **Charlotte** — the Kansas City lesson was applied: targeted DCAT searches
+  (`construction`, `development`, `inspect`, `code enforcement`, `Accela`) and a
+  full enumeration of the `Accela/Accela/MapServer`. The Accela service exposes
+  **reference/area polygons and parcel tables only — no permit records**. The
+  closest live layer is `PLN/LandDevCommercialProjects` (7,088 rows, `StatusDate`
+  2026-08-19, polygon, `ProjectNumber`/`Status`/`Address`) — a land-development
+  tracker, not the permits feed. Charlotte permits are transactional Accela;
+  reject as a feeds candidate. (LandDevCommercialProjects is a possible
+  development-activity signal, out of the 4-feed contract.)
+
+These four were the designated Wave-2 contingency swaps (plan risk W6); the
+Tier-1 promotions above expand the swap pool with point-geocoded, current feeds.
+
 ## The geocoding argument
 
 Counting only feeds already identified and verified as carrying real, current
@@ -135,8 +187,9 @@ data, blocked solely on the absence of an address → coordinate capability:
 | Honolulu (candidate) | 311, PERMITS | address-only |
 | Orlando (candidate) | SLA ×2 | address-only |
 | Oakland (division of SF) | 311 | no coordinates |
+| Sacramento (candidate, US-78) | PERMITS | current-year layers have no geometry (address-only) |
 
-**Eleven feeds, seven of them inside cities that are already registered.** A
+**Twelve feeds, seven of them inside cities that are already registered.** A
 geocoding capability would add more live feeds to the product than the four
 Tier-1 city registrations in this document combined — and it would do so
 without adding a single new metro to hand-author, a new bbox to maintain, or a

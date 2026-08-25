@@ -95,11 +95,41 @@ def build_query_shape(
 
     parts: list[str] = []
     if since_dt is not None:
-        parts.append(f"{wm} >= '{since_dt.strftime('%Y-%m-%dT%H:%M:%S')}'")
+        parts.append(f"{wm} >= {_watermark_literal(meta, since_dt)}")
     guard = watermark_exclude_clause(wm, meta.get("watermark_exclude") or [])
     if guard:
         parts.append(guard)
-    return " AND ".join(parts) or None, {"order_by": f"{wm} DESC"}
+
+    client_kwargs: dict[str, Any] = {}
+    if not _is_dc_arcgis(meta):
+        client_kwargs["order_by"] = f"{wm} DESC"
+    return " AND ".join(parts) or None, client_kwargs
+
+
+_DC_ARCGIS_HOSTS = ("maps2.dcgis.dc.gov",)
+
+
+def _is_dc_arcgis(meta: dict[str, Any]) -> bool:
+    """Whether the feed's server is the Washington DC ArcGIS server.
+
+    ``maps2.dcgis.dc.gov`` is unlike every other registered server: it rejects
+    ISO-string date comparisons in ``where`` (400 "Unable to complete
+    operation") and the ``where + orderByFields`` combination. Its working
+    query shape is ``where <date_col> >= date 'YYYY-MM-DD'`` with no
+    orderByFields (OID paging) — the shape the scheduler uses (US-109).
+    """
+    return any(host in str(meta.get("endpoint", "")) for host in _DC_ARCGIS_HOSTS)
+
+
+def _watermark_literal(meta: dict[str, Any], since_dt: datetime) -> str:
+    """Render a watermark lower-bound literal the server accepts.
+
+    The DC ArcGIS server only accepts ANSI ``date 'YYYY-MM-DD'`` literals for
+    date columns; every other registered platform accepts the ISO 8601 string.
+    """
+    if _is_dc_arcgis(meta):
+        return f"date '{since_dt.strftime('%Y-%m-%d')}'"
+    return f"'{since_dt.strftime('%Y-%m-%dT%H:%M:%S')}'"
 
 
 def backfill_job(
@@ -119,6 +149,10 @@ def backfill_job(
     fetched = published = duplicates = drops = 0
     max_watermark_seen: str | None = None
     error: str | None = None
+    # US-111 future-watermark guard (mirrors the scheduler): a future/sentinel
+    # row must not become the seeded tail watermark — sla_dc carries 2028 rows
+    # that would pin `INITIALISSUEDATE > '2028-...'` until then.
+    now_dt = datetime.now(timezone.utc)
 
     try:
         # Resolve the platform client inside the guarded section: a missing
@@ -150,8 +184,14 @@ def backfill_job(
                         fmt=meta.get("watermark_format"),
                         exclude=meta.get("watermark_exclude") or [],
                     )
-                    if entry and (max_watermark_seen is None or entry[0] > max_watermark_seen):
-                        max_watermark_seen = entry[0]
+                    if entry:
+                        parsed = entry[1]
+                        if parsed.tzinfo is None:
+                            parsed = parsed.replace(tzinfo=timezone.utc)
+                        if parsed <= now_dt and (
+                            max_watermark_seen is None or entry[0] > max_watermark_seen
+                        ):
+                            max_watermark_seen = entry[0]
 
                 try:
                     event = producer_wrapper.parse_socrata_row(row, city_id=city_id)
@@ -184,6 +224,15 @@ def backfill_job(
                         for attr in WM_ATTRS:
                             wm_val = getattr(event, attr, None)
                             if wm_val:
+                                if wm_val.tzinfo is None:
+                                    wm_val = wm_val.replace(tzinfo=timezone.utc)
+                                if wm_val > now_dt:
+                                    logger.warning(
+                                        "backfill %s: ignoring future watermark %s (US-111)",
+                                        job_name,
+                                        wm_val,
+                                    )
+                                    break
                                 wm_str = wm_val.strftime("%Y-%m-%dT%H:%M:%S")
                                 if max_watermark_seen is None or wm_str > max_watermark_seen:
                                     max_watermark_seen = wm_str

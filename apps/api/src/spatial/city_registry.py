@@ -633,7 +633,18 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={"expected_cadence_days": 7},
+                # US-110: Seattle spells the SR id `servicerequestnumber` (no
+                # underscore) and the created date `createddate` — neither is
+                # reachable by the generic chains, so every row dropped at
+                # parse. Coordinates ride `latitude`/`longitude` (covered).
+                extra={
+                    "expected_cadence_days": 7,
+                    "field_map": {
+                        "incident_id": ["servicerequestnumber"],
+                        "created_date": ["createddate"],
+                        "complaint_type": ["webintakeservicerequests"],
+                    },
+                },
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.socrata_seattle_licenses_endpoint,
