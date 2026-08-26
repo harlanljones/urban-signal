@@ -28,6 +28,14 @@ def _parse_datetime(val: Any) -> Optional[datetime]:
         # Treat 4-digit numbers as years
         if 1900 <= int(val) <= 2100:
             return datetime(int(val), 1, 1, tzinfo=timezone.utc)
+        # ArcGIS assessor tables commonly expose calendar dates as compact
+        # numeric YYYYMMDD values (for example, SALEDATE=20260801).
+        compact = str(int(val))
+        if len(compact) == 8:
+            try:
+                return datetime.strptime(compact, "%Y%m%d").replace(tzinfo=timezone.utc)
+            except ValueError:
+                pass
     if isinstance(val, str):
         val_clean = val.replace("Z", "+00:00").strip()
         try:
@@ -266,6 +274,23 @@ class DeedsACRISProducer:
                     lng_wkt, lat_wkt = _parse_wkt_point(loc)
                     lat_raw = lat_raw if lat_raw else lat_wkt
                     lng_raw = lng_raw if lng_raw else lng_wkt
+
+            if not lat_raw or not lng_raw:
+                # Address-only deed feeds can opt into ADR-0004 geocoding in
+                # their DatasetSpec. Keep the fallback declaration-driven so
+                # existing coordinate-less registries remain lossless when
+                # they have not opted into an external geocoder.
+                from src.spatial.geocoder import geocode_row_if_declared
+
+                addr_candidate = (
+                    first_mapped(row, field_map, "address_street")
+                    or row.get("property_address")
+                    or row.get("street_address")
+                    or row.get("address")
+                )
+                resolved = geocode_row_if_declared(resolved_city, "deeds", addr_candidate)
+                if resolved is not None:
+                    lat_raw, lng_raw = resolved
 
             lat = float(lat_raw) if lat_raw is not None else None
             lng = float(lng_raw) if lng_raw is not None else None

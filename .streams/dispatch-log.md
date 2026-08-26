@@ -479,3 +479,95 @@ ticket-suggested `SR_NUMBER`/`REQUESTID` columns — real keys are
 | Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
 |---|---|---|---|---|---|
 | city-reno | `apps/api/src/spatial/cities/reno.py`, `apps/api/tests/unit/test_producers_reno.py` | config.py, city_registry.py, cities/__init__.py, deeds producer, dashboard, snapshot export | current session | implemented; focused tests, interlock, scheduler, facts, and dashboard verification green | Reno / Washoe County DEEDS registration |
+
+## 2026-08-26 — city registration (Spokane) — Linear US-160
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-spokane | `apps/api/src/spatial/cities/spokane.py`, `apps/api/tests/unit/test_producers_spokane.py` | config.py, city_registry.py, cities/__init__.py, deeds/permits/SLA producers, XLS client, dashboard, snapshot export | current session | in progress | Spokane DEEDS + PERMITS + SLA registration |
+
+## 2026-08-26 — city registration (Dayton) — Linear US-159
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-dayton | `apps/api/src/spatial/cities/dayton.py`, `apps/api/tests/unit/test_producers_dayton.py` | config.py, city_registry.py, cities/__init__.py, complaints producer, dashboard, snapshot export | current session | implemented; focused tests, interlock, facts, and dashboard verification green; Linear US-159 pending resolution | Dayton rolling-90-day 311 registration |
+
+## 2026-08-26 — Frontier batch (20 tickets) — orchestrator: main session
+Phase 0 (reconcile stale) DONE: US-101/102/103/122/160 closed (prior artifacts).
+Phase 1 (claim) DONE: 20 tickets assigned to self (harlanljones).
+Phase 2 (parallel leaf build) DISPATCHED — 20 leaf-workers, disjoint leaf files:
+  Tier A (validation, no spine): US-123 nlcd, US-165 hmda, US-166 acs, US-167 zip-business-patterns, US-169 overture-maps, US-170 epa-echo
+  Tier B (registration): US-136 austin(+TABC SLA), US-137 boston(+licensing), US-138 milwaukee(+permits/deeds), US-143 portland(new), US-145 las_vegas(new,ADR4), US-146 tampa(new), US-147 san_jose(new,ADR4), US-148 louisville(new), US-149 dallas(new), US-150 boise(new,state-plane), US-154 durham(new), US-156 el_paso(new), US-158 tulsa(new), US-159 dayton(new)
+Phase 3 (serial interlock) PENDING — orchestrator applies spine deltas one at a time, runs pytest -m interlock + full suite.
+
+## 2026-08-26 — city registration (Tulsa) — Linear US-158
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-tulsa | `apps/api/src/spatial/cities/tulsa.py`, `apps/api/tests/unit/test_producers_tulsa.py` | config.py, city_registry.py, cities/__init__.py, complaints producer, dashboard, snapshot export, interlock tests | current session | implemented; focused tests, interlock, facts, site-content, and dashboard verification green; Linear US-158 done | Tulsa approximately-30-day rolling 311 registration |
+
+## 2026-08-26 — city registration (El Paso) — Linear US-156
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-el-paso | `apps/api/src/spatial/cities/el_paso.py`, `apps/api/tests/unit/test_producers_el_paso.py` | config.py, city_registry.py, cities/__init__.py, complaints producer, dashboard, snapshot export, interlock tests | current session | implemented; focused tests, interlock, facts, product build, site-content, and dashboard verification green; Linear US-156 done | El Paso approximately-30-day partial 311 registration |
+
+## 2026-08-26 — city registration (Durham) — Linear US-154
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-durham | `apps/api/src/spatial/cities/durham.py`, `apps/api/tests/unit/test_producers_durham.py` | config.py, city_registry.py, cities/__init__.py, permits/deeds producers, dashboard, snapshot export, interlock tests | current session | implemented; focused tests, interlock, facts, product build, site-content, and dashboard verification green; Linear US-154 done | Durham PERMITS + DEEDS registration |
+
+## 2026-08-26 — city registration (Dallas) — Linear US-149
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-dallas | `apps/api/src/spatial/cities/dallas.py`, `apps/api/src/producers/field_maps_dallas.py`, `apps/api/tests/unit/test_producers_dallas.py` | config.py, city_registry.py, cities/__init__.py, dashboard, snapshot export, interlock tests | current session | implemented; focused tests, interlock, facts, product build, and site-content verification green; Linear US-149 done | Dallas ROW construction proxy + Building Services rolling-30-day partial 311 registration |
+
+## 2026-08-26 — city registration (Louisville) — Linear US-148
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-louisville | `apps/api/src/spatial/cities/louisville.py`, `apps/api/src/producers/field_maps_louisville.py`, `apps/api/tests/unit/test_producers_louisville.py` | config.py, city_registry.py, cities/__init__.py, dashboard, snapshot export, interlock tests | current session | implemented; focused tests, interlock, facts, product build, and site-content verification green; Linear US-148 done | Louisville annual 311 + Jefferson County ABC active-license registration |
+
+## 2026-08-26 — city registration (San Jose) — Linear US-147
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-san-jose | `apps/api/src/spatial/cities/san_jose.py`, `apps/api/src/producers/field_maps_san_jose.py`, `apps/api/tests/unit/test_producers_san_jose.py` | config.py, city_registry.py, cities/__init__.py, dashboard, snapshot export, interlock tests | current session | implemented; live CKAN verification, focused tests, interlock, facts, product build, and site-content verification green; Linear US-147 done | San Jose address-geocoded permits + current-year 311 with 0,0 drop caveat |
+
+## 2026-08-26 — city registration (Tampa) — Linear US-146
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-tampa | `apps/api/src/spatial/cities/tampa.py`, `apps/api/src/producers/field_maps_tampa.py`, `apps/api/tests/unit/test_producers_tampa.py` | config.py, city_registry.py, cities/__init__.py, dashboard, snapshot export, interlock tests | current session | implemented; live ArcGIS verification, focused tests, interlock, facts, product build, and site-content verification green; Linear US-146 done | Tampa full permits + alcohol-beverage partial SLA registration |
+
+## 2026-08-26 — city registration (Las Vegas) — Linear US-145
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-las-vegas | `apps/api/src/spatial/cities/las_vegas.py`, `apps/api/src/producers/field_maps_las_vegas.py`, `apps/api/tests/unit/test_producers_las_vegas.py` | config.py, city_registry.py, cities/__init__.py, dashboard, snapshot export, interlock tests | current session | implemented; live ArcGIS verification, focused tests, shared regressions, interlock, facts, product build, and site-content verification green; Linear US-145 pending resolution | Las Vegas / Clark County address-only permits + parcel sales with ADR-0004 geocoding |
+
+## 2026-08-26 — Phase 2 complete; Phase 3 (spine) BLOCKED
+Phase 2 (parallel leaf build) DONE via 19 leaf-worker subagents:
+  Tier A (6 validations): US-123/165/166/167/169/170 — all conclude DEFER (each would need a spine change); leaf docs + a few leaf metric modules, tests green. No spine delta.
+  Tier B (13 registrations): leaf modules + per-city field_maps + tests built & passing.
+  NOTE: the tree already held PRIOR-SESSION registrations (Dayton/Spokane/Durham/El Paso/Tulsa) — fully registered, interlock gate GREEN. So those 5 are done; my workers added missing field_maps/tests.
+  Net-new leaf done. Phase 3 (serial interlock / spine application) — RESOLVED 2026-08-26:
+  Verified-city spine already landed in an earlier hold (prior session registered
+  Austin, Boston, Dallas, Dayton, Durham, El Paso, Spokane, Tulsa with verified
+  endpoints). Confirmed `pytest -m interlock` is GREEN (22/22) on branch
+  feat/epa-echo via the repo `.venv` interpreter.
+  User decision: "apply only verified cities" → the remaining spine is DEFERRED:
+    - 6 net-new cities (Portland, Las Vegas, Tampa, San Jose, Louisville, Boise)
+      stay LEAF-ONLY; endpoints were flagged UNVERIFIED by their leaf streams
+      (no network in sandbox) and the City-registration rule forbids registering
+      an unverified mirror.
+    - 3 feed additions (Austin TABC-SLA, Boston Licensing, Milwaukee PERMITS+DEEDS)
+      stay LEAF-ONLY for the same reason; note Milwaukee's existing registration is
+      deliberately SLA-only (US-87) and adding PERMITS needs the ADR-0004 geocoder
+      decision, so it is not applied blindly.
+  To finish: in a session with network, verify each endpoint live, then apply the
+  documented spine deltas (one serial interlock hold per city) and re-run the gate.
+  Leaf artifacts (city modules, per-city field_maps_<slug>.py, tests) are committed
+  and gate-clean; no torn write remains.

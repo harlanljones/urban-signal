@@ -12,6 +12,7 @@ from src.producers.base_producer import BaseKafkaProducer
 from src.producers.carto_client import CartoClient
 from src.producers.ckan_client import CkanClient
 from src.producers.csv_client import CSVClient
+from src.producers.excel_client import ExcelClient
 from src.producers.socrata_client import SocrataClient
 from src.schemas.models import JobType, PermitEvent
 from src.spatial.h3_indexer import H3SpatialIndexer
@@ -84,6 +85,7 @@ class DOBPermitsProducer:
         self.carto = CartoClient()
         self.ckan = CkanClient()
         self.csv = CSVClient()
+        self.excel = ExcelClient()
         self.spatial_indexer = H3SpatialIndexer()
 
     def _client_for(self, platform: str):
@@ -98,6 +100,7 @@ class DOBPermitsProducer:
             "carto": getattr(self, "carto", None),
             "ckan": getattr(self, "ckan", None),
             "csv": getattr(self, "csv", None),
+            "excel": getattr(self, "excel", None),
         }
         client = clients.get(platform)
         if client is None:
@@ -241,7 +244,11 @@ class DOBPermitsProducer:
                 or row.get("description")
                 or "A1"
             ).upper()
-            if "NEW CONSTRUCTION" in raw_job_type or "NEW BUILDING" in raw_job_type or raw_job_type == "NB":
+            if (
+                "NEW CONSTRUCTION" in raw_job_type
+                or "NEW BUILDING" in raw_job_type
+                or raw_job_type in {"NEW", "NB"}
+            ):
                 job_type = JobType.NB
             elif "DEMOLITION" in raw_job_type or "DEMOLITIONS" in raw_job_type or "WRECKING" in raw_job_type or raw_job_type == "DM":
                 job_type = JobType.DM
@@ -344,6 +351,8 @@ class DOBPermitsProducer:
             )
             address_num = str(row.get("street_number") or row.get("house__") or row.get("house_number") or "") or None
 
+            bbl = first_mapped(row, field_map, "bbl") or row.get("bbl")
+
             zipcode = str(
                 first_mapped(row, field_map, "zipcode")
                 or row.get("zip_code")
@@ -382,7 +391,7 @@ class DOBPermitsProducer:
                 source_neighborhood=source_neighborhood,
                 block=str(row.get("block")) if row.get("block") else None,
                 lot=str(row.get("lot")) if row.get("lot") else None,
-                bbl=str(row.get("bbl")) if row.get("bbl") else None,
+                bbl=str(bbl) if bbl else None,
                 address_street=address_street,
                 address_num=address_num,
                 zipcode=zipcode,

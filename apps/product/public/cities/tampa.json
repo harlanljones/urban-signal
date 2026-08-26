@@ -1,0 +1,333 @@
+{
+  "schema_version": 2,
+  "id": "tampa",
+  "name": "Tampa / Hillsborough County",
+  "state": "FL",
+  "center": {
+    "lat": 27.9506,
+    "lng": -82.4572
+  },
+  "metro_bbox": {
+    "min_lat": 27.84,
+    "max_lat": 28.16,
+    "min_lng": -82.6,
+    "max_lng": -82.22
+  },
+  "divisions": {
+    "DOWNTOWN_CHANNEL": {
+      "name": "DOWNTOWN_CHANNEL",
+      "center": {
+        "lat": 27.944,
+        "lng": -82.444
+      },
+      "bbox": {
+        "min_lat": 27.92,
+        "max_lat": 27.97,
+        "min_lng": -82.47,
+        "max_lng": -82.41
+      },
+      "submarkets": [
+        "Downtown Tampa Core",
+        "Channel District & Water Street",
+        "Marina & Tampa Riverwalk"
+      ]
+    },
+    "HYDE_PARK_BAYSHORE": {
+      "name": "HYDE_PARK_BAYSHORE",
+      "center": {
+        "lat": 27.925,
+        "lng": -82.465
+      },
+      "bbox": {
+        "min_lat": 27.9,
+        "max_lat": 27.95,
+        "min_lng": -82.49,
+        "max_lng": -82.44
+      },
+      "submarkets": [
+        "Hyde Park Village",
+        "Bayshore Boulevard",
+        "SoHo (South Howard)"
+      ]
+    },
+    "WESTSHORE_INTERNATIONAL": {
+      "name": "WESTSHORE_INTERNATIONAL",
+      "center": {
+        "lat": 27.957,
+        "lng": -82.535
+      },
+      "bbox": {
+        "min_lat": 27.93,
+        "max_lat": 27.98,
+        "min_lng": -82.57,
+        "max_lng": -82.5
+      },
+      "submarkets": [
+        "International Plaza & Westshore",
+        "Tampa Airport & Carrollwood Commons",
+        "Rocky Point & Bayport"
+      ]
+    },
+    "SOUTH_TAMPA_PALMA": {
+      "name": "SOUTH_TAMPA_PALMA",
+      "center": {
+        "lat": 27.895,
+        "lng": -82.487
+      },
+      "bbox": {
+        "min_lat": 27.86,
+        "max_lat": 27.93,
+        "min_lng": -82.52,
+        "max_lng": -82.45
+      },
+      "submarkets": [
+        "Palma Ceia & Swann",
+        "Gandy / MacDill Access",
+        "Culbreath & Beach Park"
+      ]
+    },
+    "TAMPA_HEIGHTS_SEMINOLE": {
+      "name": "TAMPA_HEIGHTS_SEMINOLE",
+      "center": {
+        "lat": 27.99,
+        "lng": -82.415
+      },
+      "bbox": {
+        "min_lat": 27.97,
+        "max_lat": 28.02,
+        "min_lng": -82.43,
+        "max_lng": -82.37
+      },
+      "submarkets": [
+        "Tampa Heights & Armature Works",
+        "Ybor City & Historic District",
+        "Seminole Heights Bungalows"
+      ]
+    },
+    "CARROLLWOOD_NORTH": {
+      "name": "CARROLLWOOD_NORTH",
+      "center": {
+        "lat": 28.06,
+        "lng": -82.485
+      },
+      "bbox": {
+        "min_lat": 28.03,
+        "max_lat": 28.1,
+        "min_lng": -82.52,
+        "max_lng": -82.43
+      },
+      "submarkets": [
+        "Carrollwood & Village Lake",
+        "North Dale Mabry Corridor"
+      ]
+    },
+    "BRANDON_EAST": {
+      "name": "BRANDON_EAST",
+      "center": {
+        "lat": 27.935,
+        "lng": -82.29
+      },
+      "bbox": {
+        "min_lat": 27.9,
+        "max_lat": 27.99,
+        "min_lng": -82.35,
+        "max_lng": -82.25
+      },
+      "submarkets": [
+        "Brandon Town Center",
+        "FishHawk & Lithia (east edge)"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Tampa Core": {
+      "name": "Downtown Tampa Core",
+      "division": "DOWNTOWN_CHANNEL",
+      "center": {
+        "lat": 27.948,
+        "lng": -82.458
+      },
+      "description": "Central business district around Curtis Hixon Park with riverwalk towers, office-to-residential conversions, and the Tampa Convention Center spine."
+    },
+    "Channel District & Water Street": {
+      "name": "Channel District & Water Street",
+      "division": "DOWNTOWN_CHANNEL",
+      "center": {
+        "lat": 27.938,
+        "lng": -82.45
+      },
+      "description": "Water Street mixed-use redevelopment and luxury residential towers on the former ship channel, the metro's densest permit pipeline."
+    },
+    "Marina & Tampa Riverwalk": {
+      "name": "Marina & Tampa Riverwalk",
+      "division": "DOWNTOWN_CHANNEL",
+      "center": {
+        "lat": 27.945,
+        "lng": -82.465
+      },
+      "description": "Ashley Drive marina frontage and riverwalk-adjacent mid-rise infill between downtown and Hyde Park."
+    },
+    "Hyde Park Village": {
+      "name": "Hyde Park Village",
+      "division": "HYDE_PARK_BAYSHORE",
+      "center": {
+        "lat": 27.935,
+        "lng": -82.465
+      },
+      "description": "Historic streetcar suburb of bungalow and masonry stock around Hyde Park Village, with teardown/rebuild pressure on large lots."
+    },
+    "Bayshore Boulevard": {
+      "name": "Bayshore Boulevard",
+      "division": "HYDE_PARK_BAYSHORE",
+      "center": {
+        "lat": 27.915,
+        "lng": -82.47
+      },
+      "description": "Tampa's signature waterfront boulevard with estate-scale homes and consistent luxury renovation permits."
+    },
+    "SoHo (South Howard)": {
+      "name": "SoHo (South Howard)",
+      "division": "HYDE_PARK_BAYSHORE",
+      "center": {
+        "lat": 27.93,
+        "lng": -82.48
+      },
+      "description": "South Howard Avenue hospitality and retail corridor with apartment-infill and adaptive reuse of commercial storefronts."
+    },
+    "International Plaza & Westshore": {
+      "name": "International Plaza & Westshore",
+      "division": "WESTSHORE_INTERNATIONAL",
+      "center": {
+        "lat": 27.955,
+        "lng": -82.54
+      },
+      "description": "Westshore business district anchored by International Plaza and Tampa International Airport, with office-to-residential conversion interest."
+    },
+    "Tampa Airport & Carrollwood Commons": {
+      "name": "Tampa Airport & Carrollwood Commons",
+      "division": "WESTSHORE_INTERNATIONAL",
+      "center": {
+        "lat": 27.97,
+        "lng": -82.555
+      },
+      "description": "Airport-adjacent commercial edge and hotel/warehouse permitting northwest of the Westshore core."
+    },
+    "Rocky Point & Bayport": {
+      "name": "Rocky Point & Bayport",
+      "division": "WESTSHORE_INTERNATIONAL",
+      "center": {
+        "lat": 27.965,
+        "lng": -82.545
+      },
+      "description": "Rocky Point peninsula resort and office campus with bayfront redevelopment and limited single-family turnover."
+    },
+    "Palma Ceia & Swann": {
+      "name": "Palma Ceia & Swann",
+      "division": "SOUTH_TAMPA_PALMA",
+      "center": {
+        "lat": 27.91,
+        "lng": -82.49
+      },
+      "description": "Established south Tampa neighborhood of masonry homes and palm-lined streets with steady renovation permitting."
+    },
+    "Gandy / MacDill Access": {
+      "name": "Gandy / MacDill Access",
+      "division": "SOUTH_TAMPA_PALMA",
+      "center": {
+        "lat": 27.88,
+        "lng": -82.5
+      },
+      "description": "Gandy Boulevard corridor and MacDill AFB gateway with light industrial and workforce-housing permitting."
+    },
+    "Culbreath & Beach Park": {
+      "name": "Culbreath & Beach Park",
+      "division": "SOUTH_TAMPA_PALMA",
+      "center": {
+        "lat": 27.905,
+        "lng": -82.51
+      },
+      "description": "Bay-front estate pocket southwest of Palma Ceia with low-volume, high-value teardown-rebuild activity."
+    },
+    "Tampa Heights & Armature Works": {
+      "name": "Tampa Heights & Armature Works",
+      "division": "TAMPA_HEIGHTS_SEMINOLE",
+      "center": {
+        "lat": 27.995,
+        "lng": -82.41
+      },
+      "description": "Riverfront revival north of downtown around Armature Works with food-hall and mid-rise residential infill."
+    },
+    "Ybor City & Historic District": {
+      "name": "Ybor City & Historic District",
+      "division": "TAMPA_HEIGHTS_SEMINOLE",
+      "center": {
+        "lat": 27.97,
+        "lng": -82.425
+      },
+      "description": "Historic cigar-worker district turned nightlife and mixed-use quarter with adaptive reuse and infill townhomes."
+    },
+    "Seminole Heights Bungalows": {
+      "name": "Seminole Heights Bungalows",
+      "division": "TAMPA_HEIGHTS_SEMINOLE",
+      "center": {
+        "lat": 28.005,
+        "lng": -82.4
+      },
+      "description": "Craftsman-bungalow streetcar suburb with renovation-led permits and Historic District overlay constraints."
+    },
+    "Carrollwood & Village Lake": {
+      "name": "Carrollwood & Village Lake",
+      "division": "CARROLLWOOD_NORTH",
+      "center": {
+        "lat": 28.07,
+        "lng": -82.49
+      },
+      "description": "North Tampa suburban lake community with pool-home turnover and scattered teardown-rebuild on large lots."
+    },
+    "North Dale Mabry Corridor": {
+      "name": "North Dale Mabry Corridor",
+      "division": "CARROLLWOOD_NORTH",
+      "center": {
+        "lat": 28.05,
+        "lng": -82.5
+      },
+      "description": "Dale Mabry highway spine with commercial-strip redevelopment and garden-apartment infill north of the airport."
+    },
+    "Brandon Town Center": {
+      "name": "Brandon Town Center",
+      "division": "BRANDON_EAST",
+      "center": {
+        "lat": 27.94,
+        "lng": -82.3
+      },
+      "description": "East Hillsborough retail and apartment hub around Westfield Brandon with ongoing multifamily infill."
+    },
+    "FishHawk & Lithia (east edge)": {
+      "name": "FishHawk & Lithia (east edge)",
+      "division": "BRANDON_EAST",
+      "center": {
+        "lat": 27.92,
+        "lng": -82.27
+      },
+      "description": "Master-planned exurban edge at the metro's eastern boundary, permitted through Hillsborough County rather than the City of Tampa."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "LASTUPDATE",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "HISTORY_ACT_DT",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/tampa.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

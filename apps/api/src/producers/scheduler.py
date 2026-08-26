@@ -492,6 +492,8 @@ class MunicipalIngestionScheduler:
                     ">",
                     met.high_watermark,
                     meta["endpoint"],
+                    watermark_type=meta.get("watermark_type"),
+                    watermark_format=meta.get("watermark_format"),
                 )
             )
         exclude_guard = (

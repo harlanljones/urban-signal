@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "id": "dayton",
+  "name": "Dayton / Montgomery County",
+  "state": "OH",
+  "center": {
+    "lat": 39.7589,
+    "lng": -84.1916
+  },
+  "metro_bbox": {
+    "min_lat": 39.55,
+    "max_lat": 40.05,
+    "min_lng": -84.65,
+    "max_lng": -83.65
+  },
+  "divisions": {
+    "DAYTON_CORE": {
+      "name": "Dayton / Montgomery County",
+      "center": {
+        "lat": 39.7589,
+        "lng": -84.1916
+      },
+      "bbox": {
+        "min_lat": 39.65,
+        "max_lat": 39.95,
+        "min_lng": -84.45,
+        "max_lng": -83.95
+      },
+      "submarkets": [
+        "Downtown & Oregon District",
+        "South Dayton",
+        "North Dayton",
+        "Kettering / Oakwood",
+        "Huber Heights / North Corridor"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Oregon District": {
+      "name": "Downtown & Oregon District",
+      "division": "DAYTON_CORE",
+      "center": {
+        "lat": 39.7589,
+        "lng": -84.1916
+      },
+      "description": "Civic core and historic entertainment district with adaptive reuse, infill, and riverfront investment."
+    },
+    "South Dayton": {
+      "name": "South Dayton",
+      "division": "DAYTON_CORE",
+      "center": {
+        "lat": 39.725,
+        "lng": -84.19
+      },
+      "description": "South-side neighborhoods with rehabilitation, neighborhood services, and small-scale redevelopment."
+    },
+    "North Dayton": {
+      "name": "North Dayton",
+      "division": "DAYTON_CORE",
+      "center": {
+        "lat": 39.805,
+        "lng": -84.19
+      },
+      "description": "North-side residential and industrial corridor with reinvestment and service-oriented change."
+    },
+    "Kettering / Oakwood": {
+      "name": "Kettering / Oakwood",
+      "division": "DAYTON_CORE",
+      "center": {
+        "lat": 39.695,
+        "lng": -84.168
+      },
+      "description": "Mature south-county communities with renovation, medical, and neighborhood retail activity."
+    },
+    "Huber Heights / North Corridor": {
+      "name": "Huber Heights / North Corridor",
+      "division": "DAYTON_CORE",
+      "center": {
+        "lat": 39.855,
+        "lng": -84.11
+      },
+      "description": "Northeast growth corridor with commercial services, housing turnover, and suburban intensification."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "ADDDTTM",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/dayton.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

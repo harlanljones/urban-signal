@@ -284,7 +284,9 @@ class SLALicensesProducer:
             )
 
             address = (
-                row.get("street_address")
+                first_mapped(row, field_map, "address_street")
+                or row.get("streetaddress")
+                or row.get("street_address")
                 or row.get("business_address")
                 or row.get("full_business_address")
                 or row.get("address")
@@ -349,6 +351,7 @@ class SLALicensesProducer:
         client_kwargs = {
             k: v for k, v in spec.extra.items() if k in ("order_by", "id_col", "select") and v
         }
+        effective_where_clause = where_clause or spec.extra.get("where_clause")
 
         logger.info("Starting %s SLA / License Ingestion Stream (limit=%d)...", cid.value.upper(), limit)
         records_streamed = 0
@@ -356,7 +359,7 @@ class SLALicensesProducer:
         for batch in client.paginate(
             endpoint_url=endpoint,
             **client_kwargs,
-            where_clause=where_clause,
+            where_clause=effective_where_clause,
             batch_size=1000,
             max_records=limit,
         ):

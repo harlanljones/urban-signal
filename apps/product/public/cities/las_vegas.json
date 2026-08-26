@@ -1,0 +1,273 @@
+{
+  "schema_version": 2,
+  "id": "las_vegas",
+  "name": "Las Vegas / Clark County",
+  "state": "NV",
+  "center": {
+    "lat": 36.1147,
+    "lng": -115.1728
+  },
+  "metro_bbox": {
+    "min_lat": 35.9,
+    "max_lat": 36.34,
+    "min_lng": -115.5,
+    "max_lng": -114.9
+  },
+  "divisions": {
+    "DOWNTOWN_STRIP": {
+      "name": "DOWNTOWN_STRIP",
+      "center": {
+        "lat": 36.13,
+        "lng": -115.16
+      },
+      "bbox": {
+        "min_lat": 36.1,
+        "max_lat": 36.2,
+        "min_lng": -115.3,
+        "max_lng": -115.1
+      },
+      "submarkets": [
+        "The Las Vegas Strip",
+        "Fremont East & 18b Arts District",
+        "Paradise & Winchester",
+        "Spring Valley"
+      ]
+    },
+    "LAS_VEGAS_CITY": {
+      "name": "LAS_VEGAS_CITY",
+      "center": {
+        "lat": 36.2,
+        "lng": -115.18
+      },
+      "bbox": {
+        "min_lat": 36.15,
+        "max_lat": 36.28,
+        "min_lng": -115.3,
+        "max_lng": -115.1
+      },
+      "submarkets": [
+        "Downtown Las Vegas (Fremont St)",
+        "Medical District & UMC",
+        "Southeast Las Vegas (Whitney)",
+        "West Las Vegas"
+      ]
+    },
+    "SUMMERLIN_NW": {
+      "name": "SUMMERLIN_NW",
+      "center": {
+        "lat": 36.22,
+        "lng": -115.32
+      },
+      "bbox": {
+        "min_lat": 36.15,
+        "max_lat": 36.3,
+        "min_lng": -115.45,
+        "max_lng": -115.25
+      },
+      "submarkets": [
+        "Summerlin South",
+        "Downtown Summerlin",
+        "Centennial Hills"
+      ]
+    },
+    "HENDERSON_SOUTH": {
+      "name": "HENDERSON_SOUTH",
+      "center": {
+        "lat": 36.03,
+        "lng": -115.07
+      },
+      "bbox": {
+        "min_lat": 35.92,
+        "max_lat": 36.1,
+        "min_lng": -115.2,
+        "max_lng": -114.95
+      },
+      "submarkets": [
+        "Green Valley",
+        "Henderson (Water St)",
+        "Anthem & MacDonald Ranch"
+      ]
+    },
+    "NORTH_LAS_VEGAS": {
+      "name": "NORTH_LAS_VEGAS",
+      "center": {
+        "lat": 36.26,
+        "lng": -115.1
+      },
+      "bbox": {
+        "min_lat": 36.2,
+        "max_lat": 36.33,
+        "min_lng": -115.2,
+        "max_lng": -115.0
+      },
+      "submarkets": [
+        "North Las Vegas (Craig Rd)",
+        "Aliante"
+      ]
+    }
+  },
+  "submarkets": {
+    "The Las Vegas Strip": {
+      "name": "The Las Vegas Strip",
+      "division": "DOWNTOWN_STRIP",
+      "center": {
+        "lat": 36.1147,
+        "lng": -115.1728
+      },
+      "description": "Resort-corridor spine on Las Vegas Blvd with the metro's densest hospitality and high-rise residential pipeline."
+    },
+    "Fremont East & 18b Arts District": {
+      "name": "Fremont East & 18b Arts District",
+      "division": "DOWNTOWN_STRIP",
+      "center": {
+        "lat": 36.162,
+        "lng": -115.141
+      },
+      "description": "Downtown revival node east of Fremont Street with adaptive reuse, boutique hospitality, and gallery density."
+    },
+    "Paradise & Winchester": {
+      "name": "Paradise & Winchester",
+      "division": "DOWNTOWN_STRIP",
+      "center": {
+        "lat": 36.13,
+        "lng": -115.15
+      },
+      "description": "Unincorporated township flanking the Strip with mid-rise multifamily and convention-adjacent commercial."
+    },
+    "Spring Valley": {
+      "name": "Spring Valley",
+      "division": "DOWNTOWN_STRIP",
+      "center": {
+        "lat": 36.12,
+        "lng": -115.25
+      },
+      "description": "Established west-side residential grid with steady infill and small-lot redevelopment."
+    },
+    "Downtown Las Vegas (Fremont St)": {
+      "name": "Downtown Las Vegas (Fremont St)",
+      "division": "LAS_VEGAS_CITY",
+      "center": {
+        "lat": 36.1716,
+        "lng": -115.1391
+      },
+      "description": "Municipal core around Fremont Street with office-to-residential conversions and Zappos-era retail renewal."
+    },
+    "Medical District & UMC": {
+      "name": "Medical District & UMC",
+      "division": "LAS_VEGAS_CITY",
+      "center": {
+        "lat": 36.16,
+        "lng": -115.155
+      },
+      "description": "Institutional health corridor anchored by UMC with renovation-led permitting and nearby commercial reuse."
+    },
+    "Southeast Las Vegas (Whitney)": {
+      "name": "Southeast Las Vegas (Whitney)",
+      "division": "LAS_VEGAS_CITY",
+      "center": {
+        "lat": 36.21,
+        "lng": -115.16
+      },
+      "description": "Post-war residential belt along the Boulder Highway with teardown/rebuild pressure and indie retail."
+    },
+    "West Las Vegas": {
+      "name": "West Las Vegas",
+      "division": "LAS_VEGAS_CITY",
+      "center": {
+        "lat": 36.175,
+        "lng": -115.22
+      },
+      "description": "Historic west-side neighborhoods with renovation permits and neighborhood-commercial frontage."
+    },
+    "Summerlin South": {
+      "name": "Summerlin South",
+      "division": "SUMMERLIN_NW",
+      "center": {
+        "lat": 36.16,
+        "lng": -115.32
+      },
+      "description": "Master-planned southwest edge with continued buildout phases and high-value residential permits."
+    },
+    "Downtown Summerlin": {
+      "name": "Downtown Summerlin",
+      "division": "SUMMERLIN_NW",
+      "center": {
+        "lat": 36.25,
+        "lng": -115.3
+      },
+      "description": "Anchor retail-and-office downtown of the Summerlin master plan under the Red Rock overlay."
+    },
+    "Centennial Hills": {
+      "name": "Centennial Hills",
+      "division": "SUMMERLIN_NW",
+      "center": {
+        "lat": 36.27,
+        "lng": -115.28
+      },
+      "description": "Northwest growth area at the metro's edge with new construction, infrastructure extension, and parcel turnover."
+    },
+    "Green Valley": {
+      "name": "Green Valley",
+      "division": "HENDERSON_SOUTH",
+      "center": {
+        "lat": 36.03,
+        "lng": -115.11
+      },
+      "description": "Mature master-planned Henderson community with renovation-heavy permitting and strict design overlays."
+    },
+    "Henderson (Water St)": {
+      "name": "Henderson (Water St)",
+      "division": "HENDERSON_SOUTH",
+      "center": {
+        "lat": 36.04,
+        "lng": -114.98
+      },
+      "description": "Henderson civic core along Water Street with mixed-use infill and ground-floor hospitality."
+    },
+    "Anthem & MacDonald Ranch": {
+      "name": "Anthem & MacDonald Ranch",
+      "division": "HENDERSON_SOUTH",
+      "center": {
+        "lat": 35.97,
+        "lng": -115.01
+      },
+      "description": "Southeast foothill estate stock with teardown-rebuild mansions dominating a low-volume, high-value permit mix."
+    },
+    "North Las Vegas (Craig Rd)": {
+      "name": "North Las Vegas (Craig Rd)",
+      "division": "NORTH_LAS_VEGAS",
+      "center": {
+        "lat": 36.24,
+        "lng": -115.12
+      },
+      "description": "Working-class north-side city with logistics investment, redevelopment, and active parcel sales."
+    },
+    "Aliante": {
+      "name": "Aliante",
+      "division": "NORTH_LAS_VEGAS",
+      "center": {
+        "lat": 36.3,
+        "lng": -115.15
+      },
+      "description": "Master-planned northwest community with new housing, infrastructure extension, and unincorporated county development meeting it."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "ISSDTTM",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SALEDATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/las_vegas.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

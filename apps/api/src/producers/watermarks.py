@@ -152,7 +152,15 @@ ANSI_DATE_LITERAL_HOSTS = (
 )
 
 
-def watermark_comparison(watermark_col: str, op: str, value: str, endpoint: str) -> str:
+def watermark_comparison(
+    watermark_col: str,
+    op: str,
+    value: str,
+    endpoint: str,
+    *,
+    watermark_type: str | None = None,
+    watermark_format: str | None = None,
+) -> str:
     """Render a ``col OP <value>`` predicate with a server-appropriate literal.
 
     Most registered servers accept the ISO 8601 string the scheduler stores;
@@ -161,6 +169,20 @@ def watermark_comparison(watermark_col: str, op: str, value: str, endpoint: str)
     literal. Shared by the scheduler's incremental filter and the backfill
     loader's windowed filter so both stay query-shape compatible.
     """
+    # San Jose's CKAN permits/311 exports store dates as M/D/YYYY text. A raw
+    # string comparison would make `8/9` sort after `8/22`; cast both sides in
+    # CKAN's SQL dialect while retaining the raw format in scheduler state.
+    if (
+        endpoint.startswith("ckan://")
+        and watermark_type == "text"
+        and watermark_format == "%m/%d/%Y %I:%M:%S %p"
+    ):
+        escaped = value.replace("'", "''")
+        pg_format = "MM/DD/YYYY HH12:MI:SS AM"
+        return (
+            f'to_timestamp("{watermark_col}", \'{pg_format}\') {op} '
+            f"to_timestamp('{escaped}', '{pg_format}')"
+        )
     if any(host in endpoint for host in ANSI_DATE_LITERAL_HOSTS):
         return f"{watermark_col} {op} date '{value[:10]}'"
     return f"{watermark_col} {op} '{value}'"

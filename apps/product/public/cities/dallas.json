@@ -1,0 +1,308 @@
+{
+  "schema_version": 2,
+  "id": "dallas",
+  "name": "Dallas / Dallas County",
+  "state": "TX",
+  "center": {
+    "lat": 32.7767,
+    "lng": -96.797
+  },
+  "metro_bbox": {
+    "min_lat": 32.6,
+    "max_lat": 33.1,
+    "min_lng": -97.05,
+    "max_lng": -96.55
+  },
+  "divisions": {
+    "DOWNTOWN_EAST": {
+      "name": "DOWNTOWN_EAST",
+      "center": {
+        "lat": 32.79,
+        "lng": -96.79
+      },
+      "bbox": {
+        "min_lat": 32.74,
+        "max_lat": 32.82,
+        "min_lng": -96.82,
+        "max_lng": -96.74
+      },
+      "submarkets": [
+        "Downtown Core & Main Street",
+        "Deep Ellum",
+        "Baylor & Cedars"
+      ]
+    },
+    "OAK_LAWN_UPTOWN": {
+      "name": "OAK_LAWN_UPTOWN",
+      "center": {
+        "lat": 32.8,
+        "lng": -96.8
+      },
+      "bbox": {
+        "min_lat": 32.76,
+        "max_lat": 32.84,
+        "min_lng": -96.83,
+        "max_lng": -96.78
+      },
+      "submarkets": [
+        "Uptown & West Village",
+        "Oak Lawn & Turtle Creek",
+        "Victory Park"
+      ]
+    },
+    "NORTH_DALLAS_PRESTON": {
+      "name": "NORTH_DALLAS_PRESTON",
+      "center": {
+        "lat": 32.89,
+        "lng": -96.8
+      },
+      "bbox": {
+        "min_lat": 32.85,
+        "max_lat": 33.0,
+        "min_lng": -96.88,
+        "max_lng": -96.72
+      },
+      "submarkets": [
+        "Preston Hollow",
+        "Preston Center & Bluffview",
+        "North Dallas & LBJ Freeway"
+      ]
+    },
+    "EAST_DALLAS_WHITE_ROCK": {
+      "name": "EAST_DALLAS_WHITE_ROCK",
+      "center": {
+        "lat": 32.83,
+        "lng": -96.71
+      },
+      "bbox": {
+        "min_lat": 32.78,
+        "max_lat": 32.88,
+        "min_lng": -96.78,
+        "max_lng": -96.66
+      },
+      "submarkets": [
+        "White Rock Lake",
+        "Lake Highlands",
+        "East Dallas & Lower Greenville"
+      ]
+    },
+    "SOUTH_DALLAS_OAK_CLIFF": {
+      "name": "SOUTH_DALLAS_OAK_CLIFF",
+      "center": {
+        "lat": 32.71,
+        "lng": -96.82
+      },
+      "bbox": {
+        "min_lat": 32.62,
+        "max_lat": 32.77,
+        "min_lng": -96.88,
+        "max_lng": -96.74
+      },
+      "submarkets": [
+        "Bishop Arts District",
+        "Kessler & Stevens Park",
+        "South Dallas & Fair Park"
+      ]
+    },
+    "PARK_CITIES_HIGHLAND_PARK": {
+      "name": "PARK_CITIES_HIGHLAND_PARK",
+      "center": {
+        "lat": 32.83,
+        "lng": -96.8
+      },
+      "bbox": {
+        "min_lat": 32.8,
+        "max_lat": 32.86,
+        "min_lng": -96.81,
+        "max_lng": -96.76
+      },
+      "submarkets": [
+        "Highland Park",
+        "University Park",
+        "Highland Park Village Edge"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Core & Main Street": {
+      "name": "Downtown Core & Main Street",
+      "division": "DOWNTOWN_EAST",
+      "center": {
+        "lat": 32.7845,
+        "lng": -96.793
+      },
+      "description": "CBD towers and Deep Ellum edge where ROW/permit velocity tracks transit-oriented redevelopment along the DART core."
+    },
+    "Deep Ellum": {
+      "name": "Deep Ellum",
+      "division": "DOWNTOWN_EAST",
+      "center": {
+        "lat": 32.7885,
+        "lng": -96.778
+      },
+      "description": "Music-venue and adaptive-reuse district east of the core, mixed-use infill driving small-lot ROW work."
+    },
+    "Baylor & Cedars": {
+      "name": "Baylor & Cedars",
+      "division": "DOWNTOWN_EAST",
+      "center": {
+        "lat": 32.8005,
+        "lng": -96.8105
+      },
+      "description": "Medical-district-adjacent residential conversion belt with hospital-anchored demand and steady renovation permits."
+    },
+    "Uptown & West Village": {
+      "name": "Uptown & West Village",
+      "division": "OAK_LAWN_UPTOWN",
+      "center": {
+        "lat": 32.7955,
+        "lng": -96.8015
+      },
+      "description": "Streetcar-era high-density multifamily spine with the metro's densest vertical construction outside downtown."
+    },
+    "Oak Lawn & Turtle Creek": {
+      "name": "Oak Lawn & Turtle Creek",
+      "division": "OAK_LAWN_UPTOWN",
+      "center": {
+        "lat": 32.8175,
+        "lng": -96.8085
+      },
+      "description": "Established estate-and-highrise corridor with teardown-rebuild mansions and luxury mid-rise permitting."
+    },
+    "Victory Park": {
+      "name": "Victory Park",
+      "division": "OAK_LAWN_UPTOWN",
+      "center": {
+        "lat": 32.7895,
+        "lng": -96.8085
+      },
+      "description": "Arena-and-residential mixed-use node northwest of downtown with ground-up tower activity."
+    },
+    "Preston Hollow": {
+      "name": "Preston Hollow",
+      "division": "NORTH_DALLAS_PRESTON",
+      "center": {
+        "lat": 32.8845,
+        "lng": -96.8055
+      },
+      "description": "Hill-country estate stock with teardown-rebuild mansions dominating a low-volume, high-value permit mix."
+    },
+    "Preston Center & Bluffview": {
+      "name": "Preston Center & Bluffview",
+      "division": "NORTH_DALLAS_PRESTON",
+      "center": {
+        "lat": 32.8655,
+        "lng": -96.8055
+      },
+      "description": "Office-to-residential conversion belt and cottage-grid neighborhoods under the Preston overlay."
+    },
+    "North Dallas & LBJ Freeway": {
+      "name": "North Dallas & LBJ Freeway",
+      "division": "NORTH_DALLAS_PRESTON",
+      "center": {
+        "lat": 32.9155,
+        "lng": -96.7555
+      },
+      "description": "Freeway-adjacent commercial edge with mid-rise multifamily replacements of aging retail and office stock."
+    },
+    "White Rock Lake": {
+      "name": "White Rock Lake",
+      "division": "EAST_DALLAS_WHITE_ROCK",
+      "center": {
+        "lat": 32.8275,
+        "lng": -96.7155
+      },
+      "description": "Park-adjacent post-war residential hills drawing renovation capital from greenbelt access."
+    },
+    "Lake Highlands": {
+      "name": "Lake Highlands",
+      "division": "EAST_DALLAS_WHITE_ROCK",
+      "center": {
+        "lat": 32.8555,
+        "lng": -96.7155
+      },
+      "description": "Suburban-style subdivisions along the northeastern growth spine, permitted through Dallas rather than Richardson."
+    },
+    "East Dallas & Lower Greenville": {
+      "name": "East Dallas & Lower Greenville",
+      "division": "EAST_DALLAS_WHITE_ROCK",
+      "center": {
+        "lat": 32.8205,
+        "lng": -96.7705
+      },
+      "description": "Indie-retail strip meeting streetcar-era bungalow stock, renovation-led permits under neighborhood overlays."
+    },
+    "Bishop Arts District": {
+      "name": "Bishop Arts District",
+      "division": "SOUTH_DALLAS_OAK_CLIFF",
+      "center": {
+        "lat": 32.7415,
+        "lng": -96.8255
+      },
+      "description": "Boutique retail and hotel flagship corridor with infill multifamily on its side streets in North Oak Cliff."
+    },
+    "Kessler & Stevens Park": {
+      "name": "Kessler & Stevens Park",
+      "division": "SOUTH_DALLAS_OAK_CLIFF",
+      "center": {
+        "lat": 32.7155,
+        "lng": -96.8355
+      },
+      "description": "Hill-country estate stock at the Oak Cliff village boundary with teardown-rebuild pressure."
+    },
+    "South Dallas & Fair Park": {
+      "name": "South Dallas & Fair Park",
+      "division": "SOUTH_DALLAS_OAK_CLIFF",
+      "center": {
+        "lat": 32.7655,
+        "lng": -96.7555
+      },
+      "description": "Fair Park-adjacent redevelopment belt with renovation-heavy permitting and historic-district overlays."
+    },
+    "Highland Park": {
+      "name": "Highland Park",
+      "division": "PARK_CITIES_HIGHLAND_PARK",
+      "center": {
+        "lat": 32.8265,
+        "lng": -96.7925
+      },
+      "description": "Incorporated estate enclave inside Dallas with teardown-rebuild mansions dominating a low-volume, high-value mix."
+    },
+    "University Park": {
+      "name": "University Park",
+      "division": "PARK_CITIES_HIGHLAND_PARK",
+      "center": {
+        "lat": 32.8355,
+        "lng": -96.7955
+      },
+      "description": "SMU-anchored residential enclave with renovation-led permits and strict tree/single-family overlays."
+    },
+    "Highland Park Village Edge": {
+      "name": "Highland Park Village Edge",
+      "division": "PARK_CITIES_HIGHLAND_PARK",
+      "center": {
+        "lat": 32.8305,
+        "lng": -96.8005
+      },
+      "description": "Retail-and-residential node at the Park Cities boundary, ground-up luxury mixed-use on side streets."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "CREATEDDATE",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "CreatedDate",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/dallas.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

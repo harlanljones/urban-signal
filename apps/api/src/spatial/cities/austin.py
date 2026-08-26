@@ -4,18 +4,28 @@ Provides neighborhood metadata, camera positioning, investment metrics,
 division catalog, and geographic bounding boxes for the City of Austin and
 the greater metro's northern edges (Pflugerville / Round Rock corridor), TX.
 
-Austin registers as a TWO-FEED partial city like Los Angeles: PERMITS
-(`quv8-5ckq` Issued Building Permits) and COMPLAINTS_311 (`xwdj-i9he`).
-SLA/DEEDS are deliberately absent — TABC's statewide alcohol feeds
-(data.texas.gov `7hf9-qc9f` / `kguh-7q9z`) carry zero geocode columns, and
-the Travis County portal (data.traviscountytx.gov) is a FedRAMP Socrata
-shell whose catalog API answers "Domain not found". See
-docs/research/new-orleans-austin-verification.md.
+Austin registers as a THREE-FEED partial city like Los Angeles: PERMITS
+(`quv8-5ckq` Issued Building Permits), COMPLAINTS_311 (`xwdj-i9he`), and an
+SLA liquor-license feed pulled from TABC's statewide open data (data.texas.gov
+`7hf9-qc9f` "TABC License Information"). DEEDS remains deliberately absent:
+the Travis County portal (data.traviscountytx.gov) is a FedRAMP Socrata shell
+whose catalog API answers "Domain not found".
+
+The TABC feed locates each license with a STREET ``address`` string but carries
+NO latitude/longitude columns — exactly the address-only case ADR 0004 was
+written for. It registers with ``needs_geocode: True`` and recovers coordinates
+through the Postgres-replay geocoder at parse time. The companion legacy
+cross-reference `kguh-7q9z` ("TABCLicenses") is NOT a registration target: it
+is a 2021 AIMS migration cross-walk with trailing-space-padded addresses and no
+authoritative status/issue dates. See docs/research/
+new-orleans-austin-verification.md and US-136.
 """
 
 from typing import Dict
 
+from src.config import settings
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
+from src.producers.field_maps_austin_tabc import FIELD_MAP as _TABC_FIELD_MAPS
 
 # Greater Austin metro bounding box: Travis County plus the Round Rock /
 # Pflugerville growth corridor to the north. Both registered feeds are
@@ -383,3 +393,33 @@ GREATER_AUSTIN_METRO_BBOX = AUSTIN_METRO_BBOX
 ATX_DIVISION_BBOXES = AUSTIN_DIVISION_BBOXES
 ATX_SUBMARKETS = AUSTIN_SUBMARKETS
 ATX_DIVISIONS = AUSTIN_DIVISIONS
+
+# ---------------------------------------------------------------------------
+# Proposed TABC liquor-license (SLA) feed spec — US-136, ADR 0004 geocode path.
+# ---------------------------------------------------------------------------
+# LEAF PROPOSAL. This is NOT wired into REGISTRY yet; the orchestrator imports
+# the data below into ``city_registry.REGISTRY[CityId.AUSTIN].datasets`` at the
+# interlock. Pinned against the live data.texas.gov view `7hf9-qc9f`
+# ("TABC License Information") schema pulled 2026-08-26.
+#
+# The feed has no latitude/longitude columns — only a street ``address`` string —
+# so it declares ``needs_geocode: True`` and ``geocode_context``; the ADR 0004
+# geocoder recovers real coordinates at parse time. ``status_change_date`` is the
+# watermark: it is the only column that advances on every Primary Status change
+# (new issuances, renewals, suspensions, surrenders), so it is the correct
+# incremental-poll cursor for a slowly-churning license file.
+AUSTIN_TABC_SLA_SPEC: Dict[str, object] = {
+    "endpoint": "https://data.texas.gov/resource/7hf9-qc9f.json",
+    "platform": "socrata",
+    "watermark_col": "status_change_date",
+    "id_keys": ["license_id"],
+    "topic": settings.topic_sla,
+    "interval_seconds": 600.0,
+    "producer_key": "sla",
+    "extra": {
+        "expected_cadence_days": 7,
+        "needs_geocode": True,
+        "geocode_context": "Austin, TX",
+        "field_map": _TABC_FIELD_MAPS["sla"],
+    },
+}

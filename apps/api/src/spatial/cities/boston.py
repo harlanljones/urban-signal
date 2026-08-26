@@ -95,3 +95,51 @@ BOSTON_DIVISIONS: dict[str, BoroughMeta] = {
         submarkets=["Quincy Center"], city_id="boston",
     ),
 }
+
+
+# ---------------------------------------------------------------------------
+# Boston Licensing Board feed (US-137) — leaf-side feed spec.
+#
+# The source CKAN resource (04dc653b-...) is the Boston Licensing Board's
+# business-license register on data.boston.gov. Its only coordinate columns are
+# gpsx/gpsy, expressed in Massachusetts State Plane meters (EPSG:26986), not
+# WGS84 degrees — so ~99.6% of rows fail spatial parsing and the feed was
+# historically excluded (fails G5 by construction).
+#
+# Resolution (ADR 0004 fork): the feed is ingested as an ADDRESS-ONLY SLA feed.
+# gpsx/gpsy are deliberately NOT mapped to latitude/longitude below; rows are
+# geocoded from the business address string at parse time (needs_geocode). The
+# field map is re-exported by src/producers/field_maps_boston_licensing.py as
+# FIELD_MAP so the orchestrator's spine registration can reference one source.
+#
+# Column spellings are PROPOSED pending a live probe of the CKAN resource
+# (mirrors the Philadelphia field-map precedent) and are pinned by the unit
+# test's equality assertion.
+# ---------------------------------------------------------------------------
+
+BOSTON_LICENSING_BOARD_FEED: dict[str, object] = {
+    "platform": "ckan",
+    "dataset_id": "04dc653b-1789-4374-9669-b07df7233344",
+    "feed_type": "sla",
+    "watermark_col": "licensetype_effective_date",
+    "needs_geocode": True,
+    "geocode_context": "Boston, MA",
+    # gpsx/gpsy intentionally absent: State Plane meters would be mis-read as
+    # WGS84 degrees if mapped to latitude/longitude.
+    "field_map": {
+        "license_id": ["license_id", "licenseno", "license_number"],
+        "license_type": ["licensetype", "license_type", "licensecategory"],
+        "effective_date": ["licensetype_effective_date", "license_effective_date", "effectivedate"],
+        "expiration_date": [
+            "licensetype_expiration_date",
+            "license_expiration_date",
+            "expirationdate",
+        ],
+        "address_street": ["business_address", "location_address", "address"],
+        "dba": ["dba", "doing_business_as", "business_name"],
+        "premises_name": ["business_name", "premises_name", "entity_name"],
+        "status": ["license_status", "status", "licensestatus"],
+        "borough": ["ward", "neighborhood"],
+    },
+}
+

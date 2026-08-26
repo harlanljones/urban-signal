@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "id": "spokane",
+  "name": "Spokane / Spokane County",
+  "state": "WA",
+  "center": {
+    "lat": 47.6588,
+    "lng": -117.426
+  },
+  "metro_bbox": {
+    "min_lat": 47.0,
+    "max_lat": 48.2,
+    "min_lng": -118.5,
+    "max_lng": -116.9
+  },
+  "divisions": {
+    "SPOKANE_CORE": {
+      "name": "Spokane / Spokane County",
+      "center": {
+        "lat": 47.6588,
+        "lng": -117.426
+      },
+      "bbox": {
+        "min_lat": 47.2,
+        "max_lat": 47.95,
+        "min_lng": -118.2,
+        "max_lng": -117.0
+      },
+      "submarkets": [
+        "Downtown & Riverfront",
+        "South Hill",
+        "North Spokane",
+        "Spokane Valley",
+        "Airway Heights / West Plains"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Riverfront": {
+      "name": "Downtown & Riverfront",
+      "division": "SPOKANE_CORE",
+      "center": {
+        "lat": 47.6588,
+        "lng": -117.426
+      },
+      "description": "Civic core and riverfront with adaptive reuse, hospitality, and mixed-use infill."
+    },
+    "South Hill": {
+      "name": "South Hill",
+      "division": "SPOKANE_CORE",
+      "center": {
+        "lat": 47.628,
+        "lng": -117.385
+      },
+      "description": "Established hillside neighborhoods with residential rehabilitation and neighborhood retail investment."
+    },
+    "North Spokane": {
+      "name": "North Spokane",
+      "division": "SPOKANE_CORE",
+      "center": {
+        "lat": 47.73,
+        "lng": -117.41
+      },
+      "description": "North-side commercial and residential corridor with infill, services, and growth pressure."
+    },
+    "Spokane Valley": {
+      "name": "Spokane Valley",
+      "division": "SPOKANE_CORE",
+      "center": {
+        "lat": 47.6732,
+        "lng": -117.2394
+      },
+      "description": "East-valley growth corridor with commercial expansion, housing delivery, and parcel turnover."
+    },
+    "Airway Heights / West Plains": {
+      "name": "Airway Heights / West Plains",
+      "division": "SPOKANE_CORE",
+      "center": {
+        "lat": 47.645,
+        "lng": -117.56
+      },
+      "description": "West Plains logistics and airport-adjacent growth area with new construction and industrial expansion."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "excel",
+      "watermark_col": "issued_date",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "socrata",
+      "watermark_col": "renewaldate",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "document_date",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/spokane.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

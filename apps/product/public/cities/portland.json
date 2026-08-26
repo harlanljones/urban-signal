@@ -1,0 +1,253 @@
+{
+  "schema_version": 2,
+  "id": "portland",
+  "name": "Portland / Multnomah County",
+  "state": "OR",
+  "center": {
+    "lat": 45.5152,
+    "lng": -122.6784
+  },
+  "metro_bbox": {
+    "min_lat": 45.35,
+    "max_lat": 45.65,
+    "min_lng": -122.85,
+    "max_lng": -122.45
+  },
+  "divisions": {
+    "DOWNTOWN_PEARL": {
+      "name": "DOWNTOWN_PEARL",
+      "center": {
+        "lat": 45.521,
+        "lng": -122.684
+      },
+      "bbox": {
+        "min_lat": 45.5,
+        "max_lat": 45.54,
+        "min_lng": -122.7,
+        "max_lng": -122.66
+      },
+      "submarkets": [
+        "Pearl District",
+        "Downtown & West End",
+        "Goose Hollow & Providence Park"
+      ]
+    },
+    "EASTSIDE_INNER": {
+      "name": "EASTSIDE_INNER",
+      "center": {
+        "lat": 45.522,
+        "lng": -122.631
+      },
+      "bbox": {
+        "min_lat": 45.5,
+        "max_lat": 45.55,
+        "min_lng": -122.66,
+        "max_lng": -122.58
+      },
+      "submarkets": [
+        "Buckman & SE Hawthorne",
+        "Kerns & Burnside East",
+        "Laurelhurst & NE Broadway"
+      ]
+    },
+    "NORTH_PORTLAND": {
+      "name": "NORTH_PORTLAND",
+      "center": {
+        "lat": 45.572,
+        "lng": -122.7
+      },
+      "bbox": {
+        "min_lat": 45.55,
+        "max_lat": 45.62,
+        "min_lng": -122.75,
+        "max_lng": -122.62
+      },
+      "submarkets": [
+        "Eliot & N Williams",
+        "Boise & N Mississippi",
+        "St Johns"
+      ]
+    },
+    "SOUTHWEST_PORTLAND": {
+      "name": "SOUTHWEST_PORTLAND",
+      "center": {
+        "lat": 45.474,
+        "lng": -122.702
+      },
+      "bbox": {
+        "min_lat": 45.4,
+        "max_lat": 45.5,
+        "min_lng": -122.75,
+        "max_lng": -122.68
+      },
+      "submarkets": [
+        "South Waterfront & OHSU",
+        "Hillsdale & SW Macadam",
+        "Multnomah Village"
+      ]
+    },
+    "SOUTHEAST_PORTLAND": {
+      "name": "SOUTHEAST_PORTLAND",
+      "center": {
+        "lat": 45.49,
+        "lng": -122.605
+      },
+      "bbox": {
+        "min_lat": 45.4,
+        "max_lat": 45.5,
+        "min_lng": -122.68,
+        "max_lng": -122.55
+      },
+      "submarkets": [
+        "Mount Tabor & SE Belmont",
+        "Woodstock & SE Foster"
+      ]
+    }
+  },
+  "submarkets": {
+    "Pearl District": {
+      "name": "Pearl District",
+      "division": "DOWNTOWN_PEARL",
+      "center": {
+        "lat": 45.528,
+        "lng": -122.6835
+      },
+      "description": "Former industrial district north of downtown converted to high-density residential and ground-floor retail and galleries."
+    },
+    "Downtown & West End": {
+      "name": "Downtown & West End",
+      "division": "DOWNTOWN_PEARL",
+      "center": {
+        "lat": 45.52,
+        "lng": -122.677
+      },
+      "description": "Central business core with office-to-residential conversions and hospitality along the transit mall."
+    },
+    "Goose Hollow & Providence Park": {
+      "name": "Goose Hollow & Providence Park",
+      "division": "DOWNTOWN_PEARL",
+      "center": {
+        "lat": 45.516,
+        "lng": -122.692
+      },
+      "description": "Stadium-adjacent residential hillside with mixed-use infill near the western downtown edge."
+    },
+    "Buckman & SE Hawthorne": {
+      "name": "Buckman & SE Hawthorne",
+      "division": "EASTSIDE_INNER",
+      "center": {
+        "lat": 45.512,
+        "lng": -122.635
+      },
+      "description": "Dense inner-east neighborhood with retail corridors, ADU construction, and renovation-led permitting."
+    },
+    "Kerns & Burnside East": {
+      "name": "Kerns & Burnside East",
+      "division": "EASTSIDE_INNER",
+      "center": {
+        "lat": 45.523,
+        "lng": -122.64
+      },
+      "description": "Transit-adjacent east-burnside corridor with mid-rise multifamily replacing single-story commercial."
+    },
+    "Laurelhurst & NE Broadway": {
+      "name": "Laurelhurst & NE Broadway",
+      "division": "EASTSIDE_INNER",
+      "center": {
+        "lat": 45.53,
+        "lng": -122.62
+      },
+      "description": "Streetcar-era bungalow district meeting the NE retail spine, with renovation-heavy permits."
+    },
+    "Eliot & N Williams": {
+      "name": "Eliot & N Williams",
+      "division": "NORTH_PORTLAND",
+      "center": {
+        "lat": 45.56,
+        "lng": -122.668
+      },
+      "description": "Rapidly densifying north corridor with infill multifamily along the N Williams bike/transit spine."
+    },
+    "Boise & N Mississippi": {
+      "name": "Boise & N Mississippi",
+      "division": "NORTH_PORTLAND",
+      "center": {
+        "lat": 45.572,
+        "lng": -122.675
+      },
+      "description": "Historic Albina bungalow stock under gentle upzoning pressure near the Mississippi arts district."
+    },
+    "St Johns": {
+      "name": "St Johns",
+      "division": "NORTH_PORTLAND",
+      "center": {
+        "lat": 45.585,
+        "lng": -122.748
+      },
+      "description": "Formerly independent north Portland town with small-lot infill and a village-scale commercial core."
+    },
+    "South Waterfront & OHSU": {
+      "name": "South Waterfront & OHSU",
+      "division": "SOUTHWEST_PORTLAND",
+      "center": {
+        "lat": 45.498,
+        "lng": -122.69
+      },
+      "description": "OHSU-anchored high-rise academic medical district with continued tower construction on the Willamette's west bank."
+    },
+    "Hillsdale & SW Macadam": {
+      "name": "Hillsdale & SW Macadam",
+      "division": "SOUTHWEST_PORTLAND",
+      "center": {
+        "lat": 45.47,
+        "lng": -122.695
+      },
+      "description": "Southwest hills neighborhood with teardown/rebuild pressure and strict slope ordinances."
+    },
+    "Multnomah Village": {
+      "name": "Multnomah Village",
+      "division": "SOUTHWEST_PORTLAND",
+      "center": {
+        "lat": 45.455,
+        "lng": -122.72
+      },
+      "description": "Inner-southwest village node with indie retail and renovation-led permits."
+    },
+    "Mount Tabor & SE Belmont": {
+      "name": "Mount Tabor & SE Belmont",
+      "division": "SOUTHEAST_PORTLAND",
+      "center": {
+        "lat": 45.495,
+        "lng": -122.625
+      },
+      "description": "Hill-adjacent east-side neighborhood with ADU construction and corridor multifamily."
+    },
+    "Woodstock & SE Foster": {
+      "name": "Woodstock & SE Foster",
+      "division": "SOUTHEAST_PORTLAND",
+      "center": {
+        "lat": 45.475,
+        "lng": -122.59
+      },
+      "description": "Outer-southeast arterial with affordability-pressure infill and small-lot development."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "ISSUEDATE",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "socrata",
+      "watermark_col": "date_received",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/portland.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

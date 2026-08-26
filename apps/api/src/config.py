@@ -804,6 +804,145 @@ class Settings(BaseSettings):
         description="Washoe County parcel sales MapServer layer URL",
     )
 
+    # Spokane / Spokane County, WA (US-160): annual county sales layers,
+    # ArcGIS-hosted XLS permits, and Washington LCB renewal snapshots.
+    arcgis_spokane_deeds_url: str = Field(
+        default="https://gismo.spokanecounty.org/arcgis/rest/services/OpenData/Property/MapServer/20",
+        description="Spokane County 2026 parcel sales MapServer layer URL",
+    )
+    excel_spokane_permits_url: str = Field(
+        default="https://www.arcgis.com/sharing/rest/content/items/3fcb39ac614d41af9fd22b87af8ff245/data",
+        description="Spokane County Building and Planning permits XLS download URL",
+    )
+    socrata_wa_liquor_renewal_endpoint: str = Field(
+        default="https://data.wa.gov/resource/9dee-kzm5.json",
+        description="Washington LCB liquor renewal Socrata endpoint",
+    )
+    socrata_wa_cannabis_renewal_endpoint: str = Field(
+        default="https://data.wa.gov/resource/brpd-b6zd.json",
+        description="Washington LCB cannabis renewal Socrata endpoint",
+    )
+
+    # Dayton, OH (US-159): Hansen service requests are a rolling 90-day
+    # ArcGIS layer; the source has no public archive.
+    arcgis_dayton_311_url: str = Field(
+        default=(
+            "https://maps.daytonohio.gov/gisservices/rest/services/"
+            "PublicWorks/COD_ServiceRequests_Last90/MapServer/0"
+        ),
+        description="Dayton Hansen service requests rolling-90-day MapServer layer URL",
+    )
+
+    # Tulsa, OK (US-158): Verint customer-care cases are a live, approximately
+    # 30-day rolling window; the public layer has no historical archive.
+    arcgis_tulsa_311_url: str = Field(
+        default=(
+            "https://maps.cityoftulsa.org/hosting/rest/services/"
+            "CustomerCare/VerintCasesPublic/FeatureServer/0"
+        ),
+        description="Tulsa Verint 311 cases rolling-window FeatureServer layer URL",
+    )
+
+    # El Paso, TX (US-156): Accela-backed requests are a live 30-day partial
+    # view. ArcGISClient requests outSR=4326, transforming native TX state-plane
+    # geometry before the shared 311 parser sees each row.
+    arcgis_el_paso_311_url: str = Field(
+        default="https://gis.elpasotexas.gov/accela/rest/services/311/Requests/FeatureServer/0",
+        description="El Paso Accela 311 requests FeatureServer layer URL",
+    )
+
+    # Durham, NC (US-154): live point permits and polygon parcel sales.
+    arcgis_durham_permits_url: str = Field(
+        default="https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Inspections/MapServer/12",
+        description="Durham All Building Permits MapServer layer URL",
+    )
+    arcgis_durham_deeds_url: str = Field(
+        default="https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4",
+        description="Durham parcel sales/deeds MapServer layer URL",
+    )
+
+    # Dallas, TX (US-149): live ROW/traffic-control permit proxy plus a
+    # Building Services CRM view containing approximately 30 days of 311 data.
+    arcgis_dallas_row_permits_url: str = Field(
+        default=(
+            "https://services2.arcgis.com/rwnOSbfKSwyTBcwN/arcgis/rest/services/"
+            "ROW/FeatureServer/0"
+        ),
+        description="Dallas right-of-way permit proxy FeatureServer layer URL",
+    )
+    arcgis_dallas_311_url: str = Field(
+        default=(
+            "https://services2.arcgis.com/rwnOSbfKSwyTBcwN/arcgis/rest/services/"
+            "CRM_30Days_viewLayer_BuildingServices/FeatureServer/0"
+        ),
+        description="Dallas Building Services approximately 30-day CRM view URL",
+    )
+
+    # Louisville, KY (US-148): annual Metro 311 layer plus Kentucky ABC's
+    # active-license registry, filtered by the ingestion spec to Jefferson
+    # County.
+    arcgis_louisville_311_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/"
+            "metro_311_2026/FeatureServer/0"
+        ),
+        description="Louisville Metro 2026 311 FeatureServer layer URL",
+    )
+    arcgis_louisville_abc_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/"
+            "ABC_State_ActiveLicenses/FeatureServer/0"
+        ),
+        description="Kentucky ABC active licenses FeatureServer layer URL",
+    )
+
+    # Portland, OR (US-143): residential permits from Portland Maps and OLCC
+    # applications received from Oregon's Socrata portal.
+    arcgis_portland_permits_url: str = Field(
+        default=(
+            "https://www.portlandmaps.com/od/rest/services/"
+            "COP_OpenData_PlanningDevelopment/MapServer/89"
+        ),
+        description="Portland residential building permits MapServer layer URL",
+    )
+    socrata_portland_olcc_applications_endpoint: str = Field(
+        default="https://data.oregon.gov/resource/qad4-bnxp.json",
+        description="Oregon OLCC liquor applications received endpoint",
+    )
+
+    # San Jose, CA (US-147): City CKAN datastore resources. Permits are an
+    # address-only rolling-30-day export; 311 is a current-year annual export.
+    ckan_san_jose_permits_endpoint: str = Field(
+        default="ckan://data.sanjoseca.gov/045b3678-e923-4002-b696-300955bc6d06",
+        description="San Jose last-30-days building permits CKAN datastore resource",
+    )
+    ckan_san_jose_311_endpoint: str = Field(
+        default="ckan://data.sanjoseca.gov/d886727c-60f1-4be7-9a30-f6806375b1a3",
+        description="San Jose 2026 311 service requests CKAN datastore resource",
+    )
+
+    # Tampa, FL (US-146): audited full permits and partial alcohol-beverage
+    # history layers, both point-geocoded ArcGIS services.
+    arcgis_tampa_permits_url: str = Field(
+        default="https://arcgis.tampagov.net/arcgis/rest/services/Planning/PermitsAll/FeatureServer/0",
+        description="Tampa full permits ArcGIS FeatureServer layer URL",
+    )
+    arcgis_tampa_sla_url: str = Field(
+        default="https://arcgis.tampagov.net/arcgis/rest/services/Planning/AlcoholBeverage/FeatureServer/0",
+        description="Tampa alcohol-beverage partial SLA ArcGIS FeatureServer layer URL",
+    )
+
+    # Las Vegas / Clark County (US-145): address-only ArcGIS tables. Both
+    # feeds declare ADR-0004 geocoding in the city registry.
+    arcgis_las_vegas_permits_url: str = Field(
+        default="https://services1.arcgis.com/F1v0ufATbBQScMtY/ArcGIS/rest/services/OpenData_Building_Permits_/FeatureServer/0",
+        description="Clark County building permits ArcGIS table URL",
+    )
+    arcgis_las_vegas_deeds_url: str = Field(
+        default="https://services1.arcgis.com/F1v0ufATbBQScMtY/ArcGIS/rest/services/parcels/FeatureServer/0",
+        description="Clark County parcel sales ArcGIS table URL",
+    )
+
     # Kansas City, MO (Socrata): Business License Holders (US-134). Snapshot
     # feed carrying native GeoJSON point geometry (96.4% non-null) and a
     # valid_license_for YYYYMMDD expiration column; publication had lapsed

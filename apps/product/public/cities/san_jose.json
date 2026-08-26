@@ -1,0 +1,288 @@
+{
+  "schema_version": 2,
+  "id": "san_jose",
+  "name": "San Jose / Santa Clara County",
+  "state": "CA",
+  "center": {
+    "lat": 37.3382,
+    "lng": -121.8863
+  },
+  "metro_bbox": {
+    "min_lat": 37.15,
+    "max_lat": 37.45,
+    "min_lng": -122.06,
+    "max_lng": -121.55
+  },
+  "divisions": {
+    "DOWNTOWN_SJ": {
+      "name": "DOWNTOWN_SJ",
+      "center": {
+        "lat": 37.338,
+        "lng": -121.886
+      },
+      "bbox": {
+        "min_lat": 37.32,
+        "max_lat": 37.35,
+        "min_lng": -121.91,
+        "max_lng": -121.86
+      },
+      "submarkets": [
+        "Downtown San Jose",
+        "SoFA District",
+        "Japantown"
+      ]
+    },
+    "NORTH_SJ": {
+      "name": "NORTH_SJ",
+      "center": {
+        "lat": 37.4,
+        "lng": -121.9
+      },
+      "bbox": {
+        "min_lat": 37.37,
+        "max_lat": 37.43,
+        "min_lng": -121.99,
+        "max_lng": -121.86
+      },
+      "submarkets": [
+        "North San Jose",
+        "Berryessa",
+        "Alviso"
+      ]
+    },
+    "SOUTH_SJ": {
+      "name": "SOUTH_SJ",
+      "center": {
+        "lat": 37.2,
+        "lng": -121.87
+      },
+      "bbox": {
+        "min_lat": 37.15,
+        "max_lat": 37.25,
+        "min_lng": -121.95,
+        "max_lng": -121.78
+      },
+      "submarkets": [
+        "Almaden Valley",
+        "Cambrian Park",
+        "Blossom Valley"
+      ]
+    },
+    "EAST_SJ": {
+      "name": "EAST_SJ",
+      "center": {
+        "lat": 37.34,
+        "lng": -121.81
+      },
+      "bbox": {
+        "min_lat": 37.28,
+        "max_lat": 37.4,
+        "min_lng": -121.85,
+        "max_lng": -121.73
+      },
+      "submarkets": [
+        "Evergreen",
+        "Eastridge"
+      ]
+    },
+    "WEST_SJ": {
+      "name": "WEST_SJ",
+      "center": {
+        "lat": 37.32,
+        "lng": -121.91
+      },
+      "bbox": {
+        "min_lat": 37.28,
+        "max_lat": 37.33,
+        "min_lng": -121.95,
+        "max_lng": -121.88
+      },
+      "submarkets": [
+        "Willow Glen",
+        "West San Carlos"
+      ]
+    },
+    "SANTA_CLARA_EDGE": {
+      "name": "SANTA_CLARA_EDGE",
+      "center": {
+        "lat": 37.37,
+        "lng": -121.93
+      },
+      "bbox": {
+        "min_lat": 37.33,
+        "max_lat": 37.41,
+        "min_lng": -121.97,
+        "max_lng": -121.87
+      },
+      "submarkets": [
+        "Santa Clara Edge",
+        "Lawrence Station",
+        "Milpitas Edge"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown San Jose": {
+      "name": "Downtown San Jose",
+      "division": "DOWNTOWN_SJ",
+      "center": {
+        "lat": 37.337,
+        "lng": -121.886
+      },
+      "description": "High-rise residential and office core around Diridon and the Google transit village, with the densest permit pipeline in the metro."
+    },
+    "SoFA District": {
+      "name": "SoFA District",
+      "division": "DOWNTOWN_SJ",
+      "center": {
+        "lat": 37.33,
+        "lng": -121.886
+      },
+      "description": "South-of-First arts and nightlife district turning former industrial blocks into mixed-use and creative-office conversions."
+    },
+    "Japantown": {
+      "name": "Japantown",
+      "division": "DOWNTOWN_SJ",
+      "center": {
+        "lat": 37.348,
+        "lng": -121.895
+      },
+      "description": "Historic low-rise commercial enclave with renovation-heavy permitting and strict preservation overlays."
+    },
+    "North San Jose": {
+      "name": "North San Jose",
+      "division": "NORTH_SJ",
+      "center": {
+        "lat": 37.4,
+        "lng": -121.9
+      },
+      "description": "Cisco-era office sprawl being rezoned to high-density residential and life-science lab space along the BART alignment."
+    },
+    "Berryessa": {
+      "name": "Berryessa",
+      "division": "NORTH_SJ",
+      "center": {
+        "lat": 37.39,
+        "lng": -121.87
+      },
+      "description": "BART-adjacent infill suburb with townhome and multifamily replacement of aging auto-oriented retail."
+    },
+    "Alviso": {
+      "name": "Alviso",
+      "division": "NORTH_SJ",
+      "center": {
+        "lat": 37.43,
+        "lng": -121.97
+      },
+      "description": "Bayland-edge former township with sparse, flood-prone development and teardown-rebuild pressure near the salt ponds."
+    },
+    "Almaden Valley": {
+      "name": "Almaden Valley",
+      "division": "SOUTH_SJ",
+      "center": {
+        "lat": 37.2,
+        "lng": -121.87
+      },
+      "description": "Hill-county estate and large-lot residential stock at the south valley floor, dominated by high-value renovation permits."
+    },
+    "Cambrian Park": {
+      "name": "Cambrian Park",
+      "division": "SOUTH_SJ",
+      "center": {
+        "lat": 37.25,
+        "lng": -121.93
+      },
+      "description": "Post-war bungalow and cottage-grid neighborhood with renovation-led permits and independent retail spines."
+    },
+    "Blossom Valley": {
+      "name": "Blossom Valley",
+      "division": "SOUTH_SJ",
+      "center": {
+        "lat": 37.2,
+        "lng": -121.85
+      },
+      "description": "Mid-century residential flatlands south of Almaden Expressway with steady small-lot infill and ADU construction."
+    },
+    "Evergreen": {
+      "name": "Evergreen",
+      "division": "EAST_SJ",
+      "center": {
+        "lat": 37.32,
+        "lng": -121.8
+      },
+      "description": "East-foothill residential community with new-construction permits and hillside teardown-rebuild activity."
+    },
+    "Eastridge": {
+      "name": "Eastridge",
+      "division": "EAST_SJ",
+      "center": {
+        "lat": 37.35,
+        "lng": -121.82
+      },
+      "description": "Mall-adjacent commercial node transitioning to mixed-use residential under the Eastridge transit-oriented plan."
+    },
+    "Willow Glen": {
+      "name": "Willow Glen",
+      "division": "WEST_SJ",
+      "center": {
+        "lat": 37.31,
+        "lng": -121.9
+      },
+      "description": "Storybook-bungalow historic district on the west side with renovation-heavy permitting and strict tree ordinances."
+    },
+    "West San Carlos": {
+      "name": "West San Carlos",
+      "division": "WEST_SJ",
+      "center": {
+        "lat": 37.32,
+        "lng": -121.92
+      },
+      "description": "CalTrain-adjacent corridor undergoing station-area densification with multifamily replacements of aging retail."
+    },
+    "Santa Clara Edge": {
+      "name": "Santa Clara Edge",
+      "division": "SANTA_CLARA_EDGE",
+      "center": {
+        "lat": 37.35,
+        "lng": -121.96
+      },
+      "description": "Levi's Stadium / Mission College edge with mixed commercial and residential intensification spilling from Santa Clara."
+    },
+    "Lawrence Station": {
+      "name": "Lawrence Station",
+      "division": "SANTA_CLARA_EDGE",
+      "center": {
+        "lat": 37.37,
+        "lng": -121.95
+      },
+      "description": "Light-rail-adjacent office-to-residential conversion corridor on the San Jose/Santa Clara border."
+    },
+    "Milpitas Edge": {
+      "name": "Milpitas Edge",
+      "division": "SANTA_CLARA_EDGE",
+      "center": {
+        "lat": 37.38,
+        "lng": -121.89
+      },
+      "description": "Northern metro boundary shading into Milpitas; BART/Berryessa-adjacent infill permitted through San Jose."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "ckan",
+      "watermark_col": "ISSUEDATE",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "ckan",
+      "watermark_col": "Date Created",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/san_jose.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
