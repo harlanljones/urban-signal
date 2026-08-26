@@ -4,12 +4,8 @@ Portland registers TWO feed types — PERMITS (Portland Maps / data.portlandoreg
 Socrata permits) and SLA (Oregon Liquor Control Commission / OLCC licenses).
 DEEDS and COMPLAINTS_311 are deliberately absent.
 
-These tests are GREEN WITHOUT any spine registration: they exercise only the
-leaf (geometry, submarket/division nesting, the per-feed field maps, and the
-shared producers driven by a monkeypatched ``resolve_field_map``). The registry
-import is used only for ``FeedType`` and to assert that, absent the spine, the
-shared ``resolve_field_map`` still degrades to ``{}`` for "portland" — i.e. the
-spine is what wires the maps in.
+These tests exercise the leaf and the completed registry wiring, including the
+live ArcGIS/Socrata field spellings and the partial-feed caveats.
 """
 
 from unittest.mock import patch
@@ -148,15 +144,12 @@ class TestPortlandFieldMaps:
         assert first_mapped(SLA_ROW, fm, "status") == "Active"
         assert first_mapped(SLA_ROW, fm, "address_street") == "200 SW Market St"
 
-    def test_resolve_field_map_degrades_without_spine(self):
-        """Until the spine wires Portland into REGISTRY, the shared resolver
-        returns {} for 'portland' (no alias, no dataset). Documents the gate."""
+    def test_resolve_field_map_uses_completed_spine_wiring(self):
         assert first_mapped.__module__  # smoke import check
         from src.producers.field_maps import resolve_field_map
 
-        # portland is not in ALIASES yet -> {} for both feeds.
-        assert resolve_field_map("portland", FeedType.PERMITS) == {}
-        assert resolve_field_map("portland", FeedType.SLA) == {}
+        assert resolve_field_map("portland", FeedType.PERMITS) is PORTLAND_PERMITS_FIELD_MAP
+        assert resolve_field_map("portland", FeedType.SLA) is PORTLAND_SLA_FIELD_MAP
 
 
 class TestPortlandFeedSpecs:
@@ -223,7 +216,7 @@ class TestPortlandProducerParsing:
         assert str(ev.job_type).endswith("OT")
 
     def test_permit_demolition_classifies_dm(self, portland_field_map, permits):
-        row = dict(PERMIT_ROW, permit_type="Demolition Permit")
+        row = dict(PERMIT_ROW, NEWCLASS="Demolition Permit")
         ev = permits.parse_socrata_row(row, city_id="portland")
         assert ev is not None
         assert str(ev.job_type).endswith("DM")

@@ -1455,7 +1455,9 @@ def get_dashboard_html() -> str:
       tulsa: { name: 'Tulsa / Tulsa County' },
       el_paso: { name: 'El Paso / El Paso County' },
       durham: { name: 'Durham / Durham County' },
-      dallas: { name: 'Dallas / Dallas County' }
+      dallas: { name: 'Dallas / Dallas County' },
+      louisville: { name: 'Louisville / Jefferson County' },
+      portland: { name: 'Portland / Multnomah County' }
     };
 
     let map = null;

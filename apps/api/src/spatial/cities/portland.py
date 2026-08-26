@@ -278,42 +278,38 @@ PDX_DIVISIONS = PORTLAND_DIVISIONS
 # fields. Endpoint constants are UNVERIFIED placeholders — see module docstring.
 # =======================================================================
 
-# UNVERIFIED (2026-08-26, no live network in sandbox). Candidate:
-#   https://data.portlandoregon.gov/resource/<permits-4x4>.json
 PORTLAND_PERMITS_ENDPOINT: str = (
-    "https://data.portlandoregon.gov/resource/UNVERIFIED_permits.json"
+    "https://www.portlandmaps.com/od/rest/services/"
+    "COP_OpenData_PlanningDevelopment/MapServer/89"
 )
-# UNVERIFIED (2026-08-26). OLCC licensed-premises data, expected on
-# data.oregon.gov (Socrata) or as a CSV export. If CSV-only, the spine should
-# set platform="csv" (CSVClient already exists on sla_licenses_producer).
 PORTLAND_SLA_ENDPOINT: str = (
-    "https://data.oregon.gov/resource/UNVERIFIED_olcc_licenses.json"
+    "https://data.oregon.gov/resource/qad4-bnxp.json"
 )
 
 PORTLAND_PERMITS_FIELD_MAP: Dict[str, list] = {
-    "job_id": ["permit_number"],
+    "job_id": ["FOLDERNUMB", "OBJECTID", "permit_number"],
     "latitude": ["latitude"],
     "longitude": ["longitude"],
-    "issuance_date": ["issue_date"],
-    "filing_date": ["application_date"],
-    "cost": ["estimated_cost", "total_cost"],
-    "status": ["status"],
+    "issuance_date": ["ISSUEDATE", "issue_date"],
+    "filing_date": ["INDATE", "application_date"],
+    "cost": ["VALUATION", "estimated_cost", "total_cost"],
+    "status": ["STATUS", "status"],
     "zipcode": ["zip_code"],
-    "job_type": ["permit_type", "permit_subtype"],
-    "address_street": ["address"],
-    "borough": ["district", "neighborhood"],
-    "proposed_units": ["proposed_units"],
+    "job_type": ["NEWCLASS", "NEWTYPE", "WORKDESC", "permit_type", "permit_subtype"],
+    "address_street": ["PROP_ADDRE", "address"],
+    "borough": ["NBRHOOD", "PDXBND", "district", "neighborhood"],
+    "proposed_units": ["NEW_UNITS", "proposed_units"],
     "proposed_stories": ["proposed_stories", "number_of_stories"],
 }
 
 PORTLAND_SLA_FIELD_MAP: Dict[str, list] = {
-    "license_id": ["license_number"],
-    "license_type": ["license_type", "license_category"],
+    "license_id": ["license_number", "trade_name", "address"],
+    "license_type": ["license_type", "application_type"],
     "dba": ["dba", "trade_name", "doing_business_as"],
-    "premises_name": ["business_name", "licensee_name"],
-    "effective_date": ["issue_date", "effective_date"],
+    "premises_name": ["business_name", "licensee_name", "trade_name"],
+    "effective_date": ["date_received", "issue_date", "effective_date"],
     "expiration_date": ["expiration_date"],
-    "status": ["license_status", "status"],
+    "status": ["application_status", "license_status", "status"],
     "address_street": ["address", "premise_address"],
     "latitude": ["latitude"],
     "longitude": ["longitude"],
@@ -324,24 +320,26 @@ PORTLAND_SLA_FIELD_MAP: Dict[str, list] = {
 PORTLAND_FEED_SPECS: Dict[str, Dict[str, object]] = {
     "permits": {
         "endpoint": PORTLAND_PERMITS_ENDPOINT,
-        "platform": "socrata",
-        "watermark_col": "issue_date",
-        "id_keys": ["permit_number", "id"],
+        "platform": "arcgis",
+        "watermark_col": "ISSUEDATE",
+        "id_keys": ["FOLDERNUMB", "OBJECTID"],
         "topic_key": "topic_permits",
         "interval_seconds": 300.0,
         "producer_key": "permits",
         "field_map": PORTLAND_PERMITS_FIELD_MAP,
         "expected_cadence_days": 7,
+        "extra": {"oid_field": "OBJECTID", "max_record_count": 2000, "order_by": "ISSUEDATE DESC", "scope": "Portland residential building permits"},
     },
     "sla": {
         "endpoint": PORTLAND_SLA_ENDPOINT,
         "platform": "socrata",
-        "watermark_col": "issue_date",
-        "id_keys": ["license_number", "id"],
+        "watermark_col": "date_received",
+        "id_keys": ["trade_name", "address"],
         "topic_key": "topic_sla",
         "interval_seconds": 600.0,
         "producer_key": "sla",
         "field_map": PORTLAND_SLA_FIELD_MAP,
         "expected_cadence_days": 7,
+        "extra": {"needs_geocode": True, "scope": "Oregon OLCC liquor applications received (address-only Portland rows)"},
     },
 }

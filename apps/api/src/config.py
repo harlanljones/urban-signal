@@ -878,6 +878,38 @@ class Settings(BaseSettings):
         description="Dallas Building Services approximately 30-day CRM view URL",
     )
 
+    # Louisville, KY (US-148): annual Metro 311 layer plus Kentucky ABC's
+    # active-license registry, filtered by the ingestion spec to Jefferson
+    # County.
+    arcgis_louisville_311_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/"
+            "metro_311_2026/FeatureServer/0"
+        ),
+        description="Louisville Metro 2026 311 FeatureServer layer URL",
+    )
+    arcgis_louisville_abc_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/"
+            "ABC_State_ActiveLicenses/FeatureServer/0"
+        ),
+        description="Kentucky ABC active licenses FeatureServer layer URL",
+    )
+
+    # Portland, OR (US-143): residential permits from Portland Maps and OLCC
+    # applications received from Oregon's Socrata portal.
+    arcgis_portland_permits_url: str = Field(
+        default=(
+            "https://www.portlandmaps.com/od/rest/services/"
+            "COP_OpenData_PlanningDevelopment/MapServer/89"
+        ),
+        description="Portland residential building permits MapServer layer URL",
+    )
+    socrata_portland_olcc_applications_endpoint: str = Field(
+        default="https://data.oregon.gov/resource/qad4-bnxp.json",
+        description="Oregon OLCC liquor applications received endpoint",
+    )
+
     # Kansas City, MO (Socrata): Business License Holders (US-134). Snapshot
     # feed carrying native GeoJSON point geometry (96.4% non-null) and a
     # valid_license_for YYYYMMDD expiration column; publication had lapsed

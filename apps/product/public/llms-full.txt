@@ -51,7 +51,7 @@ The city registry is authoritative. A machine-readable projection for the market
 
 ## Per-city machine briefs
 
-Every registered metro has a generated JSON brief at `/public/cities/<id>.json`, where `<id>` matches the metro ids in `/facts.json` and `/cities/`. The 43 briefs are generated directly from `REGISTRY` in `apps/api/src/spatial/city_registry.py`; they are not hand-authored. Schema:
+Every registered metro has a generated JSON brief at `/public/cities/<id>.json`, where `<id>` matches the metro ids in `/facts.json` and `/cities/`. The 45 briefs are generated directly from `REGISTRY` in `apps/api/src/spatial/city_registry.py`; they are not hand-authored. Schema:
 
 - `schema_version`: integer version of this document shape.
 - `id`, `name`, `state`: registry identity for the metro.

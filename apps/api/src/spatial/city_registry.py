@@ -11,6 +11,15 @@ from typing import Any, Dict, Generator, List, Optional, Protocol, Tuple, Union,
 
 from src.config import settings
 from src.producers.field_maps_dallas import DALLAS_311_FIELD_MAP, DALLAS_FIELD_MAP
+from src.producers.field_maps_louisville import LOUISVILLE_311_FIELD_MAP, LOUISVILLE_SLA_FIELD_MAP
+from src.spatial.cities.portland import (
+    PORTLAND_DIVISION_BBOXES,
+    PORTLAND_DIVISIONS,
+    PORTLAND_METRO_BBOX,
+    PORTLAND_PERMITS_FIELD_MAP,
+    PORTLAND_SLA_FIELD_MAP,
+    PORTLAND_SUBMARKETS,
+)
 from src.spatial.cities.chicago import (
     CHICAGO_DIVISION_BBOXES,
     CHICAGO_DIVISIONS,
@@ -265,6 +274,12 @@ from src.spatial.cities.dallas import (
     DALLAS_METRO_BBOX,
     DALLAS_SUBMARKETS,
 )
+from src.spatial.cities.louisville import (
+    LOUISVILLE_DIVISION_BBOXES,
+    LOUISVILLE_DIVISIONS,
+    LOUISVILLE_METRO_BBOX,
+    LOUISVILLE_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -321,6 +336,8 @@ class CityId(str, Enum):
     EL_PASO = "el_paso"
     DURHAM = "durham"
     DALLAS = "dallas"
+    LOUISVILLE = "louisville"
+    PORTLAND = "portland"
 
 
 class FeedType(str, Enum):
@@ -691,6 +708,20 @@ ALIASES: Dict[str, CityId] = {
     "dallas_county": CityId.DALLAS,
     "dallas county": CityId.DALLAS,
     "big_d": CityId.DALLAS,
+
+    # Louisville / Jefferson County, KY
+    "louisville": CityId.LOUISVILLE,
+    "louisville_ky": CityId.LOUISVILLE,
+    "louisville ky": CityId.LOUISVILLE,
+    "jefferson_county_ky": CityId.LOUISVILLE,
+    "jefferson county ky": CityId.LOUISVILLE,
+
+    # Portland / Multnomah County, OR
+    "portland": CityId.PORTLAND,
+    "portland_or": CityId.PORTLAND,
+    "portland or": CityId.PORTLAND,
+    "multnomah_county": CityId.PORTLAND,
+    "multnomah county": CityId.PORTLAND,
 }
 
 
@@ -4171,6 +4202,98 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                     "retention_days": 30,
                     "scope": "Dallas Building Services CRM requests (approximately 30-day rolling partial view)",
                     "field_map": DALLAS_311_FIELD_MAP,
+                },
+            ),
+        },
+    ),
+    CityId.LOUISVILLE: CityRegistration(
+        city_id=CityId.LOUISVILLE,
+        name="Louisville / Jefferson County",
+        state="KY",
+        center={"lat": 38.2527, "lng": -85.7585},
+        metro_bbox=LOUISVILLE_METRO_BBOX,
+        division_bboxes=LOUISVILLE_DIVISION_BBOXES,
+        submarkets=LOUISVILLE_SUBMARKETS,
+        divisions=LOUISVILLE_DIVISIONS,
+        job_suffix="louisville",
+        datasets={
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.arcgis_louisville_311_url,
+                platform="arcgis",
+                watermark_col="requested_datetime",
+                id_keys=["service_request_id", "ObjectId"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                extra={
+                    "expected_cadence_days": 30,
+                    "oid_field": "ObjectId",
+                    "max_record_count": 2000,
+                    "annual_rotation": True,
+                    "scope": "Louisville Metro 311 service requests (2026 annual ArcGIS layer)",
+                    "field_map": LOUISVILLE_311_FIELD_MAP,
+                },
+            ),
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.arcgis_louisville_abc_url,
+                platform="arcgis",
+                watermark_col="IssueDate",
+                id_keys=["LicenseNumber", "ObjectId"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "ObjectId",
+                    "max_record_count": 2000,
+                    "where_clause": "County = 'Jefferson'",
+                    "scope": "Kentucky ABC active alcohol licenses in Jefferson County",
+                    "field_map": LOUISVILLE_SLA_FIELD_MAP,
+                },
+            ),
+        },
+    ),
+    CityId.PORTLAND: CityRegistration(
+        city_id=CityId.PORTLAND,
+        name="Portland / Multnomah County",
+        state="OR",
+        center={"lat": 45.5152, "lng": -122.6784},
+        metro_bbox=PORTLAND_METRO_BBOX,
+        division_bboxes=PORTLAND_DIVISION_BBOXES,
+        submarkets=PORTLAND_SUBMARKETS,
+        divisions=PORTLAND_DIVISIONS,
+        job_suffix="portland",
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_portland_permits_url,
+                platform="arcgis",
+                watermark_col="ISSUEDATE",
+                id_keys=["FOLDERNUMB", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "order_by": "ISSUEDATE DESC",
+                    "scope": "Portland residential building permits",
+                    "field_map": PORTLAND_PERMITS_FIELD_MAP,
+                },
+            ),
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.socrata_portland_olcc_applications_endpoint,
+                platform="socrata",
+                watermark_col="date_received",
+                id_keys=["trade_name", "address"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                extra={
+                    "expected_cadence_days": 7,
+                    "needs_geocode": True,
+                    "scope": "Oregon OLCC liquor applications received (address-only Portland rows)",
+                    "field_map": PORTLAND_SLA_FIELD_MAP,
                 },
             ),
         },

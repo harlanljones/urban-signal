@@ -4,13 +4,9 @@ Provides neighborhood metadata, camera positioning, investment metrics,
 division catalog, and geographic bounding boxes for the City of Louisville and
 greater Jefferson County, KY.
 
-Louisville registers as a TWO-FEED partial city like Austin and Los Angeles:
-COMPLAINTS_311 (Louisville Metro open-data 311 service requests on the
-data.louisvilleky.gov Socrata portal) and SLA (Kentucky Alcoholic Beverage
-Control liquor-license feed on the data.kentucky.gov Socrata portal). DEEDS and
-PERMITS are deliberately absent for this phase of US-148 — Jefferson County's
-recorded-deeds and building-permit feeds are tracked separately and land under
-their own tickets once verified. See docs/research/ (US-148).
+Louisville registers as a TWO-FEED partial city: COMPLAINTS_311 from the
+Louisville Metro ArcGIS layer and SLA from the Kentucky ABC active-license
+ArcGIS layer, filtered to Jefferson County. DEEDS and PERMITS remain absent.
 """
 
 from typing import Dict
@@ -412,78 +408,45 @@ LOU_DIVISION_BBOXES = LOUISVILLE_DIVISION_BBOXES
 LOU_SUBMARKETS = LOUISVILLE_SUBMARKETS
 LOU_DIVISIONS = LOUISVILLE_DIVISIONS
 
-# ---------------------------------------------------------------------------
-# Per-feed field maps (Wave-B mechanism). The Louisville 311 service-request
-# feed and the Kentucky ABC liquor-license feed spell their columns differently
-# from the shared parser chains, so the spellings are declared here as data and
-# folded into each DatasetSpec.extra["field_map"] at interlock (spine). The
-# shared producers consult the map BEFORE their generic fallback chains, so the
-# maps are purely additive overrides. Value semantics match the chains exactly:
-# falsy values fall through to the next candidate.
-#
-# NOTE (confirm at interlock): the exact Socrata resource IDs and watermark
-# columns for both feeds must be pinned against a live catalog pull from the
-# build sandbox (network was unavailable at leaf-build time). The SHAPE and the
-# canonical-key coverage below are correct; only the source-side identifiers are
-# provisional.
-# ---------------------------------------------------------------------------
-LOUISVILLE_FIELD_MAPS: Dict[str, Dict[str, list]] = {
-    # Louisville Metro 311 service requests (data.louisvilleky.gov, Socrata).
-    "COMPLAINTS_311": {
-        "incident_id": ["ticket_id", "sr_number", "service_request_id"],
-        "latitude": ["latitude"],
-        "longitude": ["longitude"],
-        "complaint_type": ["ticket_type", "request_type", "service_name"],
-        "created_date": ["created_at", "requested_datetime", "date_created"],
-        "closed_date": ["closed_at", "date_closed"],
-        "incident_address": ["address", "street_address", "incident_address"],
-        "borough": ["neighborhood", "council_district"],
-        "zipcode": ["zip_code", "zip", "zipcode"],
-        "status": ["status"],
-    },
-    # Kentucky Alcoholic Beverage Control liquor licenses (data.kentucky.gov, Socrata).
-    "SLA": {
-        "license_id": ["license_number", "license_id"],
-        "latitude": ["latitude"],
-        "longitude": ["longitude"],
-        "effective_date": ["issue_date", "effective_date"],
-        "expiration_date": ["expiration_date"],
-        "license_type": ["license_type", "license_class"],
-        "premises_name": ["premise_name", "business_name"],
-        "dba": ["dba_name", "doing_business_as"],
-        "address_street": ["street_address", "address"],
-        "status": ["license_status", "status"],
-        "borough": ["city", "county"],
+# Exact DatasetSpec payloads for the registry spine. Dicts avoid importing
+# city_registry.DatasetSpec while city_registry imports this module.
+from src.producers.field_maps_louisville import (  # noqa: E402
+    LOUISVILLE_311_FIELD_MAP,
+    LOUISVILLE_SLA_FIELD_MAP,
+)
+
+LOUISVILLE_311_SPEC: Dict[str, object] = {
+    "endpoint": "settings.arcgis_louisville_311_url",
+    "platform": "arcgis",
+    "watermark_col": "requested_datetime",
+    "id_keys": ["service_request_id", "ObjectId"],
+    "topic": "settings.topic_311",
+    "interval_seconds": 180.0,
+    "producer_key": "311",
+    "extra": {
+        "expected_cadence_days": 30,
+        "oid_field": "ObjectId",
+        "max_record_count": 2000,
+        "annual_rotation": True,
+        "scope": "Louisville Metro 311 service requests (2026 annual ArcGIS layer)",
+        "field_map": LOUISVILLE_311_FIELD_MAP,
     },
 }
 
-# ---------------------------------------------------------------------------
-# Intended feed specs for the interlock spine delta (US-148). The orchestrator
-# folds these into REGISTRY[CityId.LOUISVILLE].datasets at interlock. Endpoint
-# is recorded as the settings attribute the spine must add to config.py; the
-# literal resource path is a provisional placeholder pending live confirmation.
-# ---------------------------------------------------------------------------
-LOUISVILLE_FEED_SPECS: Dict[str, Dict[str, object]] = {
-    "COMPLAINTS_311": {
-        "settings_attr": "socrata_louisville_311_endpoint",
-        "provisional_endpoint": "https://data.louisvilleky.gov/resource/<311-resource-id>.json",
-        "platform": "socrata",
-        "watermark_col": "created_at",
-        "id_keys": ["ticket_id", "sr_number", "id"],
-        "producer_key": "311",
-        "topic_key": "topic_311",
-        "field_map_key": "COMPLAINTS_311",
+LOUISVILLE_SLA_SPEC: Dict[str, object] = {
+    "endpoint": "settings.arcgis_louisville_abc_url",
+    "platform": "arcgis",
+    "watermark_col": "IssueDate",
+    "id_keys": ["LicenseNumber", "ObjectId"],
+    "topic": "settings.topic_sla",
+    "interval_seconds": 600.0,
+    "producer_key": "sla",
+    "extra": {
         "expected_cadence_days": 7,
-    },
-    "SLA": {
-        "settings_attr": "socrata_ky_abc_licenses_endpoint",
-        "provisional_endpoint": "https://data.kentucky.gov/resource/<ky-abc-resource-id>.json",
-        "platform": "socrata",
-        "watermark_col": "issue_date",
-        "id_keys": ["license_number", "id"],
-        "producer_key": "sla",
-        "topic_key": "topic_sla",
-        "field_map_key": "SLA",
-        "expected_cadence_days": 7,
+        "oid_field": "ObjectId",
+        "max_record_count": 2000,
+        "where_clause": "County = 'Jefferson'",
+        "scope": "Kentucky ABC active alcohol licenses in Jefferson County",
+        "field_map": LOUISVILLE_SLA_FIELD_MAP,
     },
 }

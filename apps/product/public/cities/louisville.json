@@ -1,0 +1,308 @@
+{
+  "schema_version": 2,
+  "id": "louisville",
+  "name": "Louisville / Jefferson County",
+  "state": "KY",
+  "center": {
+    "lat": 38.2527,
+    "lng": -85.7585
+  },
+  "metro_bbox": {
+    "min_lat": 38.1,
+    "max_lat": 38.35,
+    "min_lng": -85.95,
+    "max_lng": -85.55
+  },
+  "divisions": {
+    "DOWNTOWN_NULU": {
+      "name": "DOWNTOWN_NULU",
+      "center": {
+        "lat": 38.249,
+        "lng": -85.75
+      },
+      "bbox": {
+        "min_lat": 38.24,
+        "max_lat": 38.27,
+        "min_lng": -85.775,
+        "max_lng": -85.735
+      },
+      "submarkets": [
+        "Downtown & Waterfront",
+        "NuLu (East Market District)",
+        "Phoenix Hill & Shelby Street"
+      ]
+    },
+    "HIGHLANDS_GERMANTOWN": {
+      "name": "HIGHLANDS_GERMANTOWN",
+      "center": {
+        "lat": 38.225,
+        "lng": -85.705
+      },
+      "bbox": {
+        "min_lat": 38.2,
+        "max_lat": 38.255,
+        "min_lng": -85.75,
+        "max_lng": -85.66
+      },
+      "submarkets": [
+        "Bardstown Road Highlands",
+        "GermanTown & Paristown",
+        "Douglass Loop"
+      ]
+    },
+    "CLIFTON_CRESCENT_HILL": {
+      "name": "CLIFTON_CRESCENT_HILL",
+      "center": {
+        "lat": 38.265,
+        "lng": -85.7
+      },
+      "bbox": {
+        "min_lat": 38.245,
+        "max_lat": 38.285,
+        "min_lng": -85.73,
+        "max_lng": -85.66
+      },
+      "submarkets": [
+        "Clifton & Frankfort Ave",
+        "Crescent Hill",
+        "Bonnycastle"
+      ]
+    },
+    "OLD_LOUISVILLE_SHELBY_PARK": {
+      "name": "OLD_LOUISVILLE_SHELBY_PARK",
+      "center": {
+        "lat": 38.218,
+        "lng": -85.76
+      },
+      "bbox": {
+        "min_lat": 38.195,
+        "max_lat": 38.235,
+        "min_lng": -85.79,
+        "max_lng": -85.74
+      },
+      "submarkets": [
+        "Old Louisville",
+        "Shelby Park",
+        "Smoketown"
+      ]
+    },
+    "ST_MATTHEWS_EAST": {
+      "name": "ST_MATTHEWS_EAST",
+      "center": {
+        "lat": 38.268,
+        "lng": -85.635
+      },
+      "bbox": {
+        "min_lat": 38.245,
+        "max_lat": 38.285,
+        "min_lng": -85.69,
+        "max_lng": -85.61
+      },
+      "submarkets": [
+        "St. Matthews",
+        "Eastpoint & Lyndon",
+        "Hurstbourne"
+      ]
+    },
+    "WEST_PORTLAND": {
+      "name": "WEST_PORTLAND",
+      "center": {
+        "lat": 38.255,
+        "lng": -85.805
+      },
+      "bbox": {
+        "min_lat": 38.245,
+        "max_lat": 38.285,
+        "min_lng": -85.83,
+        "max_lng": -85.78
+      },
+      "submarkets": [
+        "Portland",
+        "Shawnee & Chickasaw",
+        "Russell"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Waterfront": {
+      "name": "Downtown & Waterfront",
+      "division": "DOWNTOWN_NULU",
+      "center": {
+        "lat": 38.257,
+        "lng": -85.758
+      },
+      "description": "Central business district along the Ohio River waterfront with the KFC Yum! Center and riverfront redevelopment driving mixed-use permits."
+    },
+    "NuLu (East Market District)": {
+      "name": "NuLu (East Market District)",
+      "division": "DOWNTOWN_NULU",
+      "center": {
+        "lat": 38.247,
+        "lng": -85.745
+      },
+      "description": "East Market Street gallery-and-boutique corridor converting industrial stock to hospitality and residential above retail."
+    },
+    "Phoenix Hill & Shelby Street": {
+      "name": "Phoenix Hill & Shelby Street",
+      "division": "DOWNTOWN_NULU",
+      "center": {
+        "lat": 38.242,
+        "lng": -85.752
+      },
+      "description": "Hill-edge infill between downtown and the Highlands with small-lot townhome and adaptive-reuse activity."
+    },
+    "Bardstown Road Highlands": {
+      "name": "Bardstown Road Highlands",
+      "division": "HIGHLANDS_GERMANTOWN",
+      "center": {
+        "lat": 38.235,
+        "lng": -85.685
+      },
+      "description": "The commercial spine of the Highlands — independent retail, music venues, and dense mid-rise multifamily."
+    },
+    "GermanTown & Paristown": {
+      "name": "GermanTown & Paristown",
+      "division": "HIGHLANDS_GERMANTOWN",
+      "center": {
+        "lat": 38.225,
+        "lng": -85.735
+      },
+      "description": "Post-industrial bungalow grid rehabbing into breweries, maker spaces, and infill townhomes."
+    },
+    "Douglass Loop": {
+      "name": "Douglass Loop",
+      "division": "HIGHLANDS_GERMANTOWN",
+      "center": {
+        "lat": 38.215,
+        "lng": -85.675
+      },
+      "description": "South Highlands village node with renovation-led permitting and strict neighborhood overlay review."
+    },
+    "Clifton & Frankfort Ave": {
+      "name": "Clifton & Frankfort Ave",
+      "division": "CLIFTON_CRESCENT_HILL",
+      "center": {
+        "lat": 38.265,
+        "lng": -85.715
+      },
+      "description": "Walkable neighborhood commercial corridor with mixed-use infill and hospitality conversions."
+    },
+    "Crescent Hill": {
+      "name": "Crescent Hill",
+      "division": "CLIFTON_CRESCENT_HILL",
+      "center": {
+        "lat": 38.275,
+        "lng": -85.685
+      },
+      "description": "Streetcar-era bungalow district around the reservoir with renovation-heavy permits."
+    },
+    "Bonnycastle": {
+      "name": "Bonnycastle",
+      "division": "CLIFTON_CRESCENT_HILL",
+      "center": {
+        "lat": 38.255,
+        "lng": -85.69
+      },
+      "description": "Established residential pocket between the Highlands and Crescent Hill with teardown/rebuild pressure."
+    },
+    "Old Louisville": {
+      "name": "Old Louisville",
+      "division": "OLD_LOUISVILLE_SHELBY_PARK",
+      "center": {
+        "lat": 38.215,
+        "lng": -85.765
+      },
+      "description": "Nationally significant Victorian residential district with historic-preservation overlay permitting."
+    },
+    "Shelby Park": {
+      "name": "Shelby Park",
+      "division": "OLD_LOUISVILLE_SHELBY_PARK",
+      "center": {
+        "lat": 38.225,
+        "lng": -85.755
+      },
+      "description": "South-of-downtown park neighborhood undergoing cafe-and-townhome infill."
+    },
+    "Smoketown": {
+      "name": "Smoketown",
+      "division": "OLD_LOUISVILLE_SHELBY_PARK",
+      "center": {
+        "lat": 38.235,
+        "lng": -85.755
+      },
+      "description": "Historic Black neighborhood near downtown with early-stage redevelopment and new-construction permits."
+    },
+    "St. Matthews": {
+      "name": "St. Matthews",
+      "division": "ST_MATTHEWS_EAST",
+      "center": {
+        "lat": 38.26,
+        "lng": -85.65
+      },
+      "description": "Established inner-suburb retail node with mall-adjacent mixed-use and multifamily redevelopment."
+    },
+    "Eastpoint & Lyndon": {
+      "name": "Eastpoint & Lyndon",
+      "division": "ST_MATTHEWS_EAST",
+      "center": {
+        "lat": 38.27,
+        "lng": -85.63
+      },
+      "description": "Eastern Jefferson County edge with office-to-residential conversions and suburban infill."
+    },
+    "Hurstbourne": {
+      "name": "Hurstbourne",
+      "division": "ST_MATTHEWS_EAST",
+      "center": {
+        "lat": 38.275,
+        "lng": -85.62
+      },
+      "description": "I-64 corridor office park and hotel district with selective redevelopment pressure."
+    },
+    "Portland": {
+      "name": "Portland",
+      "division": "WEST_PORTLAND",
+      "center": {
+        "lat": 38.265,
+        "lng": -85.8
+      },
+      "description": "River-front historic neighborhood with early-stage industrial-to-residential conversion and flood-recovery investment."
+    },
+    "Shawnee & Chickasaw": {
+      "name": "Shawnee & Chickasaw",
+      "division": "WEST_PORTLAND",
+      "center": {
+        "lat": 38.255,
+        "lng": -85.815
+      },
+      "description": "Western Louisville park-side neighborhoods with renovation-led permits and affordability overlays."
+    },
+    "Russell": {
+      "name": "Russell",
+      "division": "WEST_PORTLAND",
+      "center": {
+        "lat": 38.245,
+        "lng": -85.795
+      },
+      "description": "Historic West End neighborhood with new-construction and rehab permitting near the Portland renewal zone."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "requested_datetime",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "IssueDate",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/louisville.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

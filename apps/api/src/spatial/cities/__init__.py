@@ -300,6 +300,20 @@ from src.spatial.cities.dallas import (
     DALLAS_SUBMARKETS,
     is_in_dallas_metro,
 )
+from src.spatial.cities.louisville import (
+    LOUISVILLE_DIVISION_BBOXES,
+    LOUISVILLE_DIVISIONS,
+    LOUISVILLE_METRO_BBOX,
+    LOUISVILLE_SUBMARKETS,
+    is_in_louisville_metro,
+)
+from src.spatial.cities.portland import (
+    PORTLAND_DIVISION_BBOXES,
+    PORTLAND_DIVISIONS,
+    PORTLAND_METRO_BBOX,
+    PORTLAND_SUBMARKETS,
+    is_in_portland_metro,
+)
 
 __all__ = [
     "PIERCE_METRO_BBOX",
@@ -513,4 +527,14 @@ __all__ = [
     "DALLAS_DIVISIONS",
     "DALLAS_SUBMARKETS",
     "is_in_dallas_metro",
+    "LOUISVILLE_METRO_BBOX",
+    "LOUISVILLE_DIVISION_BBOXES",
+    "LOUISVILLE_DIVISIONS",
+    "LOUISVILLE_SUBMARKETS",
+    "is_in_louisville_metro",
+    "PORTLAND_METRO_BBOX",
+    "PORTLAND_DIVISION_BBOXES",
+    "PORTLAND_DIVISIONS",
+    "PORTLAND_SUBMARKETS",
+    "is_in_portland_metro",
 ]

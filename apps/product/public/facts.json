@@ -1638,6 +1638,76 @@
         "lng": -96.797
       },
       "evidence_path": "apps/api/src/spatial/cities/dallas.py"
+    },
+    {
+      "id": "louisville",
+      "name": "Louisville / Jefferson County",
+      "state": "KY",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 18,
+      "feeds": [
+        false,
+        true,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "requested_datetime",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "IssueDate",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 38.2527,
+        "lng": -85.7585
+      },
+      "evidence_path": "apps/api/src/spatial/cities/louisville.py"
+    },
+    {
+      "id": "portland",
+      "name": "Portland / Multnomah County",
+      "state": "OR",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 14,
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "ISSUEDATE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "socrata",
+          "watermark_col": "date_received",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 45.5152,
+        "lng": -122.6784
+      },
+      "evidence_path": "apps/api/src/spatial/cities/portland.py"
     }
   ],
   "pipeline": [

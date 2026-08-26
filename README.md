@@ -24,7 +24,7 @@
 
 ### National all-metros map
 
-The dashboard renders **all forty-three registered metros on one map at the same
+The dashboard renders **all forty-five registered metros on one map at the same
 time**. Metrics are normalized with build-time percentile ranks
 (`lims_score_national_pct` and friends) so every metro shares one comparable
 color scale, and cell data lazy-loads from res-5 H3 viewport tiles as the user
@@ -94,6 +94,8 @@ Traditional real estate valuation models rely on lagging transactional comps (de
 | El Paso / El Paso County (1 Division) | EL_PASO_CORE | — no verified feed | ArcGIS (Accela/Cityworks approximately 30-day partial view; transformed points) | — no verified feed | — no verified feed |
 | Durham / Durham County (1 Division) | DURHAM_CORE | ArcGIS (All Building Permits; native points) | — no verified feed | — no verified feed | ArcGIS (parcel sales; polygon centroid) |
 | Dallas / Dallas County (6 Divisions) | DOWNTOWN_EAST, OAK_LAWN_UPTOWN, NORTH_DALLAS_PRESTON, EAST_DALLAS_WHITE_ROCK, SOUTH_DALLAS_OAK_CLIFF, PARK_CITIES_HIGHLAND_PARK | ArcGIS (ROW + traffic-control permits; construction proxy) | ArcGIS (Building Services approximately 30-day rolling partial view) | — no verified feed | — no verified feed |
+| Louisville / Jefferson County (6 Divisions) | DOWNTOWN_NULU, HIGHLANDS_GERMANTOWN, CLIFTON_CRESCENT_HILL, OLD_LOUISVILLE_SHELBY_PARK, ST_MATTHEWS_EAST, WEST_PORTLAND | — no verified feed | ArcGIS (Metro 2026 annual layer) | ArcGIS (Kentucky ABC active alcohol licenses; Jefferson County filter) | — no verified feed |
+| Portland / Multnomah County (5 Divisions) | DOWNTOWN_PEARL, EASTSIDE_INNER, NORTH_PORTLAND, SOUTHWEST_PORTLAND, SOUTHEAST_PORTLAND | ArcGIS (Residential Building Permits; native points) | — no verified feed | Socrata (Oregon OLCC applications received; address geocoding) | — no verified feed |
 
 Partial registrations are deliberate: cities register only feeds that exist, and `get_dataset` raises a readable error for the rest (`apps/api/src/spatial/city_registry.py`).
 
@@ -531,9 +533,9 @@ Exposes real-time Prometheus telemetry including `prediction_requests_total`, `c
 
 ### Interactive Geospatial Dashboard
 `GET /dashboard` or `GET /` (with `Accept: text/html`)
-Serves the hardened, high-performance **MapLibre GL** web visualizer featuring single-region selection and multi-region comparison across all forty-three registered metros (San Francisco, NYC, Chicago, Seattle, Los Angeles, New Orleans, Norfolk, Detroit, Austin, Cincinnati, Boston, Baltimore, Montgomery County, Baton Rouge, Denver, Philadelphia, Washington DC, Prince George's County, Columbus, Nashville, Kansas City, Pierce County, Minneapolis, Milwaukee, Charlotte, Pittsburgh, San Diego, Indianapolis, Houston, Wichita, Chattanooga, Cleveland, Hartford, Raleigh, San Antonio, Sacramento, Reno, Spokane, Dayton, Tulsa, El Paso, Durham, Dallas), submarket filtering, H3 hexagon inspection, LIMS heatmaps, and SHAP attribution waterfall charts.
+Serves the hardened, high-performance **MapLibre GL** web visualizer featuring single-region selection and multi-region comparison across all forty-five registered metros (San Francisco, NYC, Chicago, Seattle, Los Angeles, New Orleans, Norfolk, Detroit, Austin, Cincinnati, Boston, Baltimore, Montgomery County, Baton Rouge, Denver, Philadelphia, Washington DC, Prince George's County, Columbus, Nashville, Kansas City, Pierce County, Minneapolis, Milwaukee, Charlotte, Pittsburgh, San Diego, Indianapolis, Houston, Wichita, Chattanooga, Cleveland, Hartford, Raleigh, San Antonio, Sacramento, Reno, Spokane, Dayton, Tulsa, El Paso, Durham, Dallas, Louisville, Portland), submarket filtering, H3 hexagon inspection, LIMS heatmaps, and SHAP attribution waterfall charts.
 
-The same UI is mirrored as a static asset on the Cloudflare Worker (`apps/dashboard/`), deployed live to [https://us-dash.harlanljones.com/](https://us-dash.harlanljones.com/), where `/api/v1/*` is answered from a precomputed Workers KV snapshot (built by `src/export/snapshot_builder.py`). The FastAPI service and the edge snapshot both serve all forty-three registered metros.
+The same UI is mirrored as a static asset on the Cloudflare Worker (`apps/dashboard/`), deployed live to [https://us-dash.harlanljones.com/](https://us-dash.harlanljones.com/), where `/api/v1/*` is answered from a precomputed Workers KV snapshot (built by `src/export/snapshot_builder.py`). The FastAPI service and the edge snapshot both serve all forty-five registered metros.
 
 ---
 

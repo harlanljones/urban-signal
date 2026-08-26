@@ -20,36 +20,29 @@ Claim) and update it at every step boundary. Commit it with your work.
 
 ## Intent
 
-Louisville, KY is a TWO-FEED partial city (US-148): COMPLAINTS_311 (Louisville
-Metro open-data 311 service requests) and SLA (Kentucky Alcoholic Beverage
-Control liquor-license feed). Build the leaf module following `austin.py`
-(bbox, divisions, submarkets, `is_in_*_metro`) plus a per-city field-map module
-and a leaf-only test that passes WITHOUT spine registration. No new producer
-archetype is required — both feeds ride the existing Socrata-backed 311 and SLA
-producers via a registry entry + field_map.
+Louisville, KY is a TWO-FEED partial city (US-148): COMPLAINTS_311 from the
+Louisville Metro 2026 ArcGIS layer and SLA from the Kentucky ABC active-license
+ArcGIS layer, filtered to Jefferson County. Both feeds ride the existing
+shared producers via registry entries and field maps. PERMITS and DEEDS remain
+unregistered.
 
 ## Decisions
 
-- 2026-08-26 — DISCOVERY: Louisville Metro open data = Socrata portal
-  (data.louisvilleky.gov); Kentucky ABC licenses = Kentucky open data Socrata
-  portal (data.kentucky.gov). Both 311 + SLA shapes are already carried by the
-  shared `complaints_311_producer` / `sla_licenses_producer` Socrata clients.
-  CONFIRMED: no new archetype needed; leaf is registry entry + field_map only.
-- 2026-08-26 — Field spellings for the two feeds are declared as
-  `LOUISVILLE_FIELD_MAPS` (mirrors the Wave-B mechanism). The exact Socrata
-  resource IDs / watermark columns are flagged "confirm at interlock" because
-  live catalog discovery was unavailable from the build sandbox; the SHAPE is
-  correct and the leaf test pins the field-map structure.
+- 2026-08-26 — Live probe confirmed `metro_311_2026/FeatureServer/0` with
+  `requested_datetime`, native point coordinates, and annual layer rotation.
+- 2026-08-26 — Live probe confirmed `ABC_State_ActiveLicenses/FeatureServer/0`
+  with `IssueDate`, native point coordinates, and Jefferson County filtering;
+  the source is alcohol-only and not a full business-license universe.
+- 2026-08-26 — No new producer archetype is required; ArcGISClient flattening
+  and the shared 311/SLA parsers carry both feeds.
 
 ## Current step
 
-Leaf complete and verified: `uv run pytest tests/unit/test_producers_louisville.py -q`
-(19 passed) and `uv run pytest -m interlock -q` (22 passed). Awaiting interlock.
+Leaf and spine complete and verified: `pytest tests/unit/test_producers_louisville.py -q`
+(19 passed), `pytest -m interlock -q` (22 passed), facts and product checks green.
 
 ## Next step
 
-Orchestrator applies the spine deltas recorded in the report: REGISTRY entry +
-CityId member + ALIASES, the city-module import (cities/__init__.py __all__ and
-city_registry.py import block), the field_maps central aggregation entry, the
-config.py Socrata endpoint settings, and the dashboard METRO_META + index.html
-sync — all in one spine hold so the interlock gate stays green.
+Phase 3 COMPLETE. CityId.LOUISVILLE, aliases, both ArcGIS DatasetSpecs,
+config, dashboard/static copy, generated facts, and product surfaces are wired.
+US-148 is ready to resolve after the Linear completion comment is posted.

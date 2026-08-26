@@ -5,17 +5,8 @@ COMPLAINTS_311 (Louisville Metro open-data 311 service requests) and SLA
 (Kentucky Alcoholic Beverage Control liquor-license feed). DEEDS/PERMITS are
 deliberately absent in this phase.
 
-These tests are deliberately spine-free: they import only the leaf modules
-(``src.spatial.cities.louisville`` and ``src.producers.field_maps_louisville``)
-plus the shared, non-spine field-map helper. They PASS before the orchestrator
-applies the interlock spine (REGISTRY / ALIASES / CityId additions). Once the
-spine lands, ``resolve_field_map("louisville", ...)`` will return these maps
-instead of degrading to {}.
-
-Producer smoke tests confirm the existing Socrata-backed 311 and SLA producers
-already CARRY Louisville with no new archetype — passing city_id explicitly
-exercises the shared chains, which is exactly what the registry entry will
-select at interlock.
+Producer tests confirm the existing ArcGIS-capable 311 and SLA producers carry
+the live Louisville field spellings with no new archetype.
 """
 
 from unittest.mock import patch
@@ -104,48 +95,48 @@ class TestLouisvilleFieldMaps:
 
     def test_first_mapped_resolves_louisville_311_columns(self):
         row = {
-            "ticket_id": "SR-2026-000123",
+            "service_request_id": "SR-BAPT-26-130398",
             "latitude": "38.2470",
             "longitude": "-85.7450",
-            "ticket_type": "Pothole",
-            "created_at": "2026-08-22T10:00:00.000",
-            "neighborhood": "NuLu",
+            "service_name": "Large Item Appointment",
+            "requested_datetime": "2026-08-22T10:00:00.000",
+            "council_district": "4",
             "zip_code": "40202",
         }
         fm = FIELD_MAP["COMPLAINTS_311"]
-        assert first_mapped(row, fm, "incident_id") == "SR-2026-000123"
+        assert first_mapped(row, fm, "incident_id") == "SR-BAPT-26-130398"
         assert first_mapped(row, fm, "latitude") == "38.2470"
-        assert first_mapped(row, fm, "complaint_type") == "Pothole"
-        assert first_mapped(row, fm, "borough") == "NuLu"
+        assert first_mapped(row, fm, "complaint_type") == "Large Item Appointment"
+        assert first_mapped(row, fm, "borough") == "4"
         assert first_mapped(row, fm, "zipcode") == "40202"
 
     def test_first_mapped_resolves_ky_abc_sla_columns(self):
         row = {
-            "license_number": "KY-ABC-5541",
+            "LicenseNumber": "056-TL-222451",
             "latitude": "38.2600",
             "longitude": "-85.6500",
-            "issue_date": "2026-07-01",
-            "license_type": "On-Premises Retail (DR)",
-            "premise_name": "The Louisville Bar Co",
-            "dba_name": "LouBar",
-            "street_address": "123 Bardstown Rd",
-            "license_status": "ACTIVE",
-            "city": "Louisville",
+            "IssueDate": "2026-07-01",
+            "LicenseType": "On-Premises Retail (DR)",
+            "Licensee": "The Louisville Bar Co",
+            "DBA": "LouBar",
+            "PremisesStreet": "123 Bardstown Rd",
+            "Status": "Active",
+            "County": "Jefferson",
         }
         fm = FIELD_MAP["SLA"]
-        assert first_mapped(row, fm, "license_id") == "KY-ABC-5541"
+        assert first_mapped(row, fm, "license_id") == "056-TL-222451"
         assert first_mapped(row, fm, "effective_date") == "2026-07-01"
         assert first_mapped(row, fm, "license_type") == "On-Premises Retail (DR)"
         assert first_mapped(row, fm, "premises_name") == "The Louisville Bar Co"
         assert first_mapped(row, fm, "dba") == "LouBar"
-        assert first_mapped(row, fm, "borough") == "Louisville"
+        assert first_mapped(row, fm, "borough") == "Jefferson"
 
     def test_missing_key_falls_through_to_none(self):
         assert first_mapped({"ticket_id": ""}, FIELD_MAP["COMPLAINTS_311"], "incident_id") is None
 
 
 class TestLouisvilleProducerCarry:
-    """Confirm the existing Socrata-backed producers already carry Louisville.
+    """Confirm the existing producers carry Louisville.
 
     No new archetype is required: passing city_id explicitly exercises the
     shared chains, exactly what the registry entry selects at interlock.
@@ -197,3 +188,63 @@ class TestLouisvilleProducerCarry:
         assert event.latitude == pytest.approx(38.2600)
         assert event.longitude == pytest.approx(-85.6500)
         assert event.license_id == "KY-ABC-5541"
+
+    def test_live_arcgis_311_shape_uses_louisville_field_map(self, complaints):
+        event = complaints.parse_socrata_row(
+            {
+                "service_request_id": "SR-BAPT-26-130398",
+                "requested_datetime": "2026-08-23T04:00:00+00:00",
+                "service_name": "Large Item Appointment",
+                "status_description": "OPEN",
+                "address": "2920 BRINKEY WAY 4",
+                "latitude": 38.20796097,
+                "longitude": -85.64085684,
+                "zip_code": "40218",
+                "council_district": "10",
+            },
+            city_id="louisville",
+        )
+        assert event is not None
+        assert event.incident_id == "SR-BAPT-26-130398"
+        assert event.complaint_type == "Large Item Appointment"
+        assert event.latitude == pytest.approx(38.20796097)
+
+    def test_live_arcgis_abc_shape_uses_louisville_field_map(self, sla):
+        event = sla.parse_socrata_row(
+            {
+                "LicenseNumber": "056-TL-222451",
+                "LicenseType": "Special Temporary License",
+                "Licensee": "SIX ROW EVENTS, LLC",
+                "DBA": "Bud Tent and Hitching Post",
+                "PremisesStreet": "937 Phillips Ln",
+                "County": "Jefferson",
+                "Status": "Active",
+                "IssueDate": "2026-08-22T00:00:00+00:00",
+                "ExpiryDate": "2026-08-30T00:00:00+00:00",
+                "Latitude": 38.195082,
+                "Longitude": -85.7398905,
+            },
+            city_id="louisville",
+        )
+        assert event is not None
+        assert event.license_id == "056-TL-222451"
+        assert event.license_type == "Special Temporary License"
+        assert event.latitude == pytest.approx(38.195082)
+
+
+class TestLouisvilleSpineRegistration:
+    def test_registered_feeds_and_scope(self):
+        from src.spatial.city_registry import CityId, FeedType, REGISTRY, normalize_city
+
+        assert normalize_city("louisville ky") is CityId.LOUISVILLE
+        reg = REGISTRY[CityId.LOUISVILLE]
+        assert set(reg.datasets) == {FeedType.COMPLAINTS_311, FeedType.SLA}
+        assert reg.datasets[FeedType.COMPLAINTS_311].platform == "arcgis"
+        assert reg.datasets[FeedType.SLA].extra["where_clause"] == "County = 'Jefferson'"
+
+    def test_unverified_families_remain_absent(self):
+        from src.spatial.city_registry import CityId, FeedType, get_dataset
+
+        for feed in (FeedType.PERMITS, FeedType.DEEDS):
+            with pytest.raises(KeyError, match="no.*feed"):
+                get_dataset(CityId.LOUISVILLE, feed)
