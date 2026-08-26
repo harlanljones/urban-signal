@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "id": "chattanooga",
+  "name": "Chattanooga / Hamilton County",
+  "state": "TN",
+  "center": {
+    "lat": 35.0456,
+    "lng": -85.3097
+  },
+  "metro_bbox": {
+    "min_lat": 34.98,
+    "max_lat": 35.45,
+    "min_lng": -85.5,
+    "max_lng": -84.95
+  },
+  "divisions": {
+    "CHATTANOOGA_CORE": {
+      "name": "Chattanooga Core",
+      "center": {
+        "lat": 35.0456,
+        "lng": -85.3097
+      },
+      "bbox": {
+        "min_lat": 35.0,
+        "max_lat": 35.35,
+        "min_lng": -85.4,
+        "max_lng": -85.05
+      },
+      "submarkets": [
+        "Downtown & Southside",
+        "North Shore",
+        "East Chattanooga & Highland Park",
+        "East Brainerd",
+        "Hixson"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Southside": {
+      "name": "Downtown & Southside",
+      "division": "CHATTANOOGA_CORE",
+      "center": {
+        "lat": 35.0456,
+        "lng": -85.3097
+      },
+      "description": "Riverfront civic core and Southside warehouse district with adaptive reuse, hospitality, and multifamily infill."
+    },
+    "North Shore": {
+      "name": "North Shore",
+      "division": "CHATTANOOGA_CORE",
+      "center": {
+        "lat": 35.075,
+        "lng": -85.315
+      },
+      "description": "Market Street and Frazier Avenue neighborhood retail corridor across the Tennessee River from downtown."
+    },
+    "East Chattanooga & Highland Park": {
+      "name": "East Chattanooga & Highland Park",
+      "division": "CHATTANOOGA_CORE",
+      "center": {
+        "lat": 35.052,
+        "lng": -85.265
+      },
+      "description": "Historic east-side neighborhoods with small-scale rehabilitation, neighborhood retail, and infill activity."
+    },
+    "East Brainerd": {
+      "name": "East Brainerd",
+      "division": "CHATTANOOGA_CORE",
+      "center": {
+        "lat": 35.012,
+        "lng": -85.17
+      },
+      "description": "Southeast growth corridor where retail, medical, and residential development meet the Hamilton County edge."
+    },
+    "Hixson": {
+      "name": "Hixson",
+      "division": "CHATTANOOGA_CORE",
+      "center": {
+        "lat": 35.13,
+        "lng": -85.235
+      },
+      "description": "North-of-river commercial corridor with suburban redevelopment, medical services, and mixed-use reinvestment."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "csv",
+      "watermark_col": "issueddate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SALE1DATE",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/chattanooga.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

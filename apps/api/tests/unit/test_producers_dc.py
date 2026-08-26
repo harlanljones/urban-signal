@@ -10,12 +10,10 @@ one layer per calendar year on maps2.dcgis.dc.gov and resolve through
   "Washington, DC"} (ADR 0004), keeping Avro doubles real. The layer's own
   LATITUDE/LONGITUDE columns are null or sentinel junk (39/-77) on every
   sampled row, so the field_map must NOT bridge them.
-* DEEDS stays as-is: the CAMA layer publishes ZERO address-like fields
-  (verified in ?f=pjson metadata and over the 300 newest rows, 2026-08-24)
-  so the pure-address path cannot exist; parcel-join geocoding remains out
-  of scope. DeedEvent's Avro lat/lng ARE nullable unions, so its null-coord
-  events serialize fine — unlike SLA's non-null "double" columns, which DLQ
-  any event that fails to geocode (why the >=95% resolution bar matters).
+* DEEDS publishes ZERO address-like fields, so the producer enriches CAMA
+  rows through the verified SSL → Parcel Lots polygon join before parsing.
+  Unmatched rows still retain nullable lat/lng/H3, preserving the deeds
+  precedent while the matched path emits centroid coordinates.
 
 Live-probed 2026-08-24:
 
@@ -271,16 +269,17 @@ class TestWashingtonDcRegistration:
             assert "LATITUDE" not in keys, canonical
             assert "LONGITUDE" not in keys, canonical
 
-    def test_deeds_stays_non_spatial_no_addressable_fields(self):
+    def test_deeds_declares_parcel_join_for_non_addressable_cama_rows(self):
         """US-74 finding: the CAMA sales layer publishes ZERO address-like
         fields (metadata + 300-newest-row field union, 2026-08-24), so no
-        pure-address geocoding contract can be declared; parcel-key SSL only,
-        and a parcel join stays out of scope. The feed keeps its non_spatial
-        declaration rather than DLQ-ing on a spec that cannot resolve."""
+        pure-address geocoding contract can be declared. The parcel-key SSL
+        is joined to Parcel Lots before parsing instead."""
         from src.spatial.city_registry import CityId, FeedType, get_dataset
 
         extra = get_dataset(CityId.WASHINGTON_DC, FeedType.DEEDS).extra
-        assert extra.get("non_spatial") is True
+        assert extra.get("non_spatial") is not True
+        assert extra["parcel_join"]["join_key"] == "SSL"
+        assert extra["parcel_join"]["geometry_source"] == "centroid"
         assert extra.get("needs_geocode") is not True
         assert any(
             "ssl" in str(v).lower() for v in extra.get("field_map", {}).values()
@@ -542,14 +541,14 @@ class TestDcWithProposedFieldMap(DcParsingBase):
         complaint_row["LONGITUDE"] = 0.0
         assert complaints.parse_socrata_row(complaint_row, city_id="washington_dc") is None
 
-    # -- DEEDS (non-spatial) -----------------------------------------------------
+    # -- DEEDS (parcel-joined) ---------------------------------------------------
 
     def test_deed_events_carry_null_coordinates_and_h3(self, deeds, deed_row):
         """Property Sales CAMA carries NO coordinate fields AND no address
         fields (US-74 verified the field union over 300 newest rows) — SSL
         parcel key only. Events parse with null lat/lng/H3; DeedEvent's Avro
         lat/lng are nullable unions so these serialize and reach the topic
-        (no DLQ). A parcel join stays out of scope."""
+        (no DLQ). Direct parser calls without enrichment retain null geometry."""
         ev = deeds.parse_socrata_row(deed_row, city_id="washington_dc")
         assert ev.doc_id == "414660"
         assert ev.bbl == "6093    0808"
@@ -561,6 +560,17 @@ class TestDcWithProposedFieldMap(DcParsingBase):
     def test_deed_sale_date_parses_from_epoch_ms(self, deeds, deed_row):
         ev = deeds.parse_socrata_row(deed_row, city_id="washington_dc")
         assert str(ev.recorded_date).startswith("2026-08-12")
+
+    def test_deeds_declares_ssl_parcel_centroid_join(self):
+        from src.spatial.city_registry import CityId, FeedType, get_dataset
+
+        extra = get_dataset(CityId.WASHINGTON_DC, FeedType.DEEDS).extra
+        assert extra.get("non_spatial") is not True
+        assert extra["parcel_join"] == {
+            "parcel_layer": f"{DCGIS}/DCGIS_DATA/Property_and_Land_WebMercator/FeatureServer/33",
+            "join_key": "SSL",
+            "geometry_source": "centroid",
+        }
 
 
 GEOCODED_ANSWERS = {

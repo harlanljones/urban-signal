@@ -1442,7 +1442,14 @@ def get_dashboard_html() -> str:
       san_diego: { name: 'San Diego' },
       houston: { name: 'Houston' },
       indianapolis: { name: 'Indianapolis / Marion County' },
-      wichita: { name: 'Wichita' }
+      wichita: { name: 'Wichita' },
+      chattanooga: { name: 'Chattanooga / Hamilton County' },
+      cleveland: { name: 'Cleveland / Cuyahoga County' },
+      hartford: { name: 'Hartford' },
+      raleigh: { name: 'Raleigh / Wake County' },
+      san_antonio: { name: 'San Antonio / Bexar County' },
+      sacramento: { name: 'Sacramento / Sacramento County' },
+      reno: { name: 'Reno / Washoe County' }
     };
 
     let map = null;

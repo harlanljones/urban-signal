@@ -1183,6 +1183,261 @@
         "lng": -97.3301
       },
       "evidence_path": "apps/api/src/spatial/cities/wichita.py"
+    },
+    {
+      "id": "chattanooga",
+      "name": "Chattanooga / Hamilton County",
+      "state": "TN",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        true,
+        false,
+        false,
+        true
+      ],
+      "platforms": [
+        {
+          "platform": "csv",
+          "watermark_col": "issueddate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALE1DATE",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 35.0456,
+        "lng": -85.3097
+      },
+      "evidence_path": "apps/api/src/spatial/cities/chattanooga.py"
+    },
+    {
+      "id": "cleveland",
+      "name": "Cleveland / Cuyahoga County",
+      "state": "OH",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        true,
+        true,
+        false,
+        true
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "ISSUE_DATE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "requested_datetime",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "last_transfer_date",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 41.4993,
+        "lng": -81.6944
+      },
+      "evidence_path": "apps/api/src/spatial/cities/cleveland.py"
+    },
+    {
+      "id": "hartford",
+      "name": "Hartford",
+      "state": "CT",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        true,
+        true,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "DateIssued",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "USER_Opened_Date",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "recordrefreshedon",
+          "interval_seconds": 3600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 41.7637,
+        "lng": -72.6734
+      },
+      "evidence_path": "apps/api/src/spatial/cities/hartford.py"
+    },
+    {
+      "id": "raleigh",
+      "name": "Raleigh / Wake County",
+      "state": "NC",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        true,
+        true,
+        false,
+        true
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "issueddate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "APPLIED_DATE",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALE_DATE",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 35.7796,
+        "lng": -78.6382
+      },
+      "evidence_path": "apps/api/src/spatial/cities/raleigh.py"
+    },
+    {
+      "id": "san_antonio",
+      "name": "San Antonio / Bexar County",
+      "state": "TX",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        true,
+        true,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "ckan",
+          "watermark_col": "DATE ISSUED",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "OpenedDateTime",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 29.4241,
+        "lng": -98.4936
+      },
+      "evidence_path": "apps/api/src/spatial/cities/san_antonio.py"
+    },
+    {
+      "id": "sacramento",
+      "name": "Sacramento / Sacramento County",
+      "state": "CA",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        true,
+        true,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "ISSUED_DATE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "DateCreated",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 38.5816,
+        "lng": -121.4944
+      },
+      "evidence_path": "apps/api/src/spatial/cities/sacramento.py"
+    },
+    {
+      "id": "reno",
+      "name": "Reno / Washoe County",
+      "state": "NV",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "platforms": [
+        null,
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALEDATE",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 39.5296,
+        "lng": -119.8138
+      },
+      "evidence_path": "apps/api/src/spatial/cities/reno.py"
     }
   ],
   "pipeline": [

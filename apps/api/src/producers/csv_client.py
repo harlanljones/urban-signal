@@ -81,11 +81,27 @@ class CSVClient:
         max_records: Optional[int] = None,
         select: Optional[str] = None,
         id_col: Optional[str] = None,
+        fallback_endpoints: Optional[List[str]] = None,
         **kwargs: Any,
     ) -> Generator[List[Dict[str, Any]], None, None]:
-        """Download the CSV once and yield batches of filtered rows."""
-        response = self.http.get(endpoint_url)
-        response.raise_for_status()
+        """Download the CSV once and yield batches of filtered rows.
+
+        Some ArcGIS Hub items expose both a download route and the underlying
+        item-data route. Keep the primary URL first, but allow a registration
+        to carry an explicitly verified fallback when the Hub proxy fails.
+        """
+        last_error: Exception | None = None
+        for candidate in [endpoint_url, *(fallback_endpoints or [])]:
+            try:
+                response = self.http.get(candidate)
+                response.raise_for_status()
+                break
+            except (httpx.HTTPError, OSError) as exc:
+                last_error = exc
+        else:
+            if last_error is not None:
+                raise last_error
+            raise RuntimeError("CSV endpoint list is empty")
 
         reader = csv.DictReader(io.StringIO(response.text))
         # Municipal CSVs ship UPPERCASE headers; normalize so field maps and

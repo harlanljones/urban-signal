@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "id": "sacramento",
+  "name": "Sacramento / Sacramento County",
+  "state": "CA",
+  "center": {
+    "lat": 38.5816,
+    "lng": -121.4944
+  },
+  "metro_bbox": {
+    "min_lat": 38.0,
+    "max_lat": 38.8,
+    "min_lng": -121.9,
+    "max_lng": -121.0
+  },
+  "divisions": {
+    "SACRAMENTO_CORE": {
+      "name": "Sacramento / Sacramento County",
+      "center": {
+        "lat": 38.5816,
+        "lng": -121.4944
+      },
+      "bbox": {
+        "min_lat": 38.0184,
+        "max_lat": 38.7365,
+        "min_lng": -121.8627,
+        "max_lng": -121.0262
+      },
+      "submarkets": [
+        "Downtown & Midtown",
+        "East Sacramento & River Park",
+        "Land Park & South Sacramento",
+        "Natomas",
+        "Arden-Arcade & North County"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Midtown": {
+      "name": "Downtown & Midtown",
+      "division": "SACRAMENTO_CORE",
+      "center": {
+        "lat": 38.5816,
+        "lng": -121.4944
+      },
+      "description": "Civic and historic urban core with state employment, adaptive reuse, and mixed-use infill pressure."
+    },
+    "East Sacramento & River Park": {
+      "name": "East Sacramento & River Park",
+      "division": "SACRAMENTO_CORE",
+      "center": {
+        "lat": 38.574,
+        "lng": -121.438
+      },
+      "description": "Established neighborhoods balancing housing rehabilitation, river access, and small-scale redevelopment."
+    },
+    "Land Park & South Sacramento": {
+      "name": "Land Park & South Sacramento",
+      "division": "SACRAMENTO_CORE",
+      "center": {
+        "lat": 38.524,
+        "lng": -121.493
+      },
+      "description": "South-side residential and commercial corridors with repair, infill, and public-service demand."
+    },
+    "Natomas": {
+      "name": "Natomas",
+      "division": "SACRAMENTO_CORE",
+      "center": {
+        "lat": 38.65,
+        "lng": -121.51
+      },
+      "description": "Fast-growing northwestern area where residential expansion, infrastructure, and floodplain constraints intersect."
+    },
+    "Arden-Arcade & North County": {
+      "name": "Arden-Arcade & North County",
+      "division": "SACRAMENTO_CORE",
+      "center": {
+        "lat": 38.61,
+        "lng": -121.38
+      },
+      "description": "Unincorporated commercial and residential corridor with county permitting, retrofit, and neighborhood-service activity."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "ISSUED_DATE",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "DateCreated",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/sacramento.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

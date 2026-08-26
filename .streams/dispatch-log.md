@@ -431,3 +431,51 @@ ticket-suggested `SR_NUMBER`/`REQUESTID` columns — real keys are
 **Yield:** 3 of 3. Register count now 30 metros. `pytest -m interlock` 21/21; product
 `facts:check` FACTS_FRESH (30). test_retraining.py failures are environmental
 (tmp_path/Minio), unrelated. Artifacts uncommitted per local git policy.
+
+## 2026-08-26 — city registration (Chattanooga) — Linear US-155
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-chattanooga | `apps/api/src/spatial/cities/chattanooga.py`, `apps/api/tests/unit/test_producers_chattanooga.py` | config.py, city_registry.py, cities/__init__.py, permits/deeds producers, dashboard, snapshot export | current session | implemented; focused verification green | Chattanooga PERMITS + DEEDS registration |
+
+## 2026-08-26 — city registration (Cleveland) — Linear US-153
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-cleveland | `apps/api/src/spatial/cities/cleveland.py`, `apps/api/tests/unit/test_producers_cleveland.py` | config.py, city_registry.py, cities/__init__.py, permits/311/deeds producers, dashboard, snapshot export | current session | implemented; interlock and focused verification green | Cleveland PERMITS + 311 + DEEDS registration |
+
+## 2026-08-26 — city registration (Hartford) — Linear US-152
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-hartford | `apps/api/src/spatial/cities/hartford.py`, `apps/api/tests/unit/test_producers_hartford.py` | config.py, city_registry.py, cities/__init__.py, permits/311/SLA producers, dashboard, snapshot export | current session | implemented; focused tests and interlock green; Linear US-152 done | Hartford PERMITS + 311 + CT eLicensing SLA registration |
+
+## 2026-08-26 — city registration (Raleigh) — Linear US-151
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-raleigh | `apps/api/src/spatial/cities/raleigh.py`, `apps/api/tests/unit/test_producers_raleigh.py` | config.py, city_registry.py, cities/__init__.py, permits/311/deeds producers, dashboard, snapshot export | current session | implemented; focused tests and interlock green; Linear US-151 pending resolution | Raleigh PERMITS + 311 + Wake County DEEDS registration |
+
+## 2026-08-26 — city registration (San Antonio) — Linear US-141
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-san-antonio | `apps/api/src/spatial/cities/san_antonio.py`, `apps/api/tests/unit/test_producers_san_antonio.py` | config.py, city_registry.py, cities/__init__.py, permits/311 producers, dashboard, snapshot export | current session | implemented; focused tests and interlock green; Linear US-141 pending resolution | San Antonio PERMITS + 311 registration |
+
+## 2026-08-26 — DC deeds parcel join — Linear US-139
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| dc-deeds-parcel-join | DC CAMA SSL → Parcel Lots centroid enrichment | config.py, city_registry.py, deeds producer/client, README, tests, interlock | current session | implemented; focused tests and interlock green; Linear US-139 done | DC deeds parcel-join implementation |
+
+## 2026-08-26 — city registration (Sacramento) — Linear US-142
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-sacramento | `apps/api/src/spatial/cities/sacramento.py`, `apps/api/tests/unit/test_producers_sacramento.py` | config.py, city_registry.py, cities/__init__.py, permits/311 producers, dashboard, snapshot export | current session | implemented; focused tests, interlock, facts, and dashboard verification green | Sacramento PERMITS + 311 registration |
+
+## 2026-08-26 — city registration (Reno) — Linear US-161
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-reno | `apps/api/src/spatial/cities/reno.py`, `apps/api/tests/unit/test_producers_reno.py` | config.py, city_registry.py, cities/__init__.py, deeds producer, dashboard, snapshot export | current session | implemented; focused tests, interlock, scheduler, facts, and dashboard verification green | Reno / Washoe County DEEDS registration |

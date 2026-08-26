@@ -184,6 +184,120 @@ class ArcGISClient:
         )
         return records
 
+    @staticmethod
+    def _normalize_join_value(value: Any) -> str:
+        """Normalize a parcel join key without changing its meaningful digits."""
+        return " ".join(str(value or "").split()).upper()
+
+    def fetch_centroid_index(
+        self,
+        endpoint_url: str,
+        join_key: str,
+        join_values: Optional[List[Any]] = None,
+        batch_size: int = 1000,
+        max_records: Optional[int] = None,
+    ) -> Dict[str, tuple[float, float]]:
+        """Fetch parcel polygons and return a normalized key-to-centroid index.
+
+        When ``join_values`` is supplied, query only those parcels using bounded
+        ``IN`` clauses. This keeps a CAMA deed run proportional to its sales
+        page instead of downloading the entire parcel layer on every cycle.
+        ``_fetch_page`` requests geometry and reduces each polygon to WGS84
+        centroid coordinates before this method builds the lookup. Geometry is
+        requested through ``returnGeometry``; it is not an attribute field in
+        the ``outFields`` selection.
+        """
+        layer_url = self._normalize_layer_url(endpoint_url)
+        values = list(join_values) if join_values is not None else None
+        if values is not None:
+            unique_values = []
+            seen = set()
+            for value in values:
+                normalized = self._normalize_join_value(value)
+                if normalized and normalized not in seen:
+                    unique_values.append(str(value))
+                    seen.add(normalized)
+            values = unique_values
+        if values == []:
+            return {}
+
+        index: Dict[str, tuple[float, float]] = {}
+        fetched = 0
+
+        def consume(records: List[Dict[str, Any]]) -> None:
+            nonlocal fetched
+            for record in records:
+                key = self._normalize_join_value(record.get(join_key))
+                lat = record.get("latitude")
+                lng = record.get("longitude")
+                if not key or lat is None or lng is None:
+                    continue
+                try:
+                    index[key] = (float(lat), float(lng))
+                except (TypeError, ValueError):
+                    continue
+                fetched += 1
+
+        if values is None:
+            offset = 0
+            while True:
+                fetch_limit = batch_size
+                if max_records is not None:
+                    fetch_limit = min(fetch_limit, max_records - fetched)
+                if fetch_limit <= 0:
+                    break
+                records, exceeded = self._fetch_page(
+                    endpoint_url=layer_url,
+                    where_clause=None,
+                    order_by="",
+                    limit=fetch_limit,
+                    offset=offset,
+                    select=join_key,
+                )
+                if not records:
+                    break
+                before = fetched
+                consume(records)
+                offset += len(records)
+                if max_records is not None and fetched >= max_records:
+                    break
+                if not exceeded and len(records) < fetch_limit:
+                    break
+                if fetched == before and len(records) == 0:
+                    break
+            return index
+
+        # ArcGIS accepts a text-field IN clause. Keep each request small enough
+        # to stay well below URL/server query limits.
+        for start in range(0, len(values), 100):
+            chunk = values[start : start + 100]
+            escaped = ["'" + value.replace("'", "''") + "'" for value in chunk]
+            where = f"{join_key} IN ({','.join(escaped)})"
+            offset = 0
+            while True:
+                fetch_limit = batch_size
+                if max_records is not None:
+                    fetch_limit = min(fetch_limit, max_records - fetched)
+                if fetch_limit <= 0:
+                    return index
+                records, exceeded = self._fetch_page(
+                    endpoint_url=layer_url,
+                    where_clause=where,
+                    order_by="",
+                    limit=fetch_limit,
+                    offset=offset,
+                    select=join_key,
+                )
+                if not records:
+                    break
+                consume(records)
+                offset += len(records)
+                if max_records is not None and fetched >= max_records:
+                    return index
+                if not exceeded and len(records) < fetch_limit:
+                    break
+        return index
+
     def _fetch_page(
         self,
         endpoint_url: str,

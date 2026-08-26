@@ -209,6 +209,55 @@ from src.spatial.cities.wichita import (
     WICHITA_SUBMARKETS,
     is_in_wichita_metro,
 )
+from src.spatial.cities.chattanooga import (
+    CHATTANOOGA_DIVISION_BBOXES,
+    CHATTANOOGA_DIVISIONS,
+    CHATTANOOGA_METRO_BBOX,
+    CHATTANOOGA_SUBMARKETS,
+    is_in_chattanooga_metro,
+)
+from src.spatial.cities.cleveland import (
+    CLEVELAND_DIVISION_BBOXES,
+    CLEVELAND_DIVISIONS,
+    CLEVELAND_METRO_BBOX,
+    CLEVELAND_SUBMARKETS,
+    is_in_cleveland_metro,
+)
+from src.spatial.cities.hartford import (
+    HARTFORD_DIVISION_BBOXES,
+    HARTFORD_DIVISIONS,
+    HARTFORD_METRO_BBOX,
+    HARTFORD_SUBMARKETS,
+    is_in_hartford_metro,
+)
+from src.spatial.cities.raleigh import (
+    RALEIGH_DIVISION_BBOXES,
+    RALEIGH_DIVISIONS,
+    RALEIGH_METRO_BBOX,
+    RALEIGH_SUBMARKETS,
+    is_in_raleigh_metro,
+)
+from src.spatial.cities.san_antonio import (
+    SAN_ANTONIO_DIVISION_BBOXES,
+    SAN_ANTONIO_DIVISIONS,
+    SAN_ANTONIO_METRO_BBOX,
+    SAN_ANTONIO_SUBMARKETS,
+    is_in_san_antonio_metro,
+)
+from src.spatial.cities.sacramento import (
+    SACRAMENTO_DIVISION_BBOXES,
+    SACRAMENTO_DIVISIONS,
+    SACRAMENTO_METRO_BBOX,
+    SACRAMENTO_SUBMARKETS,
+    is_in_sacramento_metro,
+)
+from src.spatial.cities.reno import (
+    RENO_DIVISION_BBOXES,
+    RENO_DIVISIONS,
+    RENO_METRO_BBOX,
+    RENO_SUBMARKETS,
+    is_in_reno_metro,
+)
 
 __all__ = [
     "PIERCE_METRO_BBOX",
@@ -357,4 +406,39 @@ __all__ = [
     "WICHITA_DIVISIONS",
     "WICHITA_SUBMARKETS",
     "is_in_wichita_metro",
+    "CHATTANOOGA_METRO_BBOX",
+    "CHATTANOOGA_DIVISION_BBOXES",
+    "CHATTANOOGA_DIVISIONS",
+    "CHATTANOOGA_SUBMARKETS",
+    "is_in_chattanooga_metro",
+    "CLEVELAND_METRO_BBOX",
+    "CLEVELAND_DIVISION_BBOXES",
+    "CLEVELAND_DIVISIONS",
+    "CLEVELAND_SUBMARKETS",
+    "is_in_cleveland_metro",
+    "HARTFORD_METRO_BBOX",
+    "HARTFORD_DIVISION_BBOXES",
+    "HARTFORD_DIVISIONS",
+    "HARTFORD_SUBMARKETS",
+    "is_in_hartford_metro",
+    "RALEIGH_METRO_BBOX",
+    "RALEIGH_DIVISION_BBOXES",
+    "RALEIGH_DIVISIONS",
+    "RALEIGH_SUBMARKETS",
+    "is_in_raleigh_metro",
+    "SAN_ANTONIO_METRO_BBOX",
+    "SAN_ANTONIO_DIVISION_BBOXES",
+    "SAN_ANTONIO_DIVISIONS",
+    "SAN_ANTONIO_SUBMARKETS",
+    "is_in_san_antonio_metro",
+    "SACRAMENTO_METRO_BBOX",
+    "SACRAMENTO_DIVISION_BBOXES",
+    "SACRAMENTO_DIVISIONS",
+    "SACRAMENTO_SUBMARKETS",
+    "is_in_sacramento_metro",
+    "RENO_METRO_BBOX",
+    "RENO_DIVISION_BBOXES",
+    "RENO_DIVISIONS",
+    "RENO_SUBMARKETS",
+    "is_in_reno_metro",
 ]

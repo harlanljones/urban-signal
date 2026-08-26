@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "id": "raleigh",
+  "name": "Raleigh / Wake County",
+  "state": "NC",
+  "center": {
+    "lat": 35.7796,
+    "lng": -78.6382
+  },
+  "metro_bbox": {
+    "min_lat": 35.4,
+    "max_lat": 36.15,
+    "min_lng": -79.5,
+    "max_lng": -78.0
+  },
+  "divisions": {
+    "RALEIGH_CORE": {
+      "name": "Raleigh / Wake County",
+      "center": {
+        "lat": 35.7796,
+        "lng": -78.6382
+      },
+      "bbox": {
+        "min_lat": 35.65,
+        "max_lat": 36.0,
+        "min_lng": -79.0,
+        "max_lng": -78.4
+      },
+      "submarkets": [
+        "Downtown & Warehouse District",
+        "North Hills & Midtown",
+        "Five Points & Village District",
+        "Southeast Raleigh",
+        "West Raleigh & Hillsborough Street"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Warehouse District": {
+      "name": "Downtown & Warehouse District",
+      "division": "RALEIGH_CORE",
+      "center": {
+        "lat": 35.7796,
+        "lng": -78.6382
+      },
+      "description": "State-capital core and warehouse edge with office, residential, hospitality, and public-realm investment."
+    },
+    "North Hills & Midtown": {
+      "name": "North Hills & Midtown",
+      "division": "RALEIGH_CORE",
+      "center": {
+        "lat": 35.837,
+        "lng": -78.64
+      },
+      "description": "North-side mixed-use and employment corridor with multifamily, retail, and transit-oriented redevelopment."
+    },
+    "Five Points & Village District": {
+      "name": "Five Points & Village District",
+      "division": "RALEIGH_CORE",
+      "center": {
+        "lat": 35.807,
+        "lng": -78.653
+      },
+      "description": "Established inner-ring neighborhoods with storefront renewal, infill housing, and corridor-scale improvements."
+    },
+    "Southeast Raleigh": {
+      "name": "Southeast Raleigh",
+      "division": "RALEIGH_CORE",
+      "center": {
+        "lat": 35.735,
+        "lng": -78.6
+      },
+      "description": "Growth and reinvestment corridor with neighborhood services, housing rehabilitation, and institutional anchors."
+    },
+    "West Raleigh & Hillsborough Street": {
+      "name": "West Raleigh & Hillsborough Street",
+      "division": "RALEIGH_CORE",
+      "center": {
+        "lat": 35.789,
+        "lng": -78.685
+      },
+      "description": "University and research-adjacent district with student housing, innovation activity, and commercial infill."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "issueddate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "APPLIED_DATE",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SALE_DATE",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/raleigh.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

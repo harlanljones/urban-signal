@@ -188,6 +188,23 @@ class Complaints311Producer:
                         loc.get("coordinates", [None, None])[0] if "coordinates" in loc else None
                     )
 
+            # Some ArcGIS services expose projected coordinates as point
+            # geometry. Hartford's 311 layer uses CT state-plane feet, which
+            # ArcGISClient would otherwise flatten into misleading lat/lng
+            # fields. Force declared address-geocoded feeds through the
+            # geocoder when the values cannot be geographic degrees.
+            try:
+                if (
+                    lat_raw is not None
+                    and lng_raw is not None
+                    and (abs(float(lat_raw)) > 90 or abs(float(lng_raw)) > 180)
+                ):
+                    lat_raw = None
+                    lng_raw = None
+            except (TypeError, ValueError):
+                lat_raw = None
+                lng_raw = None
+
             if not lat_raw or not lng_raw:
                 # Address-string feeds declaring extra["needs_geocode"]
                 # (ADR 0004) resolve coordinates at parse time so the wire

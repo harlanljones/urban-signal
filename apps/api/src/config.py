@@ -241,6 +241,26 @@ class Settings(BaseSettings):
         description="Hamilton County (Cincinnati) Auditor daily property-transfers CSV endpoint",
     )
 
+    # Chattanooga (US-155): the Hub download proxy is the preferred endpoint,
+    # while the ArcGIS item-data route is the verified fallback when the proxy
+    # returns HTTP 500. The feed is a daily-refreshed flat CSV.
+    csv_chattanooga_permits_endpoint: str = Field(
+        default="https://data.chattanooga.gov/api/download/v1/items/9937e99e93de467eae5f592061c2672c/csv?layers=0",
+        description="Chattanooga All Permits ArcGIS Hub CSV item endpoint",
+    )
+    csv_chattanooga_permits_fallback_endpoint: str = Field(
+        default="https://www.arcgis.com/sharing/rest/content/items/9937e99e93de467eae5f592061c2672c/data",
+        description="Chattanooga All Permits ArcGIS item-data fallback endpoint",
+    )
+
+    arcgis_chattanooga_deeds_url: str = Field(
+        default=(
+            "https://pwgis.chattanooga.gov/arcgis/rest/services/Misc/Parcels/"
+            "FeatureServer/0"
+        ),
+        description="Chattanooga Hamilton County parcels FeatureServer layer URL",
+    )
+
     # New Orleans (Socrata)
     socrata_nola_permits_endpoint: str = Field(
         default="https://data.nola.gov/resource/rcm3-fn58.json",
@@ -672,6 +692,116 @@ class Settings(BaseSettings):
             "ODP_RIMACServiceRequests/FeatureServer/0"
         ),
         description="Indianapolis RIMAC 311 service requests FeatureServer layer URL",
+    )
+
+    # Cleveland, OH (ArcGIS, US-153): live permits, 311, and parcel-transfer
+    # layers from the City of Cleveland Open Data ArcGIS organization.
+    arcgis_cleveland_permits_url: str = Field(
+        default=(
+            "https://services3.arcgis.com/dty2kHktVXHrqO8i/arcgis/rest/services/"
+            "Building_Permits/FeatureServer/0"
+        ),
+        description="Cleveland issued building permits FeatureServer layer URL",
+    )
+    arcgis_cleveland_311_url: str = Field(
+        default=(
+            "https://services3.arcgis.com/dty2kHktVXHrqO8i/arcgis/rest/services/"
+            "Data_311/FeatureServer/0"
+        ),
+        description="Cleveland 311 service requests FeatureServer layer URL",
+    )
+    arcgis_cleveland_deeds_url: str = Field(
+        default=(
+            "https://services3.arcgis.com/dty2kHktVXHrqO8i/arcgis/rest/services/"
+            "Parcel_Analytics_(PUBLIC_DRAFT_)/FeatureServer/0"
+        ),
+        description="Cleveland parcel analytics transfer FeatureServer layer URL",
+    )
+
+    # Hartford, CT (ArcGIS + Socrata, US-152). Hartford's 311 X/Y values are
+    # state-plane feet, so the registry routes these records through address
+    # geocoding instead of treating them as latitude/longitude.
+    arcgis_hartford_permits_url: str = Field(
+        default=(
+            "https://utility.arcgis.com/usrsvcs/servers/"
+            "d595ae995fb049d3ac54919ebf24b1ac/rest/services/"
+            "HartfordOpenDataTables/FeatureServer/0"
+        ),
+        description="Hartford building permits FeatureServer table URL",
+    )
+    arcgis_hartford_311_url: str = Field(
+        default=(
+            "https://utility.arcgis.com/usrsvcs/servers/"
+            "2185af186dda46caa1e59323407d1daf/rest/services/"
+            "Service_Requests_2015_to_Current/FeatureServer/9"
+        ),
+        description="Hartford current-year 311 FeatureServer layer URL",
+    )
+    socrata_hartford_sla_endpoint: str = Field(
+        default="https://data.ct.gov/resource/ngch-56tr.json",
+        description="Connecticut State Licenses and Credentials Socrata endpoint",
+    )
+
+    # Raleigh, NC / Wake County (ArcGIS, US-151): native point permits and
+    # 311 plus polygon parcel sales for the deeds signal.
+    arcgis_raleigh_permits_url: str = Field(
+        default=(
+            "https://services.arcgis.com/v400IkDOw1ad7Yad/arcgis/rest/services/"
+            "Building_Permits/FeatureServer/0"
+        ),
+        description="Raleigh building permits FeatureServer layer URL",
+    )
+    arcgis_raleigh_311_url: str = Field(
+        default=(
+            "https://services.arcgis.com/v400IkDOw1ad7Yad/arcgis/rest/services/"
+            "Ask_Raleigh_Requests/FeatureServer/0"
+        ),
+        description="Raleigh Ask Raleigh service requests FeatureServer layer URL",
+    )
+    arcgis_wake_deeds_url: str = Field(
+        default="https://maps.wake.gov/arcgis/rest/services/Property/Parcels/MapServer/0",
+        description="Wake County parcel sales MapServer layer URL",
+    )
+
+    # San Antonio, TX (CKAN + ArcGIS, US-141): live building permits datastore
+    # and point-based 311 service calls.
+    ckan_san_antonio_permits_endpoint: str = Field(
+        default="ckan://data.sanantonio.gov/c21106f9-3ef5-4f3a-8604-f992b4db7512",
+        description="San Antonio building permits CKAN datastore URI",
+    )
+    arcgis_san_antonio_311_url: str = Field(
+        default=(
+            "https://services.arcgis.com/g1fRTDLeMgspWrYp/arcgis/rest/services/"
+            "311_All_Service_Calls/FeatureServer/0"
+        ),
+        description="San Antonio 311 service calls FeatureServer layer URL",
+    )
+
+    # Sacramento / Sacramento County, CA (ArcGIS, US-142): native-point
+    # county permits and city 311 service requests.
+    arcgis_sacramento_permits_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/5NARefyPVtAeuJPU/arcgis/rest/services/"
+            "Permits/FeatureServer/0"
+        ),
+        description="Sacramento County permits FeatureServer layer URL",
+    )
+    arcgis_sacramento_311_url: str = Field(
+        default=(
+            "https://services5.arcgis.com/54falWtcpty3V47Z/ArcGIS/rest/services/"
+            "SalesForce311_View/FeatureServer/0"
+        ),
+        description="Sacramento 311 service requests FeatureServer layer URL",
+    )
+
+    # Reno / Washoe County, NV (ArcGIS, US-161): current county parcel sales
+    # with polygon geometry and a MM/DD/YYYY text sale-date watermark.
+    arcgis_reno_deeds_url: str = Field(
+        default=(
+            "https://gisweb.washoecounty.gov/arcgis/rest/services/OpenData/"
+            "WashoeDataShare/MapServer/0"
+        ),
+        description="Washoe County parcel sales MapServer layer URL",
     )
 
     # Kansas City, MO (Socrata): Business License Holders (US-134). Snapshot

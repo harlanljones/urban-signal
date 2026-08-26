@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "id": "san_antonio",
+  "name": "San Antonio / Bexar County",
+  "state": "TX",
+  "center": {
+    "lat": 29.4241,
+    "lng": -98.4936
+  },
+  "metro_bbox": {
+    "min_lat": 28.9,
+    "max_lat": 29.9,
+    "min_lng": -99.4,
+    "max_lng": -98.0
+  },
+  "divisions": {
+    "SAN_ANTONIO_CORE": {
+      "name": "San Antonio / Bexar County",
+      "center": {
+        "lat": 29.4241,
+        "lng": -98.4936
+      },
+      "bbox": {
+        "min_lat": 29.2,
+        "max_lat": 29.75,
+        "min_lng": -99.0,
+        "max_lng": -98.25
+      },
+      "submarkets": [
+        "Downtown & River Walk",
+        "Southtown & King William",
+        "Pearl & Broadway",
+        "Medical Center & Northwest",
+        "West Side & South San Antonio"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & River Walk": {
+      "name": "Downtown & River Walk",
+      "division": "SAN_ANTONIO_CORE",
+      "center": {
+        "lat": 29.4241,
+        "lng": -98.4936
+      },
+      "description": "Civic, hospitality, and riverfront core with adaptive reuse, visitor economy, and mixed-use redevelopment."
+    },
+    "Southtown & King William": {
+      "name": "Southtown & King William",
+      "division": "SAN_ANTONIO_CORE",
+      "center": {
+        "lat": 29.411,
+        "lng": -98.489
+      },
+      "description": "Historic south-side neighborhoods with arts, hospitality, residential rehabilitation, and infill demand."
+    },
+    "Pearl & Broadway": {
+      "name": "Pearl & Broadway",
+      "division": "SAN_ANTONIO_CORE",
+      "center": {
+        "lat": 29.442,
+        "lng": -98.48
+      },
+      "description": "North-central destination corridor with institutional, culinary, residential, and mobility-oriented investment."
+    },
+    "Medical Center & Northwest": {
+      "name": "Medical Center & Northwest",
+      "division": "SAN_ANTONIO_CORE",
+      "center": {
+        "lat": 29.51,
+        "lng": -98.58
+      },
+      "description": "Major employment and medical corridor with apartments, clinics, retail, and redevelopment pressure."
+    },
+    "West Side & South San Antonio": {
+      "name": "West Side & South San Antonio",
+      "division": "SAN_ANTONIO_CORE",
+      "center": {
+        "lat": 29.365,
+        "lng": -98.54
+      },
+      "description": "Established working neighborhoods with small-business activity, housing repair, and public infrastructure needs."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "ckan",
+      "watermark_col": "DATE ISSUED",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "OpenedDateTime",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/san_antonio.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

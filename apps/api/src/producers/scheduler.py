@@ -255,6 +255,7 @@ class MunicipalIngestionScheduler:
                     "order_by": ds.extra.get("order_by"),
                     "id_col": ds.extra.get("id_col"),
                     "select": ds.extra.get("select"),
+                    "fallback_endpoints": list(ds.extra.get("fallback_endpoints") or []),
                     # D7 text-watermark declarations (ADR 0005): sentinels
                     # become a server-side NOT-IN guard and the high
                     # watermark is tracked as the raw declared-format string
@@ -522,7 +523,9 @@ class MunicipalIngestionScheduler:
 
         try:
             client_kwargs = {
-                k: meta[k] for k in ("order_by", "id_col", "select") if meta.get(k)
+                k: meta[k]
+                for k in ("order_by", "id_col", "select", "fallback_endpoints")
+                if meta.get(k)
             }
             for batch in self._paginating_client_for(job_name).paginate(
                 endpoint_url=meta["endpoint"],

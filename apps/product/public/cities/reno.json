@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "id": "reno",
+  "name": "Reno / Washoe County",
+  "state": "NV",
+  "center": {
+    "lat": 39.5296,
+    "lng": -119.8138
+  },
+  "metro_bbox": {
+    "min_lat": 39.3,
+    "max_lat": 40.0,
+    "min_lng": -120.2,
+    "max_lng": -119.4
+  },
+  "divisions": {
+    "RENO_CORE": {
+      "name": "Reno / Washoe County",
+      "center": {
+        "lat": 39.5296,
+        "lng": -119.8138
+      },
+      "bbox": {
+        "min_lat": 39.3,
+        "max_lat": 39.8,
+        "min_lng": -120.15,
+        "max_lng": -119.55
+      },
+      "submarkets": [
+        "Downtown & Midtown",
+        "South Reno",
+        "Northwest Reno",
+        "Sparks",
+        "Spanish Springs"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Midtown": {
+      "name": "Downtown & Midtown",
+      "division": "RENO_CORE",
+      "center": {
+        "lat": 39.5296,
+        "lng": -119.8138
+      },
+      "description": "Truckee River and civic core with hospitality, adaptive reuse, and urban infill activity."
+    },
+    "South Reno": {
+      "name": "South Reno",
+      "division": "RENO_CORE",
+      "center": {
+        "lat": 39.455,
+        "lng": -119.76
+      },
+      "description": "High-growth residential corridor with new construction, retail expansion, and suburban intensification."
+    },
+    "Northwest Reno": {
+      "name": "Northwest Reno",
+      "division": "RENO_CORE",
+      "center": {
+        "lat": 39.58,
+        "lng": -119.88
+      },
+      "description": "Established foothill neighborhoods with renovation, infill, and county parcel turnover."
+    },
+    "Sparks": {
+      "name": "Sparks",
+      "division": "RENO_CORE",
+      "center": {
+        "lat": 39.5349,
+        "lng": -119.7527
+      },
+      "description": "Industrial and residential east valley with logistics investment, redevelopment, and active parcel sales."
+    },
+    "Spanish Springs": {
+      "name": "Spanish Springs",
+      "division": "RENO_CORE",
+      "center": {
+        "lat": 39.64,
+        "lng": -119.68
+      },
+      "description": "Northern growth area where new housing, infrastructure extension, and unincorporated county development meet."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": null,
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SALEDATE",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/reno.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

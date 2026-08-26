@@ -186,6 +186,48 @@ from src.spatial.cities.wichita import (
     WICHITA_METRO_BBOX,
     WICHITA_SUBMARKETS,
 )
+from src.spatial.cities.chattanooga import (
+    CHATTANOOGA_DIVISION_BBOXES,
+    CHATTANOOGA_DIVISIONS,
+    CHATTANOOGA_METRO_BBOX,
+    CHATTANOOGA_SUBMARKETS,
+)
+from src.spatial.cities.cleveland import (
+    CLEVELAND_DIVISION_BBOXES,
+    CLEVELAND_DIVISIONS,
+    CLEVELAND_METRO_BBOX,
+    CLEVELAND_SUBMARKETS,
+)
+from src.spatial.cities.hartford import (
+    HARTFORD_DIVISION_BBOXES,
+    HARTFORD_DIVISIONS,
+    HARTFORD_METRO_BBOX,
+    HARTFORD_SUBMARKETS,
+)
+from src.spatial.cities.raleigh import (
+    RALEIGH_DIVISION_BBOXES,
+    RALEIGH_DIVISIONS,
+    RALEIGH_METRO_BBOX,
+    RALEIGH_SUBMARKETS,
+)
+from src.spatial.cities.san_antonio import (
+    SAN_ANTONIO_DIVISION_BBOXES,
+    SAN_ANTONIO_DIVISIONS,
+    SAN_ANTONIO_METRO_BBOX,
+    SAN_ANTONIO_SUBMARKETS,
+)
+from src.spatial.cities.sacramento import (
+    SACRAMENTO_DIVISION_BBOXES,
+    SACRAMENTO_DIVISIONS,
+    SACRAMENTO_METRO_BBOX,
+    SACRAMENTO_SUBMARKETS,
+)
+from src.spatial.cities.reno import (
+    RENO_DIVISION_BBOXES,
+    RENO_DIVISIONS,
+    RENO_METRO_BBOX,
+    RENO_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -229,6 +271,13 @@ class CityId(str, Enum):
     HOUSTON = "houston"
     INDIANAPOLIS = "indianapolis"
     WICHITA = "wichita"
+    CHATTANOOGA = "chattanooga"
+    CLEVELAND = "cleveland"
+    HARTFORD = "hartford"
+    RALEIGH = "raleigh"
+    SAN_ANTONIO = "san_antonio"
+    SACRAMENTO = "sacramento"
+    RENO = "reno"
 
 
 class FeedType(str, Enum):
@@ -502,6 +551,59 @@ ALIASES: Dict[str, CityId] = {
     "wichita_ks": CityId.WICHITA,
     "wichita ks": CityId.WICHITA,
     "ict": CityId.WICHITA,
+
+    # Chattanooga & Hamilton County, Tennessee
+    "chattanooga": CityId.CHATTANOOGA,
+    "chattanooga_tn": CityId.CHATTANOOGA,
+    "chattanooga tn": CityId.CHATTANOOGA,
+    "hamilton_county_tn": CityId.CHATTANOOGA,
+    "hamilton county tn": CityId.CHATTANOOGA,
+    "scenic_city": CityId.CHATTANOOGA,
+
+    # Cleveland & Cuyahoga County, Ohio
+    "cleveland": CityId.CLEVELAND,
+    "cleveland_oh": CityId.CLEVELAND,
+    "cleveland oh": CityId.CLEVELAND,
+    "cuyahoga_county": CityId.CLEVELAND,
+    "cuyahoga county": CityId.CLEVELAND,
+    "the_land": CityId.CLEVELAND,
+
+    # Hartford, CT / Hartford County
+    "hartford": CityId.HARTFORD,
+    "hartford_ct": CityId.HARTFORD,
+    "hartford ct": CityId.HARTFORD,
+    "hartford_county": CityId.HARTFORD,
+    "hartford county": CityId.HARTFORD,
+
+    # Raleigh / Wake County, NC
+    "raleigh": CityId.RALEIGH,
+    "raleigh_nc": CityId.RALEIGH,
+    "raleigh nc": CityId.RALEIGH,
+    "wake_county": CityId.RALEIGH,
+    "wake county": CityId.RALEIGH,
+
+    # San Antonio / Bexar County, TX
+    "san_antonio": CityId.SAN_ANTONIO,
+    "san-antonio": CityId.SAN_ANTONIO,
+    "san antonio": CityId.SAN_ANTONIO,
+    "san_antonio_tx": CityId.SAN_ANTONIO,
+    "san antonio tx": CityId.SAN_ANTONIO,
+    "bexar_county": CityId.SAN_ANTONIO,
+    "bexar county": CityId.SAN_ANTONIO,
+
+    # Sacramento / Sacramento County, CA
+    "sacramento": CityId.SACRAMENTO,
+    "sacramento_ca": CityId.SACRAMENTO,
+    "sacramento ca": CityId.SACRAMENTO,
+    "sacramento_county": CityId.SACRAMENTO,
+    "sacramento county": CityId.SACRAMENTO,
+
+    # Reno / Washoe County, NV
+    "reno": CityId.RENO,
+    "reno_nv": CityId.RENO,
+    "reno nv": CityId.RENO,
+    "washoe_county": CityId.RENO,
+    "washoe county": CityId.RENO,
 }
 
 
@@ -2175,9 +2277,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
         # via resolve_endpoint at scheduler build; run the December rollover
         # drill before each New Year (roadmap §8.2) and append the new year's
         # layer id here. Basic Business Licenses and Property Sales CAMA are
-        # NON-SPATIAL: events carry null lat/lng/null H3 keyed by SSL /
-        # customer number (deeds-precedent tolerance); joining CAMA sales to
-        # Parcel Lots (layer 33) for geometry is future work.
+        # CAMA sales are enriched from Parcel Lots layer 33 by the deeds
+        # producer's bounded SSL parcel join before they are parsed.
         datasets={
             FeedType.PERMITS: DatasetSpec(
                 endpoint=settings.arcgis_dc_permits_url,
@@ -2290,7 +2391,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                     "expected_cadence_days": 7,
                     "oid_field": "OBJECTID",
                     "max_record_count": 2000,
-                    "non_spatial": True,
+                    "parcel_join": {
+                        "parcel_layer": "https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Property_and_Land_WebMercator/FeatureServer/33",
+                        "join_key": "SSL",
+                        "geometry_source": "centroid",
+                    },
                     "field_map": {
                         "doc_id": ["ROW_NUMBER"],
                         "bbl": ["SSL"],
@@ -3123,6 +3228,538 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                         "address_street": ["InwardAddress"],
                         "zipcode": ["PostalCode"],
                         "borough": ["Jurisdiction", "City"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.CHATTANOOGA: CityRegistration(
+        city_id=CityId.CHATTANOOGA,
+        name="Chattanooga / Hamilton County",
+        state="TN",
+        center={"lat": 35.0456, "lng": -85.3097},
+        metro_bbox=CHATTANOOGA_METRO_BBOX,
+        division_bboxes=CHATTANOOGA_DIVISION_BBOXES,
+        submarkets=CHATTANOOGA_SUBMARKETS,
+        divisions=CHATTANOOGA_DIVISIONS,
+        job_suffix="chattanooga",
+        # US-155: the Hub CSV is the live permits source; the hosted
+        # Permits_Permitted_to_Contractor FeatureServer twin is frozen and is
+        # deliberately not used. The parcel layer is live but its sale-date
+        # values are epoch-ms and reject the scheduler's ISO where literal, so
+        # it runs as a snapshot feed while the parser still preserves dates.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.csv_chattanooga_permits_endpoint,
+                platform="csv",
+                watermark_col="issueddate",
+                id_keys=["permitnum"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 7,
+                    "order_by": "issueddate DESC",
+                    "fallback_endpoints": [settings.csv_chattanooga_permits_fallback_endpoint],
+                    "scope": "City of Chattanooga All Permits Hub CSV item",
+                    "field_map": {
+                        "job_id": ["permitnum"],
+                        "issuance_date": ["issueddate"],
+                        "filing_date": ["applieddate"],
+                        "job_type": ["permitclass"],
+                        "cost": ["estprojectcostdec"],
+                        "status": ["status"],
+                        "address_street": ["address"],
+                        "zipcode": ["zipcode", "zip"],
+                        "bbl": ["pin"],
+                    },
+                },
+            ),
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.arcgis_chattanooga_deeds_url,
+                platform="arcgis",
+                watermark_col="SALE1DATE",
+                id_keys=["PIN", "OBJECTID"],
+                topic=settings.topic_deeds,
+                interval_seconds=1800.0,
+                producer_key="deeds",
+                extra={
+                    "expected_cadence_days": 7,
+                    "ingestion_mode": "snapshot",
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 1000,
+                    "scope": (
+                        "Hamilton County parcels with rolling SALE1DATE-SALE4DATE "
+                        "transfer history; polygon centroid supplies coordinates"
+                    ),
+                    "field_map": {
+                        "doc_id": ["PIN", "PARCELID", "OBJECTID"],
+                        "recorded_date": ["SALE1DATE"],
+                        "document_amount": ["SALE1CONSD"],
+                        "bbl": ["PIN", "PARCELID"],
+                        "party2_grantee": ["OWNERNAME1"],
+                        "doc_type": ["SALE1TYPE", "DEEDTYPE", "TYPE"],
+                        "borough": ["MUNICIPALITY", "CITY"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.CLEVELAND: CityRegistration(
+        city_id=CityId.CLEVELAND,
+        name="Cleveland / Cuyahoga County",
+        state="OH",
+        center={"lat": 41.4993, "lng": -81.6944},
+        metro_bbox=CLEVELAND_METRO_BBOX,
+        division_bboxes=CLEVELAND_DIVISION_BBOXES,
+        submarkets=CLEVELAND_SUBMARKETS,
+        divisions=CLEVELAND_DIVISIONS,
+        job_suffix="cleveland",
+        # US-153: all three feeds are live ArcGIS layers from the Cleveland
+        # Open Data organization. Issued permits have a documented ~10-day
+        # publication lag; use ISSUE_DATE as the stable watermark. Parcel
+        # analytics is polygonal, so ArcGISClient supplies centroid coords.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_cleveland_permits_url,
+                platform="arcgis",
+                watermark_col="ISSUE_DATE",
+                id_keys=["PERMIT_NUMBER", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 14,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "scope": "Cleveland issued building permits (published with ~10-day lag)",
+                    "field_map": {
+                        "job_id": ["PERMIT_NUMBER"],
+                        "issuance_date": ["ISSUE_DATE"],
+                        "filing_date": ["FILE_DATE"],
+                        "job_type": ["PERMIT_TYPE", "PERMIT_SUBTYPE"],
+                        "cost": ["JOB_VALUE"],
+                        "status": ["STATUS", "PERMIT_STATUS"],
+                        "address_street": ["ADDRESS"],
+                        "zipcode": ["ZIP", "ZIP_CODE"],
+                        "bbl": ["PARCEL_NUMBER"],
+                    },
+                },
+            ),
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.arcgis_cleveland_311_url,
+                platform="arcgis",
+                watermark_col="requested_datetime",
+                id_keys=["SR_NUMBER", "OBJECTID"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "scope": "Cleveland 311 service requests (native lat/long and parcelpin)",
+                    "field_map": {
+                        "incident_id": ["SR_NUMBER", "SERVICE_REQUEST_ID", "REQUEST_ID"],
+                        "created_date": ["requested_datetime"],
+                        "closed_date": ["closed_datetime", "closed_date"],
+                        "status": ["status"],
+                        "complaint_type": ["service_name"],
+                        "incident_address": ["address"],
+                        "borough": ["ward", "neighborhood"],
+                        "zipcode": ["zip", "zipcode"],
+                        "latitude": ["lat"],
+                        "longitude": ["long"],
+                    },
+                },
+            ),
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.arcgis_cleveland_deeds_url,
+                platform="arcgis",
+                watermark_col="last_transfer_date",
+                id_keys=["PARCEL_ID", "OBJECTID"],
+                topic=settings.topic_deeds,
+                interval_seconds=1800.0,
+                producer_key="deeds",
+                extra={
+                    "expected_cadence_days": 7,
+                    "ingestion_mode": "snapshot",
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "scope": "Cleveland parcel analytics with live last-transfer history",
+                    "field_map": {
+                        "doc_id": ["PARCEL_ID", "PARCEL_NUMBER", "OBJECTID"],
+                        "recorded_date": ["last_transfer_date"],
+                        "document_amount": ["sale_price", "transfer_amount"],
+                        "bbl": ["parcel_number", "PARCEL_NUMBER", "PARCEL_ID"],
+                        "party1_grantor": ["grantor"],
+                        "party2_grantee": ["grantee"],
+                        "doc_type": ["document_type", "deed_type"],
+                        "borough": ["ward", "neighborhood"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.HARTFORD: CityRegistration(
+        city_id=CityId.HARTFORD,
+        name="Hartford",
+        state="CT",
+        center={"lat": 41.7637, "lng": -72.6734},
+        metro_bbox=HARTFORD_METRO_BBOX,
+        division_bboxes=HARTFORD_DIVISION_BBOXES,
+        submarkets=HARTFORD_SUBMARKETS,
+        divisions=HARTFORD_DIVISIONS,
+        job_suffix="hartford",
+        # US-152: live ArcGIS 311 and permit tables plus Connecticut's daily
+        # statewide eLicensing Socrata feed. The ArcGIS 311 X/Y values are CT
+        # state-plane feet and the other records are address-only, so all three
+        # feeds use the ADR-0004 geocoder hook.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_hartford_permits_url,
+                platform="arcgis",
+                watermark_col="DateIssued",
+                id_keys=["RECORD_ID", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "needs_geocode": True,
+                    "geocode_context": "Hartford, CT",
+                    "scope": "Hartford building permits (ArcGIS Accela table; address-only)",
+                    "field_map": {
+                        "job_id": ["RECORD_ID"],
+                        "issuance_date": ["DateIssued"],
+                        "job_type": ["PermitType", "PERMIT_TYPE", "WorkDescription"],
+                        "cost": ["EstimatedCost", "COST", "ProjectCost"],
+                        "status": ["Status", "STATUS"],
+                        "address_street": ["PROPERTY_ADDRESS", "Location"],
+                        "zipcode": ["ZIP", "ZipCode", "POSTAL_CODE"],
+                        "bbl": ["PARCEL_ID", "ParcelID"],
+                    },
+                },
+            ),
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.arcgis_hartford_311_url,
+                platform="arcgis",
+                watermark_col="USER_Opened_Date",
+                id_keys=["SR_Number", "OBJECTID"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "endpoint_by_year": {"2026": settings.arcgis_hartford_311_url},
+                    "needs_geocode": True,
+                    "geocode_context": "Hartford, CT",
+                    "scope": "Hartford 311 current-year service requests (ArcGIS; state-plane X/Y)",
+                    "field_map": {
+                        "incident_id": ["SR_Number", "SRM_Number", "OBJECTID"],
+                        "created_date": ["USER_Opened_Date"],
+                        "closed_date": ["USER_Closed_Date", "Closed_Date"],
+                        "status": ["Status", "STATUS"],
+                        "complaint_type": ["SR_Type", "Request_Type", "Service_Name"],
+                        "incident_address": ["Match_addr", "Location", "Address"],
+                        "borough": ["Neighborhood", "Council_District"],
+                        "zipcode": ["ZIP", "ZipCode", "PostalCode"],
+                    },
+                },
+            ),
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.socrata_hartford_sla_endpoint,
+                platform="socrata",
+                watermark_col="recordrefreshedon",
+                id_keys=["license_number", "credential_number", "id"],
+                topic=settings.topic_sla,
+                interval_seconds=3600.0,
+                producer_key="sla",
+                extra={
+                    "expected_cadence_days": 7,
+                    "where": "city = 'HARTFORD'",
+                    "needs_geocode": True,
+                    "geocode_context": "Hartford, CT",
+                    "scope": "Connecticut State Licenses and Credentials filtered to Hartford",
+                    "field_map": {
+                        "license_id": ["license_number", "credential_number", "id"],
+                        "license_type": ["credential_type", "credential_name", "license_type"],
+                        "effective_date": ["effective_date", "issue_date"],
+                        "expiration_date": ["expiration_date", "expiry_date"],
+                        "address_street": ["address", "street_address", "address_line_1"],
+                        "zipcode": ["zip", "zipcode", "postal_code"],
+                        "borough": ["city"],
+                        "premises_name": ["business_name", "name"],
+                        "dba": ["business_name", "name"],
+                        "status": ["status", "license_status"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.RALEIGH: CityRegistration(
+        city_id=CityId.RALEIGH,
+        name="Raleigh / Wake County",
+        state="NC",
+        center={"lat": 35.7796, "lng": -78.6382},
+        metro_bbox=RALEIGH_METRO_BBOX,
+        division_bboxes=RALEIGH_DIVISION_BBOXES,
+        submarkets=RALEIGH_SUBMARKETS,
+        divisions=RALEIGH_DIVISIONS,
+        job_suffix="raleigh",
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_raleigh_permits_url,
+                platform="arcgis",
+                watermark_col="issueddate",
+                id_keys=["permitnum", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "scope": "Raleigh building permits (native WGS84 point layer)",
+                    "field_map": {
+                        "job_id": ["permitnum", "permitnumber"],
+                        "issuance_date": ["issueddate"],
+                        "filing_date": ["submitteddate", "applicationdate"],
+                        "job_type": ["permittypemapped", "permittype", "permitclass"],
+                        "cost": ["estprojectcost", "estimatedcost"],
+                        "status": ["statuscurrent", "status"],
+                        "address_street": ["originaladdress1", "address"],
+                        "zipcode": ["originalzip", "zip", "zip_code"],
+                        "bbl": ["pin", "parcelid"],
+                        "latitude": ["latitude_perm"],
+                        "longitude": ["longitude_perm"],
+                    },
+                },
+            ),
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.arcgis_raleigh_311_url,
+                platform="arcgis",
+                watermark_col="APPLIED_DATE",
+                id_keys=["REQUEST_ID", "OBJECTID"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "scope": "Raleigh Ask Raleigh service requests (native WGS84 points)",
+                    "field_map": {
+                        "incident_id": ["REQUEST_ID", "SR_NUMBER", "OBJECTID"],
+                        "created_date": ["APPLIED_DATE"],
+                        "closed_date": ["RESOLVED_DATE", "CLOSED_DATE"],
+                        "status": ["STATUS", "Status"],
+                        "complaint_type": ["CATEGORY", "SERVICE", "REQUEST_TYPE"],
+                        "incident_address": ["ADDRESS", "FULL_ADDRESS"],
+                        "borough": ["DISTRICT", "NEIGHBORHOOD"],
+                        "zipcode": ["ZIP_CODE", "ZIP"],
+                    },
+                },
+            ),
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.arcgis_wake_deeds_url,
+                platform="arcgis",
+                watermark_col="SALE_DATE",
+                id_keys=["OBJECTID", "PIN"],
+                topic=settings.topic_deeds,
+                interval_seconds=1800.0,
+                producer_key="deeds",
+                extra={
+                    "expected_cadence_days": 7,
+                    "ingestion_mode": "snapshot",
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "scope": "Wake County parcel sales (polygon centroid)",
+                    "field_map": {
+                        "doc_id": ["OBJECTID", "PIN", "PARCELID"],
+                        "recorded_date": ["SALE_DATE"],
+                        "document_amount": ["TOTSALPRICE", "SALE_PRICE"],
+                        "bbl": ["PIN", "PARCELID"],
+                        "party2_grantee": ["OWNER_NAME", "OWNERNAME"],
+                        "doc_type": ["DEED_TYPE", "SALE_TYPE"],
+                        "borough": ["MUNICIPALITY", "CITY"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.SAN_ANTONIO: CityRegistration(
+        city_id=CityId.SAN_ANTONIO,
+        name="San Antonio / Bexar County",
+        state="TX",
+        center={"lat": 29.4241, "lng": -98.4936},
+        metro_bbox=SAN_ANTONIO_METRO_BBOX,
+        division_bboxes=SAN_ANTONIO_DIVISION_BBOXES,
+        submarkets=SAN_ANTONIO_SUBMARKETS,
+        divisions=SAN_ANTONIO_DIVISIONS,
+        job_suffix="san_antonio",
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.ckan_san_antonio_permits_endpoint,
+                platform="ckan",
+                watermark_col="DATE ISSUED",
+                id_keys=["PERMIT NUMBER", "PERMIT_NUMBER", "RECORD_ID", "_id"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 7,
+                    "needs_geocode": True,
+                    "geocode_context": "San Antonio, TX",
+                    "scope": "San Antonio building permits (CKAN; mixed coordinate encodings)",
+                    "field_map": {
+                        "job_id": ["PERMIT NUMBER", "PERMIT_NUMBER", "RECORD_ID", "_id"],
+                        "issuance_date": ["DATE ISSUED"],
+                        "filing_date": ["DATE SUBMITTED"],
+                        "job_type": ["PERMIT TYPE", "PERMIT_TYPE", "WORK TYPE"],
+                        "cost": ["ESTIMATED COST", "ESTIMATED_COST", "TOTAL PROJECT VALUE"],
+                        "status": ["STATUS", "PERMIT STATUS"],
+                        "address_street": ["ADDRESS"],
+                        "zipcode": ["ZIP", "ZIP CODE", "ZIP_CODE"],
+                        "latitude": ["Y_COORD"],
+                        "longitude": ["X_COORD"],
+                    },
+                },
+            ),
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.arcgis_san_antonio_311_url,
+                platform="arcgis",
+                watermark_col="OpenedDateTime",
+                id_keys=["ServiceRequestNumber", "SRNumber", "REQUEST_ID", "OBJECTID"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "scope": "San Antonio 311 service calls (native WGS84 points)",
+                    "field_map": {
+                        "incident_id": ["ServiceRequestNumber", "SRNumber", "REQUEST_ID", "OBJECTID"],
+                        "created_date": ["OpenedDateTime"],
+                        "closed_date": ["ClosedDateTime", "ClosedDate"],
+                        "status": ["Status", "STATUS"],
+                        "complaint_type": ["ServiceName", "RequestType", "Type"],
+                        "incident_address": ["Address", "StreetAddress"],
+                        "borough": ["CouncilDistrict", "Neighborhood"],
+                        "zipcode": ["ZipCode", "ZIP"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.SACRAMENTO: CityRegistration(
+        city_id=CityId.SACRAMENTO,
+        name="Sacramento / Sacramento County",
+        state="CA",
+        center={"lat": 38.5816, "lng": -121.4944},
+        metro_bbox=SACRAMENTO_METRO_BBOX,
+        division_bboxes=SACRAMENTO_DIVISION_BBOXES,
+        submarkets=SACRAMENTO_SUBMARKETS,
+        divisions=SACRAMENTO_DIVISIONS,
+        job_suffix="sacramento",
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_sacramento_permits_url,
+                platform="arcgis",
+                watermark_col="ISSUED_DATE",
+                id_keys=["Application", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "needs_geocode": False,
+                    "scope": "Sacramento County building permits (native point geometry)",
+                    "field_map": {
+                        "job_id": ["Application", "OBJECTID"],
+                        "issuance_date": ["ISSUED_DATE"],
+                        "filing_date": ["APPLIED_DATE", "OpenDate"],
+                        "job_type": ["Application_Type", "Application_Subtype", "PermitCategory"],
+                        "cost": ["Valuation"],
+                        "status": ["Application_Status"],
+                        "address_street": ["Address"],
+                        "zipcode": ["ZIP", "ZipCode"],
+                        "bbl": ["Parcel_Number"],
+                    },
+                },
+            ),
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.arcgis_sacramento_311_url,
+                platform="arcgis",
+                watermark_col="DateCreated",
+                id_keys=["ReferenceNumber", "OBJECTID"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "scope": "Sacramento 311 service requests (native WGS84 points via ArcGIS outSR)",
+                    "field_map": {
+                        "incident_id": ["ReferenceNumber", "OBJECTID"],
+                        "created_date": ["DateCreated"],
+                        "closed_date": ["DateClosed"],
+                        "status": ["PublicStatus"],
+                        "complaint_type": ["CategoryLevel2", "CategoryLevel1", "CategoryName"],
+                        "incident_address": ["Address"],
+                        "borough": ["Neighborhood", "CouncilDistrictNumber"],
+                        "zipcode": ["ZIP"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.RENO: CityRegistration(
+        city_id=CityId.RENO,
+        name="Reno / Washoe County",
+        state="NV",
+        center={"lat": 39.5296, "lng": -119.8138},
+        metro_bbox=RENO_METRO_BBOX,
+        division_bboxes=RENO_DIVISION_BBOXES,
+        submarkets=RENO_SUBMARKETS,
+        divisions=RENO_DIVISIONS,
+        job_suffix="reno",
+        # US-161: Washoe's public parcel share is a live county-wide polygon
+        # layer. SALEDATE is MM/DD/YYYY text, so scheduler watermark state must
+        # retain the declared string format rather than compare raw strings
+        # across years. ArcGISClient requests outSR=4326 and derives polygon
+        # centroids for the deed event coordinates.
+        datasets={
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.arcgis_reno_deeds_url,
+                platform="arcgis",
+                watermark_col="SALEDATE",
+                id_keys=["PIN", "OBJECTID"],
+                topic=settings.topic_deeds,
+                interval_seconds=1800.0,
+                producer_key="deeds",
+                extra={
+                    "expected_cadence_days": 7,
+                    "ingestion_mode": "snapshot",
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "watermark_type": "text",
+                    "watermark_format": "%m/%d/%Y",
+                    "scope": "Washoe County parcel sales (Reno, Sparks, and unincorporated areas; polygon centroid)",
+                    "field_map": {
+                        "doc_id": ["PIN", "OBJECTID"],
+                        "bbl": ["PIN"],
+                        "document_amount": ["SALEPRICE"],
+                        "recorded_date": ["SALEDATE"],
+                        "borough": ["CITY", "SUBNAME"],
                     },
                 },
             ),

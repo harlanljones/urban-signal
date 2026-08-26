@@ -24,7 +24,7 @@
 
 ### National all-metros map
 
-The dashboard renders **all thirty registered metros on one map at the same
+The dashboard renders **all thirty-seven registered metros on one map at the same
 time**. Metrics are normalized with build-time percentile ranks
 (`lims_score_national_pct` and friends) so every metro shares one comparable
 color scale, and cell data lazy-loads from res-5 H3 viewport tiles as the user
@@ -39,7 +39,7 @@ links remain valid as camera presets.
 | :---: |
 | ![New York City metro focus](docs/screenshots/dashboard-metro-chip.png) |
 
-The registered metros: San Francisco Bay Area, New York City, Chicago, Seattle Metro, Los Angeles Metro, New Orleans Metro, Norfolk, Detroit, Austin, Cincinnati, Boston, Baltimore, Montgomery County, Baton Rouge / EBR, Denver, Philadelphia, Washington DC, Prince George's County, Columbus, Nashville, Kansas City, Pierce County, Minneapolis, Milwaukee, Charlotte, Pittsburgh, San Diego, Indianapolis, Houston, and Wichita. Explore the live interface at [https://us-dash.harlanljones.com/](https://us-dash.harlanljones.com/) or see [docs/dashboard.md](docs/dashboard.md) for the current dashboard behavior, export path, API surfaces, and screenshot evidence.
+The registered metros: San Francisco Bay Area, New York City, Chicago, Seattle Metro, Los Angeles Metro, New Orleans Metro, Norfolk, Detroit, Austin, Cincinnati, Boston, Baltimore, Montgomery County, Baton Rouge / EBR, Denver, Philadelphia, Washington DC, Prince George's County, Columbus, Nashville, Kansas City, Pierce County, Minneapolis, Milwaukee, Charlotte, Pittsburgh, San Diego, Indianapolis, Houston, Wichita, Chattanooga / Hamilton County, Cleveland / Cuyahoga County, Hartford, Raleigh / Wake County, San Antonio / Bexar County, Sacramento / Sacramento County, and Reno / Washoe County. Explore the live interface at [https://us-dash.harlanljones.com/](https://us-dash.harlanljones.com/) or see [docs/dashboard.md](docs/dashboard.md) for the current dashboard behavior, export path, API surfaces, and screenshot evidence.
 
 ---
 
@@ -67,7 +67,7 @@ Traditional real estate valuation models rely on lagging transactional comps (de
 | Baton Rouge / EBR (1 Division) | BATON_ROUGE_CORE | [Socrata](docs/research/socrata-sweep.md#baton-rouge-east-baton-rouge-parish-la-data-brlagov-34) | [Socrata](docs/research/socrata-sweep.md#baton-rouge-east-baton-rouge-parish-la-data-brlagov-34) | [Socrata snapshot](docs/research/socrata-sweep.md#baton-rouge-east-baton-rouge-parish-la-data-brlagov-34) | — no market sales feed |
 | Denver (1 Division) | DENVER_CORE | [ArcGIS](docs/research/non-socrata-platforms.md#denver--arcgis-hub--three-usable-feeds-licenses-weak-sales-not-geocoded) | [ArcGIS](docs/research/non-socrata-platforms.md#denver--arcgis-hub--three-usable-feeds-licenses-weak-sales-not-geocoded) | — no coords AND no address (non-spatial; skip) | — sales ungeocoded; $0 transfer quirk documented |
 | Philadelphia (8 Divisions) | CENTER_CITY_RITTENHOUSE, OLD_CITY_NORTHERN_LIBERTIES, SOUTH_PHILLY_PASSYUNK, WEST_PHILLY_UNIVERSITY_CITY, NORTH_PHILLY_TEMPLE, NORTHEAST_ROOSEVELT_BLVD, GERMANTOWN_MT_AIRY, RIVER_WARDS_KENSINGTON | CARTO | CARTO | CARTO | CARTO (RTT deeds; document_type='DEED') |
-| Washington DC (8 Divisions) | DOWNTOWN_NOMA_CAPITOL_RIVERFRONT, CAPITOL_HILL_EAST_END, DUPONT_KALORAMA_UPTOWN, GEORGETOWN_FOGGY_BOTTOM, COLUMBIA_HEIGHTS_PETWORTH, BROOKLAND_RHODE_ISLAND_AVE, HILL_EAST_FAIRLINTON, ANACOSTIA_EAST_OF_THE_RIVER | ArcGIS (year-sliced) | ArcGIS (year-sliced) | ArcGIS (non-spatial) | ArcGIS CAMA (non-spatial; parcel-join specified; US-139) |
+| Washington DC (8 Divisions) | DOWNTOWN_NOMA_CAPITOL_RIVERFRONT, CAPITOL_HILL_EAST_END, DUPONT_KALORAMA_UPTOWN, GEORGETOWN_FOGGY_BOTTOM, COLUMBIA_HEIGHTS_PETWORTH, BROOKLAND_RHODE_ISLAND_AVE, HILL_EAST_FAIRLINTON, ANACOSTIA_EAST_OF_THE_RIVER | ArcGIS (year-sliced) | ArcGIS (year-sliced) | ArcGIS (non-spatial) | ArcGIS CAMA + Parcel Lots SSL centroid join (US-139) |
 | Prince George's County, MD (1 Division) | PRINCE_GEORGES_CORE | — parcel table held | Socrata | — no open endpoint | Socrata (MD SDAT; snapshot) |
 | Columbus (1 Division) | COLUMBUS_CORE | ArcGIS (Accela schema) | — no open endpoint | — no open endpoint | ArcGIS (Franklin County Auditor; annual snapshot) |
 | Nashville / Davidson County (1 Division) | NASHVILLE_CORE | ArcGIS (issued) | ArcGIS (hubNashville; native coords) | ArcGIS (Residential STR) | — no verified sales feed |
@@ -81,6 +81,13 @@ Traditional real estate valuation models rely on lagging transactional comps (de
 | Indianapolis (1 Division) | INDIANAPOLIS_CORE | — Accela ACA (no public bulk API) | ArcGIS (RIMAC; native coords) | — INBiz SOS bulk is paid | — nightly parcel snapshot only |
 | Houston (1 Division) | HOUSTON_CORE | — Accela transactional (no public bulk API) | [ArcGIS](docs/research/nine-unidentified-metros-platform.md#houston-tx--register-311-only) (native coords) | — no verified feed | — annual aggregate XLS only |
 | Wichita (1 Division) | WICHITA_CORE | ArcGIS (MABCD FeatureServer layer 1; layer 0 is violations) | — no open 311 feed | — no open feed | — no verified sales feed |
+| Chattanooga / Hamilton County (1 Division) | CHATTANOOGA_CORE | CSV (ArcGIS Hub All Permits; item-data fallback) | — stale 311 publication | — no verified feed | ArcGIS (Hamilton County parcels; snapshot) |
+| Cleveland / Cuyahoga County (1 Division) | CLEVELAND_CORE | ArcGIS (Building Permits; ~10-day publication lag) | ArcGIS (Data_311) | — contractor-only registrations | ArcGIS (Parcel Analytics; live transfer history) |
+| Hartford (1 Division) | HARTFORD_CORE | ArcGIS (Accela table; address geocoding) | ArcGIS (state-plane X/Y; address geocoding) | Socrata (Connecticut statewide filter) | — no verified feed |
+| Raleigh / Wake County (1 Division) | RALEIGH_CORE | ArcGIS (Building_Permits; native points) | ArcGIS (Ask_Raleigh_Requests) | — no verified feed | ArcGIS (Wake parcel sales; snapshot) |
+| San Antonio / Bexar County (1 Division) | SAN_ANTONIO_CORE | CKAN (building permits; mixed coordinates) | ArcGIS (311_All_Service_Calls) | — no verified feed | — no verified feed |
+| Sacramento / Sacramento County (1 Division) | SACRAMENTO_CORE | ArcGIS (Permits; native points) | ArcGIS (SalesForce311_View; native points) | — no verified feed | — no verified feed |
+| Reno / Washoe County (1 Division) | RENO_CORE | — no verified feed | — no verified feed | — no verified feed | ArcGIS (WashoeDataShare; polygon centroid) |
 
 Partial registrations are deliberate: cities register only feeds that exist, and `get_dataset` raises a readable error for the rest (`apps/api/src/spatial/city_registry.py`).
 
@@ -518,9 +525,9 @@ Exposes real-time Prometheus telemetry including `prediction_requests_total`, `c
 
 ### Interactive Geospatial Dashboard
 `GET /dashboard` or `GET /` (with `Accept: text/html`)
-Serves the hardened, high-performance **MapLibre GL** web visualizer featuring single-region selection and multi-region comparison across all thirty registered metros (San Francisco, NYC, Chicago, Seattle, Los Angeles, New Orleans, Norfolk, Detroit, Austin, Cincinnati, Boston, Baltimore, Montgomery County, Baton Rouge, Denver, Philadelphia, Washington DC, Prince George's County, Columbus, Nashville, Kansas City, Pierce County, Minneapolis, Milwaukee, Charlotte, Pittsburgh, San Diego, Indianapolis, Houston, Wichita), submarket filtering, H3 hexagon inspection, LIMS heatmaps, and SHAP attribution waterfall charts.
+Serves the hardened, high-performance **MapLibre GL** web visualizer featuring single-region selection and multi-region comparison across all thirty-seven registered metros (San Francisco, NYC, Chicago, Seattle, Los Angeles, New Orleans, Norfolk, Detroit, Austin, Cincinnati, Boston, Baltimore, Montgomery County, Baton Rouge, Denver, Philadelphia, Washington DC, Prince George's County, Columbus, Nashville, Kansas City, Pierce County, Minneapolis, Milwaukee, Charlotte, Pittsburgh, San Diego, Indianapolis, Houston, Wichita, Chattanooga, Cleveland, Hartford, Raleigh, San Antonio, Sacramento, Reno), submarket filtering, H3 hexagon inspection, LIMS heatmaps, and SHAP attribution waterfall charts.
 
-The same UI is mirrored as a static asset on the Cloudflare Worker (`apps/dashboard/`), deployed live to [https://us-dash.harlanljones.com/](https://us-dash.harlanljones.com/), where `/api/v1/*` is answered from a precomputed Workers KV snapshot (built by `src/export/snapshot_builder.py`). The FastAPI service and the edge snapshot both serve all thirty registered metros.
+The same UI is mirrored as a static asset on the Cloudflare Worker (`apps/dashboard/`), deployed live to [https://us-dash.harlanljones.com/](https://us-dash.harlanljones.com/), where `/api/v1/*` is answered from a precomputed Workers KV snapshot (built by `src/export/snapshot_builder.py`). The FastAPI service and the edge snapshot both serve all thirty-seven registered metros.
 
 ---
 
@@ -624,7 +631,7 @@ cd apps/api && uv run pytest tests/ -v
 ```
 
 The test suite includes **784 automated unit and end-to-end integration tests** across 60 test modules (59 unit + 1 e2e; 781 pass, 3 skipped live probes) covering:
-- **Spatial Indexing & Multi-City Registries**: Full coverage across 30 registered metros with geometry containment, submarkets, and geocoder fallback.
+- **Spatial Indexing & Multi-City Registries**: Full coverage across 37 registered metros with geometry containment, submarkets, and geocoder fallback.
 - **Stream Processing & Avro Serialization**: Schema enforcement, watermark persistence, and dead-letter queue routing.
 - **Out-of-core Feature Engineering**: DuckDB spatio-temporal joins and exponential CapEx decay.
 - **Model Inference & Validation**: LightGBM Quantile Pinball loss, ST-GNN ONNX, DCN-v2 ONNX, and TreeSHAP explainability.

@@ -195,8 +195,35 @@ class DOBPermitsProducer:
                         loc.get("coordinates", [None, None])[0] if "coordinates" in loc else None
                     )
 
+            # Some feeds expose projected/state-plane coordinates in fields
+            # named X/Y. Never emit those values as geographic degrees.
+            try:
+                if (
+                    lat_raw is not None
+                    and lng_raw is not None
+                    and (abs(float(lat_raw)) > 90 or abs(float(lng_raw)) > 180)
+                ):
+                    lat_raw = None
+                    lng_raw = None
+            except (TypeError, ValueError):
+                lat_raw = None
+                lng_raw = None
+
             if not lat_raw or not lng_raw:
-                return None
+                from src.spatial.geocoder import geocode_row_if_declared
+
+                addr_candidate = (
+                    first_mapped(row, field_map, "address_street")
+                    or row.get("property_address")
+                    or row.get("address")
+                    or row.get("location")
+                )
+                if isinstance(addr_candidate, dict):
+                    addr_candidate = None
+                resolved = geocode_row_if_declared(resolved_city, "permits", addr_candidate)
+                if resolved is None:
+                    return None
+                lat_raw, lng_raw = resolved
 
             lat = float(lat_raw)
             lng = float(lng_raw)
@@ -396,7 +423,9 @@ class DOBPermitsProducer:
         endpoint = spec.endpoint
         client = self._client_for(spec.platform)
         client_kwargs = {
-            k: v for k, v in spec.extra.items() if k in ("order_by", "id_col", "select") and v
+            k: v
+            for k, v in spec.extra.items()
+            if k in ("order_by", "id_col", "select", "fallback_endpoints") and v
         }
 
         logger.info("Starting %s DOB Permits Ingestion Stream (limit=%d)...", cid.value.upper(), limit)

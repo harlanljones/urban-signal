@@ -428,11 +428,15 @@ class DeedsACRISProducer:
         endpoint = spec.endpoint
         client = self._client_for(spec.platform)
         client_kwargs = {
-            k: v for k, v in spec.extra.items() if k in ("order_by", "id_col", "select") and v
+            k: v
+            for k, v in spec.extra.items()
+            if k in ("order_by", "id_col", "select", "fallback_endpoints") and v
         }
 
         logger.info("Starting %s Deeds Ingestion Stream (limit=%d)...", cid.value.upper(), limit)
         records_streamed = 0
+        parcel_join = spec.extra.get("parcel_join")
+        parcel_centroids: Dict[str, tuple[float, float]] = {}
 
         for batch in client.paginate(
             endpoint_url=endpoint,
@@ -441,8 +445,26 @@ class DeedsACRISProducer:
             batch_size=1000,
             max_records=limit,
         ):
+            if parcel_join:
+                join_key = parcel_join["join_key"]
+                join_values = [row.get(join_key) for row in batch if row.get(join_key)]
+                parcel_centroids.update(
+                    client.fetch_centroid_index(
+                        endpoint_url=parcel_join["parcel_layer"],
+                        join_key=join_key,
+                        join_values=join_values,
+                    )
+                )
             for row in batch:
-                event = self.parse_socrata_row(row, city_id=cid.value)
+                enriched_row = row
+                if parcel_join:
+                    join_value = ArcGISClient._normalize_join_value(row.get(parcel_join["join_key"]))
+                    centroid = parcel_centroids.get(join_value)
+                    if centroid:
+                        enriched_row = dict(row)
+                        enriched_row.setdefault("latitude", centroid[0])
+                        enriched_row.setdefault("longitude", centroid[1])
+                event = self.parse_socrata_row(enriched_row, city_id=cid.value)
                 if event:
                     key = f"{event.city_id}:{event.doc_id}"
                     self.producer.produce(
