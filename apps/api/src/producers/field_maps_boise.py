@@ -1,11 +1,10 @@
 """Per-city field-mapping support for Boise's municipal row parsers.
 
 Boise publishes through the City of Boise Open Data Hub as an ArcGIS
-FeatureServer. Permit rows carry Idaho Transverse Mercator (EPSG:3694)
-state-plane geometry in the `SHAPE__X` / `SHAPE__Y` fields — these are NOT
-geographic degrees and MUST be dropped (the shared producer's
-`abs(lat) > 90 / abs(lng) > 180` guard does this) and resolved by the
-ADR-0004 address geocoder from `SITE_ADDRESS` instead.
+FeatureServer. The live layer advertises Idaho state-plane geometry
+(WKID 102459), but the shared ArcGIS client requests ``outSR=4326`` and
+normalizes the returned point into ``latitude``/``longitude``. The address
+fields remain the ADR-0004 fallback when a row has no usable geometry.
 
 This module is the per-city analog of :mod:`src.producers.field_maps`; it
 exports one `FIELD_MAP` consumed by the shared permits producer via the
@@ -15,19 +14,19 @@ spine `field_maps.py` dispatch stays untouched.
 
 from typing import Dict, List
 
-# Residential-only, thin PERMITS feed field spellings for Boise. `latitude` /
-# `longitude` are intentionally bound to the state-plane geometry columns so the
-# producer guard rejects them; real coordinates come from geocoding the address.
+# Residential-only, thin PERMITS feed field spellings for Boise. Geometry is
+# supplied by ArcGISClient after its WGS84 request; the aliases below retain
+# compatibility with direct rows and state-plane fallbacks.
 FIELD_MAP: Dict[str, List[str]] = {
-    "job_id": ["PERMITNUMBER", "PERMIT_NUMBER", "PERMITNO"],
-    "latitude": ["SHAPE__Y"],
-    "longitude": ["SHAPE__X"],
+    "job_id": ["RecordID", "RECORDID", "OBJECTID", "PERMITNUMBER", "PERMIT_NUMBER", "PERMITNO"],
+    "latitude": ["SHAPE__Y", "Y"],
+    "longitude": ["SHAPE__X", "X"],
     "cost": ["ESTIMATEDCOST", "ESTIMATED_COST", "PROJECTCOST", "TOTALCOST"],
-    "job_type": ["PERMITTYPE", "PERMIT_TYPE", "WORKDESCRIPTION"],
-    "issuance_date": ["ISSUEDATE", "ISSUE_DATE", "DATEISSUED"],
-    "filing_date": ["APPLICATIONDATE", "APPLICATION_DATE", "DATEFILED"],
-    "status": ["STATUS", "PERMITSTATUS"],
-    "address_street": ["SITE_ADDRESS", "SITEADDRESS", "PROPERTYADDRESS", "ADDRESS"],
+    "job_type": ["ResidentialType", "ResidentialSubtype", "PERMITTYPE", "PERMIT_TYPE", "WORKDESCRIPTION"],
+    "issuance_date": ["IssuedDate", "ISSUEDATE", "ISSUE_DATE", "DATEISSUED"],
+    "filing_date": ["ReceiveDate", "APPLICATIONDATE", "APPLICATION_DATE", "DATEFILED"],
+    "status": ["PermitStatus", "Status", "STATUS", "PERMITSTATUS"],
+    "address_street": ["PropertyAddress", "Match_addr", "SITE_ADDRESS", "SITEADDRESS", "PROPERTYADDRESS", "ADDRESS"],
     "zipcode": ["ZIPCODE", "ZIP", "POSTALCODE"],
     "bbl": ["PARCELNUMBER", "PARCEL_NUMBER", "APN"],
 }
