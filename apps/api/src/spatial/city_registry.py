@@ -12,6 +12,9 @@ from typing import Any, Dict, Generator, List, Optional, Protocol, Tuple, Union,
 from src.config import settings
 from src.producers.field_maps_dallas import DALLAS_311_FIELD_MAP, DALLAS_FIELD_MAP
 from src.producers.field_maps_louisville import LOUISVILLE_311_FIELD_MAP, LOUISVILLE_SLA_FIELD_MAP
+from src.producers.field_maps_san_jose import FIELD_MAP as SAN_JOSE_FIELD_MAP
+from src.producers.field_maps_tampa import FIELD_MAP as TAMPA_FIELD_MAP, SLA_FIELD_MAP as TAMPA_SLA_FIELD_MAP
+from src.producers.field_maps_las_vegas import FIELD_MAP as LAS_VEGAS_FIELD_MAP
 from src.spatial.cities.portland import (
     PORTLAND_DIVISION_BBOXES,
     PORTLAND_DIVISIONS,
@@ -280,6 +283,24 @@ from src.spatial.cities.louisville import (
     LOUISVILLE_METRO_BBOX,
     LOUISVILLE_SUBMARKETS,
 )
+from src.spatial.cities.san_jose import (
+    SAN_JOSE_DIVISION_BBOXES,
+    SAN_JOSE_DIVISIONS,
+    SAN_JOSE_METRO_BBOX,
+    SAN_JOSE_SUBMARKETS,
+)
+from src.spatial.cities.tampa import (
+    TAMPA_DIVISION_BBOXES,
+    TAMPA_DIVISIONS,
+    TAMPA_METRO_BBOX,
+    TAMPA_SUBMARKETS,
+)
+from src.spatial.cities.las_vegas import (
+    LAS_VEGAS_DIVISION_BBOXES,
+    LAS_VEGAS_DIVISIONS,
+    LAS_VEGAS_METRO_BBOX,
+    LAS_VEGAS_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -338,6 +359,9 @@ class CityId(str, Enum):
     DALLAS = "dallas"
     LOUISVILLE = "louisville"
     PORTLAND = "portland"
+    SAN_JOSE = "san_jose"
+    TAMPA = "tampa"
+    LAS_VEGAS = "las_vegas"
 
 
 class FeedType(str, Enum):
@@ -722,6 +746,32 @@ ALIASES: Dict[str, CityId] = {
     "portland or": CityId.PORTLAND,
     "multnomah_county": CityId.PORTLAND,
     "multnomah county": CityId.PORTLAND,
+
+    # San Jose / Santa Clara County
+    "san_jose": CityId.SAN_JOSE,
+    "san-jose": CityId.SAN_JOSE,
+    "san jose": CityId.SAN_JOSE,
+    "san_jose_ca": CityId.SAN_JOSE,
+    "san jose ca": CityId.SAN_JOSE,
+    "santa_clara_county": CityId.SAN_JOSE,
+    "santa clara county": CityId.SAN_JOSE,
+
+    # Tampa / Hillsborough County
+    "tampa": CityId.TAMPA,
+    "tampa_fl": CityId.TAMPA,
+    "tampa fl": CityId.TAMPA,
+    "hillsborough_county": CityId.TAMPA,
+    "hillsborough county": CityId.TAMPA,
+
+    # Las Vegas / Clark County
+    "las_vegas": CityId.LAS_VEGAS,
+    "las-vegas": CityId.LAS_VEGAS,
+    "las vegas": CityId.LAS_VEGAS,
+    "las_vegas_nv": CityId.LAS_VEGAS,
+    "las vegas nv": CityId.LAS_VEGAS,
+    "clark_county": CityId.LAS_VEGAS,
+    "clark county": CityId.LAS_VEGAS,
+    "vegas": CityId.LAS_VEGAS,
 }
 
 
@@ -4294,6 +4344,153 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                     "needs_geocode": True,
                     "scope": "Oregon OLCC liquor applications received (address-only Portland rows)",
                     "field_map": PORTLAND_SLA_FIELD_MAP,
+                },
+            ),
+        },
+    ),
+    CityId.SAN_JOSE: CityRegistration(
+        city_id=CityId.SAN_JOSE,
+        name="San Jose / Santa Clara County",
+        state="CA",
+        center={"lat": 37.3382, "lng": -121.8863},
+        metro_bbox=SAN_JOSE_METRO_BBOX,
+        division_bboxes=SAN_JOSE_DIVISION_BBOXES,
+        submarkets=SAN_JOSE_SUBMARKETS,
+        divisions=SAN_JOSE_DIVISIONS,
+        job_suffix="san_jose",
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.ckan_san_jose_permits_endpoint,
+                platform="ckan",
+                watermark_col="ISSUEDATE",
+                id_keys=["FOLDERNUMBER", "FOLDERRSN", "_id"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 1,
+                    "rolling_window_days": 30,
+                    "needs_geocode": True,
+                    "geocode_context": "San Jose, CA",
+                    "scope": "San Jose last-30-days building permits (address-only gx_location)",
+                    "watermark_type": "text",
+                    "watermark_format": "%m/%d/%Y %I:%M:%S %p",
+                    "field_map": SAN_JOSE_FIELD_MAP["permits"],
+                },
+            ),
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.ckan_san_jose_311_endpoint,
+                platform="ckan",
+                watermark_col="Date Created",
+                id_keys=["Incident_ID", "_id"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                extra={
+                    "expected_cadence_days": 1,
+                    "annual_rotation": True,
+                    "scope": "San Jose 311 current-year annual resource; rows with 0,0 coordinates are dropped (G8' caveat)",
+                    "watermark_type": "text",
+                    "watermark_format": "%m/%d/%Y %I:%M:%S %p",
+                    "field_map": SAN_JOSE_FIELD_MAP["311"],
+                    "endpoint_by_year": {"2026": settings.ckan_san_jose_311_endpoint},
+                },
+            ),
+        },
+    ),
+    CityId.TAMPA: CityRegistration(
+        city_id=CityId.TAMPA,
+        name="Tampa / Hillsborough County",
+        state="FL",
+        center={"lat": 27.9506, "lng": -82.4572},
+        metro_bbox=TAMPA_METRO_BBOX,
+        division_bboxes=TAMPA_DIVISION_BBOXES,
+        submarkets=TAMPA_SUBMARKETS,
+        divisions=TAMPA_DIVISIONS,
+        job_suffix="tampa",
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_tampa_permits_url,
+                platform="arcgis",
+                watermark_col="LASTUPDATE",
+                id_keys=["RECORD_ID", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 1,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "order_by": "LASTUPDATE DESC",
+                    "scope": "Tampa/Hillsborough full permits (edit-stamp watermark)",
+                    "field_map": TAMPA_FIELD_MAP,
+                },
+            ),
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.arcgis_tampa_sla_url,
+                platform="arcgis",
+                watermark_col="HISTORY_ACT_DT",
+                id_keys=["ORD_PERMIT", "APP_NUM", "OBJECTID"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "scope": "Tampa alcohol-beverage sale locations and action history (partial SLA)",
+                    "field_map": TAMPA_SLA_FIELD_MAP,
+                },
+            ),
+        },
+    ),
+    CityId.LAS_VEGAS: CityRegistration(
+        city_id=CityId.LAS_VEGAS,
+        name="Las Vegas / Clark County",
+        state="NV",
+        center={"lat": 36.1147, "lng": -115.1728},
+        metro_bbox=LAS_VEGAS_METRO_BBOX,
+        division_bboxes=LAS_VEGAS_DIVISION_BBOXES,
+        submarkets=LAS_VEGAS_SUBMARKETS,
+        divisions=LAS_VEGAS_DIVISIONS,
+        job_suffix="las_vegas",
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_las_vegas_permits_url,
+                platform="arcgis",
+                watermark_col="ISSDTTM",
+                id_keys=["APNO", "APBLDGKEY", "ObjectId"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "ObjectId",
+                    "max_record_count": 1000,
+                    "order_by": "ISSDTTM DESC",
+                    "needs_geocode": True,
+                    "geocode_context": "Las Vegas, NV",
+                    "scope": "Clark County Building Permits (address-only ArcGIS table)",
+                    "field_map": LAS_VEGAS_FIELD_MAP["permits"],
+                },
+            ),
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.arcgis_las_vegas_deeds_url,
+                platform="arcgis",
+                watermark_col="SALEDATE",
+                id_keys=["PARCEL", "DOCNO", "ObjectId"],
+                topic=settings.topic_deeds,
+                interval_seconds=600.0,
+                producer_key="deeds",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "ObjectId",
+                    "max_record_count": 2000,
+                    "order_by": "SALEDATE DESC",
+                    "needs_geocode": True,
+                    "geocode_context": "Las Vegas, NV",
+                    "scope": "Clark County real-property parcel sales / recorded deeds (address-only ArcGIS table)",
+                    "field_map": LAS_VEGAS_FIELD_MAP["deeds"],
                 },
             ),
         },

@@ -910,6 +910,39 @@ class Settings(BaseSettings):
         description="Oregon OLCC liquor applications received endpoint",
     )
 
+    # San Jose, CA (US-147): City CKAN datastore resources. Permits are an
+    # address-only rolling-30-day export; 311 is a current-year annual export.
+    ckan_san_jose_permits_endpoint: str = Field(
+        default="ckan://data.sanjoseca.gov/045b3678-e923-4002-b696-300955bc6d06",
+        description="San Jose last-30-days building permits CKAN datastore resource",
+    )
+    ckan_san_jose_311_endpoint: str = Field(
+        default="ckan://data.sanjoseca.gov/d886727c-60f1-4be7-9a30-f6806375b1a3",
+        description="San Jose 2026 311 service requests CKAN datastore resource",
+    )
+
+    # Tampa, FL (US-146): audited full permits and partial alcohol-beverage
+    # history layers, both point-geocoded ArcGIS services.
+    arcgis_tampa_permits_url: str = Field(
+        default="https://arcgis.tampagov.net/arcgis/rest/services/Planning/PermitsAll/FeatureServer/0",
+        description="Tampa full permits ArcGIS FeatureServer layer URL",
+    )
+    arcgis_tampa_sla_url: str = Field(
+        default="https://arcgis.tampagov.net/arcgis/rest/services/Planning/AlcoholBeverage/FeatureServer/0",
+        description="Tampa alcohol-beverage partial SLA ArcGIS FeatureServer layer URL",
+    )
+
+    # Las Vegas / Clark County (US-145): address-only ArcGIS tables. Both
+    # feeds declare ADR-0004 geocoding in the city registry.
+    arcgis_las_vegas_permits_url: str = Field(
+        default="https://services1.arcgis.com/F1v0ufATbBQScMtY/ArcGIS/rest/services/OpenData_Building_Permits_/FeatureServer/0",
+        description="Clark County building permits ArcGIS table URL",
+    )
+    arcgis_las_vegas_deeds_url: str = Field(
+        default="https://services1.arcgis.com/F1v0ufATbBQScMtY/ArcGIS/rest/services/parcels/FeatureServer/0",
+        description="Clark County parcel sales ArcGIS table URL",
+    )
+
     # Kansas City, MO (Socrata): Business License Holders (US-134). Snapshot
     # feed carrying native GeoJSON point geometry (96.4% non-null) and a
     # valid_license_for YYYYMMDD expiration column; publication had lapsed

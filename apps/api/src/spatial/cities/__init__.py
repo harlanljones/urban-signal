@@ -314,6 +314,27 @@ from src.spatial.cities.portland import (
     PORTLAND_SUBMARKETS,
     is_in_portland_metro,
 )
+from src.spatial.cities.san_jose import (
+    SAN_JOSE_DIVISION_BBOXES,
+    SAN_JOSE_DIVISIONS,
+    SAN_JOSE_METRO_BBOX,
+    SAN_JOSE_SUBMARKETS,
+    is_in_san_jose_metro,
+)
+from src.spatial.cities.tampa import (
+    TAMPA_DIVISION_BBOXES,
+    TAMPA_DIVISIONS,
+    TAMPA_METRO_BBOX,
+    TAMPA_SUBMARKETS,
+    is_in_tampa_metro,
+)
+from src.spatial.cities.las_vegas import (
+    LAS_VEGAS_DIVISION_BBOXES,
+    LAS_VEGAS_DIVISIONS,
+    LAS_VEGAS_METRO_BBOX,
+    LAS_VEGAS_SUBMARKETS,
+    is_in_las_vegas_metro,
+)
 
 __all__ = [
     "PIERCE_METRO_BBOX",
@@ -537,4 +558,19 @@ __all__ = [
     "PORTLAND_DIVISIONS",
     "PORTLAND_SUBMARKETS",
     "is_in_portland_metro",
+    "SAN_JOSE_METRO_BBOX",
+    "SAN_JOSE_DIVISION_BBOXES",
+    "SAN_JOSE_DIVISIONS",
+    "SAN_JOSE_SUBMARKETS",
+    "is_in_san_jose_metro",
+    "TAMPA_METRO_BBOX",
+    "TAMPA_DIVISION_BBOXES",
+    "TAMPA_DIVISIONS",
+    "TAMPA_SUBMARKETS",
+    "is_in_tampa_metro",
+    "LAS_VEGAS_METRO_BBOX",
+    "LAS_VEGAS_DIVISION_BBOXES",
+    "LAS_VEGAS_DIVISIONS",
+    "LAS_VEGAS_SUBMARKETS",
+    "is_in_las_vegas_metro",
 ]

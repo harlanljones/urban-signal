@@ -4,16 +4,13 @@ Provides neighborhood metadata, camera positioning, investment metrics,
 division catalog, and geographic bounding boxes for the City of Tampa and
 greater Hillsborough County, FL.
 
-Tampa registers as a PARTIAL city like Austin/Los Angeles. The only feed
-verified against the repo's research corpus (docs/research/wave-2-city-
-candidates.md, US-78 row-level re-probe 2026-08-24) is PERMITS — the City of
-Tampa "Single Family Permits" ArcGIS layer (Accela schema, point geometry,
-single-family coverage only, ~1,028 active-window rows). SLA / 311 / DEEDS
-were NOT found in the research sweep and could not be verified live (no network
-at leaf-build time), so they are deliberately absent; ``get_tampa_dataset()``
-raises a readable error for them, exactly like the shared ``get_dataset()``
-contract. If a Hillsborough County business-license / business-tax-receipt feed
-is confirmed, see the reported spine delta for adding FeedType.SLA.
+Tampa registers as a PARTIAL city like Austin/Los Angeles. Live ArcGIS
+verification found a full permits layer and an alcohol-beverage action-history
+layer that supports a partial SLA signal. Both are point feeds with date
+watermarks; the permits watermark is an edit stamp rather than an issuance date.
+311 remains token-gated and no usable deeds feed was found, so those families
+are deliberately absent; ``get_tampa_dataset()`` raises a readable error for
+them, exactly like the shared ``get_dataset()`` contract.
 """
 
 from typing import Dict
@@ -24,14 +21,12 @@ from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 # module (field_maps_tampa.py) so the two leaf files cannot drift apart.
 TAMPA_CITY_ID: str = "tampa"
 
-# Greater Tampa / Hillsborough County metro bounding box. Permits are
-# city-of-Tampa scoped (single-family layer); the metro bbox is permissive and
-# must contain every declared division and submarket (and live samples).
-# Verified live sample extents from the US-78 re-probe: the Single Family
-# Permits layer is point-geocoded across Tampa proper.
+# Greater Tampa / Hillsborough County metro bounding box. The metro bbox is
+# permissive enough to contain every declared division, submarket, and live
+# permit/SLA sample.
 TAMPA_METRO_BBOX: Dict[str, float] = {
     "min_lat": 27.84,
-    "max_lat": 28.12,
+    "max_lat": 28.16,
     "min_lng": -82.60,
     "max_lng": -82.22,
 }
@@ -449,55 +444,77 @@ TPA_DIVISIONS = TAMPA_DIVISIONS
 
 
 # ---------------------------------------------------------------------------
-# Feed registration (leaf-local; the spine copies this into REGISTRY).
+# Feed registration (leaf-local plain data; the spine copies this into REGISTRY).
 # ---------------------------------------------------------------------------
 # The field_map data lives in the leaf module field_maps_tampa.py (imported
 # here) so the leaf is self-contained and testable without the spine registry.
-from src.producers.field_maps_tampa import FIELD_MAP  # noqa: E402  (after TAMPA_CITY_ID)
-from src.spatial.city_registry import DatasetSpec, FeedType  # noqa: E402
-from src.config import settings  # noqa: E402
+from src.producers.field_maps_tampa import FIELD_MAP, SLA_FIELD_MAP  # noqa: E402
 
 
-# City of Tampa "Single Family Permits" — ArcGIS FeatureServer (Accela schema,
-# point geometry, single-family coverage only). Verified at row level in the
-# US-78 re-probe (docs/research/wave-2-city-candidates.md):
-#   OPENED_DATE newest 2026-07-21; LASTUPDATE 2026-08-22; point geometry;
-#   1,028 rows (710 Issued). OBJECTID is the layer's object id and must NOT
-#   reach the job-id chain (use B1_PER_ID / B1_ALT_ID).
-TAMPA_DATASETS: Dict[FeedType, DatasetSpec] = {
-    FeedType.PERMITS: DatasetSpec(
-        endpoint="https://arcgis.tampagov.net/arcgis/rest/services/OpenData/Planning/MapServer/32",
-        platform="arcgis",
-        watermark_col="OPENED_DATE",
-        id_keys=["B1_PER_ID", "B1_ALT_ID", "id"],
-        topic=settings.topic_permits,
-        interval_seconds=300.0,
-        producer_key="permits",
-        extra={
-            # Single-family-only coverage and a ~32-day newest-watermark
-            # lag at survey (OPENED_DATE 2026-07-21 vs LASTUPDATE
-            # 2026-08-22) — the source publishes as permits are opened, so
-            # alarm at 2xN=60d (US-164 precedent).
-            "expected_cadence_days": 30,
+TAMPA_PERMITS_ENDPOINT = "https://arcgis.tampagov.net/arcgis/rest/services/Planning/PermitsAll/FeatureServer/0"
+TAMPA_SLA_ENDPOINT = "https://arcgis.tampagov.net/arcgis/rest/services/Planning/AlcoholBeverage/FeatureServer/0"
+
+TAMPA_FEED_SPECS: Dict[str, Dict[str, object]] = {
+    "permits": {
+        "endpoint": TAMPA_PERMITS_ENDPOINT,
+        "platform": "arcgis",
+        "watermark_col": "LASTUPDATE",
+        "id_keys": ["RECORD_ID", "OBJECTID"],
+        "topic_key": "topic_permits",
+        "interval_seconds": 300.0,
+        "producer_key": "permits",
+        "extra": {
+            "expected_cadence_days": 1,
             "oid_field": "OBJECTID",
-            "max_record_count": 1000,
+            "max_record_count": 2000,
+            "order_by": "LASTUPDATE DESC",
+            "scope": "Tampa/Hillsborough full permits (edit-stamp watermark)",
             "field_map": FIELD_MAP,
         },
-    ),
+    },
+    "sla": {
+        "endpoint": TAMPA_SLA_ENDPOINT,
+        "platform": "arcgis",
+        "watermark_col": "HISTORY_ACT_DT",
+        "id_keys": ["ORD_PERMIT", "APP_NUM", "OBJECTID"],
+        "topic_key": "topic_sla",
+        "interval_seconds": 600.0,
+        "producer_key": "sla",
+        "extra": {
+            "expected_cadence_days": 7,
+            "oid_field": "OBJECTID",
+            "max_record_count": 2000,
+            "scope": "Tampa alcohol-beverage sale locations and action history (partial SLA)",
+            "field_map": SLA_FIELD_MAP,
+        },
+    },
 }
 
 
-def get_tampa_dataset(feed: FeedType) -> object:
+def get_tampa_dataset(feed: object) -> object:
     """Leaf-local mirror of ``city_registry.get_dataset``.
 
-    Returns the spec for a *registered* Tampa feed, or raises ``KeyError``
-    naming the city and the available feeds when the feed is absent — so a
-    partial city (PERMITS only) fails closed and readably, exactly like the
-    shared accessor the spine will route through after interlock.
+    Returns the spec for a registered Tampa feed, or raises ``KeyError`` naming
+    the city and available feeds when the feed is absent.
     """
-    if feed not in TAMPA_DATASETS:
-        available = ", ".join(sorted(f.value for f in TAMPA_DATASETS))
+    from src.spatial.city_registry import DatasetSpec
+
+    feed_name = getattr(feed, "value", str(feed))
+    if feed_name not in TAMPA_FEED_SPECS:
+        available = ", ".join(sorted(TAMPA_FEED_SPECS))
         raise KeyError(
-            f"'{TAMPA_CITY_ID}' has no '{feed.value}' feed; available: {available}"
+            f"'{TAMPA_CITY_ID}' has no '{feed_name}' feed; available: {available}"
         )
-    return TAMPA_DATASETS[feed]
+    payload = TAMPA_FEED_SPECS[feed_name]
+    from src.config import settings
+
+    return DatasetSpec(
+        endpoint=payload["endpoint"],
+        platform=payload["platform"],
+        watermark_col=payload["watermark_col"],
+        id_keys=payload["id_keys"],
+        topic=getattr(settings, payload["topic_key"]),
+        interval_seconds=payload["interval_seconds"],
+        producer_key=payload["producer_key"],
+        extra=payload["extra"],
+    )

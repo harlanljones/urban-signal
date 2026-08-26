@@ -528,7 +528,25 @@ Phase 3 (serial interlock) PENDING — orchestrator applies spine deltas one at 
 
 | Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
 |---|---|---|---|---|---|
-| city-louisville | `apps/api/src/spatial/cities/louisville.py`, `apps/api/src/producers/field_maps_louisville.py`, `apps/api/tests/unit/test_producers_louisville.py` | config.py, city_registry.py, cities/__init__.py, dashboard, snapshot export, interlock tests | current session | implemented; focused tests, interlock, facts, product build, and site-content verification green; Linear US-148 pending resolution | Louisville annual 311 + Jefferson County ABC active-license registration |
+| city-louisville | `apps/api/src/spatial/cities/louisville.py`, `apps/api/src/producers/field_maps_louisville.py`, `apps/api/tests/unit/test_producers_louisville.py` | config.py, city_registry.py, cities/__init__.py, dashboard, snapshot export, interlock tests | current session | implemented; focused tests, interlock, facts, product build, and site-content verification green; Linear US-148 done | Louisville annual 311 + Jefferson County ABC active-license registration |
+
+## 2026-08-26 — city registration (San Jose) — Linear US-147
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-san-jose | `apps/api/src/spatial/cities/san_jose.py`, `apps/api/src/producers/field_maps_san_jose.py`, `apps/api/tests/unit/test_producers_san_jose.py` | config.py, city_registry.py, cities/__init__.py, dashboard, snapshot export, interlock tests | current session | implemented; live CKAN verification, focused tests, interlock, facts, product build, and site-content verification green; Linear US-147 done | San Jose address-geocoded permits + current-year 311 with 0,0 drop caveat |
+
+## 2026-08-26 — city registration (Tampa) — Linear US-146
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-tampa | `apps/api/src/spatial/cities/tampa.py`, `apps/api/src/producers/field_maps_tampa.py`, `apps/api/tests/unit/test_producers_tampa.py` | config.py, city_registry.py, cities/__init__.py, dashboard, snapshot export, interlock tests | current session | implemented; live ArcGIS verification, focused tests, interlock, facts, product build, and site-content verification green; Linear US-146 done | Tampa full permits + alcohol-beverage partial SLA registration |
+
+## 2026-08-26 — city registration (Las Vegas) — Linear US-145
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-las-vegas | `apps/api/src/spatial/cities/las_vegas.py`, `apps/api/src/producers/field_maps_las_vegas.py`, `apps/api/tests/unit/test_producers_las_vegas.py` | config.py, city_registry.py, cities/__init__.py, dashboard, snapshot export, interlock tests | current session | implemented; live ArcGIS verification, focused tests, shared regressions, interlock, facts, product build, and site-content verification green; Linear US-145 pending resolution | Las Vegas / Clark County address-only permits + parcel sales with ADR-0004 geocoding |
 
 ## 2026-08-26 — Phase 2 complete; Phase 3 (spine) BLOCKED
 Phase 2 (parallel leaf build) DONE via 19 leaf-worker subagents:

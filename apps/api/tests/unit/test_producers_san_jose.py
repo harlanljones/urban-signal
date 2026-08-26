@@ -76,29 +76,29 @@ class TestSanJoseSpatial:
 # ---------------------------------------------------------------------------
 
 class TestSanJoseFieldMaps:
-    def test_permits_map_spells_job_id_and_coords(self):
+    def test_permits_map_reads_live_ckan_columns(self):
         row = {
-            "PERMIT_NUMBER": "BP-2026-01234",
-            "Y_COORD": "37.337",
-            "X_COORD": "-121.886",
-            "ADDRESS": "120 N MARKET ST",
+            "FOLDERNUMBER": "2026-130149-CI",
+            "ISSUEDATE": "8/14/2026 12:00:00 AM",
+            "gx_location": "1 CURTNER AV, SAN JOSE CA 95125",
+            "ASSESSORS_PARCEL_NUMBER": "45505012",
         }
-        assert first_mapped(row, SAN_JOSE_PERMITS_FIELD_MAP, "job_id") == "BP-2026-01234"
-        assert first_mapped(row, SAN_JOSE_PERMITS_FIELD_MAP, "latitude") == "37.337"
-        assert first_mapped(row, SAN_JOSE_PERMITS_FIELD_MAP, "longitude") == "-121.886"
-        assert first_mapped(row, SAN_JOSE_PERMITS_FIELD_MAP, "address_street") == "120 N MARKET ST"
+        assert first_mapped(row, SAN_JOSE_PERMITS_FIELD_MAP, "job_id") == "2026-130149-CI"
+        assert first_mapped(row, SAN_JOSE_PERMITS_FIELD_MAP, "issuance_date") == "8/14/2026 12:00:00 AM"
+        assert first_mapped(row, SAN_JOSE_PERMITS_FIELD_MAP, "address_street") == "1 CURTNER AV, SAN JOSE CA 95125"
+        assert first_mapped(row, SAN_JOSE_PERMITS_FIELD_MAP, "bbl") == "45505012"
 
-    def test_311_map_reads_request_id_not_service_request_id(self):
+    def test_311_map_reads_live_ckan_columns(self):
         row = {
-            "SR_REQUEST_ID": "SJ-311-2026-55",
-            "REQUEST_TYPE": "Graffiti",
-            "Y_COORD": "37.33",
-            "X_COORD": "-121.88",
-            "ADDRESS": "1 W SAN CARLOS ST",
+            "Incident_ID": "2117594",
+            "Service Type": "Other Issues",
+            "Date Created": "1/1/2026 12:01:31 AM",
+            "Latitude": "37.399977000001",
+            "Longitude": "-121.925974500002",
         }
-        assert first_mapped(row, SAN_JOSE_311_FIELD_MAP, "incident_id") == "SJ-311-2026-55"
-        assert first_mapped(row, SAN_JOSE_311_FIELD_MAP, "complaint_type") == "Graffiti"
-        assert first_mapped(row, SAN_JOSE_311_FIELD_MAP, "incident_address") == "1 W SAN CARLOS ST"
+        assert first_mapped(row, SAN_JOSE_311_FIELD_MAP, "incident_id") == "2117594"
+        assert first_mapped(row, SAN_JOSE_311_FIELD_MAP, "complaint_type") == "Other Issues"
+        assert first_mapped(row, SAN_JOSE_311_FIELD_MAP, "created_date") == "1/1/2026 12:01:31 AM"
 
     def test_map_is_the_exported_field_map(self):
         assert FIELD_MAP["permits"] is SAN_JOSE_PERMITS_FIELD_MAP
@@ -147,6 +147,14 @@ def complaints():
         return Complaints311Producer()
 
 
+@pytest.fixture
+def permits():
+    with patch("src.producers.dob_permits_producer.BaseKafkaProducer"):
+        from src.producers.dob_permits_producer import DOBPermitsProducer
+
+        return DOBPermitsProducer()
+
+
 def _patch_resolve_and_geocode(monkeypatch, geocode_side_effect):
     """Wire the real 311 parser to the San Jose leaf field map + a fake geocoder.
 
@@ -174,72 +182,65 @@ class TestSanJose311Parsing:
     def test_native_coords_parse_without_geocoding(self, complaints, monkeypatch):
         captured = _patch_resolve_and_geocode(monkeypatch, (37.33, -121.88))
         row = {
-            "SR_REQUEST_ID": "SJ-311-2026-55",
-            "REQUEST_TYPE": "Graffiti",
-            "STATUS": "OPEN",
-            "CREATE_DATE": "2026-08-21T22:39:12.000",
-            "ADDRESS": "1 W SAN CARLOS ST, SAN JOSE, CA",
-            "Y_COORD": "37.3300",
-            "X_COORD": "-121.8800",
+            "Incident_ID": "2117594",
+            "Service Type": "Other Issues",
+            "Status": "Closed",
+            "Date Created": "1/1/2026 12:01:31 AM",
+            "Latitude": "37.399977000001",
+            "Longitude": "-121.925974500002",
         }
         event = complaints.parse_socrata_row(row, city_id="san_jose")
         assert event is not None
-        assert event.incident_id == "SJ-311-2026-55"
-        assert event.latitude == pytest.approx(37.33)
-        assert event.longitude == pytest.approx(-121.88)
+        assert event.incident_id == "2117594"
+        assert event.latitude == pytest.approx(37.399977)
+        assert event.longitude == pytest.approx(-121.9259745)
         assert event.h3_res7 is not None
         # Native coordinates were usable — the geocoder must NOT have been called.
         assert captured == []
 
-    def test_address_only_row_geocodes_at_parse(self, complaints, monkeypatch):
+    def test_zero_coordinate_row_is_dropped_without_geocoding(self, complaints, monkeypatch):
         captured = _patch_resolve_and_geocode(monkeypatch, (37.3350, -121.8900))
         row = {
-            "SR_REQUEST_ID": "SJ-311-2026-56",
-            "REQUEST_TYPE": "Pothole",
-            "STATUS": "OPEN",
-            "CREATE_DATE": "2026-08-21T10:00:00.000",
-            "ADDRESS": "200 E SANTA CLARA ST, SAN JOSE, CA",
-            # no Y_COORD / X_COORD => address-only row
-        }
-        event = complaints.parse_socrata_row(row, city_id="san_jose")
-        assert event is not None
-        assert event.latitude == pytest.approx(37.3350)
-        assert event.longitude == pytest.approx(-121.8900)
-        assert event.h3_res7 is not None
-        assert captured == [
-            ("san_jose", "311", "200 E SANTA CLARA ST, SAN JOSE, CA", None)
-        ]
-
-    def test_out_of_range_projected_coords_geocode_instead(self, complaints, monkeypatch):
-        captured = _patch_resolve_and_geocode(monkeypatch, (37.3410, -121.9010))
-        # SanGIS sometimes emits state-plane feet in Y_COORD/X_COORD on legacy
-        # rows; abs(lat)>90 / abs(lng)>180 must reject them as non-geographic.
-        row = {
-            "SR_REQUEST_ID": "SJ-311-2026-57",
-            "REQUEST_TYPE": "Street Light Out",
-            "STATUS": "OPEN",
-            "CREATE_DATE": "2026-08-20T10:00:00.000",
-            "ADDRESS": "50 N ALMADEN BLVD, SAN JOSE, CA",
-            "Y_COORD": "4100000",
-            "X_COORD": "1900000",
-        }
-        event = complaints.parse_socrata_row(row, city_id="san_jose")
-        assert event is not None
-        assert event.latitude == pytest.approx(37.3410)
-        assert event.longitude == pytest.approx(-121.9010)
-        assert event.h3_res7 is not None
-        assert captured == [
-            ("san_jose", "311", "50 N ALMADEN BLVD, SAN JOSE, CA", None)
-        ]
-
-    def test_geocode_failure_drops_the_row(self, complaints, monkeypatch):
-        captured = _patch_resolve_and_geocode(monkeypatch, None)
-        row = {
-            "SR_REQUEST_ID": "SJ-311-2026-58",
-            "REQUEST_TYPE": "Noise",
-            "STATUS": "OPEN",
-            "CREATE_DATE": "2026-08-20T10:00:00.000",
-            "ADDRESS": "UNKNOWN AND VOID, SAN JOSE, CA",
+            "Incident_ID": "2117596",
+            "Service Type": "Pothole",
+            "Status": "Open",
+            "Date Created": "1/1/2026 10:00:00 AM",
+            "Latitude": "0.0",
+            "Longitude": "0.0",
         }
         assert complaints.parse_socrata_row(row, city_id="san_jose") is None
-        assert captured  # geocoder was consulted at least once
+        assert captured == []
+
+
+class TestSanJosePermitParsing:
+    def test_address_only_permit_uses_declared_geocoder(self, permits, monkeypatch):
+        monkeypatch.setattr(
+            "src.producers.field_maps.resolve_field_map",
+            lambda city, feed: FIELD_MAP["permits"],
+        )
+        captured = []
+
+        def fake_geocode(city_id, feed_value, address, context=None):
+            captured.append((city_id, feed_value, address, context))
+            return 37.337, -121.886
+
+        monkeypatch.setattr("src.spatial.geocoder.geocode_row_if_declared", fake_geocode)
+        event = permits.parse_socrata_row(
+            {
+                "FOLDERNUMBER": "2026-130149-CI",
+                "Status": "30",
+                "gx_location": "1 CURTNER AV, SAN JOSE CA 95125",
+                "ISSUEDATE": "8/14/2026 12:00:00 AM",
+                "PERMITVALUATION": "130200",
+                "ASSESSORS_PARCEL_NUMBER": "45505012",
+                "FOLDERNAME": "(B)",
+            },
+            city_id="san_jose",
+        )
+        assert event is not None
+        assert event.job_id == "2026-130149-CI"
+        assert event.latitude == pytest.approx(37.337)
+        assert event.issuance_date is not None
+        assert captured == [
+            ("san_jose", "permits", "1 CURTNER AV, SAN JOSE CA 95125", None)
+        ]

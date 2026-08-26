@@ -6,19 +6,17 @@ division catalog, and geographic bounding boxes for the City of San Jose, CA
 Evergreen, Milpitas edge).
 
 San Jose registers as a TWO-FEED city like Los Angeles and Austin: PERMITS
-(SanGIS Building Permits) and COMPLAINTS_311 (San José 311 Service Requests).
-Both feeds live on the **SanGIS Socrata Open Data** platform. The geocoding
-caveats that define this registration:
+(San Jose Building Permits) and COMPLAINTS_311 (San Jose 311 Service Requests).
+Both feeds live on the City's **CKAN datastore**. The geocoding caveats that
+define this registration:
 
-* The 311 layer locates a meaningful share of its rows by **address string**
-  rather than coordinates — `Y_COORD`/`X_COORD` are present on some rows but
-  absent / 0.0 / 0.0, or carry out-of-range projected values, on others. The
-  feed is therefore declared ``needs_geocode`` (ADR 0004): rows without usable
-  coordinates resolve at parse time through the Postgres-backed geocoder.
-* The PERMITS layer carries native decimal-degree coordinates in `Y_COORD` /
-  `X_COORD` but spells both job-id and address columns non-standardly, so the
-  per-city field map (apps/api/src/producers/field_maps_san_jose.py) overrides
-  the shared parser chains.
+* The 311 layer carries native decimal-degree coordinates, but the 2026
+  resource has no address column and roughly 49% of sampled rows are `0,0`.
+  Those rows are deliberately dropped by the shared parser rather than sent
+  to the Gulf of Guinea; this is the G8' null-H3 caveat tracked by US-147.
+* The PERMITS layer is address-only (`gx_location`) and therefore declares
+  ``needs_geocode`` (ADR 0004). It also uses an M/D/YYYY text watermark, which
+  is typed in the registry so incremental queries compare calendar dates.
 * San Jose addresses already end in "SAN JOSE, CA"; the geocoder's state regex
   detects `CA` and does NOT append the `geocode_context` ("San Jose, CA")
   suffix, avoiding a doubled-context query.
@@ -403,31 +401,25 @@ SJ_DIVISIONS = SAN_JOSE_DIVISIONS
 # the `incident_address` / `ADDRESS` candidates and the needs_geocode declaration.
 # ---------------------------------------------------------------------------
 SAN_JOSE_PERMITS_FIELD_MAP: Dict[str, list[str]] = {
-    "job_id": ["PERMIT_NUMBER", "PERMIT_NO", "PERMIT_ID"],
-    "issuance_date": ["ISSUANCE_DATE", "ISSUE_DATE", "DATE_ISSUED"],
-    "filing_date": ["APPLICATION_DATE", "SUBMITTAL_DATE", "FILE_DATE"],
-    "job_type": ["PERMIT_TYPE", "TYPE"],
-    "cost": ["PROJECT_COST", "VALUATION", "ESTIMATED_COST"],
-    "status": ["STATUS", "PERMIT_STATUS"],
-    "address_street": ["ADDRESS", "SITE_ADDRESS", "PROPERTY_ADDRESS"],
-    "latitude": ["Y_COORD", "LATITUDE", "LAT"],
-    "longitude": ["X_COORD", "LONGITUDE", "LON"],
-    "zipcode": ["ZIP", "ZIP_CODE"],
-    "bbl": ["APN", "PARCEL_NUMBER", "PARCEL_ID"],
+    "job_id": ["FOLDERNUMBER", "FOLDERRSN"],
+    "issuance_date": ["ISSUEDATE"],
+    "job_type": ["FOLDERNAME", "FOLDERDESC", "SUBTYPEDESCRIPTION"],
+    "cost": ["PERMITVALUATION"],
+    "status": ["Status", "PERMITAPPROVALS"],
+    "address_street": ["gx_location"],
+    "zipcode": ["gx_location"],
+    "bbl": ["ASSESSORS_PARCEL_NUMBER"],
 }
 
 SAN_JOSE_311_FIELD_MAP: Dict[str, list[str]] = {
-    "incident_id": ["SR_REQUEST_ID", "REQUEST_ID", "SERVICE_REQUEST_ID"],
-    "complaint_type": ["REQUEST_TYPE", "SERVICE_NAME", "TYPE"],
-    "created_date": ["CREATE_DATE", "REQUESTED_DATE", "DATE_CREATED"],
-    "closed_date": ["CLOSED_DATE", "RESOLVED_DATE"],
-    "status": ["STATUS"],
-    "incident_address": ["ADDRESS", "FULL_ADDRESS"],
-    "latitude": ["Y_COORD", "LATITUDE", "LAT"],
-    "longitude": ["X_COORD", "LONGITUDE", "LON"],
-    "zipcode": ["ZIP_CODE", "ZIP"],
-    "borough": ["COUNCIL_DISTRICT", "NEIGHBORHOOD"],
-    "descriptor": ["DESCRIPTION", "COMMENTS"],
+    "incident_id": ["Incident_ID"],
+    "complaint_type": ["Service Type", "Category"],
+    "created_date": ["Date Created"],
+    "closed_date": ["Date Last Updated"],
+    "status": ["Status"],
+    "latitude": ["Latitude"],
+    "longitude": ["Longitude"],
+    "descriptor": ["Category", "Department", "Source"],
 }
 
 

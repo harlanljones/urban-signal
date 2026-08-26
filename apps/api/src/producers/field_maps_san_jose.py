@@ -1,6 +1,6 @@
 """Per-city field maps for San Jose (US-147), imported by the shared parsers.
 
-San Jose registers on **SanGIS Socrata Open Data** with spellings that the
+San Jose registers on the City's **CKAN datastore** with spellings that the
 generic parser chains cannot reach, so its column mappings live here as a leaf
 module rather than grown into the shared fallbacks (src/producers/field_maps.py,
 which stays untouched per the interlock spine rules).
@@ -9,10 +9,9 @@ The shared ``resolve_field_map`` reads ``DatasetSpec.extra["field_map"]``; the
 spine registration pins these maps per feed. This module is the single-sourced
 export so the registration and the unit test agree on one definition.
 
-The 311 feed is address-string-located for a meaningful share of rows (its
-``Y_COORD``/``X_COORD`` columns are absent / 0.0 / 0.0 on many rows), so the
-spine additionally declares ``needs_geocode`` (ADR 0004) against this map's
-``incident_address`` candidate.
+The 311 feed has no address column in the current annual resource and many
+rows carry ``0.0`` coordinates. The shared parser drops those rows after its
+explicit zero-coordinate guard; it must not emit an invalid H3 cell.
 """
 
 from typing import Dict, List

@@ -1457,7 +1457,10 @@ def get_dashboard_html() -> str:
       durham: { name: 'Durham / Durham County' },
       dallas: { name: 'Dallas / Dallas County' },
       louisville: { name: 'Louisville / Jefferson County' },
-      portland: { name: 'Portland / Multnomah County' }
+      portland: { name: 'Portland / Multnomah County' },
+      san_jose: { name: 'San Jose / Santa Clara County' },
+      tampa: { name: 'Tampa / Hillsborough County' }
+      las_vegas: { name: 'Las Vegas / Clark County' }
     };
 
     let map = null;

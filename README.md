@@ -24,7 +24,7 @@
 
 ### National all-metros map
 
-The dashboard renders **all forty-five registered metros on one map at the same
+The dashboard renders **all forty-eight registered metros on one map at the same
 time**. Metrics are normalized with build-time percentile ranks
 (`lims_score_national_pct` and friends) so every metro shares one comparable
 color scale, and cell data lazy-loads from res-5 H3 viewport tiles as the user
@@ -39,7 +39,7 @@ links remain valid as camera presets.
 | :---: |
 | ![New York City metro focus](docs/screenshots/dashboard-metro-chip.png) |
 
-The registered metros: San Francisco Bay Area, New York City, Chicago, Seattle Metro, Los Angeles Metro, New Orleans Metro, Norfolk, Detroit, Austin, Cincinnati, Boston, Baltimore, Montgomery County, Baton Rouge / EBR, Denver, Philadelphia, Washington DC, Prince George's County, Columbus, Nashville, Kansas City, Pierce County, Minneapolis, Milwaukee, Charlotte, Pittsburgh, San Diego, Indianapolis, Houston, Wichita, Chattanooga / Hamilton County, Cleveland / Cuyahoga County, Hartford, Raleigh / Wake County, San Antonio / Bexar County, Sacramento / Sacramento County, Reno / Washoe County, Spokane / Spokane County, and Dayton / Montgomery County. Explore the live interface at [https://us-dash.harlanljones.com/](https://us-dash.harlanljones.com/) or see [docs/dashboard.md](docs/dashboard.md) for the current dashboard behavior, export path, API surfaces, and screenshot evidence.
+The registered metros: San Francisco Bay Area, New York City, Chicago, Seattle Metro, Los Angeles Metro, New Orleans Metro, Norfolk, Detroit, Austin, Cincinnati, Boston, Baltimore, Montgomery County, Baton Rouge / EBR, Denver, Philadelphia, Washington DC, Prince George's County, Columbus, Nashville, Kansas City, Pierce County, Minneapolis, Milwaukee, Charlotte, Pittsburgh, San Diego, Indianapolis, Houston, Wichita, Chattanooga / Hamilton County, Cleveland / Cuyahoga County, Hartford, Raleigh / Wake County, San Antonio / Bexar County, Sacramento / Sacramento County, Reno / Washoe County, Spokane / Spokane County, Dayton / Montgomery County, Dallas / Dallas County, Louisville / Jefferson County, Portland / Multnomah County, San Jose / Santa Clara County, Tampa / Hillsborough County, and Las Vegas / Clark County. Explore the live interface at [https://us-dash.harlanljones.com/](https://us-dash.harlanljones.com/) or see [docs/dashboard.md](docs/dashboard.md) for the current dashboard behavior, export path, API surfaces, and screenshot evidence.
 
 ---
 
@@ -96,6 +96,9 @@ Traditional real estate valuation models rely on lagging transactional comps (de
 | Dallas / Dallas County (6 Divisions) | DOWNTOWN_EAST, OAK_LAWN_UPTOWN, NORTH_DALLAS_PRESTON, EAST_DALLAS_WHITE_ROCK, SOUTH_DALLAS_OAK_CLIFF, PARK_CITIES_HIGHLAND_PARK | ArcGIS (ROW + traffic-control permits; construction proxy) | ArcGIS (Building Services approximately 30-day rolling partial view) | — no verified feed | — no verified feed |
 | Louisville / Jefferson County (6 Divisions) | DOWNTOWN_NULU, HIGHLANDS_GERMANTOWN, CLIFTON_CRESCENT_HILL, OLD_LOUISVILLE_SHELBY_PARK, ST_MATTHEWS_EAST, WEST_PORTLAND | — no verified feed | ArcGIS (Metro 2026 annual layer) | ArcGIS (Kentucky ABC active alcohol licenses; Jefferson County filter) | — no verified feed |
 | Portland / Multnomah County (5 Divisions) | DOWNTOWN_PEARL, EASTSIDE_INNER, NORTH_PORTLAND, SOUTHWEST_PORTLAND, SOUTHEAST_PORTLAND | ArcGIS (Residential Building Permits; native points) | — no verified feed | Socrata (Oregon OLCC applications received; address geocoding) | — no verified feed |
+| San Jose / Santa Clara County (6 Divisions) | DOWNTOWN_SJ, NORTH_SJ, SOUTH_SJ, EAST_SJ, WEST_SJ, SANTA_CLARA_EDGE | CKAN (last-30-days permits; address geocoding) | CKAN (annual current-year requests; 0,0 rows dropped) | — no open feed | — no open feed |
+| Tampa / Hillsborough County (7 Divisions) | DOWNTOWN_CHANNEL, HYDE_PARK_BAYSHORE, WESTSHORE_INTERNATIONAL, SOUTH_TAMPA_PALMA, TAMPA_HEIGHTS_SEMINOLE, CARROLLWOOD_NORTH, BRANDON_EAST | ArcGIS (full permits; edit-stamp watermark) | — no verified feed | ArcGIS (alcohol-beverage history; partial SLA) | — no verified feed |
+| Las Vegas / Clark County (5 Divisions) | DOWNTOWN_STRIP, LAS_VEGAS_CITY, SUMMERLIN_NW, HENDERSON_SOUTH, NORTH_LAS_VEGAS | ArcGIS (address-only; ADR 0004 geocoding) | — no verified feed | — no verified feed | ArcGIS (parcel sales; address-only ADR 0004 geocoding) |
 
 Partial registrations are deliberate: cities register only feeds that exist, and `get_dataset` raises a readable error for the rest (`apps/api/src/spatial/city_registry.py`).
 
@@ -533,9 +536,9 @@ Exposes real-time Prometheus telemetry including `prediction_requests_total`, `c
 
 ### Interactive Geospatial Dashboard
 `GET /dashboard` or `GET /` (with `Accept: text/html`)
-Serves the hardened, high-performance **MapLibre GL** web visualizer featuring single-region selection and multi-region comparison across all forty-five registered metros (San Francisco, NYC, Chicago, Seattle, Los Angeles, New Orleans, Norfolk, Detroit, Austin, Cincinnati, Boston, Baltimore, Montgomery County, Baton Rouge, Denver, Philadelphia, Washington DC, Prince George's County, Columbus, Nashville, Kansas City, Pierce County, Minneapolis, Milwaukee, Charlotte, Pittsburgh, San Diego, Indianapolis, Houston, Wichita, Chattanooga, Cleveland, Hartford, Raleigh, San Antonio, Sacramento, Reno, Spokane, Dayton, Tulsa, El Paso, Durham, Dallas, Louisville, Portland), submarket filtering, H3 hexagon inspection, LIMS heatmaps, and SHAP attribution waterfall charts.
+Serves the hardened, high-performance **MapLibre GL** web visualizer featuring single-region selection and multi-region comparison across all forty-eight registered metros (San Francisco, NYC, Chicago, Seattle, Los Angeles, New Orleans, Norfolk, Detroit, Austin, Cincinnati, Boston, Baltimore, Montgomery County, Baton Rouge, Denver, Philadelphia, Washington DC, Prince George's County, Columbus, Nashville, Kansas City, Pierce County, Minneapolis, Milwaukee, Charlotte, Pittsburgh, San Diego, Indianapolis, Houston, Wichita, Chattanooga, Cleveland, Hartford, Raleigh, San Antonio, Sacramento, Reno, Spokane, Dayton, Tulsa, El Paso, Durham, Dallas, Louisville, Portland, San Jose, Tampa, Las Vegas), submarket filtering, H3 hexagon inspection, LIMS heatmaps, and SHAP attribution waterfall charts.
 
-The same UI is mirrored as a static asset on the Cloudflare Worker (`apps/dashboard/`), deployed live to [https://us-dash.harlanljones.com/](https://us-dash.harlanljones.com/), where `/api/v1/*` is answered from a precomputed Workers KV snapshot (built by `src/export/snapshot_builder.py`). The FastAPI service and the edge snapshot both serve all forty-five registered metros.
+The same UI is mirrored as a static asset on the Cloudflare Worker (`apps/dashboard/`), deployed live to [https://us-dash.harlanljones.com/](https://us-dash.harlanljones.com/), where `/api/v1/*` is answered from a precomputed Workers KV snapshot (built by `src/export/snapshot_builder.py`). The FastAPI service and the edge snapshot both serve all forty-seven registered metros.
 
 ---
 

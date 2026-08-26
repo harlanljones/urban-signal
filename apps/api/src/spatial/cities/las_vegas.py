@@ -5,7 +5,7 @@ division catalog, and geographic bounding boxes for the City of Las Vegas and
 the greater Clark County metro (Summerlin, Henderson, North Las Vegas).
 
 Las Vegas registers as a TWO-FEED partial city like Los Angeles and Austin:
-PERMITS (Clark County Building Permits, native `location_1` geometry) and DEEDS
+PERMITS (Clark County Building Permits, address-only ArcGIS table) and DEEDS
 (Clark County real-property parcel sales, address-only -> geocoder-ready under
 ADR-0004). SLA / COMPLAINTS_311 are deliberately absent for this ticket — US-145
 scopes only PERMITS + sales/deeds; the 311 and business-license layers are a
@@ -399,56 +399,76 @@ LV_DIVISIONS = LAS_VEGAS_DIVISIONS
 
 # ---------------------------------------------------------------------------
 # Feed specs (imported by the spine REGISTRY entry during interlock).
-# Endpoint URLs are Clark County open-data placeholders; the orchestrator
-# confirms the live Socrata resource IDs before wiring them.
+# Both endpoints were live-verified on 2026-08-26.
 # ---------------------------------------------------------------------------
-from src.config import settings  # noqa: E402  (kept local to the spec block)
-from src.spatial.city_registry import DatasetSpec, FeedType  # noqa: E402
-
 LAS_VEGAS_PERMITS_ENDPOINT = (
-    "https://opendata.clarkcountynv.gov/resource/building_permits.json"
+    "https://services1.arcgis.com/F1v0ufATbBQScMtY/ArcGIS/rest/services/"
+    "OpenData_Building_Permits_/FeatureServer/0"
 )
 LAS_VEGAS_DEEDS_ENDPOINT = (
-    "https://opendata.clarkcountynv.gov/resource/property_sales.json"
+    "https://services1.arcgis.com/F1v0ufATbBQScMtY/ArcGIS/rest/services/"
+    "parcels/FeatureServer/0"
 )
 
-LAS_VEGAS_PERMITS_SPEC = DatasetSpec(
-    endpoint=LAS_VEGAS_PERMITS_ENDPOINT,
-    platform="socrata",
-    watermark_col="issued_date",
-    id_keys=["permit_number", "permit_no", "id"],
-    topic=settings.topic_permits,
-    interval_seconds=300.0,
-    producer_key="permits",
-    extra={
-        "expected_cadence_days": 7,
-        "scope": "Clark County Building Permits (City of Las Vegas + unincorporated county)",
-        "field_map": FIELD_MAP["permits"],
+LAS_VEGAS_FEED_SPECS: Dict[str, Dict[str, object]] = {
+    "permits": {
+        "endpoint": LAS_VEGAS_PERMITS_ENDPOINT,
+        "platform": "arcgis",
+        "watermark_col": "ISSDTTM",
+        "id_keys": ["APNO", "APBLDGKEY", "ObjectId"],
+        "topic_key": "topic_permits",
+        "interval_seconds": 300.0,
+        "producer_key": "permits",
+        "extra": {
+            "expected_cadence_days": 7,
+            "oid_field": "ObjectId",
+            "max_record_count": 1000,
+            "order_by": "ISSDTTM DESC",
+            "needs_geocode": True,
+            "geocode_context": "Las Vegas, NV",
+            "scope": "Clark County Building Permits (address-only ArcGIS table)",
+            "field_map": FIELD_MAP["permits"],
+        },
     },
-)
-
-LAS_VEGAS_DEEDS_SPEC = DatasetSpec(
-    endpoint=LAS_VEGAS_DEEDS_ENDPOINT,
-    platform="socrata",
-    watermark_col="sale_date",
-    id_keys=["document_number", "instrument_number", "id"],
-    topic=settings.topic_deeds,
-    interval_seconds=600.0,
-    producer_key="deeds",
-    # Address-only feed: ADR-0004 geocodes at enrichment. Rows arrive with a
-    # street address and no native geometry, so they emit null-H3 until the
-    # geocoder resolves them (the Wave G "no geometry" case, now supported).
-    extra={
-        "expected_cadence_days": 7,
-        "needs_geocode": True,
-        "geocode_context": "Las Vegas, NV",
-        "scope": "Clark County real-property parcel sales / recorded deeds (address-only)",
-        "field_map": FIELD_MAP["deeds"],
+    "deeds": {
+        "endpoint": LAS_VEGAS_DEEDS_ENDPOINT,
+        "platform": "arcgis",
+        "watermark_col": "SALEDATE",
+        "id_keys": ["PARCEL", "DOCNO", "ObjectId"],
+        "topic_key": "topic_deeds",
+        "interval_seconds": 600.0,
+        "producer_key": "deeds",
+        "extra": {
+            "expected_cadence_days": 7,
+            "oid_field": "ObjectId",
+            "max_record_count": 2000,
+            "order_by": "SALEDATE DESC",
+            "needs_geocode": True,
+            "geocode_context": "Las Vegas, NV",
+            "scope": "Clark County real-property parcel sales / recorded deeds (address-only ArcGIS table)",
+            "field_map": FIELD_MAP["deeds"],
+        },
     },
-)
-
-# Feed catalog the spine REGISTRY entry imports by reference.
-LAS_VEGAS_FEEDS = {
-    FeedType.PERMITS: LAS_VEGAS_PERMITS_SPEC,
-    FeedType.DEEDS: LAS_VEGAS_DEEDS_SPEC,
 }
+
+
+def get_las_vegas_dataset(feed: object) -> object:
+    """Return a leaf-local DatasetSpec without importing the registry at load time."""
+    from src.config import settings
+    from src.spatial.city_registry import DatasetSpec
+
+    feed_name = getattr(feed, "value", str(feed))
+    if feed_name not in LAS_VEGAS_FEED_SPECS:
+        available = ", ".join(sorted(LAS_VEGAS_FEED_SPECS))
+        raise KeyError(f"'las_vegas' has no '{feed_name}' feed; available: {available}")
+    payload = LAS_VEGAS_FEED_SPECS[feed_name]
+    return DatasetSpec(
+        endpoint=payload["endpoint"],
+        platform=payload["platform"],
+        watermark_col=payload["watermark_col"],
+        id_keys=payload["id_keys"],
+        topic=getattr(settings, payload["topic_key"]),
+        interval_seconds=payload["interval_seconds"],
+        producer_key=payload["producer_key"],
+        extra=payload["extra"],
+    )

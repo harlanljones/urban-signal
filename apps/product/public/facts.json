@@ -1708,6 +1708,111 @@
         "lng": -122.6784
       },
       "evidence_path": "apps/api/src/spatial/cities/portland.py"
+    },
+    {
+      "id": "san_jose",
+      "name": "San Jose / Santa Clara County",
+      "state": "CA",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 16,
+      "feeds": [
+        true,
+        true,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "ckan",
+          "watermark_col": "ISSUEDATE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "ckan",
+          "watermark_col": "Date Created",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 37.3382,
+        "lng": -121.8863
+      },
+      "evidence_path": "apps/api/src/spatial/cities/san_jose.py"
+    },
+    {
+      "id": "tampa",
+      "name": "Tampa / Hillsborough County",
+      "state": "FL",
+      "divisions": "7 divisions",
+      "division_count": 7,
+      "submarket_count": 19,
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "LASTUPDATE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "HISTORY_ACT_DT",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 27.9506,
+        "lng": -82.4572
+      },
+      "evidence_path": "apps/api/src/spatial/cities/tampa.py"
+    },
+    {
+      "id": "las_vegas",
+      "name": "Las Vegas / Clark County",
+      "state": "NV",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 16,
+      "feeds": [
+        true,
+        false,
+        false,
+        true
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "ISSDTTM",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALEDATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 36.1147,
+        "lng": -115.1728
+      },
+      "evidence_path": "apps/api/src/spatial/cities/las_vegas.py"
     }
   ],
   "pipeline": [

@@ -1,8 +1,7 @@
 # Stream log — city-las-vegas — 2026-08-26
 
-Copy of `.streams/_TEMPLATE.md` (phase 1, Claim). This stream builds the
-PHASE-2 leaf for Linear US-145: register Las Vegas, NV (Clark County) for
-PERMITS + sales/deeds, geocoder-ready per ADR-0004.
+Phase-2 registration stream for Linear US-145: register Las Vegas, NV
+(Clark County) for PERMITS + sales/deeds, geocoder-ready per ADR-0004.
 
 ## Claim
 
@@ -20,38 +19,26 @@ PERMITS + sales/deeds, geocoder-ready per ADR-0004.
 
 ## Intent
 
-Register Las Vegas / Clark County as a TWO-FEED partial city: PERMITS
-(Clark County building permits) carries native geometry; DEEDS (Clark County
-parcel sales / recorded deeds) is address-only and therefore geocoder-ready
-under ADR-0004 (`needs_geocode: True`). The leaf is fully self-contained and
-testable without any spine edit, following the Austin two-feed pattern.
+Register Las Vegas / Clark County as a TWO-FEED partial city: PERMITS and
+DEEDS are official ArcGIS tables without native geometry, so both are
+geocoder-ready under ADR-0004 (`needs_geocode: True`). The leaf is fully
+self-contained and testable without any spine edit, following the Austin
+two-feed pattern.
 
 ## Decisions
 
 - 2026-08-26 — Scope is **Clark County** (countywide), consistent with the
   Reno/Washoe and Austin/Travis pattern: the county feeds cover the metro and
   the registration is named "Las Vegas".
-- 2026-08-26 — DISCOVERY (no network in this environment; flagged for live
-  confirmation during interlock): Clark County open data is published on a
-  Socrata/ArcGIS portal (`data.clarkcountynv.gov` / `opendata.clarkcountynv.gov`).
-  Building permits and real-property parcel sales are expected Socrata datasets.
-  Exact resource IDs are placeholders in `las_vegas.py` constants and MUST be
-  confirmed against the live catalog before the spine interlock wires them.
-- 2026-08-26 — DEEDS is **address-only** (street address, no lat/lng on the
-  wire): declared `needs_geocode: True` with `geocode_context="Las Vegas, NV"`
-  so ADR-0004 geocodes at enrichment. PERMITS exposes `location_1` lat/long
-  (Socrata geo column), so it parses natively today.
-- 2026-08-26 — Field maps live on `las_vegas.py`'s `DatasetSpec.extra["field_map"]`
-  (built from `field_maps_las_vegas.FIELD_MAP`), NOT in shared
-  `field_maps.py`, per the HARD RULE.
+- 2026-08-26 — Stream claimed; registration completed in the orchestrator hold and tracked in Linear US-145.
+- 2026-08-26 — **Live audit confirmed official ArcGIS tables.** Permits: `https://services1.arcgis.com/F1v0ufATbBQScMtY/ArcGIS/rest/services/OpenData_Building_Permits_/FeatureServer/0`, `Building_Permits_MV`, address-only, 437,123 rows in the ticket audit, `ISSDTTM` newest 2026-08-14. Deeds: `https://services1.arcgis.com/F1v0ufATbBQScMtY/ArcGIS/rest/services/parcels/FeatureServer/0`, address-only, 302,153 rows in the ticket audit, `SALEDATE` newest 2026-08-01.
+- 2026-08-26 — **Field maps use live ArcGIS names.** Permits map `APNO`, `APTYPE`, `WORKTYPE`, `APL_ADDRESS`, `BLDGAPPLSTATUS`, `ISSDTTM`, `DECLVLTN`, `PRCLID`, and `ZIP`; deeds map `PARCEL`, `DOCNO`, `SALEPRICE`, `SALETYPE`, `DOCDATE`, `SALEDATE`, `ADDRESS1`, and `ZIP`. Both specs declare ADR-0004 geocoding with `geocode_context="Las Vegas, NV"`.
 
-## Current step
+## Validation
 
-Leaf files written and unit tests verified green without spine registration.
-Awaiting orchestrator interlock to apply the reported spine deltas.
-
-## Next step
-
-If resumed: confirm the two Clark County dataset resource IDs against the live
-portal, then apply the spine deltas in `city_registry.py` + `__init__.py` +
-dashboard METRO_META + `index.html` sync, run `pytest -m interlock`.
+- Registry, config, spatial exports, dashboard `METRO_META`, snapshot wiring, and static copy are complete.
+- Las Vegas focused tests: 26 passed.
+- Shared ArcGIS/deeds regression tests passed.
+- `pytest -m interlock`: 22 passed.
+- `SITE_FACTS_OK (48 metros)`, `SITE_BUILD_OK (58 routes)`, `FACTS_FRESH`, and `SITE_CONTENT_OK` are green.
+- Linear US-145 is resolved.
