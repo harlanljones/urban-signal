@@ -404,22 +404,21 @@ ATX_DIVISIONS = AUSTIN_DIVISIONS
 #
 # The feed has no latitude/longitude columns — only a street ``address`` string —
 # so it declares ``needs_geocode: True`` and ``geocode_context``; the ADR 0004
-# geocoder recovers real coordinates at parse time. ``status_change_date`` is the
-# watermark: it is the only column that advances on every Primary Status change
-# (new issuances, renewals, suspensions, surrenders), so it is the correct
-# incremental-poll cursor for a slowly-churning license file.
+# geocoder recovers real coordinates at parse time. ``current_issued_date`` is
+# the published issuance cursor for this slowly-churning license file.
 AUSTIN_TABC_SLA_SPEC: Dict[str, object] = {
     "endpoint": "https://data.texas.gov/resource/7hf9-qc9f.json",
     "platform": "socrata",
-    "watermark_col": "status_change_date",
-    "id_keys": ["license_id"],
+    "watermark_col": "current_issued_date",
+    "id_keys": ["license_id", "master_file_id"],
     "topic": settings.topic_sla,
     "interval_seconds": 600.0,
     "producer_key": "sla",
     "extra": {
         "expected_cadence_days": 7,
         "needs_geocode": True,
-        "geocode_context": "Austin, TX",
+        "geocode_context": "TX",
+        "where": "county = 'Travis'",
         "field_map": _TABC_FIELD_MAPS["sla"],
     },
 }

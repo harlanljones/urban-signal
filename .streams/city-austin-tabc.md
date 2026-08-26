@@ -35,9 +35,9 @@ the map is in the registry.
   - `kguh-7q9z` "TABCLicenses" is a 2021 AIMS-migration cross-walk
     (65,175 rows) with trailing-space-padded `locationaddress` and no
     authoritative status/issue dates. NOT a registration target.
-- 2026-08-26 — `watermark_col` = `status_change_date` (advances on every Primary
-  Status change: new issuance, renewal, suspension, surrender) — the only correct
-  incremental-poll cursor for a slowly-churning license file.
+- 2026-08-26 — `watermark_col` = `current_issued_date`, the published issuance
+  cursor for this slowly-churning license file; `license_id` + `master_file_id`
+  form the stable composite identity.
 - 2026-08-26 — NO new `FeedType` enum member required: TABC liquor licenses map
   onto the existing `FeedType.SLA`. NO new archetype in `sla_licenses_producer`:
   passing `city_id="austin"` resolves through the generic field-map chain, and
@@ -49,12 +49,11 @@ the map is in the registry.
 
 ## Current step
 
-Leaf complete. Leaf tests pass (`pytest tests/unit/test_producers_austin_tabc.py`).
-Spine deltas drafted in the report; awaiting orchestrator interlock.
+Complete. The Austin registry now contains the SLA feed with the Travis County
+Socrata filter, ADR-0004 geocoder declaration, and central field map. Parser
+tests cover both producer invocation and the `TX` provider query context.
 
 ## Next step
 
-If this were the interlock step, apply the spine deltas in `city_registry.py`
-(REGISTRY Austin `datasets[FeedType.SLA]`), copy the field map into the registry
-spec's `extra["field_map"]`, add the Austin METRO_META entry + byte-sync
-`index.html`, then run `pytest -m interlock`.
+Run the focused Austin checks and `pytest -m interlock`; then resolve US-136 in
+Linear if the gates remain green.

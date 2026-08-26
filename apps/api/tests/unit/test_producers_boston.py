@@ -26,17 +26,22 @@ def test_boston_geometry_is_self_consistent():
     assert {meta.city_id for meta in BOSTON_SUBMARKETS.values()} == {"boston"}
 
 
-def test_boston_registers_two_ckan_feeds_and_no_sales_feed():
+def test_boston_registers_ckan_feeds_and_no_sales_feed():
     city = CityId.BOSTON
     assert REGISTRY[city].job_suffix == "boston"
     assert set(REGISTRY[city].datasets) == {
         FeedType.PERMITS,
         FeedType.COMPLAINTS_311,
+        FeedType.SLA,
     }
     assert REGISTRY[city].datasets[FeedType.PERMITS].platform == "ckan"
     # Licensing Board (04dc653b) fails G5 by construction: gpsx/gpsy are
-    # Massachusetts State Plane meters, not WGS84 degrees.
-    assert FeedType.SLA not in REGISTRY[city].datasets
+    sla = REGISTRY[city].datasets[FeedType.SLA]
+    assert sla.platform == "ckan"
+    assert sla.watermark_col == "expires"
+    assert sla.id_keys == ["license_num", "_id"]
+    assert sla.extra["state_plane_crs"] == "EPSG:2249"
+    assert sla.extra["state_plane_units"] == "US survey feet"
     assert FeedType.DEEDS not in REGISTRY[city].datasets
 
 

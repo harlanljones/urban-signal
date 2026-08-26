@@ -15,7 +15,7 @@ Its absence is what makes a takeover cost twelve tool calls instead of one.
   - `apps/api/src/spatial/city_registry.py` (REGISTRY[CityId.MILWAUKEE].datasets += PERMITS + DEEDS; no new FeedType members — both exist)
   - `apps/api/src/producers/field_maps.py` (NO edit — field maps are read from registry `extra["field_map"]`; the leaf data is the source of truth)
   - dashboard METRO_META + `apps/dashboard/public/index.html` sync (US-138 dashboard wiring)
-  - `apps/api/src/config.py` (add `arcgis_milwaukee_permits_url` / `arcgis_milwaukee_deeds_url` for the live-verified endpoints)
+  - `apps/api/src/config.py` (add verified Milwaukee CKAN CSV endpoints)
 
 ## Intent
 
@@ -28,17 +28,15 @@ of the spec dicts into `city_registry.REGISTRY`.
 
 ## Decisions
 
-- 2026-08-26 — Both feeds follow the existing Milwaukee SLA: ArcGIS on
-  `milwaukeemaps.milwaukee.gov`, an ANSI-date-literal server
-  (`watermark_comparison` / `ANSI_DATE_LITERAL_HOSTS`). The incremental `where`
-  therefore renders as `col >= date 'YYYY-MM-DD'`.
+- 2026-08-26 — User approved the scope change from SLA-only. Both feeds use
+  verified CKAN/OpenGov CSV downloads from `data.milwaukee.gov`; permits use
+  `Date Issued`, and yearly property-sales snapshots use `Sale_date`.
 - 2026-08-26 — Specs are stored as plain dicts in `milwaukee.py`, NOT
   `DatasetSpec` instances, to avoid a circular import (`city_registry` already
   imports `milwaukee`). The orchestrator wraps them in `DatasetSpec(...)` and
   binds `topic=settings.topic_permits` / `settings.topic_deeds`.
-- 2026-08-26 — Endpoints are PROPOSED: service-layer IDs must be confirmed
-  live against `milwaukeemaps.milwaukee.gov` before the spine edit. Host is
-  confirmed Milwaukee ArcGIS.
+- 2026-08-26 — Live schema probes confirmed permits `Record ID`, `Address`,
+  `Date Issued`, and deeds `PropertyID`, `Address`, `Sale_date`, `Sale_price`.
 - 2026-08-26 — DEEDS `watermark_exclude` ships empty; any sentinel spellings
   (ADR-0005) are discovered live and appended at spine time. The mechanism is
   asserted in the test with a representative sentinel.
@@ -48,13 +46,11 @@ of the spec dicts into `city_registry.REGISTRY`.
 
 ## Current step
 
-Leaf complete: `milwaukee.py` extended, `field_maps_milwaukee_permits_deeds.py`
-created, test written and passing. Awaiting `pytest -m interlock` confirmation
-that the spine is untouched, then hand the spine deltas to the interlock.
+Interlock complete: the registry, config, producers, typed CSV client, README,
+and contract tests now register and consume both feeds. `pytest -m interlock`
+passes.
 
 ## Next step
 
-Run `uv run pytest tests/unit/test_producers_milwaukee_permits_deeds.py -q`
-(leaf only) and `uv run pytest -m interlock -q` (spine untouched). Then report
-exact registry/field-map/dashboard/config deltas for the orchestrator to apply
-during the interlock.
+Run the focused Milwaukee/CSV tests and the full API suite, then update Linear
+with the verified CKAN endpoints and test results.

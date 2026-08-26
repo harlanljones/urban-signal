@@ -1,10 +1,10 @@
 """Unit tests for the Austin registration and its producer wiring.
 
-Austin registers TWO feed types like Los Angeles — PERMITS (`quv8-5ckq`
-Issued Building Permits) and COMPLAINTS_311 (`xwdj-i9he`). SLA/DEEDS are
-deliberately absent: TABC's statewide alcohol feeds carry zero geocode
-columns and Travis County's portal is a FedRAMP Socrata shell (see
-docs/research/new-orleans-austin-verification.md).
+ Austin registers THREE feed types like Los Angeles — PERMITS (`quv8-5ckq`
+ Issued Building Permits), COMPLAINTS_311 (`xwdj-i9he`), and TABC's
+ address-geocoded SLA feed (`7hf9-qc9f`). DEEDS remains absent because Travis
+ County's portal is a FedRAMP Socrata shell (see
+ docs/research/new-orleans-austin-verification.md).
 
 Registration tests are expected RED until the orchestrator applies the spine
 (registry/producer edits are not leaf files). Parser tests use LIVE fixture
@@ -112,13 +112,14 @@ class TestAustinRegistration:
 
 
 class TestFeedRegistration:
-    """Austin is a two-feed partial city (LA pattern)."""
+    """Austin is a three-feed partial city (LA pattern)."""
 
-    def test_exactly_two_feeds_are_registered(self):
+    def test_exactly_three_feeds_are_registered(self):
         assert AUSTIN is not None, "spine pending: CityId.AUSTIN missing"
         assert set(_registry()[AUSTIN].datasets) == {
             FeedType.PERMITS,
             FeedType.COMPLAINTS_311,
+            FeedType.SLA,
         }
 
     def test_watermarks_match_published_schemas(self):
@@ -130,12 +131,16 @@ class TestFeedRegistration:
         assert AUSTIN is not None, "spine pending: CityId.AUSTIN missing"
         assert get_dataset(AUSTIN, FeedType.PERMITS).watermark_col == "issue_date"
         assert get_dataset(AUSTIN, FeedType.COMPLAINTS_311).watermark_col == "sr_created_date"
+        sla = get_dataset(AUSTIN, FeedType.SLA)
+        assert sla.watermark_col == "current_issued_date"
+        assert sla.id_keys == ["license_id", "master_file_id"]
+        assert sla.extra["needs_geocode"] is True
+        assert sla.extra["geocode_context"] == "TX"
+        assert sla.extra["where"] == "county = 'Travis'"
 
-    @pytest.mark.parametrize("absent_feed", [FeedType.SLA, FeedType.DEEDS])
+    @pytest.mark.parametrize("absent_feed", [FeedType.DEEDS])
     def test_absent_feeds_raise_readable_errors(self, absent_feed):
-        """SLA/DEEDS deliberately absent — TABC statewide feeds have zero
-        geocode columns; Travis County is a FedRAMP shell. The error must say
-        so structurally (names city and available feeds), LA-style."""
+        """DEEDS remains absent because Travis County is a FedRAMP shell."""
         from src.spatial.city_registry import get_dataset
 
         assert AUSTIN is not None, "spine pending: CityId.AUSTIN missing"

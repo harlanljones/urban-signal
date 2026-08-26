@@ -526,7 +526,15 @@ class MunicipalIngestionScheduler:
         try:
             client_kwargs = {
                 k: meta[k]
-                for k in ("order_by", "id_col", "select", "fallback_endpoints")
+                for k in (
+                    "order_by",
+                    "id_col",
+                    "select",
+                    "fallback_endpoints",
+                    "watermark_col",
+                    "watermark_format",
+                    "watermark_exclude",
+                )
                 if meta.get(k)
             }
             for batch in self._paginating_client_for(job_name).paginate(

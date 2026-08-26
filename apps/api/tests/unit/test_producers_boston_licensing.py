@@ -1,14 +1,10 @@
 """Leaf tests for Boston's Licensing Board SLA feed (US-137).
 
 Boston's Licensing Board source (CKAN 04dc653b-...) carries gpsx/gpsy in
-Massachusetts State Plane meters (EPSG:26986) and no WGS84 columns. This feed
-is registered as an address-only SLA feed (ADR 0004): gpsx/gpsy are never mapped
-to latitude/longitude, and the business address string is geocoded at parse
-time. These tests pass WITHOUT the spine registration (no REGISTRY SLA entry),
-proving the field map and the ADR-0004 geocode path before the orchestrator
-applies the interlock.
+Massachusetts State Plane US survey feet (EPSG:2249) and no WGS84 columns. Path A
+transforms those coordinates to WGS84 in the SLA producer.
 
-Column spellings are PROPOSED (pinned below) pending a live CKAN probe.
+Column spellings are pinned below against the live CKAN schema.
 """
 
 from datetime import UTC, datetime
@@ -28,36 +24,32 @@ from src.spatial.cities.boston import (
 )
 
 BOSTON_LICENSING_FIELD_MAP = {
-    "license_id": ["license_id", "licenseno", "license_number"],
-    "license_type": ["licensetype", "license_type", "licensecategory"],
-    "effective_date": ["licensetype_effective_date", "license_effective_date", "effectivedate"],
-    "expiration_date": [
-        "licensetype_expiration_date",
-        "license_expiration_date",
-        "expirationdate",
-    ],
-    "address_street": ["business_address", "location_address", "address"],
-    "dba": ["dba", "doing_business_as", "business_name"],
-    "premises_name": ["business_name", "premises_name", "entity_name"],
-    "status": ["license_status", "status", "licensestatus"],
-    "borough": ["ward", "neighborhood"],
+    "license_id": ["license_num"],
+    "license_type": ["license_type", "license_category"],
+    "effective_date": ["issued"],
+    "expiration_date": ["expires"],
+    "address_street": ["address"],
+    "dba": ["dba_name", "business_name"],
+    "premises_name": ["business_name", "dba_name"],
+    "status": ["status"],
+    "borough": ["city"],
 }
 
 # A representative Licensing Board row. gpsx/gpsy are MA State Plane METERS
 # (Boston ~ easting 780000, northing 2950000) — clearly not WGS84 degrees.
 BOSTON_LICENSING_ROW = {
-    "license_id": "LIC-2026-0048217",
-    "licensetype": "Common Victualler",
-    "licensetype_effective_date": "2026-03-01",
-    "licensetype_expiration_date": "2027-02-28",
-    "business_name": "Harlan Square Diner LLC",
-    "dba": "HARLAN SQUARE DINER",
-    "business_address": "123 MAIN ST, BOSTON, MA 02118",
-    "ward": "9",
-    "license_status": "Active",
-    # State Plane meters — must NOT surface as WGS84 degrees.
-    "gpsx": 780421.36,
-    "gpsy": 2950117.88,
+    "license_num": "LB-578141",
+    "license_type": "CV7 Malt Wine Liq by Zip Restricted",
+    "issued": None,
+    "expires": "2025-12-31",
+    "business_name": "Dominican Kitchen, Inc.",
+    "dba_name": "La Parada Dominican Kitchen",
+    "address": "3094-  Washington ST",
+    "city": "Roxbury",
+    "status": "Active",
+# State Plane US survey feet — must be transformed to WGS84 degrees.
+    "gpsx": 764720.2549378872,
+    "gpsy": 2940110.4333568066,
 }
 
 
@@ -75,23 +67,18 @@ def test_boston_geometry_is_self_consistent():
     assert {m.city_id for m in BOSTON_SUBMARKETS.values()} == {"boston"}
 
 
-def test_feed_spec_is_address_only_ckan_resource():
+def test_feed_spec_declares_state_plane_transform():
     spec = BOSTON_LICENSING_BOARD_FEED
     assert spec["platform"] == "ckan"
     assert spec["feed_type"] == "sla"
     assert spec["dataset_id"] == "04dc653b-1789-4374-9669-b07df7233344"
-    assert spec["needs_geocode"] is True
-    # State Plane columns must NOT be wired to WGS84 latitude/longitude.
-    assert "gpsx" not in FIELD_MAP.get("longitude", [])
-    assert "gpsy" not in FIELD_MAP.get("latitude", [])
-    assert "latitude" not in FIELD_MAP
-    assert "longitude" not in FIELD_MAP
+    assert spec["state_plane_crs"] == "EPSG:2249"
+    assert spec["state_plane_units"] == "US survey feet"
 
 
 def test_field_map_matches_pinned_proposal():
     assert FIELD_MAP == BOSTON_LICENSING_FIELD_MAP
-    # The address column the producer geocodes must be mapped.
-    assert "business_address" in FIELD_MAP["address_street"]
+    assert "address" in FIELD_MAP["address_street"]
 
 
 @pytest.fixture
@@ -102,57 +89,32 @@ def sla_producer():
         return SLALicensesProducer()
 
 
-def _geocode_row_if_declared(city_id, feed_value, address, context=None):
-    """Stand-in for the ADR 0004 geocoder: returns a deterministic WGS84 point
-    for the Boston licensing address, proving the address-only path resolves
-    real coordinates without touching the State Plane gpsx/gpsy columns."""
-    if city_id == "boston" and feed_value == "sla" and address:
-        return (42.3368, -71.0721)
-    return None
-
-
-def test_licensing_row_geocodes_address_only_via_adr0004(sla_producer):
-    with (
-        patch(
-            "src.producers.field_maps.resolve_field_map",
-            lambda city_value, feed: FIELD_MAP if (city_value == "boston" and feed.value == "sla") else {},
-        ),
-        patch(
-            "src.spatial.geocoder.geocode_row_if_declared",
-            _geocode_row_if_declared,
-        ),
+def test_licensing_row_transforms_state_plane_coordinates(sla_producer):
+    with patch(
+        "src.producers.field_maps.resolve_field_map",
+        lambda city_value, feed: FIELD_MAP if (city_value == "boston" and feed.value == "sla") else {},
     ):
         event = sla_producer.parse_socrata_row(BOSTON_LICENSING_ROW, city_id="boston")
 
     assert event is not None
     assert event.city_id == "boston"
-    assert event.license_id == "LIC-2026-0048217"
-    assert event.license_type == "Common Victualler"
-    assert event.dba == "HARLAN SQUARE DINER"
-    assert event.premises_name == "Harlan Square Diner LLC"
-    assert event.address == "123 MAIN ST, BOSTON, MA 02118"
+    assert event.license_id == "LB-578141"
+    assert event.license_type == "CV7 Malt Wine Liq by Zip Restricted"
+    assert event.dba == "La Parada Dominican Kitchen"
+    assert event.premises_name == "Dominican Kitchen, Inc."
+    assert event.address == "3094-  Washington ST"
     assert event.license_status == "Active"
-    # Coordinates came from the geocoder, NOT the State Plane gpsx/gpsy.
-    assert event.latitude == pytest.approx(42.3368)
-    assert event.longitude == pytest.approx(-71.0721)
-    assert event.latitude != pytest.approx(780421.36)
-    assert event.longitude != pytest.approx(2950117.88)
+    assert event.latitude == pytest.approx(42.3151, abs=0.001)
+    assert event.longitude == pytest.approx(-71.0986, abs=0.001)
+    assert event.latitude != pytest.approx(2940110.4333568066)
+    assert event.longitude != pytest.approx(764720.2549378872)
     assert event.h3_res7 is not None
 
 
-def test_state_plane_columns_are_never_used_as_wgs84(sla_producer):
-    """Guard: even if a row somehow also carried `latitude`/`longitude` shaped
-    like the State Plane values, the field map must not route gpsx/gpsy into
-    WGS84 — the producer falls through to geocoding instead."""
-    with (
-        patch(
-            "src.producers.field_maps.resolve_field_map",
-            lambda city_value, feed: FIELD_MAP if (city_value == "boston" and feed.value == "sla") else {},
-        ),
-        patch(
-            "src.spatial.geocoder.geocode_row_if_declared",
-            _geocode_row_if_declared,
-        ),
+def test_state_plane_columns_are_transformed_not_emitted_as_meters(sla_producer):
+    with patch(
+        "src.producers.field_maps.resolve_field_map",
+        lambda city_value, feed: FIELD_MAP if (city_value == "boston" and feed.value == "sla") else {},
     ):
         event = sla_producer.parse_socrata_row(BOSTON_LICENSING_ROW, city_id="boston")
     assert event is not None

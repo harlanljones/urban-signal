@@ -297,8 +297,9 @@ class Settings(BaseSettings):
         description="Norfolk Business Licenses endpoint (native lat/lng; placeholder-address rows excluded via extra where)",
     )
 
-    # Austin (Socrata) — partial city: SLA/DEEDS absent (TABC statewide feeds
-    # carry no geocodes; Travis County portal is unreachable)
+    # Austin (Socrata) — permits + 311 native; US-136 adds TABC liquor-license
+    # SLA (address-only, geocoded per ADR-0004). DEEDS absent (Travis County
+    # Socrata portal is unreachable).
     socrata_austin_permits_endpoint: str = Field(
         default="https://data.austintexas.gov/resource/quv8-5ckq.json",
         description="Austin Issued Building Permits endpoint",
@@ -306,6 +307,12 @@ class Settings(BaseSettings):
     socrata_austin_311_endpoint: str = Field(
         default="https://data.austintexas.gov/resource/xwdj-i9he.json",
         description="Austin 311 Public Data endpoint",
+    )
+    # US-136: TABC statewide liquor-license feed (data.texas.gov 7hf9-qc9f).
+    # Address-only (no geocodes) — geocoded at parse time per ADR-0004.
+    socrata_austin_tabc_endpoint: str = Field(
+        default="https://data.texas.gov/resource/7hf9-qc9f.json",
+        description="Austin/TABC liquor license SLA endpoint (US-136)",
     )
 
     # Cincinnati (Socrata) — PERMITS, 311, and business licenses; no sales
@@ -371,7 +378,7 @@ class Settings(BaseSettings):
         default="ckan://data.boston.gov/04dc653b-1789-4374-9669-b07df7233344",
         description=(
             "Boston Licensing Board licenses CKAN resource "
-            "(not ingested: gpsx/gpsy are State Plane meters, fails G5)"
+            "(gpsx/gpsy State Plane coordinates transformed via EPSG:2249)"
         ),
     )
 
@@ -611,6 +618,25 @@ class Settings(BaseSettings):
             "regulation/license/MapServer/0"
         ),
         description="Milwaukee liquor license MapServer layer URL",
+    )
+    # US-138: Milwaukee building permits + yearly property-sales CSVs. Both
+    # datasets are address-only and geocoded at parse time per ADR-0004; deeds
+    # use an ADR-0005 typed text watermark.
+    csv_milwaukee_permits_endpoint: str = Field(
+        default=(
+            "https://data.milwaukee.gov/dataset/9bada2e0-fad5-4545-8674-"
+            "1b2c8c4e9f2f/resource/828e9630-d7cb-42e4-960e-964eae916397/"
+            "download/buildingpermits.csv"
+        ),
+        description="Milwaukee building permits CSV endpoint (US-138)",
+    )
+    csv_milwaukee_deeds_endpoint: str = Field(
+        default=(
+            "https://data.milwaukee.gov/dataset/7a8b81f6-d750-4f62-aee8-"
+            "30ffce1c64ce/resource/1f2dbf65-3ff9-49a2-a9ef-eb0b6c503017/"
+            "download/armslengthsales_2025_valid_20260417.csv"
+        ),
+        description="Milwaukee 2025 property-sales CSV endpoint (US-138)",
     )
 
     # Charlotte, NC (ArcGIS): city 311 service requests with native

@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Architecture review for Urban Signal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: "neutral",
+        securityLevel: "loose",
+        flowchart: { curve: "basis", htmlLabels: true },
+        themeVariables: {
+          fontFamily: "ui-sans-serif, system-ui, sans-serif",
+          primaryColor: "#f8fafc",
+          primaryTextColor: "#0f172a",
+          primaryBorderColor: "#94a3b8",
+          lineColor: "#64748b",
+          tertiaryColor: "#f1f5f9"
+        }
+      });
+    </script>
+    <style>
+      :root { color-scheme: light; }
+      html { scroll-behavior: smooth; }
+      body {
+        background:
+          radial-gradient(circle at 10% 0%, rgba(16, 185, 129, .08), transparent 27rem),
+          radial-gradient(circle at 95% 7%, rgba(79, 70, 229, .07), transparent 24rem),
+          #f7f7f5;
+      }
+      .paper { box-shadow: 0 22px 70px rgba(15, 23, 42, .07); }
+      .seam { border-style: dashed; }
+      .deep {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        color: #f8fafc;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 14px 34px rgba(15,23,42,.18);
+      }
+      .leak-line { stroke: #dc2626; stroke-width: 2.25; stroke-dasharray: 5 4; }
+      .good-line { stroke: #059669; stroke-width: 2.4; }
+      .arrow { marker-end: url(#arrow); }
+      .arrow-good { marker-end: url(#arrow-good); }
+      .module-label { letter-spacing: .11em; text-transform: uppercase; font-size: 10px; font-weight: 700; }
+      .diagram-grid {
+        background-image: linear-gradient(rgba(148,163,184,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,.1) 1px, transparent 1px);
+        background-size: 18px 18px;
+      }
+      .mass-interface { background: #fecaca; border: 1px solid #f87171; }
+      .mass-implementation { background: #e2e8f0; border: 1px solid #94a3b8; }
+      .mass-deep-interface { background: #a7f3d0; border: 1px solid #34d399; }
+      .mass-deep-implementation { background: linear-gradient(180deg, #1e293b, #0f172a); }
+      .mermaid { min-height: 250px; display: flex; align-items: center; justify-content: center; }
+      @media (max-width: 760px) { .mermaid { min-height: 220px; } }
+    </style>
+  </head>
+  <body class="text-slate-900 antialiased">
+    <main class="mx-auto max-w-6xl space-y-12 px-5 py-12 md:px-8 md:py-16">
+      <header class="paper overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div class="grid gap-8 p-7 md:grid-cols-[1fr_auto] md:p-10">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-[.22em] text-emerald-700">Architecture review · 26 August 2026</p>
+            <h1 class="mt-3 max-w-3xl font-serif text-4xl leading-tight tracking-tight text-slate-950 md:text-6xl">Deepening Urban Signal</h1>
+            <p class="mt-4 font-mono text-sm text-slate-500">Recent-change weighted · whole application · five candidates</p>
+          </div>
+          <div class="grid content-start gap-2 text-xs text-slate-600">
+            <div class="flex items-center gap-3"><span class="h-5 w-8 rounded border border-slate-400 bg-white"></span><span>module</span></div>
+            <div class="flex items-center gap-3"><span class="h-5 w-8 rounded border-2 border-dashed border-slate-400 bg-white"></span><span>seam</span></div>
+            <div class="flex items-center gap-3"><span class="h-[2px] w-8 bg-red-600"></span><span>leakage</span></div>
+            <div class="flex items-center gap-3"><span class="h-5 w-8 rounded bg-slate-900"></span><span>deep module</span></div>
+          </div>
+        </div>
+        <div class="grid border-t border-slate-200 bg-slate-50 md:grid-cols-3">
+          <div class="p-5"><div class="font-mono text-2xl font-semibold">4,710</div><div class="mt-1 text-xs uppercase tracking-wider text-slate-500">registry lines</div></div>
+          <div class="border-y border-slate-200 p-5 md:border-x md:border-y-0"><div class="font-mono text-2xl font-semibold">13 files</div><div class="mt-1 text-xs uppercase tracking-wider text-slate-500">latest metro transaction</div></div>
+          <div class="p-5"><div class="font-mono text-2xl font-semibold">2 adapters</div><div class="mt-1 text-xs uppercase tracking-wider text-slate-500">justify snapshot seam</div></div>
+        </div>
+      </header>
+
+      <section id="candidates" class="space-y-12">
+        <article id="metro-registration" class="paper overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div class="border-b border-slate-200 p-7 md:p-9">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">Strong</span>
+              <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">in-process</span>
+              <span class="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">Top recommendation</span>
+            </div>
+            <h2 class="mt-4 font-serif text-3xl tracking-tight md:text-4xl">1. Collapse the Metro registration spine</h2>
+            <p class="mt-4 font-mono text-xs leading-6 text-slate-500">apps/api/src/spatial/city_registry.py · spatial/cities/*.py · config.py · serving/dashboard.py · test_interlock_gate.py</p>
+          </div>
+
+          <div class="grid gap-5 p-6 md:grid-cols-2 md:p-9">
+            <section>
+              <div class="mb-3 flex items-center justify-between"><h3 class="module-label text-red-700">Before · scattered registration</h3><span class="text-xs text-slate-400">13-file transaction</span></div>
+              <div class="diagram-grid relative h-[330px] overflow-hidden rounded-xl border border-red-200 bg-red-50/40 p-4">
+                <svg class="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 520 330" preserveAspectRatio="none">
+                  <defs>
+                    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#dc2626"/></marker>
+                    <marker id="arrow-good" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#059669"/></marker>
+                  </defs>
+                  <path d="M255 71 C180 80 120 105 87 137" class="leak-line arrow" fill="none"/>
+                  <path d="M272 71 C348 84 411 105 438 137" class="leak-line arrow" fill="none"/>
+                  <path d="M250 151 C180 164 138 196 110 228" class="leak-line arrow" fill="none"/>
+                  <path d="M275 151 C350 166 400 198 423 229" class="leak-line arrow" fill="none"/>
+                  <path d="M260 151 L260 252" class="leak-line arrow" fill="none"/>
+                </svg>
+                <div class="relative mx-auto w-52 rounded-lg border border-slate-400 bg-white p-3 text-center shadow-sm">
+                  <div class="module-label text-slate-500">Metro leaf</div><div class="mt-1 text-sm font-semibold">geography + copied spec</div>
+                </div>
+                <div class="relative mx-auto mt-7 w-60 rounded-lg border-2 border-red-400 bg-white p-3 text-center shadow-sm">
+                  <div class="module-label text-red-600">Shared spine</div><div class="mt-1 text-sm font-semibold">4,710-line registry</div>
+                </div>
+                <div class="absolute left-4 top-[205px] w-32 rounded border border-slate-300 bg-white p-2 text-center text-xs">configuration</div>
+                <div class="absolute right-4 top-[205px] w-32 rounded border border-slate-300 bg-white p-2 text-center text-xs">dashboard names</div>
+                <div class="absolute bottom-4 left-1/2 w-36 -translate-x-1/2 rounded border border-slate-300 bg-white p-2 text-center text-xs">invariant tables</div>
+              </div>
+            </section>
+            <section>
+              <div class="mb-3 flex items-center justify-between"><h3 class="module-label text-emerald-700">After · registration locality</h3><span class="text-xs text-slate-400">one deep module</span></div>
+              <div class="diagram-grid relative h-[330px] overflow-hidden rounded-xl border border-emerald-200 bg-emerald-50/40 p-4">
+                <svg class="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 520 330" preserveAspectRatio="none">
+                  <defs><marker id="arrow-good-1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#059669"/></marker></defs>
+                  <path d="M260 177 C170 185 112 214 91 246" stroke="#059669" stroke-width="2.4" marker-end="url(#arrow-good-1)" fill="none"/>
+                  <path d="M260 177 L260 246" stroke="#059669" stroke-width="2.4" marker-end="url(#arrow-good-1)" fill="none"/>
+                  <path d="M260 177 C350 185 410 214 430 246" stroke="#059669" stroke-width="2.4" marker-end="url(#arrow-good-1)" fill="none"/>
+                </svg>
+                <div class="deep relative mx-auto w-[78%] rounded-xl p-5 text-center">
+                  <div class="module-label text-emerald-300">Deep Metro registration module</div>
+                  <div class="mt-3 text-sm font-semibold">identity · aliases · geography · datasets · display facts</div>
+                  <div class="seam mx-auto mt-4 w-40 rounded border-2 border-emerald-300/70 px-2 py-1 text-xs text-emerald-100">small registration interface</div>
+                </div>
+                <div class="absolute bottom-5 left-3 w-[29%] rounded border border-slate-300 bg-white p-2 text-center text-xs">ingestion catalog</div>
+                <div class="absolute bottom-5 left-1/2 w-[29%] -translate-x-1/2 rounded border border-slate-300 bg-white p-2 text-center text-xs">snapshot + facts</div>
+                <div class="absolute bottom-5 right-3 w-[29%] rounded border border-slate-300 bg-white p-2 text-center text-xs">map projection</div>
+              </div>
+            </section>
+          </div>
+          <div class="grid gap-5 border-t border-slate-200 bg-slate-50 p-7 md:grid-cols-[1.2fr_1.2fr_1fr] md:p-9">
+            <div><h3 class="module-label text-slate-500">Problem</h3><p class="mt-2 text-sm leading-6">One Metro registration leaks across shared imports, configuration, aliases, dashboard metadata, invariant tables, and a registry that manually copies leaf declarations.</p></div>
+            <div><h3 class="module-label text-slate-500">Solution</h3><p class="mt-2 text-sm leading-6">Deepen each existing Metro module as the locality for its complete registration; let the registry implementation derive mechanical projections without changing downstream behavior.</p></div>
+            <div><h3 class="module-label text-slate-500">Wins</h3><ul class="mt-2 space-y-1.5 text-sm"><li>locality: one Metro module</li><li>leverage: every projection follows</li><li>tests cross one interface</li><li>spine contention falls sharply</li></ul></div>
+          </div>
+          <div class="border-t border-emerald-200 bg-emerald-50 px-7 py-4 text-sm text-emerald-900"><strong>ADR fit:</strong> implements ADR-0001’s own highest-value refactor signal and preserves ADR-0007’s separate-registration model.</div>
+        </article>
+
+        <article id="dataset-acquisition" class="paper overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div class="border-b border-slate-200 p-7 md:p-9">
+            <div class="flex flex-wrap items-center gap-2"><span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">Strong</span><span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">ports &amp; adapters</span></div>
+            <h2 class="mt-4 font-serif text-3xl tracking-tight md:text-4xl">2. Deepen registered dataset acquisition</h2>
+            <p class="mt-4 font-mono text-xs leading-6 text-slate-500">city_registry.py · producers/scheduler.py · producer clients · feed_staleness_probe.py · backfill paths</p>
+          </div>
+          <div class="grid gap-5 p-6 md:grid-cols-2 md:p-9">
+            <section>
+              <h3 class="module-label mb-3 text-red-700">Before · implicit interface</h3>
+              <div class="h-[330px] rounded-xl border border-red-200 bg-red-50/40 p-5">
+                <div class="mx-auto max-w-sm">
+                  <div class="mass-interface rounded-t-lg p-4 text-center">
+                    <div class="module-label text-red-800">Wide interface callers must know</div>
+                    <div class="mt-2 text-xs leading-5 text-red-950">endpoint_by_year · watermark_type · watermark_format · exclude · select · id_col · fallbacks · geocode · field_map</div>
+                  </div>
+                  <div class="mass-implementation rounded-b-lg p-3 text-center text-sm font-semibold">thin <code>DatasetSpec.extra</code> dictionary</div>
+                </div>
+                <div class="mt-5 grid grid-cols-3 gap-2 text-center text-xs">
+                  <div class="rounded border border-red-300 bg-white p-2">live poll</div><div class="rounded border border-red-300 bg-white p-2">backfill</div><div class="rounded border border-red-300 bg-white p-2">freshness</div>
+                  <div class="rounded border border-red-300 bg-white p-2">rollover</div><div class="rounded border border-red-300 bg-white p-2">geocoder</div><div class="rounded border border-red-300 bg-white p-2">row maps</div>
+                </div>
+                <div class="mt-4 text-center text-xs font-semibold text-red-700">Each caller reinterprets the same string keys</div>
+              </div>
+            </section>
+            <section>
+              <h3 class="module-label mb-3 text-emerald-700">After · acquisition depth</h3>
+              <div class="h-[330px] rounded-xl border border-emerald-200 bg-emerald-50/40 p-5">
+                <div class="mx-auto max-w-sm">
+                  <div class="mass-deep-interface rounded-t-lg p-2 text-center"><div class="module-label text-emerald-900">Small dataset interface</div></div>
+                  <div class="mass-deep-implementation rounded-b-lg p-6 text-center text-white">
+                    <div class="module-label text-emerald-300">Deep acquisition implementation</div>
+                    <div class="mt-3 text-sm leading-6">endpoint resolution<br/>watermark policy<br/>query construction<br/>pagination translation</div>
+                  </div>
+                </div>
+                <div class="seam mx-auto mt-5 grid max-w-md grid-cols-5 gap-1 rounded-lg border-2 border-emerald-400 bg-white p-2 text-center text-[10px] font-semibold uppercase tracking-wide text-slate-600">
+                  <div>Socrata</div><div>ArcGIS</div><div>CARTO</div><div>CKAN</div><div>CSV</div>
+                </div>
+                <div class="mt-3 text-center text-xs text-emerald-800">Five adapters make the seam real</div>
+              </div>
+            </section>
+          </div>
+          <div class="grid gap-5 border-t border-slate-200 bg-slate-50 p-7 md:grid-cols-[1.2fr_1.2fr_1fr] md:p-9">
+            <div><h3 class="module-label text-slate-500">Problem</h3><p class="mt-2 text-sm leading-6">The real dataset interface is an undocumented vocabulary of <code>extra</code> keys, copied into another dictionary and interpreted differently by acquisition callers and incompatible adapters.</p></div>
+            <div><h3 class="module-label text-slate-500">Solution</h3><p class="mt-2 text-sm leading-6">Concentrate endpoint, query, watermark, and pagination behavior in one deep acquisition module; keep platform differences inside their adapters.</p></div>
+            <div><h3 class="module-label text-slate-500">Wins</h3><ul class="mt-2 space-y-1.5 text-sm"><li>one acquisition test surface</li><li>locality: policy stops leaking</li><li>leverage across three callers</li><li>adapters satisfy one seam</li></ul></div>
+          </div>
+          <div class="border-t border-amber-200 bg-amber-50 px-7 py-4 text-sm text-amber-950"><strong>ADR warning:</strong> preserves ADR-0005’s watermark semantics, but changing its recorded <code>DatasetSpec.extra["watermark_*"]</code> representation requires amending or superseding that ADR.</div>
+        </article>
+
+        <article id="snapshot-query" class="paper overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div class="border-b border-slate-200 p-7 md:p-9">
+            <div class="flex flex-wrap items-center gap-2"><span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">Strong</span><span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">ports &amp; adapters</span></div>
+            <h2 class="mt-4 font-serif text-3xl tracking-tight md:text-4xl">3. Unite edge snapshot queries</h2>
+            <p class="mt-4 font-mono text-xs leading-6 text-slate-500">apps/dashboard/src/index.ts:127–185, 442–552, 1177–1425 · tests/index.test.ts</p>
+          </div>
+          <div class="grid gap-5 p-6 md:grid-cols-2 md:p-9">
+            <section>
+              <h3 class="module-label mb-3 text-red-700">Before · policy duplicated</h3>
+              <div class="rounded-xl border border-red-200 bg-white p-3">
+                <pre class="mermaid">
+flowchart TB
+  H[HTTP adapter] --> HN[normalize city]
+  HN --> HK[read snapshot KV]
+  HK --> HF[filter catalysts<br/>limit 50 / max 500]
+  M[MCP adapter] --> MN[normalize city]
+  MN --> MK[read snapshot KV]
+  MK --> MF[filter catalysts<br/>limit 25 / max 100]
+  classDef leak fill:#fef2f2,stroke:#dc2626,stroke-width:2px,color:#7f1d1d;
+  class HN,HK,HF,MN,MK,MF leak;
+                </pre>
+              </div>
+            </section>
+            <section>
+              <h3 class="module-label mb-3 text-emerald-700">After · two adapters, one seam</h3>
+              <div class="rounded-xl border border-emerald-200 bg-white p-3">
+                <pre class="mermaid">
+flowchart TB
+  H[HTTP adapter] --> Q
+  M[MCP adapter] --> Q
+  Q[Deep snapshot query module<br/>normalize · lookup · filter · predict] --> K[(Workers KV snapshots)]
+  classDef adapter fill:#f8fafc,stroke:#64748b,color:#0f172a;
+  classDef deep fill:#0f172a,stroke:#059669,stroke-width:3px,color:#f8fafc;
+  class H,M adapter;
+  class Q deep;
+                </pre>
+              </div>
+            </section>
+          </div>
+          <div class="grid gap-5 border-t border-slate-200 bg-slate-50 p-7 md:grid-cols-[1.2fr_1.2fr_1fr] md:p-9">
+            <div><h3 class="module-label text-slate-500">Problem</h3><p class="mt-2 text-sm leading-6">HTTP and MCP adapters separately normalize cities, choose KV keys, validate filters, trim catalysts, and look up predictions; observable limits have already drifted.</p></div>
+            <div><h3 class="module-label text-slate-500">Solution</h3><p class="mt-2 text-sm leading-6">Put snapshot semantics behind one deep query module while each adapter retains transport inputs, errors, headers, and representation.</p></div>
+            <div><h3 class="module-label text-slate-500">Wins</h3><ul class="mt-2 space-y-1.5 text-sm"><li>one semantic test surface</li><li>locality: filters agree</li><li>leverage across adapters</li><li>transport tests stay small</li></ul></div>
+          </div>
+        </article>
+
+        <article id="row-interpretation" class="paper overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div class="border-b border-slate-200 p-7 md:p-9">
+            <div class="flex flex-wrap items-center gap-2"><span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900">Worth exploring</span><span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">in-process</span></div>
+            <h2 class="mt-4 font-serif text-3xl tracking-tight md:text-4xl">4. Concentrate municipal row interpretation</h2>
+            <p class="mt-4 font-mono text-xs leading-6 text-slate-500">dob_permits_producer.py · complaints_311_producer.py · sla_licenses_producer.py · deeds_acris_producer.py · field_maps.py</p>
+          </div>
+          <div class="grid gap-5 p-6 md:grid-cols-2 md:p-9">
+            <section>
+              <h3 class="module-label mb-3 text-red-700">Before · repeated cross-sections</h3>
+              <div class="h-[330px] space-y-2 rounded-xl border border-red-200 bg-red-50/40 p-5">
+                <div class="grid grid-cols-[80px_1fr] items-center gap-3"><span class="text-xs font-semibold">Permits</span><div class="flex overflow-hidden rounded border border-red-300"><span class="flex-1 bg-white p-2 text-center text-[10px]">fields</span><span class="flex-1 bg-red-100 p-2 text-center text-[10px]">coords</span><span class="flex-1 bg-white p-2 text-center text-[10px]">H3</span><span class="flex-1 bg-red-100 p-2 text-center text-[10px]">division</span></div></div>
+                <div class="grid grid-cols-[80px_1fr] items-center gap-3"><span class="text-xs font-semibold">311</span><div class="flex overflow-hidden rounded border border-red-300"><span class="flex-1 bg-white p-2 text-center text-[10px]">fields</span><span class="flex-1 bg-red-100 p-2 text-center text-[10px]">coords</span><span class="flex-1 bg-white p-2 text-center text-[10px]">H3</span><span class="flex-1 bg-red-100 p-2 text-center text-[10px]">division</span></div></div>
+                <div class="grid grid-cols-[80px_1fr] items-center gap-3"><span class="text-xs font-semibold">Licenses</span><div class="flex overflow-hidden rounded border border-red-300"><span class="flex-1 bg-white p-2 text-center text-[10px]">fields</span><span class="flex-1 bg-red-100 p-2 text-center text-[10px]">coords</span><span class="flex-1 bg-white p-2 text-center text-[10px]">H3</span><span class="flex-1 bg-red-100 p-2 text-center text-[10px]">division</span></div></div>
+                <div class="grid grid-cols-[80px_1fr] items-center gap-3"><span class="text-xs font-semibold">Deeds</span><div class="flex overflow-hidden rounded border border-red-300"><span class="flex-1 bg-white p-2 text-center text-[10px]">fields</span><span class="flex-1 bg-red-100 p-2 text-center text-[10px]">coords</span><span class="flex-1 bg-white p-2 text-center text-[10px]">H3</span><span class="flex-1 bg-red-100 p-2 text-center text-[10px]">division</span></div></div>
+                <div class="mt-5 rounded-lg border-2 border-dashed border-red-400 bg-white p-3 text-center text-xs font-semibold text-red-800">Cross-feed fixes repeat in each implementation</div>
+              </div>
+            </section>
+            <section>
+              <h3 class="module-label mb-3 text-emerald-700">After · shared mechanics internal</h3>
+              <div class="h-[330px] rounded-xl border border-emerald-200 bg-emerald-50/40 p-5">
+                <div class="deep mx-auto max-w-md rounded-xl p-5 text-center">
+                  <div class="module-label text-emerald-300">Deep row interpretation module</div>
+                  <div class="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-200"><span class="rounded bg-white/10 p-2">field resolution</span><span class="rounded bg-white/10 p-2">coordinates</span><span class="rounded bg-white/10 p-2">geocoding</span><span class="rounded bg-white/10 p-2">H3 + division</span></div>
+                </div>
+                <div class="seam mx-auto mt-4 w-40 rounded border-2 border-emerald-500 bg-white p-2 text-center text-xs font-semibold">interpreted row seam</div>
+                <div class="mt-5 grid grid-cols-4 gap-2 text-center text-[10px] font-semibold uppercase tracking-wide"><div class="rounded border bg-white p-2">Permits</div><div class="rounded border bg-white p-2">311</div><div class="rounded border bg-white p-2">Licenses</div><div class="rounded border bg-white p-2">Deeds</div></div>
+                <div class="mt-3 text-center text-xs text-slate-600">Feed-specific interpretation remains local</div>
+              </div>
+            </section>
+          </div>
+          <div class="grid gap-5 border-t border-slate-200 bg-slate-50 p-7 md:grid-cols-[1.2fr_1.2fr_1fr] md:p-9">
+            <div><h3 class="module-label text-slate-500">Problem</h3><p class="mt-2 text-sm leading-6">Feed modules repeat city resolution, mapped-field lookup, coordinate and geocoding policy, H3 hierarchy creation, and division lookup before their distinctive work begins.</p></div>
+            <div><h3 class="module-label text-slate-500">Solution</h3><p class="mt-2 text-sm leading-6">Deepen one row-interpretation module around common mechanics; keep event-specific decisions in each feed module and keep dataset acquisition outside this seam.</p></div>
+            <div><h3 class="module-label text-slate-500">Wins</h3><ul class="mt-2 space-y-1.5 text-sm"><li>locality: spatial fixes once</li><li>leverage across feed modules</li><li>common tests survive</li><li>feed variation stays visible</li></ul></div>
+          </div>
+          <div class="border-t border-slate-200 bg-slate-50 px-7 py-4 text-sm text-slate-700"><strong>Constraint:</strong> null-coordinate behavior genuinely varies by feed. Avoid a configuration-heavy interface that merely relocates those branches.</div>
+        </article>
+
+        <article id="product-tools" class="paper overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div class="border-b border-slate-200 p-7 md:p-9">
+            <div class="flex flex-wrap items-center gap-2"><span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900">Worth exploring</span><span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">local-substitutable</span></div>
+            <h2 class="mt-4 font-serif text-3xl tracking-tight md:text-4xl">5. Deepen product knowledge tools</h2>
+            <p class="mt-4 font-mono text-xs leading-6 text-slate-500">apps/product/scripts/mcp-tools.mjs · worker.mjs · src/webmcp.js · generate-agent-surfaces.mjs</p>
+          </div>
+          <div class="grid gap-5 p-6 md:grid-cols-2 md:p-9">
+            <section>
+              <h3 class="module-label mb-3 text-red-700">Before · shallow contract module</h3>
+              <div class="h-[330px] rounded-xl border border-red-200 bg-red-50/40 p-5">
+                <div class="mass-interface mx-auto max-w-sm rounded-t-lg p-4 text-center"><div class="module-label text-red-800">Nearly complete tool interface</div><div class="mt-2 text-xs">four names · descriptions · schemas</div></div>
+                <div class="mass-implementation mx-auto max-w-sm rounded-b-lg p-2 text-center text-xs">43-line metadata implementation</div>
+                <div class="mt-5 grid grid-cols-2 gap-3">
+                  <div class="rounded-lg border-2 border-red-300 bg-white p-4 text-center"><div class="module-label text-red-700">MCP adapter</div><p class="mt-2 text-xs">switch + asset behavior</p></div>
+                  <div class="rounded-lg border-2 border-red-300 bg-white p-4 text-center"><div class="module-label text-red-700">WebMCP adapter</div><p class="mt-2 text-xs">duplicate tools + behavior</p></div>
+                </div>
+                <div class="mt-4 text-center text-xs font-semibold text-red-700">Descriptions and results already differ</div>
+              </div>
+            </section>
+            <section>
+              <h3 class="module-label mb-3 text-emerald-700">After · semantic depth</h3>
+              <div class="h-[330px] rounded-xl border border-emerald-200 bg-emerald-50/40 p-5">
+                <div class="deep mx-auto max-w-sm rounded-xl p-5 text-center"><div class="module-label text-emerald-300">Deep product knowledge module</div><div class="mt-3 text-sm">contracts · validation · transformations · asset paths</div><div class="seam mx-auto mt-4 rounded border-2 border-emerald-300/70 p-2 text-xs text-emerald-100">one tool interface</div></div>
+                <div class="mx-auto mt-4 h-7 w-px bg-emerald-500"></div>
+                <div class="grid grid-cols-3 gap-2 text-center text-xs"><div class="rounded border border-slate-300 bg-white p-3">MCP adapter</div><div class="rounded border border-slate-300 bg-white p-3">WebMCP adapter</div><div class="rounded border border-slate-300 bg-white p-3">discovery build</div></div>
+                <div class="mt-4 text-center text-xs text-emerald-800">Two runtime adapters justify the seam</div>
+              </div>
+            </section>
+          </div>
+          <div class="grid gap-5 border-t border-slate-200 bg-slate-50 p-7 md:grid-cols-[1.2fr_1.2fr_1fr] md:p-9">
+            <div><h3 class="module-label text-slate-500">Problem</h3><p class="mt-2 text-sm leading-6">The existing contract module shares metadata with the build and edge runtime, while browser WebMCP duplicates every tool and semantic behavior diverges.</p></div>
+            <div><h3 class="module-label text-slate-500">Solution</h3><p class="mt-2 text-sm leading-6">Deepen the product knowledge module to own contracts and semantics; leave MCP and WebMCP as adapters at the seam.</p></div>
+            <div><h3 class="module-label text-slate-500">Wins</h3><ul class="mt-2 space-y-1.5 text-sm"><li>one tool test surface</li><li>locality: contracts match behavior</li><li>leverage across three consumers</li><li>string checks disappear</li></ul></div>
+          </div>
+          <div class="border-t border-emerald-200 bg-emerald-50 px-7 py-4 text-sm text-emerald-900"><strong>ADR fit:</strong> reinforces ADR-0009’s requirement that browser tools mirror the edge tools and that discovery documents share their contract.</div>
+        </article>
+      </section>
+
+      <section id="top-recommendation" class="paper overflow-hidden rounded-2xl border border-emerald-300 bg-slate-950 text-white">
+        <div class="grid gap-8 p-8 md:grid-cols-[1fr_auto] md:items-end md:p-11">
+          <div><p class="module-label text-emerald-300">Top recommendation</p><h2 class="mt-3 font-serif text-3xl tracking-tight md:text-5xl">Collapse the Metro registration spine</h2><p class="mt-4 max-w-3xl text-base leading-7 text-slate-300">It targets the hottest recurring change path, removes proven duplicate declarations, and turns the shared spine that caused torn registrations into deep, leaf-local Metro modules.</p></div>
+          <a href="#metro-registration" class="rounded-lg bg-emerald-300 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-emerald-200">View candidate ↑</a>
+        </div>
+      </section>
+
+      <footer class="pb-6 text-center font-mono text-xs text-slate-400">Urban Signal · architecture evidence from graph generation 2026-08-26T22:17:05Z plus direct-source verification</footer>
+    </main>
+  </body>
+</html>

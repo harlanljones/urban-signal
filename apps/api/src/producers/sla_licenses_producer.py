@@ -3,6 +3,7 @@
 import argparse
 import logging
 from datetime import datetime, timezone
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Optional
 from src.config import settings
@@ -11,10 +12,38 @@ from src.producers.arcgis_client import ArcGISClient
 from src.producers.carto_client import CartoClient
 from src.producers.csv_client import CSVClient
 from src.producers.socrata_client import SocrataClient
+from src.producers.ckan_client import CkanClient
 from src.schemas.models import SLALicenseEvent
 from src.spatial.h3_indexer import H3SpatialIndexer
 
 logger = logging.getLogger(__name__)
+
+
+@lru_cache(maxsize=8)
+def _state_plane_transformer(crs: str):
+    """Build and cache an always-XY transform from a declared source CRS."""
+    from pyproj import Transformer
+
+    return Transformer.from_crs(crs, "EPSG:4326", always_xy=True)
+
+
+def _transform_state_plane(
+    row: Dict[str, Any],
+    crs: str,
+    x_col: str = "gpsx",
+    y_col: str = "gpsy",
+) -> tuple[float, float] | None:
+    """Return ``(longitude, latitude)`` for a row's projected coordinates."""
+    x_raw, y_raw = row.get(x_col), row.get(y_col)
+    if x_raw in (None, "") or y_raw in (None, ""):
+        return None
+    try:
+        x, y = _state_plane_transformer(crs).transform(float(x_raw), float(y_raw))
+    except (TypeError, ValueError, OverflowError):
+        return None
+    if not (-180 <= x <= 180 and -90 <= y <= 90):
+        return None
+    return x, y
 
 
 def _parse_datetime(val: Any) -> Optional[datetime]:
@@ -57,6 +86,7 @@ class SLALicensesProducer:
         )
         self.socrata = SocrataClient()
         self.arcgis = ArcGISClient()
+        self.ckan = CkanClient()
         self.carto = CartoClient()
         self.csv = CSVClient()
         self.spatial_indexer = H3SpatialIndexer()
@@ -191,6 +221,21 @@ class SLALicensesProducer:
                     lng_raw = loc.get("longitude") or loc.get("lng") or (
                         loc.get("coordinates", [None, None])[0] if "coordinates" in loc else None
                     )
+
+            if not lat_raw or not lng_raw:
+                # Boston's CKAN Licensing Board exposes Massachusetts Mainland
+                # State Plane US survey feet (EPSG:2249), not WGS84 degrees.
+                # Read the declared transform metadata from the registry.
+                if resolved_city == "boston":
+                    boston_spec = get_dataset(CityId.BOSTON, FeedType.SLA)
+                    transformed = _transform_state_plane(
+                        row,
+                        boston_spec.extra.get("state_plane_crs", "EPSG:2249"),
+                        boston_spec.extra.get("state_plane_x_col", "gpsx"),
+                        boston_spec.extra.get("state_plane_y_col", "gpsy"),
+                    )
+                    if transformed is not None:
+                        lng_raw, lat_raw = transformed
 
             if not lat_raw or not lng_raw:
                 # Address-string feeds declaring extra["needs_geocode"]
@@ -341,6 +386,10 @@ class SLALicensesProducer:
             logger.warning("Error parsing SLA row: %s", e)
             return None
 
+    def parse_ckan_row(self, row: Dict[str, Any], city_id: Optional[str] = None) -> Optional[SLALicenseEvent]:
+        """CKAN license records are flat JSON dicts like Socrata; reuse the generic parser."""
+        return self.parse_socrata_row(row, city_id=city_id)
+
     def run_stream(self, city_id: str = "nyc", limit: int = 5000, where_clause: Optional[str] = None):
         """Fetch SLA / license records and stream them into Kafka topic."""
         from src.spatial.city_registry import REGISTRY, CityId, FeedType, normalize_city, get_dataset
@@ -364,7 +413,8 @@ class SLALicensesProducer:
             max_records=limit,
         ):
             for row in batch:
-                event = self.parse_socrata_row(row, city_id=cid.value)
+                parse_fn = self.parse_ckan_row if spec.platform == "ckan" else self.parse_socrata_row
+                event = parse_fn(row, city_id=cid.value)
                 if event:
                     key = f"{event.city_id}:{event.license_id}"
                     self.producer.produce(

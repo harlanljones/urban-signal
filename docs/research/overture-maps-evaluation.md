@@ -25,15 +25,48 @@ I validated on three layers, in order:
    repo's metro-bbox → division/submarket → H3 7–9 model (`spatial/h3_indexer.py`,
    `spatial/submarkets.py`) by *concept*, not by running a pipeline.
 
-**Limits.** I did not download any Parquet or run a metro extraction — this is a leaf
-research stream and no pipeline was executed. The exact per-metro building/place
-counts and the real-world (`added`/`removed`) delta volume for a US metro are
-**unverified** (asserted from the guides' global counts and the changelog schema).
+**Limits.** I ran a bounded Places extraction below, but did not build a production
+pipeline or download complete releases. The counts are for the explicit rectangular
+sample bboxes, not official metro boundaries, and the release diff is an apparent
+GERS-ID delta rather than verified business openings/closures. Building-footprint
+counts and license cross-validation remain unmeasured.
 The US-specific coverage figures (e.g. how complete US building footprints are versus
 OSM/authoritative sources) are **not** individually measured; only the global
 coverage statements from the guides are cited. The precise legal interpretation of
 ODbL share-alike obligations on a derived/redistributed product is **unverified** —
 flagged for legal review, not assessed.
+
+## Bounded Places snapshot extraction (live)
+
+I read the public GeoParquet partitions for the two available dated releases,
+`2026-07-22.0` and `2026-08-19.0`, using Parquet row-group bbox statistics so only
+intersecting data was transferred. The three rectangular samples were Denver
+`(-105.15, 39.60, -104.70, 39.90)`, Houston `(-95.80, 29.45, -95.00, 30.20)`,
+and Pittsburgh `(-80.30, 40.25, -79.60, 40.70)`. The source documents the same
+release paths and bbox-filtered access pattern in the [Places guide](https://docs.overturemaps.org/guides/places/)
+and the release artifacts in the [2026-07-22 notes](https://docs.overturemaps.org/blog/2026/07/22/release-notes/).
+
+| Sample | 2026-07-22 places | 2026-08-19 places | Apparent added IDs | Apparent removed IDs | Shared IDs | Category changes | Status changes |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Denver | 95,319 | 107,254 | 14,408 | 2,473 | 92,846 | 6,096 | 5,247 |
+| Houston | 274,022 | 313,309 | 55,779 | 16,492 | 257,530 | 16,967 | 15,231 |
+| Pittsburgh | 75,094 | 80,644 | 7,115 | 1,565 | 73,529 | 5,590 | 4,024 |
+
+All three samples had zero null confidence values. `basic_category` was null for
+7,188/95,319 Denver rows in July and 4,651/107,254 in August; Houston had
+25,154/274,022 and 31,585/313,309; Pittsburgh had 5,572/75,094 and 2,857/80,644.
+This is material for category-mix features: use `taxonomy`/`basic_category` with
+an explicit unknown bucket and track schema-version changes. The large apparent
+delta fraction, especially in Houston, is evidence that the naive release diff is
+not a clean openings/closures measure; a promoted pipeline must inspect changelog
+records, bridge files, confidence, and source provenance before interpreting it.
+
+The extraction confirms feasibility of a small bbox query and stable-ID join, but
+does not establish real-world completeness or license-feed agreement. It also
+confirms that release snapshots are large: the first five August Places partitions
+alone are roughly 3.4 GB compressed, so row-group pruning or the official bbox
+client is required. See the [official Python client](https://docs.overturemaps.org/getting-data/overturemaps-py/)
+for the supported streaming bbox path.
 
 ## Headline verdict
 

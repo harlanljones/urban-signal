@@ -206,6 +206,43 @@ leaf stream must not do.
 
 ## Recommendation
 
+## Live endpoint follow-up (2026-08-26)
+
+The current official ECHO facility search endpoint was also reachable for
+bounded queries during this follow-up. It returned JSON with a stable
+`RegistryID`, facility coordinates, current compliance status, inspection
+counts, and the date/count of the last formal action. The search is facility
+oriented: its summary is useful for a contextual baseline, but it is not a
+complete event ledger.
+
+| Sample | Result rows | Formal-enforcement rows | Inspection rows | Page sample |
+| --- | ---: | ---: | ---: | ---: |
+| San Francisco, CA 94105 | 818 | 2 | 2 | 10 |
+| Chicago, IL 60601 | 271 | 3 | 4 | 10 |
+| Houston, TX, 1-mile radius around 29.7604, -95.3698 | 475 | 5 | 8 | 10 |
+
+The Houston ZIP query was rejected because its estimated 1,120 rows exceeded
+the query limit; narrowing to a radius succeeded. The official facility map
+layer independently exposes `REGISTRY_ID`, `FAC_LAT`, `FAC_LONG`, compliance
+status, inspection/action dates and counts, penalties, and program-specific
+fields. Its point geometry is suitable for an H3 8/9 join after requesting
+WGS84 output. ECHO's web-services catalog documents query-only public REST
+services, while its downloads catalog documents a weekly national/exporter
+snapshot with facility, inspection, violation, action, penalty, coordinate,
+and FRS-join fields. See the [ECHO web services catalog](https://echo.epa.gov/tools/web-services),
+[ECHO data downloads](https://echo.epa.gov/tools/data-downloads),
+[ECHO map-service documentation](https://echo.epa.gov/tools/map-service),
+[the facility map layer metadata](https://echogeo.epa.gov/arcgis/rest/services/ECHO/Facilities/MapServer/0),
+and [the facility search service](https://echodata.epa.gov/echo/echo_rest_services.get_facilities).
+
+This follow-up changes the access conclusion from “REST unavailable” to
+“bounded facility search is available, but bulk/program-specific extracts are
+still required for a durable dated-event pipeline.” Deduplicate on
+`REGISTRY_ID` plus a program/event identifier when those records are joined;
+do not use facility name or address as the key. Treat missing ECHO events as
+unknown rather than clean because coverage and reporting intensity vary by
+program, facility type, and jurisdiction.
+
 **DEFER** — do not register now, but this is a *stronger* candidate than the
 LODES validation and the data side is proven feasible. **Do not register**
 because a feed registration is impossible in the current model without a spine/

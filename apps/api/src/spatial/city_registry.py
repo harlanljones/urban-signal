@@ -16,6 +16,7 @@ from src.producers.field_maps_san_jose import FIELD_MAP as SAN_JOSE_FIELD_MAP
 from src.producers.field_maps_tampa import FIELD_MAP as TAMPA_FIELD_MAP, SLA_FIELD_MAP as TAMPA_SLA_FIELD_MAP
 from src.producers.field_maps_las_vegas import FIELD_MAP as LAS_VEGAS_FIELD_MAP
 from src.producers.field_maps_boise import FIELD_MAP as BOISE_PERMITS_FIELD_MAP
+from src.producers.field_maps_boston_licensing import FIELD_MAP as BOSTON_LICENSING_FIELD_MAP
 from src.spatial.cities.portland import (
     PORTLAND_DIVISION_BBOXES,
     PORTLAND_DIVISIONS,
@@ -1561,14 +1562,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
         submarkets=AUSTIN_SUBMARKETS,
         divisions=AUSTIN_DIVISIONS,
         job_suffix="austin",
-        # Partial registration like Los Angeles: Austin registers two feeds
-        # only. No business-license or property-sales feed exists on
-        # data.austintexas.gov — the domain exited the Socrata discovery mesh
-        # after the Texas ODP migration (its catalog now serves three internal
-        # analytics views), TABC's statewide alcohol licenses carry zero
-        # geocodes, and Travis County's Socrata presence is an unreachable
-        # FedRAMP shell. FeedType.SLA and FeedType.DEEDS stay deliberately
-        # absent; `get_dataset` raises readable errors for them.
+        # Partial registration like Los Angeles: Austin registers permits + 311
+        # natively. US-136 adds the TABC statewide liquor-license SLA feed
+        # (address-only; geocoded per ADR-0004). No property-sales feed exists
+        # on data.austintexas.gov (Travis County Socrata is an unreachable
+        # FedRAMP shell), so FeedType.DEEDS stays absent.
         datasets={
             FeedType.PERMITS: DatasetSpec(
                 endpoint=settings.socrata_austin_permits_endpoint,
@@ -1617,9 +1615,40 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                         "closed_date": ["sr_closed_date"],
                         "status": ["sr_status_desc"],
                         "zipcode": ["sr_location_zip_code"],
-                        "incident_address": ["sr_location"],
+                    "incident_address": ["sr_location"],
                         "borough": ["sr_location_council_district"],
-                    }
+                }
+            },
+        ),
+            # US-136: TABC statewide liquor-license feed (data.texas.gov
+            # `7hf9-qc9f` "TABC License Information"). Address-only — no lat/lng
+            # columns — so needs_geocode flips the coordinate requirement and the
+            # ADR 0004 geocoder resolves coordinates at parse time.
+            # watermark = current_issued_date, the published issuance cursor
+            # for this slowly-churning license file.
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.socrata_austin_tabc_endpoint,
+                platform="socrata",
+                watermark_col="current_issued_date",
+                id_keys=["license_id", "master_file_id"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                extra={
+                    "expected_cadence_days": 7,
+                    "needs_geocode": True,
+                    "geocode_context": "TX",
+                    "where": "county = 'Travis'",
+                    "field_map": {
+                        "license_id": ["license_id"],
+                        "license_type": ["license_type"],
+                        "effective_date": ["current_issued_date"],
+                        "expiration_date": ["expiration_date"],
+                        "premises_name": ["owner"],
+                        "dba": ["trade_name"],
+                        "address_street": ["address"],
+                        "status": ["license_status"],
+                    },
                 },
             ),
         },
@@ -1744,11 +1773,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
         job_suffix="boston",
         # No sales/deeds dataset exists on the Boston portal (research:
         # non-socrata-platforms.md, Boston section — "Deeds/sales: none
-        # found"). The Licensing Board feed (04dc653b) is deliberately
-        # excluded: its only coordinate columns, gpsx/gpsy, are Massachusetts
-        # State Plane meters (EPSG:26986), not WGS84 degrees, so ~99.6% of
-        # rows fail spatial parsing and it fails G5 by construction. CRS
-        # transformation is deferred to the geocoding wave (HJ-113).
+        # found"). US-137 registers the Licensing Board feed (04dc653b) as an
+        # SLA coordinates gpsx/gpsy are Massachusetts Mainland State Plane US
+        # survey feet (EPSG:2249); US-137 Path A transforms them to WGS84.
         datasets={
             FeedType.PERMITS: DatasetSpec(
                 endpoint=settings.ckan_boston_permits_endpoint,
@@ -1801,6 +1828,26 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                         "2026": settings.ckan_boston_311_endpoint,
                     },
                     "rollover": "manual-verify",
+                },
+            ),
+            # US-137: Boston Licensing Board register (CKAN 04dc653b-...).
+            # Its only coordinate columns, gpsx/gpsy, are Massachusetts State
+            # Plane US survey feet (EPSG:2249), so Path A transforms them.
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.ckan_boston_licenses_endpoint,
+                platform="ckan",
+                watermark_col="expires",
+                id_keys=["license_num", "_id"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                extra={
+                    "expected_cadence_days": 7,
+                    "state_plane_crs": "EPSG:2249",
+                    "state_plane_units": "US survey feet",
+                    "state_plane_x_col": "gpsx",
+                    "state_plane_y_col": "gpsy",
+                    "field_map": BOSTON_LICENSING_FIELD_MAP,
                 },
             ),
         },
@@ -2980,12 +3027,10 @@ REGISTRY: Dict[CityId, CityRegistration] = {
         submarkets=MILWAUKEE_SUBMARKETS,
         divisions=MILWAUKEE_DIVISIONS,
         job_suffix="mke",
-        # SLA-only registration (US-87): the city's liquor-license registry is
-        # the verified machine-readable feed with point geometry + dates.
-        # Permits are a monthly CSV with ~2-month lag and address-only coords
-        # (G5/G11 reject); no open 311 dataset; deeds are yearly archives —
-        # all deliberately unregistered. ANSI-date-literal server, so the
-        # shared watermark_comparison renders the incremental where.
+        # US-87 registered the liquor-license SLA (point geometry + dates).
+        # US-138 adds building PERMITS and recorded DEEDS (CKAN CSV). Both arrive
+        # address-only, so they geocode at parse time per ADR-0004; DEEDS uses
+        # an ADR-0005 typed text watermark.
         datasets={
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.arcgis_milwaukee_licenses_url,
@@ -3005,6 +3050,69 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                         "effective_date": ["EFFECTIVE_DATE"],
                         "expiration_date": ["EXPIRATION_DATE"],
                         "license_type": ["LIC_TYPE_ABBR", "PROFESSION_FULL_NAME"],
+                    },
+                },
+            ),
+            # US-138: building permits CSV. Address-only coords — geocoded at
+            # parse time per ADR-0004.
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.csv_milwaukee_permits_endpoint,
+                platform="csv",
+                watermark_col="date_issued",
+                id_keys=["record_id"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 90,
+                    "order_by": "date_issued ASC",
+                    "id_col": "record_id",
+                    "needs_geocode": True,
+                    "geocode_context": "Milwaukee, WI",
+                    "scope": "Milwaukee building permits (CKAN CSV, address-only coords; geocoded per ADR-0004)",
+                    "field_map": {
+                        "job_id": ["record_id"],
+                        "address_street": ["address"],
+                        "issuance_date": ["date_issued"],
+                        "filing_date": ["date_opened"],
+                        "job_type": ["permit_type"],
+                        "cost": ["construction_total_cost"],
+                    },
+                },
+            ),
+            # US-138: recorded deeds / property sales CSV. Address-only
+            # -> geocoded per ADR-0004; ADR-0005 typed text watermark.
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.csv_milwaukee_deeds_endpoint,
+                platform="csv",
+                watermark_col="sale_date",
+                id_keys=["propertyid"],
+                topic=settings.topic_deeds,
+                interval_seconds=600.0,
+                producer_key="deeds",
+                extra={
+                    "expected_cadence_days": 365,
+                    "order_by": "sale_date ASC",
+                    "id_col": "propertyid",
+                    "endpoint_by_year": {
+                        "2024": "https://data.milwaukee.gov/dataset/7a8b81f6-d750-4f62-aee8-30ffce1c64ce/resource/01651dab-2be7-40c6-a9d6-31254fe02e29/download/armslengthsales_2024_valid_20250917.csv",
+                        "2025": settings.csv_milwaukee_deeds_endpoint,
+                    },
+                    "ingestion_mode": "snapshot",
+                    "needs_geocode": True,
+                    "geocode_context": "Milwaukee, WI",
+                    "watermark_type": "text",
+                    "watermark_format": "%m/%d/%Y",
+                    "watermark_exclude": [],
+                    "scope": "Milwaukee property sales (yearly CKAN CSV snapshots; text watermark per ADR-0005)",
+                    "field_map": {
+                        "doc_id": ["propertyid"],
+                        "bbl": ["taxkey"],
+                        "address_street": ["address"],
+                        "document_amount": ["sale_price"],
+                        "recorded_date": ["sale_date"],
+                        "doc_type": ["proptype"],
+                        "borough": ["district", "nbhd"],
                     },
                 },
             ),

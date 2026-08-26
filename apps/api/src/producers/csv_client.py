@@ -16,15 +16,38 @@ import csv
 import io
 import re
 from collections.abc import Generator
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import httpx
 
 _CMP = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*(>=|<=|>|<|=|!=)\s*'([^']*)'\s*$")
 _IS_NULL = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s+is\s+not\s+null\s*$", re.IGNORECASE)
+_NOT_IN = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s+NOT\s+IN\s*\(([^)]*)\)\s*$", re.IGNORECASE)
 
 
-def _row_matches(where_clause: str | None, row: Dict[str, Any]) -> bool:
+def _normalize_header(name: str) -> str:
+    """Normalize municipal CSV headers to the producer field-map convention."""
+    return re.sub(r"[^a-z0-9]+", "_", name.strip().lower()).strip("_")
+
+
+def _typed_value(value: Any, fmt: str | None) -> datetime | None:
+    if not value or not fmt:
+        return None
+    try:
+        return datetime.strptime(str(value).strip(), fmt)
+    except (TypeError, ValueError):
+        return None
+
+
+def _row_matches(
+    where_clause: str | None,
+    row: Dict[str, Any],
+    *,
+    watermark_col: str | None = None,
+    watermark_format: str | None = None,
+    watermark_exclude: List[str] | None = None,
+) -> bool:
     """Client-side predicate over one parsed row (ANSI/SODA-style clauses)."""
     if not where_clause:
         return True
@@ -36,33 +59,49 @@ def _row_matches(where_clause: str | None, row: Dict[str, Any]) -> bool:
             part = part[1:-1].strip()
         m = _CMP.match(part)
         if m:
-            col, op, literal = m.group(1), m.group(2), m.group(3)
+            col, op, literal = _normalize_header(m.group(1)), m.group(2), m.group(3)
             value = row.get(col)
             if value is None:
                 return False
             s = str(value).strip()
+            if col == _normalize_header(watermark_col or "") and watermark_format:
+                if s in (watermark_exclude or []):
+                    return False
+                parsed_value = _typed_value(s, watermark_format)
+                parsed_literal = _typed_value(literal, watermark_format)
+                if parsed_value is None or parsed_literal is None:
+                    return False
+                left, right = parsed_value, parsed_literal
+            else:
+                left, right = s, literal
             if op == ">":
-                if not s > literal:
+                if not left > right:
                     return False
             elif op == ">=":
-                if not s >= literal:
+                if not left >= right:
                     return False
             elif op == "<":
-                if not s < literal:
+                if not left < right:
                     return False
             elif op == "<=":
-                if not s <= literal:
+                if not left <= right:
                     return False
             elif op == "=":
-                if not s == literal:
+                if not left == right:
                     return False
             elif op == "!=":
-                if not s != literal:
+                if not left != right:
                     return False
         else:
             m2 = _IS_NULL.match(part)
-            if m2 and row.get(m2.group(1)) in (None, ""):
+            if m2 and row.get(_normalize_header(m2.group(1))) in (None, ""):
                 return False
+            m3 = _NOT_IN.match(part)
+            if m3:
+                col = _normalize_header(m3.group(1))
+                excluded = {item.strip().strip("'") for item in m3.group(2).split(",")}
+                if str(row.get(col, "")).strip() in excluded:
+                    return False
     return True
 
 
@@ -104,17 +143,26 @@ class CSVClient:
             raise RuntimeError("CSV endpoint list is empty")
 
         reader = csv.DictReader(io.StringIO(response.text))
-        # Municipal CSVs ship UPPERCASE headers; normalize so field maps and
-        # the shared parser fallback chains (all lowercase) apply uniformly.
+        # Municipal CSVs use title case, spaces, and punctuation inconsistently;
+        # normalize them so shared field maps apply uniformly.
         if reader.fieldnames:
-            reader.fieldnames = [name.strip().lower() for name in reader.fieldnames]
+            reader.fieldnames = [_normalize_header(name) for name in reader.fieldnames]
         selected_cols = (
-            [c.strip().lower() for c in select.split(",") if c.strip()] if select else None
+            [_normalize_header(c) for c in select.split(",") if c.strip()] if select else None
         )
+        watermark_col = _normalize_header(kwargs.get("watermark_col") or "") or None
+        watermark_format = kwargs.get("watermark_format")
+        watermark_exclude = kwargs.get("watermark_exclude") or []
 
         rows: List[Dict[str, Any]] = []
         for row in reader:
-            if not _row_matches(where_clause, row):
+            if not _row_matches(
+                where_clause,
+                row,
+                watermark_col=watermark_col,
+                watermark_format=watermark_format,
+                watermark_exclude=watermark_exclude,
+            ):
                 continue
             if selected_cols:
                 row = {k: row[k] for k in selected_cols if k in row}
@@ -122,11 +170,18 @@ class CSVClient:
 
         if order_by:
             m = re.match(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s+(ASC|DESC)?\s*$", order_by, re.IGNORECASE)
-            col = m.group(1).lower() if m else order_by.strip().lower()
+            col = _normalize_header(m.group(1)) if m else _normalize_header(order_by)
+            typed_sort = col == watermark_col and watermark_format
+
+            def sort_key(row: Dict[str, Any]) -> Any:
+                if typed_sort:
+                    return _typed_value(row.get(col), watermark_format) or datetime.min
+                return str(row.get(col, ""))
+
             if m and m.group(2) and m.group(2).upper() == "DESC":
-                rows.sort(key=lambda r: str(r.get(col, "")), reverse=True)
+                rows.sort(key=sort_key, reverse=True)
             else:
-                rows.sort(key=lambda r: str(r.get(col, "")))
+                rows.sort(key=sort_key)
 
         total = 0
         batch: List[Dict[str, Any]] = []

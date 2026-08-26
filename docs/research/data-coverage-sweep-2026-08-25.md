@@ -28,8 +28,8 @@ sweep closes the remaining README-matrix gap cells.
 | 10 | Norfolk | Licenses | register (upgrade) | Socrata | native lat/lng 96% | daily |
 | 11 | Kansas City | Licenses | register (upgrade) | Socrata | native point 96% | snapshot (~7mo lag) |
 | 12 | Minneapolis | Licenses | register (upgrade) | ArcGIS | native lat/long | active |
-| 13 | Austin | Licenses (TABC) | defer (ADR 0004 path) | Socrata | none → geocode | daily |
-| 14 | Boston | Licenses | defer (State-Plane transform) | CKAN | State Plane EPSG:26986 | active |
+| 13 | Austin | Licenses (TABC) | register (US-136, ADR 0004) | Socrata | none → geocode | daily |
+| 14 | Boston | Licenses | register (US-137 Path A) | CKAN | State Plane EPSG:2249 → WGS84 | active |
 | 15 | Milwaukee | Permits + Deeds | defer (lag + text watermark) | CSV | address-only | 2.3mo / yearly |
 | 16 | Washington DC | Deeds | defer (parcel-join) | ArcGIS | non-spatial → join | batchy |
 | — | Nashville, Kansas City, Charlotte, Baton Rouge, New Orleans, San Diego, Columbus, Milwaukee, PG, Denver | Deeds / 311 / Licenses | skip (confirmed absent) | — | — | — |
@@ -204,16 +204,13 @@ One spine-hold (shared schema + shared `parse_watermark` `%Y.%m.%d` format prere
 
 - **Endpoint:** `https://data.texas.gov/resource/7hf9-qc9f.json`. Socrata, 126,457 rows statewide (Travis County subset 6,304).
 - **Schema:** `license_id`/`master_file_id`, `license_type`, `current_issued_date` (watermark), `expiration_date`, `trade_name`, `owner`, `address`/`address_2`/`city`/`state`/`zip`/`county`. **No coordinate columns** (confirmed).
-- **Unblock path:** ADR 0004 address-geocoding with `where: county='Travis'` (6,304 rows — a few Census batches). `needs_geocode: True`, `geocode_context: "TX"`. Blocker: ADR 0004 geocoder must be wired for SLA (the `geocode_row_if_declared` plumbing exists; confirm it runs for `sla`).
+- **Implementation:** US-136 registers the Travis County slice with `where: county='Travis'`, `needs_geocode: True`, and `geocode_context: "TX"`. The shared SLA producer invokes the ADR 0004 geocoder for the address-only rows.
 
 ### 14. Boston — Licensing Board (`04dc653b`)
 
-- **Endpoint:** `ckan://data.boston.gov/04dc653b-1789-4374-9669-b07df7233344` (already in `config.py` as `ckan_boston_licenses_endpoint`, not ingested). 3,659 rows.
-- **Schema:** `license_num`, `license_category`/`license_type`, `issued` (sparse), `expires` (watermark, text `YYYY-MM-DD`), `business_name`/`dba_name`, `address`/`city`/`state`/`zip`, `gpsx`/`gpsy` (**State Plane meters EPSG:26986**).
-- **Unblock paths (pick one):**
-  - **Path A (pyproj transform):** `pyproj.Transformer.from_crs("EPSG:26986","EPSG:4326",always_xy=True)` — ~15-line producer extension gated by `extra.state_plane_crs`. Uses the city's own geocodes (most accurate).
-  - **Path B (ADR 0004):** `needs_geocode: True`, `geocode_context: "MA"`, omit lat/lng from field_map. Simpler, slower.
-- The README's "State Plane coords only" is literally correct; the implication ("cannot register") is obsolete given pyproj or ADR 0004.
+- **Endpoint:** `ckan://data.boston.gov/04dc653b-1789-4374-9669-b07df7233344` (registered by US-137). The live datastore reports 3,628 records and fields `license_num`, `license_category`/`license_type`, `issued`, `expires`, `business_name`/`dba_name`, `address`/`city`/`state`/`zip`, `gpsx`, and `gpsy`.
+- **Coordinate verification:** live rows and the acceptance sample use Massachusetts Mainland State Plane US survey feet, EPSG:2249. `pyproj.Transformer.from_crs("EPSG:2249", "EPSG:4326", always_xy=True)` maps `gpsx=764720.25`, `gpsy=2940110.43` to approximately `(-71.0986, 42.3151)`. The earlier EPSG:26986-meter label was incorrect.
+- **Implementation:** US-137 Path A transforms the source coordinates in `sla_licenses_producer.py`; the field map uses the live CKAN names and `expires` as the text watermark.
 
 ### 15. Milwaukee — Permits + Deeds
 

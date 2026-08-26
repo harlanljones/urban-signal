@@ -455,8 +455,19 @@ class DeedsACRISProducer:
         client_kwargs = {
             k: v
             for k, v in spec.extra.items()
-            if k in ("order_by", "id_col", "select", "fallback_endpoints") and v
+            if k in (
+                "order_by",
+                "id_col",
+                "select",
+                "fallback_endpoints",
+                "watermark_col",
+                "watermark_format",
+                "watermark_exclude",
+            )
+            and v
         }
+        if spec.platform == "csv":
+            client_kwargs["watermark_col"] = spec.watermark_col
 
         logger.info("Starting %s Deeds Ingestion Stream (limit=%d)...", cid.value.upper(), limit)
         records_streamed = 0

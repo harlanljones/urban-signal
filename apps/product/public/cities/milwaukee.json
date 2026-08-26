@@ -83,7 +83,12 @@
     }
   },
   "feeds": {
-    "permits": null,
+    "permits": {
+      "platform": "csv",
+      "watermark_col": "date_issued",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
     "311": null,
     "sla": {
       "platform": "arcgis",
@@ -91,7 +96,12 @@
       "interval_seconds": 600.0,
       "topic": "raw.municipal.sla"
     },
-    "deeds": null
+    "deeds": {
+      "platform": "csv",
+      "watermark_col": "sale_date",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
   },
   "evidence_path": "apps/api/src/spatial/cities/milwaukee.py",
   "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"

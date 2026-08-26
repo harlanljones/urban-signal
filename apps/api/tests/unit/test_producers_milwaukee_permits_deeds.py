@@ -1,11 +1,8 @@
 """Contract tests for Milwaukee PERMITS + DEEDS (US-138 leaf).
 
-These tests run WITHOUT spine registration: Milwaukee is still SLA-only in
-``city_registry.REGISTRY`` (the PERMITS/DEEDS specs live as data in
-``src/spatial/cities/milwaukee.py`` and are lifted into the registry by the
-interlock orchestrator). The parser tests patch ``resolve_field_map`` to hand
-back the exact field maps proposed for Milwaukee, proving every column spelling
-resolves through the shared producers before the registry edit lands.
+These tests pin the live CKAN CSV schema and the registered Milwaukee feed
+contracts. The parser tests patch ``resolve_field_map`` to isolate the producer
+field-map behavior from the larger city registry.
 
 Two previously-blocking capabilities are asserted as ready:
   * ADR-0004 geocoder — PERMITS ships ``needs_geocode`` (address-only coords).
@@ -37,20 +34,23 @@ class TestMilwaukeePermitsDeedsSpecShape:
     def test_field_maps_keyed_by_permits_and_deeds(self):
         assert set(FIELD_MAP) == {FeedType.PERMITS, FeedType.DEEDS}
 
-    def test_permits_spec_is_arcgis_with_geocode_flag(self):
-        assert MILWAUKEE_PERMITS_SPEC["platform"] == "arcgis"
-        assert MILWAUKEE_PERMITS_SPEC["watermark_col"] == "ISSUE_DATE"
+    def test_permits_spec_is_csv_with_geocode_flag(self):
+        assert MILWAUKEE_PERMITS_SPEC["platform"] == "csv"
+        assert MILWAUKEE_PERMITS_SPEC["watermark_col"] == "date_issued"
         assert MILWAUKEE_PERMITS_SPEC["producer_key"] == "permits"
+        assert MILWAUKEE_PERMITS_SPEC["extra"]["expected_cadence_days"] == 90
         assert MILWAUKEE_PERMITS_SPEC["extra"]["needs_geocode"] is True
         assert MILWAUKEE_PERMITS_SPEC["extra"]["geocode_context"] == "Milwaukee, WI"
 
     def test_deeds_spec_declares_typed_text_watermark(self):
         extra = MILWAUKEE_DEEDS_SPEC["extra"]
-        assert MILWAUKEE_DEEDS_SPEC["platform"] == "arcgis"
-        assert MILWAUKEE_DEEDS_SPEC["watermark_col"] == "RECORDING_DATE"
+        assert MILWAUKEE_DEEDS_SPEC["platform"] == "csv"
+        assert MILWAUKEE_DEEDS_SPEC["watermark_col"] == "sale_date"
         assert MILWAUKEE_DEEDS_SPEC["producer_key"] == "deeds"
+        assert extra["expected_cadence_days"] == 365
+        assert extra["ingestion_mode"] == "snapshot"
         assert extra["watermark_type"] == "text"
-        assert extra["watermark_format"] == "%Y-%m-%d"
+        assert extra["watermark_format"] == "%m/%d/%Y"
         assert isinstance(extra["watermark_exclude"], list)
 
     def test_field_maps_expose_canonical_producer_keys(self):
@@ -62,16 +62,13 @@ class TestMilwaukeePermitsDeedsSpecShape:
             "filing_date",
             "job_type",
             "cost",
-            "borough",
-            "zipcode",
         }
         deed_keys = {
             "doc_id",
             "bbl",
             "document_amount",
             "recorded_date",
-            "party1_grantor",
-            "party2_grantee",
+            "doc_type",
             "borough",
         }
         assert permit_keys <= set(MILWAUKEE_PERMITS_FIELD_MAP)
@@ -94,9 +91,9 @@ class TestMilwaukeeDeedsTypedWatermark:
         return MILWAUKEE_DEEDS_SPEC["extra"]["watermark_format"]
 
     def test_real_date_parses_under_declared_format(self, fmt):
-        entry = typed_watermark_entry("2026-06-15", fmt=fmt)
+        entry = typed_watermark_entry("06/15/2026", fmt=fmt)
         assert entry is not None
-        assert entry[0] == "2026-06-15"
+        assert entry[0] == "06/15/2026"
         assert entry[1].year == 2026
 
     def test_empty_value_is_dropped(self, fmt):
@@ -107,19 +104,19 @@ class TestMilwaukeeDeedsTypedWatermark:
         # Representative far-future placeholder a source might use to mark an
         # "unknown date" — parses under the declared format so it would win a
         # DESC ordering without exclusion.
-        assert typed_watermark_entry("9999-12-31", fmt=fmt, exclude=["9999-12-31"]) is None
+        assert typed_watermark_entry("12/31/9999", fmt=fmt, exclude=["12/31/9999"]) is None
         # The same value would be KEPT (and poison a DESC ordering) without the
         # exclusion — the whole point of ADR-0005.
-        kept = typed_watermark_entry("9999-12-31", fmt=fmt)
+        kept = typed_watermark_entry("12/31/9999", fmt=fmt)
         assert kept is not None
 
-    def test_exclude_clause_builds_for_arcgis_where(self):
+    def test_exclude_clause_builds_for_where(self):
         clause = watermark_exclude_clause(
-            MILWAUKEE_DEEDS_SPEC["watermark_col"], ["9999-12-31", "0000-00-00"]
+            MILWAUKEE_DEEDS_SPEC["watermark_col"], ["12/31/9999", "01/01/0001"]
         )
-        assert clause == "RECORDING_DATE NOT IN ('9999-12-31', '0000-00-00')"
+        assert clause == "sale_date NOT IN ('12/31/9999', '01/01/0001')"
         # No exclusions -> no clause (caller skips the param).
-        assert watermark_exclude_clause("RECORDING_DATE", []) is None
+        assert watermark_exclude_clause("sale_date", []) is None
 
 
 # ---------------------------------------------------------------------------
@@ -148,19 +145,15 @@ class TestMilwaukeePermitsParsing:
 
     @pytest.fixture
     def permit_row(self):
-        # ArcGIS-flattened building-permit row (uppercase attrs; DateOnly
-        # ISSUE_DATE as a "YYYY-MM-DD" string, native point geometry lifted to
-        # latitude/longitude so no geocode call is required for this test).
+        # CSVClient-normalized building-permit row. Native coordinates are
+        # supplied so this parser contract does not call the live geocoder.
         return {
-            "PERMIT_NO": "BP-2026-012345",
-            "OBJECTID": 88231,
-            "ADDRESS": "123 N Water St",
-            "ISSUE_DATE": "2026-08-15",
-            "APPLICATION_DATE": "2026-07-30",
-            "PERMIT_TYPE": "Building Alteration",
-            "ESTIMATED_COST": 250000,
-            "NEIGHBORHOOD": "DOWNTOWN",
-            "ZIP_CODE": "53202",
+            "record_id": "BP-2026-012345",
+            "address": "123 N Water St",
+            "date_issued": "2026-08-15 00:00:00",
+            "date_opened": "2026-07-30 00:00:00",
+            "permit_type": "Building Alteration",
+            "construction_total_cost": 250000,
             "latitude": 43.0389,
             "longitude": -87.9065,
         }
@@ -174,9 +167,6 @@ class TestMilwaukeePermitsParsing:
         assert str(ev.filing_date).startswith("2026-07-30")
         assert ev.job_type.value == "A2"  # "ALTERATION" -> A2
         assert ev.estimated_cost == 250000.0
-        assert ev.source_neighborhood == "DOWNTOWN"
-        assert ev.zipcode == "53202"
-        assert ev.address_street == "123 N Water St"
         assert ev.latitude == pytest.approx(43.0389)
         assert ev.longitude == pytest.approx(-87.9065)
         assert ev.h3_res7 is not None
@@ -204,15 +194,12 @@ class TestMilwaukeeDeedsParsing:
     @pytest.fixture
     def deed_row(self):
         return {
-            "DOCUMENT_NO": "2026-123456",
-            "OBJECTID": 990012,
-            "PARCEL_NO": "123-456-789",
-            "SALE_PRICE": 350000,
-            "RECORDING_DATE": "2026-06-15",
-            "GRANTOR": "JOHN DOE TRUST",
-            "GRANTEE": "JANE SMITH LLC",
-            "NEIGHBORHOOD": "BAY VIEW",
-            "ZIP_CODE": "53207",
+            "propertyid": "2026-123456",
+            "taxkey": "123-456-789",
+            "address": "123 N Water St",
+            "sale_price": 350000,
+            "sale_date": "06/15/2026",
+            "proptype": "Residential",
             "latitude": 42.9998,
             "longitude": -87.9057,
         }
@@ -225,9 +212,7 @@ class TestMilwaukeeDeedsParsing:
         assert ev.bbl == "123-456-789"
         assert ev.document_amount == 350000.0
         assert str(ev.recorded_date).startswith("2026-06-15")
-        assert ev.party1_grantor == "JOHN DOE TRUST"
-        assert ev.party2_grantee == "JANE SMITH LLC"
-        assert ev.source_neighborhood == "BAY VIEW"
+        assert ev.doc_type == "RESIDENTIAL"
         assert ev.latitude == pytest.approx(42.9998)
         assert ev.longitude == pytest.approx(-87.9057)
         assert ev.h3_res7 is not None

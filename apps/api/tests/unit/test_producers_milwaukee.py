@@ -41,14 +41,18 @@ def test_milwaukee_geometry_is_self_consistent():
     assert {meta.city_id for meta in MILWAUKEE_SUBMARKETS.values()} == {"milwaukee"}
 
 
-def test_milwaukee_registers_arcgis_sla_only():
+def test_milwaukee_registers_sla_permits_and_deeds():
     from src.spatial.city_registry import REGISTRY, get_dataset, normalize_city
 
     city = CityId.MILWAUKEE
     assert normalize_city("milwaukee") is city
     assert normalize_city("mke") is city
     assert REGISTRY[city].job_suffix == "mke"
-    assert set(REGISTRY[city].datasets) == {FeedType.SLA}
+    assert set(REGISTRY[city].datasets) == {
+        FeedType.SLA,
+        FeedType.PERMITS,
+        FeedType.DEEDS,
+    }
 
     sla = REGISTRY[city].datasets[FeedType.SLA]
     assert sla.platform == "arcgis"
@@ -63,11 +67,18 @@ def test_milwaukee_registers_arcgis_sla_only():
     assert sla.extra["field_map"] == MILWAUKEE_FIELD_MAP
 
     with pytest.raises(KeyError, match="no.*feed"):
-        get_dataset(city, FeedType.PERMITS)
-    with pytest.raises(KeyError, match="no.*feed"):
         get_dataset(city, FeedType.COMPLAINTS_311)
-    with pytest.raises(KeyError, match="no.*feed"):
-        get_dataset(city, FeedType.DEEDS)
+
+    permits = get_dataset(city, FeedType.PERMITS)
+    assert permits.platform == "csv"
+    assert permits.watermark_col == "date_issued"
+    assert permits.extra["needs_geocode"] is True
+
+    deeds = get_dataset(city, FeedType.DEEDS)
+    assert deeds.platform == "csv"
+    assert deeds.watermark_col == "sale_date"
+    assert deeds.extra["watermark_format"] == "%m/%d/%Y"
+    assert deeds.extra["ingestion_mode"] == "snapshot"
 
 
 MKE_LICENSE_ROW = {

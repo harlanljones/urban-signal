@@ -1,9 +1,8 @@
 """Field map for Boston's Licensing Board SLA feed (US-137).
 
 The source CKAN resource (04dc653b-...) carries Massachusetts State Plane
-meters in gpsx/gpsy and NO WGS84 columns, so the feed is registered as an
-address-only SLA feed under ADR 0004: gpsx/gpsy are intentionally absent from
-the map and rows geocode from the business address string at parse time.
+US survey feet in gpsx/gpsy and no WGS84 columns. Path A transforms those
+columns from EPSG:2249 to WGS84 in the SLA producer.
 
 The map mirrors ``BOSTON_LICENSING_BOARD_FEED["field_map"]`` in the Boston city
 module so the spec stays single-sourced with src/spatial/cities/boston.py.
