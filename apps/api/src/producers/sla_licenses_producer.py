@@ -284,7 +284,9 @@ class SLALicensesProducer:
             )
 
             address = (
-                row.get("street_address")
+                first_mapped(row, field_map, "address_street")
+                or row.get("streetaddress")
+                or row.get("street_address")
                 or row.get("business_address")
                 or row.get("full_business_address")
                 or row.get("address")

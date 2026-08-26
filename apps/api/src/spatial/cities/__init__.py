@@ -258,6 +258,48 @@ from src.spatial.cities.reno import (
     RENO_SUBMARKETS,
     is_in_reno_metro,
 )
+from src.spatial.cities.spokane import (
+    SPOKANE_DIVISION_BBOXES,
+    SPOKANE_DIVISIONS,
+    SPOKANE_METRO_BBOX,
+    SPOKANE_SUBMARKETS,
+    is_in_spokane_metro,
+)
+from src.spatial.cities.dayton import (
+    DAYTON_DIVISION_BBOXES,
+    DAYTON_DIVISIONS,
+    DAYTON_METRO_BBOX,
+    DAYTON_SUBMARKETS,
+    is_in_dayton_metro,
+)
+from src.spatial.cities.tulsa import (
+    TULSA_DIVISION_BBOXES,
+    TULSA_DIVISIONS,
+    TULSA_METRO_BBOX,
+    TULSA_SUBMARKETS,
+    is_in_tulsa_metro,
+)
+from src.spatial.cities.el_paso import (
+    EL_PASO_DIVISION_BBOXES,
+    EL_PASO_DIVISIONS,
+    EL_PASO_METRO_BBOX,
+    EL_PASO_SUBMARKETS,
+    is_in_el_paso_metro,
+)
+from src.spatial.cities.durham import (
+    DURHAM_DIVISION_BBOXES,
+    DURHAM_DIVISIONS,
+    DURHAM_METRO_BBOX,
+    DURHAM_SUBMARKETS,
+    is_in_durham_metro,
+)
+from src.spatial.cities.dallas import (
+    DALLAS_DIVISION_BBOXES,
+    DALLAS_DIVISIONS,
+    DALLAS_METRO_BBOX,
+    DALLAS_SUBMARKETS,
+    is_in_dallas_metro,
+)
 
 __all__ = [
     "PIERCE_METRO_BBOX",
@@ -441,4 +483,34 @@ __all__ = [
     "RENO_DIVISIONS",
     "RENO_SUBMARKETS",
     "is_in_reno_metro",
+    "SPOKANE_METRO_BBOX",
+    "SPOKANE_DIVISION_BBOXES",
+    "SPOKANE_DIVISIONS",
+    "SPOKANE_SUBMARKETS",
+    "is_in_spokane_metro",
+    "DAYTON_METRO_BBOX",
+    "DAYTON_DIVISION_BBOXES",
+    "DAYTON_DIVISIONS",
+    "DAYTON_SUBMARKETS",
+    "is_in_dayton_metro",
+    "TULSA_METRO_BBOX",
+    "TULSA_DIVISION_BBOXES",
+    "TULSA_DIVISIONS",
+    "TULSA_SUBMARKETS",
+    "is_in_tulsa_metro",
+    "EL_PASO_METRO_BBOX",
+    "EL_PASO_DIVISION_BBOXES",
+    "EL_PASO_DIVISIONS",
+    "EL_PASO_SUBMARKETS",
+    "is_in_el_paso_metro",
+    "DURHAM_METRO_BBOX",
+    "DURHAM_DIVISION_BBOXES",
+    "DURHAM_DIVISIONS",
+    "DURHAM_SUBMARKETS",
+    "is_in_durham_metro",
+    "DALLAS_METRO_BBOX",
+    "DALLAS_DIVISION_BBOXES",
+    "DALLAS_DIVISIONS",
+    "DALLAS_SUBMARKETS",
+    "is_in_dallas_metro",
 ]

@@ -1,0 +1,273 @@
+{
+  "schema_version": 2,
+  "id": "durham",
+  "name": "Durham / Durham County",
+  "state": "NC",
+  "center": {
+    "lat": 36.0014,
+    "lng": -78.9018
+  },
+  "metro_bbox": {
+    "min_lat": 35.88,
+    "max_lat": 36.18,
+    "min_lng": -78.99,
+    "max_lng": -78.78
+  },
+  "divisions": {
+    "DOWNTOWN_DUKE": {
+      "name": "Downtown / Duke",
+      "center": {
+        "lat": 35.995,
+        "lng": -78.91
+      },
+      "bbox": {
+        "min_lat": 35.97,
+        "max_lat": 36.02,
+        "min_lng": -78.94,
+        "max_lng": -78.88
+      },
+      "submarkets": [
+        "Downtown Durham",
+        "Duke University & West Campus",
+        "Ninth Street District",
+        "Trinity Park & Old West Durham"
+      ]
+    },
+    "NORTH_DURHAM": {
+      "name": "North Durham",
+      "center": {
+        "lat": 36.06,
+        "lng": -78.88
+      },
+      "bbox": {
+        "min_lat": 36.02,
+        "max_lat": 36.13,
+        "min_lng": -78.92,
+        "max_lng": -78.82
+      },
+      "submarkets": [
+        "Northgate & Duke North",
+        "Roxboro Road Corridor",
+        "Bahama & Northern Edge"
+      ]
+    },
+    "EAST_DURHAM": {
+      "name": "East Durham",
+      "center": {
+        "lat": 36.01,
+        "lng": -78.84
+      },
+      "bbox": {
+        "min_lat": 35.99,
+        "max_lat": 36.05,
+        "min_lng": -78.87,
+        "max_lng": -78.8
+      },
+      "submarkets": [
+        "East Durham & Holloway",
+        "Wheeler Hill",
+        "Lyon Park"
+      ]
+    },
+    "SOUTH_DURHAM": {
+      "name": "South Durham",
+      "center": {
+        "lat": 35.93,
+        "lng": -78.9
+      },
+      "bbox": {
+        "min_lat": 35.88,
+        "max_lat": 35.99,
+        "min_lng": -78.95,
+        "max_lng": -78.82
+      },
+      "submarkets": [
+        "Southpoint & 15-501",
+        "Hope Valley & Croasdaile",
+        "Lakewood & Woodcroft",
+        "Research Triangle Park Edge"
+      ]
+    },
+    "WEST_DURHAM": {
+      "name": "West Durham",
+      "center": {
+        "lat": 36.0,
+        "lng": -78.96
+      },
+      "bbox": {
+        "min_lat": 35.99,
+        "max_lat": 36.06,
+        "min_lng": -78.99,
+        "max_lng": -78.94
+      },
+      "submarkets": [
+        "Eno River & Hillsborough Rd",
+        "Parkwood"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Durham": {
+      "name": "Downtown Durham",
+      "division": "DOWNTOWN_DUKE",
+      "center": {
+        "lat": 35.994,
+        "lng": -78.8986
+      },
+      "description": "City-core of Durham's revitalization with tower, office-to-residential, and hospitality permitting around the ballpark and Main Street."
+    },
+    "Duke University & West Campus": {
+      "name": "Duke University & West Campus",
+      "division": "DOWNTOWN_DUKE",
+      "center": {
+        "lat": 35.997,
+        "lng": -78.939
+      },
+      "description": "University-anchored edge with institutional demand, graduate-housing construction, and West Campus expansion permits."
+    },
+    "Ninth Street District": {
+      "name": "Ninth Street District",
+      "division": "DOWNTOWN_DUKE",
+      "center": {
+        "lat": 35.997,
+        "lng": -78.93
+      },
+      "description": "Corridor of retail, student housing, and mixed-use infill between downtown and the Duke campus."
+    },
+    "Trinity Park & Old West Durham": {
+      "name": "Trinity Park & Old West Durham",
+      "division": "DOWNTOWN_DUKE",
+      "center": {
+        "lat": 35.999,
+        "lng": -78.918
+      },
+      "description": "Historic streetcar-era bungalow districts with renovation-led permitting and neighborhood-conservation overlays."
+    },
+    "Northgate & Duke North": {
+      "name": "Northgate & Duke North",
+      "division": "NORTH_DURHAM",
+      "center": {
+        "lat": 36.058,
+        "lng": -78.905
+      },
+      "description": "Northern growth edge with master-planned residential and North Durham commercial redevelopment near the beltline."
+    },
+    "Roxboro Road Corridor": {
+      "name": "Roxboro Road Corridor",
+      "division": "NORTH_DURHAM",
+      "center": {
+        "lat": 36.08,
+        "lng": -78.89
+      },
+      "description": "Arterial corridor with infill multifamily, aging retail teardown/rebuild, and transit-adjacent reinvestment."
+    },
+    "Bahama & Northern Edge": {
+      "name": "Bahama & Northern Edge",
+      "division": "NORTH_DURHAM",
+      "center": {
+        "lat": 36.11,
+        "lng": -78.86
+      },
+      "description": "Exurban northern boundary of the metro with low-volume, high-lot residential permitting."
+    },
+    "East Durham & Holloway": {
+      "name": "East Durham & Holloway",
+      "division": "EAST_DURHAM",
+      "center": {
+        "lat": 36.005,
+        "lng": -78.855
+      },
+      "description": "Established inner-ring neighborhoods with storefront renewal, infill housing, and corridor-scale improvement."
+    },
+    "Wheeler Hill": {
+      "name": "Wheeler Hill",
+      "division": "EAST_DURHAM",
+      "center": {
+        "lat": 35.995,
+        "lng": -78.84
+      },
+      "description": "Hill-edge residential district with renovation capital and steady teardown/rebuild pressure."
+    },
+    "Lyon Park": {
+      "name": "Lyon Park",
+      "division": "EAST_DURHAM",
+      "center": {
+        "lat": 36.02,
+        "lng": -78.835
+      },
+      "description": "Transitional east-side neighborhood with housing rehabilitation and small-lot development."
+    },
+    "Southpoint & 15-501": {
+      "name": "Southpoint & 15-501",
+      "division": "SOUTH_DURHAM",
+      "center": {
+        "lat": 35.905,
+        "lng": -78.905
+      },
+      "description": "Southern retail and mixed-use hub with continued multifamily and commercial permitting around the 15-501 / 54 interchange."
+    },
+    "Hope Valley & Croasdaile": {
+      "name": "Hope Valley & Croasdaile",
+      "division": "SOUTH_DURHAM",
+      "center": {
+        "lat": 35.94,
+        "lng": -78.92
+      },
+      "description": "Established southwest neighborhoods with renovation-led permits and estate-stock teardown/rebuild."
+    },
+    "Lakewood & Woodcroft": {
+      "name": "Lakewood & Woodcroft",
+      "division": "SOUTH_DURHAM",
+      "center": {
+        "lat": 35.97,
+        "lng": -78.93
+      },
+      "description": "Southwest residential hills with infill housing and corridor densification near Duke and Southpoint."
+    },
+    "Research Triangle Park Edge": {
+      "name": "Research Triangle Park Edge",
+      "division": "SOUTH_DURHAM",
+      "center": {
+        "lat": 35.9,
+        "lng": -78.87
+      },
+      "description": "Southern edge shading into Research Triangle Park with employment-adjacent commercial and residential permitting."
+    },
+    "Eno River & Hillsborough Rd": {
+      "name": "Eno River & Hillsborough Rd",
+      "division": "WEST_DURHAM",
+      "center": {
+        "lat": 36.02,
+        "lng": -78.965
+      },
+      "description": "Northwest river-edge edge with protected greenway, estate stock, and limited new-construction pressure."
+    },
+    "Parkwood": {
+      "name": "Parkwood",
+      "division": "WEST_DURHAM",
+      "center": {
+        "lat": 35.995,
+        "lng": -78.955
+      },
+      "description": "Post-war west-side residential corridor with steady redevelopment and corridor densification."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "ISSUE_DATE",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "PKG_SALE_DATE",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/durham.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

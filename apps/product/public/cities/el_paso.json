@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "id": "el_paso",
+  "name": "El Paso / El Paso County",
+  "state": "TX",
+  "center": {
+    "lat": 31.7619,
+    "lng": -106.485
+  },
+  "metro_bbox": {
+    "min_lat": 31.55,
+    "max_lat": 32.2,
+    "min_lng": -107.2,
+    "max_lng": -106.0
+  },
+  "divisions": {
+    "EL_PASO_CORE": {
+      "name": "El Paso / El Paso County",
+      "center": {
+        "lat": 31.7619,
+        "lng": -106.485
+      },
+      "bbox": {
+        "min_lat": 31.65,
+        "max_lat": 32.1,
+        "min_lng": -107.05,
+        "max_lng": -106.25
+      },
+      "submarkets": [
+        "Downtown & Segundo Barrio",
+        "Westside & UTEP",
+        "Central El Paso",
+        "East El Paso",
+        "Upper Valley"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Segundo Barrio": {
+      "name": "Downtown & Segundo Barrio",
+      "division": "EL_PASO_CORE",
+      "center": {
+        "lat": 31.7587,
+        "lng": -106.4869
+      },
+      "description": "Border-adjacent civic core with historic rehabilitation, cross-border commerce, and public-realm investment."
+    },
+    "Westside & UTEP": {
+      "name": "Westside & UTEP",
+      "division": "EL_PASO_CORE",
+      "center": {
+        "lat": 31.776,
+        "lng": -106.505
+      },
+      "description": "University and west-side neighborhoods with infill, student-oriented services, and housing turnover."
+    },
+    "Central El Paso": {
+      "name": "Central El Paso",
+      "division": "EL_PASO_CORE",
+      "center": {
+        "lat": 31.79,
+        "lng": -106.435
+      },
+      "description": "Mature central neighborhoods with repair activity, municipal service demand, and corridor reinvestment."
+    },
+    "East El Paso": {
+      "name": "East El Paso",
+      "division": "EL_PASO_CORE",
+      "center": {
+        "lat": 31.805,
+        "lng": -106.275
+      },
+      "description": "Fast-growing east-side corridor where new housing, retail, and infrastructure extension converge."
+    },
+    "Upper Valley": {
+      "name": "Upper Valley",
+      "division": "EL_PASO_CORE",
+      "center": {
+        "lat": 31.87,
+        "lng": -106.535
+      },
+      "description": "Northwest valley communities balancing low-density growth, agricultural land, and service access."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "created_at",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/el_paso.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

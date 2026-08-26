@@ -804,6 +804,80 @@ class Settings(BaseSettings):
         description="Washoe County parcel sales MapServer layer URL",
     )
 
+    # Spokane / Spokane County, WA (US-160): annual county sales layers,
+    # ArcGIS-hosted XLS permits, and Washington LCB renewal snapshots.
+    arcgis_spokane_deeds_url: str = Field(
+        default="https://gismo.spokanecounty.org/arcgis/rest/services/OpenData/Property/MapServer/20",
+        description="Spokane County 2026 parcel sales MapServer layer URL",
+    )
+    excel_spokane_permits_url: str = Field(
+        default="https://www.arcgis.com/sharing/rest/content/items/3fcb39ac614d41af9fd22b87af8ff245/data",
+        description="Spokane County Building and Planning permits XLS download URL",
+    )
+    socrata_wa_liquor_renewal_endpoint: str = Field(
+        default="https://data.wa.gov/resource/9dee-kzm5.json",
+        description="Washington LCB liquor renewal Socrata endpoint",
+    )
+    socrata_wa_cannabis_renewal_endpoint: str = Field(
+        default="https://data.wa.gov/resource/brpd-b6zd.json",
+        description="Washington LCB cannabis renewal Socrata endpoint",
+    )
+
+    # Dayton, OH (US-159): Hansen service requests are a rolling 90-day
+    # ArcGIS layer; the source has no public archive.
+    arcgis_dayton_311_url: str = Field(
+        default=(
+            "https://maps.daytonohio.gov/gisservices/rest/services/"
+            "PublicWorks/COD_ServiceRequests_Last90/MapServer/0"
+        ),
+        description="Dayton Hansen service requests rolling-90-day MapServer layer URL",
+    )
+
+    # Tulsa, OK (US-158): Verint customer-care cases are a live, approximately
+    # 30-day rolling window; the public layer has no historical archive.
+    arcgis_tulsa_311_url: str = Field(
+        default=(
+            "https://maps.cityoftulsa.org/hosting/rest/services/"
+            "CustomerCare/VerintCasesPublic/FeatureServer/0"
+        ),
+        description="Tulsa Verint 311 cases rolling-window FeatureServer layer URL",
+    )
+
+    # El Paso, TX (US-156): Accela-backed requests are a live 30-day partial
+    # view. ArcGISClient requests outSR=4326, transforming native TX state-plane
+    # geometry before the shared 311 parser sees each row.
+    arcgis_el_paso_311_url: str = Field(
+        default="https://gis.elpasotexas.gov/accela/rest/services/311/Requests/FeatureServer/0",
+        description="El Paso Accela 311 requests FeatureServer layer URL",
+    )
+
+    # Durham, NC (US-154): live point permits and polygon parcel sales.
+    arcgis_durham_permits_url: str = Field(
+        default="https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Inspections/MapServer/12",
+        description="Durham All Building Permits MapServer layer URL",
+    )
+    arcgis_durham_deeds_url: str = Field(
+        default="https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4",
+        description="Durham parcel sales/deeds MapServer layer URL",
+    )
+
+    # Dallas, TX (US-149): live ROW/traffic-control permit proxy plus a
+    # Building Services CRM view containing approximately 30 days of 311 data.
+    arcgis_dallas_row_permits_url: str = Field(
+        default=(
+            "https://services2.arcgis.com/rwnOSbfKSwyTBcwN/arcgis/rest/services/"
+            "ROW/FeatureServer/0"
+        ),
+        description="Dallas right-of-way permit proxy FeatureServer layer URL",
+    )
+    arcgis_dallas_311_url: str = Field(
+        default=(
+            "https://services2.arcgis.com/rwnOSbfKSwyTBcwN/arcgis/rest/services/"
+            "CRM_30Days_viewLayer_BuildingServices/FeatureServer/0"
+        ),
+        description="Dallas Building Services approximately 30-day CRM view URL",
+    )
+
     # Kansas City, MO (Socrata): Business License Holders (US-134). Snapshot
     # feed carrying native GeoJSON point geometry (96.4% non-null) and a
     # valid_license_for YYYYMMDD expiration column; publication had lapsed

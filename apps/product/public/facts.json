@@ -1438,6 +1438,206 @@
         "lng": -119.8138
       },
       "evidence_path": "apps/api/src/spatial/cities/reno.py"
+    },
+    {
+      "id": "spokane",
+      "name": "Spokane / Spokane County",
+      "state": "WA",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        true,
+        false,
+        true,
+        true
+      ],
+      "platforms": [
+        {
+          "platform": "excel",
+          "watermark_col": "issued_date",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "socrata",
+          "watermark_col": "renewaldate",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "document_date",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 47.6588,
+        "lng": -117.426
+      },
+      "evidence_path": "apps/api/src/spatial/cities/spokane.py"
+    },
+    {
+      "id": "dayton",
+      "name": "Dayton / Montgomery County",
+      "state": "OH",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        false,
+        true,
+        false,
+        false
+      ],
+      "platforms": [
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "ADDDTTM",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 39.7589,
+        "lng": -84.1916
+      },
+      "evidence_path": "apps/api/src/spatial/cities/dayton.py"
+    },
+    {
+      "id": "tulsa",
+      "name": "Tulsa / Tulsa County",
+      "state": "OK",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        false,
+        true,
+        false,
+        false
+      ],
+      "platforms": [
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "case_opened",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 36.154,
+        "lng": -95.9928
+      },
+      "evidence_path": "apps/api/src/spatial/cities/tulsa.py"
+    },
+    {
+      "id": "el_paso",
+      "name": "El Paso / El Paso County",
+      "state": "TX",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        false,
+        true,
+        false,
+        false
+      ],
+      "platforms": [
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "created_at",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 31.7619,
+        "lng": -106.485
+      },
+      "evidence_path": "apps/api/src/spatial/cities/el_paso.py"
+    },
+    {
+      "id": "durham",
+      "name": "Durham / Durham County",
+      "state": "NC",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 16,
+      "feeds": [
+        true,
+        false,
+        false,
+        true
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "ISSUE_DATE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "PKG_SALE_DATE",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 36.0014,
+        "lng": -78.9018
+      },
+      "evidence_path": "apps/api/src/spatial/cities/durham.py"
+    },
+    {
+      "id": "dallas",
+      "name": "Dallas / Dallas County",
+      "state": "TX",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 18,
+      "feeds": [
+        true,
+        true,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "CREATEDDATE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "CreatedDate",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 32.7767,
+        "lng": -96.797
+      },
+      "evidence_path": "apps/api/src/spatial/cities/dallas.py"
     }
   ],
   "pipeline": [

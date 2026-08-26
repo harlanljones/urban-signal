@@ -11,7 +11,7 @@
 - [Methodology](/methodology/): Leading Indicator Momentum Score composition across 6-, 12-, and 18-month horizons, including which values on the site are illustrative.
 - [Architecture](/architecture/): source producers, city registry, Kafka consumers, H3 enrichment, feature aggregation, catalyst alert dispatch, PostGIS storage, ONNX horizons, edge snapshots.
 - [Cities index](/cities/): registered metros with per-feed platform, cadence, and source-contract links.
-- [Per-city machine briefs](/public/cities/austin.json): JSON at `/public/cities/<id>.json` for all 37 metros (ids listed on [/cities/](/cities/)); generated from the city registry.
+- [Per-city machine briefs](/public/cities/austin.json): JSON at `/public/cities/<id>.json` for all 43 metros (ids listed on [/cities/](/cities/)); generated from the city registry.
 - [Live dashboard](/dashboard): interactive spatial product surface.
 - [Source repository](https://github.com/harlanljones/urban-signal): implementation and documentation.
 - [City registry](https://github.com/harlanljones/urban-signal/blob/main/apps/api/src/spatial/city_registry.py): authoritative registered-city and feed contracts.

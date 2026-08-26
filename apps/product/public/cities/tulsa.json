@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "id": "tulsa",
+  "name": "Tulsa / Tulsa County",
+  "state": "OK",
+  "center": {
+    "lat": 36.154,
+    "lng": -95.9928
+  },
+  "metro_bbox": {
+    "min_lat": 35.8,
+    "max_lat": 36.45,
+    "min_lng": -96.45,
+    "max_lng": -95.45
+  },
+  "divisions": {
+    "TULSA_CORE": {
+      "name": "Tulsa / Tulsa County",
+      "center": {
+        "lat": 36.154,
+        "lng": -95.9928
+      },
+      "bbox": {
+        "min_lat": 35.9,
+        "max_lat": 36.3,
+        "min_lng": -96.25,
+        "max_lng": -95.6
+      },
+      "submarkets": [
+        "Downtown & Blue Dome",
+        "Pearl District & Kendall Whittier",
+        "Brookside & Midtown",
+        "East Tulsa",
+        "South Tulsa & Jenks"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Blue Dome": {
+      "name": "Downtown & Blue Dome",
+      "division": "TULSA_CORE",
+      "center": {
+        "lat": 36.155,
+        "lng": -95.9928
+      },
+      "description": "Civic and entertainment core with adaptive reuse, public-realm investment, and infill pressure."
+    },
+    "Pearl District & Kendall Whittier": {
+      "name": "Pearl District & Kendall Whittier",
+      "division": "TULSA_CORE",
+      "center": {
+        "lat": 36.166,
+        "lng": -95.97
+      },
+      "description": "Historic north-central neighborhoods with rehabilitation, small business, and neighborhood-service activity."
+    },
+    "Brookside & Midtown": {
+      "name": "Brookside & Midtown",
+      "division": "TULSA_CORE",
+      "center": {
+        "lat": 36.112,
+        "lng": -95.972
+      },
+      "description": "Established mixed-use corridor where renovation, retail turnover, and residential demand overlap."
+    },
+    "East Tulsa": {
+      "name": "East Tulsa",
+      "division": "TULSA_CORE",
+      "center": {
+        "lat": 36.136,
+        "lng": -95.87
+      },
+      "description": "Diverse east-side neighborhoods with service demand, commercial reinvestment, and corridor maintenance."
+    },
+    "South Tulsa & Jenks": {
+      "name": "South Tulsa & Jenks",
+      "division": "TULSA_CORE",
+      "center": {
+        "lat": 36.04,
+        "lng": -95.93
+      },
+      "description": "South metro growth corridor with housing expansion, retail development, and infrastructure extension."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "case_opened",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/tulsa.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

@@ -10,6 +10,7 @@ from enum import Enum
 from typing import Any, Dict, Generator, List, Optional, Protocol, Tuple, Union, runtime_checkable
 
 from src.config import settings
+from src.producers.field_maps_dallas import DALLAS_311_FIELD_MAP, DALLAS_FIELD_MAP
 from src.spatial.cities.chicago import (
     CHICAGO_DIVISION_BBOXES,
     CHICAGO_DIVISIONS,
@@ -228,6 +229,42 @@ from src.spatial.cities.reno import (
     RENO_METRO_BBOX,
     RENO_SUBMARKETS,
 )
+from src.spatial.cities.spokane import (
+    SPOKANE_DIVISION_BBOXES,
+    SPOKANE_DIVISIONS,
+    SPOKANE_METRO_BBOX,
+    SPOKANE_SUBMARKETS,
+)
+from src.spatial.cities.dayton import (
+    DAYTON_DIVISION_BBOXES,
+    DAYTON_DIVISIONS,
+    DAYTON_METRO_BBOX,
+    DAYTON_SUBMARKETS,
+)
+from src.spatial.cities.tulsa import (
+    TULSA_DIVISION_BBOXES,
+    TULSA_DIVISIONS,
+    TULSA_METRO_BBOX,
+    TULSA_SUBMARKETS,
+)
+from src.spatial.cities.el_paso import (
+    EL_PASO_DIVISION_BBOXES,
+    EL_PASO_DIVISIONS,
+    EL_PASO_METRO_BBOX,
+    EL_PASO_SUBMARKETS,
+)
+from src.spatial.cities.durham import (
+    DURHAM_DIVISION_BBOXES,
+    DURHAM_DIVISIONS,
+    DURHAM_METRO_BBOX,
+    DURHAM_SUBMARKETS,
+)
+from src.spatial.cities.dallas import (
+    DALLAS_DIVISION_BBOXES,
+    DALLAS_DIVISIONS,
+    DALLAS_METRO_BBOX,
+    DALLAS_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -278,6 +315,12 @@ class CityId(str, Enum):
     SAN_ANTONIO = "san_antonio"
     SACRAMENTO = "sacramento"
     RENO = "reno"
+    SPOKANE = "spokane"
+    DAYTON = "dayton"
+    TULSA = "tulsa"
+    EL_PASO = "el_paso"
+    DURHAM = "durham"
+    DALLAS = "dallas"
 
 
 class FeedType(str, Enum):
@@ -604,6 +647,50 @@ ALIASES: Dict[str, CityId] = {
     "reno nv": CityId.RENO,
     "washoe_county": CityId.RENO,
     "washoe county": CityId.RENO,
+
+    # Spokane / Spokane County, WA
+    "spokane": CityId.SPOKANE,
+    "spokane_wa": CityId.SPOKANE,
+    "spokane wa": CityId.SPOKANE,
+    "spokane_county": CityId.SPOKANE,
+    "spokane county": CityId.SPOKANE,
+
+    # Dayton / Montgomery County, OH
+    "dayton": CityId.DAYTON,
+    "dayton_oh": CityId.DAYTON,
+    "dayton oh": CityId.DAYTON,
+    "montgomery_county_oh": CityId.DAYTON,
+    "montgomery county oh": CityId.DAYTON,
+
+    # Tulsa / Tulsa County, OK
+    "tulsa": CityId.TULSA,
+    "tulsa_ok": CityId.TULSA,
+    "tulsa ok": CityId.TULSA,
+    "tulsa_county": CityId.TULSA,
+    "tulsa county": CityId.TULSA,
+
+    # El Paso / El Paso County, TX
+    "el_paso": CityId.EL_PASO,
+    "el paso": CityId.EL_PASO,
+    "el_paso_tx": CityId.EL_PASO,
+    "el paso tx": CityId.EL_PASO,
+    "el_paso_county": CityId.EL_PASO,
+    "el paso county": CityId.EL_PASO,
+
+    # Durham / Durham County, NC
+    "durham": CityId.DURHAM,
+    "durham_nc": CityId.DURHAM,
+    "durham nc": CityId.DURHAM,
+    "durham_county": CityId.DURHAM,
+    "durham county": CityId.DURHAM,
+
+    # Dallas / Dallas County, TX
+    "dallas": CityId.DALLAS,
+    "dallas_tx": CityId.DALLAS,
+    "dallas tx": CityId.DALLAS,
+    "dallas_county": CityId.DALLAS,
+    "dallas county": CityId.DALLAS,
+    "big_d": CityId.DALLAS,
 }
 
 
@@ -3761,6 +3848,329 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                         "recorded_date": ["SALEDATE"],
                         "borough": ["CITY", "SUBNAME"],
                     },
+                },
+            ),
+        },
+    ),
+    CityId.SPOKANE: CityRegistration(
+        city_id=CityId.SPOKANE,
+        name="Spokane / Spokane County",
+        state="WA",
+        center={"lat": 47.6588, "lng": -117.4260},
+        metro_bbox=SPOKANE_METRO_BBOX,
+        division_bboxes=SPOKANE_DIVISION_BBOXES,
+        submarkets=SPOKANE_SUBMARKETS,
+        divisions=SPOKANE_DIVISIONS,
+        job_suffix="spokane",
+        datasets={
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.arcgis_spokane_deeds_url,
+                platform="arcgis",
+                watermark_col="document_date",
+                id_keys=["Parcel", "OBJECTID"],
+                topic=settings.topic_deeds,
+                interval_seconds=1800.0,
+                producer_key="deeds",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "scope": "Spokane County annual parcel sales layers (polygon centroid)",
+                    "endpoint_by_year": {
+                        "2015": settings.arcgis_spokane_deeds_url.replace("/20", "/7"),
+                        "2016": settings.arcgis_spokane_deeds_url.replace("/20", "/6"),
+                        "2017": settings.arcgis_spokane_deeds_url.replace("/20", "/11"),
+                        "2018": settings.arcgis_spokane_deeds_url.replace("/20", "/10"),
+                        "2019": settings.arcgis_spokane_deeds_url.replace("/20", "/14"),
+                        "2020": settings.arcgis_spokane_deeds_url.replace("/20", "/15"),
+                        "2021": settings.arcgis_spokane_deeds_url.replace("/20", "/16"),
+                        "2022": settings.arcgis_spokane_deeds_url.replace("/20", "/5"),
+                        "2023": settings.arcgis_spokane_deeds_url.replace("/20", "/17"),
+                        "2024": settings.arcgis_spokane_deeds_url.replace("/20", "/18"),
+                        "2025": settings.arcgis_spokane_deeds_url.replace("/20", "/19"),
+                        "2026": settings.arcgis_spokane_deeds_url,
+                    },
+                    "field_map": {
+                        "doc_id": ["Parcel", "OBJECTID"],
+                        "bbl": ["Parcel"],
+                        "document_amount": ["gross_sale_price"],
+                        "recorded_date": ["document_date"],
+                        "doc_type": ["prop_use_code"],
+                    },
+                },
+            ),
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.excel_spokane_permits_url,
+                platform="excel",
+                watermark_col="issued_date",
+                id_keys=["permit_number"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 7,
+                    "needs_geocode": True,
+                    "geocode_context": "Spokane, WA",
+                    "scope": "Spokane County Building and Planning permits (ArcGIS-hosted XLS)",
+                    "field_map": {
+                        "job_id": ["permit_number"],
+                        "issuance_date": ["issued_date"],
+                        "filing_date": ["issued_date"],
+                        "job_type": ["permit_type", "project_description"],
+                        "status": ["status", "status_description"],
+                        "address_street": ["site_address"],
+                        "zipcode": ["site_zip"],
+                        "bbl": ["parcel_number"],
+                    },
+                },
+            ),
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.socrata_wa_liquor_renewal_endpoint,
+                platform="socrata",
+                watermark_col="renewaldate",
+                id_keys=["license", "ubi"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                extra={
+                    "expected_cadence_days": 7,
+                    "where": "city = 'SPOKANE'",
+                    "scope": "Washington LCB liquor renewals for Spokane site addresses",
+                    "field_map": {
+                        "license_id": ["license"],
+                        "license_type": ["l_a_type"],
+                        "premises_name": ["designatedsignee"],
+                        "dba": ["tradename"],
+                        "address_street": ["streetaddress"],
+                        "expiration_date": ["renewaldate"],
+                        "borough": ["cityname", "city"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.DAYTON: CityRegistration(
+        city_id=CityId.DAYTON,
+        name="Dayton / Montgomery County",
+        state="OH",
+        center={"lat": 39.7589, "lng": -84.1916},
+        metro_bbox=DAYTON_METRO_BBOX,
+        division_bboxes=DAYTON_DIVISION_BBOXES,
+        submarkets=DAYTON_SUBMARKETS,
+        divisions=DAYTON_DIVISIONS,
+        job_suffix="dayton",
+        datasets={
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.arcgis_dayton_311_url,
+                platform="arcgis",
+                watermark_col="ADDDTTM",
+                id_keys=["RowNumber", "REFNO"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "RowNumber",
+                    "max_record_count": 2000,
+                    "rolling_window_days": 90,
+                    "retention_days": 90,
+                    "scope": "Dayton Hansen service requests (rolling 90-day ArcGIS window)",
+                    "field_map": {
+                        "incident_id": ["RowNumber", "REFNO"],
+                        "created_date": ["ADDDTTM"],
+                        "closed_date": ["RESDTTM", "ModDTTM"],
+                        "status": ["RESFLAG", "RESCODE"],
+                        "complaint_type": ["PROBDESC", "CatName", "ProbDesc2"],
+                        "incident_address": ["ADDRESS", "LOC"],
+                        "borough": ["NEIGH_COM", "DISTRICT"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.TULSA: CityRegistration(
+        city_id=CityId.TULSA,
+        name="Tulsa / Tulsa County",
+        state="OK",
+        center={"lat": 36.1540, "lng": -95.9928},
+        metro_bbox=TULSA_METRO_BBOX,
+        division_bboxes=TULSA_DIVISION_BBOXES,
+        submarkets=TULSA_SUBMARKETS,
+        divisions=TULSA_DIVISIONS,
+        job_suffix="tulsa",
+        datasets={
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.arcgis_tulsa_311_url,
+                platform="arcgis",
+                watermark_col="case_opened",
+                id_keys=["case_id", "OBJECTID"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "rolling_window_days": 30,
+                    "retention_days": 30,
+                    "scope": "Tulsa Verint customer-care cases (approximately 30-day rolling window)",
+                    "field_map": {
+                        "incident_id": ["case_id", "OBJECTID"],
+                        "created_date": ["case_opened"],
+                        "closed_date": ["case_closed"],
+                        "status": ["case_status"],
+                        "complaint_type": ["case_type", "case_reason", "case_subject"],
+                        "incident_address": ["case_external_ref"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.EL_PASO: CityRegistration(
+        city_id=CityId.EL_PASO,
+        name="El Paso / El Paso County",
+        state="TX",
+        center={"lat": 31.7619, "lng": -106.4850},
+        metro_bbox=EL_PASO_METRO_BBOX,
+        division_bboxes=EL_PASO_DIVISION_BBOXES,
+        submarkets=EL_PASO_SUBMARKETS,
+        divisions=EL_PASO_DIVISIONS,
+        job_suffix="el_paso",
+        datasets={
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.arcgis_el_paso_311_url,
+                platform="arcgis",
+                watermark_col="created_at",
+                id_keys=["id", "request_id", "OBJECTID"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "rolling_window_days": 30,
+                    "retention_days": 30,
+                    "scope": "El Paso Accela/Cityworks 311 requests (approximately 30-day partial view)",
+                    "field_map": {
+                        "incident_id": ["id", "request_id", "OBJECTID"],
+                        "created_date": ["created_at"],
+                        "status": ["status"],
+                        "complaint_type": ["request_type", "request_category"],
+                        "incident_address": ["address"],
+                        "borough": ["district"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.DURHAM: CityRegistration(
+        city_id=CityId.DURHAM,
+        name="Durham / Durham County",
+        state="NC",
+        center={"lat": 36.0014, "lng": -78.9018},
+        metro_bbox=DURHAM_METRO_BBOX,
+        division_bboxes=DURHAM_DIVISION_BBOXES,
+        submarkets=DURHAM_SUBMARKETS,
+        divisions=DURHAM_DIVISIONS,
+        job_suffix="durham",
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_durham_permits_url,
+                platform="arcgis",
+                watermark_col="ISSUE_DATE",
+                id_keys=["PermitNum", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "scope": "Durham All Building Permits (point geometry)",
+                    "field_map": {
+                        "job_id": ["PermitNum", "OBJECTID"],
+                        "issuance_date": ["ISSUE_DATE"],
+                        "job_type": ["BLDB_ACTIVITY", "BLDB_ACTIVITY_1", "TYPE", "BLD_Type"],
+                        "cost": ["BLD_Cost"],
+                        "address_street": ["LOCATION_ADDR"],
+                        "bbl": ["PIN15", "PIN", "PID"],
+                        "status": ["PmtStatus"],
+                        "proposed_units": ["DWELLING_UNITS"],
+                    },
+                },
+            ),
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.arcgis_durham_deeds_url,
+                platform="arcgis",
+                watermark_col="PKG_SALE_DATE",
+                id_keys=["PIN", "OBJECTID_1", "OBJECTID"],
+                topic=settings.topic_deeds,
+                interval_seconds=1800.0,
+                producer_key="deeds",
+                extra={
+                    "expected_cadence_days": 7,
+                    "ingestion_mode": "snapshot",
+                    "oid_field": "OBJECTID_1",
+                    "max_record_count": 2000,
+                    "scope": "Durham County parcel sales (polygon centroid)",
+                    "field_map": {
+                        "doc_id": ["PIN", "OBJECTID_1", "OBJECTID"],
+                        "bbl": ["PIN", "PIN_EXT"],
+                        "recorded_date": ["PKG_SALE_DATE", "DEED_DATE"],
+                        "document_amount": ["PKG_SALE_PRICE", "LAND_SALE_PRICE"],
+                        "party1_grantor": ["PROPERTY_OWNER"],
+                        "borough": ["NEIGHBORHOOD", "CITY"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.DALLAS: CityRegistration(
+        city_id=CityId.DALLAS,
+        name="Dallas / Dallas County",
+        state="TX",
+        center={"lat": 32.7767, "lng": -96.7970},
+        metro_bbox=DALLAS_METRO_BBOX,
+        division_bboxes=DALLAS_DIVISION_BBOXES,
+        submarkets=DALLAS_SUBMARKETS,
+        divisions=DALLAS_DIVISIONS,
+        job_suffix="dallas",
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_dallas_row_permits_url,
+                platform="arcgis",
+                watermark_col="CREATEDDATE",
+                id_keys=["EXTERNALFILENUM", "JOBID", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "order_by": "CREATEDDATE DESC",
+                    "proxy_for": "row_permits",
+                    "scope": "Dallas right-of-way and traffic-control permits (construction proxy, not building permits)",
+                    "field_map": DALLAS_FIELD_MAP,
+                },
+            ),
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.arcgis_dallas_311_url,
+                platform="arcgis",
+                watermark_col="CreatedDate",
+                id_keys=["Service_Request_Number_c", "CaseNumber", "OBJECTID"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                extra={
+                    "expected_cadence_days": 1,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "rolling_window_days": 30,
+                    "retention_days": 30,
+                    "scope": "Dallas Building Services CRM requests (approximately 30-day rolling partial view)",
+                    "field_map": DALLAS_311_FIELD_MAP,
                 },
             ),
         },
