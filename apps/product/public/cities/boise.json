@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "id": "boise",
+  "name": "Boise / Ada County",
+  "state": "ID",
+  "center": {
+    "lat": 43.6131,
+    "lng": -116.211
+  },
+  "metro_bbox": {
+    "min_lat": 43.43,
+    "max_lat": 43.74,
+    "min_lng": -116.42,
+    "max_lng": -116.03
+  },
+  "divisions": {
+    "BOISE_CORE": {
+      "name": "Boise Core",
+      "center": {
+        "lat": 43.61,
+        "lng": -116.21
+      },
+      "bbox": {
+        "min_lat": 43.5,
+        "max_lat": 43.7,
+        "min_lng": -116.34,
+        "max_lng": -116.08
+      },
+      "submarkets": [
+        "Downtown & Capitol",
+        "North End & Hyde Park",
+        "Boise Bench & South Cole",
+        "East Boise & Harris Ranch",
+        "West Boise & Vista",
+        "BoDo & Riverfront"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Capitol": {
+      "name": "Downtown & Capitol",
+      "division": "BOISE_CORE",
+      "center": {
+        "lat": 43.6165,
+        "lng": -116.214
+      },
+      "description": "State-government and riverfront core with dense residential conversion and mixed-use infill along the Boise River."
+    },
+    "North End & Hyde Park": {
+      "name": "North End & Hyde Park",
+      "division": "BOISE_CORE",
+      "center": {
+        "lat": 43.657,
+        "lng": -116.236
+      },
+      "description": "Historic streetcar-era bungalow district with renovation-led permitting and neighborhood-conservation overlays."
+    },
+    "Boise Bench & South Cole": {
+      "name": "Boise Bench & South Cole",
+      "division": "BOISE_CORE",
+      "center": {
+        "lat": 43.58,
+        "lng": -116.23
+      },
+      "description": "Post-war residential bench south of the core with teardown/rebuild pressure and infill multifamily."
+    },
+    "East Boise & Harris Ranch": {
+      "name": "East Boise & Harris Ranch",
+      "division": "BOISE_CORE",
+      "center": {
+        "lat": 43.6,
+        "lng": -116.1
+      },
+      "description": "East-growth edge with master-planned residential subdivisions and new-construction permitting."
+    },
+    "West Boise & Vista": {
+      "name": "West Boise & Vista",
+      "division": "BOISE_CORE",
+      "center": {
+        "lat": 43.59,
+        "lng": -116.28
+      },
+      "description": "Established west-side residential corridors with steady redevelopment and corridor densification."
+    },
+    "BoDo & Riverfront": {
+      "name": "BoDo & Riverfront",
+      "division": "BOISE_CORE",
+      "center": {
+        "lat": 43.609,
+        "lng": -116.206
+      },
+      "description": "Boise Downtown / riverfront entertainment district with hotel, retail, and residential tower permitting."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "IssuedDate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/boise.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

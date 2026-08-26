@@ -1,11 +1,8 @@
 """Contract tests for Boise's residential-only ArcGIS PERMITS feed.
 
-Boise ships Idaho Transverse Mercator (EPSG:3694) state-plane geometry in the
-`SHAPE__X`/`SHAPE__Y` columns. Those are NOT geographic degrees: the shared
-producer's `abs(lat) > 90 / abs(lng) > 180` guard drops them and the ADR-0004
-geocoder resolves the permit's street address. These tests run WITHOUT a spine
-registration (no REGISTRY / ALIASES / __init__ entry) — the field map is patched
-in directly, so the leaf is verifiable on its own.
+Boise's live layer advertises Idaho state-plane geometry (WKID 102459), while
+the shared ArcGIS client requests WGS84 output for H3 indexing. These tests
+cover both that production path and the ADR-0004 address fallback.
 """
 
 from types import SimpleNamespace
@@ -45,17 +42,17 @@ def test_boise_geometry_is_self_consistent():
 
 def test_boise_field_map_resolves_spellings():
     row = {
-        "PERMITNUMBER": "BLD-2026-004512",
-        "PERMITTYPE": "Residential",
-        "ISSUEDATE": "2026-08-20T00:00:00.000Z",
+        "RecordID": "BLD26-004512",
+        "ResidentialType": "Single family",
+        "IssuedDate": "2026-08-20",
         "ESTIMATEDCOST": "245000",
-        "STATUS": "Issued",
-        "SITE_ADDRESS": "1204 W Franklin St",
+        "PermitStatus": "Issued",
+        "PropertyAddress": "1204 W Franklin St",
         "SHAPE__X": 563210.0,   # EPSG:3694 state-plane easting (NOT a degree)
         "SHAPE__Y": 1314520.0,  # EPSG:3694 state-plane northing (NOT a degree)
     }
-    assert first_mapped(row, BOISE_PERMITS_FIELD_MAP, "job_id") == "BLD-2026-004512"
-    assert first_mapped(row, BOISE_PERMITS_FIELD_MAP, "job_type") == "Residential"
+    assert first_mapped(row, BOISE_PERMITS_FIELD_MAP, "job_id") == "BLD26-004512"
+    assert first_mapped(row, BOISE_PERMITS_FIELD_MAP, "job_type") == "Single family"
     assert first_mapped(row, BOISE_PERMITS_FIELD_MAP, "cost") == "245000"
     assert first_mapped(row, BOISE_PERMITS_FIELD_MAP, "address_street") == "1204 W Franklin St"
     # The state-plane columns are exposed through the latitude/longitude slots...
@@ -98,12 +95,12 @@ def _patch_resolution():
 def test_boise_permit_drops_state_plane_and_geocodes_address(permits_producer):
     row = {
         "OBJECTID": 88123,
-        "PERMITNUMBER": "BLD-2026-004512",
-        "PERMITTYPE": "Residential",
-        "ISSUEDATE": "2026-08-20T00:00:00.000Z",
+        "RecordID": "BLD26-004512",
+        "ResidentialType": "Single family",
+        "IssuedDate": "2026-08-20",
         "ESTIMATEDCOST": "245000",
-        "STATUS": "Issued",
-        "SITE_ADDRESS": "1204 W Franklin St, Boise, ID",
+        "PermitStatus": "Issued",
+        "PropertyAddress": "1204 W Franklin St, Boise, ID",
         # State-plane geometry that must NOT be emitted as lat/lng.
         "SHAPE__X": 563210.0,
         "SHAPE__Y": 1314520.0,
@@ -112,7 +109,7 @@ def test_boise_permit_drops_state_plane_and_geocodes_address(permits_producer):
         event = permits_producer.parse_socrata_row(row, city_id="boise")
     assert event is not None
     assert event.city_id == "boise"
-    assert event.job_id == "BLD-2026-004512"
+    assert event.job_id == "BLD26-004512"
     assert event.address_street == "1204 W Franklin St, Boise, ID"
     # Coordinates are the geocoded address, NOT the state-plane northing/easting.
     assert event.latitude == pytest.approx(43.6131)
@@ -125,9 +122,9 @@ def test_boise_permit_drops_state_plane_and_geocodes_address(permits_producer):
 def test_boise_permit_without_address_is_dropped(permits_producer):
     row = {
         "OBJECTID": 88124,
-        "PERMITNUMBER": "BLD-2026-004513",
-        "PERMITTYPE": "Residential",
-        "ISSUEDATE": "2026-08-20T00:00:00.000Z",
+        "RecordID": "BLD26-004513",
+        "ResidentialType": "Single family",
+        "IssuedDate": "2026-08-20",
         "ESTIMATEDCOST": "120000",
         # No SITE_ADDRESS; state-plane geometry must be dropped and there is no
         # address to geocode, so the row has no coordinate and must be skipped.

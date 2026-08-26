@@ -5,12 +5,11 @@ the Greater Boise metropolitan extent for Urban Signal.
 
 Boise is registered as a **residential-only, thin, single-feed** city (see
 US-150 / AGENTS.md city-registration rule). The City of Boise Open Data Hub
-publishes building permits as an ArcGIS FeatureServer whose rows carry Idaho
-Transverse Mercator (EPSG:3694) state-plane geometry in `SHAPE__X`/`SHAPE__Y`.
-Those are not geographic degrees — the shared producer's `abs(lat) > 90 /
-abs(lng) > 180` guard drops them (see `dob_permits_producer.py`) and the
-ADR-0004 geocoder resolves the permit's street address into H3. No 311/SLA/DEEDS
-feeds are published at open-data quality, so only PERMITS is registered.
+publishes building permits as an ArcGIS FeatureServer whose layer metadata
+advertises Idaho state-plane geometry (WKID 102459). The shared ArcGIS client
+requests WGS84 output for H3 indexing, with the ADR-0004 geocoder as a fallback.
+No 311/SLA/DEEDS feeds are published at open-data quality, so only PERMITS is
+registered.
 
 The PERMITS spec data below is the exact payload the spine `city_registry.py`
 copies into REGISTRY under `CityId.BOISE`; it is declared here as data so the
@@ -172,8 +171,8 @@ BOISE_DIVISIONS: Dict[str, BoroughMeta] = {
 BOISE_PERMITS_SPEC: Dict[str, object] = {
     "endpoint": "settings.arcgis_boise_permits_url",
     "platform": "arcgis",
-    "watermark_col": "ISSUEDATE",
-    "id_keys": ["PERMITNUMBER", "OBJECTID", "id"],
+    "watermark_col": "IssuedDate",
+    "id_keys": ["RecordID", "OBJECTID", "id"],
     "topic": "settings.topic_permits",
     "interval_seconds": 300.0,
     "producer_key": "permits",
@@ -181,9 +180,10 @@ BOISE_PERMITS_SPEC: Dict[str, object] = {
         "expected_cadence_days": 7,
         "needs_geocode": True,
         "geocode_context": "Boise, ID",
-        "scope": "Residential building permits; state-plane geometry resolved via geocoder",
+        "scope": "Residential-only building permits; ArcGIS state-plane source requested as WGS84 with address fallback",
         "oid_field": "OBJECTID",
-        "max_record_count": 1000,
+        "max_record_count": 2000,
+        "order_by": "IssuedDate DESC",
         "field_map": BOISE_PERMITS_FIELD_MAP,
     },
 }

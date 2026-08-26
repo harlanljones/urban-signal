@@ -1459,8 +1459,9 @@ def get_dashboard_html() -> str:
       louisville: { name: 'Louisville / Jefferson County' },
       portland: { name: 'Portland / Multnomah County' },
       san_jose: { name: 'San Jose / Santa Clara County' },
-      tampa: { name: 'Tampa / Hillsborough County' }
-      las_vegas: { name: 'Las Vegas / Clark County' }
+      tampa: { name: 'Tampa / Hillsborough County' },
+      las_vegas: { name: 'Las Vegas / Clark County' },
+      boise: { name: 'Boise / Ada County' }
     };
 
     let map = null;

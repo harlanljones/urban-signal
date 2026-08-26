@@ -335,6 +335,13 @@ from src.spatial.cities.las_vegas import (
     LAS_VEGAS_SUBMARKETS,
     is_in_las_vegas_metro,
 )
+from src.spatial.cities.boise import (
+    BOISE_DIVISION_BBOXES,
+    BOISE_DIVISIONS,
+    BOISE_METRO_BBOX,
+    BOISE_SUBMARKETS,
+    is_in_boise_metro,
+)
 
 __all__ = [
     "PIERCE_METRO_BBOX",
@@ -573,4 +580,9 @@ __all__ = [
     "LAS_VEGAS_DIVISIONS",
     "LAS_VEGAS_SUBMARKETS",
     "is_in_las_vegas_metro",
+    "BOISE_METRO_BBOX",
+    "BOISE_DIVISION_BBOXES",
+    "BOISE_DIVISIONS",
+    "BOISE_SUBMARKETS",
+    "is_in_boise_metro",
 ]

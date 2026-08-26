@@ -1813,6 +1813,36 @@
         "lng": -115.1728
       },
       "evidence_path": "apps/api/src/spatial/cities/las_vegas.py"
+    },
+    {
+      "id": "boise",
+      "name": "Boise / Ada County",
+      "state": "ID",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 6,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "IssuedDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 43.6131,
+        "lng": -116.211
+      },
+      "evidence_path": "apps/api/src/spatial/cities/boise.py"
     }
   ],
   "pipeline": [

@@ -15,6 +15,7 @@ from src.producers.field_maps_louisville import LOUISVILLE_311_FIELD_MAP, LOUISV
 from src.producers.field_maps_san_jose import FIELD_MAP as SAN_JOSE_FIELD_MAP
 from src.producers.field_maps_tampa import FIELD_MAP as TAMPA_FIELD_MAP, SLA_FIELD_MAP as TAMPA_SLA_FIELD_MAP
 from src.producers.field_maps_las_vegas import FIELD_MAP as LAS_VEGAS_FIELD_MAP
+from src.producers.field_maps_boise import FIELD_MAP as BOISE_PERMITS_FIELD_MAP
 from src.spatial.cities.portland import (
     PORTLAND_DIVISION_BBOXES,
     PORTLAND_DIVISIONS,
@@ -301,6 +302,12 @@ from src.spatial.cities.las_vegas import (
     LAS_VEGAS_METRO_BBOX,
     LAS_VEGAS_SUBMARKETS,
 )
+from src.spatial.cities.boise import (
+    BOISE_DIVISION_BBOXES,
+    BOISE_DIVISIONS,
+    BOISE_METRO_BBOX,
+    BOISE_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -362,6 +369,7 @@ class CityId(str, Enum):
     SAN_JOSE = "san_jose"
     TAMPA = "tampa"
     LAS_VEGAS = "las_vegas"
+    BOISE = "boise"
 
 
 class FeedType(str, Enum):
@@ -772,6 +780,13 @@ ALIASES: Dict[str, CityId] = {
     "clark_county": CityId.LAS_VEGAS,
     "clark county": CityId.LAS_VEGAS,
     "vegas": CityId.LAS_VEGAS,
+
+    # Boise / Ada County, ID
+    "boise": CityId.BOISE,
+    "boise_id": CityId.BOISE,
+    "boise id": CityId.BOISE,
+    "ada_county": CityId.BOISE,
+    "ada county": CityId.BOISE,
 }
 
 
@@ -4491,6 +4506,38 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                     "geocode_context": "Las Vegas, NV",
                     "scope": "Clark County real-property parcel sales / recorded deeds (address-only ArcGIS table)",
                     "field_map": LAS_VEGAS_FIELD_MAP["deeds"],
+                },
+            ),
+        },
+    ),
+    CityId.BOISE: CityRegistration(
+        city_id=CityId.BOISE,
+        name="Boise / Ada County",
+        state="ID",
+        center={"lat": 43.6131, "lng": -116.2110},
+        metro_bbox=BOISE_METRO_BBOX,
+        division_bboxes=BOISE_DIVISION_BBOXES,
+        submarkets=BOISE_SUBMARKETS,
+        divisions=BOISE_DIVISIONS,
+        job_suffix="boise",
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_boise_permits_url,
+                platform="arcgis",
+                watermark_col="IssuedDate",
+                id_keys=["RecordID", "OBJECTID", "id"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "order_by": "IssuedDate DESC",
+                    "needs_geocode": True,
+                    "geocode_context": "Boise, ID",
+                    "scope": "Residential-only building permits; ArcGIS state-plane source requested as WGS84 with address fallback",
+                    "field_map": BOISE_PERMITS_FIELD_MAP,
                 },
             ),
         },

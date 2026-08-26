@@ -921,6 +921,14 @@ class Settings(BaseSettings):
         description="San Jose 2026 311 service requests CKAN datastore resource",
     )
 
+    # Boise / Ada County (US-150): residential-only permits. The source layer
+    # advertises Idaho state-plane geometry; ArcGIS queries request WGS84 and
+    # the city registry declares address geocoding as the fallback.
+    arcgis_boise_permits_url: str = Field(
+        default="https://services1.arcgis.com/WHM6qC35aMtyAAlN/arcgis/rest/services/Housing_OpenData/FeatureServer/0",
+        description="Boise residential permits ArcGIS FeatureServer layer URL",
+    )
+
     # Tampa, FL (US-146): audited full permits and partial alcohol-beverage
     # history layers, both point-geocoded ArcGIS services.
     arcgis_tampa_permits_url: str = Field(
