@@ -9,6 +9,7 @@ Kafka or the application database.
 from __future__ import annotations
 
 import argparse
+import email.utils
 import json
 import logging
 import sys
@@ -29,6 +30,7 @@ from src.config import settings
 from src.producers.arcgis_client import ArcGISClient
 from src.producers.carto_client import CartoClient
 from src.producers.ckan_client import CkanClient
+from src.producers.csv_client import CSVClient
 from src.producers.socrata_client import SocrataClient
 from src.producers.watermarks import (
     parse_watermark as parse_timestamp,
@@ -127,7 +129,20 @@ def fetch_source_updated_at(
     spec: DatasetSpec,
     request_json: Callable[..., Mapping[str, Any]],
 ) -> datetime | None:
-    """Fetch ``rowsUpdatedAt`` or ArcGIS ``lastEditDate`` when available."""
+    """Fetch ``rowsUpdatedAt``/``lastEditDate`` or the csv ``Last-Modified`` header."""
+    if spec.platform == "csv":
+        try:
+            response = request_json(spec.endpoint)
+        except Exception:  # noqa: BLE001  # a csv HEAD failure must not hide others
+            return None
+        header = response.headers.get("last-modified") if hasattr(response, "headers") else None
+        if not header:
+            return None
+        try:
+            parsed = email.utils.parsedate_to_datetime(header)
+        except (TypeError, ValueError):
+            return None
+        return parsed if parsed.tzinfo else parsed.replace(tzinfo=UTC)
     url = _metadata_url(spec)
     if not url:
         return None
@@ -150,11 +165,27 @@ def client_for(spec: DatasetSpec) -> Any:
         "arcgis": ArcGISClient,
         "carto": CartoClient,
         "ckan": CkanClient,
+        "csv": CSVClient,
     }
     try:
         return clients[spec.platform]()
     except KeyError as exc:
         raise ValueError(f"Unsupported feed platform {spec.platform!r}") from exc
+
+
+def _row_value(row: Mapping[str, Any], key: str) -> Any:
+    """Case-insensitive cell lookup.
+
+    Some clients (CSVClient lowercases headers; CkanClient's non-SQL
+    ``datastore_search`` path returns lowercase keys) transform the column
+    casing a feed declared in the registry, so a literal ``row.get(key)`` for
+    an uppercase watermark column (e.g. Pittsburgh deeds ``RECORDDATE``)
+    misses. Prefer the exact key, then a lowercased fallback.
+    """
+    if key in row:
+        return row[key]
+    return row.get(key.lower())
+
 
 def newest_watermark(
     client: Any,
@@ -162,23 +193,6 @@ def newest_watermark(
     *,
     now: datetime | None = None,
 ) -> datetime | None:
-    """Fetch a bounded newest-row sample and compare values after typed parsing.
-
-    Comparing parsed values matters for NYC's mixed ISO and ``MM/DD/YYYY``
-    permit watermark.  A bounded sample keeps the weekly probe cheap while
-    retaining the source client's normal pagination and retry behavior.
-
-    Feeds declaring a text watermark type (``spec.extra`` keys
-    ``watermark_type`` / ``watermark_format`` / ``watermark_exclude`` — see
-    ADR 0005) get their sentinels excluded server-side via a NOT-IN guard so
-    garbage rows like PG County's ``ZZZZZZZZ`` cannot crowd out the real
-    newest rows, and are compared under the declared strptime format.
-
-    Values strictly after ``now`` are ignored: a future watermark is a source
-    data artifact (license expirations and the like), not evidence of
-    freshness, so a feed whose only watermarks are future-dated yields
-    ``None`` here and ``probe_feed`` treats ``None`` as stale.
-    """
     if not spec.watermark_col:
         return None
     now = now or datetime.now(UTC)
@@ -199,7 +213,7 @@ def newest_watermark(
         for row in page
         if (
             entry := typed_watermark_entry(
-                row.get(spec.watermark_col),
+                _row_value(row, spec.watermark_col),
                 fmt=fmt,
                 exclude=exclude,
             )

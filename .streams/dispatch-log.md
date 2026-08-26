@@ -325,3 +325,86 @@ All three streams target `apps/product` with **disjoint leaf files**. Shared fil
 | us121-architecture-alerts | `apps/product/pages/architecture.html` | CHANGELOG.md, llms.txt/llms-full.txt (architecture lines), dist/ | ~in-flight | completed — typecheck green; new Alert dispatch spine node + feature aggregation loop rewrite per ADR 0008 | architecture.html aggregation/alert narrative |
 
 **Orchestrator close-out:** shared edits applied serially (CHANGELOG ×3, llms.txt ×2, llms-full.txt ×3); `bun run build` + `bun run lint` green (SITE_BUILD_OK, SITE_CONTENT_OK, AGENT_SURFACE_OK, MULTI_PAGE_OK, 37 routes). Artifacts left uncommitted per local git policy. Yield: 3 of 3.
+
+## 2026-08-25 — external context-signal validation wave (US-101 / US-102 / US-103 / US-122 / US-123)
+
+Five pure-leaf, read-only research streams, each producing exactly two files
+(its `.streams/<id>.md` claim log and one `docs/research/<topic>.md`). No spine
+files touched. All five candidates were verified open, unassigned, and unblocked
+(no relations) before claiming; assigned to `self` as the first write and each
+closing comment attached before the next spawn. Verdicts recorded per issue,
+with evidence pointers to the validation docs. Artifacts and claim logs left
+uncommitted per local git policy.
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| us101-lodes | `docs/research/census-lodes-validation.md` | none | ~2026-08-25 | completed — DEFER (near-register; data side proven; needs a new context signal family) | `docs/research/census-lodes-validation.md` (342 lines) |
+| us102-bfs | `docs/research/census-bfs-validation.md` | none | ~2026-08-25 | completed — DEFER (county series annual/no sector detail; Jan-2026 methodology change) | `docs/research/census-bfs-validation.md` (248 lines) |
+| us103-hud-usps | `docs/research/hud-usps-vacancy.md` | none | ~2026-08-25 | completed — DEFER (access restricted to gov/nonprofit + sublicense purpose; tract aggregates not points) | `docs/research/hud-usps-vacancy.md` (240 lines) |
+| us122-qcew | `docs/research/bls-qcew-validation.md` | none | ~2026-08-25 | completed — DEFER conditional register-later (supression + OMB MSA seam + employment near-duplicate of LODES) | `docs/research/bls-qcew-validation.md` (265 lines) |
+| us123-nlcd | `docs/research/annual-nlcd-layers.md` | none | ~2026-08-25 | completed — DEFER (no raster ingest capability; product-version drift risk; pilot feasible) | `docs/research/annual-nlcd-layers.md` (329 lines) |
+
+**Yield:** 5 of 5 leaf streams (all durable artifacts written). Cross-cutting
+finding: all five land as context layers, none register as event feeds — each
+would need a new context signal family (Workforce/LandCover/etc.) and, for NLCD
+and HUD–USPS, an areal/raster→H3 aggregation engine that does not exist in the
+spine. LODES is the closest to REGISTER (no granularity mismatch, fully proven);
+QCEW is register-later behind LODES/BFS. No code changed; no spine edits; gates
+not run (no code touched).
+
+## 2026-08-25 — registration wave (serial, spine-held) — US-126 first
+
+Run serially, one subagent per issue holding the interlock, because every
+registration edits the shared spine (`config.py`, `city_registry.py`) and the
+deeds cluster also edits `deeds_acris_producer.py`. Interlock gate re-run by the
+orchestrator after each release (`.venv/bin/python -m pytest -m interlock`).
+
+| Stream id | Leaf claim | Spine touched | Outcome | Yielded artifact |
+|---|---|---|---|---|
+| us126-cincinnati-deeds | `apps/api/tests/unit/test_producers_cincinnati.py` + README/roadmap rows | config.py, city_registry.py, csv_client.py, deeds_acris_producer.py | completed — interlock 21/21; focused 115; reg 86; ruff net-new 0 | Cincinnati DEEDS registered (csv, snapshot, SaleDate synth, valid='Y'); live-probed and confirmed |
+| us127-columbus-deeds | `apps/api/tests/unit/test_producers_columbus.py` + README/roadmap rows | config.py, city_registry.py, deeds_acris_producer.py | completed — interlock 21/21; unit 814/0; ruff net-new 0 | Columbus DEEDS registered (arcgis, annual snapshot, dual-schema field map); live probe: Instrument_Number NULL layer-wide (effective id = PARCELID+OBJECTID) |
+| us129-pittsburgh-deeds | `apps/api/tests/unit/test_producers_pittsburgh.py` + README row | config.py, city_registry.py, deeds_acris_producer.py | completed — interlock 21/21 | Pittsburgh DEEDS registered (ckan; self.ckan wired for the interlock client-exposure invariant); live 501,120 rows, RECORDDATE daily |
+
+## 2026-08-25 — registration wave (continued) — batch 1 (US-124 / US-135 / US-130)
+
+Parallel subagents, grouped so each batch has disjoint producer files; only
+shared `city_registry.py`/`config.py` are edited concurrently, in disjoint city
+blocks (the C7/C8-proven pattern). Interlock gate re-run by the orchestrator after
+each batch (21/21 held across all). Full unit suite at close-out: 868 passed /
+0 failed. Ruff net-new 0 per stream (counts are pre-existing HEAD lint debt).
+
+| Stream id | Leaf claim | Spine touched | Outcome | Yielded artifact |
+|---|---|---|---|---|
+| us124-san-diego-311 | `apps/api/tests/unit/test_producers_san_diego.py` + README row | config.py, city_registry.py, complaints_311_producer.py | completed — 18/18 focused; reg 102/102; ruff net-new 0 | San Diego COMPLAINTS_311 registered (csv, endpoint_by_year + companion open) |
+| us135-minneapolis-sla | `apps/api/tests/unit/test_producers_minneapolis.py` + README row | config.py, city_registry.py, sla_licenses_producer.py (additive dba prepend) | completed — focused 185/185; ruff net-new 0 | Minneapolis SLA registered (arcgis On/Off Sale, companion_endpoints) |
+| us130-philadelphia-deeds | `apps/api/tests/unit/test_producers_philadelphia.py` + README/roadmap rows | city_registry.py (extra.where) only | completed — phl 39/39; carto 28/28; ruff net-new 0 | Philly DEEDS scoped to `document_type='DEED'` (95.3% price-bearing; IN(...) rejected as it pulls 0.1%-bearing noise) |
+
+## 2026-08-25 — registration wave (continued) — batch 2 (US-129 / US-133 / US-131)
+
+| Stream id | Leaf claim | Spine touched | Outcome | Yielded artifact |
+|---|---|---|---|---|
+| us129-pittsburgh-deeds | (logged above) | config.py, city_registry.py, deeds_acris_producer.py | completed — interlock 21/21; 9/9; ruff net-new 0 | Pittsburgh DEEDS registered (ckan) |
+
+Actually batch 2 also dispatched US-133 and US-131 — recording their close-outs here:
+
+| Stream id | Leaf claim | Spine touched | Outcome | Yielded artifact |
+|---|---|---|---|---|
+| us133-norfolk-sla | `apps/api/tests/unit/test_producers_norfolk.py` + README/roadmap rows | config.py, city_registry.py, sla_licenses_producer.py (additive premises_name prepend) | completed — focused 95/95; Wiring 3/3; ruff net-new 0 | Norfolk SLA registered (socrata, placeholder-where → 96.2% geocode); obsolete G2 no-geometry verdict corrected |
+| us131-nashville-311 | `apps/api/tests/unit/test_producers_nashville.py` + README row | config.py, city_registry.py | completed — 24/24; reg 108/108; Wiring 3/3; ruff net-new 0 | Nashville COMPLAINTS_311 registered (arcgis, Latitude IS NOT NULL); positive re-adjudication of HJ-119 exclusion |
+
+## 2026-08-25 — registration wave (continued) — batch 3 (US-128 / US-132 / US-134) + close-out
+
+| Stream id | Leaf claim | Spine touched | Outcome | Yielded artifact |
+|---|---|---|---|---|
+| us128-md-sdat-deeds | `apps/api/tests/unit/test_producers_{baltimore,montgomery,prince_georges}.py` + `test_watermarks.py` + README rows | watermarks.py, config.py, city_registry.py, deeds_acris_producer.py | completed — focused 37/37; deeds cluster 310/310; interlock 21/21; ruff net-new 0 | BALTIMORE/MONTGOMERY/PRINCE_GEORGES DEEDS registered (socrata, MD SDAT, snapshot) |
+| us132-pittsburgh-311 | `apps/api/tests/unit/test_producers_pittsburgh.py` + README row | config.py, city_registry.py | completed — 17/17; reg 43/43; Wiring 3/3; ruff net-new 0 | Pittsburgh COMPLAINTS_311 registered (ckan, intraday; stale address-only-archive verdict corrected) |
+| us134-kansas-city-sla | `apps/api/tests/unit/test_producers_kansas_city.py` + README row | config.py, city_registry.py, sla_licenses_producer.py (%Y%m%d), scripts/rejection_recheck.py | completed — 9/9; SLA reg 122/122; interlock 21/21; ruff net-new 0 | KANSAS_CITY SLA registered (socrata snapshot, cadence 90); rejection_recheck kc_sla superseded |
+
+**Orchestrator close-out (2026-08-25):** `pytest -m interlock` 21/21; `pytest tests/unit` **868 passed / 3 skipped / 0 failed**. Two stale test expectations updated to the live registry (test_backfill_probe.py Baltimore scopes →4 feeds incl. deeds; test_rejection_recheck.py `kc_sla` → registered). `scripts/rejection_recheck.py` `nashville_311` marked `superseded_by:"US-131"`. Yield: 12 of 12 registration streams (5 in the completed batch + 7 with the deeds cluster). All artifacts and claim logs left uncommitted per local git policy; no dashboard edits were needed (all cities already listed; TestDashboardWiring green).
+| us125-san-diego-sla | `apps/api/tests/unit/test_producers_san_diego.py` + README row | config.py, city_registry.py, sla_licenses_producer.py (csv wiring + account_key normalization) | completed — SD 25/25; combined focused 373/373; interlock 21/21; ruff net-new 0 | San Diego SLA registered (csv snapshot; NAICS 72 hospitality for LIMS; inactive backfill 403s today) |
+
+**Registration wave complete — 12 of 12.** Final verification after US-125:
+`pytest -m interlock` **21/21**; `pytest tests/unit` **875 passed / 3 skipped / 0 failed**.
+All 12 registration issues (US-124, US-125, US-126, US-127, US-128, US-129,
+US-130, US-131, US-132, US-133, US-134, US-135) implemented, gate-verified,
+commented with evidence, and recorded above. Uncommitted per local git policy.

@@ -105,7 +105,12 @@ class CSVClient:
             rows.append(row)
 
         if order_by:
-            rows.sort(key=lambda r: str(r.get(order_by, "")))
+            m = re.match(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s+(ASC|DESC)?\s*$", order_by, re.IGNORECASE)
+            col = m.group(1).lower() if m else order_by.strip().lower()
+            if m and m.group(2) and m.group(2).upper() == "DESC":
+                rows.sort(key=lambda r: str(r.get(col, "")), reverse=True)
+            else:
+                rows.sort(key=lambda r: str(r.get(col, "")))
 
         total = 0
         batch: List[Dict[str, Any]] = []

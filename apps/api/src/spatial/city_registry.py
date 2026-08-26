@@ -1803,7 +1803,7 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=600.0,
                 producer_key="sla",
                 extra={
-                    "expected_cadence_days": 7,
+                    "expected_cadence_days": 30,
                     "oid_field": "OBJECTID",
                     "max_record_count": 16000,
                     "companion_endpoints": {
