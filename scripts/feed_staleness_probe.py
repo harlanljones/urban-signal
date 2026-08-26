@@ -110,6 +110,7 @@ class ProbeResult:
     age_days: float | None
     stale: bool
     error: str | None = None
+    alarm_exempt: bool = False
 
 
 def _metadata_url(spec: DatasetSpec) -> str | None:
@@ -249,6 +250,10 @@ def probe_feed(
     age_days = (now - oldest).total_seconds() / 86400 if oldest else None
     stale = oldest is None or now - oldest > threshold
     errors = "; ".join(error for error in (source_error, row_error) if error) or None
+    # Documented-dead / intentionally-unmaintained feeds (extra["alarm_exempt"])
+    # are still reported with their true staleness but do not page the alarm:
+    # their source has no live replacement and the human has accepted the gap.
+    alarm_exempt = bool((spec.extra or {}).get("alarm_exempt"))
     return ProbeResult(
         city_id=city_id,
         feed=feed.value,
@@ -263,6 +268,7 @@ def probe_feed(
         age_days=age_days,
         stale=stale,
         error=errors,
+        alarm_exempt=alarm_exempt,
     )
 
 
@@ -316,6 +322,7 @@ def probe_registry(
                     age_days=None,
                     stale=True,
                     error=str(exc),
+                    alarm_exempt=bool((spec.extra or {}).get("alarm_exempt")),
                 )
             FEED_AGE_DAYS.labels(city.value, feed.value, spec.platform).set(result.age_days or 0)
             FEED_STALE.labels(city.value, feed.value, spec.platform).set(int(result.stale))
@@ -328,7 +335,7 @@ def probe_registry(
 
 def page_stale(results: list[ProbeResult], webhook_urls: list[str]) -> list[int]:
     """Send one generic JSON page for stale feeds to every configured webhook."""
-    stale = [asdict(result) for result in results if result.stale]
+    stale = [asdict(result) for result in results if result.stale and not result.alarm_exempt]
     if not stale or not webhook_urls:
         return []
     stale = json.loads(json.dumps(stale, default=_json_default))
@@ -371,7 +378,7 @@ def main() -> int:
     if not args.dry_run:
         page_stale(results, settings.webhook_alert_urls)
     print(json.dumps([asdict(result) for result in results], default=str))
-    return 1 if any(result.stale for result in results) else 0
+    return 1 if any(result.stale and not result.alarm_exempt for result in results) else 0
 
 
 if __name__ == "__main__":

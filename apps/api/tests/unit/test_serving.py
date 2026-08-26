@@ -440,57 +440,81 @@ def test_catalysts_san_francisco():
 
 
 def test_dashboard_html_sf_integration():
-    """Verify dashboard HTML includes San Francisco Bay Area options and config."""
+    """Verify dashboard HTML includes San Francisco Bay Area metro metadata."""
     res = client.get("/dashboard")
     assert res.status_code == 200
     html = res.text
-    assert 'value="san_francisco"' in html
-    assert 'San Francisco Bay Area' in html
-    assert 'SAN_FRANCISCO_CORE' in html
-    assert 'SILICON_VALLEY_SOUTH_BAY' in html
-    assert 'MARIN_NORTH_BAY' in html
-    assert 'EAST_BAY' in html
-    assert 'PENINSULA' in html
+    assert "san_francisco: { name: 'San Francisco Bay Area' }" in html
+    assert 'id="metro-chips"' in html
+    assert "renderMetroChips" in html
+    assert "selectMetro" in html
 
 
-def test_dashboard_compare_menu_is_populated_from_nearby_regions():
-    """The compare menu must not expose a fixed cross-country city list."""
-    res = client.get("/dashboard")
-    assert res.status_code == 200
-    html = res.text
-    assert 'id="compare-options"' in html
-    assert "renderCompareOptions" in html
-    assert "COMPARE_RADIUS_MILES" in html
-    assert 'name="compare-city" value="washington_dc"' not in html
-
-
-def test_dashboard_html_geolocation_default_city():
-    """Verify dashboard defaults to the user's closest city via a one-time
-    geolocation request, falling back to San Francisco when denied."""
+def test_dashboard_shows_all_metros_without_city_selection():
+    """The national map renders every metro at once: the per-city selector and
+    the compare menu are gone, replaced by navigation-only metro chips."""
     res = client.get("/dashboard")
     assert res.status_code == 200
     html = res.text
 
-    # One-time geolocation request with closest-city resolution
-    assert "navigator.geolocation.getCurrentPosition" in html
-    assert "detectUserDefaultCity" in html
-    assert "findClosestCity" in html
-    assert "haversineDistance" in html
+    # Selection/comparison machinery is fully removed.
+    for removed in (
+        'id="city-select"',
+        "changeCity(",
+        'id="compare-options"',
+        "renderCompareOptions",
+        "COMPARE_RADIUS_MILES",
+        "applyComparison",
+    ):
+        assert removed not in html
 
-    # Closest-city candidates cover all supported metros
-    assert "'san_francisco': { lat: 37.7749, lng: -122.4194 }" in html
-    assert "'chicago': { lat: 41.8781, lng: -87.6298 }" in html
-    assert "'nyc': { lat: 40.7128, lng: -74.0060 }" in html
+    # Metro chips are present and are navigation, not data scoping.
+    assert 'id="metro-chips"' in html
+    assert "activeMetroChip" in html
+    assert "fitNationalView" in html
 
-    # Denial / timeout / unsupported-browser fallback goes to San Francisco
-    assert html.count("resolve('san_francisco')") >= 2
 
-    # Result is cached per session so the prompt only appears once
-    assert "sessionStorage.getItem('urban_dev_user_city')" in html
-    assert "sessionStorage.setItem('urban_dev_user_city'" in html
+def test_dashboard_html_national_view_and_lazy_tiles():
+    """Verify the dashboard boots into a CONUS-wide view and lazy-loads cells
+    from res-5 viewport tiles instead of fetching whole-city grids."""
+    res = client.get("/dashboard")
+    assert res.status_code == 200
+    html = res.text
 
-    # Manual city changes are persisted for the session as well
-    assert "try { sessionStorage.setItem('urban_dev_user_city', currentCity); } catch (e) {}" in html
+    # National camera + zoom floor hint.
+    assert "-96.6, 38.9" in html
+    assert "ZOOM_FLOOR" in html
+    assert 'id="zoom-hint"' in html
+
+    # Viewport-driven tile loading against the manifest tile index.
+    assert "updateViewportTiles" in html
+    assert "/api/v1/gridtiles?parents=" in html
+    assert "snapshotManifest.tile_index" in html
+    assert "fetchManifest" in html
+
+    # Whole-city grid fetches no longer happen from the client.
+    assert "/api/v1/grid?" not in html
+
+    # Deep links stay valid as camera presets (product site links to them).
+    assert "deepLinkedCity" in html
+
+    # No geolocation prompt: everyone lands on the national view.
+    assert "navigator.geolocation" not in html
+    assert "detectUserDefaultCity" not in html
+
+
+def test_dashboard_html_normalizes_cross_metro_metrics():
+    """Map paints read build-time percentile ranks so 27 metros share one
+    comparable color scale; raw scores remain visible in tooltips."""
+    res = client.get("/dashboard")
+    assert res.status_code == 200
+    html = res.text
+
+    assert "lims_score_national_pct" in html
+    assert "National Pct:" in html
+    assert "Metro Pct:" in html
+    # Raw-only ramps are gone from layer paints.
+    assert "['get', 'lims_score']" not in html
 
 
 def test_unknown_city_rejection_400():

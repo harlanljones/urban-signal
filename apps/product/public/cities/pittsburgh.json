@@ -98,7 +98,7 @@
     "sla": null,
     "deeds": {
       "platform": "ckan",
-      "watermark_col": "RECORDDATE",
+      "watermark_col": "SALEDATE",
       "interval_seconds": 600.0,
       "topic": "raw.municipal.deeds"
     }

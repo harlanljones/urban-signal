@@ -51,7 +51,7 @@ uv pip install -e ".[dev]"
 # Run all unit tests
 uv run pytest tests/unit -v
 
-# Run the interlock invariant gate (closure, completeness, containment across all 27 metros)
+# Run the interlock invariant gate (closure, completeness, containment across all 30 metros)
 uv run pytest -m interlock
 
 # Run end-to-end integration tests

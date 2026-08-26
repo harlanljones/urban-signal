@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "id": "indianapolis",
+  "name": "Indianapolis / Marion County",
+  "state": "IN",
+  "center": {
+    "lat": 39.7684,
+    "lng": -86.1581
+  },
+  "metro_bbox": {
+    "min_lat": 39.6,
+    "max_lat": 39.95,
+    "min_lng": -86.38,
+    "max_lng": -85.9
+  },
+  "divisions": {
+    "INDIANAPOLIS_CORE": {
+      "name": "Marion County",
+      "center": {
+        "lat": 39.7684,
+        "lng": -86.1581
+      },
+      "bbox": {
+        "min_lat": 39.63,
+        "max_lat": 39.92,
+        "min_lng": -86.35,
+        "max_lng": -85.92
+      },
+      "submarkets": [
+        "Downtown & Mile Square",
+        "Mass Ave & Chatham Arch",
+        "Fountain Square & Fletcher Place",
+        "Broad Ripple",
+        "Irvington"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Mile Square": {
+      "name": "Downtown & Mile Square",
+      "division": "INDIANAPOLIS_CORE",
+      "center": {
+        "lat": 39.7684,
+        "lng": -86.1581
+      },
+      "description": "Central business and Mile Square core with the Monon/East Street corridors, office-to-residential conversions, and statehouse/civic demand."
+    },
+    "Mass Ave & Chatham Arch": {
+      "name": "Mass Ave & Chatham Arch",
+      "division": "INDIANAPOLIS_CORE",
+      "center": {
+        "lat": 39.7753,
+        "lng": -86.1476
+      },
+      "description": "Massachusetts Avenue arts, dining, and theater district with brick rowhouse conversion and boutique hospitality demand."
+    },
+    "Fountain Square & Fletcher Place": {
+      "name": "Fountain Square & Fletcher Place",
+      "division": "INDIANAPOLIS_CORE",
+      "center": {
+        "lat": 39.752,
+        "lng": -86.1376
+      },
+      "description": "South-side historic commercial node on the Cultural Trail with Victorian infill, brewery-led adaptive reuse, and neighborhood retail."
+    },
+    "Broad Ripple": {
+      "name": "Broad Ripple",
+      "division": "INDIANAPOLIS_CORE",
+      "center": {
+        "lat": 39.8664,
+        "lng": -86.1349
+      },
+      "description": "North-side riverside village with a dense entertainment strip, canal-front retail, and steady single-family and small-multifamily renovation."
+    },
+    "Irvington": {
+      "name": "Irvington",
+      "division": "INDIANAPOLIS_CORE",
+      "center": {
+        "lat": 39.769,
+        "lng": -86.064
+      },
+      "description": "Historic east-side National Register district along Washington Street with craftsman stock, commercial-corridor reinvestment, and infill housing."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "REQUESTEDDATETIME",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/indianapolis.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

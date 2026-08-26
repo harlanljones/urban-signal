@@ -1043,7 +1043,7 @@
         null,
         {
           "platform": "ckan",
-          "watermark_col": "RECORDDATE",
+          "watermark_col": "SALEDATE",
           "interval_seconds": 600.0,
           "topic": "raw.municipal.deeds"
         }
@@ -1093,6 +1093,96 @@
         "lng": -117.1611
       },
       "evidence_path": "apps/api/src/spatial/cities/san_diego.py"
+    },
+    {
+      "id": "indianapolis",
+      "name": "Indianapolis / Marion County",
+      "state": "IN",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        false,
+        true,
+        false,
+        false
+      ],
+      "platforms": [
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "REQUESTEDDATETIME",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 39.7684,
+        "lng": -86.1581
+      },
+      "evidence_path": "apps/api/src/spatial/cities/indianapolis.py"
+    },
+    {
+      "id": "houston",
+      "name": "Houston",
+      "state": "TX",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 6,
+      "feeds": [
+        false,
+        true,
+        false,
+        false
+      ],
+      "platforms": [
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "CREATED_ON",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 29.7604,
+        "lng": -95.3698
+      },
+      "evidence_path": "apps/api/src/spatial/cities/houston.py"
+    },
+    {
+      "id": "wichita",
+      "name": "Wichita",
+      "state": "KS",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "ApplicationDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 37.6872,
+        "lng": -97.3301
+      },
+      "evidence_path": "apps/api/src/spatial/cities/wichita.py"
     }
   ],
   "pipeline": [

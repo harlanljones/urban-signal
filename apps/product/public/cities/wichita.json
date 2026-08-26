@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "id": "wichita",
+  "name": "Wichita",
+  "state": "KS",
+  "center": {
+    "lat": 37.6872,
+    "lng": -97.3301
+  },
+  "metro_bbox": {
+    "min_lat": 37.4,
+    "max_lat": 37.95,
+    "min_lng": -97.85,
+    "max_lng": -97.05
+  },
+  "divisions": {
+    "WICHITA_CORE": {
+      "name": "Wichita Core",
+      "center": {
+        "lat": 37.69,
+        "lng": -97.333
+      },
+      "bbox": {
+        "min_lat": 37.52,
+        "max_lat": 37.8,
+        "min_lng": -97.47,
+        "max_lng": -97.11
+      },
+      "submarkets": [
+        "Downtown & Old Town",
+        "Delano",
+        "College Hill",
+        "Riverside",
+        "Crown Heights & Midtown"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Old Town": {
+      "name": "Downtown & Old Town",
+      "division": "WICHITA_CORE",
+      "center": {
+        "lat": 37.69,
+        "lng": -97.333
+      },
+      "description": "Central business district and Old Town loft corridor with office conversions, heritage adaptive reuse, and high-density residential demand."
+    },
+    "Delano": {
+      "name": "Delano",
+      "division": "WICHITA_CORE",
+      "center": {
+        "lat": 37.686,
+        "lng": -97.354
+      },
+      "description": "West-side riverfront district along Douglas Avenue with boutique hospitality, mixed-use infill, and entertainment-driven reinvestment."
+    },
+    "College Hill": {
+      "name": "College Hill",
+      "division": "WICHITA_CORE",
+      "center": {
+        "lat": 37.702,
+        "lng": -97.281
+      },
+      "description": "East-side historic residential corridor with restored early-century housing and steady owner-occupant renovation activity."
+    },
+    "Riverside": {
+      "name": "Riverside",
+      "division": "WICHITA_CORE",
+      "center": {
+        "lat": 37.716,
+        "lng": -97.343
+      },
+      "description": "Northwest riverfront and park-adjacent neighborhood with historic homes, civic investment, and enclave infill activity."
+    },
+    "Crown Heights & Midtown": {
+      "name": "Crown Heights & Midtown",
+      "division": "WICHITA_CORE",
+      "center": {
+        "lat": 37.735,
+        "lng": -97.309
+      },
+      "description": "North-central residential district targeted by reinvestment programs with rehabilitation and infill housing momentum."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "ApplicationDate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/wichita.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

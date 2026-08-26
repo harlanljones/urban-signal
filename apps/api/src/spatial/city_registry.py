@@ -168,6 +168,24 @@ from src.spatial.cities.san_diego import (
     SAN_DIEGO_METRO_BBOX,
     SAN_DIEGO_SUBMARKETS,
 )
+from src.spatial.cities.houston import (
+    HOUSTON_DIVISION_BBOXES,
+    HOUSTON_DIVISIONS,
+    HOUSTON_METRO_BBOX,
+    HOUSTON_SUBMARKETS,
+)
+from src.spatial.cities.indianapolis import (
+    INDIANAPOLIS_DIVISION_BBOXES,
+    INDIANAPOLIS_DIVISIONS,
+    INDIANAPOLIS_METRO_BBOX,
+    INDIANAPOLIS_SUBMARKETS,
+)
+from src.spatial.cities.wichita import (
+    WICHITA_DIVISION_BBOXES,
+    WICHITA_DIVISIONS,
+    WICHITA_METRO_BBOX,
+    WICHITA_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -208,6 +226,9 @@ class CityId(str, Enum):
     CHARLOTTE = "charlotte"
     PITTSBURGH = "pittsburgh"
     SAN_DIEGO = "san_diego"
+    HOUSTON = "houston"
+    INDIANAPOLIS = "indianapolis"
+    WICHITA = "wichita"
 
 
 class FeedType(str, Enum):
@@ -461,6 +482,26 @@ ALIASES: Dict[str, CityId] = {
     "san diego": CityId.SAN_DIEGO,
     "san-diego": CityId.SAN_DIEGO,
     "sd": CityId.SAN_DIEGO,
+
+    # Houston, TX
+    "houston": CityId.HOUSTON,
+    "houston_tx": CityId.HOUSTON,
+    "houston-tx": CityId.HOUSTON,
+    "houston tx": CityId.HOUSTON,
+    "htx": CityId.HOUSTON,
+    "h-town": CityId.HOUSTON,
+
+    # Indianapolis / Marion County, IN
+    "indianapolis": CityId.INDIANAPOLIS,
+    "indianapolis_in": CityId.INDIANAPOLIS,
+    "indianapolis in": CityId.INDIANAPOLIS,
+    "indy": CityId.INDIANAPOLIS,
+
+    # Wichita, KS / Sedgwick County
+    "wichita": CityId.WICHITA,
+    "wichita_ks": CityId.WICHITA,
+    "wichita ks": CityId.WICHITA,
+    "ict": CityId.WICHITA,
 }
 
 
@@ -522,7 +563,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
-                extra={"expected_cadence_days": 7},
+                # NYC ACRIS record-to-date: source refreshes (rowsUpdatedAt
+                # 2026-08-10, active) but newest recorded_datetime lags ~26d
+                # (2026-07-31) — the DCP extract's recording lag. Alarm at
+                # 2xN=42d (US-164).
+                extra={"expected_cadence_days": 21},
             ),
             # US-71: current-year YTD incident set (monthly publishing -> G11
             # cadence declaration; the staleness monitor alarms at 60d).
@@ -612,7 +657,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
-                extra={"expected_cadence_days": 7},
+                # Cook County recorded-sales cadence: the dataset refreshes ~weekly
+                # (rowsUpdatedAt 2026-08-19, active) but the newest sale_date lands
+                # ~6 weeks back (2026-07-14) — the source's real close-to-record lag.
+                # Alarm at 2xN=60d (US-164).
+                extra={"expected_cadence_days": 30},
             ),
             # US-71: CPD crime incidents (lat/lon verified 2026-08-24).
             FeedType.CRIME: DatasetSpec(
@@ -691,7 +740,15 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
-                extra={"expected_cadence_days": 7},
+                # SUSPECTED STALL: source_updated_at == newest data_loaded_at ==
+                # 2026-06-26 (61d), and 0 rows have data_loaded_at >= 2026-07-01
+                # (verified 2026-08-26). No live replacement identified (US-164);
+                # keep registered + reported but exempt so it doesn't page forever.
+                extra={
+                    "expected_cadence_days": 7,
+                    "alarm_exempt": True,
+                    "alarm_exempt_reason": "SUSPECTED STALL — frozen since 2026-06-26, no replacement (US-164)",
+                },
             ),
             # US-71: SFPD incident reports (point + intersection fields).
             FeedType.CRIME: DatasetSpec(
@@ -775,6 +832,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
             # docs/research/seattle-deeds-replacement.md for the full audit
             # and the two unblock paths (KC public sharing vs bulk-file
             # producer). Do not repoint this spec at either frozen copy.
+            # alarm_exempt: source has no live anonymous replacement and the
+            # gap is accepted (tracked US-163) — the probe still reports the
+            # feed's true staleness but does not page the alarm for it.
             FeedType.DEEDS: DatasetSpec(
                 endpoint=settings.arcgis_kc_sales_url,
                 platform="arcgis",
@@ -783,7 +843,13 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
-                extra={"expected_cadence_days": 7, "oid_field": "OBJECTID", "max_record_count": 1000},
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 1000,
+                    "alarm_exempt": True,
+                    "alarm_exempt_reason": "KNOWN-DEAD publication; no live anonymous replacement (US-163)",
+                },
             ),
             # US-71: SPD crime incidents (lat/lon verified 2026-08-24).
             FeedType.CRIME: DatasetSpec(
@@ -961,7 +1027,10 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=600.0,
                 producer_key="deeds",
                 extra={
-                    "expected_cadence_days": 7,
+                    # NORA redevelopment disposals: dataset refresh is active
+                    # (rowsUpdatedAt 2026-08-11) but disposals are slow/occasional
+                    # (newest sale_date 2026-07-22). Alarm at 2xN=90d (US-164).
+                    "expected_cadence_days": 45,
                     "field_map": {
                         "doc_id": ["identifier"],
                         "bbl": ["geopin"],
@@ -1228,7 +1297,10 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 # work_type before permit_type so NB/Addition signal survives
                 # generic "Building Permit" values (mirror of Norfolk).
                 extra={
-                    "expected_cadence_days": 7,
+                    # Austin permits publish with ~3-week lag (rowsUpdatedAt
+                    # 2026-08-08, active; newest issue_date 2026-08-06). Alarm
+                    # at 2xN=42d (US-164).
+                    "expected_cadence_days": 21,
                     "field_map": {
                         "cost": ["total_job_valuation"],
                         "filing_date": ["application_date"],
@@ -1507,6 +1579,14 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                     "expected_cadence_days": 7,
                     "ingestion_mode": "snapshot",
                     "scope": "ABS liquor licensees only",
+                    # SUSPECTED STALL: the feed has NO date column (snapshot) and
+                    # rowsUpdatedAt is frozen at 2026-04-01 (146d, verified
+                    # 2026-08-26) — the county hasn't refreshed it in ~5 months.
+                    # No replacement identified (US-164); keep registered + reported
+                    # but exempt so it doesn't page forever until the source is
+                    # re-contacted.
+                    "alarm_exempt": True,
+                    "alarm_exempt_reason": "SUSPECTED STALL — no date col, rowsUpdatedAt frozen 2026-04-01 (US-164)",
                     "field_map": {
                         "license_id": ["licensee_number"],
                         "license_type": ["channel_type"],
@@ -2061,6 +2141,14 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                     "id_col": "cartodb_id",
                     "order_by": "recording_date",
                     "select": "*, ST_Y(the_geom) AS latitude, ST_X(the_geom) AS longitude",
+                    # SUSPECTED DEED-SLICE STALL: after the US-130 document_type
+                    # filter, the newest DEED recording_date is 2026-07-07 (50d)
+                    # while the dataset grows via non-DEED rows (3970 DEEDs recorded
+                    # 2026-06-01..07-07, none after). Likely a recording/DEP summary
+                    # lag (US-164) — keep registered + reported but exempt so it
+                    # doesn't page forever until the source is verified.
+                    "alarm_exempt": True,
+                    "alarm_exempt_reason": "SUSPECTED DEED-slice lag/stall — newest DEED recording 2026-07-07 (US-164)",
                     "field_map": {
                         "recorded_date": ["recording_date"],
                         "document_amount": ["total_consideration"],
@@ -2521,6 +2609,13 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                     "expected_cadence_days": 90,
                     "ingestion_mode": "snapshot",
                     "scope": "KCMO Business License Holders (snapshot; native GeoJSON point geometry)",
+                    # rowsUpdatedAt frozen at 2026-01-15 (~7-month publishing
+                    # lapse despite daily-claimed metadata; re-verified 2026-08-26).
+                    # The feed is still served and the snapshot is valid, so keep
+                    # it registered but exempt it from the alarm while the source
+                    # lapse is tracked (US-163) — do not treat it as a crash.
+                    "alarm_exempt": True,
+                    "alarm_exempt_reason": "7-month rowsUpdatedAt publishing lapse, source-side (US-163)",
                     "field_map": {
                         "license_id": ["id"],
                         "license_type": ["business_type"],
@@ -2714,7 +2809,14 @@ REGISTRY: Dict[CityId, CityRegistration] = {
             FeedType.DEEDS: DatasetSpec(
                 endpoint=settings.ckan_pittsburgh_deeds_endpoint,
                 platform="ckan",
-                watermark_col="RECORDDATE",
+                # SALEDATE is the freshness watermark: it is 0-null across the
+                # 501k-row resource, whereas RECORDDATE has ~1.25k NULLs on the
+                # newest-inserted rows — an incremental `RECORDDATE > hw` filter
+                # would drop those rows, and a probe sample ordered by
+                # `RECORDDATE DESC` is starved of dated rows (SQL sorts NULLs
+                # first under DESC). `recorded_date` in field_map still uses
+                # RECORDDATE for the event, unaffected by the watermark choice.
+                watermark_col="SALEDATE",
                 id_keys=["PARID", "RECORDDATE", "SALEDATE", "DEEDBOOK", "DEEDPAGE"],
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
@@ -2868,6 +2970,159 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                         "longitude": ["lng"],
                         "borough": ["council_district", "bid"],
                         "address_street": ["address_road"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.INDIANAPOLIS: CityRegistration(
+        city_id=CityId.INDIANAPOLIS,
+        name="Indianapolis / Marion County",
+        state="IN",
+        center={"lat": 39.7684, "lng": -86.1581},
+        metro_bbox=INDIANAPOLIS_METRO_BBOX,
+        division_bboxes=INDIANAPOLIS_DIVISION_BBOXES,
+        submarkets=INDIANAPOLIS_SUBMARKETS,
+        divisions=INDIANAPOLIS_DIVISIONS,
+        job_suffix="indianapolis",
+        # 311-only registration (US-144): the RIMAC service-request layer is the
+        # verified machine-readable feed (native point geometry + LAT/LONG_
+        # attributes, REQUESTEDDATETIME epoch-ms watermark ~718.6k rows). City
+        # permits sit in Accela Citizen Access (no public bulk API), INBiz SOS
+        # bulk data is paid, and sales exist only as a nightly parcel snapshot —
+        # so PERMITS/SLA/DEEDS stay deliberately unregistered; get_dataset
+        # raises readable errors for them. Native LAT/LONG_ ride the field map
+        # (uppercase), not a generic fallback.
+        datasets={
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.arcgis_indianapolis_311_url,
+                platform="arcgis",
+                watermark_col="REQUESTEDDATETIME",
+                id_keys=["SERVICEREQUESTID", "OBJECTID"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "scope": (
+                        "Indianapolis RIMAC 311 service requests (native point "
+                        "geometry + LAT/LONG_ attributes)"
+                    ),
+                    "field_map": {
+                        "incident_id": ["SERVICEREQUESTID", "EXTERNALSERVICEREQUEST"],
+                        "created_date": ["REQUESTEDDATETIME"],
+                        "closed_date": ["CLOSEDDATETIME"],
+                        "status": ["STATUS"],
+                        "complaint_type": ["ACTIVITY", "SERVICENAME"],
+                        "incident_address": ["ADDRESS"],
+                        "borough": ["COUNCILDISTRICT"],
+                        "zipcode": ["ZIPCODE"],
+                        "latitude": ["LAT"],
+                        "longitude": ["LONG_"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.HOUSTON: CityRegistration(
+        city_id=CityId.HOUSTON,
+        name="Houston",
+        state="TX",
+        center={"lat": 29.7604, "lng": -95.3698},
+        metro_bbox=HOUSTON_METRO_BBOX,
+        division_bboxes=HOUSTON_DIVISION_BBOXES,
+        submarkets=HOUSTON_SUBMARKETS,
+        divisions=HOUSTON_DIVISIONS,
+        job_suffix="houston",
+        # 311-only registration (US-140): City of Houston mycity2
+        # HOUSTON311_RECENT_SR_SNOW FeatureServer — native LATITUDE/LONGITUDE
+        # doubles + point geometry, CREATED_ON epoch-ms watermark, newest row
+        # 2026-08-24 (probed 2026-08-26). Rolling recent window with bounded
+        # backfill to 2021-07; 99.98% geocoded (9 of 47,100 rows null lat/lng),
+        # so no where-filter is needed. No permits/licenses/deeds feed exists on
+        # any Houston portal (research: permits are Accela transactional not on a
+        # portal; deeds are annual aggregate XLS) — all unregistered.
+        datasets={
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.arcgis_houston_311_url,
+                platform="arcgis",
+                watermark_col="CREATED_ON",
+                id_keys=["CASE_NUMBER", "OBJECTID"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "scope": (
+                        "Houston 311 recent service requests (native coords; "
+                        "CREATED_ON watermark; rolling recent window)"
+                    ),
+                    "field_map": {
+                        "incident_id": ["CASE_NUMBER"],
+                        "latitude": ["LATITUDE"],
+                        "longitude": ["LONGITUDE"],
+                        "complaint_type": ["CASE_TYPE"],
+                        "created_date": ["CREATED_ON"],
+                        "closed_date": ["CLOSED_ON"],
+                        "status": ["STATUS"],
+                        "incident_address": ["ADDRESS", "STREET"],
+                        "zipcode": ["ZIP"],
+                        "borough": ["SUPERNEIGHBORHOOD", "COUNCIL_DISTRICT"],
+                    },
+                },
+            ),
+        },
+    ),
+    CityId.WICHITA: CityRegistration(
+        city_id=CityId.WICHITA,
+        name="Wichita",
+        state="KS",
+        center={"lat": 37.6872, "lng": -97.3301},
+        metro_bbox=WICHITA_METRO_BBOX,
+        division_bboxes=WICHITA_DIVISION_BBOXES,
+        submarkets=WICHITA_SUBMARKETS,
+        divisions=WICHITA_DIVISIONS,
+        job_suffix="wichita",
+        # Permits-only registration (US-157). The MISC/MABCD FeatureServer
+        # publishes two point layers: layer 0 is Code Enforcement Violations (a
+        # documented trap — the tickets that reference it are violations, not
+        # permits) and layer 1 is the real MABCD permits SDE. ApplicationDate is
+        # the epoch-ms watermark (newest 2026-08-25, day of probe). PermitNumber
+        # identifies the permit (e.g. RFS2026-11032); OBJECTID stays out of the
+        # job-id chain as an edit counter, mirroring the Columbus precedent.
+        # No open 311/licenses/deeds feed exists, so get_dataset raises readable
+        # errors for them. Point geometry (native lat/lng via outSR=4326) and
+        # ApplicationDate epoch-ms are handled by the shared ArcGISClient.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_wichita_permits_url,
+                platform="arcgis",
+                watermark_col="ApplicationDate",
+                id_keys=["PermitNumber", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                extra={
+                    "expected_cadence_days": 7,
+                    "oid_field": "OBJECTID",
+                    "max_record_count": 2000,
+                    "scope": (
+                        "Wichita MABCD building permits (FeatureServer layer 1; "
+                        "layer 0 is Code Enforcement Violations)"
+                    ),
+                    "field_map": {
+                        "job_id": ["PermitNumber"],
+                        "issuance_date": ["ApplicationDate"],
+                        "cost": ["DeclaredValuation"],
+                        "job_type": ["WorkType", "OccupancyType"],
+                        "status": ["PermitStatus"],
+                        "address_street": ["InwardAddress"],
+                        "zipcode": ["PostalCode"],
+                        "borough": ["Jurisdiction", "City"],
                     },
                 },
             ),

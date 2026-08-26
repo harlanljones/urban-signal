@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "id": "houston",
+  "name": "Houston",
+  "state": "TX",
+  "center": {
+    "lat": 29.7604,
+    "lng": -95.3698
+  },
+  "metro_bbox": {
+    "min_lat": 29.2,
+    "max_lat": 30.3,
+    "min_lng": -95.9,
+    "max_lng": -94.8
+  },
+  "divisions": {
+    "HOUSTON_CORE": {
+      "name": "Houston",
+      "center": {
+        "lat": 29.7604,
+        "lng": -95.3698
+      },
+      "bbox": {
+        "min_lat": 29.58,
+        "max_lat": 30.02,
+        "min_lng": -95.65,
+        "max_lng": -95.1
+      },
+      "submarkets": [
+        "Downtown",
+        "Midtown",
+        "Montrose",
+        "The Heights",
+        "Museum District",
+        "Galleria / Uptown"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown": {
+      "name": "Downtown",
+      "division": "HOUSTON_CORE",
+      "center": {
+        "lat": 29.7604,
+        "lng": -95.3698
+      },
+      "description": "Central business district with the Theater District, tunnel network, and dense new high-rise residential development."
+    },
+    "Midtown": {
+      "name": "Midtown",
+      "division": "HOUSTON_CORE",
+      "center": {
+        "lat": 29.728,
+        "lng": -95.376
+      },
+      "description": "Tree-lined walkable district between Downtown and the Museum District with restaurant corridors and infill townhomes."
+    },
+    "Montrose": {
+      "name": "Montrose",
+      "division": "HOUSTON_CORE",
+      "center": {
+        "lat": 29.7412,
+        "lng": -95.394
+      },
+      "description": "Historic bungalow neighborhood along Westheimer with galleries, boutiques, and steady adaptive restoration."
+    },
+    "The Heights": {
+      "name": "The Heights",
+      "division": "HOUSTON_CORE",
+      "center": {
+        "lat": 29.799,
+        "lng": -95.399
+      },
+      "description": "Historic Heights district with Victorian cottage stock, 19th Street retail, and strong infill and renovation activity."
+    },
+    "Museum District": {
+      "name": "Museum District",
+      "division": "HOUSTON_CORE",
+      "center": {
+        "lat": 29.725,
+        "lng": -95.391
+      },
+      "description": "Cultural corridor around Hermann Park and the museum campuses with mixed-use development and stable demand."
+    },
+    "Galleria / Uptown": {
+      "name": "Galleria / Uptown",
+      "division": "HOUSTON_CORE",
+      "center": {
+        "lat": 29.742,
+        "lng": -95.462
+      },
+      "description": "Post Oak Boulevard mixed-use district with the Galleria, transit (Uptown BRT), and high-rise luxury development."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "CREATED_ON",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/houston.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

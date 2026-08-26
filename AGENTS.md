@@ -33,9 +33,10 @@ whether planned work is leaf-shaped.
 
 **Never register a city without verifying it appears on the map.** A
 registration is not done when `REGISTRY` accepts it — it is done when the city
-shows up in the dashboard: selector option, `CITY_CONFIGS` entry, and the
-synced `apps/dashboard/public/index.html` static copy. This is enforced, not
-conventional: `apps/api/tests/unit/test_interlock_gate.py::TestDashboardWiring` fails
-any `pytest -m interlock` run where a registered city is missing from the map.
-Wire the dashboard (or accept a red gate) in the same spine hold as the
-registry entry — never "docs later".
+shows up in the dashboard: a `METRO_META` entry (metro chip + `?city=` deep
+link), snapshot export coverage, res-5 grid-tile coverage in the published
+manifest, and the byte-synced `apps/dashboard/public/index.html` static copy.
+This is enforced, not conventional: `apps/api/tests/unit/test_interlock_gate.py::TestDashboardWiring`
+and `TestSnapshotWiring` fail any `pytest -m interlock` run where a registered
+city is missing from the map. Wire the dashboard (or accept a red gate) in the
+same spine hold as the registry entry — never "docs later".

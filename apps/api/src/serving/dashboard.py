@@ -276,75 +276,32 @@ def get_dashboard_html() -> str:
       color: var(--text-secondary);
       border-radius: 4px;
     }
-    .city-selector-wrapper {
-      display: flex;
-      align-items: center;
-      margin-left: 3px;
+    /* Metro chips are navigation only: they fly the camera and scope the
+       catalyst feed list. Every metro's data stays rendered regardless. */
+    #metro-chips {
+      scrollbar-width: none;
+    }
+    #metro-chips::-webkit-scrollbar {
+      display: none;
     }
 
-    .city-select-dropdown {
-      background: var(--bg-base);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-main);
-      font-family: var(--font-sans);
-      font-size: 12px;
-      font-weight: 600;
-      padding: 6px 28px 6px 10px;
-      border-radius: var(--radius-sm);
-      outline: none;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .city-select-dropdown:hover, .city-select-dropdown:focus {
-      border-color: var(--accent-primary);
-    }
-
-    .compare-control {
-      position: relative;
-      display: flex;
-      align-items: center;
-      margin-left: -3px;
-    }
-
-    .compare-toggle {
-      background: var(--accent-primary-dim);
-      border: 1px solid var(--border-active);
-      color: var(--accent-primary);
-      font-size: 11px;
-      font-weight: 600;
-      padding: 6px 10px;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-    }
-
-    .compare-toggle:hover, .compare-toggle.active {
-      color: var(--text-main);
-      border-color: var(--accent-primary);
-      background: var(--accent-primary-dim);
-    }
-
-    .compare-menu {
+    /* Shown when the camera sits below the lazy-load zoom floor. */
+    .zoom-hint {
       position: absolute;
-      top: 34px;
-      left: 0;
-      z-index: 200;
-      width: 246px;
-      padding: 13px;
-      background: var(--bg-surface-elevated);
-      border: 1px solid var(--border-active);
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-dropdown);
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 7px 14px;
+      background: rgba(8, 12, 20, 0.82);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      font-size: 11px;
+      pointer-events: none;
+      transition: opacity .25s ease;
     }
-
-    .compare-menu[hidden] { display: none; }
-    .compare-menu-title { margin: 0 2px 7px; color: var(--text-main); font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
-    .compare-menu label { display: flex; gap: 9px; align-items: center; padding: 8px 7px; border-radius: var(--radius-sm); color: var(--text-secondary); font-size: 11px; cursor: pointer; transition: background .15s ease, color .15s ease; }
-    .compare-menu label:hover { color: var(--text-main); background: rgba(255, 255, 255, .05); }
-    .compare-menu input { width: 14px; height: 14px; accent-color: var(--accent-primary); }
-    .compare-apply { width: 100%; margin-top: 10px; padding: 8px; border: 0; border-radius: var(--radius-sm); background: var(--accent-primary); color: var(--bg-base); font-size: 11px; font-weight: 700; cursor: pointer; transition: filter .15s ease, transform .15s ease; }
-    .compare-apply:hover { filter: brightness(1.08); }
-    .compare-apply:active { transform: translateY(1px); }
+    .zoom-hint[hidden] { display: none; }
 
     /* Borough / Division Navigation Selector */
     .borough-nav {
@@ -1112,10 +1069,12 @@ def get_dashboard_html() -> str:
        search collapses to a top sheet; a thumb-reachable toolbar toggles
        layers / search / inspector.
        --------------------------------------------------------------------------- */
+
     .drawer-scrim,
     .mobile-toolbar,
-    .drawer-grip,
-    .drawer-compare-slot { display: none; }
+    .drawer-grip { display: none; }
+
+    body.drawer-left-open .drawer-scrim,
 
     body.drawer-left-open .drawer-scrim,
     body.drawer-right-open .drawer-scrim,
@@ -1204,12 +1163,7 @@ def get_dashboard_html() -> str:
       .brand-icon { width: 28px; height: 28px; flex-shrink: 0; }
       .brand-title { font-size: 12px; }
       .brand-badge { display: none; }
-      .city-selector-wrapper { flex: 1 1 auto; min-width: 0; margin-left: 0; }
-      .city-select-dropdown {
-        width: 100%; min-width: 0;
-        font-size: 11px; padding: 7px 26px 7px 9px;
-        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      }
+      .borough-nav {
       .borough-nav {
         flex: 1 1 100%;
         order: 5;
@@ -1249,8 +1203,7 @@ def get_dashboard_html() -> str:
       body.drawer-left-open .sidebar-left { transform: translateX(0); }
       body.drawer-right-open .sidebar-right { transform: translateX(0); }
       .drawer-grip { display: flex; }
-      .drawer-compare-slot { display: block; padding: 12px 15px 0; }
-      #inspector-content { height: auto !important; flex: 1 1 auto; min-height: 0 !important; }
+      #inspector-content { height: auto !important;      #inspector-content { height: auto !important; flex: 1 1 auto; min-height: 0 !important; }
       .mobile-toolbar { display: flex; }
 
       /* Search collapses to a slide-down top sheet */
@@ -1312,56 +1265,12 @@ def get_dashboard_html() -> str:
         <span class="sr-only" style="display:none;">Geospatial Intelligence Dashboard</span>
         <span class="brand-badge">v2.0</span>
       </div>
-      <!-- Multi-City Selector -->
-      <div class="city-selector-wrapper">
-        <select id="city-select" class="city-select-dropdown" aria-label="Select Metropolitan Region" onchange="changeCity(this.value)">
-          <option value="san_francisco" selected>🌉 San Francisco Bay Area (5 Divisions)</option>
-          <option value="nyc">🗽 NYC (5 Boroughs)</option>
-          <option value="chicago">🏙️ Chicago (6 Divisions)</option>
-          <option value="seattle">🌲 Seattle Metro (4 Divisions)</option>
-          <option value="los_angeles">🌴 Los Angeles Metro (6 Divisions)</option>
-          <option value="new_orleans">🎺 New Orleans Metro (9 Divisions)</option>
-          <option value="norfolk">⚓ Norfolk (5 Divisions)</option>
-          <option value="detroit">🏙️ Detroit (6 Divisions)</option>
-          <option value="austin">🦇 Austin (6 Divisions)</option>
-          <option value="cincinnati">🏛️ Cincinnati (1 Division)</option>
-          <option value="boston">🦄 Boston (4 Divisions)</option>
-          <option value="baltimore">🦀 Baltimore (1 Division)</option>
-          <option value="montgomery">🦌 Montgomery County (1 Division)</option>
-          <option value="baton_rouge">🌶️ Baton Rouge (1 Division)</option>
-          <option value="denver">🏔️ Denver (1 Division)</option>
-          <option value="philadelphia">🔔 Philadelphia (8 Divisions)</option>
-          <option value="washington_dc">🏛️ Washington DC (8 Divisions)</option>
-          <option value="prince_georges">🐎 Prince George's County (1 Division)</option>
-          <option value="columbus">⚓ Columbus (1 Division)</option>
-          <option value="nashville">🎸 Nashville (1 Division)</option>
-          <option value="minneapolis">🌽 Minneapolis (6 Divisions)</option>
-          <option value="kansas_city">🎷 Kansas City (1 Division)</option>
-          <option value="pierce">🏔️ Pierce County (1 Division)</option>
-          <option value="milwaukee">🍺 Milwaukee (1 Division)</option>
-          <option value="charlotte">🏙️ Charlotte (1 Division)</option>
-          <option value="pittsburgh">⚙️ Pittsburgh (1 Division)</option>
-          <option value="san_diego">🌴 San Diego (6 Divisions)</option>
-        </select>
-      </div>
-      <div class="compare-control">
-        <button id="compare-toggle" class="compare-toggle" type="button" onclick="toggleCompareMenu()" aria-expanded="false">+ Compare</button>
-        <div id="compare-menu" class="compare-menu" hidden>
-          <div class="compare-menu-title">Compare regions</div>
-          <div id="compare-options"></div>
-          <button class="compare-apply" type="button" onclick="applyComparison()">Show selected regions</button>
-        </div>
-      </div>
     </div>
 
-    <!-- Borough / Division Navigation Selector -->
-    <nav class="borough-nav" id="borough-tabs" role="navigation" aria-label="Division Filters">
-      <button class="borough-btn active" data-borough="ALL" onclick="selectBoroughFilter('ALL')">All NYC</button>
-      <button class="borough-btn Manhattan" data-borough="Manhattan" onclick="selectBoroughFilter('Manhattan')">Manhattan</button>
-      <button class="borough-btn Brooklyn" data-borough="Brooklyn" onclick="selectBoroughFilter('Brooklyn')">Brooklyn</button>
-      <button class="borough-btn Queens" data-borough="Queens" onclick="selectBoroughFilter('Queens')">Queens</button>
-      <button class="borough-btn Bronx" data-borough="Bronx" onclick="selectBoroughFilter('Bronx')">Bronx</button>
-      <button class="borough-btn StatenIsland" data-borough="Staten Island" onclick="selectBoroughFilter('Staten Island')">Staten Island</button>
+    <!-- Metro Chips: navigation only. All metros' data renders together; a
+         chip flies the camera to its metro and scopes the catalyst feed. -->
+    <nav class="borough-nav" id="metro-chips" role="navigation" aria-label="Metro navigation">
+      <!-- Populated dynamically from the snapshot manifest -->
     </nav>
 
     <!-- Header Actions & Search -->
@@ -1412,8 +1321,7 @@ def get_dashboard_html() -> str:
         <span class="drawer-grip-title">Layers &amp; Catalysts</span>
         <button class="drawer-close" type="button" data-close aria-label="Close layers panel">&times;</button>
       </div>
-      <div class="drawer-compare-slot"></div>
-      <!-- Map Controls Panel -->
+      <!-- Map Controls Panel -->      <!-- Map Controls Panel -->
       <div class="panel-section">
         <div class="panel-header-row">
           <span class="section-title">Projection & Metric</span>
@@ -1447,13 +1355,16 @@ def get_dashboard_html() -> str:
     <!-- Center Map Viewport -->
     <main class="map-container">
       <div id="map"></div>
+      <div class="zoom-hint" id="zoom-hint" hidden>Zoom in to load cell-level data</div>
+        <main class="map-container">
+      <div id="map"></div>
 
       <!-- Floating Quick Tools -->
       <div class="map-controls-group">
         <button class="map-tool-btn" title="Toggle 3D/2D View" onclick="togglePerspective()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 17 22 12"></polyline></svg>
         </button>
-        <button class="map-tool-btn" title="Reset View (All NYC)" onclick="selectBoroughFilter('ALL')">
+        <button class="map-tool-btn" title="Reset View (All Metros)" onclick="selectMetro(null)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
         </button>
       </div>
@@ -1498,690 +1409,67 @@ def get_dashboard_html() -> str:
     // Dynamic submarkets catalog loaded per active city via /api/v1/submarkets
     let SUBMARKETS = {};
 
-    const CITY_CONFIGS = {
-      nyc: {
-        center: [-73.965, 40.7128],
-        zoom: 11.2,
-        pitch: 48,
-        bearing: -12,
-        name: 'New York City',
-        allLabel: 'All NYC',
-        divisions: [
-          { key: 'ALL', label: 'All NYC', class: 'ALL' },
-          { key: 'Manhattan', label: 'Manhattan', class: 'Manhattan' },
-          { key: 'Brooklyn', label: 'Brooklyn', class: 'Brooklyn' },
-          { key: 'Queens', label: 'Queens', class: 'Queens' },
-          { key: 'Bronx', label: 'Bronx', class: 'Bronx' },
-          { key: 'Staten Island', label: 'Staten Island', class: 'StatenIsland' }
-        ],
-        presets: {
-          'ALL': { lat: 40.7128, lng: -73.9650, zoom: 10.8, pitch: 45, bearing: -12 },
-          'Manhattan': { lat: 40.7580, lng: -73.9855, zoom: 12.8, pitch: 52, bearing: -15 },
-          'Brooklyn': { lat: 40.6782, lng: -73.9442, zoom: 12.4, pitch: 48, bearing: -10 },
-          'Queens': { lat: 40.7282, lng: -73.8448, zoom: 12.0, pitch: 45, bearing: -10 },
-          'Bronx': { lat: 40.8448, lng: -73.8648, zoom: 12.5, pitch: 48, bearing: -10 },
-          'Staten Island': { lat: 40.5795, lng: -74.1502, zoom: 12.2, pitch: 45, bearing: -10 }
-        }
-      },
-      chicago: {
-        center: [-87.6298, 41.8781],
-        zoom: 11.0,
-        pitch: 48,
-        bearing: -10,
-        name: 'Chicago',
-        allLabel: 'All Chicago',
-        divisions: [
-          { key: 'ALL', label: 'All Chicago', class: 'ALL' },
-          { key: 'Central / Downtown', label: 'Central / Loop', class: 'CentralDowntown' },
-          { key: 'North Side', label: 'North Side', class: 'NorthSide' },
-          { key: 'Northwest Side', label: 'Northwest Side', class: 'NorthwestSide' },
-          { key: 'South Side', label: 'South Side', class: 'SouthSide' },
-          { key: 'Far North Side', label: 'Far North', class: 'FarNorthSide' },
-          { key: 'Southwest Side', label: 'Southwest', class: 'SouthwestSide' }
-        ],
-        presets: {
-          'ALL': { lat: 41.8781, lng: -87.6298, zoom: 10.6, pitch: 45, bearing: -10 },
-          'Central / Downtown': { lat: 41.8827, lng: -87.6360, zoom: 13.0, pitch: 52, bearing: -12 },
-          'North Side': { lat: 41.9350, lng: -87.6550, zoom: 12.6, pitch: 48, bearing: -10 },
-          'Northwest Side': { lat: 41.9200, lng: -87.7000, zoom: 12.5, pitch: 48, bearing: -10 },
-          'South Side': { lat: 41.8200, lng: -87.6300, zoom: 12.2, pitch: 45, bearing: -10 },
-          'Far North Side': { lat: 41.9800, lng: -87.6650, zoom: 12.2, pitch: 45, bearing: -10 },
-          'Southwest Side': { lat: 41.8350, lng: -87.7000, zoom: 12.2, pitch: 45, bearing: -10 }
-        }
-      },
-      san_francisco: {
-        center: [-122.4194, 37.7749],
-        zoom: 11.8,
-        pitch: 50.0,
-        bearing: -10,
-        name: 'San Francisco Bay Area',
-        allLabel: 'All Bay Area',
-        divisions: [
-          { key: 'ALL', label: 'All Bay Area', class: 'ALL' },
-          { key: 'SAN_FRANCISCO_CORE', label: 'SF Core', class: 'SanFranciscoCore' },
-          { key: 'EAST_BAY', label: 'East Bay', class: 'EastBay' },
-          { key: 'PENINSULA', label: 'Peninsula', class: 'Peninsula' },
-          { key: 'SILICON_VALLEY_SOUTH_BAY', label: 'Silicon Valley', class: 'SiliconValleySouthBay' },
-          { key: 'MARIN_NORTH_BAY', label: 'Marin / North Bay', class: 'MarinNorthBay' }
-        ],
-        presets: {
-          'ALL': { lat: 37.7749, lng: -122.4194, zoom: 11.0, pitch: 48, bearing: -10 },
-          'SAN_FRANCISCO_CORE': { lat: 37.7749, lng: -122.4194, zoom: 12.8, pitch: 52, bearing: -12 },
-          'EAST_BAY': { lat: 37.8044, lng: -122.2712, zoom: 12.5, pitch: 48, bearing: -10 },
-          'PENINSULA': { lat: 37.5630, lng: -122.3255, zoom: 12.2, pitch: 48, bearing: -10 },
-          'SILICON_VALLEY_SOUTH_BAY': { lat: 37.3382, lng: -121.8863, zoom: 12.2, pitch: 45, bearing: -10 },
-          'MARIN_NORTH_BAY': { lat: 37.9735, lng: -122.5311, zoom: 12.0, pitch: 45, bearing: -10 },
-          'San Francisco Core': { lat: 37.7749, lng: -122.4194, zoom: 12.8, pitch: 52, bearing: -12 },
-          'East Bay': { lat: 37.8044, lng: -122.2712, zoom: 12.5, pitch: 48, bearing: -10 },
-          'Peninsula': { lat: 37.5630, lng: -122.3255, zoom: 12.2, pitch: 48, bearing: -10 },
-          'Silicon Valley / South Bay': { lat: 37.3382, lng: -121.8863, zoom: 12.2, pitch: 45, bearing: -10 },
-          'Marin / North Bay': { lat: 37.9735, lng: -122.5311, zoom: 12.0, pitch: 45, bearing: -10 }
-        }
-      },
-      seattle: {
-        center: [-122.3321, 47.6062],
-        zoom: 10.4,
-        pitch: 48,
-        bearing: -10,
-        name: 'Seattle Metro',
-        allLabel: 'All Seattle',
-        divisions: [
-          { key: 'ALL', label: 'All Seattle', class: 'ALL' },
-          { key: 'SEATTLE_CORE', label: 'Seattle Core', class: 'SeattleCore' },
-          { key: 'NORTH_KING', label: 'North King', class: 'NorthKing' },
-          { key: 'EASTSIDE', label: 'Eastside', class: 'Eastside' },
-          { key: 'SOUTH_KING', label: 'South King', class: 'SouthKing' }
-        ],
-        presets: {
-          'ALL': { lat: 47.6062, lng: -122.3321, zoom: 10.0, pitch: 45, bearing: -10 },
-          'SEATTLE_CORE': { lat: 47.6120, lng: -122.3300, zoom: 12.5, pitch: 52, bearing: -12 },
-          'NORTH_KING': { lat: 47.6950, lng: -122.3530, zoom: 12.0, pitch: 48, bearing: -10 },
-          'EASTSIDE': { lat: 47.6350, lng: -122.1350, zoom: 11.5, pitch: 45, bearing: -10 },
-          'SOUTH_KING': { lat: 47.4400, lng: -122.2850, zoom: 11.5, pitch: 45, bearing: -10 }
-        }
-      },
-      los_angeles: {
-        center: [-118.2437, 34.0522],
-        zoom: 10.2,
-        pitch: 48,
-        bearing: -10,
-        name: 'Los Angeles Metro',
-        allLabel: 'All LA',
-        divisions: [
-          { key: 'ALL', label: 'All LA', class: 'ALL' },
-          { key: 'CENTRAL_LA', label: 'Central LA', class: 'CentralLA' },
-          { key: 'WESTSIDE', label: 'Westside', class: 'Westside' },
-          { key: 'SAN_FERNANDO_VALLEY', label: 'San Fernando Valley', class: 'SanFernandoValley' },
-          { key: 'HARBOR_SOUTH_BAY', label: 'Harbor / South Bay', class: 'HarborSouthBay' },
-          { key: 'SOUTH_LA', label: 'South LA', class: 'SouthLA' },
-          { key: 'EASTSIDE_SGV', label: 'Eastside / SGV', class: 'EastsideSGV' }
-        ],
-        presets: {
-          'ALL': { lat: 34.0522, lng: -118.2437, zoom: 10.0, pitch: 45, bearing: -10 },
-          'CENTRAL_LA': { lat: 34.07, lng: -118.28, zoom: 12.5, pitch: 48, bearing: -10 },
-          'WESTSIDE': { lat: 34.04, lng: -118.45, zoom: 12.0, pitch: 48, bearing: -10 },
-          'SAN_FERNANDO_VALLEY': { lat: 34.19, lng: -118.44, zoom: 11.5, pitch: 45, bearing: -10 },
-          'HARBOR_SOUTH_BAY': { lat: 33.81, lng: -118.29, zoom: 11.5, pitch: 45, bearing: -10 },
-          'SOUTH_LA': { lat: 33.98, lng: -118.29, zoom: 12.0, pitch: 48, bearing: -10 },
-          'EASTSIDE_SGV': { lat: 34.11, lng: -118.16, zoom: 11.5, pitch: 48, bearing: -10 }
-        }
-      },
-      new_orleans: {
-        center: [-90.0715, 29.9511],
-        zoom: 10.4,
-        pitch: 48,
-        bearing: -10,
-        name: 'New Orleans Metro',
-        metroBbox: { min_lat: 29.82, max_lat: 30.16, min_lng: -90.30, max_lng: -89.62 },
-        allLabel: 'All NOLA',
-        divisions: [
-          { key: 'ALL', label: 'All NOLA', class: 'ALL' },
-          { key: 'CBD_FRENCH_QUARTER', label: 'CBD / French Quarter', class: 'CBDFrenchQuarter' },
-          { key: 'BYWATER_MARIGNY', label: 'Bywater / Marigny', class: 'BywaterMarigny' },
-          { key: 'UPTOWN_CARROLLTON', label: 'Uptown / Carrollton', class: 'UptownCarrollton' },
-          { key: 'MID_CITY', label: 'Mid City', class: 'MidCity' },
-          { key: 'LAKEVIEW_GENTILLY', label: 'Lakeview / Gentilly', class: 'LakeviewGentilly' },
-          { key: 'NEW_ORLEANS_EAST', label: 'New Orleans East', class: 'NewOrleansEast' },
-          { key: 'WEST_BANK_ALGIERS', label: 'West Bank / Algiers', class: 'WestBankAlgiers' },
-          { key: 'JEFFERSON_METAIRIE_KENNER', label: 'Jefferson / Metairie / Kenner', class: 'JeffersonMetairieKenner' },
-          { key: 'ST_BERNARD_CHALMETTE', label: 'St. Bernard / Chalmette', class: 'StBernardChalmette' }
-        ],
-        presets: {
-          'ALL': { lat: 29.9511, lng: -90.0715, zoom: 10.2, pitch: 45, bearing: -10 },
-          'CBD_FRENCH_QUARTER': { lat: 29.9580, lng: -90.0660, zoom: 13.4, pitch: 52, bearing: -12 },
-          'BYWATER_MARIGNY': { lat: 29.9680, lng: -90.0280, zoom: 13.0, pitch: 50, bearing: -10 },
-          'UPTOWN_CARROLLTON': { lat: 29.9380, lng: -90.1080, zoom: 12.8, pitch: 48, bearing: -10 },
-          'MID_CITY': { lat: 29.9850, lng: -90.0950, zoom: 12.6, pitch: 48, bearing: -10 },
-          'LAKEVIEW_GENTILLY': { lat: 30.0150, lng: -90.0800, zoom: 12.4, pitch: 45, bearing: -10 },
-          'NEW_ORLEANS_EAST': { lat: 30.0250, lng: -89.9400, zoom: 11.8, pitch: 45, bearing: -10 },
-          'WEST_BANK_ALGIERS': { lat: 29.9350, lng: -90.0300, zoom: 12.2, pitch: 45, bearing: -10 },
-          'JEFFERSON_METAIRIE_KENNER': { lat: 29.9850, lng: -90.1800, zoom: 11.8, pitch: 45, bearing: -10 },
-          'ST_BERNARD_CHALMETTE': { lat: 29.8850, lng: -89.9700, zoom: 11.8, pitch: 45, bearing: -10 }
-        }
-      },
-      norfolk: {
-        center: [-76.2859, 36.8508],
-        zoom: 11.6,
-        pitch: 48,
-        bearing: -10,
-        name: 'Norfolk',
-        metroBbox: { min_lat: 36.83, max_lat: 37.04, min_lng: -76.35, max_lng: -76.17 },
-        allLabel: 'All Norfolk',
-        divisions: [
-          { key: 'ALL', label: 'All Norfolk', class: 'ALL' },
-          { key: 'DOWNTOWN_WATERFRONT', label: 'Downtown Waterfront', class: 'DowntownWaterfront' },
-          { key: 'GHENT_WESTBURG', label: 'Ghent / Westburg', class: 'GhentWestburg' },
-          { key: 'OCEAN_VIEW', label: 'Ocean View', class: 'OceanView' },
-          { key: 'CENTRAL_MILITARY_CIRCLE', label: 'Central / Military Circle', class: 'CentralMilitaryCircle' },
-          { key: 'SOUTH_NORFOLK_BERKLEY', label: 'South Norfolk / Berkley', class: 'SouthNorfolkBerkley' }
-        ],
-        presets: {
-          'ALL': { lat: 36.8800, lng: -76.2859, zoom: 11.4, pitch: 45, bearing: -10 },
-          'DOWNTOWN_WATERFRONT': { lat: 36.8560, lng: -76.2930, zoom: 13.6, pitch: 54, bearing: -12 },
-          'GHENT_WESTBURG': { lat: 36.8660, lng: -76.3000, zoom: 13.2, pitch: 50, bearing: -10 },
-          'OCEAN_VIEW': { lat: 36.9450, lng: -76.3100, zoom: 12.6, pitch: 45, bearing: -10 },
-          'CENTRAL_MILITARY_CIRCLE': { lat: 36.8850, lng: -76.2400, zoom: 12.8, pitch: 48, bearing: -10 },
-          'SOUTH_NORFOLK_BERKLEY': { lat: 36.8500, lng: -76.2650, zoom: 13.0, pitch: 48, bearing: -10 }
-        }
-      },
-      detroit: {
-        center: [-83.0458, 42.3314],
-        zoom: 10.6,
-        pitch: 48,
-        bearing: -10,
-        name: 'Detroit',
-        metroBbox: { min_lat: 42.25, max_lat: 42.49, min_lng: -83.35, max_lng: -82.88 },
-        allLabel: 'All Detroit',
-        divisions: [
-          { key: 'ALL', label: 'All Detroit', class: 'ALL' },
-          { key: 'DOWNTOWN_MIDTOWN_CORKTOWN', label: 'Downtown / Midtown / Corktown', class: 'DowntownMidtownCorktown' },
-          { key: 'EAST_SIDE_JEFFERSON', label: 'East Side / Jefferson', class: 'EastSideJefferson' },
-          { key: 'WEST_SIDE_GRAND_RIVER', label: 'West Side / Grand River', class: 'WestSideGrandRiver' },
-          { key: 'SOUTHWEST_MEXICANTOWN', label: 'Southwest / Mexicantown', class: 'SouthwestMexicantown' },
-          { key: 'NORTH_END_HIGHLAND_PARK', label: 'North End / Highland Park', class: 'NorthEndHighlandPark' },
-          { key: 'EAST_ENGLISH_VILLAGE_MORNINGSIDE', label: 'East English Village / Morningside', class: 'EastEnglishVillageMorningside' }
-        ],
-        presets: {
-          'ALL': { lat: 42.3314, lng: -83.0458, zoom: 10.4, pitch: 45, bearing: -10 },
-          'DOWNTOWN_MIDTOWN_CORKTOWN': { lat: 42.3310, lng: -83.0600, zoom: 13.2, pitch: 52, bearing: -12 },
-          'EAST_SIDE_JEFFERSON': { lat: 42.3450, lng: -82.9850, zoom: 12.6, pitch: 48, bearing: -10 },
-          'WEST_SIDE_GRAND_RIVER': { lat: 42.3950, lng: -83.2100, zoom: 12.4, pitch: 45, bearing: -10 },
-          'SOUTHWEST_MEXICANTOWN': { lat: 42.3150, lng: -83.1100, zoom: 12.8, pitch: 48, bearing: -10 },
-          'NORTH_END_HIGHLAND_PARK': { lat: 42.3950, lng: -83.0900, zoom: 12.8, pitch: 48, bearing: -10 },
-          'EAST_ENGLISH_VILLAGE_MORNINGSIDE': { lat: 42.3700, lng: -82.9550, zoom: 12.8, pitch: 48, bearing: -10 }
-        }
-      },
-      austin: {
-        center: [-97.7431, 30.2672],
-        zoom: 10.8,
-        pitch: 48,
-        bearing: -10,
-        name: 'Austin',
-        metroBbox: { min_lat: 30.10, max_lat: 30.62, min_lng: -98.05, max_lng: -97.52 },
-        allLabel: 'All Austin',
-        divisions: [
-          { key: 'ALL', label: 'All Austin', class: 'ALL' },
-          { key: 'DOWNTOWN_CAPITOL', label: 'Downtown / Capitol', class: 'DowntownCapitol' },
-          { key: 'EAST_AUSTIN_MUELLER', label: 'East Austin / Mueller', class: 'EastAustinMueller' },
-          { key: 'SOUTH_AUSTIN_SOCO', label: 'South Austin / SoCo', class: 'SouthAustinSoCo' },
-          { key: 'NORTH_AUSTIN_DOMAIN', label: 'North Austin / The Domain', class: 'NorthAustinDomain' },
-          { key: 'WEST_AUSTIN_HILLS', label: 'West Austin Hills', class: 'WestAustinHills' },
-          { key: 'PFLUGERVILLE_ROUND_ROCK_EDGE', label: 'Pflugerville / Round Rock Edge', class: 'PflugervilleRoundRockEdge' }
-        ],
-        presets: {
-          'ALL': { lat: 30.2672, lng: -97.7431, zoom: 10.6, pitch: 45, bearing: -10 },
-          'DOWNTOWN_CAPITOL': { lat: 30.2720, lng: -97.7430, zoom: 13.6, pitch: 54, bearing: -12 },
-          'EAST_AUSTIN_MUELLER': { lat: 30.2800, lng: -97.6950, zoom: 12.8, pitch: 48, bearing: -10 },
-          'SOUTH_AUSTIN_SOCO': { lat: 30.2300, lng: -97.7550, zoom: 12.8, pitch: 48, bearing: -10 },
-          'NORTH_AUSTIN_DOMAIN': { lat: 30.3950, lng: -97.7100, zoom: 12.4, pitch: 48, bearing: -10 },
-          'WEST_AUSTIN_HILLS': { lat: 30.3100, lng: -97.8000, zoom: 12.4, pitch: 45, bearing: -10 },
-          'PFLUGERVILLE_ROUND_ROCK_EDGE': { lat: 30.4500, lng: -97.6400, zoom: 12.0, pitch: 45, bearing: -10 }
-        }
-      },
-      cincinnati: {
-        center: [-84.5120, 39.1031],
-        zoom: 11.4,
-        pitch: 48,
-        bearing: -10,
-        name: 'Cincinnati',
-        metroBbox: { min_lat: 38.80, max_lat: 39.45, min_lng: -84.95, max_lng: -84.15 },
-        allLabel: 'All Cincinnati',
-        divisions: [
-          { key: 'ALL', label: 'All Cincinnati', class: 'ALL' },
-          { key: 'CINCINNATI_CORE', label: 'Cincinnati Core', class: 'CincinnatiCore' }
-        ],
-        presets: {
-          'ALL': { lat: 39.1031, lng: -84.5120, zoom: 11.2, pitch: 45, bearing: -10 },
-          'CINCINNATI_CORE': { lat: 39.1085, lng: -84.5145, zoom: 12.8, pitch: 48, bearing: -10 }
-        }
-      },
-      boston: {
-        center: [-71.065, 42.355],
-        zoom: 10.8,
-        pitch: 48,
-        bearing: -10,
-        name: 'Boston',
-        metroBbox: { min_lat: 42.15, max_lat: 42.55, min_lng: -71.30, max_lng: -70.75 },
-        allLabel: 'All Boston',
-        divisions: [
-          { key: 'ALL', label: 'All Boston', class: 'ALL' },
-          { key: 'BOSTON_CORE', label: 'Boston Core', class: 'BostonCore' },
-          { key: 'CAMBRIDGE_SOMERVILLE', label: 'Cambridge & Somerville', class: 'CambridgeSomerville' },
-          { key: 'INNER_NORTH', label: 'Inner North & Route 128', class: 'InnerNorth' },
-          { key: 'INNER_SOUTH', label: 'Inner South', class: 'InnerSouth' }
-        ],
-        presets: {
-          'ALL': { lat: 42.355, lng: -71.065, zoom: 10.8, pitch: 45, bearing: -10 },
-          'BOSTON_CORE': { lat: 42.351, lng: -71.065, zoom: 12.8, pitch: 48, bearing: -10 },
-          'CAMBRIDGE_SOMERVILLE': { lat: 42.376, lng: -71.107, zoom: 12.8, pitch: 45, bearing: -10 },
-          'INNER_NORTH': { lat: 42.425, lng: -71.075, zoom: 11.8, pitch: 42, bearing: -10 },
-          'INNER_SOUTH': { lat: 42.245, lng: -71.030, zoom: 11.8, pitch: 43, bearing: -10 }
-        }
-      },
-      baltimore: {
-        center: [-76.612, 39.290],
-        zoom: 10.8,
-        pitch: 48,
-        bearing: -10,
-        name: 'Baltimore',
-        metroBbox: { min_lat: 39.15, max_lat: 39.75, min_lng: -76.85, max_lng: -76.25 },
-        allLabel: 'All Baltimore',
-        divisions: [
-          { key: 'ALL', label: 'All Baltimore', class: 'ALL' },
-          { key: 'BALTIMORE_CORE', label: 'Baltimore Core', class: 'BaltimoreCore' }
-        ],
-        presets: {
-          'ALL': { lat: 39.290, lng: -76.612, zoom: 10.8, pitch: 45, bearing: -10 },
-          'BALTIMORE_CORE': { lat: 39.290, lng: -76.612, zoom: 11.8, pitch: 48, bearing: -10 }
-        }
-      },
-      montgomery: {
-        center: [-77.190, 39.140],
-        zoom: 10.8,
-        pitch: 48,
-        bearing: -10,
-        name: 'Montgomery County',
-        metroBbox: { min_lat: 38.90, max_lat: 39.35, min_lng: -77.60, max_lng: -76.80 },
-        allLabel: 'All Montgomery County',
-        divisions: [
-          { key: 'ALL', label: 'All Montgomery County', class: 'ALL' },
-          { key: 'MONTGOMERY_CORE', label: 'Montgomery County', class: 'MontgomeryCore' }
-        ],
-        presets: {
-          'ALL': { lat: 39.140, lng: -77.190, zoom: 10.8, pitch: 45, bearing: -10 },
-          'MONTGOMERY_CORE': { lat: 39.140, lng: -77.190, zoom: 10.8, pitch: 45, bearing: -10 }
-        }
-      },
-      baton_rouge: {
-        center: [-91.1870, 30.4505],
-        zoom: 11.4,
-        pitch: 48,
-        bearing: -10,
-        name: 'Baton Rouge / EBR',
-        metroBbox: { min_lat: 30.25, max_lat: 30.65, min_lng: -91.35, max_lng: -90.85 },
-        allLabel: 'All Baton Rouge',
-        divisions: [
-          { key: 'ALL', label: 'All Baton Rouge', class: 'ALL' },
-          { key: 'BATON_ROUGE_CORE', label: 'Baton Rouge Core', class: 'BatonRougeCore' }
-        ],
-        presets: {
-          'ALL': { lat: 30.4505, lng: -91.1870, zoom: 11.2, pitch: 45, bearing: -10 },
-          'BATON_ROUGE_CORE': { lat: 30.4505, lng: -91.1870, zoom: 11.8, pitch: 48, bearing: -10 }
-        }
-      },
-      denver: {
-        center: [-104.9903, 39.7392],
-        zoom: 10.8,
-        pitch: 48,
-        bearing: -10,
-        name: 'Denver',
-        metroBbox: { min_lat: 39.55, max_lat: 39.95, min_lng: -105.20, max_lng: -104.50 },
-        allLabel: 'All Denver',
-        divisions: [
-          { key: 'ALL', label: 'All Denver', class: 'ALL' },
-          { key: 'DENVER_CORE', label: 'Denver Core', class: 'DenverCore' }
-        ],
-        presets: {
-          'ALL': { lat: 39.7392, lng: -104.9903, zoom: 10.6, pitch: 45, bearing: -10 },
-          'DENVER_CORE': { lat: 39.7527, lng: -104.9992, zoom: 11.8, pitch: 48, bearing: -10 }
-        }
-      },
-      minneapolis: {
-        center: [-93.2650, 44.9778],
-        zoom: 10.8,
-        pitch: 48,
-        bearing: -10,
-        name: 'Minneapolis',
-        metroBbox: { min_lat: 44.85, max_lat: 45.08, min_lng: -93.36, max_lng: -93.15 },
-        allLabel: 'All Minneapolis',
-        divisions: [
-          { key: 'ALL', label: 'All Minneapolis', class: 'ALL' },
-          { key: 'NORTH', label: 'North Minneapolis', class: 'North' },
-          { key: 'NORTHEAST', label: 'Northeast', class: 'Northeast' },
-          { key: 'CENTRAL', label: 'Central Minneapolis', class: 'Central' },
-          { key: 'SOUTH', label: 'South Minneapolis', class: 'South' },
-          { key: 'SOUTHWEST', label: 'Southwest Minneapolis', class: 'Southwest' },
-          { key: 'SOUTHEAST', label: 'Southeast Minneapolis', class: 'Southeast' }
-        ],
-        presets: {
-          'ALL': { lat: 44.9778, lng: -93.2650, zoom: 10.6, pitch: 45, bearing: -10 },
-          'NORTH': { lat: 45.0100, lng: -93.2800, zoom: 11.8, pitch: 48, bearing: -10 },
-          'NORTHEAST': { lat: 45.0200, lng: -93.2300, zoom: 11.8, pitch: 48, bearing: -10 },
-          'CENTRAL': { lat: 44.9770, lng: -93.2650, zoom: 11.6, pitch: 48, bearing: -10 },
-          'SOUTH': { lat: 44.9400, lng: -93.2600, zoom: 11.8, pitch: 48, bearing: -10 },
-          'SOUTHWEST': { lat: 44.9400, lng: -93.3100, zoom: 11.8, pitch: 48, bearing: -10 },
-          'SOUTHEAST': { lat: 44.9750, lng: -93.2200, zoom: 11.8, pitch: 48, bearing: -10 }
-        }
-      },
-      san_diego: {
-        center: [-117.1611, 32.7157],
-        zoom: 10.4,
-        pitch: 48,
-        bearing: -10,
-        name: 'San Diego',
-        metroBbox: { min_lat: 32.50, max_lat: 33.10, min_lng: -117.35, max_lng: -116.85 },
-        allLabel: 'All San Diego',
-        divisions: [
-          { key: 'ALL', label: 'All San Diego', class: 'ALL' },
-          { key: 'NORTH', label: 'North San Diego', class: 'North' },
-          { key: 'COASTAL', label: 'Coastal San Diego', class: 'Coastal' },
-          { key: 'CENTRAL', label: 'Central San Diego', class: 'Central' },
-          { key: 'EAST', label: 'East San Diego', class: 'East' },
-          { key: 'SOUTHEAST', label: 'Southeast San Diego', class: 'Southeast' },
-          { key: 'SOUTHWEST', label: 'South Bay San Diego', class: 'Southwest' }
-        ],
-        presets: {
-          'ALL': { lat: 32.7157, lng: -117.1611, zoom: 10.2, pitch: 45, bearing: -10 },
-          'NORTH': { lat: 32.8700, lng: -117.2000, zoom: 11.6, pitch: 48, bearing: -10 },
-          'COASTAL': { lat: 32.7900, lng: -117.2500, zoom: 11.6, pitch: 48, bearing: -10 },
-          'CENTRAL': { lat: 32.7400, lng: -117.1600, zoom: 11.4, pitch: 48, bearing: -10 },
-          'EAST': { lat: 32.8200, lng: -117.0500, zoom: 11.6, pitch: 48, bearing: -10 },
-          'SOUTHEAST': { lat: 32.6800, lng: -117.0300, zoom: 11.6, pitch: 48, bearing: -10 },
-          'SOUTHWEST': { lat: 32.5500, lng: -117.0300, zoom: 11.4, pitch: 48, bearing: -10 }
-        }
-      },
-      philadelphia: {
-        center: [-75.1652, 39.9526],
-        zoom: 11.0,
-        pitch: 48,
-        bearing: -10,
-        name: 'Philadelphia',
-        metroBbox: { min_lat: 39.87, max_lat: 40.14, min_lng: -75.28, max_lng: -74.95 },
-        allLabel: 'All Philly',
-        divisions: [
-          { key: 'ALL', label: 'All Philly', class: 'ALL' },
-          { key: 'CENTER_CITY_RITTENHOUSE', label: 'Center City / Rittenhouse', class: 'CenterCityRittenhouse' },
-          { key: 'OLD_CITY_NORTHERN_LIBERTIES', label: 'Old City / NoLibs', class: 'OldCityNorthernLiberties' },
-          { key: 'SOUTH_PHILLY_PASSYUNK', label: 'South Philly / Passyunk', class: 'SouthPhillyPassyunk' },
-          { key: 'WEST_PHILLY_UNIVERSITY_CITY', label: 'West Philly / University City', class: 'WestPhillyUniversityCity' },
-          { key: 'NORTH_PHILLY_TEMPLE', label: 'North Philly / Temple', class: 'NorthPhillyTemple' },
-          { key: 'NORTHEAST_ROOSEVELT_BLVD', label: 'Northeast / Roosevelt Blvd', class: 'NortheastRooseveltBlvd' },
-          { key: 'GERMANTOWN_MT_AIRY', label: 'Germantown / Mt. Airy', class: 'GermantownMtAiry' },
-          { key: 'RIVER_WARDS_KENSINGTON', label: 'River Wards / Kensington', class: 'RiverWardsKensington' }
-        ],
-        presets: {
-          'ALL': { lat: 39.9526, lng: -75.1652, zoom: 10.8, pitch: 45, bearing: -10 },
-          'CENTER_CITY_RITTENHOUSE': { lat: 39.9500, lng: -75.1700, zoom: 13.6, pitch: 54, bearing: -12 },
-          'OLD_CITY_NORTHERN_LIBERTIES': { lat: 39.9600, lng: -75.1400, zoom: 13.2, pitch: 50, bearing: -10 },
-          'SOUTH_PHILLY_PASSYUNK': { lat: 39.9300, lng: -75.1750, zoom: 12.8, pitch: 48, bearing: -10 },
-          'WEST_PHILLY_UNIVERSITY_CITY': { lat: 39.9500, lng: -75.2100, zoom: 13.0, pitch: 48, bearing: -10 },
-          'NORTH_PHILLY_TEMPLE': { lat: 39.9950, lng: -75.1800, zoom: 12.4, pitch: 45, bearing: -10 },
-          'NORTHEAST_ROOSEVELT_BLVD': { lat: 40.0450, lng: -75.0750, zoom: 12.2, pitch: 45, bearing: -10 },
-          'GERMANTOWN_MT_AIRY': { lat: 40.0650, lng: -75.1850, zoom: 12.4, pitch: 45, bearing: -10 },
-          'RIVER_WARDS_KENSINGTON': { lat: 39.9850, lng: -75.1250, zoom: 12.8, pitch: 48, bearing: -10 }
-        }
-      },
-      washington_dc: {
-        center: [-77.0369, 38.9072],
-        zoom: 11.2,
-        pitch: 48,
-        bearing: -10,
-        name: 'Washington DC',
-        metroBbox: { min_lat: 38.79, max_lat: 38.995, min_lng: -77.12, max_lng: -76.909 },
-        allLabel: 'All DC',
-        divisions: [
-          { key: 'ALL', label: 'All DC', class: 'ALL' },
-          { key: 'DOWNTOWN_NOMA_CAPITOL_RIVERFRONT', label: 'Downtown / NoMa / Riverfront', class: 'DowntownNomaCapitolRiverfront' },
-          { key: 'CAPITOL_HILL_EAST_END', label: 'Capitol Hill / East End', class: 'CapitolHillEastEnd' },
-          { key: 'DUPONT_KALORAMA_UPTOWN', label: 'Dupont / Kalorama / Uptown', class: 'DupontKaloramaUptown' },
-          { key: 'GEORGETOWN_FOGGY_BOTTOM', label: 'Georgetown / Foggy Bottom', class: 'GeorgetownFoggyBottom' },
-          { key: 'COLUMBIA_HEIGHTS_PETWORTH', label: 'Columbia Heights / Petworth', class: 'ColumbiaHeightsPetworth' },
-          { key: 'BROOKLAND_RHODE_ISLAND_AVE', label: 'Brookland / Rhode Island Ave', class: 'BrooklandRhodeIslandAve' },
-          { key: 'HILL_EAST_FAIRLINTON', label: 'Hill East / Fairlinton', class: 'HillEastFairlinton' },
-          { key: 'ANACOSTIA_EAST_OF_THE_RIVER', label: 'Anacostia / East of the River', class: 'AnacostiaEastOfTheRiver' }
-        ],
-        presets: {
-          'ALL': { lat: 38.9072, lng: -77.0369, zoom: 11.0, pitch: 45, bearing: -10 },
-          'DOWNTOWN_NOMA_CAPITOL_RIVERFRONT': { lat: 38.8950, lng: -77.0160, zoom: 13.6, pitch: 54, bearing: -12 },
-          'CAPITOL_HILL_EAST_END': { lat: 38.8890, lng: -76.9840, zoom: 13.4, pitch: 50, bearing: -10 },
-          'DUPONT_KALORAMA_UPTOWN': { lat: 38.9130, lng: -77.0420, zoom: 13.2, pitch: 48, bearing: -10 },
-          'GEORGETOWN_FOGGY_BOTTOM': { lat: 38.9030, lng: -77.0680, zoom: 13.2, pitch: 48, bearing: -10 },
-          'COLUMBIA_HEIGHTS_PETWORTH': { lat: 38.9380, lng: -77.0250, zoom: 12.8, pitch: 48, bearing: -10 },
-          'BROOKLAND_RHODE_ISLAND_AVE': { lat: 38.9330, lng: -76.9780, zoom: 13.0, pitch: 48, bearing: -10 },
-          'HILL_EAST_FAIRLINTON': { lat: 38.8760, lng: -76.9700, zoom: 13.0, pitch: 45, bearing: -10 },
-          'ANACOSTIA_EAST_OF_THE_RIVER': { lat: 38.8620, lng: -76.9650, zoom: 12.6, pitch: 45, bearing: -10 }
-        }
-      },
-      prince_georges: {
-        center: [-76.75, 38.72],
-        zoom: 10.6,
-        pitch: 48,
-        bearing: -10,
-        name: "Prince George's County",
-        metroBbox: { min_lat: 38.55, max_lat: 39.22, min_lng: -77.12, max_lng: -76.62 },
-        allLabel: 'All Prince Georges',
-        divisions: [
-          { key: 'ALL', label: 'All Prince Georges', class: 'ALL' },
-          { key: 'PRINCE_GEORGES_CORE', label: 'Prince Georges County', class: 'PrinceGeorgesCore' }
-        ],
-        presets: {
-          'ALL': { lat: 38.72, lng: -76.75, zoom: 10.4, pitch: 45, bearing: -10 },
-          'PRINCE_GEORGES_CORE': { lat: 38.72, lng: -76.75, zoom: 10.6, pitch: 48, bearing: -10 }
-        }
-      },
-      columbus: {
-        center: [-83.0007, 39.9612],
-        zoom: 11.4,
-        pitch: 48,
-        bearing: -10,
-        name: 'Columbus',
-        metroBbox: { min_lat: 39.75, max_lat: 40.20, min_lng: -83.30, max_lng: -82.70 },
-        allLabel: 'All Columbus',
-        divisions: [
-          { key: 'ALL', label: 'All Columbus', class: 'ALL' },
-          { key: 'COLUMBUS_CORE', label: 'Columbus Core', class: 'ColumbusCore' }
-        ],
-        presets: {
-          'ALL': { lat: 39.9612, lng: -83.0007, zoom: 11.2, pitch: 45, bearing: -10 },
-          'COLUMBUS_CORE': { lat: 39.9612, lng: -83.0007, zoom: 11.8, pitch: 48, bearing: -10 }
-        }
-      },
-      nashville: {
-        center: [-86.7818, 36.1627],
-        zoom: 10.4,
-        pitch: 48,
-        bearing: -10,
-        name: 'Nashville',
-        metroBbox: { min_lat: 35.94, max_lat: 36.44, min_lng: -87.16, max_lng: -86.46 },
-        allLabel: 'All Nashville',
-        divisions: [
-          { key: 'ALL', label: 'All Nashville', class: 'ALL' },
-          { key: 'NASHVILLE_CORE', label: 'Davidson County', class: 'NashvilleCore' }
-        ],
-        presets: {
-          'ALL': { lat: 36.1627, lng: -86.7818, zoom: 10.2, pitch: 45, bearing: -10 },
-          'NASHVILLE_CORE': { lat: 36.1627, lng: -86.7818, zoom: 10.8, pitch: 48, bearing: -10 }
-        }
-      },
-      kansas_city: {
-        center: [-94.58, 39.10],
-        zoom: 10.8,
-        pitch: 48,
-        bearing: -10,
-        name: 'Kansas City',
-        metroBbox: { min_lat: 38.75, max_lat: 39.40, min_lng: -94.80, max_lng: -94.30 },
-        allLabel: 'All Kansas City',
-        divisions: [
-          { key: 'ALL', label: 'All Kansas City', class: 'ALL' },
-          { key: 'KANSAS_CITY_CORE', label: 'Kansas City Core', class: 'KansasCityCore' }
-        ],
-        presets: {
-          'ALL': { lat: 39.10, lng: -94.58, zoom: 10.6, pitch: 45, bearing: -10 },
-          'KANSAS_CITY_CORE': { lat: 39.10, lng: -94.58, zoom: 11.2, pitch: 48, bearing: -10 }
-        }
-      },
-      pierce: {
-        center: [-122.4443, 47.2529],
-        zoom: 9.6,
-        pitch: 48,
-        bearing: -10,
-        name: 'Pierce County',
-        metroBbox: { min_lat: 46.73, max_lat: 47.42, min_lng: -122.85, max_lng: -121.46 },
-        allLabel: 'All Pierce County',
-        divisions: [
-          { key: 'ALL', label: 'All Pierce County', class: 'ALL' },
-          { key: 'PIERCE_COUNTY', label: 'Pierce County', class: 'PierceCounty' }
-        ],
-        presets: {
-          'ALL': { lat: 47.2529, lng: -122.4443, zoom: 9.4, pitch: 45, bearing: -10 },
-          'PIERCE_COUNTY': { lat: 47.2529, lng: -122.4443, zoom: 10.0, pitch: 48, bearing: -10 }
-        }
-      },
-      milwaukee: {
-        center: [-87.9065, 43.0389],
-        zoom: 11.0,
-        pitch: 48,
-        bearing: -10,
-        name: 'Milwaukee',
-        metroBbox: { min_lat: 42.85, max_lat: 43.20, min_lng: -88.10, max_lng: -87.80 },
-        allLabel: 'All Milwaukee',
-        divisions: [
-          { key: 'ALL', label: 'All Milwaukee', class: 'ALL' },
-          { key: 'MILWAUKEE_CORE', label: 'Milwaukee', class: 'MilwaukeeCore' }
-        ],
-        presets: {
-          'ALL': { lat: 43.0389, lng: -87.9065, zoom: 10.8, pitch: 45, bearing: -10 },
-          'MILWAUKEE_CORE': { lat: 43.0389, lng: -87.9065, zoom: 11.4, pitch: 48, bearing: -10 }
-        }
-      },
-      charlotte: {
-        center: [-80.8431, 35.2271],
-        zoom: 11.0,
-        pitch: 48,
-        bearing: -10,
-        name: 'Charlotte',
-        metroBbox: { min_lat: 34.98, max_lat: 35.55, min_lng: -81.10, max_lng: -80.45 },
-        allLabel: 'All Charlotte',
-        divisions: [
-          { key: 'ALL', label: 'All Charlotte', class: 'ALL' },
-          { key: 'CHARLOTTE_CORE', label: 'Charlotte', class: 'CharlotteCore' }
-        ],
-        presets: {
-          'ALL': { lat: 35.2271, lng: -80.8431, zoom: 10.8, pitch: 45, bearing: -10 },
-          'CHARLOTTE_CORE': { lat: 35.2271, lng: -80.8431, zoom: 11.4, pitch: 48, bearing: -10 }
-        }
-      },
-      pittsburgh: {
-        center: [-80.0000, 40.4417],
-        zoom: 11.6,
-        pitch: 48,
-        bearing: -10,
-        name: 'Pittsburgh',
-        metroBbox: { min_lat: 40.35, max_lat: 40.55, min_lng: -80.10, max_lng: -79.80 },
-        allLabel: 'All Pittsburgh',
-        divisions: [
-          { key: 'ALL', label: 'All Pittsburgh', class: 'ALL' },
-          { key: 'PITTSBURGH_CORE', label: 'Pittsburgh', class: 'PittsburghCore' }
-        ],
-        presets: {
-          'ALL': { lat: 40.4417, lng: -80.0000, zoom: 11.4, pitch: 45, bearing: -10 },
-          'PITTSBURGH_CORE': { lat: 40.4417, lng: -80.0000, zoom: 12.0, pitch: 48, bearing: -10 }
-        }
-      }
+    // Static metro metadata: chip label fallback + ?city= deep-link validation.
+    // Camera geometry comes from the snapshot manifest's metro_index; this map
+    // deliberately carries none so registration stays single-sourced.
+    const METRO_META = {
+      nyc: { name: 'New York City' },
+      chicago: { name: 'Chicago' },
+      san_francisco: { name: 'San Francisco Bay Area' },
+      seattle: { name: 'Seattle Metro' },
+      los_angeles: { name: 'Los Angeles Metro' },
+      new_orleans: { name: 'New Orleans Metro' },
+      norfolk: { name: 'Norfolk' },
+      detroit: { name: 'Detroit' },
+      austin: { name: 'Austin' },
+      cincinnati: { name: 'Cincinnati' },
+      boston: { name: 'Boston' },
+      baltimore: { name: 'Baltimore' },
+      montgomery: { name: 'Montgomery County' },
+      baton_rouge: { name: 'Baton Rouge / EBR' },
+      denver: { name: 'Denver' },
+      philadelphia: { name: 'Philadelphia' },
+      washington_dc: { name: 'Washington DC' },
+      prince_georges: { name: "Prince George's County" },
+      columbus: { name: 'Columbus' },
+      nashville: { name: 'Nashville' },
+      kansas_city: { name: 'Kansas City' },
+      minneapolis: { name: 'Minneapolis' },
+      pierce: { name: 'Pierce County' },
+      milwaukee: { name: 'Milwaukee' },
+      charlotte: { name: 'Charlotte' },
+      pittsburgh: { name: 'Pittsburgh' },
+      san_diego: { name: 'San Diego' },
+      houston: { name: 'Houston' },
+      indianapolis: { name: 'Indianapolis / Marion County' },
+      wichita: { name: 'Wichita' }
     };
-    CITY_CONFIGS.sf = CITY_CONFIGS.san_francisco;
 
-    let currentCity = 'san_francisco';
-    let activeCities = ['san_francisco'];
     let map = null;
     let gridGeoJSON = null;
     let shapChart = null;
     let currentPerspective = '3D';
     let currentMetric = 'lims_score';
     let selectedH3Index = null;
-    let activeBoroughFilter = 'ALL';
     let catalystAlerts = [];
 
+    // ---- All-metros national view state ------------------------------------
+    let snapshotManifest = null;
+    let activeMetroChip = null;        // city_id or null (= all metros)
+    const fetchedTiles = new Set();    // res-5 parents already merged into source
+    const tileFeatures = new Map();    // h3_index -> GeoJSON feature
+    const pendingTileParents = [];     // queued parents awaiting fetch
+    const tilesInFlight = new Set();
+    let tileFetchesActive = 0;
+    let tileLoadGeneration = 0;
+    let gridDirty = false;
+    let viewportDebounceTimer = 0;
+    const TILE_PARENTS_PER_REQUEST = 32;
+    const TILE_FETCH_CONCURRENCY = 2;
+    const ZOOM_FLOOR = 6;
+
     function cityDisplayName(cityId) {
-      return (CITY_CONFIGS[cityId] || {}).name || cityId.replace(/_/g, ' ');
-    }
-
-    const COMPARE_RADIUS_MILES = 175;
-    const CITY_COORDINATES = {
-      san_francisco: { lat: 37.7749, lng: -122.4194 }, chicago: { lat: 41.8781, lng: -87.6298 },
-      nyc: { lat: 40.7128, lng: -74.0060 }, seattle: { lat: 47.6062, lng: -122.3321 },
-      los_angeles: { lat: 34.0522, lng: -118.2437 }, new_orleans: { lat: 29.9511, lng: -90.0715 },
-      norfolk: { lat: 36.8508, lng: -76.2859 }, detroit: { lat: 42.3314, lng: -83.0458 },
-      austin: { lat: 30.2672, lng: -97.7431 }, philadelphia: { lat: 39.9526, lng: -75.1652 },
-      washington_dc: { lat: 38.9072, lng: -77.0369 }, baltimore: { lat: 39.2904, lng: -76.6122 },
-      montgomery: { lat: 39.0840, lng: -77.1528 }, boston: { lat: 42.3601, lng: -71.0589 },
-      cincinnati: { lat: 39.1031, lng: -84.5120 }, baton_rouge: { lat: 30.4515, lng: -91.1871 },
-      denver: { lat: 39.7392, lng: -104.9903 }, prince_georges: { lat: 38.72, lng: -76.75 },
-      columbus: { lat: 39.9612, lng: -83.0007 }, nashville: { lat: 36.1627, lng: -86.7818 },
-      kansas_city: { lat: 39.10, lng: -94.58 }, pierce: { lat: 47.2529, lng: -122.4443 },
-      milwaukee: { lat: 43.0389, lng: -87.9065 }, minneapolis: { lat: 44.9778, lng: -93.2650 },
-      charlotte: { lat: 35.2271, lng: -80.8431 },
-      pittsburgh: { lat: 40.4417, lng: -80.0000 },
-      san_diego: { lat: 32.7157, lng: -117.1611 }
-    };
-
-    function renderCompareOptions() {
-      const options = document.getElementById('compare-options');
-      const toggle = document.getElementById('compare-toggle');
-      if (!options || !toggle) return;
-      const origin = CITY_COORDINATES[currentCity];
-      const nearby = origin ? Object.entries(CITY_COORDINATES)
-        .filter(([cityId, coords]) => cityId !== currentCity && haversineDistance(origin.lat, origin.lng, coords.lat, coords.lng) <= COMPARE_RADIUS_MILES)
-        .sort(([a], [b]) => cityDisplayName(a).localeCompare(cityDisplayName(b))) : [];
-      options.replaceChildren(...nearby.map(([cityId]) => {
-        const label = document.createElement('label');
-        label.innerHTML = `<input type="checkbox" name="compare-city" value="${cityId}"> ${escapeHtml(cityDisplayName(cityId))}`;
-        label.querySelector('input').checked = activeCities.includes(cityId);
-        return label;
-      }));
-      toggle.disabled = nearby.length === 0;
-      toggle.title = nearby.length ? `Compare with nearby regions within ${COMPARE_RADIUS_MILES} miles` : 'No nearby regions available for comparison';
-      if (!nearby.length) options.innerHTML = '<div style="color:var(--text-secondary);font-size:11px;padding:4px 0 7px;">No nearby regions available</div>';
-    }
-
-    function toggleCompareMenu() {
-      const menu = document.getElementById('compare-menu');
-      const toggle = document.getElementById('compare-toggle');
-      if (!menu || !toggle) return;
-      renderCompareOptions();
-      menu.hidden = !menu.hidden;
-      toggle.classList.toggle('active', !menu.hidden);
-      toggle.setAttribute('aria-expanded', String(!menu.hidden));
-      document.querySelectorAll('input[name="compare-city"]').forEach((input) => {
-        input.checked = activeCities.includes(input.value) && input.value !== currentCity;
-      });
-    }
-
-    async function applyComparison() {
-      const selected = Array.from(document.querySelectorAll('input[name="compare-city"]:checked')).map((input) => input.value);
-      activeCities = [currentCity, ...selected.filter((city) => city !== currentCity)];
-      const menu = document.getElementById('compare-menu');
-      const toggle = document.getElementById('compare-toggle');
-      if (menu) menu.hidden = true;
-      if (toggle) {
-        toggle.classList.toggle('active', activeCities.length > 1);
-        toggle.innerText = activeCities.length > 1 ? `${activeCities.length} regions` : '+ Compare';
-        toggle.setAttribute('aria-expanded', 'false');
-      }
-      activeBoroughFilter = 'ALL';
-      renderDivisionTabs();
-      await fetchGridData();
-      await fetchCatalysts();
+      return (METRO_META[cityId] || {}).name || String(cityId).replace(/_/g, ' ');
     }
 
     // Defensive String and Number Helpers
@@ -2242,86 +1530,6 @@ def get_dashboard_html() -> str:
       return R * c;
     }
 
-    function findClosestCity(lat, lng) {
-      const cityCoordinates = {
-        'san_francisco': { lat: 37.7749, lng: -122.4194 },
-        'chicago': { lat: 41.8781, lng: -87.6298 },
-        'nyc': { lat: 40.7128, lng: -74.0060 },
-        'seattle': { lat: 47.6062, lng: -122.3321 },
-        'los_angeles': { lat: 34.0522, lng: -118.2437 },
-        'new_orleans': { lat: 29.9511, lng: -90.0715 },
-        'norfolk': { lat: 36.8508, lng: -76.2859 },
-        'detroit': { lat: 42.3314, lng: -83.0458 },
-        'austin': { lat: 30.2672, lng: -97.7431 },
-        'philadelphia': { lat: 39.9526, lng: -75.1652 },
-        'washington_dc': { lat: 38.9072, lng: -77.0369 },
-        'prince_georges': { lat: 38.72, lng: -76.75 },
-        'columbus': { lat: 39.9612, lng: -83.0007 },
-        'nashville': { lat: 36.1627, lng: -86.7818 },
-        'kansas_city': { lat: 39.10, lng: -94.58 },
-        'pierce': { lat: 47.2529, lng: -122.4443 },
-        'milwaukee': { lat: 43.0389, lng: -87.9065 },
-        'charlotte': { lat: 35.2271, lng: -80.8431 },
-        'pittsburgh': { lat: 40.4417, lng: -80.0000 }
-      };
-      let closest = 'san_francisco';
-      let minDist = Infinity;
-      for (const [cId, coords] of Object.entries(cityCoordinates)) {
-        const d = haversineDistance(lat, lng, coords.lat, coords.lng);
-        if (d < minDist) {
-          minDist = d;
-          closest = cId;
-        }
-      }
-      return closest;
-    }
-
-    async function detectUserDefaultCity() {
-      try {
-        const saved = sessionStorage.getItem('urban_dev_user_city');
-        if (saved && (saved === 'san_francisco' || saved === 'chicago' || saved === 'nyc' || saved === 'seattle' || saved === 'los_angeles' || saved === 'new_orleans' || saved === 'norfolk' || saved === 'detroit' || saved === 'austin' || saved === 'philadelphia' || saved === 'washington_dc')) {
-          return saved;
-        }
-      } catch (e) {}
-
-      if (!navigator.geolocation) {
-        try { sessionStorage.setItem('urban_dev_user_city', 'san_francisco'); } catch (e) {}
-        return 'san_francisco';
-      }
-
-      return new Promise((resolve) => {
-        let resolved = false;
-        const timeout = setTimeout(() => {
-          if (!resolved) {
-            resolved = true;
-            try { sessionStorage.setItem('urban_dev_user_city', 'san_francisco'); } catch (e) {}
-            resolve('san_francisco');
-          }
-        }, 3000);
-
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            if (resolved) return;
-            resolved = true;
-            clearTimeout(timeout);
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
-            const closest = findClosestCity(lat, lng);
-            try { sessionStorage.setItem('urban_dev_user_city', closest); } catch (e) {}
-            resolve(closest);
-          },
-          (err) => {
-            if (resolved) return;
-            resolved = true;
-            clearTimeout(timeout);
-            try { sessionStorage.setItem('urban_dev_user_city', 'san_francisco'); } catch (e) {}
-            resolve('san_francisco');
-          },
-          { timeout: 2500, maximumAge: 600000, enableHighAccuracy: false }
-        );
-      });
-    }
-
     const MAP_STYLE = {
       version: 8,
       sources: {
@@ -2354,19 +1562,7 @@ def get_dashboard_html() -> str:
     };
 
     function normalizeBorough(b) {
-      if (!b) {
-        if (currentCity === 'san_francisco' || currentCity === 'sf') return 'SAN_FRANCISCO_CORE';
-        if (currentCity === 'chicago') return 'Central / Downtown';
-        if (currentCity === 'seattle') return 'SEATTLE_CORE';
-        if (currentCity === 'los_angeles') return 'CENTRAL_LA';
-        if (currentCity === 'new_orleans') return 'CBD_FRENCH_QUARTER';
-        if (currentCity === 'norfolk') return 'DOWNTOWN_WATERFRONT';
-        if (currentCity === 'detroit') return 'DOWNTOWN_MIDTOWN_CORKTOWN';
-        if (currentCity === 'austin') return 'DOWNTOWN_CAPITOL';
-        if (currentCity === 'philadelphia') return 'CENTER_CITY_RITTENHOUSE';
-        if (currentCity === 'washington_dc') return 'DOWNTOWN_NOMA_CAPITOL_RIVERFRONT';
-        return 'Manhattan';
-      }
+      if (!b) return '';
       const clean = b.toString().trim();
       const upper = clean.toUpperCase().replace(/[\s\-_/]+/g, '');
       if (upper === 'STATENISLAND') return 'Staten Island';
@@ -2444,98 +1640,130 @@ def get_dashboard_html() -> str:
       return normalizeBorough(b).replace(/[\s\-_/]+/g, '');
     }
 
-    function renderDivisionTabs() {
-      const nav = document.getElementById('borough-tabs');
+    function renderMetroChips() {
+      const nav = document.getElementById('metro-chips');
       if (!nav) return;
-      const cfg = CITY_CONFIGS[currentCity] || CITY_CONFIGS.nyc;
-      nav.innerHTML = cfg.divisions.map(d => {
-        const isActive = (activeBoroughFilter === 'ALL' && d.key === 'ALL') || (normalizeBorough(d.key) === activeBoroughFilter);
-        return `<button class="borough-btn ${d.class} ${isActive ? 'active' : ''}" data-borough="${d.key}" onclick="selectBoroughFilter('${d.key}')">${d.label}</button>`;
-      }).join('');
+      const metros = (snapshotManifest && snapshotManifest.metro_index)
+        ? [...snapshotManifest.metro_index]
+        : Object.keys(METRO_META).map((cityId) => ({ city_id: cityId, name: cityDisplayName(cityId) }));
+      metros.sort((a, b) => String(a.name).localeCompare(String(b.name)));
+      const chips = [{ id: null, label: 'All Metros' }]
+        .concat(metros.map((m) => ({ id: m.city_id, label: m.name || cityDisplayName(m.city_id) })));
+      nav.replaceChildren(...chips.map((chip) => {
+        const isActive = (chip.id === null && activeMetroChip === null) || (chip.id !== null && activeMetroChip === chip.id);
+        const btn = document.createElement('button');
+        btn.className = `borough-btn ${isActive ? 'active' : ''}`;
+        btn.dataset.metro = chip.id || '';
+        btn.setAttribute('aria-pressed', String(isActive));
+        btn.textContent = chip.label;
+        btn.addEventListener('click', () => selectMetro(chip.id));
+        return btn;
+      }));
     }
 
-    async function changeCity(cityId) {
-      currentCity = (cityId || 'san_francisco').toLowerCase().trim();
-      if (currentCity === 'sf') currentCity = 'san_francisco';
-      activeCities = activeCities.length > 1
-        ? [currentCity, ...activeCities.filter((city) => city !== currentCity)]
-        : [currentCity];
-      renderCompareOptions();
-      try { sessionStorage.setItem('urban_dev_user_city', currentCity); } catch (e) {}
-      activeBoroughFilter = 'ALL';
-      renderDivisionTabs();
-      
-      const cfg = CITY_CONFIGS[currentCity] || CITY_CONFIGS.nyc;
-      if (map) {
-        map.flyTo({
-          center: cfg.center,
-          zoom: cfg.zoom,
-          pitch: currentPerspective === '3D' ? cfg.pitch : 0,
-          bearing: currentPerspective === '3D' ? cfg.bearing : 0,
-          duration: 1400
-        });
+    // Metro chips are navigation, not data scoping: every metro's tiles stay
+    // rendered regardless of the active chip. A chip flies the camera and
+    // scopes only the catalyst feed list.
+    function selectMetro(cityId) {
+      activeMetroChip = cityId || null;
+      renderMetroChips();
+      renderCatalystFeed();
+      if (!map) return;
+      if (!cityId) {
+        fitNationalView();
+        return;
       }
-
-      await loadSubmarkets();
-      await fetchGridData();
-      await fetchCatalysts();
+      const metro = ((snapshotManifest && snapshotManifest.metro_index) || [])
+        .find((m) => m.city_id === cityId);
+      if (metro && metro.bbox) {
+        map.fitBounds(
+          [[metro.bbox.min_lng, metro.bbox.min_lat], [metro.bbox.max_lng, metro.bbox.max_lat]],
+          { padding: 70, maxZoom: 12.4, duration: 1300 }
+        );
+      } else {
+        fitNationalView();
+      }
     }
 
-    async function loadSubmarkets() {
-      // Never let a failed city request render the previously selected city's data.
-      // The edge API can reject a stale/missing snapshot; retaining SUBMARKETS here
-      // makes the grid and catalyst fallbacks silently show the wrong city.
-      SUBMARKETS = {};
+    function fitNationalView() {
+      if (!map) return;
+      const metros = (snapshotManifest && snapshotManifest.metro_index) || [];
+      if (!metros.length) return;
+      const bounds = new maplibregl.LngLatBounds();
+      metros.forEach((m) => {
+        if (!m.bbox) return;
+        bounds.extend([m.bbox.min_lng, m.bbox.min_lat]);
+        bounds.extend([m.bbox.max_lng, m.bbox.max_lat]);
+      });
+      if (!bounds.isEmpty()) map.fitBounds(bounds, { padding: 40, maxZoom: 8, duration: 1400 });
+    }
+
+    async function fetchManifest() {
       try {
-        const resp = await fetch(`/api/v1/submarkets?city_id=${currentCity}`);
+        const resp = await fetch('/api/v1/manifest');
         if (resp.ok) {
-          const data = await resp.json();
-          if (data.submarkets && Object.keys(data.submarkets).length > 0) {
-            SUBMARKETS = data.submarkets;
-          }
+          snapshotManifest = await resp.json();
+          return true;
         }
       } catch (e) {
-        console.debug('Submarket fetch error:', e);
+        console.debug('Manifest fetch error:', e);
       }
+      showToast('Snapshot manifest unavailable — cell-level data cannot load.', 'error');
+      return false;
+    }
+
+    async function loadAllSubmarkets() {
+      SUBMARKETS = {};
+      const queue = (snapshotManifest && snapshotManifest.cities) ? [...snapshotManifest.cities] : [];
+      const worker = async () => {
+        while (queue.length) {
+          const city = queue.shift();
+          try {
+            const resp = await fetch(`/api/v1/submarkets?city_id=${city}`);
+            if (!resp.ok) continue;
+            const data = await resp.json();
+            const subs = data.submarkets || {};
+            for (const [name, meta] of Object.entries(subs)) {
+              SUBMARKETS[name] = { ...meta, city_id: data.city_id || city };
+            }
+          } catch (e) { /* one stale/missing metro must not sink the rest */ }
+        }
+      };
+      const concurrency = Math.min(6, Math.max(queue.length, 1));
+      await Promise.all(Array.from({ length: concurrency }, worker));
     }
 
     function deepLinkedCity() {
-      // US-31: /dashboard?city=<id> deep links (city pages, /compare) land
-      // preselected. Validate against CITY_CONFIGS so unknown or absent
-      // params fall through to the geolocation default untouched.
+      // US-31: /dashboard?city=<id> deep links land preselected as a camera
+      // preset only. Validate against METRO_META so unknown or absent params
+      // fall through to the national view untouched.
       try {
         const requested = new URLSearchParams(window.location.search).get('city');
         if (!requested) return null;
         let candidate = String(requested).toLowerCase().trim();
         if (candidate === 'sf') candidate = 'san_francisco';
-        return CITY_CONFIGS[candidate] ? candidate : null;
+        return METRO_META[candidate] ? candidate : null;
       } catch (e) {
         return null;
       }
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
-      const linked = deepLinkedCity();
-      if (linked) {
-        currentCity = linked;
-      } else {
-        try {
-          const detected = await detectUserDefaultCity();
-          currentCity = detected || 'san_francisco';
-        } catch (e) {
-          currentCity = 'san_francisco';
-        }
-      }
-
-      const citySelect = document.getElementById('city-select');
-      if (citySelect) {
-        citySelect.value = currentCity;
-      }
-
-      renderDivisionTabs();
       wireMobileChrome();
+
+      const linked = deepLinkedCity();
       initMap();
-      await loadSubmarkets();
+
+      await fetchManifest();
+      renderMetroChips();
+      if (linked) {
+        selectMetro(linked);
+      } else {
+        fitNationalView();
+      }
+
+      loadAllSubmarkets().then(() => renderCatalystFeed());
+      await fetchCatalysts();
 
       document.addEventListener('click', (e) => {
         const wrap = document.querySelector('.search-wrapper');
@@ -2557,20 +1785,6 @@ def get_dashboard_html() -> str:
       return window.matchMedia('(max-width: 860px)').matches;
     }
 
-    // Relocate the compare control between the header (desktop) and the layers
-    // drawer (mobile) so the header row stays uncluttered on phones.
-    function syncComparePlacement() {
-      const compare = document.querySelector('.compare-control');
-      const slot = document.querySelector('.sidebar-left .drawer-compare-slot');
-      const brandSection = document.querySelector('.brand-section');
-      if (!compare || !slot || !brandSection) return;
-      if (isMobileLayout()) {
-        if (!slot.contains(compare)) slot.appendChild(compare);
-      } else if (!brandSection.contains(compare)) {
-        brandSection.appendChild(compare);
-      }
-    }
-
     // Publish the live header height so the fixed search sheet lands below it.
     function syncHeaderHeight() {
       const header = document.querySelector('header');
@@ -2580,7 +1794,6 @@ def get_dashboard_html() -> str:
     }
 
     function syncMobileChrome() {
-      syncComparePlacement();
       syncHeaderHeight();
     }
 
@@ -2643,34 +1856,6 @@ def get_dashboard_html() -> str:
         if (e.key === 'Escape') closeMobilePanels();
       });
       syncMobileChrome();
-    }
-
-    function selectBoroughFilter(borough) {
-      activeBoroughFilter = normalizeBorough(borough === 'ALL' ? 'ALL' : borough);
-      
-      document.querySelectorAll('.borough-btn').forEach(btn => {
-        const b = btn.getAttribute('data-borough');
-        const isActive = (activeBoroughFilter === 'ALL' && b === 'ALL') || (normalizeBorough(b) === activeBoroughFilter);
-        btn.classList.toggle('active', isActive);
-      });
-
-      jumpToBorough(activeBoroughFilter);
-      filterFeedByBorough();
-    }
-
-    function jumpToBorough(borough) {
-      const bKey = normalizeBorough(borough);
-      const cfg = CITY_CONFIGS[currentCity] || CITY_CONFIGS.nyc;
-      const preset = cfg.presets[bKey] || cfg.presets['ALL'];
-      if (map && preset) {
-        map.flyTo({
-          center: [preset.lng, preset.lat],
-          zoom: preset.zoom,
-          pitch: currentPerspective === '3D' ? preset.pitch : 0,
-          bearing: currentPerspective === '3D' ? preset.bearing : 0,
-          duration: 1200
-        });
-      }
     }
 
     function onGlobalSearch(query) {
@@ -2737,24 +1922,24 @@ def get_dashboard_html() -> str:
 
     function initMap() {
       try {
-        const cfg = CITY_CONFIGS[currentCity] || CITY_CONFIGS.san_francisco;
         map = new maplibregl.Map({
           container: 'map',
           style: MAP_STYLE,
-          center: cfg.center,
-          zoom: cfg.zoom,
-          pitch: currentPerspective === '3D' ? cfg.pitch : 0,
-          bearing: currentPerspective === '3D' ? cfg.bearing : 0,
+          center: [-96.6, 38.9],
+          zoom: 4.2,
+          pitch: 0,
+          bearing: 0,
           antialias: true
         });
 
         map.addControl(new maplibregl.NavigationControl({ visualizePitch: true, showCompass: false }), 'bottom-right');
 
-        map.on('load', async () => {
+        map.on('load', () => {
           map.resize();
           setupGridLayers();
-          await fetchGridData();
-          await fetchCatalysts();
+          map.on('moveend', scheduleViewportLoad);
+          map.on('zoomend', scheduleViewportLoad);
+          scheduleViewportLoad();
           setInterval(fetchCatalysts, 15000);
         });
 
@@ -2771,22 +1956,33 @@ def get_dashboard_html() -> str:
             const props = f.properties || {};
             const coords = e.lngLat;
             const subInfo = getSubmarketInfoByCoords(props.centroid_lat || coords.lat, props.centroid_lng || coords.lng);
-            const subName = props.submarket || (subInfo ? subInfo.name : 'NYC Micro-Block');
-            const borough = normalizeBorough(props.borough || (subInfo ? subInfo.meta.borough : getBoroughNameByCoords(coords.lat, coords.lng)));
+            const subName = props.submarket || (subInfo ? subInfo.name : 'Micro-Block');
+            const borough = normalizeBorough(props.borough || (subInfo ? subInfo.meta.borough : ''));
             const bClass = getBoroughClass(borough);
             const limsVal = Number(props.lims_score || 80.0);
             const delta6m = Number(props.delta_6m_p50 || 0.12);
-            
+            const nationalPct = Number(props.lims_score_national_pct);
+            const metroPct = Number(props.lims_score_metro_pct);
+
             popup.setLngLat(coords)
               .setHTML(`
-                <div style="font-size: 11px; min-width: 150px; line-height: 1.4;">
+                <div style="font-size: 11px; min-width: 170px; line-height: 1.4;">
                   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
                     <strong style="color: var(--text-main); font-size:12px;">${subName}</strong>
                     <span class="borough-tag ${bClass}">${borough}</span>
                   </div>
+                  ${props.city_name ? `<div style="color:var(--text-muted); font-size:10px; margin-bottom:3px;">${props.city_name}</div>` : ''}
                   <div style="display:flex; justify-content:space-between; gap:8px; margin-top:2px;">
                     <span style="color:var(--text-secondary);">LIMS Score:</span>
                     <strong style="color: ${limsVal >= 85 ? 'var(--accent-danger)' : 'var(--accent-success)'}">${limsVal.toFixed(1)}</strong>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; gap:8px;">
+                    <span style="color:var(--text-secondary);">National Pct:</span>
+                    <strong>${Number.isFinite(nationalPct) ? nationalPct.toFixed(0) : '—'}</strong>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; gap:8px;">
+                    <span style="color:var(--text-secondary);">Metro Pct:</span>
+                    <strong>${Number.isFinite(metroPct) ? metroPct.toFixed(0) : '—'}</strong>
                   </div>
                   <div style="display:flex; justify-content:space-between; gap:8px;">
                     <span style="color:var(--text-secondary);">6M Return:</span>
@@ -2822,127 +2018,127 @@ def get_dashboard_html() -> str:
       }
     }
 
-    async function fetchGridData() {
-      if (activeCities.length > 1) {
-        const grids = await Promise.all(activeCities.map(async (cityId) => {
-          try {
-            const resp = await fetch(`/api/v1/grid?city_id=${cityId}`);
-            if (!resp.ok) return { type: 'FeatureCollection', features: [] };
-            const data = await resp.json();
-            return {
-              ...data,
-              features: (data.features || []).map((feature) => ({
-                ...feature,
-                properties: { ...(feature.properties || {}), city_id: cityId, city_name: cityDisplayName(cityId) }
-              }))
-            };
-          } catch (e) {
-            return { type: 'FeatureCollection', features: [] };
-          }
-        }));
-        gridGeoJSON = { type: 'FeatureCollection', features: grids.flatMap((grid) => grid.features || []) };
-        if (map && map.getSource('h3-grid-source')) {
-          map.getSource('h3-grid-source').setData(gridGeoJSON);
-          fitMapToFeatures(gridGeoJSON.features);
+    // ---- Viewport lazy loading ---------------------------------------------
+    // Cells live in res-5 parent-H3 tiles published to KV by the snapshot
+    // builder. On camera settle we sample the visible bounds for parents,
+    // keep only tiles that exist in the manifest's tile_index, and fetch the
+    // missing ones in small batched requests, center-out first.
+    function scheduleViewportLoad() {
+      clearTimeout(viewportDebounceTimer);
+      viewportDebounceTimer = setTimeout(updateViewportTiles, 220);
+    }
+
+    function res5ParentsCoveringBounds(bounds) {
+      if (typeof h3 === 'undefined' || !bounds) return [];
+      const west = bounds.getWest();
+      const east = bounds.getEast();
+      const south = bounds.getSouth();
+      const north = bounds.getNorth();
+      const latPad = Math.max(0.35, (north - south) * 0.18);
+      const lngPad = Math.max(0.45, (east - west) * 0.18);
+      const minLat = Math.max(-84, south - latPad);
+      const maxLat = Math.min(84, north + latPad);
+      const minLng = Math.max(-179.9, west - lngPad);
+      const maxLng = Math.min(179.9, east + lngPad);
+      const parents = new Set();
+      const stepLat = 0.14; // under a res-5 hex diameter so sampling cannot skip a tile
+      let samples = 0;
+      for (let lat = minLat; lat <= maxLat && samples < 4000; lat += stepLat) {
+        const stepLng = stepLat / Math.max(0.25, Math.cos(lat * Math.PI / 180));
+        for (let lng = minLng; lng <= maxLng && samples < 4000; lng += stepLng) {
+          parents.add(h3.latLngToCell(lat, lng, 5));
+          samples += 1;
         }
+      }
+      return [...parents];
+    }
+
+    function setHexLayersVisible(visible) {
+      if (!map) return;
+      if (map.getLayer('h3-hex-fill')) {
+        map.setLayoutProperty('h3-hex-fill', 'visibility', visible && currentPerspective === '2D' ? 'visible' : 'none');
+      }
+      if (map.getLayer('h3-hex-extrusion')) {
+        map.setLayoutProperty('h3-hex-extrusion', 'visibility', visible && currentPerspective === '3D' ? 'visible' : 'none');
+      }
+    }
+
+    function updateViewportTiles() {
+      if (!map || !snapshotManifest) return;
+      const tileIndex = snapshotManifest.tile_index || {};
+      const hint = document.getElementById('zoom-hint');
+      if (map.getZoom() < ZOOM_FLOOR) {
+        if (hint) hint.hidden = false;
+        setHexLayersVisible(false);
         return;
       }
+      if (hint) hint.hidden = true;
+      setHexLayersVisible(true);
+
+      const candidates = res5ParentsCoveringBounds(map.getBounds())
+        .filter((parent) => Object.prototype.hasOwnProperty.call(tileIndex, parent))
+        .filter((parent) => !fetchedTiles.has(parent) && !tilesInFlight.has(parent));
+
+      const center = map.getCenter();
+      candidates.sort((a, b) => parentDistance(a, center) - parentDistance(b, center));
+
+      pendingTileParents.length = 0;
+      pendingTileParents.push(...candidates);
+      drainTileQueue();
+    }
+
+    function parentDistance(parent, center) {
+      const [lat, lng] = h3.cellToLatLng(parent);
+      return Math.abs(lat - center.lat) + Math.abs(lng - center.lng);
+    }
+
+    function drainTileQueue() {
+      while (tileFetchesActive < TILE_FETCH_CONCURRENCY && pendingTileParents.length) {
+        const batch = pendingTileParents.splice(0, TILE_PARENTS_PER_REQUEST);
+        batch.forEach((parent) => tilesInFlight.add(parent));
+        tileFetchesActive += 1;
+        fetchTileBatch(batch);
+      }
+    }
+
+    async function fetchTileBatch(batch) {
+      const generation = tileLoadGeneration;
       try {
-        const resp = await fetch(`/api/v1/grid?city_id=${currentCity}`);
+        const resp = await fetch(`/api/v1/gridtiles?parents=${batch.join(',')}`);
         if (resp.ok) {
-          gridGeoJSON = await resp.json();
-        } else {
-          gridGeoJSON = generateClientGridGeoJSON();
+          const payload = await resp.json();
+          if (generation === tileLoadGeneration) mergeTilePayload(payload);
         }
-      } catch (err) {
-        gridGeoJSON = generateClientGridGeoJSON();
-      }
-
-      if (map && map.getSource('h3-grid-source')) {
-        map.getSource('h3-grid-source').setData(gridGeoJSON);
+        // Absent-from-KV parents will not appear later either — mark fetched.
+        batch.forEach((parent) => fetchedTiles.add(parent));
+      } catch (e) {
+        console.debug('Tile fetch error:', e);
+      } finally {
+        batch.forEach((parent) => tilesInFlight.delete(parent));
+        tileFetchesActive -= 1;
+        drainTileQueue();
+        applyGridData();
       }
     }
 
-    function fitMapToFeatures(features) {
-      if (!map || !features || !features.length) return;
-      const bounds = new maplibregl.LngLatBounds();
-      features.forEach((feature) => (feature.geometry?.coordinates?.[0] || []).forEach(([lng, lat]) => bounds.extend([lng, lat])));
-      if (!bounds.isEmpty()) map.fitBounds(bounds, { padding: 90, maxZoom: 11.6, duration: 1100 });
-    }
-
-    function buildFeature(cell, name, meta, boundary, lat, lng, lims) {
-      const borough = normalizeBorough(meta.borough);
-      return {
-        type: 'Feature',
-        id: cell,
-        geometry: {
-          type: 'Polygon',
-          coordinates: [boundary]
-        },
-        properties: {
-          h3_index: cell,
-          submarket: name,
-          borough: borough,
-          description: meta.description || '',
-          centroid_lat: lat,
-          centroid_lng: lng,
-          lims_score: lims,
-          delta_6m_p10: +(lims * 0.0011).toFixed(4),
-          delta_6m_p50: +(lims * 0.0018).toFixed(4),
-          delta_6m_p90: +(lims * 0.0026).toFixed(4),
-          delta_12m_spillover: +(lims * 0.0014).toFixed(4),
-          prob_18m_macro_outperformance: +(lims / 115.0).toFixed(4),
-          is_catalyst: lims >= 85.0,
-          capex_density_decayed: meta.capex || 500000.0,
-          permit_velocity: meta.permit_vel || 0.35,
-          shift_ratio_311: meta.shift_ratio || 2.5,
-          sla_new_filings_90d: meta.sla || 3,
-          shap_attributions: JSON.stringify({
-            capex_density_decayed: +(lims * 0.0007).toFixed(4),
-            permit_velocity: +(lims * 0.0005).toFixed(4),
-            shift_ratio_311: +(lims * 0.0004).toFixed(4),
-            sla_new_filings_90d: +(lims * 0.0002).toFixed(4),
-            complaints_neglect_count: -0.0012
-          })
-        }
-      };
-    }
-
-    function generateClientGridGeoJSON() {
-      const features = [];
-      const hasH3 = typeof h3 !== 'undefined';
-
-      for (const [name, meta] of Object.entries(SUBMARKETS)) {
-        if (hasH3) {
-          try {
-            const centerCell = h3.latLngToCell(meta.lat, meta.lng, 9);
-            const ring = h3.gridDisk(centerCell, 1);
-            ring.forEach((cell, idx) => {
-              let boundary = h3.cellToBoundary(cell, true);
-              if (boundary && boundary.length > 0) {
-                if (boundary[0][0] !== boundary[boundary.length - 1][0] || boundary[0][1] !== boundary[boundary.length - 1][1]) {
-                  boundary.push([boundary[0][0], boundary[0][1]]);
-                }
-              }
-              const centroid = h3.cellToLatLng(cell);
-              const lims = Math.min(98.0, Math.max(60.0, (meta.base_lims || 80.0) + (idx % 3 - 1) * 2.2));
-              features.push(buildFeature(cell, name, meta, boundary, centroid[0], centroid[1], lims));
-            });
-            continue;
-          } catch (e) {}
-        }
-
-        const cellId = 'hex_' + name.toLowerCase().replace(/[^a-z0-9]/g, '_');
-        const radius = 0.0035;
-        const boundary = [];
-        for (let i = 0; i < 6; i++) {
-          const angle = (Math.PI / 3) * i;
-          boundary.push([meta.lng + radius * Math.cos(angle), meta.lat + (radius * 0.75) * Math.sin(angle)]);
-        }
-        boundary.push([boundary[0][0], boundary[0][1]]);
-        features.push(buildFeature(cellId, name, meta, boundary, meta.lat, meta.lng, meta.base_lims || 80.0));
+    function mergeTilePayload(payload) {
+      const features = payload && payload.features ? payload.features : [];
+      for (const feature of features) {
+        const cell = feature.properties && feature.properties.h3_index;
+        if (!cell) continue;
+        tileFeatures.set(cell, feature);
       }
-      return { type: 'FeatureCollection', features };
+      if (features.length) gridDirty = true;
+    }
+
+    function applyGridData() {
+      if (!gridDirty || !map || !map.getSource('h3-grid-source')) return;
+      gridDirty = false;
+      gridGeoJSON = { type: 'FeatureCollection', features: [...tileFeatures.values()] };
+      map.getSource('h3-grid-source').setData(gridGeoJSON);
+      // Programmatic camera jumps can leave the repaint cycle suppressed;
+      // nudge it so freshly merged tiles index immediately.
+      map.triggerRepaint();
     }
 
     function setupGridLayers() {
@@ -2961,11 +2157,11 @@ def get_dashboard_html() -> str:
         layout: { visibility: currentPerspective === '2D' ? 'visible' : 'none' },
         paint: {
           'fill-color': [
-            'interpolate', ['linear'], ['get', 'lims_score'],
-            50, '#34d399',
-            70, '#fbbf24',
-            85, '#fb923c',
-            95, '#f43f5e'
+            'interpolate', ['linear'], ['get', 'lims_score_national_pct'],
+            0, '#34d399',
+            50, '#fbbf24',
+            75, '#fb923c',
+            90, '#f43f5e'
           ],
           'fill-opacity': 0.78
         }
@@ -2990,15 +2186,15 @@ def get_dashboard_html() -> str:
         layout: { visibility: currentPerspective === '3D' ? 'visible' : 'none' },
         paint: {
           'fill-extrusion-color': [
-            'interpolate', ['linear'], ['get', 'lims_score'],
-            50, '#34d399',
-            70, '#fbbf24',
-            85, '#fb923c',
-            95, '#f43f5e'
+            'interpolate', ['linear'], ['get', 'lims_score_national_pct'],
+            0, '#34d399',
+            50, '#fbbf24',
+            75, '#fb923c',
+            90, '#f43f5e'
           ],
           'fill-extrusion-height': [
             '*',
-            ['max', 0, ['-', ['coalesce', ['get', 'lims_score'], 50], 40]],
+            ['max', 0, ['-', ['coalesce', ['get', 'lims_score_national_pct'], 50], 40]],
             18
           ],
           'fill-extrusion-base': 0,
@@ -3024,75 +2220,46 @@ def get_dashboard_html() -> str:
       const metricEl = document.getElementById('metric-select');
       if (!metricEl) return;
       currentMetric = metricEl.value;
+      const pctProp = `${currentMetric}_national_pct`;
       const legendTitle = document.getElementById('legend-metric-title');
       const legendMin = document.getElementById('legend-min');
       const legendMid = document.getElementById('legend-mid');
       const legendMax = document.getElementById('legend-max');
 
-      let colorExpr, heightExpr;
-      if (currentMetric === 'lims_score') {
-        if (legendTitle) legendTitle.innerText = 'LIMS Momentum Score';
-        if (legendMin) legendMin.innerText = '0.0';
-        if (legendMid) legendMid.innerText = '70.0';
-        if (legendMax) legendMax.innerText = '100.0';
-        colorExpr = [
-          'interpolate', ['linear'], ['get', 'lims_score'],
-          50, '#34d399',
-          70, '#fbbf24',
-          85, '#fb923c',
-          95, '#f43f5e'
-        ];
-        heightExpr = ['*', ['max', 0, ['-', ['coalesce', ['get', 'lims_score'], 50], 40]], 18];
-      } else if (currentMetric === 'delta_6m_p50') {
-        if (legendTitle) legendTitle.innerText = '6M Expected Return (p50)';
-        if (legendMin) legendMin.innerText = '+0%';
-        if (legendMid) legendMid.innerText = '+12%';
-        if (legendMax) legendMax.innerText = '+25%';
-        colorExpr = [
-          'interpolate', ['linear'], ['get', 'delta_6m_p50'],
-          0.04, '#34d399',
-          0.10, '#fbbf24',
-          0.16, '#fb923c',
-          0.22, '#f43f5e'
-        ];
-        heightExpr = ['*', ['max', 0, ['coalesce', ['get', 'delta_6m_p50'], 0.05]], 4000];
-      } else if (currentMetric === 'delta_12m_spillover') {
-        if (legendTitle) legendTitle.innerText = '12M Spatial Spillover';
-        if (legendMin) legendMin.innerText = '+0%';
-        if (legendMid) legendMid.innerText = '+10%';
-        if (legendMax) legendMax.innerText = '+20%';
-        colorExpr = [
-          'interpolate', ['linear'], ['get', 'delta_12m_spillover'],
-          0.02, '#34d399',
-          0.08, '#fbbf24',
-          0.14, '#fb923c',
-          0.20, '#f43f5e'
-        ];
-        heightExpr = ['*', ['max', 0, ['coalesce', ['get', 'delta_12m_spillover'], 0.04]], 4500];
-      } else {
-        if (legendTitle) legendTitle.innerText = '18M Macro Outperformance';
-        if (legendMin) legendMin.innerText = '0.0';
-        if (legendMid) legendMid.innerText = '0.5';
-        if (legendMax) legendMax.innerText = '1.0';
-        colorExpr = [
-          'interpolate', ['linear'], ['get', 'prob_18m_macro_outperformance'],
-          0.2, '#34d399',
-          0.5, '#fbbf24',
-          0.75, '#fb923c',
-          0.95, '#f43f5e'
-        ];
-        heightExpr = ['*', ['max', 0, ['coalesce', ['get', 'prob_18m_macro_outperformance'], 0.5]], 900];
-      }
+      let titleSuffix = ' — National Percentile';
+      if (legendTitle) legendTitle.innerText = ({
+        lims_score: 'LIMS Momentum Score',
+        delta_6m_p50: '6M Expected Return (p50)',
+        delta_12m_spillover: '12M Spatial Spillover',
+        prob_18m_macro_outperformance: '18M Macro Outperformance'
+      })[currentMetric] + titleSuffix;
+      if (legendMin) legendMin.innerText = '0';
+      if (legendMid) legendMid.innerText = '50';
+      if (legendMax) legendMax.innerText = '100';
+
+      // One shared percentile color ramp; only extrusion height differs per metric.
+      const colorExpr = [
+        'interpolate', ['linear'], ['get', pctProp],
+        0, '#34d399',
+        50, '#fbbf24',
+        75, '#fb923c',
+        90, '#f43f5e'
+      ];
+      const heightFactor = {
+        lims_score: ['*', ['max', 0, ['-', ['coalesce', ['get', pctProp], 50], 40]], 18],
+        delta_6m_p50: ['*', ['max', 0, ['coalesce', ['get', pctProp], 50]], 40],
+        delta_12m_spillover: ['*', ['max', 0, ['coalesce', ['get', pctProp], 50]], 45],
+        prob_18m_macro_outperformance: ['*', ['max', 0, ['coalesce', ['get', pctProp], 50]], 9]
+      }[currentMetric];
 
       if (map.getLayer('h3-hex-fill')) {
         map.setPaintProperty('h3-hex-fill', 'fill-color', colorExpr);
       }
       if (map.getLayer('h3-hex-extrusion')) {
         map.setPaintProperty('h3-hex-extrusion', 'fill-extrusion-color', colorExpr);
-        map.setPaintProperty('h3-hex-extrusion', 'fill-extrusion-height', heightExpr);
+        map.setPaintProperty('h3-hex-extrusion', 'fill-extrusion-height', heightFactor);
       }
     }
-
     function setPerspective(mode) {
       currentPerspective = mode;
       const btn3d = document.getElementById('btn-3d');
@@ -3101,10 +2268,7 @@ def get_dashboard_html() -> str:
       if (btn2d) btn2d.classList.toggle('active', mode === '2D');
 
       if (map) {
-        if (map.getLayer('h3-hex-fill') && map.getLayer('h3-hex-extrusion')) {
-          map.setLayoutProperty('h3-hex-fill', 'visibility', mode === '2D' ? 'visible' : 'none');
-          map.setLayoutProperty('h3-hex-extrusion', 'visibility', mode === '3D' ? 'visible' : 'none');
-        }
+        setHexLayersVisible(map.getZoom() >= ZOOM_FLOOR);
 
         map.easeTo({
           pitch: mode === '3D' ? 52 : 0,
@@ -3166,48 +2330,20 @@ def get_dashboard_html() -> str:
     }
 
     async function fetchCatalysts() {
-      if (activeCities.length > 1) {
-        const responses = await Promise.all(activeCities.map(async (cityId) => {
-          try {
-            const resp = await fetch(`/api/v1/catalysts?city_id=${cityId}&min_lims=85.0`);
-            if (!resp.ok) return [];
-            const data = await resp.json();
-            return (data.catalysts || []).map((c) => ({ ...c, city_id: cityId, city_name: cityDisplayName(cityId) }));
-          } catch (e) { return []; }
-        }));
-        catalystAlerts = responses.flat();
-        renderCatalystFeed();
-        return;
-      }
       try {
-        const resp = await fetch(`/api/v1/catalysts?city_id=${currentCity}&min_lims=85.0`);
+        const resp = await fetch('/api/v1/catalysts/all');
         if (resp.ok) {
           const data = await resp.json();
           catalystAlerts = data.catalysts || [];
           renderCatalystFeed();
           return;
         }
-      } catch (err) {}
-
-      catalystAlerts = Object.entries(SUBMARKETS)
-        .filter(([_, meta]) => (meta.base_lims || 0) >= 85.0)
-        .map(([name, meta]) => {
-          const cell = (typeof h3 !== 'undefined') ? h3.latLngToCell(meta.lat, meta.lng, 9) : 'hex_' + name.toLowerCase();
-          return {
-            h3_index: cell,
-            submarket: name,
-            borough: normalizeBorough(meta.borough),
-            centroid_lat: meta.lat,
-            centroid_lng: meta.lng,
-            lims_score: meta.base_lims,
-            delta_6m_p50: +(meta.base_lims * 0.0018).toFixed(4),
-            delta_12m_spillover: +(meta.base_lims * 0.0014).toFixed(4)
-          };
-        });
-      renderCatalystFeed();
-    }
-
-    function filterFeedByBorough() {
+        if (!catalystAlerts.length) {
+          showToast('No combined catalyst snapshot published yet.', 'error');
+        }
+      } catch (e) {
+        console.debug('Catalyst fetch error:', e);
+      }
       renderCatalystFeed();
     }
 
@@ -3216,18 +2352,17 @@ def get_dashboard_html() -> str:
       const countBadge = document.getElementById('stat-active-catalysts');
       if (!container) return;
 
-      const filtered = catalystAlerts.filter(c => {
-        if (activeBoroughFilter === 'ALL') return true;
-        const b = normalizeBorough(c.borough);
-        return b === activeBoroughFilter;
-      });
+      const filtered = catalystAlerts.filter(c => (
+        !activeMetroChip || c.city_id === activeMetroChip
+      ));
+
 
       if (countBadge) {
         countBadge.innerText = `${filtered.length} Active`;
       }
 
       if (filtered.length === 0) {
-        container.innerHTML = `<div style="font-size:11px; color:var(--text-muted); text-align:center; padding:24px 0;">No active catalysts in ${activeBoroughFilter}</div>`;
+        container.innerHTML = `<div style="font-size:11px; color:var(--text-muted); text-align:center; padding:24px 0;">No active catalysts${activeMetroChip ? ` in ${escapeHtml(cityDisplayName(activeMetroChip))}` : ''}</div>`;
         return;
       }
 
@@ -3374,6 +2509,12 @@ def get_dashboard_html() -> str:
               <span class="borough-tag ${bClass}">${boroughName}</span>
             </div>
             <div class="parcel-meta-sub">
+              <span>H3: ${props.h3_index || ''}</span>
+              <span>•</span>
+              <span>${lat.toFixed(4)}, ${lng.toFixed(4)}</span>
+              ${props.city_name ? `<span>•</span><span>${props.city_name}</span>` : ''}
+            </div>
+
               <span>H3: ${props.h3_index || ''}</span>
               <span>•</span>
               <span>${lat.toFixed(4)}, ${lng.toFixed(4)}</span>
@@ -3655,137 +2796,10 @@ def get_dashboard_html() -> str:
     }
 
     function getBoroughNameByCoords(lat, lng) {
-      if (!lat || !lng) {
-        if (currentCity === 'san_francisco' || currentCity === 'sf') return 'SAN_FRANCISCO_CORE';
-        if (currentCity === 'chicago') return 'Central / Downtown';
-        if (currentCity === 'seattle') return 'SEATTLE_CORE';
-        if (currentCity === 'los_angeles') return 'CENTRAL_LA';
-        if (currentCity === 'new_orleans') return 'CBD_FRENCH_QUARTER';
-        if (currentCity === 'norfolk') return 'DOWNTOWN_WATERFRONT';
-        if (currentCity === 'detroit') return 'DOWNTOWN_MIDTOWN_CORKTOWN';
-        if (currentCity === 'austin') return 'DOWNTOWN_CAPITOL';
-        if (currentCity === 'philadelphia') return 'CENTER_CITY_RITTENHOUSE';
-        if (currentCity === 'washington_dc') return 'DOWNTOWN_NOMA_CAPITOL_RIVERFRONT';
-        return 'Manhattan';
-      }
-      const cfg = CITY_CONFIGS[currentCity];
-      if (cfg && cfg.metroBbox) {
-        const b = cfg.metroBbox;
-        if (lat >= b.min_lat && lat <= b.max_lat && lng >= b.min_lng && lng <= b.max_lng) {
-          const viaSubmarket = resolveDivisionByNearestSubmarket(lat, lng);
-          if (viaSubmarket) return viaSubmarket;
-        }
-      }
-      if (currentCity === 'seattle') {
-        // SEATTLE_METRO_BBOX guard: min_lat 47.28 max_lat 47.78 min_lng -122.43 max_lng -122.00
-        if (lat >= 47.28 && lat <= 47.78 && lng >= -122.43 && lng <= -122.00) {
-          if (lat >= 47.645 && lat <= 47.745 && lng >= -122.425 && lng <= -122.280) return 'NORTH_KING';
-          if (lat >= 47.500 && lat <= 47.770 && lng >= -122.260 && lng <= -122.010) return 'EASTSIDE';
-          if (lat >= 47.290 && lat <= 47.590 && lng >= -122.420 && lng <= -122.150) return 'SOUTH_KING';
-        }
-        return 'SEATTLE_CORE';
-      }
-      if (currentCity === 'los_angeles') {
-        // LA_METRO_BBOX guard: min_lat 33.7 max_lat 34.34 min_lng -118.63 max_lng -117.95
-        if (lat >= 33.7 && lat <= 34.34 && lng >= -118.63 && lng <= -117.95) {
-          if (lat >= 34.14 && lat <= 34.34 && lng >= -118.63 && lng <= -118.28) return 'SAN_FERNANDO_VALLEY';
-          if (lat >= 33.98 && lat <= 34.12 && lng >= -118.56 && lng <= -118.35) return 'WESTSIDE';
-          if (lat >= 33.7 && lat <= 33.9 && lng >= -118.45 && lng <= -118.1) return 'HARBOR_SOUTH_BAY';
-          if (lat >= 33.9 && lat <= 34.03 && lng >= -118.38 && lng <= -118.2) return 'SOUTH_LA';
-          if (lat >= 34.03 && lat <= 34.14 && lng >= -118.35 && lng <= -118.2) return 'CENTRAL_LA';
-          if (lat >= 34.03 && lat <= 34.2 && lng >= -118.28 && lng <= -117.95) return 'EASTSIDE_SGV';
-          return 'CENTRAL_LA';
-        }
-      }
-      if (currentCity === 'new_orleans') {
-        // NEW_ORLEANS_METRO_BBOX guard: min_lat 29.82 max_lat 30.16 min_lng -90.30 max_lng -89.62
-        if (lat >= 29.82 && lat <= 30.16 && lng >= -90.30 && lng <= -89.62) {
-          if (lat >= 29.93 && lat <= 30.00 && lng >= -90.10 && lng <= -90.02) return 'CBD_FRENCH_QUARTER';
-          if (lat >= 29.95 && lat <= 30.00 && lng >= -90.05 && lng <= -89.98) return 'BYWATER_MARIGNY';
-          if (lat >= 29.90 && lat <= 30.00 && lng >= -90.15 && lng <= -90.05) return 'UPTOWN_CARROLLTON';
-          if (lat >= 29.96 && lat <= 30.04 && lng >= -90.13 && lng <= -90.05) return 'MID_CITY';
-          if (lat >= 29.98 && lat <= 30.06 && lng >= -90.15 && lng <= -90.04) return 'LAKEVIEW_GENTILLY';
-          if (lat >= 29.86 && lat <= 29.98 && lng >= -90.08 && lng <= -89.95) return 'WEST_BANK_ALGIERS';
-          if (lat >= 29.99 && lat <= 30.10 && lng >= -90.08 && lng <= -89.62) return 'NEW_ORLEANS_EAST';
-          if (lat >= 29.87 && lat <= 30.05 && lng >= -90.30 && lng <= -90.10) return 'JEFFERSON_METAIRIE_KENNER';
-          if (lat >= 29.82 && lat <= 29.95 && lng >= -90.10 && lng <= -89.80) return 'ST_BERNARD_CHALMETTE';
-          return 'CBD_FRENCH_QUARTER';
-        }
-      }
-      if (currentCity === 'norfolk') {
-        // NORFOLK_METRO_BBOX guard: min_lat 36.83 max_lat 37.04 min_lng -76.35 max_lng -76.17
-        if (lat >= 36.83 && lat <= 37.04 && lng >= -76.35 && lng <= -76.17) {
-          if (lat >= 36.915 && lng <= -76.24) return 'OCEAN_VIEW';
-          if (lat >= 36.87 && lat <= 36.92 && lng >= -76.27 && lng <= -76.205) return 'CENTRAL_MILITARY_CIRCLE';
-          if (lat <= 36.88 && lng >= -76.30 && lng <= -76.23) return 'SOUTH_NORFOLK_BERKLEY';
-          if (lat >= 36.84 && lat <= 36.90 && lng >= -76.315 && lng <= -76.28) return 'DOWNTOWN_WATERFRONT';
-          if (lat >= 36.85 && lat <= 36.905 && lng >= -76.31 && lng <= -76.255) return 'GHENT_WESTBURG';
-          return 'DOWNTOWN_WATERFRONT';
-        }
-      }
-      if (currentCity === 'detroit') {
-        // DETROIT_METRO_BBOX guard: min_lat 42.25 max_lat 42.49 min_lng -83.35 max_lng -82.88
-        if (lat >= 42.25 && lat <= 42.49 && lng >= -83.35 && lng <= -82.88) {
-          if (lat >= 42.38 && lng <= -83.15) return 'WEST_SIDE_GRAND_RIVER';
-          if (lat >= 42.365 && lng >= -83.12 && lng <= -83.06) return 'NORTH_END_HIGHLAND_PARK';
-          if (lat <= 42.33 && lng >= -83.15 && lng <= -83.08) return 'SOUTHWEST_MEXICANTOWN';
-          if (lat >= 42.35 && lng >= -82.95) return 'EAST_ENGLISH_VILLAGE_MORNINGSIDE';
-          if (lat >= 42.325 && lng >= -83.03) return 'EAST_SIDE_JEFFERSON';
-          if (lat >= 42.31 && lat <= 42.365 && lng >= -83.10 && lng <= -83.02) return 'DOWNTOWN_MIDTOWN_CORKTOWN';
-          return 'DOWNTOWN_MIDTOWN_CORKTOWN';
-        }
-      }
-      if (currentCity === 'austin') {
-        // AUSTIN_METRO_BBOX guard: min_lat 30.10 max_lat 30.62 min_lng -98.05 max_lng -97.52
-        if (lat >= 30.10 && lat <= 30.62 && lng >= -98.05 && lng <= -97.52) {
-          if (lat >= 30.305 && lat <= 30.48 && lng >= -97.76 && lng <= -97.655) return 'NORTH_AUSTIN_DOMAIN';
-          if (lat >= 30.39 && lng >= -97.66) return 'PFLUGERVILLE_ROUND_ROCK_EDGE';
-          if (lat >= 30.25 && lng <= -97.755 && lat <= 30.40) return 'WEST_AUSTIN_HILLS';
-          if (lat <= 30.25 && lng <= -97.72) return 'SOUTH_AUSTIN_SOCO';
-          if (lat >= 30.25 && lat <= 30.31 && lng >= -97.72 && lng <= -97.66) return 'EAST_AUSTIN_MUELLER';
-          if (lat >= 30.25 && lat <= 30.29 && lng >= -97.765 && lng <= -97.725) return 'DOWNTOWN_CAPITOL';
-          return 'DOWNTOWN_CAPITOL';
-        }
-      }
-      if (currentCity === 'philadelphia') {
-        // PHILADELPHIA_METRO_BBOX guard: min_lat 39.87 max_lat 40.14 min_lng -75.28 max_lng -74.95
-        if (lat >= 39.87 && lat <= 40.14 && lng >= -75.28 && lng <= -74.95) {
-          if (lat >= 40.005 && lng >= -75.115) return 'NORTHEAST_ROOSEVELT_BLVD';
-          if (lat >= 40.032 && lng <= -75.16) return 'GERMANTOWN_MT_AIRY';
-          if (lat >= 39.96 && lat <= 40.01 && lng >= -75.15 && lng <= -75.105) return 'RIVER_WARDS_KENSINGTON';
-          if (lat >= 39.963 && lng <= -75.235) return 'NORTH_PHILLY_TEMPLE';
-          if (lat >= 39.933 && lat <= 39.972 && lng <= -75.188) return 'WEST_PHILLY_UNIVERSITY_CITY';
-          if (lat <= 39.952 && lng >= -75.20) return 'SOUTH_PHILLY_PASSYUNK';
-          if (lat >= 39.946 && lng <= -75.152) return 'OLD_CITY_NORTHERN_LIBERTIES';
-          if (lat >= 39.938 && lng <= -75.195) return 'CENTER_CITY_RITTENHOUSE';
-          return 'CENTER_CITY_RITTENHOUSE';
-        }
-      }
-      if (currentCity === 'washington_dc') {
-        // DC_METRO_BBOX guard: min_lat 38.79 max_lat 38.995 min_lng -77.12 max_lng -76.909
-        if (lat >= 38.79 && lat <= 38.995 && lng >= -77.12 && lng <= -76.909) {
-          if (lat <= 38.884 && lng >= -76.986) return 'HILL_EAST_FAIRLINTON';
-          if (lat <= 38.878 && lng >= -76.988) return 'ANACOSTIA_EAST_OF_THE_RIVER';
-          if (lat >= 38.926 && lng <= -77.00 && lng >= -77.04) return 'COLUMBIA_HEIGHTS_PETWORTH';
-          if (lat >= 38.926 && lng >= -77.00) return 'BROOKLAND_RHODE_ISLAND_AVE';
-          if (lat >= 38.90 && lng <= -77.045) return 'GEORGETOWN_FOGGY_BOTTOM';
-          if (lat >= 38.90 && lng <= -77.022) return 'DUPONT_KALORAMA_UPTOWN';
-          if (lat <= 38.90 && lng >= -76.995 && lng <= -76.972) return 'CAPITOL_HILL_EAST_END';
-          return 'DOWNTOWN_NOMA_CAPITOL_RIVERFRONT';
-        }
-      }
-      if (lat >= 37.0 && lat <= 38.5 && lng >= -123.0 && lng <= -121.5) {
-        if (lat >= 37.835 && lng <= -122.35) return 'MARIN_NORTH_BAY';
-        if (lat <= 37.460 && lng >= -122.20) return 'SILICON_VALLEY_SOUTH_BAY';
-        if (lat >= 37.420 && lat <= 37.700 && lng >= -122.480 && lng <= -122.180) return 'PENINSULA';
-        if (lng >= -122.350) return 'EAST_BAY';
-        return 'SAN_FRANCISCO_CORE';
-      }
-      if (lat >= 40.785 && lat <= 40.915 && lng >= -73.935 && lng <= -73.765) return 'Bronx';
-      if (lat >= 40.495 && lat <= 40.650 && lng >= -74.255 && lng <= -74.050) return 'Staten Island';
-      if (lat >= 40.540 && lat <= 40.800 && lng >= -73.960 && lng <= -73.700 && lng > -73.930) return 'Queens';
-      if (lat >= 40.570 && lat <= 40.740 && lng >= -74.050 && lng <= -73.830) return 'Brooklyn';
-      return 'Manhattan';
+      if (!lat || !lng) return '';
+      // Server grid properties carry borough; this fallback snaps to the
+      // nearest submarket (any metro) within 25 km, else reports unknown.
+      return resolveDivisionByNearestSubmarket(lat, lng) || '';
     }
   </script>
   <script>

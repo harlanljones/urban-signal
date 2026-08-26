@@ -94,6 +94,9 @@ CITY_EXPORT_NAMES = {
     CityId.WASHINGTON_DC: ("DC_METRO_BBOX", "DC_DIVISION_BBOXES", "DC_DIVISIONS", "DC_SUBMARKETS"),
     CityId.MINNEAPOLIS: ("MINNEAPOLIS_METRO_BBOX", "MINNEAPOLIS_DIVISION_BBOXES", "MINNEAPOLIS_DIVISIONS", "MINNEAPOLIS_SUBMARKETS"),
     CityId.SAN_DIEGO: ("SAN_DIEGO_METRO_BBOX", "SAN_DIEGO_DIVISION_BBOXES", "SAN_DIEGO_DIVISIONS", "SAN_DIEGO_SUBMARKETS"),
+    CityId.HOUSTON: ("HOUSTON_METRO_BBOX", "HOUSTON_DIVISION_BBOXES", "HOUSTON_DIVISIONS", "HOUSTON_SUBMARKETS"),
+    CityId.INDIANAPOLIS: ("INDIANAPOLIS_METRO_BBOX", "INDIANAPOLIS_DIVISION_BBOXES", "INDIANAPOLIS_DIVISIONS", "INDIANAPOLIS_SUBMARKETS"),
+    CityId.WICHITA: ("WICHITA_METRO_BBOX", "WICHITA_DIVISION_BBOXES", "WICHITA_DIVISIONS", "WICHITA_SUBMARKETS"),
 }
 
 EXPORT_ATTR_MAP = {
@@ -303,9 +306,11 @@ class TestDashboardWiring:
     """A registration is done when the city appears on the map — not when
     REGISTRY accepts it (AGENTS.md, "City registration rule").
 
-    The map is three layers: the dashboard's selector option, its CITY_CONFIGS
-    entry (divisions/presets), and the synced workers static copy. A registry
-    entry missing from any layer fails the gate in the same run.
+    The national map has three layers: the dashboard's METRO_META entry (chip
+    label + deep-link validation), the snapshot manifest's metro_index/tile
+    data the chips and viewport loader are driven from, and the synced workers
+    static copy. A registry entry missing from any layer fails the gate in the
+    same run.
     """
 
     DASHBOARD = REPO_ROOT / "apps" / "api" / "src" / "serving" / "dashboard.py"
@@ -315,43 +320,50 @@ class TestDashboardWiring:
         assert self.DASHBOARD.exists(), f"{self.DASHBOARD} missing — the map was deleted?"
         return self.DASHBOARD.read_text()
 
-    def test_every_registered_city_has_a_selector_option(self):
-        src = self._dashboard()
-        missing = [
-            cid.value
-            for cid in REGISTRY
-            if f'<option value="{cid.value}"' not in src
-        ]
-        assert not missing, (
-            f"registered but not on the map selector: {missing}. "
-            f"Wire dashboard options in the same spine hold as the REGISTRY entry."
-        )
-
-    def test_every_registered_city_has_a_config_entry(self):
+    def test_every_registered_city_has_a_metro_meta_entry(self):
         import re
 
         src = self._dashboard()
         missing = [
             cid.value
             for cid in REGISTRY
-            if not re.search(rf"(?m)^\s+{re.escape(cid.value)}: \{{", src)
+            if not re.search(rf"(?m)^\s+{re.escape(cid.value)}: \{{ name:", src)
         ]
         assert not missing, (
-            f"registered but missing from CITY_CONFIGS: {missing}. "
-            f"A city without center/divisions/presets cannot render."
+            f"registered but not on the map (no METRO_META entry): {missing}. "
+            f"Wire METRO_META in the same spine hold as the REGISTRY entry."
         )
 
-    def test_worker_static_copy_carries_every_city(self):
+    def test_metro_chips_nav_is_present(self):
+        src = self._dashboard()
+        assert 'id="metro-chips"' in src, (
+            "metro chip navigation missing — every registered city must be "
+            "reachable on the all-metros map"
+        )
+
+    def test_worker_static_copy_is_in_sync_and_carries_every_city(self):
+        import re
+
+        from src.serving.dashboard import get_dashboard_html
+
         if not (REPO_ROOT / "apps" / "dashboard").exists():
             pytest.skip("apps/dashboard deployment surface removed from the tree — no static copy to keep in sync")
         assert self.WORKER_STATIC.exists(), (
             f"{self.WORKER_STATIC} missing while the rest of apps/dashboard exists — "
             f"regenerate it from get_dashboard_html()"
         )
-        static = self.WORKER_STATIC.read_text()
-        stale = [cid.value for cid in REGISTRY if f'"{cid.value}"' not in static]
+        rendered = get_dashboard_html()
+        assert self.WORKER_STATIC.read_text() == rendered, (
+            f"{self.WORKER_STATIC} is a stale static copy. "
+            f"Run python scripts/export_dashboard.py before closing the wave."
+        )
+        stale = [
+            cid.value
+            for cid in REGISTRY
+            if not re.search(rf"(?m)^\s+{re.escape(cid.value)}: \{{ name:", rendered)
+        ]
         assert not stale, (
-            f"apps/dashboard/public/index.html is a stale static copy — missing {stale}. "
+            f"apps/dashboard/public/index.html lost metro metadata for {stale}. "
             f"Re-sync it from get_dashboard_html() before closing the wave."
         )
 
@@ -379,3 +391,49 @@ class TestSnapshotWiring:
             f"exported to the KV snapshot but not registered: {extra}. "
             f"Drop the stale entry or register the city."
         )
+
+    def test_grid_tiles_cover_every_registered_city(self, tmp_path):
+        """The national map renders cities from res-5 viewport tiles: a metro
+        with zero tiles is invisible no matter how far the user zooms."""
+        import asyncio
+        import json
+        from typing import Any
+
+        from src.export.snapshot_builder import (
+            CATALYST_THRESHOLD,
+            DEFAULT_RESOLUTION,
+            build_snapshot,
+        )
+
+        class StubEngine:
+            def predict_cell_features(
+                self, h3_index: str, feature_dict: dict[str, Any], include_shap: bool = True
+            ) -> dict[str, Any]:
+                return {
+                    "h3_index": h3_index,
+                    "resolution": DEFAULT_RESOLUTION,
+                    "lims_score": float(feature_dict.get("lims_score", 50.0)),
+                    "delta_6m_p50": 0.05,
+                    "delta_12m_spillover": 0.12,
+                    "prob_18m_macro_outperformance": 0.5,
+                    "is_catalyst": float(feature_dict.get("lims_score", 0.0)) >= CATALYST_THRESHOLD,
+                }
+
+        manifest = asyncio.run(build_snapshot(tmp_path / "dist", engine=StubEngine()))
+        tiled = {
+            city
+            for meta in manifest["tile_index"].values()
+            for city in meta["cities"]
+        }
+        registered = {cid.value for cid in REGISTRY}
+        missing = sorted(registered - tiled)
+        assert not missing, (
+            f"registered but invisible on the national map (no grid tiles): {missing}. "
+            f"A city without snapshot cells cannot lazy-load — check its submarkets "
+            f"and export coverage in the same spine hold as the REGISTRY entry."
+        )
+        # The published manifest must be parseable and carry the tile index.
+        assert json.loads(
+            (tmp_path / "dist" / "manifest.json").read_text()
+        )["tile_resolution"] == manifest["tile_resolution"]
+

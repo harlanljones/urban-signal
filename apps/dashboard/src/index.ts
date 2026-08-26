@@ -78,7 +78,26 @@ interface Manifest {
   resolution: number;
   k_ring: number;
   catalyst_threshold: number;
+  tile_resolution?: number;
+  tile_index?: Record<string, TileIndexEntry>;
+  metro_index?: MetroMeta[];
 }
+
+interface TileIndexEntry {
+  count: number;
+  cities: string[];
+  bbox: { min_lat: number; max_lat: number; min_lng: number; max_lng: number } | null;
+}
+
+interface MetroMeta {
+  city_id: string;
+  name: string;
+  bbox: { min_lat: number; max_lat: number; min_lng: number; max_lng: number };
+  center: { lat: number; lng: number };
+}
+
+const MAX_TILE_PARENTS_PER_REQUEST = 32;
+const H3_PARENT_PATTERN = /^[0-9a-f]{15}$/i;
 
 interface CatalystEntry {
   h3_index: string;
@@ -112,6 +131,22 @@ function normalizeCity(raw: string | null, manifest: Manifest | null): string | 
   if (alias) return alias;
   if (manifest && manifest.cities.includes(key)) return key;
   return null;
+}
+
+/** Parse and validate a comma-separated list of res-5 H3 parent indexes.
+ *  Returns null when any token is malformed so callers can reject up front. */
+function parseTileParents(raw: string): string[] | null {
+  const tokens = raw
+    .split(",")
+    .map((token) => token.trim().toLowerCase())
+    .filter((token) => token !== "");
+  if (tokens.length === 0) return null;
+  const parents: string[] = [];
+  for (const token of tokens) {
+    if (!H3_PARENT_PATTERN.test(token)) return null;
+    if (!parents.includes(token)) parents.push(token);
+  }
+  return parents;
 }
 
 async function sha256Hex(input: string): Promise<string> {
@@ -642,6 +677,20 @@ Submarket dictionary for one metro, optionally filtered by borough/division.
 ### GET /api/v1/grid?city_id=chicago
 Full H3 (resolution 9) grid with per-cell metrics. Large payload — prefer ETags.
 
+### GET /api/v1/manifest
+Snapshot metadata: supported metros with camera bboxes/centers, the res-5 H3
+grid-tile index (parent -> count/cities/bbox), and publish thresholds.
+
+### GET /api/v1/gridtiles?parents=852830bbfffffff,852ab2c3fffffff
+Viewport tiles for lazy loading: merged GeoJSON for up to 32 res-5 parent
+indexes. Valid parents come from \`tile_index\` in /api/v1/manifest. Each cell
+carries \`<metric>_metro_pct\` and \`<metric>_national_pct\` percentile ranks so
+all metros render on one comparable color scale.
+
+### GET /api/v1/catalysts/all
+Every metro's active catalysts in one document, attributed with city_id/city_name
+and sorted by descending LIMS score.
+
 ### GET /api/v1/catalysts?city_id=austin&min_lims=90&limit=25
 Strongest commercial catalyst cells. \`min_lims\` defaults to the publish
 threshold (85); \`limit\` caps at 500.
@@ -860,6 +909,35 @@ function openApiSpec(origin: string): Response {
           responses: { "200": openApiResponse("City catalog.") },
         },
       },
+      "/api/v1/manifest": {
+        get: {
+          operationId: "getManifest",
+          summary:
+            "Snapshot metadata: metros with camera bboxes, res-5 grid-tile index, thresholds.",
+          responses: { "200": openApiResponse("Manifest document.") },
+        },
+      },
+      "/api/v1/gridtiles": {
+        get: {
+          operationId: "getGridTiles",
+          summary: "Fetch viewport tiles by comma-separated res-5 H3 parent indexes (max 32).",
+          parameters: [
+            {
+              name: "parents",
+              in: "query",
+              required: true,
+              schema: { type: "string" },
+              description:
+                "Comma-separated 15-char hex res-5 H3 parent indexes. Discover valid parents via /api/v1/manifest tile_index.",
+            },
+          ],
+          responses: {
+            "200": openApiResponse("Merged FeatureCollection across requested tiles; lists missing parents."),
+            "304": { description: "ETag match — tiles unchanged." },
+            "400": openApiResponse("Missing/malformed parents or over the per-request cap."),
+          },
+        },
+      },
       "/api/v1/submarkets": {
         get: {
           operationId: "listSubmarkets",
@@ -962,6 +1040,18 @@ function openApiSpec(origin: string): Response {
           },
         },
       },
+      "/api/v1/catalysts/all": {
+        get: {
+          operationId: "getAllCatalysts",
+          summary:
+            "Every metro's active catalysts in one attributed, LIMS-ranked feed document.",
+          responses: {
+            "200": openApiResponse("Combined catalyst payload (supports ETag revalidation)."),
+            "304": { description: "ETag match — snapshot unchanged." },
+            "404": openApiResponse("No combined catalyst snapshot published."),
+          },
+        },
+      },
     },
   };
   return new Response(`${JSON.stringify(spec, null, 2)}\n`, {
@@ -999,8 +1089,11 @@ ${cityLines}
 ## Data API (no authentication required)
 
 - \`GET ${origin}/api/v1/cities\` — supported metros.
+- \`GET ${origin}/api/v1/manifest\` — snapshot metadata incl. res-5 tile index.
+- \`GET ${origin}/api/v1/gridtiles?parents=<csv>\` — viewport tiles (max 32 parents).
 - \`GET ${origin}/api/v1/submarkets?city_id=<id>[&borough=<name>]\` — submarket dictionary.
 - \`GET ${origin}/api/v1/grid?city_id=<id>\` — full H3 grid (large).
+- \`GET ${origin}/api/v1/catalysts/all\` — all metros' catalysts, attributed + ranked.
 - \`GET ${origin}/api/v1/catalysts?city_id=<id>&min_lims=85&limit=50\` — top catalyst cells.
 - \`POST ${origin}/api/v1/predict\` — body \`{"h3_index":"<r9-cell>","include_shap":true}\`.
 
@@ -1219,6 +1312,66 @@ export default {
           catalysts,
         };
         return withHeaders(JSON.stringify(payload), 200, {
+          ...baseHeaders,
+          etag: entry.etag,
+        });
+      }
+
+      // GET /api/v1/manifest — snapshot metadata: metros, tile index, thresholds
+      if (url.pathname === "/api/v1/manifest") {
+        if (!manifest) return jsonError(404, "No snapshot manifest published.");
+        const etag = `"${(await sha256Hex(JSON.stringify(manifest))).slice(0, 32)}"`;
+        if (etagMatches(request, etag)) return new Response(null, { status: 304 });
+        return withHeaders(JSON.stringify(manifest), 200, {
+          ...baseHeaders,
+          etag,
+        });
+      }
+
+      // GET /api/v1/gridtiles?parents=<h3-res5-parents-csv>
+      // Viewport lazy-loading units produced by the batch snapshot builder.
+      if (url.pathname === "/api/v1/gridtiles") {
+        const rawParents = url.searchParams.get("parents");
+        if (!rawParents || !rawParents.trim()) {
+          return jsonError(400, "Query parameter 'parents' is required (comma-separated res-5 H3 parent indexes).");
+        }
+        const parents = parseTileParents(rawParents);
+        if (!parents) {
+          return jsonError(400, "Malformed 'parents' value: expected comma-separated 15-char hex H3 indexes.");
+        }
+        if (parents.length > MAX_TILE_PARENTS_PER_REQUEST) {
+          return jsonError(400, `Too many parents requested (${parents.length}); max ${MAX_TILE_PARENTS_PER_REQUEST} per call.`);
+        }
+
+        const features: Record<string, unknown>[] = [];
+        const missing: string[] = [];
+        for (const parent of parents) {
+          const entry = await kvJson(env, `gridtiles/${parent}`);
+          if (!entry) {
+            missing.push(parent);
+            continue;
+          }
+          const payload = entry.value as { features?: Record<string, unknown>[] };
+          features.push(...(payload.features ?? []));
+        }
+        const body = JSON.stringify({
+          count: features.length,
+          requested: parents.length,
+          missing,
+          type: "FeatureCollection",
+          features,
+        });
+        const etag = `"${(await sha256Hex(body)).slice(0, 32)}"`;
+        if (etagMatches(request, etag)) return new Response(null, { status: 304 });
+        return withHeaders(body, 200, { ...baseHeaders, etag });
+      }
+
+      // GET /api/v1/catalysts/all — every metro's catalysts, attributed and ranked
+      if (url.pathname === "/api/v1/catalysts/all") {
+        const entry = await kvJson(env, "catalysts/index");
+        if (!entry) return jsonError(404, "No combined catalyst snapshot published.");
+        if (etagMatches(request, entry.etag)) return new Response(null, { status: 304 });
+        return withHeaders(JSON.stringify(entry.value), 200, {
           ...baseHeaders,
           etag: entry.etag,
         });

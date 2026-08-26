@@ -605,6 +605,18 @@ class Settings(BaseSettings):
         description="Charlotte ODP 311 service requests layer URL",
     )
 
+    # Houston, TX (ArcGIS, US-140): City of Houston mycity2 HOUSTON311_RECENT_SR_SNOW
+    # FeatureServer — native LATITUDE/LONGITUDE doubles + point geometry, CREATED_ON
+    # epoch-ms watermark. Rolling recent window (back to 2021-07); the registration
+    # is 311-only.
+    arcgis_houston_311_url: str = Field(
+        default=(
+            "https://mycity2.houstontx.gov/gisweb01/rest/services/311/"
+            "HOUSTON311_RECENT_SR_SNOW/FeatureServer/0"
+        ),
+        description="Houston 311 recent service requests FeatureServer layer URL",
+    )
+
     # Nashville, TN (ArcGIS): issued building permits plus residential STR
     # permits as the SLA-class signal; hubNashville 311 registers as the
     # COMPLAINTS_311 feed (US-131, re-adjudicated positive from HJ-119).
@@ -635,6 +647,31 @@ class Settings(BaseSettings):
     socrata_kansas_city_311_endpoint: str = Field(
         default="https://data.kcmo.org/resource/d4px-6rwg.json",
         description="Kansas City 311 Call Center Reported Issues endpoint",
+    )
+
+    # Wichita, KS (ArcGIS, US-157): MABCD permits. The MISC/MABCD service
+    # publishes two point layers — layer 0 is Code Enforcement Violations (a
+    # documented trap) and layer 1 is the real permits SDE. ApplicationDate is
+    # the epoch-ms watermark; PermitNumber identifies the permit and OBJECTID
+    # stays out of the job-id chain as an edit counter. Only this one feed
+    # (no 311/licenses/deeds) exists open.
+    arcgis_wichita_permits_url: str = Field(
+        default=(
+            "https://gismaps.wichita.gov/ageweb/rest/services/MISC/MABCD/"
+            "FeatureServer/1"
+        ),
+        description="Wichita MABCD permits FeatureServer layer URL (layer 1; layer 0 is violations)",
+    )
+
+    # Indianapolis, IN (ArcGIS, US-144): RIMAC service requests. Native point
+    # geometry + LAT/LONG_ attributes; REQUESTEDDATETIME epoch-ms watermark.
+    # 311-only registration — permits/licenses/deeds have no open feed.
+    arcgis_indianapolis_311_url: str = Field(
+        default=(
+            "https://gis.indy.gov/server/rest/services/OpenData/"
+            "ODP_RIMACServiceRequests/FeatureServer/0"
+        ),
+        description="Indianapolis RIMAC 311 service requests FeatureServer layer URL",
     )
 
     # Kansas City, MO (Socrata): Business License Holders (US-134). Snapshot

@@ -70,6 +70,18 @@ function testEnv(options: { html?: string } = {}) {
             submarkets: { SUB_1: { borough: "Manhattan", score: 71.2 } },
           });
         }
+        if (key === "catalysts/index") {
+          return JSON.stringify({
+            count: 3,
+            threshold: 85,
+            cities: ["chicago", "nyc"],
+            catalysts: [
+              { h3_index: "892a10708b7ffff", lims_score: 97.5, borough: "Manhattan", city_id: "nyc", city_name: "New York City" },
+              { h3_index: "892a10708bfffff", lims_score: 88.0, borough: "Brooklyn", city_id: "nyc", city_name: "New York City" },
+              { h3_index: "892830bbfffffff", lims_score: 86.0, borough: "Central / Downtown", city_id: "chicago", city_name: "Chicago" },
+            ],
+          });
+        }
         if (key.startsWith("catalysts/")) {
           const city = key.slice("catalysts/".length);
           return JSON.stringify({
@@ -86,6 +98,52 @@ function testEnv(options: { html?: string } = {}) {
         if (key === "cells/index") {
           return JSON.stringify({
             "892a10708b7ffff": { h3_index: "892a10708b7ffff", lims_score: 97.5, shap_attributions: [{ f: "x", v: 0.4 }] },
+          });
+        }
+        if (key.startsWith("gridtiles/")) {
+          const parent = key.slice("gridtiles/".length);
+          if (parent === "852830bbfffffff") {
+            return JSON.stringify({
+              type: "FeatureCollection",
+              tile_parent: parent,
+              tile_resolution: 5,
+              features: [
+                {
+                  type: "Feature",
+                  id: "892a10708b7ffff",
+                  geometry: { type: "Polygon", coordinates: [[[-74.0, 40.7], [-74.0, 40.8], [-73.9, 40.8], [-74.0, 40.7]]] },
+                  properties: { h3_index: "892a10708b7ffff", city_id: "nyc", city_name: "New York City", lims_score: 97.5, lims_score_national_pct: 100, lims_score_metro_pct: 96.4 },
+                },
+              ],
+            });
+          }
+          if (parent === "852ab2c3fffffff") {
+            return JSON.stringify({
+              type: "FeatureCollection",
+              tile_parent: parent,
+              tile_resolution: 5,
+              features: [
+                {
+                  type: "Feature",
+                  id: "892a10708bfffff",
+                  geometry: { type: "Polygon", coordinates: [[[-87.7, 41.9], [-87.7, 42.0], [-87.6, 42.0], [-87.7, 41.9]]] },
+                  properties: { h3_index: "892a10708bfffff", city_id: "chicago", city_name: "Chicago", lims_score: 88.0, lims_score_national_pct: 71.2, lims_score_metro_pct: 50 },
+                },
+              ],
+            });
+          }
+          return null;
+        }
+        if (key === "catalysts/index") {
+          return JSON.stringify({
+            count: 3,
+            threshold: 85,
+            cities: ["chicago", "nyc"],
+            catalysts: [
+              { h3_index: "892a10708b7ffff", lims_score: 97.5, borough: "Manhattan", city_id: "nyc", city_name: "New York City" },
+              { h3_index: "892a10708bfffff", lims_score: 88.0, borough: "Brooklyn", city_id: "nyc", city_name: "New York City" },
+              { h3_index: "892830bbfffffff", lims_score: 86.0, borough: "Central / Downtown", city_id: "chicago", city_name: "Chicago" },
+            ],
           });
         }
         return null;
@@ -159,6 +217,88 @@ test("still rejects a city absent from the snapshot manifest", async () => {
   );
 
   expect(response.status).toBe(400);
+});
+
+// ---------------------------------------------------------------------------
+// Lazy-loading tiles + combined catalyst feed
+// ---------------------------------------------------------------------------
+
+test("manifest endpoint exposes tile index and metro metadata", async () => {
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/manifest`), testEnv() as never);
+
+  expect(response.status).toBe(200);
+  const manifest = (await response.json()) as {
+    cities: string[];
+    metro_index?: unknown;
+    tile_index?: Record<string, unknown>;
+  };
+  expect(manifest.cities.length).toBe(CITY_IDS.length);
+});
+
+test("gridtiles merges features across requested parents and reports missing", async () => {
+  const response = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/gridtiles?parents=852830bbfffffff,852ab2c3fffffff,8529999ffffffff`),
+    testEnv() as never,
+  );
+
+  expect(response.status).toBe(200);
+  const payload = (await response.json()) as {
+    count: number;
+    requested: number;
+    missing: string[];
+    features: { properties: { h3_index: string } }[];
+  };
+  expect(payload.requested).toBe(3);
+  expect(payload.missing).toEqual(["8529999ffffffff"]);
+  expect(payload.count).toBe(2);
+  expect(payload.features.map((f) => f.properties.h3_index)).toEqual(["892a10708b7ffff", "892a10708bfffff"]);
+});
+
+test("gridtiles dedupes repeated parents and is case-insensitive", async () => {
+  const response = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/gridtiles?parents=852830BBFFFFFFF,852830bbfffffff`),
+    testEnv() as never,
+  );
+
+  expect(response.status).toBe(200);
+  const payload = (await response.json()) as { count: number; requested: number; missing: string[] };
+  expect(payload.requested).toBe(1);
+  expect(payload.count).toBe(1);
+  expect(payload.missing).toEqual([]);
+});
+
+test("gridtiles rejects a missing, malformed, or oversized parents parameter", async () => {
+  const missing = await worker.fetch(new Request(`${ORIGIN}/api/v1/gridtiles`), testEnv() as never);
+  expect(missing.status).toBe(400);
+
+  const malformed = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/gridtiles?parents=not-a-parent`),
+    testEnv() as never,
+  );
+  expect(malformed.status).toBe(400);
+
+  const oversized = Array.from({ length: 33 }, (_, i) => i.toString(16).padStart(15, "0")).join(",");
+  const tooMany = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/gridtiles?parents=${oversized}`),
+    testEnv() as never,
+  );
+  expect(tooMany.status).toBe(400);
+});
+
+test("catalysts/all returns the combined attributed feed", async () => {
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/catalysts/all`), testEnv() as never);
+
+  expect(response.status).toBe(200);
+  const payload = (await response.json()) as {
+    count: number;
+    cities: string[];
+    catalysts: { city_id: string; city_name: string; lims_score: number }[];
+  };
+  expect(payload.count).toBe(3);
+  expect(payload.cities).toEqual(["chicago", "nyc"]);
+  for (const entry of payload.catalysts) {
+    expect(entry.city_name).toBeTruthy();
+  }
 });
 
 // ---------------------------------------------------------------------------
@@ -268,7 +408,7 @@ test("openapi.json describes every public data route", async () => {
   expect(response.status).toBe(200);
   const spec = (await response.json()) as { openapi: string; paths: Record<string, unknown> };
   expect(spec.openapi).toMatch(/^3\.1\./);
-  for (const path of ["/health", "/api/v1/cities", "/api/v1/submarkets", "/api/v1/grid", "/api/v1/catalysts", "/api/v1/predict"]) {
+  for (const path of ["/health", "/api/v1/cities", "/api/v1/submarkets", "/api/v1/grid", "/api/v1/catalysts", "/api/v1/predict", "/api/v1/manifest", "/api/v1/gridtiles", "/api/v1/catalysts/all"]) {
     expect(spec.paths[path]).toBeTruthy();
   }
 });

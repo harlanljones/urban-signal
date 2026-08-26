@@ -106,7 +106,7 @@ def test_pittsburgh_deeds_spec_pins_ckan_source_and_field_map():
 
     spec = get_dataset(CityId.PITTSBURGH, FeedType.DEEDS)
     assert spec.platform == "ckan"
-    assert spec.watermark_col == "RECORDDATE"
+    assert spec.watermark_col == "SALEDATE"
     assert spec.topic == "raw.municipal.deeds"
     assert spec.producer_key == "deeds"
     assert spec.id_keys == ["PARID", "RECORDDATE", "SALEDATE", "DEEDBOOK", "DEEDPAGE"]

@@ -169,6 +169,13 @@ from src.spatial.cities.san_diego import (
     SAN_DIEGO_SUBMARKETS,
     is_in_san_diego_metro,
 )
+from src.spatial.cities.houston import (
+    HOUSTON_DIVISION_BBOXES,
+    HOUSTON_DIVISIONS,
+    HOUSTON_METRO_BBOX,
+    HOUSTON_SUBMARKETS,
+    is_in_houston_metro,
+)
 from src.spatial.cities.san_francisco import (
     SAN_FRANCISCO_DIVISION_BBOXES,
     SAN_FRANCISCO_DIVISIONS,
@@ -187,6 +194,20 @@ from src.spatial.cities.seattle import (
     SEATTLE_METRO_BBOX,
     SEATTLE_SUBMARKETS,
     is_in_seattle_metro,
+)
+from src.spatial.cities.indianapolis import (
+    INDIANAPOLIS_DIVISION_BBOXES,
+    INDIANAPOLIS_DIVISIONS,
+    INDIANAPOLIS_METRO_BBOX,
+    INDIANAPOLIS_SUBMARKETS,
+    is_in_indianapolis_metro,
+)
+from src.spatial.cities.wichita import (
+    WICHITA_DIVISION_BBOXES,
+    WICHITA_DIVISIONS,
+    WICHITA_METRO_BBOX,
+    WICHITA_SUBMARKETS,
+    is_in_wichita_metro,
 )
 
 __all__ = [
@@ -321,4 +342,19 @@ __all__ = [
     "SAN_DIEGO_DIVISIONS",
     "SAN_DIEGO_SUBMARKETS",
     "is_in_san_diego_metro",
+    "HOUSTON_METRO_BBOX",
+    "HOUSTON_DIVISION_BBOXES",
+    "HOUSTON_DIVISIONS",
+    "HOUSTON_SUBMARKETS",
+    "is_in_houston_metro",
+    "INDIANAPOLIS_METRO_BBOX",
+    "INDIANAPOLIS_DIVISION_BBOXES",
+    "INDIANAPOLIS_DIVISIONS",
+    "INDIANAPOLIS_SUBMARKETS",
+    "is_in_indianapolis_metro",
+    "WICHITA_METRO_BBOX",
+    "WICHITA_DIVISION_BBOXES",
+    "WICHITA_DIVISIONS",
+    "WICHITA_SUBMARKETS",
+    "is_in_wichita_metro",
 ]
