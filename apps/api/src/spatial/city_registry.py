@@ -1580,24 +1580,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 where="county = 'Travis'",
                 field_map={'license_id': ['license_id'], 'license_type': ['license_type'], 'effective_date': ['current_issued_date'], 'expiration_date': ['expiration_date'], 'premises_name': ['owner'], 'dba': ['trade_name'], 'address_street': ['address'], 'status': ['license_status']},
             ),
-            # US-71: APD NIBRS Group A Offenses (Socrata `thrk-bqb6`). Rows carry
-            # no lat/lng — only zip_code + census_block_group — so needs_geocode
-            # flips the coordinate requirement and the ADR 0004 geocoder resolves
-            # coordinates from the zip_code context at parse time (no address
-            # string is published, so zip_code alone is the only geocode key).
-            FeedType.CRIME: DatasetSpec(
-                endpoint=settings.socrata_austin_crime_endpoint,
-                platform="socrata",
-                watermark_col="occurred_date",
-                id_keys=["offenseid"],
-                topic="raw.municipal.crime",
-                interval_seconds=300.0,
-                producer_key="crime",
-                needs_geocode=True,
-                geocode_context="zip_code",
-                expected_cadence_days=7,
-                field_map={'incident_id': ['offenseid'], 'offense_type': ['nibrs_desc', 'nibrs_category'], 'occurred_date': ['occurred_date']},
-            ),
+            # US-265 note: Austin NIBRS crime (thrk-bqb6) is NOT registered — the
+            # feed publishes no lat/lng and no street address (zip_code only),
+            # which the ADR-0004 geocoder cannot resolve. Deferred pending a
+            # coordinate- or address-bearing APD crime resource.
         },
     ),
     CityId.CINCINNATI: CityRegistration(
@@ -3505,30 +3491,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 retention_days=30,
                 field_map=DALLAS_311_FIELD_MAP,
             ),
-            # Dallas Crimes (Socrata `pumt-d92b`, "Dallas - Crimes"). No lat/lng
-            # is published — only incident address + zip — so needs_geocode flips
-            # the coordinate requirement and the ADR 0004 geocoder resolves
-            # coordinates from the address at parse time. The dataset has no
-            # `offenseid`/`offensenumber` column; the unique key is
-            # `offenseservicenumber`, so it is used for both incident_id and
-            # id_keys.
-            FeedType.CRIME: DatasetSpec(
-                endpoint=settings.socrata_dallas_crime_endpoint,
-                producer_key="crime",
-                platform="socrata",
-                watermark_col="offensedate",
-                id_keys=["offenseservicenumber"],
-                topic="raw.municipal.crime",
-                interval_seconds=300.0,
-                needs_geocode=True,
-                geocode_context="Dallas, TX",
-                expected_cadence_days=7,
-                field_map={
-                    'incident_id': ['offenseservicenumber'],
-                    'offense_type': ['offensename', 'offensedescription'],
-                    'occurred_date': ['offensedate', 'offensereporteddate'],
-                },
-            ),
+            # US-265 note: Dallas Crimes (pumt-d92b) is NOT registered — the feed
+            # publishes no lat/lng and no street-address column, so it cannot be
+            # geocoded by ADR-0004. Deferred pending a coordinate- or
+            # address-bearing Dallas crime resource.
         },
     ),
     CityId.LOUISVILLE: CityRegistration(
@@ -3586,7 +3552,7 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 max_record_count=1000,
                 needs_geocode=True,
                 geocode_context="Louisville, KY",
-                field_map={'incident_id': ['incident_number'], 'offense_type': ['offense_code_name', 'offense_classification'], 'occurred_date': ['date_occurred'], 'reported_date': ['date_reported']},
+                field_map={'incident_id': ['incident_number'], 'offense_type': ['offense_code_name', 'offense_classification'], 'occurred_date': ['date_occurred'], 'reported_date': ['date_reported'], 'address': ['block_address']},
             ),
             # US-265: Louisville active construction permits (ArcGIS, native lat/long).
             FeedType.PERMITS: DatasetSpec(
@@ -3702,6 +3668,27 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 watermark_format='%m/%d/%Y %I:%M:%S %p',
                 field_map=SAN_JOSE_FIELD_MAP['311'],
                 endpoint_by_year={'2026': settings.ckan_san_jose_311_endpoint},
+            ),
+            # US-265: San Jose Police Calls for Service (CKAN). Address-only
+            # (no coordinate column in any package resource), so needs_geocode
+            # resolves coordinates via ADR-0004 at parse time.
+            FeedType.CRIME: DatasetSpec(
+                endpoint=settings.ckan_san_jose_crime_endpoint,
+                platform="ckan",
+                producer_key="crime",
+                watermark_col="OFFENSE_DATE",
+                id_keys=["EID", "CALL_NUMBER", "_id"],
+                topic=settings.topic_crime,
+                interval_seconds=300.0,
+                expected_cadence_days=7,
+                needs_geocode=True,
+                geocode_context="San Jose, CA",
+                field_map={
+                    'incident_id': ['EID', 'CALL_NUMBER'],
+                    'offense_type': ['CALL_TYPE'],
+                    'occurred_date': ['OFFENSE_DATE', 'REPORT_DATE'],
+                    'address': ['ADDRESS'],
+                },
             ),
         },
     ),
@@ -3860,9 +3847,7 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 oid_field='OBJECTID',
                 max_record_count=2000,
                 order_by='IssuedDate DESC',
-                needs_geocode=True,
-                geocode_context='Boise, ID',
-                field_map=BOISE_PERMITS_FIELD_MAP,
+                field_map={'job_id': ['RecordID'], 'cost': ['JobValue'], 'issued_date': ['IssuedDate'], 'latitude': ['Y'], 'longitude': ['X']},
             ),
             # US-265: Boise BPD crimes (ArcGIS; coords from point geometry).
             FeedType.CRIME: DatasetSpec(

@@ -1003,8 +1003,8 @@ class Settings(BaseSettings):
     # advertises Idaho state-plane geometry; ArcGIS queries request WGS84 and
     # the city registry declares address geocoding as the fallback.
     arcgis_boise_permits_url: str = Field(
-        default="https://services1.arcgis.com/WHM6qC35aMtyAAlN/arcgis/rest/services/Housing_OpenData/FeatureServer/0",
-        description="Boise residential permits ArcGIS FeatureServer layer URL",
+        default="https://services1.arcgis.com/WHM6qC35aMtyAAlN/arcgis/rest/services/PDS_BuildingPermits_HighImpact/FeatureServer/0",
+        description="Boise high-impact building permits ArcGIS FeatureServer layer URL",
     )
     # Boise Police Department crime incidents (ArcGIS `BPD_Crimes_Public`).
     arcgis_boise_crime_url: str = Field(
@@ -1110,6 +1110,10 @@ class Settings(BaseSettings):
     arcgis_boise_crime_url: str = Field(
         default="https://services1.arcgis.com/WHM6qC35aMtyAAlN/arcgis/rest/services/BPD_Crimes_Public/FeatureServer",
         description="Boise BPD crimes ArcGIS FeatureServer",
+    )
+    ckan_san_jose_crime_endpoint: str = Field(
+        default="ckan://data.sanjoseca.gov/dc0ec99c-0c6b-45fb-b1ec-faf072fe4833",
+        description="San Jose Police Calls for Service (2026, updated daily) CKAN datastore resource",
     )
 
     # Address geocoding (ADR 0004): confidence floor gates wrong-cell risk —
