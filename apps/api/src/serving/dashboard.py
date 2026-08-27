@@ -1552,19 +1552,28 @@ def get_dashboard_html() -> str:
       return R * c;
     }
 
+    // Esri Dark Gray Canvas: keyless dark raster basemap, split into a
+    // geometry base and a labels/roads reference overlay. Tiles are {z}/{y}/{x}
+    // and stop at z16 -- source maxzoom lets MapLibre overzoom the last real
+    // tile instead of pulling Esri's light "Map data not yet available" placeholder.
+    const BASEMAP_MAX_TILE_ZOOM = 16;
+    const BASEMAP_TILE_ROOT = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas';
+
     const MAP_STYLE = {
       version: 8,
       sources: {
-        'carto-dark': {
+        'basemap-dark': {
           type: 'raster',
-          tiles: [
-            'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
-            'https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
-            'https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
-            'https://d.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
-          ],
+          tiles: [BASEMAP_TILE_ROOT + '/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'],
           tileSize: 256,
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          maxzoom: BASEMAP_MAX_TILE_ZOOM,
+          attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; Esri, HERE, Garmin, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        },
+        'basemap-dark-labels': {
+          type: 'raster',
+          tiles: [BASEMAP_TILE_ROOT + '/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}'],
+          tileSize: 256,
+          maxzoom: BASEMAP_MAX_TILE_ZOOM
         }
       },
       layers: [
@@ -1574,9 +1583,16 @@ def get_dashboard_html() -> str:
           paint: { 'background-color': '#080c14' }
         },
         {
-          id: 'carto-dark-layer',
+          id: 'basemap-dark-layer',
           type: 'raster',
-          source: 'carto-dark',
+          source: 'basemap-dark',
+          minzoom: 0,
+          maxzoom: 20
+        },
+        {
+          id: 'basemap-dark-labels-layer',
+          type: 'raster',
+          source: 'basemap-dark-labels',
           minzoom: 0,
           maxzoom: 20
         }
