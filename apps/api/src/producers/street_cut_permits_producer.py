@@ -8,11 +8,17 @@ reinvestment show up here before building permits do.
 Ablation rule (US-72): this feed is ingested for a separate "disruption index"
 context feature. Nothing here feeds the LIMS score.
 
-NYC's DOT street-construction permits (``tqtj-sjs8``) are parsed for their
-shape but stay **unregistered**: current rows are address-only (the ``wkt``
-State-Plane geometry exists only on 2016-2023 rows), so they cannot produce H3
-events until a geocoding capability lands (same blocker as LA crime / Sacramento
-permits).
+US-196 (2026-08-27): the CDOT permit master (``pubx-yq2d``, 93.4% native
+coords on the newest 500) rides along as an unpolled ``companion_endpoints``
+entry on the Chicago spec. NYC's DOT street-construction permits
+(``tqtj-sjs8``) stay **unregistered**: the G5 staging geocode probe of the
+newest 500 rows recovered only 78.0% of coordinates (house-number rows 60.1%,
+intersection rows 89.2%) — below the 95% address-geocode floor for both the
+full spec and the house-number-filtered fallback. ``_nyc_row`` is kept for the
+shape so a future geocoding strategy can unlock it without producer surgery.
+
+Rows missing coordinates on specs that declare ``needs_geocode`` (ADR 0004)
+recover their point via ``geocode_row_if_declared`` before being dropped.
 """
 
 import argparse
@@ -28,6 +34,7 @@ from src.producers.carto_client import CartoClient
 from src.producers.ckan_client import CkanClient
 from src.producers.socrata_client import SocrataClient
 from src.schemas.models import StreetCutEvent
+from src.spatial.geocoder import geocode_row_if_declared
 from src.spatial.h3_indexer import H3SpatialIndexer
 
 logger = logging.getLogger(__name__)
@@ -98,7 +105,7 @@ class StreetCutPermitsProducer:
             )
         return client
 
-    def _chicago_row(self, row: dict[str, Any]) -> StreetCutEvent | None:
+    def _chicago_row(self, row: dict[str, Any], city_id: str = "chicago") -> StreetCutEvent | None:
         """Parse a Chicago CDOT street-closure row (``jdis-5sry``)."""
         lat_raw = row.get("latitude") or row.get("lat")
         lng_raw = row.get("longitude") or row.get("lng")
@@ -109,6 +116,20 @@ class StreetCutPermitsProducer:
                 lat_raw = loc["coordinates"][1]
         lat = _as_float(lat_raw)
         lng = _as_float(lng_raw)
+        if lat is None or lng is None or (lat == 0.0 and lng == 0.0):
+            # ADR 0004: specs that declare needs_geocode recover the missing
+            # point from the composed street address; feeds without the
+            # declaration fall through unchanged (dropped below).
+            street_fallback = row.get("streetname") or row.get("street")
+            if street_fallback:
+                fallback_address = (
+                    f"{row.get('streetnumberfrom', '')} "
+                    f"{row.get('direction', '')} {street_fallback} "
+                    f"{row.get('suffix', '')}".strip()
+                )
+                point = geocode_row_if_declared(city_id, "street_cut", fallback_address)
+                if point is not None:
+                    lat, lng = point
         if lat is None or lng is None or (lat == 0.0 and lng == 0.0):
             return None
 
@@ -210,7 +231,7 @@ class StreetCutPermitsProducer:
         try:
             if city_id is not None and "nyc" in str(city_id).lower():
                 return self._nyc_row(row)
-            return self._chicago_row(row)
+            return self._chicago_row(row, city_id=str(city_id or "chicago"))
         except Exception as e:
             logger.warning("Error parsing street-cut row: %s", e)
             return None

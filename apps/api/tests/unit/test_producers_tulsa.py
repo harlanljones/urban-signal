@@ -38,11 +38,11 @@ def test_tulsa_geometry_is_self_consistent():
     assert {meta.city_id for meta in TULSA_SUBMARKETS.values()} == {"tulsa"}
 
 
-def test_tulsa_registers_rolling_311_only():
+def test_tulsa_registers_rolling_311_and_crime():
     city = CityId.TULSA
     assert normalize_city("tulsa ok") is city
     assert normalize_city("tulsa county") is city
-    assert set(REGISTRY[city].datasets) == {FeedType.COMPLAINTS_311}
+    assert set(REGISTRY[city].datasets) == {FeedType.COMPLAINTS_311, FeedType.CRIME}
     complaints = get_dataset(city, FeedType.COMPLAINTS_311)
     assert complaints.platform == "arcgis"
     assert complaints.watermark_col == "case_opened"

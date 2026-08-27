@@ -50,3 +50,25 @@ Orchestrator serial hold: apply GO specs (Sacramento companion, Chicago
 `pubx-yq2d`, NYC `tqtj-sjs8`) + street-cut geocode hook; skip Denver and
 `hr8i-6s6s` primary; `pytest -m interlock`. Re-probe Sacramento before
 hold if after 2026-09-15 and Status_Date has not moved.
+
+## Current step
+
+DONE (2026-08-27, evening). Orchestrator serial hold applied per
+`docs/research/wave-3-feed-expansion.md`:
+- Chicago STREET_CUT spec: `needs_geocode=True` + `geocode_context` +
+  `field_map` (jdis columns) + `companion_endpoints={"cdot_permits_master"`
+  → pubx-yq2d} (unpolled until companion polling lands).
+- Sacramento county PERMITS spec: `companion_endpoints` entry for the city
+  `BldgPermitIssued_CurrentYear` table. G5 staging probe = 90.4% (< 95%
+  floor) → inert companion only; recheck condition documented in config.
+- `street_cut_permits_producer`: ADR 0004 `geocode_row_if_declared` fallback
+  for coordinate-less rows on needs_geocode specs + unit tests.
+- NYC `tqtj-sjs8`: NOT registered — G5 staging 78.0% (house 60.1%,
+  intersection 89.2%) < 95% for both the full spec and the house-filtered
+  fallback. `_nyc_row` shape retained; config comment records the numbers.
+- Denver SLA/DEEDS + `hr8i-6s6s`: NO-GO per contract (no address / subset).
+- Stale global-state tests refreshed: milwaukee, tulsa, louisville, boston,
+  las_vegas, leaf-naming (49→57), feedtype-taxonomy (crime/street-cut sets),
+  street-cut scope, submarkets (miami_dade resolves).
+- Gates: `pytest -m interlock` 22/22; full suite 1574 passed / 3 skipped.
+- Roadmap §4.3.1 records the outcome. Not committed (policy: user commits).

@@ -519,7 +519,7 @@ class TestSpatialDistanceAndBoroughs:
 
         assert get_city_for_coordinate(0.0, 0.0) is None
         assert get_city_for_coordinate(34.0522, -118.2437) == "los_angeles"
-        assert get_city_for_coordinate(25.7617, -80.1918) is None  # Miami, unregistered
+        assert get_city_for_coordinate(25.7617, -80.1918) == "miami_dade"  # downtown Miami
         assert get_city_for_coordinate(51.5074, -0.1278) is None  # London
 
     def test_is_in_sf_metro(self, sample_sf_coords, sample_chicago_coords, sample_nyc_coords):

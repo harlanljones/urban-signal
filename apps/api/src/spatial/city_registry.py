@@ -1143,8 +1143,26 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_street_cut,
                 interval_seconds=600.0,
                 producer_key="street_cut",
-                
+
                 expected_cadence_days=7,
+                needs_geocode=True,
+                geocode_context="Chicago, IL",
+                companion_endpoints={
+                    "cdot_permits_master": settings.socrata_chicago_cdot_permits_endpoint,
+                },
+                field_map={
+                    "permit_id": ["applicationnumber", "uniquekey"],
+                    "permit_type": ["applicationtype", "applicationdescription"],
+                    "work_type": ["worktypedescription", "worktype"],
+                    "status": ["applicationstatus", "currentmilestone"],
+                    "address": ["streetnumberfrom", "direction", "streetname", "suffix"],
+                    "latitude": ["latitude"],
+                    "longitude": ["longitude"],
+                    "issued_date": ["applicationissueddate"],
+                    "start_date": ["applicationstartdate"],
+                    "end_date": ["applicationenddate"],
+                    "fees": ["totalfees"],
+                },
             ),
         },
     ),
@@ -3292,11 +3310,14 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                
+
                 expected_cadence_days=7,
                 oid_field='OBJECTID',
                 max_record_count=2000,
                 needs_geocode=False,
+                companion_endpoints={
+                    "city_bldg_permits_issued_current_year": settings.arcgis_sacramento_city_permits_url,
+                },
                 field_map={'job_id': ['Application', 'OBJECTID'], 'issuance_date': ['ISSUED_DATE'], 'filing_date': ['APPLIED_DATE', 'OpenDate'], 'job_type': ['Application_Type', 'Application_Subtype', 'PermitCategory'], 'cost': ['Valuation'], 'status': ['Application_Status'], 'address_street': ['Address'], 'zipcode': ['ZIP', 'ZipCode'], 'bbl': ['Parcel_Number']},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(

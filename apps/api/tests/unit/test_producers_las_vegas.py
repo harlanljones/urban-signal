@@ -70,11 +70,12 @@ class TestLasVegasRegistration:
         reg = _registry()[LV]
         assert is_in_las_vegas_metro(reg.center["lat"], reg.center["lng"])
 
-    def test_exactly_two_feeds_are_registered(self):
+    def test_exactly_three_feeds_are_registered(self):
         _skip_if_no_spine()
         assert set(_registry()[LV].datasets) == {
             FeedType.PERMITS,
             FeedType.DEEDS,
+            FeedType.CRIME,
         }
 
     @pytest.mark.parametrize("absent_feed", [FeedType.SLA, FeedType.COMPLAINTS_311])

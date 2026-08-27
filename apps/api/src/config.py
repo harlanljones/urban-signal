@@ -196,12 +196,22 @@ class Settings(BaseSettings):
     )
 
     # Street-cut / utility permit feeds (US-81): disruption context signal.
-    # Chicago CDOT street closures (native coordinates) is the registered feed;
-    # NYC's DOT street-construction permits (tqtj-sjs8) stay deferred — current
-    # rows are address-only.
+    # Chicago CDOT street closures (jdis-5sry, native coordinates) is the
+    # registered feed; the CDOT permit master (pubx-yq2d) rides along as an
+    # unpolled companion until companion polling lands (US-196: 2026-08-27 G5
+    # staging probe — 98.5% of address-bearing rows recovered). NYC's DOT
+    # street-construction permits (tqtj-sjs8) stay unregistered: the 2026-08-27
+    # G5 staging probe of the newest 500 rows recovered only 78.0% of
+    # coordinates (house-number rows 60.1%, intersection rows 89.2%) — below
+    # the 95% address-geocode floor for both the full spec and the
+    # house-number-filtered fallback.
     socrata_chicago_street_cut_endpoint: str = Field(
         default="https://data.cityofchicago.org/resource/jdis-5sry.json",
         description="Chicago CDOT street closures endpoint",
+    )
+    socrata_chicago_cdot_permits_endpoint: str = Field(
+        default="https://data.cityofchicago.org/resource/pubx-yq2d.json",
+        description="Chicago CDOT permit master (street-cut companion; unpolled until companion polling lands)",
     )
 
     # San Diego (US-91): static-CSV open-data portal (seshat.datasd.org) — no
@@ -834,6 +844,18 @@ class Settings(BaseSettings):
             "Permits/FeatureServer/0"
         ),
         description="Sacramento County permits FeatureServer layer URL",
+    )
+    arcgis_sacramento_city_permits_url: str = Field(
+        default=(
+            "https://services5.arcgis.com/54falWtcpty3V47Z/arcgis/rest/services/"
+            "BldgPermitIssued_CurrentYear/FeatureServer/0"
+        ),
+        description=(
+            "Sacramento city issued-permits table (US-196 companion; unpolled). "
+            "2026-08-27 G5 staging probe recovered 90.4% of the newest 500 "
+            "rows — below the 95% address-geocode floor, so this stays an "
+            "inert companion until companion polling and a recovery fix land."
+        ),
     )
     arcgis_sacramento_311_url: str = Field(
         default=(

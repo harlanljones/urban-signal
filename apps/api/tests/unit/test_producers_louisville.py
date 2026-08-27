@@ -238,7 +238,13 @@ class TestLouisvilleSpineRegistration:
 
         assert normalize_city("louisville ky") is CityId.LOUISVILLE
         reg = REGISTRY[CityId.LOUISVILLE]
-        assert set(reg.datasets) == {FeedType.COMPLAINTS_311, FeedType.SLA}
+        assert set(reg.datasets) == {
+            FeedType.COMPLAINTS_311,
+            FeedType.SLA,
+            FeedType.PERMITS,
+            FeedType.CRIME,
+            FeedType.STREET_CUT,
+        }
         assert reg.datasets[FeedType.COMPLAINTS_311].platform == "arcgis"
         assert reg.datasets[FeedType.SLA].where == "County = 'Jefferson'"
 
@@ -256,6 +262,6 @@ class TestLouisvilleSpineRegistration:
     def test_unverified_families_remain_absent(self):
         from src.spatial.city_registry import CityId, FeedType, get_dataset
 
-        for feed in (FeedType.PERMITS, FeedType.DEEDS):
-            with pytest.raises(KeyError, match="no.*feed"):
-                get_dataset(CityId.LOUISVILLE, feed)
+        # Permits/crime/street-cut registered since; deeds remains unverified.
+        with pytest.raises(KeyError, match="no.*feed"):
+            get_dataset(CityId.LOUISVILLE, FeedType.DEEDS)

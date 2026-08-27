@@ -1,8 +1,9 @@
 """Unit tests for the US-81 street-cut / street-closure feeds (CHI).
 
 Fixtures mirror live rows probed 2026-08-24 from Chicago's CDOT street-closure
-dataset (``jdis-5sry``). NYC's DOT street-construction permits stay deferred —
-current rows are address-only.
+dataset (``jdis-5sry``). US-196: the CDOT permit master rides along as an
+unpolled companion; NYC's DOT street-construction permits stay unregistered
+after the 2026-08-27 G5 staging probe (78.0% coordinate recovery < 95% floor).
 """
 
 from unittest.mock import patch
@@ -102,12 +103,14 @@ def test_nyc_street_cut_row_without_coordinates_is_dropped(producer):
 
 
 def test_street_cut_registration_scope_and_job_names():
-    # Chicago registers the geocodable CDOT street-closure feed; NYC stays out
-    # (current rows address-only, blocked on geocoding) and so do all other
-    # metros for this signal.
+    # Chicago registers the geocodable CDOT street-closure feed. Louisville
+    # and Tampa carry geocodable street-cut feeds as well; NYC stays out
+    # (current rows address-only, pending the G5 staging gate) and so do all
+    # other metros for this signal.
+    street_cut_cities = {CityId.CHICAGO, CityId.LOUISVILLE, CityId.TAMPA}
     for city, reg in REGISTRY.items():
         registered = FeedType.STREET_CUT in reg.datasets
-        assert registered == (city == CityId.CHICAGO), (city, registered)
+        assert registered == (city in street_cut_cities), (city, registered)
     assert get_job_name(FeedType.STREET_CUT, CityId.CHICAGO) == "street_cut_chicago"
     # NYC carries no job suffix, so any feed on it gets the plain name.
     assert get_job_name(FeedType.STREET_CUT, CityId.NYC) == "street_cut"
@@ -119,3 +122,49 @@ def test_chicago_street_cut_declares_daily_cadence_and_topic():
     assert spec.endpoint.endswith("jdis-5sry.json")
     assert spec.topic == "raw.municipal.street_cut"
     assert spec.watermark_col == "applicationissueddate"
+
+
+def test_chicago_street_cut_declares_geocode_fallback_and_companion():
+    # US-196: ADR 0004 geocode fallback for the rare coordinate-less row,
+    # plus the CDOT permit master as an unpolled companion.
+    spec = get_dataset(CityId.CHICAGO, FeedType.STREET_CUT)
+    assert spec.needs_geocode is True
+    assert spec.geocode_context == "Chicago, IL"
+    assert spec.companion_endpoints["cdot_permits_master"].endswith("pubx-yq2d.json")
+
+
+def test_chicago_row_geocode_hook_recovers_missing_coordinates(producer):
+    row = {k: v for k, v in CHICAGO_ROW.items() if k not in ("latitude", "longitude", "location")}
+    with patch(
+        "src.producers.street_cut_permits_producer.geocode_row_if_declared",
+        return_value=(41.9124, -87.7571),
+    ) as hook:
+        event = producer.parse_socrata_row(row)
+    assert event is not None
+    assert event.latitude == 41.9124
+    assert event.longitude == -87.7571
+    assert event.h3_res7
+    hook.assert_called_once()
+    call_args = hook.call_args.args
+    assert call_args[0] == "chicago"
+    assert call_args[1] == "street_cut"
+    assert "1736" in call_args[2] and "LATROBE" in call_args[2]
+
+
+def test_chicago_row_geocode_hook_miss_still_drops(producer):
+    row = {k: v for k, v in CHICAGO_ROW.items() if k not in ("latitude", "longitude", "location")}
+    with patch(
+        "src.producers.street_cut_permits_producer.geocode_row_if_declared",
+        return_value=None,
+    ):
+        assert producer.parse_socrata_row(row) is None
+
+
+def test_chicago_row_without_address_fields_skips_geocode_hook(producer):
+    # Rows with nothing composable must not reach the geocoder at all.
+    row = {"applicationnumber": "2"}
+    with patch(
+        "src.producers.street_cut_permits_producer.geocode_row_if_declared"
+    ) as hook:
+        assert producer.parse_socrata_row(row) is None
+    hook.assert_not_called()

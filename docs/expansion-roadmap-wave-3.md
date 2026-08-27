@@ -94,6 +94,34 @@ Tier-1/2 finding, stamped ≤72 h before its implementation wave (§5.3 drift
 rule). Consider `scripts/metro_discovery_probe.py` mirroring
 `scripts/backfill_probe.py` / `scripts/feed_staleness_probe.py`.
 
+### 3.1 · Phase-0 results (probed 2026-08-27; evidence in `docs/research/wave-3-probe-*.md`)
+
+All ten re-probe tickets (US-197–US-206) are complete. Verdict board:
+
+| Target | Tier findings (per family) | Outcome |
+|---|---|---|
+| Phoenix AZ | permits **T1** (ArcGIS points); STR→SLA **T1**; 311 T3 (Dynamics 365 portal); deeds T3 | **Registered `phoenix`** (permits, sla) — `.streams/city-phoenix.md` |
+| Atlanta GA | all four **T3** (portal → empty Azure Gov web app; unofficial extracts stale) | none — re-probe only if the portal ever appears |
+| Miami/Fort Lauderdale FL | Miami-Dade permits **T1**, SLA (local business tax) **T1**, deeds **T2** (last-sale snapshot); 311 T3; Fort Lauderdale city T3; Broward SLA T1-occupational only | **Registered `miami_dade`** (permits, sla, deeds) — `.streams/city-miami-dade.md` |
+| St. Louis MO | 311 **T2** (CSV zip, Web-Mercator→WGS84), permits **T2** (CSV), excise licenses **T2** (CSV) | **Registered `st_louis`** (311, permits, sla) — `.streams/city-st-louis.md` |
+| Memphis TN | permits **T1** (Hub/AGIS), 311 **T1**; monthly cadence (31d) | **Registered `memphis`** (311, permits) — `.streams/city-memphis.md` |
+| Salt Lake City UT | all **T3** (stale / active-only snapshots) | none |
+| Jacksonville FL | all **T3** (WAF-gated; PA file dumps only) | none |
+| Oklahoma City OK | all **T3** (Incapsula wall; browser-session catalog resolved but feeds frozen) | none |
+| Albuquerque NM | permits **T2** (daily CSV dump, address→geocode); 311 T3 (token-gated); SLA/business-reg frozen T3 | **Registered `albuquerque`** (permits) — `.streams/city-albuquerque.md` |
+| Providence RI | all four **T3** | REJECT — do not park a stream |
+
+**Net:** 49 → **57 registered metros** (this wave's re-probe batch added
+phoenix, miami_dade, st_louis, memphis, albuquerque; the geocoder-unlocked
+wave-1 pair added honolulu, orlando; the wave-2 Pierce lane added pierce).
+Interlock gate 22/22 green; full suite 1574 passed / 3 skipped (2026-08-27,
+post-registration stale-assertion refresh in milwaukee/tulsa/louisville/
+boston/las_vegas/leaf-naming/taxonomy/street-cut/submarket tests).
+
+Extended-list metros (Omaha, Tucson, Fresno, …) remain unprobed — a later
+`probe-extended` pass can run the same row-level contract if wave-3's
+five-city yield justifies it.
+
 ---
 
 ## 4 · Wave 1 — easiest verified wins
@@ -133,6 +161,22 @@ deferred address-only feeds (no new bbox, no model calibration):
 - Denver SLA active licenses + DEEDS sales/transfers (PARID/address keys)
 - Chicago street-cut `pubx-yq2d` / `hr8i-6s6s` (partial coords)
 - NYC street-cut `tqtj-sjs8` (address-only, deferred)
+
+### 4.3.1 · US-196 outcome (applied 2026-08-27, serial hold; contract: `docs/research/wave-3-feed-expansion.md`)
+
+| Feed | Staging G5 (newest 500, Census oneline, floor 0.9) | Action |
+|---|---|---|
+| Norfolk 311 + SLA, DC SLA + DEEDS | re-probed live, still fresh | already registered — no-op |
+| Denver SLA / DEEDS | no address, no coords | **NO-GO** (US-73 descope stands) |
+| Chicago `jdis-5sry` (primary) | 99.97% native coords | + `needs_geocode` hook + `field_map` (recovers the rare miss) |
+| Chicago `pubx-yq2d` | 93.4% overall / 98.5% of address-bearing | **companion** (`cdot_permits_master`, unpolled until companion polling lands) |
+| Chicago `hr8i-6s6s` | subset of pubx | NO-GO as second primary |
+| Sacramento city permits | **90.4%** (< 95% floor; monthly batch, newest `Status_Date` 2026-07-30) | **inert companion** on county PERMITS; recheck ≥95% + batch stall after 2026-09-15 |
+| NYC `tqtj-sjs8` | **78.0%** overall (house rows 60.1%, intersections 89.2%) | **unregistered** — both the full spec and the house-filtered fallback fail G5; `_nyc_row` shape retained |
+
+Leaf change in the hold: `street_cut_permits_producer` gained the
+`geocode_row_if_declared` fallback (ADR 0004) for coordinate-less rows on
+specs that declare `needs_geocode`. Gates: interlock 22/22, full suite green.
 
 ---
 

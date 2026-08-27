@@ -40,8 +40,9 @@ def test_get_job_name_is_generic_for_new_feeds():
 
 
 def test_unregistered_new_feeds_raise_readable_get_dataset_error():
-    # Boston registers none of the signal-survey feeds (US-71/81/92/93).
-    for feed in NEW_SIGNAL_FEEDS:
+    # Boston registers crime (US-71 follow-up) but none of the other
+    # signal-survey feeds (US-81/92/93).
+    for feed in (FeedType.STREET_CUT, FeedType.EVICTIONS, FeedType.STR):
         with pytest.raises(KeyError) as excinfo:
             get_dataset(CityId.BOSTON, feed)
         message = str(excinfo.value)
@@ -49,14 +50,29 @@ def test_unregistered_new_feeds_raise_readable_get_dataset_error():
 
 
 def test_only_cleared_signal_feeds_are_registered():
-    """US-72 made the taxonomy ingestible; US-71 registered crime in the four
-    metros with a verified live feed, US-81 registered street-cut in the
-    one metro with a geocodable feed (Chicago CDOT street closures; NYC's
-    current rows are address-only), and US-93 registered NYC-only evictions
-    as context/validation. STR remains unregistered (US-92 closed not-worth-it)."""
+    """US-72 made the taxonomy ingestible; US-71 registered crime where a
+    verified live feed exists (the four launch metros plus boise, boston,
+    las_vegas, louisville, milwaukee, san_jose, tampa, tulsa), US-81
+    registered street-cut in the metros with geocodable feeds (Chicago CDOT
+    closures plus Louisville and Tampa), and US-93 registered NYC-only
+    evictions as context/validation. STR remains unregistered (US-92 closed
+    not-worth-it)."""
     registered_for = {
-        FeedType.CRIME: {CityId.NYC, CityId.CHICAGO, CityId.SAN_FRANCISCO, CityId.SEATTLE},
-        FeedType.STREET_CUT: {CityId.CHICAGO},
+        FeedType.CRIME: {
+            CityId.NYC,
+            CityId.CHICAGO,
+            CityId.SAN_FRANCISCO,
+            CityId.SEATTLE,
+            CityId.BOISE,
+            CityId.BOSTON,
+            CityId.LAS_VEGAS,
+            CityId.LOUISVILLE,
+            CityId.MILWAUKEE,
+            CityId.SAN_JOSE,
+            CityId.TAMPA,
+            CityId.TULSA,
+        },
+        FeedType.STREET_CUT: {CityId.CHICAGO, CityId.LOUISVILLE, CityId.TAMPA},
         FeedType.EVICTIONS: {CityId.NYC},
         FeedType.STR: set(),
     }

@@ -629,3 +629,18 @@ returns.
 | city-miami-dade | `cities/miami_dade.py` + field_maps + tests (US-199) | later: registry/config/dashboard | ~13:10 PT | **spine complete** — permits+SLA+deeds; no 311; interlock 22/22 | miami_dade.py + field_maps_miami_dade.py + test_producers_miami_dade.py + REGISTRY/METRO_META |
 | city-st-louis | `cities/st_louis.py` + field_maps + tests (US-200); csv_client zip-member if required | later: registry/config/dashboard | ~13:10 PT | **spine complete** — 311 zip + permits CSV + liquor SLA; mercator+zip_member wired; interlock 22/22 | st_louis.py + csv_client zip_member + REGISTRY/METRO_META |
 | probe-broward | `docs/research/wave-3-probe-broward.md` (re-dispatch; file missing) | none | ~13:10 PT | superseded — original ~12:32 stream landed the file | wave-3-probe-broward.md |
+
+## 2026-08-27 — US-192 close-out (wave-3 finish)
+
+Orchestrator single interlock hold for US-196 after G5 staging probes;
+stale global-state tests refreshed; roadmap results tables written. Five
+wave-3 city leaves (phoenix, miami_dade, st_louis, memphis, albuquerque)
+were already on disk with spine complete; interlock verified 22/22 and the
+suite repaired to 1574 passed / 3 skipped.
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| hold-us196 | street_cut producer hook + tests + stale-test refresh | config.py + city_registry.py (chicago/sacramento specs) | this session | completed — gates green | roadmap §4.3.1, geocode hook, companion entries |
+| finish-us195 | docs/expansion-roadmap-wave-3.md | none | this session | completed | §3.1 Phase-0 results table |
+
+Uncommitted at close-out: spine delta + tests + roadmap doc (user commits).

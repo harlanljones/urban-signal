@@ -52,6 +52,8 @@ def test_milwaukee_registers_sla_permits_and_deeds():
         FeedType.SLA,
         FeedType.PERMITS,
         FeedType.DEEDS,
+        FeedType.COMPLAINTS_311,
+        FeedType.CRIME,
     }
 
     sla = REGISTRY[city].datasets[FeedType.SLA]
@@ -65,9 +67,6 @@ def test_milwaukee_registers_sla_permits_and_deeds():
     assert sla.oid_field == "OBJECTID"
     assert sla.max_record_count == 2000
     assert sla.field_map == MILWAUKEE_FIELD_MAP
-
-    with pytest.raises(KeyError, match="no.*feed"):
-        get_dataset(city, FeedType.COMPLAINTS_311)
 
     permits = get_dataset(city, FeedType.PERMITS)
     assert permits.platform == "csv"
