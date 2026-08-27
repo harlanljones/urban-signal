@@ -27,16 +27,16 @@ if str(API_ROOT) not in sys.path:
 import httpx
 from prometheus_client import Counter, Gauge
 from src.config import settings
-from src.producers.arcgis_client import ArcGISClient
-from src.producers.carto_client import CartoClient
-from src.producers.ckan_client import CkanClient
-from src.producers.csv_client import CSVClient
-from src.producers.socrata_client import SocrataClient
 from src.producers.acquisition import (
     AcquisitionSpec,
     build_where,
     newest_valid_watermark,
 )
+from src.producers.arcgis_client import ArcGISClient
+from src.producers.carto_client import CartoClient
+from src.producers.ckan_client import CkanClient
+from src.producers.csv_client import CSVClient
+from src.producers.socrata_client import SocrataClient
 from src.producers.watermarks import parse_watermark as parse_timestamp
 from src.producers.watermarks import typed_watermark_entry
 from src.spatial.city_registry import (
