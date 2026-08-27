@@ -1,0 +1,328 @@
+- generic [active] [ref=f1e1]:
+  - link "Skip to main content" [ref=f1e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=f1e5]:
+    - banner [ref=f1e6]:
+      - generic [ref=f1e8]:
+        - button "Quick Links" [ref=f1e10] [cursor=pointer]
+        - combobox "English" [ref=f1e13] [cursor=pointer]:
+          - generic [ref=f1e16]: is your current preferred language.
+      - generic [ref=f1e19]:
+        - link "City of Oklahoma City - Home - Logo" [ref=f1e21] [cursor=pointer]:
+          - /url: https://www.okc.gov/Home
+        - button "Open side Menu" [ref=f1e23] [cursor=pointer]: Menu
+        - search "Sitewide search" [ref=f1e25]:
+          - generic [ref=f1e27]:
+            - generic [ref=f1e28]: Search
+            - textbox "Search" [ref=f1e29]:
+              - /placeholder: What are you looking for?
+            - button "Search" [ref=f1e30] [cursor=pointer]
+      - text:                                                                      
+    - main [ref=f1e32]:
+      - generic [ref=f1e34]:
+        - navigation "You Are Here :" [ref=f1e36]:
+          - list [ref=f1e37]:
+            - listitem [ref=f1e38]:
+              - link "Home" [ref=f1e39] [cursor=pointer]:
+                - /url: https://www.okc.gov/Home
+              - text: /
+            - listitem [ref=f1e40]:
+              - link "Government" [ref=f1e41] [cursor=pointer]:
+                - /url: https://www.okc.gov/Government
+              - text: /
+            - listitem [ref=f1e42]:
+              - link "Departments" [ref=f1e43] [cursor=pointer]:
+                - /url: https://www.okc.gov/Government/Departments
+              - text: /
+            - listitem [ref=f1e44]:
+              - link "Public Information & Marketing" [ref=f1e45] [cursor=pointer]:
+                - /url: https://www.okc.gov/Government/Departments/Public-Information-Marketing
+              - text: /
+            - listitem [ref=f1e46]: Oops
+        - generic [ref=f1e51]:
+          - heading "Oops" [level=1] [ref=f1e52]
+          - img "A photo of Ron Swanson from the show Parks and Recreation." [ref=f1e54]
+          - heading [level=1] [ref=f1e55]
+          - paragraph [ref=f1e56]: It looks like the page you were looking for cannot be found. It might have gotten lost in our recent redesign, had an address change or was removed.
+          - paragraph [ref=f1e57]:
+            - text: You can look below and see some frequently used services or
+            - link "visit our homepage" [ref=f1e58] [cursor=pointer]:
+              - /url: https://www.okc.gov/Home
+            - text: and try again. If you want to drop us a note or need help locating something feel free to
+            - link "email us" [ref=f1e59] [cursor=pointer]:
+              - /url: mailto:public.info@okc.gov?subject=Help!%20I've%20hit%20a%20404%20error%20and%20need%20some%20help%20finding%20something%20on%20okc.gov.
+            - text: .
+          - paragraph [ref=f1e60]
+          - list [ref=f1e62]:
+            - listitem [ref=f1e63]:
+              - article [ref=f1e65]:
+                - link [ref=f1e66] [cursor=pointer]:
+                  - /url: https://www.okc.gov/Services/Action-Center
+                  - heading "Action Center" [level=2] [ref=f1e67]
+            - listitem [ref=f1e68]:
+              - article [ref=f1e70]:
+                - link [ref=f1e71] [cursor=pointer]:
+                  - /url: https://www.okc.gov/Services/Animal-Welfare
+                  - heading "Animal Welfare" [level=2] [ref=f1e72]
+            - listitem [ref=f1e73]:
+              - article [ref=f1e75]:
+                - link [ref=f1e76] [cursor=pointer]:
+                  - /url: https://www.okc.gov/Infrastructure-Development/Current-Infrastructure-Projects
+                  - heading "Current Infrastructure Projects" [level=2] [ref=f1e77]
+            - listitem [ref=f1e78]:
+              - article [ref=f1e80]:
+                - link [ref=f1e81] [cursor=pointer]:
+                  - /url: https://www.okc.gov/Government/Elected-Officials
+                  - heading "Elected Officials" [level=2] [ref=f1e82]
+            - listitem [ref=f1e83]:
+              - article [ref=f1e85]:
+                - link [ref=f1e86] [cursor=pointer]:
+                  - /url: https://www.okc.gov/Government/Employment
+                  - heading "Employment" [level=2] [ref=f1e87]
+            - listitem [ref=f1e88]:
+              - article [ref=f1e90]:
+                - link [ref=f1e91] [cursor=pointer]:
+                  - /url: https://www.okc.gov/Services/Municipal-Court
+                  - heading "Municipal Court" [level=2] [ref=f1e92]
+            - listitem [ref=f1e93]:
+              - article [ref=f1e95]:
+                - link [ref=f1e96] [cursor=pointer]:
+                  - /url: https://www.okc.gov/Community-Recreation/OKC-Parks
+                  - heading "OKC Parks" [level=2] [ref=f1e97]
+            - listitem [ref=f1e98]:
+              - article [ref=f1e100]:
+                - link [ref=f1e101] [cursor=pointer]:
+                  - /url: https://www.okc.gov/Services/Permits
+                  - heading "Permits" [level=2] [ref=f1e102]
+            - listitem [ref=f1e103]:
+              - article [ref=f1e105]:
+                - link [ref=f1e106] [cursor=pointer]:
+                  - /url: https://www.okc.gov/Government/Public-Meetings-and-Agendas
+                  - heading "Public Meetings and Agendas" [level=2] [ref=f1e107]
+            - listitem [ref=f1e108]:
+              - article [ref=f1e110]:
+                - link [ref=f1e111] [cursor=pointer]:
+                  - /url: https://www.okc.gov/Services/Public-Safety
+                  - heading "Public Safety" [level=2] [ref=f1e112]
+            - listitem [ref=f1e113]:
+              - article [ref=f1e115]:
+                - link [ref=f1e116] [cursor=pointer]:
+                  - /url: https://www.okc.gov/Government/Records
+                  - heading "Records" [level=2] [ref=f1e117]
+            - listitem [ref=f1e118]:
+              - article [ref=f1e120]:
+                - link [ref=f1e121] [cursor=pointer]:
+                  - /url: https://www.okc.gov/Services/Water-Trash-Recycling
+                  - heading "Water, Trash & Recycling" [level=2] [ref=f1e122]
+          - paragraph
+          - paragraph [ref=f1e123]
+          - paragraph
+          - generic [ref=f1e124]:
+            - heading "Departments" [level=5] [ref=f1e125]
+            - list [ref=f1e126]:
+              - listitem [ref=f1e127]:
+                - article [ref=f1e129]:
+                  - link [ref=f1e130] [cursor=pointer]:
+                    - /url: https://www.okc.gov/Government/Departments/Airports
+                    - heading "Airports" [level=6] [ref=f1e131]
+              - listitem [ref=f1e132]:
+                - article [ref=f1e134]:
+                  - link [ref=f1e135] [cursor=pointer]:
+                    - /url: https://www.okc.gov/Government/Departments/Animal-Welfare
+                    - heading "Animal Welfare" [level=6] [ref=f1e136]
+              - listitem [ref=f1e137]:
+                - article [ref=f1e139]:
+                  - link [ref=f1e140] [cursor=pointer]:
+                    - /url: https://www.okc.gov/Government/Departments/City-Auditor
+                    - heading "City Auditor" [level=6] [ref=f1e141]
+              - listitem [ref=f1e142]:
+                - article [ref=f1e144]:
+                  - link [ref=f1e145] [cursor=pointer]:
+                    - /url: https://www.okc.gov/Government/Departments/City-Clerk
+                    - heading "City Clerk" [level=6] [ref=f1e146]
+              - listitem [ref=f1e147]:
+                - article [ref=f1e149]:
+                  - link [ref=f1e150] [cursor=pointer]:
+                    - /url: https://www.okc.gov/Government/Departments/Development-Services
+                    - heading "Development Services" [level=6] [ref=f1e151]
+              - listitem [ref=f1e152]:
+                - article [ref=f1e154]:
+                  - link [ref=f1e155] [cursor=pointer]:
+                    - /url: https://www.okc.gov/Government/Departments/Economic-Development
+                    - heading "Economic Development" [level=6] [ref=f1e156]
+              - listitem [ref=f1e157]:
+                - article [ref=f1e159]:
+                  - link [ref=f1e160] [cursor=pointer]:
+                    - /url: https://www.okc.gov/Government/Departments/Finance
+                    - heading "Finance" [level=6] [ref=f1e161]
+              - listitem [ref=f1e162]:
+                - article [ref=f1e164]:
+                  - link [ref=f1e165] [cursor=pointer]:
+                    - /url: https://www.okc.gov/Government/Departments/Fire
+                    - heading "Fire" [level=6] [ref=f1e166]
+              - listitem [ref=f1e167]:
+                - article [ref=f1e169]:
+                  - link [ref=f1e170] [cursor=pointer]:
+                    - /url: https://www.okc.gov/Government/Departments/Human-Resources
+                    - heading "Human Resources" [level=6] [ref=f1e171]
+              - listitem [ref=f1e172]:
+                - article [ref=f1e174]:
+                  - link [ref=f1e175] [cursor=pointer]:
+                    - /url: https://www.okc.gov/Government/Departments/Information-Technology
+                    - heading "Information Technology" [level=6] [ref=f1e176]
+              - listitem [ref=f1e177]:
+                - article [ref=f1e179]:
+                  - link [ref=f1e180] [cursor=pointer]:
+                    - /url: https://www.okc.gov/Government/Departments/Municipal-Counselor
+                    - heading "Municipal Counselor" [level=6] [ref=f1e181]
+              - listitem [ref=f1e182]:
+                - article [ref=f1e184]:
+                  - link [ref=f1e185] [cursor=pointer]:
+                    - /url: https://www.okc.gov/Government/Departments/Municipal-Court
+                    - heading "Municipal Court" [level=6] [ref=f1e186]
+              - listitem [ref=f1e187]:
+                - article [ref=f1e189]:
+                  - link [ref=f1e190] [cursor=pointer]:
+                    - /url: https://www.okc.gov/Government/Departments/Parks-Recreation
+                    - heading "Parks & Recreation" [level=6] [ref=f1e191]
+              - listitem [ref=f1e192]:
+                - article [ref=f1e194]:
+                  - link [ref=f1e195] [cursor=pointer]:
+                    - /url: https://www.okc.gov/Government/Departments/Planning
+                    - heading "Planning" [level=6] [ref=f1e196]
+              - listitem [ref=f1e197]:
+                - article [ref=f1e199]:
+                  - link [ref=f1e200] [cursor=pointer]:
+                    - /url: https://www.okc.gov/Government/Departments/Police
+                    - heading "Police" [level=6] [ref=f1e201]
+              - listitem [ref=f1e202]:
+                - article [ref=f1e204]:
+                  - link [ref=f1e205] [cursor=pointer]:
+                    - /url: https://www.okc.gov/Government/Departments/Public-Information-Marketing
+                    - heading "Public Information & Marketing" [level=6] [ref=f1e206]
+              - listitem [ref=f1e207]:
+                - article [ref=f1e209]:
+                  - link [ref=f1e210] [cursor=pointer]:
+                    - /url: https://www.okc.gov/Government/Departments/Public-Transportation-Parking
+                    - heading "Public Transportation & Parking" [level=6] [ref=f1e211]
+              - listitem [ref=f1e212]:
+                - article [ref=f1e214]:
+                  - link [ref=f1e215] [cursor=pointer]:
+                    - /url: https://www.okc.gov/Government/Departments/Public-Works
+                    - heading "Public Works" [level=6] [ref=f1e216]
+              - listitem [ref=f1e217]:
+                - article [ref=f1e219]:
+                  - link [ref=f1e220] [cursor=pointer]:
+                    - /url: https://www.okc.gov/Government/Departments/Utilities
+                    - heading "Utilities" [level=6] [ref=f1e221]
+              - listitem [ref=f1e222]:
+                - article [ref=f1e224]:
+                  - link "narrow-web-banner-with-words-600x217px.jpg (JPG, 145KB)" [ref=f1e225] [cursor=pointer]:
+                    - /url: /files/assets/city/v/2/planning/sustainability/narrow-web-banner-with-words-600x217px.jpg
+                    - heading "narrow-web-banner-with-words-600x217px.jpg" [level=6] [ref=f1e226]
+                    - generic [ref=f1e227]: (JPG, 145KB)
+          - paragraph
+          - paragraph [ref=f1e228]
+          - paragraph [ref=f1e229]
+      - link "Back to top" [ref=f1e230] [cursor=pointer]:
+        - /url: "#body-top"
+        - generic [ref=f1e231]: 
+    - contentinfo [ref=f1e233]:
+      - generic [ref=f1e236]:
+        - generic [ref=f1e237]:
+          - heading "Site Footer" [level=2] [ref=f1e238]
+          - heading "City of Oklahoma City" [level=3] [ref=f1e239]
+          - paragraph [ref=f1e240]:
+            - text: City Hall 200 North Walker Oklahoma City, OK 73102
+            - link "View on Map" [ref=f1e241] [cursor=pointer]:
+              - /url: https://maps.app.goo.gl/AXK3tDGbXbRiTSfy7
+          - paragraph [ref=f1e242]:
+            - text: P
+            - link "(405) 297-2535" [ref=f1e243] [cursor=pointer]:
+              - /url: tel:4052972535
+            - text: E
+            - link "action.center@okc.gov" [ref=f1e244] [cursor=pointer]:
+              - /url: mailto:action.center@okc.gov?subject=A%20message%20from%20OKC.gov%20
+        - generic [ref=f1e245]:
+          - heading "Site Footer" [level=2] [ref=f1e246]
+          - heading "Share & Connect" [level=3] [ref=f1e247]
+          - list [ref=f1e248]:
+            - listitem [ref=f1e249]:
+              - link "Like us on Facebook" [ref=f1e250] [cursor=pointer]:
+                - /url: https://www.facebook.com/cityofokc/
+            - listitem [ref=f1e252]:
+              - link "Follow us on X" [ref=f1e253] [cursor=pointer]:
+                - /url: https://x.com/cityofokc
+            - listitem [ref=f1e255]:
+              - link "Watch us on YouTube" [ref=f1e256] [cursor=pointer]:
+                - /url: https://www.youtube.com/user/cityofokc
+            - listitem [ref=f1e258]:
+              - link "Add us on Instagram" [ref=f1e259] [cursor=pointer]:
+                - /url: https://www.instagram.com/cityofokc
+            - listitem [ref=f1e261]:
+              - link "Follow our Nextdoor Page" [ref=f1e262] [cursor=pointer]:
+                - /url: https://nextdoor.com/agency-detail/ok/oklahoma-city/city-of-oklahoma-city
+            - listitem [ref=f1e264]:
+              - link "Download the OKC Connect App" [ref=f1e265] [cursor=pointer]:
+                - /url: https://www.okc.gov/Services/Action-Center/Report
+        - generic [ref=f1e267]:
+          - heading "Site Footer" [level=2] [ref=f1e268]
+          - heading "Get Involved" [level=3] [ref=f1e269]
+          - list [ref=f1e270]:
+            - listitem [ref=f1e271]:
+              - link "Guide to City Gov" [ref=f1e272] [cursor=pointer]:
+                - /url: https://www.okc.gov/Government/About-OKC/Guide-to-City-Government
+            - listitem [ref=f1e273]:
+              - link "Work for OKC" [ref=f1e274] [cursor=pointer]:
+                - /url: https://www.okc.gov/Government/Employment
+            - listitem [ref=f1e275]:
+              - link "Action Center" [ref=f1e276] [cursor=pointer]:
+                - /url: https://www.okc.gov/Services/Action-Center
+            - listitem [ref=f1e277]:
+              - link "Mayor" [ref=f1e278] [cursor=pointer]:
+                - /url: https://www.okc.gov/Government/Elected-Officials/Mayor
+            - listitem [ref=f1e279]:
+              - link "City Council" [ref=f1e280] [cursor=pointer]:
+                - /url: https://www.okc.gov/Government/Elected-Officials/City-Council
+            - listitem [ref=f1e281]:
+              - link "Prepare OKC" [ref=f1e282] [cursor=pointer]:
+                - /url: https://www.okc.gov/Home
+        - generic [ref=f1e283]:
+          - heading "Site Footer" [level=2] [ref=f1e284]
+          - heading "Quick Links" [level=3] [ref=f1e285]
+          - list [ref=f1e286]:
+            - listitem [ref=f1e287]:
+              - link "Contact Us" [ref=f1e288] [cursor=pointer]:
+                - /url: https://www.okc.gov/Government/About-OKC/Contact-Us
+            - listitem [ref=f1e289]:
+              - link "Utility Bill Pay" [ref=f1e290] [cursor=pointer]:
+                - /url: https://www.okc.gov/Services/Water-Trash-Recycling/Pay-Bill
+            - listitem [ref=f1e291]:
+              - link "Pay a Ticket" [ref=f1e292] [cursor=pointer]:
+                - /url: https://www.okc.gov/Services/Municipal-Court/Pay-Ticket
+            - listitem [ref=f1e293]:
+              - link "News" [ref=f1e294] [cursor=pointer]:
+                - /url: https://www.okc.gov/News-articles
+            - listitem [ref=f1e295]:
+              - link "Public Meetings" [ref=f1e296] [cursor=pointer]:
+                - /url: https://www.okc.gov/Government/Public-Meetings-and-Agendas
+      - generic [ref=f1e299]:
+        - generic [ref=f1e301]:
+          - link "Disclaimer & Copyright" [ref=f1e302] [cursor=pointer]:
+            - /url: https://www.okc.gov/Home
+          - text: "|"
+          - link "Privacy Statement" [ref=f1e303] [cursor=pointer]:
+            - /url: https://www.okc.gov/Government/About-OKC/Website-Privacy-Policy
+          - text: "|"
+          - link "Sitemap" [ref=f1e304] [cursor=pointer]:
+            - /url: https://www.okc.gov/sitemap.xml
+          - text: "|"
+          - link "Municipal Code" [ref=f1e305] [cursor=pointer]:
+            - /url: https://www.okc.gov/Government/Records/Municipal-Code
+        - generic [ref=f1e307]:
+          - text: © 2026 City of Oklahoma City |
+          - generic [ref=f1e308]:
+            - text: Powered by
+            - link "Granicus" [ref=f1e309] [cursor=pointer]:
+              - /url: https://granicus.com/solution/govaccess/opencities/
+      - status [ref=f1e310]

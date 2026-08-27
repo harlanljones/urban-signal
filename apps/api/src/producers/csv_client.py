@@ -8,6 +8,10 @@ interface the scheduler and producers expect.
 The endpoint is a year-scoped file (``approvals_issued_2026_datasd.csv``), so
 the server-side watermark predicate the scheduler renders (``col > '<hw>'``) is
 evaluated locally against the ISO date strings in the downloaded rows.
+
+Pass ``zip_member='2026.csv'`` to read one named member out of a zip endpoint
+(St. Louis CSB ``csb.zip``). The scheduler does not yet forward that kwarg —
+wiring it is a later spine hold.
 """
 
 from __future__ import annotations
@@ -15,6 +19,7 @@ from __future__ import annotations
 import csv
 import io
 import re
+import zipfile
 from collections.abc import Generator
 from datetime import datetime
 from typing import Any, Dict, List, Optional
@@ -29,6 +34,49 @@ _NOT_IN = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s+NOT\s+IN\s*\(([^)]*)\)\s*$
 def _normalize_header(name: str) -> str:
     """Normalize municipal CSV headers to the producer field-map convention."""
     return re.sub(r"[^a-z0-9]+", "_", name.strip().lower()).strip("_")
+
+
+def _decode_csv_bytes(raw: bytes) -> str:
+    """Decode a municipal CSV payload, preferring UTF-8 with a Latin-1 fallback."""
+    for encoding in ("utf-8-sig", "utf-8", "cp1252"):
+        try:
+            return raw.decode(encoding)
+        except UnicodeDecodeError:
+            continue
+    return raw.decode("utf-8", errors="replace")
+
+
+def _read_zip_member(payload: bytes, member: str) -> str:
+    """Extract one named CSV member from a zip (St. Louis CSB ``csb.zip`` / ``{year}.csv``).
+
+    ``member`` is a filename such as ``2026.csv``. A basename match is accepted
+    when the archive nests the year file under a folder.
+    """
+    name = str(member).strip()
+    if not name or name.lower() in {"true", "1", "yes"}:
+        raise ValueError(
+            "zip_member must be a member filename (e.g. '2026.csv'), not a boolean flag"
+        )
+    try:
+        archive = zipfile.ZipFile(io.BytesIO(payload))
+    except zipfile.BadZipFile as exc:
+        raise ValueError("CSV endpoint declared zip_member but the body is not a zip") from exc
+    with archive:
+        names = archive.namelist()
+        chosen = name if name in names else None
+        if chosen is None:
+            wanted = name.rsplit("/", 1)[-1].lower()
+            matches = [
+                n
+                for n in names
+                if n.rsplit("/", 1)[-1].lower() == wanted and not n.endswith("/")
+            ]
+            if not matches:
+                raise FileNotFoundError(
+                    f"zip member {name!r} not in archive; members={names}"
+                )
+            chosen = matches[0]
+        return _decode_csv_bytes(archive.read(chosen))
 
 
 def _typed_value(value: Any, fmt: str | None) -> datetime | None:
@@ -142,7 +190,12 @@ class CSVClient:
                 raise last_error
             raise RuntimeError("CSV endpoint list is empty")
 
-        reader = csv.DictReader(io.StringIO(response.text))
+        zip_member = kwargs.get("zip_member")
+        if zip_member:
+            csv_text = _read_zip_member(response.content, zip_member)
+        else:
+            csv_text = response.text
+        reader = csv.DictReader(io.StringIO(csv_text))
         # Municipal CSVs use title case, spaces, and punctuation inconsistently;
         # normalize them so shared field maps apply uniformly.
         if reader.fieldnames:

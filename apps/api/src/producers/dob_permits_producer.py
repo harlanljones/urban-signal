@@ -62,6 +62,7 @@ def _parse_datetime(val: Any) -> datetime | None:
             "%Y-%m-%d %H:%M:%S",
             "%m/%d/%Y %I:%M:%S %p",
             "%Y-%m-%dT%H:%M:%S",
+            "%B, %d %Y %H:%M:%S",
         ):
             try:
                 return datetime.strptime(val.strip(), fmt).replace(tzinfo=UTC)
@@ -158,6 +159,13 @@ class DOBPermitsProducer:
             from src.producers.field_maps import first_mapped, resolve_field_map
 
             field_map = resolve_field_map(resolved_city, FeedType.PERMITS)
+
+            if resolved_city == "albuquerque":
+                from src.spatial.cities.albuquerque import compose_permit_address
+
+                composed = compose_permit_address(row)
+                if composed:
+                    row = {**row, "address_street": composed}
 
             job_id = str(
                 first_mapped(row, field_map, "job_id")

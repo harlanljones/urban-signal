@@ -1020,6 +1020,106 @@ class Settings(BaseSettings):
         description="Fort Worth development permits ArcGIS FeatureServer layer URL",
     )
 
+    # Honolulu, HI (US-193): City and County of Honolulu Socrata. 311 is a
+    # rolling 30-day snapshot (address-only, ADR-0004). Permits endpoint is
+    # reserved for a live successor — 4vab-c87q is a closed archive through
+    # 2025-06-30 and must not be wired as incremental.
+    socrata_honolulu_311_endpoint: str = Field(
+        default="https://data.honolulu.gov/resource/jdy7-ftwe.json",
+        description="Honolulu HNL 311 Reports (rolling 30-day) Socrata endpoint",
+    )
+    socrata_honolulu_permits_endpoint: str = Field(
+        default="https://data.honolulu.gov/resource/4vab-c87q.json",
+        description="Honolulu building permits Socrata endpoint (CLOSED ARCHIVE through 2025-06-30; do not ingest as live)",
+    )
+
+    # Orlando / Orange County (US-194): Business Tax Receipts (primary SLA)
+    # plus STR licenses as an SLA companion. Live BTR window is address-only
+    # (ADR-0004). Do not wire FeedType.STR.
+    socrata_orlando_sla_endpoint: str = Field(
+        default="https://data.cityoforlando.net/resource/7388-4re5.json",
+        description="Orlando Business Tax Receipts Socrata endpoint",
+    )
+    socrata_orlando_str_endpoint: str = Field(
+        default="https://data.cityoforlando.net/resource/ssrj-rbua.json",
+        description="Orlando Short Term Rental Licenses Socrata endpoint (SLA companion)",
+    )
+
+    # Miami-Dade County (US-199): ArcGIS Hub permits table + LBT SLA snapshot
+    # + PaGis last-sale points. No 311. Companions are metadata-only.
+    arcgis_miami_dade_permits_url: str = Field(
+        default="https://services.arcgis.com/8Pc9XBTAsYuxx9Ny/arcgis/rest/services/miamidade_permit_data/FeatureServer/0",
+        description="Miami-Dade building permits issued ArcGIS table URL (rolling 2-year, address-only)",
+    )
+    arcgis_miami_dade_sla_url: str = Field(
+        default="https://services.arcgis.com/8Pc9XBTAsYuxx9Ny/arcgis/rest/services/Local_Business_Tax_Feature_Layer_View/FeatureServer/0",
+        description="Miami-Dade Local Business Tax ArcGIS FeatureServer layer URL",
+    )
+    arcgis_miami_dade_deeds_url: str = Field(
+        default="https://gisweb.miamidade.gov/ArcGIS/rest/services/MD_ComparableSales/MapServer/5",
+        description="Miami-Dade PaGis comparable-sales last-sale ArcGIS MapServer layer URL",
+    )
+    arcgis_miami_dade_sla_certificate_of_use_url: str = Field(
+        default="https://services.arcgis.com/8Pc9XBTAsYuxx9Ny/arcgis/rest/services/CertificateOfUse_New_gdb/FeatureServer/0",
+        description="Miami-Dade certificate of use ArcGIS companion (not polled)",
+    )
+    arcgis_miami_dade_sla_enterprise_twin_url: str = Field(
+        default="https://gisweb.miamidade.gov/ArcGIS/rest/services/BusinessTracker/MapServer/0",
+        description="Miami-Dade BusinessTracker ArcGIS companion (not polled)",
+    )
+
+    # Memphis / Shelby County, TN (US-201): DPD building permits (monthly
+    # ArcGIS dump) + citywide 311. Native WGS84 on permits; 311 prefers
+    # outSR=4326 geometry (do not map mixed X/Y). Partial — no SLA/deeds.
+    arcgis_memphis_permits_url: str = Field(
+        default="https://services2.arcgis.com/saWmpKJIUAjyyNVc/arcgis/rest/services/DPD_Building_Permits/FeatureServer/0",
+        description="Memphis DPD building permits ArcGIS FeatureServer layer URL",
+    )
+    arcgis_memphis_311_url: str = Field(
+        default="https://311.memphistn.gov/server/rest/services/311/311_Request_Map_PROD/FeatureServer/0",
+        description="Memphis 311 Request Map (layer 0) ArcGIS FeatureServer URL",
+    )
+
+    # Phoenix / Maricopa County (US-197): Planning_Permit daily points +
+    # ShapePHX STR as SLA. Native geometry (outSR=4326); no geocode.
+    # Companion ShapePHXPermitsPoints_DL is weekly Issued; do not wire the
+    # frozen non-_DL twin. No 311 / deeds.
+    arcgis_phoenix_permits_url: str = Field(
+        default="https://maps.phoenix.gov/pub/rest/services/Public/Planning_Permit/MapServer/1",
+        description="Phoenix Planning_Permit layer 1 ArcGIS MapServer URL",
+    )
+    arcgis_phoenix_shapephx_permits_url: str = Field(
+        default="https://mapportal.phoenix.gov/pds/rest/services/ShapePHX/ShapePHXPermitsPoints_DL/MapServer/0",
+        description="Phoenix ShapePHX Issued permits _DL companion ArcGIS MapServer URL",
+    )
+    arcgis_phoenix_sla_url: str = Field(
+        default="https://mapportal.phoenix.gov/pds/rest/services/ShapePHX/ShapePHX_Short_Term_Rentals/MapServer/0",
+        description="Phoenix ShapePHX Short Term Rentals ArcGIS MapServer URL (SLA)",
+    )
+
+    # Albuquerque / Bernalillo County (US-205): daily CABQ building-permits
+    # CSV dump. Address-only (ADR 0004). AGIS City_Building_Permits is frozen
+    # (max DateIssued 2025-01-16) and must not be wired.
+    csv_albuquerque_permits_endpoint: str = Field(
+        default="https://data.cabq.gov/business/buildingpermits/BuildingPermitsCABQ-en-us.csv",
+        description="Albuquerque building permits daily CSV dump (US-205)",
+    )
+
+    # City of St. Louis, MO (US-200): CSB 311 zip + ColdFusion 30-day permits
+    # CSV + excise liquor snapshot. Independent city; no county deeds.
+    csv_st_louis_311_endpoint: str = Field(
+        default="https://www.stlouis-mo.gov/data/upload/data-files/csb.zip",
+        description="St. Louis CSB 311 yearly CSV zip (member 2026.csv)",
+    )
+    csv_st_louis_permits_endpoint: str = Field(
+        default="https://www.stlouis-mo.gov/customcf/endpoints/building-permits/building-permits-30-days-export.cfm?permitType=all&dataType=csv",
+        description="St. Louis building permits 30-day ColdFusion CSV export",
+    )
+    csv_st_louis_sla_endpoint: str = Field(
+        default="https://www.stlouis-mo.gov/data/upload/data-files/excise-data/excise-permits-licenses.csv",
+        description="St. Louis excise (liquor) licenses CSV snapshot",
+    )
+
     # Tampa, FL (US-146): audited full permits and partial alcohol-beverage
     # history layers, both point-geocoded ArcGIS services.
     arcgis_tampa_permits_url: str = Field(

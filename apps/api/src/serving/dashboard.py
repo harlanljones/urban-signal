@@ -1465,6 +1465,13 @@ def get_dashboard_html() -> str:
       las_vegas: { name: 'Las Vegas / Clark County' },
       boise: { name: 'Boise / Ada County' },
       fort_worth: { name: 'Fort Worth / Tarrant County' },
+      honolulu: { name: 'Honolulu / City and County of Honolulu' },
+      orlando: { name: 'Orlando / Orange County' },
+      miami_dade: { name: 'Miami-Dade County' },
+      memphis: { name: 'Memphis / Shelby County' },
+      phoenix: { name: 'Phoenix / Maricopa County' },
+      albuquerque: { name: 'Albuquerque / Bernalillo County' },
+      st_louis: { name: 'St. Louis' },
     };
 
     let map = null;

@@ -571,3 +571,61 @@ Phase 2 (parallel leaf build) DONE via 19 leaf-worker subagents:
   documented spine deltas (one serial interlock hold per city) and re-run the gate.
   Leaf artifacts (city modules, per-city field_maps_<slug>.py, tests) are committed
   and gate-clean; no torn write remains.
+
+## 2026-08-27 — Wave 3 metro expansion (US-192) — orchestrator: main session
+
+Parent: [US-192](https://linear.app/harlanljones/issue/US-192/wave-3-metro-expansion-brainstorm-candidates) claimed In Progress.
+Phase 1 (claim) DONE: US-193–US-206 assigned to harlanljones.
+Phase 2 (parallel leaf) DISPATCHED — 13 leaf-workers, disjoint files.
+US-195 held by orchestrator for synthesis into `docs/expansion-roadmap-wave-3.md`
+after probes return. Shared roadmap is NOT a leaf; agents write per-city
+`docs/research/wave-3-probe-*.md` instead.
+Phase 3 (serial interlock / dashboard wiring) IN PROGRESS — Honolulu +
+Orlando spines landed 2026-08-27 ~13:00–13:05 PT. Gate: `pytest -m interlock`
+22/22. City-registration rule satisfied for both (METRO_META + index.html).
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-honolulu | `cities/honolulu.py` + field_maps + tests (US-193) | city_registry, cities/__init__, config, dashboard, index.html, complaints_311_producer | ~12:20 PT | **spine complete** — 311-only; interlock 22/22; datetime format added | honolulu.py + field_maps_honolulu.py + test_producers_honolulu.py + REGISTRY/METRO_META |
+| city-orlando | `cities/orlando.py` + field_maps + tests (US-194) | city_registry, cities/__init__, config, dashboard, index.html | ~12:20 PT | **spine complete** — SLA BTR + STR companion; interlock 22/22 | orlando.py + field_maps_orlando.py + test_producers_orlando.py + REGISTRY/METRO_META |
+| feed-expansion-geocode | `docs/research/wave-3-feed-expansion.md` drafts only (US-196) | later: city_registry DatasetSpecs on existing metros | ~12:20 PT | completed — drafts only; 3 net-new GOs (Sacramento companion, Chicago pubx-yq2d, NYC tqtj-sjs8); US-196 still In Progress | wave-3-feed-expansion.md |
+| probe-phoenix | `docs/research/wave-3-probe-phoenix.md` (US-197) | none | ~12:20 PT | completed — partial ready (permits T1 + STR SLA T1; 311/deeds T3); US-197 Done | wave-3-probe-phoenix.md |
+| probe-atlanta | `docs/research/wave-3-probe-atlanta.md` (US-198) | none | ~12:20 PT | completed — REJECT all four families (Tier 3); US-198 Done | wave-3-probe-atlanta.md |
+| probe-miami | `docs/research/wave-3-probe-miami.md` (US-199) | none | ~12:20 PT | completed — partial ready (MDC permits+SLA T1; 311 T3); US-199 Done | wave-3-probe-miami.md |
+| probe-st-louis | `docs/research/wave-3-probe-st-louis.md` (US-200) | none | ~12:20 PT | completed — partial ready (311 T1 zip, permits T2 CF CSV, liquor SLA T2 optional, deeds T3) | wave-3-probe-st-louis.md |
+| probe-memphis | `docs/research/wave-3-probe-memphis.md` (US-201) | none | ~12:20 PT | completed — partial ready (permits T1 monthly, 311 T1; SLA/deeds T3); US-201 Done | wave-3-probe-memphis.md |
+| probe-salt-lake-city | `docs/research/wave-3-probe-salt-lake-city.md` (US-202) | none | ~12:20 PT | completed — REJECT all four families (Tier 3); US-202 Done | wave-3-probe-salt-lake-city.md |
+| probe-jacksonville | `docs/research/wave-3-probe-jacksonville.md` (US-203) | none | ~12:20 PT | completed — REJECT all four families (Tier 3); US-203 Done | wave-3-probe-jacksonville.md |
+| probe-oklahoma-city | `docs/research/wave-3-probe-oklahoma-city.md` (US-204) | none | ~12:20 PT | completed — REJECT all four families (Tier 3); US-204 Done | wave-3-probe-oklahoma-city.md |
+| probe-albuquerque | `docs/research/wave-3-probe-albuquerque.md` (US-205) | none | ~12:20 PT | completed — partial ready (permits T2 CSV; 311/SLA/deeds T3); US-205 Done | wave-3-probe-albuquerque.md |
+| probe-providence | `docs/research/wave-3-probe-providence.md` (US-206) | none | ~12:20 PT | completed — REJECT all four families (Tier 3); US-206 Done | wave-3-probe-providence.md |
+
+**Yield at dispatch:** 0 of 13 (in flight). **Torn-write exposure:** none — no spine edits in Phase 2.
+
+## 2026-08-27 — US-199 Miami split (finish row-level from host fingerprint)
+
+Fingerprint landed: Miami-Dade + Broward are ArcGIS Hub, not Socrata/CKAN.
+Parent `probe-miami` still in flight writing `docs/research/wave-3-probe-miami.md`.
+Three disjoint portal streams dispatched to finish family probes:
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| probe-miami-dade | `docs/research/wave-3-probe-miami-dade.md` | none | ~12:32 PT | completed — partial ready (permits T2, SLA T1, deeds T1, 311 T3) | wave-3-probe-miami-dade.md |
+| probe-broward | `docs/research/wave-3-probe-broward.md` | none | ~12:32 PT | completed — partial ready (SLA T1 occupational licenses; permits/311/deeds T3) | wave-3-probe-broward.md |
+| probe-fort-lauderdale | `docs/research/wave-3-probe-fort-lauderdale.md` | none | ~12:32 PT | completed — not a city leaf (permits/311/SLA frozen; sales are Broward) | wave-3-probe-fort-lauderdale.md |
+
+## 2026-08-27 — Wave 3 city leaves (ready metros, leaf-only)
+
+Honolulu + Orlando spines released. Parallel Phase-2 city modules for
+probe-ready metros that have no `cities/<city>.py` yet. No spine edits in
+these streams. US-195 synthesis still held until this wave of leaves
+returns.
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-phoenix | `cities/phoenix.py` + field_maps + tests (US-197) | later: registry/config/dashboard | ~13:10 PT | **spine complete** — permits+STR-as-SLA; interlock 22/22 | phoenix.py + field_maps_phoenix.py + test_producers_phoenix.py + REGISTRY/METRO_META |
+| city-memphis | `cities/memphis.py` + field_maps + tests (US-201) | later: registry/config/dashboard | ~13:10 PT | **spine complete** — permits+311; monthly cadence 31d; interlock 22/22 | memphis.py + field_maps_memphis.py + test_producers_memphis.py + REGISTRY/METRO_META |
+| city-albuquerque | `cities/albuquerque.py` + field_maps + tests (US-205) | later: registry/config/dashboard | ~13:10 PT | **spine complete** — CSV permits; compose_permit_address hooked; interlock 22/22 | albuquerque.py + field_maps_albuquerque.py + test_producers_albuquerque.py + REGISTRY/METRO_META |
+| city-miami-dade | `cities/miami_dade.py` + field_maps + tests (US-199) | later: registry/config/dashboard | ~13:10 PT | **spine complete** — permits+SLA+deeds; no 311; interlock 22/22 | miami_dade.py + field_maps_miami_dade.py + test_producers_miami_dade.py + REGISTRY/METRO_META |
+| city-st-louis | `cities/st_louis.py` + field_maps + tests (US-200); csv_client zip-member if required | later: registry/config/dashboard | ~13:10 PT | **spine complete** — 311 zip + permits CSV + liquor SLA; mercator+zip_member wired; interlock 22/22 | st_louis.py + csv_client zip_member + REGISTRY/METRO_META |
+| probe-broward | `docs/research/wave-3-probe-broward.md` (re-dispatch; file missing) | none | ~13:10 PT | superseded — original ~12:32 stream landed the file | wave-3-probe-broward.md |

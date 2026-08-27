@@ -40,6 +40,7 @@ def _parse_datetime(val: Any) -> datetime | None:
             "%Y%m%d",
             "%m/%d/%Y %I:%M:%S %p",
             "%Y-%m-%dT%H:%M:%S",
+            "%B %d, %Y at %I:%M %p",
         ):
             try:
                 return datetime.strptime(val.strip(), fmt).replace(tzinfo=UTC)
@@ -204,6 +205,17 @@ class Complaints311Producer:
             except (TypeError, ValueError):
                 lat_raw = None
                 lng_raw = None
+
+            if (not lat_raw or not lng_raw) and resolved_city == "st_louis":
+                srx = row.get("srx") or row.get("SRX")
+                sry = row.get("sry") or row.get("SRY")
+                if srx not in (None, "") and sry not in (None, ""):
+                    from src.spatial.cities.st_louis import mercator_xy_to_wgs84
+
+                    try:
+                        lat_raw, lng_raw = mercator_xy_to_wgs84(srx, sry)
+                    except (TypeError, ValueError):
+                        pass
 
             if not lat_raw or not lng_raw:
                 # Address-string feeds declaring extra["needs_geocode"]

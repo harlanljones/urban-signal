@@ -17,6 +17,13 @@ from src.producers.field_maps_tampa import FIELD_MAP as TAMPA_FIELD_MAP, SLA_FIE
 from src.producers.field_maps_las_vegas import FIELD_MAP as LAS_VEGAS_FIELD_MAP
 from src.producers.field_maps_boise import FIELD_MAP as BOISE_PERMITS_FIELD_MAP
 from src.producers.field_maps_fort_worth import FIELD_MAP as FORT_WORTH_PERMITS_FIELD_MAP
+from src.producers.field_maps_honolulu import FIELD_MAP as HONOLULU_FIELD_MAP
+from src.producers.field_maps_orlando import SLA_FIELD_MAP as ORLANDO_SLA_FIELD_MAP
+from src.producers.field_maps_miami_dade import FIELD_MAP as MIAMI_DADE_FIELD_MAP
+from src.producers.field_maps_memphis import FIELD_MAP as MEMPHIS_FIELD_MAP
+from src.producers.field_maps_phoenix import FIELD_MAP as PHOENIX_FIELD_MAP
+from src.producers.field_maps_albuquerque import FIELD_MAP as ALBUQUERQUE_FIELD_MAP
+from src.producers.field_maps_st_louis import FIELD_MAP as ST_LOUIS_FIELD_MAP
 from src.producers.field_maps_boston_licensing import FIELD_MAP as BOSTON_LICENSING_FIELD_MAP
 from src.spatial.cities.portland import (
     PORTLAND_DIVISION_BBOXES,
@@ -316,6 +323,48 @@ from src.spatial.cities.fort_worth import (
     FORT_WORTH_METRO_BBOX,
     FORT_WORTH_SUBMARKETS,
 )
+from src.spatial.cities.honolulu import (
+    HONOLULU_DIVISION_BBOXES,
+    HONOLULU_DIVISIONS,
+    HONOLULU_METRO_BBOX,
+    HONOLULU_SUBMARKETS,
+)
+from src.spatial.cities.orlando import (
+    ORLANDO_DIVISION_BBOXES,
+    ORLANDO_DIVISIONS,
+    ORLANDO_METRO_BBOX,
+    ORLANDO_SUBMARKETS,
+)
+from src.spatial.cities.miami_dade import (
+    MIAMI_DADE_DIVISION_BBOXES,
+    MIAMI_DADE_DIVISIONS,
+    MIAMI_DADE_METRO_BBOX,
+    MIAMI_DADE_SUBMARKETS,
+)
+from src.spatial.cities.memphis import (
+    MEMPHIS_DIVISION_BBOXES,
+    MEMPHIS_DIVISIONS,
+    MEMPHIS_METRO_BBOX,
+    MEMPHIS_SUBMARKETS,
+)
+from src.spatial.cities.phoenix import (
+    PHOENIX_DIVISION_BBOXES,
+    PHOENIX_DIVISIONS,
+    PHOENIX_METRO_BBOX,
+    PHOENIX_SUBMARKETS,
+)
+from src.spatial.cities.albuquerque import (
+    ALBUQUERQUE_DIVISION_BBOXES,
+    ALBUQUERQUE_DIVISIONS,
+    ALBUQUERQUE_METRO_BBOX,
+    ALBUQUERQUE_SUBMARKETS,
+)
+from src.spatial.cities.st_louis import (
+    ST_LOUIS_DIVISION_BBOXES,
+    ST_LOUIS_DIVISIONS,
+    ST_LOUIS_METRO_BBOX,
+    ST_LOUIS_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -379,6 +428,13 @@ class CityId(str, Enum):
     LAS_VEGAS = "las_vegas"
     BOISE = "boise"
     FORT_WORTH = "fort_worth"
+    HONOLULU = "honolulu"
+    ORLANDO = "orlando"
+    MIAMI_DADE = "miami_dade"
+    MEMPHIS = "memphis"
+    PHOENIX = "phoenix"
+    ALBUQUERQUE = "albuquerque"
+    ST_LOUIS = "st_louis"
 
 
 class FeedType(str, Enum):
@@ -460,6 +516,7 @@ class DatasetSpec:
     state_plane_y_col: Optional[str] = None
     parcel_join: Dict[str, Any] = field(default_factory=dict)
     non_spatial: Optional[bool] = None
+    zip_member: Optional[str] = None
 
 
 @dataclass
@@ -841,6 +898,65 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "fort worth tx": CityId.FORT_WORTH,
     "tarrant_county": CityId.FORT_WORTH,
     "tarrant county": CityId.FORT_WORTH,
+
+    # Honolulu / City and County of Honolulu (Oahu)
+    "honolulu": CityId.HONOLULU,
+    "honolulu_hi": CityId.HONOLULU,
+    "honolulu hi": CityId.HONOLULU,
+    "hnl": CityId.HONOLULU,
+    "oahu": CityId.HONOLULU,
+    "city_and_county_of_honolulu": CityId.HONOLULU,
+    "city and county of honolulu": CityId.HONOLULU,
+
+    # Orlando / Orange County, FL
+    "orlando": CityId.ORLANDO,
+    "orlando_fl": CityId.ORLANDO,
+    "orlando fl": CityId.ORLANDO,
+    "mco": CityId.ORLANDO,
+    "orange_county_fl": CityId.ORLANDO,
+    "orange county fl": CityId.ORLANDO,
+
+    # Miami-Dade County, FL (not City of Miami / Broward — ADR 0007)
+    "miami_dade": CityId.MIAMI_DADE,
+    "miami-dade": CityId.MIAMI_DADE,
+    "miami dade": CityId.MIAMI_DADE,
+    "miami_dade_county": CityId.MIAMI_DADE,
+    "miami-dade county": CityId.MIAMI_DADE,
+    "miami dade county": CityId.MIAMI_DADE,
+    "mdc": CityId.MIAMI_DADE,
+
+    # Memphis / Shelby County, TN
+    "memphis": CityId.MEMPHIS,
+    "memphis_tn": CityId.MEMPHIS,
+    "memphis tn": CityId.MEMPHIS,
+    "mem": CityId.MEMPHIS,
+    "shelby_county": CityId.MEMPHIS,
+    "shelby county": CityId.MEMPHIS,
+    "shelby_county_tn": CityId.MEMPHIS,
+
+    # Phoenix / Maricopa County, AZ
+    "phoenix": CityId.PHOENIX,
+    "phx": CityId.PHOENIX,
+    "phoenix_az": CityId.PHOENIX,
+    "phoenix az": CityId.PHOENIX,
+    "maricopa_county": CityId.PHOENIX,
+    "maricopa county": CityId.PHOENIX,
+
+    # Albuquerque / Bernalillo County, NM
+    "albuquerque": CityId.ALBUQUERQUE,
+    "albuquerque_nm": CityId.ALBUQUERQUE,
+    "albuquerque nm": CityId.ALBUQUERQUE,
+    "abq": CityId.ALBUQUERQUE,
+    "bernalillo": CityId.ALBUQUERQUE,
+    "bernalillo_county": CityId.ALBUQUERQUE,
+    "bernalillo county": CityId.ALBUQUERQUE,
+
+    # City of St. Louis, MO (independent city — not St. Louis County)
+    "st_louis": CityId.ST_LOUIS,
+    "stl": CityId.ST_LOUIS,
+    "saint_louis": CityId.ST_LOUIS,
+    "st-louis": CityId.ST_LOUIS,
+    "st louis": CityId.ST_LOUIS,
 }
 
 
@@ -3896,6 +4012,330 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
             ),
         },
     ),
+    CityId.HONOLULU: CityRegistration(
+        city_id=CityId.HONOLULU,
+        name="Honolulu / City and County of Honolulu",
+        state="HI",
+        center={"lat": 21.3069, "lng": -157.8583},
+        metro_bbox=HONOLULU_METRO_BBOX,
+        division_bboxes=HONOLULU_DIVISION_BBOXES,
+        submarkets=HONOLULU_SUBMARKETS,
+        divisions=HONOLULU_DIVISIONS,
+        job_suffix="honolulu",
+        # Partial registration like Austin/LA, but PERMITS is withheld:
+        # 4vab-c87q is a closed snapshot through 2025-06-30 (US-193 live
+        # probe 2026-08-27). 311 only until a live permits successor exists.
+        datasets={
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.socrata_honolulu_311_endpoint,
+                platform="socrata",
+                watermark_col="date_created",
+                id_keys=["id"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                expected_cadence_days=1,
+                rolling_window_days=30,
+                watermark_type="text",
+                watermark_format="%B %d, %Y at %I:%M %p",
+                order_by="id",
+                needs_geocode=True,
+                geocode_context="Honolulu, HI",
+                field_map=HONOLULU_FIELD_MAP["311"],
+            ),
+        },
+    ),
+    CityId.ORLANDO: CityRegistration(
+        city_id=CityId.ORLANDO,
+        name="Orlando / Orange County",
+        state="FL",
+        center={"lat": 28.5383, "lng": -81.3792},
+        metro_bbox=ORLANDO_METRO_BBOX,
+        division_bboxes=ORLANDO_DIVISION_BBOXES,
+        submarkets=ORLANDO_SUBMARKETS,
+        divisions=ORLANDO_DIVISIONS,
+        job_suffix="orlando",
+        # Partial SLA-only: Business Tax Receipts primary. STR licenses are
+        # an SLA companion (Nashville/Phoenix STR precedent) — do not use
+        # FeedType.STR. Scheduler does not poll companion_endpoints today,
+        # so ingest is BTR-only until companion polling is grown.
+        datasets={
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.socrata_orlando_sla_endpoint,
+                platform="socrata",
+                watermark_col="received_date",
+                id_keys=["case_number"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                expected_cadence_days=1,
+                order_by="received_date DESC",
+                needs_geocode=True,
+                geocode_context="Orlando, FL",
+                companion_endpoints={
+                    "str_licenses": settings.socrata_orlando_str_endpoint,
+                },
+                field_map=ORLANDO_SLA_FIELD_MAP,
+            ),
+        },
+    ),
+    CityId.MIAMI_DADE: CityRegistration(
+        city_id=CityId.MIAMI_DADE,
+        name="Miami-Dade County",
+        state="FL",
+        center={"lat": 25.7617, "lng": -80.1918},
+        metro_bbox=MIAMI_DADE_METRO_BBOX,
+        division_bboxes=MIAMI_DADE_DIVISION_BBOXES,
+        submarkets=MIAMI_DADE_SUBMARKETS,
+        divisions=MIAMI_DADE_DIVISIONS,
+        job_suffix="miami_dade",
+        # Partial: PERMITS + SLA + DEEDS. 311 year-slices freeze at 2023;
+        # 2024 is token-gated. Do not alias miami / broward / fort_lauderdale.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_miami_dade_permits_url,
+                platform="arcgis",
+                watermark_col="PermitIssuedDate",
+                id_keys=["PermitNumber", "ProcessNumber", "ObjectId"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                needs_geocode=True,
+                geocode_context="Miami-Dade County, FL",
+                oid_field="ObjectId",
+                max_record_count=1000,
+                expected_cadence_days=1,
+                non_spatial=True,
+                rolling_window_days=730,
+                field_map=MIAMI_DADE_FIELD_MAP["permits"],
+            ),
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.arcgis_miami_dade_sla_url,
+                platform="arcgis",
+                watermark_col="BUSSDATE",
+                id_keys=["ACCOUNTNO", "RECEIPTNO", "OBJECTID"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                ingestion_mode="snapshot",
+                oid_field="OBJECTID",
+                max_record_count=16000,
+                expected_cadence_days=30,
+                companion_endpoints={
+                    "certificate_of_use": settings.arcgis_miami_dade_sla_certificate_of_use_url,
+                    "enterprise_twin": settings.arcgis_miami_dade_sla_enterprise_twin_url,
+                },
+                field_map=MIAMI_DADE_FIELD_MAP["sla"],
+            ),
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.arcgis_miami_dade_deeds_url,
+                platform="arcgis",
+                watermark_col="DOS_1",
+                id_keys=["FOLIO", "OR_BK_1", "OR_PG_1", "OBJECTID"],
+                topic=settings.topic_deeds,
+                interval_seconds=600.0,
+                producer_key="deeds",
+                watermark_type="text",
+                watermark_format="%Y%m%d",
+                where="PRICE_1 >= 10000",
+                oid_field="OBJECTID",
+                max_record_count=20000,
+                expected_cadence_days=7,
+                field_map=MIAMI_DADE_FIELD_MAP["deeds"],
+            ),
+        },
+    ),
+    CityId.MEMPHIS: CityRegistration(
+        city_id=CityId.MEMPHIS,
+        name="Memphis / Shelby County",
+        state="TN",
+        center={"lat": 35.1495, "lng": -90.0490},
+        metro_bbox=MEMPHIS_METRO_BBOX,
+        division_bboxes=MEMPHIS_DIVISION_BBOXES,
+        submarkets=MEMPHIS_SUBMARKETS,
+        divisions=MEMPHIS_DIVISIONS,
+        job_suffix="memphis",
+        # Partial like Austin/LA: PERMITS + 311. SLA/deeds are Tier 3
+        # (Accela / Register-of-Deeds UIs). Permits are a monthly dump
+        # (expected_cadence_days=31; 0 August 2026 rows on a 27 Aug probe
+        # is month-end, not a dead archive). OID is ObjectId not OBJECTID.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_memphis_permits_url,
+                platform="arcgis",
+                watermark_col="Issued_Date",
+                id_keys=["Record_ID", "ObjectId"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                expected_cadence_days=31,
+                needs_geocode=True,
+                geocode_context="Memphis, TN",
+                oid_field="ObjectId",
+                max_record_count=1000,
+                order_by="Issued_Date DESC",
+                field_map=MEMPHIS_FIELD_MAP["permits"],
+            ),
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.arcgis_memphis_311_url,
+                platform="arcgis",
+                watermark_col="REPORTED_DATE",
+                id_keys=["INCIDENT_NUMBER", "OBJECTID"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                expected_cadence_days=1,
+                needs_geocode=True,
+                geocode_context="Memphis, TN",
+                oid_field="OBJECTID",
+                max_record_count=3000,
+                order_by="REPORTED_DATE DESC",
+                field_map=MEMPHIS_FIELD_MAP["311"],
+            ),
+        },
+    ),
+    CityId.PHOENIX: CityRegistration(
+        city_id=CityId.PHOENIX,
+        name="Phoenix / Maricopa County",
+        state="AZ",
+        center={"lat": 33.4484, "lng": -112.0740},
+        metro_bbox=PHOENIX_METRO_BBOX,
+        division_bboxes=PHOENIX_DIVISION_BBOXES,
+        submarkets=PHOENIX_SUBMARKETS,
+        divisions=PHOENIX_DIVISIONS,
+        job_suffix="phoenix",
+        # Partial: Planning_Permit + ShapePHX STR-as-SLA. No 311 / deeds.
+        # Do not use FeedType.STR. Companion _DL is metadata until the
+        # scheduler grows companion polling.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_phoenix_permits_url,
+                platform="arcgis",
+                watermark_col="PER_ISSUE_DATE",
+                id_keys=["PER_NUM", "PID", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                expected_cadence_days=1,
+                oid_field="OBJECTID",
+                max_record_count=2000,
+                order_by="PER_ISSUE_DATE DESC",
+                needs_geocode=False,
+                companion_endpoints={
+                    "shapephx_issued": settings.arcgis_phoenix_shapephx_permits_url,
+                },
+                field_map=PHOENIX_FIELD_MAP["permits"],
+            ),
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.arcgis_phoenix_sla_url,
+                platform="arcgis",
+                watermark_col="ISSUED_DATE",
+                id_keys=["NAME", "ID", "OBJECTID"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                expected_cadence_days=7,
+                oid_field="OBJECTID",
+                max_record_count=2000,
+                order_by="ISSUED_DATE DESC",
+                needs_geocode=False,
+                field_map=PHOENIX_FIELD_MAP["sla"],
+            ),
+        },
+    ),
+    CityId.ALBUQUERQUE: CityRegistration(
+        city_id=CityId.ALBUQUERQUE,
+        name="Albuquerque / Bernalillo County",
+        state="NM",
+        center={"lat": 35.0844, "lng": -106.6504},
+        metro_bbox=ALBUQUERQUE_METRO_BBOX,
+        division_bboxes=ALBUQUERQUE_DIVISION_BBOXES,
+        submarkets=ALBUQUERQUE_SUBMARKETS,
+        divisions=ALBUQUERQUE_DIVISIONS,
+        job_suffix="albuquerque",
+        # Partial: PERMITS CSV only. AGIS City_Building_Permits is frozen;
+        # 311 CRM is not anonymously queryable. CSVClient has no IN predicate
+        # — where is NOT IN Expired.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.csv_albuquerque_permits_endpoint,
+                platform="csv",
+                watermark_col="IssueDate",
+                id_keys=["ApplicationPermitNumber"],
+                topic=settings.topic_permits,
+                interval_seconds=1800.0,
+                producer_key="permits",
+                expected_cadence_days=1,
+                watermark_type="text",
+                watermark_format="%Y%m%d",
+                watermark_exclude=["20261224"],
+                where="Status NOT IN ('Expired')",
+                needs_geocode=True,
+                geocode_context="Albuquerque, NM",
+                field_map=ALBUQUERQUE_FIELD_MAP["permits"],
+            ),
+        },
+    ),
+    CityId.ST_LOUIS: CityRegistration(
+        city_id=CityId.ST_LOUIS,
+        name="St. Louis",
+        state="MO",
+        center={"lat": 38.6270, "lng": -90.1994},
+        metro_bbox=ST_LOUIS_METRO_BBOX,
+        division_bboxes=ST_LOUIS_DIVISION_BBOXES,
+        submarkets=ST_LOUIS_SUBMARKETS,
+        divisions=ST_LOUIS_DIVISIONS,
+        job_suffix="stl",
+        # Partial: 311 zip CSV + 30-day permits CSV + liquor SLA snapshot.
+        # Deeds SaleDate lags ~6 months. Independent city only.
+        datasets={
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.csv_st_louis_311_endpoint,
+                platform="csv",
+                watermark_col="datetimeinit",
+                id_keys=["requestid"],
+                topic=settings.topic_311,
+                interval_seconds=1800.0,
+                producer_key="311",
+                expected_cadence_days=1,
+                zip_member="2026.csv",
+                endpoint_by_year={"2026": "2026.csv", "2027": "2027.csv"},
+                geocode_context="St. Louis, MO",
+                field_map=ST_LOUIS_FIELD_MAP["311"],
+            ),
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.csv_st_louis_permits_endpoint,
+                platform="csv",
+                watermark_col="issuedate",
+                id_keys=["address", "issuedate", "applicationdescription"],
+                topic=settings.topic_permits,
+                interval_seconds=1800.0,
+                producer_key="permits",
+                expected_cadence_days=21,
+                rolling_window_days=30,
+                needs_geocode=True,
+                watermark_format="%B, %d %Y %H:%M:%S",
+                geocode_context="St. Louis, MO",
+                field_map=ST_LOUIS_FIELD_MAP["permits"],
+            ),
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.csv_st_louis_sla_endpoint,
+                platform="csv",
+                watermark_col="date_expiration",
+                id_keys=["case_number", "id"],
+                topic=settings.topic_sla,
+                interval_seconds=1800.0,
+                producer_key="sla",
+                expected_cadence_days=1,
+                ingestion_mode="snapshot",
+                needs_geocode=True,
+                where="status_code = 'ACTIVE'",
+                watermark_exclude=["1969-12-31", "3027-07-02"],
+                geocode_context="St. Louis, MO",
+                field_map=ST_LOUIS_FIELD_MAP["sla"],
+            ),
+        },
+    ),
 }
 
 
@@ -3911,6 +4351,31 @@ def resolve_endpoint(spec: DatasetSpec, today: Optional[Any] = None) -> str:
     by_year = spec.endpoint_by_year
     if not by_year:
         return spec.endpoint
+    if today is None:
+        today = datetime.now(timezone.utc).date()
+    year = getattr(today, "year", None)
+    if year is None:
+        year = int(str(today)[:4])
+    for candidate in range(year, -1, -1):
+        key = str(candidate)
+        if key in by_year:
+            return by_year[key]
+    return by_year[max(by_year)]
+
+
+def resolve_zip_member(spec: DatasetSpec, today: Optional[Any] = None) -> Optional[str]:
+    """Resolve a zip-member filename for today without replacing the zip URL.
+
+    St. Louis CSB publishes ``csb.zip`` with year files inside
+    (``2026.csv``, …). ``endpoint_by_year`` maps year → member name; the
+    HTTP endpoint stays the zip. ``resolve_endpoint`` must not be used on
+    those specs — it would return ``2026.csv`` as a URL.
+    """
+    if not spec.zip_member:
+        return None
+    by_year = spec.endpoint_by_year
+    if not by_year:
+        return spec.zip_member
     if today is None:
         today = datetime.now(timezone.utc).date()
     year = getattr(today, "year", None)

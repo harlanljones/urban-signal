@@ -226,7 +226,7 @@ class MunicipalIngestionScheduler:
         }
 
         # Socrata Endpoints & Target Topics mapping derived from city registry
-        from src.spatial.city_registry import REGISTRY, get_job_name, resolve_endpoint
+        from src.spatial.city_registry import REGISTRY, get_job_name, resolve_endpoint, resolve_zip_member
 
         self.job_metadata: dict[str, dict[str, Any]] = {}
         self.configs: dict[str, JobConfig] = {}
@@ -234,8 +234,10 @@ class MunicipalIngestionScheduler:
         for city_id, reg in REGISTRY.items():
             for feed_type, ds in reg.datasets.items():
                 job_name = get_job_name(feed_type, city_id)
+                zip_member = resolve_zip_member(ds) if ds.zip_member else None
+                endpoint = ds.endpoint if ds.zip_member else resolve_endpoint(ds)
                 self.job_metadata[job_name] = {
-                    "endpoint": resolve_endpoint(ds),
+                    "endpoint": endpoint,
                     # Year-slice metadata (ADR 0002 / US-70): kept so the job
                     # can re-resolve its layer at poll time and detect the New
                     # Year switch instead of polling last year's layer forever.
@@ -264,6 +266,7 @@ class MunicipalIngestionScheduler:
                     "watermark_format": ds.watermark_format,
                     "watermark_exclude": ds.watermark_exclude or [],
                     "base_where": ds.where,
+                    "zip_member": zip_member,
                 }
                 self.configs[job_name] = JobConfig(
                     name=job_name,
@@ -340,7 +343,12 @@ class MunicipalIngestionScheduler:
 
     def _extract_record_id(self, job_name: str, row: dict[str, Any]) -> str:
         """Extract a unique record identifier from raw Socrata JSON row."""
-        id_keys = self.job_metadata[job_name]["id_keys"]
+        meta = self.job_metadata[job_name]
+        if meta.get("city_id") == "st_louis" and meta.get("producer_key") == "permits":
+            from src.spatial.cities.st_louis import permit_composite_id
+
+            return f"{job_name}:{permit_composite_id(row)}"
+        id_keys = meta["id_keys"]
         for k in id_keys:
             val = row.get(k)
             if val is not None and str(val).strip():
@@ -413,13 +421,40 @@ class MunicipalIngestionScheduler:
         ``rollover`` metric event so the staleness monitor re-baselines
         instead of paging on the reset. Returns True when a rollover occurred.
         """
-        from src.spatial.city_registry import DatasetSpec, resolve_endpoint
+        from src.spatial.city_registry import DatasetSpec, resolve_endpoint, resolve_zip_member
 
         meta = self.job_metadata[job_name]
         by_year = meta.get("endpoint_by_year")
         if not by_year:
             return False
         today = today or self._today_provider()
+        if meta.get("zip_member"):
+            resolved_member = resolve_zip_member(
+                DatasetSpec(
+                    endpoint=meta["endpoint_base"],
+                    zip_member=meta["zip_member"],
+                    endpoint_by_year=by_year,
+                ),
+                today=today,
+            )
+            if not resolved_member or resolved_member == meta["zip_member"]:
+                return False
+            met = self.metrics[job_name]
+            old_member = meta["zip_member"]
+            old_watermark = met.high_watermark
+            meta["zip_member"] = resolved_member
+            met.high_watermark = None
+            met.rollovers += 1
+            met.last_rollover = today.isoformat()
+            FEED_ROLLOVER.labels(meta.get("city_id", "unknown"), meta.get("producer_key", job_name)).inc()
+            logger.info(
+                "feed_rollover job=%s old_member=%s new_member=%s old_watermark=%s",
+                job_name,
+                old_member,
+                resolved_member,
+                old_watermark,
+            )
+            return True
         resolved = resolve_endpoint(
             DatasetSpec(
                 endpoint=meta["endpoint_base"],
@@ -535,6 +570,7 @@ class MunicipalIngestionScheduler:
                     "watermark_col",
                     "watermark_format",
                     "watermark_exclude",
+                    "zip_member",
                 )
                 if meta.get(k)
             }

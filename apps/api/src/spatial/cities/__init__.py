@@ -349,6 +349,55 @@ from src.spatial.cities.fort_worth import (
     FORT_WORTH_SUBMARKETS,
     is_in_fort_worth_metro,
 )
+from src.spatial.cities.honolulu import (
+    HONOLULU_DIVISION_BBOXES,
+    HONOLULU_DIVISIONS,
+    HONOLULU_METRO_BBOX,
+    HONOLULU_SUBMARKETS,
+    is_in_honolulu_metro,
+)
+from src.spatial.cities.orlando import (
+    ORLANDO_DIVISION_BBOXES,
+    ORLANDO_DIVISIONS,
+    ORLANDO_METRO_BBOX,
+    ORLANDO_SUBMARKETS,
+    is_in_orlando_metro,
+)
+from src.spatial.cities.miami_dade import (
+    MIAMI_DADE_DIVISION_BBOXES,
+    MIAMI_DADE_DIVISIONS,
+    MIAMI_DADE_METRO_BBOX,
+    MIAMI_DADE_SUBMARKETS,
+    is_in_miami_dade_metro,
+)
+from src.spatial.cities.memphis import (
+    MEMPHIS_DIVISION_BBOXES,
+    MEMPHIS_DIVISIONS,
+    MEMPHIS_METRO_BBOX,
+    MEMPHIS_SUBMARKETS,
+    is_in_memphis_metro,
+)
+from src.spatial.cities.phoenix import (
+    PHOENIX_DIVISION_BBOXES,
+    PHOENIX_DIVISIONS,
+    PHOENIX_METRO_BBOX,
+    PHOENIX_SUBMARKETS,
+    is_in_phoenix_metro,
+)
+from src.spatial.cities.albuquerque import (
+    ALBUQUERQUE_DIVISION_BBOXES,
+    ALBUQUERQUE_DIVISIONS,
+    ALBUQUERQUE_METRO_BBOX,
+    ALBUQUERQUE_SUBMARKETS,
+    is_in_albuquerque_metro,
+)
+from src.spatial.cities.st_louis import (
+    ST_LOUIS_DIVISION_BBOXES,
+    ST_LOUIS_DIVISIONS,
+    ST_LOUIS_METRO_BBOX,
+    ST_LOUIS_SUBMARKETS,
+    is_in_st_louis_metro,
+)
 
 __all__ = [
     "PIERCE_METRO_BBOX",
@@ -597,4 +646,39 @@ __all__ = [
     "FORT_WORTH_DIVISIONS",
     "FORT_WORTH_SUBMARKETS",
     "is_in_fort_worth_metro",
+    "HONOLULU_METRO_BBOX",
+    "HONOLULU_DIVISION_BBOXES",
+    "HONOLULU_DIVISIONS",
+    "HONOLULU_SUBMARKETS",
+    "is_in_honolulu_metro",
+    "ORLANDO_METRO_BBOX",
+    "ORLANDO_DIVISION_BBOXES",
+    "ORLANDO_DIVISIONS",
+    "ORLANDO_SUBMARKETS",
+    "is_in_orlando_metro",
+    "MIAMI_DADE_METRO_BBOX",
+    "MIAMI_DADE_DIVISION_BBOXES",
+    "MIAMI_DADE_DIVISIONS",
+    "MIAMI_DADE_SUBMARKETS",
+    "is_in_miami_dade_metro",
+    "MEMPHIS_METRO_BBOX",
+    "MEMPHIS_DIVISION_BBOXES",
+    "MEMPHIS_DIVISIONS",
+    "MEMPHIS_SUBMARKETS",
+    "is_in_memphis_metro",
+    "PHOENIX_METRO_BBOX",
+    "PHOENIX_DIVISION_BBOXES",
+    "PHOENIX_DIVISIONS",
+    "PHOENIX_SUBMARKETS",
+    "is_in_phoenix_metro",
+    "ALBUQUERQUE_METRO_BBOX",
+    "ALBUQUERQUE_DIVISION_BBOXES",
+    "ALBUQUERQUE_DIVISIONS",
+    "ALBUQUERQUE_SUBMARKETS",
+    "is_in_albuquerque_metro",
+    "ST_LOUIS_METRO_BBOX",
+    "ST_LOUIS_DIVISION_BBOXES",
+    "ST_LOUIS_DIVISIONS",
+    "ST_LOUIS_SUBMARKETS",
+    "is_in_st_louis_metro",
 ]
