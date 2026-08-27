@@ -1,0 +1,308 @@
+{
+  "schema_version": 2,
+  "id": "phoenix",
+  "name": "Phoenix / Maricopa County",
+  "state": "AZ",
+  "center": {
+    "lat": 33.4484,
+    "lng": -112.074
+  },
+  "metro_bbox": {
+    "min_lat": 33.28,
+    "max_lat": 33.86,
+    "min_lng": -112.36,
+    "max_lng": -111.92
+  },
+  "divisions": {
+    "DOWNTOWN_CENTRAL": {
+      "name": "DOWNTOWN_CENTRAL",
+      "center": {
+        "lat": 33.47,
+        "lng": -112.08
+      },
+      "bbox": {
+        "min_lat": 33.42,
+        "max_lat": 33.51,
+        "min_lng": -112.13,
+        "max_lng": -112.02
+      },
+      "submarkets": [
+        "Downtown Phoenix",
+        "Midtown / Uptown",
+        "Encanto"
+      ]
+    },
+    "SOUTH_MOUNTAIN": {
+      "name": "SOUTH_MOUNTAIN",
+      "center": {
+        "lat": 33.36,
+        "lng": -112.06
+      },
+      "bbox": {
+        "min_lat": 33.29,
+        "max_lat": 33.42,
+        "min_lng": -112.18,
+        "max_lng": -111.93
+      },
+      "submarkets": [
+        "South Mountain Village",
+        "Ahwatukee Foothills",
+        "Laveen"
+      ]
+    },
+    "WEST_VILLAGES": {
+      "name": "WEST_VILLAGES",
+      "center": {
+        "lat": 33.45,
+        "lng": -112.22
+      },
+      "bbox": {
+        "min_lat": 33.36,
+        "max_lat": 33.54,
+        "min_lng": -112.36,
+        "max_lng": -112.1
+      },
+      "submarkets": [
+        "Maryvale",
+        "Alhambra",
+        "Estrella"
+      ]
+    },
+    "NORTH_CENTRAL": {
+      "name": "NORTH_CENTRAL",
+      "center": {
+        "lat": 33.575,
+        "lng": -112.07
+      },
+      "bbox": {
+        "min_lat": 33.51,
+        "max_lat": 33.64,
+        "min_lng": -112.16,
+        "max_lng": -111.99
+      },
+      "submarkets": [
+        "Sunnyslope",
+        "North Mountain",
+        "Moon Valley"
+      ]
+    },
+    "NORTHEAST_PARADISE": {
+      "name": "NORTHEAST_PARADISE",
+      "center": {
+        "lat": 33.59,
+        "lng": -111.96
+      },
+      "bbox": {
+        "min_lat": 33.48,
+        "max_lat": 33.76,
+        "min_lng": -112.02,
+        "max_lng": -111.92
+      },
+      "submarkets": [
+        "Arcadia",
+        "Paradise Valley Village",
+        "Desert Ridge"
+      ]
+    },
+    "NORTHWEST_DEER_VALLEY": {
+      "name": "NORTHWEST_DEER_VALLEY",
+      "center": {
+        "lat": 33.73,
+        "lng": -112.12
+      },
+      "bbox": {
+        "min_lat": 33.61,
+        "max_lat": 33.86,
+        "min_lng": -112.28,
+        "max_lng": -112.0
+      },
+      "submarkets": [
+        "Deer Valley",
+        "Norterra",
+        "North Gateway"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Phoenix": {
+      "name": "Downtown Phoenix",
+      "division": "DOWNTOWN_CENTRAL",
+      "center": {
+        "lat": 33.4484,
+        "lng": -112.074
+      },
+      "description": "Washington/Central civic and sports core with office-to-residential conversions and the densest Planning & Development pipeline."
+    },
+    "Midtown / Uptown": {
+      "name": "Midtown / Uptown",
+      "division": "DOWNTOWN_CENTRAL",
+      "center": {
+        "lat": 33.4942,
+        "lng": -112.074
+      },
+      "description": "Central Avenue mid-rise corridor between McDowell and Indian School with mixed-use infill and renovation permits."
+    },
+    "Encanto": {
+      "name": "Encanto",
+      "division": "DOWNTOWN_CENTRAL",
+      "center": {
+        "lat": 33.4738,
+        "lng": -112.099
+      },
+      "description": "Historic bungalow grid around Encanto Park with renovation-led permitting and neighborhood conservation overlays."
+    },
+    "South Mountain Village": {
+      "name": "South Mountain Village",
+      "division": "SOUTH_MOUNTAIN",
+      "center": {
+        "lat": 33.406,
+        "lng": -112.073
+      },
+      "description": "South-central grid along Broadway and Central with industrial-adjacent infill and steady structural/MEP permitting."
+    },
+    "Ahwatukee Foothills": {
+      "name": "Ahwatukee Foothills",
+      "division": "SOUTH_MOUNTAIN",
+      "center": {
+        "lat": 33.3417,
+        "lng": -111.9833
+      },
+      "description": "Master-planned south-Phoenix foothills community with solar OTC, residential additions, and constrained mountain-preserve edges."
+    },
+    "Laveen": {
+      "name": "Laveen",
+      "division": "SOUTH_MOUNTAIN",
+      "center": {
+        "lat": 33.3628,
+        "lng": -112.169
+      },
+      "description": "Southwest growth edge with new-construction tract permitting along Baseline and the Loop 202."
+    },
+    "Maryvale": {
+      "name": "Maryvale",
+      "division": "WEST_VILLAGES",
+      "center": {
+        "lat": 33.4917,
+        "lng": -112.1628
+      },
+      "description": "Post-war west-side grid with high permit volume in solar, fire-sprinkler, and small-lot renovation work."
+    },
+    "Alhambra": {
+      "name": "Alhambra",
+      "division": "WEST_VILLAGES",
+      "center": {
+        "lat": 33.5095,
+        "lng": -112.116
+      },
+      "description": "Camelback west-of-Central corridor with commercial miscellaneous and residential alteration permits."
+    },
+    "Estrella": {
+      "name": "Estrella",
+      "division": "WEST_VILLAGES",
+      "center": {
+        "lat": 33.4045,
+        "lng": -112.248
+      },
+      "description": "Far-west village along the Estrella foothills with sparse new construction and industrial-edge permitting."
+    },
+    "Sunnyslope": {
+      "name": "Sunnyslope",
+      "division": "NORTH_CENTRAL",
+      "center": {
+        "lat": 33.5678,
+        "lng": -112.0885
+      },
+      "description": "North-central hillside grid with renovation-led permitting and ShapePHX Issued density around Dunlap."
+    },
+    "North Mountain": {
+      "name": "North Mountain",
+      "division": "NORTH_CENTRAL",
+      "center": {
+        "lat": 33.58,
+        "lng": -112.05
+      },
+      "description": "Preserve-adjacent north-central neighborhoods with residential additions and trailhead-constrained infill."
+    },
+    "Moon Valley": {
+      "name": "Moon Valley",
+      "division": "NORTH_CENTRAL",
+      "center": {
+        "lat": 33.6214,
+        "lng": -112.0769
+      },
+      "description": "North-central estate lots with the densest ShapePHX short-term rental operating-permit cluster."
+    },
+    "Arcadia": {
+      "name": "Arcadia",
+      "division": "NORTHEAST_PARADISE",
+      "center": {
+        "lat": 33.504,
+        "lng": -111.979
+      },
+      "description": "Camelback-east citrus-lot estates with high-value renovation permits and strict lot-coverage overlays."
+    },
+    "Paradise Valley Village": {
+      "name": "Paradise Valley Village",
+      "division": "NORTHEAST_PARADISE",
+      "center": {
+        "lat": 33.5825,
+        "lng": -111.9778
+      },
+      "description": "Tatum/Shea northeast village with mixed-use infill and professional-office permitting (not the Town of Paradise Valley)."
+    },
+    "Desert Ridge": {
+      "name": "Desert Ridge",
+      "division": "NORTHEAST_PARADISE",
+      "center": {
+        "lat": 33.676,
+        "lng": -111.93
+      },
+      "description": "Loop 101 / Tatum mixed-use node with hotel, retail, and multifamily permitting at the city's northeast edge."
+    },
+    "Deer Valley": {
+      "name": "Deer Valley",
+      "division": "NORTHWEST_DEER_VALLEY",
+      "center": {
+        "lat": 33.683,
+        "lng": -112.115
+      },
+      "description": "I-17 / Loop 101 employment and airport-adjacent village with industrial and residential permit velocity."
+    },
+    "Norterra": {
+      "name": "Norterra",
+      "division": "NORTHWEST_DEER_VALLEY",
+      "center": {
+        "lat": 33.714,
+        "lng": -112.116
+      },
+      "description": "North I-17 mixed-use town center with new-construction residential and commercial miscellaneous permits."
+    },
+    "North Gateway": {
+      "name": "North Gateway",
+      "division": "NORTHWEST_DEER_VALLEY",
+      "center": {
+        "lat": 33.7967,
+        "lng": -112.118
+      },
+      "description": "Far-north Carefree Highway growth edge with master-planned residential permitting at the city limit."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "PER_ISSUE_DATE",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "ISSUED_DATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/phoenix.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

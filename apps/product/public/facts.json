@@ -973,7 +973,7 @@
       "submarket_count": 5,
       "feeds": [
         true,
-        false,
+        true,
         true,
         true
       ],
@@ -984,7 +984,12 @@
           "interval_seconds": 300.0,
           "topic": "raw.municipal.permits"
         },
-        null,
+        {
+          "platform": "ckan",
+          "watermark_col": "CREATIONDATE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "GIS_DATETIME",
@@ -1567,13 +1572,18 @@
       "division_count": 1,
       "submarket_count": 5,
       "feeds": [
-        false,
+        true,
         true,
         false,
         false
       ],
       "platforms": [
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "Issued_Dat",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "created_at",
@@ -1667,13 +1677,18 @@
       "division_count": 6,
       "submarket_count": 18,
       "feeds": [
-        false,
+        true,
         true,
         true,
         false
       ],
       "platforms": [
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "ISSUE_DATE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "requested_datetime",
@@ -1893,6 +1908,246 @@
         "lng": -97.33
       },
       "evidence_path": "apps/api/src/spatial/cities/fort_worth.py"
+    },
+    {
+      "id": "honolulu",
+      "name": "Honolulu / City and County of Honolulu",
+      "state": "HI",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 16,
+      "feeds": [
+        false,
+        true,
+        false,
+        false
+      ],
+      "platforms": [
+        null,
+        {
+          "platform": "socrata",
+          "watermark_col": "date_created",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 21.3069,
+        "lng": -157.8583
+      },
+      "evidence_path": "apps/api/src/spatial/cities/honolulu.py"
+    },
+    {
+      "id": "orlando",
+      "name": "Orlando / Orange County",
+      "state": "FL",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 18,
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "socrata",
+          "watermark_col": "received_date",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 28.5383,
+        "lng": -81.3792
+      },
+      "evidence_path": "apps/api/src/spatial/cities/orlando.py"
+    },
+    {
+      "id": "miami_dade",
+      "name": "Miami-Dade County",
+      "state": "FL",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 18,
+      "feeds": [
+        true,
+        false,
+        true,
+        true
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "PermitIssuedDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "BUSSDATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "DOS_1",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 25.7617,
+        "lng": -80.1918
+      },
+      "evidence_path": "apps/api/src/spatial/cities/miami_dade.py"
+    },
+    {
+      "id": "memphis",
+      "name": "Memphis / Shelby County",
+      "state": "TN",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 14,
+      "feeds": [
+        true,
+        true,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "Issued_Date",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "REPORTED_DATE",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 35.1495,
+        "lng": -90.049
+      },
+      "evidence_path": "apps/api/src/spatial/cities/memphis.py"
+    },
+    {
+      "id": "phoenix",
+      "name": "Phoenix / Maricopa County",
+      "state": "AZ",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 18,
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "PER_ISSUE_DATE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "ISSUED_DATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 33.4484,
+        "lng": -112.074
+      },
+      "evidence_path": "apps/api/src/spatial/cities/phoenix.py"
+    },
+    {
+      "id": "albuquerque",
+      "name": "Albuquerque / Bernalillo County",
+      "state": "NM",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 18,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "csv",
+          "watermark_col": "IssueDate",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 35.0844,
+        "lng": -106.6504
+      },
+      "evidence_path": "apps/api/src/spatial/cities/albuquerque.py"
+    },
+    {
+      "id": "st_louis",
+      "name": "St. Louis",
+      "state": "MO",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 6,
+      "feeds": [
+        true,
+        true,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "csv",
+          "watermark_col": "issuedate",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "csv",
+          "watermark_col": "datetimeinit",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "csv",
+          "watermark_col": "date_expiration",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 38.627,
+        "lng": -90.1994
+      },
+      "evidence_path": "apps/api/src/spatial/cities/st_louis.py"
     }
   ],
   "pipeline": [

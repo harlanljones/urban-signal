@@ -1,0 +1,283 @@
+{
+  "schema_version": 2,
+  "id": "honolulu",
+  "name": "Honolulu / City and County of Honolulu",
+  "state": "HI",
+  "center": {
+    "lat": 21.3069,
+    "lng": -157.8583
+  },
+  "metro_bbox": {
+    "min_lat": 21.24,
+    "max_lat": 21.73,
+    "min_lng": -158.29,
+    "max_lng": -157.64
+  },
+  "divisions": {
+    "DOWNTOWN_HNL": {
+      "name": "DOWNTOWN_HNL",
+      "center": {
+        "lat": 21.307,
+        "lng": -157.858
+      },
+      "bbox": {
+        "min_lat": 21.285,
+        "max_lat": 21.325,
+        "min_lng": -157.875,
+        "max_lng": -157.835
+      },
+      "submarkets": [
+        "Downtown Honolulu",
+        "Chinatown",
+        "Kakaako"
+      ]
+    },
+    "WAIKIKI_EAST": {
+      "name": "WAIKIKI_EAST",
+      "center": {
+        "lat": 21.276,
+        "lng": -157.78
+      },
+      "bbox": {
+        "min_lat": 21.25,
+        "max_lat": 21.295,
+        "min_lng": -157.845,
+        "max_lng": -157.7
+      },
+      "submarkets": [
+        "Waikiki",
+        "Diamond Head & Kahala",
+        "Hawaii Kai"
+      ]
+    },
+    "WINDWARD": {
+      "name": "WINDWARD",
+      "center": {
+        "lat": 21.41,
+        "lng": -157.77
+      },
+      "bbox": {
+        "min_lat": 21.37,
+        "max_lat": 21.5,
+        "min_lng": -157.83,
+        "max_lng": -157.68
+      },
+      "submarkets": [
+        "Kailua",
+        "Kaneohe"
+      ]
+    },
+    "CENTRAL_OAHU": {
+      "name": "CENTRAL_OAHU",
+      "center": {
+        "lat": 21.42,
+        "lng": -157.975
+      },
+      "bbox": {
+        "min_lat": 21.36,
+        "max_lat": 21.52,
+        "min_lng": -158.05,
+        "max_lng": -157.9
+      },
+      "submarkets": [
+        "Aiea & Pearl City",
+        "Mililani",
+        "Wahiawa"
+      ]
+    },
+    "LEEWARD": {
+      "name": "LEEWARD",
+      "center": {
+        "lat": 21.37,
+        "lng": -158.09
+      },
+      "bbox": {
+        "min_lat": 21.3,
+        "max_lat": 21.49,
+        "min_lng": -158.23,
+        "max_lng": -157.99
+      },
+      "submarkets": [
+        "Kapolei",
+        "Ewa Beach",
+        "Waianae"
+      ]
+    },
+    "NORTH_SHORE": {
+      "name": "NORTH_SHORE",
+      "center": {
+        "lat": 21.63,
+        "lng": -158.03
+      },
+      "bbox": {
+        "min_lat": 21.55,
+        "max_lat": 21.72,
+        "min_lng": -158.2,
+        "max_lng": -157.88
+      },
+      "submarkets": [
+        "Haleiwa & Waialua",
+        "Laie & Sunset"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Honolulu": {
+      "name": "Downtown Honolulu",
+      "division": "DOWNTOWN_HNL",
+      "center": {
+        "lat": 21.3069,
+        "lng": -157.8583
+      },
+      "description": "Financial-district and civic core around Aloha Tower with office-to-residential conversions and the densest 311 volume on the island."
+    },
+    "Chinatown": {
+      "name": "Chinatown",
+      "division": "DOWNTOWN_HNL",
+      "center": {
+        "lat": 21.3124,
+        "lng": -157.8635
+      },
+      "description": "Historic low-rise commercial enclave with renovation-heavy permitting, night-market density, and preservation overlays."
+    },
+    "Kakaako": {
+      "name": "Kakaako",
+      "division": "DOWNTOWN_HNL",
+      "center": {
+        "lat": 21.298,
+        "lng": -157.86
+      },
+      "description": "Ward Village / Our Kakaako high-rise spine turning former industrial blocks into the metro's densest residential pipeline."
+    },
+    "Waikiki": {
+      "name": "Waikiki",
+      "division": "WAIKIKI_EAST",
+      "center": {
+        "lat": 21.2766,
+        "lng": -157.8278
+      },
+      "description": "Resort-corridor spine on Kalakaua with hotel renovation, timeshare conversion, and the island's highest short-stay pressure."
+    },
+    "Diamond Head & Kahala": {
+      "name": "Diamond Head & Kahala",
+      "division": "WAIKIKI_EAST",
+      "center": {
+        "lat": 21.265,
+        "lng": -157.779
+      },
+      "description": "High-value coastal estate stock east of Waikiki dominated by renovation permits and strict shoreline setbacks."
+    },
+    "Hawaii Kai": {
+      "name": "Hawaii Kai",
+      "division": "WAIKIKI_EAST",
+      "center": {
+        "lat": 21.2856,
+        "lng": -157.7175
+      },
+      "description": "Marina-planned east-Oahu community with ADU and waterfront-renovation activity at the island's southeastern edge."
+    },
+    "Kailua": {
+      "name": "Kailua",
+      "division": "WINDWARD",
+      "center": {
+        "lat": 21.4022,
+        "lng": -157.7394
+      },
+      "description": "Windward beach town with cottage-to-estate renovations and STR-driven small-lot pressure around Kailua Beach."
+    },
+    "Kaneohe": {
+      "name": "Kaneohe",
+      "division": "WINDWARD",
+      "center": {
+        "lat": 21.4183,
+        "lng": -157.8036
+      },
+      "description": "Bayfront suburban grid under the Pali with steady single-family infill and military-adjacent rental demand."
+    },
+    "Aiea & Pearl City": {
+      "name": "Aiea & Pearl City",
+      "division": "CENTRAL_OAHU",
+      "center": {
+        "lat": 21.3972,
+        "lng": -157.9731
+      },
+      "description": "Pearl Harbor-adjacent mid-island suburbs with rail-station infill and aging post-war tract replacement."
+    },
+    "Mililani": {
+      "name": "Mililani",
+      "division": "CENTRAL_OAHU",
+      "center": {
+        "lat": 21.451,
+        "lng": -158.011
+      },
+      "description": "Master-planned central plateau community with townhome infill and renovation-led permitting on the H-2 corridor."
+    },
+    "Wahiawa": {
+      "name": "Wahiawa",
+      "division": "CENTRAL_OAHU",
+      "center": {
+        "lat": 21.502,
+        "lng": -158.023
+      },
+      "description": "Pineapple-town grid at the island's saddle with sparse permitting and Schofield Barracks-adjacent rental stock."
+    },
+    "Kapolei": {
+      "name": "Kapolei",
+      "division": "LEEWARD",
+      "center": {
+        "lat": 21.3356,
+        "lng": -158.0808
+      },
+      "description": "Second-city civic and commercial node with the island's largest new-construction pipeline west of downtown."
+    },
+    "Ewa Beach": {
+      "name": "Ewa Beach",
+      "division": "LEEWARD",
+      "center": {
+        "lat": 21.3169,
+        "lng": -158.0122
+      },
+      "description": "South-loeward tract and Hoakalei marina growth edge with high single-family permit velocity."
+    },
+    "Waianae": {
+      "name": "Waianae",
+      "division": "LEEWARD",
+      "center": {
+        "lat": 21.4389,
+        "lng": -158.1814
+      },
+      "description": "Leeward coast townships with sparse, shoreline-constrained development and high 311 volume relative to permit activity."
+    },
+    "Haleiwa & Waialua": {
+      "name": "Haleiwa & Waialua",
+      "division": "NORTH_SHORE",
+      "center": {
+        "lat": 21.5906,
+        "lng": -158.1036
+      },
+      "description": "North Shore surf-town commercial spine with STR-driven cottage renovations and agricultural-lot pressure."
+    },
+    "Laie & Sunset": {
+      "name": "Laie & Sunset",
+      "division": "NORTH_SHORE",
+      "center": {
+        "lat": 21.6477,
+        "lng": -157.9253
+      },
+      "description": "Windward-north coastal villages with limited new construction and seasonal STR occupancy around Sunset Beach and Laie."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": {
+      "platform": "socrata",
+      "watermark_col": "date_created",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/honolulu.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

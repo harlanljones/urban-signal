@@ -1,0 +1,313 @@
+{
+  "schema_version": 2,
+  "id": "miami_dade",
+  "name": "Miami-Dade County",
+  "state": "FL",
+  "center": {
+    "lat": 25.7617,
+    "lng": -80.1918
+  },
+  "metro_bbox": {
+    "min_lat": 25.13,
+    "max_lat": 25.98,
+    "min_lng": -80.88,
+    "max_lng": -80.11
+  },
+  "divisions": {
+    "DOWNTOWN_BRICKELL": {
+      "name": "DOWNTOWN_BRICKELL",
+      "center": {
+        "lat": 25.774,
+        "lng": -80.194
+      },
+      "bbox": {
+        "min_lat": 25.74,
+        "max_lat": 25.82,
+        "min_lng": -80.22,
+        "max_lng": -80.16
+      },
+      "submarkets": [
+        "Downtown Miami",
+        "Brickell",
+        "Wynwood / Edgewater"
+      ]
+    },
+    "BEACH_BAY": {
+      "name": "BEACH_BAY",
+      "center": {
+        "lat": 25.763,
+        "lng": -80.142
+      },
+      "bbox": {
+        "min_lat": 25.67,
+        "max_lat": 25.88,
+        "min_lng": -80.175,
+        "max_lng": -80.115
+      },
+      "submarkets": [
+        "South Beach",
+        "Mid-Beach",
+        "Key Biscayne"
+      ]
+    },
+    "CORAL_GABLES_GROVE": {
+      "name": "CORAL_GABLES_GROVE",
+      "center": {
+        "lat": 25.718,
+        "lng": -80.267
+      },
+      "bbox": {
+        "min_lat": 25.65,
+        "max_lat": 25.75,
+        "min_lng": -80.33,
+        "max_lng": -80.22
+      },
+      "submarkets": [
+        "Coral Gables",
+        "Coconut Grove",
+        "South Miami / Pinecrest"
+      ]
+    },
+    "NORTH_CORRIDOR": {
+      "name": "NORTH_CORRIDOR",
+      "center": {
+        "lat": 25.918,
+        "lng": -80.221
+      },
+      "bbox": {
+        "min_lat": 25.83,
+        "max_lat": 25.975,
+        "min_lng": -80.32,
+        "max_lng": -80.12
+      },
+      "submarkets": [
+        "Hialeah",
+        "Miami Gardens",
+        "Aventura"
+      ]
+    },
+    "WEST_DORAL_AIRPORT": {
+      "name": "WEST_DORAL_AIRPORT",
+      "center": {
+        "lat": 25.779,
+        "lng": -80.352
+      },
+      "bbox": {
+        "min_lat": 25.73,
+        "max_lat": 25.86,
+        "min_lng": -80.42,
+        "max_lng": -80.28
+      },
+      "submarkets": [
+        "Doral",
+        "Sweetwater",
+        "Westchester"
+      ]
+    },
+    "SOUTH_KENDALL_HOMESTEAD": {
+      "name": "SOUTH_KENDALL_HOMESTEAD",
+      "center": {
+        "lat": 25.55,
+        "lng": -80.4
+      },
+      "bbox": {
+        "min_lat": 25.14,
+        "max_lat": 25.72,
+        "min_lng": -80.55,
+        "max_lng": -80.25
+      },
+      "submarkets": [
+        "Kendall",
+        "Cutler Bay",
+        "Homestead / Florida City"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Miami": {
+      "name": "Downtown Miami",
+      "division": "DOWNTOWN_BRICKELL",
+      "center": {
+        "lat": 25.7617,
+        "lng": -80.1918
+      },
+      "description": "County civic and office core around Government Center with tower conversions and the densest issued-permit pipeline."
+    },
+    "Brickell": {
+      "name": "Brickell",
+      "division": "DOWNTOWN_BRICKELL",
+      "center": {
+        "lat": 25.758,
+        "lng": -80.1915
+      },
+      "description": "Financial-district high-rise spine south of the Miami River with luxury condo and office-to-residential conversions."
+    },
+    "Wynwood / Edgewater": {
+      "name": "Wynwood / Edgewater",
+      "division": "DOWNTOWN_BRICKELL",
+      "center": {
+        "lat": 25.801,
+        "lng": -80.199
+      },
+      "description": "Warehouse-district adaptive reuse and bayfront mid-rise infill north of downtown."
+    },
+    "South Beach": {
+      "name": "South Beach",
+      "division": "BEACH_BAY",
+      "center": {
+        "lat": 25.7826,
+        "lng": -80.1341
+      },
+      "description": "Art Deco hotel-renovation corridor on Ocean Drive with the island's highest hospitality-license density."
+    },
+    "Mid-Beach": {
+      "name": "Mid-Beach",
+      "division": "BEACH_BAY",
+      "center": {
+        "lat": 25.813,
+        "lng": -80.13
+      },
+      "description": "Collins Avenue hotel and condo spine north of South Beach with renovation-led permitting."
+    },
+    "Key Biscayne": {
+      "name": "Key Biscayne",
+      "division": "BEACH_BAY",
+      "center": {
+        "lat": 25.6936,
+        "lng": -80.1628
+      },
+      "description": "Barrier-island village with estate renovations and strict coastal-construction overlays."
+    },
+    "Coral Gables": {
+      "name": "Coral Gables",
+      "division": "CORAL_GABLES_GROVE",
+      "center": {
+        "lat": 25.721,
+        "lng": -80.268
+      },
+      "description": "Mediterranean-revival planned city with Miracle Mile retail and high-value residential renovations."
+    },
+    "Coconut Grove": {
+      "name": "Coconut Grove",
+      "division": "CORAL_GABLES_GROVE",
+      "center": {
+        "lat": 25.727,
+        "lng": -80.241
+      },
+      "description": "Bayfront village of cottages and marinas with teardown pressure on large lots."
+    },
+    "South Miami / Pinecrest": {
+      "name": "South Miami / Pinecrest",
+      "division": "CORAL_GABLES_GROVE",
+      "center": {
+        "lat": 25.706,
+        "lng": -80.293
+      },
+      "description": "US-1 corridor suburbs with estate lots, independent retail, and renovation-led licensing."
+    },
+    "Hialeah": {
+      "name": "Hialeah",
+      "division": "NORTH_CORRIDOR",
+      "center": {
+        "lat": 25.8576,
+        "lng": -80.2781
+      },
+      "description": "Industrial and small-lot residential grid with dense local-business-tax and contractor licensing."
+    },
+    "Miami Gardens": {
+      "name": "Miami Gardens",
+      "division": "NORTH_CORRIDOR",
+      "center": {
+        "lat": 25.942,
+        "lng": -80.2456
+      },
+      "description": "North-county suburban grid at the Broward line with single-family infill and neighborhood services."
+    },
+    "Aventura": {
+      "name": "Aventura",
+      "division": "NORTH_CORRIDOR",
+      "center": {
+        "lat": 25.9564,
+        "lng": -80.139
+      },
+      "description": "Northeast-county condo and mall node at the Broward line — county identity, not Fort Lauderdale."
+    },
+    "Doral": {
+      "name": "Doral",
+      "division": "WEST_DORAL_AIRPORT",
+      "center": {
+        "lat": 25.8195,
+        "lng": -80.3553
+      },
+      "description": "West-county office-park and warehouse city with the metro's densest new-construction industrial pipeline."
+    },
+    "Sweetwater": {
+      "name": "Sweetwater",
+      "division": "WEST_DORAL_AIRPORT",
+      "center": {
+        "lat": 25.7634,
+        "lng": -80.3731
+      },
+      "description": "FIU-adjacent west corridor with small-lot residential and service-license density."
+    },
+    "Westchester": {
+      "name": "Westchester",
+      "division": "WEST_DORAL_AIRPORT",
+      "center": {
+        "lat": 25.7543,
+        "lng": -80.327
+      },
+      "description": "Bird Road suburban grid between the airport and Coral Gables with renovation-led permitting."
+    },
+    "Kendall": {
+      "name": "Kendall",
+      "division": "SOUTH_KENDALL_HOMESTEAD",
+      "center": {
+        "lat": 25.679,
+        "lng": -80.317
+      },
+      "description": "South-Dade suburban commercial spine along Kendall Drive with medical and retail licensing."
+    },
+    "Cutler Bay": {
+      "name": "Cutler Bay",
+      "division": "SOUTH_KENDALL_HOMESTEAD",
+      "center": {
+        "lat": 25.5808,
+        "lng": -80.3467
+      },
+      "description": "South-county lakeside suburbs with small-lot infill and neighborhood services."
+    },
+    "Homestead / Florida City": {
+      "name": "Homestead / Florida City",
+      "division": "SOUTH_KENDALL_HOMESTEAD",
+      "center": {
+        "lat": 25.4687,
+        "lng": -80.4776
+      },
+      "description": "Agricultural south-county edge with new-construction tract housing and the county's southern permit cluster."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "PermitIssuedDate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "BUSSDATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "DOS_1",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/miami_dade.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

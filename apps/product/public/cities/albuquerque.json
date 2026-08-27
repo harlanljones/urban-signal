@@ -1,0 +1,303 @@
+{
+  "schema_version": 2,
+  "id": "albuquerque",
+  "name": "Albuquerque / Bernalillo County",
+  "state": "NM",
+  "center": {
+    "lat": 35.0844,
+    "lng": -106.6504
+  },
+  "metro_bbox": {
+    "min_lat": 34.94,
+    "max_lat": 35.22,
+    "min_lng": -106.85,
+    "max_lng": -106.47
+  },
+  "divisions": {
+    "DOWNTOWN_CORE": {
+      "name": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 35.084,
+        "lng": -106.65
+      },
+      "bbox": {
+        "min_lat": 35.06,
+        "max_lat": 35.12,
+        "min_lng": -106.7,
+        "max_lng": -106.62
+      },
+      "submarkets": [
+        "Downtown Albuquerque",
+        "Old Town",
+        "Barelas"
+      ]
+    },
+    "NOB_HILL_UNM": {
+      "name": "NOB_HILL_UNM",
+      "center": {
+        "lat": 35.081,
+        "lng": -106.605
+      },
+      "bbox": {
+        "min_lat": 35.06,
+        "max_lat": 35.11,
+        "min_lng": -106.63,
+        "max_lng": -106.54
+      },
+      "submarkets": [
+        "Nob Hill",
+        "UNM / University",
+        "International District"
+      ]
+    },
+    "NORTHEAST_HEIGHTS": {
+      "name": "NORTHEAST_HEIGHTS",
+      "center": {
+        "lat": 35.125,
+        "lng": -106.545
+      },
+      "bbox": {
+        "min_lat": 35.09,
+        "max_lat": 35.18,
+        "min_lng": -106.6,
+        "max_lng": -106.48
+      },
+      "submarkets": [
+        "Uptown",
+        "Far Northeast Heights",
+        "Foothills"
+      ]
+    },
+    "NORTH_VALLEY": {
+      "name": "NORTH_VALLEY",
+      "center": {
+        "lat": 35.165,
+        "lng": -106.64
+      },
+      "bbox": {
+        "min_lat": 35.12,
+        "max_lat": 35.22,
+        "min_lng": -106.7,
+        "max_lng": -106.58
+      },
+      "submarkets": [
+        "North Valley",
+        "Journal Center",
+        "Alameda"
+      ]
+    },
+    "WEST_MESA": {
+      "name": "WEST_MESA",
+      "center": {
+        "lat": 35.14,
+        "lng": -106.745
+      },
+      "bbox": {
+        "min_lat": 35.08,
+        "max_lat": 35.2,
+        "min_lng": -106.85,
+        "max_lng": -106.68
+      },
+      "submarkets": [
+        "West Central / Atrisco",
+        "Taylor Ranch / Petroglyph",
+        "Volcano Cliffs"
+      ]
+    },
+    "SOUTH_VALLEY": {
+      "name": "SOUTH_VALLEY",
+      "center": {
+        "lat": 35.02,
+        "lng": -106.64
+      },
+      "bbox": {
+        "min_lat": 34.94,
+        "max_lat": 35.07,
+        "min_lng": -106.75,
+        "max_lng": -106.55
+      },
+      "submarkets": [
+        "South Valley",
+        "Sunport / Airport",
+        "Mesa del Sol"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Albuquerque": {
+      "name": "Downtown Albuquerque",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 35.0844,
+        "lng": -106.6504
+      },
+      "description": "Civic and rail-runner core around Central and 2nd with office-to-residential conversions and the densest issued-permit volume."
+    },
+    "Old Town": {
+      "name": "Old Town",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 35.0964,
+        "lng": -106.6698
+      },
+      "description": "Plaza-centered historic adobe stock with renovation-heavy permitting and preservation overlays west of downtown."
+    },
+    "Barelas": {
+      "name": "Barelas",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 35.0735,
+        "lng": -106.6565
+      },
+      "description": "South-of-downtown rail and warehouse district with adaptive reuse along 4th Street and the Barelas-South Valley seam."
+    },
+    "Nob Hill": {
+      "name": "Nob Hill",
+      "division": "NOB_HILL_UNM",
+      "center": {
+        "lat": 35.0808,
+        "lng": -106.6056
+      },
+      "description": "Route 66 commercial spine east of downtown with storefront renovation, ADU pressure, and the metro's densest street-retail permits."
+    },
+    "UNM / University": {
+      "name": "UNM / University",
+      "division": "NOB_HILL_UNM",
+      "center": {
+        "lat": 35.0843,
+        "lng": -106.6198
+      },
+      "description": "Campus-adjacent rental and medical-office stock with student-housing infill and hospital-corridor permitting."
+    },
+    "International District": {
+      "name": "International District",
+      "division": "NOB_HILL_UNM",
+      "center": {
+        "lat": 35.071,
+        "lng": -106.561
+      },
+      "description": "Central-east corridor along Zuni and Central with small-lot commercial rehab and high 311-to-permit imbalance."
+    },
+    "Uptown": {
+      "name": "Uptown",
+      "division": "NORTHEAST_HEIGHTS",
+      "center": {
+        "lat": 35.104,
+        "lng": -106.571
+      },
+      "description": "Louisiana and I-40 office-retail node with mixed-use tower conversions and the Heights' densest commercial permit pipeline."
+    },
+    "Far Northeast Heights": {
+      "name": "Far Northeast Heights",
+      "division": "NORTHEAST_HEIGHTS",
+      "center": {
+        "lat": 35.145,
+        "lng": -106.525
+      },
+      "description": "Post-war tract grid toward the Sandias with teardown/rebuild and ADU permitting on large lots."
+    },
+    "Foothills": {
+      "name": "Foothills",
+      "division": "NORTHEAST_HEIGHTS",
+      "center": {
+        "lat": 35.096,
+        "lng": -106.498
+      },
+      "description": "High-value east-edge estate stock under Open Space constraints, dominated by renovation rather than new construction."
+    },
+    "North Valley": {
+      "name": "North Valley",
+      "division": "NORTH_VALLEY",
+      "center": {
+        "lat": 35.161,
+        "lng": -106.642
+      },
+      "description": "Acequia-irrigated lots along 4th Street with estate infill, horse-property splits, and Los Ranchos-adjacent permitting."
+    },
+    "Journal Center": {
+      "name": "Journal Center",
+      "division": "NORTH_VALLEY",
+      "center": {
+        "lat": 35.148,
+        "lng": -106.589
+      },
+      "description": "I-25 north employment campus with office, industrial, and limited residential conversion permits."
+    },
+    "Alameda": {
+      "name": "Alameda",
+      "division": "NORTH_VALLEY",
+      "center": {
+        "lat": 35.192,
+        "lng": -106.646
+      },
+      "description": "Northern city-limit villages along the Rio Grande with sparse permitting and agricultural-lot pressure."
+    },
+    "West Central / Atrisco": {
+      "name": "West Central / Atrisco",
+      "division": "WEST_MESA",
+      "center": {
+        "lat": 35.095,
+        "lng": -106.722
+      },
+      "description": "Central Avenue west of the river with corridor commercial rehab and Atrisco-grant residential infill."
+    },
+    "Taylor Ranch / Petroglyph": {
+      "name": "Taylor Ranch / Petroglyph",
+      "division": "WEST_MESA",
+      "center": {
+        "lat": 35.158,
+        "lng": -106.732
+      },
+      "description": "Northwest mesa master-planned tracts against Petroglyph National Monument with high single-family permit velocity."
+    },
+    "Volcano Cliffs": {
+      "name": "Volcano Cliffs",
+      "division": "WEST_MESA",
+      "center": {
+        "lat": 35.168,
+        "lng": -106.762
+      },
+      "description": "Far-west escarpment growth edge with new-construction permitting on volcanic-mesa lots."
+    },
+    "South Valley": {
+      "name": "South Valley",
+      "division": "SOUTH_VALLEY",
+      "center": {
+        "lat": 35.022,
+        "lng": -106.682
+      },
+      "description": "Unincorporated-adjacent south valley with agricultural-lot splits, owner-builder permits, and Isleta-road commercial."
+    },
+    "Sunport / Airport": {
+      "name": "Sunport / Airport",
+      "division": "SOUTH_VALLEY",
+      "center": {
+        "lat": 35.041,
+        "lng": -106.609
+      },
+      "description": "Airport and Yale industrial belt with warehouse, hotel, and limited residential permitting south of Gibson."
+    },
+    "Mesa del Sol": {
+      "name": "Mesa del Sol",
+      "division": "SOUTH_VALLEY",
+      "center": {
+        "lat": 34.995,
+        "lng": -106.622
+      },
+      "description": "Master-planned south mesa with the city's largest greenfield residential and employment-center pipeline."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "csv",
+      "watermark_col": "IssueDate",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/albuquerque.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

@@ -1,0 +1,303 @@
+{
+  "schema_version": 2,
+  "id": "orlando",
+  "name": "Orlando / Orange County",
+  "state": "FL",
+  "center": {
+    "lat": 28.5383,
+    "lng": -81.3792
+  },
+  "metro_bbox": {
+    "min_lat": 28.34,
+    "max_lat": 28.64,
+    "min_lng": -81.52,
+    "max_lng": -81.22
+  },
+  "divisions": {
+    "DOWNTOWN_LAKE_EOLA": {
+      "name": "DOWNTOWN_LAKE_EOLA",
+      "center": {
+        "lat": 28.538,
+        "lng": -81.374
+      },
+      "bbox": {
+        "min_lat": 28.52,
+        "max_lat": 28.56,
+        "min_lng": -81.4,
+        "max_lng": -81.35
+      },
+      "submarkets": [
+        "Downtown Orlando",
+        "Thornton Park",
+        "SoDo"
+      ]
+    },
+    "NORTH_COLLEGE_PARK": {
+      "name": "NORTH_COLLEGE_PARK",
+      "center": {
+        "lat": 28.577,
+        "lng": -81.392
+      },
+      "bbox": {
+        "min_lat": 28.555,
+        "max_lat": 28.62,
+        "min_lng": -81.42,
+        "max_lng": -81.36
+      },
+      "submarkets": [
+        "College Park",
+        "Ivanhoe Village",
+        "Princeton / Silver Star"
+      ]
+    },
+    "EAST_BALDWIN_PARK": {
+      "name": "EAST_BALDWIN_PARK",
+      "center": {
+        "lat": 28.562,
+        "lng": -81.342
+      },
+      "bbox": {
+        "min_lat": 28.54,
+        "max_lat": 28.6,
+        "min_lng": -81.36,
+        "max_lng": -81.28
+      },
+      "submarkets": [
+        "Baldwin Park",
+        "Milk District",
+        "Audubon Park"
+      ]
+    },
+    "SOUTH_ORANGE_CONWAY": {
+      "name": "SOUTH_ORANGE_CONWAY",
+      "center": {
+        "lat": 28.503,
+        "lng": -81.343
+      },
+      "bbox": {
+        "min_lat": 28.48,
+        "max_lat": 28.535,
+        "min_lng": -81.4,
+        "max_lng": -81.3
+      },
+      "submarkets": [
+        "South Orange",
+        "Conway",
+        "Airport North"
+      ]
+    },
+    "WEST_IDRIVE_METROWEST": {
+      "name": "WEST_IDRIVE_METROWEST",
+      "center": {
+        "lat": 28.488,
+        "lng": -81.469
+      },
+      "bbox": {
+        "min_lat": 28.43,
+        "max_lat": 28.54,
+        "min_lng": -81.52,
+        "max_lng": -81.4
+      },
+      "submarkets": [
+        "International Drive / Florida Center",
+        "Metro West",
+        "Kirkman / Universal Edge"
+      ]
+    },
+    "SOUTHEAST_LAKE_NONA": {
+      "name": "SOUTHEAST_LAKE_NONA",
+      "center": {
+        "lat": 28.408,
+        "lng": -81.279
+      },
+      "bbox": {
+        "min_lat": 28.34,
+        "max_lat": 28.48,
+        "min_lng": -81.36,
+        "max_lng": -81.22
+      },
+      "submarkets": [
+        "Lake Nona South / Medical City",
+        "Lake Nona Central",
+        "Airport South"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Orlando": {
+      "name": "Downtown Orlando",
+      "division": "DOWNTOWN_LAKE_EOLA",
+      "center": {
+        "lat": 28.5383,
+        "lng": -81.3792
+      },
+      "description": "Church Street and Lake Eola civic core with office-to-residential conversions and the densest business-tax pipeline."
+    },
+    "Thornton Park": {
+      "name": "Thornton Park",
+      "division": "DOWNTOWN_LAKE_EOLA",
+      "center": {
+        "lat": 28.543,
+        "lng": -81.368
+      },
+      "description": "Brick-street bungalow grid east of Lake Eola with renovation-led licensing and neighborhood retail."
+    },
+    "SoDo": {
+      "name": "SoDo",
+      "division": "DOWNTOWN_LAKE_EOLA",
+      "center": {
+        "lat": 28.53,
+        "lng": -81.376
+      },
+      "description": "South of Downtown warehouse and creative-office conversions along Orange Avenue."
+    },
+    "College Park": {
+      "name": "College Park",
+      "division": "NORTH_COLLEGE_PARK",
+      "center": {
+        "lat": 28.577,
+        "lng": -81.393
+      },
+      "description": "North-of-downtown streetcar suburb with Edgewater Drive retail and high STR turnover."
+    },
+    "Ivanhoe Village": {
+      "name": "Ivanhoe Village",
+      "division": "NORTH_COLLEGE_PARK",
+      "center": {
+        "lat": 28.568,
+        "lng": -81.377
+      },
+      "description": "Mills Avenue corridor between downtown and College Park with adaptive-reuse commercial."
+    },
+    "Princeton / Silver Star": {
+      "name": "Princeton / Silver Star",
+      "division": "NORTH_COLLEGE_PARK",
+      "center": {
+        "lat": 28.585,
+        "lng": -81.405
+      },
+      "description": "Industrial-adjacent north side with contractor and service-license density along Silver Star."
+    },
+    "Baldwin Park": {
+      "name": "Baldwin Park",
+      "division": "EAST_BALDWIN_PARK",
+      "center": {
+        "lat": 28.57,
+        "lng": -81.325
+      },
+      "description": "Master-planned New Urbanist village on the former Navy base with mixed-use and professional offices."
+    },
+    "Milk District": {
+      "name": "Milk District",
+      "division": "EAST_BALDWIN_PARK",
+      "center": {
+        "lat": 28.548,
+        "lng": -81.351
+      },
+      "description": "Colonialtown east-of-downtown grid with brewery/retail conversions and short-term rental pressure."
+    },
+    "Audubon Park": {
+      "name": "Audubon Park",
+      "division": "EAST_BALDWIN_PARK",
+      "center": {
+        "lat": 28.569,
+        "lng": -81.351
+      },
+      "description": "Garden-district bungalows along Corrine Drive with independent retail and renovation licenses."
+    },
+    "South Orange": {
+      "name": "South Orange",
+      "division": "SOUTH_ORANGE_CONWAY",
+      "center": {
+        "lat": 28.522,
+        "lng": -81.377
+      },
+      "description": "Orlando Health medical corridor on South Orange Avenue with professional and clinical licensing."
+    },
+    "Conway": {
+      "name": "Conway",
+      "division": "SOUTH_ORANGE_CONWAY",
+      "center": {
+        "lat": 28.498,
+        "lng": -81.331
+      },
+      "description": "Lakeside residential south of downtown with small-lot infill and neighborhood services."
+    },
+    "Airport North": {
+      "name": "Airport North",
+      "division": "SOUTH_ORANGE_CONWAY",
+      "center": {
+        "lat": 28.49,
+        "lng": -81.32
+      },
+      "description": "MCO-adjacent logistics and hospitality licensing north of the airfield."
+    },
+    "International Drive / Florida Center": {
+      "name": "International Drive / Florida Center",
+      "division": "WEST_IDRIVE_METROWEST",
+      "center": {
+        "lat": 28.46,
+        "lng": -81.467
+      },
+      "description": "Tourist-corridor hospitality, retail, and body-art licensing along International Drive."
+    },
+    "Metro West": {
+      "name": "Metro West",
+      "division": "WEST_IDRIVE_METROWEST",
+      "center": {
+        "lat": 28.513,
+        "lng": -81.485
+      },
+      "description": "West-side planned community and office park with service and contractor licenses."
+    },
+    "Kirkman / Universal Edge": {
+      "name": "Kirkman / Universal Edge",
+      "division": "WEST_IDRIVE_METROWEST",
+      "center": {
+        "lat": 28.49,
+        "lng": -81.455
+      },
+      "description": "Kirkman Road hospitality and contractor spine at the Universal resort edge."
+    },
+    "Lake Nona South / Medical City": {
+      "name": "Lake Nona South / Medical City",
+      "division": "SOUTHEAST_LAKE_NONA",
+      "center": {
+        "lat": 28.368,
+        "lng": -81.275
+      },
+      "description": "Nemours / UCF Medical City campus with physician and professional-firm licensing."
+    },
+    "Lake Nona Central": {
+      "name": "Lake Nona Central",
+      "division": "SOUTHEAST_LAKE_NONA",
+      "center": {
+        "lat": 28.425,
+        "lng": -81.255
+      },
+      "description": "Town-center mixed-use and residential buildout east of the airport."
+    },
+    "Airport South": {
+      "name": "Airport South",
+      "division": "SOUTHEAST_LAKE_NONA",
+      "center": {
+        "lat": 28.431,
+        "lng": -81.308
+      },
+      "description": "Airside industrial and cargo licensing south of MCO."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "socrata",
+      "watermark_col": "received_date",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/orlando.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

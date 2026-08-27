@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "id": "st_louis",
+  "name": "St. Louis",
+  "state": "MO",
+  "center": {
+    "lat": 38.627,
+    "lng": -90.1994
+  },
+  "metro_bbox": {
+    "min_lat": 38.53,
+    "max_lat": 38.775,
+    "min_lng": -90.322,
+    "max_lng": -90.166
+  },
+  "divisions": {
+    "STL_CORE": {
+      "name": "St. Louis Core",
+      "center": {
+        "lat": 38.627,
+        "lng": -90.1994
+      },
+      "bbox": {
+        "min_lat": 38.57,
+        "max_lat": 38.68,
+        "min_lng": -90.3,
+        "max_lng": -90.18
+      },
+      "submarkets": [
+        "Downtown & Gateway Arch",
+        "Central West End",
+        "The Hill",
+        "Soulard & Benton Park",
+        "Tower Grove & Shaw",
+        "Old North St. Louis"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Gateway Arch": {
+      "name": "Downtown & Gateway Arch",
+      "division": "STL_CORE",
+      "center": {
+        "lat": 38.627,
+        "lng": -90.1994
+      },
+      "description": "Civic core and riverfront around the Gateway Arch with office conversion, stadium-adjacent hospitality, and the densest CSB 311 volume in the city."
+    },
+    "Central West End": {
+      "name": "Central West End",
+      "division": "STL_CORE",
+      "center": {
+        "lat": 38.6447,
+        "lng": -90.2614
+      },
+      "description": "Medical-and-university district around BJC / WashU with high-value residential rehab and mixed-use infill along Euclid."
+    },
+    "The Hill": {
+      "name": "The Hill",
+      "division": "STL_CORE",
+      "center": {
+        "lat": 38.6162,
+        "lng": -90.2778
+      },
+      "description": "Italian enclave west of Kingshighway with renovation-led permitting, restaurant density, and stable single-family stock."
+    },
+    "Soulard & Benton Park": {
+      "name": "Soulard & Benton Park",
+      "division": "STL_CORE",
+      "center": {
+        "lat": 38.6045,
+        "lng": -90.2085
+      },
+      "description": "Historic market neighborhood and brewery corridor south of downtown with rehab-heavy permitting and hospitality churn."
+    },
+    "Tower Grove & Shaw": {
+      "name": "Tower Grove & Shaw",
+      "division": "STL_CORE",
+      "center": {
+        "lat": 38.588,
+        "lng": -90.256
+      },
+      "description": "South-city garden-district grid around Tower Grove Park with steady single-family rehab and small-commercial renewal."
+    },
+    "Old North St. Louis": {
+      "name": "Old North St. Louis",
+      "division": "STL_CORE",
+      "center": {
+        "lat": 38.655,
+        "lng": -90.195
+      },
+      "description": "Near-north historic district with sparse but targeted rehab, high 311 volume relative to permit activity, and riverfront-adjacent vacant-stock pressure."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "csv",
+      "watermark_col": "issuedate",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "csv",
+      "watermark_col": "datetimeinit",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "csv",
+      "watermark_col": "date_expiration",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/st_louis.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

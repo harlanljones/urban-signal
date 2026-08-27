@@ -1,0 +1,268 @@
+{
+  "schema_version": 2,
+  "id": "memphis",
+  "name": "Memphis / Shelby County",
+  "state": "TN",
+  "center": {
+    "lat": 35.1495,
+    "lng": -90.049
+  },
+  "metro_bbox": {
+    "min_lat": 34.99,
+    "max_lat": 35.28,
+    "min_lng": -90.13,
+    "max_lng": -89.68
+  },
+  "divisions": {
+    "DOWNTOWN_RIVERFRONT": {
+      "name": "DOWNTOWN_RIVERFRONT",
+      "center": {
+        "lat": 35.1495,
+        "lng": -90.049
+      },
+      "bbox": {
+        "min_lat": 35.125,
+        "max_lat": 35.175,
+        "min_lng": -90.075,
+        "max_lng": -90.025
+      },
+      "submarkets": [
+        "Downtown Memphis",
+        "Harbor Town & Mud Island",
+        "South Main"
+      ]
+    },
+    "MIDTOWN_MEDICAL": {
+      "name": "MIDTOWN_MEDICAL",
+      "center": {
+        "lat": 35.14,
+        "lng": -90.0
+      },
+      "bbox": {
+        "min_lat": 35.115,
+        "max_lat": 35.165,
+        "min_lng": -90.03,
+        "max_lng": -89.97
+      },
+      "submarkets": [
+        "Midtown & Cooper-Young",
+        "Medical District",
+        "Overton Park & Evergreen"
+      ]
+    },
+    "EAST_MEMPHIS_POPLAR": {
+      "name": "EAST_MEMPHIS_POPLAR",
+      "center": {
+        "lat": 35.13,
+        "lng": -89.91
+      },
+      "bbox": {
+        "min_lat": 35.1,
+        "max_lat": 35.16,
+        "min_lng": -89.97,
+        "max_lng": -89.85
+      },
+      "submarkets": [
+        "East Memphis",
+        "Poplar Corridor"
+      ]
+    },
+    "SOUTH_WHITEHAVEN": {
+      "name": "SOUTH_WHITEHAVEN",
+      "center": {
+        "lat": 35.04,
+        "lng": -90.02
+      },
+      "bbox": {
+        "min_lat": 34.995,
+        "max_lat": 35.1,
+        "min_lng": -90.08,
+        "max_lng": -89.9
+      },
+      "submarkets": [
+        "Whitehaven",
+        "South Memphis"
+      ]
+    },
+    "NORTH_FRAYSER_RALEIGH": {
+      "name": "NORTH_FRAYSER_RALEIGH",
+      "center": {
+        "lat": 35.22,
+        "lng": -89.955
+      },
+      "bbox": {
+        "min_lat": 35.175,
+        "max_lat": 35.27,
+        "min_lng": -90.08,
+        "max_lng": -89.85
+      },
+      "submarkets": [
+        "Frayser",
+        "Raleigh"
+      ]
+    },
+    "UNIVERSITY_HICKORY_HILL": {
+      "name": "UNIVERSITY_HICKORY_HILL",
+      "center": {
+        "lat": 35.09,
+        "lng": -89.85
+      },
+      "bbox": {
+        "min_lat": 35.04,
+        "max_lat": 35.145,
+        "min_lng": -89.95,
+        "max_lng": -89.7
+      },
+      "submarkets": [
+        "University District",
+        "Hickory Hill & Parkway Village"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Memphis": {
+      "name": "Downtown Memphis",
+      "division": "DOWNTOWN_RIVERFRONT",
+      "center": {
+        "lat": 35.1495,
+        "lng": -90.049
+      },
+      "description": "Mississippi riverfront civic core around Court Square and Beale with office-to-residential conversions and the densest 311 volume in the metro."
+    },
+    "Harbor Town & Mud Island": {
+      "name": "Harbor Town & Mud Island",
+      "division": "DOWNTOWN_RIVERFRONT",
+      "center": {
+        "lat": 35.165,
+        "lng": -90.055
+      },
+      "description": "Planned river-island neighborhood north of downtown with renovation-led permitting and trail-adjacent residential stock."
+    },
+    "South Main": {
+      "name": "South Main",
+      "division": "DOWNTOWN_RIVERFRONT",
+      "center": {
+        "lat": 35.135,
+        "lng": -90.058
+      },
+      "description": "Arts-district warehouse conversions south of Beale with loft infill and entertainment-adjacent short-stay pressure."
+    },
+    "Midtown & Cooper-Young": {
+      "name": "Midtown & Cooper-Young",
+      "division": "MIDTOWN_MEDICAL",
+      "center": {
+        "lat": 35.135,
+        "lng": -90.005
+      },
+      "description": "Streetcar-era bungalow grid and Cooper-Young commercial node with renovation-heavy residential permitting."
+    },
+    "Medical District": {
+      "name": "Medical District",
+      "division": "MIDTOWN_MEDICAL",
+      "center": {
+        "lat": 35.14,
+        "lng": -90.018
+      },
+      "description": "Hospital-anchored employment core between downtown and Midtown with institutional expansion and workforce housing."
+    },
+    "Overton Park & Evergreen": {
+      "name": "Overton Park & Evergreen",
+      "division": "MIDTOWN_MEDICAL",
+      "center": {
+        "lat": 35.148,
+        "lng": -89.99
+      },
+      "description": "Park-adjacent historic district with conservation overlays and steady single-family renovation."
+    },
+    "East Memphis": {
+      "name": "East Memphis",
+      "division": "EAST_MEMPHIS_POPLAR",
+      "center": {
+        "lat": 35.125,
+        "lng": -89.91
+      },
+      "description": "Poplar-corridor professional and residential belt with the metro's highest-value single-family stock and office parks."
+    },
+    "Poplar Corridor": {
+      "name": "Poplar Corridor",
+      "division": "EAST_MEMPHIS_POPLAR",
+      "center": {
+        "lat": 35.14,
+        "lng": -89.89
+      },
+      "description": "East-Poplar commercial spine toward Germantown with medical-office and multifamily infill."
+    },
+    "Whitehaven": {
+      "name": "Whitehaven",
+      "division": "SOUTH_WHITEHAVEN",
+      "center": {
+        "lat": 35.033,
+        "lng": -90.025
+      },
+      "description": "South-Memphis Graceland corridor with renovation and alteration permits on post-war tract housing."
+    },
+    "South Memphis": {
+      "name": "South Memphis",
+      "division": "SOUTH_WHITEHAVEN",
+      "center": {
+        "lat": 35.075,
+        "lng": -90.045
+      },
+      "description": "Industrial-adjacent south grid with sparse new construction and high 311 volume relative to permit activity."
+    },
+    "Frayser": {
+      "name": "Frayser",
+      "division": "NORTH_FRAYSER_RALEIGH",
+      "center": {
+        "lat": 35.22,
+        "lng": -90.0
+      },
+      "description": "North-Memphis residential plateau with alteration-led permitting and code-enforcement-heavy 311 demand."
+    },
+    "Raleigh": {
+      "name": "Raleigh",
+      "division": "NORTH_FRAYSER_RALEIGH",
+      "center": {
+        "lat": 35.23,
+        "lng": -89.91
+      },
+      "description": "Northeast Memphis / Raleigh Springs corridor with suburban-lot renovations and retail-node 311 volume."
+    },
+    "University District": {
+      "name": "University District",
+      "division": "UNIVERSITY_HICKORY_HILL",
+      "center": {
+        "lat": 35.118,
+        "lng": -89.937
+      },
+      "description": "University of Memphis-adjacent rental and small-lot stock with student-driven turnover and renovation permits."
+    },
+    "Hickory Hill & Parkway Village": {
+      "name": "Hickory Hill & Parkway Village",
+      "division": "UNIVERSITY_HICKORY_HILL",
+      "center": {
+        "lat": 35.06,
+        "lng": -89.85
+      },
+      "description": "Southeast Memphis suburban grid toward the Germantown line with townhome infill and solid-waste 311 load."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "Issued_Date",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "REPORTED_DATE",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/memphis.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
