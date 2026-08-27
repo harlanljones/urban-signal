@@ -62,7 +62,7 @@
         "lat": 40.7128,
         "lng": -74.006
       },
-      "evidence_path": "apps/api/src/spatial/city_registry.py"
+      "evidence_path": "apps/api/src/spatial/cities/nyc.py"
     },
     {
       "id": "chicago",
@@ -1863,6 +1863,36 @@
         "lng": -116.211
       },
       "evidence_path": "apps/api/src/spatial/cities/boise.py"
+    },
+    {
+      "id": "fort_worth",
+      "name": "Fort Worth / Tarrant County",
+      "state": "TX",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 6,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "File_Date",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 32.755,
+        "lng": -97.33
+      },
+      "evidence_path": "apps/api/src/spatial/cities/fort_worth.py"
     }
   ],
   "pipeline": [

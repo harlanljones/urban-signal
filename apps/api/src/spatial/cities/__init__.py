@@ -342,6 +342,13 @@ from src.spatial.cities.boise import (
     BOISE_SUBMARKETS,
     is_in_boise_metro,
 )
+from src.spatial.cities.fort_worth import (
+    FORT_WORTH_DIVISION_BBOXES,
+    FORT_WORTH_DIVISIONS,
+    FORT_WORTH_METRO_BBOX,
+    FORT_WORTH_SUBMARKETS,
+    is_in_fort_worth_metro,
+)
 
 __all__ = [
     "PIERCE_METRO_BBOX",
@@ -585,4 +592,9 @@ __all__ = [
     "BOISE_DIVISIONS",
     "BOISE_SUBMARKETS",
     "is_in_boise_metro",
+    "FORT_WORTH_METRO_BBOX",
+    "FORT_WORTH_DIVISION_BBOXES",
+    "FORT_WORTH_DIVISIONS",
+    "FORT_WORTH_SUBMARKETS",
+    "is_in_fort_worth_metro",
 ]

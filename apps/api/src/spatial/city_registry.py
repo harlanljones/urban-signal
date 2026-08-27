@@ -16,6 +16,7 @@ from src.producers.field_maps_san_jose import FIELD_MAP as SAN_JOSE_FIELD_MAP
 from src.producers.field_maps_tampa import FIELD_MAP as TAMPA_FIELD_MAP, SLA_FIELD_MAP as TAMPA_SLA_FIELD_MAP
 from src.producers.field_maps_las_vegas import FIELD_MAP as LAS_VEGAS_FIELD_MAP
 from src.producers.field_maps_boise import FIELD_MAP as BOISE_PERMITS_FIELD_MAP
+from src.producers.field_maps_fort_worth import FIELD_MAP as FORT_WORTH_PERMITS_FIELD_MAP
 from src.producers.field_maps_boston_licensing import FIELD_MAP as BOSTON_LICENSING_FIELD_MAP
 from src.spatial.cities.portland import (
     PORTLAND_DIVISION_BBOXES,
@@ -309,6 +310,12 @@ from src.spatial.cities.boise import (
     BOISE_METRO_BBOX,
     BOISE_SUBMARKETS,
 )
+from src.spatial.cities.fort_worth import (
+    FORT_WORTH_DIVISION_BBOXES,
+    FORT_WORTH_DIVISIONS,
+    FORT_WORTH_METRO_BBOX,
+    FORT_WORTH_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -371,6 +378,7 @@ class CityId(str, Enum):
     TAMPA = "tampa"
     LAS_VEGAS = "las_vegas"
     BOISE = "boise"
+    FORT_WORTH = "fort_worth"
 
 
 class FeedType(str, Enum):
@@ -825,6 +833,14 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "boise id": CityId.BOISE,
     "ada_county": CityId.BOISE,
     "ada county": CityId.BOISE,
+
+    # Fort Worth / Tarrant County, TX
+    "fort_worth": CityId.FORT_WORTH,
+    "fort worth": CityId.FORT_WORTH,
+    "fortworth": CityId.FORT_WORTH,
+    "fort worth tx": CityId.FORT_WORTH,
+    "tarrant_county": CityId.FORT_WORTH,
+    "tarrant county": CityId.FORT_WORTH,
 }
 
 
@@ -1564,6 +1580,24 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 where="county = 'Travis'",
                 field_map={'license_id': ['license_id'], 'license_type': ['license_type'], 'effective_date': ['current_issued_date'], 'expiration_date': ['expiration_date'], 'premises_name': ['owner'], 'dba': ['trade_name'], 'address_street': ['address'], 'status': ['license_status']},
             ),
+            # US-71: APD NIBRS Group A Offenses (Socrata `thrk-bqb6`). Rows carry
+            # no lat/lng — only zip_code + census_block_group — so needs_geocode
+            # flips the coordinate requirement and the ADR 0004 geocoder resolves
+            # coordinates from the zip_code context at parse time (no address
+            # string is published, so zip_code alone is the only geocode key).
+            FeedType.CRIME: DatasetSpec(
+                endpoint=settings.socrata_austin_crime_endpoint,
+                platform="socrata",
+                watermark_col="occurred_date",
+                id_keys=["offenseid"],
+                topic="raw.municipal.crime",
+                interval_seconds=300.0,
+                producer_key="crime",
+                needs_geocode=True,
+                geocode_context="zip_code",
+                expected_cadence_days=7,
+                field_map={'incident_id': ['offenseid'], 'offense_type': ['nibrs_desc', 'nibrs_category'], 'occurred_date': ['occurred_date']},
+            ),
         },
     ),
     CityId.CINCINNATI: CityRegistration(
@@ -1697,6 +1731,26 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 state_plane_x_col='gpsx',
                 state_plane_y_col='gpsy',
                 field_map=BOSTON_LICENSING_FIELD_MAP,
+            ),
+            # US-: Boston Crime Incident Reports (CKAN 6220d948-... odata v4).
+            # Source carries Lat/Long directly, so no geocode step required.
+            FeedType.CRIME: DatasetSpec(
+                endpoint=settings.ckan_boston_crime_endpoint,
+                platform="ckan",
+                watermark_col="OCCURRED_ON_DATE",
+                id_keys=["INCIDENT_NUMBER"],
+                topic="raw.municipal.crime",
+                interval_seconds=300.0,
+                producer_key="crime",
+                field_map={
+                    "incident_id": ["INCIDENT_NUMBER"],
+                    "offense_type": ["OFFENSE_DESCRIPTION"],
+                    "occurred_date": ["OCCURRED_ON_DATE"],
+                    "latitude": ["Lat"],
+                    "longitude": ["Long"],
+                },
+                needs_geocode=False,
+                expected_cadence_days=7,
             ),
         },
     ),
@@ -2546,6 +2600,39 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 watermark_exclude=[],
                 field_map={'doc_id': ['propertyid'], 'bbl': ['taxkey'], 'address_street': ['address'], 'document_amount': ['sale_price'], 'recorded_date': ['sale_date'], 'doc_type': ['proptype'], 'borough': ['district', 'nbhd']},
             ),
+            # US-265: Milwaukee NIBRS crime (CKAN datastore, native lat/long).
+            FeedType.CRIME: DatasetSpec(
+                endpoint=settings.ckan_milwaukee_crime_endpoint,
+                platform="ckan",
+                watermark_col="Incident_Last_Edited",
+                id_keys=["Case_Number"],
+                topic=settings.topic_crime,
+                interval_seconds=300.0,
+                producer_key="crime",
+                expected_cadence_days=7,
+                watermark_type="timestamp",
+                watermark_format="%Y-%m-%d %H:%M:%S",
+                order_by="Incident_Last_Edited ASC",
+                field_map={'incident_id': ['Case_Number'], 'latitude': ['Address_Latitude'], 'longitude': ['Address_Longitude'], 'offense_type': ['Offense_All'], 'occurred_date': ['Incident_Date'], 'borough': ['Police_District']},
+            ),
+            # US-265: Milwaukee Call Center 311 (CKAN, address-only -> geocoded).
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.ckan_milwaukee_311_endpoint,
+                platform="ckan",
+                watermark_col="CREATIONDATE",
+                id_keys=["_id"],
+                topic=settings.topic_311,
+                interval_seconds=300.0,
+                producer_key="311",
+                expected_cadence_days=7,
+                watermark_type="timestamp",
+                watermark_format="%Y-%m-%d %H:%M:%S",
+                order_by="CREATIONDATE ASC",
+                oid_field="_id",
+                needs_geocode=True,
+                geocode_context="Milwaukee, WI",
+                field_map={'incident_id': ['_id'], 'incident_address': ['OBJECTDESC'], 'complaint_type': ['TITLE'], 'created_date': ['CREATIONDATE'], 'closed_date': ['CLOSEDDATETIME']},
+            ),
         },
     ),
     CityId.CHARLOTTE: CityRegistration(
@@ -3272,6 +3359,20 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 retention_days=30,
                 field_map={'incident_id': ['case_id', 'OBJECTID'], 'created_date': ['case_opened'], 'closed_date': ['case_closed'], 'status': ['case_status'], 'complaint_type': ['case_type', 'case_reason', 'case_subject'], 'incident_address': ['case_external_ref']},
             ),
+            # US-265: Tulsa crime (ArcGIS FeatureServer; coords from point geometry).
+            FeedType.CRIME: DatasetSpec(
+                endpoint=settings.arcgis_tulsa_crime_url,
+                platform="arcgis",
+                watermark_col="START_DATE",
+                id_keys=["INCIDENT_NUM", "OBJECTID"],
+                topic=settings.topic_crime,
+                interval_seconds=300.0,
+                producer_key="crime",
+                expected_cadence_days=7,
+                oid_field="OBJECTID",
+                max_record_count=1000,
+                field_map={'incident_id': ['INCIDENT_NUM', 'OBJECTID'], 'offense_type': ['CRIME_TYPE'], 'occurred_date': ['START_DATE']},
+            ),
         },
     ),
     CityId.EL_PASO: CityRegistration(
@@ -3300,6 +3401,22 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 rolling_window_days=30,
                 retention_days=30,
                 field_map={'incident_id': ['id', 'request_id', 'OBJECTID'], 'created_date': ['created_at'], 'status': ['status'], 'complaint_type': ['request_type', 'request_category'], 'incident_address': ['address'], 'borough': ['district']},
+            ),
+            # US-265: El Paso building permits (ArcGIS; frozen 2018-2021 snapshot).
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_el_paso_permits_url,
+                platform="arcgis",
+                watermark_col="Issued_Dat",
+                id_keys=["B1_ALT_ID", "FID", "id"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                expected_cadence_days=7,
+                oid_field="FID",
+                max_record_count=1000,
+                alarm_exempt=True,
+                alarm_exempt_reason="frozen 2018-2021 historical building-permit snapshot",
+                field_map={'job_id': ['B1_ALT_ID'], 'cost': ['JOBVALUE'], 'issued_date': ['Issued_Dat']},
             ),
         },
     ),
@@ -3388,6 +3505,30 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 retention_days=30,
                 field_map=DALLAS_311_FIELD_MAP,
             ),
+            # Dallas Crimes (Socrata `pumt-d92b`, "Dallas - Crimes"). No lat/lng
+            # is published — only incident address + zip — so needs_geocode flips
+            # the coordinate requirement and the ADR 0004 geocoder resolves
+            # coordinates from the address at parse time. The dataset has no
+            # `offenseid`/`offensenumber` column; the unique key is
+            # `offenseservicenumber`, so it is used for both incident_id and
+            # id_keys.
+            FeedType.CRIME: DatasetSpec(
+                endpoint=settings.socrata_dallas_crime_endpoint,
+                producer_key="crime",
+                platform="socrata",
+                watermark_col="offensedate",
+                id_keys=["offenseservicenumber"],
+                topic="raw.municipal.crime",
+                interval_seconds=300.0,
+                needs_geocode=True,
+                geocode_context="Dallas, TX",
+                expected_cadence_days=7,
+                field_map={
+                    'incident_id': ['offenseservicenumber'],
+                    'offense_type': ['offensename', 'offensedescription'],
+                    'occurred_date': ['offensedate', 'offensereporteddate'],
+                },
+            ),
         },
     ),
     CityId.LOUISVILLE: CityRegistration(
@@ -3430,6 +3571,50 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 max_record_count=2000,
                 where="County = 'Jefferson'",
                 field_map=LOUISVILLE_SLA_FIELD_MAP,
+            ),
+            # US-265: Louisville crime (ArcGIS; no native coords -> geocoded).
+            FeedType.CRIME: DatasetSpec(
+                endpoint=settings.arcgis_louisville_crime_url,
+                platform="arcgis",
+                watermark_col="date_occurred",
+                id_keys=["incident_number", "ObjectId"],
+                topic=settings.topic_crime,
+                interval_seconds=300.0,
+                producer_key="crime",
+                expected_cadence_days=7,
+                oid_field="ObjectId",
+                max_record_count=1000,
+                needs_geocode=True,
+                geocode_context="Louisville, KY",
+                field_map={'incident_id': ['incident_number'], 'offense_type': ['offense_code_name', 'offense_classification'], 'occurred_date': ['date_occurred'], 'reported_date': ['date_reported']},
+            ),
+            # US-265: Louisville active construction permits (ArcGIS, native lat/long).
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_louisville_permits_url,
+                platform="arcgis",
+                watermark_col="ISSUE_DATE",
+                id_keys=["PERMIT_NUMBER", "ObjectId"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                expected_cadence_days=7,
+                oid_field="ObjectId",
+                max_record_count=1000,
+                field_map={'job_id': ['PERMIT_NUMBER'], 'cost': ['PROJECT_COSTS', 'PERMIT_FEE'], 'latitude': ['LATITUDE'], 'longitude': ['LONGITUDE'], 'issued_date': ['ISSUE_DATE']},
+            ),
+            # US-265: Louisville ROW construction permits (ArcGIS, native lat/long).
+            FeedType.STREET_CUT: DatasetSpec(
+                endpoint=settings.arcgis_louisville_street_cut_url,
+                platform="arcgis",
+                watermark_col="FROM_DATE",
+                id_keys=["PERMIT_NO", "ObjectId"],
+                topic=settings.topic_street_cut,
+                interval_seconds=300.0,
+                producer_key="street_cut",
+                expected_cadence_days=7,
+                oid_field="ObjectId",
+                max_record_count=1000,
+                field_map={'job_id': ['PERMIT_NO'], 'latitude': ['LATITUDE'], 'longitude': ['LONGITUDE'], 'issued_date': ['FROM_DATE']},
             ),
         },
     ),
@@ -3560,6 +3745,34 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 max_record_count=2000,
                 field_map=TAMPA_SLA_FIELD_MAP,
             ),
+            # US-265: Tampa Police Calls for Service (ArcGIS; coords from geometry).
+            FeedType.CRIME: DatasetSpec(
+                endpoint=settings.arcgis_tampa_crime_url,
+                platform="arcgis",
+                watermark_col="occ_date",
+                id_keys=["ESRI_OID", "report_number"],
+                topic=settings.topic_crime,
+                interval_seconds=300.0,
+                producer_key="crime",
+                expected_cadence_days=7,
+                oid_field="ESRI_OID",
+                max_record_count=1000,
+                field_map={'incident_id': ['report_number'], 'offense_type': ['case_description'], 'occurred_date': ['occ_date']},
+            ),
+            # US-265: Tampa ROW permits (ArcGIS, native lat/long).
+            FeedType.STREET_CUT: DatasetSpec(
+                endpoint=settings.arcgis_tampa_street_cut_url,
+                platform="arcgis",
+                watermark_col="ISSUEDDATE",
+                id_keys=["OBJECTID", "RECORDID"],
+                topic=settings.topic_street_cut,
+                interval_seconds=600.0,
+                producer_key="street_cut",
+                expected_cadence_days=7,
+                oid_field="OBJECTID",
+                max_record_count=1000,
+                field_map={'job_id': ['RECORDID'], 'latitude': ['LATITUDE'], 'longitude': ['LONGITUDE'], 'issued_date': ['ISSUEDDATE']},
+            ),
         },
     ),
     CityId.LAS_VEGAS: CityRegistration(
@@ -3607,6 +3820,20 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 geocode_context='Las Vegas, NV',
                 field_map=LAS_VEGAS_FIELD_MAP['deeds'],
             ),
+            # US-265: Las Vegas LVMPD Calls For Service (ArcGIS, native lat/long).
+            FeedType.CRIME: DatasetSpec(
+                endpoint=settings.arcgis_las_vegas_calls_for_service_url,
+                platform="arcgis",
+                oid_field="OBJECTID",
+                max_record_count=1000,
+                watermark_col="incidentdate",
+                id_keys=["OBJECTID", "incidentnumber"],
+                topic=settings.topic_crime,
+                interval_seconds=300.0,
+                producer_key="crime",
+                expected_cadence_days=7,
+                field_map={'incident_id': ['incidentnumber', 'OBJECTID'], 'offense_type': ['incidenttypedescription'], 'occurred_date': ['incidentdate'], 'latitude': ['latitude'], 'longitude': ['longitude'], 'address': ['location']},
+            ),
         },
     ),
     CityId.BOISE: CityRegistration(
@@ -3636,6 +3863,51 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 needs_geocode=True,
                 geocode_context='Boise, ID',
                 field_map=BOISE_PERMITS_FIELD_MAP,
+            ),
+            # US-265: Boise BPD crimes (ArcGIS; coords from point geometry).
+            FeedType.CRIME: DatasetSpec(
+                endpoint=settings.arcgis_boise_crime_url,
+                platform="arcgis",
+                watermark_col="OccurredDateTime",
+                id_keys=["OBJECTID", "DRNumber"],
+                topic=settings.topic_crime,
+                interval_seconds=300.0,
+                producer_key="crime",
+                expected_cadence_days=7,
+                oid_field="OBJECTID",
+                max_record_count=1000,
+                order_by="OccurredDateTime DESC",
+                field_map={'incident_id': ['OBJECTID', 'DRNumber'], 'offense_type': ['IncidentType', 'CrimeCodeDescription', 'CrimeType'], 'occurred_date': ['OccurredDateTime', 'ReportedDate'], 'borough': ['District', 'PatrolArea']},
+            ),
+        },
+    ),
+    CityId.FORT_WORTH: CityRegistration(
+        city_id=CityId.FORT_WORTH,
+        name="Fort Worth / Tarrant County",
+        state="TX",
+        center={"lat": 32.7550, "lng": -97.3300},
+        metro_bbox=FORT_WORTH_METRO_BBOX,
+        division_bboxes=FORT_WORTH_DIVISION_BBOXES,
+        submarkets=FORT_WORTH_SUBMARKETS,
+        divisions=FORT_WORTH_DIVISIONS,
+        job_suffix="fort_worth",
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_fort_worth_permits_url,
+                platform="arcgis",
+                watermark_col="File_Date",
+                id_keys=["Unique_ID", "Permit_No", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=1000,
+                order_by='File_Date DESC',
+                needs_geocode=True,
+                geocode_context='Fort Worth, TX',
+                field_map=FORT_WORTH_PERMITS_FIELD_MAP,
             ),
         },
     ),

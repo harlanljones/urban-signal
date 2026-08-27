@@ -1464,6 +1464,7 @@ def get_dashboard_html() -> str:
       tampa: { name: 'Tampa / Hillsborough County' },
       las_vegas: { name: 'Las Vegas / Clark County' },
       boise: { name: 'Boise / Ada County' },
+      fort_worth: { name: 'Fort Worth / Tarrant County' },
     };
 
     let map = null;
