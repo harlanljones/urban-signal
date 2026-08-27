@@ -149,3 +149,6 @@ ehthumbs.db
 .impeccable/*
 !.impeccable/review/
 
+# Browser MCP session dumps (page snapshots, dataset scrapes)
+.playwright-mcp/
+
