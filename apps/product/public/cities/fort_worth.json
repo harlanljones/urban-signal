@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "id": "fort_worth",
+  "name": "Fort Worth / Tarrant County",
+  "state": "TX",
+  "center": {
+    "lat": 32.755,
+    "lng": -97.33
+  },
+  "metro_bbox": {
+    "min_lat": 32.4,
+    "max_lat": 33.05,
+    "min_lng": -97.75,
+    "max_lng": -96.95
+  },
+  "divisions": {
+    "FORT_WORTH_CORE": {
+      "name": "Fort Worth Core",
+      "center": {
+        "lat": 32.76,
+        "lng": -97.33
+      },
+      "bbox": {
+        "min_lat": 32.55,
+        "max_lat": 33.0,
+        "min_lng": -97.65,
+        "max_lng": -97.05
+      },
+      "submarkets": [
+        "Downtown & Sundance",
+        "Near Southside",
+        "Cultural District",
+        "TCU / West Cliff",
+        "Arlington Heights & Hospital District",
+        "North Fort Worth / Alliance"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Sundance": {
+      "name": "Downtown & Sundance",
+      "division": "FORT_WORTH_CORE",
+      "center": {
+        "lat": 32.755,
+        "lng": -97.33
+      },
+      "description": "Central business district and Sundance Square with mixed-use towers, hotel, and residential conversion permitting."
+    },
+    "Near Southside": {
+      "name": "Near Southside",
+      "division": "FORT_WORTH_CORE",
+      "center": {
+        "lat": 32.71,
+        "lng": -97.32
+      },
+      "description": "Medical-district-adjacent infill and adaptive-reuse neighborhood with steady residential and commercial permitting."
+    },
+    "Cultural District": {
+      "name": "Cultural District",
+      "division": "FORT_WORTH_CORE",
+      "center": {
+        "lat": 32.745,
+        "lng": -97.365
+      },
+      "description": "Museums, parks, and fabricating district with infill multifamily and hospitality permitting near the Trinity trails."
+    },
+    "TCU / West Cliff": {
+      "name": "TCU / West Cliff",
+      "division": "FORT_WORTH_CORE",
+      "center": {
+        "lat": 32.706,
+        "lng": -97.365
+      },
+      "description": "University-adjacent streetcar-era neighborhoods with renovation-led and teardown/rebuild permitting."
+    },
+    "Arlington Heights & Hospital District": {
+      "name": "Arlington Heights & Hospital District",
+      "division": "FORT_WORTH_CORE",
+      "center": {
+        "lat": 32.735,
+        "lng": -97.395
+      },
+      "description": "Established west-side residential corridors near the hospital district with steady redevelopment permitting."
+    },
+    "North Fort Worth / Alliance": {
+      "name": "North Fort Worth / Alliance",
+      "division": "FORT_WORTH_CORE",
+      "center": {
+        "lat": 32.9,
+        "lng": -97.3
+      },
+      "description": "High-growth northern edge around the Alliance logistics corridor with master-planned residential and industrial permitting."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "File_Date",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/fort_worth.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

@@ -314,6 +314,13 @@ class Settings(BaseSettings):
         default="https://data.texas.gov/resource/7hf9-qc9f.json",
         description="Austin/TABC liquor license SLA endpoint (US-136)",
     )
+    # US-71: APD NIBRS Group A Offenses (Socrata `thrk-bqb6`). Rows carry no
+    # lat/lng — only zip_code + census_block_group — so coordinates resolve from
+    # the zip_code context via the ADR-0004 geocoder at parse time.
+    socrata_austin_crime_endpoint: str = Field(
+        default="https://data.austintexas.gov/resource/thrk-bqb6.json",
+        description="Austin APD NIBRS Group A Offenses Socrata endpoint (US-71)",
+    )
 
     # Cincinnati (Socrata) — PERMITS, 311, and business licenses; no sales
     # feed was found in the verified Socrata catalog sweep.
@@ -380,6 +387,13 @@ class Settings(BaseSettings):
             "Boston Licensing Board licenses CKAN resource "
             "(gpsx/gpsy State Plane coordinates transformed via EPSG:2249)"
         ),
+    )
+    # US-: Boston Crime Incident Reports (CKAN 6220d948-... odata v4). Source
+    # carries Lat/Long directly, so no geocode step required. Mirrors the other
+    # Boston CKAN feeds' `ckan://` scheme.
+    ckan_boston_crime_endpoint: str = Field(
+        default="ckan://data.boston.gov/6220d948-eae2-4e4b-8723-2dc8e67722a3",
+        description="Boston Crime Incident Reports CKAN resource",
     )
 
     # Baton Rouge / East Baton Rouge Parish (Socrata).
@@ -638,6 +652,15 @@ class Settings(BaseSettings):
         ),
         description="Milwaukee 2025 property-sales CSV endpoint (US-138)",
     )
+    # Milwaukee CKAN crime + 311 datastore resources.
+    ckan_milwaukee_crime_endpoint: str = Field(
+        default="ckan://data.milwaukee.gov/87843297-a6fa-46d4-ba5d-cb342fb2d3bb",
+        description="Milwaukee crime incidents CKAN datastore resource",
+    )
+    ckan_milwaukee_311_endpoint: str = Field(
+        default="ckan://data.milwaukee.gov/bf2b508a-5bfa-49da-8846-d87ffeee020a",
+        description="Milwaukee 311 service requests CKAN datastore resource",
+    )
 
     # Charlotte, NC (ArcGIS): city 311 service requests with native
     # LATITUDE/LONGITUDE + point geometry. Mecklenburg County permits/parcels
@@ -868,6 +891,11 @@ class Settings(BaseSettings):
         ),
         description="Tulsa Verint 311 cases rolling-window FeatureServer layer URL",
     )
+    # Tulsa crime (ArcGIS `Tulsa_Crime_Time_Display`).
+    arcgis_tulsa_crime_url: str = Field(
+        default="https://services5.arcgis.com/cuQhNeNcUrgLmYGD/arcgis/rest/services/Tulsa_Crime_Time_Display/FeatureServer/0",
+        description="Tulsa crime incidents ArcGIS FeatureServer layer URL",
+    )
 
     # El Paso, TX (US-156): Accela-backed requests are a live 30-day partial
     # view. ArcGISClient requests outSR=4326, transforming native TX state-plane
@@ -875,6 +903,11 @@ class Settings(BaseSettings):
     arcgis_el_paso_311_url: str = Field(
         default="https://gis.elpasotexas.gov/accela/rest/services/311/Requests/FeatureServer/0",
         description="El Paso Accela 311 requests FeatureServer layer URL",
+    )
+    # El Paso residential permits (ArcGIS `NewResi2018_19`).
+    arcgis_el_paso_permits_url: str = Field(
+        default="https://services1.arcgis.com/hyTVSIhR7dHyDsJF/arcgis/rest/services/NewResi2018_19/FeatureServer/0",
+        description="El Paso residential permits ArcGIS FeatureServer layer URL",
     )
 
     # Durham, NC (US-154): live point permits and polygon parcel sales.
@@ -903,6 +936,11 @@ class Settings(BaseSettings):
         ),
         description="Dallas Building Services approximately 30-day CRM view URL",
     )
+    # Dallas crimes (Socrata `pumt-d92b`).
+    socrata_dallas_crime_endpoint: str = Field(
+        default="https://www.dallasopendata.com/resource/pumt-d92b.json",
+        description="Dallas crimes Socrata endpoint",
+    )
 
     # Louisville, KY (US-148): annual Metro 311 layer plus Kentucky ABC's
     # active-license registry, filtered by the ingestion spec to Jefferson
@@ -920,6 +958,20 @@ class Settings(BaseSettings):
             "ABC_State_ActiveLicenses/FeatureServer/0"
         ),
         description="Kentucky ABC active licenses FeatureServer layer URL",
+    )
+    # Louisville crime, active construction permits, and ROW construction
+    # permits (ArcGIS, same org as the 311/ABC layers).
+    arcgis_louisville_crime_url: str = Field(
+        default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/crime_data_2025/FeatureServer",
+        description="Louisville crime incidents ArcGIS FeatureServer layer URL",
+    )
+    arcgis_louisville_permits_url: str = Field(
+        default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/active_construction_permits/FeatureServer",
+        description="Louisville active construction permits ArcGIS FeatureServer layer URL",
+    )
+    arcgis_louisville_street_cut_url: str = Field(
+        default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/Louisville_KY_ROW_Construction_Permits_new/FeatureServer",
+        description="Louisville ROW construction permits ArcGIS FeatureServer layer URL",
     )
 
     # Portland, OR (US-143): residential permits from Portland Maps and OLCC
@@ -951,8 +1003,21 @@ class Settings(BaseSettings):
     # advertises Idaho state-plane geometry; ArcGIS queries request WGS84 and
     # the city registry declares address geocoding as the fallback.
     arcgis_boise_permits_url: str = Field(
-        default="https://services1.arcgis.com/WHM6qC35aMtyAAlN/arcgis/rest/services/Housing_OpenData/FeatureServer/0",
-        description="Boise residential permits ArcGIS FeatureServer layer URL",
+        default="https://services1.arcgis.com/WHM6qC35aMtyAAlN/arcgis/rest/services/PDS_BuildingPermits_HighImpact/FeatureServer/0",
+        description="Boise high-impact building permits ArcGIS FeatureServer layer URL",
+    )
+    # Boise Police Department crime incidents (ArcGIS `BPD_Crimes_Public`).
+    arcgis_boise_crime_url: str = Field(
+        default="https://services1.arcgis.com/WHM6qC35aMtyAAlN/arcgis/rest/services/BPD_Crimes_Public/FeatureServer",
+        description="Boise crime incidents ArcGIS FeatureServer layer URL",
+    )
+
+    # Fort Worth / Tarrant County (US-150): CFW Development Permits Points, a
+    # WGS84 ArcGIS point layer (759k+ records, hourly refresh). Geometry resolves
+    # directly to lat/lng; address geocoding is the fallback for geometry-less rows.
+    arcgis_fort_worth_permits_url: str = Field(
+        default="https://mapit.fortworthtexas.gov/ags/rest/services/CIVIC/Permits/FeatureServer/0",
+        description="Fort Worth development permits ArcGIS FeatureServer layer URL",
     )
 
     # Tampa, FL (US-146): audited full permits and partial alcohol-beverage
@@ -964,6 +1029,15 @@ class Settings(BaseSettings):
     arcgis_tampa_sla_url: str = Field(
         default="https://arcgis.tampagov.net/arcgis/rest/services/Planning/AlcoholBeverage/FeatureServer/0",
         description="Tampa alcohol-beverage partial SLA ArcGIS FeatureServer layer URL",
+    )
+    # Tampa crime (calls for service) and right-of-way permits (ArcGIS).
+    arcgis_tampa_crime_url: str = Field(
+        default="https://arcgis.tampagov.net/arcgis/rest/services/CallsforService/FirePoliceCalls/MapServer/1",
+        description="Tampa calls-for-service ArcGIS MapServer layer URL",
+    )
+    arcgis_tampa_street_cut_url: str = Field(
+        default="https://arcgis.tampagov.net/arcgis/rest/services/Transportation/ROWPermits/FeatureServer/0",
+        description="Tampa right-of-way permits ArcGIS FeatureServer layer URL",
     )
 
     # Las Vegas / Clark County (US-145): address-only ArcGIS tables. Both
@@ -984,6 +1058,62 @@ class Settings(BaseSettings):
     socrata_kansas_city_licenses_endpoint: str = Field(
         default="https://data.kcmo.org/resource/pnm4-68wg.json",
         description="Kansas City Business License Holders endpoint",
+    )
+
+    # US-265: supplemental feeds for existing cities (research 2026-08-26). Each
+    # endpoint is declared here so the interlock gate's endpoint-in-settings
+    # invariant holds; the registry references these fields, never literals.
+    socrata_dallas_crime_endpoint: str = Field(
+        default="https://www.dallasopendata.com/resource/pumt-d92b.json",
+        description="Dallas Crimes Socrata endpoint (aging; verify before relying)",
+    )
+    ckan_milwaukee_crime_endpoint: str = Field(
+        default="ckan://data.milwaukee.gov/87843297-a6fa-46d4-ba5d-cb342fb2d3bb",
+        description="Milwaukee NIBRS crime CKAN resource",
+    )
+    ckan_milwaukee_311_endpoint: str = Field(
+        default="ckan://data.milwaukee.gov/bf2b508a-5bfa-49da-8846-d87ffeee020a",
+        description="Milwaukee Call Center 311 CKAN resource",
+    )
+    arcgis_tulsa_crime_url: str = Field(
+        default="https://services5.arcgis.com/cuQhNeNcUrgLmYGD/arcgis/rest/services/Tulsa_Crime_Time_Display/FeatureServer/0",
+        description="Tulsa crime ArcGIS FeatureServer",
+    )
+    arcgis_el_paso_permits_url: str = Field(
+        default="https://services1.arcgis.com/hyTVSIhR7dHyDsJF/arcgis/rest/services/NewResi2018_19/FeatureServer/0",
+        description="El Paso residential building permits ArcGIS FeatureServer (frozen 2018-2021 snapshot)",
+    )
+    arcgis_louisville_crime_url: str = Field(
+        default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/crime_data_2025/FeatureServer",
+        description="Louisville Metro crime ArcGIS FeatureServer (geocoded; no native coords)",
+    )
+    arcgis_louisville_permits_url: str = Field(
+        default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/active_construction_permits/FeatureServer",
+        description="Louisville active construction permits ArcGIS FeatureServer",
+    )
+    arcgis_louisville_street_cut_url: str = Field(
+        default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/Louisville_KY_ROW_Construction_Permits_new/FeatureServer",
+        description="Louisville ROW construction permits ArcGIS FeatureServer",
+    )
+    arcgis_tampa_crime_url: str = Field(
+        default="https://arcgis.tampagov.net/arcgis/rest/services/CallsforService/FirePoliceCalls/MapServer/1",
+        description="Tampa Police Calls for Service ArcGIS MapServer",
+    )
+    arcgis_tampa_street_cut_url: str = Field(
+        default="https://arcgis.tampagov.net/arcgis/rest/services/Transportation/ROWPermits/FeatureServer/0",
+        description="Tampa ROW permits ArcGIS FeatureServer",
+    )
+    arcgis_las_vegas_calls_for_service_url: str = Field(
+        default="https://services.arcgis.com/jjSk6t82vIntwDbs/arcgis/rest/services/LVMPD_Calls_For_Service_All/FeatureServer",
+        description="Las Vegas LVMPD Calls For Service ArcGIS FeatureServer",
+    )
+    arcgis_boise_crime_url: str = Field(
+        default="https://services1.arcgis.com/WHM6qC35aMtyAAlN/arcgis/rest/services/BPD_Crimes_Public/FeatureServer",
+        description="Boise BPD crimes ArcGIS FeatureServer",
+    )
+    ckan_san_jose_crime_endpoint: str = Field(
+        default="ckan://data.sanjoseca.gov/dc0ec99c-0c6b-45fb-b1ec-faf072fe4833",
+        description="San Jose Police Calls for Service (2026, updated daily) CKAN datastore resource",
     )
 
     # Address geocoding (ADR 0004): confidence floor gates wrong-cell risk —

@@ -768,6 +768,6 @@
       "topic": "raw.municipal.deeds"
     }
   },
-  "evidence_path": "apps/api/src/spatial/city_registry.py",
+  "evidence_path": "apps/api/src/spatial/cities/nyc.py",
   "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
 }

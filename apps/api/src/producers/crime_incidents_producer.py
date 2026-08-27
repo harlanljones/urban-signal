@@ -185,7 +185,23 @@ class CrimeIncidentsProducer:
                         lat_raw = loc.get("latitude") or loc.get("lat")
                         lng_raw = loc.get("longitude") or loc.get("lng")
             if not lat_raw or not lng_raw:
-                return None
+                # Address-string feeds declaring needs_geocode (ADR 0004) resolve
+                # coordinates at parse time, mirroring the 311 producer; feeds
+                # without a declared geocode keep the legacy hard drop.
+                addr_candidate = (
+                    first_mapped(row, field_map, "address")
+                    or first_mapped(row, field_map, "incident_address")
+                    or row.get("address")
+                    or row.get("block_address")
+                    or row.get("loc_of_occur_desc")
+                )
+                if isinstance(addr_candidate, dict):
+                    addr_candidate = None
+                from src.spatial.geocoder import geocode_row_if_declared
+                resolved = geocode_row_if_declared(resolved_city, "crime", addr_candidate)
+                if resolved is None:
+                    return None
+                lat_raw, lng_raw = resolved
 
             lat = float(lat_raw)
             lng = float(lng_raw)
