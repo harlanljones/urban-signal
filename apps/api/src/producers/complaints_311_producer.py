@@ -350,9 +350,9 @@ class Complaints311Producer:
         spec = get_dataset(cid, FeedType.COMPLAINTS_311)
         endpoint = spec.endpoint
         client = self._client_for(spec.platform)
-        client_kwargs = {
-            k: v for k, v in spec.extra.items() if k in ("order_by", "id_col", "select") and v
-        }
+        from src.producers.acquisition import AcquisitionSpec, build_adapter_request
+
+        client_kwargs = build_adapter_request(spec.platform, AcquisitionSpec.from_dataset_spec(spec))
 
         logger.info("Starting %s 311 Ingestion Stream (limit=%d)...", cid.value.upper(), limit)
         records_streamed = 0

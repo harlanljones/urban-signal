@@ -25,7 +25,7 @@ def _mapped_year_of(every_feed: list[YearSliceFeed]) -> int:
     """The most recent year that every registered year-sliced feed maps."""
     common = None
     for entry in every_feed:
-        years = set((entry.spec.extra.get("endpoint_by_year") or {}).keys())
+        years = set((entry.spec.endpoint_by_year or {}).keys())
         common = years if common is None else (common & years)
     assert common, "registry has no year shared by every year-sliced feed"
     return max(int(y) for y in common)
@@ -41,13 +41,13 @@ def test_drill_green_when_all_feeds_map_target_year():
     # Each resolved endpoint matches the mapping the scheduler would use.
     for check in checks:
         entry = next(f for f in feeds if f.feed.value == check.feed and f.city_id.value == check.city_id)
-        assert check.endpoint == entry.spec.extra["endpoint_by_year"][str(year)]
+        assert check.endpoint == entry.spec.endpoint_by_year[str(year)]
 
 
 def test_drill_green_for_synthetic_mapped_year():
     spec = DatasetSpec(
         endpoint="https://fake.example/base",
-        extra={"endpoint_by_year": {"2026": "u/2026", "2027": "u/2027"}},
+        endpoint_by_year={"2026": "u/2026", "2027": "u/2027"},
     )
     feed = YearSliceFeed(CityId.BOSTON, FeedType.COMPLAINTS_311, spec)
     checks = drill_rollover(date(2027, 1, 2), feeds=[feed])
@@ -60,7 +60,7 @@ def test_drill_green_for_synthetic_mapped_year():
 def test_drill_fails_loudly_for_unmapped_year():
     spec = DatasetSpec(
         endpoint="https://fake.example/base",
-        extra={"endpoint_by_year": {"2026": "u/2026"}},
+        endpoint_by_year={"2026": "u/2026"},
     )
     feed = YearSliceFeed(CityId.WASHINGTON_DC, FeedType.PERMITS, spec)
     with pytest.raises(RolloverDrillError, match="2027"):

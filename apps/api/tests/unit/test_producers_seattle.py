@@ -163,7 +163,7 @@ class TestSeattleRegistration:
         missed both, so every 311 row dropped at parse. The field map is the
         pin that keeps this fixed."""
         spec = REGISTRY[CityId.SEATTLE].datasets[FeedType.COMPLAINTS_311]
-        fm = spec.extra.get("field_map", {})
+        fm = spec.field_map or {}
         assert "servicerequestnumber" in fm.get("incident_id", [])
         assert "createddate" in fm.get("created_date", [])
 

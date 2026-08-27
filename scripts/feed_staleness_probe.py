@@ -32,13 +32,13 @@ from src.producers.carto_client import CartoClient
 from src.producers.ckan_client import CkanClient
 from src.producers.csv_client import CSVClient
 from src.producers.socrata_client import SocrataClient
-from src.producers.watermarks import (
-    parse_watermark as parse_timestamp,
+from src.producers.acquisition import (
+    AcquisitionSpec,
+    build_where,
+    newest_valid_watermark,
 )
-from src.producers.watermarks import (
-    typed_watermark_entry,
-    watermark_exclude_clause,
-)
+from src.producers.watermarks import parse_watermark as parse_timestamp
+from src.producers.watermarks import typed_watermark_entry
 from src.spatial.city_registry import (
     REGISTRY,
     DatasetSpec,
@@ -65,7 +65,7 @@ def declared_staleness_threshold(
     ``fallback``; the registry invariant test keeps that path empty for
     registered feeds.
     """
-    raw = spec.extra.get("expected_cadence_days") if spec.extra else None
+    raw = spec.expected_cadence_days
     try:
         days = float(raw)  # type: ignore[arg-type]
     except (TypeError, ValueError):
@@ -197,16 +197,26 @@ def newest_watermark(
     if not spec.watermark_col:
         return None
     now = now or datetime.now(UTC)
-    extra = spec.extra or {}
-    exclude = extra.get("watermark_exclude") or ()
-    is_text = extra.get("watermark_type") == "text"
-    fmt = extra.get("watermark_format") if is_text else None
+    # The sentinel guard (ADR 0005) and the US-111 future-guard now come from
+    # the AcquisitionEngine; only the probe-specific newest-first ordering and
+    # per-column case-insensitive lookup stay here.
+    acq = AcquisitionSpec.from_dataset_spec(spec)
+    exclude = acq.watermark_exclude
+    is_text = acq.watermark_type == "text"
+    fmt = acq.watermark_format if is_text else None
+    where_clause = build_where(
+        base_where=None,
+        watermark_col=spec.watermark_col,
+        high_watermark=None,
+        endpoint=spec.endpoint,
+        watermark_exclude=exclude,
+    )
     pages: Iterable[list[dict[str, Any]]] = client.paginate(
         endpoint_url=spec.endpoint,
         order_by=f"{spec.watermark_col} DESC",
         batch_size=1000,
         max_records=1000,
-        where_clause=watermark_exclude_clause(spec.watermark_col, exclude),
+        where_clause=where_clause,
     )
     entries = [
         entry
@@ -221,8 +231,7 @@ def newest_watermark(
         )
         is not None
     ]
-    valid = [entry for entry in entries if entry[1] <= now]
-    best = max(valid, key=lambda entry: entry[1]) if valid else None
+    best = newest_valid_watermark(entries, now)
     return best[1] if best else None
 
 
@@ -253,7 +262,7 @@ def probe_feed(
     # Documented-dead / intentionally-unmaintained feeds (extra["alarm_exempt"])
     # are still reported with their true staleness but do not page the alarm:
     # their source has no live replacement and the human has accepted the gap.
-    alarm_exempt = bool((spec.extra or {}).get("alarm_exempt"))
+    alarm_exempt = bool(spec.alarm_exempt)
     return ProbeResult(
         city_id=city_id,
         feed=feed.value,
@@ -322,7 +331,7 @@ def probe_registry(
                     age_days=None,
                     stale=True,
                     error=str(exc),
-                    alarm_exempt=bool((spec.extra or {}).get("alarm_exempt")),
+                    alarm_exempt=bool(spec.alarm_exempt),
                 )
             FEED_AGE_DAYS.labels(city.value, feed.value, spec.platform).set(result.age_days or 0)
             FEED_STALE.labels(city.value, feed.value, spec.platform).set(int(result.stale))

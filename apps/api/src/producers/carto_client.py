@@ -27,8 +27,8 @@ Design decisions specific to CARTO:
 
   The tie-breaker ``id_col`` defaults to ``cartodb_id``, which every CARTO table
   carries. Callers override per-table columns via kwargs (a future Philadelphia
-  registration carries them through ``DatasetSpec.extra``, e.g.
-  ``extra={"order_by": "permitissuedate", "id_col": "cartodb_id"}``).
+  registration carries them through ``DatasetSpec``, e.g.
+  ``order_by="permitissuedate", id_col="cartodb_id"``).
 
 * **Sentinel dates.** Several Philly tables contain impossible years (3200,
   9798) in their issue/document date columns, and NULLs are common. Both break
@@ -272,7 +272,7 @@ class CartoClient:
 
         ``order_by`` defaults to ``updated_at`` when unset (the most common
         mutation-tracking column); Philadelphia registrations should carry the
-        real per-table column through ``DatasetSpec.extra``. Sentinel filtering
+        real per-table column through ``DatasetSpec``. Sentinel filtering
         auto-enables for date-named order columns (see module docstring).
         """
         sql_api_url, resolved_table = self._parse_endpoint(endpoint_url, table)

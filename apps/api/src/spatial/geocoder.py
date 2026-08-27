@@ -451,12 +451,12 @@ def geocode_row_if_declared(
         if cid is None:
             return None
         spec = get_dataset(cid, FeedType(feed_value))
-        if not (spec.extra or {}).get("needs_geocode"):
+        if not spec.needs_geocode:
             return None
         if not isinstance(address, str) or len(address.strip()) < 6:
             return None
         query = address.strip()
-        suffix = (spec.extra or {}).get("geocode_context")
+        suffix = spec.geocode_context
         if suffix and suffix.upper() not in query.upper() and not _STATE_RE.search(query.upper()):
             query = f"{query}, {suffix}"
         point = get_geocoder().geocode(query)

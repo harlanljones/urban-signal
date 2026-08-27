@@ -211,7 +211,7 @@ async def predict_batch(
 @router.get("/catalysts")
 async def get_active_catalysts(
     city_id: Optional[str] = Query(default="nyc", description="City identifier ('nyc', 'chicago', 'san_francisco', 'sf')"),
-    min_lims: float = Query(default=85.0, ge=0.0, le=100.0),
+    min_lims: float = Query(default=84.0, ge=0.0, le=100.0),
     resolution: int = Query(default=9, ge=7, le=9),
     borough: Optional[str] = Query(default=None),
     limit: int = Query(default=50, ge=1, le=500),

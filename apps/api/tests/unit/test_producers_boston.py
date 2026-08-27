@@ -40,8 +40,8 @@ def test_boston_registers_ckan_feeds_and_no_sales_feed():
     assert sla.platform == "ckan"
     assert sla.watermark_col == "expires"
     assert sla.id_keys == ["license_num", "_id"]
-    assert sla.extra["state_plane_crs"] == "EPSG:2249"
-    assert sla.extra["state_plane_units"] == "US survey feet"
+    assert sla.state_plane_crs == "EPSG:2249"
+    assert sla.state_plane_units == "US survey feet"
     assert FeedType.DEEDS not in REGISTRY[city].datasets
 
 
@@ -49,10 +49,10 @@ def test_boston_resources_and_field_maps_are_pinned():
     permits = REGISTRY[CityId.BOSTON].datasets[FeedType.PERMITS]
     assert permits.endpoint == "ckan://data.boston.gov/6ddcd912-32a0-43df-9908-63574f8c7e77"
     assert permits.watermark_col == "issued_date"
-    assert permits.extra["field_map"]["job_id"] == ["permitnumber"]
+    assert permits.field_map["job_id"] == ["permitnumber"]
 
     current_311 = REGISTRY[CityId.BOSTON].datasets[FeedType.COMPLAINTS_311]
-    assert current_311.extra["endpoint_by_year"]["2026"].endswith("1a0b420d-99f1-4887-9851-990b2a5a6e17")
+    assert current_311.endpoint_by_year["2026"].endswith("1a0b420d-99f1-4887-9851-990b2a5a6e17")
     assert resolve_endpoint(current_311, date(2026, 8, 23)).endswith("1a0b420d-99f1-4887-9851-990b2a5a6e17")
     assert current_311.watermark_col == "open_dt"
 

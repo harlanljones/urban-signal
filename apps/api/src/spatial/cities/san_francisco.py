@@ -930,3 +930,14 @@ SAN_FRANCISCO_DIVISIONS: Dict[str, BoroughMeta] = {
 }
 
 SF_DIVISIONS = SAN_FRANCISCO_DIVISIONS
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=SAN_FRANCISCO_METRO_BBOX,
+    division_bboxes=SAN_FRANCISCO_DIVISION_BBOXES,
+    submarkets=SAN_FRANCISCO_SUBMARKETS,
+    divisions=SAN_FRANCISCO_DIVISIONS,
+    contains=is_in_sf_metro,
+)

@@ -25,7 +25,19 @@
  * content negotiation returns a markdown rendering of the dashboard.
  */
 
-interface Env {
+// Route both adapters through the transport-free snapshot module (US-189/US-190).
+// The limit constants come from snapshot.ts so the OpenAPI/MCP schemas below stay
+// in lock-step with the single semantic source — see the PRODUCT DECISION comment
+// in snapshot.ts.
+import {
+  queryCatalysts,
+  querySubmarkets,
+  lookupPrediction,
+  CATALYST_DEFAULT_LIMIT,
+  CATALYST_MAX_LIMIT,
+} from "./snapshot";
+
+export interface Env {
   SNAPSHOT: KVNamespace;
   ASSETS: Fetcher;
 }
@@ -71,7 +83,7 @@ let manifestCache: { value: Manifest | null; expires: number } = {
   expires: 0,
 };
 
-interface Manifest {
+export interface Manifest {
   generated_at: string;
   app_version: string;
   cities: string[];
@@ -99,13 +111,13 @@ interface MetroMeta {
 const MAX_TILE_PARENTS_PER_REQUEST = 32;
 const H3_PARENT_PATTERN = /^[0-9a-f]{15}$/i;
 
-interface CatalystEntry {
+export interface CatalystEntry {
   h3_index: string;
   lims_score: number;
   [key: string]: unknown;
 }
 
-interface CatalystPayload {
+export interface CatalystPayload {
   city_id: string;
   count: number;
   threshold: number;
@@ -124,7 +136,7 @@ function jsonError(status: number, detail: string): Response {
   });
 }
 
-function normalizeCity(raw: string | null, manifest: Manifest | null): string | null {
+export function normalizeCity(raw: string | null, manifest: Manifest | null): string | null {
   if (!raw) return "nyc";
   const key = raw.trim().toLowerCase();
   const alias = CITY_ALIASES[key];
@@ -162,7 +174,7 @@ function etagMatches(request: Request, etag: string): boolean {
   return header.split(",").some((candidate) => candidate.trim() === etag);
 }
 
-async function kvJson(env: Env, key: string): Promise<{ value: unknown; etag: string } | null> {
+export async function kvJson(env: Env, key: string): Promise<{ value: unknown; etag: string } | null> {
   const raw = await env.SNAPSHOT.get(key);
   if (raw === null) return null;
   return { value: JSON.parse(raw), etag: `"${(await sha256Hex(raw)).slice(0, 32)}"` };
@@ -175,7 +187,7 @@ function withHeaders(body: string, status: number, extra: HeadersInit): Response
   });
 }
 
-async function getManifest(env: Env): Promise<Manifest | null> {
+export async function getManifest(env: Env): Promise<Manifest | null> {
   const now = Date.now();
   if (manifestCache.value && now < manifestCache.expires) return manifestCache.value;
   const raw = await env.SNAPSHOT.get("manifest");
@@ -353,6 +365,7 @@ const MCP_TOOLS: McpToolDefinition[] = [
       type: "object",
       properties: {
         city_id: { type: "string", description: "City identifier from list_cities (aliases like 'sf' or 'dc' are accepted)." },
+        borough: { type: "string", description: "Optional borough/division filter (case-insensitive; honors the same normalization as the HTTP API)." },
       },
       required: ["city_id"],
       additionalProperties: false,
@@ -367,7 +380,9 @@ const MCP_TOOLS: McpToolDefinition[] = [
       properties: {
         city_id: { type: "string", description: "City identifier from list_cities." },
         min_lims: { type: "number", minimum: 0, maximum: 100, description: "Minimum LIMS score filter." },
-        limit: { type: "integer", minimum: 1, maximum: 100, description: "Maximum cells returned (default 25)." },
+        // PRODUCT DECISION (US-190): MCP adopts the HTTP/manifest limit policy —
+        // default 50, hard max 500. Keep these in sync with snapshot.ts.
+        limit: { type: "integer", minimum: 1, maximum: CATALYST_MAX_LIMIT, description: `Maximum cells returned (default ${CATALYST_DEFAULT_LIMIT}).` },
         borough: { type: "string", description: "Optional borough/division filter." },
       },
       required: ["city_id"],
@@ -464,17 +479,21 @@ async function callTool(
           isError: true,
         };
       }
-      const entry = await kvJson(env, `submarkets/${city}`);
-      if (!entry) {
-        return { content: [{ type: "text", text: `No snapshot for city '${city}'.` }], isError: true };
+      // PRODUCT DECISION (US-190): MCP now honors `borough`, matching the HTTP
+      // adapter, via the shared snapshot query.
+      const result = await querySubmarkets(env, {
+        city,
+        borough: strParam(args, "borough") ?? undefined,
+      });
+      if ("error" in result) {
+        return { content: [{ type: "text", text: result.error }], isError: true };
       }
-      const payload = entry.value as { submarkets?: Record<string, Record<string, unknown>> };
-      const submarkets = Object.entries(payload.submarkets ?? {}).map(([id, meta]) => ({
+      const submarkets = Object.entries(result.submarkets).map(([id, meta]) => ({
         id,
-        borough: meta.borough ?? null,
+        borough: (meta as Record<string, unknown>).borough ?? null,
       }));
       return {
-        content: [{ type: "text", text: await text({ city_id: city, count: submarkets.length, submarkets }) }],
+        content: [{ type: "text", text: await text({ city_id: result.city_id, count: submarkets.length, submarkets }) }],
       };
     }
     case "get_catalysts": {
@@ -486,35 +505,29 @@ async function callTool(
           isError: true,
         };
       }
-      const entry = await kvJson(env, `catalysts/${city}`);
-      if (!entry) {
-        return { content: [{ type: "text", text: `No catalyst snapshot for city '${city}'.` }], isError: true };
+      // Route through the shared snapshot query. The limit/max/min_lims/borough
+      // policy is identical to HTTP by PRODUCT DECISION (US-190); the adapter
+      // keeps only its own transport envelope and trim shape.
+      const result = await queryCatalysts(env, {
+        city,
+        minLims: numParam(args, "min_lims") ?? undefined,
+        limit: numParam(args, "limit") ?? undefined,
+        borough: strParam(args, "borough") ?? undefined,
+      });
+      if ("error" in result) {
+        // Reachable error here is the out-of-range min_lims message, which
+        // snapshot returns verbatim; unsupported-city is handled above.
+        return { content: [{ type: "text", text: result.error }], isError: true };
       }
-      const stored = entry.value as CatalystPayload;
-      const minLims = numParam(args, "min_lims") ?? stored.threshold ?? 85;
-      if (minLims < 0 || minLims > 100) {
-        return { content: [{ type: "text", text: "min_lims must be within [0.0, 100.0]." }], isError: true };
-      }
-      let catalysts = stored.catalysts;
-      if (minLims > (stored.threshold ?? 85)) {
-        catalysts = catalysts.filter((c) => Number(c.lims_score) >= minLims);
-      }
-      const boroughRaw = strParam(args, "borough");
-      if (boroughRaw) {
-        const norm = boroughRaw.toUpperCase().replace(/[\s-]/g, "_");
-        catalysts = catalysts.filter((c) => String(c.borough).toUpperCase() === norm);
-      }
-      const limit = Math.min(Math.max(numParam(args, "limit") ?? 25, 1), 100);
-      catalysts = catalysts.slice(0, limit);
       return {
         content: [
           {
             type: "text",
             text: await text({
-              city_id: stored.city_id,
-              count: catalysts.length,
-              threshold: minLims,
-              catalysts: catalysts.map(trimCatalyst),
+              city_id: result.city_id,
+              count: result.catalysts.length,
+              threshold: result.threshold,
+              catalysts: result.catalysts.map(trimCatalyst),
             }),
           },
         ],
@@ -528,23 +541,16 @@ async function callTool(
           isError: true,
         };
       }
-      const entry = await kvJson(env, "cells/index");
-      if (!entry) {
-        return { content: [{ type: "text", text: "No prediction snapshot available." }], isError: true };
-      }
-      const cells = entry.value as Record<string, Record<string, unknown>>;
-      const pred = cells[h3Index];
-      if (!pred) {
-        return {
-          content: [{ type: "text", text: `No precomputed prediction for cell '${h3Index}'.` }],
-          isError: true,
-        };
-      }
-      if (!boolParam(args, "include_shap", true)) {
-        const { shap_attributions: _omit, ...rest } = pred;
-        return { content: [{ type: "text", text: await text(rest) }] };
-      }
-      return { content: [{ type: "text", text: await text(pred) }] };
+      // SHAP strip trigger is identical to the HTTP adapter: only when
+      // include_shap is explicitly false.
+      const result = await lookupPrediction(env, {
+        h3Index,
+          includeShap: boolParam(args, "include_shap", true) ? undefined : false,
+        });
+        if ("error" in result) {
+          return { content: [{ type: "text", text: String((result as Record<string, unknown>).error) }], isError: true };
+        }
+      return { content: [{ type: "text", text: await text(result) }] };
     }
     default:
       return { content: [{ type: "text", text: `Unknown tool '${String(toolName)}'.` }], isError: true };
@@ -693,7 +699,7 @@ and sorted by descending LIMS score.
 
 ### GET /api/v1/catalysts?city_id=austin&min_lims=90&limit=25
 Strongest commercial catalyst cells. \`min_lims\` defaults to the publish
-threshold (85); \`limit\` caps at 500.
+threshold (84); \`limit\` caps at 500.
 
 ### POST /api/v1/predict
 Point forecast for one cell.
@@ -984,7 +990,7 @@ function openApiSpec(origin: string): Response {
               in: "query",
               required: false,
               schema: { type: "number", minimum: 0, maximum: 100 },
-              description: "Minimum LIMS score; defaults to the publish threshold (85).",
+              description: "Minimum LIMS score; defaults to the publish threshold (84).",
             },
             {
               name: "limit",
@@ -1094,7 +1100,7 @@ ${cityLines}
 - \`GET ${origin}/api/v1/submarkets?city_id=<id>[&borough=<name>]\` — submarket dictionary.
 - \`GET ${origin}/api/v1/grid?city_id=<id>\` — full H3 grid (large).
 - \`GET ${origin}/api/v1/catalysts/all\` — all metros' catalysts, attributed + ranked.
-- \`GET ${origin}/api/v1/catalysts?city_id=<id>&min_lims=85&limit=50\` — top catalyst cells.
+- \`GET ${origin}/api/v1/catalysts?city_id=<id>&min_lims=84&limit=50\` — top catalyst cells.
 - \`POST ${origin}/api/v1/predict\` — body \`{"h3_index":"<r9-cell>","include_shap":true}\`.
 
 Snapshot endpoints return ETags and an \`x-snapshot-created\` publish stamp.
@@ -1164,10 +1170,21 @@ async function serveSite(request: Request, env: Env, url: URL): Promise<Response
 
   const asset = await env.ASSETS.fetch(request);
   const contentType = asset.headers.get("content-type") ?? "";
-  if (asset.ok && contentType.includes("text/html")) {
+  if (asset.ok) {
     const headers = new Headers(asset.headers);
-    headers.set("link", HOME_LINK_HEADERS);
-    headers.append("vary", "Accept");
+    // Long-lived edge caching. The dashboard HTML (incl. its inline app script)
+    // is immutable per deploy and safe to cache for a short window with
+    // background revalidation; any other static asset gets a year-long cache.
+    const isHtml = contentType.includes("text/html");
+    if (isHtml) {
+      headers.set("cache-control", "public, max-age=300, stale-while-revalidate=86400");
+    } else if (/\.(css|js|mjs|svg|woff2?|ttf|png|jpe?g|webp|avif|gif|ico)(\?|$)/i.test(url.pathname)) {
+      headers.set("cache-control", "public, max-age=31536000, immutable");
+    }
+    if (isHtml) {
+      headers.set("link", HOME_LINK_HEADERS);
+      headers.append("vary", "Accept");
+    }
     return new Response(asset.body, { status: asset.status, headers });
   }
   return asset;
@@ -1227,21 +1244,20 @@ export default {
         if (!entry) return jsonError(404, `No snapshot for city '${city}'.`);
         if (etagMatches(request, entry.etag)) return new Response(null, { status: 304 });
 
+        // Borough filter + normalization live in snapshot.ts; the adapter only
+        // formats the transport payload from the query result (ETag/304 come
+        // from the raw entry above).
+        const result = await querySubmarkets(env, {
+          city,
+          borough: url.searchParams.get("borough") ?? undefined,
+        });
+        if ("error" in result) return jsonError(404, result.error);
         const payload = entry.value as Record<string, unknown>;
-        const boroughFilter = url.searchParams.get("borough");
-        if (boroughFilter) {
-          const norm = boroughFilter.trim().toUpperCase().replace(/[\s-]/g, "_");
-          const submarkets = Object.fromEntries(
-            Object.entries(
-              (payload.submarkets as Record<string, Record<string, unknown>>) ?? {}
-            ).filter(([, meta]) => String(meta.borough).toUpperCase() === norm)
-          );
-          Object.assign(payload, {
-            borough: norm,
-            count: Object.keys(submarkets).length,
-            submarkets,
-          });
-        }
+        Object.assign(payload, {
+          city_id: result.city_id,
+          count: Object.keys(result.submarkets).length,
+          submarkets: result.submarkets,
+        });
         return withHeaders(JSON.stringify(payload), 200, {
           ...baseHeaders,
           etag: entry.etag,
@@ -1275,41 +1291,34 @@ export default {
             `Unsupported city_id '${url.searchParams.get("city_id")}'. Supported cities: ${supportedCities}.`
           );
         }
-        const minLimsRaw = url.searchParams.get("min_lims");
-        const minLims =
-          minLimsRaw !== null && minLimsRaw !== ""
-            ? Number(minLimsRaw)
-            : (manifest?.catalyst_threshold ?? 85.0);
-        if (!Number.isFinite(minLims) || minLims < 0 || minLims > 100) {
-          return jsonError(422, "min_lims must be within [0.0, 100.0].");
-        }
-        const limitRaw = Number(url.searchParams.get("limit") ?? "50");
-        const limit = Math.min(Math.max(Number.isFinite(limitRaw) ? limitRaw : 50, 1), 500);
-
+        // Transport parsing only. The min_lims/limit/borough policy, default
+        // source, bounding, and filter/slice all live in snapshot.ts (PRODUCT
+        // DECISION US-190); the adapter keeps the 422/404 envelope + wording.
         const entry = await kvJson(env, `catalysts/${city}`);
         if (!entry) return jsonError(404, `No catalyst snapshot for city '${city}'.`);
         if (etagMatches(request, entry.etag)) return new Response(null, { status: 304 });
 
-        const stored = entry.value as CatalystPayload;
-        let catalysts = stored.catalysts;
-        if (minLims > (stored.threshold ?? 85.0)) {
-          catalysts = catalysts.filter((c) => Number(c.lims_score) >= minLims);
-        }
-        const boroughFilter = url.searchParams.get("borough");
-        if (boroughFilter) {
-          const norm = boroughFilter.trim().toUpperCase().replace(/[\s-]/g, "_");
-          catalysts = catalysts.filter(
-            (c) => String(c.borough).toUpperCase() === norm
-          );
-        }
-        catalysts = catalysts.slice(0, limit);
+        const minLimsRaw = url.searchParams.get("min_lims");
+        const minLims = minLimsRaw !== null ? Number(minLimsRaw) : undefined;
+        const limitRaw = url.searchParams.get("limit");
+        const limit =
+          limitRaw !== null && limitRaw !== "" && Number.isFinite(Number(limitRaw))
+            ? Number(limitRaw)
+            : undefined;
 
+        const result = await queryCatalysts(env, {
+          city,
+          minLims,
+          limit,
+          borough: url.searchParams.get("borough") ?? undefined,
+        });
+        if ("error" in result) return jsonError(422, result.error);
         const payload: CatalystPayload = {
-          city_id: stored.city_id,
-          count: catalysts.length,
-          threshold: minLims,
-          borough: boroughFilter ? boroughFilter.trim().toUpperCase().replace(/[\s-]/g, "_") : null,
-          catalysts,
+          city_id: result.city_id,
+          count: result.catalysts.length,
+          threshold: result.threshold,
+          borough: result.borough,
+          catalysts: result.catalysts,
         };
         return withHeaders(JSON.stringify(payload), 200, {
           ...baseHeaders,
@@ -1400,19 +1409,14 @@ export default {
           );
         }
 
-        const entry = await kvJson(env, "cells/index");
-        if (!entry) return jsonError(404, "No prediction snapshot available.");
-
-        const cells = entry.value as Record<string, Record<string, unknown>>;
-        const pred = cells[h3Index];
-        if (!pred) {
-          return jsonError(404, `No precomputed prediction for cell '${h3Index}'.`);
-        }
-        if (body.include_shap === false) {
-          const { shap_attributions: _omit, ...rest } = pred;
-          return withHeaders(JSON.stringify(rest), 200, baseHeaders);
-        }
-        return withHeaders(JSON.stringify(pred), 200, baseHeaders);
+        // Data + cell lookup + SHAP-strip trigger come from the shared snapshot
+        // query; the adapter keeps its own 400/404 envelopes and wording.
+        const result = await lookupPrediction(env, {
+          h3Index,
+          includeShap: body.include_shap === false ? false : undefined,
+        });
+        if ("error" in result) return jsonError(404, String((result as Record<string, unknown>).error));
+        return withHeaders(JSON.stringify(result), 200, baseHeaders);
       }
 
       return jsonError(404, "Not Found");

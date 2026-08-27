@@ -8,7 +8,7 @@ year. Run it in staging every December 15 against the NEXT year's Jan 2:
 
 Exits nonzero (loudly) if any feed lacks a mapping — risk R3's failure mode.
 The fix is the manual fallback runbook: append the year's endpoint in
-``DatasetSpec.extra["endpoint_by_year"]``, restart the scheduler job, verify
+``DatasetSpec["endpoint_by_year"]``, restart the scheduler job, verify
 with a newest-row probe.
 """
 

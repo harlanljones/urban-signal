@@ -91,3 +91,14 @@ CINCINNATI_DIVISIONS: Dict[str, BoroughMeta] = {
         city_id="cincinnati",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=CINCINNATI_METRO_BBOX,
+    division_bboxes=CINCINNATI_DIVISION_BBOXES,
+    submarkets=CINCINNATI_SUBMARKETS,
+    divisions=CINCINNATI_DIVISIONS,
+    contains=is_in_cincinnati_metro,
+)

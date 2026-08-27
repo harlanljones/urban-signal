@@ -13,7 +13,7 @@ from src.spatial.cities.charlotte import (
 )
 from src.spatial.city_registry import CityId, FeedType
 
-# Recommended DatasetSpec.extra["field_map"] for US-88. Every entry spells an
+# Recommended DatasetSpec.field_map for US-88. Every entry spells an
 # uppercase column the shared producer fallback chains cannot reach;
 # latitude/longitude need no entry because ArcGISClient lifts point geometry
 # onto those exact keys (outSR=4326) before parsing.
@@ -56,10 +56,10 @@ def test_charlotte_registers_arcgis_311_only():
     assert s311.watermark_col == "RECEIVED_DATE"
     assert s311.interval_seconds == 180.0
     assert s311.producer_key == "311"
-    assert s311.extra["expected_cadence_days"] == 7
-    assert s311.extra["oid_field"] == "OBJECTID"
-    assert s311.extra["max_record_count"] == 7500
-    assert s311.extra["field_map"] == CHARLOTTE_FIELD_MAP
+    assert s311.expected_cadence_days == 7
+    assert s311.oid_field == "OBJECTID"
+    assert s311.max_record_count == 7500
+    assert s311.field_map == CHARLOTTE_FIELD_MAP
 
     with pytest.raises(KeyError, match="no.*feed"):
         get_dataset(city, FeedType.PERMITS)

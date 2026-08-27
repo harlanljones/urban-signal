@@ -18,13 +18,20 @@ from src.spatial.h3_indexer import H3SpatialIndexer
 logger = logging.getLogger(__name__)
 
 
-def _parse_datetime(val: Any) -> Optional[datetime]:
-    """Parse various ISO and common municipal date formats into a timezone-aware datetime."""
+def _parse_datetime(val: Any, spec: Any = None) -> Optional[datetime]:
+    """Parse various ISO and common municipal date formats into a timezone-aware datetime.
+
+    Numeric coercion (year or compact YYYYMMDD) is only attempted for rows
+    whose feed carries a registered DatasetSpec. Unregistered candidate feeds
+    (for example Denver's un-landed sales table) must not silently fabricate a
+    date from a raw integer watermark value, so they fall through to the
+    caller's now() fallback instead.
+    """
     if not val:
         return None
     if isinstance(val, datetime):
         return val if val.tzinfo else val.replace(tzinfo=timezone.utc)
-    if isinstance(val, (int, float)):
+    if isinstance(val, (int, float)) and spec is not None:
         # Treat 4-digit numbers as years
         if 1900 <= int(val) <= 2100:
             return datetime(int(val), 1, 1, tzinfo=timezone.utc)
@@ -218,6 +225,19 @@ class DeedsACRISProducer:
 
             field_map = resolve_field_map(resolved_city, FeedType.DEEDS)
 
+            # Resolve the registered DatasetSpec for this feed (if any). The
+            # flattened spec carries the geocode/date-parsing flags directly;
+            # unregistered candidate feeds (Denver's not-yet-landed sales table)
+            # intentionally resolve to None so neither numeric date coercion nor
+            # the geocode hook is invoked.
+            spec = None
+            try:
+                cid = normalize_city(resolved_city)
+                if cid is not None:
+                    spec = get_dataset(cid, FeedType.DEEDS)
+            except Exception:
+                spec = None
+
             doc_id = str(
                 first_mapped(row, field_map, "doc_id")
                 or row.get("ExciseTaxNum")
@@ -276,21 +296,23 @@ class DeedsACRISProducer:
                     lng_raw = lng_raw if lng_raw else lng_wkt
 
             if not lat_raw or not lng_raw:
-                # Address-only deed feeds can opt into ADR-0004 geocoding in
-                # their DatasetSpec. Keep the fallback declaration-driven so
-                # existing coordinate-less registries remain lossless when
-                # they have not opted into an external geocoder.
-                from src.spatial.geocoder import geocode_row_if_declared
+                # Address-only deed feeds can opt into ADR-0004 geocoding via a
+                # direct ``needs_geocode`` declaration on their DatasetSpec. The
+                # geocode hook is only reached when the feed actually declares
+                # it, so feeds without a registered spec (or without the flag)
+                # remain lossless and coordinate-less.
+                if spec is not None and spec.needs_geocode:
+                    from src.spatial.geocoder import geocode_row_if_declared
 
-                addr_candidate = (
-                    first_mapped(row, field_map, "address_street")
-                    or row.get("property_address")
-                    or row.get("street_address")
-                    or row.get("address")
-                )
-                resolved = geocode_row_if_declared(resolved_city, "deeds", addr_candidate)
-                if resolved is not None:
-                    lat_raw, lng_raw = resolved
+                    addr_candidate = (
+                        first_mapped(row, field_map, "address_street")
+                        or row.get("property_address")
+                        or row.get("street_address")
+                        or row.get("address")
+                    )
+                    resolved = geocode_row_if_declared(resolved_city, "deeds", addr_candidate)
+                    if resolved is not None:
+                        lat_raw, lng_raw = resolved
 
             lat = float(lat_raw) if lat_raw is not None else None
             lng = float(lng_raw) if lng_raw is not None else None
@@ -362,7 +384,7 @@ class DeedsACRISProducer:
                 or row.get("good_through_date")
                 or row.get("SaleDate")
             )
-            recorded_dt = _parse_datetime(recorded_str) or datetime.now(timezone.utc)
+            recorded_dt = _parse_datetime(recorded_str, spec) or datetime.now(timezone.utc)
 
             bbl_val = str(
                 first_mapped(row, field_map, "bbl")
@@ -452,26 +474,13 @@ class DeedsACRISProducer:
         spec = get_dataset(cid, FeedType.DEEDS)
         endpoint = spec.endpoint
         client = self._client_for(spec.platform)
-        client_kwargs = {
-            k: v
-            for k, v in spec.extra.items()
-            if k in (
-                "order_by",
-                "id_col",
-                "select",
-                "fallback_endpoints",
-                "watermark_col",
-                "watermark_format",
-                "watermark_exclude",
-            )
-            and v
-        }
-        if spec.platform == "csv":
-            client_kwargs["watermark_col"] = spec.watermark_col
+        from src.producers.acquisition import AcquisitionSpec, build_adapter_request
+
+        client_kwargs = build_adapter_request(spec.platform, AcquisitionSpec.from_dataset_spec(spec))
 
         logger.info("Starting %s Deeds Ingestion Stream (limit=%d)...", cid.value.upper(), limit)
         records_streamed = 0
-        parcel_join = spec.extra.get("parcel_join")
+        parcel_join = spec.parcel_join
         parcel_centroids: Dict[str, tuple[float, float]] = {}
 
         for batch in client.paginate(

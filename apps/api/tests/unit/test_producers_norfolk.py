@@ -118,10 +118,10 @@ class TestPartialFeedRegistration:
         assert get_dataset(CityId.NORFOLK, FeedType.SLA).watermark_col == "business_opened_date"
 
     def test_geocoded_feed_declares_its_address_contract(self):
-        extra = get_dataset(CityId.NORFOLK, FeedType.COMPLAINTS_311).extra
-        assert extra["needs_geocode"] is True
-        assert extra["geocode_context"] == "Norfolk, VA"
-        assert extra["expected_cadence_days"] >= 1
+        extra = get_dataset(CityId.NORFOLK, FeedType.COMPLAINTS_311)
+        assert extra.needs_geocode is True
+        assert extra.geocode_context == "Norfolk, VA"
+        assert extra.expected_cadence_days >= 1
 
     def test_sla_declares_socrata_watermark_and_ids(self):
         """US-133: the Wave G2 "no geometry" verdict is obsolete — the city
@@ -134,11 +134,11 @@ class TestPartialFeedRegistration:
         assert spec.producer_key == "sla"
 
     def test_sla_registration_where_clause_drops_placeholder_addresses(self):
-        extra = get_dataset(CityId.NORFOLK, FeedType.SLA).extra
-        assert extra["where"] == "location_address != 'NO NORFOLK ADDRESS REQUIRED 99999'"
+        extra = get_dataset(CityId.NORFOLK, FeedType.SLA)
+        assert extra.where == "location_address != 'NO NORFOLK ADDRESS REQUIRED 99999'"
 
     def test_sla_registration_field_map_maps_native_columns(self):
-        fm = get_dataset(CityId.NORFOLK, FeedType.SLA).extra["field_map"]
+        fm = get_dataset(CityId.NORFOLK, FeedType.SLA).field_map
         assert fm["license_id"] == ["trading_as_name", "primary_owner"]
         assert fm["dba"] == ["trading_as_name"]
         assert fm["premises_name"] == ["primary_owner"]

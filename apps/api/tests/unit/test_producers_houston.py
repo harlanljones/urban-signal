@@ -61,10 +61,10 @@ def test_houston_registers_arcgis_311_only():
     assert s311.watermark_col == "CREATED_ON"
     assert s311.interval_seconds == 180.0
     assert s311.producer_key == "311"
-    assert s311.extra["expected_cadence_days"] == 7
-    assert s311.extra["oid_field"] == "OBJECTID"
-    assert s311.extra["max_record_count"] == 2000
-    assert s311.extra["field_map"] == HOUSTON_FIELD_MAP
+    assert s311.expected_cadence_days == 7
+    assert s311.oid_field == "OBJECTID"
+    assert s311.max_record_count == 2000
+    assert s311.field_map == HOUSTON_FIELD_MAP
 
     with pytest.raises(KeyError, match="no.*feed"):
         get_dataset(city, FeedType.PERMITS)

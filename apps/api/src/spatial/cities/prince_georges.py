@@ -101,3 +101,14 @@ PRINCE_GEORGES_DIVISIONS: dict[str, BoroughMeta] = {
         city_id="prince_georges",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=PRINCE_GEORGES_METRO_BBOX,
+    division_bboxes=PRINCE_GEORGES_DIVISION_BBOXES,
+    submarkets=PRINCE_GEORGES_SUBMARKETS,
+    divisions=PRINCE_GEORGES_DIVISIONS,
+    contains=is_in_prince_georges_metro,
+)

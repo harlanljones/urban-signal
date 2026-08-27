@@ -34,20 +34,20 @@ def test_montgomery_registers_permits_liquor_and_sdat_deeds():
     assert FeedType.COMPLAINTS_311 not in reg.datasets  # MC311 xtyh-brr2: see US-94 evaluation.
     permits = reg.datasets[FeedType.PERMITS]
     assert permits.endpoint.endswith("/resource/m88u-pqki.json")
-    assert permits.extra["companion_endpoints"] == {
+    assert permits.companion_endpoints == {
         "commercial": "https://data.montgomerycountymd.gov/resource/i26v-w6bd.json",
         "demolition": "https://data.montgomerycountymd.gov/resource/b6ht-fw3x.json",
         "electrical": "https://data.montgomerycountymd.gov/resource/qxie-8qnp.json",
     }
-    assert permits.extra["field_map"]["latitude"] == ["location.latitude"]
+    assert permits.field_map["latitude"] == ["location.latitude"]
     licenses = reg.datasets[FeedType.SLA]
     assert licenses.endpoint.endswith("/resource/c6rw-fazn.json")
-    assert licenses.extra["ingestion_mode"] == "snapshot"
-    assert licenses.extra["field_map"]["license_id"] == ["licensee_number"]
+    assert licenses.ingestion_mode == "snapshot"
+    assert licenses.field_map["license_id"] == ["licensee_number"]
     deeds = reg.datasets[FeedType.DEEDS]
     assert deeds.endpoint.endswith("/resource/kb22-is2w.json")
-    assert deeds.extra["ingestion_mode"] == "snapshot"
-    assert deeds.extra["field_map"]["doc_id"] == ["account_id_mdp_field_acctid"]
+    assert deeds.ingestion_mode == "snapshot"
+    assert deeds.field_map["doc_id"] == ["account_id_mdp_field_acctid"]
 
 
 def test_montgomery_permit_row_parses_nested_location():

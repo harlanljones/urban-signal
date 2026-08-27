@@ -115,7 +115,7 @@ def test_street_cut_registration_scope_and_job_names():
 
 def test_chicago_street_cut_declares_daily_cadence_and_topic():
     spec = get_dataset(CityId.CHICAGO, FeedType.STREET_CUT)
-    assert spec.extra["expected_cadence_days"] == 7
+    assert spec.expected_cadence_days == 7
     assert spec.endpoint.endswith("jdis-5sry.json")
     assert spec.topic == "raw.municipal.street_cut"
     assert spec.watermark_col == "applicationissueddate"

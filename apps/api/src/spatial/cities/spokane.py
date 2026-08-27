@@ -75,3 +75,14 @@ SPOKANE_DIVISIONS: dict[str, BoroughMeta] = {
         city_id="spokane",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=SPOKANE_METRO_BBOX,
+    division_bboxes=SPOKANE_DIVISION_BBOXES,
+    submarkets=SPOKANE_SUBMARKETS,
+    divisions=SPOKANE_DIVISIONS,
+    contains=is_in_spokane_metro,
+)

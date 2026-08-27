@@ -606,3 +606,14 @@ LOS_ANGELES_METRO_BBOX = LA_METRO_BBOX
 LOS_ANGELES_DIVISION_BBOXES = LA_DIVISION_BBOXES
 LOS_ANGELES_SUBMARKETS = LA_SUBMARKETS
 LOS_ANGELES_DIVISIONS = LA_DIVISIONS
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=LOS_ANGELES_METRO_BBOX,
+    division_bboxes=LOS_ANGELES_DIVISION_BBOXES,
+    submarkets=LOS_ANGELES_SUBMARKETS,
+    divisions=LOS_ANGELES_DIVISIONS,
+    contains=is_in_la_metro,
+)

@@ -6,7 +6,7 @@ identical to the live serving API. Output layout (per run):
     <out>/grid/{city}.json         GeoJSON FeatureCollection (res 9, k_ring 1, no SHAP)
                                    + cross-metro percentile normalization properties
     <out>/gridtiles/<parent>.json  Res-5 parent-H3 viewport tiles (lazy-load units)
-    <out>/catalysts/{city}.json    Active catalyst clusters (min_lims = 85.0)
+    <out>/catalysts/{city}.json    Active catalyst clusters (min_lims = 84.0)
     <out>/catalysts/index.json     All metros' catalysts flattened with city attribution
     <out>/submarkets/{city}.json   Submarket catalog per city
     <out>/cells.json               Global h3_index -> prediction map (SHAP included)
@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 SUPPORTED_CITIES = [city.value for city in CityId]
 DEFAULT_RESOLUTION = 9
 DEFAULT_K_RING = 1
-CATALYST_THRESHOLD = 85.0
+CATALYST_THRESHOLD = 84.0
 CATALYST_LIMIT = 50
 TILE_RESOLUTION = 5
 NORMALIZED_METRICS = (
@@ -135,13 +135,15 @@ def _bucket_grid_tiles(grids: dict[str, dict[str, Any]]) -> dict[str, list[dict[
     per-city attribution logic.
     """
     tiles: dict[str, list[dict[str, Any]]] = {}
+    seen_cells: set[str] = set()
     for city, grid in grids.items():
         city_name = REGISTRY[CityId(city)].name
         for feature in grid.get("features", []):
             props = feature.setdefault("properties", {})
             cell = props.get("h3_index")
-            if not cell:
+            if not cell or cell in seen_cells:
                 continue
+            seen_cells.add(cell)
             props.setdefault("city_id", city)
             props["city_name"] = city_name
             parent = h3.cell_to_parent(cell, TILE_RESOLUTION)

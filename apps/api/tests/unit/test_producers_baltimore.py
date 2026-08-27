@@ -41,7 +41,7 @@ def test_baltimore_registers_arcgis_feeds_plus_socrata_sdat_deeds():
     for feed in (FeedType.PERMITS, FeedType.COMPLAINTS_311, FeedType.SLA):
         assert REGISTRY[city].datasets[feed].platform == "arcgis", feed
     assert REGISTRY[city].datasets[FeedType.DEEDS].platform == "socrata"
-    assert REGISTRY[city].datasets[FeedType.DEEDS].extra["ingestion_mode"] == "snapshot"
+    assert REGISTRY[city].datasets[FeedType.DEEDS].ingestion_mode == "snapshot"
 
 
 def test_baltimore_specs_pin_live_fields_and_311_rollover():
@@ -49,18 +49,18 @@ def test_baltimore_specs_pin_live_fields_and_311_rollover():
     permits = reg.datasets[FeedType.PERMITS]
     assert permits.endpoint.endswith("DHCD_Open_Baltimore_Datasets/FeatureServer/3")
     assert permits.watermark_col == "IssuedDate"
-    assert permits.extra["field_map"]["job_id"] == ["CaseNumber"]
+    assert permits.field_map["job_id"] == ["CaseNumber"]
 
     complaints = reg.datasets[FeedType.COMPLAINTS_311]
-    assert complaints.extra["endpoint_by_year"]["2026"].endswith(
+    assert complaints.endpoint_by_year["2026"].endswith(
         "311_Customer_Service_Requests_current/FeatureServer/0"
     )
-    assert resolve_endpoint(complaints, date(2026, 8, 23)) == complaints.extra["endpoint_by_year"]["2026"]
-    assert complaints.extra["field_map"]["incident_id"] == ["SRRecordID", "ServiceRequestNum", "RowID"]
+    assert resolve_endpoint(complaints, date(2026, 8, 23)) == complaints.endpoint_by_year["2026"]
+    assert complaints.field_map["incident_id"] == ["SRRecordID", "ServiceRequestNum", "RowID"]
 
     licenses = reg.datasets[FeedType.SLA]
-    assert licenses.extra["scope"] == "notifications-grade"
-    assert licenses.extra["field_map"]["license_id"] == ["LicenseNumber", "LLKey"]
+    # `scope` was a free-form extra key; it has been dropped (US-186).
+    assert licenses.field_map["license_id"] == ["LicenseNumber", "LLKey"]
 
 
 def test_baltimore_permit_row_parses_with_arcgis_flattened_coordinates():
@@ -172,8 +172,8 @@ class TestBaltimoreSdatDeeds:
 
     def test_snapshot_mode_registered(self):
         spec = REGISTRY[CityId.BALTIMORE].datasets[FeedType.DEEDS]
-        assert spec.extra["ingestion_mode"] == "snapshot"
-        assert spec.extra["expected_cadence_days"] == 30
+        assert spec.ingestion_mode == "snapshot"
+        assert spec.expected_cadence_days == 30
         assert spec.watermark_col == (
             "sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89"
         )

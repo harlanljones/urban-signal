@@ -75,3 +75,14 @@ RALEIGH_DIVISIONS: dict[str, BoroughMeta] = {
         city_id="raleigh",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=RALEIGH_METRO_BBOX,
+    division_bboxes=RALEIGH_DIVISION_BBOXES,
+    submarkets=RALEIGH_SUBMARKETS,
+    divisions=RALEIGH_DIVISIONS,
+    contains=is_in_raleigh_metro,
+)

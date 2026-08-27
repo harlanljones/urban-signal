@@ -123,3 +123,14 @@ NASHVILLE_DIVISIONS: dict[str, BoroughMeta] = {
         city_id="nashville",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=NASHVILLE_METRO_BBOX,
+    division_bboxes=NASHVILLE_DIVISION_BBOXES,
+    submarkets=NASHVILLE_SUBMARKETS,
+    divisions=NASHVILLE_DIVISIONS,
+    contains=is_in_nashville_metro,
+)

@@ -123,3 +123,13 @@ CHARLOTTE_DIVISIONS: dict[str, BoroughMeta] = {
         city_id="charlotte",
     ),
 }
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=CHARLOTTE_METRO_BBOX,
+    division_bboxes=CHARLOTTE_DIVISION_BBOXES,
+    submarkets=CHARLOTTE_SUBMARKETS,
+    divisions=CHARLOTTE_DIVISIONS,
+    contains=is_in_charlotte_metro,
+)

@@ -17,13 +17,7 @@ from src.spatial.cities.san_francisco import (
     is_in_san_francisco_metro,
     is_in_sf_metro,
 )
-from src.spatial.city_registry import (
-    NYC_BOROUGH_BBOXES,
-    NYC_METRO_BBOX,
-    REGISTRY,
-    CityId,
-    normalize_city,
-)
+from src.spatial.submarkets import NYC_BOROUGH_BBOXES, NYC_METRO_BBOX
 
 
 def is_in_nyc_metro(lat: float, lng: float) -> bool:
@@ -40,6 +34,8 @@ def get_city_for_coordinate(lat: float, lng: float) -> Optional[str]:
     # as "no match" rather than letting the bbox comparison raise TypeError.
     if lat is None or lng is None:
         return None
+
+    from src.spatial.city_registry import REGISTRY
 
     for cid, reg in REGISTRY.items():
         bbox = reg.metro_bbox
@@ -107,6 +103,8 @@ def get_division_for_coordinate(
     # as "no match" rather than letting the bbox comparison raise TypeError.
     if lat is None or lng is None:
         return None
+
+    from src.spatial.city_registry import REGISTRY, normalize_city
 
     norm_city = normalize_city(city_id)
     if not norm_city or norm_city not in REGISTRY:

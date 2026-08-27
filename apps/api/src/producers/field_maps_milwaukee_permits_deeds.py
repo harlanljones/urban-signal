@@ -21,7 +21,7 @@ from src.spatial.cities.milwaukee import (
 )
 
 # Canonical field maps for the two new Milwaukee feeds, keyed by FeedType so the
-# spine can embed them as `DatasetSpec.extra["field_map"]` verbatim.
+# spine can embed them as `DatasetSpec["field_map"]` verbatim.
 FIELD_MAP: Dict[FeedType, Dict[str, List[str]]] = {
     FeedType.PERMITS: MILWAUKEE_PERMITS_FIELD_MAP,
     FeedType.DEEDS: MILWAUKEE_DEEDS_FIELD_MAP,

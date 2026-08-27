@@ -129,8 +129,8 @@ class TestFeedRegistration:
         """Every Detroit layer reports objectIdField='ObjectId' (camelCase —
         NOT King County's OBJECTID) and maxRecordCount=1000 live."""
         for spec in REGISTRY[CityId.DETROIT].datasets.values():
-            assert spec.extra["oid_field"] == "ObjectId"
-            assert spec.extra["max_record_count"] == 1000
+            assert spec.oid_field == "ObjectId"
+            assert spec.max_record_count == 1000
 
     def test_endpoints_resolve_to_live_layers(self):
         base = "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services"

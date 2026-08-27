@@ -75,3 +75,14 @@ RENO_DIVISIONS: dict[str, BoroughMeta] = {
         city_id="reno",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=RENO_METRO_BBOX,
+    division_bboxes=RENO_DIVISION_BBOXES,
+    submarkets=RENO_SUBMARKETS,
+    divisions=RENO_DIVISIONS,
+    contains=is_in_reno_metro,
+)

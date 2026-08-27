@@ -213,14 +213,14 @@ class TestCompleteness:
                 assert spec.endpoint.startswith(scheme), (
                     f"{label}: {spec.platform} endpoint must start with {scheme!r}"
                 )
-                assert spec.watermark_col or spec.extra.get("ingestion_mode") == "snapshot", label
+                assert spec.watermark_col or spec.ingestion_mode == "snapshot", label
                 assert spec.id_keys and all(isinstance(k, str) and k for k in spec.id_keys), label
                 assert spec.interval_seconds > 0, label
                 assert spec.producer_key == feed.value, (
                     f"{label}: producer_key {spec.producer_key!r} != feed {feed.value!r}"
                 )
                 if spec.platform == "arcgis":
-                    assert "oid_field" in spec.extra, f"{label}: arcgis spec missing oid_field"
+                    assert spec.oid_field is not None, f"{label}: arcgis spec missing oid_field"
 
     def test_endpoints_declared_in_settings(self):
         declared = _declared_endpoint_defaults()

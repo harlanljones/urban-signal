@@ -316,3 +316,13 @@ MINNEAPOLIS_DIVISIONS: Dict[str, BoroughMeta] = {
         city_id="minneapolis",
     ),
 }
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=MINNEAPOLIS_METRO_BBOX,
+    division_bboxes=MINNEAPOLIS_DIVISION_BBOXES,
+    submarkets=MINNEAPOLIS_SUBMARKETS,
+    divisions=MINNEAPOLIS_DIVISIONS,
+    contains=is_in_minneapolis_metro,
+)

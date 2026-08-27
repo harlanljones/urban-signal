@@ -13,7 +13,7 @@ from src.spatial.cities.wichita import (
 )
 from src.spatial.city_registry import CityId, FeedType
 
-# Recommended DatasetSpec.extra["field_map"] for US-157. Every entry spells a
+# Recommended DatasetSpec.field_map for US-157. Every entry spells a
 # column the shared producer fallback chains cannot reach (mixed-case City of
 # Wichita -> MABCD schema); latitude/longitude need no entry because
 # ArcGISClient lifts point geometry onto those exact keys before parsing.
@@ -68,10 +68,10 @@ def test_wichita_registers_arcgis_permits_only():
     assert permits.interval_seconds == 300.0
     assert permits.producer_key == "permits"
     assert "PermitNumber" in permits.id_keys
-    assert permits.extra["expected_cadence_days"] == 7
-    assert permits.extra["oid_field"] == "OBJECTID"
-    assert permits.extra["max_record_count"] == 2000
-    assert permits.extra["field_map"] == WICHITA_FIELD_MAP
+    assert permits.expected_cadence_days == 7
+    assert permits.oid_field == "OBJECTID"
+    assert permits.max_record_count == 2000
+    assert permits.field_map == WICHITA_FIELD_MAP
 
     with pytest.raises(KeyError, match="no.*feed"):
         get_dataset(city, FeedType.COMPLAINTS_311)

@@ -13,7 +13,7 @@ def test_every_registered_feed_declares_expected_cadence():
     bad = []
     for city, registration in REGISTRY.items():
         for feed, spec in registration.datasets.items():
-            days = (spec.extra or {}).get("expected_cadence_days")
+            days = spec.expected_cadence_days
             if not isinstance(days, int) or isinstance(days, bool) or days < 1:
                 bad.append(f"{city.value}/{feed.value}: {days!r}")
     assert bad == []
@@ -27,9 +27,9 @@ def test_backfilled_feeds_keep_the_default_seven():
     in favor of their declared value.
     """
     values = {
-        spec.extra["expected_cadence_days"]
+        spec.expected_cadence_days
         for registration in REGISTRY.values()
         for spec in registration.datasets.values()
-        if "expected_cadence_days" in spec.extra
+        if spec.expected_cadence_days is not None
     }
     assert 7 in values

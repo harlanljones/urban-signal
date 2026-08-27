@@ -68,13 +68,13 @@ def test_san_antonio_registers_permits_and_311():
     assert permits.platform == "ckan"
     assert permits.endpoint == "ckan://data.sanantonio.gov/c21106f9-3ef5-4f3a-8604-f992b4db7512"
     assert permits.watermark_col == "DATE ISSUED"
-    assert permits.extra["needs_geocode"] is True
-    assert permits.extra["field_map"] == SAN_ANTONIO_PERMITS_FIELD_MAP
+    assert permits.needs_geocode is True
+    assert permits.field_map == SAN_ANTONIO_PERMITS_FIELD_MAP
 
     complaints = get_dataset(city, FeedType.COMPLAINTS_311)
     assert complaints.platform == "arcgis"
     assert complaints.watermark_col == "OpenedDateTime"
-    assert complaints.extra["field_map"] == SAN_ANTONIO_311_FIELD_MAP
+    assert complaints.field_map == SAN_ANTONIO_311_FIELD_MAP
 
 
 @pytest.fixture

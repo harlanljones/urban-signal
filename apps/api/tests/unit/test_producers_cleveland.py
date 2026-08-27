@@ -84,19 +84,19 @@ def test_cleveland_registers_three_verified_feeds():
     assert permits.platform == "arcgis"
     assert permits.watermark_col == "ISSUE_DATE"
     assert permits.id_keys == ["PERMIT_NUMBER", "OBJECTID"]
-    assert permits.extra["field_map"] == CLEVELAND_PERMITS_FIELD_MAP
+    assert permits.field_map == CLEVELAND_PERMITS_FIELD_MAP
 
     complaints = get_dataset(city, FeedType.COMPLAINTS_311)
     assert complaints.platform == "arcgis"
     assert complaints.watermark_col == "requested_datetime"
     assert complaints.id_keys == ["SR_NUMBER", "OBJECTID"]
-    assert complaints.extra["field_map"] == CLEVELAND_311_FIELD_MAP
+    assert complaints.field_map == CLEVELAND_311_FIELD_MAP
 
     deeds = get_dataset(city, FeedType.DEEDS)
     assert deeds.platform == "arcgis"
     assert deeds.watermark_col == "last_transfer_date"
     assert deeds.id_keys == ["PARCEL_ID", "OBJECTID"]
-    assert deeds.extra["field_map"] == CLEVELAND_DEEDS_FIELD_MAP
+    assert deeds.field_map == CLEVELAND_DEEDS_FIELD_MAP
 
     with pytest.raises(KeyError, match="no.*feed"):
         get_dataset(city, FeedType.SLA)

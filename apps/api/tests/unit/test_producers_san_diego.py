@@ -124,7 +124,7 @@ def test_san_diego_spec_declares_csv_platform_and_year_rollover():
     assert spec.watermark_col == "approval_issue_date"
     assert spec.topic == "raw.municipal.permits"
     assert spec.endpoint.startswith("https://seshat.datasd.org/")
-    by_year = spec.extra["endpoint_by_year"]
+    by_year = spec.endpoint_by_year
     assert by_year["2026"].endswith("approvals_issued_2026_datasd.csv")
     assert by_year["2027"].endswith("approvals_issued_2027_datasd.csv")
     assert resolve_endpoint_resolves_current_year(spec)
@@ -136,7 +136,7 @@ def resolve_endpoint_resolves_current_year(spec) -> bool:
     from src.spatial.city_registry import resolve_endpoint
 
     resolved = resolve_endpoint(spec, today=date(2026, 8, 24))
-    return resolved == spec.extra["endpoint_by_year"]["2026"]
+    return resolved == spec.endpoint_by_year["2026"]
 
 
 # ---------------------------------------------------------------------------
@@ -239,12 +239,12 @@ def test_san_diego_311_spec_declares_csv_platform_and_rollover():
     assert spec.id_keys == ["service_request_id"]
     assert spec.topic == "raw.municipal.311"
     assert spec.endpoint.startswith("https://seshat.datasd.org/get_it_done_reports/")
-    by_year = spec.extra["endpoint_by_year"]
+    by_year = spec.endpoint_by_year
     assert by_year["2026"].endswith("get_it_done_requests_closed_2026_datasd.csv")
     assert by_year["2027"].endswith("get_it_done_requests_closed_2027_datasd.csv")
     assert by_year["2016"].endswith("get_it_done_requests_closed_2016_datasd.csv")
     assert resolve_endpoint(spec, today=date(2026, 8, 24)) == by_year["2026"]
-    assert spec.extra["companion_endpoints"]["open"].endswith(
+    assert spec.companion_endpoints["open"].endswith(
         "get_it_done_requests_open_datasd.csv"
     )
 
@@ -395,7 +395,7 @@ def test_san_diego_sla_spec_declares_csv_platform_and_snapshot():
     assert spec.topic == "raw.municipal.sla"
     assert spec.endpoint.startswith("https://seshat.datasd.org/business_tax_certificates/")
     assert spec.endpoint.endswith("sd_businesses_active_datasd.csv")
-    assert spec.extra["ingestion_mode"] == "snapshot"
+    assert spec.ingestion_mode == "snapshot"
     assert spec.producer_key == "sla"
 
 

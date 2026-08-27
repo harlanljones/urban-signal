@@ -75,3 +75,14 @@ HARTFORD_DIVISIONS: dict[str, BoroughMeta] = {
         city_id="hartford",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=HARTFORD_METRO_BBOX,
+    division_bboxes=HARTFORD_DIVISION_BBOXES,
+    submarkets=HARTFORD_SUBMARKETS,
+    divisions=HARTFORD_DIVISIONS,
+    contains=is_in_hartford_metro,
+)

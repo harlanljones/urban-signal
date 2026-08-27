@@ -67,15 +67,15 @@ def test_chattanooga_registers_permits_and_deeds_only():
     assert permits.platform == "csv"
     assert permits.watermark_col == "issueddate"
     assert permits.id_keys == ["permitnum"]
-    assert permits.extra["fallback_endpoints"]
-    assert permits.extra["field_map"] == CHATTANOOGA_PERMITS_FIELD_MAP
+    assert permits.fallback_endpoints
+    assert permits.field_map == CHATTANOOGA_PERMITS_FIELD_MAP
 
     deeds = get_dataset(city, FeedType.DEEDS)
     assert deeds.platform == "arcgis"
     assert deeds.watermark_col == "SALE1DATE"
     assert deeds.id_keys == ["PIN", "OBJECTID"]
-    assert deeds.extra["ingestion_mode"] == "snapshot"
-    assert deeds.extra["field_map"] == CHATTANOOGA_DEEDS_FIELD_MAP
+    assert deeds.ingestion_mode == "snapshot"
+    assert deeds.field_map == CHATTANOOGA_DEEDS_FIELD_MAP
 
     with pytest.raises(KeyError, match="no.*feed"):
         get_dataset(city, FeedType.COMPLAINTS_311)

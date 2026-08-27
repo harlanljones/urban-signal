@@ -127,7 +127,7 @@ class TestResolveEndpointYearSlicing:
     """The D3 mechanism DC's year-sliced feeds plug into (already on spine)."""
 
     def _spec(self, by_year, endpoint="fallback"):
-        return SimpleNamespace(endpoint=endpoint, extra={"endpoint_by_year": by_year})
+        return SimpleNamespace(endpoint=endpoint, endpoint_by_year=by_year)
 
     def test_resolves_current_year_layer(self):
         import datetime as dt
@@ -222,7 +222,7 @@ class TestWashingtonDcRegistration:
         from src.spatial.city_registry import CityId, get_dataset
 
         spec = get_dataset(CityId.WASHINGTON_DC, feed)
-        extra_years = spec.extra["endpoint_by_year"]
+        extra_years = spec.endpoint_by_year
         assert len(extra_years) >= 2
         current = str(__import__("datetime").date.today().year)
         assert extra_years[current] == by_year[current]
@@ -238,11 +238,11 @@ class TestWashingtonDcRegistration:
         dc = CityId.WASHINGTON_DC
         for feed in set(REGISTRY[dc].datasets):
             spec = get_dataset(dc, feed)
-            assert spec.extra["oid_field"] == "OBJECTID", feed
-        assert get_dataset(dc, FeedType.PERMITS).extra["max_record_count"] == 2000
-        assert get_dataset(dc, FeedType.SLA).extra["max_record_count"] == 2000
-        assert get_dataset(dc, FeedType.DEEDS).extra["max_record_count"] == 2000
-        assert get_dataset(dc, FeedType.COMPLAINTS_311).extra["max_record_count"] == 1000
+            assert spec.oid_field == "OBJECTID", feed
+        assert get_dataset(dc, FeedType.PERMITS).max_record_count == 2000
+        assert get_dataset(dc, FeedType.SLA).max_record_count == 2000
+        assert get_dataset(dc, FeedType.DEEDS).max_record_count == 2000
+        assert get_dataset(dc, FeedType.COMPLAINTS_311).max_record_count == 1000
 
     def test_sla_declares_geocoded_premises_contract(self):
         """US-74: SLA upgrades from non_spatial to address-string geocoding
@@ -250,12 +250,12 @@ class TestWashingtonDcRegistration:
         still carries non_spatial=True."""
         from src.spatial.city_registry import CityId, FeedType, get_dataset
 
-        extra = get_dataset(CityId.WASHINGTON_DC, FeedType.SLA).extra
-        assert extra.get("needs_geocode") is True
-        assert extra["geocode_context"] == "Washington, DC"
-        assert extra.get("expected_cadence_days", 0) >= 1
-        assert extra.get("non_spatial") is not True
-        assert extra["field_map"]["address_street"] == ["PREMISEADDRESS"]
+        extra = get_dataset(CityId.WASHINGTON_DC, FeedType.SLA)
+        assert extra.needs_geocode is True
+        assert extra.geocode_context == "Washington, DC"
+        assert extra.expected_cadence_days or 0 >= 1
+        assert extra.non_spatial is not True
+        assert extra.field_map["address_street"] == ["PREMISEADDRESS"]
 
     def test_sla_field_map_never_bridges_sentinel_coordinate_columns(self):
         """The layer's LATITUDE/LONGITUDE columns hold null or the sentinel
@@ -264,7 +264,7 @@ class TestWashingtonDcRegistration:
         Holds pre-spine (nothing mapped) and must hold after it."""
         from src.spatial.city_registry import CityId, FeedType, get_dataset
 
-        field_map = get_dataset(CityId.WASHINGTON_DC, FeedType.SLA).extra["field_map"]
+        field_map = get_dataset(CityId.WASHINGTON_DC, FeedType.SLA).field_map
         for canonical, keys in field_map.items():
             assert "LATITUDE" not in keys, canonical
             assert "LONGITUDE" not in keys, canonical
@@ -276,13 +276,13 @@ class TestWashingtonDcRegistration:
         is joined to Parcel Lots before parsing instead."""
         from src.spatial.city_registry import CityId, FeedType, get_dataset
 
-        extra = get_dataset(CityId.WASHINGTON_DC, FeedType.DEEDS).extra
-        assert extra.get("non_spatial") is not True
-        assert extra["parcel_join"]["join_key"] == "SSL"
-        assert extra["parcel_join"]["geometry_source"] == "centroid"
-        assert extra.get("needs_geocode") is not True
+        extra = get_dataset(CityId.WASHINGTON_DC, FeedType.DEEDS)
+        assert extra.non_spatial is not True
+        assert extra.parcel_join["join_key"] == "SSL"
+        assert extra.parcel_join["geometry_source"] == "centroid"
+        assert extra.needs_geocode is not True
         assert any(
-            "ssl" in str(v).lower() for v in extra.get("field_map", {}).values()
+            "ssl" in str(v).lower() for v in (extra.field_map or {}).values()
         )
 
 
@@ -564,9 +564,9 @@ class TestDcWithProposedFieldMap(DcParsingBase):
     def test_deeds_declares_ssl_parcel_centroid_join(self):
         from src.spatial.city_registry import CityId, FeedType, get_dataset
 
-        extra = get_dataset(CityId.WASHINGTON_DC, FeedType.DEEDS).extra
-        assert extra.get("non_spatial") is not True
-        assert extra["parcel_join"] == {
+        extra = get_dataset(CityId.WASHINGTON_DC, FeedType.DEEDS)
+        assert extra.non_spatial is not True
+        assert extra.parcel_join == {
             "parcel_layer": f"{DCGIS}/DCGIS_DATA/Property_and_Land_WebMercator/FeatureServer/33",
             "join_key": "SSL",
             "geometry_source": "centroid",

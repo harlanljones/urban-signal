@@ -91,3 +91,14 @@ BATON_ROUGE_DIVISIONS: Dict[str, BoroughMeta] = {
         city_id="baton_rouge",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=BATON_ROUGE_METRO_BBOX,
+    division_bboxes=BATON_ROUGE_DIVISION_BBOXES,
+    submarkets=BATON_ROUGE_SUBMARKETS,
+    divisions=BATON_ROUGE_DIVISIONS,
+    contains=is_in_baton_rouge_metro,
+)

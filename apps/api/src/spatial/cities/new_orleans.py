@@ -494,3 +494,14 @@ NOLA_METRO_BBOX = NEW_ORLEANS_METRO_BBOX
 NEW_ORLEANS_DIVISION_BBOXES = NOLA_DIVISION_BBOXES
 NEW_ORLEANS_SUBMARKETS = NOLA_SUBMARKETS
 NEW_ORLEANS_DIVISIONS = NOLA_DIVISIONS
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=NEW_ORLEANS_METRO_BBOX,
+    division_bboxes=NEW_ORLEANS_DIVISION_BBOXES,
+    submarkets=NEW_ORLEANS_SUBMARKETS,
+    divisions=NEW_ORLEANS_DIVISIONS,
+    contains=is_in_new_orleans_metro,
+)

@@ -11,10 +11,10 @@ Instead, a city declares its spellings as data alongside its feed spec:
 
     DatasetSpec(
         ...,
-        extra={"field_map": {
+        field_map={
             "job_id": ["numstring"],
             "latitude": ["location_1.latitude"],   # dotted = nested container
-        }},
+        },
     )
 
 Parsers consult the map for the resolved city BEFORE their generic fallback
@@ -64,5 +64,5 @@ def resolve_field_map(city_value: str, feed: "FeedType") -> dict[str, list[str]]
         spec = get_dataset(norm, feed)
     except KeyError:
         return {}
-    field_map = spec.extra.get("field_map")
+    field_map = spec.field_map
     return field_map if isinstance(field_map, dict) else {}

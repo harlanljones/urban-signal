@@ -406,7 +406,14 @@ class PaginatingClient(Protocol):
 
 @dataclass
 class DatasetSpec:
-    """Specification for a municipal dataset endpoint and ingestion configuration."""
+    """Specification for a municipal dataset endpoint and ingestion configuration.
+
+    Acquisition keys that used to live in a free-form ``extra`` dict are now
+    first-class typed fields (US-186). Every field defaults to the old
+    "key-absent" semantics, so existing callers behave identically. ``scope``
+    was the only genuinely-dead key and has been dropped.
+    """
+
     endpoint: str
     platform: str = "socrata"  # "socrata", "arcgis", "ckan", etc.
     watermark_col: str = ""
@@ -414,7 +421,37 @@ class DatasetSpec:
     topic: str = ""
     interval_seconds: float = 300.0
     producer_key: str = ""
-    extra: Dict[str, Any] = field(default_factory=dict)
+    # --- typed acquisition keys (formerly ``extra``) ---
+    endpoint_by_year: Dict[str, str] = field(default_factory=dict)
+    watermark_type: Optional[str] = None
+    watermark_format: Optional[str] = None
+    watermark_exclude: List[str] = field(default_factory=list)
+    order_by: Optional[str] = None
+    id_col: Optional[str] = None
+    select: Optional[str] = None
+    fallback_endpoints: List[str] = field(default_factory=list)
+    where: Optional[str] = None
+    needs_geocode: bool = False
+    geocode_context: Optional[str] = None
+    field_map: Dict[str, Any] = field(default_factory=dict)
+    ingestion_mode: str = "incremental"
+    oid_field: Optional[str] = None
+    max_record_count: Optional[int] = None
+    expected_cadence_days: Optional[int] = None
+    alarm_exempt: bool = False
+    alarm_exempt_reason: Optional[str] = None
+    annual_rotation: bool = False
+    companion_endpoints: Dict[str, Any] = field(default_factory=dict)
+    proxy_for: Optional[str] = None
+    retention_days: Optional[int] = None
+    rolling_window_days: Optional[int] = None
+    rollover: Optional[str] = None
+    state_plane_crs: Optional[str] = None
+    state_plane_units: Optional[str] = None
+    state_plane_x_col: Optional[str] = None
+    state_plane_y_col: Optional[str] = None
+    parcel_join: Dict[str, Any] = field(default_factory=dict)
+    non_spatial: Optional[bool] = None
 
 
 @dataclass
@@ -433,7 +470,7 @@ class CityRegistration:
 
 
 # Canonical alias lookup mapping all known alias strings to CityId
-ALIASES: Dict[str, CityId] = {
+_HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     # NYC
     "nyc": CityId.NYC,
     "new_york": CityId.NYC,
@@ -799,7 +836,7 @@ def normalize_city(city_id: Optional[str]) -> Optional[CityId]:
     return ALIASES.get(c, None)
 
 
-REGISTRY: Dict[CityId, CityRegistration] = {
+_HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
     CityId.NYC: CityRegistration(
         city_id=CityId.NYC,
         name="New York City",
@@ -819,7 +856,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={"expected_cadence_days": 7},
+                
+                expected_cadence_days=7,
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.socrata_311_endpoint,
@@ -829,7 +867,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={"expected_cadence_days": 7},
+                
+                expected_cadence_days=7,
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.socrata_sla_endpoint,
@@ -839,7 +878,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
-                extra={"expected_cadence_days": 7},
+                
+                expected_cadence_days=7,
             ),
             FeedType.DEEDS: DatasetSpec(
                 endpoint=settings.socrata_deeds_endpoint,
@@ -853,7 +893,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 # 2026-08-10, active) but newest recorded_datetime lags ~26d
                 # (2026-07-31) — the DCP extract's recording lag. Alarm at
                 # 2xN=42d (US-164).
-                extra={"expected_cadence_days": 21},
+                
+                expected_cadence_days=21,
             ),
             # US-71: current-year YTD incident set (monthly publishing -> G11
             # cadence declaration; the staleness monitor alarms at 60d).
@@ -865,7 +906,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_crime,
                 interval_seconds=1800.0,
                 producer_key="crime",
-                extra={"expected_cadence_days": 30},
+                
+                expected_cadence_days=30,
             ),
             # US-93: Marshal's executed evictions — NYC-only context/validation,
             # never a LIMS input (single-metro asymmetry rule). Feed carries
@@ -879,18 +921,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_evictions,
                 interval_seconds=900.0,
                 producer_key="evictions",
-                extra={
-                    "expected_cadence_days": 7,
-                    "field_map": {
-                        "eviction_id": ["court_index_number", "docket_number"],
-                        "latitude": ["latitude"],
-                        "longitude": ["longitude"],
-                        "executed_date": ["executed_date"],
-                        "borough": ["borough"],
-                        "zipcode": ["eviction_zip"],
-                        "residential_commercial": ["residential_commercial_ind"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                field_map={'eviction_id': ['court_index_number', 'docket_number'], 'latitude': ['latitude'], 'longitude': ['longitude'], 'executed_date': ['executed_date'], 'borough': ['borough'], 'zipcode': ['eviction_zip'], 'residential_commercial': ['residential_commercial_ind']},
             ),
         },
     ),
@@ -913,7 +946,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={"expected_cadence_days": 7},
+                
+                expected_cadence_days=7,
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.socrata_chicago_311_endpoint,
@@ -923,7 +957,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={"expected_cadence_days": 7},
+                
+                expected_cadence_days=7,
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.socrata_chicago_licenses_endpoint,
@@ -933,7 +968,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
-                extra={"expected_cadence_days": 7},
+                
+                expected_cadence_days=7,
             ),
             FeedType.DEEDS: DatasetSpec(
                 endpoint=settings.socrata_chicago_deeds_endpoint,
@@ -947,7 +983,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 # (rowsUpdatedAt 2026-08-19, active) but the newest sale_date lands
                 # ~6 weeks back (2026-07-14) — the source's real close-to-record lag.
                 # Alarm at 2xN=60d (US-164).
-                extra={"expected_cadence_days": 30},
+                
+                expected_cadence_days=30,
             ),
             # US-71: CPD crime incidents (lat/lon verified 2026-08-24).
             FeedType.CRIME: DatasetSpec(
@@ -958,7 +995,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_crime,
                 interval_seconds=1800.0,
                 producer_key="crime",
-                extra={"expected_cadence_days": 7},
+                
+                expected_cadence_days=7,
             ),
             # US-81: CDOT street closures (native coordinates, 99.9% coverage,
             # daily cadence). Disruption context only — never a LIMS term.
@@ -973,7 +1011,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_street_cut,
                 interval_seconds=600.0,
                 producer_key="street_cut",
-                extra={"expected_cadence_days": 7},
+                
+                expected_cadence_days=7,
             ),
         },
     ),
@@ -996,7 +1035,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={"expected_cadence_days": 7},
+                
+                expected_cadence_days=7,
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.socrata_sf_311_endpoint,
@@ -1006,7 +1046,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={"expected_cadence_days": 7},
+                
+                expected_cadence_days=7,
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.socrata_sf_licenses_endpoint,
@@ -1016,7 +1057,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
-                extra={"expected_cadence_days": 7},
+                
+                expected_cadence_days=7,
             ),
             FeedType.DEEDS: DatasetSpec(
                 endpoint=settings.socrata_sf_deeds_endpoint,
@@ -1030,11 +1072,10 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 # 2026-06-26 (61d), and 0 rows have data_loaded_at >= 2026-07-01
                 # (verified 2026-08-26). No live replacement identified (US-164);
                 # keep registered + reported but exempt so it doesn't page forever.
-                extra={
-                    "expected_cadence_days": 7,
-                    "alarm_exempt": True,
-                    "alarm_exempt_reason": "SUSPECTED STALL — frozen since 2026-06-26, no replacement (US-164)",
-                },
+                
+                expected_cadence_days=7,
+                alarm_exempt=True,
+                alarm_exempt_reason='SUSPECTED STALL — frozen since 2026-06-26, no replacement (US-164)',
             ),
             # US-71: SFPD incident reports (point + intersection fields).
             FeedType.CRIME: DatasetSpec(
@@ -1045,7 +1086,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_crime,
                 interval_seconds=1800.0,
                 producer_key="crime",
-                extra={"expected_cadence_days": 7},
+                
+                expected_cadence_days=7,
             ),
         },
     ),
@@ -1068,7 +1110,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={"expected_cadence_days": 7},
+                
+                expected_cadence_days=7,
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.socrata_seattle_311_endpoint,
@@ -1082,14 +1125,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 # underscore) and the created date `createddate` — neither is
                 # reachable by the generic chains, so every row dropped at
                 # parse. Coordinates ride `latitude`/`longitude` (covered).
-                extra={
-                    "expected_cadence_days": 7,
-                    "field_map": {
-                        "incident_id": ["servicerequestnumber"],
-                        "created_date": ["createddate"],
-                        "complaint_type": ["webintakeservicerequests"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                field_map={'incident_id': ['servicerequestnumber'], 'created_date': ['createddate'], 'complaint_type': ['webintakeservicerequests']},
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.socrata_seattle_licenses_endpoint,
@@ -1099,7 +1137,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
-                extra={"expected_cadence_days": 7},
+                
+                expected_cadence_days=7,
             ),
             # King County Assessor parcel sales stand in for recorded deeds. This
             # is an ArcGIS FeatureServer, not Socrata: it pages by OBJECTID via
@@ -1129,13 +1168,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 1000,
-                    "alarm_exempt": True,
-                    "alarm_exempt_reason": "KNOWN-DEAD publication; no live anonymous replacement (US-163)",
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=1000,
+                alarm_exempt=True,
+                alarm_exempt_reason='KNOWN-DEAD publication; no live anonymous replacement (US-163)',
             ),
             # US-71: SPD crime incidents (lat/lon verified 2026-08-24).
             FeedType.CRIME: DatasetSpec(
@@ -1146,7 +1184,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_crime,
                 interval_seconds=1800.0,
                 producer_key="crime",
-                extra={"expected_cadence_days": 7},
+                
+                expected_cadence_days=7,
             ),
         },
     ),
@@ -1178,7 +1217,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={"expected_cadence_days": 7},
+                
+                expected_cadence_days=7,
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.socrata_la_311_endpoint,
@@ -1194,19 +1234,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 # yearly backfills use `srnumber`/`requesttype`. Declared here
                 # rather than grown into the shared chains — see
                 # src/producers/field_maps.py.
-                extra={
-                    "expected_cadence_days": 7,
-                    "field_map": {
-                        "incident_id": ["casenumber", "srnumber"],
-                        "latitude": ["geolocation__latitude__s"],
-                        "longitude": ["geolocation__longitude__s"],
-                        "complaint_type": ["requesttype"],
-                        "created_date": ["createddate"],
-                        "closed_date": ["closeddate"],
-                        "zipcode": ["zipcode__c"],
-                        "borough": ["locator_sr_neigborhood_council"],
-                    }
-                },
+                
+                expected_cadence_days=7,
+                field_map={'incident_id': ['casenumber', 'srnumber'], 'latitude': ['geolocation__latitude__s'], 'longitude': ['geolocation__longitude__s'], 'complaint_type': ['requesttype'], 'created_date': ['createddate'], 'closed_date': ['closeddate'], 'zipcode': ['zipcode__c'], 'borough': ['locator_sr_neigborhood_council']},
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.socrata_la_licenses_endpoint,
@@ -1216,7 +1246,8 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
-                extra={"expected_cadence_days": 7},
+                
+                expected_cadence_days=7,
             ),
         },
     ),
@@ -1242,20 +1273,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 # NOLA permits spell everything their own way; `pin` exists on
                 # the feed but is a parcel number — deliberately kept out of
                 # the job-id chain. See src/producers/field_maps.py.
-                extra={
-                    "expected_cadence_days": 7,
-                    "field_map": {
-                        "job_id": ["numstring"],
-                        "latitude": ["location_1.latitude"],
-                        "longitude": ["location_1.longitude"],
-                        "cost": ["constrval"],
-                        "job_type": ["type"],
-                        "issuance_date": ["issuedate"],
-                        "filing_date": ["filingdate"],
-                        "status": ["currentstatus"],
-                        "borough": ["subdivision"],
-                    }
-                },
+                
+                expected_cadence_days=7,
+                field_map={'job_id': ['numstring'], 'latitude': ['location_1.latitude'], 'longitude': ['location_1.longitude'], 'cost': ['constrval'], 'job_type': ['type'], 'issuance_date': ['issuedate'], 'filing_date': ['filingdate'], 'status': ['currentstatus'], 'borough': ['subdivision']},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.socrata_nola_311_endpoint,
@@ -1265,17 +1285,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "field_map": {
-                        "incident_id": ["service_request", "rowid"],
-                        "created_date": ["date_created"],
-                        "closed_date": ["case_close_date"],
-                        "descriptor": ["request_reason"],
-                        "incident_address": ["final_address"],
-                        "borough": ["address_councildis"],
-                    }
-                },
+                
+                expected_cadence_days=7,
+                field_map={'incident_id': ['service_request', 'rowid'], 'created_date': ['date_created'], 'closed_date': ['case_close_date'], 'descriptor': ['request_reason'], 'incident_address': ['final_address'], 'borough': ['address_councildis']},
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.socrata_nola_licenses_endpoint,
@@ -1288,16 +1300,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 # ~18% of rows sit outside the parish (metro-bbox filtering
                 # drops them) and some businessstartdate values are future-
                 # dated (max seen 2027-02-27) — tolerated, not treated as now.
-                extra={
-                    "expected_cadence_days": 7,
-                    "field_map": {
-                        "license_id": ["businesslicensenumber"],
-                        "effective_date": ["businessstartdate"],
-                        "license_type": ["businesstype"],
-                        "dba": ["businessname"],
-                        "premises_name": ["ownername"],
-                    }
-                },
+                
+                expected_cadence_days=7,
+                field_map={'license_id': ['businesslicensenumber'], 'effective_date': ['businessstartdate'], 'license_type': ['businesstype'], 'dba': ['businessname'], 'premises_name': ['ownername']},
             ),
             # NORA Sold Properties is the Redevelopment Authority's own
             # disposals, NOT a general recorded-deeds feed — it under-counts
@@ -1312,20 +1317,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
-                extra={
-                    # NORA redevelopment disposals: dataset refresh is active
-                    # (rowsUpdatedAt 2026-08-11) but disposals are slow/occasional
-                    # (newest sale_date 2026-07-22). Alarm at 2xN=90d (US-164).
-                    "expected_cadence_days": 45,
-                    "field_map": {
-                        "doc_id": ["identifier"],
-                        "bbl": ["geopin"],
-                        "latitude": ["geocoded_column.latitude"],
-                        "longitude": ["geocoded_column.longitude"],
-                        "doc_type": ["disposition_channel"],
-                        "borough": ["council_district"],
-                    }
-                },
+                
+                expected_cadence_days=45,
+                field_map={'doc_id': ['identifier'], 'bbl': ['geopin'], 'latitude': ['geocoded_column.latitude'], 'longitude': ['geocoded_column.longitude'], 'doc_type': ['disposition_channel'], 'borough': ['council_district']},
             ),
         },
     ),
@@ -1357,16 +1351,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 producer_key="permits",
                 # Scheduled (future-dated) filings appear on this feed (max
                 # seen 2027-01-27) — tolerated as watermark skew.
-                extra={
-                    "expected_cadence_days": 7,
-                    "field_map": {
-                        "cost": ["project_cost"],
-                        "filing_date": ["application_date"],
-                        # work_type before type: bare "Building" classifies to
-                        # OT; the NB/A2 signal lives in work_type.
-                        "job_type": ["work_type", "type"],
-                    }
-                },
+                
+                expected_cadence_days=7,
+                field_map={'cost': ['project_cost'], 'filing_date': ['application_date'], 'job_type': ['work_type', 'type']},
             ),
             # Property Assessment and Sales publishes one dataset per fiscal
             # year (FY23...FY27). Rotate the endpoint each July — the new FY
@@ -1381,13 +1368,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
-                extra={
-                    "expected_cadence_days": 7,
-                    "field_map": {
-                        "doc_id": ["document_number"],
-                        "bbl": ["gpin", "parcel_id"],
-                    }
-                },
+                
+                expected_cadence_days=7,
+                field_map={'doc_id': ['document_number'], 'bbl': ['gpin', 'parcel_id']},
             ),
             # MyNorfolk 311 locates cases with an address STRING only — the
             # original registration deferred these two feeds until an
@@ -1413,20 +1396,10 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 # 5% null-H3 ceiling. Business names double as a license
                 # identity (no numeric license id on the feed); the three
                 # id_keys form the watermark/dedup tuple.
-                extra={
-                    "expected_cadence_days": 7,
-                    "where": "location_address != 'NO NORFOLK ADDRESS REQUIRED 99999'",
-                    "field_map": {
-                        "license_id": ["trading_as_name", "primary_owner"],
-                        "dba": ["trading_as_name"],
-                        "premises_name": ["primary_owner"],
-                        "license_type": ["naics"],
-                        "effective_date": ["business_opened_date"],
-                        "address_street": ["location_address"],
-                        "latitude": ["latitude"],
-                        "longitude": ["longitude"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                where="location_address != 'NO NORFOLK ADDRESS REQUIRED 99999'",
+                field_map={'license_id': ['trading_as_name', 'primary_owner'], 'dba': ['trading_as_name'], 'premises_name': ['primary_owner'], 'license_type': ['naics'], 'effective_date': ['business_opened_date'], 'address_street': ['location_address'], 'latitude': ['latitude'], 'longitude': ['longitude']},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.socrata_norfolk_311_endpoint,
@@ -1436,19 +1409,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=600.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "needs_geocode": True,
-                    "geocode_context": "Norfolk, VA",
-                    "scope": "MyNorfolk 311 cases; located by address string",
-                    "field_map": {
-                        "incident_id": ["service_request_number"],
-                        "complaint_type": ["service_request_type", "service_request_category"],
-                        "created_date": ["creation_date"],
-                        "status": ["status"],
-                        "incident_address": ["location"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                needs_geocode=True,
+                geocode_context='Norfolk, VA',
+                field_map={'incident_id': ['service_request_number'], 'complaint_type': ['service_request_type', 'service_request_category'], 'created_date': ['creation_date'], 'status': ['status'], 'incident_address': ['location']},
             ),
         },
     ),
@@ -1478,15 +1443,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "ObjectId",
-                    "max_record_count": 1000,
-                    "field_map": {
-                        "job_id": ["record_id"],
-                        "cost": ["amt_permit_cost"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='ObjectId',
+                max_record_count=1000,
+                field_map={'job_id': ['record_id'], 'cost': ['amt_permit_cost']},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.arcgis_detroit_311_url,
@@ -1496,15 +1457,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "ObjectId",
-                    "max_record_count": 1000,
-                    "field_map": {
-                        "incident_id": ["issue_id"],
-                        "closed_date": ["closed_at"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='ObjectId',
+                max_record_count=1000,
+                field_map={'incident_id': ['issue_id'], 'closed_date': ['closed_at']},
             ),
             # Renewal-driven feed: `expiration_date` is the only date column,
             # so effective_date stays None and the watermark moves slowly by
@@ -1518,18 +1475,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "ObjectId",
-                    "max_record_count": 1000,
-                    # The shared license_type chain has no bare 'license_type'
-                    # term — without the map every row falls to the
-                    # 'On-Premises Liquor' default.
-                    "field_map": {
-                        "license_id": ["record_id"],
-                        "license_type": ["license_type", "license_category"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='ObjectId',
+                max_record_count=1000,
+                field_map={'license_id': ['record_id'], 'license_type': ['license_type', 'license_category']},
             ),
             FeedType.DEEDS: DatasetSpec(
                 endpoint=settings.arcgis_detroit_sales_url,
@@ -1539,16 +1489,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "ObjectId",
-                    "max_record_count": 1000,
-                    "field_map": {
-                        "doc_id": ["sale_id"],
-                        "bbl": ["parcel_id"],
-                        "document_amount": ["amt_sale_price"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='ObjectId',
+                max_record_count=1000,
+                field_map={'doc_id': ['sale_id'], 'bbl': ['parcel_id'], 'document_amount': ['amt_sale_price']},
             ),
         },
     ),
@@ -1579,20 +1524,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 # total_job_valuation is NULL on remodel rows (accepted);
                 # work_type before permit_type so NB/Addition signal survives
                 # generic "Building Permit" values (mirror of Norfolk).
-                extra={
-                    # Austin permits publish with ~3-week lag (rowsUpdatedAt
-                    # 2026-08-08, active; newest issue_date 2026-08-06). Alarm
-                    # at 2xN=42d (US-164).
-                    "expected_cadence_days": 21,
-                    "field_map": {
-                        "cost": ["total_job_valuation"],
-                        "filing_date": ["application_date"],
-                        "job_type": ["work_type", "permit_type"],
-                        "proposed_units": ["number_of_units"],
-                        "proposed_stories": ["number_of_floors"],
-                        "borough": ["council_district"],
-                    }
-                },
+                
+                expected_cadence_days=21,
+                field_map={'cost': ['total_job_valuation'], 'filing_date': ['application_date'], 'job_type': ['work_type', 'permit_type'], 'proposed_units': ['number_of_units'], 'proposed_stories': ['number_of_floors'], 'borough': ['council_district']},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.socrata_austin_311_endpoint,
@@ -1605,20 +1539,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 # sr_number is also a Chicago chain term: production always
                 # passes city_id explicitly, and the tightened chicago sniff
                 # requires corroborating markers (see complaints_311_producer).
-                extra={
-                    "expected_cadence_days": 7,
-                    "field_map": {
-                        "latitude": ["sr_location_lat"],
-                        "longitude": ["sr_location_long"],
-                        "complaint_type": ["sr_type_desc"],
-                        "created_date": ["sr_created_date"],
-                        "closed_date": ["sr_closed_date"],
-                        "status": ["sr_status_desc"],
-                        "zipcode": ["sr_location_zip_code"],
-                    "incident_address": ["sr_location"],
-                        "borough": ["sr_location_council_district"],
-                }
-            },
+                
+                expected_cadence_days=7,
+                field_map={'latitude': ['sr_location_lat'], 'longitude': ['sr_location_long'], 'complaint_type': ['sr_type_desc'], 'created_date': ['sr_created_date'], 'closed_date': ['sr_closed_date'], 'status': ['sr_status_desc'], 'zipcode': ['sr_location_zip_code'], 'incident_address': ['sr_location'], 'borough': ['sr_location_council_district']},
         ),
             # US-136: TABC statewide liquor-license feed (data.texas.gov
             # `7hf9-qc9f` "TABC License Information"). Address-only — no lat/lng
@@ -1634,22 +1557,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
-                extra={
-                    "expected_cadence_days": 7,
-                    "needs_geocode": True,
-                    "geocode_context": "TX",
-                    "where": "county = 'Travis'",
-                    "field_map": {
-                        "license_id": ["license_id"],
-                        "license_type": ["license_type"],
-                        "effective_date": ["current_issued_date"],
-                        "expiration_date": ["expiration_date"],
-                        "premises_name": ["owner"],
-                        "dba": ["trade_name"],
-                        "address_street": ["address"],
-                        "status": ["license_status"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                needs_geocode=True,
+                geocode_context='TX',
+                where="county = 'Travis'",
+                field_map={'license_id': ['license_id'], 'license_type': ['license_type'], 'effective_date': ['current_issued_date'], 'expiration_date': ['expiration_date'], 'premises_name': ['owner'], 'dba': ['trade_name'], 'address_street': ['address'], 'status': ['license_status']},
             ),
         },
     ),
@@ -1678,16 +1591,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "field_map": {
-                        "job_id": ["permit_number", "permitnumber", "pin"],
-                        "issuance_date": ["issueddate"],
-                        "filing_date": ["applieddate"],
-                        "address_street": ["originaladdress1"],
-                        "zipcode": ["originalzip"],
-                    }
-                },
+                
+                expected_cadence_days=7,
+                field_map={'job_id': ['permit_number', 'permitnumber', 'pin'], 'issuance_date': ['issueddate'], 'filing_date': ['applieddate'], 'address_street': ['originaladdress1'], 'zipcode': ['originalzip']},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.socrata_cincinnati_311_endpoint,
@@ -1697,15 +1603,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "field_map": {
-                        "incident_id": ["sr_number"],
-                        "created_date": ["date_time_received"],
-                        "incident_address": ["address"],
-                        "complaint_type": ["sr_type_desc", "sr_type"],
-                    }
-                },
+                
+                expected_cadence_days=7,
+                field_map={'incident_id': ['sr_number'], 'created_date': ['date_time_received'], 'incident_address': ['address'], 'complaint_type': ['sr_type_desc', 'sr_type']},
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.socrata_cincinnati_licenses_endpoint,
@@ -1715,16 +1615,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
-                extra={
-                    "expected_cadence_days": 7,
-                    "field_map": {
-                        "license_id": ["number_key", "uniqueid"],
-                        "effective_date": ["entered_date"],
-                        "latitude": ["latitude"],
-                        "longitude": ["longitude"],
-                        "status": ["data_status", "status_class"],
-                    }
-                },
+                
+                expected_cadence_days=7,
+                field_map={'license_id': ['number_key', 'uniqueid'], 'effective_date': ['entered_date'], 'latitude': ['latitude'], 'longitude': ['longitude'], 'status': ['data_status', 'status_class']},
             ),
             FeedType.DEEDS: DatasetSpec(
                 endpoint=settings.csv_cincinnati_deeds_endpoint,
@@ -1734,30 +1627,13 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=1800.0,
                 producer_key="deeds",
-                extra={
-                    "expected_cadence_days": 7,
-                    "ingestion_mode": "snapshot",
-                    "where": "valid = 'Y'",
-                    "needs_geocode": True,
-                    "geocode_context": "Hamilton County, OH",
-                    "scope": (
-                        "Hamilton County Auditor daily property-transfers "
-                        "(arm's-length Valid='Y' rows; SaleDate synthesized "
-                        "from MonthSale/DaySale/YearSale; address-only, "
-                        "geocode deferred to ADR 0004)"
-                    ),
-                    "field_map": {
-                        "doc_id": ["conveyancenumber"],
-                        "bbl": ["propertynumber"],
-                        "document_amount": ["saleamount"],
-                        "party1_grantor": ["previousowner"],
-                        "party2_grantee": ["ownername1", "ownername2"],
-                        "doc_type": ["deedtype"],
-                        "incident_address": ["house#", "streetname", "streetsuffix"],
-                        "zipcode": ["locationzipcode"],
-                        "borough": ["appraisalarea"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                ingestion_mode='snapshot',
+                where="valid = 'Y'",
+                needs_geocode=True,
+                geocode_context='Hamilton County, OH',
+                field_map={'doc_id': ['conveyancenumber'], 'bbl': ['propertynumber'], 'document_amount': ['saleamount'], 'party1_grantor': ['previousowner'], 'party2_grantee': ['ownername1', 'ownername2'], 'doc_type': ['deedtype'], 'incident_address': ['house#', 'streetname', 'streetsuffix'], 'zipcode': ['locationzipcode'], 'borough': ['appraisalarea']},
             ),
         },
     ),
@@ -1785,21 +1661,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "field_map": {
-                        "job_id": ["permitnumber"],
-                        "issuance_date": ["issued_date"],
-                        "filing_date": ["issued_date"],
-                        "address_street": ["address"],
-                        "zipcode": ["zip"],
-                        "borough": ["ward"],
-                        "latitude": ["y_latitude", "gpsy"],
-                        "longitude": ["x_longitude", "gpsx"],
-                        "status": ["status"],
-                        "cost": ["declared_valuation"],
-                    }
-                },
+                
+                expected_cadence_days=7,
+                field_map={'job_id': ['permitnumber'], 'issuance_date': ['issued_date'], 'filing_date': ['issued_date'], 'address_street': ['address'], 'zipcode': ['zip'], 'borough': ['ward'], 'latitude': ['y_latitude', 'gpsy'], 'longitude': ['x_longitude', 'gpsx'], 'status': ['status'], 'cost': ['declared_valuation']},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.ckan_boston_311_endpoint,
@@ -1809,26 +1673,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "field_map": {
-                        "incident_id": ["case_enquiry_id"],
-                        "latitude": ["latitude"],
-                        "longitude": ["longitude"],
-                        "complaint_type": ["type", "case_title"],
-                        "created_date": ["open_dt"],
-                        "closed_date": ["closed_dt"],
-                        "status": ["case_status"],
-                        "incident_address": ["location_street_name", "location"],
-                        "zipcode": ["location_zipcode"],
-                        "borough": ["ward"],
-                    },
-                    "endpoint_by_year": {
-                        "2025": settings.ckan_boston_311_2025_endpoint,
-                        "2026": settings.ckan_boston_311_endpoint,
-                    },
-                    "rollover": "manual-verify",
-                },
+                
+                expected_cadence_days=7,
+                field_map={'incident_id': ['case_enquiry_id'], 'latitude': ['latitude'], 'longitude': ['longitude'], 'complaint_type': ['type', 'case_title'], 'created_date': ['open_dt'], 'closed_date': ['closed_dt'], 'status': ['case_status'], 'incident_address': ['location_street_name', 'location'], 'zipcode': ['location_zipcode'], 'borough': ['ward']},
+                endpoint_by_year={'2025': settings.ckan_boston_311_2025_endpoint, '2026': settings.ckan_boston_311_endpoint},
+                rollover='manual-verify',
             ),
             # US-137: Boston Licensing Board register (CKAN 04dc653b-...).
             # Its only coordinate columns, gpsx/gpsy, are Massachusetts State
@@ -1841,14 +1690,13 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
-                extra={
-                    "expected_cadence_days": 7,
-                    "state_plane_crs": "EPSG:2249",
-                    "state_plane_units": "US survey feet",
-                    "state_plane_x_col": "gpsx",
-                    "state_plane_y_col": "gpsy",
-                    "field_map": BOSTON_LICENSING_FIELD_MAP,
-                },
+                
+                expected_cadence_days=7,
+                state_plane_crs='EPSG:2249',
+                state_plane_units='US survey feet',
+                state_plane_x_col='gpsx',
+                state_plane_y_col='gpsy',
+                field_map=BOSTON_LICENSING_FIELD_MAP,
             ),
         },
     ),
@@ -1879,25 +1727,10 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "field_map": {
-                        "job_id": ["permitno"],
-                        "issuance_date": ["issueddate"],
-                        "filing_date": ["addeddate"],
-                        "address_street": ["stno", "stname", "suffix", "postdir"],
-                        "zipcode": ["zip"],
-                        "job_type": ["worktype", "applicationtype", "usecode"],
-                        "status": ["status"],
-                        "latitude": ["location.latitude"],
-                        "longitude": ["location.longitude"],
-                    },
-                    "companion_endpoints": {
-                        "commercial": "https://data.montgomerycountymd.gov/resource/i26v-w6bd.json",
-                        "demolition": "https://data.montgomerycountymd.gov/resource/b6ht-fw3x.json",
-                        "electrical": "https://data.montgomerycountymd.gov/resource/qxie-8qnp.json",
-                    },
-                },
+                
+                expected_cadence_days=7,
+                field_map={'job_id': ['permitno'], 'issuance_date': ['issueddate'], 'filing_date': ['addeddate'], 'address_street': ['stno', 'stname', 'suffix', 'postdir'], 'zipcode': ['zip'], 'job_type': ['worktype', 'applicationtype', 'usecode'], 'status': ['status'], 'latitude': ['location.latitude'], 'longitude': ['location.longitude']},
+                companion_endpoints={'commercial': 'https://data.montgomerycountymd.gov/resource/i26v-w6bd.json', 'demolition': 'https://data.montgomerycountymd.gov/resource/b6ht-fw3x.json', 'electrical': 'https://data.montgomerycountymd.gov/resource/qxie-8qnp.json'},
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.socrata_montgomery_licenses_endpoint,
@@ -1907,28 +1740,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=900.0,
                 producer_key="sla",
-                extra={
-                    "expected_cadence_days": 7,
-                    "ingestion_mode": "snapshot",
-                    "scope": "ABS liquor licensees only",
-                    # SUSPECTED STALL: the feed has NO date column (snapshot) and
-                    # rowsUpdatedAt is frozen at 2026-04-01 (146d, verified
-                    # 2026-08-26) — the county hasn't refreshed it in ~5 months.
-                    # No replacement identified (US-164); keep registered + reported
-                    # but exempt so it doesn't page forever until the source is
-                    # re-contacted.
-                    "alarm_exempt": True,
-                    "alarm_exempt_reason": "SUSPECTED STALL — no date col, rowsUpdatedAt frozen 2026-04-01 (US-164)",
-                    "field_map": {
-                        "license_id": ["licensee_number"],
-                        "license_type": ["channel_type"],
-                        "premises_name": ["licensee_name", "account_name"],
-                        "address_street": ["street"],
-                        "zipcode": ["zip"],
-                        "latitude": ["location.latitude"],
-                        "longitude": ["location.longitude"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                ingestion_mode='snapshot',
+                alarm_exempt=True,
+                alarm_exempt_reason='SUSPECTED STALL — no date col, rowsUpdatedAt frozen 2026-04-01 (US-164)',
+                field_map={'license_id': ['licensee_number'], 'license_type': ['channel_type'], 'premises_name': ['licensee_name', 'account_name'], 'address_street': ['street'], 'zipcode': ['zip'], 'latitude': ['location.latitude'], 'longitude': ['location.longitude']},
             ),
             # US-128: MD SDAT real-property deeds — per-parcel assessment
             # snapshot (one row per parcel; segment 1 = most recent sale, with
@@ -1945,20 +1762,10 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
-                extra={
-                    "expected_cadence_days": 30,
-                    "ingestion_mode": "snapshot",
-                    "scope": "MD SDAT per-parcel assessment snapshot (last 3 sales; segment 1 = most recent)",
-                    "field_map": {
-                        "doc_id": ["account_id_mdp_field_acctid"],
-                        "bbl": ["account_id_mdp_field_acctid"],
-                        "document_amount": ["sales_segment_1_consideration_mdp_field_considr1_sdat_field_90"],
-                        "recorded_date": ["sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89"],
-                        "party1_grantor": ["sales_segment_1_grantor_name_mdp_field_grntnam1_sdat_field_80"],
-                        "latitude": ["mdp_latitude_mdp_field_digycord_converted_to_wgs84"],
-                        "longitude": ["mdp_longitude_mdp_field_digxcord_converted_to_wgs84"],
-                    },
-                },
+                
+                expected_cadence_days=30,
+                ingestion_mode='snapshot',
+                field_map={'doc_id': ['account_id_mdp_field_acctid'], 'bbl': ['account_id_mdp_field_acctid'], 'document_amount': ['sales_segment_1_consideration_mdp_field_considr1_sdat_field_90'], 'recorded_date': ['sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89'], 'party1_grantor': ['sales_segment_1_grantor_name_mdp_field_grntnam1_sdat_field_80'], 'latitude': ['mdp_latitude_mdp_field_digycord_converted_to_wgs84'], 'longitude': ['mdp_longitude_mdp_field_digxcord_converted_to_wgs84']},
             ),
         },
     ),
@@ -1985,19 +1792,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "field_map": {
-                        "job_id": ["permitnumber", "permitid"],
-                        "issuance_date": ["issueddate"],
-                        "filing_date": ["creationdate"],
-                        "job_type": ["permittype"],
-                        "cost": ["projectvalue"],
-                        "address_street": ["streetaddress", "address"],
-                        "zipcode": ["zip"],
-                        "borough": ["parishname"],
-                    }
-                },
+                
+                expected_cadence_days=7,
+                field_map={'job_id': ['permitnumber', 'permitid'], 'issuance_date': ['issueddate'], 'filing_date': ['creationdate'], 'job_type': ['permittype'], 'cost': ['projectvalue'], 'address_street': ['streetaddress', 'address'], 'zipcode': ['zip'], 'borough': ['parishname']},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.socrata_baton_rouge_311_endpoint,
@@ -2007,19 +1804,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "field_map": {
-                        "incident_id": ["id"],
-                        "latitude": ["latitude"],
-                        "longitude": ["longitude"],
-                        "complaint_type": ["typename", "parenttype"],
-                        "created_date": ["createdate"],
-                        "status": ["statusdesc"],
-                        "incident_address": ["streetaddress"],
-                        "borough": ["division"],
-                    }
-                },
+                
+                expected_cadence_days=7,
+                field_map={'incident_id': ['id'], 'latitude': ['latitude'], 'longitude': ['longitude'], 'complaint_type': ['typename', 'parenttype'], 'created_date': ['createdate'], 'status': ['statusdesc'], 'incident_address': ['streetaddress'], 'borough': ['division']},
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.socrata_baton_rouge_licenses_endpoint,
@@ -2029,18 +1816,10 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
-                extra={
-                    "expected_cadence_days": 7,
-                    "ingestion_mode": "snapshot",
-                    "field_map": {
-                        "license_id": ["taccount"],
-                        "latitude": ["geolocation.latitude"],
-                        "longitude": ["geolocation.longitude"],
-                        "license_type": ["typename", "naicname"],
-                        "status": ["tstatus"],
-                        "premises_name": ["tname", "tlegalname"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                ingestion_mode='snapshot',
+                field_map={'license_id': ['taccount'], 'latitude': ['geolocation.latitude'], 'longitude': ['geolocation.longitude'], 'license_type': ['typename', 'naicname'], 'status': ['tstatus'], 'premises_name': ['tname', 'tlegalname']},
             ),
         },
     ),
@@ -2066,27 +1845,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "companion_endpoints": {
-                        "commercial": (
-                            "https://services1.arcgis.com/zdB7qR0BtYrg0Xpl/arcgis/rest/services/"
-                            "ODC_DEV_COMMERCIALCONSTPERMIT_P/FeatureServer/317"
-                        )
-                    },
-                    "field_map": {
-                        "job_id": ["PERMIT_NUM"],
-                        "issuance_date": ["DATE_ISSUED"],
-                        "filing_date": ["DATE_RECEIVED"],
-                        "job_type": ["CLASS"],
-                        "cost": ["VALUATION"],
-                        "address_street": ["ADDRESS"],
-                        "proposed_units": ["UNITS"],
-                        "borough": ["NEIGHBORHOOD"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                companion_endpoints={'commercial': 'https://services1.arcgis.com/zdB7qR0BtYrg0Xpl/arcgis/rest/services/ODC_DEV_COMMERCIALCONSTPERMIT_P/FeatureServer/317'},
+                field_map={'job_id': ['PERMIT_NUM'], 'issuance_date': ['DATE_ISSUED'], 'filing_date': ['DATE_RECEIVED'], 'job_type': ['CLASS'], 'cost': ['VALUATION'], 'address_street': ['ADDRESS'], 'proposed_units': ['UNITS'], 'borough': ['NEIGHBORHOOD']},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.arcgis_denver_311_url,
@@ -2096,23 +1860,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "field_map": {
-                        "latitude": ["Latitude"],
-                        "longitude": ["Longitude"],
-                        "incident_id": ["OBJECTID"],
-                        "complaint_type": ["Type", "Topic", "Case_Summary"],
-                        "created_date": ["Case_Created_dttm"],
-                        "closed_date": ["Case_Closed_dttm"],
-                        "status": ["Case_Status"],
-                        "incident_address": ["Incident_Address_1"],
-                        "zipcode": ["Incident_Zip_Code", "Customer_Zip_Code"],
-                        "borough": ["Neighborhood"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                field_map={'latitude': ['Latitude'], 'longitude': ['Longitude'], 'incident_id': ['OBJECTID'], 'complaint_type': ['Type', 'Topic', 'Case_Summary'], 'created_date': ['Case_Created_dttm'], 'closed_date': ['Case_Closed_dttm'], 'status': ['Case_Status'], 'incident_address': ['Incident_Address_1'], 'zipcode': ['Incident_Zip_Code', 'Customer_Zip_Code'], 'borough': ['Neighborhood']},
             ),
         },
     ),
@@ -2145,21 +1897,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 16000,
-                    "field_map": {
-                        "job_id": ["permitNumber"],
-                        "issuance_date": ["issueDate"],
-                        "cost": ["value"],
-                        "job_type": ["permitType", "workType"],
-                        "status": ["status", "milestone"],
-                        "proposed_units": ["dwellingUnitsNew"],
-                        "existing_units": ["dwellingUnitsEliminated"],
-                        "borough": ["Neighborhoods_Desc", "Wards"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=16000,
+                field_map={'job_id': ['permitNumber'], 'issuance_date': ['issueDate'], 'cost': ['value'], 'job_type': ['permitType', 'workType'], 'status': ['status', 'milestone'], 'proposed_units': ['dwellingUnitsNew'], 'existing_units': ['dwellingUnitsEliminated'], 'borough': ['Neighborhoods_Desc', 'Wards']},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.arcgis_minneapolis_311_url,
@@ -2169,35 +1911,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 16000,
-                    "endpoint_by_year": {
-                        "2015": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2015/FeatureServer/0",
-                        "2016": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2016/FeatureServer/0",
-                        "2017": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2017/FeatureServer/0",
-                        "2018": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2018/FeatureServer/0",
-                        "2019": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2019/FeatureServer/0",
-                        "2020": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2020/FeatureServer/0",
-                        "2021": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2021/FeatureServer/0",
-                        "2022": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2022/FeatureServer/0",
-                        "2023": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2023/FeatureServer/0",
-                        "2024": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2024/FeatureServer/0",
-                        "2025": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2025/FeatureServer/0",
-                        "2026": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2026/FeatureServer/0",
-                    },
-                    # CASESTATUS is a raw int with unclear open/closed
-                    # semantics; leave it unmapped (status defaults "Open",
-                    # closed_date carries closure).
-                    "field_map": {
-                        "incident_id": ["CASEID"],
-                        "complaint_type": ["TYPENAME", "REASONNAME", "SUBJECTNAME"],
-                        "created_date": ["OPENEDDATETIME"],
-                        "closed_date": ["CLOSEDDATETIME"],
-                        "incident_address": ["TITLE"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=16000,
+                endpoint_by_year={'2015': 'https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2015/FeatureServer/0', '2016': 'https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2016/FeatureServer/0', '2017': 'https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2017/FeatureServer/0', '2018': 'https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2018/FeatureServer/0', '2019': 'https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2019/FeatureServer/0', '2020': 'https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2020/FeatureServer/0', '2021': 'https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2021/FeatureServer/0', '2022': 'https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2022/FeatureServer/0', '2023': 'https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2023/FeatureServer/0', '2024': 'https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2024/FeatureServer/0', '2025': 'https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2025/FeatureServer/0', '2026': 'https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Public_311_2026/FeatureServer/0'},
+                field_map={'incident_id': ['CASEID'], 'complaint_type': ['TYPENAME', 'REASONNAME', 'SUBJECTNAME'], 'created_date': ['OPENEDDATETIME'], 'closed_date': ['CLOSEDDATETIME'], 'incident_address': ['TITLE']},
             ),
             # US-135: On/Off-Sale liquor license inventory (AGOL item
             # 5042131de56d44749f6e43c0b5738b21). Point layer with native
@@ -2214,25 +1933,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
-                extra={
-                    "expected_cadence_days": 30,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 16000,
-                    "companion_endpoints": {
-                        "off_sale": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Off_Sale_Liquor/FeatureServer/0",
-                    },
-                    "field_map": {
-                        "license_id": ["licenseNumber"],
-                        "license_type": ["licenseType", "liquorType"],
-                        "effective_date": ["issueDate"],
-                        "expiration_date": ["expirationDate"],
-                        "dba": ["licenseName"],
-                        "latitude": ["lat"],
-                        "longitude": ["long"],
-                        "incident_address": ["address"],
-                        "borough": ["ward", "neighborhood"],
-                    },
-                },
+                
+                expected_cadence_days=30,
+                oid_field='OBJECTID',
+                max_record_count=16000,
+                companion_endpoints={'off_sale': 'https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Off_Sale_Liquor/FeatureServer/0'},
+                field_map={'license_id': ['licenseNumber'], 'license_type': ['licenseType', 'liquorType'], 'effective_date': ['issueDate'], 'expiration_date': ['expirationDate'], 'dba': ['licenseName'], 'latitude': ['lat'], 'longitude': ['long'], 'incident_address': ['address'], 'borough': ['ward', 'neighborhood']},
             ),
         },
     ),
@@ -2265,20 +1971,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 1000,
-                    "field_map": {
-                        "job_id": ["CaseNumber"],
-                        "issuance_date": ["IssuedDate"],
-                        "expiration_date": ["ExpirationDate"],
-                        "address_street": ["Address"],
-                        "cost": ["Cost"],
-                        "borough": ["Neighborhood", "Council_District"],
-                        "job_type": ["ProposedUse", "ExistingUse"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=1000,
+                field_map={'job_id': ['CaseNumber'], 'issuance_date': ['IssuedDate'], 'expiration_date': ['ExpirationDate'], 'address_street': ['Address'], 'cost': ['Cost'], 'borough': ['Neighborhood', 'Council_District'], 'job_type': ['ProposedUse', 'ExistingUse']},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.arcgis_baltimore_311_url,
@@ -2288,28 +1985,13 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "RowID",
-                    "max_record_count": 2000,
-                    "field_map": {
-                        "incident_id": ["SRRecordID", "ServiceRequestNum", "RowID"],
-                        "latitude": ["Latitude"],
-                        "longitude": ["Longitude"],
-                        "complaint_type": ["SRType"],
-                        "created_date": ["CreatedDate"],
-                        "closed_date": ["CloseDate"],
-                        "status": ["SRStatus"],
-                        "incident_address": ["Address"],
-                        "zipcode": ["ZipCode"],
-                        "borough": ["Neighborhood", "CouncilDistrict"],
-                    },
-                    "endpoint_by_year": {
-                        "2025": settings.arcgis_baltimore_311_2025_url,
-                        "2026": settings.arcgis_baltimore_311_url,
-                    },
-                    "rollover": "manual-verify",
-                },
+                
+                expected_cadence_days=7,
+                oid_field='RowID',
+                max_record_count=2000,
+                field_map={'incident_id': ['SRRecordID', 'ServiceRequestNum', 'RowID'], 'latitude': ['Latitude'], 'longitude': ['Longitude'], 'complaint_type': ['SRType'], 'created_date': ['CreatedDate'], 'closed_date': ['CloseDate'], 'status': ['SRStatus'], 'incident_address': ['Address'], 'zipcode': ['ZipCode'], 'borough': ['Neighborhood', 'CouncilDistrict']},
+                endpoint_by_year={'2025': settings.arcgis_baltimore_311_2025_url, '2026': settings.arcgis_baltimore_311_url},
+                rollover='manual-verify',
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.arcgis_baltimore_licenses_url,
@@ -2319,21 +2001,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "ESRI_OID",
-                    "max_record_count": 2000,
-                    "field_map": {
-                        "license_id": ["LicenseNumber", "LLKey"],
-                        "license_type": ["LicenseClass", "SubClass"],
-                        "effective_date": ["LicenseDate"],
-                        "expiration_date": ["LicenseEndDate"],
-                        "status": ["LicenseStatus"],
-                        "address_street": ["AddrStreet"],
-                        "zipcode": ["AddrZip"],
-                    },
-                    "scope": "notifications-grade",
-                },
+                
+                expected_cadence_days=7,
+                oid_field='ESRI_OID',
+                max_record_count=2000,
+                field_map={'license_id': ['LicenseNumber', 'LLKey'], 'license_type': ['LicenseClass', 'SubClass'], 'effective_date': ['LicenseDate'], 'expiration_date': ['LicenseEndDate'], 'status': ['LicenseStatus'], 'address_street': ['AddrStreet'], 'zipcode': ['AddrZip']},
             ),
             # US-128: MD SDAT real-property deeds — per-parcel assessment
             # snapshot (one row per parcel; segment 1 = most recent sale, with
@@ -2350,20 +2022,10 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
-                extra={
-                    "expected_cadence_days": 30,
-                    "ingestion_mode": "snapshot",
-                    "scope": "MD SDAT per-parcel assessment snapshot (last 3 sales; segment 1 = most recent)",
-                    "field_map": {
-                        "doc_id": ["account_id_mdp_field_acctid"],
-                        "bbl": ["account_id_mdp_field_acctid"],
-                        "document_amount": ["sales_segment_1_consideration_mdp_field_considr1_sdat_field_90"],
-                        "recorded_date": ["sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89"],
-                        "party1_grantor": ["sales_segment_1_grantor_name_mdp_field_grntnam1_sdat_field_80"],
-                        "latitude": ["mdp_latitude_mdp_field_digycord_converted_to_wgs84"],
-                        "longitude": ["mdp_longitude_mdp_field_digxcord_converted_to_wgs84"],
-                    },
-                },
+                
+                expected_cadence_days=30,
+                ingestion_mode='snapshot',
+                field_map={'doc_id': ['account_id_mdp_field_acctid'], 'bbl': ['account_id_mdp_field_acctid'], 'document_amount': ['sales_segment_1_consideration_mdp_field_considr1_sdat_field_90'], 'recorded_date': ['sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89'], 'party1_grantor': ['sales_segment_1_grantor_name_mdp_field_grntnam1_sdat_field_80'], 'latitude': ['mdp_latitude_mdp_field_digycord_converted_to_wgs84'], 'longitude': ['mdp_longitude_mdp_field_digxcord_converted_to_wgs84']},
             ),
         },
     ),
@@ -2393,18 +2055,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "id_col": "cartodb_id",
-                    "order_by": "permitissuedate",
-                    "select": "*, ST_Y(the_geom) AS latitude, ST_X(the_geom) AS longitude",
-                    "field_map": {
-                        "job_id": ["permitnumber"],
-                        "issuance_date": ["permitissuedate"],
-                        "borough": ["council_district"],
-                        "zipcode": ["zip"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                id_col='cartodb_id',
+                order_by='permitissuedate',
+                select='*, ST_Y(the_geom) AS latitude, ST_X(the_geom) AS longitude',
+                field_map={'job_id': ['permitnumber'], 'issuance_date': ['permitissuedate'], 'borough': ['council_district'], 'zipcode': ['zip']},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.carto_phl_311_endpoint,
@@ -2414,16 +2070,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "id_col": "cartodb_id",
-                    "order_by": "requested_datetime",
-                    "field_map": {
-                        "latitude": ["lat"],
-                        "longitude": ["lon"],
-                        "closed_date": ["closed_datetime"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                id_col='cartodb_id',
+                order_by='requested_datetime',
+                field_map={'latitude': ['lat'], 'longitude': ['lon'], 'closed_date': ['closed_datetime']},
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.carto_phl_licenses_endpoint,
@@ -2433,19 +2084,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
-                extra={
-                    "expected_cadence_days": 7,
-                    "id_col": "cartodb_id",
-                    "order_by": "mostrecentissuedate",
-                    "select": "*, ST_Y(the_geom) AS latitude, ST_X(the_geom) AS longitude",
-                    "field_map": {
-                        "license_id": ["licensenum"],
-                        "license_type": ["licensetype"],
-                        "effective_date": ["initialissuedate"],
-                        "expiration_date": ["expirationdate"],
-                        "status": ["licensestatus"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                id_col='cartodb_id',
+                order_by='mostrecentissuedate',
+                select='*, ST_Y(the_geom) AS latitude, ST_X(the_geom) AS longitude',
+                field_map={'license_id': ['licensenum'], 'license_type': ['licensetype'], 'effective_date': ['initialissuedate'], 'expiration_date': ['expirationdate'], 'status': ['licensestatus']},
             ),
             # Real Estate Transfer Tax summary is a price-bearing recorded-deeds
             # source (Office of Realty Transfer Tax) once scoped to actual
@@ -2467,28 +2111,15 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
-                extra={
-                    "expected_cadence_days": 7,
-                    "where": "document_type = 'DEED'",
-                    "id_col": "cartodb_id",
-                    "order_by": "recording_date",
-                    "select": "*, ST_Y(the_geom) AS latitude, ST_X(the_geom) AS longitude",
-                    # SUSPECTED DEED-SLICE STALL: after the US-130 document_type
-                    # filter, the newest DEED recording_date is 2026-07-07 (50d)
-                    # while the dataset grows via non-DEED rows (3970 DEEDs recorded
-                    # 2026-06-01..07-07, none after). Likely a recording/DEP summary
-                    # lag (US-164) — keep registered + reported but exempt so it
-                    # doesn't page forever until the source is verified.
-                    "alarm_exempt": True,
-                    "alarm_exempt_reason": "SUSPECTED DEED-slice lag/stall — newest DEED recording 2026-07-07 (US-164)",
-                    "field_map": {
-                        "recorded_date": ["recording_date"],
-                        "document_amount": ["total_consideration"],
-                        "bbl": ["opa_account_num"],
-                        "party1_grantor": ["grantors"],
-                        "party2_grantee": ["grantees"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                where="document_type = 'DEED'",
+                id_col='cartodb_id',
+                order_by='recording_date',
+                select='*, ST_Y(the_geom) AS latitude, ST_X(the_geom) AS longitude',
+                alarm_exempt=True,
+                alarm_exempt_reason='SUSPECTED DEED-slice lag/stall — newest DEED recording 2026-07-07 (US-164)',
+                field_map={'recorded_date': ['recording_date'], 'document_amount': ['total_consideration'], 'bbl': ['opa_account_num'], 'party1_grantor': ['grantors'], 'party2_grantee': ['grantees']},
             ),
         },
     ),
@@ -2518,27 +2149,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "endpoint_by_year": {
-                        "2023": "https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/15",
-                        "2024": "https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/16",
-                        "2025": "https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/17",
-                        "2026": "https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/18",
-                    },
-                    "field_map": {
-                        "job_id": ["PERMIT_ID"],
-                        "latitude": ["LATITUDE"],
-                        "longitude": ["LONGITUDE"],
-                        "issuance_date": ["ISSUE_DATE"],
-                        "job_type": ["PERMIT_TYPE_NAME", "PERMIT_SUBTYPE_NAME"],
-                        "cost": ["FEES_PAID"],
-                        "borough": ["WARD"],
-                        "zipcode": ["ZIPCODE"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                endpoint_by_year={'2023': 'https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/15', '2024': 'https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/16', '2025': 'https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/17', '2026': 'https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/18'},
+                field_map={'job_id': ['PERMIT_ID'], 'latitude': ['LATITUDE'], 'longitude': ['LONGITUDE'], 'issuance_date': ['ISSUE_DATE'], 'job_type': ['PERMIT_TYPE_NAME', 'PERMIT_SUBTYPE_NAME'], 'cost': ['FEES_PAID'], 'borough': ['WARD'], 'zipcode': ['ZIPCODE']},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.arcgis_dc_311_url,
@@ -2548,30 +2164,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 1000,
-                    "endpoint_by_year": {
-                        "2022": "https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/14",
-                        "2023": "https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/15",
-                        "2024": "https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/16",
-                        "2025": "https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/18",
-                        "2026": "https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/21",
-                    },
-                    "field_map": {
-                        "incident_id": ["SERVICEREQUESTID"],
-                        "latitude": ["LATITUDE"],
-                        "longitude": ["LONGITUDE"],
-                        "complaint_type": ["SERVICECODEDESCRIPTION"],
-                        "created_date": ["ADDDATE"],
-                        "closed_date": ["RESOLUTIONDATE"],
-                        "status": ["SERVICEORDERSTATUS"],
-                        "incident_address": ["STREETADDRESS"],
-                        "borough": ["WARD"],
-                        "zipcode": ["ZIPCODE"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=1000,
+                endpoint_by_year={'2022': 'https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/14', '2023': 'https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/15', '2024': 'https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/16', '2025': 'https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/18', '2026': 'https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/21'},
+                field_map={'incident_id': ['SERVICEREQUESTID'], 'latitude': ['LATITUDE'], 'longitude': ['LONGITUDE'], 'complaint_type': ['SERVICECODEDESCRIPTION'], 'created_date': ['ADDDATE'], 'closed_date': ['RESOLUTIONDATE'], 'status': ['SERVICEORDERSTATUS'], 'incident_address': ['STREETADDRESS'], 'borough': ['WARD'], 'zipcode': ['ZIPCODE']},
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.arcgis_dc_licenses_url,
@@ -2581,33 +2179,14 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    # US-74: premises-string feed (ADR 0004). PREMISEADDRESS
-                    # geocodes at parse time so Avro doubles stay real; the
-                    # layer's own LATITUDE/LONGITUDE are null or 39/-77
-                    # sentinels and stay unmapped, and BILLINGADDRESS is
-                    # mailing-only (never the premises) so it never maps.
-                    # ~24% of premises sit out-of-state — true-site semantics
-                    # are kept wherever they are.
-                    "needs_geocode": True,
-                    "geocode_context": "Washington, DC",
-                    # The spatial product registers DC premises only: ~24% of
-                    # watermark-window rows are out-of-state premises whose
-                    # addresses would neither geocode against DC context nor
-                    # belong in DC cells.
-                    "where": "PREMISEINDC = 'Yes'",
-                    "field_map": {
-                        "license_id": ["CUSTOMERNUMBER"],
-                        "license_type": ["LICENSETYPE"],
-                        "effective_date": ["LICENSESTARTDATE"],
-                        "expiration_date": ["LICENSEENDDATE"],
-                        "borough": ["WARD"],
-                        "address_street": ["PREMISEADDRESS"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                needs_geocode=True,
+                geocode_context='Washington, DC',
+                where="PREMISEINDC = 'Yes'",
+                field_map={'license_id': ['CUSTOMERNUMBER'], 'license_type': ['LICENSETYPE'], 'effective_date': ['LICENSESTARTDATE'], 'expiration_date': ['LICENSEENDDATE'], 'borough': ['WARD'], 'address_street': ['PREMISEADDRESS']},
             ),
             FeedType.DEEDS: DatasetSpec(
                 endpoint=settings.arcgis_dc_sales_url,
@@ -2617,23 +2196,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "parcel_join": {
-                        "parcel_layer": "https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Property_and_Land_WebMercator/FeatureServer/33",
-                        "join_key": "SSL",
-                        "geometry_source": "centroid",
-                    },
-                    "field_map": {
-                        "doc_id": ["ROW_NUMBER"],
-                        "bbl": ["SSL"],
-                        "document_amount": ["SALE_PRICE"],
-                        "recorded_date": ["SALE_DATE"],
-                        "doc_type": ["QUALIFIED"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                parcel_join={'parcel_layer': 'https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Property_and_Land_WebMercator/FeatureServer/33', 'join_key': 'SSL', 'geometry_source': 'centroid'},
+                field_map={'doc_id': ['ROW_NUMBER'], 'bbl': ['SSL'], 'document_amount': ['SALE_PRICE'], 'recorded_date': ['SALE_DATE'], 'doc_type': ['QUALIFIED']},
             ),
         },
     ),
@@ -2677,16 +2245,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=600.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 30,
-                    "scope": "CountyRun 311 service requests (monthly batch publishing)",
-                    "field_map": {
-                        "incident_id": ["service_request"],
-                        "complaint_type": ["request_name"],
-                        "created_date": ["date_request_opened"],
-                        "status": ["request_status"],
-                    },
-                },
+                
+                expected_cadence_days=30,
+                field_map={'incident_id': ['service_request'], 'complaint_type': ['request_name'], 'created_date': ['date_request_opened'], 'status': ['request_status']},
             ),
             # US-128: MD SDAT real-property deeds — per-parcel assessment
             # snapshot (one row per parcel; segment 1 = most recent sale, with
@@ -2703,20 +2264,10 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
-                extra={
-                    "expected_cadence_days": 30,
-                    "ingestion_mode": "snapshot",
-                    "scope": "MD SDAT per-parcel assessment snapshot (last 3 sales; segment 1 = most recent)",
-                    "field_map": {
-                        "doc_id": ["account_id_mdp_field_acctid"],
-                        "bbl": ["account_id_mdp_field_acctid"],
-                        "document_amount": ["sales_segment_1_consideration_mdp_field_considr1_sdat_field_90"],
-                        "recorded_date": ["sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89"],
-                        "party1_grantor": ["sales_segment_1_grantor_name_mdp_field_grntnam1_sdat_field_80"],
-                        "latitude": ["mdp_latitude_mdp_field_digycord_converted_to_wgs84"],
-                        "longitude": ["mdp_longitude_mdp_field_digxcord_converted_to_wgs84"],
-                    },
-                },
+                
+                expected_cadence_days=30,
+                ingestion_mode='snapshot',
+                field_map={'doc_id': ['account_id_mdp_field_acctid'], 'bbl': ['account_id_mdp_field_acctid'], 'document_amount': ['sales_segment_1_consideration_mdp_field_considr1_sdat_field_90'], 'recorded_date': ['sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89'], 'party1_grantor': ['sales_segment_1_grantor_name_mdp_field_grntnam1_sdat_field_80'], 'latitude': ['mdp_latitude_mdp_field_digycord_converted_to_wgs84'], 'longitude': ['mdp_longitude_mdp_field_digxcord_converted_to_wgs84']},
             ),
         },
     ),
@@ -2743,20 +2294,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "field_map": {
-                        "job_id": ["B1_ALT_ID"],
-                        "issuance_date": ["ISSUED_DT"],
-                        "cost": ["G3_VALUE_TTL"],
-                        "address_street": ["SITE_ADDRESS"],
-                        "zipcode": ["B1_SITUS_ZIP"],
-                        "status": ["PERMIT_STATUS"],
-                        "job_type": ["B1_PER_TYPE"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                field_map={'job_id': ['B1_ALT_ID'], 'issuance_date': ['ISSUED_DT'], 'cost': ['G3_VALUE_TTL'], 'address_street': ['SITE_ADDRESS'], 'zipcode': ['B1_SITUS_ZIP'], 'status': ['PERMIT_STATUS'], 'job_type': ['B1_PER_TYPE']},
             ),
             # US-127: Franklin County Auditor (FCAO) sales-dashboard points
             # layer — an annual-snapshot ArcGIS FeatureServer, point-geocoded
@@ -2775,26 +2317,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
-                extra={
-                    "expected_cadence_days": 365,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "scope": (
-                        "Franklin County Auditor annual sales snapshot "
-                        "(point-geocoded; dual SALEPRICE/Sale_Price schema)"
-                    ),
-                    "field_map": {
-                        "doc_id": ["Instrument_Number", "PARCELID"],
-                        "bbl": ["PARCELID"],
-                        "document_amount": ["Sale_Price", "SALEPRICE"],
-                        "recorded_date": ["SALEDATE"],
-                        "party1_grantor": ["OWNERNME1"],
-                        "party2_grantee": ["OWN1", "OWN2"],
-                        "incident_address": ["SITEADDRESS"],
-                        "zipcode": ["ZIPCD"],
-                        "borough": ["MUNINAME", "NHBDNAME"],
-                    },
-                },
+                
+                expected_cadence_days=365,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                field_map={'doc_id': ['Instrument_Number', 'PARCELID'], 'bbl': ['PARCELID'], 'document_amount': ['Sale_Price', 'SALEPRICE'], 'recorded_date': ['SALEDATE'], 'party1_grantor': ['OWNERNME1'], 'party2_grantee': ['OWN1', 'OWN2'], 'incident_address': ['SITEADDRESS'], 'zipcode': ['ZIPCD'], 'borough': ['MUNINAME', 'NHBDNAME']},
             ),
         },
     ),
@@ -2825,19 +2352,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "ObjectId",
-                    "max_record_count": 1000,
-                    "field_map": {
-                        "job_id": ["Permit__"],
-                        "issuance_date": ["Date_Issued"],
-                        "filing_date": ["Date_Entered"],
-                        "cost": ["Const_Cost"],
-                        "latitude": ["Lat"],
-                        "longitude": ["Lon"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='ObjectId',
+                max_record_count=1000,
+                field_map={'job_id': ['Permit__'], 'issuance_date': ['Date_Issued'], 'filing_date': ['Date_Entered'], 'cost': ['Const_Cost'], 'latitude': ['Lat'], 'longitude': ['Lon']},
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.arcgis_nashville_str_url,
@@ -2847,21 +2366,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
-                extra={
-                    "expected_cadence_days": 14,
-                    "oid_field": "ObjectId",
-                    "max_record_count": 1000,
-                    "scope": "Residential Short Term Rental permits (STR investor-pressure signal)",
-                    "field_map": {
-                        "license_id": ["Permit__"],
-                        "effective_date": ["Date_Issued"],
-                        "expiration_date": ["Expiration_Date"],
-                        "license_type": ["Permit_Subtype_Description", "Permit_Type"],
-                        "status": ["Permit_Status"],
-                        "latitude": ["Lat"],
-                        "longitude": ["Lon"],
-                    },
-                },
+                
+                expected_cadence_days=14,
+                oid_field='ObjectId',
+                max_record_count=1000,
+                field_map={'license_id': ['Permit__'], 'effective_date': ['Date_Issued'], 'expiration_date': ['Expiration_Date'], 'license_type': ['Permit_Subtype_Description', 'Permit_Type'], 'status': ['Permit_Status'], 'latitude': ['Lat'], 'longitude': ['Lon']},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.arcgis_nashville_311_url,
@@ -2871,24 +2380,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "where": "Latitude IS NOT NULL",
-                    "field_map": {
-                        "incident_id": ["Request__"],
-                        "latitude": ["Latitude"],
-                        "longitude": ["Longitude"],
-                        "created_date": ["Date_Time_Opened"],
-                        "closed_date": ["Date_Time_Closed"],
-                        "status": ["Status"],
-                        "complaint_type": ["Request_Type", "Subrequest_Type"],
-                        "incident_address": ["Address"],
-                        "zipcode": ["ZIP"],
-                        "borough": ["Council_District"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                where='Latitude IS NOT NULL',
+                field_map={'incident_id': ['Request__'], 'latitude': ['Latitude'], 'longitude': ['Longitude'], 'created_date': ['Date_Time_Opened'], 'closed_date': ['Date_Time_Closed'], 'status': ['Status'], 'complaint_type': ['Request_Type', 'Subrequest_Type'], 'incident_address': ['Address'], 'zipcode': ['ZIP'], 'borough': ['Council_District']},
             ),
         },
     ),
@@ -2921,16 +2418,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=600.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "scope": "KCMO 311 Call Center Reported Issues (intraday publishing)",
-                    "field_map": {
-                        "incident_id": ["reported_issue"],
-                        "complaint_type": ["issue_type"],
-                        "created_date": ["open_date_time"],
-                        "status": ["current_status"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                field_map={'incident_id': ['reported_issue'], 'complaint_type': ['issue_type'], 'created_date': ['open_date_time'], 'status': ['current_status']},
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.socrata_kansas_city_licenses_endpoint,
@@ -2940,29 +2430,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
-                extra={
-                    "expected_cadence_days": 90,
-                    "ingestion_mode": "snapshot",
-                    "scope": "KCMO Business License Holders (snapshot; native GeoJSON point geometry)",
-                    # rowsUpdatedAt frozen at 2026-01-15 (~7-month publishing
-                    # lapse despite daily-claimed metadata; re-verified 2026-08-26).
-                    # The feed is still served and the snapshot is valid, so keep
-                    # it registered but exempt it from the alarm while the source
-                    # lapse is tracked (US-163) — do not treat it as a crash.
-                    "alarm_exempt": True,
-                    "alarm_exempt_reason": "7-month rowsUpdatedAt publishing lapse, source-side (US-163)",
-                    "field_map": {
-                        "license_id": ["id"],
-                        "license_type": ["business_type"],
-                        "expiration_date": ["valid_license_for"],
-                        "dba": ["dba_name"],
-                        "latitude": ["location.latitude"],
-                        "longitude": ["location.longitude"],
-                        "incident_address": ["address"],
-                        "borough": ["city"],
-                        "zipcode": ["zipcode"],
-                    },
-                },
+                
+                expected_cadence_days=90,
+                ingestion_mode='snapshot',
+                alarm_exempt=True,
+                alarm_exempt_reason='7-month rowsUpdatedAt publishing lapse, source-side (US-163)',
+                field_map={'license_id': ['id'], 'license_type': ['business_type'], 'expiration_date': ['valid_license_for'], 'dba': ['dba_name'], 'latitude': ['location.latitude'], 'longitude': ['location.longitude'], 'incident_address': ['address'], 'borough': ['city'], 'zipcode': ['zipcode']},
             ),
         },
     ),
@@ -2994,26 +2467,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "where": (
-                        "applicationDept LIKE '%BUILDING%' OR "
-                        "applicationDept LIKE '%LAND USE%'"
-                    ),
-                    "field_map": {
-                        "job_id": ["applicationNumber"],
-                        "issuance_date": ["issuedDate", "applicationDate"],
-                        "filing_date": ["applicationDate"],
-                        "cost": ["buildingValuation", "projectValue"],
-                        "address_street": ["siteAddress"],
-                        "status": ["applicationStatus"],
-                        "job_type": ["applicationType", "workType", "buildingType"],
-                        "proposed_units": ["dwellingUnits"],
-                        "proposed_stories": ["stories"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                where="applicationDept LIKE '%BUILDING%' OR applicationDept LIKE '%LAND USE%'",
+                field_map={'job_id': ['applicationNumber'], 'issuance_date': ['issuedDate', 'applicationDate'], 'filing_date': ['applicationDate'], 'cost': ['buildingValuation', 'projectValue'], 'address_street': ['siteAddress'], 'status': ['applicationStatus'], 'job_type': ['applicationType', 'workType', 'buildingType'], 'proposed_units': ['dwellingUnits'], 'proposed_stories': ['stories']},
             ),
         },
     ),
@@ -3040,18 +2499,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "scope": "Milwaukee liquor license registry (active licenses, point geometry)",
-                    "field_map": {
-                        "license_id": ["LICENSE_ID"],
-                        "effective_date": ["EFFECTIVE_DATE"],
-                        "expiration_date": ["EXPIRATION_DATE"],
-                        "license_type": ["LIC_TYPE_ABBR", "PROFESSION_FULL_NAME"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                field_map={'license_id': ['LICENSE_ID'], 'effective_date': ['EFFECTIVE_DATE'], 'expiration_date': ['EXPIRATION_DATE'], 'license_type': ['LIC_TYPE_ABBR', 'PROFESSION_FULL_NAME']},
             ),
             # US-138: building permits CSV. Address-only coords — geocoded at
             # parse time per ADR-0004.
@@ -3063,22 +2515,13 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 90,
-                    "order_by": "date_issued ASC",
-                    "id_col": "record_id",
-                    "needs_geocode": True,
-                    "geocode_context": "Milwaukee, WI",
-                    "scope": "Milwaukee building permits (CKAN CSV, address-only coords; geocoded per ADR-0004)",
-                    "field_map": {
-                        "job_id": ["record_id"],
-                        "address_street": ["address"],
-                        "issuance_date": ["date_issued"],
-                        "filing_date": ["date_opened"],
-                        "job_type": ["permit_type"],
-                        "cost": ["construction_total_cost"],
-                    },
-                },
+                
+                expected_cadence_days=90,
+                order_by='date_issued ASC',
+                id_col='record_id',
+                needs_geocode=True,
+                geocode_context='Milwaukee, WI',
+                field_map={'job_id': ['record_id'], 'address_street': ['address'], 'issuance_date': ['date_issued'], 'filing_date': ['date_opened'], 'job_type': ['permit_type'], 'cost': ['construction_total_cost']},
             ),
             # US-138: recorded deeds / property sales CSV. Address-only
             # -> geocoded per ADR-0004; ADR-0005 typed text watermark.
@@ -3090,31 +2533,18 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
-                extra={
-                    "expected_cadence_days": 365,
-                    "order_by": "sale_date ASC",
-                    "id_col": "propertyid",
-                    "endpoint_by_year": {
-                        "2024": "https://data.milwaukee.gov/dataset/7a8b81f6-d750-4f62-aee8-30ffce1c64ce/resource/01651dab-2be7-40c6-a9d6-31254fe02e29/download/armslengthsales_2024_valid_20250917.csv",
-                        "2025": settings.csv_milwaukee_deeds_endpoint,
-                    },
-                    "ingestion_mode": "snapshot",
-                    "needs_geocode": True,
-                    "geocode_context": "Milwaukee, WI",
-                    "watermark_type": "text",
-                    "watermark_format": "%m/%d/%Y",
-                    "watermark_exclude": [],
-                    "scope": "Milwaukee property sales (yearly CKAN CSV snapshots; text watermark per ADR-0005)",
-                    "field_map": {
-                        "doc_id": ["propertyid"],
-                        "bbl": ["taxkey"],
-                        "address_street": ["address"],
-                        "document_amount": ["sale_price"],
-                        "recorded_date": ["sale_date"],
-                        "doc_type": ["proptype"],
-                        "borough": ["district", "nbhd"],
-                    },
-                },
+                
+                expected_cadence_days=365,
+                order_by='sale_date ASC',
+                id_col='propertyid',
+                endpoint_by_year={'2024': 'https://data.milwaukee.gov/dataset/7a8b81f6-d750-4f62-aee8-30ffce1c64ce/resource/01651dab-2be7-40c6-a9d6-31254fe02e29/download/armslengthsales_2024_valid_20250917.csv', '2025': settings.csv_milwaukee_deeds_endpoint},
+                ingestion_mode='snapshot',
+                needs_geocode=True,
+                geocode_context='Milwaukee, WI',
+                watermark_type='text',
+                watermark_format='%m/%d/%Y',
+                watermark_exclude=[],
+                field_map={'doc_id': ['propertyid'], 'bbl': ['taxkey'], 'address_street': ['address'], 'document_amount': ['sale_price'], 'recorded_date': ['sale_date'], 'doc_type': ['proptype'], 'borough': ['district', 'nbhd']},
             ),
         },
     ),
@@ -3143,19 +2573,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 7500,
-                    "scope": "Charlotte ODP 311 service requests (native coords)",
-                    "field_map": {
-                        "incident_id": ["REQUEST_NO"],
-                        "created_date": ["RECEIVED_DATE"],
-                        "complaint_type": ["REQUEST_TYPE"],
-                        "incident_address": ["FULL_ADDRESS"],
-                        "borough": ["COUNCIL_DISTRICT"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=7500,
+                field_map={'incident_id': ['REQUEST_NO'], 'created_date': ['RECEIVED_DATE'], 'complaint_type': ['REQUEST_TYPE'], 'incident_address': ['FULL_ADDRESS'], 'borough': ['COUNCIL_DISTRICT']},
             ),
         },
     ),
@@ -3188,19 +2610,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "scope": "City of Pittsburgh PLI Permits (WPRDC)",
-                    "field_map": {
-                        "job_id": ["permit_id"],
-                        "issuance_date": ["issue_date"],
-                        "cost": ["total_project_value"],
-                        "address_street": ["address"],
-                        "status": ["status"],
-                        "job_type": ["permit_type", "work_type"],
-                        "zipcode": ["zip_code"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                field_map={'job_id': ['permit_id'], 'issuance_date': ['issue_date'], 'cost': ['total_project_value'], 'address_street': ['address'], 'status': ['status'], 'job_type': ['permit_type', 'work_type'], 'zipcode': ['zip_code']},
             ),
             FeedType.DEEDS: DatasetSpec(
                 endpoint=settings.ckan_pittsburgh_deeds_endpoint,
@@ -3217,19 +2629,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
-                extra={
-                    "expected_cadence_days": 7,
-                    "scope": "Allegheny County property-sale transactions (WPRDC; address-only)",
-                    "field_map": {
-                        "doc_id": ["PARID", "DEEDBOOK", "DEEDPAGE"],
-                        "bbl": ["PARID"],
-                        "document_amount": ["PRICE"],
-                        "recorded_date": ["RECORDDATE"],
-                        "doc_type": ["INSTRTYP"],
-                        "borough": ["MUNIDESC", "PROPERTYCITY"],
-                        "incident_address": ["FULL_ADDRESS"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                field_map={'doc_id': ['PARID', 'DEEDBOOK', 'DEEDPAGE'], 'bbl': ['PARID'], 'document_amount': ['PRICE'], 'recorded_date': ['RECORDDATE'], 'doc_type': ['INSTRTYP'], 'borough': ['MUNIDESC', 'PROPERTYCITY'], 'incident_address': ['FULL_ADDRESS']},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.ckan_pittsburgh_311_endpoint,
@@ -3239,20 +2641,9 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "scope": "City of Pittsburgh 311 requests (WPRDC Pittsburgh 311 Data; native lat/lng)",
-                    "field_map": {
-                        "incident_id": ["unique_id", "case_number"],
-                        "latitude": ["latitude"],
-                        "longitude": ["longitude"],
-                        "created_date": ["created_date_utc"],
-                        "closed_date": ["closed_date_utc"],
-                        "complaint_type": ["subject"],
-                        "incident_address": ["street"],
-                        "borough": ["neighborhood", "council_district", "ward"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                field_map={'incident_id': ['unique_id', 'case_number'], 'latitude': ['latitude'], 'longitude': ['longitude'], 'created_date': ['created_date_utc'], 'closed_date': ['closed_date_utc'], 'complaint_type': ['subject'], 'incident_address': ['street'], 'borough': ['neighborhood', 'council_district', 'ward']},
             ),
         },
     ),
@@ -3283,25 +2674,10 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=1800.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "scope": "San Diego Development Services issued approvals (permit-like types only)",
-                    "endpoint_by_year": {
-                        "2026": "https://seshat.datasd.org/development_permits/approvals_issued_2026_datasd.csv",
-                        "2027": "https://seshat.datasd.org/development_permits/approvals_issued_2027_datasd.csv",
-                    },
-                    "field_map": {
-                        "job_id": ["approval_id"],
-                        "issuance_date": ["approval_issue_date"],
-                        "filing_date": ["approval_create_date"],
-                        "cost": ["approval_valuation"],
-                        "latitude": ["gis_latitude"],
-                        "longitude": ["gis_longitude"],
-                        "address_street": ["gis_address"],
-                        "job_type": ["approval_type"],
-                        "status": ["approval_status"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                endpoint_by_year={'2026': 'https://seshat.datasd.org/development_permits/approvals_issued_2026_datasd.csv', '2027': 'https://seshat.datasd.org/development_permits/approvals_issued_2027_datasd.csv'},
+                field_map={'job_id': ['approval_id'], 'issuance_date': ['approval_issue_date'], 'filing_date': ['approval_create_date'], 'cost': ['approval_valuation'], 'latitude': ['gis_latitude'], 'longitude': ['gis_longitude'], 'address_street': ['gis_address'], 'job_type': ['approval_type'], 'status': ['approval_status']},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.csv_san_diego_311_endpoint,
@@ -3311,38 +2687,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=1800.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "scope": "San Diego Get It Done 311 requests (closed-year + open queue)",
-                    "endpoint_by_year": {
-                        "2016": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2016_datasd.csv",
-                        "2017": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2017_datasd.csv",
-                        "2018": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2018_datasd.csv",
-                        "2019": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2019_datasd.csv",
-                        "2020": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2020_datasd.csv",
-                        "2021": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2021_datasd.csv",
-                        "2022": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2022_datasd.csv",
-                        "2023": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2023_datasd.csv",
-                        "2024": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2024_datasd.csv",
-                        "2025": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2025_datasd.csv",
-                        "2026": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2026_datasd.csv",
-                        "2027": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2027_datasd.csv",
-                    },
-                    "companion_endpoints": {
-                        "open": "https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_open_datasd.csv",
-                    },
-                    "field_map": {
-                        "incident_id": ["service_request_id"],
-                        "created_date": ["date_requested"],
-                        "closed_date": ["date_closed"],
-                        "complaint_type": ["service_name", "service_name_detail"],
-                        "latitude": ["lat"],
-                        "longitude": ["lng"],
-                        "incident_address": ["street_address"],
-                        "zipcode": ["zipcode"],
-                        "borough": ["council_district", "comm_plan_name"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                endpoint_by_year={'2016': 'https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2016_datasd.csv', '2017': 'https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2017_datasd.csv', '2018': 'https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2018_datasd.csv', '2019': 'https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2019_datasd.csv', '2020': 'https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2020_datasd.csv', '2021': 'https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2021_datasd.csv', '2022': 'https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2022_datasd.csv', '2023': 'https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2023_datasd.csv', '2024': 'https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2024_datasd.csv', '2025': 'https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2025_datasd.csv', '2026': 'https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2026_datasd.csv', '2027': 'https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2027_datasd.csv'},
+                companion_endpoints={'open': 'https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_open_datasd.csv'},
+                field_map={'incident_id': ['service_request_id'], 'created_date': ['date_requested'], 'closed_date': ['date_closed'], 'complaint_type': ['service_name', 'service_name_detail'], 'latitude': ['lat'], 'longitude': ['lng'], 'incident_address': ['street_address'], 'zipcode': ['zipcode'], 'borough': ['council_district', 'comm_plan_name']},
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.csv_san_diego_licenses_endpoint,
@@ -3352,22 +2701,10 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=1800.0,
                 producer_key="sla",
-                extra={
-                    "expected_cadence_days": 7,
-                    "ingestion_mode": "snapshot",
-                    "scope": "San Diego Business Tax Certificates active-business registry (snapshot; NAICS 72 = hospitality for the LIMS SLA term)",
-                    "field_map": {
-                        "license_id": ["account_key"],
-                        "effective_date": ["date_cert_effective"],
-                        "expiration_date": ["date_cert_expiration"],
-                        "license_type": ["naics_description", "naics_sector"],
-                        "dba": ["dba_name"],
-                        "latitude": ["lat"],
-                        "longitude": ["lng"],
-                        "borough": ["council_district", "bid"],
-                        "address_street": ["address_road"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                ingestion_mode='snapshot',
+                field_map={'license_id': ['account_key'], 'effective_date': ['date_cert_effective'], 'expiration_date': ['date_cert_expiration'], 'license_type': ['naics_description', 'naics_sector'], 'dba': ['dba_name'], 'latitude': ['lat'], 'longitude': ['lng'], 'borough': ['council_district', 'bid'], 'address_street': ['address_road']},
             ),
         },
     ),
@@ -3398,27 +2735,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "scope": (
-                        "Indianapolis RIMAC 311 service requests (native point "
-                        "geometry + LAT/LONG_ attributes)"
-                    ),
-                    "field_map": {
-                        "incident_id": ["SERVICEREQUESTID", "EXTERNALSERVICEREQUEST"],
-                        "created_date": ["REQUESTEDDATETIME"],
-                        "closed_date": ["CLOSEDDATETIME"],
-                        "status": ["STATUS"],
-                        "complaint_type": ["ACTIVITY", "SERVICENAME"],
-                        "incident_address": ["ADDRESS"],
-                        "borough": ["COUNCILDISTRICT"],
-                        "zipcode": ["ZIPCODE"],
-                        "latitude": ["LAT"],
-                        "longitude": ["LONG_"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                field_map={'incident_id': ['SERVICEREQUESTID', 'EXTERNALSERVICEREQUEST'], 'created_date': ['REQUESTEDDATETIME'], 'closed_date': ['CLOSEDDATETIME'], 'status': ['STATUS'], 'complaint_type': ['ACTIVITY', 'SERVICENAME'], 'incident_address': ['ADDRESS'], 'borough': ['COUNCILDISTRICT'], 'zipcode': ['ZIPCODE'], 'latitude': ['LAT'], 'longitude': ['LONG_']},
             ),
         },
     ),
@@ -3449,27 +2770,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "scope": (
-                        "Houston 311 recent service requests (native coords; "
-                        "CREATED_ON watermark; rolling recent window)"
-                    ),
-                    "field_map": {
-                        "incident_id": ["CASE_NUMBER"],
-                        "latitude": ["LATITUDE"],
-                        "longitude": ["LONGITUDE"],
-                        "complaint_type": ["CASE_TYPE"],
-                        "created_date": ["CREATED_ON"],
-                        "closed_date": ["CLOSED_ON"],
-                        "status": ["STATUS"],
-                        "incident_address": ["ADDRESS", "STREET"],
-                        "zipcode": ["ZIP"],
-                        "borough": ["SUPERNEIGHBORHOOD", "COUNCIL_DISTRICT"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                field_map={'incident_id': ['CASE_NUMBER'], 'latitude': ['LATITUDE'], 'longitude': ['LONGITUDE'], 'complaint_type': ['CASE_TYPE'], 'created_date': ['CREATED_ON'], 'closed_date': ['CLOSED_ON'], 'status': ['STATUS'], 'incident_address': ['ADDRESS', 'STREET'], 'zipcode': ['ZIP'], 'borough': ['SUPERNEIGHBORHOOD', 'COUNCIL_DISTRICT']},
             ),
         },
     ),
@@ -3502,25 +2807,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "scope": (
-                        "Wichita MABCD building permits (FeatureServer layer 1; "
-                        "layer 0 is Code Enforcement Violations)"
-                    ),
-                    "field_map": {
-                        "job_id": ["PermitNumber"],
-                        "issuance_date": ["ApplicationDate"],
-                        "cost": ["DeclaredValuation"],
-                        "job_type": ["WorkType", "OccupancyType"],
-                        "status": ["PermitStatus"],
-                        "address_street": ["InwardAddress"],
-                        "zipcode": ["PostalCode"],
-                        "borough": ["Jurisdiction", "City"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                field_map={'job_id': ['PermitNumber'], 'issuance_date': ['ApplicationDate'], 'cost': ['DeclaredValuation'], 'job_type': ['WorkType', 'OccupancyType'], 'status': ['PermitStatus'], 'address_street': ['InwardAddress'], 'zipcode': ['PostalCode'], 'borough': ['Jurisdiction', 'City']},
             ),
         },
     ),
@@ -3548,23 +2839,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "order_by": "issueddate DESC",
-                    "fallback_endpoints": [settings.csv_chattanooga_permits_fallback_endpoint],
-                    "scope": "City of Chattanooga All Permits Hub CSV item",
-                    "field_map": {
-                        "job_id": ["permitnum"],
-                        "issuance_date": ["issueddate"],
-                        "filing_date": ["applieddate"],
-                        "job_type": ["permitclass"],
-                        "cost": ["estprojectcostdec"],
-                        "status": ["status"],
-                        "address_street": ["address"],
-                        "zipcode": ["zipcode", "zip"],
-                        "bbl": ["pin"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                order_by='issueddate DESC',
+                fallback_endpoints=[settings.csv_chattanooga_permits_fallback_endpoint],
+                field_map={'job_id': ['permitnum'], 'issuance_date': ['issueddate'], 'filing_date': ['applieddate'], 'job_type': ['permitclass'], 'cost': ['estprojectcostdec'], 'status': ['status'], 'address_street': ['address'], 'zipcode': ['zipcode', 'zip'], 'bbl': ['pin']},
             ),
             FeedType.DEEDS: DatasetSpec(
                 endpoint=settings.arcgis_chattanooga_deeds_url,
@@ -3574,25 +2853,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=1800.0,
                 producer_key="deeds",
-                extra={
-                    "expected_cadence_days": 7,
-                    "ingestion_mode": "snapshot",
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 1000,
-                    "scope": (
-                        "Hamilton County parcels with rolling SALE1DATE-SALE4DATE "
-                        "transfer history; polygon centroid supplies coordinates"
-                    ),
-                    "field_map": {
-                        "doc_id": ["PIN", "PARCELID", "OBJECTID"],
-                        "recorded_date": ["SALE1DATE"],
-                        "document_amount": ["SALE1CONSD"],
-                        "bbl": ["PIN", "PARCELID"],
-                        "party2_grantee": ["OWNERNAME1"],
-                        "doc_type": ["SALE1TYPE", "DEEDTYPE", "TYPE"],
-                        "borough": ["MUNICIPALITY", "CITY"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                ingestion_mode='snapshot',
+                oid_field='OBJECTID',
+                max_record_count=1000,
+                field_map={'doc_id': ['PIN', 'PARCELID', 'OBJECTID'], 'recorded_date': ['SALE1DATE'], 'document_amount': ['SALE1CONSD'], 'bbl': ['PIN', 'PARCELID'], 'party2_grantee': ['OWNERNAME1'], 'doc_type': ['SALE1TYPE', 'DEEDTYPE', 'TYPE'], 'borough': ['MUNICIPALITY', 'CITY']},
             ),
         },
     ),
@@ -3619,23 +2885,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 14,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "scope": "Cleveland issued building permits (published with ~10-day lag)",
-                    "field_map": {
-                        "job_id": ["PERMIT_NUMBER"],
-                        "issuance_date": ["ISSUE_DATE"],
-                        "filing_date": ["FILE_DATE"],
-                        "job_type": ["PERMIT_TYPE", "PERMIT_SUBTYPE"],
-                        "cost": ["JOB_VALUE"],
-                        "status": ["STATUS", "PERMIT_STATUS"],
-                        "address_street": ["ADDRESS"],
-                        "zipcode": ["ZIP", "ZIP_CODE"],
-                        "bbl": ["PARCEL_NUMBER"],
-                    },
-                },
+                
+                expected_cadence_days=14,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                field_map={'job_id': ['PERMIT_NUMBER'], 'issuance_date': ['ISSUE_DATE'], 'filing_date': ['FILE_DATE'], 'job_type': ['PERMIT_TYPE', 'PERMIT_SUBTYPE'], 'cost': ['JOB_VALUE'], 'status': ['STATUS', 'PERMIT_STATUS'], 'address_street': ['ADDRESS'], 'zipcode': ['ZIP', 'ZIP_CODE'], 'bbl': ['PARCEL_NUMBER']},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.arcgis_cleveland_311_url,
@@ -3645,24 +2899,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "scope": "Cleveland 311 service requests (native lat/long and parcelpin)",
-                    "field_map": {
-                        "incident_id": ["SR_NUMBER", "SERVICE_REQUEST_ID", "REQUEST_ID"],
-                        "created_date": ["requested_datetime"],
-                        "closed_date": ["closed_datetime", "closed_date"],
-                        "status": ["status"],
-                        "complaint_type": ["service_name"],
-                        "incident_address": ["address"],
-                        "borough": ["ward", "neighborhood"],
-                        "zipcode": ["zip", "zipcode"],
-                        "latitude": ["lat"],
-                        "longitude": ["long"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                field_map={'incident_id': ['SR_NUMBER', 'SERVICE_REQUEST_ID', 'REQUEST_ID'], 'created_date': ['requested_datetime'], 'closed_date': ['closed_datetime', 'closed_date'], 'status': ['status'], 'complaint_type': ['service_name'], 'incident_address': ['address'], 'borough': ['ward', 'neighborhood'], 'zipcode': ['zip', 'zipcode'], 'latitude': ['lat'], 'longitude': ['long']},
             ),
             FeedType.DEEDS: DatasetSpec(
                 endpoint=settings.arcgis_cleveland_deeds_url,
@@ -3672,23 +2913,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=1800.0,
                 producer_key="deeds",
-                extra={
-                    "expected_cadence_days": 7,
-                    "ingestion_mode": "snapshot",
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "scope": "Cleveland parcel analytics with live last-transfer history",
-                    "field_map": {
-                        "doc_id": ["PARCEL_ID", "PARCEL_NUMBER", "OBJECTID"],
-                        "recorded_date": ["last_transfer_date"],
-                        "document_amount": ["sale_price", "transfer_amount"],
-                        "bbl": ["parcel_number", "PARCEL_NUMBER", "PARCEL_ID"],
-                        "party1_grantor": ["grantor"],
-                        "party2_grantee": ["grantee"],
-                        "doc_type": ["document_type", "deed_type"],
-                        "borough": ["ward", "neighborhood"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                ingestion_mode='snapshot',
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                field_map={'doc_id': ['PARCEL_ID', 'PARCEL_NUMBER', 'OBJECTID'], 'recorded_date': ['last_transfer_date'], 'document_amount': ['sale_price', 'transfer_amount'], 'bbl': ['parcel_number', 'PARCEL_NUMBER', 'PARCEL_ID'], 'party1_grantor': ['grantor'], 'party2_grantee': ['grantee'], 'doc_type': ['document_type', 'deed_type'], 'borough': ['ward', 'neighborhood']},
             ),
         },
     ),
@@ -3715,24 +2945,13 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "needs_geocode": True,
-                    "geocode_context": "Hartford, CT",
-                    "scope": "Hartford building permits (ArcGIS Accela table; address-only)",
-                    "field_map": {
-                        "job_id": ["RECORD_ID"],
-                        "issuance_date": ["DateIssued"],
-                        "job_type": ["PermitType", "PERMIT_TYPE", "WorkDescription"],
-                        "cost": ["EstimatedCost", "COST", "ProjectCost"],
-                        "status": ["Status", "STATUS"],
-                        "address_street": ["PROPERTY_ADDRESS", "Location"],
-                        "zipcode": ["ZIP", "ZipCode", "POSTAL_CODE"],
-                        "bbl": ["PARCEL_ID", "ParcelID"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                needs_geocode=True,
+                geocode_context='Hartford, CT',
+                field_map={'job_id': ['RECORD_ID'], 'issuance_date': ['DateIssued'], 'job_type': ['PermitType', 'PERMIT_TYPE', 'WorkDescription'], 'cost': ['EstimatedCost', 'COST', 'ProjectCost'], 'status': ['Status', 'STATUS'], 'address_street': ['PROPERTY_ADDRESS', 'Location'], 'zipcode': ['ZIP', 'ZipCode', 'POSTAL_CODE'], 'bbl': ['PARCEL_ID', 'ParcelID']},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.arcgis_hartford_311_url,
@@ -3742,25 +2961,14 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "endpoint_by_year": {"2026": settings.arcgis_hartford_311_url},
-                    "needs_geocode": True,
-                    "geocode_context": "Hartford, CT",
-                    "scope": "Hartford 311 current-year service requests (ArcGIS; state-plane X/Y)",
-                    "field_map": {
-                        "incident_id": ["SR_Number", "SRM_Number", "OBJECTID"],
-                        "created_date": ["USER_Opened_Date"],
-                        "closed_date": ["USER_Closed_Date", "Closed_Date"],
-                        "status": ["Status", "STATUS"],
-                        "complaint_type": ["SR_Type", "Request_Type", "Service_Name"],
-                        "incident_address": ["Match_addr", "Location", "Address"],
-                        "borough": ["Neighborhood", "Council_District"],
-                        "zipcode": ["ZIP", "ZipCode", "PostalCode"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                endpoint_by_year={'2026': settings.arcgis_hartford_311_url},
+                needs_geocode=True,
+                geocode_context='Hartford, CT',
+                field_map={'incident_id': ['SR_Number', 'SRM_Number', 'OBJECTID'], 'created_date': ['USER_Opened_Date'], 'closed_date': ['USER_Closed_Date', 'Closed_Date'], 'status': ['Status', 'STATUS'], 'complaint_type': ['SR_Type', 'Request_Type', 'Service_Name'], 'incident_address': ['Match_addr', 'Location', 'Address'], 'borough': ['Neighborhood', 'Council_District'], 'zipcode': ['ZIP', 'ZipCode', 'PostalCode']},
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.socrata_hartford_sla_endpoint,
@@ -3770,25 +2978,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=3600.0,
                 producer_key="sla",
-                extra={
-                    "expected_cadence_days": 7,
-                    "where": "city = 'HARTFORD'",
-                    "needs_geocode": True,
-                    "geocode_context": "Hartford, CT",
-                    "scope": "Connecticut State Licenses and Credentials filtered to Hartford",
-                    "field_map": {
-                        "license_id": ["license_number", "credential_number", "id"],
-                        "license_type": ["credential_type", "credential_name", "license_type"],
-                        "effective_date": ["effective_date", "issue_date"],
-                        "expiration_date": ["expiration_date", "expiry_date"],
-                        "address_street": ["address", "street_address", "address_line_1"],
-                        "zipcode": ["zip", "zipcode", "postal_code"],
-                        "borough": ["city"],
-                        "premises_name": ["business_name", "name"],
-                        "dba": ["business_name", "name"],
-                        "status": ["status", "license_status"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                where="city = 'HARTFORD'",
+                needs_geocode=True,
+                geocode_context='Hartford, CT',
+                field_map={'license_id': ['license_number', 'credential_number', 'id'], 'license_type': ['credential_type', 'credential_name', 'license_type'], 'effective_date': ['effective_date', 'issue_date'], 'expiration_date': ['expiration_date', 'expiry_date'], 'address_street': ['address', 'street_address', 'address_line_1'], 'zipcode': ['zip', 'zipcode', 'postal_code'], 'borough': ['city'], 'premises_name': ['business_name', 'name'], 'dba': ['business_name', 'name'], 'status': ['status', 'license_status']},
             ),
         },
     ),
@@ -3811,25 +3006,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "scope": "Raleigh building permits (native WGS84 point layer)",
-                    "field_map": {
-                        "job_id": ["permitnum", "permitnumber"],
-                        "issuance_date": ["issueddate"],
-                        "filing_date": ["submitteddate", "applicationdate"],
-                        "job_type": ["permittypemapped", "permittype", "permitclass"],
-                        "cost": ["estprojectcost", "estimatedcost"],
-                        "status": ["statuscurrent", "status"],
-                        "address_street": ["originaladdress1", "address"],
-                        "zipcode": ["originalzip", "zip", "zip_code"],
-                        "bbl": ["pin", "parcelid"],
-                        "latitude": ["latitude_perm"],
-                        "longitude": ["longitude_perm"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                field_map={'job_id': ['permitnum', 'permitnumber'], 'issuance_date': ['issueddate'], 'filing_date': ['submitteddate', 'applicationdate'], 'job_type': ['permittypemapped', 'permittype', 'permitclass'], 'cost': ['estprojectcost', 'estimatedcost'], 'status': ['statuscurrent', 'status'], 'address_street': ['originaladdress1', 'address'], 'zipcode': ['originalzip', 'zip', 'zip_code'], 'bbl': ['pin', 'parcelid'], 'latitude': ['latitude_perm'], 'longitude': ['longitude_perm']},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.arcgis_raleigh_311_url,
@@ -3839,22 +3020,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "scope": "Raleigh Ask Raleigh service requests (native WGS84 points)",
-                    "field_map": {
-                        "incident_id": ["REQUEST_ID", "SR_NUMBER", "OBJECTID"],
-                        "created_date": ["APPLIED_DATE"],
-                        "closed_date": ["RESOLVED_DATE", "CLOSED_DATE"],
-                        "status": ["STATUS", "Status"],
-                        "complaint_type": ["CATEGORY", "SERVICE", "REQUEST_TYPE"],
-                        "incident_address": ["ADDRESS", "FULL_ADDRESS"],
-                        "borough": ["DISTRICT", "NEIGHBORHOOD"],
-                        "zipcode": ["ZIP_CODE", "ZIP"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                field_map={'incident_id': ['REQUEST_ID', 'SR_NUMBER', 'OBJECTID'], 'created_date': ['APPLIED_DATE'], 'closed_date': ['RESOLVED_DATE', 'CLOSED_DATE'], 'status': ['STATUS', 'Status'], 'complaint_type': ['CATEGORY', 'SERVICE', 'REQUEST_TYPE'], 'incident_address': ['ADDRESS', 'FULL_ADDRESS'], 'borough': ['DISTRICT', 'NEIGHBORHOOD'], 'zipcode': ['ZIP_CODE', 'ZIP']},
             ),
             FeedType.DEEDS: DatasetSpec(
                 endpoint=settings.arcgis_wake_deeds_url,
@@ -3864,22 +3034,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=1800.0,
                 producer_key="deeds",
-                extra={
-                    "expected_cadence_days": 7,
-                    "ingestion_mode": "snapshot",
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "scope": "Wake County parcel sales (polygon centroid)",
-                    "field_map": {
-                        "doc_id": ["OBJECTID", "PIN", "PARCELID"],
-                        "recorded_date": ["SALE_DATE"],
-                        "document_amount": ["TOTSALPRICE", "SALE_PRICE"],
-                        "bbl": ["PIN", "PARCELID"],
-                        "party2_grantee": ["OWNER_NAME", "OWNERNAME"],
-                        "doc_type": ["DEED_TYPE", "SALE_TYPE"],
-                        "borough": ["MUNICIPALITY", "CITY"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                ingestion_mode='snapshot',
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                field_map={'doc_id': ['OBJECTID', 'PIN', 'PARCELID'], 'recorded_date': ['SALE_DATE'], 'document_amount': ['TOTSALPRICE', 'SALE_PRICE'], 'bbl': ['PIN', 'PARCELID'], 'party2_grantee': ['OWNER_NAME', 'OWNERNAME'], 'doc_type': ['DEED_TYPE', 'SALE_TYPE'], 'borough': ['MUNICIPALITY', 'CITY']},
             ),
         },
     ),
@@ -3902,24 +3062,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "needs_geocode": True,
-                    "geocode_context": "San Antonio, TX",
-                    "scope": "San Antonio building permits (CKAN; mixed coordinate encodings)",
-                    "field_map": {
-                        "job_id": ["PERMIT NUMBER", "PERMIT_NUMBER", "RECORD_ID", "_id"],
-                        "issuance_date": ["DATE ISSUED"],
-                        "filing_date": ["DATE SUBMITTED"],
-                        "job_type": ["PERMIT TYPE", "PERMIT_TYPE", "WORK TYPE"],
-                        "cost": ["ESTIMATED COST", "ESTIMATED_COST", "TOTAL PROJECT VALUE"],
-                        "status": ["STATUS", "PERMIT STATUS"],
-                        "address_street": ["ADDRESS"],
-                        "zipcode": ["ZIP", "ZIP CODE", "ZIP_CODE"],
-                        "latitude": ["Y_COORD"],
-                        "longitude": ["X_COORD"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                needs_geocode=True,
+                geocode_context='San Antonio, TX',
+                field_map={'job_id': ['PERMIT NUMBER', 'PERMIT_NUMBER', 'RECORD_ID', '_id'], 'issuance_date': ['DATE ISSUED'], 'filing_date': ['DATE SUBMITTED'], 'job_type': ['PERMIT TYPE', 'PERMIT_TYPE', 'WORK TYPE'], 'cost': ['ESTIMATED COST', 'ESTIMATED_COST', 'TOTAL PROJECT VALUE'], 'status': ['STATUS', 'PERMIT STATUS'], 'address_street': ['ADDRESS'], 'zipcode': ['ZIP', 'ZIP CODE', 'ZIP_CODE'], 'latitude': ['Y_COORD'], 'longitude': ['X_COORD']},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.arcgis_san_antonio_311_url,
@@ -3929,22 +3076,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "scope": "San Antonio 311 service calls (native WGS84 points)",
-                    "field_map": {
-                        "incident_id": ["ServiceRequestNumber", "SRNumber", "REQUEST_ID", "OBJECTID"],
-                        "created_date": ["OpenedDateTime"],
-                        "closed_date": ["ClosedDateTime", "ClosedDate"],
-                        "status": ["Status", "STATUS"],
-                        "complaint_type": ["ServiceName", "RequestType", "Type"],
-                        "incident_address": ["Address", "StreetAddress"],
-                        "borough": ["CouncilDistrict", "Neighborhood"],
-                        "zipcode": ["ZipCode", "ZIP"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                field_map={'incident_id': ['ServiceRequestNumber', 'SRNumber', 'REQUEST_ID', 'OBJECTID'], 'created_date': ['OpenedDateTime'], 'closed_date': ['ClosedDateTime', 'ClosedDate'], 'status': ['Status', 'STATUS'], 'complaint_type': ['ServiceName', 'RequestType', 'Type'], 'incident_address': ['Address', 'StreetAddress'], 'borough': ['CouncilDistrict', 'Neighborhood'], 'zipcode': ['ZipCode', 'ZIP']},
             ),
         },
     ),
@@ -3967,24 +3103,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "needs_geocode": False,
-                    "scope": "Sacramento County building permits (native point geometry)",
-                    "field_map": {
-                        "job_id": ["Application", "OBJECTID"],
-                        "issuance_date": ["ISSUED_DATE"],
-                        "filing_date": ["APPLIED_DATE", "OpenDate"],
-                        "job_type": ["Application_Type", "Application_Subtype", "PermitCategory"],
-                        "cost": ["Valuation"],
-                        "status": ["Application_Status"],
-                        "address_street": ["Address"],
-                        "zipcode": ["ZIP", "ZipCode"],
-                        "bbl": ["Parcel_Number"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                needs_geocode=False,
+                field_map={'job_id': ['Application', 'OBJECTID'], 'issuance_date': ['ISSUED_DATE'], 'filing_date': ['APPLIED_DATE', 'OpenDate'], 'job_type': ['Application_Type', 'Application_Subtype', 'PermitCategory'], 'cost': ['Valuation'], 'status': ['Application_Status'], 'address_street': ['Address'], 'zipcode': ['ZIP', 'ZipCode'], 'bbl': ['Parcel_Number']},
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.arcgis_sacramento_311_url,
@@ -3994,22 +3118,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "scope": "Sacramento 311 service requests (native WGS84 points via ArcGIS outSR)",
-                    "field_map": {
-                        "incident_id": ["ReferenceNumber", "OBJECTID"],
-                        "created_date": ["DateCreated"],
-                        "closed_date": ["DateClosed"],
-                        "status": ["PublicStatus"],
-                        "complaint_type": ["CategoryLevel2", "CategoryLevel1", "CategoryName"],
-                        "incident_address": ["Address"],
-                        "borough": ["Neighborhood", "CouncilDistrictNumber"],
-                        "zipcode": ["ZIP"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                field_map={'incident_id': ['ReferenceNumber', 'OBJECTID'], 'created_date': ['DateCreated'], 'closed_date': ['DateClosed'], 'status': ['PublicStatus'], 'complaint_type': ['CategoryLevel2', 'CategoryLevel1', 'CategoryName'], 'incident_address': ['Address'], 'borough': ['Neighborhood', 'CouncilDistrictNumber'], 'zipcode': ['ZIP']},
             ),
         },
     ),
@@ -4037,22 +3150,14 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=1800.0,
                 producer_key="deeds",
-                extra={
-                    "expected_cadence_days": 7,
-                    "ingestion_mode": "snapshot",
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "watermark_type": "text",
-                    "watermark_format": "%m/%d/%Y",
-                    "scope": "Washoe County parcel sales (Reno, Sparks, and unincorporated areas; polygon centroid)",
-                    "field_map": {
-                        "doc_id": ["PIN", "OBJECTID"],
-                        "bbl": ["PIN"],
-                        "document_amount": ["SALEPRICE"],
-                        "recorded_date": ["SALEDATE"],
-                        "borough": ["CITY", "SUBNAME"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                ingestion_mode='snapshot',
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                watermark_type='text',
+                watermark_format='%m/%d/%Y',
+                field_map={'doc_id': ['PIN', 'OBJECTID'], 'bbl': ['PIN'], 'document_amount': ['SALEPRICE'], 'recorded_date': ['SALEDATE'], 'borough': ['CITY', 'SUBNAME']},
             ),
         },
     ),
@@ -4075,33 +3180,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=1800.0,
                 producer_key="deeds",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "scope": "Spokane County annual parcel sales layers (polygon centroid)",
-                    "endpoint_by_year": {
-                        "2015": settings.arcgis_spokane_deeds_url.replace("/20", "/7"),
-                        "2016": settings.arcgis_spokane_deeds_url.replace("/20", "/6"),
-                        "2017": settings.arcgis_spokane_deeds_url.replace("/20", "/11"),
-                        "2018": settings.arcgis_spokane_deeds_url.replace("/20", "/10"),
-                        "2019": settings.arcgis_spokane_deeds_url.replace("/20", "/14"),
-                        "2020": settings.arcgis_spokane_deeds_url.replace("/20", "/15"),
-                        "2021": settings.arcgis_spokane_deeds_url.replace("/20", "/16"),
-                        "2022": settings.arcgis_spokane_deeds_url.replace("/20", "/5"),
-                        "2023": settings.arcgis_spokane_deeds_url.replace("/20", "/17"),
-                        "2024": settings.arcgis_spokane_deeds_url.replace("/20", "/18"),
-                        "2025": settings.arcgis_spokane_deeds_url.replace("/20", "/19"),
-                        "2026": settings.arcgis_spokane_deeds_url,
-                    },
-                    "field_map": {
-                        "doc_id": ["Parcel", "OBJECTID"],
-                        "bbl": ["Parcel"],
-                        "document_amount": ["gross_sale_price"],
-                        "recorded_date": ["document_date"],
-                        "doc_type": ["prop_use_code"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                endpoint_by_year={'2015': settings.arcgis_spokane_deeds_url.replace('/20', '/7'), '2016': settings.arcgis_spokane_deeds_url.replace('/20', '/6'), '2017': settings.arcgis_spokane_deeds_url.replace('/20', '/11'), '2018': settings.arcgis_spokane_deeds_url.replace('/20', '/10'), '2019': settings.arcgis_spokane_deeds_url.replace('/20', '/14'), '2020': settings.arcgis_spokane_deeds_url.replace('/20', '/15'), '2021': settings.arcgis_spokane_deeds_url.replace('/20', '/16'), '2022': settings.arcgis_spokane_deeds_url.replace('/20', '/5'), '2023': settings.arcgis_spokane_deeds_url.replace('/20', '/17'), '2024': settings.arcgis_spokane_deeds_url.replace('/20', '/18'), '2025': settings.arcgis_spokane_deeds_url.replace('/20', '/19'), '2026': settings.arcgis_spokane_deeds_url},
+                field_map={'doc_id': ['Parcel', 'OBJECTID'], 'bbl': ['Parcel'], 'document_amount': ['gross_sale_price'], 'recorded_date': ['document_date'], 'doc_type': ['prop_use_code']},
             ),
             FeedType.PERMITS: DatasetSpec(
                 endpoint=settings.excel_spokane_permits_url,
@@ -4111,22 +3195,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "needs_geocode": True,
-                    "geocode_context": "Spokane, WA",
-                    "scope": "Spokane County Building and Planning permits (ArcGIS-hosted XLS)",
-                    "field_map": {
-                        "job_id": ["permit_number"],
-                        "issuance_date": ["issued_date"],
-                        "filing_date": ["issued_date"],
-                        "job_type": ["permit_type", "project_description"],
-                        "status": ["status", "status_description"],
-                        "address_street": ["site_address"],
-                        "zipcode": ["site_zip"],
-                        "bbl": ["parcel_number"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                needs_geocode=True,
+                geocode_context='Spokane, WA',
+                field_map={'job_id': ['permit_number'], 'issuance_date': ['issued_date'], 'filing_date': ['issued_date'], 'job_type': ['permit_type', 'project_description'], 'status': ['status', 'status_description'], 'address_street': ['site_address'], 'zipcode': ['site_zip'], 'bbl': ['parcel_number']},
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.socrata_wa_liquor_renewal_endpoint,
@@ -4136,20 +3209,10 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
-                extra={
-                    "expected_cadence_days": 7,
-                    "where": "city = 'SPOKANE'",
-                    "scope": "Washington LCB liquor renewals for Spokane site addresses",
-                    "field_map": {
-                        "license_id": ["license"],
-                        "license_type": ["l_a_type"],
-                        "premises_name": ["designatedsignee"],
-                        "dba": ["tradename"],
-                        "address_street": ["streetaddress"],
-                        "expiration_date": ["renewaldate"],
-                        "borough": ["cityname", "city"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                where="city = 'SPOKANE'",
+                field_map={'license_id': ['license'], 'license_type': ['l_a_type'], 'premises_name': ['designatedsignee'], 'dba': ['tradename'], 'address_street': ['streetaddress'], 'expiration_date': ['renewaldate'], 'borough': ['cityname', 'city']},
             ),
         },
     ),
@@ -4172,23 +3235,13 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "RowNumber",
-                    "max_record_count": 2000,
-                    "rolling_window_days": 90,
-                    "retention_days": 90,
-                    "scope": "Dayton Hansen service requests (rolling 90-day ArcGIS window)",
-                    "field_map": {
-                        "incident_id": ["RowNumber", "REFNO"],
-                        "created_date": ["ADDDTTM"],
-                        "closed_date": ["RESDTTM", "ModDTTM"],
-                        "status": ["RESFLAG", "RESCODE"],
-                        "complaint_type": ["PROBDESC", "CatName", "ProbDesc2"],
-                        "incident_address": ["ADDRESS", "LOC"],
-                        "borough": ["NEIGH_COM", "DISTRICT"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='RowNumber',
+                max_record_count=2000,
+                rolling_window_days=90,
+                retention_days=90,
+                field_map={'incident_id': ['RowNumber', 'REFNO'], 'created_date': ['ADDDTTM'], 'closed_date': ['RESDTTM', 'ModDTTM'], 'status': ['RESFLAG', 'RESCODE'], 'complaint_type': ['PROBDESC', 'CatName', 'ProbDesc2'], 'incident_address': ['ADDRESS', 'LOC'], 'borough': ['NEIGH_COM', 'DISTRICT']},
             ),
         },
     ),
@@ -4211,22 +3264,13 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "rolling_window_days": 30,
-                    "retention_days": 30,
-                    "scope": "Tulsa Verint customer-care cases (approximately 30-day rolling window)",
-                    "field_map": {
-                        "incident_id": ["case_id", "OBJECTID"],
-                        "created_date": ["case_opened"],
-                        "closed_date": ["case_closed"],
-                        "status": ["case_status"],
-                        "complaint_type": ["case_type", "case_reason", "case_subject"],
-                        "incident_address": ["case_external_ref"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                rolling_window_days=30,
+                retention_days=30,
+                field_map={'incident_id': ['case_id', 'OBJECTID'], 'created_date': ['case_opened'], 'closed_date': ['case_closed'], 'status': ['case_status'], 'complaint_type': ['case_type', 'case_reason', 'case_subject'], 'incident_address': ['case_external_ref']},
             ),
         },
     ),
@@ -4249,22 +3293,13 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "rolling_window_days": 30,
-                    "retention_days": 30,
-                    "scope": "El Paso Accela/Cityworks 311 requests (approximately 30-day partial view)",
-                    "field_map": {
-                        "incident_id": ["id", "request_id", "OBJECTID"],
-                        "created_date": ["created_at"],
-                        "status": ["status"],
-                        "complaint_type": ["request_type", "request_category"],
-                        "incident_address": ["address"],
-                        "borough": ["district"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                rolling_window_days=30,
+                retention_days=30,
+                field_map={'incident_id': ['id', 'request_id', 'OBJECTID'], 'created_date': ['created_at'], 'status': ['status'], 'complaint_type': ['request_type', 'request_category'], 'incident_address': ['address'], 'borough': ['district']},
             ),
         },
     ),
@@ -4287,22 +3322,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "scope": "Durham All Building Permits (point geometry)",
-                    "field_map": {
-                        "job_id": ["PermitNum", "OBJECTID"],
-                        "issuance_date": ["ISSUE_DATE"],
-                        "job_type": ["BLDB_ACTIVITY", "BLDB_ACTIVITY_1", "TYPE", "BLD_Type"],
-                        "cost": ["BLD_Cost"],
-                        "address_street": ["LOCATION_ADDR"],
-                        "bbl": ["PIN15", "PIN", "PID"],
-                        "status": ["PmtStatus"],
-                        "proposed_units": ["DWELLING_UNITS"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                field_map={'job_id': ['PermitNum', 'OBJECTID'], 'issuance_date': ['ISSUE_DATE'], 'job_type': ['BLDB_ACTIVITY', 'BLDB_ACTIVITY_1', 'TYPE', 'BLD_Type'], 'cost': ['BLD_Cost'], 'address_street': ['LOCATION_ADDR'], 'bbl': ['PIN15', 'PIN', 'PID'], 'status': ['PmtStatus'], 'proposed_units': ['DWELLING_UNITS']},
             ),
             FeedType.DEEDS: DatasetSpec(
                 endpoint=settings.arcgis_durham_deeds_url,
@@ -4312,21 +3336,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=1800.0,
                 producer_key="deeds",
-                extra={
-                    "expected_cadence_days": 7,
-                    "ingestion_mode": "snapshot",
-                    "oid_field": "OBJECTID_1",
-                    "max_record_count": 2000,
-                    "scope": "Durham County parcel sales (polygon centroid)",
-                    "field_map": {
-                        "doc_id": ["PIN", "OBJECTID_1", "OBJECTID"],
-                        "bbl": ["PIN", "PIN_EXT"],
-                        "recorded_date": ["PKG_SALE_DATE", "DEED_DATE"],
-                        "document_amount": ["PKG_SALE_PRICE", "LAND_SALE_PRICE"],
-                        "party1_grantor": ["PROPERTY_OWNER"],
-                        "borough": ["NEIGHBORHOOD", "CITY"],
-                    },
-                },
+                
+                expected_cadence_days=7,
+                ingestion_mode='snapshot',
+                oid_field='OBJECTID_1',
+                max_record_count=2000,
+                field_map={'doc_id': ['PIN', 'OBJECTID_1', 'OBJECTID'], 'bbl': ['PIN', 'PIN_EXT'], 'recorded_date': ['PKG_SALE_DATE', 'DEED_DATE'], 'document_amount': ['PKG_SALE_PRICE', 'LAND_SALE_PRICE'], 'party1_grantor': ['PROPERTY_OWNER'], 'borough': ['NEIGHBORHOOD', 'CITY']},
             ),
         },
     ),
@@ -4349,15 +3364,13 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "order_by": "CREATEDDATE DESC",
-                    "proxy_for": "row_permits",
-                    "scope": "Dallas right-of-way and traffic-control permits (construction proxy, not building permits)",
-                    "field_map": DALLAS_FIELD_MAP,
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                order_by='CREATEDDATE DESC',
+                proxy_for='row_permits',
+                field_map=DALLAS_FIELD_MAP,
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.arcgis_dallas_311_url,
@@ -4367,15 +3380,13 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 1,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "rolling_window_days": 30,
-                    "retention_days": 30,
-                    "scope": "Dallas Building Services CRM requests (approximately 30-day rolling partial view)",
-                    "field_map": DALLAS_311_FIELD_MAP,
-                },
+                
+                expected_cadence_days=1,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                rolling_window_days=30,
+                retention_days=30,
+                field_map=DALLAS_311_FIELD_MAP,
             ),
         },
     ),
@@ -4398,14 +3409,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 30,
-                    "oid_field": "ObjectId",
-                    "max_record_count": 2000,
-                    "annual_rotation": True,
-                    "scope": "Louisville Metro 311 service requests (2026 annual ArcGIS layer)",
-                    "field_map": LOUISVILLE_311_FIELD_MAP,
-                },
+                
+                expected_cadence_days=30,
+                oid_field='ObjectId',
+                max_record_count=2000,
+                annual_rotation=True,
+                field_map=LOUISVILLE_311_FIELD_MAP,
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.arcgis_louisville_abc_url,
@@ -4415,14 +3424,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "ObjectId",
-                    "max_record_count": 2000,
-                    "where_clause": "County = 'Jefferson'",
-                    "scope": "Kentucky ABC active alcohol licenses in Jefferson County",
-                    "field_map": LOUISVILLE_SLA_FIELD_MAP,
-                },
+                
+                expected_cadence_days=7,
+                oid_field='ObjectId',
+                max_record_count=2000,
+                where="County = 'Jefferson'",
+                field_map=LOUISVILLE_SLA_FIELD_MAP,
             ),
         },
     ),
@@ -4445,14 +3452,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "order_by": "ISSUEDATE DESC",
-                    "scope": "Portland residential building permits",
-                    "field_map": PORTLAND_PERMITS_FIELD_MAP,
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                order_by='ISSUEDATE DESC',
+                field_map=PORTLAND_PERMITS_FIELD_MAP,
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.socrata_portland_olcc_applications_endpoint,
@@ -4462,12 +3467,10 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
-                extra={
-                    "expected_cadence_days": 7,
-                    "needs_geocode": True,
-                    "scope": "Oregon OLCC liquor applications received (address-only Portland rows)",
-                    "field_map": PORTLAND_SLA_FIELD_MAP,
-                },
+                
+                expected_cadence_days=7,
+                needs_geocode=True,
+                field_map=PORTLAND_SLA_FIELD_MAP,
             ),
         },
     ),
@@ -4490,16 +3493,14 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 1,
-                    "rolling_window_days": 30,
-                    "needs_geocode": True,
-                    "geocode_context": "San Jose, CA",
-                    "scope": "San Jose last-30-days building permits (address-only gx_location)",
-                    "watermark_type": "text",
-                    "watermark_format": "%m/%d/%Y %I:%M:%S %p",
-                    "field_map": SAN_JOSE_FIELD_MAP["permits"],
-                },
+                
+                expected_cadence_days=1,
+                rolling_window_days=30,
+                needs_geocode=True,
+                geocode_context='San Jose, CA',
+                watermark_type='text',
+                watermark_format='%m/%d/%Y %I:%M:%S %p',
+                field_map=SAN_JOSE_FIELD_MAP['permits'],
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
                 endpoint=settings.ckan_san_jose_311_endpoint,
@@ -4509,15 +3510,13 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_311,
                 interval_seconds=180.0,
                 producer_key="311",
-                extra={
-                    "expected_cadence_days": 1,
-                    "annual_rotation": True,
-                    "scope": "San Jose 311 current-year annual resource; rows with 0,0 coordinates are dropped (G8' caveat)",
-                    "watermark_type": "text",
-                    "watermark_format": "%m/%d/%Y %I:%M:%S %p",
-                    "field_map": SAN_JOSE_FIELD_MAP["311"],
-                    "endpoint_by_year": {"2026": settings.ckan_san_jose_311_endpoint},
-                },
+                
+                expected_cadence_days=1,
+                annual_rotation=True,
+                watermark_type='text',
+                watermark_format='%m/%d/%Y %I:%M:%S %p',
+                field_map=SAN_JOSE_FIELD_MAP['311'],
+                endpoint_by_year={'2026': settings.ckan_san_jose_311_endpoint},
             ),
         },
     ),
@@ -4540,14 +3539,12 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 1,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "order_by": "LASTUPDATE DESC",
-                    "scope": "Tampa/Hillsborough full permits (edit-stamp watermark)",
-                    "field_map": TAMPA_FIELD_MAP,
-                },
+                
+                expected_cadence_days=1,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                order_by='LASTUPDATE DESC',
+                field_map=TAMPA_FIELD_MAP,
             ),
             FeedType.SLA: DatasetSpec(
                 endpoint=settings.arcgis_tampa_sla_url,
@@ -4557,13 +3554,11 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_sla,
                 interval_seconds=600.0,
                 producer_key="sla",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "scope": "Tampa alcohol-beverage sale locations and action history (partial SLA)",
-                    "field_map": TAMPA_SLA_FIELD_MAP,
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                field_map=TAMPA_SLA_FIELD_MAP,
             ),
         },
     ),
@@ -4586,16 +3581,14 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "ObjectId",
-                    "max_record_count": 1000,
-                    "order_by": "ISSDTTM DESC",
-                    "needs_geocode": True,
-                    "geocode_context": "Las Vegas, NV",
-                    "scope": "Clark County Building Permits (address-only ArcGIS table)",
-                    "field_map": LAS_VEGAS_FIELD_MAP["permits"],
-                },
+                
+                expected_cadence_days=7,
+                oid_field='ObjectId',
+                max_record_count=1000,
+                order_by='ISSDTTM DESC',
+                needs_geocode=True,
+                geocode_context='Las Vegas, NV',
+                field_map=LAS_VEGAS_FIELD_MAP['permits'],
             ),
             FeedType.DEEDS: DatasetSpec(
                 endpoint=settings.arcgis_las_vegas_deeds_url,
@@ -4605,16 +3598,14 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_deeds,
                 interval_seconds=600.0,
                 producer_key="deeds",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "ObjectId",
-                    "max_record_count": 2000,
-                    "order_by": "SALEDATE DESC",
-                    "needs_geocode": True,
-                    "geocode_context": "Las Vegas, NV",
-                    "scope": "Clark County real-property parcel sales / recorded deeds (address-only ArcGIS table)",
-                    "field_map": LAS_VEGAS_FIELD_MAP["deeds"],
-                },
+                
+                expected_cadence_days=7,
+                oid_field='ObjectId',
+                max_record_count=2000,
+                order_by='SALEDATE DESC',
+                needs_geocode=True,
+                geocode_context='Las Vegas, NV',
+                field_map=LAS_VEGAS_FIELD_MAP['deeds'],
             ),
         },
     ),
@@ -4637,16 +3628,14 @@ REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                extra={
-                    "expected_cadence_days": 7,
-                    "oid_field": "OBJECTID",
-                    "max_record_count": 2000,
-                    "order_by": "IssuedDate DESC",
-                    "needs_geocode": True,
-                    "geocode_context": "Boise, ID",
-                    "scope": "Residential-only building permits; ArcGIS state-plane source requested as WGS84 with address fallback",
-                    "field_map": BOISE_PERMITS_FIELD_MAP,
-                },
+                
+                expected_cadence_days=7,
+                oid_field='OBJECTID',
+                max_record_count=2000,
+                order_by='IssuedDate DESC',
+                needs_geocode=True,
+                geocode_context='Boise, ID',
+                field_map=BOISE_PERMITS_FIELD_MAP,
             ),
         },
     ),
@@ -4657,12 +3646,12 @@ def resolve_endpoint(spec: DatasetSpec, today: Optional[Any] = None) -> str:
     """Resolve a spec's endpoint for "today", honoring year-sliced datasets.
 
     Some jurisdictions publish one layer/resource per calendar year
-    (`extra={"endpoint_by_year": {"2026": "...FeatureServer/18", ...}}`).
+    (`endpoint_by_year={"2026": "...FeatureServer/18", ...}`).
     Returns the current year's entry when present, else the newest year not
     in the future, else the lexicographically latest entry. Annual rollover
     drill: see docs/expansion-roadmap.md §8.2.
     """
-    by_year = spec.extra.get("endpoint_by_year")
+    by_year = spec.endpoint_by_year
     if not by_year:
         return spec.endpoint
     if today is None:
@@ -4704,3 +3693,12 @@ def get_job_name(feed: FeedType, city_id: CityId) -> str:
     if not reg or not reg.job_suffix:
         return feed.value
     return f"{feed.value}_{reg.job_suffix}"
+
+
+USE_DERIVED_REGISTRY = True
+
+if USE_DERIVED_REGISTRY:
+    from src.spatial import registry_derivation
+
+    REGISTRY = registry_derivation.build_registry_from_registrations()
+    ALIASES = registry_derivation.build_aliases_from_registrations()

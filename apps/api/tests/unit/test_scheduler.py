@@ -340,7 +340,7 @@ class TestYearSliceEndpoints:
     def _spec(self, by_year):
         from src.spatial.city_registry import DatasetSpec
 
-        return DatasetSpec(endpoint="https://default.example", extra={"endpoint_by_year": by_year})
+        return DatasetSpec(endpoint="https://default.example", endpoint_by_year=by_year)
 
     def test_current_year_wins(self):
         import datetime as dt

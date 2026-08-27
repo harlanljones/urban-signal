@@ -230,9 +230,9 @@ class SLALicensesProducer:
                     boston_spec = get_dataset(CityId.BOSTON, FeedType.SLA)
                     transformed = _transform_state_plane(
                         row,
-                        boston_spec.extra.get("state_plane_crs", "EPSG:2249"),
-                        boston_spec.extra.get("state_plane_x_col", "gpsx"),
-                        boston_spec.extra.get("state_plane_y_col", "gpsy"),
+                        boston_spec.state_plane_crs or "EPSG:2249",
+                        boston_spec.state_plane_x_col or "gpsx",
+                        boston_spec.state_plane_y_col or "gpsy",
                     )
                     if transformed is not None:
                         lng_raw, lat_raw = transformed
@@ -397,10 +397,10 @@ class SLALicensesProducer:
         spec = get_dataset(cid, FeedType.SLA)
         endpoint = spec.endpoint
         client = self._client_for(spec.platform)
-        client_kwargs = {
-            k: v for k, v in spec.extra.items() if k in ("order_by", "id_col", "select") and v
-        }
-        effective_where_clause = where_clause or spec.extra.get("where_clause")
+        from src.producers.acquisition import AcquisitionSpec, build_adapter_request
+
+        client_kwargs = build_adapter_request(spec.platform, AcquisitionSpec.from_dataset_spec(spec))
+        effective_where_clause = where_clause or spec.where
 
         logger.info("Starting %s SLA / License Ingestion Stream (limit=%d)...", cid.value.upper(), limit)
         records_streamed = 0

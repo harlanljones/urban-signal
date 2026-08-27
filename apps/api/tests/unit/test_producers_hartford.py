@@ -80,21 +80,21 @@ def test_hartford_registers_311_permits_and_sla():
     assert permits.platform == "arcgis"
     assert permits.watermark_col == "DateIssued"
     assert permits.id_keys == ["RECORD_ID", "OBJECTID"]
-    assert permits.extra["field_map"] == HARTFORD_PERMITS_FIELD_MAP
-    assert permits.extra["needs_geocode"] is True
+    assert permits.field_map == HARTFORD_PERMITS_FIELD_MAP
+    assert permits.needs_geocode is True
 
     complaints = get_dataset(city, FeedType.COMPLAINTS_311)
     assert complaints.platform == "arcgis"
     assert complaints.watermark_col == "USER_Opened_Date"
-    assert complaints.extra["endpoint_by_year"]["2026"] == complaints.endpoint
-    assert complaints.extra["field_map"] == HARTFORD_311_FIELD_MAP
+    assert complaints.endpoint_by_year["2026"] == complaints.endpoint
+    assert complaints.field_map == HARTFORD_311_FIELD_MAP
     assert resolve_endpoint(complaints, datetime(2026, 8, 26, tzinfo=UTC).date()) == complaints.endpoint
 
     sla = get_dataset(city, FeedType.SLA)
     assert sla.platform == "socrata"
     assert sla.watermark_col == "recordrefreshedon"
-    assert sla.extra["where"] == "city = 'HARTFORD'"
-    assert sla.extra["field_map"] == HARTFORD_SLA_FIELD_MAP
+    assert sla.where == "city = 'HARTFORD'"
+    assert sla.field_map == HARTFORD_SLA_FIELD_MAP
 
 
 @pytest.fixture

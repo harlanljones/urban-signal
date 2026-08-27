@@ -202,3 +202,14 @@ MILWAUKEE_DEEDS_SPEC: dict = {
         "field_map": MILWAUKEE_DEEDS_FIELD_MAP,
     },
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=MILWAUKEE_METRO_BBOX,
+    division_bboxes=MILWAUKEE_DIVISION_BBOXES,
+    submarkets=MILWAUKEE_SUBMARKETS,
+    divisions=MILWAUKEE_DIVISIONS,
+    contains=is_in_milwaukee_metro,
+)

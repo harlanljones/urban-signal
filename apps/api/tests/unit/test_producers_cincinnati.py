@@ -73,12 +73,12 @@ def test_cincinnati_deeds_spec_pins_field_map_and_filters():
 
     spec = get_dataset(CityId.CINCINNATI, FeedType.DEEDS)
     assert spec.topic == "raw.municipal.deeds"
-    assert spec.extra["ingestion_mode"] == "snapshot"
-    assert spec.extra["where"] == "valid = 'Y'"
-    assert spec.extra["needs_geocode"] is True
-    assert spec.extra["geocode_context"] == "Hamilton County, OH"
-    assert spec.extra["field_map"]["document_amount"] == ["saleamount"]
-    assert spec.extra["field_map"]["doc_id"] == ["conveyancenumber"]
+    assert spec.ingestion_mode == "snapshot"
+    assert spec.where == "valid = 'Y'"
+    assert spec.needs_geocode is True
+    assert spec.geocode_context == "Hamilton County, OH"
+    assert spec.field_map["document_amount"] == ["saleamount"]
+    assert spec.field_map["doc_id"] == ["conveyancenumber"]
 
 
 # Live row captured 2026-08-25 from transfer_dailysales_new.csv, headers

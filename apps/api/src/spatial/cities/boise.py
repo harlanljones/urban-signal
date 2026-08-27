@@ -193,3 +193,14 @@ GREATER_BOISE_METRO_BBOX = BOISE_METRO_BBOX
 BOISE_DIVISION_BBOXES = BOISE_DIVISION_BBOXES
 BOISE_DIVISIONS = BOISE_DIVISIONS
 BOISE_SUBMARKETS = BOISE_SUBMARKETS
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=BOISE_METRO_BBOX,
+    division_bboxes=BOISE_DIVISION_BBOXES,
+    submarkets=BOISE_SUBMARKETS,
+    divisions=BOISE_DIVISIONS,
+    contains=is_in_boise_metro,
+)

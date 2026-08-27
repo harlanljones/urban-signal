@@ -75,3 +75,14 @@ SAN_ANTONIO_DIVISIONS: dict[str, BoroughMeta] = {
         city_id="san_antonio",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=SAN_ANTONIO_METRO_BBOX,
+    division_bboxes=SAN_ANTONIO_DIVISION_BBOXES,
+    submarkets=SAN_ANTONIO_SUBMARKETS,
+    divisions=SAN_ANTONIO_DIVISIONS,
+    contains=is_in_san_antonio_metro,
+)

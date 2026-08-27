@@ -7,7 +7,7 @@ Las Vegas' spellings as data, mirroring the Wave-B mechanism used by NOLA,
 Seattle, Norfolk, and other registrations.
 
 The map is keyed by feed (`"permits"` / `"deeds"`) so `las_vegas.py` can embed
-each sub-map into the matching `DatasetSpec.extra["field_map"]`. The shared
+each sub-map into the matching `DatasetSpec["field_map"]`. The shared
 `first_mapped` helper consumes these lists directly.
 
 Both Las Vegas feeds are address-only on the wire (the permit and parcel

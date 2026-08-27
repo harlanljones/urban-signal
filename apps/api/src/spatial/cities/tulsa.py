@@ -124,3 +124,14 @@ GREATER_TULSA_METRO_BBOX = TULSA_METRO_BBOX
 TULSA_DIVISION_BBOXES = TULSA_DIVISION_BBOXES
 TULSA_DIVISIONS = TULSA_DIVISIONS
 TULSA_SUBMARKETS = TULSA_SUBMARKETS
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=TULSA_METRO_BBOX,
+    division_bboxes=TULSA_DIVISION_BBOXES,
+    submarkets=TULSA_SUBMARKETS,
+    divisions=TULSA_DIVISIONS,
+    contains=is_in_tulsa_metro,
+)

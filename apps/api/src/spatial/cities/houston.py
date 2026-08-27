@@ -138,3 +138,14 @@ HOUSTON_DIVISIONS: dict[str, BoroughMeta] = {
         city_id="houston",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=HOUSTON_METRO_BBOX,
+    division_bboxes=HOUSTON_DIVISION_BBOXES,
+    submarkets=HOUSTON_SUBMARKETS,
+    divisions=HOUSTON_DIVISIONS,
+    contains=is_in_houston_metro,
+)

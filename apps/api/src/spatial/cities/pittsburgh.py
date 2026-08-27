@@ -120,3 +120,13 @@ PITTSBURGH_DIVISIONS: dict[str, BoroughMeta] = {
         city_id="pittsburgh",
     ),
 }
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=PITTSBURGH_METRO_BBOX,
+    division_bboxes=PITTSBURGH_DIVISION_BBOXES,
+    submarkets=PITTSBURGH_SUBMARKETS,
+    divisions=PITTSBURGH_DIVISIONS,
+    contains=is_in_pittsburgh_metro,
+)

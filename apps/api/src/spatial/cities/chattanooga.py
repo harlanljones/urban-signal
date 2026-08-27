@@ -119,3 +119,14 @@ CHATTANOOGA_DIVISIONS: dict[str, BoroughMeta] = {
         city_id="chattanooga",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=CHATTANOOGA_METRO_BBOX,
+    division_bboxes=CHATTANOOGA_DIVISION_BBOXES,
+    submarkets=CHATTANOOGA_SUBMARKETS,
+    divisions=CHATTANOOGA_DIVISIONS,
+    contains=is_in_chattanooga_metro,
+)

@@ -134,9 +134,9 @@ class TestFeedRegistration:
         sla = get_dataset(AUSTIN, FeedType.SLA)
         assert sla.watermark_col == "current_issued_date"
         assert sla.id_keys == ["license_id", "master_file_id"]
-        assert sla.extra["needs_geocode"] is True
-        assert sla.extra["geocode_context"] == "TX"
-        assert sla.extra["where"] == "county = 'Travis'"
+        assert sla.needs_geocode is True
+        assert sla.geocode_context == "TX"
+        assert sla.where == "county = 'Travis'"
 
     @pytest.mark.parametrize("absent_feed", [FeedType.DEEDS])
     def test_absent_feeds_raise_readable_errors(self, absent_feed):
@@ -152,7 +152,7 @@ class TestAustinRowParsing:
     """Fixtures captured live from data.austintexas.gov on 2026-08-23
     (newest-by-watermark rows, untruncated via `| python3 -m json.tool`).
 
-    Per the Wave-B mechanism, field maps ride on DatasetSpec.extra in the
+    Per the Wave-B mechanism, field maps ride on DatasetSpec in the
     registry — a spine file. Until the spine lands, resolve_field_map("austin",
     ...) degrades to {} and rows parse through the shared chains alone.
     """

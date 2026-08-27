@@ -343,3 +343,14 @@ PORTLAND_FEED_SPECS: Dict[str, Dict[str, object]] = {
         "extra": {"needs_geocode": True, "scope": "Oregon OLCC liquor applications received (address-only Portland rows)"},
     },
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=PORTLAND_METRO_BBOX,
+    division_bboxes=PORTLAND_DIVISION_BBOXES,
+    submarkets=PORTLAND_SUBMARKETS,
+    divisions=PORTLAND_DIVISIONS,
+    contains=is_in_portland_metro,
+)

@@ -239,7 +239,7 @@ class MunicipalIngestionScheduler:
                     # Year-slice metadata (ADR 0002 / US-70): kept so the job
                     # can re-resolve its layer at poll time and detect the New
                     # Year switch instead of polling last year's layer forever.
-                    "endpoint_by_year": dict(ds.extra.get("endpoint_by_year") or {}),
+                    "endpoint_by_year": dict(ds.endpoint_by_year or {}),
                     "endpoint_base": ds.endpoint,
                     "topic": ds.topic,
                     "watermark_col": ds.watermark_col,
@@ -247,23 +247,23 @@ class MunicipalIngestionScheduler:
                     "city_id": city_id.value,
                     "producer_key": ds.producer_key or feed_type.value,
                     "platform": ds.platform,
-                    "ingestion_mode": ds.extra.get("ingestion_mode", "incremental"),
+                    "ingestion_mode": ds.ingestion_mode or "incremental",
                     # Platform-specific pagination knobs forwarded verbatim to
                     # clients that accept them (e.g. CartoClient select/
                     # order_by/id_col; socrata accepts order_by only). Clients
                     # that don't take a key simply never receive it.
-                    "order_by": ds.extra.get("order_by"),
-                    "id_col": ds.extra.get("id_col"),
-                    "select": ds.extra.get("select"),
-                    "fallback_endpoints": list(ds.extra.get("fallback_endpoints") or []),
+                    "order_by": ds.order_by,
+                    "id_col": ds.id_col,
+                    "select": ds.select,
+                    "fallback_endpoints": list(ds.fallback_endpoints or []),
                     # D7 text-watermark declarations (ADR 0005): sentinels
                     # become a server-side NOT-IN guard and the high
                     # watermark is tracked as the raw declared-format string
                     # instead of an ISO reformat of a parsed event attribute.
-                    "watermark_type": ds.extra.get("watermark_type"),
-                    "watermark_format": ds.extra.get("watermark_format"),
-                    "watermark_exclude": ds.extra.get("watermark_exclude") or [],
-                    "base_where": ds.extra.get("where"),
+                    "watermark_type": ds.watermark_type,
+                    "watermark_format": ds.watermark_format,
+                    "watermark_exclude": ds.watermark_exclude or [],
+                    "base_where": ds.where,
                 }
                 self.configs[job_name] = JobConfig(
                     name=job_name,
@@ -423,7 +423,8 @@ class MunicipalIngestionScheduler:
         resolved = resolve_endpoint(
             DatasetSpec(
                 endpoint=meta["endpoint_base"],
-                extra={"endpoint_by_year": by_year},
+                
+                endpoint_by_year=by_year,
             ),
             today=today,
         )

@@ -445,8 +445,19 @@ LOUISVILLE_SLA_SPEC: Dict[str, object] = {
         "expected_cadence_days": 7,
         "oid_field": "ObjectId",
         "max_record_count": 2000,
-        "where_clause": "County = 'Jefferson'",
+        "where": "County = 'Jefferson'",
         "scope": "Kentucky ABC active alcohol licenses in Jefferson County",
         "field_map": LOUISVILLE_SLA_FIELD_MAP,
     },
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=LOUISVILLE_METRO_BBOX,
+    division_bboxes=LOUISVILLE_DIVISION_BBOXES,
+    submarkets=LOUISVILLE_SUBMARKETS,
+    divisions=LOUISVILLE_DIVISIONS,
+    contains=is_in_louisville_metro,
+)

@@ -118,3 +118,14 @@ WICHITA_DIVISIONS: dict[str, BoroughMeta] = {
         city_id="wichita",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=WICHITA_METRO_BBOX,
+    division_bboxes=WICHITA_DIVISION_BBOXES,
+    submarkets=WICHITA_SUBMARKETS,
+    divisions=WICHITA_DIVISIONS,
+    contains=is_in_wichita_metro,
+)

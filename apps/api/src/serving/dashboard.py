@@ -68,6 +68,9 @@ def get_dashboard_html() -> str:
       --accent-danger-dim: rgba(244, 63, 94, 0.12);
       --accent-purple: #c084fc;
       --accent-purple-dim: rgba(192, 132, 252, 0.12);
+      --accent-emerald: #34d399;
+      --accent-amber: #fbbf24;
+      --accent-crimson: #f43f5e;
       
       --borough-manhattan: #38bdf8;
       --borough-brooklyn: #34d399;
@@ -1164,7 +1167,6 @@ def get_dashboard_html() -> str:
       .brand-title { font-size: 12px; }
       .brand-badge { display: none; }
       .borough-nav {
-      .borough-nav {
         flex: 1 1 100%;
         order: 5;
         width: 100%;
@@ -1203,7 +1205,7 @@ def get_dashboard_html() -> str:
       body.drawer-left-open .sidebar-left { transform: translateX(0); }
       body.drawer-right-open .sidebar-right { transform: translateX(0); }
       .drawer-grip { display: flex; }
-      #inspector-content { height: auto !important;      #inspector-content { height: auto !important; flex: 1 1 auto; min-height: 0 !important; }
+      #inspector-content { height: auto !important; flex: 1 1 auto; min-height: 0 !important; }
       .mobile-toolbar { display: flex; }
 
       /* Search collapses to a slide-down top sheet */
@@ -1356,8 +1358,6 @@ def get_dashboard_html() -> str:
     <main class="map-container">
       <div id="map"></div>
       <div class="zoom-hint" id="zoom-hint" hidden>Zoom in to load cell-level data</div>
-        <main class="map-container">
-      <div id="map"></div>
 
       <!-- Floating Quick Tools -->
       <div class="map-controls-group">
@@ -1411,7 +1411,9 @@ def get_dashboard_html() -> str:
 
     // Static metro metadata: chip label fallback + ?city= deep-link validation.
     // Camera geometry comes from the snapshot manifest's metro_index; this map
-    // deliberately carries none so registration stays single-sourced.
+    // deliberately carries none so registration stays single-sourced. The block
+    // below is generated from the live REGISTRY (US-179) so a registered city
+    // can never fall off the map.
     const METRO_META = {
       nyc: { name: 'New York City' },
       chicago: { name: 'Chicago' },
@@ -1424,24 +1426,24 @@ def get_dashboard_html() -> str:
       austin: { name: 'Austin' },
       cincinnati: { name: 'Cincinnati' },
       boston: { name: 'Boston' },
-      baltimore: { name: 'Baltimore' },
       montgomery: { name: 'Montgomery County' },
-      baton_rouge: { name: 'Baton Rouge / EBR' },
+      baton_rouge: { name: 'Baton Rouge / East Baton Rouge Parish' },
       denver: { name: 'Denver' },
+      minneapolis: { name: 'Minneapolis' },
+      baltimore: { name: 'Baltimore' },
       philadelphia: { name: 'Philadelphia' },
       washington_dc: { name: 'Washington DC' },
-      prince_georges: { name: "Prince George's County" },
+      prince_georges: { name: 'Prince George\'s County' },
       columbus: { name: 'Columbus' },
-      nashville: { name: 'Nashville' },
+      nashville: { name: 'Nashville / Davidson County' },
       kansas_city: { name: 'Kansas City' },
-      minneapolis: { name: 'Minneapolis' },
       pierce: { name: 'Pierce County' },
       milwaukee: { name: 'Milwaukee' },
       charlotte: { name: 'Charlotte' },
       pittsburgh: { name: 'Pittsburgh' },
       san_diego: { name: 'San Diego' },
-      houston: { name: 'Houston' },
       indianapolis: { name: 'Indianapolis / Marion County' },
+      houston: { name: 'Houston' },
       wichita: { name: 'Wichita' },
       chattanooga: { name: 'Chattanooga / Hamilton County' },
       cleveland: { name: 'Cleveland / Cuyahoga County' },
@@ -1461,7 +1463,7 @@ def get_dashboard_html() -> str:
       san_jose: { name: 'San Jose / Santa Clara County' },
       tampa: { name: 'Tampa / Hillsborough County' },
       las_vegas: { name: 'Las Vegas / Clark County' },
-      boise: { name: 'Boise / Ada County' }
+      boise: { name: 'Boise / Ada County' },
     };
 
     let map = null;
@@ -2499,7 +2501,7 @@ def get_dashboard_html() -> str:
       if (!container) return;
 
       const lims = Number(props.lims_score) || 0;
-      const isCatalyst = lims >= 85.0;
+      const isCatalyst = lims >= 84.0;
       const p10 = (Number(props.delta_6m_p10 || 0.02) * 100).toFixed(1);
       const p50 = (Number(props.delta_6m_p50 || 0.12) * 100).toFixed(1);
       const p90 = (Number(props.delta_6m_p90 || 0.20) * 100).toFixed(1);
@@ -2532,11 +2534,6 @@ def get_dashboard_html() -> str:
               <span>•</span>
               <span>${lat.toFixed(4)}, ${lng.toFixed(4)}</span>
               ${props.city_name ? `<span>•</span><span>${props.city_name}</span>` : ''}
-            </div>
-
-              <span>H3: ${props.h3_index || ''}</span>
-              <span>•</span>
-              <span>${lat.toFixed(4)}, ${lng.toFixed(4)}</span>
             </div>
             <div class="parcel-description">${description}</div>
           </div>

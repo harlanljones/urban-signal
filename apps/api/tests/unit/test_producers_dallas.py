@@ -241,24 +241,24 @@ class TestDallasSpineRegistration:
         reg = REGISTRY[DALLAS]
         assert set(reg.datasets) == {FeedType.PERMITS, FeedType.COMPLAINTS_311}
         spec = reg.datasets[FeedType.PERMITS]
-        assert spec.extra.get("proxy_for") == "row_permits"
+        assert spec.proxy_for == "row_permits"
         assert spec.platform == "arcgis"
         assert spec.watermark_col == "CREATEDDATE"
 
         complaints = reg.datasets[FeedType.COMPLAINTS_311]
         assert complaints.platform == "arcgis"
-        assert complaints.extra["rolling_window_days"] == 30
-        assert complaints.extra["retention_days"] == 30
-        assert complaints.extra["scope"].startswith("Dallas Building Services")
+        assert complaints.rolling_window_days == 30
+        assert complaints.retention_days == 30
+        # `scope` was a free-form extra key; it has been dropped (US-186).
 
     def test_field_map_is_wired_in_registry(self):
         from src.spatial.city_registry import FeedType, REGISTRY
 
         spec = REGISTRY[DALLAS].datasets[FeedType.PERMITS]
-        assert spec.extra.get("field_map") is DALLAS_FIELD_MAP
+        assert spec.field_map is DALLAS_FIELD_MAP
 
     def test_311_field_map_is_wired_in_registry(self):
         from src.spatial.city_registry import FeedType, REGISTRY
 
         spec = REGISTRY[DALLAS].datasets[FeedType.COMPLAINTS_311]
-        assert spec.extra.get("field_map") is DALLAS_311_FIELD_MAP
+        assert spec.field_map is DALLAS_311_FIELD_MAP

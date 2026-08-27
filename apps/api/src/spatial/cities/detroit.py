@@ -14,7 +14,7 @@ existing ArcGISClient. Two live-probed quirks (2026-08-23) are load-bearing:
   "fix" them into timestamps.
 * **OID field is ``ObjectId``** (camelCase), not King County's ``OBJECTID``,
   on every layer. Pagination still works because the client reads
-  ``objectIdField`` from layer metadata, but each DatasetSpec.extra must pin
+  ``objectIdField`` from layer metadata, but each DatasetSpec must pin
   ``oid_field="ObjectId"``.
 
 The Improve Detroit 311 feed geocodes via flat ``longitude``/``latitude``
@@ -391,3 +391,14 @@ DETROIT_DIVISIONS: Dict[str, BoroughMeta] = {
         city_id="detroit",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=DETROIT_METRO_BBOX,
+    division_bboxes=DETROIT_DIVISION_BBOXES,
+    submarkets=DETROIT_SUBMARKETS,
+    divisions=DETROIT_DIVISIONS,
+    contains=is_in_detroit_metro,
+)

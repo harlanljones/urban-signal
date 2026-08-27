@@ -118,3 +118,14 @@ KANSAS_CITY_DIVISIONS: dict[str, BoroughMeta] = {
         city_id="kansas_city",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=KANSAS_CITY_METRO_BBOX,
+    division_bboxes=KANSAS_CITY_DIVISION_BBOXES,
+    submarkets=KANSAS_CITY_SUBMARKETS,
+    divisions=KANSAS_CITY_DIVISIONS,
+    contains=is_in_kansas_city_metro,
+)

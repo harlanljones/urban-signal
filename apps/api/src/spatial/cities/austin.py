@@ -422,3 +422,14 @@ AUSTIN_TABC_SLA_SPEC: Dict[str, object] = {
         "field_map": _TABC_FIELD_MAPS["sla"],
     },
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=AUSTIN_METRO_BBOX,
+    division_bboxes=AUSTIN_DIVISION_BBOXES,
+    submarkets=AUSTIN_SUBMARKETS,
+    divisions=AUSTIN_DIVISIONS,
+    contains=is_in_austin_metro,
+)

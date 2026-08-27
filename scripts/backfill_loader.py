@@ -41,13 +41,15 @@ API_ROOT = Path(__file__).resolve().parent.parent / "apps" / "api"
 if str(API_ROOT) not in sys.path:
     sys.path.insert(0, str(API_ROOT))
 
-from src.producers.scheduler import MunicipalIngestionScheduler
-from src.producers.watermarks import (
-    ANSI_DATE_LITERAL_HOSTS,
-    typed_watermark_entry,
-    watermark_comparison,
-    watermark_exclude_clause,
+from src.producers.acquisition import (
+    AcquisitionEngine,
+    AcquisitionSpec,
+    advance_event_watermark,
+    build_where,
 )
+from src.producers.scheduler import MunicipalIngestionScheduler
+from src.producers.watermarks import ANSI_DATE_LITERAL_HOSTS
+from src.spatial.city_registry import DatasetSpec
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +63,31 @@ PLATFORM_PAGE_SIZE = {
 }
 
 WM_ATTRS = ("issuance_date", "created_date", "effective_date", "recorded_date")
+
+
+def _spec_from_meta(meta: dict[str, Any]) -> AcquisitionSpec:
+    """Build a typed ``AcquisitionSpec`` for a scheduler job-metadata dict.
+
+    The meaningful watermark keys live at the top level of ``job_metadata``
+    (mirroring the typed ``DatasetSpec`` acquisition fields); lift them into an
+    ``AcquisitionSpec`` so the engine's WHERE and watermark helpers can be used
+    verbatim.
+    """
+    watermark_exclude = meta.get("watermark_exclude")
+    return AcquisitionSpec.from_dataset_spec(
+        DatasetSpec(
+            endpoint=meta.get("endpoint", ""),
+            platform=meta.get("platform", "socrata"),
+            watermark_col=meta.get("watermark_col", ""),
+            id_keys=list(meta.get("id_keys") or []),
+            topic=meta.get("topic", ""),
+            producer_key=meta.get("producer_key", ""),
+            watermark_type=meta.get("watermark_type"),
+            watermark_format=meta.get("watermark_format"),
+            watermark_exclude=list(watermark_exclude) if watermark_exclude is not None else None,
+            where=meta.get("base_where"),
+        )
+    )
 
 
 def select_jobs(
@@ -90,29 +117,36 @@ def build_query_shape(
     a table-head sweep bounded by ``max_records``. Watermarked feeds filter to
     the window (plus the declared sentinel guard, ADR 0005) and page
     newest-first so a capped run keeps the freshest slice.
+
+    The window predicate and sentinel guard are produced by the
+    ``AcquisitionEngine`` WHERE builder (US-182), keeping the emitted SQL
+    byte-for-byte identical to the prior inline path. The backfill has always
+    ignored ``watermark_type``/``watermark_format`` for the window predicate, so
+    they are suppressed here to preserve that exact shape.
     """
     wm = meta.get("watermark_col")
     if not wm:
         return None, {}
 
-    parts: list[str] = []
-    if since_dt is not None:
-        parts.append(
-            watermark_comparison(
-                wm,
-                ">=",
-                since_dt.strftime("%Y-%m-%dT%H:%M:%S"),
-                str(meta.get("endpoint", "")),
-            )
-        )
-    guard = watermark_exclude_clause(wm, meta.get("watermark_exclude") or [])
-    if guard:
-        parts.append(guard)
+    spec = _spec_from_meta(meta)
+    high_watermark = (
+        since_dt.strftime("%Y-%m-%dT%H:%M:%S") if since_dt is not None else None
+    )
+    where = build_where(
+        base_where=None,
+        watermark_col=wm,
+        high_watermark=high_watermark,
+        endpoint=str(meta.get("endpoint", "")),
+        watermark_op=">=",
+        watermark_exclude=spec.watermark_exclude,
+        watermark_type=None,
+        watermark_format=None,
+    )
 
     client_kwargs: dict[str, Any] = {}
     if not _is_ansi_date_literal_server(meta):
         client_kwargs["order_by"] = f"{wm} DESC"
-    return " AND ".join(parts) or None, client_kwargs
+    return where, client_kwargs
 
 
 def _is_ansi_date_literal_server(meta: dict[str, Any]) -> bool:
@@ -146,8 +180,11 @@ def backfill_job(
     error: str | None = None
     # US-111 future-watermark guard (mirrors the scheduler): a future/sentinel
     # row must not become the seeded tail watermark — sla_dc carries 2028 rows
-    # that would pin `INITIALISSUEDATE > '2028-...'` until then.
+    # that would pin `INITIALISSUEDATE > '2028-...'` until then. The guard now
+    # lives in the AcquisitionEngine's watermark helpers (US-182).
     now_dt = datetime.now(timezone.utc)
+    spec = _spec_from_meta(meta)
+    engine = AcquisitionEngine(spec)
 
     try:
         # Resolve the platform client inside the guarded section: a missing
@@ -163,6 +200,15 @@ def backfill_job(
             max_records=max_rows,
             **client_kwargs,
         ):
+            # Text-typed feeds (ADR 0005) track the raw declared-format string
+            # from the column before parsing; the engine skips future rows.
+            if spec.watermark_type == "text":
+                max_watermark_seen = engine.advance_text_watermark(
+                    batch,
+                    high_watermark=max_watermark_seen,
+                    now_dt=now_dt,
+                )
+
             for row in batch:
                 fetched += 1
                 rec_id = scheduler._extract_record_id(job_name, row)
@@ -170,23 +216,6 @@ def backfill_job(
                 if scheduler.dedup.check_and_add(rec_id):
                     duplicates += 1
                     continue
-
-                # Track text-typed watermarks from the raw column before
-                # parsing (ADR 0005), exactly like the scheduler.
-                if meta.get("watermark_type") == "text":
-                    entry = typed_watermark_entry(
-                        row.get(meta["watermark_col"]),
-                        fmt=meta.get("watermark_format"),
-                        exclude=meta.get("watermark_exclude") or [],
-                    )
-                    if entry:
-                        parsed = entry[1]
-                        if parsed.tzinfo is None:
-                            parsed = parsed.replace(tzinfo=timezone.utc)
-                        if parsed <= now_dt and (
-                            max_watermark_seen is None or entry[0] > max_watermark_seen
-                        ):
-                            max_watermark_seen = entry[0]
 
                 try:
                     event = producer_wrapper.parse_socrata_row(row, city_id=city_id)
@@ -215,7 +244,7 @@ def backfill_job(
                     )
                     published += 1
 
-                    if meta.get("watermark_type") != "text":
+                    if spec.watermark_type != "text":
                         for attr in WM_ATTRS:
                             wm_val = getattr(event, attr, None)
                             if wm_val:
@@ -228,9 +257,11 @@ def backfill_job(
                                         wm_val,
                                     )
                                     break
-                                wm_str = wm_val.strftime("%Y-%m-%dT%H:%M:%S")
-                                if max_watermark_seen is None or wm_str > max_watermark_seen:
-                                    max_watermark_seen = wm_str
+                                max_watermark_seen = advance_event_watermark(
+                                    max_watermark_seen,
+                                    wm_val,
+                                    now_dt,
+                                )
                                 break
                 except Exception as parse_err:  # noqa: BLE001
                     drops += 1

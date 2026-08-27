@@ -333,3 +333,14 @@ NORFOLK_DIVISIONS: Dict[str, BoroughMeta] = {
         city_id="norfolk",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=NORFOLK_METRO_BBOX,
+    division_bboxes=NORFOLK_DIVISION_BBOXES,
+    submarkets=NORFOLK_SUBMARKETS,
+    divisions=NORFOLK_DIVISIONS,
+    contains=is_in_norfolk_metro,
+)

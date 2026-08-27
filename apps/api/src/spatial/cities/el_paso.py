@@ -75,3 +75,14 @@ EL_PASO_DIVISIONS: dict[str, BoroughMeta] = {
         city_id="el_paso",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=EL_PASO_METRO_BBOX,
+    division_bboxes=EL_PASO_DIVISION_BBOXES,
+    submarkets=EL_PASO_SUBMARKETS,
+    divisions=EL_PASO_DIVISIONS,
+    contains=is_in_el_paso_metro,
+)

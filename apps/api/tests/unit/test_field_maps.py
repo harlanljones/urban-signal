@@ -1,6 +1,6 @@
 """Unit tests for the per-city field-mapping table used by the shared parsers.
 
-A city registers `DatasetSpec.extra["field_map"]` — canonical event field to
+A city registers `DatasetSpec.field_map` — canonical event field to
 candidate row keys, dotted paths indexing nested containers. Parsers consult
 the map for the resolved city before falling back to their generic chains.
 These tests pin the mechanism and the tightened chicago 311 sniff that Austin's
@@ -88,8 +88,8 @@ class TestMapOverridesChains:
     def _with_nyc_map(self, monkeypatch, field_map):
         reg = REGISTRY[CityId.NYC]
         spec = reg.datasets[FeedType.PERMITS]
-        monkeypatch.setitem(
-            spec.extra,
+        monkeypatch.setattr(
+            spec,
             "field_map",
             field_map,
         )

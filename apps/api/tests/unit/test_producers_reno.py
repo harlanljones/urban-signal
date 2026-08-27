@@ -49,9 +49,9 @@ def test_reno_registers_deeds_only():
     assert deeds.endpoint.endswith("/OpenData/WashoeDataShare/MapServer/0")
     assert deeds.watermark_col == "SALEDATE"
     assert deeds.id_keys == ["PIN", "OBJECTID"]
-    assert deeds.extra["field_map"] == RENO_DEEDS_FIELD_MAP
-    assert deeds.extra["watermark_type"] == "text"
-    assert deeds.extra["watermark_format"] == "%m/%d/%Y"
+    assert deeds.field_map == RENO_DEEDS_FIELD_MAP
+    assert deeds.watermark_type == "text"
+    assert deeds.watermark_format == "%m/%d/%Y"
 
     for feed in (FeedType.PERMITS, FeedType.COMPLAINTS_311, FeedType.SLA):
         with pytest.raises(KeyError, match="no.*feed"):

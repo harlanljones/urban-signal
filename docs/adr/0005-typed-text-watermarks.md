@@ -4,8 +4,34 @@
 **Date:** 2026-08-24
 **Scope:** urban-signal
 **Supersedes:** —
+**Superseded by:** US-186 — the `extra` dict transport described below is
+replaced by declared typed fields on `DatasetSpec` / `AcquisitionSpec`; the
+watermark semantics (type, format, exclusion) are unchanged.
 **Companion:** HJ-114 (D7); `docs/expansion-roadmap-wave-2.md` §3 D7;
 HJ-125 (PG County registration, unblocked by this decision)
+
+## Amendment — US-186 (typed acquisition)
+
+US-186 promoted every live `extra` sub-key to a typed field on `DatasetSpec`
+(and the derived `AcquisitionSpec`), deleting the free-form `extra: Dict` and
+the dead `scope` key. The watermark contract from this ADR is unchanged in
+behavior — only the transport moved from `extra={...}` to declared fields:
+
+```python
+DatasetSpec(
+    ...,
+    watermark_type="text",       # opt-in; absent ⇒ legacy event-attr path
+    watermark_format="%Y%m%d",   # strptime format of every non-sentinel value
+    watermark_exclude=["ZZZZZZZZ", "XXXXXXXX"],
+)
+```
+
+Readers that previously read `spec.extra["watermark_exclude"]` now read
+`spec.watermark_exclude` (and likewise for `watermark_type`,
+`watermark_format`, `where`, `field_map`, `endpoint_by_year`, etc.). The
+server-side exclusion guard, typed raw-string high watermark, and legacy path
+all operate on the same declared values; nothing about the decision's three
+consequences changed.
 
 ## Context
 
@@ -32,15 +58,17 @@ nothing stops sentinels from entering the scheduler's stored watermark.
 
 ## Decision
 
-A dataset declares its watermark's type through `DatasetSpec.extra`; the
-scheduler resolves declarations into behavior. No client changes.
+A dataset declares its watermark's type as a typed field on `DatasetSpec`
+(historically `DatasetSpec.extra`); the scheduler resolves declarations into
+behavior. No client changes.
 
 ```python
-extra={
-    "watermark_type": "text",          # opt-in; absent ⇒ legacy event-attr path
-    "watermark_format": "%Y%m%d",      # strptime format of every non-sentinel value
-    "watermark_exclude": ["ZZZZZZZZ", "XXXXXXXX"],
-}
+DatasetSpec(
+    ...,
+    watermark_type="text",          # opt-in; absent ⇒ legacy event-attr path
+    watermark_format="%Y%m%d",      # strptime format of every non-sentinel value
+    watermark_exclude=["ZZZZZZZZ", "XXXXXXXX"],
+)
 ```
 
 Three consequences, all behind the interlock gate:
@@ -89,7 +117,7 @@ spends its budget on real data instead of sentinel rows.
 - PG County registration (HJ-125) declares both observed sentinels; the
   mechanism is verified live against `qzrv-2tnv`: guarded top-of-order
   returns real `YYYYMMDD` dates (`20260529`…), typed newest = 2026-05-29.
-- New text-typed cities cost three `extra` keys, zero scheduler edits.
+- New text-typed cities cost three typed watermark fields, zero scheduler edits.
 - Sentinel discovery remains operational: the probe flags stale feeds, and
   an unknown sentinel spelling still fails parse (→ dropped, feed reads
   stale) rather than poisoning state — degradation, not corruption.

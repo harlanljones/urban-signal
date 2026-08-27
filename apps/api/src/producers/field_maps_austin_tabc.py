@@ -2,7 +2,7 @@
 
 This is a LEAF module — it is NOT imported by the shared producers at runtime.
 In production the field map below is merged into the Austin ``CityRegistration``
-``datasets[FeedType.SLA].extra["field_map"]`` entry in
+``datasets[FeedType.SLA].field_map`` entry in
 ``src/spatial/city_registry.py`` (the spine) when the orchestrator applies the
 interlock. The registry is the single source of truth; this file exists so the
 leaf can (a) prove the proposed spellings resolve through the unmodified

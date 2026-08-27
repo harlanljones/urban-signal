@@ -126,12 +126,12 @@ def test_registration_is_partial_permits_311_and_sla():
 
 def test_311_is_year_sliced_and_resolves_current_year():
     spec = get_dataset(CityId.MINNEAPOLIS, FeedType.COMPLAINTS_311)
-    by_year = spec.extra["endpoint_by_year"]
+    by_year = spec.endpoint_by_year
     assert "2026" in by_year
     assert resolve_endpoint(spec, datetime(2026, 8, 24).date()).endswith("Public_311_2026/FeatureServer/0")
     assert resolve_endpoint(spec, datetime(2025, 6, 1).date()).endswith("Public_311_2025/FeatureServer/0")
-    assert spec.extra["oid_field"] == "OBJECTID"
-    assert spec.extra["max_record_count"] == 16000
+    assert spec.oid_field == "OBJECTID"
+    assert spec.max_record_count == 16000
 
 
 def test_division_geometry_nests_and_resolves():
@@ -220,9 +220,9 @@ class TestMinneapolisSLAParsing:
 
     def test_off_sale_registered_as_companion_endpoint(self):
         spec = get_dataset(CityId.MINNEAPOLIS, FeedType.SLA)
-        companion = spec.extra["companion_endpoints"]["off_sale"]
+        companion = spec.companion_endpoints["off_sale"]
         assert companion.endswith("/Off_Sale_Liquor/FeatureServer/0")
         assert spec.watermark_col == "issueDate"
         assert spec.id_keys == ["licenseNumber", "OBJECTID"]
-        assert spec.extra["oid_field"] == "OBJECTID"
-        assert spec.extra["max_record_count"] == 16000
+        assert spec.oid_field == "OBJECTID"
+        assert spec.max_record_count == 16000

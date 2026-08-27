@@ -13,7 +13,7 @@ from src.spatial.cities.milwaukee import (
 )
 from src.spatial.city_registry import CityId, FeedType
 
-# Recommended DatasetSpec.extra["field_map"] for US-87. Every entry spells an
+# Recommended DatasetSpec.field_map for US-87. Every entry spells an
 # uppercase column the shared producer fallback chains cannot reach;
 # latitude/longitude need no entry because ArcGISClient lifts point geometry
 # onto those exact keys (outSR=4326) before parsing.
@@ -61,10 +61,10 @@ def test_milwaukee_registers_sla_permits_and_deeds():
     assert sla.watermark_col == "GIS_DATETIME"
     assert sla.interval_seconds == 600.0
     assert sla.producer_key == "sla"
-    assert sla.extra["expected_cadence_days"] == 7
-    assert sla.extra["oid_field"] == "OBJECTID"
-    assert sla.extra["max_record_count"] == 2000
-    assert sla.extra["field_map"] == MILWAUKEE_FIELD_MAP
+    assert sla.expected_cadence_days == 7
+    assert sla.oid_field == "OBJECTID"
+    assert sla.max_record_count == 2000
+    assert sla.field_map == MILWAUKEE_FIELD_MAP
 
     with pytest.raises(KeyError, match="no.*feed"):
         get_dataset(city, FeedType.COMPLAINTS_311)
@@ -72,13 +72,13 @@ def test_milwaukee_registers_sla_permits_and_deeds():
     permits = get_dataset(city, FeedType.PERMITS)
     assert permits.platform == "csv"
     assert permits.watermark_col == "date_issued"
-    assert permits.extra["needs_geocode"] is True
+    assert permits.needs_geocode is True
 
     deeds = get_dataset(city, FeedType.DEEDS)
     assert deeds.platform == "csv"
     assert deeds.watermark_col == "sale_date"
-    assert deeds.extra["watermark_format"] == "%m/%d/%Y"
-    assert deeds.extra["ingestion_mode"] == "snapshot"
+    assert deeds.watermark_format == "%m/%d/%Y"
+    assert deeds.ingestion_mode == "snapshot"
 
 
 MKE_LICENSE_ROW = {

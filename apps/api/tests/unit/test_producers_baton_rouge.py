@@ -41,7 +41,7 @@ def test_baton_rouge_registers_three_feeds_and_excludes_sales():
     assert REGISTRY[city].datasets[FeedType.COMPLAINTS_311].watermark_col == "createdate"
     license_spec = REGISTRY[city].datasets[FeedType.SLA]
     assert license_spec.watermark_col == ""
-    assert license_spec.extra["ingestion_mode"] == "snapshot"
+    assert license_spec.ingestion_mode == "snapshot"
     with pytest.raises(KeyError, match="no.*feed"):
         get_dataset(city, FeedType.DEEDS)
 

@@ -240,7 +240,18 @@ class TestLouisvilleSpineRegistration:
         reg = REGISTRY[CityId.LOUISVILLE]
         assert set(reg.datasets) == {FeedType.COMPLAINTS_311, FeedType.SLA}
         assert reg.datasets[FeedType.COMPLAINTS_311].platform == "arcgis"
-        assert reg.datasets[FeedType.SLA].extra["where_clause"] == "County = 'Jefferson'"
+        assert reg.datasets[FeedType.SLA].where == "County = 'Jefferson'"
+
+    def test_county_filter_reaches_scheduler_base_where(self):
+        from src.producers.scheduler import MunicipalIngestionScheduler
+
+        sched = MunicipalIngestionScheduler()
+        lou_jobs = [k for k in sched.job_metadata if "louisville" in k and k.startswith("sla")]
+        assert lou_jobs, "expected a louisville SLA job in the scheduler"
+        meta = sched.job_metadata[lou_jobs[0]]
+        # `where` is the canonical key the scheduler folds into base_where and
+        # ANDs with the watermark clause; the old `where_clause` key was dead.
+        assert meta["base_where"] == "County = 'Jefferson'"
 
     def test_unverified_families_remain_absent(self):
         from src.spatial.city_registry import CityId, FeedType, get_dataset

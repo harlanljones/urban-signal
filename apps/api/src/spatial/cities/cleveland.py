@@ -119,3 +119,14 @@ CLEVELAND_DIVISIONS: dict[str, BoroughMeta] = {
         city_id="cleveland",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=CLEVELAND_METRO_BBOX,
+    division_bboxes=CLEVELAND_DIVISION_BBOXES,
+    submarkets=CLEVELAND_SUBMARKETS,
+    divisions=CLEVELAND_DIVISIONS,
+    contains=is_in_cleveland_metro,
+)

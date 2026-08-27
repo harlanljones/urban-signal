@@ -5,7 +5,7 @@ generic parser chains cannot reach, so its column mappings live here as a leaf
 module rather than grown into the shared fallbacks (src/producers/field_maps.py,
 which stays untouched per the interlock spine rules).
 
-The shared ``resolve_field_map`` reads ``DatasetSpec.extra["field_map"]``; the
+The shared ``resolve_field_map`` reads ``DatasetSpec["field_map"]``; the
 spine registration pins these maps per feed. This module is the single-sourced
 export so the registration and the unit test agree on one definition.
 
@@ -25,7 +25,7 @@ from src.spatial.cities.san_jose import (
 # FeedType value string so either feed can be wired independently.
 FIELD_MAP: Dict[str, Dict[str, List[str]]] = SAN_JOSE_FIELD_MAPS
 
-# Exposed for the spine's DatasetSpec.extra["geocode_context"] on the 311 feed.
+# Exposed for the spine's DatasetSpec["geocode_context"] on the 311 feed.
 GEOCODE_CONTEXT: str = SAN_JOSE_GEOCODE_CONTEXT
 
 __all__ = ["FIELD_MAP", "GEOCODE_CONTEXT"]

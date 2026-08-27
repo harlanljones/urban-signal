@@ -29,11 +29,13 @@ const CITY_IDS = [
   "charlotte",
   "pittsburgh",
   "san_diego",
+  "big",
+  "dual",
 ] as const;
 
 const ORIGIN = "https://urban-signal.test";
 
-function testEnv(options: { html?: string } = {}) {
+export function testEnv(options: { html?: string } = {}) {
   return {
     SNAPSHOT: {
       async get(key: string) {
@@ -81,6 +83,41 @@ function testEnv(options: { html?: string } = {}) {
               { h3_index: "892830bbfffffff", lims_score: 86.0, borough: "Central / Downtown", city_id: "chicago", city_name: "Chicago" },
             ],
           });
+        }
+        if (key === "catalysts/nyc") {
+          return JSON.stringify({
+            city_id: "nyc",
+            count: 3,
+            threshold: 85,
+            borough: null,
+            catalysts: [
+              { h3_index: "892a10708b7ffff", lims_score: 97.5, borough: "Manhattan", city_id: "nyc", city_name: "New York City" },
+              { h3_index: "892a10708bfffff", lims_score: 86.0, borough: "Brooklyn", city_id: "nyc", city_name: "New York City" },
+              { h3_index: "892830bbfffffff", lims_score: 91.0, borough: "Washington_Heights", city_id: "nyc", city_name: "New York City" },
+            ],
+          });
+        }
+        if (key === "catalysts/dual") {
+          return JSON.stringify({
+            city_id: "dual",
+            count: 2,
+            threshold: 90,
+            borough: null,
+            catalysts: [
+              { h3_index: "892a10708b7ffff", lims_score: 97.5, borough: "Manhattan", city_id: "dual", city_name: "Dual" },
+              { h3_index: "892a10708bfffff", lims_score: 86.0, borough: "Brooklyn", city_id: "dual", city_name: "Dual" },
+            ],
+          });
+        }
+        if (key === "catalysts/big") {
+          const big = Array.from({ length: 600 }, (_, i) => ({
+            h3_index: `892a100${(i % 1000).toString(16).padStart(3, "0")}${i.toString(16).padStart(4, "0")}`,
+            lims_score: 90 - (i % 30),
+            borough: "Queens",
+            city_id: "big",
+            city_name: "Bigville",
+          }));
+          return JSON.stringify({ city_id: "big", count: big.length, threshold: 85, borough: null, catalysts: big });
         }
         if (key.startsWith("catalysts/")) {
           const city = key.slice("catalysts/".length);
@@ -546,4 +583,247 @@ test("ai-catalog.json is CORS-open with well-formed entries", async () => {
     expect(entry.representativeQueries.length).toBeGreaterThanOrEqual(2);
     expect(entry.representativeQueries.length).toBeLessThanOrEqual(5);
   }
+});
+
+// ---------------------------------------------------------------------------
+// US-187: snapshot contract safety-net tests (limit/max, min_lims, borough,
+// trim shape, SHAP strip) for both the HTTP and MCP adapters.
+// ---------------------------------------------------------------------------
+
+async function mcpTool(env: never, name: string, args: Record<string, unknown>) {
+  await worker.fetch(
+    new Request(`${ORIGIN}/mcp`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: 1,
+        method: "initialize",
+        params: { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name: "t", version: "0" } },
+      }),
+    }),
+    env,
+  );
+  const response = await worker.fetch(
+    new Request(`${ORIGIN}/mcp`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/call", params: { name, arguments: args } }),
+    }),
+    env,
+  );
+  const json = (await response.json()) as { result?: { content: { text: string }[]; isError?: boolean } };
+  const result = json.result!;
+  return {
+    isError: Boolean(result.isError),
+    payload: result.isError ? null : (JSON.parse(result.content[0].text) as Record<string, unknown>),
+  };
+}
+
+// (1) HTTP catalysts limit: default 50, clamp at 500
+test("HTTP catalysts defaults to limit 50", async () => {
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/catalysts?city_id=big`), testEnv() as never);
+  expect(response.status).toBe(200);
+  const json = (await response.json()) as { catalysts: unknown[] };
+  expect(json.catalysts.length).toBe(50);
+});
+
+test("HTTP catalysts clamps limit beyond the 500 max", async () => {
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/catalysts?city_id=big&limit=600`), testEnv() as never);
+  expect(response.status).toBe(200);
+  const json = (await response.json()) as { catalysts: unknown[] };
+  expect(json.catalysts.length).toBe(500);
+});
+
+test("HTTP catalysts honors an in-range explicit limit", async () => {
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/catalysts?city_id=big&limit=10`), testEnv() as never);
+  expect(response.status).toBe(200);
+  const json = (await response.json()) as { catalysts: unknown[] };
+  expect(json.catalysts.length).toBe(10);
+});
+
+// (2) Catalyst limit policy — CONSOLIDATED via PRODUCT DECISION (US-190):
+// both adapters now use the HTTP/manifest policy (default 50, max 500). The
+// historical MCP default of 25 and 100 clamp are intentionally retired.
+test("MCP get_catalysts defaults to limit 50 (aligned with HTTP)", async () => {
+  const { isError, payload } = await mcpTool(testEnv() as never, "get_catalysts", { city_id: "big" });
+  expect(isError).toBe(false);
+  expect((payload!.catalysts as unknown[]).length).toBe(50);
+});
+
+test("MCP get_catalysts clamps limit at the 500 max (aligned with HTTP)", async () => {
+  const { isError, payload } = await mcpTool(testEnv() as never, "get_catalysts", { city_id: "big", limit: 600 });
+  expect(isError).toBe(false);
+  expect((payload!.catalysts as unknown[]).length).toBe(500);
+});
+
+// (3) min_lims bounds + default-source behavior for both adapters
+test("HTTP catalysts rejects min_lims above 100 with 422", async () => {
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/catalysts?city_id=nyc&min_lims=150`), testEnv() as never);
+  expect(response.status).toBe(422);
+});
+
+test("HTTP catalysts rejects min_lims below 0 with 422", async () => {
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/catalysts?city_id=nyc&min_lims=-5`), testEnv() as never);
+  expect(response.status).toBe(422);
+});
+
+test("HTTP catalysts accepts an in-range min_lims (200)", async () => {
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/catalysts?city_id=nyc&min_lims=50`), testEnv() as never);
+  expect(response.status).toBe(200);
+  const json = (await response.json()) as { threshold: number };
+  expect(json.threshold).toBe(50);
+});
+
+test("HTTP catalysts default min_lims comes from the manifest threshold (85)", async () => {
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/catalysts?city_id=dual`), testEnv() as never);
+  expect(response.status).toBe(200);
+  const json = (await response.json()) as { threshold: number };
+  expect(json.threshold).toBe(85);
+});
+
+test("MCP get_catalysts rejects min_lims out of range with isError", async () => {
+  const { isError } = await mcpTool(testEnv() as never, "get_catalysts", { city_id: "nyc", min_lims: 150 });
+  expect(isError).toBe(true);
+});
+
+test("MCP get_catalysts accepts an in-range min_lims", async () => {
+  const { isError, payload } = await mcpTool(testEnv() as never, "get_catalysts", { city_id: "nyc", min_lims: 50 });
+  expect(isError).toBe(false);
+  expect(payload!.threshold).toBe(50);
+});
+
+test("MCP get_catalysts default min_lims comes from the manifest threshold (85), not the stored snapshot threshold", async () => {
+  const { isError, payload } = await mcpTool(testEnv() as never, "get_catalysts", { city_id: "dual" });
+  expect(isError).toBe(false);
+  expect(payload!.threshold).toBe(85);
+});
+
+// (4) Borough filtering + normalization (case / space / hyphen)
+test("HTTP catalysts borough filter returns only matching borough", async () => {
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/catalysts?city_id=nyc&borough=Manhattan`), testEnv() as never);
+  expect(response.status).toBe(200);
+  const json = (await response.json()) as { catalysts: { borough: string }[] };
+  expect(json.catalysts.length).toBe(1);
+  expect(json.catalysts[0].borough).toBe("Manhattan");
+});
+
+test("HTTP catalysts borough normalizes case", async () => {
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/catalysts?city_id=nyc&borough=manhattan`), testEnv() as never);
+  const json = (await response.json()) as { catalysts: unknown[] };
+  expect(json.catalysts.length).toBe(1);
+});
+
+test("HTTP catalysts borough normalizes spaces and hyphens to underscores", async () => {
+  const bySpace = await worker.fetch(new Request(`${ORIGIN}/api/v1/catalysts?city_id=nyc&borough=washington heights`), testEnv() as never);
+  expect((await bySpace.json() as { catalysts: unknown[] }).catalysts.length).toBe(1);
+  const byHyphen = await worker.fetch(new Request(`${ORIGIN}/api/v1/catalysts?city_id=nyc&borough=washington-heights`), testEnv() as never);
+  expect((await byHyphen.json() as { catalysts: unknown[] }).catalysts.length).toBe(1);
+});
+
+test("MCP get_catalysts borough filter matches after normalization", async () => {
+  const { isError, payload } = await mcpTool(testEnv() as never, "get_catalysts", { city_id: "nyc", borough: "brooklyn" });
+  expect(isError).toBe(false);
+  const cats = payload!.catalysts as { borough: string }[];
+  expect(cats.length).toBe(1);
+  expect(cats[0].borough).toBe("Brooklyn");
+});
+
+// (4b) US-190 drift resolution: MCP get_submarkets now honors `borough`, matching HTTP.
+test("MCP get_submarkets honors the borough filter", async () => {
+  const { isError, payload } = await mcpTool(testEnv() as never, "get_submarkets", { city_id: "nyc", borough: "Manhattan" });
+  expect(isError).toBe(false);
+  const sub = payload!.submarkets as { id: string; borough: string }[];
+  expect(sub.length).toBe(1);
+  expect(sub[0].borough).toBe("Manhattan");
+});
+
+test("MCP get_submarkets without borough returns every submarket", async () => {
+  const { isError, payload } = await mcpTool(testEnv() as never, "get_submarkets", { city_id: "nyc" });
+  expect(isError).toBe(false);
+  expect((payload!.submarkets as unknown[]).length).toBe(1);
+});
+
+// (5) Catalyst trim shape: HTTP full vs MCP trimmed (3-field)
+test("HTTP catalysts return full entries including extra attributes", async () => {
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/catalysts?city_id=nyc`), testEnv() as never);
+  expect(response.status).toBe(200);
+  const json = (await response.json()) as { catalysts: Record<string, unknown>[] };
+  const entry = json.catalysts[0];
+  expect(entry.h3_index).toBeTruthy();
+  expect(entry.lims_score).toBeTruthy();
+  expect(entry.borough).toBeTruthy();
+  expect(entry.city_id).toBe("nyc");
+  expect(entry.city_name).toBe("New York City");
+});
+
+test("MCP get_catalysts return trimmed 3-field objects", async () => {
+  const { isError, payload } = await mcpTool(testEnv() as never, "get_catalysts", { city_id: "nyc" });
+  expect(isError).toBe(false);
+  const entry = (payload!.catalysts as Record<string, unknown>[])[0];
+  expect(Object.keys(entry).sort()).toEqual(["borough", "h3_index", "lims_score"]);
+  expect(entry.city_id).toBeUndefined();
+  expect(entry.city_name).toBeUndefined();
+});
+
+// (6) SHAP strip: include_shap=false omits shap_attributions; true/omit keeps it
+test("HTTP predict strips shap_attributions when include_shap=false", async () => {
+  const response = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/predict`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ h3_index: "892a10708b7ffff", include_shap: false }),
+    }),
+    testEnv() as never,
+  );
+  expect(response.status).toBe(200);
+  const json = (await response.json()) as { shap_attributions?: unknown; h3_index: string };
+  expect(json.shap_attributions).toBeUndefined();
+  expect(json.h3_index).toBe("892a10708b7ffff");
+});
+
+test("HTTP predict keeps shap_attributions when include_shap=true", async () => {
+  const response = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/predict`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ h3_index: "892a10708b7ffff", include_shap: true }),
+    }),
+    testEnv() as never,
+  );
+  expect(response.status).toBe(200);
+  const json = (await response.json()) as { shap_attributions?: unknown };
+  expect(Array.isArray(json.shap_attributions)).toBe(true);
+});
+
+test("HTTP predict keeps shap_attributions when include_shap is omitted", async () => {
+  const response = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/predict`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ h3_index: "892a10708b7ffff" }),
+    }),
+    testEnv() as never,
+  );
+  expect(response.status).toBe(200);
+  const json = (await response.json()) as { shap_attributions?: unknown };
+  expect(Array.isArray(json.shap_attributions)).toBe(true);
+});
+
+test("MCP predict_cell strips shap_attributions when include_shap=false", async () => {
+  const { isError, payload } = await mcpTool(testEnv() as never, "predict_cell", { h3_index: "892a10708b7ffff", include_shap: false });
+  expect(isError).toBe(false);
+  expect((payload as { shap_attributions?: unknown }).shap_attributions).toBeUndefined();
+});
+
+test("MCP predict_cell keeps shap_attributions when include_shap=true", async () => {
+  const { isError, payload } = await mcpTool(testEnv() as never, "predict_cell", { h3_index: "892a10708b7ffff", include_shap: true });
+  expect(isError).toBe(false);
+  expect(Array.isArray((payload as { shap_attributions?: unknown }).shap_attributions)).toBe(true);
+});
+
+test("MCP predict_cell keeps shap_attributions when include_shap is omitted", async () => {
+  const { isError, payload } = await mcpTool(testEnv() as never, "predict_cell", { h3_index: "892a10708b7ffff" });
+  expect(isError).toBe(false);
+  expect(Array.isArray((payload as { shap_attributions?: unknown }).shap_attributions)).toBe(true);
 });

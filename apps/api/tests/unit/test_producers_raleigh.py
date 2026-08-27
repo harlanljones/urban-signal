@@ -78,18 +78,18 @@ def test_raleigh_registers_permits_311_and_deeds():
     assert permits.platform == "arcgis"
     assert permits.watermark_col == "issueddate"
     assert permits.id_keys == ["permitnum", "OBJECTID"]
-    assert permits.extra["field_map"] == RALEIGH_PERMITS_FIELD_MAP
+    assert permits.field_map == RALEIGH_PERMITS_FIELD_MAP
 
     complaints = get_dataset(city, FeedType.COMPLAINTS_311)
     assert complaints.platform == "arcgis"
     assert complaints.watermark_col == "APPLIED_DATE"
-    assert complaints.extra["field_map"] == RALEIGH_311_FIELD_MAP
+    assert complaints.field_map == RALEIGH_311_FIELD_MAP
 
     deeds = get_dataset(city, FeedType.DEEDS)
     assert deeds.platform == "arcgis"
     assert deeds.watermark_col == "SALE_DATE"
-    assert deeds.extra["ingestion_mode"] == "snapshot"
-    assert deeds.extra["field_map"] == RALEIGH_DEEDS_FIELD_MAP
+    assert deeds.ingestion_mode == "snapshot"
+    assert deeds.field_map == RALEIGH_DEEDS_FIELD_MAP
 
 
 @pytest.fixture

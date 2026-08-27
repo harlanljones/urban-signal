@@ -508,6 +508,12 @@ def get_tampa_dataset(feed: object) -> object:
     payload = TAMPA_FEED_SPECS[feed_name]
     from src.config import settings
 
+    # Promote the former free-form extra keys (minus the dead `scope`) to typed
+    # DatasetSpec fields.
+    extra_kwargs = {
+        k: v for k, v in payload.get("extra", {}).items() if k != "scope"
+    }
+
     return DatasetSpec(
         endpoint=payload["endpoint"],
         platform=payload["platform"],
@@ -516,5 +522,16 @@ def get_tampa_dataset(feed: object) -> object:
         topic=getattr(settings, payload["topic_key"]),
         interval_seconds=payload["interval_seconds"],
         producer_key=payload["producer_key"],
-        extra=payload["extra"],
+        **extra_kwargs,
     )
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=TAMPA_METRO_BBOX,
+    division_bboxes=TAMPA_DIVISION_BBOXES,
+    submarkets=TAMPA_SUBMARKETS,
+    divisions=TAMPA_DIVISIONS,
+    contains=is_in_tampa_metro,
+)

@@ -301,3 +301,13 @@ SAN_DIEGO_DIVISIONS: Dict[str, BoroughMeta] = {
         city_id="san_diego",
     ),
 }
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=SAN_DIEGO_METRO_BBOX,
+    division_bboxes=SAN_DIEGO_DIVISION_BBOXES,
+    submarkets=SAN_DIEGO_SUBMARKETS,
+    divisions=SAN_DIEGO_DIVISIONS,
+    contains=is_in_san_diego_metro,
+)

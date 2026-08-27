@@ -435,3 +435,18 @@ PHL_DIVISIONS: Dict[str, BoroughMeta] = {
         city_id="philadelphia",
     ),
 }
+# Canonical naming aliases (US-175: standardize Metro leaf constant naming).
+PHILADELPHIA_DIVISION_BBOXES = PHL_DIVISION_BBOXES
+PHILADELPHIA_SUBMARKETS = PHL_SUBMARKETS
+PHILADELPHIA_DIVISIONS = PHL_DIVISIONS
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=PHILADELPHIA_METRO_BBOX,
+    division_bboxes=PHILADELPHIA_DIVISION_BBOXES,
+    submarkets=PHILADELPHIA_SUBMARKETS,
+    divisions=PHILADELPHIA_DIVISIONS,
+    contains=is_in_philadelphia_metro,
+)

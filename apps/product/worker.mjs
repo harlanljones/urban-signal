@@ -85,12 +85,37 @@ function acceptsMarkdown(acceptHeader) {
     .some((part) => part.trim().toLowerCase().startsWith("text/markdown"));
 }
 
-function decorate(response, { pathname, contentType, tokens } = {}) {
+// Long-lived edge caching. Static, content-addressed assets (scripts, styles,
+// icons) can be cached for a year with background revalidation; everything else
+// (HTML, facts, llms docs) gets a short window so deploys propagate, but still
+// serves instantly from cache and refreshes in the background. This replaces the
+// default `max-age=0, must-revalidate` that forced a conditional round-trip on
+// every single navigation.
+const IMMUTABLE_ASSET = "public, max-age=31536000, immutable";
+const FRESH_CONTENT = "public, max-age=300, stale-while-revalidate=86400";
+
+function cacheControlFor(pathname, contentType) {
+  if (pathname.startsWith("/healthz") || pathname === "/mcp") return "no-store";
+  const type = (contentType ?? "").toLowerCase();
+  if (/\.(css|js|mjs|svg|woff2?|ttf|ico|png|jpeg|jpg|webp|avif|gif)(\?|$)/i.test(pathname)) {
+    return IMMUTABLE_ASSET;
+  }
+  if (type.includes("text/html")) return FRESH_CONTENT;
+  if (type.includes("application/json") || type.includes("text/markdown") || type.includes("text/plain")) {
+    return FRESH_CONTENT;
+  }
+  if (/\.(json|md|txt)(\?|$)/i.test(pathname)) return FRESH_CONTENT;
+  return FRESH_CONTENT;
+}
+
+function decorate(response, { pathname, contentType, tokens, cacheControl } = {}) {
   const headers = new Headers(response.headers);
   if (contentType) headers.set("content-type", contentType);
   headers.set("link", linkHeaderFor(pathname));
   headers.append("vary", "Accept");
   if (tokens !== undefined) headers.set("x-markdown-tokens", String(tokens));
+  const policy = cacheControl ?? cacheControlFor(pathname, response.headers.get("content-type"));
+  if (policy) headers.set("cache-control", policy);
   if (pathname.startsWith("/.well-known/") || pathname === "/healthz") {
     for (const [key, value] of Object.entries(CORS_HEADERS)) headers.set(key, value);
   }

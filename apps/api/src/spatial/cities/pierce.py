@@ -137,3 +137,13 @@ PIERCE_DIVISIONS: dict[str, BoroughMeta] = {
         city_id="pierce",
     ),
 }
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=PIERCE_METRO_BBOX,
+    division_bboxes=PIERCE_DIVISION_BBOXES,
+    submarkets=PIERCE_SUBMARKETS,
+    divisions=PIERCE_DIVISIONS,
+    contains=is_in_pierce_metro,
+)

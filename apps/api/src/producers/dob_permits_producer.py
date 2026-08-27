@@ -431,22 +431,9 @@ class DOBPermitsProducer:
         spec = get_dataset(cid, FeedType.PERMITS)
         endpoint = spec.endpoint
         client = self._client_for(spec.platform)
-        client_kwargs = {
-            k: v
-            for k, v in spec.extra.items()
-            if k in (
-                "order_by",
-                "id_col",
-                "select",
-                "fallback_endpoints",
-                "watermark_col",
-                "watermark_format",
-                "watermark_exclude",
-            )
-            and v
-        }
-        if spec.platform == "csv":
-            client_kwargs["watermark_col"] = spec.watermark_col
+        from src.producers.acquisition import AcquisitionSpec, build_adapter_request
+
+        client_kwargs = build_adapter_request(spec.platform, AcquisitionSpec.from_dataset_spec(spec))
 
         logger.info("Starting %s DOB Permits Ingestion Stream (limit=%d)...", cid.value.upper(), limit)
         records_streamed = 0

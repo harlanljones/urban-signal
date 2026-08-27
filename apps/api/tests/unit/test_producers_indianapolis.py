@@ -63,10 +63,10 @@ def test_indianapolis_311_spec_pins_the_live_schema():
     assert spec.endpoint.endswith("/ODP_RIMACServiceRequests/FeatureServer/0")
     assert spec.watermark_col == "REQUESTEDDATETIME"
     assert spec.id_keys == ["SERVICEREQUESTID", "OBJECTID"]
-    assert spec.extra["expected_cadence_days"] == 7
-    assert spec.extra["oid_field"] == "OBJECTID"
-    assert spec.extra["max_record_count"] == 2000
-    assert spec.extra["field_map"] == COMPLAINTS_311_FIELD_MAP
+    assert spec.expected_cadence_days == 7
+    assert spec.oid_field == "OBJECTID"
+    assert spec.max_record_count == 2000
+    assert spec.field_map == COMPLAINTS_311_FIELD_MAP
 
 
 def test_indianapolis_hard_excludes_unregistered_feeds():

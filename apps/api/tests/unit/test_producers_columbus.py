@@ -13,7 +13,7 @@ from src.spatial.cities.columbus import (
 )
 from src.spatial.city_registry import CityId, FeedType
 
-# Recommended DatasetSpec.extra["field_map"] for HJ-118. Every entry spells a
+# Recommended DatasetSpec.field_map for HJ-118. Every entry spells a
 # column the shared producer fallback chains cannot reach (uppercase Accela
 # schema); latitude/longitude need no entry because ArcGISClient lifts point
 # geometry onto those exact keys before parsing.
@@ -27,7 +27,7 @@ COLUMBUS_FIELD_MAP = {
     "job_type": ["B1_PER_TYPE"],
 }
 
-# Recommended DatasetSpec.extra["field_map"] for US-127 (Franklin County
+# Recommended DatasetSpec.field_map for US-127 (Franklin County
 # Auditor sales points). Dual old/new schema: Sale_Price + OWN1/OWN2 populate
 # every row (1568/1568) while SALEPRICE (1543) and Instrument_Number/
 # MUNINAME/NHBDNAME (0) are partial/empty layer-wide — hence the fully
@@ -79,10 +79,10 @@ def test_columbus_registers_arcgis_permits_and_deeds():
     # the job-id chain (it is an edit counter, not a business key).
     assert "B1_ALT_ID" in permits.id_keys
     assert "OBJECTID" not in permits.id_keys
-    assert permits.extra["expected_cadence_days"] == 7
-    assert permits.extra["oid_field"] == "OBJECTID"
-    assert permits.extra["max_record_count"] == 2000
-    assert permits.extra["field_map"] == COLUMBUS_FIELD_MAP
+    assert permits.expected_cadence_days == 7
+    assert permits.oid_field == "OBJECTID"
+    assert permits.max_record_count == 2000
+    assert permits.field_map == COLUMBUS_FIELD_MAP
 
     with pytest.raises(KeyError, match="no.*feed"):
         get_dataset(city, FeedType.COMPLAINTS_311)
@@ -105,10 +105,10 @@ def test_columbus_deeds_spec_pins_arcgis_annual_snapshot():
     assert spec.topic == "raw.municipal.deeds"
     assert spec.producer_key == "deeds"
     # Annual snapshot (lastEditDate 2026-07-31); the layer caps a page at 2000.
-    assert spec.extra["expected_cadence_days"] == 365
-    assert spec.extra["oid_field"] == "OBJECTID"
-    assert spec.extra["max_record_count"] == 2000
-    assert spec.extra["field_map"] == COLUMBUS_DEEDS_FIELD_MAP
+    assert spec.expected_cadence_days == 365
+    assert spec.oid_field == "OBJECTID"
+    assert spec.max_record_count == 2000
+    assert spec.field_map == COLUMBUS_DEEDS_FIELD_MAP
 
 
 CB_PERMIT_ROW = {

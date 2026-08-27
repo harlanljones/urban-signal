@@ -95,18 +95,18 @@ class TestFeedRegistration:
 
     def test_arcgis_extras_pin_oid_field_and_page_cap(self):
         spec = get_tampa_dataset(FeedType.PERMITS)
-        assert spec.extra.get("oid_field") == "OBJECTID"
-        assert spec.extra.get("max_record_count") == 2000
+        assert spec.oid_field == "OBJECTID"
+        assert spec.max_record_count == 2000
 
     def test_field_map_is_embedded_and_matches_leaf_module(self):
         spec = get_tampa_dataset(FeedType.PERMITS)
-        assert spec.extra.get("field_map") is FIELD_MAP
+        assert spec.field_map is FIELD_MAP
 
     def test_sla_spec_matches_audited_layer(self):
         spec = get_tampa_dataset(FeedType.SLA)
         assert spec.platform == "arcgis"
         assert spec.watermark_col == "HISTORY_ACT_DT"
-        assert spec.extra.get("field_map") is SLA_FIELD_MAP
+        assert spec.field_map is SLA_FIELD_MAP
 
     @pytest.mark.parametrize("absent_feed", [FeedType.COMPLAINTS_311, FeedType.DEEDS])
     def test_absent_feeds_raise_readable_errors(self, absent_feed):

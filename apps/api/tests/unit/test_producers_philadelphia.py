@@ -165,7 +165,7 @@ class TestFeedRegistration:
         assert get_dataset(CityId.PHILADELPHIA, FeedType.COMPLAINTS_311).watermark_col == "requested_datetime"
         assert get_dataset(CityId.PHILADELPHIA, FeedType.SLA).watermark_col == "mostrecentissuedate"
         assert get_dataset(CityId.PHILADELPHIA, FeedType.DEEDS).watermark_col == "recording_date"
-        assert get_dataset(CityId.PHILADELPHIA, FeedType.DEEDS).extra["order_by"] == "recording_date"
+        assert get_dataset(CityId.PHILADELPHIA, FeedType.DEEDS).order_by == "recording_date"
 
     def test_deeds_where_filter_scopes_to_price_bearing_document_type(self):
         """US-130: the deeds feed must not over-ingest mortgages/satisfactions
@@ -173,7 +173,7 @@ class TestFeedRegistration:
         spec carries a where filter pinning document_type='DEED', a ~95%
         price-bearing subset of rtt_summary (live-probed 2026-08-25)."""
         spec = get_dataset(CityId.PHILADELPHIA, FeedType.DEEDS)
-        assert spec.extra["where"] == "document_type = 'DEED'"
+        assert spec.where == "document_type = 'DEED'"
         # The where flows into the scheduler's base_where and from there into
         # the CartoClient WHERE clause (scheduler.py `base_where`).
         from src.producers.carto_client import CartoClient
@@ -187,11 +187,11 @@ class TestFeedRegistration:
         state-plane feet, not lng/lat."""
         for feed in (FeedType.PERMITS, FeedType.SLA, FeedType.DEEDS):
             spec = get_dataset(CityId.PHILADELPHIA, feed)
-            assert spec.extra["id_col"] == "cartodb_id"
-            assert "ST_Y(the_geom) AS latitude" in spec.extra["select"]
-            assert "ST_X(the_geom) AS longitude" in spec.extra["select"]
+            assert spec.id_col == "cartodb_id"
+            assert "ST_Y(the_geom) AS latitude" in spec.select
+            assert "ST_X(the_geom) AS longitude" in spec.select
         three11 = get_dataset(CityId.PHILADELPHIA, FeedType.COMPLAINTS_311)
-        assert three11.extra["id_col"] == "cartodb_id"
+        assert three11.id_col == "cartodb_id"
 
     def test_every_alias_target_is_registered(self):
         for alias, cid in ALIASES.items():

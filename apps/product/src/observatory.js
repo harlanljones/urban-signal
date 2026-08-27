@@ -129,9 +129,10 @@ export function createObservatory(canvas, options = {}) {
       ctx.lineWidth = routeIndex === state.activeLayer ? 1.25 : .6;
       ctx.stroke();
       for (let dot = 0; dot < 4; dot += 1) {
-        const progress = state.reducedMotion ? (dot + 1) / 5 : (time * (.035 + routeIndex * .004) + dot / 4) % 1;
+        const raw = state.reducedMotion ? (dot + 1) / 5 : time * (.035 + routeIndex * .004) + dot / 4;
+        const progress = ((raw % 1) + 1) % 1;
         const segmentPosition = progress * (route.length - 1);
-        const segment = Math.min(route.length - 2, Math.floor(segmentPosition));
+        const segment = Math.max(0, Math.min(route.length - 2, Math.floor(segmentPosition)));
         const amount = segmentPosition - segment;
         const [startX, startY] = route[segment];
         const [endX, endY] = route[segment + 1];
@@ -209,19 +210,36 @@ export function createObservatory(canvas, options = {}) {
     ctx.restore();
   }
 
-  function schedule() {
-    if (!destroyed && visible && !raf && !state.reducedMotion) raf = requestAnimationFrame(render);
+  // Throttle to ~30fps and pause entirely when the tab is hidden. The subtle
+  // pulse does not need 60fps, and a perpetual 60fps loop pegs a core, drains
+  // battery, and makes low-end devices feel sluggish.
+  const FRAME_MS = 33;
+  let lastFrame = 0;
+
+  function tick(now) {
+    raf = 0;
+    if (destroyed || !visible || document.hidden) return;
+    if (now - lastFrame >= FRAME_MS) {
+      lastFrame = now;
+      draw(now);
+    }
+    schedule();
   }
 
-  function render(now) {
-    raf = 0;
+  function schedule() {
+    if (!destroyed && visible && !document.hidden && !raf && !state.reducedMotion) {
+      raf = requestAnimationFrame(tick);
+    }
+  }
+
+  function draw(now) {
     if (destroyed || !visible) return;
     const { w, h, dpr } = bounds;
     const ease = state.reducedMotion ? 1 : .085;
     state.pointer.x = lerp(state.pointer.x, state.pointerTarget.x, ease);
     state.pointer.y = lerp(state.pointer.y, state.pointerTarget.y, ease);
     const focus = nearestCell(state.pointer);
-    const time = (now - startedAt) / 1000;
+    const time = Math.max(0, (now - startedAt) / 1000);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
     ctx.save();
@@ -236,21 +254,26 @@ export function createObservatory(canvas, options = {}) {
 
   const observer = new IntersectionObserver(([entry]) => {
     visible = entry.isIntersecting;
-    if (visible) { resize(); render(performance.now()); schedule(); }
+    if (visible) { resize(); draw(performance.now()); schedule(); }
     else if (raf) { cancelAnimationFrame(raf); raf = 0; }
   }, { threshold: 0 });
-  const onResize = () => { resize(); render(performance.now()); };
+  const onResize = () => { resize(); draw(performance.now()); };
+  const onVisibility = () => {
+    if (document.hidden) { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
+    else { lastFrame = 0; resize(); draw(performance.now()); schedule(); }
+  };
   observer.observe(canvas);
   addEventListener("resize", onResize, { passive: true });
+  document.addEventListener("visibilitychange", onVisibility);
   resize();
-  render(performance.now());
+  draw(performance.now());
   schedule();
 
   return {
     setState(next = {}) {
       if (next.pointer) state.pointerTarget = { ...next.pointer };
       Object.assign(state, { ...next, pointer: state.pointer });
-      if (state.reducedMotion) render(performance.now());
+      if (state.reducedMotion) draw(performance.now());
       else schedule();
     },
     destroy() {
@@ -258,6 +281,7 @@ export function createObservatory(canvas, options = {}) {
       cancelAnimationFrame(raf);
       observer.disconnect();
       removeEventListener("resize", onResize);
+      document.removeEventListener("visibilitychange", onVisibility);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
   };

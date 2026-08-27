@@ -41,9 +41,9 @@ def test_prince_georges_registers_311_and_sdat_deeds():
     c311 = REGISTRY[city].datasets[FeedType.COMPLAINTS_311]
     assert c311.watermark_col == "date_request_opened"
     # G11 exception: monthly batch publishing, alarms at 60d not 14d
-    assert c311.extra["expected_cadence_days"] == 30
-    assert c311.extra["field_map"]["incident_id"] == ["service_request"]
-    assert c311.extra["field_map"]["created_date"] == ["date_request_opened"]
+    assert c311.expected_cadence_days == 30
+    assert c311.field_map["incident_id"] == ["service_request"]
+    assert c311.field_map["created_date"] == ["date_request_opened"]
 
     # US-128: the MD SDAT deeds feed (opendata.maryland.gov/w3eb-4mzd) is
     # registered Point-geocoded and sidesteps the held qzrv-2tnv parcel table.
@@ -53,8 +53,8 @@ def test_prince_georges_registers_311_and_sdat_deeds():
     assert deeds.watermark_col == (
         "sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89"
     )
-    assert deeds.extra["ingestion_mode"] == "snapshot"
-    assert deeds.extra["field_map"]["doc_id"] == ["account_id_mdp_field_acctid"]
+    assert deeds.ingestion_mode == "snapshot"
+    assert deeds.field_map["doc_id"] == ["account_id_mdp_field_acctid"]
 
     # The held qzrv-2tnv parcel table stays unregistered (HJ-125: deed geometry
     # extraction missing MultiPolygon handling — see TestPrinceGeorgesParcelSnapshotFinding).

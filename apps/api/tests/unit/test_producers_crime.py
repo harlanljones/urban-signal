@@ -204,6 +204,6 @@ def test_crime_registration_scope_and_job_names():
 def test_nyc_crime_declares_monthly_cadence():
     """G11: NYC's YTD crime set publishes monthly; alarm window is 60d."""
     spec = get_dataset(CityId.NYC, FeedType.CRIME)
-    assert spec.extra["expected_cadence_days"] == 30
+    assert spec.expected_cadence_days == 30
     assert spec.endpoint.endswith("5uac-w243.json")
     assert spec.topic == "raw.municipal.crime"

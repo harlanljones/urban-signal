@@ -83,10 +83,10 @@ def test_nashville_permit_spec_pins_the_live_schema():
     assert spec.endpoint.endswith("/Building_Permits_Issued_2/FeatureServer/0")
     assert spec.watermark_col == "Date_Issued"
     assert spec.id_keys == ["Permit__", "ObjectId"]
-    assert spec.extra["expected_cadence_days"] == 7
-    assert spec.extra["oid_field"] == "ObjectId"
-    assert spec.extra["max_record_count"] == 1000
-    assert spec.extra["field_map"] == PERMITS_FIELD_MAP
+    assert spec.expected_cadence_days == 7
+    assert spec.oid_field == "ObjectId"
+    assert spec.max_record_count == 1000
+    assert spec.field_map == PERMITS_FIELD_MAP
 
 
 def test_nashville_str_spec_pins_the_live_schema():
@@ -97,10 +97,10 @@ def test_nashville_str_spec_pins_the_live_schema():
     assert spec.endpoint.endswith("/Residential_Short_Term_Rental_Permits_view/FeatureServer/0")
     assert spec.watermark_col == "Date_Issued"
     assert spec.id_keys == ["Permit__", "ObjectId"]
-    assert spec.extra["expected_cadence_days"] == 14
-    assert spec.extra["oid_field"] == "ObjectId"
-    assert spec.extra["max_record_count"] == 1000
-    assert spec.extra["field_map"] == SLA_FIELD_MAP
+    assert spec.expected_cadence_days == 14
+    assert spec.oid_field == "ObjectId"
+    assert spec.max_record_count == 1000
+    assert spec.field_map == SLA_FIELD_MAP
 
 
 def test_nashville_311_spec_pins_the_live_schema():
@@ -111,11 +111,11 @@ def test_nashville_311_spec_pins_the_live_schema():
     assert spec.endpoint.endswith("/hubNashville_311_Service_Requests_Current_Year_view/FeatureServer/0")
     assert spec.watermark_col == "Date_Time_Opened"
     assert spec.id_keys == ["Request__", "GlobalID", "OBJECTID"]
-    assert spec.extra["expected_cadence_days"] == 7
-    assert spec.extra["oid_field"] == "OBJECTID"
-    assert spec.extra["max_record_count"] == 2000
-    assert spec.extra["where"] == "Latitude IS NOT NULL"
-    assert spec.extra["field_map"] == COMPLAINTS_311_FIELD_MAP
+    assert spec.expected_cadence_days == 7
+    assert spec.oid_field == "OBJECTID"
+    assert spec.max_record_count == 2000
+    assert spec.where == "Latitude IS NOT NULL"
+    assert spec.field_map == COMPLAINTS_311_FIELD_MAP
 
 
 def test_nashville_registers_hubnashville_311_and_hard_excludes_deeds():

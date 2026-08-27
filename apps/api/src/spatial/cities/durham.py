@@ -440,3 +440,14 @@ GREATER_DURHAM_METRO_BBOX = DURHAM_METRO_BBOX
 DURHAM_DIVISION_BBOXES = DURHAM_DIVISION_BBOXES
 DURHAM_DIVISIONS = DURHAM_DIVISIONS
 DURHAM_SUBMARKETS = DURHAM_SUBMARKETS
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=DURHAM_METRO_BBOX,
+    division_bboxes=DURHAM_DIVISION_BBOXES,
+    submarkets=DURHAM_SUBMARKETS,
+    divisions=DURHAM_DIVISIONS,
+    contains=is_in_durham_metro,
+)

@@ -175,7 +175,7 @@ def probe_feed(
     endpoint = spec.endpoint
     order_col = spec.watermark_col
     order_by = f"{order_col} DESC" if order_col else ""
-    field_map = spec.extra.get("field_map") if isinstance(spec.extra.get("field_map"), dict) else {}
+    field_map = spec.field_map if isinstance(spec.field_map, dict) else {}
 
     client = client_for(spec)
     producer = producer_for(spec.producer_key or feed.value)

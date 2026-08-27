@@ -58,19 +58,19 @@ def test_spokane_registers_deeds_permits_and_sla():
     assert deeds.platform == "arcgis"
     assert deeds.watermark_col == "document_date"
     assert deeds.id_keys == ["Parcel", "OBJECTID"]
-    assert deeds.extra["endpoint_by_year"]["2015"].endswith("/MapServer/7")
-    assert deeds.extra["endpoint_by_year"]["2026"].endswith("/MapServer/20")
+    assert deeds.endpoint_by_year["2015"].endswith("/MapServer/7")
+    assert deeds.endpoint_by_year["2026"].endswith("/MapServer/20")
 
     permits = get_dataset(city, FeedType.PERMITS)
     assert permits.platform == "excel"
     assert permits.watermark_col == "issued_date"
-    assert permits.extra["needs_geocode"] is True
-    assert permits.extra["field_map"] == SPOKANE_PERMITS_FIELD_MAP
+    assert permits.needs_geocode is True
+    assert permits.field_map == SPOKANE_PERMITS_FIELD_MAP
 
     sla = get_dataset(city, FeedType.SLA)
     assert sla.platform == "socrata"
     assert sla.watermark_col == "renewaldate"
-    assert sla.extra["where"] == "city = 'SPOKANE'"
+    assert sla.where == "city = 'SPOKANE'"
 
 
 def test_excel_client_normalizes_headers_filters_and_batches():

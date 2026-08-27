@@ -81,8 +81,8 @@ def test_kansas_city_registers_311_and_sla():
     assert c311.watermark_col == "open_date_time"
     # G11: publishes every day (14/14 days with rows at the 2026-08-24 probe),
     # intraday timestamps -- daily-ish cadence, standard alarm window.
-    assert c311.extra["expected_cadence_days"] == 7
-    assert c311.extra["field_map"] == KC_SPEC_FIELD_MAP
+    assert c311.expected_cadence_days == 7
+    assert c311.field_map == KC_SPEC_FIELD_MAP
 
     # US-134: business license snapshot. No usable open-date watermark, so D4
     # snapshot mode diffs ids across full refreshes (Baton Rouge precedent).
@@ -90,9 +90,9 @@ def test_kansas_city_registers_311_and_sla():
     assert sla.watermark_col == ""
     assert sla.platform == "socrata"
     assert sla.id_keys == ["id"]
-    assert sla.extra["expected_cadence_days"] == 90  # ~7m publishing lapse
-    assert sla.extra["ingestion_mode"] == "snapshot"
-    assert sla.extra["field_map"] == KC_SLA_SPEC_FIELD_MAP
+    assert sla.expected_cadence_days == 90  # ~7m publishing lapse
+    assert sla.ingestion_mode == "snapshot"
+    assert sla.field_map == KC_SLA_SPEC_FIELD_MAP
 
     # HJ-120 exclusion that still holds: KC permits survive only as dead
     # annual archives (2019-2023) -- registering would page G5 forever.

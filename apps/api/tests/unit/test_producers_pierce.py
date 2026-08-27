@@ -13,7 +13,7 @@ from src.spatial.cities.pierce import (
 )
 from src.spatial.city_registry import CityId, FeedType
 
-# Recommended DatasetSpec.extra["field_map"] for US-80. Every entry spells a
+# Recommended DatasetSpec.field_map for US-80. Every entry spells a
 # camelCase column the shared producer fallback chains cannot reach;
 # latitude/longitude need no entry because ArcGISClient lifts point geometry
 # onto those exact keys (outSR=4326) before parsing. The two-date issuance
@@ -70,11 +70,11 @@ def test_pierce_registers_arcgis_permits_only():
     assert permits.watermark_col == "issuedDate"
     assert permits.interval_seconds == 300.0
     assert permits.producer_key == "permits"
-    assert permits.extra["expected_cadence_days"] == 7
-    assert permits.extra["oid_field"] == "OBJECTID"
-    assert permits.extra["max_record_count"] == 2000
-    assert permits.extra["where"] == PIERCE_FEED_WHERE
-    assert permits.extra["field_map"] == PIERCE_FIELD_MAP
+    assert permits.expected_cadence_days == 7
+    assert permits.oid_field == "OBJECTID"
+    assert permits.max_record_count == 2000
+    assert permits.where == PIERCE_FEED_WHERE
+    assert permits.field_map == PIERCE_FIELD_MAP
 
     with pytest.raises(KeyError, match="no.*feed"):
         get_dataset(city, FeedType.COMPLAINTS_311)

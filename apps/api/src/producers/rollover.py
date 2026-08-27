@@ -1,7 +1,7 @@
 """Annual year-slice rollover drill (US-70; roadmap §8.2, risk R3).
 
 DC permits/311, Boston 311, and Baltimore 311 publish one layer/resource per
-calendar year via ``DatasetSpec.extra["endpoint_by_year"]``. If the mapping
+calendar year via ``DatasetSpec["endpoint_by_year"]``. If the mapping
 for the new year is never appended, the scheduler silently keeps polling last
 year's stale layer — the exact "Certain (if unmitigated)" failure risk R3.
 
@@ -39,13 +39,27 @@ class YearSliceFeed:
     spec: DatasetSpec
 
 
+# US-70 rollover-drill scope: the year-sliced feeds the drill is contracted to
+# guarantee a New-Year layer switch for. Other registered feeds may also carry
+# an ``endpoint_by_year`` mapping (handled at poll time by ``resolve_endpoint``),
+# but they are outside this drill's rollover contract.
+REGISTERED_YEAR_SLICED_FEEDS: frozenset[tuple[CityId, FeedType]] = frozenset(
+    {
+        (CityId.WASHINGTON_DC, FeedType.PERMITS),
+        (CityId.WASHINGTON_DC, FeedType.COMPLAINTS_311),
+        (CityId.BOSTON, FeedType.COMPLAINTS_311),
+        (CityId.BALTIMORE, FeedType.COMPLAINTS_311),
+    }
+)
+
+
 def iter_year_sliced_feeds() -> list[YearSliceFeed]:
-    """Every registered feed carrying an ``endpoint_by_year`` mapping."""
+    """Every registered US-70 year-sliced feed (carrying ``endpoint_by_year``)."""
     return [
         YearSliceFeed(city_id, feed, spec)
         for city_id, reg in REGISTRY.items()
         for feed, spec in reg.datasets.items()
-        if spec.extra.get("endpoint_by_year")
+        if (city_id, feed) in REGISTERED_YEAR_SLICED_FEEDS and spec.endpoint_by_year
     ]
 
 
@@ -79,7 +93,7 @@ def drill_rollover(
     missing: list[tuple[CityId, FeedType, list[str]]] = []
     checks: list[RolloverCheck] = []
     for entry in feeds if feeds is not None else iter_year_sliced_feeds():
-        by_year = entry.spec.extra.get("endpoint_by_year") or {}
+        by_year = entry.spec.endpoint_by_year or {}
         if str(today.year) not in by_year:
             missing.append((entry.city_id, entry.feed, sorted(by_year)))
             continue

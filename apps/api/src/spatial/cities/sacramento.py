@@ -75,3 +75,14 @@ SACRAMENTO_DIVISIONS: dict[str, BoroughMeta] = {
         city_id="sacramento",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=SACRAMENTO_METRO_BBOX,
+    division_bboxes=SACRAMENTO_DIVISION_BBOXES,
+    submarkets=SACRAMENTO_SUBMARKETS,
+    divisions=SACRAMENTO_DIVISIONS,
+    contains=is_in_sacramento_metro,
+)

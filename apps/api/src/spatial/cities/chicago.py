@@ -650,3 +650,14 @@ CHICAGO_DIVISIONS: Dict[str, BoroughMeta] = {
         city_id="chicago",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=CHICAGO_METRO_BBOX,
+    division_bboxes=CHICAGO_DIVISION_BBOXES,
+    submarkets=CHICAGO_SUBMARKETS,
+    divisions=CHICAGO_DIVISIONS,
+    contains=is_in_chicago_metro,
+)

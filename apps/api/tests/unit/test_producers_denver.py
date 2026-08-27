@@ -164,11 +164,11 @@ def test_denver_arcgis_specs_pin_date_and_coordinate_quirks():
     reg = REGISTRY[CityId.DENVER]
     permits = reg.datasets[FeedType.PERMITS]
     complaints = reg.datasets[FeedType.COMPLAINTS_311]
-    assert permits.extra["field_map"]["issuance_date"] == ["DATE_ISSUED"]
+    assert permits.field_map["issuance_date"] == ["DATE_ISSUED"]
     assert complaints.watermark_col == "Case_Created_Date"
-    assert complaints.extra["field_map"]["latitude"] == ["Latitude"]
-    assert complaints.extra["field_map"]["longitude"] == ["Longitude"]
-    assert permits.extra["companion_endpoints"]["commercial"].endswith("/FeatureServer/317")
+    assert complaints.field_map["latitude"] == ["Latitude"]
+    assert complaints.field_map["longitude"] == ["Longitude"]
+    assert permits.companion_endpoints["commercial"].endswith("/FeatureServer/317")
 
 
 def test_denver_live_shaped_permit_row_parses():

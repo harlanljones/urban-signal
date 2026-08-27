@@ -75,3 +75,14 @@ DAYTON_DIVISIONS: dict[str, BoroughMeta] = {
         city_id="dayton",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=DAYTON_METRO_BBOX,
+    division_bboxes=DAYTON_DIVISION_BBOXES,
+    submarkets=DAYTON_SUBMARKETS,
+    divisions=DAYTON_DIVISIONS,
+    contains=is_in_dayton_metro,
+)

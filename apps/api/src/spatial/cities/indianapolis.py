@@ -118,3 +118,14 @@ INDIANAPOLIS_DIVISIONS: dict[str, BoroughMeta] = {
         city_id="indianapolis",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=INDIANAPOLIS_METRO_BBOX,
+    division_bboxes=INDIANAPOLIS_DIVISION_BBOXES,
+    submarkets=INDIANAPOLIS_SUBMARKETS,
+    divisions=INDIANAPOLIS_DIVISIONS,
+    contains=is_in_indianapolis_metro,
+)

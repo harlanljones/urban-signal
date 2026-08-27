@@ -49,3 +49,14 @@ MONTGOMERY_DIVISIONS: dict[str, BoroughMeta] = {
         bbox=MONTGOMERY_DIVISION_BBOXES["MONTGOMERY_CORE"], submarkets=list(MONTGOMERY_SUBMARKETS), city_id="montgomery",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=MONTGOMERY_METRO_BBOX,
+    division_bboxes=MONTGOMERY_DIVISION_BBOXES,
+    submarkets=MONTGOMERY_SUBMARKETS,
+    divisions=MONTGOMERY_DIVISIONS,
+    contains=is_in_montgomery_metro,
+)

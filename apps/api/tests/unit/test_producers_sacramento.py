@@ -66,13 +66,13 @@ def test_sacramento_registers_permits_and_311():
     assert permits.platform == "arcgis"
     assert permits.endpoint.endswith("/Permits/FeatureServer/0")
     assert permits.watermark_col == "ISSUED_DATE"
-    assert permits.extra["field_map"] == SACRAMENTO_PERMITS_FIELD_MAP
-    assert permits.extra["needs_geocode"] is False
+    assert permits.field_map == SACRAMENTO_PERMITS_FIELD_MAP
+    assert permits.needs_geocode is False
 
     complaints = get_dataset(city, FeedType.COMPLAINTS_311)
     assert complaints.platform == "arcgis"
     assert complaints.watermark_col == "DateCreated"
-    assert complaints.extra["field_map"] == SACRAMENTO_311_FIELD_MAP
+    assert complaints.field_map == SACRAMENTO_311_FIELD_MAP
 
 
 @pytest.fixture

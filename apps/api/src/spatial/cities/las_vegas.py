@@ -462,6 +462,11 @@ def get_las_vegas_dataset(feed: object) -> object:
         available = ", ".join(sorted(LAS_VEGAS_FEED_SPECS))
         raise KeyError(f"'las_vegas' has no '{feed_name}' feed; available: {available}")
     payload = LAS_VEGAS_FEED_SPECS[feed_name]
+    # Promote the former free-form extra keys (minus the dead `scope`) to typed
+    # DatasetSpec fields.
+    extra_kwargs = {
+        k: v for k, v in payload.get("extra", {}).items() if k != "scope"
+    }
     return DatasetSpec(
         endpoint=payload["endpoint"],
         platform=payload["platform"],
@@ -470,5 +475,16 @@ def get_las_vegas_dataset(feed: object) -> object:
         topic=getattr(settings, payload["topic_key"]),
         interval_seconds=payload["interval_seconds"],
         producer_key=payload["producer_key"],
-        extra=payload["extra"],
+        **extra_kwargs,
     )
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=LAS_VEGAS_METRO_BBOX,
+    division_bboxes=LAS_VEGAS_DIVISION_BBOXES,
+    submarkets=LAS_VEGAS_SUBMARKETS,
+    divisions=LAS_VEGAS_DIVISIONS,
+    contains=is_in_las_vegas_metro,
+)

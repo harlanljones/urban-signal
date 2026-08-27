@@ -118,3 +118,14 @@ COLUMBUS_DIVISIONS: dict[str, BoroughMeta] = {
         city_id="columbus",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=COLUMBUS_METRO_BBOX,
+    division_bboxes=COLUMBUS_DIVISION_BBOXES,
+    submarkets=COLUMBUS_SUBMARKETS,
+    divisions=COLUMBUS_DIVISIONS,
+    contains=is_in_columbus_metro,
+)

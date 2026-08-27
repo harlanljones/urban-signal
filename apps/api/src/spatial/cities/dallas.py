@@ -450,3 +450,14 @@ DALLAS_311_SPEC: Dict[str, Any] = {
         "field_map": DALLAS_311_FIELD_MAP,
     },
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=DALLAS_METRO_BBOX,
+    division_bboxes=DALLAS_DIVISION_BBOXES,
+    submarkets=DALLAS_SUBMARKETS,
+    divisions=DALLAS_DIVISIONS,
+    contains=is_in_dallas_metro,
+)

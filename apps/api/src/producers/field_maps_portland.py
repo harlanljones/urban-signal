@@ -1,7 +1,7 @@
 """Per-feed field maps for Portland, OR (leaf module — do NOT edit shared field_maps.py).
 
 Exports ``FIELD_MAP`` keyed by feed name ("permits" / "sla"). The shared
-``resolve_field_map`` reads a city's map off the registered ``DatasetSpec.extra``
+``resolve_field_map`` reads a city's map off the registered ``DatasetSpec``
 ["field_map"], so the spine folds these into ``city_registry``'s Portland
 ``REGISTRY`` entry (it does NOT mutate the shared ``field_maps.py``). Keeping
 Portland's maps here means the leaf is testable in isolation and the spine edit

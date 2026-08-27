@@ -54,9 +54,9 @@ def test_dayton_registers_rolling_311_only():
     assert complaints.platform == "arcgis"
     assert complaints.watermark_col == "ADDDTTM"
     assert complaints.id_keys == ["RowNumber", "REFNO"]
-    assert complaints.extra["rolling_window_days"] == 90
-    assert complaints.extra["retention_days"] == 90
-    assert complaints.extra["field_map"] == DAYTON_FIELD_MAP
+    assert complaints.rolling_window_days == 90
+    assert complaints.retention_days == 90
+    assert complaints.field_map == DAYTON_FIELD_MAP
     for feed in (FeedType.PERMITS, FeedType.SLA, FeedType.DEEDS):
         with pytest.raises(KeyError, match="no.*feed"):
             get_dataset(city, feed)

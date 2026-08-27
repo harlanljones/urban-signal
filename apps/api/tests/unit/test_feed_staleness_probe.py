@@ -63,11 +63,9 @@ def test_newest_watermark_excludes_declared_sentinels_server_side():
     spec = DatasetSpec(
         endpoint="https://data.example/resource/test.json",
         watermark_col="transfer_date",
-        extra={
-            "watermark_type": "text",
-            "watermark_format": "%Y%m%d",
-            "watermark_exclude": ["ZZZZZZZZ"],
-        },
+        watermark_type="text",
+        watermark_format="%Y%m%d",
+        watermark_exclude=["ZZZZZZZZ"],
     )
     now = datetime(2026, 8, 23, tzinfo=UTC)
     assert newest_watermark(client, spec, now=now) == datetime(2026, 8, 15, tzinfo=UTC)
@@ -197,7 +195,7 @@ def test_declared_cadence_sets_alarm_window():
     spec = DatasetSpec(
         endpoint="https://data.example/resource/test.json",
         watermark_col="issued",
-        extra={"expected_cadence_days": 30},
+        expected_cadence_days=30,
     )
     assert declared_staleness_threshold(spec) == timedelta(days=60)
 
@@ -208,7 +206,7 @@ def test_missing_or_invalid_declaration_falls_back():
     plain = DatasetSpec(endpoint="https://data.example/resource/test.json")
     assert declared_staleness_threshold(plain) is STALE_AFTER
     for bad in ({"expected_cadence_days": 0}, {"expected_cadence_days": "soon"}):
-        spec = DatasetSpec(endpoint="u", extra=bad)
+        spec = DatasetSpec(endpoint="u", **bad)
         assert declared_staleness_threshold(spec, fallback=timedelta(days=3)) == timedelta(days=3)
 
 
@@ -228,7 +226,8 @@ def test_rollover_rebaseline_does_not_page_staleness_monitor():
     spec = DatasetSpec(
         endpoint="https://fake.example/base",
         watermark_col="ADDDATE",
-        extra={"endpoint_by_year": by_year, "expected_cadence_days": 7},
+        endpoint_by_year=by_year,
+        expected_cadence_days=7,
     )
     now = datetime(2027, 1, 2, 12, 0, tzinfo=UTC)
     rolled = DatasetSpec(**{**asdict(spec), "endpoint": resolve_endpoint(spec, today=now.date())})
@@ -258,7 +257,7 @@ def test_probe_alarms_at_twice_declared_cadence_not_global_seven():
     monthly = DatasetSpec(
         endpoint="https://data.example/resource/test.json",
         watermark_col="issued",
-        extra={"expected_cadence_days": 30},
+        expected_cadence_days=30,
     )
     now = datetime(2026, 8, 23, tzinfo=UTC)
     # 53 days old: beyond the old global 7-day window, inside 2 x 30

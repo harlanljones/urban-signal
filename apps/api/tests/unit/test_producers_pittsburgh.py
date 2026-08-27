@@ -14,7 +14,7 @@ from src.spatial.cities.pittsburgh import (
 )
 from src.spatial.city_registry import REGISTRY, CityId, FeedType
 
-# Recommended DatasetSpec.extra["field_map"] for US-89. Every entry spells a
+# Recommended DatasetSpec.field_map for US-89. Every entry spells a
 # WPRDC column the shared producer fallback chains cannot reach (the chains
 # say `permit_number`/`issued_date`/`revised_cost`); latitude/longitude ride
 # native lowercase keys the chains already read.
@@ -28,7 +28,7 @@ PITTSBURGH_FIELD_MAP = {
     "zipcode": ["zip_code"],
 }
 
-# DatasetSpec.extra["field_map"] for US-129 (Pittsburgh deeds). The WPRDC
+# DatasetSpec.field_map for US-129 (Pittsburgh deeds). The WPRDC
 # property-sales schema is all-uppercase; every entry spells a column the shared
 # deeds chains cannot reach bare (`sale_price`/`document_number`/`recording_date`
 # don't exist). address is FULL_ADDRESS; there is no latitude/longitude on the
@@ -43,7 +43,7 @@ PITTSBURGH_DEEDS_FIELD_MAP = {
     "incident_address": ["FULL_ADDRESS"],
 }
 
-# DatasetSpec.extra["field_map"] for US-132 (Pittsburgh 311, WPRDC "Pittsburgh
+# DatasetSpec.field_map for US-132 (Pittsburgh 311, WPRDC "Pittsburgh
 # 311 Data"). The schema is lowercase with `subject` as the category and
 # `latitude`/`longitude` as TEXT (5-dec EXACT / 2-dec APPROXIMATE — the 311
 # producer casts to float). `unique_id` is the stable id; `case_number` is the
@@ -94,8 +94,8 @@ def test_pittsburgh_registers_ckan_permits_deeds_and_311():
     assert permits.watermark_col == "issue_date"
     assert permits.interval_seconds == 300.0
     assert permits.producer_key == "permits"
-    assert permits.extra["expected_cadence_days"] == 7
-    assert permits.extra["field_map"] == PITTSBURGH_FIELD_MAP
+    assert permits.expected_cadence_days == 7
+    assert permits.field_map == PITTSBURGH_FIELD_MAP
 
     with pytest.raises(KeyError, match="no.*feed"):
         get_dataset(city, FeedType.SLA)
@@ -110,8 +110,8 @@ def test_pittsburgh_deeds_spec_pins_ckan_source_and_field_map():
     assert spec.topic == "raw.municipal.deeds"
     assert spec.producer_key == "deeds"
     assert spec.id_keys == ["PARID", "RECORDDATE", "SALEDATE", "DEEDBOOK", "DEEDPAGE"]
-    assert spec.extra["expected_cadence_days"] == 7
-    assert spec.extra["field_map"] == PITTSBURGH_DEEDS_FIELD_MAP
+    assert spec.expected_cadence_days == 7
+    assert spec.field_map == PITTSBURGH_DEEDS_FIELD_MAP
 
 
 PGH_PERMIT_ROW = {
@@ -260,8 +260,8 @@ def test_pittsburgh_311_spec_pins_ckan_source_and_field_map():
     assert spec.topic == "raw.municipal.311"
     assert spec.producer_key == "311"
     assert spec.interval_seconds == 180.0
-    assert spec.extra["expected_cadence_days"] == 7
-    assert spec.extra["field_map"] == PITTSBURGH_311_FIELD_MAP
+    assert spec.expected_cadence_days == 7
+    assert spec.field_map == PITTSBURGH_311_FIELD_MAP
 
 
 def test_pittsburgh_311_field_map_resolves():

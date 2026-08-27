@@ -399,3 +399,14 @@ SEATTLE_DIVISIONS: Dict[str, BoroughMeta] = {
         city_id="seattle",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=SEATTLE_METRO_BBOX,
+    division_bboxes=SEATTLE_DIVISION_BBOXES,
+    submarkets=SEATTLE_SUBMARKETS,
+    divisions=SEATTLE_DIVISIONS,
+    contains=is_in_seattle_metro,
+)

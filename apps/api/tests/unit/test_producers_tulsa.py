@@ -47,9 +47,9 @@ def test_tulsa_registers_rolling_311_only():
     assert complaints.platform == "arcgis"
     assert complaints.watermark_col == "case_opened"
     assert complaints.id_keys == ["case_id", "OBJECTID"]
-    assert complaints.extra["rolling_window_days"] == 30
-    assert complaints.extra["retention_days"] == 30
-    assert complaints.extra["field_map"] == TULSA_FIELD_MAP
+    assert complaints.rolling_window_days == 30
+    assert complaints.retention_days == 30
+    assert complaints.field_map == TULSA_FIELD_MAP
     for feed in (FeedType.PERMITS, FeedType.SLA, FeedType.DEEDS):
         with pytest.raises(KeyError, match="no.*feed"):
             get_dataset(city, feed)

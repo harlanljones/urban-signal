@@ -106,3 +106,14 @@ DENVER_DIVISIONS: Dict[str, BoroughMeta] = {
         city_id="denver",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=DENVER_METRO_BBOX,
+    division_bboxes=DENVER_DIVISION_BBOXES,
+    submarkets=DENVER_SUBMARKETS,
+    divisions=DENVER_DIVISIONS,
+    contains=is_in_denver_metro,
+)

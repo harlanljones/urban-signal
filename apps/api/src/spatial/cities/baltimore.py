@@ -63,3 +63,14 @@ BALTIMORE_DIVISIONS: dict[str, BoroughMeta] = {
         submarkets=list(BALTIMORE_SUBMARKETS), city_id="baltimore",
     ),
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=BALTIMORE_METRO_BBOX,
+    division_bboxes=BALTIMORE_DIVISION_BBOXES,
+    submarkets=BALTIMORE_SUBMARKETS,
+    divisions=BALTIMORE_DIVISIONS,
+    contains=is_in_baltimore_metro,
+)

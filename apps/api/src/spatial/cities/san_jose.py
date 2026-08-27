@@ -394,7 +394,7 @@ SJ_DIVISIONS = SAN_JOSE_DIVISIONS
 # ---------------------------------------------------------------------------
 # Per-feed field maps (US-147 / ADR 0004). Exported so the shared parser chains
 # consult them for San Jose before falling back to generics, and so the spine
-# registration can pin them into DatasetSpec.extra["field_map"] (see the leaf
+# registration can pin them into DatasetSpec["field_map"] (see the leaf
 # report). The 311 map's latitude/longitude candidates lead with the
 # `Y_COORD`/`X_COORD` decimal-degree columns SanGIS publishes, then fall back to
 # `LATITUDE`/`LONGITUDE` spellings; rows with neither route to the geocoder via
@@ -435,3 +435,14 @@ SAN_JOSE_FIELD_MAPS: Dict[str, Dict[str, list[str]]] = {
     "permits": SAN_JOSE_PERMITS_FIELD_MAP,
     "311": SAN_JOSE_311_FIELD_MAP,
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=SAN_JOSE_METRO_BBOX,
+    division_bboxes=SAN_JOSE_DIVISION_BBOXES,
+    submarkets=SAN_JOSE_SUBMARKETS,
+    divisions=SAN_JOSE_DIVISIONS,
+    contains=is_in_san_jose_metro,
+)

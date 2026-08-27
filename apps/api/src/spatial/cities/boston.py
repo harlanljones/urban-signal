@@ -133,3 +133,14 @@ BOSTON_LICENSING_BOARD_FEED: dict[str, object] = {
         "borough": ["city"],
     },
 }
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=BOSTON_METRO_BBOX,
+    division_bboxes=BOSTON_DIVISION_BBOXES,
+    submarkets=BOSTON_SUBMARKETS,
+    divisions=BOSTON_DIVISIONS,
+    contains=is_in_boston_metro,
+)

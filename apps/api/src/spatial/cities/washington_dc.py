@@ -467,3 +467,19 @@ DC_DIVISIONS: Dict[str, BoroughMeta] = {
         city_id="washington_dc",
     ),
 }
+# Canonical naming aliases (US-175: standardize Metro leaf constant naming).
+WASHINGTON_DC_METRO_BBOX = DC_METRO_BBOX
+WASHINGTON_DC_DIVISION_BBOXES = DC_DIVISION_BBOXES
+WASHINGTON_DC_SUBMARKETS = DC_SUBMARKETS
+WASHINGTON_DC_DIVISIONS = DC_DIVISIONS
+
+
+from src.spatial.registration import SpatialRegistration
+
+REGISTRATION = SpatialRegistration(
+    metro_bbox=WASHINGTON_DC_METRO_BBOX,
+    division_bboxes=WASHINGTON_DC_DIVISION_BBOXES,
+    submarkets=WASHINGTON_DC_SUBMARKETS,
+    divisions=WASHINGTON_DC_DIVISIONS,
+    contains=is_in_dc_metro,
+)
