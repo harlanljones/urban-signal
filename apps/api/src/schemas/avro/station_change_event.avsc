@@ -1,0 +1,24 @@
+{
+  "type": "record",
+  "name": "StationChangeEvent",
+  "namespace": "org.urbandev.events",
+  "doc": "Docked-mobility station install/removal, detected by snapshot diff (US-363 §1.2). Detection-dated.",
+  "fields": [
+    { "name": "city_id", "type": "string", "default": "nyc" },
+    { "name": "system_id", "type": "string" },
+    { "name": "station_id", "type": "string" },
+    { "name": "event_type", "type": "string" },
+    { "name": "station_name", "type": ["null", "string"], "default": null },
+    { "name": "short_name", "type": ["null", "string"], "default": null },
+    { "name": "capacity", "type": ["null", "int"], "default": null },
+    { "name": "operator", "type": ["null", "string"], "default": null },
+    { "name": "borough", "type": ["null", "string"], "default": null },
+    { "name": "latitude", "type": "double" },
+    { "name": "longitude", "type": "double" },
+    { "name": "event_date", "type": "string" },
+    { "name": "h3_res7", "type": ["null", "string"], "default": null },
+    { "name": "h3_res8", "type": ["null", "string"], "default": null },
+    { "name": "h3_res9", "type": ["null", "string"], "default": null },
+    { "name": "ingested_at", "type": "string" }
+  ]
+}

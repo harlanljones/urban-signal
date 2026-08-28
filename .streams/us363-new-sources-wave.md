@@ -202,11 +202,123 @@ its wave-5 commits may land here; `git checkout main` refuses while its edits
 are uncommitted, and stashing another agent's in-flight hold is not mine to
 do. Separate with a cherry-pick of 0523e8d if the branches need untangling.
 
+## Phase 3 result — event schemas + §1.2 GBFS + §1.4 client (2026-08-28)
+
+### The §5 event-schema decision, made once
+Four new Avro types, matching §6.3's budget:
+1. `StationChangeEvent` — GBFS. Kept separate from the generic shape because a
+   bikeshare station carries dock-level state (capacity, docks available) that
+   a charger or a small cell does not.
+2. `PoiChangeEvent` — POI deltas. **Never** an `SLALicenseEvent`: a license is
+   a government authorization with an issuing body and a legal effective date;
+   a POI detection is a vendor observation with a confidence and a release
+   date. Conflating them corrupts the license move-in/out semantics that the
+   S1 flow features rest on.
+3. `InfrastructureEvent` — **generic**, as §5 suggested. `category` ∈
+   {ev_station, small_cell, grid_capacity}; `unit_count` carries whatever the
+   family counts (ports, antennas, megawatts). Three near-identical schemas
+   would have cost three consumers and three feature-key sets for no analytic
+   gain.
+4. `InsuranceLossEvent` — NFIP claims.
+FEMA **disaster declarations** deliberately earn no type: county-level, no
+loss amount, no point geometry. They ride the existing
+`ContextObservationEvent` — context around claims, not a sited event.
+
+### Where national feeds live
+`src/spatial/national_feeds.py`, not `CityRegistration.datasets`. A city holds
+at most one DatasetSpec per FeedType and these feeds have no per-city
+endpoint; registering one national file 62 times would make 62 jobs poll the
+same URL, and the city gate's per-city invariants are meaningless for them.
+GBFS is the exception and stays city-shaped: one system, one metro.
+
+### §1.2 GBFS — live proof run, four systems
+```
+nyc            bkn      v2.3  2,508 stations   98 pre-activation (is_installed=0)
+chicago        chi      v2.3  2,050 stations    1 pre-activation
+san_francisco  bay      v2.3    633 stations    0
+washington_dc  dca-cabi v1.1    866 stations    0
+```
+Second poll on warm state: 0 added / 0 removed on every system. 6,057 stations
+under management; both the v2.x `data.<lang>.feeds` and the v3 flat dialect are
+handled, and the v1.1 path is exercised for real by Capital Bikeshare.
+
+**Two findings that changed the design:**
+- **`gbfs.lyft.com/gbfs/2.3/dca/` is a live-but-empty stub.** HTTP 200, fresh
+  `last_updated`, `"stations": []`. The real Capital Bikeshare system is
+  `dca-cabi` on GBFS **1.1** with 866 stations, reached through
+  `gbfs.capitalbikeshare.com/gbfs/gbfs.json`. Registering the stub would have
+  seeded an empty store and then emitted 866 spurious installs.
+- Therefore **an empty station set is a failed poll, not a snapshot**
+  (`EmptySnapshotError`): never seed or overwrite state from one. Likewise a
+  first poll emits nothing — with no prior state every station looks new, and
+  the install date of a pre-existing station simply is not knowable from a
+  feed that publishes no history.
+
+### §1.3 FSQ — the source moved
+The anonymous S3 bucket the sweep recorded (`fsq-os-places-us-east-1`) now
+holds **only LICENSE.txt and NOTICE.txt**; every release partition is gone.
+Foursquare moved the dataset to a **gated Hugging Face repo** (anonymous
+download 401, access auto-granted on request). Layout is unchanged —
+`release/dt=<date>/{places,deltas,categories}/parquet/`, 21 releases, latest
+**dt=2026-08-11** with 10 delta partitions. Apache-2.0 still applies and
+NOTICE.txt attribution must travel with any derivative, so the spec carries
+the attribution string. Registered with `auth=bearer`/`HF_TOKEN`; it is not
+schedulable until the token exists.
+This is exactly the failure mode the sweep warned about ("FSQ did exactly that
+in Oct 2025") — re-probing before registering is what caught it.
+
+### §1.4 OpenFEMA — verified live
+`NfipClaims` **v3**: `$inlinecount=allpages`, `$filter`, `$orderby`,
+`$select`, `$top`/`$skip` all behave (NY since 2024-01-01 → count **1,443**).
+`DisasterDeclarationsSummaries` is v2-only; v3 404s.
+- **The published coordinate is unusable.** FEMA truncates claim lat/lng to
+  0.1° (~11 km) — wider than a res-7 hexagon, and capable of naming the wrong
+  city. Tagging goes `censusGeoid` → tract centroid → H3, ZIP centroid as
+  fallback, DLQ otherwise, with `geometry_source` recorded on the event. The
+  live Harris County example: FEMA publishes (29.9, −95.4); the tract centroid
+  is (29.935, −95.305), over 9 km away.
+- **Tracts split between censuses.** Harris County's `48201222700` became
+  `...01`/`...02` in the 2020 tabulation, so a claim filed under the old id
+  matches no Gazetteer tract exactly. The crosswalk falls back to the parent's
+  first child, which always lies inside the old tract.
+- **NFIP paid amounts go negative** (a NY claim at −8,627.72, found live when
+  a `ge=0` constraint rejected it): recoveries and subrogation reverse earlier
+  payments. Clamping to zero would understate exactly the hexes with the most
+  complicated claim histories. The constraint is gone and the reason is
+  recorded on the model.
+
+### §1.5 NREL — cannot be verified from here
+`developer.nrel.gov` and `afdc.energy.gov` do **not resolve** from this
+network (DNS failure) — the same block the research sweep hit, so nothing
+about this feed has been confirmed live by anyone. Registered with
+`verified=False`, which keeps it out of `schedulable_feeds()` until someone
+spot-verifies `developer.nrel.gov/terms/` and one live response.
+
+### Gates
+`pytest -m interlock` 24 passed / 0 failed. My modules'' tests: 151 passed
+(context observations 47, series 61, gbfs+national 37, plus the concurrent
+agent''s snapshot/openfema tests, which pass against my clients unchanged).
+
+## ⚠ Collision — a second agent is working this same ticket
+Discovered 22:22–22:25 while writing §1.4. Another session is writing US-363
+files in the same tree and **overwrote `src/producers/nfip_producer.py`** with
+its own implementation, and has added `src/producers/nrel_afdc_client.py`,
+`src/producers/ev_charging_producer.py` and five test modules
+(`test_nfip_producer.py`, `test_openfema_client.py`, `test_snapshot_client.py`,
+`test_nrel_afdc_client.py`, `test_ev_charging_producer.py`). Its tests pass
+against *my* `snapshot_client.py` and `openfema_client.py` unchanged, so the
+two efforts are compatible where they meet — but there is no stream claim for
+it in `.streams/`, which is what would have prevented this.
+
+I have stopped writing shared paths and committed only my own files. Not mine
+and not touched by me: `nfip_producer.py`, `nrel_afdc_client.py`,
+`ev_charging_producer.py` and the five test modules above.
+
 ## Current step
-Phase 2 committed. Starting the §5 event-schema spine decision.
+Phase 3 committed. **Stopped pending direction** — §1.3 `poi_diff_producer`
+is the only component neither agent has built, and §1.4/§1.5 need the two
+implementations reconciled before either is trustworthy.
 
 ## Next step
-Decide generic `InfrastructureEvent` vs per-family once (§5 item 2), register
-`StationChangeEvent` / `poi_change` / `insurance_loss` schemas in one hold,
-then build SnapshotClient/GBFS, poi_diff_producer/FSQ, OpenFemaClient and
-NrelAfdcClient.
+Reconcile with the other agent''s §1.4/§1.5 work (or have one of us drop it),
+then build `poi_diff_producer` against the gated Hugging Face channel.

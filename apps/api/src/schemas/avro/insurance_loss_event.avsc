@@ -1,0 +1,30 @@
+{
+  "type": "record",
+  "name": "InsuranceLossEvent",
+  "namespace": "org.urbandev.events",
+  "doc": "Paid NFIP flood claim, distress context (US-363 §1.4). H3 comes from the tract centroid via censusGeoid — never from the 0.1-degree privacy-truncated coordinate. Paid amounts may be negative (recovery/subrogation reversals).",
+  "fields": [
+    { "name": "city_id", "type": "string", "default": "nyc" },
+    { "name": "claim_id", "type": "string" },
+    { "name": "event_date", "type": "string" },
+    { "name": "amount_paid_building", "type": "double", "default": 0.0 },
+    { "name": "amount_paid_contents", "type": "double", "default": 0.0 },
+    { "name": "building_damage_amount", "type": ["null", "double"], "default": null },
+    { "name": "flood_event", "type": ["null", "string"], "default": null },
+    { "name": "rated_flood_zone", "type": ["null", "string"], "default": null },
+    { "name": "census_geoid", "type": ["null", "string"], "default": null },
+    { "name": "county_code", "type": ["null", "string"], "default": null },
+    { "name": "zipcode", "type": ["null", "string"], "default": null },
+    { "name": "state", "type": ["null", "string"], "default": null },
+    { "name": "borough", "type": ["null", "string"], "default": null },
+    { "name": "occupancy_type", "type": ["null", "int"], "default": null },
+    { "name": "water_depth", "type": ["null", "double"], "default": null },
+    { "name": "geometry_source", "type": "string", "default": "tract_centroid" },
+    { "name": "latitude", "type": ["null", "double"], "default": null },
+    { "name": "longitude", "type": ["null", "double"], "default": null },
+    { "name": "h3_res7", "type": ["null", "string"], "default": null },
+    { "name": "h3_res8", "type": ["null", "string"], "default": null },
+    { "name": "h3_res9", "type": ["null", "string"], "default": null },
+    { "name": "ingested_at", "type": "string" }
+  ]
+}

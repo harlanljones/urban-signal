@@ -32,6 +32,7 @@ from src.producers.deeds_acris_producer import DeedsACRISProducer
 from src.producers.dob_permits_producer import DOBPermitsProducer
 from src.producers.evictions_producer import EvictionsProducer
 from src.producers.context_observations_producer import ContextObservationsProducer
+from src.producers.gbfs_producer import GbfsProducer
 from src.producers.sla_licenses_producer import SLALicensesProducer
 from src.producers.street_cut_permits_producer import StreetCutPermitsProducer
 from src.producers.watermarks import (
@@ -230,6 +231,7 @@ class MunicipalIngestionScheduler:
             # producer_key -> distinct object.
             "energy_benchmark": ContextObservationsProducer(bootstrap_servers=self.bootstrap_servers),
             "bike_ped": ContextObservationsProducer(bootstrap_servers=self.bootstrap_servers),
+            "gbfs": GbfsProducer(bootstrap_servers=self.bootstrap_servers),
         }
 
         # Socrata Endpoints & Target Topics mapping derived from city registry

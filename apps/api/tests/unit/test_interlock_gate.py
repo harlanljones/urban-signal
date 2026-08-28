@@ -46,9 +46,10 @@ FEED_TOPICS = {
     # so a second topic would buy nothing but a second consumer.
     FeedType.ENERGY_BENCHMARK: settings.topic_context_observations,
     FeedType.BIKE_PED: settings.topic_context_observations,
+    FeedType.GBFS: settings.topic_station_change,
 }
 
-KNOWN_PLATFORMS = {"socrata", "arcgis", "carto", "ckan", "csv", "excel"}
+KNOWN_PLATFORMS = {"socrata", "arcgis", "carto", "ckan", "csv", "excel", "gbfs"}
 
 # URI scheme each platform's endpoint must carry (carto/ckan use opaque
 # client-parsed URIs; see the client modules).
@@ -59,6 +60,9 @@ PLATFORM_SCHEMES = {
     "ckan": "ckan://",
     "csv": "https://",
     "excel": "https://",
+    # GBFS specs point at the system's auto-discovery root (`gbfs.json`); the
+    # named feeds are resolved from it at poll time, not registered here.
+    "gbfs": "https://",
 }
 
 # Which invariant class guards each spine file. A manifest path absent from
