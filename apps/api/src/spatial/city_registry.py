@@ -435,6 +435,7 @@ from src.spatial.cities.waco import (
     WACO_SUBMARKETS,
 )
 <<<<<<< HEAD
+<<<<<<< HEAD
 from src.spatial.cities.lake_charles import (
     LAKE_CHARLES_DIVISION_BBOXES,
     LAKE_CHARLES_DIVISIONS,
@@ -544,6 +545,14 @@ from src.spatial.cities.lexington import (
     LEXINGTON_METRO_BBOX,
     LEXINGTON_SUBMARKETS,
 >>>>>>> 828194a (US-290: add CityId.LEXINGTON, aliases, and REGISTRY entry (SLA via KY ABC Fayette filter))
+=======
+from src.spatial.cities.asheville import (
+    ASHEVILLE_CENTER,
+    ASHEVILLE_DIVISION_BBOXES,
+    ASHEVILLE_DIVISIONS,
+    ASHEVILLE_METRO_BBOX,
+    ASHEVILLE_SUBMARKETS,
+>>>>>>> 2e56aa9 (feat(api): register CityId.asheville, add aliases, REGISTRY (SLA via SNAP NC), and export in cities/__init__.py (US-291))
 )
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
@@ -625,8 +634,6 @@ class CityId(str, Enum):
     AMARILLO = "amarillo"
     BEAUMONT = "beaumont"
     WACO = "waco"
-<<<<<<< HEAD
-<<<<<<< HEAD
     JACKSON_MS = "jackson_ms"
     MACON_BIBB = "macon_bibb"
     TYLER = "tyler"
@@ -645,6 +652,7 @@ class CityId(str, Enum):
     AUGUSTA = "augusta"
     PORT_ST_LUCIE = "port_st_lucie"
     LEXINGTON = "lexington"
+    ASHEVILLE = "asheville"
 
 
 class FeedType(str, Enum):
@@ -1243,8 +1251,6 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "waco": CityId.WACO,
     "waco_tx": CityId.WACO,
     "waco tx": CityId.WACO,
-<<<<<<< HEAD
-<<<<<<< HEAD
     # Jackson, MS
     "jackson_ms": CityId.JACKSON_MS,
     "jackson-ms": CityId.JACKSON_MS,
@@ -1320,6 +1326,10 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "lexington": CityId.LEXINGTON,
     "lexington_ky": CityId.LEXINGTON,
     "lexington ky": CityId.LEXINGTON,
+    # Asheville, NC
+    "asheville": CityId.ASHEVILLE,
+    "asheville_nc": CityId.ASHEVILLE,
+    "asheville nc": CityId.ASHEVILLE,
 }
 
 
@@ -5241,6 +5251,7 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
     ),
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     CityId.LAKE_CHARLES: CityRegistration(
         city_id=CityId.LAKE_CHARLES,
         name="Lake Charles",
@@ -5600,16 +5611,7 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 max_record_count=2000,
             ),
             # Florida statewide SNAP fallback (SLA)
-=======
-                oid_field="PermitID",
-                max_record_count=2000,
-                order_by="DateIssued DESC",
-                field_map=PORT_ST_LUCIE_FIELD_MAP,
-            ),
-            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice (FL).
->>>>>>> 717ce8a (US-289: Register CityId.port_st_lucie with REGISTRY + ALIASES; add settings.arcgis_port_st_lucie_permits_url; include SNAP SLA (FL))
             FeedType.SLA: snap_sla_spec("FL"),
-=======
     CityId.LEXINGTON: CityRegistration(
         city_id=CityId.LEXINGTON,
         name="Lexington / Fayette County",
@@ -5638,7 +5640,21 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 where="County = 'Fayette'",
                 field_map=LOUISVILLE_SLA_FIELD_MAP,
             ),
->>>>>>> 828194a (US-290: add CityId.LEXINGTON, aliases, and REGISTRY entry (SLA via KY ABC Fayette filter))
+    CityId.ASHEVILLE: CityRegistration(
+        city_id=CityId.ASHEVILLE,
+        name="Asheville",
+        state="NC",
+        center=ASHEVILLE_CENTER,
+        metro_bbox=ASHEVILLE_METRO_BBOX,
+        division_bboxes=ASHEVILLE_DIVISION_BBOXES,
+        submarkets=ASHEVILLE_SUBMARKETS,
+        divisions=ASHEVILLE_DIVISIONS,
+        job_suffix="avl",
+        # Initial registration with SNAP SLA (NC slice). A verifiable public
+        # permits/311/deeds API was not found on data-avl.opendata.arcgis.com
+        # during US-291; prefer municipal feeds when proven.
+        datasets={
+            FeedType.SLA: snap_sla_spec("NC"),
         },
     ),
 }
