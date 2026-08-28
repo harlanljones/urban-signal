@@ -118,14 +118,18 @@ class TestSeattleRegistration:
         assert reg.division_bboxes is SEATTLE_DIVISION_BBOXES
         assert reg.submarkets is SEATTLE_SUBMARKETS
         assert reg.divisions is SEATTLE_DIVISIONS
-        # The four original feeds plus the US-71 crime signal; signal-survey
-        # FeedTypes register via their own tickets.
+        # The four original feeds, the US-71 crime signal, and the US-363
+        # context-measurement pair (§2.7 benchmarking `teqw-tu6e`, §2.8
+        # Fremont Bridge counts `65db-xm6k`); other signal-survey FeedTypes
+        # register via their own tickets.
         assert set(reg.datasets) == {
             FeedType.PERMITS,
             FeedType.COMPLAINTS_311,
             FeedType.SLA,
             FeedType.DEEDS,
             FeedType.CRIME,
+            FeedType.ENERGY_BENCHMARK,
+            FeedType.BIKE_PED,
         }
 
     def test_center_is_inside_metro_bbox(self):

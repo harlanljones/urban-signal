@@ -41,6 +41,11 @@ FEED_TOPICS = {
     FeedType.STREET_CUT: settings.topic_street_cut,
     FeedType.EVICTIONS: settings.topic_evictions,
     FeedType.STR: settings.topic_str,
+    # US-363 context-measurement families. Both ride ONE topic: they share a
+    # single ContextObservationEvent shape and are told apart by `source`,
+    # so a second topic would buy nothing but a second consumer.
+    FeedType.ENERGY_BENCHMARK: settings.topic_context_observations,
+    FeedType.BIKE_PED: settings.topic_context_observations,
 }
 
 KNOWN_PLATFORMS = {"socrata", "arcgis", "carto", "ckan", "csv", "excel"}

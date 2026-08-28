@@ -20,6 +20,15 @@
     { "name": "sla_move_outs_90d", "type": "int", "default": 0 },
     { "name": "deed_total_volume_180d", "type": "double", "default": 0.0 },
     { "name": "deed_transaction_count_180d", "type": "int", "default": 0 },
+    { "name": "energy_site_eui_mean", "type": ["null", "double"], "default": null },
+    { "name": "energy_star_score_mean", "type": ["null", "double"], "default": null },
+    { "name": "energy_ghg_intensity_mean", "type": ["null", "double"], "default": null },
+    { "name": "energy_non_compliant_share", "type": ["null", "double"], "default": null },
+    { "name": "energy_low_score_share", "type": ["null", "double"], "default": null },
+    { "name": "energy_benchmarked_buildings", "type": "int", "default": 0 },
+    { "name": "bike_flow_daily_mean", "type": ["null", "double"], "default": null },
+    { "name": "ped_flow_daily_mean", "type": ["null", "double"], "default": null },
+    { "name": "counter_sensor_count", "type": "int", "default": 0 },
     { "name": "lims_score", "type": "double", "default": 0.0 },
     { "name": "created_at", "type": "string" }
   ]
