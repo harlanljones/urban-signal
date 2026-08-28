@@ -644,3 +644,16 @@ suite repaired to 1574 passed / 3 skipped.
 | finish-us195 | docs/expansion-roadmap-wave-3.md | none | this session | completed | §3.1 Phase-0 results table |
 
 Uncommitted at close-out: spine delta + tests + roadmap doc (user commits).
+
+## 2026-08-27 — Post-wave-3 parallel round (orchestrator: 3 streams)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Task |
+|---|---|---|---|---|
+| verify-dashboard | none (read-only live checks) | none | this entry | dashboard METRO_META + snapshot/manifest coverage for 5 new metros |
+| model-refresh | none (training artifacts, gitignored) | none | this entry | retrain incl. new metros as H3-7 holdouts (roadmap §5/§7) |
+| us364-snap | tests + probe evidence | config.py + city_registry.py (starter-set SLA specs) | this entry | US-364 SNAP retailers as SLALicenseEvent |
+
+Only one stream edits code; no interlock contention. Commit policy: none of
+the streams git-commit — changesets land uncommitted for the maintainer.
+
+| 2026-08-27 — us364-snap outcome | leaf: apps/api/tests/unit/test_producers_snap.py (+5 refreshed per-city tests) | spine: apps/api/src/config.py, apps/api/src/spatial/city_registry.py | completed | US-364: SNAP registered as FeedType.SLA on 6-metro starter set (dallas/denver/columbus/raleigh/boise/wichita) via shared snap_sla_spec(state); snapshot mode, cadence 14d; facts re-exported. Gates: interlock 22 passed, suite 1585 passed/3 skipped, product lint green, ruff zero-new-findings. Yield: 11 new tests + 6 registrations + product facts. |

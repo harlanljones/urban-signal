@@ -239,7 +239,12 @@ class TestDallasSpineRegistration:
         from src.spatial.city_registry import FeedType, REGISTRY
 
         reg = REGISTRY[DALLAS]
-        assert set(reg.datasets) == {FeedType.PERMITS, FeedType.COMPLAINTS_311}
+        # US-364 adds the SNAP SLA slice (national FNS feed, State='TX').
+        assert set(reg.datasets) == {
+            FeedType.PERMITS,
+            FeedType.COMPLAINTS_311,
+            FeedType.SLA,
+        }
         spec = reg.datasets[FeedType.PERMITS]
         assert spec.proxy_for == "row_permits"
         assert spec.platform == "arcgis"

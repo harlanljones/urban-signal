@@ -135,28 +135,35 @@ class TestDenverRegistration:
 
         assert resolve_field_map("denver", FeedType.DEEDS) == {}
 
-    def test_licenses_descoped_no_usable_watermark(self):
-        """US-73 descope evidence: Active Business Licenses (table id 31)
-        exposes exactly one date-like field, Expiration_Date, which is
-        term-length-driven rather than arrival-ordered - newest-by-OBJECTID
-        rows expire 2027-2030 while the ORDER BY DESC maxima are century
-        typos (2200-12-31 and 8099-12-31 among 41,986 rows all sharing the
-        single status 'License Issued - Active'). No issue-date field and no
-        edit timestamp exist, so no incremental watermark can be declared;
-        per the ticket rule the feed stays unregistered."""
-        with pytest.raises(KeyError, match="no.*feed"):
-            get_dataset(CityId.DENVER, FeedType.SLA)
+    def test_licenses_descoped_snap_fills_the_sla_slot(self):
+        """US-73 descope evidence: Denver's own Active Business Licenses
+        (table id 31) exposes exactly one date-like field, Expiration_Date,
+        which is term-length-driven rather than arrival-ordered - newest-by-
+        OBJECTID rows expire 2027-2030 while the ORDER BY DESC maxima are
+        century typos (2200-12-31 and 8099-12-31 among 41,986 rows all
+        sharing the single status 'License Issued - Active'). No issue-date
+        field and no edit timestamp exist, so that source itself stays
+        unregistered. US-364 later filled the SLA slot with the national
+        USDA FNS SNAP retailer feed (snapshot mode, State='CO') — the US-73
+        verdict about the Denver licenses source still stands."""
+        from src.spatial.city_registry import get_dataset
+
+        spec = get_dataset(CityId.DENVER, FeedType.SLA)
+        assert "snap_retailer_location_data" in spec.endpoint
+        assert "data.denvergov.org" not in spec.endpoint
 
 
-def test_denver_stays_a_two_feed_city():
+def test_denver_is_now_a_three_feed_city():
     city = CityId.DENVER
     assert normalize_city("denver") is city
     assert REGISTRY[city].job_suffix == "denver"
-    # US-73 outcome: licenses descoped (no usable watermark), sales reverted
-    # under G8' (zero address columns) — Denver keeps its 2-feed stub.
+    # US-73 outcome: the Denver licenses source stayed descoped (no usable
+    # watermark) and sales were reverted under G8' (zero address columns).
+    # US-364 added SNAP (national FNS feed, State='CO') as the SLA feed.
     assert set(REGISTRY[city].datasets) == {
         FeedType.PERMITS,
         FeedType.COMPLAINTS_311,
+        FeedType.SLA,
     }
 
 

@@ -19,6 +19,10 @@ logger = logging.getLogger(__name__)
 CALIBRATION_REQUIRED_CITY_IDS = frozenset({
     "new_orleans", "norfolk", "detroit", "austin", "philadelphia", "cincinnati",
     "baton_rouge", "washington_dc", "boston", "denver", "baltimore", "montgomery",
+    # Wave 3 (expansion-roadmap-wave-3.md §7): ship alert_enabled=false (calibrating).
+    "phoenix", "miami_dade", "st_louis", "memphis", "albuquerque",
+    # Wave 1/2 geocoder-unlocked + Pierce lane (same §7 rule).
+    "honolulu", "orlando", "pierce",
 })
 
 

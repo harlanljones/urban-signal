@@ -1237,6 +1237,16 @@ class Settings(BaseSettings):
         default="ckan://data.sanjoseca.gov/dc0ec99c-0c6b-45fb-b1ec-faf072fe4833",
         description="San Jose Police Calls for Service (2026, updated daily) CKAN datastore resource",
     )
+    # US-364: USDA FNS SNAP Retailer Locator — one national FeatureServer
+    # (item 8b260f9a10b0459aa441ad8588c2251c, usda-fns org) sliced per metro
+    # with a State where-clause. FNS states the data is updated every 2 weeks.
+    arcgis_snap_retailers_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/"
+            "snap_retailer_location_data/FeatureServer/0"
+        ),
+        description="USDA FNS SNAP retailer locations ArcGIS FeatureServer layer URL",
+    )
 
     # Address geocoding (ADR 0004): confidence floor gates wrong-cell risk —
     # below it, events keep null H3 rather than a guessed coordinate.

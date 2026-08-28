@@ -67,7 +67,12 @@ def test_columbus_registers_arcgis_permits_and_deeds():
     assert normalize_city("columbus") is city
     assert normalize_city("columbus_oh") is city
     assert REGISTRY[city].job_suffix == "cmoh"
-    assert set(REGISTRY[city].datasets) == {FeedType.PERMITS, FeedType.DEEDS}
+    # US-364 adds the SNAP SLA slice (national FNS feed, State='OH').
+    assert set(REGISTRY[city].datasets) == {
+        FeedType.PERMITS,
+        FeedType.DEEDS,
+        FeedType.SLA,
+    }
 
     permits = REGISTRY[city].datasets[FeedType.PERMITS]
     assert permits.platform == "arcgis"
@@ -86,8 +91,6 @@ def test_columbus_registers_arcgis_permits_and_deeds():
 
     with pytest.raises(KeyError, match="no.*feed"):
         get_dataset(city, FeedType.COMPLAINTS_311)
-    with pytest.raises(KeyError, match="no.*feed"):
-        get_dataset(city, FeedType.SLA)
 
 
 def test_columbus_deeds_spec_pins_arcgis_annual_snapshot():
