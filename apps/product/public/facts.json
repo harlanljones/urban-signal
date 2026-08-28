@@ -2844,6 +2844,42 @@
       "center": { "lat": 35.5951, "lng": -82.5515 },
       "evidence_path": "apps/api/src/spatial/cities/asheville.py"
     }
+    ,
+    {
+      "id": "wilmington_nc",
+      "name": "Wilmington, NC",
+      "state": "NC",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 11,
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "ISSUE_DATE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 34.235,
+        "lng": -77.948
+      },
+      "evidence_path": "apps/api/src/spatial/cities/wilmington_nc.py"
+    }
   ],
   "pipeline": [
     {

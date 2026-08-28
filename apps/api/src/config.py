@@ -958,6 +958,12 @@ class Settings(BaseSettings):
         description="Durham parcel sales/deeds MapServer layer URL",
     )
 
+    # Wilmington, NC / New Hanover County (US-292): county permits FeatureServer.
+    arcgis_wilmington_nc_permits_url: str = Field(
+        default="https://gis.nhcgov.com/server/rest/services/Thematic/BuildingPermits/FeatureServer/0",
+        description="New Hanover County building permits FeatureServer layer URL",
+    )
+
     # Dallas, TX (US-149): live ROW/traffic-control permit proxy plus a
     # Building Services CRM view containing approximately 30 days of 311 data.
     arcgis_dallas_row_permits_url: str = Field(

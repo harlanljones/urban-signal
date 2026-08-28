@@ -31,6 +31,7 @@ from src.producers.field_maps_omaha import FIELD_MAP as OMAHA_FIELD_MAP
 from src.producers.field_maps_toledo import FIELD_MAP as TOLEDO_FIELD_MAP
 from src.producers.field_maps_boston_licensing import FIELD_MAP as BOSTON_LICENSING_FIELD_MAP
 from src.producers.field_maps_cape_coral import FIELD_MAP as CAPE_CORAL_FIELD_MAP
+from src.producers.field_maps_wilmington_nc import FIELD_MAP as WILMINGTON_NC_FIELD_MAP
 from src.spatial.cities.portland import (
     PORTLAND_DIVISION_BBOXES,
     PORTLAND_DIVISIONS,
@@ -436,6 +437,7 @@ from src.spatial.cities.waco import (
 )
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 from src.spatial.cities.lake_charles import (
     LAKE_CHARLES_DIVISION_BBOXES,
     LAKE_CHARLES_DIVISIONS,
@@ -553,6 +555,14 @@ from src.spatial.cities.asheville import (
     ASHEVILLE_METRO_BBOX,
     ASHEVILLE_SUBMARKETS,
 >>>>>>> 2e56aa9 (feat(api): register CityId.asheville, add aliases, REGISTRY (SLA via SNAP NC), and export in cities/__init__.py (US-291))
+=======
+from src.spatial.cities.wilmington_nc import (
+    WILMINGTON_NC_CENTER,
+    WILMINGTON_NC_DIVISION_BBOXES,
+    WILMINGTON_NC_DIVISIONS,
+    WILMINGTON_NC_METRO_BBOX,
+    WILMINGTON_NC_SUBMARKETS,
+>>>>>>> 4a2f3d8 (feat(registry): register CityId.WILMINGTON_NC, aliases, and datasets (permits + SNAP SLA NC))
 )
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
@@ -634,6 +644,7 @@ class CityId(str, Enum):
     AMARILLO = "amarillo"
     BEAUMONT = "beaumont"
     WACO = "waco"
+<<<<<<< HEAD
     JACKSON_MS = "jackson_ms"
     MACON_BIBB = "macon_bibb"
     TYLER = "tyler"
@@ -653,6 +664,7 @@ class CityId(str, Enum):
     PORT_ST_LUCIE = "port_st_lucie"
     LEXINGTON = "lexington"
     ASHEVILLE = "asheville"
+    WILMINGTON_NC = "wilmington_nc"
 
 
 class FeedType(str, Enum):
@@ -1330,6 +1342,10 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "asheville": CityId.ASHEVILLE,
     "asheville_nc": CityId.ASHEVILLE,
     "asheville nc": CityId.ASHEVILLE,
+    # Wilmington, NC (reserve plain 'wilmington' for DE)
+    "wilmington_nc": CityId.WILMINGTON_NC,
+    "wilmington-nc": CityId.WILMINGTON_NC,
+    "wilmington nc": CityId.WILMINGTON_NC,
 }
 
 
@@ -5252,6 +5268,7 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     CityId.LAKE_CHARLES: CityRegistration(
         city_id=CityId.LAKE_CHARLES,
         name="Lake Charles",
@@ -5654,6 +5671,36 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         # permits/311/deeds API was not found on data-avl.opendata.arcgis.com
         # during US-291; prefer municipal feeds when proven.
         datasets={
+=======
+    CityId.WILMINGTON_NC: CityRegistration(
+        city_id=CityId.WILMINGTON_NC,
+        name="Wilmington, NC",
+        state="NC",
+        center=WILMINGTON_NC_CENTER,
+        metro_bbox=WILMINGTON_NC_METRO_BBOX,
+        division_bboxes=WILMINGTON_NC_DIVISION_BBOXES,
+        submarkets=WILMINGTON_NC_SUBMARKETS,
+        divisions=WILMINGTON_NC_DIVISIONS,
+        job_suffix="wilmington_nc",
+        datasets={
+            # Verified public permits (New Hanover County): ISSUE_DATE watermark,
+            # native State Plane geometry (client requests outSR=4326).
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_wilmington_nc_permits_url,
+                platform="arcgis",
+                watermark_col="ISSUE_DATE",
+                id_keys=["PERMIT_NUMBER", "PMPERMITID", "OBJECTID", "id"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                expected_cadence_days=30,
+                oid_field="OBJECTID",
+                max_record_count=10000,
+                field_map=WILMINGTON_NC_FIELD_MAP["permits"],
+            ),
+            # North Carolina fallback for SLA until a Wilmington-specific
+            # municipal registry is verified.
+>>>>>>> 4a2f3d8 (feat(registry): register CityId.WILMINGTON_NC, aliases, and datasets (permits + SNAP SLA NC))
             FeedType.SLA: snap_sla_spec("NC"),
         },
     ),
