@@ -1,0 +1,218 @@
+{
+  "schema_version": 2,
+  "id": "omaha",
+  "name": "Omaha",
+  "state": "NE",
+  "center": {
+    "lat": 41.258,
+    "lng": -95.937
+  },
+  "metro_bbox": {
+    "min_lat": 41.17,
+    "max_lat": 41.37,
+    "min_lng": -96.25,
+    "max_lng": -95.88
+  },
+  "divisions": {
+    "DOWNTOWN_OLD_MARKET": {
+      "name": "DOWNTOWN_OLD_MARKET",
+      "center": {
+        "lat": 41.258,
+        "lng": -95.937
+      },
+      "bbox": {
+        "min_lat": 41.249,
+        "max_lat": 41.268,
+        "min_lng": -95.95,
+        "max_lng": -95.925
+      },
+      "submarkets": [
+        "Downtown & Old Market"
+      ]
+    },
+    "MIDTOWN_DUNDEE": {
+      "name": "MIDTOWN_DUNDEE",
+      "center": {
+        "lat": 41.262,
+        "lng": -95.974
+      },
+      "bbox": {
+        "min_lat": 41.25,
+        "max_lat": 41.274,
+        "min_lng": -95.992,
+        "max_lng": -95.958
+      },
+      "submarkets": [
+        "Midtown Crossing",
+        "Dundee"
+      ]
+    },
+    "AKSARBEN_VILLAGE": {
+      "name": "AKSARBEN_VILLAGE",
+      "center": {
+        "lat": 41.249,
+        "lng": -95.981
+      },
+      "bbox": {
+        "min_lat": 41.242,
+        "max_lat": 41.256,
+        "min_lng": -95.992,
+        "max_lng": -95.972
+      },
+      "submarkets": [
+        "Aksarben Village"
+      ]
+    },
+    "NORTH_OMAHA": {
+      "name": "NORTH_OMAHA",
+      "center": {
+        "lat": 41.284,
+        "lng": -95.975
+      },
+      "bbox": {
+        "min_lat": 41.262,
+        "max_lat": 41.33,
+        "min_lng": -96.01,
+        "max_lng": -95.938
+      },
+      "submarkets": [
+        "North Omaha",
+        "Benson"
+      ]
+    },
+    "SOUTH_OMAHA": {
+      "name": "SOUTH_OMAHA",
+      "center": {
+        "lat": 41.22,
+        "lng": -95.935
+      },
+      "bbox": {
+        "min_lat": 41.2,
+        "max_lat": 41.248,
+        "min_lng": -95.95,
+        "max_lng": -95.918
+      },
+      "submarkets": [
+        "South Omaha"
+      ]
+    },
+    "WEST_MILLARD": {
+      "name": "WEST_MILLARD",
+      "center": {
+        "lat": 41.25,
+        "lng": -96.145
+      },
+      "bbox": {
+        "min_lat": 41.205,
+        "max_lat": 41.29,
+        "min_lng": -96.24,
+        "max_lng": -96.08
+      },
+      "submarkets": [
+        "West Omaha",
+        "Millard"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Old Market": {
+      "name": "Downtown & Old Market",
+      "division": "DOWNTOWN_OLD_MARKET",
+      "center": {
+        "lat": 41.258,
+        "lng": -95.937
+      },
+      "description": "Gene Leahy Mall riverfront core with the Old Market entertainment grid, office conversions, and the densest Mayor's Hotline volume in the metro."
+    },
+    "Midtown Crossing": {
+      "name": "Midtown Crossing",
+      "division": "MIDTOWN_DUNDEE",
+      "center": {
+        "lat": 41.2565,
+        "lng": -95.968
+      },
+      "description": "Turner Park mixed-use district between downtown and Dundee with multifamily infill and steady restaurant-corridor 311 demand."
+    },
+    "Dundee": {
+      "name": "Dundee",
+      "division": "MIDTOWN_DUNDEE",
+      "center": {
+        "lat": 41.268,
+        "lng": -95.98
+      },
+      "description": "Historic bungalow neighborhood around Underwood Avenue with renovation-led permitting and tree-canopy service requests."
+    },
+    "Aksarben Village": {
+      "name": "Aksarben Village",
+      "division": "AKSARBEN_VILLAGE",
+      "center": {
+        "lat": 41.249,
+        "lng": -95.981
+      },
+      "description": "Former racetrack redevelopment anchored by the Chromatin riverfront-adjacent office campus, University of Nebraska Omaha expansion, and apartment growth."
+    },
+    "North Omaha": {
+      "name": "North Omaha",
+      "division": "NORTH_OMAHA",
+      "center": {
+        "lat": 41.295,
+        "lng": -95.96
+      },
+      "description": "Historic northside corridor with concentrated disinvestment signals, code-enforcement-heavy 311 demand, and targeted reinvestment along Ames Avenue."
+    },
+    "Benson": {
+      "name": "Benson",
+      "division": "NORTH_OMAHA",
+      "center": {
+        "lat": 41.272,
+        "lng": -95.996
+      },
+      "description": "Music-venue and brewery commercial node on Maple Street with older housing stock and active neighborhood-association permit engagement."
+    },
+    "South Omaha": {
+      "name": "South Omaha",
+      "division": "SOUTH_OMAHA",
+      "center": {
+        "lat": 41.22,
+        "lng": -95.935
+      },
+      "description": "Stockyards-heritage Latino commercial district around 24th Street with owner-occupied infill and high trash/dumping 311 volume."
+    },
+    "West Omaha": {
+      "name": "West Omaha",
+      "division": "WEST_MILLARD",
+      "center": {
+        "lat": 41.271,
+        "lng": -96.17
+      },
+      "description": "Employment and retail belt along Dodge Street toward 180th with the metro's newest single-family stock and highest permit velocity."
+    },
+    "Millard": {
+      "name": "Millard",
+      "division": "WEST_MILLARD",
+      "center": {
+        "lat": 41.229,
+        "lng": -96.123
+      },
+      "description": "Annexed southwest suburban grid with school-driven residential growth, teardown-rebuild lots, and storm-drain 311 clusters."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "DATETIMEINIT",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/omaha.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

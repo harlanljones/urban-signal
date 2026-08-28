@@ -137,6 +137,18 @@ export function testEnv(options: { html?: string } = {}) {
             "892a10708b7ffff": { h3_index: "892a10708b7ffff", lims_score: 97.5, shap_attributions: [{ f: "x", v: 0.4 }] },
           });
         }
+        if (key.startsWith("cells/")) {
+          // US-385 per-cell shard: only this cell is sharded in the fixture.
+          const cell = key.slice("cells/".length);
+          if (cell === "892830bbfffffff") {
+            return JSON.stringify({
+              h3_index: cell,
+              lims_score: 91.0,
+              source: "per-cell-shard",
+            });
+          }
+          return null;
+        }
         if (key.startsWith("gridtiles/")) {
           const parent = key.slice("gridtiles/".length);
           if (parent === "852830bbfffffff") {

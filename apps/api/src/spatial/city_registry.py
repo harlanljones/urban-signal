@@ -24,6 +24,11 @@ from src.producers.field_maps_memphis import FIELD_MAP as MEMPHIS_FIELD_MAP
 from src.producers.field_maps_phoenix import FIELD_MAP as PHOENIX_FIELD_MAP
 from src.producers.field_maps_albuquerque import FIELD_MAP as ALBUQUERQUE_FIELD_MAP
 from src.producers.field_maps_st_louis import FIELD_MAP as ST_LOUIS_FIELD_MAP
+from src.producers.field_maps_aurora import FIELD_MAP as AURORA_FIELD_MAP
+from src.producers.field_maps_henderson import FIELD_MAP as HENDERSON_FIELD_MAP
+from src.producers.field_maps_virginia_beach import FIELD_MAP as VIRGINIA_BEACH_FIELD_MAP
+from src.producers.field_maps_omaha import FIELD_MAP as OMAHA_FIELD_MAP
+from src.producers.field_maps_toledo import FIELD_MAP as TOLEDO_FIELD_MAP
 from src.producers.field_maps_boston_licensing import FIELD_MAP as BOSTON_LICENSING_FIELD_MAP
 from src.spatial.cities.portland import (
     PORTLAND_DIVISION_BBOXES,
@@ -365,6 +370,37 @@ from src.spatial.cities.st_louis import (
     ST_LOUIS_METRO_BBOX,
     ST_LOUIS_SUBMARKETS,
 )
+from src.spatial.cities.aurora import (
+    AURORA_DIVISION_BBOXES,
+    AURORA_DIVISIONS,
+    AURORA_METRO_BBOX,
+    AURORA_SUBMARKETS,
+)
+from src.spatial.cities.henderson import (
+    HENDERSON_DIVISION_BBOXES,
+    HENDERSON_DIVISIONS,
+    HENDERSON_METRO_BBOX,
+    HENDERSON_SUBMARKETS,
+)
+from src.spatial.cities.virginia_beach import (
+    VIRGINIA_BEACH_CENTER,
+    VIRGINIA_BEACH_DIVISION_BBOXES,
+    VIRGINIA_BEACH_DIVISIONS,
+    VIRGINIA_BEACH_METRO_BBOX,
+    VIRGINIA_BEACH_SUBMARKETS,
+)
+from src.spatial.cities.omaha import (
+    OMAHA_DIVISION_BBOXES,
+    OMAHA_DIVISIONS,
+    OMAHA_METRO_BBOX,
+    OMAHA_SUBMARKETS,
+)
+from src.spatial.cities.toledo import (
+    TOLEDO_DIVISION_BBOXES,
+    TOLEDO_DIVISIONS,
+    TOLEDO_METRO_BBOX,
+    TOLEDO_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -435,6 +471,11 @@ class CityId(str, Enum):
     PHOENIX = "phoenix"
     ALBUQUERQUE = "albuquerque"
     ST_LOUIS = "st_louis"
+    AURORA = "aurora"
+    HENDERSON = "henderson"
+    VIRGINIA_BEACH = "virginia_beach"
+    OMAHA = "omaha"
+    TOLEDO = "toledo"
 
 
 class FeedType(str, Enum):
@@ -957,6 +998,38 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "saint_louis": CityId.ST_LOUIS,
     "st-louis": CityId.ST_LOUIS,
     "st louis": CityId.ST_LOUIS,
+
+    # Aurora, CO
+    "aurora": CityId.AURORA,
+    "aurora_co": CityId.AURORA,
+    "aurora-co": CityId.AURORA,
+    "aurora co": CityId.AURORA,
+
+    # Henderson, NV
+    "henderson": CityId.HENDERSON,
+    "henderson_nv": CityId.HENDERSON,
+    "henderson-nv": CityId.HENDERSON,
+    "henderson nv": CityId.HENDERSON,
+
+    # Virginia Beach, VA
+    "virginia_beach": CityId.VIRGINIA_BEACH,
+    "virginia-beach": CityId.VIRGINIA_BEACH,
+    "virginia beach": CityId.VIRGINIA_BEACH,
+    "va_beach": CityId.VIRGINIA_BEACH,
+    "va beach": CityId.VIRGINIA_BEACH,
+
+    # Omaha, NE
+    "omaha": CityId.OMAHA,
+    "omaha_ne": CityId.OMAHA,
+    "omaha-ne": CityId.OMAHA,
+    "omaha ne": CityId.OMAHA,
+    "oma": CityId.OMAHA,
+
+    # Toledo, OH
+    "toledo": CityId.TOLEDO,
+    "toledo_oh": CityId.TOLEDO,
+    "toledo-oh": CityId.TOLEDO,
+    "toledo oh": CityId.TOLEDO,
 }
 
 
@@ -4511,6 +4584,264 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 geocode_context="St. Louis, MO",
                 field_map=ST_LOUIS_FIELD_MAP["sla"],
             ),
+        },
+    ),
+    CityId.AURORA: CityRegistration(
+        city_id=CityId.AURORA,
+        name="Aurora",
+        state="CO",
+        center={"lat": 39.7294, "lng": -104.8319},
+        metro_bbox=AURORA_METRO_BBOX,
+        division_bboxes=AURORA_DIVISION_BBOXES,
+        submarkets=AURORA_SUBMARKETS,
+        divisions=AURORA_DIVISIONS,
+        job_suffix="aurora",
+        # US-326: issued building permits (MapServer 44) + business/SLA
+        # (MapServer 77 snapshot). Native outSR=4326 geometry primary;
+        # EPSG:2232 State-Plane X/Y fallback. L156/L157 rolling views and
+        # L34/L36/L4 companions are NOT registered as separate feeds.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_aurora_permits_url,
+                platform="arcgis",
+                watermark_col="IssueDate",
+                id_keys=["Permit_", "FolderRSN", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                expected_cadence_days=1,
+                needs_geocode=False,
+                oid_field="OBJECTID",
+                max_record_count=2000,
+                order_by="IssueDate DESC",
+                state_plane_crs="EPSG:2232",
+                state_plane_units="ftUS",
+                state_plane_x_col="PropX",
+                state_plane_y_col="PropY",
+                field_map=AURORA_FIELD_MAP["permits"],
+            ),
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.arcgis_aurora_sla_url,
+                platform="arcgis",
+                watermark_col="Issue_Date",
+                id_keys=["License_Number", "entity_key", "OBJECTID"],
+                topic=settings.topic_sla,
+                interval_seconds=300.0,
+                producer_key="sla",
+                expected_cadence_days=1,
+                needs_geocode=False,
+                ingestion_mode="snapshot",
+                oid_field="OBJECTID",
+                max_record_count=2000,
+                order_by="Issue_Date DESC",
+                state_plane_crs="EPSG:2232",
+                state_plane_units="ftUS",
+                state_plane_x_col="X",
+                state_plane_y_col="Y",
+                companion_endpoints={
+                    "liquor": settings.arcgis_aurora_sla_liquor_url,
+                    "all_businesses": settings.arcgis_aurora_sla_all_businesses_url,
+                    "marijuana": settings.arcgis_aurora_sla_marijuana_url,
+                },
+                field_map=AURORA_FIELD_MAP["sla"],
+            ),
+        },
+    ),
+    CityId.HENDERSON: CityRegistration(
+        city_id=CityId.HENDERSON,
+        name="Henderson",
+        state="NV",
+        center={"lat": 36.0395, "lng": -115.0341},
+        metro_bbox=HENDERSON_METRO_BBOX,
+        division_bboxes=HENDERSON_DIVISION_BBOXES,
+        submarkets=HENDERSON_SUBMARKETS,
+        divisions=HENDERSON_DIVISIONS,
+        job_suffix="henderson",
+        # US-325: DSC_Permits (GISX/GISY WGS84 with address supplement) +
+        # Active Licenses CSV snapshot (address-only -> ADR 0004 geocode).
+        # MJBL county-wide companion filtered to Jurisdiction='HENDERSON'.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_henderson_permits_url,
+                platform="arcgis",
+                watermark_col="IssueDate",
+                id_keys=["PermitNumber", "ObjectId"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                expected_cadence_days=1,
+                needs_geocode=True,
+                geocode_context="Henderson, NV",
+                oid_field="ObjectId",
+                max_record_count=1000,
+                order_by="IssueDate DESC",
+                field_map=HENDERSON_FIELD_MAP["permits"],
+            ),
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.arcgis_henderson_sla_url,
+                platform="csv",
+                watermark_col="Original Issue Date",
+                id_keys=["License Number"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                expected_cadence_days=1,
+                watermark_type="text",
+                watermark_format="%m/%d/%Y",
+                ingestion_mode="snapshot",
+                needs_geocode=True,
+                geocode_context="Henderson, NV",
+                companion_endpoints={
+                    "mjbl": {
+                        "endpoint": settings.arcgis_henderson_sla_mjbl_url,
+                        "filter": "Jurisdiction='HENDERSON'",
+                        "watermark_col": "IssueDate",
+                        "watermark_type": "text",
+                        "watermark_format": "%m-%d-%Y %H:%M",
+                        "id_keys": ["MJBLNumber", "IsPrimary"],
+                    },
+                },
+                field_map=HENDERSON_FIELD_MAP["sla"],
+            ),
+        },
+    ),
+    CityId.VIRGINIA_BEACH: CityRegistration(
+        city_id=CityId.VIRGINIA_BEACH,
+        name="Virginia Beach",
+        state="VA",
+        center=VIRGINIA_BEACH_CENTER,
+        metro_bbox=VIRGINIA_BEACH_METRO_BBOX,
+        division_bboxes=VIRGINIA_BEACH_DIVISION_BBOXES,
+        submarkets=VIRGINIA_BEACH_SUBMARKETS,
+        divisions=VIRGINIA_BEACH_DIVISIONS,
+        job_suffix="vb",
+        # US-354: permits (cadence 1d), SLA (annual-license trickle, 365d),
+        # deeds (batched ~2-3wk publication, 14d — probe mid-Sept for stall).
+        # All three are address-only Tables (non_spatial, ADR-0005 geocode);
+        # GPIN is the T1 parcel-join path.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_virginia_beach_permits_url,
+                platform="arcgis",
+                watermark_col="IssueDate",
+                id_keys=["PermitNumber", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                expected_cadence_days=1,
+                watermark_type="text",
+                watermark_format="%Y/%m/%d",
+                needs_geocode=True,
+                geocode_context="Virginia Beach, VA",
+                oid_field="OBJECTID",
+                max_record_count=2000,
+                non_spatial=True,
+                field_map=VIRGINIA_BEACH_FIELD_MAP["permits"],
+            ),
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.arcgis_virginia_beach_sla_url,
+                platform="arcgis",
+                watermark_col="Begin_Date",
+                id_keys=["Trade_Name", "Owner_Name", "Business_Address"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                expected_cadence_days=365,
+                watermark_type="text",
+                watermark_format="%m/%d/%Y",
+                needs_geocode=True,
+                geocode_context="Virginia Beach, VA",
+                oid_field="OBJECTID",
+                max_record_count=2000,
+                non_spatial=True,
+                field_map=VIRGINIA_BEACH_FIELD_MAP["sla"],
+            ),
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.arcgis_virginia_beach_deeds_url,
+                platform="arcgis",
+                watermark_col="Sales_Date",
+                id_keys=["Document_Number", "GPIN", "Sales_Date"],
+                topic=settings.topic_deeds,
+                interval_seconds=600.0,
+                producer_key="deeds",
+                expected_cadence_days=14,
+                needs_geocode=True,
+                geocode_context="Virginia Beach, VA",
+                oid_field="OBJECTID",
+                max_record_count=2000,
+                non_spatial=True,
+                field_map=VIRGINIA_BEACH_FIELD_MAP["deeds"],
+            ),
+        },
+    ),
+    CityId.OMAHA: CityRegistration(
+        city_id=CityId.OMAHA,
+        name="Omaha",
+        state="NE",
+        center={"lat": 41.2580, "lng": -95.9370},
+        metro_bbox=OMAHA_METRO_BBOX,
+        division_bboxes=OMAHA_DIVISION_BBOXES,
+        submarkets=OMAHA_SUBMARKETS,
+        divisions=OMAHA_DIVISIONS,
+        job_suffix="omaha",
+        # US-358: partial — Mayor's Hotline 311 only (Tier 1, same-day).
+        # Native outSR=4326 geometry; PROBADDRESS geocode supplement.
+        # DATETIMEINIT is an esriFieldTypeDateOnly watermark. SLA is the
+        # SNAP state slice (USDA FNS retailers, US-364) — closes the gate
+        # that no registered metro is SLA-less.
+        datasets={
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.arcgis_omaha_311_url,
+                platform="arcgis",
+                watermark_col="DATETIMEINIT",
+                id_keys=["OBJECTID", "REQUESTID"],
+                topic=settings.topic_311,
+                interval_seconds=180.0,
+                producer_key="311",
+                expected_cadence_days=1,
+                needs_geocode=True,
+                geocode_context="Omaha, NE",
+                oid_field="OBJECTID",
+                max_record_count=2000,
+                order_by="DATETIMEINIT DESC",
+                field_map=OMAHA_FIELD_MAP["311"],
+            ),
+            FeedType.SLA: snap_sla_spec("NE"),
+        },
+    ),
+    CityId.TOLEDO: CityRegistration(
+        city_id=CityId.TOLEDO,
+        name="Toledo",
+        state="OH",
+        center={"lat": 41.6528, "lng": -83.5379},
+        metro_bbox=TOLEDO_METRO_BBOX,
+        division_bboxes=TOLEDO_DIVISION_BBOXES,
+        submarkets=TOLEDO_SUBMARKETS,
+        divisions=TOLEDO_DIVISIONS,
+        job_suffix="toledo",
+        # US-359: partial — Engage Toledo Cityworks 311 only (Tier 1, same-day).
+        # Native outSR=4326 geometry primary; LOCATION geocode supplement.
+        # X_COORD/Y_COORD are mixed-CRS and are deliberately not mapped.
+        # SLA is the SNAP state slice (OH, already established for
+        # Columbus/Cleveland/Dayton via US-364).
+        datasets={
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.arcgis_toledo_311_url,
+                platform="arcgis",
+                watermark_col="INIT_DATE",
+                id_keys=["REQUEST_ID"],
+                topic=settings.topic_311,
+                interval_seconds=300.0,
+                producer_key="311",
+                expected_cadence_days=1,
+                needs_geocode=True,
+                geocode_context="Toledo, OH",
+                oid_field="REQUEST_ID",
+                max_record_count=2000,
+                order_by="INIT_DATE DESC",
+                field_map=TOLEDO_FIELD_MAP["311"],
+            ),
+            FeedType.SLA: snap_sla_spec("OH"),
         },
     ),
 }

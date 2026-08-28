@@ -1472,6 +1472,11 @@ def get_dashboard_html() -> str:
       phoenix: { name: 'Phoenix / Maricopa County' },
       albuquerque: { name: 'Albuquerque / Bernalillo County' },
       st_louis: { name: 'St. Louis' },
+      aurora: { name: 'Aurora, CO' },
+      henderson: { name: 'Henderson, NV' },
+      virginia_beach: { name: 'Virginia Beach' },
+      omaha: { name: 'Omaha' },
+      toledo: { name: 'Toledo' },
     };
 
     let map = null;

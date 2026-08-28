@@ -1,0 +1,268 @@
+{
+  "schema_version": 2,
+  "id": "virginia_beach",
+  "name": "Virginia Beach",
+  "state": "VA",
+  "center": {
+    "lat": 36.8528,
+    "lng": -76.1089
+  },
+  "metro_bbox": {
+    "min_lat": 36.54,
+    "max_lat": 36.96,
+    "min_lng": -76.22,
+    "max_lng": -75.91
+  },
+  "divisions": {
+    "RESORT_AREA": {
+      "name": "RESORT_AREA",
+      "center": {
+        "lat": 36.885,
+        "lng": -75.965
+      },
+      "bbox": {
+        "min_lat": 36.83,
+        "max_lat": 36.95,
+        "min_lng": -76.0,
+        "max_lng": -75.91
+      },
+      "submarkets": [
+        "Oceanfront Resort District",
+        "North End & Cape Henry",
+        "Cavalier Beach"
+      ]
+    },
+    "TOWN_CENTER": {
+      "name": "TOWN_CENTER",
+      "center": {
+        "lat": 36.855,
+        "lng": -76.1089
+      },
+      "bbox": {
+        "min_lat": 36.82,
+        "max_lat": 36.9,
+        "min_lng": -76.14,
+        "max_lng": -76.07
+      },
+      "submarkets": [
+        "Virginia Beach Town Center",
+        "Pembroke / Independence",
+        "Lynnhaven Mall District"
+      ]
+    },
+    "KEMPSVILLE": {
+      "name": "KEMPSVILLE",
+      "center": {
+        "lat": 36.815,
+        "lng": -76.165
+      },
+      "bbox": {
+        "min_lat": 36.75,
+        "max_lat": 36.86,
+        "min_lng": -76.22,
+        "max_lng": -76.1
+      },
+      "submarkets": [
+        "Kempsville",
+        "Princess Anne Plaza",
+        "Indian Lakes"
+      ]
+    },
+    "BAYSIDE_GREAT_NECK": {
+      "name": "BAYSIDE_GREAT_NECK",
+      "center": {
+        "lat": 36.895,
+        "lng": -76.14
+      },
+      "bbox": {
+        "min_lat": 36.86,
+        "max_lat": 36.96,
+        "min_lng": -76.2,
+        "max_lng": -76.1
+      },
+      "submarkets": [
+        "Shore Drive Corridor",
+        "Bayside & Little Neck",
+        "Great Neck"
+      ]
+    },
+    "PUNGO_PRINCESS_ANNE": {
+      "name": "PUNGO_PRINCESS_ANNE",
+      "center": {
+        "lat": 36.71,
+        "lng": -76.02
+      },
+      "bbox": {
+        "min_lat": 36.54,
+        "max_lat": 36.78,
+        "min_lng": -76.14,
+        "max_lng": -75.91
+      },
+      "submarkets": [
+        "Princess Anne Commons",
+        "Pungo",
+        "Sandbridge"
+      ]
+    }
+  },
+  "submarkets": {
+    "Oceanfront Resort District": {
+      "name": "Oceanfront Resort District",
+      "division": "RESORT_AREA",
+      "center": {
+        "lat": 36.8529,
+        "lng": -75.978
+      },
+      "description": "Atlantic Avenue hotel-and-entertainment strip between Rudee Inlet and 40th Street with relentless hotel renovation and height-driven permitting."
+    },
+    "North End & Cape Henry": {
+      "name": "North End & Cape Henry",
+      "division": "RESORT_AREA",
+      "center": {
+        "lat": 36.91,
+        "lng": -75.988
+      },
+      "description": "Guarded residential beach enclave of shingle-style homes from 52nd to 88th Street with teardown-and-rebuild pressure on oceanfront lots."
+    },
+    "Cavalier Beach": {
+      "name": "Cavalier Beach",
+      "division": "RESORT_AREA",
+      "center": {
+        "lat": 36.889,
+        "lng": -75.979
+      },
+      "description": "Cavalier Hotel and Cardinal Road district mixing landmark-hotel restoration with premium condo infill at the North End gate."
+    },
+    "Virginia Beach Town Center": {
+      "name": "Virginia Beach Town Center",
+      "division": "TOWN_CENTER",
+      "center": {
+        "lat": 36.8528,
+        "lng": -76.1089
+      },
+      "description": "The city's planned high-rise CBD around Pembroke Avenue and Constitution Drive with office towers, a Westin anchor, and the densest commercial pipeline."
+    },
+    "Pembroke / Independence": {
+      "name": "Pembroke / Independence",
+      "division": "TOWN_CENTER",
+      "center": {
+        "lat": 36.861,
+        "lng": -76.129
+      },
+      "description": "Independence Boulevard office-and-retail spine north of Town Center absorbing older strip parcels into mixed-use redevelopment."
+    },
+    "Lynnhaven Mall District": {
+      "name": "Lynnhaven Mall District",
+      "division": "TOWN_CENTER",
+      "center": {
+        "lat": 36.845,
+        "lng": -76.128
+      },
+      "description": "Regional-mall retail core at Virginia Beach Blvd and Independence with outparcel medical and hospitality refits."
+    },
+    "Kempsville": {
+      "name": "Kempsville",
+      "division": "KEMPSVILLE",
+      "center": {
+        "lat": 36.82,
+        "lng": -76.175
+      },
+      "description": "Mature residential crossroads at Kempsville Road and Providence Road with steady additions, roof-and-HVAC trades, and neighborhood retail."
+    },
+    "Princess Anne Plaza": {
+      "name": "Princess Anne Plaza",
+      "division": "KEMPSVILLE",
+      "center": {
+        "lat": 36.798,
+        "lng": -76.13
+      },
+      "description": "Post-war plaza-and-ranch grid near the Municipal Center with municipal-adjacent services and investor renovation flow."
+    },
+    "Indian Lakes": {
+      "name": "Indian Lakes",
+      "division": "KEMPSVILLE",
+      "center": {
+        "lat": 36.825,
+        "lng": -76.14
+      },
+      "description": "Golf-course community of lakeside colonials east of Kempsville with kitchen-and-deck renovation demand."
+    },
+    "Shore Drive Corridor": {
+      "name": "Shore Drive Corridor",
+      "division": "BAYSIDE_GREAT_NECK",
+      "center": {
+        "lat": 36.905,
+        "lng": -76.155
+      },
+      "description": "Chesapeake Bay resort corridor from Lynnhaven Inlet to First Landing State Park with condo-repurposing and restaurant-row licensing."
+    },
+    "Bayside & Little Neck": {
+      "name": "Bayside & Little Neck",
+      "division": "BAYSIDE_GREAT_NECK",
+      "center": {
+        "lat": 36.885,
+        "lng": -76.15
+      },
+      "description": "Working residential grid between Shore Drive and Independence with starter-stock turnover and accessory-dwelling interest."
+    },
+    "Great Neck": {
+      "name": "Great Neck",
+      "division": "BAYSIDE_GREAT_NECK",
+      "center": {
+        "lat": 36.895,
+        "lng": -76.115
+      },
+      "description": "Affluent peninsula of school-adjacent subdivisions and Deep Creek estates with high-value addition permitting."
+    },
+    "Princess Anne Commons": {
+      "name": "Princess Anne Commons",
+      "division": "PUNGO_PRINCESS_ANNE",
+      "center": {
+        "lat": 36.775,
+        "lng": -76.06
+      },
+      "description": "Institutional growth node at the Aquarium and Sportsplex with the city's newest tract-housing and medical-office clusters."
+    },
+    "Pungo": {
+      "name": "Pungo",
+      "division": "PUNGO_PRINCESS_ANNE",
+      "center": {
+        "lat": 36.7,
+        "lng": -76.01
+      },
+      "description": "Rural-agricultural flats of field roads and farmettes under aggressive-by-right estate-lot conversion pressure."
+    },
+    "Sandbridge": {
+      "name": "Sandbridge",
+      "division": "PUNGO_PRINCESS_ANNE",
+      "center": {
+        "lat": 36.6468,
+        "lng": -75.929
+      },
+      "description": "Barrier-island village of rental cottages and dune-line houses at the North Carolina line with storm-rebuild and elevation work."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "IssueDate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "Begin_Date",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "Sales_Date",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/virginia_beach.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

@@ -1,0 +1,313 @@
+{
+  "schema_version": 2,
+  "id": "toledo",
+  "name": "Toledo",
+  "state": "OH",
+  "center": {
+    "lat": 41.6528,
+    "lng": -83.5379
+  },
+  "metro_bbox": {
+    "min_lat": 41.52,
+    "max_lat": 41.76,
+    "min_lng": -83.78,
+    "max_lng": -83.38
+  },
+  "divisions": {
+    "DOWNTOWN_RIVERFRONT": {
+      "name": "DOWNTOWN_RIVERFRONT",
+      "center": {
+        "lat": 41.6528,
+        "lng": -83.5379
+      },
+      "bbox": {
+        "min_lat": 41.638,
+        "max_lat": 41.668,
+        "min_lng": -83.555,
+        "max_lng": -83.52
+      },
+      "submarkets": [
+        "Downtown Toledo",
+        "Warehouse District",
+        "Vistula & Riverfront"
+      ]
+    },
+    "OLD_WEST_END": {
+      "name": "OLD_WEST_END",
+      "center": {
+        "lat": 41.6618,
+        "lng": -83.5716
+      },
+      "bbox": {
+        "min_lat": 41.652,
+        "max_lat": 41.672,
+        "min_lng": -83.585,
+        "max_lng": -83.553
+      },
+      "submarkets": [
+        "Old West End",
+        "Westmoreland"
+      ]
+    },
+    "OTTAWA_HILLS_AREA": {
+      "name": "OTTAWA_HILLS_AREA",
+      "center": {
+        "lat": 41.6741,
+        "lng": -83.6336
+      },
+      "bbox": {
+        "min_lat": 41.66,
+        "max_lat": 41.69,
+        "min_lng": -83.652,
+        "max_lng": -83.615
+      },
+      "submarkets": [
+        "Ottawa Hills",
+        "Westgate Village"
+      ]
+    },
+    "WEST_TOLEDO": {
+      "name": "WEST_TOLEDO",
+      "center": {
+        "lat": 41.686,
+        "lng": -83.6025
+      },
+      "bbox": {
+        "min_lat": 41.665,
+        "max_lat": 41.712,
+        "min_lng": -83.645,
+        "max_lng": -83.56
+      },
+      "submarkets": [
+        "West Toledo",
+        "Library Village",
+        "Franklin Park",
+        "DeVeaux"
+      ]
+    },
+    "NORTH_POINT_PLACE": {
+      "name": "NORTH_POINT_PLACE",
+      "center": {
+        "lat": 41.7055,
+        "lng": -83.5058
+      },
+      "bbox": {
+        "min_lat": 41.682,
+        "max_lat": 41.726,
+        "min_lng": -83.535,
+        "max_lng": -83.468
+      },
+      "submarkets": [
+        "Point Place",
+        "North Towne"
+      ]
+    },
+    "SOUTH_TOLEDO_MONASTERY": {
+      "name": "SOUTH_TOLEDO_MONASTERY",
+      "center": {
+        "lat": 41.6337,
+        "lng": -83.5927
+      },
+      "bbox": {
+        "min_lat": 41.592,
+        "max_lat": 41.668,
+        "min_lng": -83.625,
+        "max_lng": -83.558
+      },
+      "submarkets": [
+        "South Toledo",
+        "Monastery & Parkside"
+      ]
+    },
+    "EAST_SIDE_BIRMINGHAM": {
+      "name": "EAST_SIDE_BIRMINGHAM",
+      "center": {
+        "lat": 41.6588,
+        "lng": -83.4909
+      },
+      "bbox": {
+        "min_lat": 41.64,
+        "max_lat": 41.678,
+        "min_lng": -83.522,
+        "max_lng": -83.455
+      },
+      "submarkets": [
+        "East Toledo",
+        "Birmingham"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Toledo": {
+      "name": "Downtown Toledo",
+      "division": "DOWNTOWN_RIVERFRONT",
+      "center": {
+        "lat": 41.6528,
+        "lng": -83.5379
+      },
+      "description": "Maumee River civic core around Government Center and Fifth Third Field with the densest same-day 311 volume in the metro."
+    },
+    "Warehouse District": {
+      "name": "Warehouse District",
+      "division": "DOWNTOWN_RIVERFRONT",
+      "center": {
+        "lat": 41.6463,
+        "lng": -83.5438
+      },
+      "description": "Nineteenth-century warehouse loft conversions south of downtown with restaurant infill and renovation-led service demand."
+    },
+    "Vistula & Riverfront": {
+      "name": "Vistula & Riverfront",
+      "division": "DOWNTOWN_RIVERFRONT",
+      "center": {
+        "lat": 41.6617,
+        "lng": -83.5306
+      },
+      "description": "Historic Vistula district north of downtown with Italianate stock, riverfront trail investment, and steady code-enforcement load."
+    },
+    "Old West End": {
+      "name": "Old West End",
+      "division": "OLD_WEST_END",
+      "center": {
+        "lat": 41.6641,
+        "lng": -83.5655
+      },
+      "description": "Victorian mansion district around the Toledo Museum of Art with the Midwest's largest collection of period housing and heavy restoration pressure."
+    },
+    "Westmoreland": {
+      "name": "Westmoreland",
+      "division": "OLD_WEST_END",
+      "center": {
+        "lat": 41.6594,
+        "lng": -83.5776
+      },
+      "description": "Museum-adjacent historic district with ambleside-era housing, the Monastery of the Visitation edge, and renovation-heavy 311 demand."
+    },
+    "Ottawa Hills": {
+      "name": "Ottawa Hills",
+      "division": "OTTAWA_HILLS_AREA",
+      "center": {
+        "lat": 41.6689,
+        "lng": -83.637
+      },
+      "description": "Village enclave around the Ottawa River with the metro's highest-value single-family stock and low-volume, high-cost service requests."
+    },
+    "Westgate Village": {
+      "name": "Westgate Village",
+      "division": "OTTAWA_HILLS_AREA",
+      "center": {
+        "lat": 41.6793,
+        "lng": -83.6301
+      },
+      "description": "Central Avenue retail node at the Toledo/Ottawa Hills line with mixed commercial-residential turnover and solid-waste 311 load."
+    },
+    "West Toledo": {
+      "name": "West Toledo",
+      "division": "WEST_TOLEDO",
+      "center": {
+        "lat": 41.6885,
+        "lng": -83.577
+      },
+      "description": "Streetcar-era residential belt between Monroe and Sylvania with bungalow renovation and steady tree/waste service demand."
+    },
+    "Library Village": {
+      "name": "Library Village",
+      "division": "WEST_TOLEDO",
+      "center": {
+        "lat": 41.6726,
+        "lng": -83.5909
+      },
+      "description": "Monroe Street corridor around the historic branch library with small-commercial storefronts and rental turnover."
+    },
+    "Franklin Park": {
+      "name": "Franklin Park",
+      "division": "WEST_TOLEDO",
+      "center": {
+        "lat": 41.6999,
+        "lng": -83.614
+      },
+      "description": "Mall-anchored northwest retail and residential belt with high traffic-related 311 volume and apartment infill."
+    },
+    "DeVeaux": {
+      "name": "DeVeaux",
+      "division": "WEST_TOLEDO",
+      "center": {
+        "lat": 41.6828,
+        "lng": -83.6279
+      },
+      "description": "DeVeaux school-area post-war neighborhoods with owner-occupied stock and modest alteration activity."
+    },
+    "Point Place": {
+      "name": "Point Place",
+      "division": "NORTH_POINT_PLACE",
+      "center": {
+        "lat": 41.715,
+        "lng": -83.49
+      },
+      "description": "Maumee Bay peninsula of marinas and canal housing with flood- and drainage-heavy service requests."
+    },
+    "North Towne": {
+      "name": "North Towne",
+      "division": "NORTH_POINT_PLACE",
+      "center": {
+        "lat": 41.696,
+        "lng": -83.5216
+      },
+      "description": "North Summit Street corridor with mixed industrial-residential edges and code-enforcement 311 load."
+    },
+    "South Toledo": {
+      "name": "South Toledo",
+      "division": "SOUTH_TOLEDO_MONASTERY",
+      "center": {
+        "lat": 41.6092,
+        "lng": -83.5898
+      },
+      "description": "Bowsher-area residential belt south of the Maumee with high same-day 311 volume relative to permit activity."
+    },
+    "Monastery & Parkside": {
+      "name": "Monastery & Parkside",
+      "division": "SOUTH_TOLEDO_MONASTERY",
+      "center": {
+        "lat": 41.6581,
+        "lng": -83.5956
+      },
+      "description": "Parkside Boulevard corridor around the Visitation monastery grounds with stable owner-occupied stock and park-edge 311 demand."
+    },
+    "East Toledo": {
+      "name": "East Toledo",
+      "division": "EAST_SIDE_BIRMINGHAM",
+      "center": {
+        "lat": 41.6547,
+        "lng": -83.5057
+      },
+      "description": "East-of-river residential plateau around East Broadway with infrastructure-heavy 311 demand and sparse new construction."
+    },
+    "Birmingham": {
+      "name": "Birmingham",
+      "division": "EAST_SIDE_BIRMINGHAM",
+      "center": {
+        "lat": 41.6629,
+        "lng": -83.476
+      },
+      "description": "Historic Hungarian neighborhood around Birmingham Festival with intact ethnic housing stock and steady renovation."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "INIT_DATE",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/toledo.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

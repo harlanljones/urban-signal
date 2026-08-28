@@ -149,3 +149,31 @@ test("lookupPrediction errors on a missing cell without throwing", async () => {
   const result = await lookupPrediction(testEnv() as any, { h3Index: "deadbeef" });
   expect("error" in result).toBe(true);
 });
+
+// ---------------------------------------------------------------------------
+// lookupPrediction — US-385 per-cell shard precedence + legacy fallback
+// ---------------------------------------------------------------------------
+
+test("lookupPrediction prefers the per-cell shard when present", async () => {
+  const result = (await lookupPrediction(testEnv() as any, {
+    h3Index: "892830bbfffffff",
+  })) as any;
+  expect(result.lims_score).toBe(91.0);
+  expect(result.source).toBe("per-cell-shard");
+});
+
+test("lookupPrediction falls back to the legacy cells/index value when no shard exists", async () => {
+  const result = (await lookupPrediction(testEnv() as any, {
+    h3Index: "892a10708b7ffff",
+  })) as any;
+  expect(result.lims_score).toBe(97.5);
+  expect(result.shap_attributions).toEqual([{ f: "x", v: 0.4 }]);
+});
+
+test("lookupPrediction strips shap from the legacy fallback when includeShap is false", async () => {
+  const result = (await lookupPrediction(testEnv() as any, {
+    h3Index: "892a10708b7ffff",
+    includeShap: false,
+  })) as any;
+  expect(result.shap_attributions).toBeUndefined();
+});

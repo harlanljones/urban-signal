@@ -35,11 +35,24 @@ product city JSONs).
 
 ## Current step
 
-Surveying existing signal-research leaves (`us101-lodes`, `signal-overture`,
-`signal-nlcd`, `signal-acs`, `us122-qcew`) + spatial module layout before writing
-`national_grid.py`, to reuse rather than duplicate.
+US-382 deliverables complete (uncommitted — repo policy: human/CI commits):
+- `src/spatial/assets/us_outline_census_20m.geojson` — vendored Census
+  cb_2023_us_nation_20m (public domain), simplified 0.004°/5dp, 82 parts, 102 KB.
+- `src/spatial/national_grid.py` — hierarchically-closed pyramid res 4/5/6;
+  golden counts 5,251 / 36,757 / 257,299 (closure cost vs raw polyfill: +0.04% at
+  res 5; raw fill is NOT parent-closed along coastlines).
+- `src/export/national_builder.py` — LODES v1 signal (WAC jobs / RAC workers,
+  sha-verified downloads, block internal-point → hex aggregation, null-honest
+  group sums, percentile ranks reused from snapshot_builder), Parquet chunks
+  partitioned by res-3 parent + build_report.json; CLI mirrors snapshot_builder.
+- Tests: 20 unit tests green (test_national_grid.py, test_national_builder.py —
+  synthetic fixtures, no network); real-network proof run: Delaware 2023
+  (6,373 WAC / 12,698 RAC blocks → 144/257,299 cells with jobs; 409,883 jobs,
+  407,158 workers; null cells keep null ranks). `pytest -m interlock` green.
+  ruff clean. No spine edits; no overlap with wave-4 dirty files.
 
 ## Next step
 
-Read existing signal leaf logs + spatial module; then implement polyfill + golden
-count gate; then national_builder skeleton with one signal end-to-end.
+Close US-382 on Linear; claim US-385 (KV sharding + CI gates, lowest open).
+Remaining signals (buildings/OSM/VIIRS/ACS) are documented TODOs in
+national_builder.py for follow-up tickets.

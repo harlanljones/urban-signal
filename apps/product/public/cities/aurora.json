@@ -1,0 +1,228 @@
+{
+  "schema_version": 2,
+  "id": "aurora",
+  "name": "Aurora",
+  "state": "CO",
+  "center": {
+    "lat": 39.7294,
+    "lng": -104.8319
+  },
+  "metro_bbox": {
+    "min_lat": 39.54,
+    "max_lat": 39.83,
+    "min_lng": -104.98,
+    "max_lng": -104.6
+  },
+  "divisions": {
+    "NORTHWEST_URBAN_CORE": {
+      "name": "NORTHWEST_URBAN_CORE",
+      "center": {
+        "lat": 39.75,
+        "lng": -104.875
+      },
+      "bbox": {
+        "min_lat": 39.72,
+        "max_lat": 39.8,
+        "min_lng": -104.98,
+        "max_lng": -104.85
+      },
+      "submarkets": [
+        "Original Aurora & Colfax",
+        "Northwest Aurora MLK"
+      ]
+    },
+    "FITZSIMONS_ANSHUTZ": {
+      "name": "FITZSIMONS_ANSHUTZ",
+      "center": {
+        "lat": 39.74,
+        "lng": -104.835
+      },
+      "bbox": {
+        "min_lat": 39.72,
+        "max_lat": 39.8,
+        "min_lng": -104.85,
+        "max_lng": -104.8
+      },
+      "submarkets": [
+        "Anschutz Medical Campus"
+      ]
+    },
+    "AURORA_HIGHLANDS_EAST": {
+      "name": "AURORA_HIGHLANDS_EAST",
+      "center": {
+        "lat": 39.765,
+        "lng": -104.74
+      },
+      "bbox": {
+        "min_lat": 39.7,
+        "max_lat": 39.83,
+        "min_lng": -104.8,
+        "max_lng": -104.6
+      },
+      "submarkets": [
+        "Aurora Highlands",
+        "Painted Prairie"
+      ]
+    },
+    "CENTRAL_HAVANA": {
+      "name": "CENTRAL_HAVANA",
+      "center": {
+        "lat": 39.7,
+        "lng": -104.855
+      },
+      "bbox": {
+        "min_lat": 39.66,
+        "max_lat": 39.72,
+        "min_lng": -104.9,
+        "max_lng": -104.82
+      },
+      "submarkets": [
+        "Havana Business District",
+        "Mission Viejo & Aurora Hills"
+      ]
+    },
+    "SOUTHEAST_SOUTHLANDS": {
+      "name": "SOUTHEAST_SOUTHLANDS",
+      "center": {
+        "lat": 39.615,
+        "lng": -104.745
+      },
+      "bbox": {
+        "min_lat": 39.54,
+        "max_lat": 39.67,
+        "min_lng": -104.78,
+        "max_lng": -104.6
+      },
+      "submarkets": [
+        "Southlands",
+        "Seven Hills & Saddle Rock"
+      ]
+    },
+    "SOUTHWEST_SMOKY_HILL": {
+      "name": "SOUTHWEST_SMOKY_HILL",
+      "center": {
+        "lat": 39.61,
+        "lng": -104.85
+      },
+      "bbox": {
+        "min_lat": 39.54,
+        "max_lat": 39.66,
+        "min_lng": -104.92,
+        "max_lng": -104.78
+      },
+      "submarkets": [
+        "Piney Creek & Smoky Hill"
+      ]
+    }
+  },
+  "submarkets": {
+    "Original Aurora & Colfax": {
+      "name": "Original Aurora & Colfax",
+      "division": "NORTHWEST_URBAN_CORE",
+      "center": {
+        "lat": 39.7405,
+        "lng": -104.868
+      },
+      "description": "East Colfax cultural arts district and the city's oldest grid with facade grants, mixed-use conversions, and steady alteration permitting."
+    },
+    "Northwest Aurora MLK": {
+      "name": "Northwest Aurora MLK",
+      "division": "NORTHWEST_URBAN_CORE",
+      "center": {
+        "lat": 39.772,
+        "lng": -104.89
+      },
+      "description": "MLK Boulevard corridor of post-war tract housing with renovation-led permitting and infill on former school sites."
+    },
+    "Anschutz Medical Campus": {
+      "name": "Anschutz Medical Campus",
+      "division": "FITZSIMONS_ANSHUTZ",
+      "center": {
+        "lat": 39.7433,
+        "lng": -104.8342
+      },
+      "description": "Fitzsimons life-sciences anchor with continuous institutional expansion, med-ed tenancy, and the metro's densest permit velocity per parcel."
+    },
+    "Aurora Highlands": {
+      "name": "Aurora Highlands",
+      "division": "AURORA_HIGHLANDS_EAST",
+      "center": {
+        "lat": 39.774,
+        "lng": -104.746
+      },
+      "description": "Master-planned northeast growth corridor with new-build tract permitting, school-package filings, and Gaylord-scale commercial pads."
+    },
+    "Painted Prairie": {
+      "name": "Painted Prairie",
+      "division": "AURORA_HIGHLANDS_EAST",
+      "center": {
+        "lat": 39.7866,
+        "lng": -104.7952
+      },
+      "description": "Newer mixed-housing development near Tower Road with builder-driven permit volume and neighborhood-retail pads."
+    },
+    "Havana Business District": {
+      "name": "Havana Business District",
+      "division": "CENTRAL_HAVANA",
+      "center": {
+        "lat": 39.71,
+        "lng": -104.866
+      },
+      "description": "Havana BID strip with immigrant-owned small business licensing, facade improvements, and transit-adjacent infill."
+    },
+    "Mission Viejo & Aurora Hills": {
+      "name": "Mission Viejo & Aurora Hills",
+      "division": "CENTRAL_HAVANA",
+      "center": {
+        "lat": 39.68,
+        "lng": -104.83
+      },
+      "description": "Mid-century residential belt around Aurora Hills library with basement-finish and roof-permit cadence."
+    },
+    "Southlands": {
+      "name": "Southlands",
+      "division": "SOUTHEAST_SOUTHLANDS",
+      "center": {
+        "lat": 39.6,
+        "lng": -104.73
+      },
+      "description": "Southeast lifestyle-retail anchor with townhome infill, E-470 pad sites, and the metro's newest-roof stock."
+    },
+    "Seven Hills & Saddle Rock": {
+      "name": "Seven Hills & Saddle Rock",
+      "division": "SOUTHEAST_SOUTHLANDS",
+      "center": {
+        "lat": 39.645,
+        "lng": -104.77
+      },
+      "description": "Golf-course custom-build belt with high-valuation new construction and pool/deck auxiliary permits."
+    },
+    "Piney Creek & Smoky Hill": {
+      "name": "Piney Creek & Smoky Hill",
+      "division": "SOUTHWEST_SMOKY_HILL",
+      "center": {
+        "lat": 39.614,
+        "lng": -104.793
+      },
+      "description": "Piney Creek village housing next to the Smoky Hill Road retail spine with steady renovation and business-license churn."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "IssueDate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "Issue_Date",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/aurora.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

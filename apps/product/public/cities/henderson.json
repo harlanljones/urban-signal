@@ -1,0 +1,208 @@
+{
+  "schema_version": 2,
+  "id": "henderson",
+  "name": "Henderson",
+  "state": "NV",
+  "center": {
+    "lat": 36.0395,
+    "lng": -115.0341
+  },
+  "metro_bbox": {
+    "min_lat": 35.9,
+    "max_lat": 36.1,
+    "min_lng": -115.15,
+    "max_lng": -114.82
+  },
+  "divisions": {
+    "DOWNTOWN_WATER_STREET": {
+      "name": "DOWNTOWN_WATER_STREET",
+      "center": {
+        "lat": 36.0403,
+        "lng": -114.9815
+      },
+      "bbox": {
+        "min_lat": 36.03,
+        "max_lat": 36.055,
+        "min_lng": -115.0,
+        "max_lng": -114.965
+      },
+      "submarkets": [
+        "Water Street District"
+      ]
+    },
+    "GREEN_VALLEY_WEST": {
+      "name": "GREEN_VALLEY_WEST",
+      "center": {
+        "lat": 36.0125,
+        "lng": -115.034
+      },
+      "bbox": {
+        "min_lat": 35.998,
+        "max_lat": 36.035,
+        "min_lng": -115.055,
+        "max_lng": -115.002
+      },
+      "submarkets": [
+        "Green Valley"
+      ]
+    },
+    "GREEN_VALLEY_RANCH": {
+      "name": "GREEN_VALLEY_RANCH",
+      "center": {
+        "lat": 36.0185,
+        "lng": -114.99
+      },
+      "bbox": {
+        "min_lat": 36.005,
+        "max_lat": 36.03,
+        "min_lng": -115.0,
+        "max_lng": -114.975
+      },
+      "submarkets": [
+        "Green Valley Ranch"
+      ]
+    },
+    "FOOTHILLS_SOUTH": {
+      "name": "FOOTHILLS_SOUTH",
+      "center": {
+        "lat": 36.005,
+        "lng": -114.948
+      },
+      "bbox": {
+        "min_lat": 35.96,
+        "max_lat": 36.02,
+        "min_lng": -115.01,
+        "max_lng": -114.92
+      },
+      "submarkets": [
+        "Anthem",
+        "Seven Hills",
+        "MacDonald Ranch"
+      ]
+    },
+    "LAKE_LAS_VEGAS": {
+      "name": "LAKE_LAS_VEGAS",
+      "center": {
+        "lat": 36.0235,
+        "lng": -114.9185
+      },
+      "bbox": {
+        "min_lat": 36.015,
+        "max_lat": 36.038,
+        "min_lng": -114.94,
+        "max_lng": -114.9
+      },
+      "submarkets": [
+        "Lake Las Vegas"
+      ]
+    },
+    "WEST_INNOVATION": {
+      "name": "WEST_INNOVATION",
+      "center": {
+        "lat": 35.992,
+        "lng": -115.02
+      },
+      "bbox": {
+        "min_lat": 35.975,
+        "max_lat": 35.997,
+        "min_lng": -115.06,
+        "max_lng": -115.01
+      },
+      "submarkets": [
+        "Innovation District"
+      ]
+    }
+  },
+  "submarkets": {
+    "Water Street District": {
+      "name": "Water Street District",
+      "division": "DOWNTOWN_WATER_STREET",
+      "center": {
+        "lat": 36.0403,
+        "lng": -114.9815
+      },
+      "description": "City core along Water Street with the civic center, facade-renewal infill, and the downtown redevelopment corridor's mixed-use permitting."
+    },
+    "Green Valley": {
+      "name": "Green Valley",
+      "division": "GREEN_VALLEY_WEST",
+      "center": {
+        "lat": 36.0125,
+        "lng": -115.034
+      },
+      "description": "Master-planned 1970s-90s valley west of Green Valley Parkway with pool-home renovation, kitchen/bath alterations, and steady resale turnover."
+    },
+    "Green Valley Ranch": {
+      "name": "Green Valley Ranch",
+      "division": "GREEN_VALLEY_RANCH",
+      "center": {
+        "lat": 36.0185,
+        "lng": -114.99
+      },
+      "description": "GVR master plan around The District and the resort corridor with village retail, townhome infill, and the metro's highest lease pressure."
+    },
+    "Anthem": {
+      "name": "Anthem",
+      "division": "FOOTHILLS_SOUTH",
+      "center": {
+        "lat": 36.001,
+        "lng": -114.933
+      },
+      "description": "Gated foothills country-club belt below the Black Mountains with luxury custom-lot builds and the metro's top valuation band."
+    },
+    "Seven Hills": {
+      "name": "Seven Hills",
+      "division": "FOOTHILLS_SOUTH",
+      "center": {
+        "lat": 36.005,
+        "lng": -114.974
+      },
+      "description": "Hillside village plan south of the 215 with view-lot estate renovation and clubhouse-adjacent retail on Seven Hills Drive."
+    },
+    "MacDonald Ranch": {
+      "name": "MacDonald Ranch",
+      "division": "FOOTHILLS_SOUTH",
+      "center": {
+        "lat": 36.016,
+        "lng": -114.941
+      },
+      "description": "MacDonald Highlands and the Ranch corridor with guard-gated custom estates, hillside grading permits, and golf-course frontage stock."
+    },
+    "Lake Las Vegas": {
+      "name": "Lake Las Vegas",
+      "division": "LAKE_LAS_VEGAS",
+      "center": {
+        "lat": 36.0235,
+        "lng": -114.9185
+      },
+      "description": "Resort lake enclave around MonteLago Village with villa and condo product, hospitality-led permitting, and short-stay sensitive demand."
+    },
+    "Innovation District": {
+      "name": "Innovation District",
+      "division": "WEST_INNOVATION",
+      "center": {
+        "lat": 35.992,
+        "lng": -115.02
+      },
+      "description": "West Henderson's designated innovation corridor (Union Village / MedCity adjacency) with industrial-to-civic conversion and anchor-institution expansion."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "IssueDate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "csv",
+      "watermark_col": "Original Issue Date",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/henderson.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

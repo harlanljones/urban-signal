@@ -9,7 +9,13 @@ identical to the live serving API. Output layout (per run):
     <out>/catalysts/{city}.json    Active catalyst clusters (min_lims = 84.0)
     <out>/catalysts/index.json     All metros' catalysts flattened with city attribution
     <out>/submarkets/{city}.json   Submarket catalog per city
-    <out>/cells.json               Global h3_index -> prediction map (SHAP included)
+    <out>/cells.json               Global h3_index -> prediction map (SHAP included);
+                                   legacy single-key format, written only during the
+                                   per-cell compat window (--skip-legacy-cells to omit)
+    <out>/cells/{h3}.json          Per-cell prediction shards (one KV key per cell —
+                                   point lookups read exactly one key, and no single
+                                   value can approach the 25 MiB KV cap)
+    <out>/cells/index_meta.json    Sharding metadata {sharded, total, generated_at}
     <out>/manifest.json            Run metadata (generated_at, cities, keys, counts,
                                    tile_index, metro_index, tile_resolution)
     <out>/kv-bulk.json             Single file for `wrangler kv bulk put`
@@ -28,15 +34,17 @@ import asyncio
 import json
 import logging
 import math
+import os
+from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 import h3
 
-from src.spatial.city_registry import CityId, REGISTRY
 from src.serving import router as api_router
 from src.serving.engine import MultiHorizonInferenceEngine
+from src.spatial.city_registry import REGISTRY, CityId
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +54,15 @@ DEFAULT_K_RING = 1
 CATALYST_THRESHOLD = 84.0
 CATALYST_LIMIT = 50
 TILE_RESOLUTION = 5
+# Size budgets (US-385): a publish that would exceed Workers KV limits must fail
+# the build here, not inside `wrangler kv bulk put` at 2 AM.
+MAX_KV_VALUE_BYTES = 20 * 1024 * 1024  # KV hard cap is 25 MiB per value
+MAX_MANIFEST_BYTES = 10 * 1024 * 1024  # boot manifest fetched by every visitor
+MAX_BULK_BYTES = 512 * 1024 * 1024
+# Cells inference is the dominant build cost; ONNX sessions are thread-safe for
+# concurrent run() calls, and pool.map preserves submission order so the publish
+# stays deterministic.
+CELL_INFERENCE_WORKERS = min(8, os.cpu_count() or 4)
 NORMALIZED_METRICS = (
     "lims_score",
     "delta_6m_p50",
@@ -187,7 +204,9 @@ def _flatten_catalysts(catalysts_by_city: dict[str, dict[str, Any]]) -> dict[str
             enriched.setdefault("city_id", payload.get("city_id", city))
             enriched["city_name"] = city_name
             entries.append(enriched)
-    entries.sort(key=lambda entry: (-float(entry.get("lims_score", 0.0)), str(entry.get("h3_index"))))
+    entries.sort(
+        key=lambda entry: (-float(entry.get("lims_score", 0.0)), str(entry.get("h3_index")))
+    )
     return {
         "count": len(entries),
         "threshold": CATALYST_THRESHOLD,
@@ -200,8 +219,15 @@ async def build_snapshot(
     out_dir: Path,
     engine: MultiHorizonInferenceEngine | None = None,
     cities: list[str] | None = None,
+    include_legacy_cells: bool = True,
 ) -> dict[str, Any]:
-    """Build all snapshot artifacts into out_dir and return the manifest dict."""
+    """Build all snapshot artifacts into out_dir and return the manifest dict.
+
+    ``include_legacy_cells`` keeps writing the monolithic ``cells/index`` value
+    during the compat window so an already-deployed worker (which reads the
+    single key) keeps serving while ``cells/{h3}`` shards roll out. Flip to
+    False once the worker's per-cell lookup path is live everywhere.
+    """
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     cities = list(cities or SUPPORTED_CITIES)
@@ -215,6 +241,11 @@ async def build_snapshot(
 
     def register(key: str, path: Path, payload: Any) -> None:
         size = _write_json(path, payload)
+        if size > MAX_KV_VALUE_BYTES:
+            raise ValueError(
+                f"KV value '{key}' is {size:,} bytes, over the {MAX_KV_VALUE_BYTES:,}-byte "
+                f"build budget (KV hard cap 25 MiB). Shard the key before publishing."
+            )
         keys_index[key] = {"bytes": size}
         kv_entries.append({"key": key, "value": json.dumps(payload, separators=(",", ":"))})
 
@@ -246,7 +277,8 @@ async def build_snapshot(
     # Percentiles must see every exported metro before anything reaches KV.
     _apply_percentile_normalization(grids)
 
-    cells_index: dict[str, Any] = {}
+    cells_requests: list[tuple[str, dict[str, Any]]] = []
+    seen_cells: set[str] = set()
 
     for city in cities:
         grid = grids[city]
@@ -266,15 +298,33 @@ async def build_snapshot(
         for feature in grid.get("features", []):
             props = feature.get("properties", {})
             h3_cell = props.get("h3_index")
-            if not h3_cell or h3_cell in cells_index:
+            if not h3_cell or h3_cell in seen_cells:
                 continue
+            seen_cells.add(h3_cell)
             feats = {k: props[k] for k in CELL_FEATURE_KEYS if k in props}
-            pred = engine.predict_cell_features(
-                h3_index=h3_cell, feature_dict=feats, include_shap=True
-            )
-            cells_index[h3_cell] = pred
+            cells_requests.append((h3_cell, feats))
 
-    register("cells/index", out_dir / "cells.json", cells_index)
+    # Inference runs on a thread pool (ONNX sessions are thread-safe); results
+    # are consumed in submission order so the publish is deterministic.
+    def _predict(request: tuple[str, dict[str, Any]]) -> dict[str, Any]:
+        h3_cell, feats = request
+        return engine.predict_cell_features(h3_index=h3_cell, feature_dict=feats, include_shap=True)
+
+    with ThreadPoolExecutor(max_workers=CELL_INFERENCE_WORKERS) as pool:
+        predictions = list(pool.map(_predict, cells_requests))
+    cells_by_index = {request[0]: pred for request, pred in zip(cells_requests, predictions)}
+
+    for h3_cell, pred in cells_by_index.items():
+        register(f"cells/{h3_cell}", out_dir / "cells" / f"{h3_cell}.json", pred)
+
+    cells_meta = {
+        "sharded": True,
+        "total": len(cells_by_index),
+        "generated_at": datetime.now(UTC).isoformat(),
+    }
+    register("cells/index_meta", out_dir / "cells" / "index_meta.json", cells_meta)
+    if include_legacy_cells:
+        register("cells/index", out_dir / "cells.json", cells_by_index)
 
     tiles = _bucket_grid_tiles(grids)
     tile_index: dict[str, dict[str, Any]] = {}
@@ -292,7 +342,11 @@ async def build_snapshot(
             "bbox": _features_bbox(features),
         }
 
-    register("catalysts/index", out_dir / "catalysts" / "index.json", _flatten_catalysts(catalysts_by_city))
+    register(
+        "catalysts/index",
+        out_dir / "catalysts" / "index.json",
+        _flatten_catalysts(catalysts_by_city),
+    )
 
     manifest = {
         "generated_at": datetime.now(UTC).isoformat(),
@@ -302,22 +356,34 @@ async def build_snapshot(
         "k_ring": DEFAULT_K_RING,
         "catalyst_threshold": CATALYST_THRESHOLD,
         "counts": counts,
-        "cells": len(cells_index),
+        "cells": len(cells_by_index),
+        "cells_sharded": True,
         "keys": keys_index,
         "tile_resolution": TILE_RESOLUTION,
         "tile_index": tile_index,
         "metro_index": _build_metro_index(grids),
     }
+    manifest_size = _write_json(out_dir / "manifest.json", manifest)
+    if manifest_size > MAX_MANIFEST_BYTES:
+        raise ValueError(
+            f"Manifest is {manifest_size:,} bytes, over the {MAX_MANIFEST_BYTES:,}-byte boot "
+            f"budget. Slim it (split tile_index into its own key) before publishing."
+        )
     register("manifest", out_dir / "manifest.json", manifest)
 
     bulk_path = out_dir / "kv-bulk.json"
     bulk_path.write_text(json.dumps(kv_entries), encoding="utf-8")
+    if bulk_path.stat().st_size > MAX_BULK_BYTES:
+        raise ValueError(
+            f"kv-bulk.json is {bulk_path.stat().st_size:,} bytes, over the "
+            f"{MAX_BULK_BYTES:,}-byte build budget. Chunk the bulk put."
+        )
 
     logger.info(
-        "Snapshot complete: %d KV keys (%d grid tiles), %d cells -> %s (%d bytes bulk)",
+        "Snapshot complete: %d KV keys (%d grid tiles, %d cells) -> %s (%d bytes bulk)",
         len(kv_entries),
         len(tile_index),
-        len(cells_index),
+        len(cells_by_index),
         bulk_path,
         bulk_path.stat().st_size,
     )
@@ -344,8 +410,19 @@ def main() -> None:
         choices=SUPPORTED_CITIES,
         help="Subset of cities to export",
     )
+    parser.add_argument(
+        "--skip-legacy-cells",
+        action="store_true",
+        help="Do not write the monolithic cells/index value (per-cell shards only)",
+    )
     args = parser.parse_args()
-    asyncio.run(build_snapshot(Path(args.out), cities=args.cities))
+    asyncio.run(
+        build_snapshot(
+            Path(args.out),
+            cities=args.cities,
+            include_legacy_cells=not args.skip_legacy_cells,
+        )
+    )
 
 
 if __name__ == "__main__":

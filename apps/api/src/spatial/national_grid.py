@@ -20,7 +20,7 @@ cells at res 5 (+0.04% area), identical at res 4.
 
 from __future__ import annotations
 
-from functools import lru_cache
+from functools import cache, lru_cache
 from pathlib import Path
 
 import h3
@@ -77,7 +77,7 @@ def base_cells(resolution: int = BASE_RESOLUTION) -> tuple[str, ...]:
     return tuple(sorted(cells))
 
 
-@lru_cache(maxsize=None)
+@cache
 def cells_at_resolution(resolution: int) -> tuple[str, ...]:
     """All national cells at ``resolution``, hierarchically closed to the base polyfill."""
     if resolution not in NATIONAL_RESOLUTIONS:

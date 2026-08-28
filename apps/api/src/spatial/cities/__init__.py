@@ -398,6 +398,41 @@ from src.spatial.cities.st_louis import (
     ST_LOUIS_SUBMARKETS,
     is_in_st_louis_metro,
 )
+from src.spatial.cities.aurora import (
+    AURORA_DIVISION_BBOXES,
+    AURORA_DIVISIONS,
+    AURORA_METRO_BBOX,
+    AURORA_SUBMARKETS,
+    is_in_aurora_metro,
+)
+from src.spatial.cities.henderson import (
+    HENDERSON_DIVISION_BBOXES,
+    HENDERSON_DIVISIONS,
+    HENDERSON_METRO_BBOX,
+    HENDERSON_SUBMARKETS,
+    is_in_henderson_metro,
+)
+from src.spatial.cities.virginia_beach import (
+    VIRGINIA_BEACH_DIVISION_BBOXES,
+    VIRGINIA_BEACH_DIVISIONS,
+    VIRGINIA_BEACH_METRO_BBOX,
+    VIRGINIA_BEACH_SUBMARKETS,
+    is_in_virginia_beach_metro,
+)
+from src.spatial.cities.omaha import (
+    OMAHA_DIVISION_BBOXES,
+    OMAHA_DIVISIONS,
+    OMAHA_METRO_BBOX,
+    OMAHA_SUBMARKETS,
+    is_in_omaha_metro,
+)
+from src.spatial.cities.toledo import (
+    TOLEDO_DIVISION_BBOXES,
+    TOLEDO_DIVISIONS,
+    TOLEDO_METRO_BBOX,
+    TOLEDO_SUBMARKETS,
+    is_in_toledo_metro,
+)
 
 __all__ = [
     "PIERCE_METRO_BBOX",
@@ -681,4 +716,29 @@ __all__ = [
     "ST_LOUIS_DIVISIONS",
     "ST_LOUIS_SUBMARKETS",
     "is_in_st_louis_metro",
+    "AURORA_METRO_BBOX",
+    "AURORA_DIVISION_BBOXES",
+    "AURORA_DIVISIONS",
+    "AURORA_SUBMARKETS",
+    "is_in_aurora_metro",
+    "HENDERSON_METRO_BBOX",
+    "HENDERSON_DIVISION_BBOXES",
+    "HENDERSON_DIVISIONS",
+    "HENDERSON_SUBMARKETS",
+    "is_in_henderson_metro",
+    "VIRGINIA_BEACH_METRO_BBOX",
+    "VIRGINIA_BEACH_DIVISION_BBOXES",
+    "VIRGINIA_BEACH_DIVISIONS",
+    "VIRGINIA_BEACH_SUBMARKETS",
+    "is_in_virginia_beach_metro",
+    "OMAHA_METRO_BBOX",
+    "OMAHA_DIVISION_BBOXES",
+    "OMAHA_DIVISIONS",
+    "OMAHA_SUBMARKETS",
+    "is_in_omaha_metro",
+    "TOLEDO_METRO_BBOX",
+    "TOLEDO_DIVISION_BBOXES",
+    "TOLEDO_DIVISIONS",
+    "TOLEDO_SUBMARKETS",
+    "is_in_toledo_metro",
 ]

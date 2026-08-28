@@ -2283,6 +2283,186 @@
         "lng": -90.1994
       },
       "evidence_path": "apps/api/src/spatial/cities/st_louis.py"
+    },
+    {
+      "id": "aurora",
+      "name": "Aurora",
+      "state": "CO",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 10,
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "IssueDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "Issue_Date",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 39.7294,
+        "lng": -104.8319
+      },
+      "evidence_path": "apps/api/src/spatial/cities/aurora.py"
+    },
+    {
+      "id": "henderson",
+      "name": "Henderson",
+      "state": "NV",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 8,
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "IssueDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "csv",
+          "watermark_col": "Original Issue Date",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 36.0395,
+        "lng": -115.0341
+      },
+      "evidence_path": "apps/api/src/spatial/cities/henderson.py"
+    },
+    {
+      "id": "virginia_beach",
+      "name": "Virginia Beach",
+      "state": "VA",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 15,
+      "feeds": [
+        true,
+        false,
+        true,
+        true
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "IssueDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "Begin_Date",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "Sales_Date",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 36.8528,
+        "lng": -76.1089
+      },
+      "evidence_path": "apps/api/src/spatial/cities/virginia_beach.py"
+    },
+    {
+      "id": "omaha",
+      "name": "Omaha",
+      "state": "NE",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 9,
+      "feeds": [
+        false,
+        true,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "DATETIMEINIT",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 41.258,
+        "lng": -95.937
+      },
+      "evidence_path": "apps/api/src/spatial/cities/omaha.py"
+    },
+    {
+      "id": "toledo",
+      "name": "Toledo",
+      "state": "OH",
+      "divisions": "7 divisions",
+      "division_count": 7,
+      "submarket_count": 17,
+      "feeds": [
+        false,
+        true,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "INIT_DATE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 41.6528,
+        "lng": -83.5379
+      },
+      "evidence_path": "apps/api/src/spatial/cities/toledo.py"
     }
   ],
   "pipeline": [

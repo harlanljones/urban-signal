@@ -161,6 +161,10 @@ export async function querySubmarkets(
  * Returns the cell prediction, or `{ error }` when the cell/snapshot is missing
  * or h3_index is blank. Strips `shap_attributions` only when `includeShap` is
  * explicitly `false` (the same trigger the adapters use).
+ *
+ * Reads the per-cell shard `cells/{h3_index}` first (US-385: one KV lookup per
+ * request instead of parsing the monolithic `cells/index` value) and falls back
+ * to the legacy single key while the compat window is open.
  */
 export type PredictionOutcome = Record<string, unknown> | { error: string };
 
@@ -171,11 +175,19 @@ export async function lookupPrediction(
   const h3Index = opts.h3Index?.trim();
   if (!h3Index) return { error: "'h3_index' is required." };
 
-  const entry = await kvJson(env, "cells/index");
-  if (!entry) return { error: "No prediction snapshot available." };
+  let pred: Record<string, unknown> | undefined;
 
-  const cells = entry.value as Record<string, Record<string, unknown>>;
-  const pred = cells[h3Index];
+  const shard = await kvJson(env, `cells/${h3Index}`);
+  if (shard) pred = shard.value as Record<string, unknown>;
+
+  if (!pred) {
+    const entry = await kvJson(env, "cells/index");
+    if (entry) {
+      const cells = entry.value as Record<string, Record<string, unknown>>;
+      pred = cells[h3Index];
+    }
+  }
+
   if (!pred) return { error: `No precomputed prediction for cell '${h3Index}'.` };
 
   if (opts.includeShap === false) {

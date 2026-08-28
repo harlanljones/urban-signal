@@ -1119,6 +1119,79 @@ class Settings(BaseSettings):
         description="Phoenix ShapePHX Short Term Rentals ArcGIS MapServer URL (SLA)",
     )
 
+    # Aurora, CO (US-326): issued building permits MapServer 44 (full history,
+    # IssueDate watermark) + non-home business licenses MapServer 77 (Issue_Date
+    # snapshot; L34 liquor / L36 all-business / L4 marijuana companions). Native
+    # outSR=4326 geometry primary; EPSG:2232 State-Plane PropX/PropY fallback.
+    arcgis_aurora_permits_url: str = Field(
+        default="https://ags.auroragov.org/aurora/rest/services/OpenData/MapServer/44",
+        description="Aurora issued building permits ArcGIS MapServer URL",
+    )
+    arcgis_aurora_sla_url: str = Field(
+        default="https://ags.auroragov.org/aurora/rest/services/OpenData/MapServer/77",
+        description="Aurora non-home business licenses ArcGIS MapServer URL (SLA)",
+    )
+    arcgis_aurora_sla_liquor_url: str = Field(
+        default="https://ags.auroragov.org/aurora/rest/services/OpenData/MapServer/34",
+        description="Aurora liquor licenses companion ArcGIS MapServer URL",
+    )
+    arcgis_aurora_sla_all_businesses_url: str = Field(
+        default="https://ags.auroragov.org/aurora/rest/services/OpenData/MapServer/36",
+        description="Aurora all-business licenses companion ArcGIS MapServer URL",
+    )
+    arcgis_aurora_sla_marijuana_url: str = Field(
+        default="https://ags.auroragov.org/aurora/rest/services/OpenData/MapServer/4",
+        description="Aurora marijuana licenses companion ArcGIS MapServer URL",
+    )
+
+    # Henderson, NV (US-325): DSC_Permits FeatureServer 0 (IssueDate) + Active
+    # Licenses CSV item (Original Issue Date snapshot, address-only needs_geocode),
+    # with MJBL companion item filtered Jurisdiction='HENDERSON'.
+    arcgis_henderson_permits_url: str = Field(
+        default="https://services2.arcgis.com/naGsY5NZWVbd6bwD/arcgis/rest/services/DSC_Permits/FeatureServer/0",
+        description="Henderson DSC permits ArcGIS FeatureServer URL",
+    )
+    arcgis_henderson_sla_url: str = Field(
+        default="https://www.arcgis.com/sharing/rest/content/items/2b3fac57210542229afc4bfddd6cd6e8/data",
+        description="Henderson active business licenses CSV item URL (SLA)",
+    )
+    arcgis_henderson_sla_mjbl_url: str = Field(
+        default="https://www.arcgis.com/sharing/rest/content/items/6c470a95e83e4051a4d1222afa056ed6/data",
+        description="Henderson MJBL licenses CSV companion item URL",
+    )
+
+    # Virginia Beach, VA (US-354): Building_Permits_Applications_view (IssueDate,
+    # cadence 1d), Business_Licenses_view (Begin_Date annual-trickle SLA, cadence
+    # 365d), Property_Sales_ (Sales_Date batched deeds, cadence 14d). All Tables
+    # (non_spatial, address-only needs_geocode).
+    arcgis_virginia_beach_permits_url: str = Field(
+        default="https://services2.arcgis.com/CyVvlIiUfRBmMQuu/arcgis/rest/services/Building_Permits_Applications_view/FeatureServer/0",
+        description="Virginia Beach building permits view ArcGIS FeatureServer URL",
+    )
+    arcgis_virginia_beach_sla_url: str = Field(
+        default="https://services2.arcgis.com/CyVvlIiUfRBmMQuu/arcgis/rest/services/Business_Licenses_view/FeatureServer/0",
+        description="Virginia Beach business licenses view ArcGIS FeatureServer URL (SLA)",
+    )
+    arcgis_virginia_beach_deeds_url: str = Field(
+        default="https://services2.arcgis.com/CyVvlIiUfRBmMQuu/arcgis/rest/services/Property_Sales_/FeatureServer/0",
+        description="Virginia Beach property sales ArcGIS FeatureServer URL (deeds)",
+    )
+
+    # Omaha, NE (US-358): Mayor's Hotline Cityworks 311 MapServer 0 (DATETIMEINIT
+    # DateOnly watermark, same-day, native outSR=4326, PROBADDRESS geocode).
+    arcgis_omaha_311_url: str = Field(
+        default="https://dcgis.org/server/rest/services/Cityworks/Mayors_Hotline_Dashboard_Interactive/MapServer/0",
+        description="Omaha Mayor's Hotline 311 ArcGIS MapServer URL",
+    )
+
+    # Toledo, OH (US-359): Engage Toledo Cityworks service-request extract
+    # MapServer 0 (INIT_DATE watermark, same-day, native outSR=4326 primary,
+    # LOCATION geocode; do NOT map mixed X_COORD/Y_COORD).
+    arcgis_toledo_311_url: str = Field(
+        default="https://gis.toledo.oh.gov/arcgis/rest/services/Public/CityWorks_ServiceRequest_2022/MapServer/0",
+        description="Toledo Engage 311 Cityworks ArcGIS MapServer URL",
+    )
+
     # Albuquerque / Bernalillo County (US-205): daily CABQ building-permits
     # CSV dump. Address-only (ADR 0004). AGIS City_Building_Permits is frozen
     # (max DateIssued 2025-01-16) and must not be wired.

@@ -49,11 +49,18 @@ def snapshot(tmp_path: Path) -> dict[str, Any]:
     return manifest
 
 
-def asyncio_run_build(tmp_path: Path, cities=None) -> dict[str, Any]:
+def asyncio_run_build(
+    tmp_path: Path, cities=None, include_legacy_cells: bool = True
+) -> dict[str, Any]:
     import asyncio
 
     return asyncio.run(
-        build_snapshot(tmp_path / "dist", engine=StubEngine(), cities=cities)
+        build_snapshot(
+            tmp_path / "dist",
+            engine=StubEngine(),
+            cities=cities,
+            include_legacy_cells=include_legacy_cells,
+        )
     )
 
 
@@ -63,12 +70,42 @@ def test_manifest_shape(snapshot: dict[str, Any]):
     assert snapshot["k_ring"] == DEFAULT_K_RING
     assert snapshot["catalyst_threshold"] == CATALYST_THRESHOLD
     assert snapshot["generated_at"].endswith("+00:00") or "T" in snapshot["generated_at"]
-    expected_keys = {"manifest", "cells/index", "catalysts/index"}
+    assert snapshot["cells_sharded"] is True
+    expected_keys = {"manifest", "cells/index", "cells/index_meta", "catalysts/index"}
     for city in snapshot["cities"]:
         expected_keys |= {f"grid/{city}", f"catalysts/{city}", f"submarkets/{city}"}
     for parent in snapshot["tile_index"]:
         expected_keys.add(f"gridtiles/{parent}")
-    assert expected_keys == set(snapshot["keys"])
+    keys = set(snapshot["keys"])
+    cell_shards = {key for key in keys if key.startswith("cells/") and key != "cells/index_meta"}
+    assert expected_keys | cell_shards == keys
+
+
+def test_per_cell_shards_match_legacy_cells(snapshot: dict[str, Any], tmp_path: Path):
+    """During the compat window every per-cell shard must exist in legacy cells/index."""
+    legacy = json.loads((tmp_path / "dist" / "cells.json").read_text())
+    keys = set(snapshot["keys"])
+    cell_shards = {
+        key.removeprefix("cells/")
+        for key in keys
+        if key.startswith("cells/") and key not in ("cells/index", "cells/index_meta")
+    }
+    assert cell_shards == set(legacy)
+    meta = json.loads((tmp_path / "dist" / "cells" / "index_meta.json").read_text())
+    assert meta["sharded"] is True
+    assert meta["total"] == len(legacy)
+    for cell, pred in legacy.items():
+        shard = json.loads((tmp_path / "dist" / "cells" / f"{cell}.json").read_text())
+        assert shard == pred
+
+
+def test_skip_legacy_cells_omits_single_key(tmp_path: Path):
+    manifest = asyncio_run_build(tmp_path, cities=["nyc"], include_legacy_cells=False)
+    keys = set(manifest["keys"])
+    assert "cells/index" not in keys
+    assert "cells/index_meta" in keys
+    cell_shards = {key for key in keys if key.startswith("cells/") and key != "cells/index_meta"}
+    assert cell_shards
 
 
 def test_grid_artifact_is_feature_collection(snapshot: dict[str, Any], tmp_path: Path):
@@ -116,14 +153,21 @@ def test_subset_city_export(tmp_path: Path):
     manifest = asyncio_run_build(tmp_path, cities=["nyc"])
     assert manifest["cities"] == ["nyc"]
     bulk = json.loads((tmp_path / "dist" / "kv-bulk.json").read_text())
-    assert {e["key"] for e in bulk} == {
+    bulk_keys = {e["key"] for e in bulk}
+    cell_shards = {
+        key for key in bulk_keys if key.startswith("cells/") and key != "cells/index_meta"
+    }
+    # No keys from unselected cities may leak; cell shards are exactly nyc's cells.
+    assert bulk_keys == {
         "manifest",
         "cells/index",
+        "cells/index_meta",
         "catalysts/index",
         "grid/nyc",
         "catalysts/nyc",
         "submarkets/nyc",
         *{f"gridtiles/{parent}" for parent in manifest["tile_index"]},
+        *cell_shards,
     }
 
 
@@ -187,7 +231,7 @@ def test_national_percentile_differs_from_metro_across_metros(
     if len(snapshot["cities"]) < 2:
         pytest.skip("subset export — national and metro ranks coincide")
     seen_difference = False
-    for city, features in _all_grid_features(tmp_path, snapshot["cities"]).items():
+    for features in _all_grid_features(tmp_path, snapshot["cities"]).values():
         for feature in features:
             if feature["properties"]["lims_score_metro_pct"] != feature["properties"]["lims_score_national_pct"]:
                 seen_difference = True
