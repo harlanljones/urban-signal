@@ -427,6 +427,7 @@ from src.spatial.cities.waco import (
     WACO_METRO_BBOX,
     WACO_SUBMARKETS,
 )
+<<<<<<< HEAD
 from src.spatial.cities.lake_charles import (
     LAKE_CHARLES_DIVISION_BBOXES,
     LAKE_CHARLES_DIVISIONS,
@@ -501,6 +502,13 @@ from src.spatial.cities.alexandria import (
     ALEXANDRIA_DIVISIONS,
     ALEXANDRIA_METRO_BBOX,
     ALEXANDRIA_SUBMARKETS,
+)
+from src.spatial.cities.jonesboro import (
+    JONESBORO_CENTER,
+    JONESBORO_DIVISION_BBOXES,
+    JONESBORO_DIVISIONS,
+    JONESBORO_METRO_BBOX,
+    JONESBORO_SUBMARKETS,
 )
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
@@ -593,6 +601,7 @@ class CityId(str, Enum):
     MIDLAND = "midland"
     ODESSA = "odessa"
     ALEXANDRIA = "alexandria"
+    JONESBORO = "jonesboro"
 
 
 class FeedType(str, Enum):
@@ -1229,6 +1238,10 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "rapides": CityId.ALEXANDRIA,
     "rapides_parish": CityId.ALEXANDRIA,
     "rapides parish": CityId.ALEXANDRIA,
+    # Jonesboro, AR
+    "jonesboro": CityId.JONESBORO,
+    "jonesboro_ar": CityId.JONESBORO,
+    "jonesboro ar": CityId.JONESBORO,
 }
 
 
@@ -5129,6 +5142,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         job_suffix="lake_charles",
         # Initial registration: SLA via USDA SNAP Retailers (LA slice).
         # Calcasieu Parish/Lake Charles permit endpoints will be added when a public API is verified.
+        datasets={
+            FeedType.SLA: snap_sla_spec("LA"),
+        },
+    ),
     CityId.ALEXANDRIA: CityRegistration(
         city_id=CityId.ALEXANDRIA,
         name="Alexandria",
@@ -5338,12 +5355,24 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         job_suffix="fort_smith",
         # US-275: initial registration SNAP-only (AR slice). No public municipal
         # permits API verified at claim; expand when a city permits feed is proven.
+    ),
+    CityId.JONESBORO: CityRegistration(
+        city_id=CityId.JONESBORO,
+        name="Jonesboro",
+        state="AR",
+        center=JONESBORO_CENTER,
+        metro_bbox=JONESBORO_METRO_BBOX,
+        division_bboxes=JONESBORO_DIVISION_BBOXES,
+        submarkets=JONESBORO_SUBMARKETS,
+        divisions=JONESBORO_DIVISIONS,
+        job_suffix="jonesboro",
+        # US-283: initial registration with SNAP SLA (AR slice). No verified
+        # public municipal permits API identified; register SNAP-only and
+        # expand when a city permits endpoint is proven.
         datasets={
             FeedType.SLA: snap_sla_spec("AR"),
         },
     ),
-=======
->>>>>>> 7636987 (api(spine): register CityId.alexandria with aliases and SNAP SLA (LA); import Alexandria leaf)
 }
 
 
