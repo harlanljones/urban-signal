@@ -1251,6 +1251,12 @@ class Settings(BaseSettings):
         description="Tampa right-of-way permits ArcGIS FeatureServer layer URL",
     )
 
+    # Cape Coral–Fort Myers, FL (US-285): public permits MapServer table (address-only).
+    arcgis_cape_coral_permits_url: str = Field(
+        default="https://capeims.capecoral.gov/arcgis/rest/services/OpenData/OpenData/MapServer/1",
+        description="Cape Coral–Fort Myers building permits ArcGIS MapServer table URL (address-only)",
+    )
+
     # Las Vegas / Clark County (US-145): address-only ArcGIS tables. Both
     # feeds declare ADR-0004 geocoding in the city registry.
     arcgis_las_vegas_permits_url: str = Field(

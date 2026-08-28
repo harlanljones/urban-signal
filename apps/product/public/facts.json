@@ -20,6 +20,41 @@
   ],
   "metros": [
     {
+      "id": "cape_coral",
+      "name": "Cape Coral–Fort Myers",
+      "state": "FL",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 8,
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "issuedate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 26.58,
+        "lng": -81.92
+      },
+      "evidence_path": "apps/api/src/spatial/cities/cape_coral.py"
+    },
+    {
       "id": "nyc",
       "name": "New York City",
       "state": "NY",
@@ -2506,6 +2541,30 @@
       "divisions": "1 division",
       "division_count": 1,
       "submarket_count": 5,
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 30.084,
+        "lng": -94.101
+      },
+      "evidence_path": "apps/api/src/spatial/cities/beaumont.py"
+    },
+    {
       "id": "waco",
       "name": "Waco",
       "state": "TX",
@@ -2530,10 +2589,6 @@
         null
       ],
       "center": {
-        "lat": 30.084,
-        "lng": -94.101
-      },
-      "evidence_path": "apps/api/src/spatial/cities/beaumont.py"
         "lat": 31.5493,
         "lng": -97.1467
       },
