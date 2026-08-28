@@ -448,6 +448,13 @@ from src.spatial.cities.waco import (
     WACO_SUBMARKETS,
     is_in_waco_metro,
 )
+from src.spatial.cities.jackson_ms import (
+    JACKSON_MS_DIVISION_BBOXES,
+    JACKSON_MS_DIVISIONS,
+    JACKSON_MS_METRO_BBOX,
+    JACKSON_MS_SUBMARKETS,
+    is_in_jackson_ms_metro,
+)
 
 __all__ = [
     "PIERCE_METRO_BBOX",
@@ -766,4 +773,9 @@ __all__ = [
     "WACO_DIVISIONS",
     "WACO_SUBMARKETS",
     "is_in_waco_metro",
+    "JACKSON_MS_METRO_BBOX",
+    "JACKSON_MS_DIVISION_BBOXES",
+    "JACKSON_MS_DIVISIONS",
+    "JACKSON_MS_SUBMARKETS",
+    "is_in_jackson_ms_metro",
 ]
