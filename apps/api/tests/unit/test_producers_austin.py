@@ -20,6 +20,9 @@ from unittest.mock import patch
 
 import pytest
 
+from src.config import settings
+from src.producers.field_maps_state_licenses import TABC_ACTIVE_FIELD_MAP
+
 from src.spatial.cities.austin import (
     AUSTIN_DIVISION_BBOXES,
     AUSTIN_DIVISIONS,
@@ -132,11 +135,18 @@ class TestFeedRegistration:
         assert get_dataset(AUSTIN, FeedType.PERMITS).watermark_col == "issue_date"
         assert get_dataset(AUSTIN, FeedType.COMPLAINTS_311).watermark_col == "sr_created_date"
         sla = get_dataset(AUSTIN, FeedType.SLA)
-        assert sla.watermark_col == "current_issued_date"
+        # US-372 migration: status_change_date is the fresher cursor (captures
+        # renewals/status mutations; leaf-verified max 2026-08-26 vs
+        # current_issued_date max 2026-08-25).
+        assert sla.watermark_col == "status_change_date"
+        assert sla.order_by == "status_change_date DESC"
         assert sla.id_keys == ["license_id", "master_file_id"]
         assert sla.needs_geocode is True
         assert sla.geocode_context == "TX"
         assert sla.where == "county = 'Travis'"
+        # Namespaced endpoint + shared TABC map (all four TX slices uniform).
+        assert sla.endpoint == settings.socrata_tabc_active_endpoint
+        assert sla.field_map is TABC_ACTIVE_FIELD_MAP
 
     @pytest.mark.parametrize("absent_feed", [FeedType.DEEDS])
     def test_absent_feeds_raise_readable_errors(self, absent_feed):

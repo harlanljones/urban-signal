@@ -38,9 +38,9 @@ SNAP_ENDPOINT_FRAG = (
 )
 
 # US-364 starter set: geographically spread SLA-less metros (one per state).
+# dallas/denver left the set in the US-372 spine hold: their SLA slots were
+# taken by the real TABC / CO liquor registries.
 SNAP_STARTER_METROS = [
-    ("dallas", "TX"),
-    ("denver", "CO"),
     ("columbus", "OH"),
     ("raleigh", "NC"),
     ("boise", "ID"),
@@ -50,6 +50,7 @@ SNAP_STARTER_METROS = [
 # US-364 extension: every remaining SLA-less registered metro at edit time.
 # Metros sharing a state each carry their own spec with the same filter
 # (dallas/fort_worth both TX in the starter shape) — duplication accepted.
+# houston/san_antonio left the set in the US-372 spine hold (TABC slices).
 SNAP_EXTENDED_METROS = [
     ("albuquerque", "NM"),
     ("charlotte", "NC"),
@@ -60,7 +61,6 @@ SNAP_EXTENDED_METROS = [
     ("el_paso", "TX"),
     ("fort_worth", "TX"),
     ("honolulu", "HI"),
-    ("houston", "TX"),
     ("indianapolis", "IN"),
     ("las_vegas", "NV"),
     ("memphis", "TN"),
@@ -69,7 +69,6 @@ SNAP_EXTENDED_METROS = [
     ("prince_georges", "MD"),
     ("reno", "NV"),
     ("sacramento", "CA"),
-    ("san_antonio", "TX"),
     ("san_jose", "CA"),
     ("tulsa", "OK"),
 ]
@@ -168,8 +167,6 @@ class TestSnapRegistrationShape:
         from src.spatial.city_registry import CityId, FeedType, get_dataset
 
         expected = {
-            CityId.DALLAS: "TX",
-            CityId.DENVER: "CO",
             CityId.COLUMBUS: "OH",
             CityId.RALEIGH: "NC",
             CityId.BOISE: "ID",
@@ -185,8 +182,6 @@ class TestSnapRegistrationShape:
         from src.spatial.city_registry import CityId, FeedType, get_dataset
 
         expected = {
-            CityId.DALLAS: "State = 'TX'",
-            CityId.DENVER: "State = 'CO'",
             CityId.COLUMBUS: "State = 'OH'",
             CityId.RALEIGH: "State = 'NC'",
             CityId.BOISE: "State = 'ID'",
@@ -196,7 +191,7 @@ class TestSnapRegistrationShape:
             assert get_dataset(city, FeedType.SLA).where == where
 
     def test_specs_share_the_snap_snapshot_contract(self):
-        """All 27 registrations share one endpoint/field-map helper and
+        """All 23 registrations share one endpoint/field-map helper and
         declare the verified-live acquisition contract: snapshot mode (no
         per-row date field exists), Record_ID/ObjectId ids, ObjectId OID,
         14-day cadence per FNS's published refresh statement."""
@@ -235,7 +230,7 @@ class TestSnapRegistrationShape:
         from src.producers.field_maps import resolve_field_map
         from src.spatial.city_registry import FeedType
 
-        assert resolve_field_map("dallas", FeedType.SLA) is SNAP_SLA_FIELD_MAP
+        assert resolve_field_map("columbus", FeedType.SLA) is SNAP_SLA_FIELD_MAP
         assert resolve_field_map("wichita", FeedType.SLA) is SNAP_SLA_FIELD_MAP
 
     def test_extended_set_registers_sla_specs(self):
@@ -266,8 +261,24 @@ class TestSnapRegistrationShape:
             assert spec is not None, city_id
 
 
+@pytest.fixture
+def snap_field_map(monkeypatch):
+    """Pin the SNAP map for dallas/denver: both cities left the SNAP registry
+    set in the US-372 spine hold (TABC / CO liquor took their SLA slots), so
+    the live resolve_field_map no longer returns SNAP's map for them. The
+    parser contract below is map-shaped, not registry-shaped."""
+
+    def fake(city, feed):
+        if city in ("dallas", "denver", "wichita"):
+            return SNAP_SLA_FIELD_MAP
+        return {}
+
+    monkeypatch.setattr("src.producers.field_maps.resolve_field_map", fake)
+    return fake
+
+
 class TestSnapParsing:
-    def test_dallas_row_parses_through_field_map(self, snap_producer):
+    def test_dallas_row_parses_through_field_map(self, snap_field_map, snap_producer):
         row = _flatten_feature(
             DALLAS_SNAP_FEATURE["attributes"], DALLAS_SNAP_FEATURE["geometry"]
         )
@@ -292,7 +303,7 @@ class TestSnapParsing:
         assert event.h3_res8 is not None
         assert event.h3_res9 is not None
 
-    def test_denver_row_parses_with_global_h3_outside_bbox_check(self, snap_producer):
+    def test_denver_row_parses_with_global_h3_outside_bbox_check(self, snap_field_map, snap_producer):
         row = _flatten_feature(
             DENVER_SNAP_FEATURE["attributes"], DENVER_SNAP_FEATURE["geometry"]
         )
@@ -322,7 +333,7 @@ class TestSnapParsing:
         assert event.latitude == pytest.approx(37.672279)
         assert event.longitude == pytest.approx(-97.279945)
 
-    def test_missing_record_id_drops_the_row(self, snap_producer):
+    def test_missing_record_id_drops_the_row(self, snap_field_map, snap_producer):
         row = _flatten_feature(
             DALLAS_SNAP_FEATURE["attributes"], DALLAS_SNAP_FEATURE["geometry"]
         )
@@ -332,7 +343,7 @@ class TestSnapParsing:
         # the field-map hit the row is unrepresentable and must drop.
         assert snap_producer.parse_socrata_row(row, city_id="dallas") is None
 
-    def test_coordinate_less_row_emits_null_coord_event(self, snap_producer):
+    def test_coordinate_less_row_emits_null_coord_event(self, snap_field_map, snap_producer):
         """Null-coord tolerance (DC Basic Business Licenses precedent): a row
         with a valid id but no lat/lng still emits with null H3 rather than
         being dropped — and, critically, files under no H3 cell."""

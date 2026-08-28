@@ -1,8 +1,9 @@
 """Unit tests for the Portland, OR leaf registration and its producer wiring.
 
 Portland registers TWO feed types — PERMITS (Portland Maps / data.portlandoregon.gov
-Socrata permits) and SLA (Oregon Liquor Control Commission / OLCC licenses).
-DEEDS and COMPLAINTS_311 are deliberately absent.
+Socrata permits) and SLA (Oregon Construction Contractors Board / CCB active
+contractor licenses, US-372 — replacing the former OLCC applications feed by
+dispatch decision 2026-08-28). DEEDS and COMPLAINTS_311 are deliberately absent.
 
 These tests exercise the leaf and the completed registry wiring, including the
 live ArcGIS/Socrata field spellings and the partial-feed caveats.
@@ -45,22 +46,32 @@ PERMIT_ROW = {
     "proposed_stories": "6",
 }
 
+# CCB rows are address-only (no lat/lng column; needs_geocode) with no status
+# column — the registry publishes active licenses only. Byte-verbatim capture
+# 2026-08-28, shared with tests/unit/test_state_license_specs.py.
 SLA_ROW = {
-    "license_number": "OLCC-123456",
-    "license_type": "Full On-Premises",
-    "business_name": "Rose City Tavern LLC",
-    "licensee_name": "Rose City Tavern LLC",
-    "dba": "Rose City Tavern",
-    "trade_name": "Rose City Tavern",
-    "issue_date": "2025-09-01",
-    "effective_date": "2025-09-01",
-    "expiration_date": "2027-08-31",
-    "license_status": "Active",
-    "status": "Active",
-    "address": "200 SW Market St",
-    "latitude": "45.5105",
-    "longitude": "-122.6775",
-    "district": "DOWNTOWN",
+    "license_number": "259529",
+    "license_type": "RGC",
+    "county_code": "26",
+    "county_name": "Multnomah",
+    "lic_exp_date": "12/23/2027",
+    "orig_regis_date": "12/23/2025",
+    "bond_company": "FCCI INSURANCE COMPANY",
+    "bond_amount": "25000",
+    "bond_exp_date": "12/23/2027",
+    "ins_company": "CBIC",
+    "ins_amount": "1000000",
+    "ins_exp_date": "11/12/2026",
+    "full_name": "AJS REMODEL & REPAIR LLC",
+    "address": "1125 NE 58TH AVE",
+    "city": "PORTLAND",
+    "state": "OR",
+    "zip_code": "97213",
+    "phone_number": "6023158224",
+    "rmi_name": "ANDREW JAY LONG",
+    "exempt_text": "Exempt",
+    "endorsement_text": "Residential General Contractor",
+    "license_type_ns": "or_ccb:RGC",
 }
 
 
@@ -118,12 +129,17 @@ class TestPortlandFieldMaps:
         assert expected.issubset(set(PORTLAND_PERMITS_FIELD_MAP))
 
     def test_sla_canonical_keys_present(self):
+        # CCB reality: no status column (active-only registry), no coordinate
+        # columns (address-only -> needs_geocode), no dba spelling.
         expected = {
-            "license_id", "license_type", "dba", "premises_name",
-            "effective_date", "expiration_date", "status", "address_street",
-            "latitude", "longitude", "borough",
+            "license_id", "license_type", "premises_name",
+            "effective_date", "expiration_date", "address_street",
+            "borough",
         }
         assert expected.issubset(set(PORTLAND_SLA_FIELD_MAP))
+
+    def test_sla_license_type_is_namespaced(self):
+        assert PORTLAND_SLA_FIELD_MAP["license_type"] == ["license_type_ns"]
 
     def test_permits_field_map_resolves_sample_row(self):
         fm = FIELD_MAP["permits"]
@@ -137,12 +153,12 @@ class TestPortlandFieldMaps:
 
     def test_sla_field_map_resolves_sample_row(self):
         fm = FIELD_MAP["sla"]
-        assert first_mapped(SLA_ROW, fm, "license_id") == "OLCC-123456"
-        assert first_mapped(SLA_ROW, fm, "premises_name") == "Rose City Tavern LLC"
-        assert first_mapped(SLA_ROW, fm, "dba") == "Rose City Tavern"
-        assert first_mapped(SLA_ROW, fm, "effective_date") == "2025-09-01"
-        assert first_mapped(SLA_ROW, fm, "status") == "Active"
-        assert first_mapped(SLA_ROW, fm, "address_street") == "200 SW Market St"
+        assert first_mapped(SLA_ROW, fm, "license_id") == "259529"
+        assert first_mapped(SLA_ROW, fm, "license_type") == "or_ccb:RGC"
+        assert first_mapped(SLA_ROW, fm, "premises_name") == "AJS REMODEL & REPAIR LLC"
+        assert first_mapped(SLA_ROW, fm, "effective_date") == "12/23/2025"
+        assert first_mapped(SLA_ROW, fm, "expiration_date") == "12/23/2027"
+        assert first_mapped(SLA_ROW, fm, "address_street") == "1125 NE 58TH AVE"
 
     def test_resolve_field_map_uses_completed_spine_wiring(self):
         assert first_mapped.__module__  # smoke import check
@@ -160,14 +176,17 @@ class TestPortlandFeedSpecs:
         for feed, spec in PORTLAND_FEED_SPECS.items():
             assert spec["endpoint"] and isinstance(spec["endpoint"], str)
             assert spec["platform"] in ("socrata", "arcgis", "carto", "ckan", "csv")
-            assert spec["watermark_col"]
+            # Gate invariant mirror: a watermark or declared snapshot mode.
+            assert spec["watermark_col"] or spec["extra"].get("ingestion_mode") == "snapshot"
             assert spec["field_map"] is (PORTLAND_PERMITS_FIELD_MAP if feed == "permits" else PORTLAND_SLA_FIELD_MAP)
 
 
 @pytest.fixture
 def portland_field_map(monkeypatch):
     """Drive the shared producers' resolve_field_map to Portland's leaf maps,
-    mimicking what the spine REGISTRY entry will do once wired."""
+    mimicking what the spine REGISTRY entry will do once wired. Also stubs the
+    ADR-0004 geocode provider (boise precedent): the CCB SLA slice is
+    address-only, so an unstubbed parse would attempt a live geocode."""
 
     def fake(city, feed):
         if city == "portland":
@@ -181,6 +200,10 @@ def portland_field_map(monkeypatch):
     # *inside* parse_socrata_row, so patching the field_maps module attribute is
     # what actually reaches them at call time.
     monkeypatch.setattr("src.producers.field_maps.resolve_field_map", fake)
+    monkeypatch.setattr(
+        "src.spatial.geocoder.geocode_row_if_declared",
+        lambda city_id, feed_value, address, context=None: (45.5605, -122.6105),
+    )
     return fake
 
 
@@ -225,15 +248,14 @@ class TestPortlandProducerParsing:
         ev = sla.parse_socrata_row(SLA_ROW, city_id="portland")
         assert ev is not None
         assert ev.city_id == "portland"
-        assert ev.license_id == "OLCC-123456"
-        assert ev.latitude == pytest.approx(45.5105)
-        assert ev.longitude == pytest.approx(-122.6775)
-        assert str(ev.effective_date).startswith("2025-09-01")
-        assert ev.dba == "Rose City Tavern"
-        assert ev.premises_name == "Rose City Tavern LLC"
-        assert ev.license_status == "Active"
+        assert ev.license_id == "259529"
+        assert ev.license_type == "or_ccb:RGC"
+        assert ev.premises_name == "AJS REMODEL & REPAIR LLC"
+        assert str(ev.effective_date).startswith("2025-12-23")
+        assert str(ev.expiration_date).startswith("2027-12-23")
+        assert ev.address == "1125 NE 58TH AVE"
 
     def test_sla_sample_sits_inside_the_metro_bbox(self, sla):
-        assert is_in_portland_metro(
-            float(SLA_ROW["latitude"]), float(SLA_ROW["longitude"])
-        )
+        # CCB rows carry no coordinates; the Portland-slice address geocodes
+        # into the metro (NE 58th Ave is inside PORTLAND_METRO_BBOX).
+        assert is_in_portland_metro(45.5605, -122.6105)

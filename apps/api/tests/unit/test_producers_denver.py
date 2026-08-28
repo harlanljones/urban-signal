@@ -36,6 +36,8 @@ from unittest.mock import patch
 
 import pytest
 
+from src.config import settings
+
 from src.spatial.cities.denver import (
     DENVER_DIVISION_BBOXES,
     DENVER_DIVISIONS,
@@ -135,7 +137,7 @@ class TestDenverRegistration:
 
         assert resolve_field_map("denver", FeedType.DEEDS) == {}
 
-    def test_licenses_descoped_snap_fills_the_sla_slot(self):
+    def test_licenses_descoped_sla_slot_history(self):
         """US-73 descope evidence: Denver's own Active Business Licenses
         (table id 31) exposes exactly one date-like field, Expiration_Date,
         which is term-length-driven rather than arrival-ordered - newest-by-
@@ -143,14 +145,23 @@ class TestDenverRegistration:
         century typos (2200-12-31 and 8099-12-31 among 41,986 rows all
         sharing the single status 'License Issued - Active'). No issue-date
         field and no edit timestamp exist, so that source itself stays
-        unregistered. US-364 later filled the SLA slot with the national
-        USDA FNS SNAP retailer feed (snapshot mode, State='CO') — the US-73
-        verdict about the Denver licenses source still stands."""
+        unregistered. US-364 filled the SLA slot with the national USDA FNS
+        SNAP retailer feed; US-372 replaced that stand-in with the state CO
+        liquor registry (geocoded points, snapshot mode) — the US-73 verdict
+        about the Denver licenses source still stands."""
         from src.spatial.city_registry import get_dataset
 
         spec = get_dataset(CityId.DENVER, FeedType.SLA)
-        assert "snap_retailer_location_data" in spec.endpoint
+        assert spec.endpoint == settings.socrata_co_liquor_endpoint
+        assert "ier5-5ms2" in spec.endpoint
+        assert "snap_retailer_location_data" not in spec.endpoint
         assert "data.denvergov.org" not in spec.endpoint
+        # US-372 contract: snapshot (no chronological watermark — expiration
+        # is expiry-style), geocoded points ship with the rows.
+        assert spec.ingestion_mode == "snapshot"
+        assert spec.watermark_col == ""
+        assert spec.needs_geocode is False
+        assert spec.where == "city = 'Denver'"
 
 
 def test_denver_is_now_a_three_feed_city():
