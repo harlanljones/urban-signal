@@ -405,6 +405,13 @@ class Settings(BaseSettings):
         default="ckan://data.boston.gov/6220d948-eae2-4e4b-8723-2dc8e67722a3",
         description="Boston Crime Incident Reports CKAN resource",
     )
+    # US-209: Boston Property Assessment FY2026 (DEEDS proxy; snapshot). The registry
+    # wires this as a snapshot-mode DEEDS feed so the model has a price-bearing proxy
+    # where Boston lacks an open recorded-deeds endpoint.
+    ckan_boston_property_assessment_endpoint: str = Field(
+        default="ckan://data.boston.gov/e02c44d2-3c64-459c-8fe2-e1ce5f38a035",
+        description="Boston Property Assessment FY2026 CKAN resource (DEEDS proxy; snapshot)",
+    )
 
     # Baton Rouge / East Baton Rouge Parish (Socrata).
     socrata_baton_rouge_permits_endpoint: str = Field(

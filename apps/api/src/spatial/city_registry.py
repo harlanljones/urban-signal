@@ -1922,11 +1922,11 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         submarkets=BOSTON_SUBMARKETS,
         divisions=BOSTON_DIVISIONS,
         job_suffix="boston",
-        # No sales/deeds dataset exists on the Boston portal (research:
-        # non-socrata-platforms.md, Boston section — "Deeds/sales: none
-        # found"). US-137 registers the Licensing Board feed (04dc653b) as an
-        # SLA coordinates gpsx/gpsy are Massachusetts Mainland State Plane US
-        # survey feet (EPSG:2249); US-137 Path A transforms them to WGS84.
+        # Boston has no open recorded-deeds feed; the Property Assessment FY snapshot
+        # is wired as a DEEDS proxy so downstream models have a price-bearing input.
+        # US-137 registers the Licensing Board feed (04dc653b) as SLA; coordinates
+        # gpsx/gpsy are Massachusetts Mainland State Plane US survey feet (EPSG:2249);
+        # Path A transforms them to WGS84.
         datasets={
             FeedType.PERMITS: DatasetSpec(
                 endpoint=settings.ckan_boston_permits_endpoint,
@@ -1972,6 +1972,31 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 state_plane_x_col='gpsx',
                 state_plane_y_col='gpsy',
                 field_map=BOSTON_LICENSING_FIELD_MAP,
+            ),
+            # US-209: Property Assessment FY2026 — proxy for recorded deeds.
+            # Snapshot-mode so full table refreshes dedupe on pid. Many rows
+            # lack coordinates; DeedEvent tolerates null lat/lng (Cook County precedent).
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.ckan_boston_property_assessment_endpoint,
+                platform="ckan",
+                watermark_col="",
+                id_keys=["pid", "_id"],
+                topic=settings.topic_deeds,
+                interval_seconds=1800.0,
+                producer_key="deeds",
+                
+                expected_cadence_days=365,
+                ingestion_mode='snapshot',
+                field_map={
+                    "doc_id": ["pid", "parcel_id", "map_par_id"],
+                    "bbl": ["pid", "parcel_id", "map_par_id"],
+                    "document_amount": ["total_value", "total_assessed_value", "total_av", "av_total"],
+                    "recorded_date": ["fy", "year"],
+                    "latitude": ["latitude", "y_latitude", "gpsy"],
+                    "longitude": ["longitude", "x_longitude", "gpsx"],
+                    "borough": ["ward", "neighborhood"],
+                    "address_street": ["location", "address"],
+                },
             ),
             # US-: Boston Crime Incident Reports (CKAN 6220d948-... odata v4).
             # Source carries Lat/Long directly, so no geocode step required.
