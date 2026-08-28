@@ -377,6 +377,13 @@ from src.spatial.cities.miami_dade import (
     MIAMI_DADE_SUBMARKETS,
     is_in_miami_dade_metro,
 )
+from src.spatial.cities.ocala import (
+    OCALA_DIVISION_BBOXES,
+    OCALA_DIVISIONS,
+    OCALA_METRO_BBOX,
+    OCALA_SUBMARKETS,
+    is_in_ocala_metro,
+)
 from src.spatial.cities.memphis import (
     MEMPHIS_DIVISION_BBOXES,
     MEMPHIS_DIVISIONS,
@@ -727,6 +734,11 @@ __all__ = [
     "ORLANDO_DIVISIONS",
     "ORLANDO_SUBMARKETS",
     "is_in_orlando_metro",
+    "OCALA_METRO_BBOX",
+    "OCALA_DIVISION_BBOXES",
+    "OCALA_DIVISIONS",
+    "OCALA_SUBMARKETS",
+    "is_in_ocala_metro",
     "MIAMI_DADE_METRO_BBOX",
     "MIAMI_DADE_DIVISION_BBOXES",
     "MIAMI_DADE_DIVISIONS",
