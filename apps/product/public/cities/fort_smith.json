@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "id": "fort_smith",
+  "name": "Fort Smith",
+  "state": "AR",
+  "center": {
+    "lat": 35.3859,
+    "lng": -94.3985
+  },
+  "metro_bbox": {
+    "min_lat": 35.28,
+    "max_lat": 35.45,
+    "min_lng": -94.49,
+    "max_lng": -94.25
+  },
+  "divisions": {
+    "FORT_SMITH_CORE": {
+      "name": "Fort Smith Core",
+      "center": {
+        "lat": 35.3859,
+        "lng": -94.3985
+      },
+      "bbox": {
+        "min_lat": 35.3,
+        "max_lat": 35.43,
+        "min_lng": -94.46,
+        "max_lng": -94.28
+      },
+      "submarkets": [
+        "Downtown & Garrison Ave",
+        "Rogers Avenue Corridor",
+        "Fianna Hills & Southside",
+        "Chaffee Crossing",
+        "Riverfront & Belle Grove"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Garrison Ave": {
+      "name": "Downtown & Garrison Ave",
+      "division": "FORT_SMITH_CORE",
+      "center": {
+        "lat": 35.3875,
+        "lng": -94.421
+      },
+      "description": "Historic core and entertainment corridor with adaptive reuse and small mixed-use infill."
+    },
+    "Rogers Avenue Corridor": {
+      "name": "Rogers Avenue Corridor",
+      "division": "FORT_SMITH_CORE",
+      "center": {
+        "lat": 35.354,
+        "lng": -94.358
+      },
+      "description": "Primary east–west commercial spine with incremental retail reinvestment and site upgrades."
+    },
+    "Fianna Hills & Southside": {
+      "name": "Fianna Hills & Southside",
+      "division": "FORT_SMITH_CORE",
+      "center": {
+        "lat": 35.312,
+        "lng": -94.376
+      },
+      "description": "Southside neighborhoods with renovation-led residential activity and neighborhood services."
+    },
+    "Chaffee Crossing": {
+      "name": "Chaffee Crossing",
+      "division": "FORT_SMITH_CORE",
+      "center": {
+        "lat": 35.334,
+        "lng": -94.284
+      },
+      "description": "Redeveloping east-side district with mixed-use and residential growth near the river bend."
+    },
+    "Riverfront & Belle Grove": {
+      "name": "Riverfront & Belle Grove",
+      "division": "FORT_SMITH_CORE",
+      "center": {
+        "lat": 35.394,
+        "lng": -94.409
+      },
+      "description": "Arkansas Riverfront and adjacent historic residential fabric; steady renovation and public-realm work."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/fort_smith.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

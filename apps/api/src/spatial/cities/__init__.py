@@ -483,6 +483,13 @@ from src.spatial.cities.tyler import (
     TYLER_SUBMARKETS,
     is_in_tyler_metro,
 )
+from src.spatial.cities.fort_smith import (
+    FORT_SMITH_DIVISION_BBOXES,
+    FORT_SMITH_DIVISIONS,
+    FORT_SMITH_METRO_BBOX,
+    FORT_SMITH_SUBMARKETS,
+    is_in_fort_smith_metro,
+)
 
 from src.spatial.cities.lake_charles import (
     LAKE_CHARLES_DIVISION_BBOXES,
@@ -838,4 +845,9 @@ __all__ = [
     "LAKE_CHARLES_DIVISIONS",
     "LAKE_CHARLES_SUBMARKETS",
     "is_in_lake_charles_metro",
+    "FORT_SMITH_METRO_BBOX",
+    "FORT_SMITH_DIVISION_BBOXES",
+    "FORT_SMITH_DIVISIONS",
+    "FORT_SMITH_SUBMARKETS",
+    "is_in_fort_smith_metro",
 ]
