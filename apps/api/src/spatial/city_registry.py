@@ -428,6 +428,7 @@ from src.spatial.cities.waco import (
     WACO_SUBMARKETS,
 )
 <<<<<<< HEAD
+<<<<<<< HEAD
 from src.spatial.cities.lake_charles import (
     LAKE_CHARLES_DIVISION_BBOXES,
     LAKE_CHARLES_DIVISIONS,
@@ -509,6 +510,14 @@ from src.spatial.cities.jonesboro import (
     JONESBORO_DIVISIONS,
     JONESBORO_METRO_BBOX,
     JONESBORO_SUBMARKETS,
+=======
+from src.spatial.cities.charleston_sc import (
+    CHARLESTON_SC_CENTER,
+    CHARLESTON_SC_DIVISION_BBOXES,
+    CHARLESTON_SC_DIVISIONS,
+    CHARLESTON_SC_METRO_BBOX,
+    CHARLESTON_SC_SUBMARKETS,
+>>>>>>> 0e2b606 (registry: add CityId.charleston_sc with aliases and SNAP SLA (SC slice))
 )
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
@@ -602,6 +611,7 @@ class CityId(str, Enum):
     ODESSA = "odessa"
     ALEXANDRIA = "alexandria"
     JONESBORO = "jonesboro"
+    CHARLESTON_SC = "charleston_sc"
 
 
 class FeedType(str, Enum):
@@ -1242,6 +1252,10 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "jonesboro": CityId.JONESBORO,
     "jonesboro_ar": CityId.JONESBORO,
     "jonesboro ar": CityId.JONESBORO,
+    # Charleston, SC (avoid plain 'charleston' — reserved for future WV city)
+    "charleston_sc": CityId.CHARLESTON_SC,
+    "charleston sc": CityId.CHARLESTON_SC,
+    "charleston-sc": CityId.CHARLESTON_SC,
 }
 
 
@@ -5130,6 +5144,7 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
             FeedType.SLA: snap_sla_spec("TX"),
         },
     ),
+<<<<<<< HEAD
     CityId.LAKE_CHARLES: CityRegistration(
         city_id=CityId.LAKE_CHARLES,
         name="Lake Charles",
@@ -5371,6 +5386,24 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         # expand when a city permits endpoint is proven.
         datasets={
             FeedType.SLA: snap_sla_spec("AR"),
+        },
+    ),
+    CityId.CHARLESTON_SC: CityRegistration(
+        city_id=CityId.CHARLESTON_SC,
+        name="Charleston",
+        state="SC",
+        center=CHARLESTON_SC_CENTER,
+        metro_bbox=CHARLESTON_SC_METRO_BBOX,
+        division_bboxes=CHARLESTON_SC_DIVISION_BBOXES,
+        submarkets=CHARLESTON_SC_SUBMARKETS,
+        divisions=CHARLESTON_SC_DIVISIONS,
+        job_suffix="charleston_sc",
+        # US-284: initial registration with SNAP SLA (SC slice). Public city
+        # permits endpoint on data-charleston-sc.opendata.arcgis.com not yet
+        # verifiable without authentication; register SNAP-only and expand when
+        # a municipal permits API is proven.
+        datasets={
+            FeedType.SLA: snap_sla_spec("SC"),
         },
     ),
 }

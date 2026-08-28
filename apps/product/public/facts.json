@@ -2541,6 +2541,7 @@
     },
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
       "id": "jackson_ms",
       "name": "Jackson",
       "state": "MS",
@@ -2700,6 +2701,18 @@
       "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
       "center": { "lat": 35.8423, "lng": -90.7043 },
       "evidence_path": "apps/api/src/spatial/cities/jonesboro.py"
+    },
+    {
+      "id": "charleston_sc",
+      "name": "Charleston",
+      "state": "SC",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 7,
+      "feeds": [false, false, true, false],
+      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
+      "center": { "lat": 32.781, "lng": -79.931 },
+      "evidence_path": "apps/api/src/spatial/cities/charleston_sc.py"
     }
   ],
   "pipeline": [

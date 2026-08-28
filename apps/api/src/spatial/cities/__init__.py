@@ -462,6 +462,7 @@ from src.spatial.cities.waco import (
     WACO_SUBMARKETS,
     is_in_waco_metro,
 )
+<<<<<<< HEAD
 from src.spatial.cities.jackson_ms import (
     JACKSON_MS_DIVISION_BBOXES,
     JACKSON_MS_DIVISIONS,
@@ -552,6 +553,13 @@ from src.spatial.cities.jonesboro import (
     JONESBORO_METRO_BBOX,
     JONESBORO_SUBMARKETS,
     is_in_jonesboro_metro,
+)
+from src.spatial.cities.charleston_sc import (
+    CHARLESTON_SC_DIVISION_BBOXES,
+    CHARLESTON_SC_DIVISIONS,
+    CHARLESTON_SC_METRO_BBOX,
+    CHARLESTON_SC_SUBMARKETS,
+    is_in_charleston_sc_metro,
 )
 __all__ = [
     "PIERCE_METRO_BBOX",
@@ -945,4 +953,9 @@ __all__ = [
     "JONESBORO_DIVISIONS",
     "JONESBORO_SUBMARKETS",
     "is_in_jonesboro_metro",
+    "CHARLESTON_SC_METRO_BBOX",
+    "CHARLESTON_SC_DIVISION_BBOXES",
+    "CHARLESTON_SC_DIVISIONS",
+    "CHARLESTON_SC_SUBMARKETS",
+    "is_in_charleston_sc_metro",
 ]
