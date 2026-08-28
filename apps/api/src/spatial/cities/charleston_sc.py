@@ -38,7 +38,7 @@ CHARLESTON_SC_DIVISION_BBOXES: Dict[str, Dict[str, float]] = {
     # James Island spine (Folly Rd)
     "JAMES_ISLAND": {"min_lat": 32.700, "max_lat": 32.780, "min_lng": -79.990, "max_lng": -79.910},
     # Daniel Island / Cainhoy Peninsula
-    "DANIEL_CAINHOY": {"min_lat": 32.840, "max_lat": 33.000, "min_lng": -79.900, "max_lng": -79.700},
+    "DANIEL_CAINHOY": {"min_lat": 32.840, "max_lat": 33.000, "min_lng": -79.930, "max_lng": -79.700},
 }
 
 
