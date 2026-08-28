@@ -448,6 +448,13 @@ from src.spatial.cities.amarillo import (
     AMARILLO_SUBMARKETS,
     is_in_amarillo_metro,
 )
+from src.spatial.cities.waco import (
+    WACO_DIVISION_BBOXES,
+    WACO_DIVISIONS,
+    WACO_METRO_BBOX,
+    WACO_SUBMARKETS,
+    is_in_waco_metro,
+)
 
 __all__ = [
     "PIERCE_METRO_BBOX",
@@ -766,4 +773,9 @@ __all__ = [
     "BEAUMONT_DIVISIONS",
     "BEAUMONT_SUBMARKETS",
     "is_in_beaumont_metro",
+    "WACO_METRO_BBOX",
+    "WACO_DIVISION_BBOXES",
+    "WACO_DIVISIONS",
+    "WACO_SUBMARKETS",
+    "is_in_waco_metro",
 ]

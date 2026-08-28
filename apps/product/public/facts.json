@@ -2501,6 +2501,12 @@
       "divisions": "1 division",
       "division_count": 1,
       "submarket_count": 5,
+      "id": "waco",
+      "name": "Waco",
+      "state": "TX",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 8,
       "feeds": [
         false,
         false,
@@ -2523,6 +2529,10 @@
         "lng": -94.101
       },
       "evidence_path": "apps/api/src/spatial/cities/beaumont.py"
+        "lat": 31.5493,
+        "lng": -97.1467
+      },
+      "evidence_path": "apps/api/src/spatial/cities/waco.py"
     }
   ],
   "pipeline": [
