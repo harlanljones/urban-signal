@@ -30,6 +30,7 @@ from src.producers.field_maps_virginia_beach import FIELD_MAP as VIRGINIA_BEACH_
 from src.producers.field_maps_omaha import FIELD_MAP as OMAHA_FIELD_MAP
 from src.producers.field_maps_toledo import FIELD_MAP as TOLEDO_FIELD_MAP
 from src.producers.field_maps_boston_licensing import FIELD_MAP as BOSTON_LICENSING_FIELD_MAP
+from src.producers.field_maps_cape_coral import FIELD_MAP as CAPE_CORAL_FIELD_MAP
 from src.spatial.cities.portland import (
     PORTLAND_DIVISION_BBOXES,
     PORTLAND_DIVISIONS,
@@ -201,6 +202,12 @@ from src.spatial.cities.houston import (
     HOUSTON_DIVISIONS,
     HOUSTON_METRO_BBOX,
     HOUSTON_SUBMARKETS,
+)
+from src.spatial.cities.cape_coral import (
+    CAPE_CORAL_DIVISION_BBOXES,
+    CAPE_CORAL_DIVISIONS,
+    CAPE_CORAL_METRO_BBOX,
+    CAPE_CORAL_SUBMARKETS,
 )
 from src.spatial.cities.indianapolis import (
     INDIANAPOLIS_DIVISION_BBOXES,
@@ -535,6 +542,7 @@ class CityId(str, Enum):
     NYC = "nyc"
     CHICAGO = "chicago"
     SAN_FRANCISCO = "san_francisco"
+    CAPE_CORAL = "cape_coral"
     SEATTLE = "seattle"
     LOS_ANGELES = "los_angeles"
     NEW_ORLEANS = "new_orleans"
@@ -1053,6 +1061,16 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "san jose ca": CityId.SAN_JOSE,
     "santa_clara_county": CityId.SAN_JOSE,
     "santa clara county": CityId.SAN_JOSE,
+
+    # Cape Coral–Fort Myers / Lee County, FL
+    "cape_coral": CityId.CAPE_CORAL,
+    "cape coral": CityId.CAPE_CORAL,
+    "fort_myers": CityId.CAPE_CORAL,
+    "fort myers": CityId.CAPE_CORAL,
+    "cape coral fort myers": CityId.CAPE_CORAL,
+    "cape_coral_fort_myers": CityId.CAPE_CORAL,
+    "lee_county": CityId.CAPE_CORAL,
+    "lee county": CityId.CAPE_CORAL,
 
     # Tampa / Hillsborough County
     "tampa": CityId.TAMPA,
@@ -4353,6 +4371,37 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 max_record_count=1000,
                 field_map={'job_id': ['RECORDID'], 'latitude': ['LATITUDE'], 'longitude': ['LONGITUDE'], 'issued_date': ['ISSUEDDATE']},
             ),
+        },
+    ),
+    CityId.CAPE_CORAL: CityRegistration(
+        city_id=CityId.CAPE_CORAL,
+        name="Cape Coral–Fort Myers",
+        state="FL",
+        center={"lat": 26.58, "lng": -81.92},
+        metro_bbox=CAPE_CORAL_METRO_BBOX,
+        division_bboxes=CAPE_CORAL_DIVISION_BBOXES,
+        submarkets=CAPE_CORAL_SUBMARKETS,
+        divisions=CAPE_CORAL_DIVISIONS,
+        job_suffix="cape_coral",
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_cape_coral_permits_url,
+                platform="arcgis",
+                watermark_col="issuedate",
+                id_keys=["Permit_Number", "objectid"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                expected_cadence_days=7,
+                order_by="issuedate DESC",
+                needs_geocode=True,
+                geocode_context="Cape Coral, FL",
+                non_spatial=True,
+                max_record_count=2000,
+                field_map=CAPE_CORAL_FIELD_MAP,
+            ),
+            # Food-retail SLA fallback — FL slice.
+            FeedType.SLA: snap_sla_spec("FL"),
         },
     ),
     CityId.LAS_VEGAS: CityRegistration(

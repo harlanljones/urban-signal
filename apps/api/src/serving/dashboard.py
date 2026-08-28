@@ -1466,6 +1466,7 @@ def get_dashboard_html() -> str:
       louisville: { name: 'Louisville / Jefferson County' },
       portland: { name: 'Portland / Multnomah County' },
       san_jose: { name: 'San Jose / Santa Clara County' },
+      cape_coral: { name: 'Cape Coral–Fort Myers' },
       tampa: { name: 'Tampa / Hillsborough County' },
       las_vegas: { name: 'Las Vegas / Clark County' },
       boise: { name: 'Boise / Ada County' },

@@ -447,6 +447,13 @@ from src.spatial.cities.toledo import (
     TOLEDO_SUBMARKETS,
     is_in_toledo_metro,
 )
+from src.spatial.cities.cape_coral import (
+    CAPE_CORAL_DIVISION_BBOXES,
+    CAPE_CORAL_DIVISIONS,
+    CAPE_CORAL_METRO_BBOX,
+    CAPE_CORAL_SUBMARKETS,
+    is_in_cape_coral_metro,
+)
 
 from src.spatial.cities.amarillo import (
     AMARILLO_DIVISION_BBOXES,
@@ -560,6 +567,13 @@ from src.spatial.cities.charleston_sc import (
     CHARLESTON_SC_METRO_BBOX,
     CHARLESTON_SC_SUBMARKETS,
     is_in_charleston_sc_metro,
+)
+from src.spatial.cities.cape_coral import (
+    CAPE_CORAL_DIVISION_BBOXES,
+    CAPE_CORAL_DIVISIONS,
+    CAPE_CORAL_METRO_BBOX,
+    CAPE_CORAL_SUBMARKETS,
+    is_in_cape_coral_metro,
 )
 __all__ = [
     "PIERCE_METRO_BBOX",
@@ -888,6 +902,7 @@ __all__ = [
     "WACO_DIVISIONS",
     "WACO_SUBMARKETS",
     "is_in_waco_metro",
+<<<<<<< HEAD
     "JACKSON_MS_METRO_BBOX",
     "JACKSON_MS_DIVISION_BBOXES",
     "JACKSON_MS_DIVISIONS",
@@ -958,4 +973,9 @@ __all__ = [
     "CHARLESTON_SC_DIVISIONS",
     "CHARLESTON_SC_SUBMARKETS",
     "is_in_charleston_sc_metro",
+    "CAPE_CORAL_METRO_BBOX",
+    "CAPE_CORAL_DIVISION_BBOXES",
+    "CAPE_CORAL_DIVISIONS",
+    "CAPE_CORAL_SUBMARKETS",
+    "is_in_cape_coral_metro",
 ]
