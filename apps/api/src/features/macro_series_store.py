@@ -38,6 +38,12 @@ CURRENT_TABLE = "macro_series"
 VINTAGE_TABLE = "macro_series_vintages"
 
 
+def _count_result(result: Any) -> int:
+    """Read a nullable DuckDB scalar without indexing an optional row."""
+    row = result.fetchone()
+    return int(row[0]) if row and row[0] is not None else 0
+
+
 @dataclass(frozen=True)
 class UpsertResult:
     """What one release actually changed."""
@@ -173,15 +179,15 @@ class MacroSeriesStore:
             f"AND c.geography_id = s.geography_id AND c.period = s.period"
         )
 
-        revised = int(
+        revised = _count_result(
             self.con.execute(
                 f"SELECT count(1) {joined} WHERE c.value IS DISTINCT FROM s.value"
-            ).fetchone()[0]
+            )
         )
-        unchanged = int(
+        unchanged = _count_result(
             self.con.execute(
                 f"SELECT count(1) {joined} WHERE c.value IS NOT DISTINCT FROM s.value"
-            ).fetchone()[0]
+            )
         )
 
         # Retain every displaced value before overwriting it.
@@ -206,7 +212,7 @@ class MacroSeriesStore:
             """,
             [now],
         )
-        inserted = int(
+        inserted = _count_result(
             self.con.execute(
                 f"""
                 SELECT count(1) FROM _staged s
@@ -216,7 +222,7 @@ class MacroSeriesStore:
                       AND c.geography_id = s.geography_id AND c.period = s.period
                 )
                 """
-            ).fetchone()[0]
+            )
         )
         self.con.execute(
             f"""
@@ -296,7 +302,7 @@ class MacroSeriesStore:
         ]
 
     def count(self) -> int:
-        return int(self.con.execute(f"SELECT count(1) FROM {CURRENT_TABLE}").fetchone()[0])
+        return _count_result(self.con.execute(f"SELECT count(1) FROM {CURRENT_TABLE}"))
 
     def close(self) -> None:
         self.con.close()

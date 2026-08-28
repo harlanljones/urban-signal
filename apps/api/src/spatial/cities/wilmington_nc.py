@@ -35,9 +35,13 @@ WILMINGTON_NC_DIVISION_BBOXES: Dict[str, Dict[str, float]] = {
     # West-of-river employment/industrial belt toward Leland/Navassa
     "WEST_SIDE": {"min_lat": 34.20, "max_lat": 34.32, "min_lng": -78.10, "max_lng": -77.98},
     # Beaches barrier island + east corridor (Wrightsville + Eastwood/Mayfaire)
-    "BEACHES": {"min_lat": 34.15, "max_lat": 34.25, "min_lng": -77.85, "max_lng": -77.70},
+    # West edge abuts DOWNTOWN_RIVERFRONT (-77.90) so UNCW & Eastwood, which sits
+    # at -77.87, falls inside its own division rather than in the gap between them.
+    "BEACHES": {"min_lat": 34.15, "max_lat": 34.25, "min_lng": -77.90, "max_lng": -77.70},
     # Southern Cape Fear / Shipyard Blvd, Carolina Beach, Kure Beach
-    "SOUTH_CAPE_FEAR": {"min_lat": 33.95, "max_lat": 34.20, "min_lng": -78.05, "max_lng": -77.90},
+    # East edge reaches -77.88 so Carolina Beach and Kure Beach, the barrier-island
+    # towns this division is named for, sit inside it.
+    "SOUTH_CAPE_FEAR": {"min_lat": 33.95, "max_lat": 34.20, "min_lng": -78.05, "max_lng": -77.88},
 }
 
 

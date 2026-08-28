@@ -167,6 +167,7 @@ class TestGeographyCrosswalk:
             ("Denver-Aurora-Lakewood, CO", "denver"),
             ("Washington-Arlington-Alexandria, DC-VA-MD-WV", "washington_dc"),
             ("Miami-Fort Lauderdale-Pompano Beach, FL", "miami_dade"),
+            ("Columbus, GA-AL", "columbus_ga"),
         ],
     )
     def test_publisher_metro_labels_resolve(self, crosswalk, label, expected):

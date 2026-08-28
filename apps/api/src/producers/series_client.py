@@ -266,8 +266,11 @@ class SeriesClient:
         """Wide layout: identity columns, then one column per period."""
         reader = csv.DictReader(io.StringIO(text))
         headers = reader.fieldnames or []
-        period_columns = [(h, parse_period(h, spec.period_type)) for h in headers]
-        period_columns = [(h, p) for h, p in period_columns if p is not None]
+        period_columns: list[tuple[str, date]] = []
+        for header in headers:
+            period = parse_period(header, spec.period_type)
+            if period is not None:
+                period_columns.append((header, period))
         if not period_columns:
             raise SeriesFetchError(
                 f"{spec.series_id}: no period columns in header — layout is not "

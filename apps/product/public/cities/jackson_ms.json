@@ -55,10 +55,10 @@
         "lng": -90.32
       },
       "bbox": {
-        "min_lat": 32.3,
+        "min_lat": 32.28,
         "max_lat": 32.45,
         "min_lng": -90.45,
-        "max_lng": -90.23
+        "max_lng": -90.2
       },
       "submarkets": [
         "JSU & West Capitol",

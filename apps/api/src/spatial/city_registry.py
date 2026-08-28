@@ -47,6 +47,9 @@ from src.producers.field_maps_energy_benchmark import (
     NYC_ENERGY_FIELD_MAP,
     SEATTLE_ENERGY_FIELD_MAP,
 )
+from src.producers.field_maps_cape_coral import FIELD_MAP as CAPE_CORAL_FIELD_MAP
+from src.producers.field_maps_port_st_lucie import FIELD_MAP as PORT_ST_LUCIE_FIELD_MAP
+from src.producers.field_maps_wilmington_nc import FIELD_MAP as WILMINGTON_NC_FIELD_MAP
 from src.spatial.cities.portland import (
     PORTLAND_DIVISION_BBOXES,
     PORTLAND_DIVISIONS,
@@ -535,6 +538,120 @@ from src.spatial.cities.augusta import (
     AUGUSTA_METRO_BBOX,
     AUGUSTA_SUBMARKETS,
 )
+from src.spatial.cities.abilene import (
+    ABILENE_CENTER,
+    ABILENE_DIVISIONS,
+    ABILENE_DIVISION_BBOXES,
+    ABILENE_METRO_BBOX,
+    ABILENE_SUBMARKETS,
+)
+from src.spatial.cities.alexandria import (
+    ALEXANDRIA_CENTER,
+    ALEXANDRIA_DIVISIONS,
+    ALEXANDRIA_DIVISION_BBOXES,
+    ALEXANDRIA_METRO_BBOX,
+    ALEXANDRIA_SUBMARKETS,
+)
+from src.spatial.cities.asheville import (
+    ASHEVILLE_CENTER,
+    ASHEVILLE_DIVISIONS,
+    ASHEVILLE_DIVISION_BBOXES,
+    ASHEVILLE_METRO_BBOX,
+    ASHEVILLE_SUBMARKETS,
+)
+from src.spatial.cities.cape_coral import (
+    CAPE_CORAL_DIVISIONS,
+    CAPE_CORAL_DIVISION_BBOXES,
+    CAPE_CORAL_METRO_BBOX,
+    CAPE_CORAL_SUBMARKETS,
+)
+from src.spatial.cities.charleston_sc import (
+    CHARLESTON_SC_CENTER,
+    CHARLESTON_SC_DIVISIONS,
+    CHARLESTON_SC_DIVISION_BBOXES,
+    CHARLESTON_SC_METRO_BBOX,
+    CHARLESTON_SC_SUBMARKETS,
+)
+from src.spatial.cities.fort_smith import (
+    FORT_SMITH_DIVISIONS,
+    FORT_SMITH_DIVISION_BBOXES,
+    FORT_SMITH_METRO_BBOX,
+    FORT_SMITH_SUBMARKETS,
+)
+from src.spatial.cities.jonesboro import (
+    JONESBORO_CENTER,
+    JONESBORO_DIVISIONS,
+    JONESBORO_DIVISION_BBOXES,
+    JONESBORO_METRO_BBOX,
+    JONESBORO_SUBMARKETS,
+)
+from src.spatial.cities.lake_charles import (
+    LAKE_CHARLES_DIVISIONS,
+    LAKE_CHARLES_DIVISION_BBOXES,
+    LAKE_CHARLES_METRO_BBOX,
+    LAKE_CHARLES_SUBMARKETS,
+)
+from src.spatial.cities.lakeland import (
+    LAKELAND_DIVISIONS,
+    LAKELAND_DIVISION_BBOXES,
+    LAKELAND_METRO_BBOX,
+    LAKELAND_SUBMARKETS,
+)
+from src.spatial.cities.lexington import (
+    LEXINGTON_CENTER,
+    LEXINGTON_DIVISIONS,
+    LEXINGTON_DIVISION_BBOXES,
+    LEXINGTON_METRO_BBOX,
+    LEXINGTON_SUBMARKETS,
+)
+from src.spatial.cities.longview import (
+    LONGVIEW_CENTER,
+    LONGVIEW_DIVISIONS,
+    LONGVIEW_DIVISION_BBOXES,
+    LONGVIEW_METRO_BBOX,
+    LONGVIEW_SUBMARKETS,
+)
+from src.spatial.cities.midland import (
+    MIDLAND_CENTER,
+    MIDLAND_DIVISIONS,
+    MIDLAND_DIVISION_BBOXES,
+    MIDLAND_METRO_BBOX,
+    MIDLAND_SUBMARKETS,
+)
+from src.spatial.cities.monroe import (
+    MONROE_CENTER,
+    MONROE_DIVISIONS,
+    MONROE_DIVISION_BBOXES,
+    MONROE_METRO_BBOX,
+    MONROE_SUBMARKETS,
+)
+from src.spatial.cities.odessa import (
+    ODESSA_CENTER,
+    ODESSA_DIVISIONS,
+    ODESSA_DIVISION_BBOXES,
+    ODESSA_METRO_BBOX,
+    ODESSA_SUBMARKETS,
+)
+from src.spatial.cities.port_st_lucie import (
+    PORT_ST_LUCIE_DIVISIONS,
+    PORT_ST_LUCIE_DIVISION_BBOXES,
+    PORT_ST_LUCIE_METRO_BBOX,
+    PORT_ST_LUCIE_SUBMARKETS,
+)
+from src.spatial.cities.texarkana import (
+    TEXARKANA_CENTER,
+    TEXARKANA_DIVISIONS,
+    TEXARKANA_DIVISION_BBOXES,
+    TEXARKANA_METRO_BBOX,
+    TEXARKANA_SUBMARKETS,
+)
+from src.spatial.cities.wilmington_nc import (
+    WILMINGTON_NC_CENTER,
+    WILMINGTON_NC_DIVISIONS,
+    WILMINGTON_NC_DIVISION_BBOXES,
+    WILMINGTON_NC_METRO_BBOX,
+    WILMINGTON_NC_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -628,6 +745,23 @@ class CityId(str, Enum):
     GREENVILLE = "greenville"
     ANCHORAGE = "anchorage"
     TUCSON = "tucson"
+    ABILENE = "abilene"
+    ALEXANDRIA = "alexandria"
+    ASHEVILLE = "asheville"
+    CAPE_CORAL = "cape_coral"
+    CHARLESTON_SC = "charleston_sc"
+    FORT_SMITH = "fort_smith"
+    JONESBORO = "jonesboro"
+    LAKE_CHARLES = "lake_charles"
+    LAKELAND = "lakeland"
+    LEXINGTON = "lexington"
+    LONGVIEW = "longview"
+    MIDLAND = "midland"
+    MONROE = "monroe"
+    ODESSA = "odessa"
+    PORT_ST_LUCIE = "port_st_lucie"
+    TEXARKANA = "texarkana"
+    WILMINGTON_NC = "wilmington_nc"
 
 
 class FeedType(str, Enum):
@@ -1290,6 +1424,76 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "tucson-az": CityId.TUCSON,
     "tucson az": CityId.TUCSON,
     "tuscon": CityId.TUCSON,
+    "abilene": CityId.ABILENE,
+    "abilene_tx": CityId.ABILENE,
+    "abilene tx": CityId.ABILENE,
+    "alexandria": CityId.ALEXANDRIA,
+    "alexandria_la": CityId.ALEXANDRIA,
+    "alexandria la": CityId.ALEXANDRIA,
+    "rapides": CityId.ALEXANDRIA,
+    "rapides_parish": CityId.ALEXANDRIA,
+    "rapides parish": CityId.ALEXANDRIA,
+    "asheville": CityId.ASHEVILLE,
+    "asheville_nc": CityId.ASHEVILLE,
+    "asheville nc": CityId.ASHEVILLE,
+    "cape_coral": CityId.CAPE_CORAL,
+    "cape coral": CityId.CAPE_CORAL,
+    "fort_myers": CityId.CAPE_CORAL,
+    "fort myers": CityId.CAPE_CORAL,
+    "cape coral fort myers": CityId.CAPE_CORAL,
+    "cape_coral_fort_myers": CityId.CAPE_CORAL,
+    "lee_county": CityId.CAPE_CORAL,
+    "lee county": CityId.CAPE_CORAL,
+    "charleston_sc": CityId.CHARLESTON_SC,
+    "charleston sc": CityId.CHARLESTON_SC,
+    "charleston-sc": CityId.CHARLESTON_SC,
+    "fort_smith": CityId.FORT_SMITH,
+    "fort smith": CityId.FORT_SMITH,
+    "fort_smith_ar": CityId.FORT_SMITH,
+    "fort smith ar": CityId.FORT_SMITH,
+    "jonesboro": CityId.JONESBORO,
+    "jonesboro_ar": CityId.JONESBORO,
+    "jonesboro ar": CityId.JONESBORO,
+    "lake_charles": CityId.LAKE_CHARLES,
+    "lake-charles": CityId.LAKE_CHARLES,
+    "lake charles": CityId.LAKE_CHARLES,
+    "lake_charles_la": CityId.LAKE_CHARLES,
+    "lake charles la": CityId.LAKE_CHARLES,
+    "calcasieu": CityId.LAKE_CHARLES,
+    "calcasieu_parish": CityId.LAKE_CHARLES,
+    "calcasieu parish": CityId.LAKE_CHARLES,
+    "lakeland": CityId.LAKELAND,
+    "lakeland_fl": CityId.LAKELAND,
+    "lakeland fl": CityId.LAKELAND,
+    "lexington": CityId.LEXINGTON,
+    "lexington_ky": CityId.LEXINGTON,
+    "lexington ky": CityId.LEXINGTON,
+    "longview": CityId.LONGVIEW,
+    "longview_tx": CityId.LONGVIEW,
+    "longview tx": CityId.LONGVIEW,
+    "midland": CityId.MIDLAND,
+    "midland_tx": CityId.MIDLAND,
+    "midland-tx": CityId.MIDLAND,
+    "midland tx": CityId.MIDLAND,
+    "monroe": CityId.MONROE,
+    "monroe_la": CityId.MONROE,
+    "monroe la": CityId.MONROE,
+    "odessa": CityId.ODESSA,
+    "odessa_tx": CityId.ODESSA,
+    "odessa tx": CityId.ODESSA,
+    "port_st_lucie": CityId.PORT_ST_LUCIE,
+    "port-st-lucie": CityId.PORT_ST_LUCIE,
+    "port st lucie": CityId.PORT_ST_LUCIE,
+    "psl": CityId.PORT_ST_LUCIE,
+    "port saint lucie": CityId.PORT_ST_LUCIE,
+    "texarkana": CityId.TEXARKANA,
+    "texarkana_tx": CityId.TEXARKANA,
+    "texarkana tx": CityId.TEXARKANA,
+    "texarkana_ar": CityId.TEXARKANA,
+    "texarkana ar": CityId.TEXARKANA,
+    "wilmington_nc": CityId.WILMINGTON_NC,
+    "wilmington-nc": CityId.WILMINGTON_NC,
+    "wilmington nc": CityId.WILMINGTON_NC,
 }
 
 
@@ -5876,6 +6080,357 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 max_record_count=2000,
                 field_map=TUCSON_SLA_FIELD_MAP,
             ),
+        },
+    ),
+    CityId.ABILENE: CityRegistration(
+        city_id=CityId.ABILENE,
+        name="Abilene",
+        state="TX",
+        center=ABILENE_CENTER,
+        metro_bbox=ABILENE_METRO_BBOX,
+        division_bboxes=ABILENE_DIVISION_BBOXES,
+        submarkets=ABILENE_SUBMARKETS,
+        divisions=ABILENE_DIVISIONS,
+        job_suffix="abilene",
+        # US-278: initial registration with SNAP SLA (TX slice). Verify
+        # municipal permits via a public API before enabling permits feed.
+        datasets={
+            FeedType.SLA: snap_sla_spec("TX"),
+        },
+    ),
+    CityId.ALEXANDRIA: CityRegistration(
+        city_id=CityId.ALEXANDRIA,
+        name="Alexandria",
+        state="LA",
+        center=ALEXANDRIA_CENTER,
+        metro_bbox=ALEXANDRIA_METRO_BBOX,
+        division_bboxes=ALEXANDRIA_DIVISION_BBOXES,
+        submarkets=ALEXANDRIA_SUBMARKETS,
+        divisions=ALEXANDRIA_DIVISIONS,
+        job_suffix="alexandria",
+        # US-281: initial registration with SNAP SLA (LA slice). City permits
+        # run through My Permit Now; no verifiable public API was found for
+        # Alexandria/Rapides at registration time.
+        datasets={
+            FeedType.SLA: snap_sla_spec("LA"),
+        },
+    ),
+    CityId.ASHEVILLE: CityRegistration(
+        city_id=CityId.ASHEVILLE,
+        name="Asheville",
+        state="NC",
+        center=ASHEVILLE_CENTER,
+        metro_bbox=ASHEVILLE_METRO_BBOX,
+        division_bboxes=ASHEVILLE_DIVISION_BBOXES,
+        submarkets=ASHEVILLE_SUBMARKETS,
+        divisions=ASHEVILLE_DIVISIONS,
+        job_suffix="avl",
+        # Initial registration with SNAP SLA (NC slice). A verifiable public
+        # permits/311/deeds API was not found on data-avl.opendata.arcgis.com
+        # during US-291; prefer municipal feeds when proven.
+        datasets={
+            FeedType.SLA: snap_sla_spec("NC"),
+        },
+    ),
+    CityId.CAPE_CORAL: CityRegistration(
+        city_id=CityId.CAPE_CORAL,
+        name="Cape Coral–Fort Myers",
+        state="FL",
+        center={"lat": 26.58, "lng": -81.92},
+        metro_bbox=CAPE_CORAL_METRO_BBOX,
+        division_bboxes=CAPE_CORAL_DIVISION_BBOXES,
+        submarkets=CAPE_CORAL_SUBMARKETS,
+        divisions=CAPE_CORAL_DIVISIONS,
+        job_suffix="cape_coral",
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_cape_coral_permits_url,
+                platform="arcgis",
+                watermark_col="issuedate",
+                id_keys=["Permit_Number", "objectid"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                expected_cadence_days=7,
+                order_by="issuedate DESC",
+                needs_geocode=True,
+                geocode_context="Cape Coral, FL",
+                non_spatial=True,
+                oid_field="objectid",
+                max_record_count=2000,
+                field_map=CAPE_CORAL_FIELD_MAP,
+            ),
+            # Food-retail SLA fallback — FL slice.
+            FeedType.SLA: snap_sla_spec("FL"),
+        },
+    ),
+    CityId.CHARLESTON_SC: CityRegistration(
+        city_id=CityId.CHARLESTON_SC,
+        name="Charleston",
+        state="SC",
+        center=CHARLESTON_SC_CENTER,
+        metro_bbox=CHARLESTON_SC_METRO_BBOX,
+        division_bboxes=CHARLESTON_SC_DIVISION_BBOXES,
+        submarkets=CHARLESTON_SC_SUBMARKETS,
+        divisions=CHARLESTON_SC_DIVISIONS,
+        job_suffix="charleston_sc",
+        # US-284: initial registration with SNAP SLA (SC slice). Public city
+        # permits endpoint on data-charleston-sc.opendata.arcgis.com not yet
+        # verifiable without authentication; register SNAP-only and expand when
+        # a municipal permits API is proven.
+        datasets={
+            FeedType.SLA: snap_sla_spec("SC"),
+        },
+    ),
+    CityId.FORT_SMITH: CityRegistration(
+        city_id=CityId.FORT_SMITH,
+        name="Fort Smith",
+        state="AR",
+        center={"lat": 35.3859, "lng": -94.3985},
+        metro_bbox=FORT_SMITH_METRO_BBOX,
+        division_bboxes=FORT_SMITH_DIVISION_BBOXES,
+        submarkets=FORT_SMITH_SUBMARKETS,
+        divisions=FORT_SMITH_DIVISIONS,
+        job_suffix="fort_smith",
+        # US-275: initial registration SNAP-only (AR slice). No public municipal
+        # permits API verified at claim; expand when a city permits feed is proven.
+        datasets={
+            FeedType.SLA: snap_sla_spec("AR"),
+        },
+    ),
+    CityId.JONESBORO: CityRegistration(
+        city_id=CityId.JONESBORO,
+        name="Jonesboro",
+        state="AR",
+        center=JONESBORO_CENTER,
+        metro_bbox=JONESBORO_METRO_BBOX,
+        division_bboxes=JONESBORO_DIVISION_BBOXES,
+        submarkets=JONESBORO_SUBMARKETS,
+        divisions=JONESBORO_DIVISIONS,
+        job_suffix="jonesboro",
+        # US-283: initial registration with SNAP SLA (AR slice). No verified
+        # public municipal permits API identified; register SNAP-only and
+        # expand when a city permits endpoint is proven.
+        datasets={
+            FeedType.SLA: snap_sla_spec("AR"),
+        },
+    ),
+    CityId.LAKE_CHARLES: CityRegistration(
+        city_id=CityId.LAKE_CHARLES,
+        name="Lake Charles",
+        state="LA",
+        center={"lat": 30.2266, "lng": -93.2174},
+        metro_bbox=LAKE_CHARLES_METRO_BBOX,
+        division_bboxes=LAKE_CHARLES_DIVISION_BBOXES,
+        submarkets=LAKE_CHARLES_SUBMARKETS,
+        divisions=LAKE_CHARLES_DIVISIONS,
+        job_suffix="lake_charles",
+        # Initial registration: SLA via USDA SNAP Retailers (LA slice).
+        # Calcasieu Parish/Lake Charles permit endpoints will be added when a public API is verified.
+        datasets={
+            FeedType.SLA: snap_sla_spec("LA"),
+        },
+    ),
+    CityId.LAKELAND: CityRegistration(
+        city_id=CityId.LAKELAND,
+        name="Lakeland",
+        state="FL",
+        center={"lat": 28.0395, "lng": -81.9498},
+        metro_bbox=LAKELAND_METRO_BBOX,
+        division_bboxes=LAKELAND_DIVISION_BBOXES,
+        submarkets=LAKELAND_SUBMARKETS,
+        divisions=LAKELAND_DIVISIONS,
+        job_suffix="lakeland",
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_lakeland_permits_url,
+                platform="arcgis",
+                watermark_col="ISSUEDATE",
+                id_keys=["PERMIT_NO", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                expected_cadence_days=7,
+                oid_field="OBJECTID",
+                max_record_count=2000,
+            ),
+            # Florida statewide SNAP fallback (SLA)
+            FeedType.SLA: snap_sla_spec("FL"),
+        },
+    ),
+    CityId.LEXINGTON: CityRegistration(
+        city_id=CityId.LEXINGTON,
+        name="Lexington / Fayette County",
+        state="KY",
+        center=LEXINGTON_CENTER,
+        metro_bbox=LEXINGTON_METRO_BBOX,
+        division_bboxes=LEXINGTON_DIVISION_BBOXES,
+        submarkets=LEXINGTON_SUBMARKETS,
+        divisions=LEXINGTON_DIVISIONS,
+        job_suffix="lexington",
+        # US-290: prefer verified public feed — Kentucky ABC active licenses
+        # (ArcGIS) filtered to Fayette County. Permits/311 pending verification.
+        datasets={
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.arcgis_louisville_abc_url,
+                platform="arcgis",
+                watermark_col="IssueDate",
+                id_keys=["LicenseNumber", "ObjectId"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+
+                expected_cadence_days=7,
+                oid_field="ObjectId",
+                max_record_count=2000,
+                where="County = 'Fayette'",
+                field_map=LOUISVILLE_SLA_FIELD_MAP,
+            ),
+        },
+    ),
+    CityId.LONGVIEW: CityRegistration(
+        city_id=CityId.LONGVIEW,
+        name="Longview",
+        state="TX",
+        center=LONGVIEW_CENTER,
+        metro_bbox=LONGVIEW_METRO_BBOX,
+        division_bboxes=LONGVIEW_DIVISION_BBOXES,
+        submarkets=LONGVIEW_SUBMARKETS,
+        divisions=LONGVIEW_DIVISIONS,
+        job_suffix="longview",
+        # US-276: initial registration with SNAP SLA (TX slice). No verifiable
+        # public city permits endpoint confirmed pre-commit; register SNAP-only
+        # and expand once a municipal permits API is proven.
+        datasets={
+            FeedType.SLA: snap_sla_spec("TX"),
+        },
+    ),
+    CityId.MIDLAND: CityRegistration(
+        city_id=CityId.MIDLAND,
+        name="Midland",
+        state="TX",
+        center=MIDLAND_CENTER,
+        metro_bbox=MIDLAND_METRO_BBOX,
+        division_bboxes=MIDLAND_DIVISION_BBOXES,
+        submarkets=MIDLAND_SUBMARKETS,
+        divisions=MIDLAND_DIVISIONS,
+        job_suffix="midland",
+        # US-279: initial registration with SNAP SLA (TX slice). EnerGov/PermitMidland
+        # has no open public API endpoint; do not register permits until verifiable.
+        datasets={
+            FeedType.SLA: snap_sla_spec("TX"),
+        },
+    ),
+    CityId.MONROE: CityRegistration(
+        city_id=CityId.MONROE,
+        name="Monroe",
+        state="LA",
+        center=MONROE_CENTER,
+        metro_bbox=MONROE_METRO_BBOX,
+        division_bboxes=MONROE_DIVISION_BBOXES,
+        submarkets=MONROE_SUBMARKETS,
+        divisions=MONROE_DIVISIONS,
+        job_suffix="monroe",
+        # US-277: initial registration with SNAP SLA (LA slice). No verifiable
+        # public permits endpoint exists (parish/city use citizen portals).
+        datasets={
+            FeedType.SLA: snap_sla_spec("LA"),
+        },
+    ),
+    CityId.ODESSA: CityRegistration(
+        city_id=CityId.ODESSA,
+        name="Odessa",
+        state="TX",
+        center=ODESSA_CENTER,
+        metro_bbox=ODESSA_METRO_BBOX,
+        division_bboxes=ODESSA_DIVISION_BBOXES,
+        submarkets=ODESSA_SUBMARKETS,
+        divisions=ODESSA_DIVISIONS,
+        job_suffix="odessa",
+        # US-280: initial registration with SNAP SLA (TX slice). A verifiable
+        # public city permits feed was not found during registration; register
+        # SNAP-only and expand when a municipal permits API is proven.
+        datasets={
+            FeedType.SLA: snap_sla_spec("TX"),
+        },
+    ),
+    CityId.PORT_ST_LUCIE: CityRegistration(
+        city_id=CityId.PORT_ST_LUCIE,
+        name="Port St. Lucie",
+        state="FL",
+        center={"lat": 27.28, "lng": -80.36},
+        metro_bbox=PORT_ST_LUCIE_METRO_BBOX,
+        division_bboxes=PORT_ST_LUCIE_DIVISION_BBOXES,
+        submarkets=PORT_ST_LUCIE_SUBMARKETS,
+        divisions=PORT_ST_LUCIE_DIVISIONS,
+        job_suffix="port_st_lucie",
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_port_st_lucie_permits_url,
+                platform="arcgis",
+                watermark_col="DateIssued",
+                id_keys=["PermitID", "AddressID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                expected_cadence_days=7,
+                needs_geocode=True,
+                geocode_context="Port St. Lucie, FL",
+                oid_field="PermitID",
+                max_record_count=2000,
+                order_by="DateIssued DESC",
+                field_map=PORT_ST_LUCIE_FIELD_MAP,
+            ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice (FL).
+            FeedType.SLA: snap_sla_spec("FL"),
+        },
+    ),
+    CityId.TEXARKANA: CityRegistration(
+        city_id=CityId.TEXARKANA,
+        name="Texarkana",
+        state="TX",  # bi-state TX-AR metro; primary slice TX while registry supports one-slice SNAP
+        center=TEXARKANA_CENTER,
+        metro_bbox=TEXARKANA_METRO_BBOX,
+        division_bboxes=TEXARKANA_DIVISION_BBOXES,
+        submarkets=TEXARKANA_SUBMARKETS,
+        divisions=TEXARKANA_DIVISIONS,
+        job_suffix="texarkana",
+        # US-282: initial registration with SNAP SLA (TX slice). Public municipal
+        # permits endpoints were not verifiable on both sides; do not invent a
+        # dual-state slice until the registry supports it. Expand when feeds are proven.
+        datasets={
+            FeedType.SLA: snap_sla_spec("TX"),
+        },
+    ),
+    CityId.WILMINGTON_NC: CityRegistration(
+        city_id=CityId.WILMINGTON_NC,
+        name="Wilmington, NC",
+        state="NC",
+        center=WILMINGTON_NC_CENTER,
+        metro_bbox=WILMINGTON_NC_METRO_BBOX,
+        division_bboxes=WILMINGTON_NC_DIVISION_BBOXES,
+        submarkets=WILMINGTON_NC_SUBMARKETS,
+        divisions=WILMINGTON_NC_DIVISIONS,
+        job_suffix="wilmington_nc",
+        datasets={
+            # Verified public permits (New Hanover County): ISSUE_DATE watermark,
+            # native State Plane geometry (client requests outSR=4326).
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_wilmington_nc_permits_url,
+                platform="arcgis",
+                watermark_col="ISSUE_DATE",
+                id_keys=["PERMIT_NUMBER", "PMPERMITID", "OBJECTID", "id"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                expected_cadence_days=30,
+                oid_field="OBJECTID",
+                max_record_count=10000,
+                field_map=WILMINGTON_NC_FIELD_MAP["permits"],
+            ),
+            # North Carolina fallback for SLA until a Wilmington-specific
+            # municipal registry is verified.
+            FeedType.SLA: snap_sla_spec("NC"),
         },
     ),
 }

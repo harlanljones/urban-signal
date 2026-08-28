@@ -38,6 +38,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+from urllib.parse import urljoin
 
 logger = logging.getLogger(__name__)
 
@@ -100,6 +101,16 @@ class SnapshotDiff:
     dlq: List[Tuple[str, str]] = field(default_factory=list)  # (station_id, reason)
 
 
+SUPPORTED_GBFS_VERSIONS = ("3.0", "2.3", "1.1")
+STATUS_NUMERIC_FIELDS = (
+    "num_bikes_available",
+    "num_docks_available",
+    "num_bikes_disabled",
+    "num_docks_disabled",
+)
+STATUS_SENTINELS = DOCK_SENTINELS | {86400}
+
+
 class GbfsDialectError(RuntimeError):
     """The feed does not look like any GBFS version we can read."""
 
@@ -125,6 +136,7 @@ class SnapshotClient:
 
         self.state_dir = Path(state_dir or settings.gbfs_state_dir)
         self.timeout = timeout_seconds
+        self.last_status_snapshot: Optional[Tuple[str, List[Dict[str, Any]]]] = None
 
     # ----------------------------------------------------------------- #
     # transport                                                          #
@@ -141,15 +153,8 @@ class SnapshotClient:
     # discovery                                                          #
     # ----------------------------------------------------------------- #
     @staticmethod
-    def resolve_feeds(discovery: Dict[str, Any]) -> Dict[str, str]:
-        """Map feed name -> URL from a discovery document of any GBFS dialect.
-
-        v1.x and v2.x nest the feed list under a language key
-        (``data.en.feeds``); v3.0 drops the language level (``data.feeds``).
-        Both are accepted rather than pinning one, because a system can and
-        does change dialect between polls — Lyft's own systems publish 2.3
-        while BCycle LA is still on 1.1.
-        """
+    def resolve_feeds(discovery: Dict[str, Any], base_url: str | None = None) -> Dict[str, str]:
+        """Map feed name -> URL from a GBFS document of any supported dialect."""
         data = discovery.get("data")
         if not isinstance(data, dict):
             raise GbfsDialectError("discovery document has no `data` object")
@@ -168,18 +173,76 @@ class SnapshotClient:
         resolved = {}
         for entry in feeds:
             if isinstance(entry, dict) and entry.get("name") and entry.get("url"):
-                resolved[str(entry["name"])] = str(entry["url"])
+                url = str(entry["url"])
+                resolved[str(entry["name"])] = urljoin(base_url, url) if base_url else url
         if STATION_INFORMATION not in resolved:
             raise GbfsDialectError(
                 f"system publishes no {STATION_INFORMATION} feed (has: {sorted(resolved)})"
             )
         return resolved
 
+    @staticmethod
+    def _version_links(payload: Dict[str, Any], base_url: str) -> List[Tuple[str, str]]:
+        """Extract supported GBFS version-document links from either dialect."""
+        links: List[Tuple[str, str]] = []
+
+        def visit(value: Any) -> None:
+            if isinstance(value, dict):
+                versions = value.get("versions")
+                if isinstance(versions, list):
+                    for entry in versions:
+                        if isinstance(entry, dict) and entry.get("version") and entry.get("url"):
+                            links.append((str(entry["version"]), urljoin(base_url, str(entry["url"]))))
+                feeds = value.get("feeds")
+                if isinstance(feeds, list):
+                    for entry in feeds:
+                        if (
+                            isinstance(entry, dict)
+                            and entry.get("name") == "gbfs_versions"
+                            and entry.get("url")
+                        ):
+                            links.append(("", urljoin(base_url, str(entry["url"]))))
+                for child in value.values():
+                    visit(child)
+            elif isinstance(value, list):
+                for child in value:
+                    visit(child)
+
+        visit(payload.get("data"))
+        return links
+
+    @staticmethod
+    def _version_rank(version: str) -> int:
+        try:
+            return SUPPORTED_GBFS_VERSIONS.index(version)
+        except ValueError:
+            return len(SUPPORTED_GBFS_VERSIONS)
+
     def discover(self, discovery_url: str) -> Tuple[Dict[str, str], str]:
-        """Fetch the discovery root; return (feeds, declared version)."""
-        payload = self._get_json(discovery_url)
-        version = str(payload.get("version") or "")
-        return self.resolve_feeds(payload), version
+        """Fetch the highest supported document advertised by ``gbfs_versions``."""
+        root = self._get_json(discovery_url)
+        if not isinstance(root, dict):
+            raise GbfsDialectError("discovery response is not a JSON object")
+
+        candidates = self._version_links(root, discovery_url)
+        expanded: List[Tuple[str, str]] = list(candidates)
+        for declared_version, url in candidates:
+            if declared_version in SUPPORTED_GBFS_VERSIONS:
+                continue
+            versions_doc = self._get_json(url)
+            if isinstance(versions_doc, dict):
+                expanded.extend(self._version_links(versions_doc, url))
+
+        supported = [entry for entry in expanded if entry[0] in SUPPORTED_GBFS_VERSIONS]
+        if supported:
+            # SUPPORTED_GBFS_VERSIONS is ordered newest-to-oldest.
+            version, document_url = min(supported, key=lambda entry: self._version_rank(entry[0]))
+            selected = self._get_json(document_url)
+            if isinstance(selected, dict):
+                return self.resolve_feeds(selected, document_url), version
+
+        version = str(root.get("version") or "")
+        return self.resolve_feeds(root, discovery_url), version
 
     # ----------------------------------------------------------------- #
     # parsing                                                            #
@@ -257,6 +320,77 @@ class SnapshotClient:
             )
         return stations, dlq
 
+    @staticmethod
+    def parse_status(
+        status: Optional[Dict[str, Any]],
+        stations: Dict[str, StationRecord],
+        snapshot_ts: Optional[str] = None,
+    ) -> Tuple[str, List[Dict[str, Any]]]:
+        """Normalize one station-status snapshot for the private state archive.
+
+        Status rows are retained by source snapshot timestamp rather than
+        overwritten. Unknown station ids and malformed rows are omitted: the
+        station-information snapshot is the authoritative spatial inventory.
+        Operator sentinels are represented as null so they cannot contaminate
+        availability or turnover aggregates.
+        """
+        if not status:
+            stamp = snapshot_ts or datetime.now(UTC).isoformat()
+            return stamp, []
+
+        raw_timestamp = status.get("last_updated")
+        if raw_timestamp is None:
+            raw_timestamp = (status.get("data") or {}).get("last_updated")
+        if raw_timestamp is not None and str(raw_timestamp).strip():
+            try:
+                stamp = datetime.fromtimestamp(float(raw_timestamp), UTC).isoformat()
+            except (TypeError, ValueError, OverflowError, OSError):
+                stamp = str(raw_timestamp)
+        else:
+            stamp = snapshot_ts or datetime.now(UTC).isoformat()
+
+        from src.spatial.h3_indexer import H3SpatialIndexer
+
+        rows: List[Dict[str, Any]] = []
+        for raw in (status.get("data") or {}).get("stations") or []:
+            if not isinstance(raw, dict):
+                continue
+            station_id = str(raw.get("station_id") or "").strip()
+            station = stations.get(station_id)
+            if not station or station.lat is None or station.lon is None:
+                continue
+
+            row: Dict[str, Any] = {
+                "station_id": station_id,
+                "snapshot_ts": stamp,
+                "latitude": station.lat,
+                "longitude": station.lon,
+                "is_installed": raw.get("is_installed"),
+                "is_renting": raw.get("is_renting"),
+                "is_returning": raw.get("is_returning"),
+            }
+            for field_name in STATUS_NUMERIC_FIELDS:
+                value = raw.get(field_name)
+                if value is not None:
+                    try:
+                        value = int(value)
+                    except (TypeError, ValueError):
+                        value = None
+                if value in STATUS_SENTINELS:
+                    value = None
+                row[field_name] = value
+
+            last_reported = raw.get("last_reported")
+            if last_reported is not None:
+                try:
+                    last_reported = int(last_reported)
+                except (TypeError, ValueError):
+                    last_reported = None
+            row["last_reported"] = None if last_reported in STATUS_SENTINELS else last_reported
+            row.update(H3SpatialIndexer.get_multi_res_hierarchy(station.lat, station.lon))
+            rows.append(row)
+        return stamp, rows
+
     # ----------------------------------------------------------------- #
     # state store                                                        #
     # ----------------------------------------------------------------- #
@@ -277,13 +411,53 @@ class SnapshotClient:
             for sid, row in (payload.get("stations") or {}).items()
         }
 
-    def save_state(self, system_id: str, stations: Dict[str, StationRecord]) -> None:
+    def load_status_snapshots(self, system_id: str) -> List[Dict[str, Any]]:
+        """Load the normalized status archive for one GBFS system."""
+        path = self.state_path(system_id)
+        if not path.exists():
+            return []
+        try:
+            payload = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError):
+            return []
+        archive = payload.get("status_snapshots") or {}
+        return list(archive.values()) if isinstance(archive, dict) else []
+
+    def save_state(
+        self,
+        system_id: str,
+        stations: Dict[str, StationRecord],
+        status_snapshot: Optional[Tuple[str, List[Dict[str, Any]]]] = None,
+    ) -> None:
         path = self.state_path(system_id)
         path.parent.mkdir(parents=True, exist_ok=True)
+
+        prior: Dict[str, Any] = {}
+        if path.exists():
+            try:
+                loaded = json.loads(path.read_text())
+                if isinstance(loaded, dict):
+                    prior = loaded
+            except (OSError, json.JSONDecodeError):
+                logger.warning("Replacing unreadable GBFS state %s", path)
+
+        archive = prior.get("status_snapshots") or {}
+        if not isinstance(archive, dict):
+            archive = {}
+        if status_snapshot is not None:
+            snapshot_ts, rows = status_snapshot
+            archive[f"station_status:{snapshot_ts}"] = {
+                "system_id": system_id,
+                "feed": STATION_STATUS,
+                "snapshot_ts": snapshot_ts,
+                "rows": rows,
+            }
+
         payload = {
             "system_id": system_id,
             "saved_at": datetime.now(UTC).isoformat(),
             "stations": {sid: rec.to_json() for sid, rec in stations.items()},
+            "status_snapshots": archive,
         }
         # Write-then-rename: a torn state file would look like a system that
         # lost every station and emit thousands of spurious removals.
@@ -349,6 +523,7 @@ class SnapshotClient:
                 f"{system_id}: station_information returned no usable stations "
                 f"({len(dlq)} rows rejected) — refusing to seed or overwrite state"
             )
+        self.last_status_snapshot = self.parse_status(status, current)
         previous = self.load_state(system_id)
         result = self.diff(previous, current)
         result.dlq = dlq

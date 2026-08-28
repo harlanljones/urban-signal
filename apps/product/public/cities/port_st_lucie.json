@@ -3,64 +3,123 @@
   "id": "port_st_lucie",
   "name": "Port St. Lucie",
   "state": "FL",
-  "center": { "lat": 27.28, "lng": -80.36 },
-  "metro_bbox": { "min_lat": 27.15, "max_lat": 27.40, "min_lng": -80.50, "max_lng": -80.20 },
+  "center": {
+    "lat": 27.28,
+    "lng": -80.36
+  },
+  "metro_bbox": {
+    "min_lat": 27.15,
+    "max_lat": 27.4,
+    "min_lng": -80.5,
+    "max_lng": -80.2
+  },
   "divisions": {
     "TRADITION_WEST": {
       "name": "TRADITION_WEST",
-      "center": { "lat": 27.300, "lng": -80.430 },
-      "bbox": { "min_lat": 27.23, "max_lat": 27.34, "min_lng": -80.48, "max_lng": -80.38 },
-      "submarkets": ["Tradition & Western PSL", "St. Lucie West"]
+      "center": {
+        "lat": 27.3,
+        "lng": -80.43
+      },
+      "bbox": {
+        "min_lat": 27.23,
+        "max_lat": 27.34,
+        "min_lng": -80.48,
+        "max_lng": -80.38
+      },
+      "submarkets": [
+        "Tradition & Western PSL",
+        "St. Lucie West"
+      ]
     },
     "CENTRAL": {
       "name": "CENTRAL",
-      "center": { "lat": 27.285, "lng": -80.345 },
-      "bbox": { "min_lat": 27.22, "max_lat": 27.34, "min_lng": -80.38, "max_lng": -80.30 },
-      "submarkets": ["Crosstown Parkway Corridor", "PSL Blvd Central"]
+      "center": {
+        "lat": 27.285,
+        "lng": -80.345
+      },
+      "bbox": {
+        "min_lat": 27.22,
+        "max_lat": 27.34,
+        "min_lng": -80.38,
+        "max_lng": -80.3
+      },
+      "submarkets": [
+        "Crosstown Parkway Corridor",
+        "PSL Blvd Central"
+      ]
     },
     "EAST_RIVER": {
       "name": "EAST_RIVER",
-      "center": { "lat": 27.300, "lng": -80.270 },
-      "bbox": { "min_lat": 27.23, "max_lat": 27.36, "min_lng": -80.30, "max_lng": -80.22 },
-      "submarkets": ["US-1 & East PSL", "Jensen Beach South Edge"]
+      "center": {
+        "lat": 27.3,
+        "lng": -80.27
+      },
+      "bbox": {
+        "min_lat": 27.23,
+        "max_lat": 27.36,
+        "min_lng": -80.3,
+        "max_lng": -80.22
+      },
+      "submarkets": [
+        "US-1 & East PSL",
+        "Jensen Beach South Edge"
+      ]
     }
   },
   "submarkets": {
     "Tradition & Western PSL": {
       "name": "Tradition & Western PSL",
       "division": "TRADITION_WEST",
-      "center": { "lat": 27.275, "lng": -80.430 },
+      "center": {
+        "lat": 27.275,
+        "lng": -80.43
+      },
       "description": "Master-planned Tradition area and western growth corridor along I-95."
     },
     "St. Lucie West": {
       "name": "St. Lucie West",
       "division": "TRADITION_WEST",
-      "center": { "lat": 27.320, "lng": -80.405 },
+      "center": {
+        "lat": 27.32,
+        "lng": -80.405
+      },
       "description": "St. Lucie West town center, retail and multifamily infill."
     },
     "Crosstown Parkway Corridor": {
       "name": "Crosstown Parkway Corridor",
       "division": "CENTRAL",
-      "center": { "lat": 27.285, "lng": -80.363 },
+      "center": {
+        "lat": 27.285,
+        "lng": -80.363
+      },
       "description": "East–west spine through central PSL with steady residential permitting."
     },
     "PSL Blvd Central": {
       "name": "PSL Blvd Central",
       "division": "CENTRAL",
-      "center": { "lat": 27.271, "lng": -80.327 },
-      "description": "Port St. Lucie Boulevard corridor teardown/rebuild and renovation activity."
+      "center": {
+        "lat": 27.271,
+        "lng": -80.327
+      },
+      "description": "Port St. Lucie Boulevard central corridor small-lot teardowns and renovations."
     },
     "US-1 & East PSL": {
       "name": "US-1 & East PSL",
       "division": "EAST_RIVER",
-      "center": { "lat": 27.300, "lng": -80.285 },
+      "center": {
+        "lat": 27.3,
+        "lng": -80.285
+      },
       "description": "US-1 commercial corridor and east-side infill near the North Fork St. Lucie River."
     },
     "Jensen Beach South Edge": {
       "name": "Jensen Beach South Edge",
       "division": "EAST_RIVER",
-      "center": { "lat": 27.240, "lng": -80.267 },
-      "description": "River-adjacent residential renewal on the northeast edge."
+      "center": {
+        "lat": 27.24,
+        "lng": -80.267
+      },
+      "description": "Northern/eastern edge near Jensen Beach, river-adjacent residential renewal."
     }
   },
   "feeds": {
@@ -82,4 +141,3 @@
   "evidence_path": "apps/api/src/spatial/cities/port_st_lucie.py",
   "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
 }
-
