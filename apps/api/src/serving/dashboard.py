@@ -1494,9 +1494,8 @@ def get_dashboard_html() -> str:
       longview: { name: 'Longview' },
       monroe: { name: 'Monroe' },
       abilene: { name: 'Abilene' },
-      abilene: { name: 'Abilene' },
       texarkana: { name: 'Texarkana' },
-      texarkana: { name: 'Texarkana' },
+      midland: { name: 'Midland' },
     };
 
     let map = null;
