@@ -1,0 +1,188 @@
+{
+  "schema_version": 2,
+  "id": "amarillo",
+  "name": "Amarillo",
+  "state": "TX",
+  "center": {
+    "lat": 35.207,
+    "lng": -101.833
+  },
+  "metro_bbox": {
+    "min_lat": 35.06,
+    "max_lat": 35.35,
+    "min_lng": -102.0,
+    "max_lng": -101.65
+  },
+  "divisions": {
+    "CENTRAL_CORE": {
+      "name": "CENTRAL_CORE",
+      "center": {
+        "lat": 35.2085,
+        "lng": -101.833
+      },
+      "bbox": {
+        "min_lat": 35.175,
+        "max_lat": 35.235,
+        "min_lng": -101.885,
+        "max_lng": -101.78
+      },
+      "submarkets": [
+        "Downtown Amarillo",
+        "Polk Street District"
+      ]
+    },
+    "WEST_SIDE": {
+      "name": "WEST_SIDE",
+      "center": {
+        "lat": 35.185,
+        "lng": -101.925
+      },
+      "bbox": {
+        "min_lat": 35.15,
+        "max_lat": 35.27,
+        "min_lng": -102.0,
+        "max_lng": -101.885
+      },
+      "submarkets": [
+        "Westgate / Soncy",
+        "Medical Center & Wolflin"
+      ]
+    },
+    "SOUTH_STRIPS": {
+      "name": "SOUTH_STRIPS",
+      "center": {
+        "lat": 35.15,
+        "lng": -101.9
+      },
+      "bbox": {
+        "min_lat": 35.08,
+        "max_lat": 35.19,
+        "min_lng": -101.96,
+        "max_lng": -101.78
+      },
+      "submarkets": [
+        "Southwest Amarillo",
+        "Amarillo College Area"
+      ]
+    },
+    "EAST_GATE": {
+      "name": "EAST_GATE",
+      "center": {
+        "lat": 35.215,
+        "lng": -101.745
+      },
+      "bbox": {
+        "min_lat": 35.16,
+        "max_lat": 35.26,
+        "min_lng": -101.78,
+        "max_lng": -101.65
+      },
+      "submarkets": [
+        "East Gateway & Airport"
+      ]
+    },
+    "NORTH_LOOP": {
+      "name": "NORTH_LOOP",
+      "center": {
+        "lat": 35.27,
+        "lng": -101.835
+      },
+      "bbox": {
+        "min_lat": 35.235,
+        "max_lat": 35.33,
+        "min_lng": -101.93,
+        "max_lng": -101.76
+      },
+      "submarkets": [
+        "Eastridge & North Heights"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Amarillo": {
+      "name": "Downtown Amarillo",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 35.2088,
+        "lng": -101.8355
+      },
+      "description": "Civic Center, Polk Street corridor, and historic Route 66 core with mixed commercial renovation and infill."
+    },
+    "Polk Street District": {
+      "name": "Polk Street District",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 35.2105,
+        "lng": -101.835
+      },
+      "description": "Historic main-street blocks with restaurants, nightlife, and adaptive reuse loft conversions."
+    },
+    "Westgate / Soncy": {
+      "name": "Westgate / Soncy",
+      "division": "WEST_SIDE",
+      "center": {
+        "lat": 35.187,
+        "lng": -101.938
+      },
+      "description": "Regional mall and Soncy Road retail corridor with outparcel medical, hospitality, and steady tenant rollover."
+    },
+    "Medical Center & Wolflin": {
+      "name": "Medical Center & Wolflin",
+      "division": "WEST_SIDE",
+      "center": {
+        "lat": 35.1805,
+        "lng": -101.905
+      },
+      "description": "BSA / Northwest Texas healthcare cluster and Wolflin residential-adjacent commercial grid."
+    },
+    "Southwest Amarillo": {
+      "name": "Southwest Amarillo",
+      "division": "SOUTH_STRIPS",
+      "center": {
+        "lat": 35.15,
+        "lng": -101.9
+      },
+      "description": "Southwestern growth belt of newer subdivisions and highway-oriented retail."
+    },
+    "Amarillo College Area": {
+      "name": "Amarillo College Area",
+      "division": "SOUTH_STRIPS",
+      "center": {
+        "lat": 35.184,
+        "lng": -101.878
+      },
+      "description": "Campus-adjacent district and Wolflin Heights edges with steady renovation and services."
+    },
+    "East Gateway & Airport": {
+      "name": "East Gateway & Airport",
+      "division": "EAST_GATE",
+      "center": {
+        "lat": 35.22,
+        "lng": -101.74
+      },
+      "description": "Eastern industrial and airport approach corridor along I-40 with logistics and highway services."
+    },
+    "Eastridge & North Heights": {
+      "name": "Eastridge & North Heights",
+      "division": "NORTH_LOOP",
+      "center": {
+        "lat": 35.255,
+        "lng": -101.82
+      },
+      "description": "Northern residential plateaus and historic neighborhoods with infrastructure-driven service demand."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/amarillo.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
