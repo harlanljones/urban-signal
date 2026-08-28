@@ -517,6 +517,7 @@ METRO_NAME_OVERRIDES: Dict[Tuple[str, str], str] = {
     ("miami", "fl"): "miami_dade",           # CBSA 33100 (NOT 33060, Miami OK)
     ("boise city", "id"): "boise",           # CBSA 14260
     ("st. louis", "mo"): "st_louis",         # CBSA 41180
+    ("columbus", "ga"): "columbus_ga",       # CBSA 17980; bare "columbus" is Columbus OH
 }
 
 # Registered markets with no CBSA of their own — they are submarkets inside a
