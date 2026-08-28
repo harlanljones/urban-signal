@@ -1499,6 +1499,8 @@ def get_dashboard_html() -> str:
       odessa: { name: 'Odessa' },
       alexandria: { name: 'Alexandria' },
       jonesboro: { name: 'Jonesboro' },
+      charleston_sc: { name: 'Charleston, SC' },
+      charleston_sc: { name: 'Charleston, SC' },
     };
 
     let map = null;
