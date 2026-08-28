@@ -1497,7 +1497,8 @@ def get_dashboard_html() -> str:
       texarkana: { name: 'Texarkana' },
       midland: { name: 'Midland' },
       odessa: { name: 'Odessa' },
-      odessa: { name: 'Odessa' },
+      alexandria: { name: 'Alexandria' },
+      alexandria: { name: 'Alexandria' },
     };
 
     let map = null;
