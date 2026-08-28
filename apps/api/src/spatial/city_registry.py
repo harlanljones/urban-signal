@@ -616,6 +616,7 @@ class CityId(str, Enum):
     AMARILLO = "amarillo"
     BEAUMONT = "beaumont"
     WACO = "waco"
+<<<<<<< HEAD
     JACKSON_MS = "jackson_ms"
     MACON_BIBB = "macon_bibb"
     TYLER = "tyler"
@@ -632,6 +633,7 @@ class CityId(str, Enum):
     CHARLESTON_SC = "charleston_sc"
     LAKELAND = "lakeland"
     AUGUSTA = "augusta"
+    PORT_ST_LUCIE = "port_st_lucie"
 
 
 class FeedType(str, Enum):
@@ -1230,6 +1232,7 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "waco": CityId.WACO,
     "waco_tx": CityId.WACO,
     "waco tx": CityId.WACO,
+<<<<<<< HEAD
     # Jackson, MS
     "jackson_ms": CityId.JACKSON_MS,
     "jackson-ms": CityId.JACKSON_MS,
@@ -1295,6 +1298,12 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "augusta": CityId.AUGUSTA,
     "augusta_ga": CityId.AUGUSTA,
     "augusta ga": CityId.AUGUSTA,
+    # Port St. Lucie (Southeast)
+    "port_st_lucie": CityId.PORT_ST_LUCIE,
+    "port-st-lucie": CityId.PORT_ST_LUCIE,
+    "port st lucie": CityId.PORT_ST_LUCIE,
+    "psl": CityId.PORT_ST_LUCIE,
+    "port saint lucie": CityId.PORT_ST_LUCIE,
 }
 
 
@@ -5214,6 +5223,7 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
             FeedType.SLA: snap_sla_spec("TX"),
         },
     ),
+<<<<<<< HEAD
     CityId.LAKE_CHARLES: CityRegistration(
         city_id=CityId.LAKE_CHARLES,
         name="Lake Charles",
@@ -5345,24 +5355,35 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 platform="arcgis",
                 watermark_col="DATE_ISSUE",
                 id_keys=["PERMITNUMBER", "PERM_NUM"],
+    CityId.PORT_ST_LUCIE: CityRegistration(
+        city_id=CityId.PORT_ST_LUCIE,
+        name="Port St. Lucie",
+        state="FL",
+        center={"lat": 27.28, "lng": -80.36},
+        metro_bbox=PORT_ST_LUCIE_METRO_BBOX,
+        division_bboxes=PORT_ST_LUCIE_DIVISION_BBOXES,
+        submarkets=PORT_ST_LUCIE_SUBMARKETS,
+        divisions=PORT_ST_LUCIE_DIVISIONS,
+        job_suffix="port_st_lucie",
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_port_st_lucie_permits_url,
+                platform="arcgis",
+                watermark_col="DateIssued",
+                id_keys=["PermitID", "AddressID"],
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
                 expected_cadence_days=7,
                 needs_geocode=True,
-                geocode_context="Augusta, GA",
-                oid_field="OBJECTID",
-                max_record_count=15000,
-                field_map={
-                    "job_id": ["PERMITNUMBER", "PERM_NUM"],
-                    "address_street": ["JOBADDRESS"],
-                    "issuance_date": ["DATE_ISSUE", "DATE_ENTERED"],
-                    "filing_date": ["DATE_ENTERED"],
-                    "cost": ["WORKCOST"],
-                    "status": ["PERMIT_STATUS"],
-                },
+                geocode_context="Port St. Lucie, FL",
+                oid_field="PermitID",
+                max_record_count=2000,
+                order_by="DateIssued DESC",
+                field_map=PORT_ST_LUCIE_FIELD_MAP,
             ),
-            FeedType.SLA: snap_sla_spec("GA"),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice (FL).
+            FeedType.SLA: snap_sla_spec("FL"),
         },
     ),
     CityId.TYLER: CityRegistration(
@@ -5532,6 +5553,14 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 max_record_count=2000,
             ),
             # Florida statewide SNAP fallback (SLA)
+=======
+                oid_field="PermitID",
+                max_record_count=2000,
+                order_by="DateIssued DESC",
+                field_map=PORT_ST_LUCIE_FIELD_MAP,
+            ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice (FL).
+>>>>>>> 717ce8a (US-289: Register CityId.port_st_lucie with REGISTRY + ALIASES; add settings.arcgis_port_st_lucie_permits_url; include SNAP SLA (FL))
             FeedType.SLA: snap_sla_spec("FL"),
         },
     ),
