@@ -1490,6 +1490,7 @@ def get_dashboard_html() -> str:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       jackson_ms: { name: 'Jackson' },
       macon_bibb: { name: 'Macon-Bibb County' },
       ocala: { name: 'Ocala / Marion County' },
@@ -1509,6 +1510,7 @@ def get_dashboard_html() -> str:
       augusta: { name: 'Augusta, GA' },
       port_st_lucie: { name: 'Port St. Lucie' },
       asheville: { name: 'Asheville, NC' },
+      wilmington_nc: { name: 'Wilmington, NC' },
     };
 
     let map = null;
