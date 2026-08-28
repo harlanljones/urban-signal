@@ -17,6 +17,11 @@
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" />
   <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
   
+  <!-- deck.gl UMD (no bundler) -->
+  <script src="https://unpkg.com/@deck.gl/core@8.9.36/dist.min.js"></script>
+  <script src="https://unpkg.com/@deck.gl/geo-layers@8.9.36/dist.min.js"></script>
+  <script src="https://unpkg.com/@deck.gl/mapbox@8.9.36/dist.min.js"></script>
+  
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   
@@ -1456,6 +1461,7 @@
     };
 
     let map = null;
+    let deckOverlay = null; // deck.gl MapboxOverlay
     let gridGeoJSON = null;
     let shapChart = null;
     let currentPerspective = '3D';
@@ -1474,9 +1480,25 @@
     let tileLoadGeneration = 0;
     let gridDirty = false;
     let viewportDebounceTimer = 0;
+    let nationalDebounceTimer = 0;
     const TILE_PARENTS_PER_REQUEST = 32;
     const TILE_FETCH_CONCURRENCY = 2;
     const ZOOM_FLOOR = 6;
+    const NATIONAL_HIDE_ZOOM = 12; // hide national overlay above this to avoid double-draw
+
+    // National overlay cache: per-resolution res-3-parent -> features[]
+    const nationalCache = {
+      4: new Map(),
+      5: new Map(),
+      6: new Map(),
+    };
+    // Active data shown on the overlay per resolution
+    const nationalActive = {
+      4: [],
+      5: [],
+      6: [],
+    };
+    let nationalActiveRes = null;
 
     function cityDisplayName(cityId) {
       return (METRO_META[cityId] || {}).name || String(cityId).replace(/_/g, ' ');
@@ -1540,6 +1562,222 @@
       return R * c;
     }
 
+    // ---- deck.gl national LOD overlay --------------------------------------
+    function deckSupported() {
+      try {
+        return typeof deck !== 'undefined' && !!document.createElement('canvas').getContext('webgl');
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function initDeckOverlay() {
+      if (!map || !deckSupported()) return;
+      try {
+        const hasWebGL2 = !!document.createElement('canvas').getContext('webgl2');
+        // Interleaved when WebGL2 is available (shares MapLibre context); separate canvas fallback on WebGL1
+        deckOverlay = new deck.MapboxOverlay({ interleaved: hasWebGL2, layers: [] });
+        deckOverlay.setMap(map);
+        // Initial paint
+        scheduleNationalLoad();
+      } catch (err) {
+        console.warn('deck.gl overlay failed to initialize:', err);
+      }
+    }
+
+    function nationalResForZoom(z) {
+      if (z < 5) return 4;
+      if (z < 8) return 5;
+      return 6;
+    }
+
+    function res3ParentsCoveringBounds(bounds) {
+      if (typeof h3 === 'undefined' || !bounds) return [];
+      const west = bounds.getWest();
+      const east = bounds.getEast();
+      const south = bounds.getSouth();
+      const north = bounds.getNorth();
+      // Sample below a res-3 hex diameter so sampling cannot skip a parent
+      const stepLat = 0.9;   // ~ lat height of res-3
+      const stepLng = 0.9;   // ~ lng width of res-3 (rough)
+      const parents = new Set();
+      for (let lat = south; lat <= north; lat += stepLat) {
+        for (let lng = west; lng <= east; lng += stepLng) {
+          try {
+            const cell = h3.latLngToCell(lat, lng, 3);
+            if (cell) parents.add(cell);
+          } catch (_) { /* ignore */ }
+        }
+      }
+      return Array.from(parents);
+    }
+
+    function scheduleNationalLoad() {
+      clearTimeout(nationalDebounceTimer);
+      nationalDebounceTimer = setTimeout(updateNationalOverlay, 250);
+    }
+
+    async function updateNationalOverlay() {
+      if (!map || !deckOverlay) return;
+      const z = map.getZoom();
+      const hint = document.getElementById('zoom-hint');
+      // Retire the "Zoom in..." dead-zone message
+      if (hint) hint.hidden = true;
+      // Show/hide overlay by zoom to avoid double-draw with metro res-9
+      const overlayVisible = z < NATIONAL_HIDE_ZOOM;
+      if (!overlayVisible) {
+        try { deckOverlay.setProps({ layers: [] }); } catch (_) {}
+        return;
+      }
+
+      const res = nationalResForZoom(z);
+      nationalActiveRes = res;
+      // Swap per-res data — never accumulate across res levels
+      nationalActive[4] = [];
+      nationalActive[5] = [];
+      nationalActive[6] = [];
+
+      // Determine res-3 parents to request for this viewport
+      const parents = res3ParentsCoveringBounds(map.getBounds());
+      const missing = parents.filter((p) => !nationalCache[res].has(p));
+      // Batch-fetch missing parents; API mirrors gridtiles shape
+      if (missing.length) {
+        const batches = [];
+        const BATCH = 24;
+        for (let i = 0; i < missing.length; i += BATCH) {
+          batches.push(missing.slice(i, i + BATCH));
+        }
+        await Promise.all(
+          batches.map(async (chunk) => {
+            const url = `/api/v1/national/${res}?parents=${chunk.join(',')}`;
+            try {
+              const resp = await fetch(url);
+              if (!resp.ok) return;
+              const payload = await resp.json();
+              const feats = (payload && payload.features) || [];
+              // Cache by the reported parent when present; otherwise group by computed res-3 parent
+              for (const feature of feats) {
+                const cell = feature?.properties?.h3_index;
+                if (!cell) continue;
+                const p = (typeof h3 !== 'undefined' && h3.cellToParent) ? h3.cellToParent(cell, 3) : null;
+                const key = (p && chunk.includes(p)) ? p : (p || chunk[0]);
+                if (!nationalCache[res].has(key)) nationalCache[res].set(key, []);
+                nationalCache[res].get(key).push(feature);
+              }
+            } catch (e) {
+              console.debug('national fetch error:', e);
+            }
+          })
+        );
+      }
+
+      // Assemble active features for the overlay from the cached parents in view
+      let feats = [];
+      for (const p of parents) {
+        const arr = nationalCache[res].get(p);
+        if (arr && arr.length) feats = feats.concat(arr);
+      }
+      nationalActive[res] = feats;
+
+      // Update deck overlay layers
+      try {
+        deckOverlay.setProps({ layers: buildNationalLayers(res) });
+      } catch (e) {
+        console.debug('overlay setProps failed:', e);
+      }
+    }
+
+    function pctFromProps(props) {
+      // Prefer the current metric's national percentile; fall back to first *_national_pct present
+      const primary = props[`${currentMetric}_national_pct`];
+      if (Number.isFinite(Number(primary))) return Number(primary);
+      for (const [k, v] of Object.entries(props)) {
+        if (k.endsWith('_national_pct') && Number.isFinite(Number(v))) return Number(v);
+      }
+      return null;
+    }
+
+    function colorForPct(pct) {
+      // Returns [r,g,b, a] with shared ramp stops
+      if (pct === null || pct === undefined) return [80, 80, 90, 130];
+      if (pct < 50) {
+        // 0 -> #34d399
+        return [52, 211, 153, 200];
+      } else if (pct < 75) {
+        // 50 -> #fbbf24
+        return [251, 191, 36, 220];
+      } else if (pct < 90) {
+        // 75 -> #fb923c
+        return [251, 146, 60, 230];
+      }
+      // 90+ -> #f43f5e
+      return [244, 63, 94, 235];
+    }
+
+    function buildNationalLayers(activeRes) {
+      const mkLayer = (res) => {
+        const data = nationalActive[res] || [];
+        const visible = nationalActiveRes === res;
+        return new deck.H3HexagonLayer({
+          id: `national-h3-r${res}`,
+          data,
+          visible,
+          pickable: true,
+          extruded: currentPerspective === '3D',
+          // High-precision path is fine at res4/res5 counts; res6 benefits from instancing path
+          highPrecision: res <= 5,
+          getHexagon: (d) => (d?.properties?.h3_index) || d?.h3_index || '',
+          getFillColor: (d) => colorForPct(pctFromProps((d && d.properties) || {})),
+          getElevation: (d) => {
+            const pct = pctFromProps((d && d.properties) || {});
+            if (!Number.isFinite(pct)) return 0;
+            // Match MapLibre 3D emphasis roughly per metric; reuse lims scaling by default
+            const factors = {
+              lims_score: 18,
+              delta_6m_p50: 40,
+              delta_12m_spillover: 45,
+              prob_18m_macro_outperformance: 9,
+            };
+            const factor = factors[currentMetric] || 18;
+            const base = Math.max(0, (pct ?? 50) - 40);
+            return base * factor;
+          },
+          onClick: (info) => {
+            const props = (info && info.object && (info.object.properties || info.object)) || {};
+            const h3idx = props.h3_index;
+            if (h3idx) {
+              const c = (typeof h3 !== 'undefined' && h3.cellToLatLng) ? h3.cellToLatLng(h3idx) : [null, null];
+              inspectH3CellWithNationalFallback(h3idx, c[0], c[1], props);
+            }
+          },
+          updateTriggers: {
+            getFillColor: currentMetric + (currentPerspective === '3D' ? '-3d' : '-2d'),
+            getElevation: currentMetric,
+          },
+        });
+      };
+      return [mkLayer(4), mkLayer(5), mkLayer(6)];
+    }
+
+    async function inspectH3CellWithNationalFallback(h3Index, lat, lng, natProps) {
+      try {
+        const resp = await fetch('/api/v1/predict', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ h3_index: h3Index, include_shap: true })
+        });
+        if (resp.ok) {
+          const pred = await resp.json();
+          handleHexSelection({ ...natProps, ...pred, h3_index: h3Index, centroid_lat: lat, centroid_lng: lng });
+          return;
+        }
+      } catch (e) {
+        /* fall through to national-only inspector */
+      }
+      // Honest no-data: show a minimal card with any *_national_pct properties present
+      const props = Object.assign({}, natProps, { h3_index: h3Index, centroid_lat: lat, centroid_lng: lng });
+      handleHexSelection(props);
+    }
     // Esri Dark Gray Canvas: keyless dark raster basemap, split into a
     // geometry base and a labels/roads reference overlay. Tiles are {z}/{y}/{x}
     // and stop at z16 -- source maxzoom lets MapLibre overzoom the last real
@@ -1963,9 +2201,11 @@
         map.on('load', () => {
           map.resize();
           setupGridLayers();
-          map.on('moveend', scheduleViewportLoad);
-          map.on('zoomend', scheduleViewportLoad);
+          initDeckOverlay();
+          map.on('moveend', () => { scheduleViewportLoad(); scheduleNationalLoad(); });
+          map.on('zoomend', () => { scheduleViewportLoad(); scheduleNationalLoad(); updateLayerVisibilities(); });
           scheduleViewportLoad();
+          scheduleNationalLoad();
           setInterval(fetchCatalysts, 15000);
         });
 
@@ -2093,13 +2333,12 @@
       if (!map || !snapshotManifest) return;
       const tileIndex = snapshotManifest.tile_index || {};
       const hint = document.getElementById('zoom-hint');
+      if (hint) hint.hidden = true; // dead-zone hint retired; national overlay covers country view
       if (map.getZoom() < ZOOM_FLOOR) {
-        if (hint) hint.hidden = false;
         setHexLayersVisible(false);
-        return;
+        return; // below metro band: do not fetch res-9 tiles
       }
-      if (hint) hint.hidden = true;
-      setHexLayersVisible(true);
+      // Above the floor, visibilities are managed by updateLayerVisibilities()
 
       const candidates = res5ParentsCoveringBounds(map.getBounds())
         .filter((parent) => Object.prototype.hasOwnProperty.call(tileIndex, parent))
@@ -2160,11 +2399,35 @@
     function applyGridData() {
       if (!gridDirty || !map || !map.getSource('h3-grid-source')) return;
       gridDirty = false;
+      // LRU-by-distance eviction to cap memory and avoid frame spikes
+      evictDistantGridFeatures();
       gridGeoJSON = { type: 'FeatureCollection', features: [...tileFeatures.values()] };
       map.getSource('h3-grid-source').setData(gridGeoJSON);
       // Programmatic camera jumps can leave the repaint cycle suppressed;
       // nudge it so freshly merged tiles index immediately.
       map.triggerRepaint();
+    }
+
+    function evictDistantGridFeatures(maxCount = 120000) {
+      const size = tileFeatures.size;
+      if (size <= maxCount) return;
+      const center = map.getCenter();
+      const scored = [];
+      for (const [cell, feature] of tileFeatures.entries()) {
+        let lat = feature?.properties?.centroid_lat;
+        let lng = feature?.properties?.centroid_lng;
+        if ((!Number.isFinite(lat) || !Number.isFinite(lng)) && typeof h3 !== 'undefined' && h3.cellToLatLng) {
+          const c = h3.cellToLatLng(cell);
+          lat = c[0];
+          lng = c[1];
+        }
+        const d = (Number.isFinite(lat) && Number.isFinite(lng)) ? haversineDistance(center.lat, center.lng, lat, lng) : 9999;
+        scored.push([cell, d]);
+      }
+      scored.sort((a, b) => a[1] - b[1]);
+      for (let i = maxCount; i < scored.length; i++) {
+        tileFeatures.delete(scored[i][0]);
+      }
     }
 
     function setupGridLayers() {
@@ -2285,6 +2548,10 @@
         map.setPaintProperty('h3-hex-extrusion', 'fill-extrusion-color', colorExpr);
         map.setPaintProperty('h3-hex-extrusion', 'fill-extrusion-height', heightFactor);
       }
+      // Reflect metric change on deck.gl overlay
+      if (deckOverlay) {
+        try { deckOverlay.setProps({ layers: buildNationalLayers(nationalActiveRes || nationalResForZoom(map.getZoom())) }); } catch (_) {}
+      }
     }
     function setPerspective(mode) {
       currentPerspective = mode;
@@ -2294,7 +2561,7 @@
       if (btn2d) btn2d.classList.toggle('active', mode === '2D');
 
       if (map) {
-        setHexLayersVisible(map.getZoom() >= ZOOM_FLOOR);
+        updateLayerVisibilities();
 
         map.easeTo({
           pitch: mode === '3D' ? 52 : 0,
@@ -2302,6 +2569,15 @@
           duration: 900
         });
       }
+    }
+    function updateLayerVisibilities() {
+      if (!map) return;
+      const z = map.getZoom();
+      // Hide metro res-9 when national overlay would double-draw (below NATIONAL_HIDE_ZOOM)
+      const showMetro = z >= ZOOM_FLOOR && z >= NATIONAL_HIDE_ZOOM;
+      setHexLayersVisible(showMetro);
+      // deck overlay visibility is controlled in updateNationalOverlay()
+      scheduleNationalLoad();
     }
 
     function togglePerspective() {
