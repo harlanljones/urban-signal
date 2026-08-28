@@ -2652,6 +2652,18 @@
       "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
       "center": { "lat": 33.4251, "lng": -94.0477 },
       "evidence_path": "apps/api/src/spatial/cities/texarkana.py"
+    },
+    {
+      "id": "midland",
+      "name": "Midland",
+      "state": "TX",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 8,
+      "feeds": [false, false, true, false],
+      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
+      "center": { "lat": 31.997, "lng": -102.078 },
+      "evidence_path": "apps/api/src/spatial/cities/midland.py"
     }
   ],
   "pipeline": [

@@ -426,6 +426,7 @@ from src.spatial.cities.waco import (
     WACO_DIVISIONS,
     WACO_METRO_BBOX,
     WACO_SUBMARKETS,
+)
 from src.spatial.cities.lake_charles import (
     LAKE_CHARLES_DIVISION_BBOXES,
     LAKE_CHARLES_DIVISIONS,
@@ -473,12 +474,12 @@ from src.spatial.cities.monroe import (
     MONROE_METRO_BBOX,
     MONROE_SUBMARKETS,
 )
-from src.spatial.cities.abilene import (
-    ABILENE_CENTER,
-    ABILENE_DIVISION_BBOXES,
-    ABILENE_DIVISIONS,
-    ABILENE_METRO_BBOX,
-    ABILENE_SUBMARKETS,
+from src.spatial.cities.midland import (
+    MIDLAND_CENTER,
+    MIDLAND_DIVISION_BBOXES,
+    MIDLAND_DIVISIONS,
+    MIDLAND_METRO_BBOX,
+    MIDLAND_SUBMARKETS,
 )
 from src.spatial.cities.texarkana import (
     TEXARKANA_CENTER,
@@ -575,6 +576,7 @@ class CityId(str, Enum):
     MONROE = "monroe"
     ABILENE = "abilene"
     TEXARKANA = "texarkana"
+    MIDLAND = "midland"
 
 
 class FeedType(str, Enum):
@@ -1195,6 +1197,11 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "texarkana tx": CityId.TEXARKANA,
     "texarkana_ar": CityId.TEXARKANA,
     "texarkana ar": CityId.TEXARKANA,
+    # Midland, TX
+    "midland": CityId.MIDLAND,
+    "midland_tx": CityId.MIDLAND,
+    "midland-tx": CityId.MIDLAND,
+    "midland tx": CityId.MIDLAND,
 }
 
 
@@ -5229,6 +5236,22 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
             FeedType.SLA: snap_sla_spec("TX"),
         },
     ),
+    CityId.MIDLAND: CityRegistration(
+        city_id=CityId.MIDLAND,
+        name="Midland",
+        state="TX",
+        center=MIDLAND_CENTER,
+        metro_bbox=MIDLAND_METRO_BBOX,
+        division_bboxes=MIDLAND_DIVISION_BBOXES,
+        submarkets=MIDLAND_SUBMARKETS,
+        divisions=MIDLAND_DIVISIONS,
+        job_suffix="midland",
+        # US-279: initial registration with SNAP SLA (TX slice). EnerGov/PermitMidland
+        # has no open public API endpoint; do not register permits until verifiable.
+        datasets={
+            FeedType.SLA: snap_sla_spec("TX"),
+        },
+    ),
     CityId.LONGVIEW: CityRegistration(
         city_id=CityId.LONGVIEW,
         name="Longview",
@@ -5262,8 +5285,6 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
             FeedType.SLA: snap_sla_spec("AR"),
         },
     ),
-=======
->>>>>>> 6b90602 (leaf(spatial): add Texarkana geometry + containment tests (US-282))
 }
 
 

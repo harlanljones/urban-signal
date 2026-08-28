@@ -462,8 +462,6 @@ from src.spatial.cities.waco import (
     WACO_SUBMARKETS,
     is_in_waco_metro,
 )
-<<<<<<< HEAD
-<<<<<<< HEAD
 from src.spatial.cities.jackson_ms import (
     JACKSON_MS_DIVISION_BBOXES,
     JACKSON_MS_DIVISIONS,
@@ -520,13 +518,19 @@ from src.spatial.cities.texarkana import (
     TEXARKANA_SUBMARKETS,
     is_in_texarkana_metro,
 )
-
 from src.spatial.cities.lake_charles import (
     LAKE_CHARLES_DIVISION_BBOXES,
     LAKE_CHARLES_DIVISIONS,
     LAKE_CHARLES_METRO_BBOX,
     LAKE_CHARLES_SUBMARKETS,
     is_in_lake_charles_metro,
+)
+from src.spatial.cities.midland import (
+    MIDLAND_DIVISION_BBOXES,
+    MIDLAND_DIVISIONS,
+    MIDLAND_METRO_BBOX,
+    MIDLAND_SUBMARKETS,
+    is_in_midland_metro,
 )
 __all__ = [
     "PIERCE_METRO_BBOX",
@@ -855,7 +859,6 @@ __all__ = [
     "WACO_DIVISIONS",
     "WACO_SUBMARKETS",
     "is_in_waco_metro",
-<<<<<<< HEAD
     "JACKSON_MS_METRO_BBOX",
     "JACKSON_MS_DIVISION_BBOXES",
     "JACKSON_MS_DIVISIONS",
@@ -901,4 +904,9 @@ __all__ = [
     "TEXARKANA_DIVISIONS",
     "TEXARKANA_SUBMARKETS",
     "is_in_texarkana_metro",
+    "MIDLAND_METRO_BBOX",
+    "MIDLAND_DIVISION_BBOXES",
+    "MIDLAND_DIVISIONS",
+    "MIDLAND_SUBMARKETS",
+    "is_in_midland_metro",
 ]
