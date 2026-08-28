@@ -117,11 +117,96 @@ green at every step boundary.
   vs the 68 leaf modules the uncommitted wave-5 work adds). It is red on this
   tree before any US-363 edit and is not mine to move.
 
+## Phase 2 result — §1.1 SeriesClient DONE (2026-08-28)
+
+Leaf only. No spine files touched: series are national files keyed by
+geography, not city feeds, so they live in their own `SERIES_REGISTRY` rather
+than `CityRegistration.datasets` (a city holds at most one DatasetSpec per
+FeedType, while one metro carries rent + value + forecast + HPI + FMR series
+at once). Nothing is produced to Kafka — the output is an upsert.
+
+Files: `src/spatial/geography_crosswalk.py`, `src/spatial/series_registry.py`,
+`src/producers/series_client.py`, `src/features/macro_series_store.py`,
+`tests/unit/test_series_client.py` (61 tests).
+
+### Decisions
+- **Crosswalk source: Census Gazetteer, not HUD.** The sweep suggests HUD's
+  USPS ZIP crosswalk; `huduser.gov/hudapi/public/usps` returns **401** without
+  a Bearer token (verified 2026-08-28), which would make the crosswalk — a
+  dependency of *every* series feed — fail closed on a missing secret. The
+  Gazetteer files are the same public-domain geography with no key:
+  `2024_Gaz_zcta_national.zip` (33,791 ZCTA centroids) and
+  `2024_Gaz_cbsa_national.zip` (935 CBSAs).
+- **Metro names do not match across publishers.** The 2024 Gazetteer carries
+  2023 OMB delineations; Zillow still ships the older titles. Exact matching
+  loses most metros:
+  `Houston-Pasadena-The Woodlands, TX` vs `Houston-The Woodlands-Sugar Land, TX`;
+  `New York-Newark-Jersey City, NY-NJ` vs `New York, NY`;
+  `Chicago-Naperville-Elgin, IL-IN` vs `…, IL-IN-WI`.
+  Matching tries the full name, then falls back to (primary city, first
+  state) — the two parts that survive redelineation. Ambiguous keys are
+  logged and dropped, never guessed.
+- **CBSA -> city is NOT centroid containment.** A CBSA spans whole counties,
+  so its internal point sits outside the tighter bbox we register a metro
+  with: Seattle-Tacoma-Bellevue's centroid lands in the Cascades, east of
+  Seattle's `metro_bbox` entirely; Denver's and DC's do the same. Containment
+  is right for a ZIP and wrong for a CBSA, so CBSAs resolve by primary city
+  with containment only as a second pass. Pinned by a test.
+- **Four CBSA-title spellings the registry's aliases lack** live in the
+  crosswalk, not in spine ALIASES, because each is a title artifact and two
+  are genuinely ambiguous as bare aliases: "washington" is also a state and
+  "miami" is also the Miami, OK micro area (CBSA 33060). Keying on
+  (city, state) is what makes them safe.
+- **Coverage:** every registered city is reachable from a CBSA except
+  `fort_worth`, `aurora` and `prince_georges`, which have no CBSA of their own
+  (they are submarkets inside Dallas-Fort Worth, Denver-Aurora and
+  Washington-Arlington-Alexandria). They get ZIP-level coverage instead, where
+  smallest-bbox containment picks the more specific registration. Asserted by
+  a test so a lost CBSA link fails loudly instead of emptying a series.
+- **The store is not append-only.** Zillow and FHFA reissue and revise full
+  history; a watermark append would freeze the first vintage of every revised
+  month. `macro_series` upserts current values and writes displaced ones to
+  `macro_series_vintages`; `max_period()` is a freshness signal, explicitly
+  not an ingestion cursor.
+- **Set-based upsert.** The first implementation read-then-wrote per row:
+  **37s** for one Zillow release. Staging through a registered DataFrame and
+  diffing in four statements is **0.7s** for the same 313,065 rows and 5.4s
+  for ZHVI's 2,407,210. The PRIMARY KEY was measured rather than assumed —
+  0.09s vs 0.28s to bulk-insert 313k — and kept.
+- **Timezone/period normalization:** every period is stored as the first day
+  of its period, so a publisher switching month-end to month-start labels
+  cannot fork the key space.
+
+### Live proof run (2026-08-28, all four keyless series)
+```
+zori_zip        313,065 obs   62 cities  2015-01..2026-07  fetch 1.1s  upsert 0.7s
+fhfa_hpi_metro    7,242 obs   50 cities  1991-01..2026-04  fetch 2.6s  upsert 0.0s
+zhvf_metro          219 obs   59 cities  2026-08..2027-07  fetch 0.2s  upsert 0.0s
+zhvi_zip      2,407,210 obs   62 cities  2000-01..2026-07  fetch 6.3s  upsert 5.4s
+re-apply identical release -> 0 inserted / 0 revised / 7,242 unchanged
+perturb 100 values         -> 0 inserted / 100 revised / 0 unchanged
+store total                -> 2,727,736 rows
+```
+
+### Gates
+`pytest tests/unit/test_series_client.py` 61 passed; `pytest -m interlock`
+24 passed / 0 failed.
+
+### Note on the tree (2026-08-28 ~22:05)
+Another session held the `city_registry.py` spine mid-run for the wave-5
+city registrations, and the tree briefly carried a torn write
+(`CityId.BUFFALO` + aliases with no registration, so `import city_registry`
+raised). It cleared on its own. I did not touch that file during the hold.
+Also: cutting this branch switched the working tree under that session, so
+its wave-5 commits may land here; `git checkout main` refuses while its edits
+are uncommitted, and stashing another agent's in-flight hold is not mine to
+do. Separate with a cherry-pick of 0523e8d if the branches need untangling.
+
 ## Current step
-Phase 1 committed. Starting the §5 event-schema spine decision, then
-`SeriesClient` (§1.1).
+Phase 2 committed. Starting the §5 event-schema spine decision.
 
 ## Next step
 Decide generic `InfrastructureEvent` vs per-family once (§5 item 2), register
-`StationChangeEvent` / `poi_change` / `insurance_loss` schemas in one hold, and
-build SeriesClient + the geography crosswalk.
+`StationChangeEvent` / `poi_change` / `insurance_loss` schemas in one hold,
+then build SnapshotClient/GBFS, poi_diff_producer/FSQ, OpenFemaClient and
+NrelAfdcClient.
