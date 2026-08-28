@@ -1493,6 +1493,8 @@ def get_dashboard_html() -> str:
       fort_smith: { name: 'Fort Smith, AR' },
       longview: { name: 'Longview' },
       monroe: { name: 'Monroe' },
+      abilene: { name: 'Abilene' },
+      abilene: { name: 'Abilene' },
     };
 
     let map = null;

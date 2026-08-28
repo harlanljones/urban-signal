@@ -1,0 +1,189 @@
+{
+  "schema_version": 2,
+  "id": "abilene",
+  "name": "Abilene",
+  "state": "TX",
+  "center": {
+    "lat": 32.4487,
+    "lng": -99.7331
+  },
+  "metro_bbox": {
+    "min_lat": 32.3,
+    "max_lat": 32.57,
+    "min_lng": -99.9,
+    "max_lng": -99.55
+  },
+  "divisions": {
+    "CENTRAL_CORE": {
+      "name": "CENTRAL_CORE",
+      "center": {
+        "lat": 32.448,
+        "lng": -99.7335
+      },
+      "bbox": {
+        "min_lat": 32.43,
+        "max_lat": 32.47,
+        "min_lng": -99.76,
+        "max_lng": -99.7
+      },
+      "submarkets": [
+        "Downtown Abilene",
+        "SoDA District"
+      ]
+    },
+    "WEST_SIDE": {
+      "name": "WEST_SIDE",
+      "center": {
+        "lat": 32.455,
+        "lng": -99.8
+      },
+      "bbox": {
+        "min_lat": 32.4,
+        "max_lat": 32.5,
+        "min_lng": -99.9,
+        "max_lng": -99.72
+      },
+      "submarkets": [
+        "Buffalo Gap Road Corridor"
+      ]
+    },
+    "SOUTH_BELT": {
+      "name": "SOUTH_BELT",
+      "center": {
+        "lat": 32.365,
+        "lng": -99.74
+      },
+      "bbox": {
+        "min_lat": 32.3,
+        "max_lat": 32.42,
+        "min_lng": -99.85,
+        "max_lng": -99.65
+      },
+      "submarkets": [
+        "South 14th Commercial",
+        "Mall of Abilene / Southwest Dr",
+        "Airport Corridor"
+      ]
+    },
+    "EAST_GATE": {
+      "name": "EAST_GATE",
+      "center": {
+        "lat": 32.505,
+        "lng": -99.64
+      },
+      "bbox": {
+        "min_lat": 32.44,
+        "max_lat": 32.56,
+        "min_lng": -99.73,
+        "max_lng": -99.55
+      },
+      "submarkets": [
+        "ACU / Northeast District"
+      ]
+    },
+    "NORTH_LOOP": {
+      "name": "NORTH_LOOP",
+      "center": {
+        "lat": 32.535,
+        "lng": -99.72
+      },
+      "bbox": {
+        "min_lat": 32.5,
+        "max_lat": 32.57,
+        "min_lng": -99.85,
+        "max_lng": -99.6
+      },
+      "submarkets": [
+        "North Abilene / I-20"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Abilene": {
+      "name": "Downtown Abilene",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 32.4487,
+        "lng": -99.7331
+      },
+      "description": "Historic courthouse, cultural district, and mixed-use main-street blocks."
+    },
+    "SoDA District": {
+      "name": "SoDA District",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 32.444,
+        "lng": -99.733
+      },
+      "description": "South Downtown Abilene arts & dining corridor with adaptive reuse momentum."
+    },
+    "Buffalo Gap Road Corridor": {
+      "name": "Buffalo Gap Road Corridor",
+      "division": "WEST_SIDE",
+      "center": {
+        "lat": 32.43,
+        "lng": -99.77
+      },
+      "description": "Retail and services spine along Buffalo Gap Rd and SW 14th connectors."
+    },
+    "South 14th Commercial": {
+      "name": "South 14th Commercial",
+      "division": "SOUTH_BELT",
+      "center": {
+        "lat": 32.41,
+        "lng": -99.75
+      },
+      "description": "South Abilene growth belt with highway-oriented retail and neighborhood services."
+    },
+    "Mall of Abilene / Southwest Dr": {
+      "name": "Mall of Abilene / Southwest Dr",
+      "division": "SOUTH_BELT",
+      "center": {
+        "lat": 32.39,
+        "lng": -99.7556
+      },
+      "description": "Regional mall area and Southwest Dr commercial clusters."
+    },
+    "Airport Corridor": {
+      "name": "Airport Corridor",
+      "division": "SOUTH_BELT",
+      "center": {
+        "lat": 32.41,
+        "lng": -99.68
+      },
+      "description": "Abilene Regional Airport vicinity and industrial ribbons along TX-36."
+    },
+    "ACU / Northeast District": {
+      "name": "ACU / Northeast District",
+      "division": "EAST_GATE",
+      "center": {
+        "lat": 32.47,
+        "lng": -99.71
+      },
+      "description": "Abilene Christian University vicinity and northeast neighborhood services."
+    },
+    "North Abilene / I-20": {
+      "name": "North Abilene / I-20",
+      "division": "NORTH_LOOP",
+      "center": {
+        "lat": 32.54,
+        "lng": -99.73
+      },
+      "description": "I-20 logistics and retail corridor with hospital and hospitality clusters."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/abilene.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
+
