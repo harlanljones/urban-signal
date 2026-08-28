@@ -13,6 +13,7 @@ from src.schemas.models import (
     DeedEvent,
     EnrichedH3Feature,
     EvictionEvent,
+    InsuranceLossEvent,
     PermitEvent,
     SLALicenseEvent,
     StreetCutEvent,
@@ -127,12 +128,36 @@ def test_enriched_h3_feature_avro_serialization():
         timestamp=datetime.now(timezone.utc),
         sla_move_ins_90d=3,
         sla_move_outs_90d=2,
+        poi_opened_count_90d=4,
+        poi_closed_count_90d=1,
+        poi_net_churn_90d=3,
+        nfip_claim_count_180d=2,
+        nfip_paid_amount_180d=1500.0,
     )
     data = feature.model_dump(mode="json")
     deserialized = _validate_avro_roundtrip("enriched_h3_feature.avsc", data)
     assert deserialized["h3_index"] == "892a1072893ffff"
     assert deserialized["sla_move_ins_90d"] == 3
     assert deserialized["sla_move_outs_90d"] == 2
+    assert deserialized["poi_net_churn_90d"] == 3
+    assert deserialized["nfip_claim_count_180d"] == 2
+    assert deserialized["nfip_paid_amount_180d"] == 1500.0
+
+
+def test_insurance_loss_event_avro_serialization():
+    event = InsuranceLossEvent(
+        city_id="nyc",
+        claim_id="claim-1",
+        event_date=datetime.now(timezone.utc),
+        amount_paid_building=1200.0,
+        amount_paid_contents=300.0,
+        geometry_source="tract_centroid",
+        h3_res9="892a1072893ffff",
+    )
+    data = event.model_dump(mode="json")
+    deserialized = _validate_avro_roundtrip("insurance_loss_event.avsc", data)
+    assert deserialized["claim_id"] == "claim-1"
+    assert deserialized["amount_paid_building"] == 1200.0
 
 
 def test_pydantic_cost_parsing():

@@ -445,6 +445,15 @@ class EnrichedH3Feature(BaseModel):
     sla_move_outs_90d: int = Field(default=0)
     deed_total_volume_180d: float = Field(default=0.0)
     deed_transaction_count_180d: int = Field(default=0)
+    # POI release-delta context (US-369). These vendor observations are
+    # context-only and intentionally never feed the LIMS formula.
+    poi_opened_count_90d: int = Field(default=0)
+    poi_closed_count_90d: int = Field(default=0)
+    poi_net_churn_90d: int = Field(default=0)
+    # NFIP flood-loss distress context (US-370). These fields are deliberately
+    # excluded from the LIMS calculation until separately ablated.
+    nfip_claim_count_180d: int = Field(default=0)
+    nfip_paid_amount_180d: float = Field(default=0.0)
     # Building-stock performance context (US-363 §2.7). Annual cadence, three
     # metros (NYC LL84 / Chicago / Seattle). Means are over the buildings that
     # actually reported the metric — a null disclosure is excluded, never

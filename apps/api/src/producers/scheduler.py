@@ -36,6 +36,7 @@ from src.producers.evictions_producer import EvictionsProducer
 from src.producers.gbfs_producer import GbfsProducer
 from src.producers.nfip_producer import NfipProducer
 from src.producers.nrel_afdc_client import NrelAfdcClient
+from src.producers.poi_diff_producer import PoiDiffProducer
 from src.producers.sla_licenses_producer import SLALicensesProducer
 from src.producers.street_cut_permits_producer import StreetCutPermitsProducer
 from src.producers.watermarks import (
@@ -237,6 +238,12 @@ class MunicipalIngestionScheduler:
             "bike_ped": ContextObservationsProducer(bootstrap_servers=self.bootstrap_servers),
             "gbfs": GbfsProducer(bootstrap_servers=self.bootstrap_servers),
             "nfip_claims": NfipProducer(bootstrap_servers=self.bootstrap_servers),
+            # POI release deltas are credential-gated; the national scheduler
+            # keeps the job visible but only enables it when HF_TOKEN exists.
+            "poi_change": PoiDiffProducer(
+                bootstrap_servers=self.bootstrap_servers,
+                strict_licensing=True,
+            ),
             # The setting is intentionally optional while NREL remains
             # unverified. Pass a non-empty sentinel so constructing the
             # disabled producer does not require a credential-bearing setting.
@@ -308,16 +315,25 @@ class MunicipalIngestionScheduler:
         # National feeds are one job per source, not one job per city. Keep
         # every implemented source visible in the scheduler, but leave an
         # unverified or credentialed source disabled until its registry spec
-        # makes it safe to poll (US-363). Disaster declarations and POI
-        # changes remain registered metadata without a producer implementation
-        # and therefore do not become runnable jobs here.
+        # makes it safe to poll (US-363). Claims and declarations share the
+        # OpenFEMA producer but dispatch to different event contracts.
         runnable_national = {spec.feed for spec in schedulable_feeds()}
         national_specs = {
             spec.feed: spec
             for spec in schedulable_feeds()
-            if spec.feed in (NationalFeed.NFIP_CLAIMS, NationalFeed.EV_CHARGING)
+            if spec.feed in (
+                NationalFeed.NFIP_CLAIMS,
+                NationalFeed.DISASTER_DECLARATIONS,
+                NationalFeed.POI_CHANGE,
+                NationalFeed.EV_CHARGING,
+            )
         }
-        for feed in (NationalFeed.NFIP_CLAIMS, NationalFeed.EV_CHARGING):
+        for feed in (
+            NationalFeed.NFIP_CLAIMS,
+            NationalFeed.DISASTER_DECLARATIONS,
+            NationalFeed.POI_CHANGE,
+            NationalFeed.EV_CHARGING,
+        ):
             spec = NATIONAL_FEEDS[feed]
             job_name = spec.feed.value
             self.job_metadata[job_name] = {
@@ -361,6 +377,8 @@ class MunicipalIngestionScheduler:
                 count = producer.run_stream(city_id=meta["city_id"], limit=limit)
             elif meta.get("national_feed") == NationalFeed.NFIP_CLAIMS:
                 count = producer.run_stream(since=met.high_watermark, limit=limit)
+            elif meta.get("national_feed") == NationalFeed.DISASTER_DECLARATIONS:
+                count = producer.run_declarations(since=met.high_watermark, limit=limit)
             else:
                 count = producer.run_stream(limit=limit)
             count = int(count or 0)

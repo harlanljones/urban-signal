@@ -92,12 +92,16 @@ class FeatureAggregationWorker:
             settings.topic_311,
             settings.topic_sla,
             settings.topic_deeds,
+            settings.topic_poi_change,
+            settings.topic_insurance_loss,
         ]
         self.FEED_BY_TOPIC = {
             settings.topic_permits: "permits",
             settings.topic_311: "311",
             settings.topic_sla: "sla",
             settings.topic_deeds: "deeds",
+            settings.topic_poi_change: "poi_change",
+            settings.topic_insurance_loss: "insurance_loss",
         }
 
         self.consumer = BaseKafkaConsumer(
@@ -162,6 +166,11 @@ class FeatureAggregationWorker:
             sla_move_outs_90d=feat_dict.get("sla_move_outs_90d", 0),
             deed_total_volume_180d=feat_dict["deed_total_volume_180d"],
             deed_transaction_count_180d=feat_dict["deed_transaction_count_180d"],
+            poi_opened_count_90d=feat_dict.get("poi_opened_count_90d", 0),
+            poi_closed_count_90d=feat_dict.get("poi_closed_count_90d", 0),
+            poi_net_churn_90d=feat_dict.get("poi_net_churn_90d", 0),
+            nfip_claim_count_180d=feat_dict.get("nfip_claim_count_180d", 0),
+            nfip_paid_amount_180d=feat_dict.get("nfip_paid_amount_180d", 0.0),
             lims_score=feat_dict["lims_score"],
             created_at=datetime.now(timezone.utc),
         )
@@ -215,16 +224,17 @@ class FeatureAggregationWorker:
                 return
 
             feed = self.FEED_BY_TOPIC.get(topic, topic)
-            cell_key = f"{self.city_id}:{h3_cell}"
+            event_city_id = record.get("city_id") or self.city_id
+            cell_key = event_city_id + ":" + h3_cell
 
             self._insert_record(topic, record)
 
             if not self.cooldown.try_acquire(cell_key):
-                ABSORBED_RECORDS.labels(city_id=self.city_id, feed=feed).inc()
+                ABSORBED_RECORDS.labels(city_id=event_city_id, feed=feed).inc()
                 logger.debug("Cell %s hot; absorbed record key=%s feed=%s", h3_cell, key, feed)
                 return
 
-            self.process_and_emit_cell(h3_index=h3_cell, resolution=9, city_id=self.city_id)
+            self.process_and_emit_cell(h3_index=h3_cell, resolution=9, city_id=event_city_id)
         except Exception as e:
             logger.exception("Aggregation failed for key %s from topic %s: %s", key, topic, e)
             self.enriched_producer.route_to_dlq(
@@ -296,6 +306,42 @@ class FeatureAggregationWorker:
                 "ingested_at": pd.to_datetime(record.get("ingested_at") or datetime.now(timezone.utc)),
             }])
             self.feature_pipeline.insert_deeds(df)
+
+        elif topic == settings.topic_poi_change:
+            release_id = record.get("release_id") or record.get("event_date") or "unknown"
+            source = record.get("source", "fsq")
+            poi_id = record.get("poi_id")
+            event_type = record.get("event_type")
+            event_key = f"{source}:{poi_id}:{release_id}:{event_type}"
+            df = pd.DataFrame([{
+                "event_key": event_key,
+                "poi_id": record.get("poi_id"),
+                "source": record.get("source", "fsq"),
+                "event_type": record.get("event_type"),
+                "event_date": pd.to_datetime(record.get("event_date") or datetime.now(timezone.utc)),
+                "latitude": float(record["latitude"]),
+                "longitude": float(record["longitude"]),
+                "h3_res7": record.get("h3_res7"),
+                "h3_res8": record.get("h3_res8"),
+                "h3_res9": record.get("h3_res9"),
+                "ingested_at": pd.to_datetime(record.get("ingested_at") or datetime.now(timezone.utc)),
+            }])
+            self.feature_pipeline.insert_poi_changes(df)
+
+        elif topic == settings.topic_insurance_loss:
+            df = pd.DataFrame([{
+                "claim_id": record.get("claim_id"),
+                "event_date": pd.to_datetime(record.get("event_date") or datetime.now(timezone.utc)),
+                "amount_paid_building": float(record.get("amount_paid_building", 0.0)),
+                "amount_paid_contents": float(record.get("amount_paid_contents", 0.0)),
+                "latitude": record.get("latitude"),
+                "longitude": record.get("longitude"),
+                "h3_res7": record.get("h3_res7"),
+                "h3_res8": record.get("h3_res8"),
+                "h3_res9": record.get("h3_res9"),
+                "ingested_at": pd.to_datetime(record.get("ingested_at") or datetime.now(timezone.utc)),
+            }])
+            self.feature_pipeline.insert_insurance_losses(df)
 
     def start(self):
         """Start the feature aggregation consumer loop."""

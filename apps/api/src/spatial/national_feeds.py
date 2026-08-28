@@ -180,13 +180,22 @@ def get_national_feed(feed: NationalFeed) -> NationalFeedSpec:
 
 
 def schedulable_feeds() -> List[NationalFeedSpec]:
-    """Feeds whose source has been confirmed live and which hold their credential.
+    """Return verified feeds whose credentials and licensing gates are ready.
 
-    A spec that is unverified, or whose credential is unset, is skipped with
-    its reason rather than scheduled into a job that fails every cycle.
+    Foursquare's commercial run also requires the documented non-commercial
+    category exclusion list. Keep the feed visible in metadata, but do not
+    schedule it while that list is empty; ``PoiDiffProducer`` fails closed on
+    the same condition.
     """
+    from src.producers.poi_diff_producer import NON_COMMERCIAL_CATEGORY_IDS
+
     return [
         spec
         for spec in NATIONAL_FEEDS.values()
-        if spec.verified and (spec.auth == "none" or spec.token())
+        if spec.verified
+        and (spec.auth == "none" or spec.token())
+        and (
+            spec.feed is not NationalFeed.POI_CHANGE
+            or bool(NON_COMMERCIAL_CATEGORY_IDS)
+        )
     ]

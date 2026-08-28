@@ -40,6 +40,35 @@ def test_nfip_is_a_scheduled_national_job():
     assert result["records_published"] == 4
 
 
+def test_disaster_declarations_is_registered_and_dispatchable():
+    scheduler = _scheduler()
+    assert "disaster_declarations" in scheduler.configs
+    producer = scheduler.producers["nfip_claims"]
+    producer.run_declarations = MagicMock(return_value=3)
+    scheduler.configs["disaster_declarations"].enabled = True
+
+    result = scheduler.poll_job("disaster_declarations", limit=10)
+
+    producer.run_declarations.assert_called_once_with(since=None, limit=10)
+    assert result["status"] == "SUCCESS"
+    assert result["records_published"] == 3
+
+
+def test_poi_change_is_registered_and_dispatchable():
+    scheduler = _scheduler()
+    assert "poi_change" in scheduler.producers
+    assert "poi_change" in scheduler.configs
+    producer = scheduler.producers["poi_change"]
+    producer.run_stream = MagicMock(return_value=2)
+    scheduler.configs["poi_change"].enabled = True
+
+    result = scheduler.poll_job("poi_change", limit=10)
+
+    producer.run_stream.assert_called_once_with(limit=10)
+    assert result["status"] == "SUCCESS"
+    assert result["records_published"] == 2
+
+
 def test_ev_job_is_registered_but_disabled_until_verified():
     scheduler = _scheduler()
 
