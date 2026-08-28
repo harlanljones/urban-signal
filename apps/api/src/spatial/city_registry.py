@@ -426,6 +426,7 @@ from src.spatial.cities.waco import (
     WACO_DIVISIONS,
     WACO_METRO_BBOX,
     WACO_SUBMARKETS,
+)
 from src.spatial.cities.lake_charles import (
     LAKE_CHARLES_DIVISION_BBOXES,
     LAKE_CHARLES_DIVISIONS,

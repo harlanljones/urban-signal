@@ -462,7 +462,6 @@ from src.spatial.cities.waco import (
     WACO_SUBMARKETS,
     is_in_waco_metro,
 )
-<<<<<<< HEAD
 from src.spatial.cities.jackson_ms import (
     JACKSON_MS_DIVISION_BBOXES,
     JACKSON_MS_DIVISIONS,
@@ -498,7 +497,6 @@ from src.spatial.cities.longview import (
     LONGVIEW_SUBMARKETS,
     is_in_longview_metro,
 )
-<<<<<<< HEAD
 from src.spatial.cities.monroe import (
     MONROE_DIVISION_BBOXES,
     MONROE_DIVISIONS,

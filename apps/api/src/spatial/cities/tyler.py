@@ -27,7 +27,7 @@ TYLER_CENTER: Dict[str, float] = {"lat": 32.3519, "lng": -95.3006}
 TYLER_DIVISION_BBOXES: Dict[str, Dict[str, float]] = {
     "CENTRAL_CORE": {"min_lat": 32.335, "max_lat": 32.370, "min_lng": -95.330, "max_lng": -95.270},
     "WEST_SIDE": {"min_lat": 32.320, "max_lat": 32.420, "min_lng": -95.450, "max_lng": -95.340},
-    "EAST_GATE": {"min_lat": 32.320, "max_lat": 32.420, "min_lng": -95.270, "max_lng": -95.150},
+    "EAST_GATE": {"min_lat": 32.310, "max_lat": 32.420, "min_lng": -95.270, "max_lng": -95.150},
     "SOUTH_STRIPS": {"min_lat": 32.250, "max_lat": 32.330, "min_lng": -95.430, "max_lng": -95.250},
     "NORTH_LOOP": {"min_lat": 32.370, "max_lat": 32.450, "min_lng": -95.420, "max_lng": -95.220},
 }
