@@ -346,6 +346,12 @@ from src.spatial.cities.miami_dade import (
     MIAMI_DADE_METRO_BBOX,
     MIAMI_DADE_SUBMARKETS,
 )
+from src.spatial.cities.ocala import (
+    OCALA_DIVISION_BBOXES,
+    OCALA_DIVISIONS,
+    OCALA_METRO_BBOX,
+    OCALA_SUBMARKETS,
+)
 from src.spatial.cities.memphis import (
     MEMPHIS_DIVISION_BBOXES,
     MEMPHIS_DIVISIONS,
@@ -499,6 +505,7 @@ class CityId(str, Enum):
     FORT_WORTH = "fort_worth"
     HONOLULU = "honolulu"
     ORLANDO = "orlando"
+    OCALA = "ocala"
     MIAMI_DADE = "miami_dade"
     MEMPHIS = "memphis"
     PHOENIX = "phoenix"
@@ -994,6 +1001,11 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "mco": CityId.ORLANDO,
     "orange_county_fl": CityId.ORLANDO,
     "orange county fl": CityId.ORLANDO,
+
+    # Ocala / Marion County, FL
+    "ocala": CityId.OCALA,
+    "ocala_fl": CityId.OCALA,
+    "ocala fl": CityId.OCALA,
 
     # Miami-Dade County, FL (not City of Miami / Broward — ADR 0007)
     "miami_dade": CityId.MIAMI_DADE,
@@ -4995,6 +5007,23 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         # Do not fake endpoints; expand when a municipal API is proven.
         datasets={
             FeedType.SLA: snap_sla_spec("MS"),
+        },
+    ),
+    CityId.OCALA: CityRegistration(
+        city_id=CityId.OCALA,
+        name="Ocala / Marion County",
+        state="FL",
+        center={"lat": 29.1872, "lng": -82.1401},
+        metro_bbox=OCALA_METRO_BBOX,
+        division_bboxes=OCALA_DIVISION_BBOXES,
+        submarkets=OCALA_SUBMARKETS,
+        divisions=OCALA_DIVISIONS,
+        job_suffix="ocala",
+        # US-297: initial registration with SNAP-only SLA (FL slice). A verifiable
+        # public Marion County/Ocala permits layer was not found on the ArcGIS Hub.
+        # Do not fake endpoints; prefer SNAP until a municipal API is proven.
+        datasets={
+            FeedType.SLA: snap_sla_spec("FL"),
         },
     ),
     CityId.MACON_BIBB: CityRegistration(
