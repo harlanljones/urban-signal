@@ -20,6 +20,41 @@
   ],
   "metros": [
     {
+      "id": "cape_coral",
+      "name": "Cape Coral–Fort Myers",
+      "state": "FL",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 8,
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "issuedate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 26.58,
+        "lng": -81.92
+      },
+      "evidence_path": "apps/api/src/spatial/cities/cape_coral.py"
+    },
+    {
       "id": "nyc",
       "name": "New York City",
       "state": "NY",
@@ -2506,6 +2541,30 @@
       "divisions": "1 division",
       "division_count": 1,
       "submarket_count": 5,
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 30.084,
+        "lng": -94.101
+      },
+      "evidence_path": "apps/api/src/spatial/cities/beaumont.py"
+    },
+    {
       "id": "waco",
       "name": "Waco",
       "state": "TX",
@@ -2530,16 +2589,16 @@
         null
       ],
       "center": {
-        "lat": 30.084,
-        "lng": -94.101
-      },
-      "evidence_path": "apps/api/src/spatial/cities/beaumont.py"
         "lat": 31.5493,
         "lng": -97.1467
       },
       "evidence_path": "apps/api/src/spatial/cities/waco.py"
     },
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
       "id": "jackson_ms",
       "name": "Jackson",
       "state": "MS",
@@ -2569,16 +2628,21 @@
       "evidence_path": "apps/api/src/spatial/cities/macon_bibb.py"
     },
     {
-      "id": "tyler",
-      "name": "Tyler",
-      "state": "TX",
-      "divisions": "5 divisions",
-      "division_count": 5,
-      "submarket_count": 6,
-      "feeds": [false, false, true, false],
-      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
-      "center": { "lat": 32.3519, "lng": -95.3006 },
-      "evidence_path": "apps/api/src/spatial/cities/tyler.py"
+      "id": "lakeland",
+      "name": "Lakeland",
+      "state": "FL",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 3,
+      "feeds": [true, false, true, false],
+      "platforms": [
+        { "platform": "arcgis", "watermark_col": "ISSUEDATE", "interval_seconds": 300.0, "topic": "raw.municipal.permits" },
+        null,
+        { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" },
+        null
+      ],
+      "center": { "lat": 28.0395, "lng": -81.9498 },
+      "evidence_path": "apps/api/src/spatial/cities/lakeland.py"
     },
     {
       "id": "lake_charles",
@@ -2605,6 +2669,18 @@
       "evidence_path": "apps/api/src/spatial/cities/fort_smith.py"
     },
     {
+      "id": "odessa",
+      "name": "Odessa",
+      "state": "TX",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 7,
+      "feeds": [false, false, true, false],
+      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
+      "center": { "lat": 31.845, "lng": -102.367 },
+      "evidence_path": "apps/api/src/spatial/cities/odessa.py"
+    },
+    {
       "id": "longview",
       "name": "Longview",
       "state": "TX",
@@ -2617,27 +2693,192 @@
       "evidence_path": "apps/api/src/spatial/cities/longview.py"
     },
     {
-<<<<<<< HEAD
       "id": "monroe",
       "name": "Monroe",
       "state": "LA",
-=======
-      "id": "abilene",
-      "name": "Abilene",
-      "state": "TX",
->>>>>>> 11b1f04 (US-278: Register CityId.abilene with REGISTRY + ALIASES (SNAP SLA TX), export from cities package, wire METRO_META and byte-sync dashboard; update product facts and city brief)
       "divisions": "5 divisions",
       "division_count": 5,
       "submarket_count": 8,
       "feeds": [false, false, true, false],
       "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
-<<<<<<< HEAD
       "center": { "lat": 32.5093, "lng": -92.1193 },
       "evidence_path": "apps/api/src/spatial/cities/monroe.py"
-=======
+    },
+    {
+      "id": "abilene",
+      "name": "Abilene",
+      "state": "TX",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 8,
+      "feeds": [false, false, true, false],
+      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
       "center": { "lat": 32.4487, "lng": -99.7331 },
       "evidence_path": "apps/api/src/spatial/cities/abilene.py"
->>>>>>> 11b1f04 (US-278: Register CityId.abilene with REGISTRY + ALIASES (SNAP SLA TX), export from cities package, wire METRO_META and byte-sync dashboard; update product facts and city brief)
+    },
+    {
+      "id": "texarkana",
+      "name": "Texarkana",
+      "state": "TX",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 8,
+      "feeds": [false, false, true, false],
+      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
+      "center": { "lat": 33.4251, "lng": -94.0477 },
+      "evidence_path": "apps/api/src/spatial/cities/texarkana.py"
+    },
+    {
+      "id": "midland",
+      "name": "Midland",
+      "state": "TX",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 8,
+      "feeds": [false, false, true, false],
+      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
+      "center": { "lat": 31.997, "lng": -102.078 },
+      "evidence_path": "apps/api/src/spatial/cities/midland.py"
+    },
+    {
+      "id": "alexandria",
+      "name": "Alexandria",
+      "state": "LA",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 7,
+      "feeds": [false, false, true, false],
+      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
+      "center": { "lat": 31.3113, "lng": -92.4451 },
+      "evidence_path": "apps/api/src/spatial/cities/alexandria.py"
+    },
+    {
+      "id": "jonesboro",
+      "name": "Jonesboro",
+      "state": "AR",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 7,
+      "feeds": [false, false, true, false],
+      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
+      "center": { "lat": 35.8423, "lng": -90.7043 },
+      "evidence_path": "apps/api/src/spatial/cities/jonesboro.py"
+    },
+    {
+      "id": "charleston_sc",
+      "name": "Charleston",
+      "state": "SC",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 7,
+      "feeds": [false, false, true, false],
+      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
+      "center": { "lat": 32.781, "lng": -79.931 },
+      "evidence_path": "apps/api/src/spatial/cities/charleston_sc.py"
+    },
+    {
+      "id": "augusta",
+      "name": "Augusta",
+      "state": "GA",
+      "divisions": "4 divisions",
+      "division_count": 4,
+      "submarket_count": 8,
+      "feeds": [true, false, true, false],
+      "platforms": [
+        { "platform": "arcgis", "watermark_col": "DATE_ISSUE", "interval_seconds": 300.0, "topic": "raw.municipal.permits" },
+        null,
+        { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" },
+        null
+      ],
+      "center": { "lat": 33.476, "lng": -82.010 },
+      "evidence_path": "apps/api/src/spatial/cities/augusta.py"
+    },
+    {
+      "id": "port_st_lucie",
+      "name": "Port St. Lucie",
+      "state": "FL",
+      "divisions": "3 divisions",
+      "division_count": 3,
+      "submarket_count": 6,
+      "feeds": [true, false, true, false],
+      "platforms": [
+        { "platform": "arcgis", "watermark_col": "DateIssued", "interval_seconds": 300.0, "topic": "raw.municipal.permits" },
+        null,
+        { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" },
+        null
+      ],
+      "center": { "lat": 27.28, "lng": -80.36 },
+      "evidence_path": "apps/api/src/spatial/cities/port_st_lucie.py"
+    },
+    {
+      "id": "lexington",
+      "name": "Lexington / Fayette County",
+      "state": "KY",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 11,
+      "feeds": [false, false, true, false],
+      "platforms": [
+        null,
+        null,
+        { "platform": "arcgis", "watermark_col": "IssueDate", "interval_seconds": 600.0, "topic": "raw.municipal.sla" },
+        null
+      ],
+      "center": { "lat": 38.046, "lng": -84.497 },
+      "evidence_path": "apps/api/src/spatial/cities/lexington.py"
+    },
+    {
+      "id": "asheville",
+      "name": "Asheville, NC",
+      "state": "NC",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 8,
+      "feeds": [false, false, true, false],
+      "platforms": [
+        null,
+        null,
+        { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" },
+        null
+      ],
+      "center": { "lat": 35.5951, "lng": -82.5515 },
+      "evidence_path": "apps/api/src/spatial/cities/asheville.py"
+    }
+    ,
+    {
+      "id": "wilmington_nc",
+      "name": "Wilmington, NC",
+      "state": "NC",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 11,
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "ISSUE_DATE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 34.235,
+        "lng": -77.948
+      },
+      "evidence_path": "apps/api/src/spatial/cities/wilmington_nc.py"
     }
   ],
   "pipeline": [

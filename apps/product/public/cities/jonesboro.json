@@ -1,0 +1,178 @@
+{
+  "schema_version": 2,
+  "id": "jonesboro",
+  "name": "Jonesboro",
+  "state": "AR",
+  "center": {
+    "lat": 35.8423,
+    "lng": -90.7043
+  },
+  "metro_bbox": {
+    "min_lat": 35.7,
+    "max_lat": 36.0,
+    "min_lng": -90.85,
+    "max_lng": -90.55
+  },
+  "divisions": {
+    "CENTRAL_CORE": {
+      "name": "CENTRAL_CORE",
+      "center": {
+        "lat": 35.8423,
+        "lng": -90.7043
+      },
+      "bbox": {
+        "min_lat": 35.81,
+        "max_lat": 35.88,
+        "min_lng": -90.74,
+        "max_lng": -90.66
+      },
+      "submarkets": [
+        "Downtown Jonesboro",
+        "Main & Union Corridor"
+      ]
+    },
+    "A_STATE_DISTRICT": {
+      "name": "A_STATE_DISTRICT",
+      "center": {
+        "lat": 35.85,
+        "lng": -90.66
+      },
+      "bbox": {
+        "min_lat": 35.83,
+        "max_lat": 35.92,
+        "min_lng": -90.71,
+        "max_lng": -90.6
+      },
+      "submarkets": [
+        "Arkansas State University",
+        "Caraway & Highland Retail"
+      ]
+    },
+    "WEST_BELT": {
+      "name": "WEST_BELT",
+      "center": {
+        "lat": 35.84,
+        "lng": -90.79
+      },
+      "bbox": {
+        "min_lat": 35.78,
+        "max_lat": 35.9,
+        "min_lng": -90.85,
+        "max_lng": -90.73
+      },
+      "submarkets": [
+        "West Jonesboro & Valley View"
+      ]
+    },
+    "SOUTH_GATE": {
+      "name": "SOUTH_GATE",
+      "center": {
+        "lat": 35.76,
+        "lng": -90.72
+      },
+      "bbox": {
+        "min_lat": 35.7,
+        "max_lat": 35.82,
+        "min_lng": -90.82,
+        "max_lng": -90.65
+      },
+      "submarkets": [
+        "South Jonesboro Industrial"
+      ]
+    },
+    "NORTHEAST_BELT": {
+      "name": "NORTHEAST_BELT",
+      "center": {
+        "lat": 35.93,
+        "lng": -90.64
+      },
+      "bbox": {
+        "min_lat": 35.88,
+        "max_lat": 36.0,
+        "min_lng": -90.74,
+        "max_lng": -90.56
+      },
+      "submarkets": [
+        "Nettleton & NE Commercial"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Jonesboro": {
+      "name": "Downtown Jonesboro",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 35.835,
+        "lng": -90.704
+      },
+      "description": "Historic Main Street core with courthouse square, small business reinvestment, and adaptive reuse."
+    },
+    "Main & Union Corridor": {
+      "name": "Main & Union Corridor",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 35.842,
+        "lng": -90.69
+      },
+      "description": "Central east-west spine linking downtown to Caraway with mixed small-format commercial."
+    },
+    "Arkansas State University": {
+      "name": "Arkansas State University",
+      "division": "A_STATE_DISTRICT",
+      "center": {
+        "lat": 35.8445,
+        "lng": -90.653
+      },
+      "description": "Campus and Johnson Ave corridor with student housing infill and institutional projects."
+    },
+    "Caraway & Highland Retail": {
+      "name": "Caraway & Highland Retail",
+      "division": "A_STATE_DISTRICT",
+      "center": {
+        "lat": 35.855,
+        "lng": -90.68
+      },
+      "description": "Commercial strips serving the campus and neighborhoods along Caraway and Highland."
+    },
+    "West Jonesboro & Valley View": {
+      "name": "West Jonesboro & Valley View",
+      "division": "WEST_BELT",
+      "center": {
+        "lat": 35.82,
+        "lng": -90.775
+      },
+      "description": "Westside growth belt toward Valley View with suburban residential and service nodes."
+    },
+    "South Jonesboro Industrial": {
+      "name": "South Jonesboro Industrial",
+      "division": "SOUTH_GATE",
+      "center": {
+        "lat": 35.76,
+        "lng": -90.72
+      },
+      "description": "Industrial and logistics corridor south of downtown with highway-oriented retail."
+    },
+    "Nettleton & NE Commercial": {
+      "name": "Nettleton & NE Commercial",
+      "division": "NORTHEAST_BELT",
+      "center": {
+        "lat": 35.905,
+        "lng": -90.65
+      },
+      "description": "Northeast belt around Nettleton and Brookland approach with steady small-scale reinvestment."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/jonesboro.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

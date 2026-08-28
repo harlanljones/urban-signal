@@ -1464,8 +1464,10 @@ def get_dashboard_html() -> str:
       durham: { name: 'Durham / Durham County' },
       dallas: { name: 'Dallas / Dallas County' },
       louisville: { name: 'Louisville / Jefferson County' },
+      lexington: { name: 'Lexington / Fayette County' },
       portland: { name: 'Portland / Multnomah County' },
       san_jose: { name: 'San Jose / Santa Clara County' },
+      cape_coral: { name: 'Cape Coral–Fort Myers' },
       tampa: { name: 'Tampa / Hillsborough County' },
       las_vegas: { name: 'Las Vegas / Clark County' },
       boise: { name: 'Boise / Ada County' },
@@ -1485,6 +1487,10 @@ def get_dashboard_html() -> str:
       amarillo: { name: 'Amarillo' },
       beaumont: { name: 'Beaumont' },
       waco: { name: 'Waco' },
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
       jackson_ms: { name: 'Jackson' },
       macon_bibb: { name: 'Macon-Bibb County' },
       ocala: { name: 'Ocala / Marion County' },
@@ -1494,7 +1500,17 @@ def get_dashboard_html() -> str:
       longview: { name: 'Longview' },
       monroe: { name: 'Monroe' },
       abilene: { name: 'Abilene' },
-      abilene: { name: 'Abilene' },
+      texarkana: { name: 'Texarkana' },
+      midland: { name: 'Midland' },
+      odessa: { name: 'Odessa' },
+      alexandria: { name: 'Alexandria' },
+      jonesboro: { name: 'Jonesboro' },
+      charleston_sc: { name: 'Charleston, SC' },
+      lakeland: { name: 'Lakeland' },
+      augusta: { name: 'Augusta, GA' },
+      port_st_lucie: { name: 'Port St. Lucie' },
+      asheville: { name: 'Asheville, NC' },
+      wilmington_nc: { name: 'Wilmington, NC' },
     };
 
     let map = null;

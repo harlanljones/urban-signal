@@ -1,0 +1,218 @@
+{
+  "schema_version": 2,
+  "id": "lexington",
+  "name": "Lexington / Fayette County",
+  "state": "KY",
+  "center": {
+    "lat": 38.046,
+    "lng": -84.497
+  },
+  "metro_bbox": {
+    "min_lat": 37.9,
+    "max_lat": 38.15,
+    "min_lng": -84.65,
+    "max_lng": -84.3
+  },
+  "divisions": {
+    "DOWNTOWN_UK": {
+      "name": "DOWNTOWN_UK",
+      "center": {
+        "lat": 38.042,
+        "lng": -84.5
+      },
+      "bbox": {
+        "min_lat": 38.02,
+        "max_lat": 38.075,
+        "min_lng": -84.53,
+        "max_lng": -84.47
+      },
+      "submarkets": [
+        "Downtown & Rupp Arena",
+        "University of Kentucky",
+        "Chevy Chase & Euclid Ave"
+      ]
+    },
+    "NORTHSIDE": {
+      "name": "NORTHSIDE",
+      "center": {
+        "lat": 38.105,
+        "lng": -84.5
+      },
+      "bbox": {
+        "min_lat": 38.075,
+        "max_lat": 38.13,
+        "min_lng": -84.55,
+        "max_lng": -84.45
+      },
+      "submarkets": [
+        "North Limestone (NoLi)",
+        "Meadow Park & Russell Cave"
+      ]
+    },
+    "SOUTHEAST": {
+      "name": "SOUTHEAST",
+      "center": {
+        "lat": 38.015,
+        "lng": -84.44
+      },
+      "bbox": {
+        "min_lat": 37.98,
+        "max_lat": 38.05,
+        "min_lng": -84.48,
+        "max_lng": -84.34
+      },
+      "submarkets": [
+        "Hamburg Pavilion",
+        "Richmond Rd Corridor"
+      ]
+    },
+    "SOUTHWEST": {
+      "name": "SOUTHWEST",
+      "center": {
+        "lat": 38.01,
+        "lng": -84.59
+      },
+      "bbox": {
+        "min_lat": 37.98,
+        "max_lat": 38.05,
+        "min_lng": -84.65,
+        "max_lng": -84.53
+      },
+      "submarkets": [
+        "Beaumont Centre & Harrodsburg",
+        "Nicholasville Rd South"
+      ]
+    },
+    "EAST_NEW_CIRCLE": {
+      "name": "EAST_NEW_CIRCLE",
+      "center": {
+        "lat": 38.07,
+        "lng": -84.395
+      },
+      "bbox": {
+        "min_lat": 38.03,
+        "max_lat": 38.11,
+        "min_lng": -84.45,
+        "max_lng": -84.34
+      },
+      "submarkets": [
+        "Winchester Rd & Industrial",
+        "Andover & Pleasant Ridge"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Rupp Arena": {
+      "name": "Downtown & Rupp Arena",
+      "division": "DOWNTOWN_UK",
+      "center": {
+        "lat": 38.047,
+        "lng": -84.502
+      },
+      "description": "Civic core around Rupp Arena and the Convention Center with adaptive reuse and hospitality infill."
+    },
+    "University of Kentucky": {
+      "name": "University of Kentucky",
+      "division": "DOWNTOWN_UK",
+      "center": {
+        "lat": 38.03,
+        "lng": -84.505
+      },
+      "description": "Campus-adjacent mixed-use and student housing along Limestone, Euclid, and Nicholasville corridors."
+    },
+    "Chevy Chase & Euclid Ave": {
+      "name": "Chevy Chase & Euclid Ave",
+      "division": "DOWNTOWN_UK",
+      "center": {
+        "lat": 38.031,
+        "lng": -84.488
+      },
+      "description": "Neighborhood retail corridor east of campus with small-lot infill and renovations."
+    },
+    "North Limestone (NoLi)": {
+      "name": "North Limestone (NoLi)",
+      "division": "NORTHSIDE",
+      "center": {
+        "lat": 38.095,
+        "lng": -84.475
+      },
+      "description": "Arts and maker corridor north of downtown with steady small-scale reinvestment."
+    },
+    "Meadow Park & Russell Cave": {
+      "name": "Meadow Park & Russell Cave",
+      "division": "NORTHSIDE",
+      "center": {
+        "lat": 38.11,
+        "lng": -84.52
+      },
+      "description": "Northside neighborhoods along Russell Cave Rd and Loudon Ave."
+    },
+    "Hamburg Pavilion": {
+      "name": "Hamburg Pavilion",
+      "division": "SOUTHEAST",
+      "center": {
+        "lat": 38.03,
+        "lng": -84.42
+      },
+      "description": "I-75 retail and mixed-use node with ongoing pad-site development and hospitality."
+    },
+    "Richmond Rd Corridor": {
+      "name": "Richmond Rd Corridor",
+      "division": "SOUTHEAST",
+      "center": {
+        "lat": 38.005,
+        "lng": -84.455
+      },
+      "description": "Established corridor with renovation-led permits and selective infill."
+    },
+    "Beaumont Centre & Harrodsburg": {
+      "name": "Beaumont Centre & Harrodsburg",
+      "division": "SOUTHWEST",
+      "center": {
+        "lat": 37.995,
+        "lng": -84.57
+      },
+      "description": "Southwest growth belt with office, retail, and multifamily infill."
+    },
+    "Nicholasville Rd South": {
+      "name": "Nicholasville Rd South",
+      "division": "SOUTHWEST",
+      "center": {
+        "lat": 37.99,
+        "lng": -84.535
+      },
+      "description": "Regional commercial spine with redevelopment pressure around major intersections."
+    },
+    "Winchester Rd & Industrial": {
+      "name": "Winchester Rd & Industrial",
+      "division": "EAST_NEW_CIRCLE",
+      "center": {
+        "lat": 38.08,
+        "lng": -84.41
+      },
+      "description": "Industrial and logistics corridor with selective commercial reinvestment."
+    },
+    "Andover & Pleasant Ridge": {
+      "name": "Andover & Pleasant Ridge",
+      "division": "EAST_NEW_CIRCLE",
+      "center": {
+        "lat": 38.065,
+        "lng": -84.385
+      },
+      "description": "East-side neighborhoods with steady residential improvements and services."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "IssueDate",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/lexington.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

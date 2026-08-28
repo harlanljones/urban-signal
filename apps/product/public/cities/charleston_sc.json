@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "id": "charleston_sc",
+  "name": "Charleston",
+  "state": "SC",
+  "center": {
+    "lat": 32.781,
+    "lng": -79.931
+  },
+  "metro_bbox": {
+    "min_lat": 32.6,
+    "max_lat": 33.02,
+    "min_lng": -80.3,
+    "max_lng": -79.6
+  },
+  "divisions": {
+    "PENINSULA_CORE": {
+      "name": "PENINSULA_CORE",
+      "center": { "lat": 32.78, "lng": -79.935 },
+      "bbox": { "min_lat": 32.74, "max_lat": 32.82, "min_lng": -79.975, "max_lng": -79.9 },
+      "submarkets": [
+        "Historic Peninsula",
+        "Upper King & Cannonborough"
+      ]
+    },
+    "MOUNT_PLEASANT": {
+      "name": "MOUNT_PLEASANT",
+      "center": { "lat": 32.82, "lng": -79.855 },
+      "bbox": { "min_lat": 32.77, "max_lat": 32.9, "min_lng": -79.9, "max_lng": -79.75 },
+      "submarkets": [ "Mount Pleasant Waterfront" ]
+    },
+    "WEST_ASHLEY": {
+      "name": "WEST_ASHLEY",
+      "center": { "lat": 32.775, "lng": -80.0 },
+      "bbox": { "min_lat": 32.72, "max_lat": 32.82, "min_lng": -80.06, "max_lng": -79.95 },
+      "submarkets": [ "West Ashley Corridors" ]
+    },
+    "NORTH_CHARLESTON": {
+      "name": "NORTH_CHARLESTON",
+      "center": { "lat": 32.9, "lng": -79.975 },
+      "bbox": { "min_lat": 32.84, "max_lat": 32.98, "min_lng": -80.05, "max_lng": -79.9 },
+      "submarkets": [ "Park Circle" ]
+    },
+    "JAMES_ISLAND": {
+      "name": "JAMES_ISLAND",
+      "center": { "lat": 32.745, "lng": -79.965 },
+      "bbox": { "min_lat": 32.7, "max_lat": 32.78, "min_lng": -79.99, "max_lng": -79.91 },
+      "submarkets": [ "James Island Folly Rd" ]
+    },
+    "DANIEL_CAINHOY": {
+      "name": "DANIEL_CAINHOY",
+      "center": { "lat": 32.9, "lng": -79.84 },
+      "bbox": { "min_lat": 32.84, "max_lat": 33.0, "min_lng": -79.9, "max_lng": -79.7 },
+      "submarkets": [ "Daniel Island" ]
+    }
+  },
+  "submarkets": {
+    "Historic Peninsula": {
+      "name": "Historic Peninsula",
+      "division": "PENINSULA_CORE",
+      "center": { "lat": 32.781, "lng": -79.931 },
+      "description": "King St, City Market, and waterfront anchors with adaptive reuse and hospitality infill."
+    },
+    "Upper King & Cannonborough": {
+      "name": "Upper King & Cannonborough",
+      "division": "PENINSULA_CORE",
+      "center": { "lat": 32.792, "lng": -79.942 },
+      "description": "Mixed-use corridor and medical district spillover north of Calhoun."
+    },
+    "Mount Pleasant Waterfront": {
+      "name": "Mount Pleasant Waterfront",
+      "division": "MOUNT_PLEASANT",
+      "center": { "lat": 32.806, "lng": -79.875 },
+      "description": "Waterfront Park, Old Village, and US-17 commercial spine with steady reinvestment."
+    },
+    "West Ashley Corridors": {
+      "name": "West Ashley Corridors",
+      "division": "WEST_ASHLEY",
+      "center": { "lat": 32.782, "lng": -80.006 },
+      "description": "Savannah Hwy and Sam Rittenberg Blvd retail/service belts and medical clusters."
+    },
+    "Park Circle": {
+      "name": "Park Circle",
+      "division": "NORTH_CHARLESTON",
+      "center": { "lat": 32.885, "lng": -79.975 },
+      "description": "Historic Park Circle district with small-scale infill and hospitality/logistics adjacency."
+    },
+    "James Island Folly Rd": {
+      "name": "James Island Folly Rd",
+      "division": "JAMES_ISLAND",
+      "center": { "lat": 32.742, "lng": -79.965 },
+      "description": "Folly Road commercial spine and neighborhood services."
+    },
+    "Daniel Island": {
+      "name": "Daniel Island",
+      "division": "DANIEL_CAINHOY",
+      "center": { "lat": 32.87, "lng": -79.91 },
+      "description": "Master-planned mixed-use with logistics adjacency across I-526."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/charleston_sc.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
+

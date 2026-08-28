@@ -1,0 +1,199 @@
+{
+  "schema_version": 2,
+  "id": "midland",
+  "name": "Midland",
+  "state": "TX",
+  "center": {
+    "lat": 31.997,
+    "lng": -102.078
+  },
+  "metro_bbox": {
+    "min_lat": 31.85,
+    "max_lat": 32.1,
+    "min_lng": -102.25,
+    "max_lng": -101.9
+  },
+  "divisions": {
+    "CENTRAL_CORE": {
+      "name": "CENTRAL_CORE",
+      "center": {
+        "lat": 31.9975,
+        "lng": -102.075
+      },
+      "bbox": {
+        "min_lat": 31.975,
+        "max_lat": 32.025,
+        "min_lng": -102.115,
+        "max_lng": -102.035
+      },
+      "submarkets": [
+        "Downtown Midland",
+        "Centennial Park & Convention District"
+      ]
+    },
+    "WEST_SIDE": {
+      "name": "WEST_SIDE",
+      "center": {
+        "lat": 32.005,
+        "lng": -102.16
+      },
+      "bbox": {
+        "min_lat": 31.96,
+        "max_lat": 32.06,
+        "min_lng": -102.25,
+        "max_lng": -102.115
+      },
+      "submarkets": [
+        "Medical Center & Andrews Hwy",
+        "Loop 250 West Retail"
+      ]
+    },
+    "EAST_GATE": {
+      "name": "EAST_GATE",
+      "center": {
+        "lat": 31.995,
+        "lng": -101.97
+      },
+      "bbox": {
+        "min_lat": 31.96,
+        "max_lat": 32.06,
+        "min_lng": -102.035,
+        "max_lng": -101.9
+      },
+      "submarkets": [
+        "Fairgrounds & East Industrial"
+      ]
+    },
+    "SOUTH_CORRIDOR": {
+      "name": "SOUTH_CORRIDOR",
+      "center": {
+        "lat": 31.915,
+        "lng": -102.12
+      },
+      "bbox": {
+        "min_lat": 31.85,
+        "max_lat": 31.97,
+        "min_lng": -102.22,
+        "max_lng": -101.98
+      },
+      "submarkets": [
+        "I-20 Logistics & Bush Rd",
+        "Airport & I-20 West"
+      ]
+    },
+    "NORTH_LOOP": {
+      "name": "NORTH_LOOP",
+      "center": {
+        "lat": 32.06,
+        "lng": -102.09
+      },
+      "bbox": {
+        "min_lat": 32.025,
+        "max_lat": 32.1,
+        "min_lng": -102.2,
+        "max_lng": -101.98
+      },
+      "submarkets": [
+        "Wadley & Loop 250 North",
+        "Midland Park Mall"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Midland": {
+      "name": "Downtown Midland",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 31.997,
+        "lng": -102.078
+      },
+      "description": "Civic/office core centered on Centennial Park, Wadley Ave, and Colorado Ave with mixed-use infill."
+    },
+    "Centennial Park & Convention District": {
+      "name": "Centennial Park & Convention District",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 31.999,
+        "lng": -102.074
+      },
+      "description": "Park-front hospitality and meeting venues with adjacent retail and small-footprint office."
+    },
+    "Medical Center & Andrews Hwy": {
+      "name": "Medical Center & Andrews Hwy",
+      "division": "WEST_SIDE",
+      "center": {
+        "lat": 32.0,
+        "lng": -102.15
+      },
+      "description": "Midland Memorial vicinity and Andrews Highway corridor with clinic, MOB, and supportive retail."
+    },
+    "Loop 250 West Retail": {
+      "name": "Loop 250 West Retail",
+      "division": "WEST_SIDE",
+      "center": {
+        "lat": 32.03,
+        "lng": -102.17
+      },
+      "description": "Power-center retail along Loop 250 with outparcel services and steady tenant rollover."
+    },
+    "Fairgrounds & East Industrial": {
+      "name": "Fairgrounds & East Industrial",
+      "division": "EAST_GATE",
+      "center": {
+        "lat": 31.99,
+        "lng": -101.98
+      },
+      "description": "Scharbauer, fairgrounds vicinity, and east-side light industrial approaching FM 715."
+    },
+    "I-20 Logistics & Bush Rd": {
+      "name": "I-20 Logistics & Bush Rd",
+      "division": "SOUTH_CORRIDOR",
+      "center": {
+        "lat": 31.9,
+        "lng": -102.1
+      },
+      "description": "I-20 frontage logistics, Bush Road industrial clusters, and service yards."
+    },
+    "Airport & I-20 West": {
+      "name": "Airport & I-20 West",
+      "division": "SOUTH_CORRIDOR",
+      "center": {
+        "lat": 31.94,
+        "lng": -102.21
+      },
+      "description": "Midland International Air & Space Port area and western I-20 service/industrial corridor."
+    },
+    "Wadley & Loop 250 North": {
+      "name": "Wadley & Loop 250 North",
+      "division": "NORTH_LOOP",
+      "center": {
+        "lat": 32.055,
+        "lng": -102.05
+      },
+      "description": "Northern Loop 250 retail and residential-adjacent services concentrated near Wadley Ave."
+    },
+    "Midland Park Mall": {
+      "name": "Midland Park Mall",
+      "division": "NORTH_LOOP",
+      "center": {
+        "lat": 32.05,
+        "lng": -102.12
+      },
+      "description": "Legacy regional mall node with surrounding outparcels and medical/professional infill."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/midland.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
+

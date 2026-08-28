@@ -1,0 +1,127 @@
+{
+  "schema_version": 2,
+  "id": "wilmington_nc",
+  "name": "Wilmington, NC",
+  "state": "NC",
+  "center": { "lat": 34.235, "lng": -77.948 },
+  "metro_bbox": { "min_lat": 33.92, "max_lat": 34.39, "min_lng": -78.10, "max_lng": -77.70 },
+  "divisions": {
+    "DOWNTOWN_RIVERFRONT": {
+      "name": "Downtown Riverfront",
+      "center": { "lat": 34.235, "lng": -77.944 },
+      "bbox": { "min_lat": 34.20, "max_lat": 34.26, "min_lng": -77.97, "max_lng": -77.90 },
+      "submarkets": [ "Downtown Wilmington", "Riverwalk & Castle Street" ]
+    },
+    "NORTH_SIDE": {
+      "name": "North Side",
+      "center": { "lat": 34.310, "lng": -77.910 },
+      "bbox": { "min_lat": 34.26, "max_lat": 34.38, "min_lng": -77.98, "max_lng": -77.85 },
+      "submarkets": [ "Northchase & Murrayville", "Ogden & Porters Neck" ]
+    },
+    "WEST_SIDE": {
+      "name": "West Side",
+      "center": { "lat": 34.260, "lng": -78.030 },
+      "bbox": { "min_lat": 34.20, "max_lat": 34.32, "min_lng": -78.10, "max_lng": -77.98 },
+      "submarkets": [ "Leland Gateway & West Bank", "Navassa Industrial" ]
+    },
+    "BEACHES": {
+      "name": "Beaches",
+      "center": { "lat": 34.220, "lng": -77.820 },
+      "bbox": { "min_lat": 34.15, "max_lat": 34.25, "min_lng": -77.85, "max_lng": -77.70 },
+      "submarkets": [ "UNCW & Eastwood", "Mayfaire & Military Cutoff", "Wrightsville Beach" ]
+    },
+    "SOUTH_CAPE_FEAR": {
+      "name": "South Cape Fear",
+      "center": { "lat": 34.100, "lng": -77.940 },
+      "bbox": { "min_lat": 33.95, "max_lat": 34.20, "min_lng": -78.05, "max_lng": -77.90 },
+      "submarkets": [ "Shipyard Blvd & Port", "Carolina & Kure Beach" ]
+    }
+  },
+  "submarkets": {
+    "Downtown Wilmington": {
+      "name": "Downtown Wilmington",
+      "division": "DOWNTOWN_RIVERFRONT",
+      "center": { "lat": 34.236, "lng": -77.949 },
+      "description": "Historic core and Riverwalk district with adaptive reuse and hospitality infill."
+    },
+    "Riverwalk & Castle Street": {
+      "name": "Riverwalk & Castle Street",
+      "division": "DOWNTOWN_RIVERFRONT",
+      "center": { "lat": 34.230, "lng": -77.942 },
+      "description": "Southern downtown corridor with small-scale mixed-use and streetscape reinvestment."
+    },
+    "Northchase & Murrayville": {
+      "name": "Northchase & Murrayville",
+      "division": "NORTH_SIDE",
+      "center": { "lat": 34.294, "lng": -77.900 },
+      "description": "Northern growth belt with residential infill and logistics-adjacent services."
+    },
+    "Ogden & Porters Neck": {
+      "name": "Ogden & Porters Neck",
+      "division": "NORTH_SIDE",
+      "center": { "lat": 34.285, "lng": -77.870 },
+      "description": "Northeast residential/commercial corridors along Market St and Porters Neck Rd."
+    },
+    "Leland Gateway & West Bank": {
+      "name": "Leland Gateway & West Bank",
+      "division": "WEST_SIDE",
+      "center": { "lat": 34.225, "lng": -78.030 },
+      "description": "Cape Fear west bank gateway: logistics, light industrial, and highway retail."
+    },
+    "Navassa Industrial": {
+      "name": "Navassa Industrial",
+      "division": "WEST_SIDE",
+      "center": { "lat": 34.282, "lng": -78.060 },
+      "description": "Industrial belt northwest of the river with rail-adjacent parcels."
+    },
+    "UNCW & Eastwood": {
+      "name": "UNCW & Eastwood",
+      "division": "BEACHES",
+      "center": { "lat": 34.225, "lng": -77.870 },
+      "description": "Campus-adjacent district with student housing and services along Eastwood Rd."
+    },
+    "Mayfaire & Military Cutoff": {
+      "name": "Mayfaire & Military Cutoff",
+      "division": "BEACHES",
+      "center": { "lat": 34.244, "lng": -77.826 },
+      "description": "Mixed-use retail and office cluster near Mayfaire and Military Cutoff."
+    },
+    "Wrightsville Beach": {
+      "name": "Wrightsville Beach",
+      "division": "BEACHES",
+      "center": { "lat": 34.208, "lng": -77.796 },
+      "description": "Barrier island hospitality and residential reinvestment."
+    },
+    "Shipyard Blvd & Port": {
+      "name": "Shipyard Blvd & Port",
+      "division": "SOUTH_CAPE_FEAR",
+      "center": { "lat": 34.179, "lng": -77.959 },
+      "description": "Southern logistics and port-adjacent industrial/hospitality belt."
+    },
+    "Carolina & Kure Beach": {
+      "name": "Carolina & Kure Beach",
+      "division": "SOUTH_CAPE_FEAR",
+      "center": { "lat": 34.036, "lng": -77.898 },
+      "description": "Southern barrier-island towns with steady small-scale hospitality and residential activity."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "ISSUE_DATE",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/wilmington_nc.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
+

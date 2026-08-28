@@ -958,6 +958,12 @@ class Settings(BaseSettings):
         description="Durham parcel sales/deeds MapServer layer URL",
     )
 
+    # Wilmington, NC / New Hanover County (US-292): county permits FeatureServer.
+    arcgis_wilmington_nc_permits_url: str = Field(
+        default="https://gis.nhcgov.com/server/rest/services/Thematic/BuildingPermits/FeatureServer/0",
+        description="New Hanover County building permits FeatureServer layer URL",
+    )
+
     # Dallas, TX (US-149): live ROW/traffic-control permit proxy plus a
     # Building Services CRM view containing approximately 30 days of 311 data.
     arcgis_dallas_row_permits_url: str = Field(
@@ -1251,6 +1257,22 @@ class Settings(BaseSettings):
         description="Tampa right-of-way permits ArcGIS FeatureServer layer URL",
     )
 
+    # Cape Coral–Fort Myers, FL (US-285): public permits MapServer table (address-only).
+    arcgis_cape_coral_permits_url: str = Field(
+        default="https://capeims.capecoral.gov/arcgis/rest/services/OpenData/OpenData/MapServer/1",
+        description="Cape Coral–Fort Myers building permits ArcGIS MapServer table URL (address-only)",
+    )
+    # Lakeland, FL (US-286): iMS Public CED permits MapServer layer (verified on GeoHub).
+    arcgis_lakeland_permits_url: str = Field(
+        default="https://gismims.lakelandgov.net/portal/rest/services/Public_CED/Lakeland_CED_Permits/MapServer/0",
+        description="Lakeland iMS Public CED permits ArcGIS MapServer layer URL",
+    )
+    # Port St. Lucie, FL (US-289): public Building Permits FeatureServer (weekly updates)
+    arcgis_port_st_lucie_permits_url: str = Field(
+        default="https://services1.arcgis.com/YdUP5V6WwzeG8T8r/arcgis/rest/services/Permits/FeatureServer/0",
+        description="Port St. Lucie building permits ArcGIS FeatureServer layer URL",
+    )
+
     # Las Vegas / Clark County (US-145): address-only ArcGIS tables. Both
     # feeds declare ADR-0004 geocoding in the city registry.
     arcgis_las_vegas_permits_url: str = Field(
@@ -1289,6 +1311,13 @@ class Settings(BaseSettings):
     arcgis_tulsa_crime_url: str = Field(
         default="https://services5.arcgis.com/cuQhNeNcUrgLmYGD/arcgis/rest/services/Tulsa_Crime_Time_Display/FeatureServer/0",
         description="Tulsa crime ArcGIS FeatureServer",
+    )
+    # Augusta, GA (US-287): CityView permits table (non-spatial; address-only).
+    # Registered as PERMITS with ADR-0004 geocoding; 311 requires an API key and
+    # is not registered. SLA uses SNAP GA slice.
+    arcgis_augusta_permits_url: str = Field(
+        default="https://gismap.augustaga.gov/arcgis/rest/services/EnterpriseApps/iasWorld_Permit/MapServer/1",
+        description="Augusta CityView permits ArcGIS MapServer table URL (address-only, geocoded)",
     )
     arcgis_el_paso_permits_url: str = Field(
         default="https://services1.arcgis.com/hyTVSIhR7dHyDsJF/arcgis/rest/services/NewResi2018_19/FeatureServer/0",
