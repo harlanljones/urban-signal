@@ -21,12 +21,13 @@ Onboard Columbus, GA as a new Urban Signal metro (`CityId.columbus_ga`) with ver
 
 - 2026-08-28 — Public permits feed verified at `ccggisprod.columbusga.org` MapServer layer 0 (“Residential”) with `Issued` date, `OBJECTID` OID, native point geometry (WKID 2240; client outSR=4326 path). Using layer 0 as primary; scheduler does not poll companion_endpoints today.
 - 2026-08-28 — SLA via SNAP state slice for GA (`snap_sla_spec("GA")`).
+- 2026-08-28 — Additive rebase onto origin/main. Gainesville stays on PR #31 (not stolen). Ocala already on main is preserved. Did not start Melbourne/Ocala follow-on work.
 
 ## Current step
 
-Create `columbus_ga.py` leaf with bbox, divisions, submarkets, REGISTRATION; then export in `cities/__init__.py`.
+Additive rebase of #32 onto origin/main (26237f0). Shared files took main, then re-applied Columbus GA-only lines. Stripped leftover `<<<<<<< HEAD` markers inherited from main in dashboard.py / index.html / facts.json. Bumped leaf-count pin 93 → 94.
 
 ## Next step
 
-Add CityId/ALIASES/REGISTRY entry + settings endpoint; wire dashboard METRO_META and regenerate static copy; export product facts; run `pytest -m interlock`.
+Stop after #32 is conflict-free against main and pushed. Do not start Melbourne/Ocala. Merge stays human.
 
