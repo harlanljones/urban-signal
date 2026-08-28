@@ -1256,6 +1256,11 @@ class Settings(BaseSettings):
         default="https://capeims.capecoral.gov/arcgis/rest/services/OpenData/OpenData/MapServer/1",
         description="Cape Coral–Fort Myers building permits ArcGIS MapServer table URL (address-only)",
     )
+    # Lakeland, FL (US-286): iMS Public CED permits MapServer layer (verified on GeoHub).
+    arcgis_lakeland_permits_url: str = Field(
+        default="https://gismims.lakelandgov.net/portal/rest/services/Public_CED/Lakeland_CED_Permits/MapServer/0",
+        description="Lakeland iMS Public CED permits ArcGIS MapServer layer URL",
+    )
 
     # Las Vegas / Clark County (US-145): address-only ArcGIS tables. Both
     # feeds declare ADR-0004 geocoding in the city registry.

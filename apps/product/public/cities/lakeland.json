@@ -1,0 +1,64 @@
+{
+  "schema_version": 2,
+  "id": "lakeland",
+  "name": "Lakeland",
+  "state": "FL",
+  "center": { "lat": 28.0395, "lng": -81.9498 },
+  "metro_bbox": {
+    "min_lat": 27.95,
+    "max_lat": 28.13,
+    "min_lng": -82.10,
+    "max_lng": -81.80
+  },
+  "divisions": {
+    "LAKELAND_CORE": {
+      "name": "LAKELAND_CORE",
+      "center": { "lat": 28.041, "lng": -81.949 },
+      "bbox": { "min_lat": 28.00, "max_lat": 28.08, "min_lng": -82.01, "max_lng": -81.90 },
+      "submarkets": [
+        "Downtown Lakeland",
+        "South Lakeland Strips",
+        "Lakeland Highlands"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Lakeland": {
+      "name": "Downtown Lakeland",
+      "division": "LAKELAND_CORE",
+      "center": { "lat": 28.041, "lng": -81.949 },
+      "description": "Historic downtown core around Munn Park and Lake Mirror with steady renovation permits."
+    },
+    "South Lakeland Strips": {
+      "name": "South Lakeland Strips",
+      "division": "LAKELAND_CORE",
+      "center": { "lat": 28.015, "lng": -81.955 },
+      "description": "Commercial corridors south of downtown with retail renovation and small infill."
+    },
+    "Lakeland Highlands": {
+      "name": "Lakeland Highlands",
+      "division": "LAKELAND_CORE",
+      "center": { "lat": 28.06, "lng": -81.93 },
+      "description": "Residential pockets north/east with scattered teardown-rebuild and additions."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "ISSUEDATE",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/lakeland.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
+

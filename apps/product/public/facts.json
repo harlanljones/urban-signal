@@ -2595,8 +2595,6 @@
       "evidence_path": "apps/api/src/spatial/cities/waco.py"
     },
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
       "id": "jackson_ms",
       "name": "Jackson",
       "state": "MS",
@@ -2626,16 +2624,21 @@
       "evidence_path": "apps/api/src/spatial/cities/macon_bibb.py"
     },
     {
-      "id": "tyler",
-      "name": "Tyler",
-      "state": "TX",
-      "divisions": "5 divisions",
-      "division_count": 5,
-      "submarket_count": 6,
-      "feeds": [false, false, true, false],
-      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
-      "center": { "lat": 32.3519, "lng": -95.3006 },
-      "evidence_path": "apps/api/src/spatial/cities/tyler.py"
+      "id": "lakeland",
+      "name": "Lakeland",
+      "state": "FL",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 3,
+      "feeds": [true, false, true, false],
+      "platforms": [
+        { "platform": "arcgis", "watermark_col": "ISSUEDATE", "interval_seconds": 300.0, "topic": "raw.municipal.permits" },
+        null,
+        { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" },
+        null
+      ],
+      "center": { "lat": 28.0395, "lng": -81.9498 },
+      "evidence_path": "apps/api/src/spatial/cities/lakeland.py"
     },
     {
       "id": "lake_charles",
