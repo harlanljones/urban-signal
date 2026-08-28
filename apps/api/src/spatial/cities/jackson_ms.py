@@ -32,7 +32,7 @@ JACKSON_MS_DIVISION_BBOXES: Dict[str, Dict[str, float]] = {
     # North Jackson to Ridgeland/Madison commercial belts
     "NORTH_JACKSON_MADISON": {"min_lat": 32.340, "max_lat": 32.500, "min_lng": -90.350, "max_lng": -89.950},
     # West Jackson and Clinton corridors
-    "WEST_CLINTON": {"min_lat": 32.300, "max_lat": 32.450, "min_lng": -90.450, "max_lng": -90.230},
+    "WEST_CLINTON": {"min_lat": 32.280, "max_lat": 32.450, "min_lng": -90.450, "max_lng": -90.200},
     # Flowood/Pearl east-of-I-55 corridors and JAN airport approaches
     "EAST_FLOWOOD_RANKIN": {"min_lat": 32.260, "max_lat": 32.410, "min_lng": -90.150, "max_lng": -89.850},
     # South Jackson & Byram growth belt
