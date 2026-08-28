@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "id": "lake_charles",
+  "name": "Lake Charles",
+  "state": "LA",
+  "center": { "lat": 30.2266, "lng": -93.2174 },
+  "metro_bbox": { "min_lat": 30.05, "max_lat": 30.35, "min_lng": -93.35, "max_lng": -93.09 },
+  "divisions": {
+    "LAKE_CHARLES_CORE": {
+      "name": "LAKE_CHARLES_CORE",
+      "center": { "lat": 30.226, "lng": -93.215 },
+      "bbox": { "min_lat": 30.19, "max_lat": 30.26, "min_lng": -93.25, "max_lng": -93.17 },
+      "submarkets": [
+        "Downtown Lake Charles & Lakefront"
+      ]
+    },
+    "PRIEN_LAKE_SOUTH": {
+      "name": "PRIEN_LAKE_SOUTH",
+      "center": { "lat": 30.202, "lng": -93.242 },
+      "bbox": { "min_lat": 30.17, "max_lat": 30.23, "min_lng": -93.26, "max_lng": -93.18 },
+      "submarkets": [
+        "Prien Lake Retail Corridor"
+      ]
+    },
+    "WESTLAKE_INDUSTRIAL": {
+      "name": "WESTLAKE_INDUSTRIAL",
+      "center": { "lat": 30.26, "lng": -93.245 },
+      "bbox": { "min_lat": 30.23, "max_lat": 30.30, "min_lng": -93.29, "max_lng": -93.19 },
+      "submarkets": [
+        "Westlake & Petrochemical District"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Lake Charles & Lakefront": {
+      "name": "Downtown Lake Charles & Lakefront",
+      "division": "LAKE_CHARLES_CORE",
+      "center": { "lat": 30.2266, "lng": -93.2174 },
+      "description": "Historic downtown and lakeshore activation with civic anchors and hospitality."
+    },
+    "Prien Lake Retail Corridor": {
+      "name": "Prien Lake Retail Corridor",
+      "division": "PRIEN_LAKE_SOUTH",
+      "center": { "lat": 30.2005, "lng": -93.254 },
+      "description": "Prien Lake Mall and Gauthier Road commercial corridor with steady small-format investment."
+    },
+    "Westlake & Petrochemical District": {
+      "name": "Westlake & Petrochemical District",
+      "division": "WESTLAKE_INDUSTRIAL",
+      "center": { "lat": 30.257, "lng": -93.254 },
+      "description": "Industrial waterfront and Westlake city area with employment-driven demand signals."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/lake_charles.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
+

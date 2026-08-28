@@ -426,6 +426,11 @@ from src.spatial.cities.waco import (
     WACO_DIVISIONS,
     WACO_METRO_BBOX,
     WACO_SUBMARKETS,
+from src.spatial.cities.lake_charles import (
+    LAKE_CHARLES_DIVISION_BBOXES,
+    LAKE_CHARLES_DIVISIONS,
+    LAKE_CHARLES_METRO_BBOX,
+    LAKE_CHARLES_SUBMARKETS,
 )
 from src.spatial.cities.jackson_ms import (
     JACKSON_MS_CENTER,
@@ -530,6 +535,7 @@ class CityId(str, Enum):
     JACKSON_MS = "jackson_ms"
     MACON_BIBB = "macon_bibb"
     TYLER = "tyler"
+    LAKE_CHARLES = "lake_charles"
 
 
 class FeedType(str, Enum):
@@ -747,6 +753,16 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "brla": CityId.BATON_ROUGE,
     "east_baton_rouge": CityId.BATON_ROUGE,
     "east baton rouge": CityId.BATON_ROUGE,
+
+    # Lake Charles, LA
+    "lake_charles": CityId.LAKE_CHARLES,
+    "lake-charles": CityId.LAKE_CHARLES,
+    "lake charles": CityId.LAKE_CHARLES,
+    "lake_charles_la": CityId.LAKE_CHARLES,
+    "lake charles la": CityId.LAKE_CHARLES,
+    "calcasieu": CityId.LAKE_CHARLES,
+    "calcasieu_parish": CityId.LAKE_CHARLES,
+    "calcasieu parish": CityId.LAKE_CHARLES,
 
     # Denver
     "denver": CityId.DENVER,
@@ -5003,6 +5019,24 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         # SNAP-only and expand when a municipal permits API is proven.
         datasets={
             FeedType.SLA: snap_sla_spec("TX"),
+        },
+    ),
+    CityId.LAKE_CHARLES: CityRegistration(
+        city_id=CityId.LAKE_CHARLES,
+        name="Lake Charles",
+        state="LA",
+        center={"lat": 30.2266, "lng": -93.2174},
+        metro_bbox=LAKE_CHARLES_METRO_BBOX,
+        division_bboxes=LAKE_CHARLES_DIVISION_BBOXES,
+        submarkets=LAKE_CHARLES_SUBMARKETS,
+        divisions=LAKE_CHARLES_DIVISIONS,
+        job_suffix="lake_charles",
+        # Initial registration: SLA via USDA SNAP Retailers (LA slice).
+        # Calcasieu Parish/Lake Charles permit endpoints will be added when a public API is verified.
+        datasets={
+            FeedType.SLA: snap_sla_spec("LA"),
+        },
+    ),
         },
     ),
     CityId.JACKSON_MS: CityRegistration(
