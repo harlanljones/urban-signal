@@ -448,6 +448,13 @@ from src.spatial.cities.waco import (
     WACO_SUBMARKETS,
     is_in_waco_metro,
 )
+from src.spatial.cities.macon_bibb import (
+    MACON_BIBB_DIVISION_BBOXES,
+    MACON_BIBB_DIVISIONS,
+    MACON_BIBB_METRO_BBOX,
+    MACON_BIBB_SUBMARKETS,
+    is_in_macon_bibb_metro,
+)
 
 __all__ = [
     "PIERCE_METRO_BBOX",
@@ -766,4 +773,9 @@ __all__ = [
     "WACO_DIVISIONS",
     "WACO_SUBMARKETS",
     "is_in_waco_metro",
+    "MACON_BIBB_METRO_BBOX",
+    "MACON_BIBB_DIVISION_BBOXES",
+    "MACON_BIBB_DIVISIONS",
+    "MACON_BIBB_SUBMARKETS",
+    "is_in_macon_bibb_metro",
 ]

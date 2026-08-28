@@ -415,6 +415,13 @@ from src.spatial.cities.waco import (
     WACO_METRO_BBOX,
     WACO_SUBMARKETS,
 )
+from src.spatial.cities.macon_bibb import (
+    MACON_BIBB_CENTER,
+    MACON_BIBB_DIVISION_BBOXES,
+    MACON_BIBB_DIVISIONS,
+    MACON_BIBB_METRO_BBOX,
+    MACON_BIBB_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -492,6 +499,7 @@ class CityId(str, Enum):
     TOLEDO = "toledo"
     AMARILLO = "amarillo"
     WACO = "waco"
+    MACON_BIBB = "macon_bibb"
 
 
 class FeedType(str, Enum):
@@ -1055,6 +1063,12 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "waco": CityId.WACO,
     "waco_tx": CityId.WACO,
     "waco tx": CityId.WACO,
+    # Macon-Bibb, GA
+    "macon_bibb": CityId.MACON_BIBB,
+    "macon-bibb": CityId.MACON_BIBB,
+    "macon bibb": CityId.MACON_BIBB,
+    "macon": CityId.MACON_BIBB,
+    "macon_ga": CityId.MACON_BIBB,
 }
 
 
@@ -4925,6 +4939,41 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         # SNAP-only and expand when a municipal permits API is proven.
         datasets={
             FeedType.SLA: snap_sla_spec("TX"),
+        },
+    ),
+    CityId.MACON_BIBB: CityRegistration(
+        city_id=CityId.MACON_BIBB,
+        name="Macon-Bibb County",
+        state="GA",
+        center=MACON_BIBB_CENTER,
+        metro_bbox=MACON_BIBB_METRO_BBOX,
+        division_bboxes=MACON_BIBB_DIVISION_BBOXES,
+        submarkets=MACON_BIBB_SUBMARKETS,
+        divisions=MACON_BIBB_DIVISIONS,
+        job_suffix="macon_bibb",
+        # US-295: verified public permits (ArcGIS FeatureServer) plus SNAP GA slice.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_macon_bibb_permits_url,
+                platform="arcgis",
+                watermark_col="ISSUEDATE",
+                id_keys=["OBJECTID0", "FOLDERYEAR", "FOLDERSEQUENCE"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                
+                expected_cadence_days=7,
+                oid_field="OBJECTID0",
+                max_record_count=1000,
+                field_map={
+                    "job_id": ["OBJECTID0"],
+                    "issuance_date": ["ISSUEDATE"],
+                    "filing_date": ["INDATE"],
+                    "address_street": ["PROPSTREET"],
+                    "zipcode": ["PROPPOSTAL"],
+                },
+            ),
+            FeedType.SLA: snap_sla_spec("GA"),
         },
     ),
 }
