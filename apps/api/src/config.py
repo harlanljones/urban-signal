@@ -628,6 +628,17 @@ class Settings(BaseSettings):
         description="Franklin County (Columbus) Auditor deeds/sales FeatureServer layer URL",
     )
 
+    # Columbus, GA (ArcGIS): Building permit application locations — native
+    # point geometry (MapServer Feature Layer 0, Residential; see also 1=Commercial,
+    # 2=Pool/Sprinkler). Client requests outSR=4326 so coordinates parse to lat/lng.
+    arcgis_columbus_ga_permits_url: str = Field(
+        default=(
+            "https://ccggisprod.columbusga.org/server/rest/services/"
+            "BuildingPermits/MapServer/0"
+        ),
+        description="Columbus, GA building permits MapServer layer URL (Residential)",
+    )
+
     # Pierce County, WA (ArcGIS): county applications and permits across six
     # departments (Building, Development Engineering, Environmental, Fire,
     # Land Use, Sewer). Point layer in WA State Plane; the client's outSR=4326
