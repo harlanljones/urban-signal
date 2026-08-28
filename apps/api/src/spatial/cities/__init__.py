@@ -335,6 +335,13 @@ from src.spatial.cities.tampa import (
     TAMPA_SUBMARKETS,
     is_in_tampa_metro,
 )
+from src.spatial.cities.port_st_lucie import (
+    PORT_ST_LUCIE_DIVISION_BBOXES,
+    PORT_ST_LUCIE_DIVISIONS,
+    PORT_ST_LUCIE_METRO_BBOX,
+    PORT_ST_LUCIE_SUBMARKETS,
+    is_in_port_st_lucie_metro,
+)
 from src.spatial.cities.las_vegas import (
     LAS_VEGAS_DIVISION_BBOXES,
     LAS_VEGAS_DIVISIONS,
@@ -820,6 +827,11 @@ __all__ = [
     "TAMPA_DIVISIONS",
     "TAMPA_SUBMARKETS",
     "is_in_tampa_metro",
+    "PORT_ST_LUCIE_METRO_BBOX",
+    "PORT_ST_LUCIE_DIVISION_BBOXES",
+    "PORT_ST_LUCIE_DIVISIONS",
+    "PORT_ST_LUCIE_SUBMARKETS",
+    "is_in_port_st_lucie_metro",
     "LAS_VEGAS_METRO_BBOX",
     "LAS_VEGAS_DIVISION_BBOXES",
     "LAS_VEGAS_DIVISIONS",
