@@ -2598,6 +2598,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       "id": "jackson_ms",
       "name": "Jackson",
       "state": "MS",
@@ -2825,6 +2826,23 @@
       ],
       "center": { "lat": 38.046, "lng": -84.497 },
       "evidence_path": "apps/api/src/spatial/cities/lexington.py"
+    },
+    {
+      "id": "asheville",
+      "name": "Asheville, NC",
+      "state": "NC",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 8,
+      "feeds": [false, false, true, false],
+      "platforms": [
+        null,
+        null,
+        { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" },
+        null
+      ],
+      "center": { "lat": 35.5951, "lng": -82.5515 },
+      "evidence_path": "apps/api/src/spatial/cities/asheville.py"
     }
   ],
   "pipeline": [
