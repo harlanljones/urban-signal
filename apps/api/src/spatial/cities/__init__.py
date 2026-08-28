@@ -518,6 +518,13 @@ from src.spatial.cities.texarkana import (
     TEXARKANA_SUBMARKETS,
     is_in_texarkana_metro,
 )
+from src.spatial.cities.odessa import (
+    ODESSA_DIVISION_BBOXES,
+    ODESSA_DIVISIONS,
+    ODESSA_METRO_BBOX,
+    ODESSA_SUBMARKETS,
+    is_in_odessa_metro,
+)
 from src.spatial.cities.lake_charles import (
     LAKE_CHARLES_DIVISION_BBOXES,
     LAKE_CHARLES_DIVISIONS,
@@ -909,4 +916,9 @@ __all__ = [
     "MIDLAND_DIVISIONS",
     "MIDLAND_SUBMARKETS",
     "is_in_midland_metro",
+    "ODESSA_METRO_BBOX",
+    "ODESSA_DIVISION_BBOXES",
+    "ODESSA_DIVISIONS",
+    "ODESSA_SUBMARKETS",
+    "is_in_odessa_metro",
 ]
