@@ -381,6 +381,12 @@ from src.spatial.cities.ocala import (
     OCALA_METRO_BBOX,
     OCALA_SUBMARKETS,
 )
+from src.spatial.cities.melbourne import (
+    MELBOURNE_DIVISION_BBOXES,
+    MELBOURNE_DIVISIONS,
+    MELBOURNE_METRO_BBOX,
+    MELBOURNE_SUBMARKETS,
+)
 from src.spatial.cities.memphis import (
     MEMPHIS_DIVISION_BBOXES,
     MEMPHIS_DIVISIONS,
@@ -592,6 +598,7 @@ class CityId(str, Enum):
     TAMPA = "tampa"
     LAS_VEGAS = "las_vegas"
     BOISE = "boise"
+    MELBOURNE = "melbourne"
     FORT_WORTH = "fort_worth"
     HONOLULU = "honolulu"
     ORLANDO = "orlando"
@@ -1129,6 +1136,13 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "ocala_fl": CityId.OCALA,
     "ocala fl": CityId.OCALA,
 
+    # Melbourne / Palm Bay / Titusville (Brevard County, FL)
+    "melbourne": CityId.MELBOURNE,
+    "melbourne_fl": CityId.MELBOURNE,
+    "melbourne fl": CityId.MELBOURNE,
+    "palm_bay": CityId.MELBOURNE,
+    "palm bay": CityId.MELBOURNE,
+
     # Miami-Dade County, FL (not City of Miami / Broward — ADR 0007)
     "miami_dade": CityId.MIAMI_DADE,
     "miami-dade": CityId.MIAMI_DADE,
@@ -1490,6 +1504,45 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 expected_cadence_days=1,
                 companion_endpoints={'system_id': 'bkn', 'operator': 'lyft'},
             ),
+        },
+    ),
+    CityId.MELBOURNE: CityRegistration(
+        city_id=CityId.MELBOURNE,
+        name="Melbourne / Palm Bay / Titusville",
+        state="FL",
+        center={"lat": 28.0836, "lng": -80.6081},
+        metro_bbox=MELBOURNE_METRO_BBOX,
+        division_bboxes=MELBOURNE_DIVISION_BBOXES,
+        submarkets=MELBOURNE_SUBMARKETS,
+        divisions=MELBOURNE_DIVISIONS,
+        job_suffix="melbourne",
+        # Partial: PERMITS + SNAP SLA fallback (state-sliced 'FL').
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_brevard_permits_url,
+                platform="arcgis",
+                watermark_col="issueDate",
+                id_keys=["ApplicationNumber", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                expected_cadence_days=1,
+                oid_field="OBJECTID",
+                max_record_count=1000,
+                order_by="issueDate DESC",
+                field_map={
+                    "job_id": ["ApplicationNumber"],
+                    "issuance_date": ["issueDate", "PermitDate", "ApplicationDate"],
+                    "status": ["PermitStatus"],
+                    "job_type": ["ApplicationType", "PermitType"],
+                    "address_street": ["ADDRESS"],
+                    "cost": ["EstimateValuation"],
+                },
+            ),
+            # USDA FNS SNAP retailers as the SLA slice (Florida state filter).
+            # Rows outside the metro bbox still carry global H3 tags; metro
+            # scoping happens downstream in spatialization.
+            FeedType.SLA: snap_sla_spec("FL"),
         },
     ),
     CityId.CHICAGO: CityRegistration(

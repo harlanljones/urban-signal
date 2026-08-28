@@ -1900,7 +1900,7 @@
       "platforms": [
         {
           "platform": "arcgis",
-          "watermark_col": "ISSUEDATE",
+          "watermark_col": "issueDate",
           "interval_seconds": 300.0,
           "topic": "raw.municipal.permits"
         },
@@ -1993,6 +1993,33 @@
         "lng": -82.4572
       },
       "evidence_path": "apps/api/src/spatial/cities/tampa.py"
+    },
+    {
+      "id": "melbourne",
+      "name": "Melbourne / Palm Bay / Titusville",
+      "state": "FL",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 13,
+      "feeds": [true, false, true, false],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "issueDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": { "lat": 28.0836, "lng": -80.6081 },
+      "evidence_path": "apps/api/src/spatial/cities/melbourne.py"
     },
     {
       "id": "las_vegas",

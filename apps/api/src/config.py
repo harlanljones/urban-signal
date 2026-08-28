@@ -1253,6 +1253,12 @@ class Settings(BaseSettings):
         description="Gainesville building permits Socrata endpoint",
     )
 
+    # Melbourne / Palm Bay / Titusville (Brevard County, FL) — US-296
+    arcgis_brevard_permits_url: str = Field(
+        default="https://gis.palmbayflorida.org/arcgis/rest/services/GrowthManagement/BuildingPermits/FeatureServer/0",
+        description="Palm Bay (Brevard County) Building Permits ArcGIS FeatureServer layer URL",
+    )
+
     # Miami-Dade County (US-199): ArcGIS Hub permits table + LBT SLA snapshot
     # + PaGis last-sale points. No 311. Companions are metadata-only.
     arcgis_miami_dade_permits_url: str = Field(
