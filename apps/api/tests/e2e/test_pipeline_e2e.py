@@ -14,7 +14,7 @@ import asyncio
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
-from fastapi.testclient import TestClient
+import httpx
 import pandas as pd
 import pytest
 from src.config import settings
@@ -39,15 +39,62 @@ from src.schemas.models import (
 from src.serving.app import create_app
 from src.serving.dispatcher import WebhookDispatcher
 from src.serving.engine import MultiHorizonInferenceEngine
+from src.serving.router import get_feature_pipeline, get_inference_engine
 from src.spatial.h3_indexer import H3SpatialIndexer
 from src.storage.postgis_sync import PostGISSpatialSync
 
 
+class SyncASGIClient:
+    """Small synchronous adapter for HTTPX's async ASGI transport."""
+
+    def __init__(self, app):
+        self._app = app
+
+    def request(self, method, url, **kwargs):
+        async def send():
+            transport = httpx.ASGITransport(app=self._app)
+            async with httpx.AsyncClient(
+                transport=transport,
+                base_url="http://testserver",
+                follow_redirects=True,
+            ) as client:
+                return await client.request(method, url, **kwargs)
+
+        return asyncio.run(send())
+
+    def get(self, url, **kwargs):
+        return self.request("GET", url, **kwargs)
+
+    def post(self, url, **kwargs):
+        return self.request("POST", url, **kwargs)
+
+
 @pytest.fixture(scope="module")
-def shared_app_client():
+def shared_inference_engine():
+    return MultiHorizonInferenceEngine()
+
+
+@pytest.fixture(scope="module")
+def shared_feature_pipeline():
+    pipeline = SpatialFeaturePipeline(db_path=":memory:")
+    try:
+        yield pipeline
+    finally:
+        pipeline.close()
+
+
+@pytest.fixture(scope="module")
+def shared_app_client(shared_inference_engine, shared_feature_pipeline):
+    async def provide_shared_inference_engine():
+        return shared_inference_engine
+
+    async def provide_shared_feature_pipeline():
+        return shared_feature_pipeline
+
     app = create_app()
-    with TestClient(app) as client:
-        yield client
+    app.dependency_overrides[get_inference_engine] = provide_shared_inference_engine
+    app.dependency_overrides[get_feature_pipeline] = provide_shared_feature_pipeline
+    yield SyncASGIClient(app)
 
 
 @pytest.fixture
@@ -200,8 +247,8 @@ def test_e2e_duckdb_feature_store_aggregations(spatial_pipeline):
 # -----------------------------------------------------------------------------
 # 4. MULTI-HORIZON MODEL INFERENCE & SHAP EXPLAINABILITY
 # -----------------------------------------------------------------------------
-def test_e2e_multi_horizon_inference_engine():
-    engine = MultiHorizonInferenceEngine()
+def test_e2e_multi_horizon_inference_engine(shared_inference_engine):
+    engine = shared_inference_engine
     test_cell = "892a1072893ffff"
 
     sample_feats = {

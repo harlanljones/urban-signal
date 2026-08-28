@@ -150,7 +150,9 @@ def test_probe_registry_uses_registered_city_feeds_without_manual_config():
         metadata_fetcher=lambda spec: datetime(2026, 8, 22, tzinfo=UTC),
     )
     assert {result.city_id for result in results} == {"nyc"}
-    assert len(results) == 6  # permits, 311, sla, deeds, crime (US-71), evictions (US-93)
+    # permits, 311, sla, deeds, crime (US-71), evictions (US-93),
+    # energy_benchmark + bike_ped (US-363 §2.7/§2.8), GBFS (US-363 §1.2).
+    assert len(results) == 9
     assert all(not result.stale for result in results)
 
 

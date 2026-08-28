@@ -1,0 +1,525 @@
+city_id: virginia_beach
+name: Virginia Beach
+state: VA
+center:
+  lat: 36.8528
+  lng: -76.1089
+metro_bbox:
+  min_lat: 36.54
+  max_lat: 36.96
+  min_lng: -76.22
+  max_lng: -75.91
+division_bboxes:
+  RESORT_AREA:
+    min_lat: 36.83
+    max_lat: 36.95
+    min_lng: -76.0
+    max_lng: -75.91
+  TOWN_CENTER:
+    min_lat: 36.82
+    max_lat: 36.9
+    min_lng: -76.14
+    max_lng: -76.07
+  KEMPSVILLE:
+    min_lat: 36.75
+    max_lat: 36.86
+    min_lng: -76.22
+    max_lng: -76.1
+  BAYSIDE_GREAT_NECK:
+    min_lat: 36.86
+    max_lat: 36.96
+    min_lng: -76.2
+    max_lng: -76.1
+  PUNGO_PRINCESS_ANNE:
+    min_lat: 36.54
+    max_lat: 36.78
+    min_lng: -76.14
+    max_lng: -75.91
+submarkets:
+  Oceanfront Resort District:
+    name: Oceanfront Resort District
+    borough: RESORT_AREA
+    lat: 36.8529
+    lng: -75.978
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.9
+    capex: 9200000.0
+    permit_vel: 52.0
+    shift_ratio: 1.6
+    sla: 68.0
+    description: Atlantic Avenue hotel-and-entertainment strip between Rudee Inlet
+      and 40th Street with relentless hotel renovation and height-driven permitting.
+    city_id: virginia_beach
+  North End & Cape Henry:
+    name: North End & Cape Henry
+    borough: RESORT_AREA
+    lat: 36.91
+    lng: -75.988
+    zoom: 14.5
+    pitch: 40.0
+    base_lims: 0.88
+    capex: 8100000.0
+    permit_vel: 38.0
+    shift_ratio: 1.5
+    sla: 62.0
+    description: Guarded residential beach enclave of shingle-style homes from 52nd
+      to 88th Street with teardown-and-rebuild pressure on oceanfront lots.
+    city_id: virginia_beach
+  Cavalier Beach:
+    name: Cavalier Beach
+    borough: RESORT_AREA
+    lat: 36.889
+    lng: -75.979
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.86
+    capex: 7400000.0
+    permit_vel: 34.0
+    shift_ratio: 1.46
+    sla: 58.0
+    description: Cavalier Hotel and Cardinal Road district mixing landmark-hotel restoration
+      with premium condo infill at the North End gate.
+    city_id: virginia_beach
+  Virginia Beach Town Center:
+    name: Virginia Beach Town Center
+    borough: TOWN_CENTER
+    lat: 36.8528
+    lng: -76.1089
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.91
+    capex: 11800000.0
+    permit_vel: 56.0
+    shift_ratio: 1.64
+    sla: 72.0
+    description: The city's planned high-rise CBD around Pembroke Avenue and Constitution
+      Drive with office towers, a Westin anchor, and the densest commercial pipeline.
+    city_id: virginia_beach
+  Pembroke / Independence:
+    name: Pembroke / Independence
+    borough: TOWN_CENTER
+    lat: 36.861
+    lng: -76.129
+    zoom: 14.5
+    pitch: 40.0
+    base_lims: 0.84
+    capex: 6800000.0
+    permit_vel: 40.0
+    shift_ratio: 1.44
+    sla: 56.0
+    description: Independence Boulevard office-and-retail spine north of Town Center
+      absorbing older strip parcels into mixed-use redevelopment.
+    city_id: virginia_beach
+  Lynnhaven Mall District:
+    name: Lynnhaven Mall District
+    borough: TOWN_CENTER
+    lat: 36.845
+    lng: -76.128
+    zoom: 14.0
+    pitch: 38.0
+    base_lims: 0.8
+    capex: 5900000.0
+    permit_vel: 36.0
+    shift_ratio: 1.38
+    sla: 52.0
+    description: Regional-mall retail core at Virginia Beach Blvd and Independence
+      with outparcel medical and hospitality refits.
+    city_id: virginia_beach
+  Kempsville:
+    name: Kempsville
+    borough: KEMPSVILLE
+    lat: 36.82
+    lng: -76.175
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.76
+    capex: 4800000.0
+    permit_vel: 32.0
+    shift_ratio: 1.3
+    sla: 48.0
+    description: Mature residential crossroads at Kempsville Road and Providence Road
+      with steady additions, roof-and-HVAC trades, and neighborhood retail.
+    city_id: virginia_beach
+  Princess Anne Plaza:
+    name: Princess Anne Plaza
+    borough: KEMPSVILLE
+    lat: 36.798
+    lng: -76.13
+    zoom: 14.0
+    pitch: 32.0
+    base_lims: 0.72
+    capex: 3900000.0
+    permit_vel: 26.0
+    shift_ratio: 1.22
+    sla: 42.0
+    description: Post-war plaza-and-ranch grid near the Municipal Center with municipal-adjacent
+      services and investor renovation flow.
+    city_id: virginia_beach
+  Indian Lakes:
+    name: Indian Lakes
+    borough: KEMPSVILLE
+    lat: 36.825
+    lng: -76.14
+    zoom: 14.0
+    pitch: 32.0
+    base_lims: 0.74
+    capex: 4100000.0
+    permit_vel: 28.0
+    shift_ratio: 1.26
+    sla: 44.0
+    description: Golf-course community of lakeside colonials east of Kempsville with
+      kitchen-and-deck renovation demand.
+    city_id: virginia_beach
+  Shore Drive Corridor:
+    name: Shore Drive Corridor
+    borough: BAYSIDE_GREAT_NECK
+    lat: 36.905
+    lng: -76.155
+    zoom: 14.0
+    pitch: 38.0
+    base_lims: 0.82
+    capex: 5600000.0
+    permit_vel: 38.0
+    shift_ratio: 1.42
+    sla: 54.0
+    description: Chesapeake Bay resort corridor from Lynnhaven Inlet to First Landing
+      State Park with condo-repurposing and restaurant-row licensing.
+    city_id: virginia_beach
+  Bayside & Little Neck:
+    name: Bayside & Little Neck
+    borough: BAYSIDE_GREAT_NECK
+    lat: 36.885
+    lng: -76.15
+    zoom: 14.0
+    pitch: 32.0
+    base_lims: 0.72
+    capex: 3700000.0
+    permit_vel: 26.0
+    shift_ratio: 1.24
+    sla: 40.0
+    description: Working residential grid between Shore Drive and Independence with
+      starter-stock turnover and accessory-dwelling interest.
+    city_id: virginia_beach
+  Great Neck:
+    name: Great Neck
+    borough: BAYSIDE_GREAT_NECK
+    lat: 36.895
+    lng: -76.115
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.84
+    capex: 6200000.0
+    permit_vel: 34.0
+    shift_ratio: 1.46
+    sla: 58.0
+    description: Affluent peninsula of school-adjacent subdivisions and Deep Creek
+      estates with high-value addition permitting.
+    city_id: virginia_beach
+  Princess Anne Commons:
+    name: Princess Anne Commons
+    borough: PUNGO_PRINCESS_ANNE
+    lat: 36.775
+    lng: -76.06
+    zoom: 13.5
+    pitch: 35.0
+    base_lims: 0.78
+    capex: 5200000.0
+    permit_vel: 40.0
+    shift_ratio: 1.4
+    sla: 50.0
+    description: Institutional growth node at the Aquarium and Sportsplex with the
+      city's newest tract-housing and medical-office clusters.
+    city_id: virginia_beach
+  Pungo:
+    name: Pungo
+    borough: PUNGO_PRINCESS_ANNE
+    lat: 36.7
+    lng: -76.01
+    zoom: 13.0
+    pitch: 30.0
+    base_lims: 0.62
+    capex: 2900000.0
+    permit_vel: 22.0
+    shift_ratio: 1.18
+    sla: 34.0
+    description: Rural-agricultural flats of field roads and farmettes under aggressive-by-right
+      estate-lot conversion pressure.
+    city_id: virginia_beach
+  Sandbridge:
+    name: Sandbridge
+    borough: PUNGO_PRINCESS_ANNE
+    lat: 36.6468
+    lng: -75.929
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.7
+    capex: 4600000.0
+    permit_vel: 24.0
+    shift_ratio: 1.32
+    sla: 38.0
+    description: Barrier-island village of rental cottages and dune-line houses at
+      the North Carolina line with storm-rebuild and elevation work.
+    city_id: virginia_beach
+divisions:
+  RESORT_AREA:
+    name: RESORT_AREA
+    center_lat: 36.885
+    center_lng: -75.965
+    zoom: 13.0
+    bbox:
+      min_lat: 36.83
+      max_lat: 36.95
+      min_lng: -76.0
+      max_lng: -75.91
+    submarkets:
+    - Oceanfront Resort District
+    - North End & Cape Henry
+    - Cavalier Beach
+    city_id: virginia_beach
+  TOWN_CENTER:
+    name: TOWN_CENTER
+    center_lat: 36.855
+    center_lng: -76.1089
+    zoom: 13.5
+    bbox:
+      min_lat: 36.82
+      max_lat: 36.9
+      min_lng: -76.14
+      max_lng: -76.07
+    submarkets:
+    - Virginia Beach Town Center
+    - Pembroke / Independence
+    - Lynnhaven Mall District
+    city_id: virginia_beach
+  KEMPSVILLE:
+    name: KEMPSVILLE
+    center_lat: 36.815
+    center_lng: -76.165
+    zoom: 13.0
+    bbox:
+      min_lat: 36.75
+      max_lat: 36.86
+      min_lng: -76.22
+      max_lng: -76.1
+    submarkets:
+    - Kempsville
+    - Princess Anne Plaza
+    - Indian Lakes
+    city_id: virginia_beach
+  BAYSIDE_GREAT_NECK:
+    name: BAYSIDE_GREAT_NECK
+    center_lat: 36.895
+    center_lng: -76.14
+    zoom: 13.0
+    bbox:
+      min_lat: 36.86
+      max_lat: 36.96
+      min_lng: -76.2
+      max_lng: -76.1
+    submarkets:
+    - Shore Drive Corridor
+    - Bayside & Little Neck
+    - Great Neck
+    city_id: virginia_beach
+  PUNGO_PRINCESS_ANNE:
+    name: PUNGO_PRINCESS_ANNE
+    center_lat: 36.71
+    center_lng: -76.02
+    zoom: 12.0
+    bbox:
+      min_lat: 36.54
+      max_lat: 36.78
+      min_lng: -76.14
+      max_lng: -75.91
+    submarkets:
+    - Princess Anne Commons
+    - Pungo
+    - Sandbridge
+    city_id: virginia_beach
+datasets:
+  permits:
+    endpoint: https://services2.arcgis.com/CyVvlIiUfRBmMQuu/arcgis/rest/services/Building_Permits_Applications_view/FeatureServer/0
+    platform: arcgis
+    watermark_col: IssueDate
+    id_keys:
+    - PermitNumber
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: text
+    watermark_format: '%Y/%m/%d'
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Virginia Beach, VA
+    field_map:
+      job_id:
+      - PermitNumber
+      - OBJECTID
+      job_type:
+      - WorkType
+      - PermitType
+      issuance_date:
+      - IssueDate
+      filing_date:
+      - ApplicationDate
+      address_street:
+      - StreetAddress
+      bbl:
+      - GPIN
+      borough:
+      - City
+      zipcode:
+      - Zip
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: true
+    zip_member: null
+  sla:
+    endpoint: https://services2.arcgis.com/CyVvlIiUfRBmMQuu/arcgis/rest/services/Business_Licenses_view/FeatureServer/0
+    platform: arcgis
+    watermark_col: Begin_Date
+    id_keys:
+    - Trade_Name
+    - Owner_Name
+    - Business_Address
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: text
+    watermark_format: '%m/%d/%Y'
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Virginia Beach, VA
+    field_map:
+      license_id:
+      - Trade_Name
+      - Owner_Name
+      - Business_Address
+      dba:
+      - Trade_Name
+      premises_name:
+      - Owner_Name
+      license_type:
+      - Business_Classification
+      - NAICS
+      effective_date:
+      - Begin_Date
+      address_street:
+      - Business_Address
+      borough:
+      - Business_City
+      zipcode:
+      - Business_ZipCode
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 365
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: true
+    zip_member: null
+  deeds:
+    endpoint: https://services2.arcgis.com/CyVvlIiUfRBmMQuu/arcgis/rest/services/Property_Sales_/FeatureServer/0
+    platform: arcgis
+    watermark_col: Sales_Date
+    id_keys:
+    - Document_Number
+    - GPIN
+    - Sales_Date
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Virginia Beach, VA
+    field_map:
+      doc_id:
+      - Document_Number
+      - OBJECTID
+      bbl:
+      - GPIN
+      document_amount:
+      - Sale_Price
+      recorded_date:
+      - Sales_Date
+      address_street:
+      - Street_Address
+      incident_address:
+      - Street_Address
+      borough:
+      - Neighborhood
+      zipcode:
+      - Zip_Code
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: true
+    zip_member: null
+aliases:
+- virginia-beach
+- virginia beach
+- va_beach
+- va beach
+job_suffix: vb

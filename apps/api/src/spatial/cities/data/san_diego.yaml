@@ -1,0 +1,510 @@
+city_id: san_diego
+name: San Diego
+state: CA
+center:
+  lat: 32.7157
+  lng: -117.1611
+metro_bbox:
+  min_lat: 32.5
+  max_lat: 33.1
+  min_lng: -117.35
+  max_lng: -116.85
+division_bboxes:
+  NORTH:
+    min_lat: 32.8
+    max_lat: 33.08
+    min_lng: -117.3
+    max_lng: -117.05
+  COASTAL:
+    min_lat: 32.68
+    max_lat: 32.9
+    min_lng: -117.3
+    max_lng: -117.18
+  CENTRAL:
+    min_lat: 32.7
+    max_lat: 32.8
+    min_lng: -117.2
+    max_lng: -117.1
+  EAST:
+    min_lat: 32.74
+    max_lat: 33.05
+    min_lng: -117.15
+    max_lng: -116.9
+  SOUTHEAST:
+    min_lat: 32.6
+    max_lat: 32.75
+    min_lng: -117.15
+    max_lng: -116.9
+  SOUTHWEST:
+    min_lat: 32.5
+    max_lat: 32.68
+    min_lng: -117.2
+    max_lng: -116.9
+submarkets:
+  La Jolla:
+    name: La Jolla
+    borough: NORTH
+    lat: 32.8328
+    lng: -117.2713
+    zoom: 12.6
+    pitch: 46.0
+    base_lims: 0.92
+    capex: 9200000.0
+    permit_vel: 38.0
+    shift_ratio: 1.28
+    sla: 44.0
+    description: Coastal science-and-affluence district with biotech labs, low-rise
+      multifamily, and high-value residential redevelopment.
+    city_id: san_diego
+  Mira Mesa:
+    name: Mira Mesa
+    borough: NORTH
+    lat: 32.9167
+    lng: -117.1433
+    zoom: 12.4
+    pitch: 44.0
+    base_lims: 0.78
+    capex: 6200000.0
+    permit_vel: 34.0
+    shift_ratio: 1.36
+    sla: 52.0
+    description: Tech-corridor residential plateau with steady infill, office-to-residential
+      conversions, and planning-permit activity.
+    city_id: san_diego
+  Pacific Beach:
+    name: Pacific Beach
+    borough: COASTAL
+    lat: 32.7977
+    lng: -117.2408
+    zoom: 13.0
+    pitch: 48.0
+    base_lims: 0.85
+    capex: 7400000.0
+    permit_vel: 40.0
+    shift_ratio: 1.42
+    sla: 58.0
+    description: Beach-adjacent rental district with multifamily infill, short-term-rental
+      churn, and steady interior renovation.
+    city_id: san_diego
+  Ocean Beach:
+    name: Ocean Beach
+    borough: COASTAL
+    lat: 32.7513
+    lng: -117.2498
+    zoom: 12.8
+    pitch: 46.0
+    base_lims: 0.81
+    capex: 5100000.0
+    permit_vel: 28.0
+    shift_ratio: 1.34
+    sla: 51.0
+    description: Bohemian coastal village with modest single-family rehab, cottage
+      infill, and long-standing neighborhood retail.
+    city_id: san_diego
+  Downtown:
+    name: Downtown
+    borough: CENTRAL
+    lat: 32.7157
+    lng: -117.1611
+    zoom: 13.2
+    pitch: 52.0
+    base_lims: 0.94
+    capex: 14800000.0
+    permit_vel: 64.0
+    shift_ratio: 1.58
+    sla: 71.0
+    description: "CBD and East Village high-rise pipeline \u2014 office, hospitality,\
+      \ residential towers, and the densest permitting in the metro."
+    city_id: san_diego
+  North Park:
+    name: North Park
+    borough: CENTRAL
+    lat: 32.7365
+    lng: -117.1228
+    zoom: 13.0
+    pitch: 48.0
+    base_lims: 0.86
+    capex: 8200000.0
+    permit_vel: 44.0
+    shift_ratio: 1.47
+    sla: 63.0
+    description: Urban-village commercial corridor with dense multifamily infill,
+      adaptive reuse, and steady mixed-use permitting.
+    city_id: san_diego
+  Kearny Mesa:
+    name: Kearny Mesa
+    borough: EAST
+    lat: 32.8135
+    lng: -117.1331
+    zoom: 12.4
+    pitch: 44.0
+    base_lims: 0.8
+    capex: 6400000.0
+    permit_vel: 36.0
+    shift_ratio: 1.35
+    sla: 48.0
+    description: Auto-row and light-industrial district with warehouse conversions,
+      commercial buildouts, and logistics infill.
+    city_id: san_diego
+  Mission Valley:
+    name: Mission Valley
+    borough: EAST
+    lat: 32.7761
+    lng: -117.1113
+    zoom: 12.8
+    pitch: 46.0
+    base_lims: 0.88
+    capex: 9800000.0
+    permit_vel: 48.0
+    shift_ratio: 1.45
+    sla: 56.0
+    description: River-valley corridor of large mixed-use and commercial redevelopment
+      along the transit spine.
+    city_id: san_diego
+  Logan Heights:
+    name: Logan Heights
+    borough: SOUTHEAST
+    lat: 32.7008
+    lng: -117.1077
+    zoom: 12.6
+    pitch: 44.0
+    base_lims: 0.74
+    capex: 4600000.0
+    permit_vel: 26.0
+    shift_ratio: 1.3
+    sla: 50.0
+    description: Historic barrio east of downtown with community-driven infill, ADU
+      programs, and small commercial renewal.
+    city_id: san_diego
+  Encanto:
+    name: Encanto
+    borough: SOUTHEAST
+    lat: 32.7092
+    lng: -117.0775
+    zoom: 12.4
+    pitch: 44.0
+    base_lims: 0.72
+    capex: 3900000.0
+    permit_vel: 22.0
+    shift_ratio: 1.27
+    sla: 49.0
+    description: Inner-southeast residential district with single-family rehab, ADU
+      activity, and modest retail reinvestment.
+    city_id: san_diego
+  Otay Mesa:
+    name: Otay Mesa
+    borough: SOUTHWEST
+    lat: 32.5537
+    lng: -117.044
+    zoom: 12.2
+    pitch: 44.0
+    base_lims: 0.76
+    capex: 5800000.0
+    permit_vel: 32.0
+    shift_ratio: 1.31
+    sla: 41.0
+    description: Border industrial and logistics mesa with warehouse construction,
+      distribution centers, and border-economy churn.
+    city_id: san_diego
+  San Ysidro:
+    name: San Ysidro
+    borough: SOUTHWEST
+    lat: 32.543
+    lng: -117.052
+    zoom: 12.6
+    pitch: 46.0
+    base_lims: 0.7
+    capex: 3400000.0
+    permit_vel: 20.0
+    shift_ratio: 1.24
+    sla: 46.0
+    description: Border gateway neighborhood with mixed-use infill around the port
+      of entry and steady small-commercial permits.
+    city_id: san_diego
+divisions:
+  NORTH:
+    name: North San Diego
+    center_lat: 32.87
+    center_lng: -117.2
+    zoom: 11.6
+    bbox:
+      min_lat: 32.8
+      max_lat: 33.08
+      min_lng: -117.3
+      max_lng: -117.05
+    submarkets:
+    - La Jolla
+    - Mira Mesa
+    city_id: san_diego
+  COASTAL:
+    name: Coastal San Diego
+    center_lat: 32.79
+    center_lng: -117.25
+    zoom: 11.6
+    bbox:
+      min_lat: 32.68
+      max_lat: 32.9
+      min_lng: -117.3
+      max_lng: -117.18
+    submarkets:
+    - Pacific Beach
+    - Ocean Beach
+    city_id: san_diego
+  CENTRAL:
+    name: Central San Diego
+    center_lat: 32.74
+    center_lng: -117.16
+    zoom: 11.4
+    bbox:
+      min_lat: 32.7
+      max_lat: 32.8
+      min_lng: -117.2
+      max_lng: -117.1
+    submarkets:
+    - Downtown
+    - North Park
+    city_id: san_diego
+  EAST:
+    name: East San Diego
+    center_lat: 32.82
+    center_lng: -117.05
+    zoom: 11.6
+    bbox:
+      min_lat: 32.74
+      max_lat: 33.05
+      min_lng: -117.15
+      max_lng: -116.9
+    submarkets:
+    - Kearny Mesa
+    - Mission Valley
+    city_id: san_diego
+  SOUTHEAST:
+    name: Southeast San Diego
+    center_lat: 32.68
+    center_lng: -117.03
+    zoom: 11.6
+    bbox:
+      min_lat: 32.6
+      max_lat: 32.75
+      min_lng: -117.15
+      max_lng: -116.9
+    submarkets:
+    - Logan Heights
+    - Encanto
+    city_id: san_diego
+  SOUTHWEST:
+    name: South Bay San Diego
+    center_lat: 32.55
+    center_lng: -117.03
+    zoom: 11.4
+    bbox:
+      min_lat: 32.5
+      max_lat: 32.68
+      min_lng: -117.2
+      max_lng: -116.9
+    submarkets:
+    - Otay Mesa
+    - San Ysidro
+    city_id: san_diego
+datasets:
+  permits:
+    endpoint: https://seshat.datasd.org/development_permits/approvals_issued_2026_datasd.csv
+    platform: csv
+    watermark_col: approval_issue_date
+    id_keys:
+    - approval_id
+    - development_id
+    - project_id
+    topic: raw.municipal.permits
+    interval_seconds: 1800.0
+    producer_key: permits
+    endpoint_by_year:
+      '2026': https://seshat.datasd.org/development_permits/approvals_issued_2026_datasd.csv
+      '2027': https://seshat.datasd.org/development_permits/approvals_issued_2027_datasd.csv
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - approval_id
+      issuance_date:
+      - approval_issue_date
+      filing_date:
+      - approval_create_date
+      cost:
+      - approval_valuation
+      latitude:
+      - gis_latitude
+      longitude:
+      - gis_longitude
+      address_street:
+      - gis_address
+      job_type:
+      - approval_type
+      status:
+      - approval_status
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2026_datasd.csv
+    platform: csv
+    watermark_col: date_requested
+    id_keys:
+    - service_request_id
+    topic: raw.municipal.311
+    interval_seconds: 1800.0
+    producer_key: '311'
+    endpoint_by_year:
+      '2016': https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2016_datasd.csv
+      '2017': https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2017_datasd.csv
+      '2018': https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2018_datasd.csv
+      '2019': https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2019_datasd.csv
+      '2020': https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2020_datasd.csv
+      '2021': https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2021_datasd.csv
+      '2022': https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2022_datasd.csv
+      '2023': https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2023_datasd.csv
+      '2024': https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2024_datasd.csv
+      '2025': https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2025_datasd.csv
+      '2026': https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2026_datasd.csv
+      '2027': https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_closed_2027_datasd.csv
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - service_request_id
+      created_date:
+      - date_requested
+      closed_date:
+      - date_closed
+      complaint_type:
+      - service_name
+      - service_name_detail
+      latitude:
+      - lat
+      longitude:
+      - lng
+      incident_address:
+      - street_address
+      zipcode:
+      - zipcode
+      borough:
+      - council_district
+      - comm_plan_name
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints:
+      open: https://seshat.datasd.org/get_it_done_reports/get_it_done_requests_open_datasd.csv
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://seshat.datasd.org/business_tax_certificates/sd_businesses_active_datasd.csv
+    platform: csv
+    watermark_col: date_account_creation
+    id_keys:
+    - account_key
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - account_key
+      effective_date:
+      - date_cert_effective
+      expiration_date:
+      - date_cert_expiration
+      license_type:
+      - naics_description
+      - naics_sector
+      dba:
+      - dba_name
+      latitude:
+      - lat
+      longitude:
+      - lng
+      borough:
+      - council_district
+      - bid
+      address_street:
+      - address_road
+    ingestion_mode: snapshot
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- sandiego
+- san diego
+- san-diego
+- sd
+job_suffix: sd

@@ -24,9 +24,89 @@ based on that flag).
 """
 
 import importlib
-from typing import Dict, List
+from collections.abc import Iterable
+from dataclasses import replace
+from pathlib import Path
+from typing import Any
 
 from src.spatial.registration import SpatialRegistration
+
+
+def build_registry_from_data(definitions, endpoint_resolver=lambda name: name):
+    """Build registrations directly from validated declarative definitions.
+
+    This factory is deliberately separate from the legacy fallback below so a
+    caller can validate and promote a data migration in one interlock hold.
+    """
+    from src.spatial import city_registry
+    from src.spatial.city_data import build_registration
+
+    return {
+        registration.city_id: registration
+        for registration in (
+            build_registration(
+                definition,
+                city_id_type=city_registry.CityId,
+                feed_type=city_registry.FeedType,
+                endpoint_resolver=endpoint_resolver,
+            )
+            for definition in definitions
+        )
+    }
+
+
+def build_aliases_from_data(definitions: Iterable[dict[str, Any]]) -> dict[str, object]:
+    from src.spatial import city_registry
+    from src.spatial.city_data import validate_definition
+
+    aliases: dict[str, object] = {}
+    for raw in definitions:
+        definition = validate_definition(raw)
+        try:
+            city_id = city_registry.CityId(definition["city_id"])
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"unknown city_id {definition['city_id']!r}") from exc
+        for alias in [definition["city_id"], *definition.get("aliases", [])]:
+            key = str(alias).strip().lower()
+            if not key:
+                raise ValueError(f"{city_id.value} contains an empty alias")
+            previous = aliases.setdefault(key, city_id)
+            if previous != city_id:
+                raise ValueError(
+                    f"alias {key!r} maps to both {previous.value!r} and {city_id.value!r}"
+                )
+    return aliases
+
+
+def build_runtime_exports(endpoint_resolver=lambda name: name):
+    from src.config import settings
+    from src.spatial import city_registry
+    from src.spatial.city_data import load_definitions
+
+    try:
+        definitions = load_definitions(Path(settings.city_data_dir))
+        if not definitions:
+            return None
+        registry = build_registry_from_data(definitions, endpoint_resolver)
+        legacy_ids = set(city_registry._HANDWRITTEN_REGISTRY)
+        if not legacy_ids.issubset(registry):
+            return None
+        canonical = build_registry_from_registrations()
+        for city_id in legacy_ids:
+            source = canonical[city_id]
+            runtime = registry[city_id]
+            registry[city_id] = replace(
+                runtime,
+                metro_bbox=source.metro_bbox,
+                division_bboxes=source.division_bboxes,
+                submarkets=source.submarkets,
+                divisions=source.divisions,
+            )
+        aliases = build_aliases_from_registrations()
+        aliases.update(build_aliases_from_data(definitions))
+        return registry, aliases
+    except Exception:
+        return None
 
 
 def _leaf_registration(city_id):
@@ -52,7 +132,7 @@ def build_registry_from_registrations():
     from src.spatial import city_registry
 
     handwritten = city_registry._HANDWRITTEN_REGISTRY
-    out: Dict[object, object] = {}
+    out: dict[object, object] = {}
     for city_id, hand in handwritten.items():
         reg: SpatialRegistration = _leaf_registration(city_id)
         out[city_id] = city_registry.CityRegistration(
@@ -82,16 +162,14 @@ def build_aliases_from_registrations():
 
     handwritten = city_registry._HANDWRITTEN_ALIASES
     registrations = city_registry._HANDWRITTEN_REGISTRY
-    derived: Dict[str, object] = {}
+    derived: dict[str, object] = {}
     for alias, city_id in handwritten.items():
-        assert city_id in registrations, (
-            f"alias {alias!r} -> {city_id!r} has no registration"
-        )
+        assert city_id in registrations, f"alias {alias!r} -> {city_id!r} has no registration"
         derived[alias] = city_id
     return derived
 
 
-def derived_supported_cities() -> List[object]:
+def derived_supported_cities() -> list[object]:
     """Yield the same supported-city list as today (derived from ``CityId``)."""
     from src.spatial import city_registry
 

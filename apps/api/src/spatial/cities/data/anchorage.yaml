@@ -1,0 +1,354 @@
+city_id: anchorage
+name: Anchorage
+state: AK
+center:
+  lat: 61.2176
+  lng: -149.8997
+metro_bbox:
+  min_lat: 60.8
+  max_lat: 61.5
+  min_lng: -150.25
+  max_lng: -148.95
+division_bboxes:
+  DOWNTOWN_CORE:
+    min_lat: 61.197
+    max_lat: 61.232
+    min_lng: -149.925
+    max_lng: -149.862
+  MIDTOWN_EAST:
+    min_lat: 61.185
+    max_lat: 61.2
+    min_lng: -149.915
+    max_lng: -149.82
+  EAST_ANCHORAGE:
+    min_lat: 61.188
+    max_lat: 61.23
+    min_lng: -149.815
+    max_lng: -149.735
+  WEST_ANCH:
+    min_lat: 61.135
+    max_lat: 61.2
+    min_lng: -150.03
+    max_lng: -149.895
+  EAGLE_RIVER_CHUGIAK:
+    min_lat: 61.28
+    max_lat: 61.45
+    min_lng: -149.66
+    max_lng: -149.42
+submarkets:
+  Downtown Anchorage:
+    name: Downtown Anchorage
+    borough: DOWNTOWN_CORE
+    lat: 61.2176
+    lng: -149.8997
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.84
+    capex: 5100000.0
+    permit_vel: 26.0
+    shift_ratio: 1.42
+    sla: 52.0
+    description: The 4th Avenue/City Hall core on the Knik Arm shoreline with office-to-residential
+      conversions, the waterfront redevelopment arc, and the state government office
+      base.
+    city_id: anchorage
+  South Addition:
+    name: South Addition
+    borough: DOWNTOWN_CORE
+    lat: 61.203
+    lng: -149.873
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.82
+    capex: 4300000.0
+    permit_vel: 22.0
+    shift_ratio: 1.36
+    sla: 48.0
+    description: The 1910s grid south of downtown around the Delaney Park Strip with
+      craftsman and art-deco stock, small-lot infill, and the West Anchorage restaurant
+      row.
+    city_id: anchorage
+  Midtown:
+    name: Midtown
+    borough: MIDTOWN_EAST
+    lat: 61.1955
+    lng: -149.903
+    zoom: 14.5
+    pitch: 42.0
+    base_lims: 0.81
+    capex: 4600000.0
+    permit_vel: 25.0
+    shift_ratio: 1.4
+    sla: 50.0
+    description: The C Street/Northern Lights office-retail node between downtown
+      and the airport with 1980s commercial stock cycling toward multifamily conversion.
+    city_id: anchorage
+  Rogers Park:
+    name: Rogers Park
+    borough: MIDTOWN_EAST
+    lat: 61.1915
+    lng: -149.842
+    zoom: 14.5
+    pitch: 38.0
+    base_lims: 0.78
+    capex: 3700000.0
+    permit_vel: 20.0
+    shift_ratio: 1.33
+    sla: 46.0
+    description: The post-war tract grid east of the Debarr corridor around Rogers
+      Park Elementary with steady renovation trades and duplex conversion pressure.
+    city_id: anchorage
+  Russian Jack:
+    name: Russian Jack
+    borough: EAST_ANCHORAGE
+    lat: 61.21
+    lng: -149.787
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.72
+    capex: 3200000.0
+    permit_vel: 17.0
+    shift_ratio: 1.27
+    sla: 41.0
+    description: The northeast hills around Russian Jack Springs Park with 1960s-70s
+      subdivisions, deep starter-home turnover, and the Muldoon-edge rental register.
+    city_id: anchorage
+  Sand Lake:
+    name: Sand Lake
+    borough: WEST_ANCH
+    lat: 61.15
+    lng: -149.99
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.75
+    capex: 3900000.0
+    permit_vel: 19.0
+    shift_ratio: 1.3
+    sla: 44.0
+    description: The lake-country southwest around the airport was with mid-century
+      ramblers, floatplane-adjacent lots, and steady executive teardown/rebuild.
+    city_id: anchorage
+  Turnagain:
+    name: Turnagain
+    borough: WEST_ANCH
+    lat: 61.19
+    lng: -149.967
+    zoom: 14.5
+    pitch: 38.0
+    base_lims: 0.79
+    capex: 4100000.0
+    permit_vel: 21.0
+    shift_ratio: 1.34
+    sla: 47.0
+    description: The bluff-top residential arm west of Spenard with Cook Inlet views,
+      chunky 1950s-60s stock, and renovation-led permit flow near Kincaid.
+    city_id: anchorage
+  Eagle River & Chugiak:
+    name: Eagle River & Chugiak
+    borough: EAGLE_RIVER_CHUGIAK
+    lat: 61.322
+    lng: -149.548
+    zoom: 13.0
+    pitch: 35.0
+    base_lims: 0.73
+    capex: 3500000.0
+    permit_vel: 18.0
+    shift_ratio: 1.29
+    sla: 43.0
+    description: The Glenn Highway bedroom corridor from Eagle River through Chugiak
+      to Eklutna with 12,927 live assessor parcels, JBER-driven demand, and large-lot
+      subdivision growth.
+    city_id: anchorage
+divisions:
+  DOWNTOWN_CORE:
+    name: DOWNTOWN_CORE
+    center_lat: 61.2103
+    center_lng: -149.8864
+    zoom: 13.5
+    bbox:
+      min_lat: 61.197
+      max_lat: 61.232
+      min_lng: -149.925
+      max_lng: -149.862
+    submarkets:
+    - Downtown Anchorage
+    - South Addition
+    city_id: anchorage
+  MIDTOWN_EAST:
+    name: MIDTOWN_EAST
+    center_lat: 61.1935
+    center_lng: -149.8725
+    zoom: 13.5
+    bbox:
+      min_lat: 61.185
+      max_lat: 61.2
+      min_lng: -149.915
+      max_lng: -149.82
+    submarkets:
+    - Midtown
+    - Rogers Park
+    city_id: anchorage
+  EAST_ANCHORAGE:
+    name: EAST_ANCHORAGE
+    center_lat: 61.21
+    center_lng: -149.787
+    zoom: 13.0
+    bbox:
+      min_lat: 61.188
+      max_lat: 61.23
+      min_lng: -149.815
+      max_lng: -149.735
+    submarkets:
+    - Russian Jack
+    city_id: anchorage
+  WEST_ANCH:
+    name: WEST_ANCH
+    center_lat: 61.17
+    center_lng: -149.9785
+    zoom: 13.0
+    bbox:
+      min_lat: 61.135
+      max_lat: 61.2
+      min_lng: -150.03
+      max_lng: -149.895
+    submarkets:
+    - Sand Lake
+    - Turnagain
+    city_id: anchorage
+  EAGLE_RIVER_CHUGIAK:
+    name: EAGLE_RIVER_CHUGIAK
+    center_lat: 61.322
+    center_lng: -149.548
+    zoom: 12.0
+    bbox:
+      min_lat: 61.28
+      max_lat: 61.45
+      min_lng: -149.66
+      max_lng: -149.42
+    submarkets:
+    - Eagle River & Chugiak
+    city_id: anchorage
+datasets:
+  deeds:
+    endpoint: https://services2.arcgis.com/Ce3DhLRthdwbHlfF/arcgis/rest/services/PropertyInformation_Hosted/FeatureServer/0
+    platform: arcgis
+    watermark_col: Deed_Date
+    id_keys:
+    - Parcel_ID
+    - GIS_ParcelNum11
+    - OBJECTID
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: Deed_Date DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: Deed_Date <= CURRENT_TIMESTAMP
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - Parcel_ID
+      - GIS_ParcelNum11
+      - OBJECTID
+      - id
+      recorded_date:
+      - Deed_Date
+      borough:
+      - GIS_Site_City
+      - Tax_District
+      party2_grantee:
+      - Owner_Name
+      bbl:
+      - Parcel_ID
+      - GIS_ParcelNum11
+      address_street:
+      - Parcel_Address
+      zipcode:
+      - GIS_Site_Zipcode
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 3
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: false
+    zip_member: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'AK'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- anchorage_ak
+- anchorage-ak
+- anchorage ak
+job_suffix: anchorage

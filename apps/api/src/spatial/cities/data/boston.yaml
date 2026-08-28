@@ -1,0 +1,421 @@
+city_id: boston
+name: Boston
+state: MA
+center:
+  lat: 42.355
+  lng: -71.065
+metro_bbox:
+  min_lat: 42.15
+  max_lat: 42.55
+  min_lng: -71.3
+  max_lng: -70.75
+division_bboxes:
+  BOSTON_CORE:
+    min_lat: 42.28
+    max_lat: 42.4
+    min_lng: -71.15
+    max_lng: -70.95
+  CAMBRIDGE_SOMERVILLE:
+    min_lat: 42.34
+    max_lat: 42.43
+    min_lng: -71.18
+    max_lng: -71.05
+  INNER_NORTH:
+    min_lat: 42.35
+    max_lat: 42.52
+    min_lng: -71.3
+    max_lng: -70.85
+  INNER_SOUTH:
+    min_lat: 42.15
+    max_lat: 42.35
+    min_lng: -71.25
+    max_lng: -70.8
+submarkets:
+  Downtown & Seaport:
+    name: Downtown & Seaport
+    borough: BOSTON_CORE
+    lat: 42.355
+    lng: -71.055
+    zoom: 13.8
+    pitch: 48.0
+    base_lims: 0.9
+    capex: 10500000.0
+    permit_vel: 52.0
+    shift_ratio: 1.58
+    sla: 68.0
+    description: Financial District, Downtown Crossing, and Seaport growth corridors.
+    city_id: boston
+  Back Bay & Fenway:
+    name: Back Bay & Fenway
+    borough: BOSTON_CORE
+    lat: 42.347
+    lng: -71.095
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.86
+    capex: 8800000.0
+    permit_vel: 44.0
+    shift_ratio: 1.48
+    sla: 63.0
+    description: Dense institutional, residential, and hospitality redevelopment spine.
+    city_id: boston
+  Harvard Square:
+    name: Harvard Square
+    borough: CAMBRIDGE_SOMERVILLE
+    lat: 42.373
+    lng: -71.119
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.88
+    capex: 7600000.0
+    permit_vel: 38.0
+    shift_ratio: 1.45
+    sla: 61.0
+    description: University, biotech, and mixed-use demand around Harvard Square.
+    city_id: boston
+  Union Square:
+    name: Union Square
+    borough: CAMBRIDGE_SOMERVILLE
+    lat: 42.379
+    lng: -71.095
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.82
+    capex: 6200000.0
+    permit_vel: 35.0
+    shift_ratio: 1.4
+    sla: 57.0
+    description: Somerville transit-oriented infill and neighborhood commercial corridor.
+    city_id: boston
+  Waltham Innovation District:
+    name: Waltham Innovation District
+    borough: INNER_NORTH
+    lat: 42.376
+    lng: -71.236
+    zoom: 13.2
+    pitch: 42.0
+    base_lims: 0.76
+    capex: 5400000.0
+    permit_vel: 29.0
+    shift_ratio: 1.34
+    sla: 54.0
+    description: Route 128 office, research, and adaptive-reuse corridor.
+    city_id: boston
+  Quincy Center:
+    name: Quincy Center
+    borough: INNER_SOUTH
+    lat: 42.252
+    lng: -71.003
+    zoom: 13.4
+    pitch: 43.0
+    base_lims: 0.74
+    capex: 4800000.0
+    permit_vel: 31.0
+    shift_ratio: 1.36
+    sla: 52.0
+    description: South Shore transit hub with residential and civic redevelopment
+      pressure.
+    city_id: boston
+divisions:
+  BOSTON_CORE:
+    name: Boston Core
+    center_lat: 42.351
+    center_lng: -71.065
+    zoom: 12.8
+    bbox:
+      min_lat: 42.28
+      max_lat: 42.4
+      min_lng: -71.15
+      max_lng: -70.95
+    submarkets:
+    - Downtown & Seaport
+    - Back Bay & Fenway
+    city_id: boston
+  CAMBRIDGE_SOMERVILLE:
+    name: Cambridge & Somerville
+    center_lat: 42.376
+    center_lng: -71.107
+    zoom: 12.8
+    bbox:
+      min_lat: 42.34
+      max_lat: 42.43
+      min_lng: -71.18
+      max_lng: -71.05
+    submarkets:
+    - Harvard Square
+    - Union Square
+    city_id: boston
+  INNER_NORTH:
+    name: Inner North & Route 128
+    center_lat: 42.425
+    center_lng: -71.075
+    zoom: 11.8
+    bbox:
+      min_lat: 42.35
+      max_lat: 42.52
+      min_lng: -71.3
+      max_lng: -70.85
+    submarkets:
+    - Waltham Innovation District
+    city_id: boston
+  INNER_SOUTH:
+    name: Inner South
+    center_lat: 42.245
+    center_lng: -71.03
+    zoom: 11.8
+    bbox:
+      min_lat: 42.15
+      max_lat: 42.35
+      min_lng: -71.25
+      max_lng: -70.8
+    submarkets:
+    - Quincy Center
+    city_id: boston
+datasets:
+  permits:
+    endpoint: ckan://data.boston.gov/6ddcd912-32a0-43df-9908-63574f8c7e77
+    platform: ckan
+    watermark_col: issued_date
+    id_keys:
+    - permitnumber
+    - _id
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - permitnumber
+      issuance_date:
+      - issued_date
+      filing_date:
+      - issued_date
+      address_street:
+      - address
+      zipcode:
+      - zip
+      borough:
+      - ward
+      latitude:
+      - y_latitude
+      - gpsy
+      longitude:
+      - x_longitude
+      - gpsx
+      status:
+      - status
+      cost:
+      - declared_valuation
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: ckan://data.boston.gov/1a0b420d-99f1-4887-9851-990b2a5a6e17
+    platform: ckan
+    watermark_col: open_dt
+    id_keys:
+    - case_enquiry_id
+    - _id
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year:
+      '2025': ckan://data.boston.gov/9d7c2214-4709-478a-a2e8-fb2020a5bb94
+      '2026': ckan://data.boston.gov/1a0b420d-99f1-4887-9851-990b2a5a6e17
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - case_enquiry_id
+      latitude:
+      - latitude
+      longitude:
+      - longitude
+      complaint_type:
+      - type
+      - case_title
+      created_date:
+      - open_dt
+      closed_date:
+      - closed_dt
+      status:
+      - case_status
+      incident_address:
+      - location_street_name
+      - location
+      zipcode:
+      - location_zipcode
+      borough:
+      - ward
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: manual-verify
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: ckan://data.boston.gov/04dc653b-1789-4374-9669-b07df7233344
+    platform: ckan
+    watermark_col: expires
+    id_keys:
+    - license_num
+    - _id
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - license_num
+      license_type:
+      - license_type
+      - license_category
+      effective_date:
+      - issued
+      expiration_date:
+      - expires
+      address_street:
+      - address
+      dba:
+      - dba_name
+      - business_name
+      premises_name:
+      - business_name
+      - dba_name
+      status:
+      - status
+      borough:
+      - city
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: EPSG:2249
+    state_plane_units: US survey feet
+    state_plane_x_col: gpsx
+    state_plane_y_col: gpsy
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  crime:
+    endpoint: ckan://data.boston.gov/6220d948-eae2-4e4b-8723-2dc8e67722a3
+    platform: ckan
+    watermark_col: OCCURRED_ON_DATE
+    id_keys:
+    - INCIDENT_NUMBER
+    topic: raw.municipal.crime
+    interval_seconds: 300.0
+    producer_key: crime
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - INCIDENT_NUMBER
+      offense_type:
+      - OFFENSE_DESCRIPTION
+      occurred_date:
+      - OCCURRED_ON_DATE
+      latitude:
+      - Lat
+      longitude:
+      - Long
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- bos
+- greater_boston
+- greater boston
+- cambridge
+- somerville
+job_suffix: boston

@@ -1,0 +1,385 @@
+city_id: henderson
+name: Henderson
+state: NV
+center:
+  lat: 36.0395
+  lng: -115.0341
+metro_bbox:
+  min_lat: 35.9
+  max_lat: 36.1
+  min_lng: -115.15
+  max_lng: -114.82
+division_bboxes:
+  DOWNTOWN_WATER_STREET:
+    min_lat: 36.03
+    max_lat: 36.055
+    min_lng: -115.0
+    max_lng: -114.965
+  GREEN_VALLEY_WEST:
+    min_lat: 35.998
+    max_lat: 36.035
+    min_lng: -115.055
+    max_lng: -115.002
+  GREEN_VALLEY_RANCH:
+    min_lat: 36.005
+    max_lat: 36.03
+    min_lng: -115.0
+    max_lng: -114.975
+  FOOTHILLS_SOUTH:
+    min_lat: 35.96
+    max_lat: 36.02
+    min_lng: -115.01
+    max_lng: -114.92
+  LAKE_LAS_VEGAS:
+    min_lat: 36.015
+    max_lat: 36.038
+    min_lng: -114.94
+    max_lng: -114.9
+  WEST_INNOVATION:
+    min_lat: 35.975
+    max_lat: 35.997
+    min_lng: -115.06
+    max_lng: -115.01
+submarkets:
+  Water Street District:
+    name: Water Street District
+    borough: DOWNTOWN_WATER_STREET
+    lat: 36.0403
+    lng: -114.9815
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.84
+    capex: 7600000.0
+    permit_vel: 36.0
+    shift_ratio: 1.48
+    sla: 60.0
+    description: City core along Water Street with the civic center, facade-renewal
+      infill, and the downtown redevelopment corridor's mixed-use permitting.
+    city_id: henderson
+  Green Valley:
+    name: Green Valley
+    borough: GREEN_VALLEY_WEST
+    lat: 36.0125
+    lng: -115.034
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.87
+    capex: 8800000.0
+    permit_vel: 40.0
+    shift_ratio: 1.52
+    sla: 62.0
+    description: Master-planned 1970s-90s valley west of Green Valley Parkway with
+      pool-home renovation, kitchen/bath alterations, and steady resale turnover.
+    city_id: henderson
+  Green Valley Ranch:
+    name: Green Valley Ranch
+    borough: GREEN_VALLEY_RANCH
+    lat: 36.0185
+    lng: -114.99
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.88
+    capex: 9100000.0
+    permit_vel: 42.0
+    shift_ratio: 1.54
+    sla: 63.0
+    description: GVR master plan around The District and the resort corridor with
+      village retail, townhome infill, and the metro's highest lease pressure.
+    city_id: henderson
+  Anthem:
+    name: Anthem
+    borough: FOOTHILLS_SOUTH
+    lat: 36.001
+    lng: -114.933
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.9
+    capex: 10200000.0
+    permit_vel: 38.0
+    shift_ratio: 1.56
+    sla: 65.0
+    description: Gated foothills country-club belt below the Black Mountains with
+      luxury custom-lot builds and the metro's top valuation band.
+    city_id: henderson
+  Seven Hills:
+    name: Seven Hills
+    borough: FOOTHILLS_SOUTH
+    lat: 36.005
+    lng: -114.974
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.89
+    capex: 9600000.0
+    permit_vel: 37.0
+    shift_ratio: 1.55
+    sla: 64.0
+    description: Hillside village plan south of the 215 with view-lot estate renovation
+      and clubhouse-adjacent retail on Seven Hills Drive.
+    city_id: henderson
+  MacDonald Ranch:
+    name: MacDonald Ranch
+    borough: FOOTHILLS_SOUTH
+    lat: 36.016
+    lng: -114.941
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.89
+    capex: 9400000.0
+    permit_vel: 35.0
+    shift_ratio: 1.53
+    sla: 63.0
+    description: MacDonald Highlands and the Ranch corridor with guard-gated custom
+      estates, hillside grading permits, and golf-course frontage stock.
+    city_id: henderson
+  Lake Las Vegas:
+    name: Lake Las Vegas
+    borough: LAKE_LAS_VEGAS
+    lat: 36.0235
+    lng: -114.9185
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.83
+    capex: 8200000.0
+    permit_vel: 30.0
+    shift_ratio: 1.47
+    sla: 58.0
+    description: Resort lake enclave around MonteLago Village with villa and condo
+      product, hospitality-led permitting, and short-stay sensitive demand.
+    city_id: henderson
+  Innovation District:
+    name: Innovation District
+    borough: WEST_INNOVATION
+    lat: 35.992
+    lng: -115.02
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.8
+    capex: 6900000.0
+    permit_vel: 34.0
+    shift_ratio: 1.44
+    sla: 55.0
+    description: West Henderson's designated innovation corridor (Union Village /
+      MedCity adjacency) with industrial-to-civic conversion and anchor-institution
+      expansion.
+    city_id: henderson
+divisions:
+  DOWNTOWN_WATER_STREET:
+    name: DOWNTOWN_WATER_STREET
+    center_lat: 36.0403
+    center_lng: -114.9815
+    zoom: 14.0
+    bbox:
+      min_lat: 36.03
+      max_lat: 36.055
+      min_lng: -115.0
+      max_lng: -114.965
+    submarkets:
+    - Water Street District
+    city_id: henderson
+  GREEN_VALLEY_WEST:
+    name: GREEN_VALLEY_WEST
+    center_lat: 36.0125
+    center_lng: -115.034
+    zoom: 13.5
+    bbox:
+      min_lat: 35.998
+      max_lat: 36.035
+      min_lng: -115.055
+      max_lng: -115.002
+    submarkets:
+    - Green Valley
+    city_id: henderson
+  GREEN_VALLEY_RANCH:
+    name: GREEN_VALLEY_RANCH
+    center_lat: 36.0185
+    center_lng: -114.99
+    zoom: 13.5
+    bbox:
+      min_lat: 36.005
+      max_lat: 36.03
+      min_lng: -115.0
+      max_lng: -114.975
+    submarkets:
+    - Green Valley Ranch
+    city_id: henderson
+  FOOTHILLS_SOUTH:
+    name: FOOTHILLS_SOUTH
+    center_lat: 36.005
+    center_lng: -114.948
+    zoom: 12.5
+    bbox:
+      min_lat: 35.96
+      max_lat: 36.02
+      min_lng: -115.01
+      max_lng: -114.92
+    submarkets:
+    - Anthem
+    - Seven Hills
+    - MacDonald Ranch
+    city_id: henderson
+  LAKE_LAS_VEGAS:
+    name: LAKE_LAS_VEGAS
+    center_lat: 36.0235
+    center_lng: -114.9185
+    zoom: 13.0
+    bbox:
+      min_lat: 36.015
+      max_lat: 36.038
+      min_lng: -114.94
+      max_lng: -114.9
+    submarkets:
+    - Lake Las Vegas
+    city_id: henderson
+  WEST_INNOVATION:
+    name: WEST_INNOVATION
+    center_lat: 35.992
+    center_lng: -115.02
+    zoom: 13.0
+    bbox:
+      min_lat: 35.975
+      max_lat: 35.997
+      min_lng: -115.06
+      max_lng: -115.01
+    submarkets:
+    - Innovation District
+    city_id: henderson
+datasets:
+  permits:
+    endpoint: https://services2.arcgis.com/naGsY5NZWVbd6bwD/arcgis/rest/services/DSC_Permits/FeatureServer/0
+    platform: arcgis
+    watermark_col: IssueDate
+    id_keys:
+    - PermitNumber
+    - ObjectId
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: IssueDate DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Henderson, NV
+    field_map:
+      job_id:
+      - PermitNumber
+      - ObjectId
+      issuance_date:
+      - IssueDate
+      filing_date:
+      - ApplyDate
+      status:
+      - PermitStatus
+      job_type:
+      - PermitType
+      - WorkClass
+      - Category
+      cost:
+      - ValuationTotal
+      address_street:
+      - ParcelAddressNumber
+      - ParcelAddressPreDirection
+      - ParcelAddressStreet
+      - ParcelAddressStreetType
+      bbl:
+      - ParcelNumber
+      zipcode:
+      - ParcelAddressZip
+      latitude:
+      - GISY
+      longitude:
+      - GISX
+    ingestion_mode: incremental
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://www.arcgis.com/sharing/rest/content/items/2b3fac57210542229afc4bfddd6cd6e8/data
+    platform: csv
+    watermark_col: Original Issue Date
+    id_keys:
+    - License Number
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: text
+    watermark_format: '%m/%d/%Y'
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Henderson, NV
+    field_map:
+      license_id:
+      - License Number
+      dba:
+      - DBA
+      - Entity Name
+      premises_name:
+      - Entity Name
+      license_type:
+      - License Type
+      - License Sub-Type
+      effective_date:
+      - Original Issue Date
+      expiration_date:
+      - Expiration Date
+      address_street:
+      - Business Location
+    ingestion_mode: snapshot
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints:
+      mjbl:
+        endpoint: https://www.arcgis.com/sharing/rest/content/items/6c470a95e83e4051a4d1222afa056ed6/data
+        filter: Jurisdiction='HENDERSON'
+        watermark_col: IssueDate
+        watermark_type: text
+        watermark_format: '%m-%d-%Y %H:%M'
+        id_keys:
+        - MJBLNumber
+        - IsPrimary
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- henderson_nv
+- henderson-nv
+- henderson nv
+job_suffix: henderson

@@ -1,0 +1,203 @@
+{
+  "schema_version": 2,
+  "id": "buffalo",
+  "name": "Buffalo",
+  "state": "NY",
+  "center": {
+    "lat": 42.8864,
+    "lng": -78.8784
+  },
+  "metro_bbox": {
+    "min_lat": 42.82,
+    "max_lat": 42.97,
+    "min_lng": -78.93,
+    "max_lng": -78.78
+  },
+  "divisions": {
+    "DOWNTOWN_WATERFRONT": {
+      "name": "DOWNTOWN_WATERFRONT",
+      "center": {
+        "lat": 42.8805,
+        "lng": -78.8727
+      },
+      "bbox": {
+        "min_lat": 42.87,
+        "max_lat": 42.891,
+        "min_lng": -78.89,
+        "max_lng": -78.856
+      },
+      "submarkets": [
+        "Canalside",
+        "Larkinville"
+      ]
+    },
+    "WEST_SIDE": {
+      "name": "WEST_SIDE",
+      "center": {
+        "lat": 42.9045,
+        "lng": -78.8781
+      },
+      "bbox": {
+        "min_lat": 42.892,
+        "max_lat": 42.917,
+        "min_lng": -78.892,
+        "max_lng": -78.866
+      },
+      "submarkets": [
+        "Allentown",
+        "Elmwood Village"
+      ]
+    },
+    "NORTH_BUFFALO": {
+      "name": "NORTH_BUFFALO",
+      "center": {
+        "lat": 42.9408,
+        "lng": -78.8772
+      },
+      "bbox": {
+        "min_lat": 42.931,
+        "max_lat": 42.95,
+        "min_lng": -78.892,
+        "max_lng": -78.862
+      },
+      "submarkets": [
+        "Hertel Avenue"
+      ]
+    },
+    "BLACK_ROCK": {
+      "name": "BLACK_ROCK",
+      "center": {
+        "lat": 42.9374,
+        "lng": -78.9019
+      },
+      "bbox": {
+        "min_lat": 42.928,
+        "max_lat": 42.947,
+        "min_lng": -78.918,
+        "max_lng": -78.89
+      },
+      "submarkets": [
+        "Black Rock"
+      ]
+    },
+    "EAST_SIDE": {
+      "name": "EAST_SIDE",
+      "center": {
+        "lat": 42.894,
+        "lng": -78.8346
+      },
+      "bbox": {
+        "min_lat": 42.884,
+        "max_lat": 42.904,
+        "min_lng": -78.852,
+        "max_lng": -78.818
+      },
+      "submarkets": [
+        "Broadway-Fillmore"
+      ]
+    },
+    "UNIVERSITY_HEIGHTS": {
+      "name": "UNIVERSITY_HEIGHTS",
+      "center": {
+        "lat": 42.9585,
+        "lng": -78.8218
+      },
+      "bbox": {
+        "min_lat": 42.95,
+        "max_lat": 42.967,
+        "min_lng": -78.836,
+        "max_lng": -78.806
+      },
+      "submarkets": [
+        "University Heights"
+      ]
+    }
+  },
+  "submarkets": {
+    "Canalside": {
+      "name": "Canalside",
+      "division": "DOWNTOWN_WATERFRONT",
+      "center": {
+        "lat": 42.8772,
+        "lng": -78.8811
+      },
+      "description": "Erie Canal terminus waterfront with the Cobblestone entertainment district, KeyBank Center adjacency, and heritage-interpreted infill along the recreated canals."
+    },
+    "Larkinville": {
+      "name": "Larkinville",
+      "division": "DOWNTOWN_WATERFRONT",
+      "center": {
+        "lat": 42.8845,
+        "lng": -78.8643
+      },
+      "description": "Larkin Square and the Exchange Street corridor with adaptive reuse of the historic Larkin complex, food-truck programming, and downtown-adjacent office conversion."
+    },
+    "Allentown": {
+      "name": "Allentown",
+      "division": "WEST_SIDE",
+      "center": {
+        "lat": 42.8997,
+        "lng": -78.879
+      },
+      "description": "Historic preservation district along Allen Street with galleries, music venues, Italianate rowhouses, and the Cottage District's Victorian stock renovation."
+    },
+    "Elmwood Village": {
+      "name": "Elmwood Village",
+      "division": "WEST_SIDE",
+      "center": {
+        "lat": 42.9094,
+        "lng": -78.8772
+      },
+      "description": "Elmwood Avenue retail spine between the Olmsted parkways and Delaware Park with the Bidwell farmers market, mixed-use storefronts, and the metro's strongest walk-up rents."
+    },
+    "Hertel Avenue": {
+      "name": "Hertel Avenue",
+      "division": "NORTH_BUFFALO",
+      "center": {
+        "lat": 42.9408,
+        "lng": -78.8772
+      },
+      "description": "The Hertel Strip in North Buffalo with its Italian-heritage commercial row, parkside bungalow belts, and restaurant-led storefront revitalization."
+    },
+    "Black Rock": {
+      "name": "Black Rock",
+      "division": "BLACK_ROCK",
+      "center": {
+        "lat": 42.9374,
+        "lng": -78.9019
+      },
+      "description": "Historic 19th-century village on the Niagara River edge (annexed 1854) with the Amherst Street corridor, Scajaquada Creek frontage, and early-stage riverfront reinvestment."
+    },
+    "Broadway-Fillmore": {
+      "name": "Broadway-Fillmore",
+      "division": "EAST_SIDE",
+      "center": {
+        "lat": 42.894,
+        "lng": -78.8346
+      },
+      "description": "Broadway Market and the Fillmore commercial row with Polish-heritage housing stock, stabilization-level values, and corridor redevelopment groundwork on the East Side."
+    },
+    "University Heights": {
+      "name": "University Heights",
+      "division": "UNIVERSITY_HEIGHTS",
+      "center": {
+        "lat": 42.9585,
+        "lng": -78.8218
+      },
+      "description": "UB South Campus district at the Main Street metro-rail terminus with the student-rental belt, Sugar City creative reuse, and Amherst-line demand spillover."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "socrata",
+      "watermark_col": "issdttm",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/buffalo.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

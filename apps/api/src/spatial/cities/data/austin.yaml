@@ -1,0 +1,549 @@
+city_id: austin
+name: Austin
+state: TX
+center:
+  lat: 30.2672
+  lng: -97.7431
+metro_bbox:
+  min_lat: 30.1
+  max_lat: 30.62
+  min_lng: -98.05
+  max_lng: -97.52
+division_bboxes:
+  DOWNTOWN_CAPITOL:
+    min_lat: 30.25
+    max_lat: 30.29
+    min_lng: -97.765
+    max_lng: -97.725
+  EAST_AUSTIN_MUELLER:
+    min_lat: 30.25
+    max_lat: 30.31
+    min_lng: -97.72
+    max_lng: -97.66
+  SOUTH_AUSTIN_SOCO:
+    min_lat: 30.16
+    max_lat: 30.25
+    min_lng: -97.81
+    max_lng: -97.72
+  NORTH_AUSTIN_DOMAIN:
+    min_lat: 30.305
+    max_lat: 30.48
+    min_lng: -97.76
+    max_lng: -97.655
+  WEST_AUSTIN_HILLS:
+    min_lat: 30.25
+    max_lat: 30.4
+    min_lng: -97.865
+    max_lng: -97.755
+  PFLUGERVILLE_ROUND_ROCK_EDGE:
+    min_lat: 30.39
+    max_lat: 30.55
+    min_lng: -97.72
+    max_lng: -97.52
+submarkets:
+  Rainey Street & Riverfront:
+    name: Rainey Street & Riverfront
+    borough: DOWNTOWN_CAPITOL
+    lat: 30.2565
+    lng: -97.737
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.93
+    capex: 12000000.0
+    permit_vel: 58.0
+    shift_ratio: 1.7
+    sla: 75.0
+    description: Bungalow-to-tower conversion district on Lady Bird Lake's north shore,
+      where hotel and residential towers dominate the permit pipeline.
+    city_id: austin
+  Warehouse District:
+    name: Warehouse District
+    borough: DOWNTOWN_CAPITOL
+    lat: 30.2685
+    lng: -97.7505
+    zoom: 14.5
+    pitch: 52.0
+    base_lims: 0.89
+    capex: 9800000.0
+    permit_vel: 44.0
+    shift_ratio: 1.61
+    sla: 70.0
+    description: Historic supply-warehouse blocks west of Congress now carrying office-to-residential
+      conversions and ground-floor hospitality.
+    city_id: austin
+  Congress Ave & Capitol Complex:
+    name: Congress Ave & Capitol Complex
+    borough: DOWNTOWN_CAPITOL
+    lat: 30.2745
+    lng: -97.7355
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.87
+    capex: 11000000.0
+    permit_vel: 46.0
+    shift_ratio: 1.57
+    sla: 67.0
+    description: Capitol-view office spine with the Texas Capitol complex and state-tenant
+      demand anchoring the state government economy.
+    city_id: austin
+  East Cesar Chavez & Holly:
+    name: East Cesar Chavez & Holly
+    borough: EAST_AUSTIN_MUELLER
+    lat: 30.2575
+    lng: -97.7165
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.85
+    capex: 7800000.0
+    permit_vel: 47.0
+    shift_ratio: 1.56
+    sla: 64.0
+    description: Former industrial riverfront edge east of I-35 with townhome infill,
+      music-venue adaptive reuse, and sustained small-lot development.
+    city_id: austin
+  East 6th Street Corridor:
+    name: East 6th Street Corridor
+    borough: EAST_AUSTIN_MUELLER
+    lat: 30.2645
+    lng: -97.7105
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.83
+    capex: 6400000.0
+    permit_vel: 43.0
+    shift_ratio: 1.51
+    sla: 60.0
+    description: Bar-and-venue strip turned mixed-use corridor with mid-rise multifamily
+      replacing single-story commercial east of the highway.
+    city_id: austin
+  Mueller & Cherrywood:
+    name: Mueller & Cherrywood
+    borough: EAST_AUSTIN_MUELLER
+    lat: 30.2975
+    lng: -97.7075
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.88
+    capex: 9200000.0
+    permit_vel: 52.0
+    shift_ratio: 1.59
+    sla: 63.0
+    description: Master-planned airport redevelopment with continued buildout phases
+      adjacent to Cherrywood and Windsor Park bungalow stock.
+    city_id: austin
+  South Congress (SoCo):
+    name: South Congress (SoCo)
+    borough: SOUTH_AUSTIN_SOCO
+    lat: 30.2455
+    lng: -97.7505
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.86
+    capex: 8600000.0
+    permit_vel: 41.0
+    shift_ratio: 1.54
+    sla: 62.0
+    description: Hotel-and-retail flagship corridor with boutique lodging conversions
+      and skyline-view multifamily on its side streets.
+    city_id: austin
+  Travis Heights:
+    name: Travis Heights
+    borough: SOUTH_AUSTIN_SOCO
+    lat: 30.2395
+    lng: -97.7415
+    zoom: 14.0
+    pitch: 42.0
+    base_lims: 0.84
+    capex: 6900000.0
+    permit_vel: 33.0
+    shift_ratio: 1.49
+    sla: 58.0
+    description: Historic district of craftsman and mid-century stock south of Lake
+      Shore Drive, with renovation-heavy permitting and strict tree ordinances.
+    city_id: austin
+  Bouldin Creek:
+    name: Bouldin Creek
+    borough: SOUTH_AUSTIN_SOCO
+    lat: 30.2475
+    lng: -97.7625
+    zoom: 14.0
+    pitch: 42.0
+    base_lims: 0.82
+    capex: 6100000.0
+    permit_vel: 35.0
+    shift_ratio: 1.46
+    sla: 57.0
+    description: Cottage-grid neighbourhood between S 1st and Lamar with teardown/rebuild
+      pressure and independent retail spines.
+    city_id: austin
+  The Domain & North Burnet:
+    name: The Domain & North Burnet
+    borough: NORTH_AUSTIN_DOMAIN
+    lat: 30.4005
+    lng: -97.7245
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.9
+    capex: 12000000.0
+    permit_vel: 55.0
+    shift_ratio: 1.65
+    sla: 68.0
+    description: Apple-, Amazon- and Meta-anchored secondary downtown under the Burnet/Braker
+      overlay, with the metro's densest office pipeline outside the core.
+    city_id: austin
+  Hyde Park & North Loop:
+    name: Hyde Park & North Loop
+    borough: NORTH_AUSTIN_DOMAIN
+    lat: 30.3135
+    lng: -97.7255
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.78
+    capex: 5200000.0
+    permit_vel: 29.0
+    shift_ratio: 1.38
+    sla: 54.0
+    description: Streetcar-era bungalow historic district meeting the North Loop indie-retail
+      strip, with renovation-led permits and neighborhood-conservation overlays.
+    city_id: austin
+  Westlake Hills Edge:
+    name: Westlake Hills Edge
+    borough: WEST_AUSTIN_HILLS
+    lat: 30.2905
+    lng: -97.8055
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.91
+    capex: 10500000.0
+    permit_vel: 22.0
+    shift_ratio: 1.52
+    sla: 50.0
+    description: Hill-country estate stock at the Westlake village boundary with teardown-rebuild
+      mansions dominating a low-volume, high-value permit mix.
+    city_id: austin
+  Barton Hills & Zilker:
+    name: Barton Hills & Zilker
+    borough: WEST_AUSTIN_HILLS
+    lat: 30.2535
+    lng: -97.7805
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.79
+    capex: 5600000.0
+    permit_vel: 28.0
+    shift_ratio: 1.4
+    sla: 56.0
+    description: Park-adjacent post-war residential hills beside Zilker Park, drawing
+      renovation capital from greenbelt access.
+    city_id: austin
+  South Lamar Corridor:
+    name: South Lamar Corridor
+    borough: WEST_AUSTIN_HILLS
+    lat: 30.2625
+    lng: -97.7725
+    zoom: 13.5
+    pitch: 45.0
+    base_lims: 0.81
+    capex: 6500000.0
+    permit_vel: 38.0
+    shift_ratio: 1.47
+    sla: 59.0
+    description: Strip-retail arterial undergoing station-area densification with
+      multifamily replacements of aging retail and motel stock.
+    city_id: austin
+  Tech Ridge & Pflugerville South:
+    name: Tech Ridge & Pflugerville South
+    borough: PFLUGERVILLE_ROUND_ROCK_EDGE
+    lat: 30.4155
+    lng: -97.6835
+    zoom: 12.5
+    pitch: 38.0
+    base_lims: 0.62
+    capex: 3400000.0
+    permit_vel: 36.0
+    shift_ratio: 1.24
+    sla: 41.0
+    description: Transit-oriented park-and-ride node shading into Pflugerville's southern
+      subdivisions along the I-35 growth spine.
+    city_id: austin
+  Round Rock Edge & La Frontera:
+    name: Round Rock Edge & La Frontera
+    borough: PFLUGERVILLE_ROUND_ROCK_EDGE
+    lat: 30.5055
+    lng: -97.7005
+    zoom: 12.5
+    pitch: 38.0
+    base_lims: 0.58
+    capex: 2900000.0
+    permit_vel: 24.0
+    shift_ratio: 1.18
+    sla: 37.0
+    description: Williamson County commercial edge at the metro's northern boundary,
+      permitted through Round Rock rather than the City of Austin.
+    city_id: austin
+divisions:
+  DOWNTOWN_CAPITOL:
+    name: DOWNTOWN_CAPITOL
+    center_lat: 30.267
+    center_lng: -97.74
+    zoom: 13.5
+    bbox:
+      min_lat: 30.25
+      max_lat: 30.29
+      min_lng: -97.765
+      max_lng: -97.725
+    submarkets:
+    - Rainey Street & Riverfront
+    - Warehouse District
+    - Congress Ave & Capitol Complex
+    city_id: austin
+  EAST_AUSTIN_MUELLER:
+    name: EAST_AUSTIN_MUELLER
+    center_lat: 30.28
+    center_lng: -97.69
+    zoom: 13.0
+    bbox:
+      min_lat: 30.25
+      max_lat: 30.31
+      min_lng: -97.72
+      max_lng: -97.66
+    submarkets:
+    - East Cesar Chavez & Holly
+    - East 6th Street Corridor
+    - Mueller & Cherrywood
+    city_id: austin
+  SOUTH_AUSTIN_SOCO:
+    name: SOUTH_AUSTIN_SOCO
+    center_lat: 30.21
+    center_lng: -97.75
+    zoom: 13.0
+    bbox:
+      min_lat: 30.16
+      max_lat: 30.25
+      min_lng: -97.81
+      max_lng: -97.72
+    submarkets:
+    - South Congress (SoCo)
+    - Travis Heights
+    - Bouldin Creek
+    city_id: austin
+  NORTH_AUSTIN_DOMAIN:
+    name: NORTH_AUSTIN_DOMAIN
+    center_lat: 30.36
+    center_lng: -97.72
+    zoom: 12.5
+    bbox:
+      min_lat: 30.305
+      max_lat: 30.48
+      min_lng: -97.76
+      max_lng: -97.655
+    submarkets:
+    - The Domain & North Burnet
+    - Hyde Park & North Loop
+    city_id: austin
+  WEST_AUSTIN_HILLS:
+    name: WEST_AUSTIN_HILLS
+    center_lat: 30.28
+    center_lng: -97.79
+    zoom: 12.5
+    bbox:
+      min_lat: 30.25
+      max_lat: 30.4
+      min_lng: -97.865
+      max_lng: -97.755
+    submarkets:
+    - Westlake Hills Edge
+    - Barton Hills & Zilker
+    - South Lamar Corridor
+    city_id: austin
+  PFLUGERVILLE_ROUND_ROCK_EDGE:
+    name: PFLUGERVILLE_ROUND_ROCK_EDGE
+    center_lat: 30.46
+    center_lng: -97.65
+    zoom: 11.5
+    bbox:
+      min_lat: 30.39
+      max_lat: 30.55
+      min_lng: -97.72
+      max_lng: -97.52
+    submarkets:
+    - Tech Ridge & Pflugerville South
+    - Round Rock Edge & La Frontera
+    city_id: austin
+datasets:
+  permits:
+    endpoint: https://data.austintexas.gov/resource/quv8-5ckq.json
+    platform: socrata
+    watermark_col: issue_date
+    id_keys:
+    - permit_number
+    - objectid
+    - id
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      cost:
+      - total_job_valuation
+      filing_date:
+      - application_date
+      job_type:
+      - work_type
+      - permit_type
+      proposed_units:
+      - number_of_units
+      proposed_stories:
+      - number_of_floors
+      borough:
+      - council_district
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 21
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: https://data.austintexas.gov/resource/xwdj-i9he.json
+    platform: socrata
+    watermark_col: sr_created_date
+    id_keys:
+    - sr_number
+    - id
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      latitude:
+      - sr_location_lat
+      longitude:
+      - sr_location_long
+      complaint_type:
+      - sr_type_desc
+      created_date:
+      - sr_created_date
+      closed_date:
+      - sr_closed_date
+      status:
+      - sr_status_desc
+      zipcode:
+      - sr_location_zip_code
+      incident_address:
+      - sr_location
+      borough:
+      - sr_location_council_district
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://data.texas.gov/resource/7hf9-qc9f.json
+    platform: socrata
+    watermark_col: current_issued_date
+    id_keys:
+    - license_id
+    - master_file_id
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: county = 'Travis'
+    needs_geocode: true
+    geocode_context: TX
+    field_map:
+      license_id:
+      - license_id
+      license_type:
+      - license_type
+      effective_date:
+      - current_issued_date
+      expiration_date:
+      - expiration_date
+      premises_name:
+      - owner
+      dba:
+      - trade_name
+      address_street:
+      - address
+      status:
+      - license_status
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- travis_county
+- travis-county
+- travis county
+job_suffix: austin

@@ -5,9 +5,11 @@ acceptance entry (KC 311 re-found from the 2026-08-23 rejection list) is
 asserted structurally so the guarantee survives refactors.
 """
 
+import os
 from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock, patch
 
+import pytest
 from scripts.rejection_recheck import (
     REJECTIONS,
     classify,
@@ -137,6 +139,10 @@ class TestLiveAcceptance:
     """The ticket's literal acceptance: the script re-finds KC 311 from the
     2026-08-23 rejection list. Networked — runs the real dataset probe only."""
 
+    @pytest.mark.skipif(
+        os.environ.get("URBAN_LIVE_PROBE") != "1",
+        reason="live probe disabled; set URBAN_LIVE_PROBE=1 to enable",
+    )
     def test_kc_311_resolves_with_fresh_evidence(self):
         from scripts.rejection_recheck import probe_socrata_dataset
 

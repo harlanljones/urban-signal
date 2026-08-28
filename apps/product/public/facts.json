@@ -21,7 +21,7 @@
   "metros": [
     {
       "id": "cape_coral",
-      "name": "Cape Coral–Fort Myers",
+      "name": "Cape Coral\u2013Fort Myers",
       "state": "FL",
       "divisions": "5 divisions",
       "division_count": 5,
@@ -2636,9 +2636,27 @@
       "divisions": "5 divisions",
       "division_count": 5,
       "submarket_count": 9,
-      "feeds": [false, false, true, false],
-      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
-      "center": { "lat": 32.2989, "lng": -90.1847 },
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 32.2989,
+        "lng": -90.1847
+      },
       "evidence_path": "apps/api/src/spatial/cities/jackson_ms.py"
     },
     {
@@ -2648,14 +2666,32 @@
       "divisions": "5 divisions",
       "division_count": 5,
       "submarket_count": 8,
-      "feeds": [true, false, true, false],
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
       "platforms": [
-        { "platform": "arcgis", "watermark_col": "ISSUEDATE", "interval_seconds": 300.0, "topic": "raw.municipal.permits" },
+        {
+          "platform": "arcgis",
+          "watermark_col": "ISSUEDATE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
         null,
-        { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" },
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
-      "center": { "lat": 32.8366, "lng": -83.6324 },
+      "center": {
+        "lat": 32.8366,
+        "lng": -83.6324
+      },
       "evidence_path": "apps/api/src/spatial/cities/macon_bibb.py"
     },
     {
@@ -2665,14 +2701,32 @@
       "divisions": "1 division",
       "division_count": 1,
       "submarket_count": 3,
-      "feeds": [true, false, true, false],
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
       "platforms": [
-        { "platform": "arcgis", "watermark_col": "ISSUEDATE", "interval_seconds": 300.0, "topic": "raw.municipal.permits" },
+        {
+          "platform": "arcgis",
+          "watermark_col": "ISSUEDATE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
         null,
-        { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" },
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
-      "center": { "lat": 28.0395, "lng": -81.9498 },
+      "center": {
+        "lat": 28.0395,
+        "lng": -81.9498
+      },
       "evidence_path": "apps/api/src/spatial/cities/lakeland.py"
     },
     {
@@ -2682,9 +2736,27 @@
       "divisions": "3 divisions",
       "division_count": 3,
       "submarket_count": 3,
-      "feeds": [false, false, true, false],
-      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
-      "center": { "lat": 30.2266, "lng": -93.2174 },
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 30.2266,
+        "lng": -93.2174
+      },
       "evidence_path": "apps/api/src/spatial/cities/lake_charles.py"
     },
     {
@@ -2694,9 +2766,27 @@
       "divisions": "1 division",
       "division_count": 1,
       "submarket_count": 5,
-      "feeds": [false, false, true, false],
-      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
-      "center": { "lat": 35.3859, "lng": -94.3985 },
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 35.3859,
+        "lng": -94.3985
+      },
       "evidence_path": "apps/api/src/spatial/cities/fort_smith.py"
     },
     {
@@ -2706,9 +2796,27 @@
       "divisions": "5 divisions",
       "division_count": 5,
       "submarket_count": 7,
-      "feeds": [false, false, true, false],
-      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
-      "center": { "lat": 31.845, "lng": -102.367 },
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 31.845,
+        "lng": -102.367
+      },
       "evidence_path": "apps/api/src/spatial/cities/odessa.py"
     },
     {
@@ -2718,9 +2826,27 @@
       "divisions": "5 divisions",
       "division_count": 5,
       "submarket_count": 7,
-      "feeds": [false, false, true, false],
-      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
-      "center": { "lat": 32.5007, "lng": -94.7405 },
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 32.5007,
+        "lng": -94.7405
+      },
       "evidence_path": "apps/api/src/spatial/cities/longview.py"
     },
     {
@@ -2730,9 +2856,27 @@
       "divisions": "5 divisions",
       "division_count": 5,
       "submarket_count": 8,
-      "feeds": [false, false, true, false],
-      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
-      "center": { "lat": 32.5093, "lng": -92.1193 },
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 32.5093,
+        "lng": -92.1193
+      },
       "evidence_path": "apps/api/src/spatial/cities/monroe.py"
     },
     {
@@ -2742,9 +2886,27 @@
       "divisions": "5 divisions",
       "division_count": 5,
       "submarket_count": 8,
-      "feeds": [false, false, true, false],
-      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
-      "center": { "lat": 32.4487, "lng": -99.7331 },
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 32.4487,
+        "lng": -99.7331
+      },
       "evidence_path": "apps/api/src/spatial/cities/abilene.py"
     },
     {
@@ -2754,9 +2916,27 @@
       "divisions": "5 divisions",
       "division_count": 5,
       "submarket_count": 8,
-      "feeds": [false, false, true, false],
-      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
-      "center": { "lat": 33.4251, "lng": -94.0477 },
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 33.4251,
+        "lng": -94.0477
+      },
       "evidence_path": "apps/api/src/spatial/cities/texarkana.py"
     },
     {
@@ -2766,9 +2946,27 @@
       "divisions": "5 divisions",
       "division_count": 5,
       "submarket_count": 8,
-      "feeds": [false, false, true, false],
-      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
-      "center": { "lat": 31.997, "lng": -102.078 },
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 31.997,
+        "lng": -102.078
+      },
       "evidence_path": "apps/api/src/spatial/cities/midland.py"
     },
     {
@@ -2778,9 +2976,27 @@
       "divisions": "5 divisions",
       "division_count": 5,
       "submarket_count": 7,
-      "feeds": [false, false, true, false],
-      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
-      "center": { "lat": 31.3113, "lng": -92.4451 },
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 31.3113,
+        "lng": -92.4451
+      },
       "evidence_path": "apps/api/src/spatial/cities/alexandria.py"
     },
     {
@@ -2790,9 +3006,27 @@
       "divisions": "5 divisions",
       "division_count": 5,
       "submarket_count": 7,
-      "feeds": [false, false, true, false],
-      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
-      "center": { "lat": 35.8423, "lng": -90.7043 },
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 35.8423,
+        "lng": -90.7043
+      },
       "evidence_path": "apps/api/src/spatial/cities/jonesboro.py"
     },
     {
@@ -2802,9 +3036,27 @@
       "divisions": "6 divisions",
       "division_count": 6,
       "submarket_count": 7,
-      "feeds": [false, false, true, false],
-      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
-      "center": { "lat": 32.781, "lng": -79.931 },
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 32.781,
+        "lng": -79.931
+      },
       "evidence_path": "apps/api/src/spatial/cities/charleston_sc.py"
     },
     {
@@ -2814,14 +3066,32 @@
       "divisions": "4 divisions",
       "division_count": 4,
       "submarket_count": 8,
-      "feeds": [true, false, true, false],
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
       "platforms": [
-        { "platform": "arcgis", "watermark_col": "DATE_ISSUE", "interval_seconds": 300.0, "topic": "raw.municipal.permits" },
+        {
+          "platform": "arcgis",
+          "watermark_col": "DATE_ISSUE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
         null,
-        { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" },
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
-      "center": { "lat": 33.476, "lng": -82.010 },
+      "center": {
+        "lat": 33.476,
+        "lng": -82.01
+      },
       "evidence_path": "apps/api/src/spatial/cities/augusta.py"
     },
     {
@@ -2831,14 +3101,32 @@
       "divisions": "3 divisions",
       "division_count": 3,
       "submarket_count": 6,
-      "feeds": [true, false, true, false],
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
       "platforms": [
-        { "platform": "arcgis", "watermark_col": "DateIssued", "interval_seconds": 300.0, "topic": "raw.municipal.permits" },
+        {
+          "platform": "arcgis",
+          "watermark_col": "DateIssued",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
         null,
-        { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" },
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
-      "center": { "lat": 27.28, "lng": -80.36 },
+      "center": {
+        "lat": 27.28,
+        "lng": -80.36
+      },
       "evidence_path": "apps/api/src/spatial/cities/port_st_lucie.py"
     },
     {
@@ -2848,14 +3136,27 @@
       "divisions": "5 divisions",
       "division_count": 5,
       "submarket_count": 11,
-      "feeds": [false, false, true, false],
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
       "platforms": [
         null,
         null,
-        { "platform": "arcgis", "watermark_col": "IssueDate", "interval_seconds": 600.0, "topic": "raw.municipal.sla" },
+        {
+          "platform": "arcgis",
+          "watermark_col": "IssueDate",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
-      "center": { "lat": 38.046, "lng": -84.497 },
+      "center": {
+        "lat": 38.046,
+        "lng": -84.497
+      },
       "evidence_path": "apps/api/src/spatial/cities/lexington.py"
     },
     {
@@ -2865,17 +3166,29 @@
       "divisions": "6 divisions",
       "division_count": 6,
       "submarket_count": 8,
-      "feeds": [false, false, true, false],
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
       "platforms": [
         null,
         null,
-        { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" },
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
-      "center": { "lat": 35.5951, "lng": -82.5515 },
+      "center": {
+        "lat": 35.5951,
+        "lng": -82.5515
+      },
       "evidence_path": "apps/api/src/spatial/cities/asheville.py"
-    }
-    ,
+    },
     {
       "id": "wilmington_nc",
       "name": "Wilmington, NC",
@@ -2945,6 +3258,241 @@
         "lng": -82.3248
       },
       "evidence_path": "apps/api/src/spatial/cities/gainesville.py"
+    },
+    {
+      "id": "buffalo",
+      "name": "Buffalo",
+      "state": "NY",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 8,
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "socrata",
+          "watermark_col": "issdttm",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 42.8864,
+        "lng": -78.8784
+      },
+      "evidence_path": "apps/api/src/spatial/cities/buffalo.py"
+    },
+    {
+      "id": "rochester",
+      "name": "Rochester",
+      "state": "NY",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 8,
+      "feeds": [
+        false,
+        false,
+        true,
+        true
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALE_DATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 43.156,
+        "lng": -77.612
+      },
+      "evidence_path": "apps/api/src/spatial/cities/rochester.py"
+    },
+    {
+      "id": "syracuse",
+      "name": "Syracuse",
+      "state": "NY",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 8,
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "RR_app_received",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 43.0481,
+        "lng": -76.1474
+      },
+      "evidence_path": "apps/api/src/spatial/cities/syracuse.py"
+    },
+    {
+      "id": "lynchburg",
+      "name": "Lynchburg",
+      "state": "VA",
+      "divisions": "3 divisions",
+      "division_count": 3,
+      "submarket_count": 7,
+      "feeds": [
+        true,
+        false,
+        true,
+        true
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "StartDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "LicenseIssued",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "SaleDate",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 37.4135,
+        "lng": -79.1422
+      },
+      "evidence_path": "apps/api/src/spatial/cities/lynchburg.py"
+    },
+    {
+      "id": "greenville",
+      "name": "Greenville",
+      "state": "SC",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 8,
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "NewIssueDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 34.8497,
+        "lng": -82.3992
+      },
+      "evidence_path": "apps/api/src/spatial/cities/greenville.py"
+    },
+    {
+      "id": "anchorage",
+      "name": "Anchorage",
+      "state": "AK",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 8,
+      "feeds": [
+        false,
+        false,
+        true,
+        true
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "Deed_Date",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 61.2176,
+        "lng": -149.8997
+      },
+      "evidence_path": "apps/api/src/spatial/cities/anchorage.py"
+    },
+    {
+      "id": "tucson",
+      "name": "Tucson",
+      "state": "AZ",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 8,
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "DT_START",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 32.2226,
+        "lng": -110.9723
+      },
+      "evidence_path": "apps/api/src/spatial/cities/tucson.py"
     }
   ],
   "pipeline": [

@@ -11,33 +11,40 @@ internal-only ``.ads`` host, business licenses are a static 2021-2024 renewal
 snapshot with no watermark column, and deeds are parcel CAMA attributes.
 
 Live-probe caveats that define this leaf (original probe 2026-08-28,
-``docs/research/probe-greenville.md``; re-probed 2026-08-28 04:0x UTC, US-340):
+``docs/research/probe-greenville.md``; resume re-probe 2026-08-28 UTC,
+US-340):
 
 * The ticket's ArcGIS Hub hint is the wrong door — the Hub placeholders are a
   private org (401) and no Socrata exists. The public door is the ArcGIS
   Server 10.81 REST endpoint. The layer is a **MapServer** (not a
   FeatureServer — same ``query`` contract; ``ArcGISClient`` handles both).
 * PERMITS is **daily** and date-truncated: newest ``NewIssueDate`` on the
-  re-probe was ``1787803200000`` = 2026-08-27T04:00:00+00:00 (2026-08-27
-  local EDT midnight; four co-newest rows). The layer holds a **rolling
-  2-year window** (rows older than that are purged), so ``min(date)`` is not
-  staleness evidence. Re-probe windows: 3d=18, 7d=29, 60d=276, total 3,886
-  (probe-day: 7d=17, 60d=264, total 3,874).
+  resume re-probe was unchanged at ``1787803200000`` =
+  2026-08-27T04:00:00+00:00 (2026-08-27 local EDT midnight; four co-newest
+  rows). The layer holds a **rolling 2-year window** (rows older than that
+  are purged — live oldest 2024-01-02), so ``min(date)`` is not staleness
+  evidence. Resume re-probe windows: 3d=29, 7d=38, 60d=280, total 3,886
+  (probe-day: 7d=17, 60d=264, total 3,874). Window counts must be computed
+  client-side from the ordered fetch: the ``time=`` parameter is silently
+  ignored (no time definition on the layer — it returns unfiltered counts).
 * ``NewIssueDate`` is **not where-clause queryable** (any
   ``NewIssueDate >= ...`` comparison returns ArcGIS error 400 "Failed to
   execute query" while plain columns filter fine) — order with
   ``orderByFields=NewIssueDate DESC`` and filter client-side.
 * Coordinates are **native geometry**: queries with ``outSR=4326`` return
-  in-city WGS84 point geometry (re-probe: x=-82.377…, y=34.856… etc.),
-  which ``ArcGISClient._flatten_feature`` lifts to ``latitude``/``longitude``.
-  The ``X_COORD``/``Y_COORD`` *attributes* are **State Plane feet** (SC
-  zone, values ≈ 1.58e6 / 1.08e6) — never mapped, never emitted as degrees;
-  the producer's projected-coordinate guard is a second net behind that.
-* ``STREETADDRESS`` is the address fallback (0 nulls live): rows arriving
-  without geometry resolve through the ADR 0004 geocode supplement with
-  context "Greenville, SC". ``APPLICDATE`` is a numeric ``YYYYMMDD`` double
-  (not an esri date) and does not ISO-normalize client-side — mapping kept
-  for the spine to convert if desired; ``filing_date`` stays None until then.
+  in-city WGS84 point geometry (resume re-probe: x=-82.338…/-82.377…,
+  y=34.800…/34.856… on the three captured fixtures; all 3,886 live rows
+  carried geometry), which ``ArcGISClient._flatten_feature`` lifts to
+  ``latitude``/``longitude``. The ``X_COORD``/``Y_COORD`` *attributes* are
+  **State Plane feet** (SC zone, values ≈ 1.58e6 / 1.08e6 — some rows carry
+  0.0) — never mapped, never emitted as degrees; the producer's
+  projected-coordinate guard is a second net behind that.
+* ``STREETADDRESS`` is the address fallback (0 nulls live, resume re-probe
+  included): rows arriving without geometry resolve through the ADR 0004
+  geocode supplement with context "Greenville, SC". ``APPLICDATE`` is a
+  numeric ``YYYYMMDD`` double (not an esri date) and does not ISO-normalize
+  client-side — mapping kept for the spine to convert if desired;
+  ``filing_date`` stays None until then.
 * No neighborhood / district / parcel column exists on the layer, so no
   ``borough`` field-map candidate is declared (Omaha discipline): division
   resolution comes from coordinates at ingest, and ``source_neighborhood``

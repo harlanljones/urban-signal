@@ -1,0 +1,615 @@
+city_id: miami_dade
+name: Miami-Dade County
+state: FL
+center:
+  lat: 25.7617
+  lng: -80.1918
+metro_bbox:
+  min_lat: 25.13
+  max_lat: 25.98
+  min_lng: -80.88
+  max_lng: -80.11
+division_bboxes:
+  DOWNTOWN_BRICKELL:
+    min_lat: 25.74
+    max_lat: 25.82
+    min_lng: -80.22
+    max_lng: -80.16
+  BEACH_BAY:
+    min_lat: 25.67
+    max_lat: 25.88
+    min_lng: -80.175
+    max_lng: -80.115
+  CORAL_GABLES_GROVE:
+    min_lat: 25.65
+    max_lat: 25.75
+    min_lng: -80.33
+    max_lng: -80.22
+  NORTH_CORRIDOR:
+    min_lat: 25.83
+    max_lat: 25.975
+    min_lng: -80.32
+    max_lng: -80.12
+  WEST_DORAL_AIRPORT:
+    min_lat: 25.73
+    max_lat: 25.86
+    min_lng: -80.42
+    max_lng: -80.28
+  SOUTH_KENDALL_HOMESTEAD:
+    min_lat: 25.14
+    max_lat: 25.72
+    min_lng: -80.55
+    max_lng: -80.25
+submarkets:
+  Downtown Miami:
+    name: Downtown Miami
+    borough: DOWNTOWN_BRICKELL
+    lat: 25.7617
+    lng: -80.1918
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.91
+    capex: 14500000.0
+    permit_vel: 58.0
+    shift_ratio: 1.68
+    sla: 74.0
+    description: County civic and office core around Government Center with tower
+      conversions and the densest issued-permit pipeline.
+    city_id: miami_dade
+  Brickell:
+    name: Brickell
+    borough: DOWNTOWN_BRICKELL
+    lat: 25.758
+    lng: -80.1915
+    zoom: 14.5
+    pitch: 52.0
+    base_lims: 0.93
+    capex: 16800000.0
+    permit_vel: 64.0
+    shift_ratio: 1.74
+    sla: 78.0
+    description: Financial-district high-rise spine south of the Miami River with
+      luxury condo and office-to-residential conversions.
+    city_id: miami_dade
+  Wynwood / Edgewater:
+    name: Wynwood / Edgewater
+    borough: DOWNTOWN_BRICKELL
+    lat: 25.801
+    lng: -80.199
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.88
+    capex: 11200000.0
+    permit_vel: 52.0
+    shift_ratio: 1.62
+    sla: 70.0
+    description: Warehouse-district adaptive reuse and bayfront mid-rise infill north
+      of downtown.
+    city_id: miami_dade
+  South Beach:
+    name: South Beach
+    borough: BEACH_BAY
+    lat: 25.7826
+    lng: -80.1341
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.9
+    capex: 15200000.0
+    permit_vel: 48.0
+    shift_ratio: 1.6
+    sla: 72.0
+    description: Art Deco hotel-renovation corridor on Ocean Drive with the island's
+      highest hospitality-license density.
+    city_id: miami_dade
+  Mid-Beach:
+    name: Mid-Beach
+    borough: BEACH_BAY
+    lat: 25.813
+    lng: -80.13
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.86
+    capex: 9800000.0
+    permit_vel: 36.0
+    shift_ratio: 1.48
+    sla: 64.0
+    description: Collins Avenue hotel and condo spine north of South Beach with renovation-led
+      permitting.
+    city_id: miami_dade
+  Key Biscayne:
+    name: Key Biscayne
+    borough: BEACH_BAY
+    lat: 25.6936
+    lng: -80.1628
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.84
+    capex: 8600000.0
+    permit_vel: 24.0
+    shift_ratio: 1.36
+    sla: 56.0
+    description: Barrier-island village with estate renovations and strict coastal-construction
+      overlays.
+    city_id: miami_dade
+  Coral Gables:
+    name: Coral Gables
+    borough: CORAL_GABLES_GROVE
+    lat: 25.721
+    lng: -80.268
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.89
+    capex: 12400000.0
+    permit_vel: 42.0
+    shift_ratio: 1.54
+    sla: 68.0
+    description: Mediterranean-revival planned city with Miracle Mile retail and high-value
+      residential renovations.
+    city_id: miami_dade
+  Coconut Grove:
+    name: Coconut Grove
+    borough: CORAL_GABLES_GROVE
+    lat: 25.727
+    lng: -80.241
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.85
+    capex: 9200000.0
+    permit_vel: 34.0
+    shift_ratio: 1.46
+    sla: 62.0
+    description: Bayfront village of cottages and marinas with teardown pressure on
+      large lots.
+    city_id: miami_dade
+  South Miami / Pinecrest:
+    name: South Miami / Pinecrest
+    borough: CORAL_GABLES_GROVE
+    lat: 25.706
+    lng: -80.293
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.81
+    capex: 7400000.0
+    permit_vel: 28.0
+    shift_ratio: 1.38
+    sla: 54.0
+    description: US-1 corridor suburbs with estate lots, independent retail, and renovation-led
+      licensing.
+    city_id: miami_dade
+  Hialeah:
+    name: Hialeah
+    borough: NORTH_CORRIDOR
+    lat: 25.8576
+    lng: -80.2781
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.78
+    capex: 5600000.0
+    permit_vel: 38.0
+    shift_ratio: 1.44
+    sla: 58.0
+    description: Industrial and small-lot residential grid with dense local-business-tax
+      and contractor licensing.
+    city_id: miami_dade
+  Miami Gardens:
+    name: Miami Gardens
+    borough: NORTH_CORRIDOR
+    lat: 25.942
+    lng: -80.2456
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.72
+    capex: 4100000.0
+    permit_vel: 26.0
+    shift_ratio: 1.3
+    sla: 46.0
+    description: North-county suburban grid at the Broward line with single-family
+      infill and neighborhood services.
+    city_id: miami_dade
+  Aventura:
+    name: Aventura
+    borough: NORTH_CORRIDOR
+    lat: 25.9564
+    lng: -80.139
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.87
+    capex: 10800000.0
+    permit_vel: 32.0
+    shift_ratio: 1.5
+    sla: 66.0
+    description: "Northeast-county condo and mall node at the Broward line \u2014\
+      \ county identity, not Fort Lauderdale."
+    city_id: miami_dade
+  Doral:
+    name: Doral
+    borough: WEST_DORAL_AIRPORT
+    lat: 25.8195
+    lng: -80.3553
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.86
+    capex: 11800000.0
+    permit_vel: 46.0
+    shift_ratio: 1.56
+    sla: 67.0
+    description: West-county office-park and warehouse city with the metro's densest
+      new-construction industrial pipeline.
+    city_id: miami_dade
+  Sweetwater:
+    name: Sweetwater
+    borough: WEST_DORAL_AIRPORT
+    lat: 25.7634
+    lng: -80.3731
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.74
+    capex: 4800000.0
+    permit_vel: 29.0
+    shift_ratio: 1.34
+    sla: 50.0
+    description: FIU-adjacent west corridor with small-lot residential and service-license
+      density.
+    city_id: miami_dade
+  Westchester:
+    name: Westchester
+    borough: WEST_DORAL_AIRPORT
+    lat: 25.7543
+    lng: -80.327
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.76
+    capex: 5200000.0
+    permit_vel: 27.0
+    shift_ratio: 1.36
+    sla: 52.0
+    description: Bird Road suburban grid between the airport and Coral Gables with
+      renovation-led permitting.
+    city_id: miami_dade
+  Kendall:
+    name: Kendall
+    borough: SOUTH_KENDALL_HOMESTEAD
+    lat: 25.679
+    lng: -80.317
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.8
+    capex: 6800000.0
+    permit_vel: 33.0
+    shift_ratio: 1.42
+    sla: 57.0
+    description: South-Dade suburban commercial spine along Kendall Drive with medical
+      and retail licensing.
+    city_id: miami_dade
+  Cutler Bay:
+    name: Cutler Bay
+    borough: SOUTH_KENDALL_HOMESTEAD
+    lat: 25.5808
+    lng: -80.3467
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.73
+    capex: 4300000.0
+    permit_vel: 24.0
+    shift_ratio: 1.28
+    sla: 48.0
+    description: South-county lakeside suburbs with small-lot infill and neighborhood
+      services.
+    city_id: miami_dade
+  Homestead / Florida City:
+    name: Homestead / Florida City
+    borough: SOUTH_KENDALL_HOMESTEAD
+    lat: 25.4687
+    lng: -80.4776
+    zoom: 12.5
+    pitch: 38.0
+    base_lims: 0.68
+    capex: 3600000.0
+    permit_vel: 28.0
+    shift_ratio: 1.32
+    sla: 44.0
+    description: Agricultural south-county edge with new-construction tract housing
+      and the county's southern permit cluster.
+    city_id: miami_dade
+divisions:
+  DOWNTOWN_BRICKELL:
+    name: DOWNTOWN_BRICKELL
+    center_lat: 25.774
+    center_lng: -80.194
+    zoom: 13.5
+    bbox:
+      min_lat: 25.74
+      max_lat: 25.82
+      min_lng: -80.22
+      max_lng: -80.16
+    submarkets:
+    - Downtown Miami
+    - Brickell
+    - Wynwood / Edgewater
+    city_id: miami_dade
+  BEACH_BAY:
+    name: BEACH_BAY
+    center_lat: 25.763
+    center_lng: -80.142
+    zoom: 12.5
+    bbox:
+      min_lat: 25.67
+      max_lat: 25.88
+      min_lng: -80.175
+      max_lng: -80.115
+    submarkets:
+    - South Beach
+    - Mid-Beach
+    - Key Biscayne
+    city_id: miami_dade
+  CORAL_GABLES_GROVE:
+    name: CORAL_GABLES_GROVE
+    center_lat: 25.718
+    center_lng: -80.267
+    zoom: 13.0
+    bbox:
+      min_lat: 25.65
+      max_lat: 25.75
+      min_lng: -80.33
+      max_lng: -80.22
+    submarkets:
+    - Coral Gables
+    - Coconut Grove
+    - South Miami / Pinecrest
+    city_id: miami_dade
+  NORTH_CORRIDOR:
+    name: NORTH_CORRIDOR
+    center_lat: 25.918
+    center_lng: -80.221
+    zoom: 12.5
+    bbox:
+      min_lat: 25.83
+      max_lat: 25.975
+      min_lng: -80.32
+      max_lng: -80.12
+    submarkets:
+    - Hialeah
+    - Miami Gardens
+    - Aventura
+    city_id: miami_dade
+  WEST_DORAL_AIRPORT:
+    name: WEST_DORAL_AIRPORT
+    center_lat: 25.779
+    center_lng: -80.352
+    zoom: 12.5
+    bbox:
+      min_lat: 25.73
+      max_lat: 25.86
+      min_lng: -80.42
+      max_lng: -80.28
+    submarkets:
+    - Doral
+    - Sweetwater
+    - Westchester
+    city_id: miami_dade
+  SOUTH_KENDALL_HOMESTEAD:
+    name: SOUTH_KENDALL_HOMESTEAD
+    center_lat: 25.55
+    center_lng: -80.4
+    zoom: 11.5
+    bbox:
+      min_lat: 25.14
+      max_lat: 25.72
+      min_lng: -80.55
+      max_lng: -80.25
+    submarkets:
+    - Kendall
+    - Cutler Bay
+    - Homestead / Florida City
+    city_id: miami_dade
+datasets:
+  permits:
+    endpoint: https://services.arcgis.com/8Pc9XBTAsYuxx9Ny/arcgis/rest/services/miamidade_permit_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: PermitIssuedDate
+    id_keys:
+    - PermitNumber
+    - ProcessNumber
+    - ObjectId
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Miami-Dade County, FL
+    field_map:
+      job_id:
+      - PermitNumber
+      - ProcessNumber
+      - ObjectId
+      job_type:
+      - PermitType
+      - ApplicationTypeDescription
+      cost:
+      - EstimatedValue
+      issuance_date:
+      - PermitIssuedDate
+      issued_date:
+      - PermitIssuedDate
+      filing_date:
+      - ApplicationDate
+      address_street:
+      - PropertyAddress
+      incident_address:
+      - PropertyAddress
+      borough:
+      - City
+      bbl:
+      - FolioNumber
+      proposed_units:
+      - StructureUnits
+      proposed_stories:
+      - StructureFloors
+    ingestion_mode: incremental
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: 730
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: true
+    zip_member: null
+  sla:
+    endpoint: https://services.arcgis.com/8Pc9XBTAsYuxx9Ny/arcgis/rest/services/Local_Business_Tax_Feature_Layer_View/FeatureServer/0
+    platform: arcgis
+    watermark_col: BUSSDATE
+    id_keys:
+    - ACCOUNTNO
+    - RECEIPTNO
+    - OBJECTID
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - ACCOUNTNO
+      dba:
+      - BUSNAME
+      premises_name:
+      - OWNERNAME
+      license_type:
+      - CLASSDESC
+      - CATGRYNAME
+      - OCCDESC
+      effective_date:
+      - BUSSDATE
+      address_street:
+      - BUSADDR
+      latitude:
+      - LAT
+      longitude:
+      - LON
+      status:
+      - ACCSTATUS
+      - PAIDSTATUS
+      borough:
+      - BUSCITY
+      zipcode:
+      - ZIPCODE
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 16000
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints:
+      certificate_of_use: https://services.arcgis.com/8Pc9XBTAsYuxx9Ny/arcgis/rest/services/CertificateOfUse_New_gdb/FeatureServer/0
+      enterprise_twin: https://gisweb.miamidade.gov/ArcGIS/rest/services/BusinessTracker/MapServer/0
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  deeds:
+    endpoint: https://gisweb.miamidade.gov/ArcGIS/rest/services/MD_ComparableSales/MapServer/5
+    platform: arcgis
+    watermark_col: DOS_1
+    id_keys:
+    - FOLIO
+    - OR_BK_1
+    - OR_PG_1
+    - OBJECTID
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: text
+    watermark_format: '%Y%m%d'
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: PRICE_1 >= 10000
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - OR_BK_1
+      - OR_PG_1
+      - FOLIO
+      - OBJECTID
+      bbl:
+      - FOLIO
+      document_amount:
+      - PRICE_1
+      recorded_date:
+      - DOS_1
+      party1_grantor:
+      - GRANTOR_1
+      party2_grantee:
+      - GRANTEE_1
+      address_street:
+      - TRUE_SITE_ADDR
+      incident_address:
+      - TRUE_SITE_ADDR
+      zipcode:
+      - TRUE_SITE_ZIP_CODE
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 20000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- miami-dade
+- miami dade
+- miami_dade_county
+- miami-dade county
+- miami dade county
+- mdc
+job_suffix: miami_dade

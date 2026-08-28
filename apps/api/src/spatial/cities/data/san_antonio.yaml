@@ -1,0 +1,319 @@
+city_id: san_antonio
+name: San Antonio / Bexar County
+state: TX
+center:
+  lat: 29.4241
+  lng: -98.4936
+metro_bbox:
+  min_lat: 28.9
+  max_lat: 29.9
+  min_lng: -99.4
+  max_lng: -98.0
+division_bboxes:
+  SAN_ANTONIO_CORE:
+    min_lat: 29.2
+    max_lat: 29.75
+    min_lng: -99.0
+    max_lng: -98.25
+submarkets:
+  Downtown & River Walk:
+    name: Downtown & River Walk
+    borough: SAN_ANTONIO_CORE
+    lat: 29.4241
+    lng: -98.4936
+    zoom: 13.3
+    pitch: 48.0
+    base_lims: 0.84
+    capex: 8200000.0
+    permit_vel: 40.0
+    shift_ratio: 1.43
+    sla: 58.0
+    description: Civic, hospitality, and riverfront core with adaptive reuse, visitor
+      economy, and mixed-use redevelopment.
+    city_id: san_antonio
+  Southtown & King William:
+    name: Southtown & King William
+    borough: SAN_ANTONIO_CORE
+    lat: 29.411
+    lng: -98.489
+    zoom: 13.1
+    pitch: 46.0
+    base_lims: 0.82
+    capex: 6800000.0
+    permit_vel: 36.0
+    shift_ratio: 1.41
+    sla: 57.0
+    description: Historic south-side neighborhoods with arts, hospitality, residential
+      rehabilitation, and infill demand.
+    city_id: san_antonio
+  Pearl & Broadway:
+    name: Pearl & Broadway
+    borough: SAN_ANTONIO_CORE
+    lat: 29.442
+    lng: -98.48
+    zoom: 13.0
+    pitch: 44.0
+    base_lims: 0.83
+    capex: 7500000.0
+    permit_vel: 38.0
+    shift_ratio: 1.44
+    sla: 59.0
+    description: North-central destination corridor with institutional, culinary,
+      residential, and mobility-oriented investment.
+    city_id: san_antonio
+  Medical Center & Northwest:
+    name: Medical Center & Northwest
+    borough: SAN_ANTONIO_CORE
+    lat: 29.51
+    lng: -98.58
+    zoom: 12.8
+    pitch: 42.0
+    base_lims: 0.79
+    capex: 7200000.0
+    permit_vel: 34.0
+    shift_ratio: 1.39
+    sla: 56.0
+    description: Major employment and medical corridor with apartments, clinics, retail,
+      and redevelopment pressure.
+    city_id: san_antonio
+  West Side & South San Antonio:
+    name: West Side & South San Antonio
+    borough: SAN_ANTONIO_CORE
+    lat: 29.365
+    lng: -98.54
+    zoom: 12.8
+    pitch: 42.0
+    base_lims: 0.76
+    capex: 5100000.0
+    permit_vel: 30.0
+    shift_ratio: 1.35
+    sla: 53.0
+    description: Established working neighborhoods with small-business activity, housing
+      repair, and public infrastructure needs.
+    city_id: san_antonio
+divisions:
+  SAN_ANTONIO_CORE:
+    name: San Antonio / Bexar County
+    center_lat: 29.4241
+    center_lng: -98.4936
+    zoom: 11.8
+    bbox:
+      min_lat: 29.2
+      max_lat: 29.75
+      min_lng: -99.0
+      max_lng: -98.25
+    submarkets:
+    - Downtown & River Walk
+    - Southtown & King William
+    - Pearl & Broadway
+    - Medical Center & Northwest
+    - West Side & South San Antonio
+    city_id: san_antonio
+datasets:
+  permits:
+    endpoint: ckan://data.sanantonio.gov/c21106f9-3ef5-4f3a-8604-f992b4db7512
+    platform: ckan
+    watermark_col: DATE ISSUED
+    id_keys:
+    - PERMIT NUMBER
+    - PERMIT_NUMBER
+    - RECORD_ID
+    - _id
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: San Antonio, TX
+    field_map:
+      job_id:
+      - PERMIT NUMBER
+      - PERMIT_NUMBER
+      - RECORD_ID
+      - _id
+      issuance_date:
+      - DATE ISSUED
+      filing_date:
+      - DATE SUBMITTED
+      job_type:
+      - PERMIT TYPE
+      - PERMIT_TYPE
+      - WORK TYPE
+      cost:
+      - ESTIMATED COST
+      - ESTIMATED_COST
+      - TOTAL PROJECT VALUE
+      status:
+      - STATUS
+      - PERMIT STATUS
+      address_street:
+      - ADDRESS
+      zipcode:
+      - ZIP
+      - ZIP CODE
+      - ZIP_CODE
+      latitude:
+      - Y_COORD
+      longitude:
+      - X_COORD
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: https://services.arcgis.com/g1fRTDLeMgspWrYp/arcgis/rest/services/311_All_Service_Calls/FeatureServer/0
+    platform: arcgis
+    watermark_col: OpenedDateTime
+    id_keys:
+    - ServiceRequestNumber
+    - SRNumber
+    - REQUEST_ID
+    - OBJECTID
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - ServiceRequestNumber
+      - SRNumber
+      - REQUEST_ID
+      - OBJECTID
+      created_date:
+      - OpenedDateTime
+      closed_date:
+      - ClosedDateTime
+      - ClosedDate
+      status:
+      - Status
+      - STATUS
+      complaint_type:
+      - ServiceName
+      - RequestType
+      - Type
+      incident_address:
+      - Address
+      - StreetAddress
+      borough:
+      - CouncilDistrict
+      - Neighborhood
+      zipcode:
+      - ZipCode
+      - ZIP
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'TX'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- san-antonio
+- san antonio
+- san_antonio_tx
+- san antonio tx
+- bexar_county
+- bexar county
+job_suffix: san_antonio

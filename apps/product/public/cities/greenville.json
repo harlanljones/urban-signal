@@ -1,0 +1,208 @@
+{
+  "schema_version": 2,
+  "id": "greenville",
+  "name": "Greenville",
+  "state": "SC",
+  "center": {
+    "lat": 34.8497,
+    "lng": -82.3992
+  },
+  "metro_bbox": {
+    "min_lat": 34.76,
+    "max_lat": 34.93,
+    "min_lng": -82.48,
+    "max_lng": -82.31
+  },
+  "divisions": {
+    "DOWNTOWN_MAIN_STREET": {
+      "name": "DOWNTOWN_MAIN_STREET",
+      "center": {
+        "lat": 34.8497,
+        "lng": -82.3992
+      },
+      "bbox": {
+        "min_lat": 34.842,
+        "max_lat": 34.86,
+        "min_lng": -82.41,
+        "max_lng": -82.388
+      },
+      "submarkets": [
+        "Downtown"
+      ]
+    },
+    "WEST_END": {
+      "name": "WEST_END",
+      "center": {
+        "lat": 34.8413,
+        "lng": -82.403
+      },
+      "bbox": {
+        "min_lat": 34.83,
+        "max_lat": 34.855,
+        "min_lng": -82.435,
+        "max_lng": -82.393
+      },
+      "submarkets": [
+        "West End",
+        "Village of West Greenville"
+      ]
+    },
+    "NORTH_MAIN": {
+      "name": "NORTH_MAIN",
+      "center": {
+        "lat": 34.867,
+        "lng": -82.401
+      },
+      "bbox": {
+        "min_lat": 34.858,
+        "max_lat": 34.88,
+        "min_lng": -82.415,
+        "max_lng": -82.39
+      },
+      "submarkets": [
+        "North Main"
+      ]
+    },
+    "AUGUSTA_ROAD": {
+      "name": "AUGUSTA_ROAD",
+      "center": {
+        "lat": 34.837,
+        "lng": -82.386
+      },
+      "bbox": {
+        "min_lat": 34.828,
+        "max_lat": 34.845,
+        "min_lng": -82.398,
+        "max_lng": -82.378
+      },
+      "submarkets": [
+        "Augusta Road"
+      ]
+    },
+    "EASTSIDE": {
+      "name": "EASTSIDE",
+      "center": {
+        "lat": 34.8565,
+        "lng": -82.367
+      },
+      "bbox": {
+        "min_lat": 34.822,
+        "max_lat": 34.865,
+        "min_lng": -82.38,
+        "max_lng": -82.335
+      },
+      "submarkets": [
+        "Overbrook",
+        "Verdae"
+      ]
+    },
+    "PARIS_MOUNTAIN": {
+      "name": "PARIS_MOUNTAIN",
+      "center": {
+        "lat": 34.902,
+        "lng": -82.396
+      },
+      "bbox": {
+        "min_lat": 34.88,
+        "max_lat": 34.925,
+        "min_lng": -82.43,
+        "max_lng": -82.37
+      },
+      "submarkets": [
+        "Paris Mountain Edge"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown": {
+      "name": "Downtown",
+      "division": "DOWNTOWN_MAIN_STREET",
+      "center": {
+        "lat": 34.8497,
+        "lng": -82.3992
+      },
+      "description": "Main Street core with the Falls Park riverfront, hotel/office adaptive reuse, and the award-winning downtown mixed-use permitting corridor."
+    },
+    "West End": {
+      "name": "West End",
+      "division": "WEST_END",
+      "center": {
+        "lat": 34.8413,
+        "lng": -82.403
+      },
+      "description": "Historic warehouse district below the Reedy River with Fluor Field anchors, loft conversions, and the metro's strongest restaurant-row foot traffic."
+    },
+    "Village of West Greenville": {
+      "name": "Village of West Greenville",
+      "division": "WEST_END",
+      "center": {
+        "lat": 34.8455,
+        "lng": -82.4235
+      },
+      "description": "Pendleton Street arts district with mill-structure studios, cottage infill, and artist-led commercial rehabilitation permits."
+    },
+    "North Main": {
+      "name": "North Main",
+      "division": "NORTH_MAIN",
+      "center": {
+        "lat": 34.867,
+        "lng": -82.401
+      },
+      "description": "North Main Street corridor of bungalow stock and infill townhomes between downtown and the Paris Mountain slopes."
+    },
+    "Augusta Road": {
+      "name": "Augusta Road",
+      "division": "AUGUSTA_ROAD",
+      "center": {
+        "lat": 34.837,
+        "lng": -82.386
+      },
+      "description": "Augusta Street retail-residential spine with walkable shopfronts, pre-war renovation, and steady high-valuation alteration permits."
+    },
+    "Overbrook": {
+      "name": "Overbrook",
+      "division": "EASTSIDE",
+      "center": {
+        "lat": 34.8565,
+        "lng": -82.367
+      },
+      "description": "Overbrook/Stone Avenue east side with starter-home turnover, duplex conversions, and Stone Ave mixed-use nodes."
+    },
+    "Verdae": {
+      "name": "Verdae",
+      "division": "EASTSIDE",
+      "center": {
+        "lat": 34.833,
+        "lng": -82.346
+      },
+      "description": "Verdae Boulevard and Woodruff Road growth belt with master-planned multifamily, office park expansion, and the metro's largest new-build valuations."
+    },
+    "Paris Mountain Edge": {
+      "name": "Paris Mountain Edge",
+      "division": "PARIS_MOUNTAIN",
+      "center": {
+        "lat": 34.902,
+        "lng": -82.396
+      },
+      "description": "South slopes of Paris Mountain at the city's north edge with view-lot estate builds and state-park-adjacent low-density permitting."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "NewIssueDate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/greenville.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

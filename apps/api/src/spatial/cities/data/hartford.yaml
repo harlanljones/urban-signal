@@ -1,0 +1,328 @@
+city_id: hartford
+name: Hartford
+state: CT
+center:
+  lat: 41.7637
+  lng: -72.6734
+metro_bbox:
+  min_lat: 41.55
+  max_lat: 42.05
+  min_lng: -73.0
+  max_lng: -72.35
+division_bboxes:
+  HARTFORD_CORE:
+    min_lat: 41.65
+    max_lat: 41.9
+    min_lng: -72.85
+    max_lng: -72.5
+submarkets:
+  Downtown & Sheldon-Charter Oak:
+    name: Downtown & Sheldon-Charter Oak
+    borough: HARTFORD_CORE
+    lat: 41.7637
+    lng: -72.6734
+    zoom: 13.4
+    pitch: 48.0
+    base_lims: 0.84
+    capex: 6800000.0
+    permit_vel: 35.0
+    shift_ratio: 1.42
+    sla: 57.0
+    description: Civic center and river-adjacent neighborhoods with institutional,
+      hospitality, and adaptive-reuse activity.
+    city_id: hartford
+  Asylum Hill & West End:
+    name: Asylum Hill & West End
+    borough: HARTFORD_CORE
+    lat: 41.7737
+    lng: -72.701
+    zoom: 13.1
+    pitch: 44.0
+    base_lims: 0.81
+    capex: 5200000.0
+    permit_vel: 29.0
+    shift_ratio: 1.37
+    sla: 55.0
+    description: Historic residential and medical corridor with rehabilitation, neighborhood
+      retail, and institutional demand.
+    city_id: hartford
+  Frog Hollow & Parkville:
+    name: Frog Hollow & Parkville
+    borough: HARTFORD_CORE
+    lat: 41.752
+    lng: -72.708
+    zoom: 13.0
+    pitch: 44.0
+    base_lims: 0.79
+    capex: 4600000.0
+    permit_vel: 31.0
+    shift_ratio: 1.39
+    sla: 54.0
+    description: West-side mixed residential and industrial transition zone with infill
+      and small-business reinvestment.
+    city_id: hartford
+  South End & Barry Square:
+    name: South End & Barry Square
+    borough: HARTFORD_CORE
+    lat: 41.735
+    lng: -72.68
+    zoom: 12.9
+    pitch: 42.0
+    base_lims: 0.76
+    capex: 3900000.0
+    permit_vel: 26.0
+    shift_ratio: 1.34
+    sla: 52.0
+    description: South Hartford neighborhoods combining legacy housing stock, local
+      commerce, and corridor-scale redevelopment.
+    city_id: hartford
+  North Meadows & Blue Hills:
+    name: North Meadows & Blue Hills
+    borough: HARTFORD_CORE
+    lat: 41.8
+    lng: -72.67
+    zoom: 12.8
+    pitch: 42.0
+    base_lims: 0.74
+    capex: 4300000.0
+    permit_vel: 24.0
+    shift_ratio: 1.32
+    sla: 51.0
+    description: North-side employment and residential edge with logistics, neighborhood
+      services, and public-realm investment.
+    city_id: hartford
+divisions:
+  HARTFORD_CORE:
+    name: Hartford Core
+    center_lat: 41.7637
+    center_lng: -72.6734
+    zoom: 11.8
+    bbox:
+      min_lat: 41.65
+      max_lat: 41.9
+      min_lng: -72.85
+      max_lng: -72.5
+    submarkets:
+    - Downtown & Sheldon-Charter Oak
+    - Asylum Hill & West End
+    - Frog Hollow & Parkville
+    - South End & Barry Square
+    - North Meadows & Blue Hills
+    city_id: hartford
+datasets:
+  permits:
+    endpoint: https://utility.arcgis.com/usrsvcs/servers/d595ae995fb049d3ac54919ebf24b1ac/rest/services/HartfordOpenDataTables/FeatureServer/0
+    platform: arcgis
+    watermark_col: DateIssued
+    id_keys:
+    - RECORD_ID
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Hartford, CT
+    field_map:
+      job_id:
+      - RECORD_ID
+      issuance_date:
+      - DateIssued
+      job_type:
+      - PermitType
+      - PERMIT_TYPE
+      - WorkDescription
+      cost:
+      - EstimatedCost
+      - COST
+      - ProjectCost
+      status:
+      - Status
+      - STATUS
+      address_street:
+      - PROPERTY_ADDRESS
+      - Location
+      zipcode:
+      - ZIP
+      - ZipCode
+      - POSTAL_CODE
+      bbl:
+      - PARCEL_ID
+      - ParcelID
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: https://utility.arcgis.com/usrsvcs/servers/2185af186dda46caa1e59323407d1daf/rest/services/Service_Requests_2015_to_Current/FeatureServer/9
+    platform: arcgis
+    watermark_col: USER_Opened_Date
+    id_keys:
+    - SR_Number
+    - OBJECTID
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year:
+      '2026': https://utility.arcgis.com/usrsvcs/servers/2185af186dda46caa1e59323407d1daf/rest/services/Service_Requests_2015_to_Current/FeatureServer/9
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Hartford, CT
+    field_map:
+      incident_id:
+      - SR_Number
+      - SRM_Number
+      - OBJECTID
+      created_date:
+      - USER_Opened_Date
+      closed_date:
+      - USER_Closed_Date
+      - Closed_Date
+      status:
+      - Status
+      - STATUS
+      complaint_type:
+      - SR_Type
+      - Request_Type
+      - Service_Name
+      incident_address:
+      - Match_addr
+      - Location
+      - Address
+      borough:
+      - Neighborhood
+      - Council_District
+      zipcode:
+      - ZIP
+      - ZipCode
+      - PostalCode
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://data.ct.gov/resource/ngch-56tr.json
+    platform: socrata
+    watermark_col: recordrefreshedon
+    id_keys:
+    - license_number
+    - credential_number
+    - id
+    topic: raw.municipal.sla
+    interval_seconds: 3600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: city = 'HARTFORD'
+    needs_geocode: true
+    geocode_context: Hartford, CT
+    field_map:
+      license_id:
+      - license_number
+      - credential_number
+      - id
+      license_type:
+      - credential_type
+      - credential_name
+      - license_type
+      effective_date:
+      - effective_date
+      - issue_date
+      expiration_date:
+      - expiration_date
+      - expiry_date
+      address_street:
+      - address
+      - street_address
+      - address_line_1
+      zipcode:
+      - zip
+      - zipcode
+      - postal_code
+      borough:
+      - city
+      premises_name:
+      - business_name
+      - name
+      dba:
+      - business_name
+      - name
+      status:
+      - status
+      - license_status
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- hartford_ct
+- hartford ct
+- hartford_county
+- hartford county
+job_suffix: hartford

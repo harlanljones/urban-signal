@@ -1,0 +1,29 @@
+{
+  "type": "record",
+  "name": "InfrastructureEvent",
+  "namespace": "org.urbandev.events",
+  "doc": "New fixed infrastructure as a capex proxy (US-363 §1.5/§5). Generic by decision: ev_station | small_cell | grid_capacity share one shape.",
+  "fields": [
+    { "name": "city_id", "type": "string", "default": "nyc" },
+    { "name": "asset_id", "type": "string" },
+    { "name": "category", "type": "string" },
+    { "name": "event_type", "type": "string", "default": "opened" },
+    { "name": "name", "type": ["null", "string"], "default": null },
+    { "name": "operator", "type": ["null", "string"], "default": null },
+    { "name": "status", "type": ["null", "string"], "default": null },
+    { "name": "access_type", "type": ["null", "string"], "default": null },
+    { "name": "unit_count", "type": ["null", "int"], "default": null },
+    { "name": "fast_unit_count", "type": ["null", "int"], "default": null },
+    { "name": "address", "type": ["null", "string"], "default": null },
+    { "name": "borough", "type": ["null", "string"], "default": null },
+    { "name": "zipcode", "type": ["null", "string"], "default": null },
+    { "name": "latitude", "type": "double" },
+    { "name": "longitude", "type": "double" },
+    { "name": "event_date", "type": "string" },
+    { "name": "date_is_detection", "type": "boolean", "default": false },
+    { "name": "h3_res7", "type": ["null", "string"], "default": null },
+    { "name": "h3_res8", "type": ["null", "string"], "default": null },
+    { "name": "h3_res9", "type": ["null", "string"], "default": null },
+    { "name": "ingested_at", "type": "string" }
+  ]
+}

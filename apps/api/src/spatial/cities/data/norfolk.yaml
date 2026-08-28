@@ -1,0 +1,522 @@
+city_id: norfolk
+name: Norfolk
+state: VA
+center:
+  lat: 36.8508
+  lng: -76.2859
+metro_bbox:
+  min_lat: 36.83
+  max_lat: 37.04
+  min_lng: -76.35
+  max_lng: -76.17
+division_bboxes:
+  DOWNTOWN_WATERFRONT:
+    min_lat: 36.84
+    max_lat: 36.9
+    min_lng: -76.315
+    max_lng: -76.28
+  GHENT_WESTBURG:
+    min_lat: 36.85
+    max_lat: 36.905
+    min_lng: -76.31
+    max_lng: -76.255
+  OCEAN_VIEW:
+    min_lat: 36.915
+    max_lat: 37.04
+    min_lng: -76.35
+    max_lng: -76.24
+  CENTRAL_MILITARY_CIRCLE:
+    min_lat: 36.87
+    max_lat: 36.92
+    min_lng: -76.27
+    max_lng: -76.205
+  SOUTH_NORFOLK_BERKLEY:
+    min_lat: 36.83
+    max_lat: 36.88
+    min_lng: -76.3
+    max_lng: -76.23
+submarkets:
+  Downtown Norfolk & Waterfront:
+    name: Downtown Norfolk & Waterfront
+    borough: DOWNTOWN_WATERFRONT
+    lat: 36.8505
+    lng: -76.293
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.9
+    capex: 8600000.0
+    permit_vel: 50.0
+    shift_ratio: 1.62
+    sla: 66.0
+    description: Elizabeth River waterfront CBD anchored by USS Wisconsin, Nauticus,
+      Waterside District, and the Dominion Enterprises tower boom along Main Street.
+    city_id: norfolk
+  NEON Arts District:
+    name: NEON Arts District
+    borough: DOWNTOWN_WATERFRONT
+    lat: 36.862
+    lng: -76.2905
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.78
+    capex: 4200000.0
+    permit_vel: 30.0
+    shift_ratio: 1.38
+    sla: 58.0
+    description: Gallery-and-mural arts corridor on Granby Street's north end converting
+      warehouses into studios, breweries, and infill apartments.
+    city_id: norfolk
+  Lamberts Point:
+    name: Lamberts Point
+    borough: DOWNTOWN_WATERFRONT
+    lat: 36.872
+    lng: -76.306
+    zoom: 14.5
+    pitch: 35.0
+    base_lims: 0.66
+    capex: 3200000.0
+    permit_vel: 24.0
+    shift_ratio: 1.22
+    sla: 46.0
+    description: Coal-pier and rail-front neighborhood beside Old Dominion University
+      rebuilding its rowhouse stock amid industrial-buffer redevelopment.
+    city_id: norfolk
+  Ghent:
+    name: Ghent
+    borough: GHENT_WESTBURG
+    lat: 36.864
+    lng: -76.282
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.88
+    capex: 7200000.0
+    permit_vel: 44.0
+    shift_ratio: 1.52
+    sla: 62.0
+    description: Historic brick rowhouse district around the Harrison Opera House
+      and Colley Avenue retail spine with relentless renovation demand.
+    city_id: norfolk
+  West Ghent & Page Point:
+    name: West Ghent & Page Point
+    borough: GHENT_WESTBURG
+    lat: 36.87
+    lng: -76.3
+    zoom: 14.5
+    pitch: 35.0
+    base_lims: 0.82
+    capex: 5800000.0
+    permit_vel: 34.0
+    shift_ratio: 1.42
+    sla: 54.0
+    description: Colonial Place-adjacent enclave of craftsman homes fronting the Elizabeth
+      River with steady high-end remodel activity.
+    city_id: norfolk
+  Wards Corner:
+    name: Wards Corner
+    borough: GHENT_WESTBURG
+    lat: 36.898
+    lng: -76.265
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.74
+    capex: 4800000.0
+    permit_vel: 32.0
+    shift_ratio: 1.3
+    sla: 48.0
+    description: Mid-century commercial crossroads of Hampton Blvd and Granby undergoing
+      planned mixed-use redevelopment at the Talbot Park edge.
+    city_id: norfolk
+  Ocean View:
+    name: Ocean View
+    borough: OCEAN_VIEW
+    lat: 36.945
+    lng: -76.33
+    zoom: 14.5
+    pitch: 35.0
+    base_lims: 0.72
+    capex: 4600000.0
+    permit_vel: 28.0
+    shift_ratio: 1.28
+    sla: 44.0
+    description: Chesapeake Bay beach-strip cottages and condo corridors along Ocean
+      View Avenue with Naval Station Norfolk visible across Willoughby Bay.
+    city_id: norfolk
+  East Beach:
+    name: East Beach
+    borough: OCEAN_VIEW
+    lat: 36.967
+    lng: -76.285
+    zoom: 15.0
+    pitch: 35.0
+    base_lims: 0.84
+    capex: 6900000.0
+    permit_vel: 38.0
+    shift_ratio: 1.48
+    sla: 52.0
+    description: New Urbanist master-planned bayfront community of cottage courts
+      and marina village commanding premium coastal pricing.
+    city_id: norfolk
+  Willoughby Spit:
+    name: Willoughby Spit
+    borough: OCEAN_VIEW
+    lat: 36.923
+    lng: -76.318
+    zoom: 15.0
+    pitch: 35.0
+    base_lims: 0.68
+    capex: 3400000.0
+    permit_vel: 22.0
+    shift_ratio: 1.2
+    sla: 40.0
+    description: Slim sand-spit peninsula of bungalow stock between the Bay and the
+      HRBT approach with flood-resilience retrofit demand.
+    city_id: norfolk
+  Military Circle:
+    name: Military Circle
+    borough: CENTRAL_MILITARY_CIRCLE
+    lat: 36.888
+    lng: -76.245
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.7
+    capex: 5200000.0
+    permit_vel: 34.0
+    shift_ratio: 1.34
+    sla: 50.0
+    description: Mall-redevelopment district near Sentara Norfolk General Hospital's
+      Janaf corridor pivoting from retail boxes to medical-adjacent mixed use.
+    city_id: norfolk
+  Norview:
+    name: Norview
+    borough: CENTRAL_MILITARY_CIRCLE
+    lat: 36.899
+    lng: -76.23
+    zoom: 14.0
+    pitch: 30.0
+    base_lims: 0.64
+    capex: 2900000.0
+    permit_vel: 24.0
+    shift_ratio: 1.18
+    sla: 38.0
+    description: Post-war starter-home neighborhoods under the NAS Norfolk flight
+      path with affordable entry pricing and steady investor rehab flow.
+    city_id: norfolk
+  Berkley:
+    name: Berkley
+    borough: SOUTH_NORFOLK_BERKLEY
+    lat: 36.852
+    lng: -76.283
+    zoom: 15.0
+    pitch: 35.0
+    base_lims: 0.62
+    capex: 2600000.0
+    permit_vel: 22.0
+    shift_ratio: 1.16
+    sla: 34.0
+    description: Historic shipyard-worker grid south of the Elizabeth River with century-old
+      foursquares and early-stage riverfront reinvestment.
+    city_id: norfolk
+  Campostella:
+    name: Campostella
+    borough: SOUTH_NORFOLK_BERKLEY
+    lat: 36.858
+    lng: -76.264
+    zoom: 14.5
+    pitch: 30.0
+    base_lims: 0.6
+    capex: 2500000.0
+    permit_vel: 22.0
+    shift_ratio: 1.15
+    sla: 30.0
+    description: Riverside residential district near the Virginia Zoo and Campostella
+      Bridge anchoring South Norfolk's gradual appreciation curve.
+    city_id: norfolk
+divisions:
+  DOWNTOWN_WATERFRONT:
+    name: DOWNTOWN_WATERFRONT
+    center_lat: 36.858
+    center_lng: -76.293
+    zoom: 13.5
+    bbox:
+      min_lat: 36.84
+      max_lat: 36.9
+      min_lng: -76.315
+      max_lng: -76.28
+    submarkets:
+    - Downtown Norfolk & Waterfront
+    - NEON Arts District
+    - Lamberts Point
+    city_id: norfolk
+  GHENT_WESTBURG:
+    name: GHENT_WESTBURG
+    center_lat: 36.877
+    center_lng: -76.282
+    zoom: 13.5
+    bbox:
+      min_lat: 36.85
+      max_lat: 36.905
+      min_lng: -76.31
+      max_lng: -76.255
+    submarkets:
+    - Ghent
+    - West Ghent & Page Point
+    - Wards Corner
+    city_id: norfolk
+  OCEAN_VIEW:
+    name: OCEAN_VIEW
+    center_lat: 36.945
+    center_lng: -76.295
+    zoom: 12.5
+    bbox:
+      min_lat: 36.915
+      max_lat: 37.04
+      min_lng: -76.35
+      max_lng: -76.24
+    submarkets:
+    - Ocean View
+    - East Beach
+    - Willoughby Spit
+    city_id: norfolk
+  CENTRAL_MILITARY_CIRCLE:
+    name: CENTRAL_MILITARY_CIRCLE
+    center_lat: 36.893
+    center_lng: -76.238
+    zoom: 13.0
+    bbox:
+      min_lat: 36.87
+      max_lat: 36.92
+      min_lng: -76.27
+      max_lng: -76.205
+    submarkets:
+    - Military Circle
+    - Norview
+    city_id: norfolk
+  SOUTH_NORFOLK_BERKLEY:
+    name: SOUTH_NORFOLK_BERKLEY
+    center_lat: 36.855
+    center_lng: -76.274
+    zoom: 13.5
+    bbox:
+      min_lat: 36.83
+      max_lat: 36.88
+      min_lng: -76.3
+      max_lng: -76.23
+    submarkets:
+    - Berkley
+    - Campostella
+    city_id: norfolk
+datasets:
+  permits:
+    endpoint: https://data.norfolk.gov/resource/fahm-yuh4.json
+    platform: socrata
+    watermark_col: issue_date
+    id_keys:
+    - permit_number
+    - gpin
+    - tax_account
+    - id
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      cost:
+      - project_cost
+      filing_date:
+      - application_date
+      job_type:
+      - work_type
+      - type
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  deeds:
+    endpoint: https://data.norfolk.gov/resource/qva7-tzrf.json
+    platform: socrata
+    watermark_col: transfer_date
+    id_keys:
+    - document_number
+    - lrsn
+    - gpin
+    - id
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - document_number
+      bbl:
+      - gpin
+      - parcel_id
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://data.norfolk.gov/resource/dpi6-sct5.json
+    platform: socrata
+    watermark_col: business_opened_date
+    id_keys:
+    - trading_as_name
+    - primary_owner
+    - business_opened_date
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: location_address != 'NO NORFOLK ADDRESS REQUIRED 99999'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - trading_as_name
+      - primary_owner
+      dba:
+      - trading_as_name
+      premises_name:
+      - primary_owner
+      license_type:
+      - naics
+      effective_date:
+      - business_opened_date
+      address_street:
+      - location_address
+      latitude:
+      - latitude
+      longitude:
+      - longitude
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: https://data.norfolk.gov/resource/nbyu-xjez.json
+    platform: socrata
+    watermark_col: creation_date
+    id_keys:
+    - service_request_number
+    - id
+    topic: raw.municipal.311
+    interval_seconds: 600.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Norfolk, VA
+    field_map:
+      incident_id:
+      - service_request_number
+      complaint_type:
+      - service_request_type
+      - service_request_category
+      created_date:
+      - creation_date
+      status:
+      - status
+      incident_address:
+      - location
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- norfolk_va
+- norfolk-va
+- norfolk va
+job_suffix: norfolk

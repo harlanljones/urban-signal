@@ -1,0 +1,369 @@
+city_id: rochester
+name: Rochester
+state: NY
+center:
+  lat: 43.156
+  lng: -77.612
+metro_bbox:
+  min_lat: 43.1
+  max_lat: 43.27
+  min_lng: -77.71
+  max_lng: -77.53
+division_bboxes:
+  DOWNTOWN_RIVER:
+    min_lat: 43.13
+    max_lat: 43.17
+    min_lng: -77.65
+    max_lng: -77.6
+  EAST_SIDE_CULTURAL:
+    min_lat: 43.14
+    max_lat: 43.165
+    min_lng: -77.61
+    max_lng: -77.575
+  NORTH_LAKESHORE:
+    min_lat: 43.21
+    max_lat: 43.27
+    min_lng: -77.6
+    max_lng: -77.535
+  NORTHWEST_GORGE:
+    min_lat: 43.16
+    max_lat: 43.21
+    min_lng: -77.66
+    max_lng: -77.61
+  SOUTHWEST_WARD:
+    min_lat: 43.1
+    max_lat: 43.14
+    min_lng: -77.67
+    max_lng: -77.615
+  NORTHEAST_UPPER:
+    min_lat: 43.165
+    max_lat: 43.2
+    min_lng: -77.61
+    max_lng: -77.555
+submarkets:
+  Center City:
+    name: Center City
+    borough: DOWNTOWN_RIVER
+    lat: 43.151
+    lng: -77.618
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.86
+    capex: 6500000.0
+    permit_vel: 34.0
+    shift_ratio: 1.48
+    sla: 58.0
+    description: The Main Street CBD west of the Genesee with office-to-residential
+      conversions, theROC anchor projects, and the city's densest mixed-use pipeline.
+    city_id: rochester
+  Corn Hill:
+    name: Corn Hill
+    borough: DOWNTOWN_RIVER
+    lat: 43.143
+    lng: -77.624
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.82
+    capex: 4200000.0
+    permit_vel: 24.0
+    shift_ratio: 1.35
+    sla: 46.0
+    description: 'The third-oldest residential neighborhood in Rochester: Italianate
+      and Victorian rowhouses on the bluff southwest of downtown with steady restoration
+      trades.'
+    city_id: rochester
+  Park Avenue:
+    name: Park Avenue
+    borough: EAST_SIDE_CULTURAL
+    lat: 43.15
+    lng: -77.596
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.84
+    capex: 5100000.0
+    permit_vel: 30.0
+    shift_ratio: 1.42
+    sla: 54.0
+    description: The East Avenue corridor's boutique retail spine of mansions cut
+      into apartments, restaurant-row licensing, and high-turnover condo stock.
+    city_id: rochester
+  Neighborhood of the Arts:
+    name: Neighborhood of the Arts
+    borough: EAST_SIDE_CULTURAL
+    lat: 43.153
+    lng: -77.588
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.83
+    capex: 4800000.0
+    permit_vel: 28.0
+    shift_ratio: 1.4
+    sla: 52.0
+    description: The Memorial Art Gallery / Village Gate district around University
+      Avenue where loft conversions and gallery-space retrofits drive the permit mix.
+    city_id: rochester
+  Charlotte:
+    name: Charlotte
+    borough: NORTH_LAKESHORE
+    lat: 43.227
+    lng: -77.563
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.68
+    capex: 2900000.0
+    permit_vel: 18.0
+    shift_ratio: 1.2
+    sla: 36.0
+    description: The Ontario lakeshore village at the river mouth with seasonal cottage
+      turnover, pier-adjacent hospitality licensing, and flood-zone rebuild work.
+    city_id: rochester
+  Maplewood:
+    name: Maplewood
+    borough: NORTHWEST_GORGE
+    lat: 43.172
+    lng: -77.625
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.74
+    capex: 3400000.0
+    permit_vel: 22.0
+    shift_ratio: 1.26
+    sla: 42.0
+    description: The Dewey Avenue grid west of the Genesee gorge around Maplewood
+      Park with solid pre-war housing stock and investor renovation flow.
+    city_id: rochester
+  19th Ward:
+    name: 19th Ward
+    borough: SOUTHWEST_WARD
+    lat: 43.12
+    lng: -77.643
+    zoom: 14.0
+    pitch: 32.0
+    base_lims: 0.7
+    capex: 3100000.0
+    permit_vel: 20.0
+    shift_ratio: 1.24
+    sla: 40.0
+    description: The Thurston Road/Arnett Boulevard ward south of the UR campus with
+      craftsman-bungalow stock, a deep rental register, and block-by-block reinvestment.
+    city_id: rochester
+  Upper Falls:
+    name: Upper Falls
+    borough: NORTHEAST_UPPER
+    lat: 43.177
+    lng: -77.596
+    zoom: 14.0
+    pitch: 32.0
+    base_lims: 0.66
+    capex: 2700000.0
+    permit_vel: 16.0
+    shift_ratio: 1.18
+    sla: 34.0
+    description: The north-central ward along Upper Falls Boulevard where the city's
+      lowest sale prices meet the heaviest vacancy-to-acquisition conversion flow.
+    city_id: rochester
+divisions:
+  DOWNTOWN_RIVER:
+    name: DOWNTOWN_RIVER
+    center_lat: 43.147
+    center_lng: -77.621
+    zoom: 13.5
+    bbox:
+      min_lat: 43.13
+      max_lat: 43.17
+      min_lng: -77.65
+      max_lng: -77.6
+    submarkets:
+    - Center City
+    - Corn Hill
+    city_id: rochester
+  EAST_SIDE_CULTURAL:
+    name: EAST_SIDE_CULTURAL
+    center_lat: 43.1515
+    center_lng: -77.592
+    zoom: 13.5
+    bbox:
+      min_lat: 43.14
+      max_lat: 43.165
+      min_lng: -77.61
+      max_lng: -77.575
+    submarkets:
+    - Park Avenue
+    - Neighborhood of the Arts
+    city_id: rochester
+  NORTH_LAKESHORE:
+    name: NORTH_LAKESHORE
+    center_lat: 43.227
+    center_lng: -77.563
+    zoom: 13.0
+    bbox:
+      min_lat: 43.21
+      max_lat: 43.27
+      min_lng: -77.6
+      max_lng: -77.535
+    submarkets:
+    - Charlotte
+    city_id: rochester
+  NORTHWEST_GORGE:
+    name: NORTHWEST_GORGE
+    center_lat: 43.185
+    center_lng: -77.635
+    zoom: 13.0
+    bbox:
+      min_lat: 43.16
+      max_lat: 43.21
+      min_lng: -77.66
+      max_lng: -77.61
+    submarkets:
+    - Maplewood
+    city_id: rochester
+  SOUTHWEST_WARD:
+    name: SOUTHWEST_WARD
+    center_lat: 43.12
+    center_lng: -77.643
+    zoom: 13.0
+    bbox:
+      min_lat: 43.1
+      max_lat: 43.14
+      min_lng: -77.67
+      max_lng: -77.615
+    submarkets:
+    - 19th Ward
+    city_id: rochester
+  NORTHEAST_UPPER:
+    name: NORTHEAST_UPPER
+    center_lat: 43.177
+    center_lng: -77.596
+    zoom: 13.0
+    bbox:
+      min_lat: 43.165
+      max_lat: 43.2
+      min_lng: -77.61
+      max_lng: -77.555
+    submarkets:
+    - Upper Falls
+    city_id: rochester
+datasets:
+  deeds:
+    endpoint: https://maps.cityofrochester.gov/server/rest/services/Open_Data/Tax_Parcels_Open_Data/FeatureServer/0
+    platform: arcgis
+    watermark_col: SALE_DATE
+    id_keys:
+    - PRINTKEY
+    - PARCELID
+    - SALE_DATE
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: text
+    watermark_format: '%m/%d/%Y'
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - PRINTKEY
+      - PARCELID
+      bbl:
+      - PARCELID
+      doc_type:
+      - DEED_TYPE
+      document_amount:
+      - SALE_PRICE
+      recorded_date:
+      - SALE_DATE
+      address_street:
+      - SITEADDRESS
+      incident_address:
+      - SITEADDRESS
+      borough:
+      - CITY
+      zipcode:
+      - ZIP5
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 100000
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: false
+    zip_member: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'NY'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- rochester_ny
+- rochester-ny
+- rochester ny
+job_suffix: rochester

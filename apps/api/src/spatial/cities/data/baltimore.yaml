@@ -1,0 +1,337 @@
+city_id: baltimore
+name: Baltimore
+state: MD
+center:
+  lat: 39.29
+  lng: -76.612
+metro_bbox:
+  min_lat: 39.15
+  max_lat: 39.75
+  min_lng: -76.85
+  max_lng: -76.25
+division_bboxes:
+  BALTIMORE_CORE:
+    min_lat: 39.2
+    max_lat: 39.45
+    min_lng: -76.75
+    max_lng: -76.45
+submarkets:
+  Downtown & Inner Harbor:
+    name: Downtown & Inner Harbor
+    borough: BALTIMORE_CORE
+    lat: 39.287
+    lng: -76.612
+    zoom: 13.4
+    pitch: 48.0
+    base_lims: 0.82
+    capex: 7200000.0
+    permit_vel: 38.0
+    shift_ratio: 1.44
+    sla: 58.0
+    description: Downtown, Inner Harbor, and waterfront redevelopment corridor.
+    city_id: baltimore
+  Fells Point & Canton:
+    name: Fells Point & Canton
+    borough: BALTIMORE_CORE
+    lat: 39.282
+    lng: -76.58
+    zoom: 13.4
+    pitch: 46.0
+    base_lims: 0.8
+    capex: 6100000.0
+    permit_vel: 34.0
+    shift_ratio: 1.4
+    sla: 55.0
+    description: Historic waterfront neighborhoods with residential and hospitality
+      investment.
+    city_id: baltimore
+  Mount Vernon & Bolton Hill:
+    name: Mount Vernon & Bolton Hill
+    borough: BALTIMORE_CORE
+    lat: 39.305
+    lng: -76.62
+    zoom: 13.4
+    pitch: 45.0
+    base_lims: 0.76
+    capex: 5200000.0
+    permit_vel: 29.0
+    shift_ratio: 1.36
+    sla: 52.0
+    description: Historic central neighborhoods with adaptive reuse and institutional
+      demand.
+    city_id: baltimore
+  North Baltimore:
+    name: North Baltimore
+    borough: BALTIMORE_CORE
+    lat: 39.345
+    lng: -76.625
+    zoom: 12.8
+    pitch: 43.0
+    base_lims: 0.72
+    capex: 4600000.0
+    permit_vel: 25.0
+    shift_ratio: 1.32
+    sla: 50.0
+    description: North-side residential and education corridor with steady permit
+      activity.
+    city_id: baltimore
+divisions:
+  BALTIMORE_CORE:
+    name: Baltimore Core
+    center_lat: 39.29
+    center_lng: -76.612
+    zoom: 11.8
+    bbox:
+      min_lat: 39.2
+      max_lat: 39.45
+      min_lng: -76.75
+      max_lng: -76.45
+    submarkets:
+    - Downtown & Inner Harbor
+    - Fells Point & Canton
+    - Mount Vernon & Bolton Hill
+    - North Baltimore
+    city_id: baltimore
+datasets:
+  permits:
+    endpoint: https://egisdata.baltimorecity.gov/egis/rest/services/Housing/DHCD_Open_Baltimore_Datasets/FeatureServer/3
+    platform: arcgis
+    watermark_col: IssuedDate
+    id_keys:
+    - CaseNumber
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - CaseNumber
+      issuance_date:
+      - IssuedDate
+      expiration_date:
+      - ExpirationDate
+      address_street:
+      - Address
+      cost:
+      - Cost
+      borough:
+      - Neighborhood
+      - Council_District
+      job_type:
+      - ProposedUse
+      - ExistingUse
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 1000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: https://services1.arcgis.com/UWYHeuuJISiGmgXx/ArcGIS/rest/services/311_Customer_Service_Requests_current/FeatureServer/0
+    platform: arcgis
+    watermark_col: CreatedDate
+    id_keys:
+    - SRRecordID
+    - ServiceRequestNum
+    - RowID
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year:
+      '2025': https://services1.arcgis.com/UWYHeuuJISiGmgXx/ArcGIS/rest/services/311_Customer_Service_Requests_2025/FeatureServer/0
+      '2026': https://services1.arcgis.com/UWYHeuuJISiGmgXx/ArcGIS/rest/services/311_Customer_Service_Requests_current/FeatureServer/0
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - SRRecordID
+      - ServiceRequestNum
+      - RowID
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      complaint_type:
+      - SRType
+      created_date:
+      - CreatedDate
+      closed_date:
+      - CloseDate
+      status:
+      - SRStatus
+      incident_address:
+      - Address
+      zipcode:
+      - ZipCode
+      borough:
+      - Neighborhood
+      - CouncilDistrict
+    ingestion_mode: incremental
+    oid_field: RowID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: manual-verify
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://opendata.baltimorecity.gov/egis/rest/services/NonSpatialTables/Licenses/FeatureServer/0
+    platform: arcgis
+    watermark_col: LicenseDate
+    id_keys:
+    - LicenseNumber
+    - LLKey
+    - ESRI_OID
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - LicenseNumber
+      - LLKey
+      license_type:
+      - LicenseClass
+      - SubClass
+      effective_date:
+      - LicenseDate
+      expiration_date:
+      - LicenseEndDate
+      status:
+      - LicenseStatus
+      address_street:
+      - AddrStreet
+      zipcode:
+      - AddrZip
+    ingestion_mode: incremental
+    oid_field: ESRI_OID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  deeds:
+    endpoint: https://opendata.maryland.gov/resource/3x3p-xk2v.json
+    platform: socrata
+    watermark_col: sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89
+    id_keys:
+    - account_id_mdp_field_acctid
+    - sales_segment_1_transfer_number_mdp_field_transno1_sdat_field_79
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - account_id_mdp_field_acctid
+      bbl:
+      - account_id_mdp_field_acctid
+      document_amount:
+      - sales_segment_1_consideration_mdp_field_considr1_sdat_field_90
+      recorded_date:
+      - sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89
+      party1_grantor:
+      - sales_segment_1_grantor_name_mdp_field_grntnam1_sdat_field_80
+      latitude:
+      - mdp_latitude_mdp_field_digycord_converted_to_wgs84
+      longitude:
+      - mdp_longitude_mdp_field_digxcord_converted_to_wgs84
+    ingestion_mode: snapshot
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- baltimore_city
+- baltimore city
+- bmore
+job_suffix: baltimore

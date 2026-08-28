@@ -1,0 +1,789 @@
+city_id: los_angeles
+name: Los Angeles Metro
+state: CA
+center:
+  lat: 34.0522
+  lng: -118.2437
+metro_bbox:
+  min_lat: 33.7
+  max_lat: 34.34
+  min_lng: -118.63
+  max_lng: -117.95
+division_bboxes:
+  CENTRAL_LA:
+    min_lat: 34.03
+    max_lat: 34.14
+    min_lng: -118.35
+    max_lng: -118.2
+  WESTSIDE:
+    min_lat: 33.98
+    max_lat: 34.12
+    min_lng: -118.56
+    max_lng: -118.35
+  SAN_FERNANDO_VALLEY:
+    min_lat: 34.14
+    max_lat: 34.34
+    min_lng: -118.63
+    max_lng: -118.28
+  SOUTH_LA:
+    min_lat: 33.9
+    max_lat: 34.03
+    min_lng: -118.38
+    max_lng: -118.2
+  HARBOR_SOUTH_BAY:
+    min_lat: 33.7
+    max_lat: 33.9
+    min_lng: -118.45
+    max_lng: -118.1
+  EASTSIDE_SGV:
+    min_lat: 34.03
+    max_lat: 34.2
+    min_lng: -118.28
+    max_lng: -117.95
+submarkets:
+  Downtown Core & Bunker Hill:
+    name: Downtown Core & Bunker Hill
+    borough: CENTRAL_LA
+    lat: 34.0522
+    lng: -118.2437
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.93
+    capex: 18500000.0
+    permit_vel: 61.0
+    shift_ratio: 1.66
+    sla: 71.0
+    description: Financial District towers, Grand Avenue cultural corridor, and the
+      adaptive-reuse pipeline converting pre-war office stock to residential.
+    city_id: los_angeles
+  Arts District & Warehouse:
+    name: Arts District & Warehouse
+    borough: CENTRAL_LA
+    lat: 34.041
+    lng: -118.235
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.86
+    capex: 12800000.0
+    permit_vel: 48.0
+    shift_ratio: 1.52
+    sla: 63.0
+    description: Former produce and warehouse blocks east of Alameda now carrying
+      creative-office conversions and ground-floor food and beverage.
+    city_id: los_angeles
+  Koreatown:
+    name: Koreatown
+    borough: CENTRAL_LA
+    lat: 34.0577
+    lng: -118.3009
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.89
+    capex: 11200000.0
+    permit_vel: 57.0
+    shift_ratio: 1.61
+    sla: 68.0
+    description: Densest submarket in the county by units per acre, with mid-rise
+      podium construction along Wilshire and Vermont transit stops.
+    city_id: los_angeles
+  Hollywood:
+    name: Hollywood
+    borough: CENTRAL_LA
+    lat: 34.0983
+    lng: -118.3267
+    zoom: 14.0
+    pitch: 52.0
+    base_lims: 0.88
+    capex: 14100000.0
+    permit_vel: 53.0
+    shift_ratio: 1.57
+    sla: 66.0
+    description: Entertainment-anchored corridor along Hollywood and Sunset with studio-adjacent
+      office and tourism-driven ground-floor retail.
+    city_id: los_angeles
+  Silver Lake & Echo Park:
+    name: Silver Lake & Echo Park
+    borough: CENTRAL_LA
+    lat: 34.087
+    lng: -118.26
+    zoom: 13.5
+    pitch: 45.0
+    base_lims: 0.81
+    capex: 7900000.0
+    permit_vel: 41.0
+    shift_ratio: 1.44
+    sla: 58.0
+    description: Hillside residential neighbourhoods with small-lot subdivision activity
+      and independent retail along Sunset and Silver Lake Boulevard.
+    city_id: los_angeles
+  Mid-Wilshire & Miracle Mile:
+    name: Mid-Wilshire & Miracle Mile
+    borough: CENTRAL_LA
+    lat: 34.0624
+    lng: -118.34
+    zoom: 13.5
+    pitch: 48.0
+    base_lims: 0.85
+    capex: 10600000.0
+    permit_vel: 46.0
+    shift_ratio: 1.49
+    sla: 62.0
+    description: Museum Row and the Purple Line extension corridor, with pre-war office
+      towers and institutional expansion around LACMA.
+    city_id: los_angeles
+  Santa Monica:
+    name: Santa Monica
+    borough: WESTSIDE
+    lat: 34.0195
+    lng: -118.4912
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.91
+    capex: 16200000.0
+    permit_vel: 44.0
+    shift_ratio: 1.63
+    sla: 69.0
+    description: Coastal office and creative-tech cluster with strict rent-control
+      and development-agreement overlays constraining new supply.
+    city_id: los_angeles
+  Venice:
+    name: Venice
+    borough: WESTSIDE
+    lat: 33.985
+    lng: -118.4695
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.87
+    capex: 11800000.0
+    permit_vel: 38.0
+    shift_ratio: 1.55
+    sla: 64.0
+    description: Abbot Kinney retail spine and canal-adjacent residential, with coastal-commission
+      review lengthening entitlement timelines.
+    city_id: los_angeles
+  Culver City:
+    name: Culver City
+    borough: WESTSIDE
+    lat: 34.0211
+    lng: -118.3965
+    zoom: 13.5
+    pitch: 50.0
+    base_lims: 0.9
+    capex: 15400000.0
+    permit_vel: 58.0
+    shift_ratio: 1.64
+    sla: 70.0
+    description: Studio and streaming-tenant campus growth around the Expo Line with
+      the county's most active creative-office pipeline.
+    city_id: los_angeles
+  Westwood & UCLA:
+    name: Westwood & UCLA
+    borough: WESTSIDE
+    lat: 34.0635
+    lng: -118.4455
+    zoom: 14.0
+    pitch: 47.0
+    base_lims: 0.88
+    capex: 13700000.0
+    permit_vel: 42.0
+    shift_ratio: 1.54
+    sla: 65.0
+    description: University-anchored village with institutional medical expansion
+      and student-housing demand outpacing entitled supply.
+    city_id: los_angeles
+  Brentwood:
+    name: Brentwood
+    borough: WESTSIDE
+    lat: 34.052
+    lng: -118.476
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.79
+    capex: 9300000.0
+    permit_vel: 29.0
+    shift_ratio: 1.38
+    sla: 55.0
+    description: Low-density hillside single-family stock with San Vicente retail
+      and limited multifamily entitlement capacity.
+    city_id: los_angeles
+  Playa Vista & Silicon Beach:
+    name: Playa Vista & Silicon Beach
+    borough: WESTSIDE
+    lat: 33.981
+    lng: -118.42
+    zoom: 13.5
+    pitch: 50.0
+    base_lims: 0.92
+    capex: 17100000.0
+    permit_vel: 55.0
+    shift_ratio: 1.68
+    sla: 72.0
+    description: Master-planned campus district built on the former Hughes airfield,
+      carrying the Westside's largest contiguous office blocks.
+    city_id: los_angeles
+  Sherman Oaks:
+    name: Sherman Oaks
+    borough: SAN_FERNANDO_VALLEY
+    lat: 34.1508
+    lng: -118.449
+    zoom: 13.5
+    pitch: 45.0
+    base_lims: 0.83
+    capex: 8600000.0
+    permit_vel: 44.0
+    shift_ratio: 1.46
+    sla: 60.0
+    description: Ventura Boulevard retail and office corridor with hillside residential
+      above and steady small-scale infill.
+    city_id: los_angeles
+  Studio City:
+    name: Studio City
+    borough: SAN_FERNANDO_VALLEY
+    lat: 34.1436
+    lng: -118.396
+    zoom: 13.5
+    pitch: 45.0
+    base_lims: 0.84
+    capex: 9100000.0
+    permit_vel: 46.0
+    shift_ratio: 1.48
+    sla: 61.0
+    description: Studio-adjacent commercial strip along Ventura with production-support
+      tenancy and low-rise multifamily.
+    city_id: los_angeles
+  Van Nuys:
+    name: Van Nuys
+    borough: SAN_FERNANDO_VALLEY
+    lat: 34.1866
+    lng: -118.4487
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.76
+    capex: 6200000.0
+    permit_vel: 52.0
+    shift_ratio: 1.35
+    sla: 54.0
+    description: Civic-centre and light-industrial core of the central Valley, with
+      airport-adjacent logistics and older multifamily stock.
+    city_id: los_angeles
+  North Hollywood & NoHo Arts:
+    name: North Hollywood & NoHo Arts
+    borough: SAN_FERNANDO_VALLEY
+    lat: 34.172
+    lng: -118.376
+    zoom: 13.5
+    pitch: 48.0
+    base_lims: 0.87
+    capex: 12400000.0
+    permit_vel: 59.0
+    shift_ratio: 1.58
+    sla: 67.0
+    description: Red Line terminus and the Valley's densest transit-oriented pipeline,
+      anchored by the NoHo Arts District redevelopment.
+    city_id: los_angeles
+  Woodland Hills & Warner Center:
+    name: Woodland Hills & Warner Center
+    borough: SAN_FERNANDO_VALLEY
+    lat: 34.1683
+    lng: -118.6059
+    zoom: 13.0
+    pitch: 46.0
+    base_lims: 0.85
+    capex: 13900000.0
+    permit_vel: 50.0
+    shift_ratio: 1.53
+    sla: 64.0
+    description: Warner Center specific-plan area carrying the west Valley's only
+      high-rise entitlements and largest office concentration.
+    city_id: los_angeles
+  Burbank Media District:
+    name: Burbank Media District
+    borough: SAN_FERNANDO_VALLEY
+    lat: 34.1808
+    lng: -118.329
+    zoom: 13.5
+    pitch: 48.0
+    base_lims: 0.89
+    capex: 15800000.0
+    permit_vel: 54.0
+    shift_ratio: 1.6
+    sla: 68.0
+    description: Studio-owned campuses and post-production tenancy with municipal
+      review handled by Burbank rather than the City of LA.
+    city_id: los_angeles
+  Crenshaw & Leimert Park:
+    name: Crenshaw & Leimert Park
+    borough: SOUTH_LA
+    lat: 34.009
+    lng: -118.335
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.78
+    capex: 6800000.0
+    permit_vel: 47.0
+    shift_ratio: 1.4
+    sla: 57.0
+    description: Historic cultural district along the new K Line, with transit-adjacent
+      parcels drawing first-wave redevelopment interest.
+    city_id: los_angeles
+  Exposition Park & USC:
+    name: Exposition Park & USC
+    borough: SOUTH_LA
+    lat: 34.018
+    lng: -118.286
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.82
+    capex: 10200000.0
+    permit_vel: 49.0
+    shift_ratio: 1.47
+    sla: 61.0
+    description: Museum and stadium cluster with university-driven student housing
+      and the Lucas Museum construction anchoring the park.
+    city_id: los_angeles
+  Inglewood & SoFi:
+    name: Inglewood & SoFi
+    borough: SOUTH_LA
+    lat: 33.956
+    lng: -118.34
+    zoom: 13.0
+    pitch: 50.0
+    base_lims: 0.9
+    capex: 19200000.0
+    permit_vel: 63.0
+    shift_ratio: 1.7
+    sla: 73.0
+    description: Stadium and arena district driving the county's steepest land-value
+      reset, with hospitality and mixed-use following.
+    city_id: los_angeles
+  Watts:
+    name: Watts
+    borough: SOUTH_LA
+    lat: 33.94
+    lng: -118.24
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.71
+    capex: 4300000.0
+    permit_vel: 36.0
+    shift_ratio: 1.28
+    sla: 49.0
+    description: Predominantly single-family and public-housing stock with Blue Line
+      access and long-running redevelopment initiatives.
+    city_id: los_angeles
+  San Pedro & Waterfront:
+    name: San Pedro & Waterfront
+    borough: HARBOR_SOUTH_BAY
+    lat: 33.7361
+    lng: -118.2922
+    zoom: 13.0
+    pitch: 46.0
+    base_lims: 0.8
+    capex: 9700000.0
+    permit_vel: 43.0
+    shift_ratio: 1.43
+    sla: 59.0
+    description: Port-adjacent downtown with the West Harbor waterfront redevelopment
+      and working-waterfront industrial tenancy.
+    city_id: los_angeles
+  Long Beach Downtown:
+    name: Long Beach Downtown
+    borough: HARBOR_SOUTH_BAY
+    lat: 33.7701
+    lng: -118.1937
+    zoom: 13.5
+    pitch: 48.0
+    base_lims: 0.86
+    capex: 12900000.0
+    permit_vel: 56.0
+    shift_ratio: 1.54
+    sla: 65.0
+    description: Independent-jurisdiction downtown with high-rise residential delivery
+      and convention and port-office tenancy.
+    city_id: los_angeles
+  Torrance:
+    name: Torrance
+    borough: HARBOR_SOUTH_BAY
+    lat: 33.8358
+    lng: -118.3406
+    zoom: 12.5
+    pitch: 40.0
+    base_lims: 0.77
+    capex: 7400000.0
+    permit_vel: 39.0
+    shift_ratio: 1.36
+    sla: 55.0
+    description: Automotive and aerospace employment base with large-format retail
+      and low-rise industrial parks.
+    city_id: los_angeles
+  Redondo & Hermosa Beach:
+    name: Redondo & Hermosa Beach
+    borough: HARBOR_SOUTH_BAY
+    lat: 33.8492
+    lng: -118.3884
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.83
+    capex: 10800000.0
+    permit_vel: 31.0
+    shift_ratio: 1.45
+    sla: 60.0
+    description: Coastal beach cities with height-limited zoning, pier-adjacent retail,
+      and constrained multifamily supply.
+    city_id: los_angeles
+  Carson:
+    name: Carson
+    borough: HARBOR_SOUTH_BAY
+    lat: 33.8317
+    lng: -118.282
+    zoom: 12.5
+    pitch: 38.0
+    base_lims: 0.73
+    capex: 5600000.0
+    permit_vel: 45.0
+    shift_ratio: 1.31
+    sla: 51.0
+    description: Logistics and refinery-adjacent industrial land serving port drayage,
+      with limited residential entitlement activity.
+    city_id: los_angeles
+  Boyle Heights:
+    name: Boyle Heights
+    borough: EASTSIDE_SGV
+    lat: 34.034
+    lng: -118.21
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.79
+    capex: 6100000.0
+    permit_vel: 42.0
+    shift_ratio: 1.41
+    sla: 57.0
+    description: Gold Line-served eastside neighbourhood with historic multifamily
+      stock and active anti-displacement policy overlays.
+    city_id: los_angeles
+  Highland Park:
+    name: Highland Park
+    borough: EASTSIDE_SGV
+    lat: 34.112
+    lng: -118.192
+    zoom: 13.5
+    pitch: 43.0
+    base_lims: 0.81
+    capex: 7200000.0
+    permit_vel: 40.0
+    shift_ratio: 1.44
+    sla: 58.0
+    description: York and Figueroa retail corridors with craftsman residential stock
+      and sustained small-scale renovation permitting.
+    city_id: los_angeles
+  Pasadena Old Town:
+    name: Pasadena Old Town
+    borough: EASTSIDE_SGV
+    lat: 34.1466
+    lng: -118.15
+    zoom: 13.5
+    pitch: 47.0
+    base_lims: 0.88
+    capex: 14600000.0
+    permit_vel: 51.0
+    shift_ratio: 1.59
+    sla: 67.0
+    description: Independent-jurisdiction historic core with institutional and biotech
+      tenancy and design-review-heavy entitlement.
+    city_id: los_angeles
+  Glendale:
+    name: Glendale
+    borough: EASTSIDE_SGV
+    lat: 34.1425
+    lng: -118.2551
+    zoom: 13.5
+    pitch: 47.0
+    base_lims: 0.87
+    capex: 13300000.0
+    permit_vel: 57.0
+    shift_ratio: 1.56
+    sla: 66.0
+    description: Brand Boulevard retail and animation-studio office base, permitted
+      through Glendale's own development services.
+    city_id: los_angeles
+  Alhambra & San Gabriel:
+    name: Alhambra & San Gabriel
+    borough: EASTSIDE_SGV
+    lat: 34.0953
+    lng: -118.127
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.8
+    capex: 8100000.0
+    permit_vel: 44.0
+    shift_ratio: 1.42
+    sla: 58.0
+    description: San Gabriel Valley commercial corridors with dense low-rise multifamily
+      and cross-border investment demand.
+    city_id: los_angeles
+divisions:
+  CENTRAL_LA:
+    name: CENTRAL_LA
+    center_lat: 34.07
+    center_lng: -118.28
+    zoom: 12.5
+    bbox:
+      min_lat: 34.03
+      max_lat: 34.14
+      min_lng: -118.35
+      max_lng: -118.2
+    submarkets:
+    - Downtown Core & Bunker Hill
+    - Arts District & Warehouse
+    - Koreatown
+    - Hollywood
+    - Silver Lake & Echo Park
+    - Mid-Wilshire & Miracle Mile
+    city_id: los_angeles
+  WESTSIDE:
+    name: WESTSIDE
+    center_lat: 34.04
+    center_lng: -118.45
+    zoom: 12.0
+    bbox:
+      min_lat: 33.98
+      max_lat: 34.12
+      min_lng: -118.56
+      max_lng: -118.35
+    submarkets:
+    - Santa Monica
+    - Venice
+    - Culver City
+    - Westwood & UCLA
+    - Brentwood
+    - Playa Vista & Silicon Beach
+    city_id: los_angeles
+  SAN_FERNANDO_VALLEY:
+    name: SAN_FERNANDO_VALLEY
+    center_lat: 34.19
+    center_lng: -118.44
+    zoom: 11.5
+    bbox:
+      min_lat: 34.14
+      max_lat: 34.34
+      min_lng: -118.63
+      max_lng: -118.28
+    submarkets:
+    - Sherman Oaks
+    - Studio City
+    - Van Nuys
+    - North Hollywood & NoHo Arts
+    - Woodland Hills & Warner Center
+    - Burbank Media District
+    city_id: los_angeles
+  SOUTH_LA:
+    name: SOUTH_LA
+    center_lat: 33.98
+    center_lng: -118.29
+    zoom: 12.0
+    bbox:
+      min_lat: 33.9
+      max_lat: 34.03
+      min_lng: -118.38
+      max_lng: -118.2
+    submarkets:
+    - Crenshaw & Leimert Park
+    - Exposition Park & USC
+    - Inglewood & SoFi
+    - Watts
+    city_id: los_angeles
+  HARBOR_SOUTH_BAY:
+    name: HARBOR_SOUTH_BAY
+    center_lat: 33.81
+    center_lng: -118.29
+    zoom: 11.5
+    bbox:
+      min_lat: 33.7
+      max_lat: 33.9
+      min_lng: -118.45
+      max_lng: -118.1
+    submarkets:
+    - San Pedro & Waterfront
+    - Long Beach Downtown
+    - Torrance
+    - Redondo & Hermosa Beach
+    - Carson
+    city_id: los_angeles
+  EASTSIDE_SGV:
+    name: EASTSIDE_SGV
+    center_lat: 34.11
+    center_lng: -118.16
+    zoom: 11.5
+    bbox:
+      min_lat: 34.03
+      max_lat: 34.2
+      min_lng: -118.28
+      max_lng: -117.95
+    submarkets:
+    - Boyle Heights
+    - Highland Park
+    - Pasadena Old Town
+    - Glendale
+    - Alhambra & San Gabriel
+    city_id: los_angeles
+datasets:
+  permits:
+    endpoint: https://data.lacity.org/resource/pi9x-tg5x.json
+    platform: socrata
+    watermark_col: issue_date
+    id_keys:
+    - permit_nbr
+    - pin_nbr
+    - apn
+    - id
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map: {}
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: https://data.lacity.org/resource/2cy6-i7zn.json
+    platform: socrata
+    watermark_col: createddate
+    id_keys:
+    - casenumber
+    - srnumber
+    - id
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - casenumber
+      - srnumber
+      latitude:
+      - geolocation__latitude__s
+      longitude:
+      - geolocation__longitude__s
+      complaint_type:
+      - requesttype
+      created_date:
+      - createddate
+      closed_date:
+      - closeddate
+      zipcode:
+      - zipcode__c
+      borough:
+      - locator_sr_neigborhood_council
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://data.lacity.org/resource/6rrh-rzua.json
+    platform: socrata
+    watermark_col: location_start_date
+    id_keys:
+    - location_account
+    - business_name
+    - id
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map: {}
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- los-angeles
+- los angeles
+- la
+- l.a.
+- socal
+- la_county
+- la-county
+- la county
+- long_beach
+- long beach
+- pasadena
+- glendale
+- south_bay
+- san_fernando_valley
+job_suffix: la

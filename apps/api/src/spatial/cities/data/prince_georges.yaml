@@ -1,0 +1,264 @@
+city_id: prince_georges
+name: Prince George's County
+state: MD
+center:
+  lat: 38.72
+  lng: -76.75
+metro_bbox:
+  min_lat: 38.55
+  max_lat: 39.22
+  min_lng: -77.12
+  max_lng: -76.62
+division_bboxes:
+  PRINCE_GEORGES_CORE:
+    min_lat: 38.6
+    max_lat: 39.05
+    min_lng: -77.05
+    max_lng: -76.7
+submarkets:
+  National Harbor & Oxon Hill:
+    name: National Harbor & Oxon Hill
+    borough: PRINCE_GEORGES_CORE
+    lat: 38.783
+    lng: -76.982
+    zoom: 13.8
+    pitch: 50.0
+    base_lims: 0.82
+    capex: 6200000.0
+    permit_vel: 32.0
+    shift_ratio: 1.41
+    sla: 58.0
+    description: Potomac waterfront mixed-use district anchored by the convention
+      center and casino, with hotel-adjacent retail and residential demand.
+    city_id: prince_georges
+  Largo & Landover Core:
+    name: Largo & Landover Core
+    borough: PRINCE_GEORGES_CORE
+    lat: 38.87
+    lng: -76.84
+    zoom: 13.2
+    pitch: 46.0
+    base_lims: 0.79
+    capex: 5400000.0
+    permit_vel: 30.0
+    shift_ratio: 1.38
+    sla: 55.0
+    description: Blue Line office and medical corridor around Largo Town Center and
+      the new regional hospital, with county-government anchoring.
+    city_id: prince_georges
+  Bowie & South Laurel:
+    name: Bowie & South Laurel
+    borough: PRINCE_GEORGES_CORE
+    lat: 38.942
+    lng: -76.73
+    zoom: 12.8
+    pitch: 44.0
+    base_lims: 0.76
+    capex: 4600000.0
+    permit_vel: 27.0
+    shift_ratio: 1.33
+    sla: 52.0
+    description: Suburban family belt along the Route 197 and US-1 north corridors,
+      dominated by single-family stock and town-center retail.
+    city_id: prince_georges
+  College Park & Route 1:
+    name: College Park & Route 1
+    borough: PRINCE_GEORGES_CORE
+    lat: 38.99
+    lng: -76.93
+    zoom: 13.4
+    pitch: 48.0
+    base_lims: 0.84
+    capex: 5000000.0
+    permit_vel: 34.0
+    shift_ratio: 1.45
+    sla: 60.0
+    description: University of Maryland anchor market with student rental demand,
+      research-park employment, and Purple Line construction activity.
+    city_id: prince_georges
+divisions:
+  PRINCE_GEORGES_CORE:
+    name: Prince Georges County
+    center_lat: 38.72
+    center_lng: -76.75
+    zoom: 10.6
+    bbox:
+      min_lat: 38.6
+      max_lat: 39.05
+      min_lng: -77.05
+      max_lng: -76.7
+    submarkets:
+    - National Harbor & Oxon Hill
+    - Largo & Landover Core
+    - Bowie & South Laurel
+    - College Park & Route 1
+    city_id: prince_georges
+datasets:
+  '311':
+    endpoint: https://data.princegeorgescountymd.gov/resource/2ywx-ipcd.json
+    platform: socrata
+    watermark_col: date_request_opened
+    id_keys:
+    - service_request
+    - id
+    topic: raw.municipal.311
+    interval_seconds: 600.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - service_request
+      complaint_type:
+      - request_name
+      created_date:
+      - date_request_opened
+      status:
+      - request_status
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  deeds:
+    endpoint: https://opendata.maryland.gov/resource/w3eb-4mzd.json
+    platform: socrata
+    watermark_col: sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89
+    id_keys:
+    - account_id_mdp_field_acctid
+    - sales_segment_1_transfer_number_mdp_field_transno1_sdat_field_79
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - account_id_mdp_field_acctid
+      bbl:
+      - account_id_mdp_field_acctid
+      document_amount:
+      - sales_segment_1_consideration_mdp_field_considr1_sdat_field_90
+      recorded_date:
+      - sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89
+      party1_grantor:
+      - sales_segment_1_grantor_name_mdp_field_grntnam1_sdat_field_80
+      latitude:
+      - mdp_latitude_mdp_field_digycord_converted_to_wgs84
+      longitude:
+      - mdp_longitude_mdp_field_digxcord_converted_to_wgs84
+    ingestion_mode: snapshot
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'MD'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- prince georges
+- prince_georges_county
+- prince george's county
+- pgco
+- pgcounty
+job_suffix: pgmd

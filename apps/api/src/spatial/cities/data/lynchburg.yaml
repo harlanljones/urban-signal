@@ -1,0 +1,363 @@
+city_id: lynchburg
+name: Lynchburg
+state: VA
+center:
+  lat: 37.4135
+  lng: -79.1422
+metro_bbox:
+  min_lat: 37.33
+  max_lat: 37.47
+  min_lng: -79.28
+  max_lng: -79.08
+division_bboxes:
+  DOWNTOWN_RIVERFRONT:
+    min_lat: 37.4
+    max_lat: 37.435
+    min_lng: -79.165
+    max_lng: -79.125
+  SOUTH_SIDE:
+    min_lat: 37.375
+    max_lat: 37.412
+    min_lng: -79.195
+    max_lng: -79.155
+  WEST_END:
+    min_lat: 37.385
+    max_lat: 37.445
+    min_lng: -79.23
+    max_lng: -79.185
+submarkets:
+  Downtown:
+    name: Downtown
+    borough: DOWNTOWN_RIVERFRONT
+    lat: 37.4135
+    lng: -79.1422
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.85
+    capex: 5200000.0
+    permit_vel: 30.0
+    shift_ratio: 1.45
+    sla: 55.0
+    description: 'Court Street hill to Main Street commercial core with the city''s
+      densest renovation pipeline: upper-floor apartment conversions, facade grants,
+      and institutional anchors.'
+    city_id: lynchburg
+  Riverfront:
+    name: Riverfront
+    borough: DOWNTOWN_RIVERFRONT
+    lat: 37.4095
+    lng: -79.139
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.82
+    capex: 4600000.0
+    permit_vel: 26.0
+    shift_ratio: 1.4
+    sla: 50.0
+    description: James River arts-and-amphitheater district below Ninth Street where
+      mill-warehouse stock converts to dining, lofts, and riverwalk-adjacent hospitality.
+    city_id: lynchburg
+  Diamond Hill:
+    name: Diamond Hill
+    borough: SOUTH_SIDE
+    lat: 37.4055
+    lng: -79.1585
+    zoom: 14.5
+    pitch: 38.0
+    base_lims: 0.72
+    capex: 2600000.0
+    permit_vel: 18.0
+    shift_ratio: 1.26
+    sla: 40.0
+    description: Historic brick rowhouse district on the hill southwest of downtown
+      with investor-led restoration and first-time-buyer turnover.
+    city_id: lynchburg
+  Tinbridge Hill:
+    name: Tinbridge Hill
+    borough: SOUTH_SIDE
+    lat: 37.4035
+    lng: -79.1755
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.68
+    capex: 2100000.0
+    permit_vel: 15.0
+    shift_ratio: 1.22
+    sla: 36.0
+    description: Working residential grid between Federal Street and the Miller Park
+      edge with steady repair-trade permitting and infill interest.
+    city_id: lynchburg
+  Heritage:
+    name: Heritage
+    borough: SOUTH_SIDE
+    lat: 37.386
+    lng: -79.185
+    zoom: 14.0
+    pitch: 32.0
+    base_lims: 0.66
+    capex: 1900000.0
+    permit_vel: 14.0
+    shift_ratio: 1.2
+    sla: 34.0
+    description: Wards Road corridor neighborhoods around the Heritage schools and
+      the airport commercial strip, absorbing medical-office and retail refit demand.
+    city_id: lynchburg
+  Boonsboro:
+    name: Boonsboro
+    borough: WEST_END
+    lat: 37.4295
+    lng: -79.1985
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.8
+    capex: 3900000.0
+    permit_vel: 22.0
+    shift_ratio: 1.36
+    sla: 48.0
+    description: Affluent Boonsboro Road corridor of estate infill, Peaks View-adjacent
+      subdivisions, and the Link Road retail node.
+    city_id: lynchburg
+  Wyndhurst:
+    name: Wyndhurst
+    borough: WEST_END
+    lat: 37.3985
+    lng: -79.209
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.78
+    capex: 3500000.0
+    permit_vel: 24.0
+    shift_ratio: 1.34
+    sla: 46.0
+    description: Master-planned new-urbanist district off Lakeside Drive mixing tract
+      build-out, the Wyndhurst Industrial Corridor's flex space, and Liberty University
+      spillover.
+    city_id: lynchburg
+divisions:
+  DOWNTOWN_RIVERFRONT:
+    name: DOWNTOWN_RIVERFRONT
+    center_lat: 37.412
+    center_lng: -79.142
+    zoom: 14.5
+    bbox:
+      min_lat: 37.4
+      max_lat: 37.435
+      min_lng: -79.165
+      max_lng: -79.125
+    submarkets:
+    - Downtown
+    - Riverfront
+    city_id: lynchburg
+  SOUTH_SIDE:
+    name: SOUTH_SIDE
+    center_lat: 37.398
+    center_lng: -79.173
+    zoom: 13.5
+    bbox:
+      min_lat: 37.375
+      max_lat: 37.412
+      min_lng: -79.195
+      max_lng: -79.155
+    submarkets:
+    - Diamond Hill
+    - Tinbridge Hill
+    - Heritage
+    city_id: lynchburg
+  WEST_END:
+    name: WEST_END
+    center_lat: 37.414
+    center_lng: -79.204
+    zoom: 13.5
+    bbox:
+      min_lat: 37.385
+      max_lat: 37.445
+      min_lng: -79.23
+      max_lng: -79.185
+    submarkets:
+    - Boonsboro
+    - Wyndhurst
+    city_id: lynchburg
+datasets:
+  permits:
+    endpoint: https://mapviewer.lynchburgva.gov/arcgis/rest/services/OpenData/ODPDynamic/MapServer/37
+    platform: arcgis
+    watermark_col: StartDate
+    id_keys:
+    - RecordNo
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: OBJECTID
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Lynchburg, VA
+    field_map:
+      job_id:
+      - RecordNo
+      - OBJECTID
+      job_type:
+      - SubType
+      - Type
+      issuance_date:
+      - StartDate
+      address_street:
+      - Address
+      bbl:
+      - ParcelID
+      borough:
+      - Neighborhood
+      cost:
+      - JobValue
+      status:
+      - Status
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 50000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: true
+    zip_member: null
+  sla:
+    endpoint: https://mapviewer.lynchburgva.gov/arcgis/rest/services/OpenData/ODPDynamic/MapServer/33
+    platform: arcgis
+    watermark_col: LicenseIssued
+    id_keys:
+    - LicenseNumber
+    - OBJECTID
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: OBJECTID
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Lynchburg, VA
+    field_map:
+      license_id:
+      - LicenseNumber
+      - Company
+      - TradeName
+      dba:
+      - TradeName
+      - Company
+      premises_name:
+      - Company
+      license_type:
+      - BusinessType
+      effective_date:
+      - LicenseIssued
+      expiration_date:
+      - LicenseExpires
+      address_street:
+      - MailAddress1
+      zipcode:
+      - MailZip
+      status:
+      - Status
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 50000
+    expected_cadence_days: 365
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: true
+    zip_member: null
+  deeds:
+    endpoint: https://mapviewer.lynchburgva.gov/arcgis/rest/services/OpenData/ODPDynamic/MapServer/34
+    platform: arcgis
+    watermark_col: SaleDate
+    id_keys:
+    - LRSN
+    - DocumentNo
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: ESRI_OID
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Lynchburg, VA
+    field_map:
+      doc_id:
+      - DocumentNo
+      - ESRI_OID
+      bbl:
+      - LRSN
+      document_amount:
+      - SaleAmount
+      recorded_date:
+      - SaleDate
+      party1_grantor:
+      - Seller
+      party2_grantee:
+      - Buyer
+    ingestion_mode: incremental
+    oid_field: ESRI_OID
+    max_record_count: 50000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join:
+      parcel_layer: https://mapviewer.lynchburgva.gov/arcgis/rest/services/OpenData/ODPDynamic/MapServer/41
+      join_key: LRSN
+      geometry_source: centroid
+    non_spatial: true
+    zip_member: null
+aliases:
+- lynchburg_va
+- lynchburg-va
+- lynchburg va
+job_suffix: lynchburg

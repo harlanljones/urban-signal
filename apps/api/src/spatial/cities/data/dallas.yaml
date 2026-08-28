@@ -1,0 +1,597 @@
+city_id: dallas
+name: Dallas / Dallas County
+state: TX
+center:
+  lat: 32.7767
+  lng: -96.797
+metro_bbox:
+  min_lat: 32.6
+  max_lat: 33.1
+  min_lng: -97.05
+  max_lng: -96.55
+division_bboxes:
+  DOWNTOWN_EAST:
+    min_lat: 32.74
+    max_lat: 32.82
+    min_lng: -96.82
+    max_lng: -96.74
+  OAK_LAWN_UPTOWN:
+    min_lat: 32.76
+    max_lat: 32.84
+    min_lng: -96.83
+    max_lng: -96.78
+  NORTH_DALLAS_PRESTON:
+    min_lat: 32.85
+    max_lat: 33.0
+    min_lng: -96.88
+    max_lng: -96.72
+  EAST_DALLAS_WHITE_ROCK:
+    min_lat: 32.78
+    max_lat: 32.88
+    min_lng: -96.78
+    max_lng: -96.66
+  SOUTH_DALLAS_OAK_CLIFF:
+    min_lat: 32.62
+    max_lat: 32.77
+    min_lng: -96.88
+    max_lng: -96.74
+  PARK_CITIES_HIGHLAND_PARK:
+    min_lat: 32.8
+    max_lat: 32.86
+    min_lng: -96.81
+    max_lng: -96.76
+submarkets:
+  Downtown Core & Main Street:
+    name: Downtown Core & Main Street
+    borough: DOWNTOWN_EAST
+    lat: 32.7845
+    lng: -96.793
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.92
+    capex: 11500000.0
+    permit_vel: 54.0
+    shift_ratio: 1.66
+    sla: 72.0
+    description: CBD towers and Deep Ellum edge where ROW/permit velocity tracks transit-oriented
+      redevelopment along the DART core.
+    city_id: dallas
+  Deep Ellum:
+    name: Deep Ellum
+    borough: DOWNTOWN_EAST
+    lat: 32.7885
+    lng: -96.778
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.84
+    capex: 7600000.0
+    permit_vel: 49.0
+    shift_ratio: 1.58
+    sla: 63.0
+    description: Music-venue and adaptive-reuse district east of the core, mixed-use
+      infill driving small-lot ROW work.
+    city_id: dallas
+  Baylor & Cedars:
+    name: Baylor & Cedars
+    borough: DOWNTOWN_EAST
+    lat: 32.8005
+    lng: -96.8105
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.8
+    capex: 6400000.0
+    permit_vel: 38.0
+    shift_ratio: 1.49
+    sla: 58.0
+    description: Medical-district-adjacent residential conversion belt with hospital-anchored
+      demand and steady renovation permits.
+    city_id: dallas
+  Uptown & West Village:
+    name: Uptown & West Village
+    borough: OAK_LAWN_UPTOWN
+    lat: 32.7955
+    lng: -96.8015
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.9
+    capex: 11800000.0
+    permit_vel: 57.0
+    shift_ratio: 1.64
+    sla: 70.0
+    description: Streetcar-era high-density multifamily spine with the metro's densest
+      vertical construction outside downtown.
+    city_id: dallas
+  Oak Lawn & Turtle Creek:
+    name: Oak Lawn & Turtle Creek
+    borough: OAK_LAWN_UPTOWN
+    lat: 32.8175
+    lng: -96.8085
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.86
+    capex: 9200000.0
+    permit_vel: 44.0
+    shift_ratio: 1.55
+    sla: 64.0
+    description: Established estate-and-highrise corridor with teardown-rebuild mansions
+      and luxury mid-rise permitting.
+    city_id: dallas
+  Victory Park:
+    name: Victory Park
+    borough: OAK_LAWN_UPTOWN
+    lat: 32.7895
+    lng: -96.8085
+    zoom: 14.0
+    pitch: 52.0
+    base_lims: 0.83
+    capex: 8800000.0
+    permit_vel: 41.0
+    shift_ratio: 1.52
+    sla: 61.0
+    description: Arena-and-residential mixed-use node northwest of downtown with ground-up
+      tower activity.
+    city_id: dallas
+  Preston Hollow:
+    name: Preston Hollow
+    borough: NORTH_DALLAS_PRESTON
+    lat: 32.8845
+    lng: -96.8055
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.89
+    capex: 10500000.0
+    permit_vel: 33.0
+    shift_ratio: 1.46
+    sla: 55.0
+    description: Hill-country estate stock with teardown-rebuild mansions dominating
+      a low-volume, high-value permit mix.
+    city_id: dallas
+  Preston Center & Bluffview:
+    name: Preston Center & Bluffview
+    borough: NORTH_DALLAS_PRESTON
+    lat: 32.8655
+    lng: -96.8055
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.85
+    capex: 8400000.0
+    permit_vel: 39.0
+    shift_ratio: 1.5
+    sla: 60.0
+    description: Office-to-residential conversion belt and cottage-grid neighborhoods
+      under the Preston overlay.
+    city_id: dallas
+  North Dallas & LBJ Freeway:
+    name: North Dallas & LBJ Freeway
+    borough: NORTH_DALLAS_PRESTON
+    lat: 32.9155
+    lng: -96.7555
+    zoom: 12.5
+    pitch: 38.0
+    base_lims: 0.74
+    capex: 5200000.0
+    permit_vel: 31.0
+    shift_ratio: 1.36
+    sla: 49.0
+    description: Freeway-adjacent commercial edge with mid-rise multifamily replacements
+      of aging retail and office stock.
+    city_id: dallas
+  White Rock Lake:
+    name: White Rock Lake
+    borough: EAST_DALLAS_WHITE_ROCK
+    lat: 32.8275
+    lng: -96.7155
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.81
+    capex: 6700000.0
+    permit_vel: 28.0
+    shift_ratio: 1.41
+    sla: 54.0
+    description: Park-adjacent post-war residential hills drawing renovation capital
+      from greenbelt access.
+    city_id: dallas
+  Lake Highlands:
+    name: Lake Highlands
+    borough: EAST_DALLAS_WHITE_ROCK
+    lat: 32.8555
+    lng: -96.7155
+    zoom: 13.0
+    pitch: 38.0
+    base_lims: 0.76
+    capex: 5400000.0
+    permit_vel: 26.0
+    shift_ratio: 1.34
+    sla: 47.0
+    description: Suburban-style subdivisions along the northeastern growth spine,
+      permitted through Dallas rather than Richardson.
+    city_id: dallas
+  East Dallas & Lower Greenville:
+    name: East Dallas & Lower Greenville
+    borough: EAST_DALLAS_WHITE_ROCK
+    lat: 32.8205
+    lng: -96.7705
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.83
+    capex: 6900000.0
+    permit_vel: 35.0
+    shift_ratio: 1.45
+    sla: 56.0
+    description: Indie-retail strip meeting streetcar-era bungalow stock, renovation-led
+      permits under neighborhood overlays.
+    city_id: dallas
+  Bishop Arts District:
+    name: Bishop Arts District
+    borough: SOUTH_DALLAS_OAK_CLIFF
+    lat: 32.7415
+    lng: -96.8255
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.84
+    capex: 8200000.0
+    permit_vel: 42.0
+    shift_ratio: 1.53
+    sla: 60.0
+    description: Boutique retail and hotel flagship corridor with infill multifamily
+      on its side streets in North Oak Cliff.
+    city_id: dallas
+  Kessler & Stevens Park:
+    name: Kessler & Stevens Park
+    borough: SOUTH_DALLAS_OAK_CLIFF
+    lat: 32.7155
+    lng: -96.8355
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.79
+    capex: 6000000.0
+    permit_vel: 27.0
+    shift_ratio: 1.4
+    sla: 52.0
+    description: Hill-country estate stock at the Oak Cliff village boundary with
+      teardown-rebuild pressure.
+    city_id: dallas
+  South Dallas & Fair Park:
+    name: South Dallas & Fair Park
+    borough: SOUTH_DALLAS_OAK_CLIFF
+    lat: 32.7655
+    lng: -96.7555
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.7
+    capex: 4200000.0
+    permit_vel: 22.0
+    shift_ratio: 1.28
+    sla: 43.0
+    description: Fair Park-adjacent redevelopment belt with renovation-heavy permitting
+      and historic-district overlays.
+    city_id: dallas
+  Highland Park:
+    name: Highland Park
+    borough: PARK_CITIES_HIGHLAND_PARK
+    lat: 32.8265
+    lng: -96.7925
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.91
+    capex: 11000000.0
+    permit_vel: 24.0
+    shift_ratio: 1.5
+    sla: 51.0
+    description: Incorporated estate enclave inside Dallas with teardown-rebuild mansions
+      dominating a low-volume, high-value mix.
+    city_id: dallas
+  University Park:
+    name: University Park
+    borough: PARK_CITIES_HIGHLAND_PARK
+    lat: 32.8355
+    lng: -96.7955
+    zoom: 14.0
+    pitch: 44.0
+    base_lims: 0.87
+    capex: 9600000.0
+    permit_vel: 29.0
+    shift_ratio: 1.47
+    sla: 55.0
+    description: SMU-anchored residential enclave with renovation-led permits and
+      strict tree/single-family overlays.
+    city_id: dallas
+  Highland Park Village Edge:
+    name: Highland Park Village Edge
+    borough: PARK_CITIES_HIGHLAND_PARK
+    lat: 32.8305
+    lng: -96.8005
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.82
+    capex: 7300000.0
+    permit_vel: 21.0
+    shift_ratio: 1.42
+    sla: 48.0
+    description: Retail-and-residential node at the Park Cities boundary, ground-up
+      luxury mixed-use on side streets.
+    city_id: dallas
+divisions:
+  DOWNTOWN_EAST:
+    name: DOWNTOWN_EAST
+    center_lat: 32.79
+    center_lng: -96.79
+    zoom: 13.5
+    bbox:
+      min_lat: 32.74
+      max_lat: 32.82
+      min_lng: -96.82
+      max_lng: -96.74
+    submarkets:
+    - Downtown Core & Main Street
+    - Deep Ellum
+    - Baylor & Cedars
+    city_id: dallas
+  OAK_LAWN_UPTOWN:
+    name: OAK_LAWN_UPTOWN
+    center_lat: 32.8
+    center_lng: -96.8
+    zoom: 13.0
+    bbox:
+      min_lat: 32.76
+      max_lat: 32.84
+      min_lng: -96.83
+      max_lng: -96.78
+    submarkets:
+    - Uptown & West Village
+    - Oak Lawn & Turtle Creek
+    - Victory Park
+    city_id: dallas
+  NORTH_DALLAS_PRESTON:
+    name: NORTH_DALLAS_PRESTON
+    center_lat: 32.89
+    center_lng: -96.8
+    zoom: 12.5
+    bbox:
+      min_lat: 32.85
+      max_lat: 33.0
+      min_lng: -96.88
+      max_lng: -96.72
+    submarkets:
+    - Preston Hollow
+    - Preston Center & Bluffview
+    - North Dallas & LBJ Freeway
+    city_id: dallas
+  EAST_DALLAS_WHITE_ROCK:
+    name: EAST_DALLAS_WHITE_ROCK
+    center_lat: 32.83
+    center_lng: -96.71
+    zoom: 13.0
+    bbox:
+      min_lat: 32.78
+      max_lat: 32.88
+      min_lng: -96.78
+      max_lng: -96.66
+    submarkets:
+    - White Rock Lake
+    - Lake Highlands
+    - East Dallas & Lower Greenville
+    city_id: dallas
+  SOUTH_DALLAS_OAK_CLIFF:
+    name: SOUTH_DALLAS_OAK_CLIFF
+    center_lat: 32.71
+    center_lng: -96.82
+    zoom: 12.5
+    bbox:
+      min_lat: 32.62
+      max_lat: 32.77
+      min_lng: -96.88
+      max_lng: -96.74
+    submarkets:
+    - Bishop Arts District
+    - Kessler & Stevens Park
+    - South Dallas & Fair Park
+    city_id: dallas
+  PARK_CITIES_HIGHLAND_PARK:
+    name: PARK_CITIES_HIGHLAND_PARK
+    center_lat: 32.83
+    center_lng: -96.8
+    zoom: 13.5
+    bbox:
+      min_lat: 32.8
+      max_lat: 32.86
+      min_lng: -96.81
+      max_lng: -96.76
+    submarkets:
+    - Highland Park
+    - University Park
+    - Highland Park Village Edge
+    city_id: dallas
+datasets:
+  permits:
+    endpoint: https://services2.arcgis.com/rwnOSbfKSwyTBcwN/arcgis/rest/services/ROW/FeatureServer/0
+    platform: arcgis
+    watermark_col: CREATEDDATE
+    id_keys:
+    - EXTERNALFILENUM
+    - JOBID
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: CREATEDDATE DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - EXTERNALFILENUM
+      - JOBID
+      - OBJECTID
+      job_type:
+      - PERMITTYPE
+      - ROWREASONFORJOB
+      - ROWIMPROVEMENTREPAIR
+      issuance_date:
+      - ISSUEDATE
+      filing_date:
+      - CREATEDDATE
+      status:
+      - STATUSDESCRIPTION
+      borough:
+      - COUNCIL_DISTRICTS
+      address_street:
+      - LOCATIONNAMES
+      - SPECIFICLOCATION
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: row_permits
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: https://services2.arcgis.com/rwnOSbfKSwyTBcwN/arcgis/rest/services/CRM_30Days_viewLayer_BuildingServices/FeatureServer/0
+    platform: arcgis
+    watermark_col: CreatedDate
+    id_keys:
+    - Service_Request_Number_c
+    - CaseNumber
+    - OBJECTID
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - Service_Request_Number_c
+      - CaseNumber
+      - OBJECTID
+      created_date:
+      - CreatedDate
+      closed_date:
+      - ClosedDate
+      status:
+      - Status
+      complaint_type:
+      - Subject
+      - Service_Type_Version_Code_c
+      incident_address:
+      - Address_c
+      - Location_Details_c
+      borough:
+      - Council_District_c
+      - City_Service_Area_c
+      zipcode:
+      - Zipcode_c
+      latitude:
+      - Location_Latitude_s
+      longitude:
+      - Location_Longitude_s
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: 30
+    rolling_window_days: 30
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'TX'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- dallas_tx
+- dallas tx
+- dallas_county
+- dallas county
+- big_d
+job_suffix: dallas

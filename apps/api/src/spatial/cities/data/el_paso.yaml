@@ -1,0 +1,281 @@
+city_id: el_paso
+name: El Paso / El Paso County
+state: TX
+center:
+  lat: 31.7619
+  lng: -106.485
+metro_bbox:
+  min_lat: 31.55
+  max_lat: 32.2
+  min_lng: -107.2
+  max_lng: -106.0
+division_bboxes:
+  EL_PASO_CORE:
+    min_lat: 31.65
+    max_lat: 32.1
+    min_lng: -107.05
+    max_lng: -106.25
+submarkets:
+  Downtown & Segundo Barrio:
+    name: Downtown & Segundo Barrio
+    borough: EL_PASO_CORE
+    lat: 31.7587
+    lng: -106.4869
+    zoom: 13.0
+    pitch: 45.0
+    base_lims: 0.8
+    capex: 5600000.0
+    permit_vel: 28.0
+    shift_ratio: 1.35
+    sla: 52.0
+    description: Border-adjacent civic core with historic rehabilitation, cross-border
+      commerce, and public-realm investment.
+    city_id: el_paso
+  Westside & UTEP:
+    name: Westside & UTEP
+    borough: EL_PASO_CORE
+    lat: 31.776
+    lng: -106.505
+    zoom: 12.7
+    pitch: 42.0
+    base_lims: 0.78
+    capex: 5200000.0
+    permit_vel: 26.0
+    shift_ratio: 1.33
+    sla: 51.0
+    description: University and west-side neighborhoods with infill, student-oriented
+      services, and housing turnover.
+    city_id: el_paso
+  Central El Paso:
+    name: Central El Paso
+    borough: EL_PASO_CORE
+    lat: 31.79
+    lng: -106.435
+    zoom: 12.6
+    pitch: 41.0
+    base_lims: 0.76
+    capex: 4800000.0
+    permit_vel: 25.0
+    shift_ratio: 1.32
+    sla: 50.0
+    description: Mature central neighborhoods with repair activity, municipal service
+      demand, and corridor reinvestment.
+    city_id: el_paso
+  East El Paso:
+    name: East El Paso
+    borough: EL_PASO_CORE
+    lat: 31.805
+    lng: -106.275
+    zoom: 12.2
+    pitch: 39.0
+    base_lims: 0.77
+    capex: 6500000.0
+    permit_vel: 34.0
+    shift_ratio: 1.38
+    sla: 53.0
+    description: Fast-growing east-side corridor where new housing, retail, and infrastructure
+      extension converge.
+    city_id: el_paso
+  Upper Valley:
+    name: Upper Valley
+    borough: EL_PASO_CORE
+    lat: 31.87
+    lng: -106.535
+    zoom: 11.9
+    pitch: 37.0
+    base_lims: 0.74
+    capex: 5100000.0
+    permit_vel: 24.0
+    shift_ratio: 1.3
+    sla: 49.0
+    description: Northwest valley communities balancing low-density growth, agricultural
+      land, and service access.
+    city_id: el_paso
+divisions:
+  EL_PASO_CORE:
+    name: El Paso / El Paso County
+    center_lat: 31.7619
+    center_lng: -106.485
+    zoom: 10.8
+    bbox:
+      min_lat: 31.65
+      max_lat: 32.1
+      min_lng: -107.05
+      max_lng: -106.25
+    submarkets:
+    - Downtown & Segundo Barrio
+    - Westside & UTEP
+    - Central El Paso
+    - East El Paso
+    - Upper Valley
+    city_id: el_paso
+datasets:
+  '311':
+    endpoint: https://gis.elpasotexas.gov/accela/rest/services/311/Requests/FeatureServer/0
+    platform: arcgis
+    watermark_col: created_at
+    id_keys:
+    - id
+    - request_id
+    - OBJECTID
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - id
+      - request_id
+      - OBJECTID
+      created_date:
+      - created_at
+      status:
+      - status
+      complaint_type:
+      - request_type
+      - request_category
+      incident_address:
+      - address
+      borough:
+      - district
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: 30
+    rolling_window_days: 30
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  permits:
+    endpoint: https://services1.arcgis.com/hyTVSIhR7dHyDsJF/arcgis/rest/services/NewResi2018_19/FeatureServer/0
+    platform: arcgis
+    watermark_col: Issued_Dat
+    id_keys:
+    - B1_ALT_ID
+    - FID
+    - id
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - B1_ALT_ID
+      cost:
+      - JOBVALUE
+      issued_date:
+      - Issued_Dat
+    ingestion_mode: incremental
+    oid_field: FID
+    max_record_count: 1000
+    expected_cadence_days: 7
+    alarm_exempt: true
+    alarm_exempt_reason: frozen 2018-2021 historical building-permit snapshot
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'TX'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- el paso
+- el_paso_tx
+- el paso tx
+- el_paso_county
+- el paso county
+job_suffix: el_paso

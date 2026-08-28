@@ -1,0 +1,158 @@
+{
+  "schema_version": 2,
+  "id": "lynchburg",
+  "name": "Lynchburg",
+  "state": "VA",
+  "center": {
+    "lat": 37.4135,
+    "lng": -79.1422
+  },
+  "metro_bbox": {
+    "min_lat": 37.33,
+    "max_lat": 37.47,
+    "min_lng": -79.28,
+    "max_lng": -79.08
+  },
+  "divisions": {
+    "DOWNTOWN_RIVERFRONT": {
+      "name": "DOWNTOWN_RIVERFRONT",
+      "center": {
+        "lat": 37.412,
+        "lng": -79.142
+      },
+      "bbox": {
+        "min_lat": 37.4,
+        "max_lat": 37.435,
+        "min_lng": -79.165,
+        "max_lng": -79.125
+      },
+      "submarkets": [
+        "Downtown",
+        "Riverfront"
+      ]
+    },
+    "SOUTH_SIDE": {
+      "name": "SOUTH_SIDE",
+      "center": {
+        "lat": 37.398,
+        "lng": -79.173
+      },
+      "bbox": {
+        "min_lat": 37.375,
+        "max_lat": 37.412,
+        "min_lng": -79.195,
+        "max_lng": -79.155
+      },
+      "submarkets": [
+        "Diamond Hill",
+        "Tinbridge Hill",
+        "Heritage"
+      ]
+    },
+    "WEST_END": {
+      "name": "WEST_END",
+      "center": {
+        "lat": 37.414,
+        "lng": -79.204
+      },
+      "bbox": {
+        "min_lat": 37.385,
+        "max_lat": 37.445,
+        "min_lng": -79.23,
+        "max_lng": -79.185
+      },
+      "submarkets": [
+        "Boonsboro",
+        "Wyndhurst"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown": {
+      "name": "Downtown",
+      "division": "DOWNTOWN_RIVERFRONT",
+      "center": {
+        "lat": 37.4135,
+        "lng": -79.1422
+      },
+      "description": "Court Street hill to Main Street commercial core with the city's densest renovation pipeline: upper-floor apartment conversions, facade grants, and institutional anchors."
+    },
+    "Riverfront": {
+      "name": "Riverfront",
+      "division": "DOWNTOWN_RIVERFRONT",
+      "center": {
+        "lat": 37.4095,
+        "lng": -79.139
+      },
+      "description": "James River arts-and-amphitheater district below Ninth Street where mill-warehouse stock converts to dining, lofts, and riverwalk-adjacent hospitality."
+    },
+    "Diamond Hill": {
+      "name": "Diamond Hill",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 37.4055,
+        "lng": -79.1585
+      },
+      "description": "Historic brick rowhouse district on the hill southwest of downtown with investor-led restoration and first-time-buyer turnover."
+    },
+    "Tinbridge Hill": {
+      "name": "Tinbridge Hill",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 37.4035,
+        "lng": -79.1755
+      },
+      "description": "Working residential grid between Federal Street and the Miller Park edge with steady repair-trade permitting and infill interest."
+    },
+    "Heritage": {
+      "name": "Heritage",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 37.386,
+        "lng": -79.185
+      },
+      "description": "Wards Road corridor neighborhoods around the Heritage schools and the airport commercial strip, absorbing medical-office and retail refit demand."
+    },
+    "Boonsboro": {
+      "name": "Boonsboro",
+      "division": "WEST_END",
+      "center": {
+        "lat": 37.4295,
+        "lng": -79.1985
+      },
+      "description": "Affluent Boonsboro Road corridor of estate infill, Peaks View-adjacent subdivisions, and the Link Road retail node."
+    },
+    "Wyndhurst": {
+      "name": "Wyndhurst",
+      "division": "WEST_END",
+      "center": {
+        "lat": 37.3985,
+        "lng": -79.209
+      },
+      "description": "Master-planned new-urbanist district off Lakeside Drive mixing tract build-out, the Wyndhurst Industrial Corridor's flex space, and Liberty University spillover."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "StartDate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "LicenseIssued",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SaleDate",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/lynchburg.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
