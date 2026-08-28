@@ -476,7 +476,6 @@ from src.spatial.cities.waco import (
     WACO_SUBMARKETS,
     is_in_waco_metro,
 )
-<<<<<<< HEAD
 from src.spatial.cities.jackson_ms import (
     JACKSON_MS_DIVISION_BBOXES,
     JACKSON_MS_DIVISIONS,
@@ -596,7 +595,6 @@ from src.spatial.cities.augusta import (
     AUGUSTA_SUBMARKETS,
     is_in_augusta_metro,
 )
-=======
 from src.spatial.cities.lexington import (
     LEXINGTON_DIVISION_BBOXES,
     LEXINGTON_DIVISIONS,
@@ -604,8 +602,13 @@ from src.spatial.cities.lexington import (
     LEXINGTON_SUBMARKETS,
     is_in_lexington_metro,
 )
-
->>>>>>> 1abaaf3 (US-290: export Lexington constants from cities package (__all__ + imports))
+from src.spatial.cities.asheville import (
+    ASHEVILLE_DIVISION_BBOXES,
+    ASHEVILLE_DIVISIONS,
+    ASHEVILLE_METRO_BBOX,
+    ASHEVILLE_SUBMARKETS,
+    is_in_asheville_metro,
+)
 __all__ = [
     "PIERCE_METRO_BBOX",
     "PIERCE_DIVISION_BBOXES",
