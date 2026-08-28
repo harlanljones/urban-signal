@@ -25,3 +25,14 @@ The pipeline is a progressive disclosure control: each stage changes its detail 
 ## Content rules
 
 Describe feed availability exactly. A missing city source is a product fact, not a blank to hide. Keep model horizons at 6, 12, and 18 months, and keep the LIMS ingredients visible. Claims must point back to the repository, the city registry, or the live dashboard.
+
+## Dashboard is a separate surface
+
+This world belongs to the **product site** (Persuade/Read). The live MapLibre
+dashboard (`apps/dashboard`, served from `us-dash.harlanljones.com`) is a
+**distinct Operate surface** — a dark control-room instrument with IBM Plex,
+its own token set, and stricter honesty rules (registry-baseline states instead
+of fabricated numbers). It deliberately does not inherit this field-notebook
+world. See `.impeccable/surfaces/apps-dashboard-public-index-html.md` for its
+brief; `apps/api/src/serving/dashboard.py` is its single source of truth.
+

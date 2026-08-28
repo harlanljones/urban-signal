@@ -22,6 +22,8 @@ const archDetails = {
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+const esc = (value) =>
+  String(value).replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
 const sourceUrl = (path) => `${REPOSITORY}/${path.includes(".") ? "blob" : "tree"}/main/${path}`;
 let siteFacts = null;
 let showAllCities = false;
@@ -141,13 +143,13 @@ function renderPlatformMatrix() {
   };
   const platformBlocks = [...platforms.entries()]
     .sort((a, b) => b[1].size - a[1].size)
-    .map(([name, metros]) => `<span class="platform-stat"><b>${metros.size}</b><small>${name}<br>metros</small></span>`)
+    .map(([name, metros]) => `<span class="platform-stat"><b>${metros.size}</b><small>${esc(name)}<br>metros</small></span>`)
     .join("");
   const cadenceRows = layers
     .map((label, index) => {
       const row = cadence[index];
       if (!row.metros) return `<tr><td>${label}</td><td>—</td><td>not published</td><td>—</td></tr>`;
-      return `<tr><td>${label}</td><td>${row.metros}</td><td>${cadenceLabel(row.intervals)}</td><td>${[...row.platforms].join(", ")}</td></tr>`;
+      return `<tr><td>${esc(label)}</td><td>${row.metros}</td><td>${esc(cadenceLabel(row.intervals))}</td><td>${[...row.platforms].map(esc).join(", ")}</td></tr>`;
     })
     .join("");
   host.innerHTML = `
@@ -212,7 +214,7 @@ function freshTokens(metro) {
     const record = cityFresh[key];
     if (!record || typeof record.age_hours !== "number") return [`<span class="fresh-token fresh-missing">${key} —</span>`];
     const stale = record.age_hours > 48;
-    return [`<span class="fresh-token${stale ? " fresh-stale" : ""}" title="last synced ${record.last_synced_at ?? "unknown"}">${key} ${formatAge(record.age_hours)}</span>`];
+    return [`<span class="fresh-token${stale ? " fresh-stale" : ""}" title="last synced ${esc(record.last_synced_at ?? "unknown")}">${esc(key)} ${esc(formatAge(record.age_hours))}</span>`];
   });
   return tokens.length ? tokens.join("") : '<span class="fresh-missing" aria-label="no sync data">—</span>';
 }
@@ -232,11 +234,11 @@ function renderCoverageMatrix() {
     .map(({ id, name, state, platforms }) => {
       const cells = platforms
         .map((entry) => entry
-          ? `<td><span class="cell-platform">${entry.platform}</span><span class="cell-cadence">${cadenceLabel(entry.interval_seconds)}</span></td>`
+          ? `<td><span class="cell-platform">${esc(entry.platform)}</span><span class="cell-cadence">${esc(cadenceLabel(entry.interval_seconds))}</span></td>`
           : '<td class="cell-none"><span aria-label="not published">—</span></td>')
         .join("");
       const freshness = showFreshness ? `<td class="cell-fresh">${freshTokens({ id, platforms })}</td>` : "";
-      return `<tr><th scope="row"><a class="matrix-metro" href="/cities/${id}/">${name}</a><span class="matrix-state">/ ${state}</span></th>${cells}${freshness}</tr>`;
+      return `<tr><th scope="row"><a class="matrix-metro" href="/cities/${esc(id)}/">${esc(name)}</a><span class="matrix-state">/ ${esc(state)}</span></th>${cells}${freshness}</tr>`;
     })
     .join("");
   host.innerHTML = `
@@ -263,22 +265,22 @@ function renderCompareColumns() {
       const rows = layers
         .map((label, index) => {
           const entry = metro.platforms[index];
-          return `<tr><th scope="row">${label}</th>${entry
-            ? `<td><span class="cell-platform">${entry.platform}</span><span class="cell-cadence">every ${fmt(entry.interval_seconds)}</span></td>`
+          return `<tr><th scope="row">${esc(label)}</th>${entry
+            ? `<td><span class="cell-platform">${esc(entry.platform)}</span><span class="cell-cadence">every ${esc(fmt(entry.interval_seconds))}</span></td>`
             : '<td class="cell-none"><span aria-label="not published">—</span></td>'}</tr>`;
         })
         .join("");
       return `
       <article class="compare-col">
-        <header class="compare-head"><h3><a href="/cities/${metro.id}/">${metro.name}</a><span class="matrix-state">/ ${metro.state}</span></h3><span class="mono compare-id">${metro.id}</span></header>
+        <header class="compare-head"><h3><a href="/cities/${esc(metro.id)}/">${esc(metro.name)}</a><span class="matrix-state">/ ${esc(metro.state)}</span></h3><span class="mono compare-id">${esc(metro.id)}</span></header>
         <table class="cadence-table compare-table">
-          <caption class="sr-only">${metro.name}: coverage by feed family</caption>
+          <caption class="sr-only">${esc(metro.name)}: coverage by feed family</caption>
           <thead><tr><th scope="col">Feed family</th><th scope="col">Platform · cadence</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
-        <p class="compare-counts mono">${metro.divisions.toUpperCase()} · ${metro.submarket_count} SUBMARKETS</p>
+        <p class="compare-counts mono">${esc(metro.divisions.toUpperCase())} · ${metro.submarket_count} SUBMARKETS</p>
         <div class="compare-links">
-          <a href="/dashboard?city=${encodeURIComponent(metro.id)}">Open ${metro.name} on the live map</a>
+          <a href="/dashboard?city=${encodeURIComponent(metro.id)}">Open ${esc(metro.name)} on the live map</a>
           <a href="${sourceUrl(metro.evidence_path)}" target="_blank" rel="noreferrer">Inspect this metro’s source contract</a>
           <a href="/public/cities/${metro.id}.json" target="_blank" rel="noreferrer">Machine-readable coverage</a>
         </div>
@@ -301,7 +303,9 @@ function renderCompare() {
       });
     });
     selects.forEach((select, index) => {
-      select.selectedIndex = index;
+      const preferred = index === 0 ? "nyc" : "san_francisco";
+      const preferredIndex = [...select.options].findIndex((option) => option.value === preferred);
+      select.selectedIndex = preferredIndex >= 0 ? preferredIndex : index;
       select.addEventListener("change", renderCompareColumns);
     });
   }

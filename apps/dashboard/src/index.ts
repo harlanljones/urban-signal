@@ -81,10 +81,18 @@ const CITY_ALIASES: Record<string, string> = {
   dc: "washington_dc",
 };
 
-let manifestCache: { value: Manifest | null; expires: number } = {
+let manifestCache: { value: Manifest | null; etag: string | null; expires: number } = {
   value: null,
+  etag: null,
   expires: 0,
 };
+
+/** Clears the in-isolate snapshot caches (KV values + manifest). Used by the
+ *  test suite to keep module-level cache state from leaking between cases. */
+export function clearSnapshotCaches(): void {
+  kvJsonCache = new Map();
+  manifestCache = { value: null, etag: null, expires: 0 };
+}
 
 export interface Manifest {
   generated_at: string;
@@ -112,7 +120,7 @@ interface MetroMeta {
 }
 
 const MAX_TILE_PARENTS_PER_REQUEST = 32;
-const H3_PARENT_PATTERN = /^[0-9a-f]{15}$/i;
+export const H3_PARENT_PATTERN = /^[0-9a-f]{15}$/i;
 
 export interface CatalystEntry {
   h3_index: string;
@@ -135,8 +143,20 @@ export interface CatalystPayload {
 function jsonError(status: number, detail: string): Response {
   return new Response(JSON.stringify({ detail }), {
     status,
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      "x-content-type-options": "nosniff",
+      "cache-control": "no-store",
+    },
   });
+}
+
+function safeEcho(raw: unknown, max = 96): string {
+  return String(raw ?? "")
+    .replace(/[\u0000-\u001f\u007f]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, max);
 }
 
 export function normalizeCity(raw: string | null, manifest: Manifest | null): string | null {
@@ -174,30 +194,71 @@ async function sha256Hex(input: string): Promise<string> {
 function etagMatches(request: Request, etag: string): boolean {
   const header = request.headers.get("if-none-match");
   if (!header) return false;
-  return header.split(",").some((candidate) => candidate.trim() === etag);
+  const bare = etag.replace(/^W\//, "");
+  return header.split(",").some((candidate) => {
+    const trimmed = candidate.trim();
+    return trimmed === "*" || trimmed === etag || trimmed.replace(/^W\//, "") === bare;
+  });
 }
 
+// Snapshot values are re-read far more often than they change (publishes are
+// batch runs), and each read previously paid a full-body JSON.parse plus a
+// SHA-256 over multi-MB payloads. Cache {value, etag} briefly; TTL matches the
+// manifest cache so post-publish staleness stays bounded by the same bound.
+type KvCacheEntry = { value: unknown; etag: string; expires: number };
+let kvJsonCache = new Map<string, KvCacheEntry>();
+
 export async function kvJson(env: Env, key: string): Promise<{ value: unknown; etag: string } | null> {
+  const now = Date.now();
+  const cached = kvJsonCache.get(key);
+  if (cached && now < cached.expires) return cached;
   const raw = await env.SNAPSHOT.get(key);
-  if (raw === null) return null;
-  return { value: JSON.parse(raw), etag: `"${(await sha256Hex(raw)).slice(0, 32)}"` };
+  if (raw === null) {
+    if (cached) return cached;
+    return null;
+  }
+  const entry: KvCacheEntry = {
+    value: JSON.parse(raw),
+    etag: `"${(await sha256Hex(raw)).slice(0, 32)}"`,
+    expires: now + MANIFEST_TTL_MS,
+  };
+  kvJsonCache.set(key, entry);
+  return entry;
 }
 
 function withHeaders(body: string, status: number, extra: HeadersInit): Response {
   return new Response(body, {
     status,
-    headers: { "content-type": "application/json", ...Object.fromEntries(Object.entries(extra)) },
+    headers: {
+      "content-type": "application/json",
+      "x-content-type-options": "nosniff",
+      "referrer-policy": "strict-origin-when-cross-origin",
+      ...extra,
+    },
+  });
+}
+
+/** 304s should re-prime downstream caches (RFC 9110): echo validators + TTL. */
+function notModified(baseHeaders: Record<string, string>, etag: string): Response {
+  return new Response(null, {
+    status: 304,
+    headers: { ...baseHeaders, etag, "x-content-type-options": "nosniff" },
   });
 }
 
 export async function getManifest(env: Env): Promise<Manifest | null> {
   const now = Date.now();
   if (manifestCache.value && now < manifestCache.expires) return manifestCache.value;
-  const raw = await env.SNAPSHOT.get("manifest");
-  if (raw === null) return null;
-  const value = JSON.parse(raw) as Manifest;
-  manifestCache = { value, expires: now + MANIFEST_TTL_MS };
-  return value;
+  try {
+    const raw = await env.SNAPSHOT.get("manifest");
+    if (raw === null) return manifestCache.value; // stale beats a spurious 404
+    const value = JSON.parse(raw) as Manifest;
+    const etag = `"${(await sha256Hex(raw)).slice(0, 32)}"`;
+    manifestCache = { value, etag, expires: now + MANIFEST_TTL_MS };
+    return value;
+  } catch {
+    return manifestCache.value; // malformed publish: keep last known-good
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -217,6 +278,8 @@ function discoveryHeaders(contentType: string, extra: Record<string, string> = {
   const headers = new Headers({ "content-type": contentType });
   headers.set("cache-control", DISCOVERY_CACHE_CONTROL);
   headers.set("access-control-allow-origin", "*");
+  headers.set("access-control-allow-methods", "GET, POST, OPTIONS");
+  headers.set("access-control-allow-headers", "content-type, mcp-session-id, last-event-id");
   for (const [key, value] of Object.entries(extra)) headers.set(key, value);
   return headers;
 }
@@ -453,6 +516,7 @@ function trimCatalyst(entry: CatalystEntry): Record<string, unknown> {
     h3_index: entry.h3_index,
     lims_score: Number(entry.lims_score),
   };
+  if (!Number.isFinite(out.lims_score as number)) out.lims_score = null;
   if (entry.borough !== undefined) out.borough = entry.borough;
   return out;
 }
@@ -478,7 +542,7 @@ async function callTool(
       const city = normalizeCity(strParam(args, "city_id"), manifest);
       if (!city) {
         return {
-          content: [{ type: "text", text: `Unsupported city_id '${String(args.city_id)}'. Call list_cities first.` }],
+          content: [{ type: "text", text: `Unsupported city_id '${safeEcho(args.city_id, 64)}'. Call list_cities first.` }],
           isError: true,
         };
       }
@@ -504,7 +568,7 @@ async function callTool(
       const city = normalizeCity(strParam(args, "city_id"), manifest);
       if (!city) {
         return {
-          content: [{ type: "text", text: `Unsupported city_id '${String(args.city_id)}'. Call list_cities first.` }],
+          content: [{ type: "text", text: `Unsupported city_id '${safeEcho(args.city_id, 64)}'. Call list_cities first.` }],
           isError: true,
         };
       }
@@ -556,11 +620,19 @@ async function callTool(
       return { content: [{ type: "text", text: await text(result) }] };
     }
     default:
-      return { content: [{ type: "text", text: `Unknown tool '${String(toolName)}'.` }], isError: true };
+      return { content: [{ type: "text", text: `Unknown tool '${safeEcho(toolName, 64)}'.` }], isError: true };
   }
 }
 
+function mcpCorsHeaders(): Record<string, string> {
+  const h = discoveryHeaders("application/json");
+  return Object.fromEntries([...h.entries()].filter(([k]) => k.startsWith("access-control")));
+}
+
 async function mcpEndpoint(request: Request, env: Env): Promise<Response> {
+  if (request.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: mcpCorsHeaders() });
+  }
   if (request.method === "GET") {
     return jsonError(405, "Urban Signal MCP: POST JSON-RPC 2.0 messages to this endpoint (Streamable HTTP).");
   }
@@ -575,6 +647,14 @@ async function mcpEndpoint(request: Request, env: Env): Promise<Response> {
     return new Response(
       JSON.stringify({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "Parse error" } }),
       { status: 400, headers: { "content-type": "application/json" } }
+    );
+  }
+
+  // JSON-RPC batch arrays are out of scope for this read-only server.
+  if (Array.isArray(message)) {
+    return new Response(
+      JSON.stringify({ jsonrpc: "2.0", id: null, error: { code: -32600, message: "Invalid Request: batch arrays are not supported" } }),
+      { status: 400, headers: discoveryHeaders("application/json") }
     );
   }
 
@@ -609,14 +689,11 @@ async function mcpEndpoint(request: Request, env: Env): Promise<Response> {
         return rpcResult(message.id, await callTool(params, env));
       }
       default:
-        return rpcError(message.id, -32601, `Method not found: ${String(message.method)}`);
+        return rpcError(message.id, -32601, `Method not found: ${safeEcho(message.method, 64)}`);
     }
   } catch (err) {
-    return rpcError(
-      message.id,
-      -32603,
-      `Internal error: ${err instanceof Error ? err.message : "unknown failure"}`
-    );
+    console.error("mcp internal error:", err);
+    return rpcError(message.id, -32603, "Internal error");
   }
 }
 
@@ -886,8 +963,8 @@ function openApiResponse(description: string): Record<string, unknown> {
 const CITY_ID_PARAM: Record<string, unknown> = {
   name: "city_id",
   in: "query",
-  required: true,
-  schema: { type: "string" },
+  required: false,
+  schema: { type: "string", default: "nyc" },
   description:
     "Metropolitan region identifier (see /api/v1/cities). Aliases accepted: sf, sea, king_county, la, philly, dc.",
 };
@@ -1230,7 +1307,25 @@ async function serveSite(request: Request, env: Env, url: URL): Promise<Response
     if (isHtml) {
       headers.set("link", HOME_LINK_HEADERS);
       headers.append("vary", "Accept");
+      headers.set(
+        "content-security-policy",
+        [
+          "default-src 'self'",
+          "script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net",
+          "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+          "font-src 'self' https://fonts.gstatic.com",
+          "img-src 'self' data: blob: https://*.arcgisonline.com https://unpkg.com",
+          "connect-src 'self' https://*.arcgisonline.com",
+          "worker-src 'self' blob:",
+          "child-src 'self' blob:",
+          "frame-ancestors 'self'",
+          "base-uri 'self'",
+          "form-action 'self'",
+        ].join("; ")
+      );
     }
+    headers.set("x-content-type-options", "nosniff");
+    if (!headers.has("referrer-policy")) headers.set("referrer-policy", "strict-origin-when-cross-origin");
     return new Response(asset.body, { status: asset.status, headers });
   }
   return asset;
@@ -1238,7 +1333,17 @@ async function serveSite(request: Request, env: Env, url: URL): Promise<Response
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const url = new URL(request.url);
+    try {
+      return await handleRequest(request, env);
+    } catch (err) {
+      console.error("unhandled worker error:", err);
+      return jsonError(500, "Edge error: snapshot data temporarily unavailable.");
+    }
+  },
+};
+
+async function handleRequest(request: Request, env: Env): Promise<Response> {
+  const url = new URL(request.url);
 
     if (url.pathname === "/health" || url.pathname === "/live" || url.pathname === "/ready") {
       const manifest = await getManifest(env);
@@ -1283,12 +1388,12 @@ export default {
         if (!city) {
           return jsonError(
             400,
-            `Unsupported city_id '${url.searchParams.get("city_id")}'. Supported cities: ${supportedCities}.`
+            `Unsupported city_id '${safeEcho(url.searchParams.get("city_id"))}'. Supported cities: ${supportedCities}.`
           );
         }
         const entry = await kvJson(env, `submarkets/${city}`);
         if (!entry) return jsonError(404, `No snapshot for city '${city}'.`);
-        if (etagMatches(request, entry.etag)) return new Response(null, { status: 304 });
+        if (etagMatches(request, entry.etag)) return notModified(baseHeaders, entry.etag);
 
         // Borough filter + normalization live in snapshot.ts; the adapter only
         // formats the transport payload from the query result (ETag/304 come
@@ -1316,12 +1421,12 @@ export default {
         if (!city) {
           return jsonError(
             400,
-            `Unsupported city_id '${url.searchParams.get("city_id")}'. Supported cities: ${supportedCities}.`
+            `Unsupported city_id '${safeEcho(url.searchParams.get("city_id"))}'. Supported cities: ${supportedCities}.`
           );
         }
         const entry = await kvJson(env, `grid/${city}`);
         if (!entry) return jsonError(404, `No grid snapshot for city '${city}'.`);
-        if (etagMatches(request, entry.etag)) return new Response(null, { status: 304 });
+        if (etagMatches(request, entry.etag)) return notModified(baseHeaders, entry.etag);
         return withHeaders(JSON.stringify(entry.value), 200, {
           ...baseHeaders,
           etag: entry.etag,
@@ -1334,7 +1439,7 @@ export default {
         if (!city) {
           return jsonError(
             400,
-            `Unsupported city_id '${url.searchParams.get("city_id")}'. Supported cities: ${supportedCities}.`
+            `Unsupported city_id '${safeEcho(url.searchParams.get("city_id"))}'. Supported cities: ${supportedCities}.`
           );
         }
         // Transport parsing only. The min_lims/limit/borough policy, default
@@ -1342,13 +1447,14 @@ export default {
         // DECISION US-190); the adapter keeps the 422/404 envelope + wording.
         const entry = await kvJson(env, `catalysts/${city}`);
         if (!entry) return jsonError(404, `No catalyst snapshot for city '${city}'.`);
-        if (etagMatches(request, entry.etag)) return new Response(null, { status: 304 });
+        if (etagMatches(request, entry.etag)) return notModified(baseHeaders, entry.etag);
 
         const minLimsRaw = url.searchParams.get("min_lims");
-        const minLims = minLimsRaw !== null ? Number(minLimsRaw) : undefined;
+        const minLims =
+          minLimsRaw !== null && minLimsRaw.trim() !== "" ? Number(minLimsRaw) : undefined;
         const limitRaw = url.searchParams.get("limit");
         const limit =
-          limitRaw !== null && limitRaw !== "" && Number.isFinite(Number(limitRaw))
+          limitRaw !== null && limitRaw.trim() !== "" && Number.isInteger(Number(limitRaw))
             ? Number(limitRaw)
             : undefined;
 
@@ -1375,8 +1481,12 @@ export default {
       // GET /api/v1/manifest — snapshot metadata: metros, tile index, thresholds
       if (url.pathname === "/api/v1/manifest") {
         if (!manifest) return jsonError(404, "No snapshot manifest published.");
-        const etag = `"${(await sha256Hex(JSON.stringify(manifest))).slice(0, 32)}"`;
-        if (etagMatches(request, etag)) return new Response(null, { status: 304 });
+        let etag = manifestCache.etag;
+        if (!etag || manifestCache.value !== manifest) {
+          etag = `"${(await sha256Hex(JSON.stringify(manifest))).slice(0, 32)}"`;
+          manifestCache = { value: manifest, etag, expires: manifestCache.expires };
+        }
+        if (etagMatches(request, etag)) return notModified(baseHeaders, etag);
         return withHeaders(JSON.stringify(manifest), 200, {
           ...baseHeaders,
           etag,
@@ -1398,12 +1508,13 @@ export default {
           return jsonError(400, `Too many parents requested (${parents.length}); max ${MAX_TILE_PARENTS_PER_REQUEST} per call.`);
         }
 
+        const entries = await Promise.all(parents.map((parent) => kvJson(env, `gridtiles/${parent}`)));
         const features: Record<string, unknown>[] = [];
         const missing: string[] = [];
-        for (const parent of parents) {
-          const entry = await kvJson(env, `gridtiles/${parent}`);
+        for (let i = 0; i < parents.length; i += 1) {
+          const entry = entries[i];
           if (!entry) {
-            missing.push(parent);
+            missing.push(parents[i]);
             continue;
           }
           const payload = entry.value as { features?: Record<string, unknown>[] };
@@ -1417,7 +1528,7 @@ export default {
           features,
         });
         const etag = `"${(await sha256Hex(body)).slice(0, 32)}"`;
-        if (etagMatches(request, etag)) return new Response(null, { status: 304 });
+        if (etagMatches(request, etag)) return notModified(baseHeaders, etag);
         return withHeaders(body, 200, { ...baseHeaders, etag });
       }
 
@@ -1427,7 +1538,7 @@ export default {
         if ("error" in result) return jsonError(404, result.error);
         const body = JSON.stringify(result);
         const etag = `"${(await sha256Hex(body)).slice(0, 32)}"`;
-        if (etagMatches(request, etag)) return new Response(null, { status: 304 });
+        if (etagMatches(request, etag)) return notModified(baseHeaders, etag);
         return withHeaders(body, 200, { ...baseHeaders, etag });
       }
 
@@ -1451,7 +1562,7 @@ export default {
         if ("error" in result) return jsonError(400, result.error);
         const body = JSON.stringify(result);
         const etag = `"${(await sha256Hex(body)).slice(0, 32)}"`;
-        if (etagMatches(request, etag)) return new Response(null, { status: 304 });
+        if (etagMatches(request, etag)) return notModified(baseHeaders, etag);
         return withHeaders(body, 200, { ...baseHeaders, etag });
       }
 
@@ -1459,7 +1570,7 @@ export default {
       if (url.pathname === "/api/v1/catalysts/all") {
         const entry = await kvJson(env, "catalysts/index");
         if (!entry) return jsonError(404, "No combined catalyst snapshot published.");
-        if (etagMatches(request, entry.etag)) return new Response(null, { status: 304 });
+        if (etagMatches(request, entry.etag)) return notModified(baseHeaders, entry.etag);
         return withHeaders(JSON.stringify(entry.value), 200, {
           ...baseHeaders,
           etag: entry.etag,
@@ -1471,22 +1582,33 @@ export default {
         if (request.method !== "POST") {
           return jsonError(405, "Method Not Allowed");
         }
+        const contentType = request.headers.get("content-type") ?? "";
+        if (!contentType.toLowerCase().includes("application/json")) {
+          return jsonError(415, "Expected 'content-type: application/json'.");
+        }
+        const rawBody = await request.text();
+        if (rawBody.length > 100_000) {
+          return jsonError(413, "Request body too large (max 100 KB).");
+        }
         let body: Record<string, unknown>;
         try {
-          body = (await request.json()) as Record<string, unknown>;
+          body = JSON.parse(rawBody) as Record<string, unknown>;
         } catch {
           return jsonError(400, "Invalid JSON body.");
         }
 
         const h3Index =
           typeof body.h3_index === "string" && body.h3_index.trim()
-            ? body.h3_index.trim()
+            ? body.h3_index.trim().toLowerCase()
             : null;
         if (!h3Index) {
           return jsonError(
             400,
             "Edge snapshot requires 'h3_index'. Provide the H3 cell for ('latitude', 'longitude') via the client-side h3 resolver."
           );
+        }
+        if (!H3_PARENT_PATTERN.test(h3Index)) {
+          return jsonError(400, "Malformed 'h3_index': expected a 15-char hex H3 cell index.");
         }
 
         // Data + cell lookup + SHAP-strip trigger come from the shared snapshot
@@ -1501,10 +1623,7 @@ export default {
 
       return jsonError(404, "Not Found");
     } catch (err) {
-      return jsonError(
-        500,
-        `Edge error: ${err instanceof Error ? err.message : "unknown failure"}`
-      );
+      console.error("edge error:", err);
+      return jsonError(500, "Edge error: snapshot data temporarily unavailable.");
     }
-  },
-};
+}

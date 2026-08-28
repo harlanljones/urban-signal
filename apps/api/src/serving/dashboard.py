@@ -39,7 +39,7 @@ def get_dashboard_html() -> str:
   
   <!-- MapLibre GL JS -->
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" />
-  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+  <script defer src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
   
   <!-- deck.gl UMD (no bundler) -->
   <script src="https://unpkg.com/@deck.gl/core@8.9.36/dist.min.js"></script>
@@ -47,10 +47,10 @@ def get_dashboard_html() -> str:
   <script src="https://unpkg.com/@deck.gl/mapbox@8.9.36/dist.min.js"></script>
   
   <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   
   <!-- H3 JS -->
-  <script src="https://unpkg.com/h3-js@4.1.0/dist/h3-js.umd.js"></script>
+  <script defer src="https://unpkg.com/h3-js@4.1.0/dist/h3-js.umd.js"></script>
 
   <style>
     :root {
@@ -205,6 +205,21 @@ def get_dashboard_html() -> str:
     @keyframes toastIn {
       from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .toast-banner { animation: none; }
+    }
+
+    .pulse-dot.static { background: var(--text-muted); }
+
+    .shap-empty {
+      padding: 18px 14px;
+      border: 1px dashed var(--border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      font-size: 11px;
+      text-align: center;
     }
 
     /* Scrollbar */
@@ -1328,7 +1343,7 @@ def get_dashboard_html() -> str:
         <span class="drawer-grip-title">Layers &amp; Catalysts</span>
         <button class="drawer-close" type="button" data-close aria-label="Close layers panel">&times;</button>
       </div>
-      <!-- Map Controls Panel -->      <!-- Map Controls Panel -->
+      <!-- Map Controls Panel -->
       <div class="panel-section">
         <div class="panel-header-row">
           <span class="section-title">Projection & Metric</span>
@@ -1382,7 +1397,7 @@ def get_dashboard_html() -> str:
         <div class="legend-bar"></div>
         <div class="legend-range-labels">
           <span id="legend-min">0.0</span>
-          <span id="legend-mid">70.0</span>
+          <span id="legend-mid">50.0</span>
           <span id="legend-max">100.0</span>
         </div>
       </div>
@@ -1518,6 +1533,8 @@ def get_dashboard_html() -> str:
       anchorage: { name: 'Anchorage, AK' },
       tucson: { name: 'Tucson, AZ' },
     };
+
+    const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     let map = null;
     let deckOverlay = null; // deck.gl MapboxOverlay
@@ -2001,7 +2018,7 @@ def get_dashboard_html() -> str:
       if (metro && metro.bbox) {
         map.fitBounds(
           [[metro.bbox.min_lng, metro.bbox.min_lat], [metro.bbox.max_lng, metro.bbox.max_lat]],
-          { padding: 70, maxZoom: 12.4, duration: 1300 }
+          { padding: 70, maxZoom: 12.4, duration: REDUCED_MOTION ? 0 : 1300 }
         );
       } else {
         fitNationalView();
@@ -2018,7 +2035,7 @@ def get_dashboard_html() -> str:
         bounds.extend([m.bbox.min_lng, m.bbox.min_lat]);
         bounds.extend([m.bbox.max_lng, m.bbox.max_lat]);
       });
-      if (!bounds.isEmpty()) map.fitBounds(bounds, { padding: 40, maxZoom: 8, duration: 1400 });
+      if (!bounds.isEmpty()) map.fitBounds(bounds, { padding: 40, maxZoom: 8, duration: REDUCED_MOTION ? 0 : 1400 });
     }
 
     async function fetchManifest() {
@@ -2026,6 +2043,13 @@ def get_dashboard_html() -> str:
         const resp = await fetch('/api/v1/manifest');
         if (resp.ok) {
           snapshotManifest = await resp.json();
+          const stamp = snapshotManifest && snapshotManifest.generated_at;
+          const pillText = document.getElementById('stream-status-text');
+          const pillDot = document.getElementById('stream-pulse-dot');
+          if (pillText && stamp && stamp.length >= 16) {
+            pillText.textContent = 'Snapshot ' + stamp.slice(11, 16) + ' UTC';
+            if (pillDot) pillDot.classList.add('static');
+          }
           return true;
         }
       } catch (e) {
@@ -2095,6 +2119,20 @@ def get_dashboard_html() -> str:
           if (dd) dd.classList.remove('visible');
         }
       });
+      const dd = document.getElementById('search-dropdown');
+      if (dd) {
+        dd.addEventListener('click', (e) => {
+          const row = e.target.closest('.search-result-item');
+          if (row && row.dataset.submarket) selectSearchSubmarket(row.dataset.submarket);
+        });
+      }
+      const feed = document.getElementById('catalyst-feed-list');
+      if (feed) {
+        feed.addEventListener('click', (e) => {
+          const item = e.target.closest('.catalyst-item');
+          if (item && item.dataset.h3) zoomToHex(item.dataset.h3, Number(item.dataset.lat), Number(item.dataset.lng));
+        });
+      }
     });
 
     window.addEventListener('resize', () => {
@@ -2204,16 +2242,26 @@ def get_dashboard_html() -> str:
         return;
       }
 
-      dd.innerHTML = matches.map(([name, meta]) => {
+      dd.replaceChildren(...matches.map(([name, meta]) => {
         const borough = normalizeBorough(meta.borough);
         const bClass = getBoroughClass(borough);
-        return `
-          <div class="search-result-item" onclick="selectSearchSubmarket('${name}')">
-            <span><strong>${name}</strong> <span class="borough-tag ${bClass}" style="margin-left:4px;">${borough}</span></span>
-            <span class="item-sub">LIMS ${Number(meta.base_lims || 80.0).toFixed(1)}</span>
-          </div>
-        `;
-      }).join('');
+        const row = document.createElement('div');
+        row.className = 'search-result-item';
+        row.dataset.submarket = name;
+        const left = document.createElement('span');
+        const strong = document.createElement('strong');
+        strong.textContent = name;
+        const tag = document.createElement('span');
+        tag.className = 'borough-tag ' + bClass;
+        tag.style.marginLeft = '4px';
+        tag.textContent = borough;
+        left.append(strong, tag);
+        const right = document.createElement('span');
+        right.className = 'item-sub';
+        right.textContent = 'LIMS ' + Number(meta.base_lims || 80.0).toFixed(1);
+        row.append(left, right);
+        return row;
+      }));
       dd.classList.add('visible');
     }
 
@@ -2293,10 +2341,10 @@ def get_dashboard_html() -> str:
               .setHTML(`
                 <div style="font-size: 11px; min-width: 170px; line-height: 1.4;">
                   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                    <strong style="color: var(--text-main); font-size:12px;">${subName}</strong>
-                    <span class="borough-tag ${bClass}">${borough}</span>
+                    <strong style="color: var(--text-main); font-size:12px;">${escapeHtml(subName)}</strong>
+                    <span class="borough-tag ${escapeHtml(bClass)}">${escapeHtml(borough)}</span>
                   </div>
-                  ${props.city_name ? `<div style="color:var(--text-muted); font-size:10px; margin-bottom:3px;">${props.city_name}</div>` : ''}
+                  ${props.city_name ? `<div style="color:var(--text-muted); font-size:10px; margin-bottom:3px;">${escapeHtml(props.city_name)}</div>` : ''}
                   <div style="display:flex; justify-content:space-between; gap:8px; margin-top:2px;">
                     <span style="color:var(--text-secondary);">LIMS Score:</span>
                     <strong style="color: ${limsVal >= 85 ? 'var(--accent-danger)' : 'var(--accent-success)'}">${limsVal.toFixed(1)}</strong>
@@ -2625,7 +2673,7 @@ def get_dashboard_html() -> str:
         map.easeTo({
           pitch: mode === '3D' ? 52 : 0,
           bearing: mode === '3D' ? -15 : 0,
-          duration: 900
+          duration: REDUCED_MOTION ? 0 : 900
         });
       }
     }
@@ -2654,7 +2702,7 @@ def get_dashboard_html() -> str:
           zoom: meta.zoom || 15.2,
           pitch: currentPerspective === '3D' ? (meta.pitch || 50) : 0,
           bearing: -15,
-          duration: 1200
+          duration: REDUCED_MOTION ? 0 : 1200
         });
       }
 
@@ -2675,17 +2723,12 @@ def get_dashboard_html() -> str:
           description: meta.description,
           centroid_lat: meta.lat,
           centroid_lng: meta.lng,
-          lims_score: meta.base_lims || 82.0,
-          delta_6m_p10: +((meta.base_lims || 82.0) * 0.0011).toFixed(4),
-          delta_6m_p50: +((meta.base_lims || 82.0) * 0.0018).toFixed(4),
-          delta_6m_p90: +((meta.base_lims || 82.0) * 0.0026).toFixed(4),
-          delta_12m_spillover: +((meta.base_lims || 82.0) * 0.0014).toFixed(4),
-          prob_18m_macro_outperformance: +((meta.base_lims || 82.0) / 115.0).toFixed(4),
-          capex_density_decayed: meta.capex || 500000.0,
-          permit_velocity: meta.permit_vel || 0.35,
-          shift_ratio_311: meta.shift_ratio || 2.5,
-          sla_new_filings_90d: meta.sla || 3,
-          inference_latency_ms: 2.8
+          lims_score: meta.base_lims,
+          capex_density_decayed: meta.capex,
+          permit_velocity: meta.permit_vel,
+          shift_ratio_311: meta.shift_ratio,
+          sla_new_filings_90d: meta.sla,
+          __baseline: true
         });
       }
     }
@@ -2727,7 +2770,7 @@ def get_dashboard_html() -> str:
         return;
       }
 
-      container.innerHTML = filtered.map((c) => {
+      container.replaceChildren(...filtered.map((c) => {
         const subInfo = getSubmarketInfoByCoords(c.centroid_lat, c.centroid_lng);
         const submarket = c.submarket || (subInfo ? subInfo.name : 'Active Parcel');
         const borough = normalizeBorough(c.borough || (subInfo ? subInfo.meta.borough : 'Manhattan'));
@@ -2736,20 +2779,39 @@ def get_dashboard_html() -> str:
         const lng = c.centroid_lng || (subInfo ? subInfo.meta.lng : -74.00);
         const isSelected = selectedH3Index === c.h3_index;
 
-        return `
-          <div class="catalyst-item ${isSelected ? 'selected' : ''}" onclick="zoomToHex('${c.h3_index}', ${lat}, ${lng})">
-            <div class="catalyst-item-top">
-              <span class="catalyst-name">${submarket}</span>
-              <span class="catalyst-lims-tag">${Number(c.lims_score || 85.0).toFixed(1)}</span>
-            </div>
-            <div class="catalyst-item-bottom">
-              <span class="borough-tag ${bClass}">${borough}</span>
-              ${c.city_name ? `<span class="borough-tag">${c.city_name}</span>` : ''}
-              <span class="delta-tag">+${(Number(c.delta_6m_p50 || 0.14) * 100).toFixed(1)}% 6M</span>
-            </div>
-          </div>
-        `;
-      }).join('');
+        const item = document.createElement('div');
+        item.className = 'catalyst-item' + (isSelected ? ' selected' : '');
+        item.dataset.h3 = c.h3_index || '';
+        item.dataset.lat = String(lat);
+        item.dataset.lng = String(lng);
+        const top = document.createElement('div');
+        top.className = 'catalyst-item-top';
+        const nameEl = document.createElement('span');
+        nameEl.className = 'catalyst-name';
+        nameEl.textContent = submarket;
+        const limsEl = document.createElement('span');
+        limsEl.className = 'catalyst-lims-tag';
+        limsEl.textContent = Number(c.lims_score || 85.0).toFixed(1);
+        top.append(nameEl, limsEl);
+        const bottom = document.createElement('div');
+        bottom.className = 'catalyst-item-bottom';
+        const boroughEl = document.createElement('span');
+        boroughEl.className = 'borough-tag ' + bClass;
+        boroughEl.textContent = borough;
+        bottom.append(boroughEl);
+        if (c.city_name) {
+          const cityEl = document.createElement('span');
+          cityEl.className = 'borough-tag';
+          cityEl.textContent = c.city_name;
+          bottom.append(cityEl);
+        }
+        const deltaEl = document.createElement('span');
+        deltaEl.className = 'delta-tag';
+        deltaEl.textContent = '+' + (Number(c.delta_6m_p50 || 0.14) * 100).toFixed(1) + '% 6M';
+        bottom.append(deltaEl);
+        item.append(top, bottom);
+        return item;
+      }));
     }
 
     function zoomToHex(h3Index, lat, lng) {
@@ -2760,7 +2822,7 @@ def get_dashboard_html() -> str:
           zoom: 15.6,
           pitch: currentPerspective === '3D' ? 55 : 0,
           bearing: -12,
-          duration: 1100
+          duration: REDUCED_MOTION ? 0 : 1100
         });
 
         if (map.getLayer('h3-hex-selected')) {
@@ -2804,20 +2866,15 @@ def get_dashboard_html() -> str:
           h3_index: h3Index,
           submarket: subInfo ? subInfo.name : 'Selected Parcel',
           borough: normalizeBorough(subInfo ? subInfo.meta.borough : getBoroughNameByCoords(lat, lng)),
-          description: subInfo ? subInfo.meta.description : 'Active spatio-temporal cluster',
+          description: subInfo ? subInfo.meta.description : 'Selected coordinate — outside published cell snapshots',
           centroid_lat: lat,
           centroid_lng: lng,
-          lims_score: subInfo ? subInfo.meta.base_lims : 84.0,
-          delta_6m_p10: 0.035,
-          delta_6m_p50: 0.145,
-          delta_6m_p90: 0.225,
-          delta_12m_spillover: 0.125,
-          prob_18m_macro_outperformance: 0.85,
-          capex_density_decayed: subInfo ? subInfo.meta.capex : 550000.0,
-          permit_velocity: subInfo ? subInfo.meta.permit_vel : 0.42,
-          shift_ratio_311: subInfo ? subInfo.meta.shift_ratio : 3.0,
-          sla_new_filings_90d: subInfo ? subInfo.meta.sla : 4,
-          inference_latency_ms: 2.8
+          lims_score: subInfo ? subInfo.meta.base_lims : undefined,
+          capex_density_decayed: subInfo ? subInfo.meta.capex : undefined,
+          permit_velocity: subInfo ? subInfo.meta.permit_vel : undefined,
+          shift_ratio_311: subInfo ? subInfo.meta.shift_ratio : undefined,
+          sla_new_filings_90d: subInfo ? subInfo.meta.sla : undefined,
+          __baseline: true
         };
       }
 
@@ -2840,8 +2897,9 @@ def get_dashboard_html() -> str:
       const container = document.getElementById('inspector-content');
       if (!container) return;
 
+      const baselineOnly = props.__baseline === true;
       const lims = Number(props.lims_score) || 0;
-      const isCatalyst = lims >= 84.0;
+      const isCatalyst = !baselineOnly && lims >= 84.0;
       const p10 = (Number(props.delta_6m_p10 || 0.02) * 100).toFixed(1);
       const p50 = (Number(props.delta_6m_p50 || 0.12) * 100).toFixed(1);
       const p90 = (Number(props.delta_6m_p90 || 0.20) * 100).toFixed(1);
@@ -2861,37 +2919,64 @@ def get_dashboard_html() -> str:
         try { shapObj = JSON.parse(shapObj); } catch(e) { shapObj = null; }
       }
 
+      const esc = escapeHtml;
       container.innerHTML = `
         <div class="inspector-content">
-          <!-- Parcel Header -->
           <div class="parcel-header">
             <div class="parcel-title-row">
-              <div class="parcel-name">${submarketName}</div>
-              <span class="borough-tag ${bClass}">${boroughName}</span>
+              <div class="parcel-name">${esc(submarketName)}</div>
+              <span class="borough-tag ${esc(bClass)}">${esc(boroughName)}</span>
             </div>
             <div class="parcel-meta-sub">
-              <span>H3: ${props.h3_index || ''}</span>
+              <span>H3: ${esc(props.h3_index || '')}</span>
               <span>•</span>
               <span>${lat.toFixed(4)}, ${lng.toFixed(4)}</span>
-              ${props.city_name ? `<span>•</span><span>${props.city_name}</span>` : ''}
+              ${props.city_name ? `<span>•</span><span>${esc(props.city_name)}</span>` : ''}
             </div>
-            <div class="parcel-description">${description}</div>
+            <div class="parcel-description">${esc(description)}</div>
           </div>
 
-          <!-- Score Hero Summary -->
           <div class="score-hero-block">
             <div class="score-hero-left">
-              <span class="score-hero-label">LIMS Momentum Score</span>
-              <span class="score-status-pill" style="color: ${isCatalyst ? 'var(--accent-danger)' : 'var(--accent-success)'}">
-                ${isCatalyst ? '● High Catalyst Alert' : '● Active Signal'}
+              <span class="score-hero-label">${baselineOnly ? 'Registry Baseline Momentum' : 'LIMS Momentum Score'}</span>
+              <span class="score-status-pill" style="color: ${baselineOnly ? 'var(--text-secondary)' : isCatalyst ? 'var(--accent-danger)' : 'var(--accent-success)'}">
+                ${baselineOnly ? '○ Baseline — no model snapshot' : isCatalyst ? '● High Catalyst Alert' : '● Active Signal'}
               </span>
             </div>
-            <div class="score-hero-val" style="color: ${isCatalyst ? 'var(--accent-danger)' : 'var(--accent-success)'}">
-              ${lims.toFixed(1)}
+            <div class="score-hero-val" style="color: ${baselineOnly ? 'var(--text-secondary)' : isCatalyst ? 'var(--accent-danger)' : 'var(--accent-success)'}">
+              ${baselineOnly && !Number.isFinite(Number(props.lims_score)) ? '—' : lims.toFixed(1)}
             </div>
           </div>
+          ${
+            baselineOnly
+              ? `
+          <div>
+            <div class="forecast-section-title">Multi-Horizon Projections</div>
+            <div class="shap-empty">No precomputed model snapshot covers this cell yet. Fly to a rendered hexagon (or open a catalyst alert) for the full 6/12/18-month forecast with SHAP attribution.</div>
+          </div>
 
-          <!-- Multi-Horizon Forecast -->
+          <div>
+            <div class="forecast-section-title">Registry Baseline Telemetry</div>
+            <table class="telemetry-table">
+              <tr>
+                <td class="lbl">CapEx Density (Decayed)</td>
+                <td class="val">${Number.isFinite(Number(props.capex_density_decayed)) ? '$' + Number(props.capex_density_decayed).toLocaleString() + '/km²' : '—'}</td>
+              </tr>
+              <tr>
+                <td class="lbl">Permit Velocity</td>
+                <td class="val">${Number.isFinite(Number(props.permit_velocity)) ? (Number(props.permit_velocity) * 100).toFixed(1) + '%' : '—'}</td>
+              </tr>
+              <tr>
+                <td class="lbl">311 Shift Ratio (QoL/Neglect)</td>
+                <td class="val">${Number.isFinite(Number(props.shift_ratio_311)) ? Number(props.shift_ratio_311).toFixed(2) + 'x' : '—'}</td>
+              </tr>
+              <tr>
+                <td class="lbl">SLA Filings (90d)</td>
+                <td class="val">${Number.isFinite(Number(props.sla_new_filings_90d)) ? props.sla_new_filings_90d + ' filings' : '—'}</td>
+              </tr>
+            </table>
+          </div>`
+              : `
           <div>
             <div class="forecast-section-title">Multi-Horizon Projections</div>
             <div class="quantiles-card">
@@ -2927,7 +3012,6 @@ def get_dashboard_html() -> str:
             </div>
           </div>
 
-          <!-- SHAP Attribution Breakdown -->
           <div>
             <div class="forecast-section-title">SHAP Feature Attribution</div>
             <div class="chart-block">
@@ -2935,7 +3019,6 @@ def get_dashboard_html() -> str:
             </div>
           </div>
 
-          <!-- Telemetry Attributes Table -->
           <div>
             <div class="forecast-section-title">Leading Telemetry Indicators</div>
             <table class="telemetry-table">
@@ -2960,7 +3043,8 @@ def get_dashboard_html() -> str:
                 <td class="val" style="color:var(--accent-primary);">${props.inference_latency_ms || 2.8} ms</td>
               </tr>
             </table>
-          </div>
+          </div>`
+          }
         </div>
       `;
 
@@ -2977,14 +3061,12 @@ def get_dashboard_html() -> str:
       }
 
       const hasData = shap && typeof shap === 'object' && Object.keys(shap).length > 0;
-      const data = hasData ? shap : {
-        'CapEx Density': 0.048,
-        'Permit Velocity': 0.035,
-        '311 Shift Ratio': 0.027,
-        'SLA Filings': 0.015,
-        'Deed Volume': 0.008,
-        'Neglect 311': -0.012
-      };
+      if (!hasData) {
+        const block = ctx.closest('.chart-block');
+        if (block) block.innerHTML = '<div class="shap-empty">No SHAP attribution published for this cell.</div>';
+        return;
+      }
+      const data = shap;
 
       const labels = Object.keys(data).map(k => k.replace(/_/g, ' '));
       const values = Object.values(data);
@@ -3005,7 +3087,7 @@ def get_dashboard_html() -> str:
           indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
-          animation: { duration: 200 },
+          animation: { duration: REDUCED_MOTION ? 0 : 200 },
           plugins: {
             legend: { display: false },
             tooltip: {
@@ -3067,7 +3149,7 @@ def get_dashboard_html() -> str:
             zoom: 15.5,
             pitch: currentPerspective === '3D' ? 52 : 0,
             bearing: -15,
-            duration: 1100
+            duration: REDUCED_MOTION ? 0 : 1100
           });
         }
 
@@ -3091,20 +3173,14 @@ def get_dashboard_html() -> str:
         } catch (e) {}
 
         if (!predData) {
-          const baseLims = subInfo ? (subInfo.meta.base_lims || 82.5) : 82.5;
           predData = {
             h3_index: h3Index || 'custom_hex',
-            lims_score: baseLims,
-            delta_6m_p10: +(baseLims * 0.0011).toFixed(4),
-            delta_6m_p50: +(baseLims * 0.0018).toFixed(4),
-            delta_6m_p90: +(baseLims * 0.0026).toFixed(4),
-            delta_12m_spillover: +(baseLims * 0.0014).toFixed(4),
-            prob_18m_macro_outperformance: +(baseLims / 115.0).toFixed(4),
-            capex_density_decayed: subInfo ? subInfo.meta.capex : 450000.0,
-            permit_velocity: subInfo ? subInfo.meta.permit_vel : 0.38,
-            shift_ratio_311: subInfo ? subInfo.meta.shift_ratio : 2.8,
-            sla_new_filings_90d: subInfo ? subInfo.meta.sla : 3,
-            inference_latency_ms: 2.7
+            lims_score: subInfo ? subInfo.meta.base_lims : undefined,
+            capex_density_decayed: subInfo ? subInfo.meta.capex : undefined,
+            permit_velocity: subInfo ? subInfo.meta.permit_vel : undefined,
+            shift_ratio_311: subInfo ? subInfo.meta.shift_ratio : undefined,
+            sla_new_filings_90d: subInfo ? subInfo.meta.sla : undefined,
+            __baseline: true
           };
         }
 

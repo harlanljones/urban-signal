@@ -25,6 +25,7 @@ import {
   kvJson,
   getManifest,
   normalizeCity,
+  H3_PARENT_PATTERN,
 } from "./index";
 
 function normalizeBorough(raw: string): string {
@@ -172,8 +173,11 @@ export async function lookupPrediction(
   env: Env,
   opts: { h3Index: string; includeShap?: boolean }
 ): Promise<PredictionOutcome> {
-  const h3Index = opts.h3Index?.trim();
+  const h3Index = opts.h3Index?.trim().toLowerCase();
   if (!h3Index) return { error: "'h3_index' is required." };
+  if (!H3_PARENT_PATTERN.test(h3Index)) {
+    return { error: "Malformed 'h3_index': expected a 15-char hex H3 cell index." };
+  }
 
   let pred: Record<string, unknown> | undefined;
 
@@ -239,13 +243,16 @@ export async function fetchNationalRows(
   if (!(NATIONAL_RESOLUTIONS as readonly number[]).includes(opts.res)) {
     return { error: `'res' must be one of ${NATIONAL_RESOLUTIONS.join(", ")}.` };
   }
+  const entries = await Promise.all(
+    opts.parents.map((parent) => kvJson(env, `national/${opts.res}/${parent}`))
+  );
   const rows: unknown[][] = [];
   const missing: string[] = [];
   let cols: string[] | null = null;
-  for (const parent of opts.parents) {
-    const entry = await kvJson(env, `national/${opts.res}/${parent}`);
+  for (let i = 0; i < opts.parents.length; i += 1) {
+    const entry = entries[i];
     if (!entry) {
-      missing.push(parent);
+      missing.push(opts.parents[i]);
       continue;
     }
     const chunk = entry.value as { cols?: string[]; rows?: unknown[][] };

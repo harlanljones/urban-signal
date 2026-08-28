@@ -1,5 +1,5 @@
-import { expect, test } from "bun:test";
-import worker from "../src/index";
+import { expect, test, beforeEach } from "bun:test";
+import worker, { clearSnapshotCaches } from "../src/index";
 import { testEnv } from "./index.test";
 import {
   queryCatalysts,
@@ -9,6 +9,8 @@ import {
   fetchNationalIndex,
   fetchNationalRows,
 } from "../src/snapshot";
+
+beforeEach(() => clearSnapshotCaches());
 
 const ORIGIN = "https://urban-signal.test";
 const env = () => testEnv() as never;
