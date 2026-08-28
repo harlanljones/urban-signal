@@ -1,32 +1,36 @@
-# Stream log — <stream-id> — <date>
+# Stream log — city-fort-smith — 2026-08-28
 
-Copy this file to `.streams/<stream-id>.md` as your FIRST action (phase 1,
-Claim) and update it at every step boundary. Commit it with your work.
-Its absence is what makes a takeover cost twelve tool calls instead of one.
+Claimed per parallel-streams protocol. Updating at each step boundary.
 
 ## Claim
 
-- **Stream id:** <short-id, e.g. `city-new-orleans`>
-- **Leaf files I will create/edit:** <exact paths — if you cannot name them,
-  you are not decomposed enough to run in parallel>
-- **Spine files I expect to need:** <paths from docs/agents/spine-manifest.txt>
+- **Stream id:** `city-fort-smith`
+- **Leaf files I will create/edit:**
+  - `apps/api/src/spatial/cities/fort_smith.py` (metro bbox, division bbox, submarkets, contains)
+  - `.streams/city-fort-smith.md` (this log)
+- **Spine files I expect to need (serial hold):**
+  - `apps/api/src/spatial/city_registry.py` (CityId.FORT_SMITH + ALIASES + REGISTRATION with SNAP AR SLA)
+  - `apps/api/src/spatial/cities/__init__.py` (export Fort Smith symbols + __all__)
+  - `apps/api/src/serving/dashboard.py` (METRO_META entry "Fort Smith, AR")
+  - `apps/dashboard/public/index.html` (byte-synced static copy)
+  - `apps/product/public/facts.json` + `apps/product/public/cities/fort_smith.json` (via `scripts/export_site_facts.py`)
 
 ## Intent
 
-<One paragraph: what done looks like for this stream.>
+Onboard Fort Smith, AR as a new Urban Signal metro (South Central region). Verify availability of a municipal building-permits feed; if none is publicly verifiable, register SNAP Retailer Locator as the SLA slice (`snap_sla_spec("AR")`) per ticket guidance. Deliver a complete registration per city-registration rule: REGISTRY + ALIASES + METRO_META + snapshot/grid coverage + byte-synced dashboard static. Keep the edit additive and isolated from Amarillo/Beaumont/Waco/Tyler/Lake Charles.
 
 ## Decisions
 
-<Appended as made. Findings go here the moment they are learned (F5) —
-not at the end.>
-
-- <timestamp> —
+- 2026-08-28 06:55Z — Probe result: no public municipal permits API found for Fort Smith (CityView portal present; GIS public items limited to utilities). Proceeding with SNAP SLA fallback using `snap_sla_spec("AR")` (ticket allows; use AR, not TX/LA).
 
 ## Current step
 
-<What is in flight right now, so an interrupting agent knows where the
-write boundary was.>
+Authoring `apps/api/src/spatial/cities/fort_smith.py` with metro/division bboxes and 5–6 submarkets; ensure containment invariant holds.
+
+## Current step
+
+Leaf geometry authoring.
 
 ## Next step
 
-<What you would do next if you resumed yourself.>
+1) Register CityId + ALIASES + REGISTRY (SLA only, AR) + exports. 2) Add METRO_META and export dashboard static. 3) Export product facts. 4) Run `pytest -m interlock`. 5) Open ready PR linked to US-275.
