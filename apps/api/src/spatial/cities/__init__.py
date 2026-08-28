@@ -335,6 +335,13 @@ from src.spatial.cities.tampa import (
     TAMPA_SUBMARKETS,
     is_in_tampa_metro,
 )
+from src.spatial.cities.port_st_lucie import (
+    PORT_ST_LUCIE_DIVISION_BBOXES,
+    PORT_ST_LUCIE_DIVISIONS,
+    PORT_ST_LUCIE_METRO_BBOX,
+    PORT_ST_LUCIE_SUBMARKETS,
+    is_in_port_st_lucie_metro,
+)
 from src.spatial.cities.las_vegas import (
     LAS_VEGAS_DIVISION_BBOXES,
     LAS_VEGAS_DIVISIONS,
@@ -447,6 +454,13 @@ from src.spatial.cities.toledo import (
     TOLEDO_SUBMARKETS,
     is_in_toledo_metro,
 )
+from src.spatial.cities.cape_coral import (
+    CAPE_CORAL_DIVISION_BBOXES,
+    CAPE_CORAL_DIVISIONS,
+    CAPE_CORAL_METRO_BBOX,
+    CAPE_CORAL_SUBMARKETS,
+    is_in_cape_coral_metro,
+)
 
 from src.spatial.cities.amarillo import (
     AMARILLO_DIVISION_BBOXES,
@@ -462,6 +476,7 @@ from src.spatial.cities.waco import (
     WACO_SUBMARKETS,
     is_in_waco_metro,
 )
+<<<<<<< HEAD
 from src.spatial.cities.jackson_ms import (
     JACKSON_MS_DIVISION_BBOXES,
     JACKSON_MS_DIVISIONS,
@@ -511,7 +526,27 @@ from src.spatial.cities.abilene import (
     ABILENE_SUBMARKETS,
     is_in_abilene_metro,
 )
-
+from src.spatial.cities.texarkana import (
+    TEXARKANA_DIVISION_BBOXES,
+    TEXARKANA_DIVISIONS,
+    TEXARKANA_METRO_BBOX,
+    TEXARKANA_SUBMARKETS,
+    is_in_texarkana_metro,
+)
+from src.spatial.cities.odessa import (
+    ODESSA_DIVISION_BBOXES,
+    ODESSA_DIVISIONS,
+    ODESSA_METRO_BBOX,
+    ODESSA_SUBMARKETS,
+    is_in_odessa_metro,
+)
+from src.spatial.cities.alexandria import (
+    ALEXANDRIA_DIVISION_BBOXES,
+    ALEXANDRIA_DIVISIONS,
+    ALEXANDRIA_METRO_BBOX,
+    ALEXANDRIA_SUBMARKETS,
+    is_in_alexandria_metro,
+)
 from src.spatial.cities.lake_charles import (
     LAKE_CHARLES_DIVISION_BBOXES,
     LAKE_CHARLES_DIVISIONS,
@@ -519,6 +554,70 @@ from src.spatial.cities.lake_charles import (
     LAKE_CHARLES_SUBMARKETS,
     is_in_lake_charles_metro,
 )
+from src.spatial.cities.midland import (
+    MIDLAND_DIVISION_BBOXES,
+    MIDLAND_DIVISIONS,
+    MIDLAND_METRO_BBOX,
+    MIDLAND_SUBMARKETS,
+    is_in_midland_metro,
+)
+from src.spatial.cities.jonesboro import (
+    JONESBORO_DIVISION_BBOXES,
+    JONESBORO_DIVISIONS,
+    JONESBORO_METRO_BBOX,
+    JONESBORO_SUBMARKETS,
+    is_in_jonesboro_metro,
+)
+from src.spatial.cities.charleston_sc import (
+    CHARLESTON_SC_DIVISION_BBOXES,
+    CHARLESTON_SC_DIVISIONS,
+    CHARLESTON_SC_METRO_BBOX,
+    CHARLESTON_SC_SUBMARKETS,
+    is_in_charleston_sc_metro,
+)
+from src.spatial.cities.cape_coral import (
+    CAPE_CORAL_DIVISION_BBOXES,
+    CAPE_CORAL_DIVISIONS,
+    CAPE_CORAL_METRO_BBOX,
+    CAPE_CORAL_SUBMARKETS,
+    is_in_cape_coral_metro,
+)
+from src.spatial.cities.lakeland import (
+    LAKELAND_DIVISION_BBOXES,
+    LAKELAND_DIVISIONS,
+    LAKELAND_METRO_BBOX,
+    LAKELAND_SUBMARKETS,
+    is_in_lakeland_metro,
+)
+from src.spatial.cities.augusta import (
+    AUGUSTA_DIVISION_BBOXES,
+    AUGUSTA_DIVISIONS,
+    AUGUSTA_METRO_BBOX,
+    AUGUSTA_SUBMARKETS,
+    is_in_augusta_metro,
+)
+from src.spatial.cities.lexington import (
+    LEXINGTON_DIVISION_BBOXES,
+    LEXINGTON_DIVISIONS,
+    LEXINGTON_METRO_BBOX,
+    LEXINGTON_SUBMARKETS,
+    is_in_lexington_metro,
+)
+from src.spatial.cities.asheville import (
+    ASHEVILLE_DIVISION_BBOXES,
+    ASHEVILLE_DIVISIONS,
+    ASHEVILLE_METRO_BBOX,
+    ASHEVILLE_SUBMARKETS,
+    is_in_asheville_metro,
+)
+from src.spatial.cities.wilmington_nc import (
+    WILMINGTON_NC_DIVISION_BBOXES,
+    WILMINGTON_NC_DIVISIONS,
+    WILMINGTON_NC_METRO_BBOX,
+    WILMINGTON_NC_SUBMARKETS,
+    is_in_wilmington_nc_metro,
+)
+
 __all__ = [
     "PIERCE_METRO_BBOX",
     "PIERCE_DIVISION_BBOXES",
@@ -751,6 +850,11 @@ __all__ = [
     "TAMPA_DIVISIONS",
     "TAMPA_SUBMARKETS",
     "is_in_tampa_metro",
+    "PORT_ST_LUCIE_METRO_BBOX",
+    "PORT_ST_LUCIE_DIVISION_BBOXES",
+    "PORT_ST_LUCIE_DIVISIONS",
+    "PORT_ST_LUCIE_SUBMARKETS",
+    "is_in_port_st_lucie_metro",
     "LAS_VEGAS_METRO_BBOX",
     "LAS_VEGAS_DIVISION_BBOXES",
     "LAS_VEGAS_DIVISIONS",
@@ -886,4 +990,59 @@ __all__ = [
     "ABILENE_DIVISIONS",
     "ABILENE_SUBMARKETS",
     "is_in_abilene_metro",
+    "TEXARKANA_METRO_BBOX",
+    "TEXARKANA_DIVISION_BBOXES",
+    "TEXARKANA_DIVISIONS",
+    "TEXARKANA_SUBMARKETS",
+    "is_in_texarkana_metro",
+    "MIDLAND_METRO_BBOX",
+    "MIDLAND_DIVISION_BBOXES",
+    "MIDLAND_DIVISIONS",
+    "MIDLAND_SUBMARKETS",
+    "is_in_midland_metro",
+    "ODESSA_METRO_BBOX",
+    "ODESSA_DIVISION_BBOXES",
+    "ODESSA_DIVISIONS",
+    "ODESSA_SUBMARKETS",
+    "is_in_odessa_metro",
+    "ALEXANDRIA_METRO_BBOX",
+    "ALEXANDRIA_DIVISION_BBOXES",
+    "ALEXANDRIA_DIVISIONS",
+    "ALEXANDRIA_SUBMARKETS",
+    "is_in_alexandria_metro",
+    "JONESBORO_METRO_BBOX",
+    "JONESBORO_DIVISION_BBOXES",
+    "JONESBORO_DIVISIONS",
+    "JONESBORO_SUBMARKETS",
+    "is_in_jonesboro_metro",
+    "CHARLESTON_SC_METRO_BBOX",
+    "CHARLESTON_SC_DIVISION_BBOXES",
+    "CHARLESTON_SC_DIVISIONS",
+    "CHARLESTON_SC_SUBMARKETS",
+    "is_in_charleston_sc_metro",
+    "CAPE_CORAL_METRO_BBOX",
+    "CAPE_CORAL_DIVISION_BBOXES",
+    "CAPE_CORAL_DIVISIONS",
+    "CAPE_CORAL_SUBMARKETS",
+    "is_in_cape_coral_metro",
+    "LAKELAND_METRO_BBOX",
+    "LAKELAND_DIVISION_BBOXES",
+    "LAKELAND_DIVISIONS",
+    "LAKELAND_SUBMARKETS",
+    "is_in_lakeland_metro",
+    "AUGUSTA_METRO_BBOX",
+    "AUGUSTA_DIVISION_BBOXES",
+    "AUGUSTA_DIVISIONS",
+    "AUGUSTA_SUBMARKETS",
+    "is_in_augusta_metro",
+    "LEXINGTON_METRO_BBOX",
+    "LEXINGTON_DIVISION_BBOXES",
+    "LEXINGTON_DIVISIONS",
+    "LEXINGTON_SUBMARKETS",
+    "is_in_lexington_metro",
+    "WILMINGTON_NC_METRO_BBOX",
+    "WILMINGTON_NC_DIVISION_BBOXES",
+    "WILMINGTON_NC_DIVISIONS",
+    "WILMINGTON_NC_SUBMARKETS",
+    "is_in_wilmington_nc_metro",
 ]
