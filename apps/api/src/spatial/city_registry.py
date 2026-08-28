@@ -480,6 +480,13 @@ from src.spatial.cities.abilene import (
     ABILENE_METRO_BBOX,
     ABILENE_SUBMARKETS,
 )
+from src.spatial.cities.texarkana import (
+    TEXARKANA_CENTER,
+    TEXARKANA_DIVISION_BBOXES,
+    TEXARKANA_DIVISIONS,
+    TEXARKANA_METRO_BBOX,
+    TEXARKANA_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -567,6 +574,7 @@ class CityId(str, Enum):
     LONGVIEW = "longview"
     MONROE = "monroe"
     ABILENE = "abilene"
+    TEXARKANA = "texarkana"
 
 
 class FeedType(str, Enum):
@@ -1181,6 +1189,12 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "abilene": CityId.ABILENE,
     "abilene_tx": CityId.ABILENE,
     "abilene tx": CityId.ABILENE,
+    # Texarkana, TX-AR (primary slice TX; AR unregistered until dual-slice is supported)
+    "texarkana": CityId.TEXARKANA,
+    "texarkana_tx": CityId.TEXARKANA,
+    "texarkana tx": CityId.TEXARKANA,
+    "texarkana_ar": CityId.TEXARKANA,
+    "texarkana ar": CityId.TEXARKANA,
 }
 
 
@@ -5182,6 +5196,19 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         job_suffix="tyler",
         # US-273: initial registration with SNAP SLA (TX slice). City permits
         # via data.texas.gov require verification; register when public API confirmed.
+    CityId.TEXARKANA: CityRegistration(
+        city_id=CityId.TEXARKANA,
+        name="Texarkana",
+        state="TX",  # bi-state TX-AR metro; primary slice TX while registry supports one-slice SNAP
+        center=TEXARKANA_CENTER,
+        metro_bbox=TEXARKANA_METRO_BBOX,
+        division_bboxes=TEXARKANA_DIVISION_BBOXES,
+        submarkets=TEXARKANA_SUBMARKETS,
+        divisions=TEXARKANA_DIVISIONS,
+        job_suffix="texarkana",
+        # US-282: initial registration with SNAP SLA (TX slice). Public municipal
+        # permits endpoints were not verifiable on both sides; do not invent a
+        # dual-state slice until the registry supports it. Expand when feeds are proven.
         datasets={
             FeedType.SLA: snap_sla_spec("TX"),
         },
@@ -5235,6 +5262,8 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
             FeedType.SLA: snap_sla_spec("AR"),
         },
     ),
+=======
+>>>>>>> 6b90602 (leaf(spatial): add Texarkana geometry + containment tests (US-282))
 }
 
 
