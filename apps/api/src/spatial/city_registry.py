@@ -436,6 +436,7 @@ from src.spatial.cities.waco import (
 )
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 from src.spatial.cities.lake_charles import (
     LAKE_CHARLES_DIVISION_BBOXES,
     LAKE_CHARLES_DIVISIONS,
@@ -517,14 +518,19 @@ from src.spatial.cities.jonesboro import (
     JONESBORO_DIVISIONS,
     JONESBORO_METRO_BBOX,
     JONESBORO_SUBMARKETS,
-=======
+)
 from src.spatial.cities.charleston_sc import (
     CHARLESTON_SC_CENTER,
     CHARLESTON_SC_DIVISION_BBOXES,
     CHARLESTON_SC_DIVISIONS,
     CHARLESTON_SC_METRO_BBOX,
     CHARLESTON_SC_SUBMARKETS,
->>>>>>> 0e2b606 (registry: add CityId.charleston_sc with aliases and SNAP SLA (SC slice))
+)
+from src.spatial.cities.lakeland import (
+    LAKELAND_DIVISION_BBOXES,
+    LAKELAND_DIVISIONS,
+    LAKELAND_METRO_BBOX,
+    LAKELAND_SUBMARKETS,
 )
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
@@ -620,6 +626,7 @@ class CityId(str, Enum):
     ALEXANDRIA = "alexandria"
     JONESBORO = "jonesboro"
     CHARLESTON_SC = "charleston_sc"
+    LAKELAND = "lakeland"
 
 
 class FeedType(str, Enum):
@@ -1078,6 +1085,11 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "tampa fl": CityId.TAMPA,
     "hillsborough_county": CityId.TAMPA,
     "hillsborough county": CityId.TAMPA,
+
+    # Lakeland, FL
+    "lakeland": CityId.LAKELAND,
+    "lakeland_fl": CityId.LAKELAND,
+    "lakeland fl": CityId.LAKELAND,
 
     # Las Vegas / Clark County
     "las_vegas": CityId.LAS_VEGAS,
@@ -5194,6 +5206,7 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         },
     ),
 <<<<<<< HEAD
+<<<<<<< HEAD
     CityId.LAKE_CHARLES: CityRegistration(
         city_id=CityId.LAKE_CHARLES,
         name="Lake Charles",
@@ -5453,6 +5466,33 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         # a municipal permits API is proven.
         datasets={
             FeedType.SLA: snap_sla_spec("SC"),
+        },
+    ),
+    CityId.LAKELAND: CityRegistration(
+        city_id=CityId.LAKELAND,
+        name="Lakeland",
+        state="FL",
+        center={"lat": 28.0395, "lng": -81.9498},
+        metro_bbox=LAKELAND_METRO_BBOX,
+        division_bboxes=LAKELAND_DIVISION_BBOXES,
+        submarkets=LAKELAND_SUBMARKETS,
+        divisions=LAKELAND_DIVISIONS,
+        job_suffix="lakeland",
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_lakeland_permits_url,
+                platform="arcgis",
+                watermark_col="ISSUEDATE",
+                id_keys=["PERMIT_NO", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                expected_cadence_days=7,
+                oid_field="OBJECTID",
+                max_record_count=2000,
+            ),
+            # Florida statewide SNAP fallback (SLA)
+            FeedType.SLA: snap_sla_spec("FL"),
         },
     ),
 }

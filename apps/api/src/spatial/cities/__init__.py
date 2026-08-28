@@ -469,7 +469,6 @@ from src.spatial.cities.waco import (
     WACO_SUBMARKETS,
     is_in_waco_metro,
 )
-<<<<<<< HEAD
 from src.spatial.cities.jackson_ms import (
     JACKSON_MS_DIVISION_BBOXES,
     JACKSON_MS_DIVISIONS,
@@ -574,6 +573,13 @@ from src.spatial.cities.cape_coral import (
     CAPE_CORAL_METRO_BBOX,
     CAPE_CORAL_SUBMARKETS,
     is_in_cape_coral_metro,
+)
+from src.spatial.cities.lakeland import (
+    LAKELAND_DIVISION_BBOXES,
+    LAKELAND_DIVISIONS,
+    LAKELAND_METRO_BBOX,
+    LAKELAND_SUBMARKETS,
+    is_in_lakeland_metro,
 )
 __all__ = [
     "PIERCE_METRO_BBOX",
@@ -902,7 +908,6 @@ __all__ = [
     "WACO_DIVISIONS",
     "WACO_SUBMARKETS",
     "is_in_waco_metro",
-<<<<<<< HEAD
     "JACKSON_MS_METRO_BBOX",
     "JACKSON_MS_DIVISION_BBOXES",
     "JACKSON_MS_DIVISIONS",
@@ -978,4 +983,10 @@ __all__ = [
     "CAPE_CORAL_DIVISIONS",
     "CAPE_CORAL_SUBMARKETS",
     "is_in_cape_coral_metro",
+    "LAKELAND_METRO_BBOX",
+    "LAKELAND_DIVISION_BBOXES",
+    "LAKELAND_DIVISIONS",
+    "LAKELAND_SUBMARKETS",
+    "is_in_lakeland_metro",
 ]
+*** End Patch*** End Patch
