@@ -81,6 +81,10 @@ MANIFEST
 *.session-journal
 data/
 datasets/
+!/apps/api/src/spatial/cities/data/
+!/apps/api/src/spatial/cities/data/*.yaml
+/apps/api/src/spatial/cities/data/_example.yaml
+/apps/api/src/spatial/cities/data/README.md
 *.parquet
 *.feather
 *.arrow

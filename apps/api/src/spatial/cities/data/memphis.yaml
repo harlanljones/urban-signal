@@ -1,0 +1,534 @@
+city_id: memphis
+name: Memphis / Shelby County
+state: TN
+center:
+  lat: 35.1495
+  lng: -90.049
+metro_bbox:
+  min_lat: 34.99
+  max_lat: 35.28
+  min_lng: -90.13
+  max_lng: -89.68
+division_bboxes:
+  DOWNTOWN_RIVERFRONT:
+    min_lat: 35.125
+    max_lat: 35.175
+    min_lng: -90.075
+    max_lng: -90.025
+  MIDTOWN_MEDICAL:
+    min_lat: 35.115
+    max_lat: 35.165
+    min_lng: -90.03
+    max_lng: -89.97
+  EAST_MEMPHIS_POPLAR:
+    min_lat: 35.1
+    max_lat: 35.16
+    min_lng: -89.97
+    max_lng: -89.85
+  SOUTH_WHITEHAVEN:
+    min_lat: 34.995
+    max_lat: 35.1
+    min_lng: -90.08
+    max_lng: -89.9
+  NORTH_FRAYSER_RALEIGH:
+    min_lat: 35.175
+    max_lat: 35.27
+    min_lng: -90.08
+    max_lng: -89.85
+  UNIVERSITY_HICKORY_HILL:
+    min_lat: 35.04
+    max_lat: 35.145
+    min_lng: -89.95
+    max_lng: -89.7
+submarkets:
+  Downtown Memphis:
+    name: Downtown Memphis
+    borough: DOWNTOWN_RIVERFRONT
+    lat: 35.1495
+    lng: -90.049
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.88
+    capex: 9800000.0
+    permit_vel: 44.0
+    shift_ratio: 1.52
+    sla: 64.0
+    description: Mississippi riverfront civic core around Court Square and Beale with
+      office-to-residential conversions and the densest 311 volume in the metro.
+    city_id: memphis
+  Harbor Town & Mud Island:
+    name: Harbor Town & Mud Island
+    borough: DOWNTOWN_RIVERFRONT
+    lat: 35.165
+    lng: -90.055
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.86
+    capex: 8200000.0
+    permit_vel: 32.0
+    shift_ratio: 1.46
+    sla: 58.0
+    description: Planned river-island neighborhood north of downtown with renovation-led
+      permitting and trail-adjacent residential stock.
+    city_id: memphis
+  South Main:
+    name: South Main
+    borough: DOWNTOWN_RIVERFRONT
+    lat: 35.135
+    lng: -90.058
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.84
+    capex: 7400000.0
+    permit_vel: 36.0
+    shift_ratio: 1.48
+    sla: 60.0
+    description: Arts-district warehouse conversions south of Beale with loft infill
+      and entertainment-adjacent short-stay pressure.
+    city_id: memphis
+  Midtown & Cooper-Young:
+    name: Midtown & Cooper-Young
+    borough: MIDTOWN_MEDICAL
+    lat: 35.135
+    lng: -90.005
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.85
+    capex: 7600000.0
+    permit_vel: 38.0
+    shift_ratio: 1.5
+    sla: 61.0
+    description: Streetcar-era bungalow grid and Cooper-Young commercial node with
+      renovation-heavy residential permitting.
+    city_id: memphis
+  Medical District:
+    name: Medical District
+    borough: MIDTOWN_MEDICAL
+    lat: 35.14
+    lng: -90.018
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.82
+    capex: 8800000.0
+    permit_vel: 34.0
+    shift_ratio: 1.44
+    sla: 59.0
+    description: Hospital-anchored employment core between downtown and Midtown with
+      institutional expansion and workforce housing.
+    city_id: memphis
+  Overton Park & Evergreen:
+    name: Overton Park & Evergreen
+    borough: MIDTOWN_MEDICAL
+    lat: 35.148
+    lng: -89.99
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.83
+    capex: 6900000.0
+    permit_vel: 30.0
+    shift_ratio: 1.42
+    sla: 56.0
+    description: Park-adjacent historic district with conservation overlays and steady
+      single-family renovation.
+    city_id: memphis
+  East Memphis:
+    name: East Memphis
+    borough: EAST_MEMPHIS_POPLAR
+    lat: 35.125
+    lng: -89.91
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.87
+    capex: 9200000.0
+    permit_vel: 40.0
+    shift_ratio: 1.54
+    sla: 63.0
+    description: Poplar-corridor professional and residential belt with the metro's
+      highest-value single-family stock and office parks.
+    city_id: memphis
+  Poplar Corridor:
+    name: Poplar Corridor
+    borough: EAST_MEMPHIS_POPLAR
+    lat: 35.14
+    lng: -89.89
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.84
+    capex: 8100000.0
+    permit_vel: 36.0
+    shift_ratio: 1.48
+    sla: 60.0
+    description: East-Poplar commercial spine toward Germantown with medical-office
+      and multifamily infill.
+    city_id: memphis
+  Whitehaven:
+    name: Whitehaven
+    borough: SOUTH_WHITEHAVEN
+    lat: 35.033
+    lng: -90.025
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.72
+    capex: 4100000.0
+    permit_vel: 28.0
+    shift_ratio: 1.32
+    sla: 48.0
+    description: South-Memphis Graceland corridor with renovation and alteration permits
+      on post-war tract housing.
+    city_id: memphis
+  South Memphis:
+    name: South Memphis
+    borough: SOUTH_WHITEHAVEN
+    lat: 35.075
+    lng: -90.045
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.68
+    capex: 3600000.0
+    permit_vel: 24.0
+    shift_ratio: 1.28
+    sla: 44.0
+    description: Industrial-adjacent south grid with sparse new construction and high
+      311 volume relative to permit activity.
+    city_id: memphis
+  Frayser:
+    name: Frayser
+    borough: NORTH_FRAYSER_RALEIGH
+    lat: 35.22
+    lng: -90.0
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.66
+    capex: 3200000.0
+    permit_vel: 22.0
+    shift_ratio: 1.24
+    sla: 42.0
+    description: North-Memphis residential plateau with alteration-led permitting
+      and code-enforcement-heavy 311 demand.
+    city_id: memphis
+  Raleigh:
+    name: Raleigh
+    borough: NORTH_FRAYSER_RALEIGH
+    lat: 35.23
+    lng: -89.91
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.7
+    capex: 3800000.0
+    permit_vel: 26.0
+    shift_ratio: 1.3
+    sla: 46.0
+    description: Northeast Memphis / Raleigh Springs corridor with suburban-lot renovations
+      and retail-node 311 volume.
+    city_id: memphis
+  University District:
+    name: University District
+    borough: UNIVERSITY_HICKORY_HILL
+    lat: 35.118
+    lng: -89.937
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.78
+    capex: 5400000.0
+    permit_vel: 30.0
+    shift_ratio: 1.38
+    sla: 52.0
+    description: University of Memphis-adjacent rental and small-lot stock with student-driven
+      turnover and renovation permits.
+    city_id: memphis
+  Hickory Hill & Parkway Village:
+    name: Hickory Hill & Parkway Village
+    borough: UNIVERSITY_HICKORY_HILL
+    lat: 35.06
+    lng: -89.85
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.74
+    capex: 4600000.0
+    permit_vel: 29.0
+    shift_ratio: 1.36
+    sla: 50.0
+    description: Southeast Memphis suburban grid toward the Germantown line with townhome
+      infill and solid-waste 311 load.
+    city_id: memphis
+divisions:
+  DOWNTOWN_RIVERFRONT:
+    name: DOWNTOWN_RIVERFRONT
+    center_lat: 35.1495
+    center_lng: -90.049
+    zoom: 13.5
+    bbox:
+      min_lat: 35.125
+      max_lat: 35.175
+      min_lng: -90.075
+      max_lng: -90.025
+    submarkets:
+    - Downtown Memphis
+    - Harbor Town & Mud Island
+    - South Main
+    city_id: memphis
+  MIDTOWN_MEDICAL:
+    name: MIDTOWN_MEDICAL
+    center_lat: 35.14
+    center_lng: -90.0
+    zoom: 13.0
+    bbox:
+      min_lat: 35.115
+      max_lat: 35.165
+      min_lng: -90.03
+      max_lng: -89.97
+    submarkets:
+    - Midtown & Cooper-Young
+    - Medical District
+    - Overton Park & Evergreen
+    city_id: memphis
+  EAST_MEMPHIS_POPLAR:
+    name: EAST_MEMPHIS_POPLAR
+    center_lat: 35.13
+    center_lng: -89.91
+    zoom: 12.5
+    bbox:
+      min_lat: 35.1
+      max_lat: 35.16
+      min_lng: -89.97
+      max_lng: -89.85
+    submarkets:
+    - East Memphis
+    - Poplar Corridor
+    city_id: memphis
+  SOUTH_WHITEHAVEN:
+    name: SOUTH_WHITEHAVEN
+    center_lat: 35.04
+    center_lng: -90.02
+    zoom: 12.5
+    bbox:
+      min_lat: 34.995
+      max_lat: 35.1
+      min_lng: -90.08
+      max_lng: -89.9
+    submarkets:
+    - Whitehaven
+    - South Memphis
+    city_id: memphis
+  NORTH_FRAYSER_RALEIGH:
+    name: NORTH_FRAYSER_RALEIGH
+    center_lat: 35.22
+    center_lng: -89.955
+    zoom: 12.0
+    bbox:
+      min_lat: 35.175
+      max_lat: 35.27
+      min_lng: -90.08
+      max_lng: -89.85
+    submarkets:
+    - Frayser
+    - Raleigh
+    city_id: memphis
+  UNIVERSITY_HICKORY_HILL:
+    name: UNIVERSITY_HICKORY_HILL
+    center_lat: 35.09
+    center_lng: -89.85
+    zoom: 12.0
+    bbox:
+      min_lat: 35.04
+      max_lat: 35.145
+      min_lng: -89.95
+      max_lng: -89.7
+    submarkets:
+    - University District
+    - Hickory Hill & Parkway Village
+    city_id: memphis
+datasets:
+  permits:
+    endpoint: https://services2.arcgis.com/saWmpKJIUAjyyNVc/arcgis/rest/services/DPD_Building_Permits/FeatureServer/0
+    platform: arcgis
+    watermark_col: Issued_Date
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: Issued_Date DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Memphis, TN
+    field_map:
+      job_id:
+      - Record_ID
+      - ObjectId
+      - OBJECTID
+      issuance_date:
+      - Issued_Date
+      job_type:
+      - Construction_Type
+      - Sub_Type
+      - Description
+      cost:
+      - Valuation
+      address_street:
+      - Address
+      zipcode:
+      - ZIP_Code
+      borough:
+      - City
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+    ingestion_mode: incremental
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 31
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: https://311.memphistn.gov/server/rest/services/311/311_Request_Map_PROD/FeatureServer/0
+    platform: arcgis
+    watermark_col: REPORTED_DATE
+    id_keys:
+    - INCIDENT_NUMBER
+    - OBJECTID
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: REPORTED_DATE DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Memphis, TN
+    field_map:
+      incident_id:
+      - INCIDENT_NUMBER
+      - INCIDENT_ID
+      - OBJECTID
+      complaint_type:
+      - REQUEST_TYPE
+      - DEPARTMENT
+      created_date:
+      - REPORTED_DATE
+      closed_date:
+      - RESOLVED_DATE
+      status:
+      - REQUEST_STATUS
+      incident_address:
+      - Location_Address
+      zipcode:
+      - ZipCode
+      descriptor:
+      - REQUEST_SUMMARY
+      - REQUEST_TYPE
+      borough:
+      - neigh_desc
+      - cd_desc
+      - DEPARTMENT
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 3000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'TN'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- memphis_tn
+- memphis tn
+- mem
+- shelby_county
+- shelby county
+- shelby_county_tn
+job_suffix: memphis

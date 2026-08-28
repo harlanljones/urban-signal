@@ -20,6 +20,10 @@ class Settings(BaseSettings):
     app_env: str = Field(default="development", description="Environment: development, staging, production")
     log_level: str = Field(default="INFO", description="Log level")
     service_name: str = Field(default="urban-signal-predictor")
+    city_data_dir: str = Field(
+        default="./src/spatial/cities/data",
+        description="Directory containing declarative city-registration definitions",
+    )
 
     # Kafka & Strimzi Streaming
     kafka_bootstrap_servers: str = Field(

@@ -1,0 +1,652 @@
+city_id: philadelphia
+name: Philadelphia
+state: PA
+center:
+  lat: 39.9526
+  lng: -75.1652
+metro_bbox:
+  min_lat: 39.87
+  max_lat: 40.14
+  min_lng: -75.28
+  max_lng: -74.95
+division_bboxes:
+  CENTER_CITY_RITTENHOUSE:
+    min_lat: 39.938
+    max_lat: 39.972
+    min_lng: -75.195
+    max_lng: -75.152
+  OLD_CITY_NORTHERN_LIBERTIES:
+    min_lat: 39.946
+    max_lat: 39.982
+    min_lng: -75.152
+    max_lng: -75.118
+  SOUTH_PHILLY_PASSYUNK:
+    min_lat: 39.908
+    max_lat: 39.952
+    min_lng: -75.2
+    max_lng: -75.15
+  WEST_PHILLY_UNIVERSITY_CITY:
+    min_lat: 39.933
+    max_lat: 39.972
+    min_lng: -75.23
+    max_lng: -75.188
+  NORTH_PHILLY_TEMPLE:
+    min_lat: 39.963
+    max_lat: 40.04
+    min_lng: -75.235
+    max_lng: -75.13
+  NORTHEAST_ROOSEVELT_BLVD:
+    min_lat: 40.005
+    max_lat: 40.09
+    min_lng: -75.115
+    max_lng: -75.03
+  GERMANTOWN_MT_AIRY:
+    min_lat: 40.032
+    max_lat: 40.1
+    min_lng: -75.21
+    max_lng: -75.16
+  RIVER_WARDS_KENSINGTON:
+    min_lat: 39.96
+    max_lat: 40.01
+    min_lng: -75.15
+    max_lng: -75.105
+submarkets:
+  Rittenhouse Square:
+    name: Rittenhouse Square
+    borough: CENTER_CITY_RITTENHOUSE
+    lat: 39.9526
+    lng: -75.17
+    zoom: 15.0
+    pitch: 50.0
+    base_lims: 0.92
+    capex: 11000000.0
+    permit_vel: 56.0
+    shift_ratio: 1.68
+    sla: 72.0
+    description: 'The region''s premier retail-and-residence square: Walnut Street
+      luxury corridor, office towers converting to residential, and sustained high-rise
+      infill demand.'
+    city_id: philadelphia
+  Market East:
+    name: Market East
+    borough: CENTER_CITY_RITTENHOUSE
+    lat: 39.9523
+    lng: -75.16
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.84
+    capex: 7600000.0
+    permit_vel: 44.0
+    shift_ratio: 1.44
+    sla: 58.0
+    description: Jefferson and Convention Center district undergoing the Gallery/East
+      Market redevelopment, hospital-anchor demand, and adaptive-reuse of former department
+      stores.
+    city_id: philadelphia
+  Old City & Northern Liberties:
+    name: Old City & Northern Liberties
+    borough: OLD_CITY_NORTHERN_LIBERTIES
+    lat: 39.956
+    lng: -75.142
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.86
+    capex: 8000000.0
+    permit_vel: 48.0
+    shift_ratio: 1.48
+    sla: 54.0
+    description: Colonial-grid gallery district meeting the Piazza nightlife corridor;
+      condo conversions, boutique hotel demand, and I-95 cap waterfront spillover.
+    city_id: philadelphia
+  East Passyunk:
+    name: East Passyunk
+    borough: SOUTH_PHILLY_PASSYUNK
+    lat: 39.927
+    lng: -75.167
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.82
+    capex: 5800000.0
+    permit_vel: 38.0
+    shift_ratio: 1.42
+    sla: 48.0
+    description: Restaurant-row rowhouse corridor with rapid appreciation, BYO dining
+      economy, and tight two-story brick housing stock feeding renovation permits.
+    city_id: philadelphia
+  Pennsport:
+    name: Pennsport
+    borough: SOUTH_PHILLY_PASSYUNK
+    lat: 39.925
+    lng: -75.154
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.76
+    capex: 4600000.0
+    permit_vel: 42.0
+    shift_ratio: 1.38
+    sla: 40.0
+    description: Moyamensing builder belt between Queen Village and the stadiums;
+      trio-to-condo redevelopment pressure from the Delaware waterfront spillover.
+    city_id: philadelphia
+  Graduate Hospital:
+    name: Graduate Hospital
+    borough: SOUTH_PHILLY_PASSYUNK
+    lat: 39.9455
+    lng: -75.177
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.85
+    capex: 6200000.0
+    permit_vel: 40.0
+    shift_ratio: 1.46
+    sla: 52.0
+    description: G-Ho brownstone revival around South Street West with first-in-class
+      school demand, medical-office anchors, and dense triplex conversion activity.
+    city_id: philadelphia
+  University City & Drexel uCity:
+    name: University City & Drexel uCity
+    borough: WEST_PHILLY_UNIVERSITY_CITY
+    lat: 39.953
+    lng: -75.192
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.88
+    capex: 10500000.0
+    permit_vel: 52.0
+    shift_ratio: 1.62
+    sla: 64.0
+    description: 'Penn/Drexel innovation district: uCity Square lab build-out, Schuylkill
+      Yards towers, and institutional demand driving the region''s deepest crane count
+      outside Center City.'
+    city_id: philadelphia
+  Spruce Hill:
+    name: Spruce Hill
+    borough: WEST_PHILLY_UNIVERSITY_CITY
+    lat: 39.958
+    lng: -75.205
+    zoom: 14.5
+    pitch: 40.0
+    base_lims: 0.79
+    capex: 4800000.0
+    permit_vel: 30.0
+    shift_ratio: 1.32
+    sla: 44.0
+    description: Victorian twin-and-mansion academic enclave with Penn faculty demand,
+      landmark districts, and steady single-family restoration permitting.
+    city_id: philadelphia
+  Temple/Liacouras Corridor:
+    name: Temple/Liacouras Corridor
+    borough: NORTH_PHILLY_TEMPLE
+    lat: 39.981
+    lng: -75.155
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.62
+    capex: 3400000.0
+    permit_vel: 36.0
+    shift_ratio: 1.24
+    sla: 34.0
+    description: 'Student-housing frontier around Temple''s main campus: purpose-built
+      dorm supply, corner-store commercial revival, and high-yield rental spreads.'
+    city_id: philadelphia
+  Fairmount & Brewerytown:
+    name: Fairmount & Brewerytown
+    borough: NORTH_PHILLY_TEMPLE
+    lat: 39.973
+    lng: -75.185
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.81
+    capex: 5600000.0
+    permit_vel: 42.0
+    shift_ratio: 1.44
+    sla: 50.0
+    description: Museum-district rowhouses meeting Brewerytown's brewer-row redevelopment
+      along Girard Avenue with Art Museum spillover and brewery-heritage branding.
+    city_id: philadelphia
+  Manayunk:
+    name: Manayunk
+    borough: NORTH_PHILLY_TEMPLE
+    lat: 40.023
+    lng: -75.227
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.77
+    capex: 5000000.0
+    permit_vel: 32.0
+    shift_ratio: 1.36
+    sla: 46.0
+    description: Canal-side hillside village with Main Street retail, towpath recreation
+      demand, and steep-street new construction on former mill land.
+    city_id: philadelphia
+  Mayfair:
+    name: Mayfair
+    borough: NORTHEAST_ROOSEVELT_BLVD
+    lat: 40.026
+    lng: -75.088
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.68
+    capex: 3200000.0
+    permit_vel: 26.0
+    shift_ratio: 1.2
+    sla: 32.0
+    description: Frankford-El terminus neighborhood of twins and corner stores along
+      Roosevelt Boulevard with value-priced entry stock and steady owner-occupant
+      demand.
+    city_id: philadelphia
+  Fox Chase:
+    name: Fox Chase
+    borough: NORTHEAST_ROOSEVELT_BLVD
+    lat: 40.077
+    lng: -75.075
+    zoom: 13.5
+    pitch: 35.0
+    base_lims: 0.72
+    capex: 2900000.0
+    permit_vel: 20.0
+    shift_ratio: 1.16
+    sla: 28.0
+    description: Rail-commuter leafy Northeast edge with Fox Chase Cancer Center anchor,
+      detached and twin housing stock, and low-turnover family ownership.
+    city_id: philadelphia
+  Germantown Ave Corridor:
+    name: Germantown Ave Corridor
+    borough: GERMANTOWN_MT_AIRY
+    lat: 40.04
+    lng: -75.18
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.55
+    capex: 2400000.0
+    permit_vel: 24.0
+    shift_ratio: 1.14
+    sla: 26.0
+    description: Historic colonial commercial spine through Germantown with surplus
+      church and mill stock, deep-discount acquisition, and historic-tax-credit rehabilitation
+      upside.
+    city_id: philadelphia
+  Chestnut Hill:
+    name: Chestnut Hill
+    borough: GERMANTOWN_MT_AIRY
+    lat: 40.065
+    lng: -75.206
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.83
+    capex: 6800000.0
+    permit_vel: 28.0
+    shift_ratio: 1.4
+    sla: 56.0
+    description: Garden-suburb estate district at the regional rail terminus with
+      Germantown Avenue boutiques, arboretum anchors, and preservation-constrained
+      premium stock.
+    city_id: philadelphia
+  Fishtown:
+    name: Fishtown
+    borough: RIVER_WARDS_KENSINGTON
+    lat: 39.97
+    lng: -75.131
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.87
+    capex: 7200000.0
+    permit_vel: 50.0
+    shift_ratio: 1.56
+    sla: 62.0
+    description: The city's bar-and-restaurant capital turned fastest-appreciating
+      rowhouse market; Frankford Avenue corridors and Delaware-adjacent new construction.
+    city_id: philadelphia
+  Port Richmond:
+    name: Port Richmond
+    borough: RIVER_WARDS_KENSINGTON
+    lat: 39.978
+    lng: -75.117
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.78
+    capex: 5200000.0
+    permit_vel: 46.0
+    shift_ratio: 1.46
+    sla: 44.0
+    description: 'Polish-cathedral river ward absorbing Fishtown spillover: affordable
+      brick twins, I-95 industrial edge, and builder townhome assemblies.'
+    city_id: philadelphia
+  Kensington/Frankford Ave:
+    name: Kensington/Frankford Ave
+    borough: RIVER_WARDS_KENSINGTON
+    lat: 39.986
+    lng: -75.133
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.52
+    capex: 2000000.0
+    permit_vel: 34.0
+    shift_ratio: 1.1
+    sla: 30.0
+    description: 'Post-industrial creative frontier along the El: vacant-lot assemblies,
+      artist-live-work conversions, and the widest value spread in the River Wards.'
+    city_id: philadelphia
+divisions:
+  CENTER_CITY_RITTENHOUSE:
+    name: CENTER_CITY_RITTENHOUSE
+    center_lat: 39.9525
+    center_lng: -75.17
+    zoom: 13.5
+    bbox:
+      min_lat: 39.938
+      max_lat: 39.972
+      min_lng: -75.195
+      max_lng: -75.152
+    submarkets:
+    - Rittenhouse Square
+    - Market East
+    city_id: philadelphia
+  OLD_CITY_NORTHERN_LIBERTIES:
+    name: OLD_CITY_NORTHERN_LIBERTIES
+    center_lat: 39.957
+    center_lng: -75.14
+    zoom: 14.0
+    bbox:
+      min_lat: 39.946
+      max_lat: 39.982
+      min_lng: -75.152
+      max_lng: -75.118
+    submarkets:
+    - Old City & Northern Liberties
+    city_id: philadelphia
+  SOUTH_PHILLY_PASSYUNK:
+    name: SOUTH_PHILLY_PASSYUNK
+    center_lat: 39.931
+    center_lng: -75.17
+    zoom: 13.0
+    bbox:
+      min_lat: 39.908
+      max_lat: 39.952
+      min_lng: -75.2
+      max_lng: -75.15
+    submarkets:
+    - East Passyunk
+    - Pennsport
+    - Graduate Hospital
+    city_id: philadelphia
+  WEST_PHILLY_UNIVERSITY_CITY:
+    name: WEST_PHILLY_UNIVERSITY_CITY
+    center_lat: 39.954
+    center_lng: -75.198
+    zoom: 13.5
+    bbox:
+      min_lat: 39.933
+      max_lat: 39.972
+      min_lng: -75.23
+      max_lng: -75.188
+    submarkets:
+    - University City & Drexel uCity
+    - Spruce Hill
+    city_id: philadelphia
+  NORTH_PHILLY_TEMPLE:
+    name: NORTH_PHILLY_TEMPLE
+    center_lat: 39.992
+    center_lng: -75.19
+    zoom: 12.5
+    bbox:
+      min_lat: 39.963
+      max_lat: 40.04
+      min_lng: -75.235
+      max_lng: -75.13
+    submarkets:
+    - Temple/Liacouras Corridor
+    - Fairmount & Brewerytown
+    - Manayunk
+    city_id: philadelphia
+  NORTHEAST_ROOSEVELT_BLVD:
+    name: NORTHEAST_ROOSEVELT_BLVD
+    center_lat: 40.045
+    center_lng: -75.078
+    zoom: 12.5
+    bbox:
+      min_lat: 40.005
+      max_lat: 40.09
+      min_lng: -75.115
+      max_lng: -75.03
+    submarkets:
+    - Mayfair
+    - Fox Chase
+    city_id: philadelphia
+  GERMANTOWN_MT_AIRY:
+    name: GERMANTOWN_MT_AIRY
+    center_lat: 40.052
+    center_lng: -75.188
+    zoom: 12.5
+    bbox:
+      min_lat: 40.032
+      max_lat: 40.1
+      min_lng: -75.21
+      max_lng: -75.16
+    submarkets:
+    - Germantown Ave Corridor
+    - Chestnut Hill
+    city_id: philadelphia
+  RIVER_WARDS_KENSINGTON:
+    name: RIVER_WARDS_KENSINGTON
+    center_lat: 39.978
+    center_lng: -75.127
+    zoom: 13.0
+    bbox:
+      min_lat: 39.96
+      max_lat: 40.01
+      min_lng: -75.15
+      max_lng: -75.105
+    submarkets:
+    - Fishtown
+    - Port Richmond
+    - Kensington/Frankford Ave
+    city_id: philadelphia
+datasets:
+  permits:
+    endpoint: carto://phl.carto.com/permits
+    platform: carto
+    watermark_col: permitissuedate
+    id_keys:
+    - cartodb_id
+    - permitnumber
+    - id
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: permitissuedate
+    id_col: cartodb_id
+    select: '*, ST_Y(the_geom) AS latitude, ST_X(the_geom) AS longitude'
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - permitnumber
+      issuance_date:
+      - permitissuedate
+      borough:
+      - council_district
+      zipcode:
+      - zip
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: carto://phl.carto.com/public_cases_fc
+    platform: carto
+    watermark_col: requested_datetime
+    id_keys:
+    - service_request_id
+    - cartodb_id
+    - id
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: requested_datetime
+    id_col: cartodb_id
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      latitude:
+      - lat
+      longitude:
+      - lon
+      closed_date:
+      - closed_datetime
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: carto://phl.carto.com/business_licenses
+    platform: carto
+    watermark_col: mostrecentissuedate
+    id_keys:
+    - licensenum
+    - cartodb_id
+    - id
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: mostrecentissuedate
+    id_col: cartodb_id
+    select: '*, ST_Y(the_geom) AS latitude, ST_X(the_geom) AS longitude'
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - licensenum
+      license_type:
+      - licensetype
+      effective_date:
+      - initialissuedate
+      expiration_date:
+      - expirationdate
+      status:
+      - licensestatus
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  deeds:
+    endpoint: carto://phl.carto.com/rtt_summary
+    platform: carto
+    watermark_col: recording_date
+    id_keys:
+    - document_id
+    - cartodb_id
+    - id
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: recording_date
+    id_col: cartodb_id
+    select: '*, ST_Y(the_geom) AS latitude, ST_X(the_geom) AS longitude'
+    fallback_endpoints: []
+    where: document_type = 'DEED'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      recorded_date:
+      - recording_date
+      document_amount:
+      - total_consideration
+      bbl:
+      - opa_account_num
+      party1_grantor:
+      - grantors
+      party2_grantee:
+      - grantees
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: true
+    alarm_exempt_reason: "SUSPECTED DEED-slice lag/stall \u2014 newest DEED recording\
+      \ 2026-07-07 (US-164)"
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- philly
+- phl
+job_suffix: philadelphia

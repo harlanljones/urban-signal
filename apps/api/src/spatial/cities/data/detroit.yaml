@@ -1,0 +1,569 @@
+city_id: detroit
+name: Detroit
+state: MI
+center:
+  lat: 42.3314
+  lng: -83.0458
+metro_bbox:
+  min_lat: 42.25
+  max_lat: 42.49
+  min_lng: -83.35
+  max_lng: -82.88
+division_bboxes:
+  DOWNTOWN_MIDTOWN_CORKTOWN:
+    min_lat: 42.31
+    max_lat: 42.365
+    min_lng: -83.1
+    max_lng: -83.02
+  EAST_SIDE_JEFFERSON:
+    min_lat: 42.325
+    max_lat: 42.375
+    min_lng: -83.03
+    max_lng: -82.94
+  WEST_SIDE_GRAND_RIVER:
+    min_lat: 42.38
+    max_lat: 42.425
+    min_lng: -83.29
+    max_lng: -83.15
+  SOUTHWEST_MEXICANTOWN:
+    min_lat: 42.295
+    max_lat: 42.33
+    min_lng: -83.15
+    max_lng: -83.08
+  NORTH_END_HIGHLAND_PARK:
+    min_lat: 42.365
+    max_lat: 42.44
+    min_lng: -83.12
+    max_lng: -83.06
+  EAST_ENGLISH_VILLAGE_MORNINGSIDE:
+    min_lat: 42.35
+    max_lat: 42.395
+    min_lng: -82.995
+    max_lng: -82.92
+submarkets:
+  Campus Martius & CBD:
+    name: Campus Martius & CBD
+    borough: DOWNTOWN_MIDTOWN_CORKTOWN
+    lat: 42.3314
+    lng: -83.0458
+    zoom: 15.0
+    pitch: 55.0
+    base_lims: 0.9
+    capex: 11000000.0
+    permit_vel: 55.0
+    shift_ratio: 1.7
+    sla: 72.0
+    description: Downtown core around Campus Martius park with Hudson's-site tower
+      construction, office-to-residential conversions, and the Woodward retail spine.
+    city_id: detroit
+  Midtown Cultural District:
+    name: Midtown Cultural District
+    borough: DOWNTOWN_MIDTOWN_CORKTOWN
+    lat: 42.3555
+    lng: -83.0632
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.87
+    capex: 8500000.0
+    permit_vel: 44.0
+    shift_ratio: 1.52
+    sla: 58.0
+    description: DIA, Wayne State University, MOCAD, and the College for Creative
+      Studies anchoring institutional demand, mixed-use infill, and Woodward corridor
+      recovery.
+    city_id: detroit
+  Corktown & Michigan Central Station:
+    name: Corktown & Michigan Central Station
+    borough: DOWNTOWN_MIDTOWN_CORKTOWN
+    lat: 42.3232
+    lng: -83.0765
+    zoom: 15.0
+    pitch: 50.0
+    base_lims: 0.88
+    capex: 9200000.0
+    permit_vel: 48.0
+    shift_ratio: 1.6
+    sla: 54.0
+    description: Michigan Central Station's Ford-led innovation campus driving restaurant
+      rows on Michigan Avenue and townhouse infill across Corktown.
+    city_id: detroit
+  East Riverfront Growth:
+    name: East Riverfront Growth
+    borough: EAST_SIDE_JEFFERSON
+    lat: 42.333
+    lng: -83.015
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.78
+    capex: 7200000.0
+    permit_vel: 38.0
+    shift_ratio: 1.42
+    sla: 44.0
+    description: RiverWalk-adjacent apartment towers and the Aretha Franklin Amphitheatre
+      extending redevelopment pressure east from the CBD along Jefferson.
+    city_id: detroit
+  West Village:
+    name: West Village
+    borough: EAST_SIDE_JEFFERSON
+    lat: 42.35
+    lng: -82.977
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.68
+    capex: 3800000.0
+    permit_vel: 26.0
+    shift_ratio: 1.28
+    sla: 38.0
+    description: Historic rowhouse district with Kercheval boutique retail and cafe
+      culture, a stable anchor of Detroit's east-side revival.
+    city_id: detroit
+  Jefferson-Chalmers:
+    name: Jefferson-Chalmers
+    borough: EAST_SIDE_JEFFERSON
+    lat: 42.3619
+    lng: -82.9511
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.56
+    capex: 2600000.0
+    permit_vel: 21.0
+    shift_ratio: 1.16
+    sla: 27.0
+    description: Far-east lakefront business district and canal neighborhoods with
+      National Register historic commercial frontage and slow but real reinvestment.
+    city_id: detroit
+  Brightmoor:
+    name: Brightmoor
+    borough: WEST_SIDE_GRAND_RIVER
+    lat: 42.398
+    lng: -83.228
+    zoom: 13.5
+    pitch: 30.0
+    base_lims: 0.5
+    capex: 2000000.0
+    permit_vel: 20.0
+    shift_ratio: 1.1
+    sla: 25.0
+    description: Northwest residential belt of bungalows and large-lot vacancy where
+      community land trusts and blight removal set the redevelopment tempo.
+    city_id: detroit
+  Grandmont-Rosedale:
+    name: Grandmont-Rosedale
+    borough: WEST_SIDE_GRAND_RIVER
+    lat: 42.405
+    lng: -83.187
+    zoom: 14.0
+    pitch: 30.0
+    base_lims: 0.66
+    capex: 3400000.0
+    permit_vel: 24.0
+    shift_ratio: 1.22
+    sla: 32.0
+    description: Five-neighborhood Tudor and brick-ranch enclave with an active community
+      development corporation and steady Grand River commercial rehab.
+    city_id: detroit
+  Mexicantown & Clark Park:
+    name: Mexicantown & Clark Park
+    borough: SOUTHWEST_MEXICANTOWN
+    lat: 42.323
+    lng: -83.101
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.64
+    capex: 3200000.0
+    permit_vel: 27.0
+    shift_ratio: 1.3
+    sla: 46.0
+    description: Bagley-Fernandez commercial corridors with Mexican bakeries and restaurants
+      around Clark Park, plus the international freight village at the Ambassador
+      Bridge.
+    city_id: detroit
+  Southwest Industrial Corridor:
+    name: Southwest Industrial Corridor
+    borough: SOUTHWEST_MEXICANTOWN
+    lat: 42.306
+    lng: -83.131
+    zoom: 13.5
+    pitch: 30.0
+    base_lims: 0.55
+    capex: 4600000.0
+    permit_vel: 31.0
+    shift_ratio: 1.18
+    sla: 28.0
+    description: Vigor-industrial district between Fort Street and the river with
+      heavy-manufacturing sites, rail spurs, and brownfield logistics conversions.
+    city_id: detroit
+  New Center & Fisher Building:
+    name: New Center & Fisher Building
+    borough: NORTH_END_HIGHLAND_PARK
+    lat: 42.373
+    lng: -83.078
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.74
+    capex: 6200000.0
+    permit_vel: 36.0
+    shift_ratio: 1.4
+    sla: 42.0
+    description: Albert Kahn's Fisher and GM-era skyline with the Amtrak station hub,
+      Henry Ford Health expansion, and mixed-use infill on West Grand Boulevard.
+    city_id: detroit
+  Bagley & Fitzgerald Revival Zone:
+    name: Bagley & Fitzgerald Revival Zone
+    borough: NORTH_END_HIGHLAND_PARK
+    lat: 42.421
+    lng: -83.084
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.58
+    capex: 2800000.0
+    permit_vel: 23.0
+    shift_ratio: 1.24
+    sla: 30.0
+    description: Livernois Avenue of Fashion galleries and the Fitzgerald master-planned
+      rehabilitation of hundreds of vacant structures around Marygrove and University
+      of Detroit Mercy.
+    city_id: detroit
+  Palmer Woods & University District:
+    name: Palmer Woods & University District
+    borough: NORTH_END_HIGHLAND_PARK
+    lat: 42.43
+    lng: -83.106
+    zoom: 14.0
+    pitch: 30.0
+    base_lims: 0.72
+    capex: 3600000.0
+    permit_vel: 22.0
+    shift_ratio: 1.18
+    sla: 34.0
+    description: Estate-scale Palmer Woods historic district and Sherwood Forest adjoining
+      the Detroit Golf Club, the metro's most resilient north-side housing stock.
+    city_id: detroit
+  Indian Village:
+    name: Indian Village
+    borough: EAST_ENGLISH_VILLAGE_MORNINGSIDE
+    lat: 42.3595
+    lng: -82.984
+    zoom: 15.0
+    pitch: 35.0
+    base_lims: 0.7
+    capex: 3000000.0
+    permit_vel: 22.0
+    shift_ratio: 1.2
+    sla: 33.0
+    description: Albert Kahn-designed mansion district on Burns, Iroquois, and Seminole
+      with an annual house tour and deeply held preservation ethos.
+    city_id: detroit
+  Morningside:
+    name: Morningside
+    borough: EAST_ENGLISH_VILLAGE_MORNINGSIDE
+    lat: 42.374
+    lng: -82.946
+    zoom: 14.0
+    pitch: 30.0
+    base_lims: 0.54
+    capex: 2400000.0
+    permit_vel: 21.0
+    shift_ratio: 1.14
+    sla: 26.0
+    description: Balduck Park brick-bungalow community with Gratiot-strip storefronts
+      in early-stage acquisition-and-rehab recovery.
+    city_id: detroit
+  East English Village:
+    name: East English Village
+    borough: EAST_ENGLISH_VILLAGE_MORNINGSIDE
+    lat: 42.386
+    lng: -82.932
+    zoom: 14.0
+    pitch: 30.0
+    base_lims: 0.62
+    capex: 2700000.0
+    permit_vel: 24.0
+    shift_ratio: 1.19
+    sla: 31.0
+    description: Brick-tudor homeowner enclave east of Morningside prized for stability,
+      active block clubs, and Harper Avenue retail nodes.
+    city_id: detroit
+divisions:
+  DOWNTOWN_MIDTOWN_CORKTOWN:
+    name: DOWNTOWN_MIDTOWN_CORKTOWN
+    center_lat: 42.3367
+    center_lng: -83.0618
+    zoom: 13.5
+    bbox:
+      min_lat: 42.31
+      max_lat: 42.365
+      min_lng: -83.1
+      max_lng: -83.02
+    submarkets:
+    - Campus Martius & CBD
+    - Midtown Cultural District
+    - Corktown & Michigan Central Station
+    city_id: detroit
+  EAST_SIDE_JEFFERSON:
+    name: EAST_SIDE_JEFFERSON
+    center_lat: 42.3483
+    center_lng: -82.981
+    zoom: 12.5
+    bbox:
+      min_lat: 42.325
+      max_lat: 42.375
+      min_lng: -83.03
+      max_lng: -82.94
+    submarkets:
+    - East Riverfront Growth
+    - West Village
+    - Jefferson-Chalmers
+    city_id: detroit
+  WEST_SIDE_GRAND_RIVER:
+    name: WEST_SIDE_GRAND_RIVER
+    center_lat: 42.4015
+    center_lng: -83.207
+    zoom: 12.5
+    bbox:
+      min_lat: 42.38
+      max_lat: 42.425
+      min_lng: -83.29
+      max_lng: -83.15
+    submarkets:
+    - Brightmoor
+    - Grandmont-Rosedale
+    city_id: detroit
+  SOUTHWEST_MEXICANTOWN:
+    name: SOUTHWEST_MEXICANTOWN
+    center_lat: 42.3145
+    center_lng: -83.1155
+    zoom: 13.0
+    bbox:
+      min_lat: 42.295
+      max_lat: 42.33
+      min_lng: -83.15
+      max_lng: -83.08
+    submarkets:
+    - Mexicantown & Clark Park
+    - Southwest Industrial Corridor
+    city_id: detroit
+  NORTH_END_HIGHLAND_PARK:
+    name: NORTH_END_HIGHLAND_PARK
+    center_lat: 42.408
+    center_lng: -83.0893
+    zoom: 12.5
+    bbox:
+      min_lat: 42.365
+      max_lat: 42.44
+      min_lng: -83.12
+      max_lng: -83.06
+    submarkets:
+    - New Center & Fisher Building
+    - Bagley & Fitzgerald Revival Zone
+    - Palmer Woods & University District
+    city_id: detroit
+  EAST_ENGLISH_VILLAGE_MORNINGSIDE:
+    name: EAST_ENGLISH_VILLAGE_MORNINGSIDE
+    center_lat: 42.3732
+    center_lng: -82.954
+    zoom: 12.5
+    bbox:
+      min_lat: 42.35
+      max_lat: 42.395
+      min_lng: -82.995
+      max_lng: -82.92
+    submarkets:
+    - Indian Village
+    - Morningside
+    - East English Village
+    city_id: detroit
+datasets:
+  permits:
+    endpoint: https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/bseed_building_permits/FeatureServer/0
+    platform: arcgis
+    watermark_col: issued_date
+    id_keys:
+    - record_id
+    - ObjectId
+    - id
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - record_id
+      cost:
+      - amt_permit_cost
+    ingestion_mode: incremental
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/improve_detroit/FeatureServer/0
+    platform: arcgis
+    watermark_col: created_at
+    id_keys:
+    - issue_id
+    - ObjectId
+    - id
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - issue_id
+      closed_date:
+      - closed_at
+    ingestion_mode: incremental
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/bseed_active_business_licenses/FeatureServer/0
+    platform: arcgis
+    watermark_col: expiration_date
+    id_keys:
+    - record_id
+    - ObjectId
+    - id
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - record_id
+      license_type:
+      - license_type
+      - license_category
+    ingestion_mode: incremental
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  deeds:
+    endpoint: https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/assessor_property_sales_view/FeatureServer/0
+    platform: arcgis
+    watermark_col: sale_date
+    id_keys:
+    - sale_id
+    - liber_page
+    - ObjectId
+    - id
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - sale_id
+      bbl:
+      - parcel_id
+      document_amount:
+      - amt_sale_price
+    ingestion_mode: incremental
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- detroit_mi
+- detroit-mi
+- detroit mi
+job_suffix: detroit

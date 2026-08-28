@@ -1,0 +1,733 @@
+city_id: new_orleans
+name: New Orleans Metro
+state: LA
+center:
+  lat: 29.9511
+  lng: -90.0715
+metro_bbox:
+  min_lat: 29.82
+  max_lat: 30.16
+  min_lng: -90.3
+  max_lng: -89.62
+division_bboxes:
+  CBD_FRENCH_QUARTER:
+    min_lat: 29.93
+    max_lat: 30.0
+    min_lng: -90.1
+    max_lng: -90.02
+  BYWATER_MARIGNY:
+    min_lat: 29.95
+    max_lat: 30.0
+    min_lng: -90.05
+    max_lng: -89.98
+  UPTOWN_CARROLLTON:
+    min_lat: 29.9
+    max_lat: 30.0
+    min_lng: -90.15
+    max_lng: -90.05
+  MID_CITY:
+    min_lat: 29.96
+    max_lat: 30.04
+    min_lng: -90.13
+    max_lng: -90.05
+  LAKEVIEW_GENTILLY:
+    min_lat: 29.98
+    max_lat: 30.06
+    min_lng: -90.15
+    max_lng: -90.04
+  NEW_ORLEANS_EAST:
+    min_lat: 29.99
+    max_lat: 30.1
+    min_lng: -90.08
+    max_lng: -89.62
+  WEST_BANK_ALGIERS:
+    min_lat: 29.86
+    max_lat: 29.98
+    min_lng: -90.08
+    max_lng: -89.95
+  JEFFERSON_METAIRIE_KENNER:
+    min_lat: 29.87
+    max_lat: 30.05
+    min_lng: -90.3
+    max_lng: -90.1
+  ST_BERNARD_CHALMETTE:
+    min_lat: 29.82
+    max_lat: 29.95
+    min_lng: -90.1
+    max_lng: -89.8
+submarkets:
+  French Quarter & CBD Towers:
+    name: French Quarter & CBD Towers
+    borough: CBD_FRENCH_QUARTER
+    lat: 29.9555
+    lng: -90.0685
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.92
+    capex: 12000000.0
+    permit_vel: 58.0
+    shift_ratio: 1.7
+    sla: 75.0
+    description: Historic Quarter grid beside the Poydras Street high-rise core, where
+      hospitality-driven ground floor demand meets limited entitled supply.
+    city_id: new_orleans
+  BioDistrict & University Medical:
+    name: BioDistrict & University Medical
+    borough: CBD_FRENCH_QUARTER
+    lat: 29.9665
+    lng: -90.0885
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.84
+    capex: 10500000.0
+    permit_vel: 47.0
+    shift_ratio: 1.56
+    sla: 67.0
+    description: University Medical Center and the VA hospital anchoring a bioscience
+      district with institutional expansion and supporting multifamily.
+    city_id: new_orleans
+  Warehouse & Arts District:
+    name: Warehouse & Arts District
+    borough: CBD_FRENCH_QUARTER
+    lat: 29.9455
+    lng: -90.0825
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.87
+    capex: 9800000.0
+    permit_vel: 44.0
+    shift_ratio: 1.6
+    sla: 70.0
+    description: Julia Row galleries and converted cotton warehouses carrying condo
+      conversions and hotel-adjacent adaptive reuse.
+    city_id: new_orleans
+  Bywater & St. Claude Corridor:
+    name: Bywater & St. Claude Corridor
+    borough: BYWATER_MARIGNY
+    lat: 29.9685
+    lng: -90.0285
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.8
+    capex: 4800000.0
+    permit_vel: 38.0
+    shift_ratio: 1.45
+    sla: 58.0
+    description: Shotgun-grid neighbourhood along the St. Claude arts corridor with
+      sustained small-scale renovation permitting.
+    city_id: new_orleans
+  Marigny & Frenchmen Street:
+    name: Marigny & Frenchmen Street
+    borough: BYWATER_MARIGNY
+    lat: 29.9725
+    lng: -90.0425
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.83
+    capex: 5200000.0
+    permit_vel: 41.0
+    shift_ratio: 1.49
+    sla: 61.0
+    description: Music-venue economy around Frenchmen Street with Creole-cottage stock
+      and short-term-rental policy shaping values.
+    city_id: new_orleans
+  Magazine Street Retail Corridor:
+    name: Magazine Street Retail Corridor
+    borough: UPTOWN_CARROLLTON
+    lat: 29.9325
+    lng: -90.0925
+    zoom: 13.5
+    pitch: 45.0
+    base_lims: 0.86
+    capex: 7200000.0
+    permit_vel: 43.0
+    shift_ratio: 1.53
+    sla: 65.0
+    description: Six miles of independent retail and antiques through the Garden District
+      edge, with historic-district review constraining change.
+    city_id: new_orleans
+  Audubon & Riverbend:
+    name: Audubon & Riverbend
+    borough: UPTOWN_CARROLLTON
+    lat: 29.9185
+    lng: -90.1185
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.88
+    capex: 8500000.0
+    permit_vel: 36.0
+    shift_ratio: 1.57
+    sla: 68.0
+    description: Zoo- and university-adjacent residential stock with the deepest-demand
+      single-family market in Orleans Parish.
+    city_id: new_orleans
+  Carrollton & Oak Street:
+    name: Carrollton & Oak Street
+    borough: UPTOWN_CARROLLTON
+    lat: 29.9485
+    lng: -90.1325
+    zoom: 13.5
+    pitch: 43.0
+    base_lims: 0.79
+    capex: 5600000.0
+    permit_vel: 39.0
+    shift_ratio: 1.42
+    sla: 57.0
+    description: Streetcar-served neighbourhood commercial node with levee-adjacent
+      housing and steady infill renovation.
+    city_id: new_orleans
+  City Park & Bayou St. John:
+    name: City Park & Bayou St. John
+    borough: MID_CITY
+    lat: 29.9825
+    lng: -90.0925
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.81
+    capex: 6000000.0
+    permit_vel: 40.0
+    shift_ratio: 1.47
+    sla: 60.0
+    description: Park-edge bungalow stock beside the bayou waterway, drawing renovation
+      capital from the museum and festival economy.
+    city_id: new_orleans
+  Tulane-Canal Corridor:
+    name: Tulane-Canal Corridor
+    borough: MID_CITY
+    lat: 29.9785
+    lng: -90.1085
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.74
+    capex: 4400000.0
+    permit_vel: 46.0
+    shift_ratio: 1.36
+    sla: 52.0
+    description: Hospital-and-streetcar spine toward Carrollton Avenue with older
+      multifamily stock and clinic-driven demand.
+    city_id: new_orleans
+  Lakeview & Lakeshore:
+    name: Lakeview & Lakeshore
+    borough: LAKEVIEW_GENTILLY
+    lat: 30.0105
+    lng: -90.1105
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.85
+    capex: 7600000.0
+    permit_vel: 34.0
+    shift_ratio: 1.51
+    sla: 63.0
+    description: Post-Katrina rebuilt lakefront neighbourhoods behind the outfall
+      canals, with elevated new construction dominating permits.
+    city_id: new_orleans
+  Gentilly & Dillard:
+    name: Gentilly & Dillard
+    borough: LAKEVIEW_GENTILLY
+    lat: 30.0025
+    lng: -90.0725
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.71
+    capex: 3800000.0
+    permit_vel: 42.0
+    shift_ratio: 1.33
+    sla: 50.0
+    description: Mid-century tract housing between the university campuses and the
+      Industrial Canal with gradual redevelopment interest.
+    city_id: new_orleans
+  New Orleans East I-10 Corridor:
+    name: New Orleans East I-10 Corridor
+    borough: NEW_ORLEANS_EAST
+    lat: 30.0355
+    lng: -89.9455
+    zoom: 12.5
+    pitch: 40.0
+    base_lims: 0.62
+    capex: 3400000.0
+    permit_vel: 48.0
+    shift_ratio: 1.26
+    sla: 44.0
+    description: Read Boulevard and I-10 service-road retail with the Michoud industrial
+      reserve driving long-run logistics growth.
+    city_id: new_orleans
+  Village de l'Est & Lake Forest:
+    name: Village de l'Est & Lake Forest
+    borough: NEW_ORLEANS_EAST
+    lat: 30.0605
+    lng: -89.9155
+    zoom: 12.5
+    pitch: 38.0
+    base_lims: 0.55
+    capex: 2400000.0
+    permit_vel: 32.0
+    shift_ratio: 1.16
+    sla: 37.0
+    description: Vietnamese-American commercial nodes along Alcee Fortier and Chef
+      Menteur with large-lot residential recovery.
+    city_id: new_orleans
+  Algiers Point:
+    name: Algiers Point
+    borough: WEST_BANK_ALGIERS
+    lat: 29.9555
+    lng: -90.0225
+    zoom: 14.0
+    pitch: 44.0
+    base_lims: 0.77
+    capex: 4200000.0
+    permit_vel: 31.0
+    shift_ratio: 1.4
+    sla: 54.0
+    description: Ferry-connected historic district across from the Quarter with Victorian
+      stock and skyline-view demand.
+    city_id: new_orleans
+  English Turn & Tall Timbers:
+    name: English Turn & Tall Timbers
+    borough: WEST_BANK_ALGIERS
+    lat: 29.9085
+    lng: -90.0085
+    zoom: 12.5
+    pitch: 38.0
+    base_lims: 0.66
+    capex: 3100000.0
+    permit_vel: 27.0
+    shift_ratio: 1.28
+    sla: 45.0
+    description: Golf-course and subdivision growth downriver on the West Bank with
+      parish-edge land supply.
+    city_id: new_orleans
+  Metairie Causeway Boulevard Retail:
+    name: Metairie Causeway Boulevard Retail
+    borough: JEFFERSON_METAIRIE_KENNER
+    lat: 29.9885
+    lng: -90.1725
+    zoom: 13.0
+    pitch: 44.0
+    base_lims: 0.83
+    capex: 6900000.0
+    permit_vel: 45.0
+    shift_ratio: 1.5
+    sla: 64.0
+    description: Jefferson Parish's dominant strip-retail and office corridor running
+      Lakeside Shopping Center to the lakefront.
+    city_id: new_orleans
+  Kenner Esplanade & Airport District:
+    name: Kenner Esplanade & Airport District
+    borough: JEFFERSON_METAIRIE_KENNER
+    lat: 29.9845
+    lng: -90.2465
+    zoom: 12.5
+    pitch: 42.0
+    base_lims: 0.73
+    capex: 5000000.0
+    permit_vel: 44.0
+    shift_ratio: 1.39
+    sla: 56.0
+    description: Esplanade mall district and Louis Armstrong International adjacency
+      with hospitality and logistics tenancy.
+    city_id: new_orleans
+  Harahan & River Ridge:
+    name: Harahan & River Ridge
+    borough: JEFFERSON_METAIRIE_KENNER
+    lat: 29.9415
+    lng: -90.1965
+    zoom: 12.5
+    pitch: 38.0
+    base_lims: 0.78
+    capex: 4100000.0
+    permit_vel: 29.0
+    shift_ratio: 1.44
+    sla: 59.0
+    description: River-bend single-family suburbs of East-Bank Jefferson with stable
+      owner-occupant demand and Old Jefferson retail edges.
+    city_id: new_orleans
+  Chalmette Refinery Corridor:
+    name: Chalmette Refinery Corridor
+    borough: ST_BERNARD_CHALMETTE
+    lat: 29.8885
+    lng: -89.9585
+    zoom: 12.5
+    pitch: 40.0
+    base_lims: 0.64
+    capex: 2900000.0
+    permit_vel: 26.0
+    shift_ratio: 1.24
+    sla: 41.0
+    description: Refinery-adjacent parish seat with buyout-zone land dynamics and
+      petrochemical payroll underpinning demand.
+    city_id: new_orleans
+  Arabi & Meraux:
+    name: Arabi & Meraux
+    borough: ST_BERNARD_CHALMETTE
+    lat: 29.9185
+    lng: -89.9985
+    zoom: 12.5
+    pitch: 38.0
+    base_lims: 0.68
+    capex: 2600000.0
+    permit_vel: 23.0
+    shift_ratio: 1.21
+    sla: 39.0
+    description: River-road communities nearest the Orleans line absorbing first-ring
+      spillover demand from the Bywater.
+    city_id: new_orleans
+divisions:
+  CBD_FRENCH_QUARTER:
+    name: CBD_FRENCH_QUARTER
+    center_lat: 29.96
+    center_lng: -90.07
+    zoom: 12.5
+    bbox:
+      min_lat: 29.93
+      max_lat: 30.0
+      min_lng: -90.1
+      max_lng: -90.02
+    submarkets:
+    - French Quarter & CBD Towers
+    - BioDistrict & University Medical
+    - Warehouse & Arts District
+    city_id: new_orleans
+  BYWATER_MARIGNY:
+    name: BYWATER_MARIGNY
+    center_lat: 29.97
+    center_lng: -90.03
+    zoom: 12.5
+    bbox:
+      min_lat: 29.95
+      max_lat: 30.0
+      min_lng: -90.05
+      max_lng: -89.98
+    submarkets:
+    - Bywater & St. Claude Corridor
+    - Marigny & Frenchmen Street
+    city_id: new_orleans
+  UPTOWN_CARROLLTON:
+    name: UPTOWN_CARROLLTON
+    center_lat: 29.94
+    center_lng: -90.1
+    zoom: 12.5
+    bbox:
+      min_lat: 29.9
+      max_lat: 30.0
+      min_lng: -90.15
+      max_lng: -90.05
+    submarkets:
+    - Magazine Street Retail Corridor
+    - Audubon & Riverbend
+    - Carrollton & Oak Street
+    city_id: new_orleans
+  MID_CITY:
+    name: MID_CITY
+    center_lat: 29.99
+    center_lng: -90.09
+    zoom: 12.5
+    bbox:
+      min_lat: 29.96
+      max_lat: 30.04
+      min_lng: -90.13
+      max_lng: -90.05
+    submarkets:
+    - City Park & Bayou St. John
+    - Tulane-Canal Corridor
+    city_id: new_orleans
+  LAKEVIEW_GENTILLY:
+    name: LAKEVIEW_GENTILLY
+    center_lat: 30.01
+    center_lng: -90.09
+    zoom: 12.0
+    bbox:
+      min_lat: 29.98
+      max_lat: 30.06
+      min_lng: -90.15
+      max_lng: -90.04
+    submarkets:
+    - Lakeview & Lakeshore
+    - Gentilly & Dillard
+    city_id: new_orleans
+  NEW_ORLEANS_EAST:
+    name: NEW_ORLEANS_EAST
+    center_lat: 30.04
+    center_lng: -89.92
+    zoom: 11.5
+    bbox:
+      min_lat: 29.99
+      max_lat: 30.1
+      min_lng: -90.08
+      max_lng: -89.62
+    submarkets:
+    - New Orleans East I-10 Corridor
+    - Village de l'Est & Lake Forest
+    city_id: new_orleans
+  WEST_BANK_ALGIERS:
+    name: WEST_BANK_ALGIERS
+    center_lat: 29.93
+    center_lng: -90.01
+    zoom: 12.0
+    bbox:
+      min_lat: 29.86
+      max_lat: 29.98
+      min_lng: -90.08
+      max_lng: -89.95
+    submarkets:
+    - Algiers Point
+    - English Turn & Tall Timbers
+    city_id: new_orleans
+  JEFFERSON_METAIRIE_KENNER:
+    name: JEFFERSON_METAIRIE_KENNER
+    center_lat: 29.97
+    center_lng: -90.2
+    zoom: 12.0
+    bbox:
+      min_lat: 29.87
+      max_lat: 30.05
+      min_lng: -90.3
+      max_lng: -90.1
+    submarkets:
+    - Metairie Causeway Boulevard Retail
+    - Kenner Esplanade & Airport District
+    - Harahan & River Ridge
+    city_id: new_orleans
+  ST_BERNARD_CHALMETTE:
+    name: ST_BERNARD_CHALMETTE
+    center_lat: 29.89
+    center_lng: -89.97
+    zoom: 11.5
+    bbox:
+      min_lat: 29.82
+      max_lat: 29.95
+      min_lng: -90.1
+      max_lng: -89.8
+    submarkets:
+    - Chalmette Refinery Corridor
+    - Arabi & Meraux
+    city_id: new_orleans
+datasets:
+  permits:
+    endpoint: https://data.nola.gov/resource/rcm3-fn58.json
+    platform: socrata
+    watermark_col: issuedate
+    id_keys:
+    - numstring
+    - prmtid
+    - objectid
+    - id
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - numstring
+      latitude:
+      - location_1.latitude
+      longitude:
+      - location_1.longitude
+      cost:
+      - constrval
+      job_type:
+      - type
+      issuance_date:
+      - issuedate
+      filing_date:
+      - filingdate
+      status:
+      - currentstatus
+      borough:
+      - subdivision
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: https://data.nola.gov/resource/2jgv-pqrq.json
+    platform: socrata
+    watermark_col: date_created
+    id_keys:
+    - service_request
+    - rowid
+    - id
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - service_request
+      - rowid
+      created_date:
+      - date_created
+      closed_date:
+      - case_close_date
+      descriptor:
+      - request_reason
+      incident_address:
+      - final_address
+      borough:
+      - address_councildis
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://data.nola.gov/resource/hjcd-grvu.json
+    platform: socrata
+    watermark_col: businessstartdate
+    id_keys:
+    - businesslicensenumber
+    - id
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - businesslicensenumber
+      effective_date:
+      - businessstartdate
+      license_type:
+      - businesstype
+      dba:
+      - businessname
+      premises_name:
+      - ownername
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  deeds:
+    endpoint: https://data.nola.gov/resource/hpm5-48nj.json
+    platform: socrata
+    watermark_col: sale_date
+    id_keys:
+    - identifier
+    - geopin
+    - id
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - identifier
+      bbl:
+      - geopin
+      latitude:
+      - geocoded_column.latitude
+      longitude:
+      - geocoded_column.longitude
+      doc_type:
+      - disposition_channel
+      borough:
+      - council_district
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 45
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- new-orleans
+- new orleans
+- nola
+- orleans_parish
+- orleans-parish
+- orleans parish
+job_suffix: nola

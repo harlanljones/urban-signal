@@ -1,0 +1,255 @@
+city_id: houston
+name: Houston
+state: TX
+center:
+  lat: 29.7604
+  lng: -95.3698
+metro_bbox:
+  min_lat: 29.2
+  max_lat: 30.3
+  min_lng: -95.9
+  max_lng: -94.8
+division_bboxes:
+  HOUSTON_CORE:
+    min_lat: 29.58
+    max_lat: 30.02
+    min_lng: -95.65
+    max_lng: -95.1
+submarkets:
+  Downtown:
+    name: Downtown
+    borough: HOUSTON_CORE
+    lat: 29.7604
+    lng: -95.3698
+    zoom: 13.4
+    pitch: 48.0
+    base_lims: 0.84
+    capex: 10500000.0
+    permit_vel: 42.0
+    shift_ratio: 1.45
+    sla: 58.0
+    description: Central business district with the Theater District, tunnel network,
+      and dense new high-rise residential development.
+    city_id: houston
+  Midtown:
+    name: Midtown
+    borough: HOUSTON_CORE
+    lat: 29.728
+    lng: -95.376
+    zoom: 13.2
+    pitch: 46.0
+    base_lims: 0.81
+    capex: 7600000.0
+    permit_vel: 38.0
+    shift_ratio: 1.42
+    sla: 56.0
+    description: Tree-lined walkable district between Downtown and the Museum District
+      with restaurant corridors and infill townhomes.
+    city_id: houston
+  Montrose:
+    name: Montrose
+    borough: HOUSTON_CORE
+    lat: 29.7412
+    lng: -95.394
+    zoom: 13.2
+    pitch: 44.0
+    base_lims: 0.78
+    capex: 6900000.0
+    permit_vel: 34.0
+    shift_ratio: 1.38
+    sla: 52.0
+    description: Historic bungalow neighborhood along Westheimer with galleries, boutiques,
+      and steady adaptive restoration.
+    city_id: houston
+  The Heights:
+    name: The Heights
+    borough: HOUSTON_CORE
+    lat: 29.799
+    lng: -95.399
+    zoom: 13.0
+    pitch: 44.0
+    base_lims: 0.8
+    capex: 7800000.0
+    permit_vel: 40.0
+    shift_ratio: 1.44
+    sla: 55.0
+    description: Historic Heights district with Victorian cottage stock, 19th Street
+      retail, and strong infill and renovation activity.
+    city_id: houston
+  Museum District:
+    name: Museum District
+    borough: HOUSTON_CORE
+    lat: 29.725
+    lng: -95.391
+    zoom: 13.2
+    pitch: 46.0
+    base_lims: 0.77
+    capex: 7100000.0
+    permit_vel: 32.0
+    shift_ratio: 1.36
+    sla: 50.0
+    description: Cultural corridor around Hermann Park and the museum campuses with
+      mixed-use development and stable demand.
+    city_id: houston
+  Galleria / Uptown:
+    name: Galleria / Uptown
+    borough: HOUSTON_CORE
+    lat: 29.742
+    lng: -95.462
+    zoom: 13.0
+    pitch: 46.0
+    base_lims: 0.86
+    capex: 9800000.0
+    permit_vel: 41.0
+    shift_ratio: 1.47
+    sla: 60.0
+    description: Post Oak Boulevard mixed-use district with the Galleria, transit
+      (Uptown BRT), and high-rise luxury development.
+    city_id: houston
+divisions:
+  HOUSTON_CORE:
+    name: Houston
+    center_lat: 29.7604
+    center_lng: -95.3698
+    zoom: 10.8
+    bbox:
+      min_lat: 29.58
+      max_lat: 30.02
+      min_lng: -95.65
+      max_lng: -95.1
+    submarkets:
+    - Downtown
+    - Midtown
+    - Montrose
+    - The Heights
+    - Museum District
+    - Galleria / Uptown
+    city_id: houston
+datasets:
+  '311':
+    endpoint: https://mycity2.houstontx.gov/gisweb01/rest/services/311/HOUSTON311_RECENT_SR_SNOW/FeatureServer/0
+    platform: arcgis
+    watermark_col: CREATED_ON
+    id_keys:
+    - CASE_NUMBER
+    - OBJECTID
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - CASE_NUMBER
+      latitude:
+      - LATITUDE
+      longitude:
+      - LONGITUDE
+      complaint_type:
+      - CASE_TYPE
+      created_date:
+      - CREATED_ON
+      closed_date:
+      - CLOSED_ON
+      status:
+      - STATUS
+      incident_address:
+      - ADDRESS
+      - STREET
+      zipcode:
+      - ZIP
+      borough:
+      - SUPERNEIGHBORHOOD
+      - COUNCIL_DISTRICT
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'TX'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- houston_tx
+- houston-tx
+- houston tx
+- htx
+- h-town
+job_suffix: houston

@@ -1,0 +1,310 @@
+city_id: cincinnati
+name: Cincinnati
+state: OH
+center:
+  lat: 39.1031
+  lng: -84.512
+metro_bbox:
+  min_lat: 38.8
+  max_lat: 39.45
+  min_lng: -84.95
+  max_lng: -84.15
+division_bboxes:
+  CINCINNATI_CORE:
+    min_lat: 39.0
+    max_lat: 39.2
+    min_lng: -84.7
+    max_lng: -84.35
+submarkets:
+  Downtown & Over-the-Rhine:
+    name: Downtown & Over-the-Rhine
+    borough: CINCINNATI_CORE
+    lat: 39.1085
+    lng: -84.5145
+    zoom: 13.8
+    pitch: 48.0
+    base_lims: 0.86
+    capex: 8200000.0
+    permit_vel: 42.0
+    shift_ratio: 1.48
+    sla: 62.0
+    description: Historic central-city blocks spanning the downtown business core
+      and Over-the-Rhine mixed-use corridor.
+    city_id: cincinnati
+  Uptown & Clifton:
+    name: Uptown & Clifton
+    borough: CINCINNATI_CORE
+    lat: 39.139
+    lng: -84.515
+    zoom: 13.6
+    pitch: 44.0
+    base_lims: 0.82
+    capex: 6100000.0
+    permit_vel: 35.0
+    shift_ratio: 1.42
+    sla: 58.0
+    description: University and medical-institution district north of downtown with
+      dense rental and neighborhood retail demand.
+    city_id: cincinnati
+  West End & Queensgate:
+    name: West End & Queensgate
+    borough: CINCINNATI_CORE
+    lat: 39.105
+    lng: -84.538
+    zoom: 13.6
+    pitch: 44.0
+    base_lims: 0.79
+    capex: 5400000.0
+    permit_vel: 31.0
+    shift_ratio: 1.38
+    sla: 55.0
+    description: West-side redevelopment edge between the central city, stadium district,
+      and industrial riverfront.
+    city_id: cincinnati
+divisions:
+  CINCINNATI_CORE:
+    name: Cincinnati Core
+    center_lat: 39.1085
+    center_lng: -84.5145
+    zoom: 12.8
+    bbox:
+      min_lat: 39.0
+      max_lat: 39.2
+      min_lng: -84.7
+      max_lng: -84.35
+    submarkets:
+    - Downtown & Over-the-Rhine
+    - Uptown & Clifton
+    - West End & Queensgate
+    city_id: cincinnati
+datasets:
+  permits:
+    endpoint: https://data.cincinnati-oh.gov/resource/uhjb-xac9.json
+    platform: socrata
+    watermark_col: issueddate
+    id_keys:
+    - permit_number
+    - permitnumber
+    - pin
+    - id
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - permit_number
+      - permitnumber
+      - pin
+      issuance_date:
+      - issueddate
+      filing_date:
+      - applieddate
+      address_street:
+      - originaladdress1
+      zipcode:
+      - originalzip
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: https://data.cincinnati-oh.gov/resource/gcej-gmiw.json
+    platform: socrata
+    watermark_col: date_time_received
+    id_keys:
+    - service_request_id
+    - sr_number
+    - id
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - sr_number
+      created_date:
+      - date_time_received
+      incident_address:
+      - address
+      complaint_type:
+      - sr_type_desc
+      - sr_type
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://data.cincinnati-oh.gov/resource/ehdi-ajku.json
+    platform: socrata
+    watermark_col: entered_date
+    id_keys:
+    - license_number
+    - license_id
+    - id
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - number_key
+      - uniqueid
+      effective_date:
+      - entered_date
+      latitude:
+      - latitude
+      longitude:
+      - longitude
+      status:
+      - data_status
+      - status_class
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  deeds:
+    endpoint: https://www.hamiltoncountyauditor.org/download/transfer_dailysales_new.csv
+    platform: csv
+    watermark_col: SaleDate
+    id_keys:
+    - conveyancenumber
+    - propertynumber
+    topic: raw.municipal.deeds
+    interval_seconds: 1800.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: valid = 'Y'
+    needs_geocode: true
+    geocode_context: Hamilton County, OH
+    field_map:
+      doc_id:
+      - conveyancenumber
+      bbl:
+      - propertynumber
+      document_amount:
+      - saleamount
+      party1_grantor:
+      - previousowner
+      party2_grantee:
+      - ownername1
+      - ownername2
+      doc_type:
+      - deedtype
+      incident_address:
+      - house#
+      - streetname
+      - streetsuffix
+      zipcode:
+      - locationzipcode
+      borough:
+      - appraisalarea
+    ingestion_mode: snapshot
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- cincy
+- cinci
+- cincinnati-oh
+- cincinnati oh
+- hamilton_county
+- hamilton county
+job_suffix: cinci

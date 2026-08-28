@@ -7,9 +7,10 @@ validated without changing any consumer of the existing runtime objects.
 
 from __future__ import annotations
 
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import fields
 from pathlib import Path
-from typing import Any, Callable, Iterable, Mapping
+from typing import Any
 
 import yaml
 
@@ -18,6 +19,14 @@ from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 DATA_DIR = Path(__file__).with_name("cities") / "data"
 _REQUIRED_CITY_FIELDS = {"city_id", "name", "state", "center", "metro_bbox", "datasets"}
 _REQUIRED_BBOX_FIELDS = {"min_lat", "max_lat", "min_lng", "max_lng"}
+
+
+class _FeedKey(str):
+    """String-compatible key for a declarative feed absent from ``FeedType``."""
+
+    @property
+    def value(self) -> str:
+        return str(self)
 
 
 def _as_mapping(value: Any, label: str) -> dict[str, Any]:
@@ -85,6 +94,12 @@ def load_definitions(directory: Path = DATA_DIR) -> list[dict[str, Any]]:
         if path.name.startswith("_"):
             continue
         definition = validate_definition(yaml.safe_load(path.read_text(encoding="utf-8")))
+        from src.spatial.city_registry import CityId
+
+        try:
+            CityId(definition["city_id"])
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"unknown city_id {definition['city_id']!r}") from exc
         if definition["city_id"] in seen:
             raise ValueError(f"duplicate city_id {definition['city_id']!r}")
         seen.add(definition["city_id"])
@@ -97,8 +112,17 @@ def _build_dataset(raw: Mapping[str, Any], resolve: Callable[[str], Any]) -> Any
 
     data = dict(raw)
     endpoint_setting = data.pop("endpoint_setting", None)
-    if endpoint_setting:
-        data["endpoint"] = resolve(str(endpoint_setting))
+    if endpoint_setting is not None:
+        setting_name = str(endpoint_setting)
+        resolved = resolve(setting_name)
+        if resolved == setting_name:
+            from src.config import settings
+
+            try:
+                resolved = getattr(settings, setting_name)
+            except AttributeError as exc:
+                raise ValueError(f"unknown endpoint setting {setting_name!r}") from exc
+        data["endpoint"] = resolved
     if "endpoint" not in data:
         raise ValueError("dataset is missing endpoint")
     allowed = {item.name for item in fields(DatasetSpec)}
@@ -106,6 +130,14 @@ def _build_dataset(raw: Mapping[str, Any], resolve: Callable[[str], Any]) -> Any
     if unknown:
         raise ValueError(f"dataset has unknown fields: {sorted(unknown)}")
     return DatasetSpec(**data)
+
+
+def _feed_key(value: Any, feed_type: Any) -> Any:
+    """Use the public enum where available and preserve newer YAML feeds."""
+    try:
+        return feed_type(value)
+    except (TypeError, ValueError):
+        return _FeedKey(str(value))
 
 
 def build_registration(
@@ -119,7 +151,10 @@ def build_registration(
     from src.spatial.city_registry import CityRegistration
 
     data = validate_definition(definition)
-    city_id = city_id_type(data["city_id"])
+    try:
+        city_id = city_id_type(data["city_id"])
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"unknown city_id {data['city_id']!r}") from exc
     submarkets = {
         name: _dataclass_from_data(SubmarketMeta, value, f"{city_id.value}.submarkets.{name}")
         for name, value in _as_mapping(data["submarkets"], f"{city_id.value}.submarkets").items()
@@ -129,7 +164,7 @@ def build_registration(
         for name, value in _as_mapping(data["divisions"], f"{city_id.value}.divisions").items()
     }
     datasets = {
-        feed_type(feed): _build_dataset(value, endpoint_resolver)
+        _feed_key(feed, feed_type): _build_dataset(value, endpoint_resolver)
         for feed, value in data["datasets"].items()
     }
     return CityRegistration(
@@ -146,7 +181,9 @@ def build_registration(
     )
 
 
-def aliases_from_definitions(definitions: Iterable[Mapping[str, Any]], city_id_type: Any) -> dict[str, Any]:
+def aliases_from_definitions(
+    definitions: Iterable[Mapping[str, Any]], city_id_type: Any
+) -> dict[str, Any]:
     """Create an alias map and reject aliases that collide across cities."""
     aliases: dict[str, Any] = {}
     for raw in definitions:
@@ -158,5 +195,7 @@ def aliases_from_definitions(definitions: Iterable[Mapping[str, Any]], city_id_t
                 raise ValueError(f"{city_id.value} contains an empty alias")
             previous = aliases.setdefault(key, city_id)
             if previous != city_id:
-                raise ValueError(f"alias {key!r} maps to both {previous.value!r} and {city_id.value!r}")
+                raise ValueError(
+                    f"alias {key!r} maps to both {previous.value!r} and {city_id.value!r}"
+                )
     return aliases

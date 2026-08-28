@@ -1,0 +1,297 @@
+city_id: boise
+name: Boise / Ada County
+state: ID
+center:
+  lat: 43.6131
+  lng: -116.211
+metro_bbox:
+  min_lat: 43.43
+  max_lat: 43.74
+  min_lng: -116.42
+  max_lng: -116.03
+division_bboxes:
+  BOISE_CORE:
+    min_lat: 43.5
+    max_lat: 43.7
+    min_lng: -116.34
+    max_lng: -116.08
+submarkets:
+  Downtown & Capitol:
+    name: Downtown & Capitol
+    borough: BOISE_CORE
+    lat: 43.6165
+    lng: -116.214
+    zoom: 14.2
+    pitch: 52.0
+    base_lims: 0.88
+    capex: 9800000.0
+    permit_vel: 51.0
+    shift_ratio: 1.58
+    sla: 66.0
+    description: State-government and riverfront core with dense residential conversion
+      and mixed-use infill along the Boise River.
+    city_id: boise
+  North End & Hyde Park:
+    name: North End & Hyde Park
+    borough: BOISE_CORE
+    lat: 43.657
+    lng: -116.236
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.84
+    capex: 7600000.0
+    permit_vel: 44.0
+    shift_ratio: 1.52
+    sla: 62.0
+    description: Historic streetcar-era bungalow district with renovation-led permitting
+      and neighborhood-conservation overlays.
+    city_id: boise
+  Boise Bench & South Cole:
+    name: Boise Bench & South Cole
+    borough: BOISE_CORE
+    lat: 43.58
+    lng: -116.23
+    zoom: 13.6
+    pitch: 42.0
+    base_lims: 0.8
+    capex: 5800000.0
+    permit_vel: 36.0
+    shift_ratio: 1.46
+    sla: 58.0
+    description: Post-war residential bench south of the core with teardown/rebuild
+      pressure and infill multifamily.
+    city_id: boise
+  East Boise & Harris Ranch:
+    name: East Boise & Harris Ranch
+    borough: BOISE_CORE
+    lat: 43.6
+    lng: -116.1
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.82
+    capex: 6400000.0
+    permit_vel: 39.0
+    shift_ratio: 1.49
+    sla: 59.0
+    description: East-growth edge with master-planned residential subdivisions and
+      new-construction permitting.
+    city_id: boise
+  West Boise & Vista:
+    name: West Boise & Vista
+    borough: BOISE_CORE
+    lat: 43.59
+    lng: -116.28
+    zoom: 13.2
+    pitch: 42.0
+    base_lims: 0.79
+    capex: 5200000.0
+    permit_vel: 32.0
+    shift_ratio: 1.44
+    sla: 56.0
+    description: Established west-side residential corridors with steady redevelopment
+      and corridor densification.
+    city_id: boise
+  BoDo & Riverfront:
+    name: BoDo & Riverfront
+    borough: BOISE_CORE
+    lat: 43.609
+    lng: -116.206
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.86
+    capex: 8900000.0
+    permit_vel: 48.0
+    shift_ratio: 1.55
+    sla: 64.0
+    description: Boise Downtown / riverfront entertainment district with hotel, retail,
+      and residential tower permitting.
+    city_id: boise
+divisions:
+  BOISE_CORE:
+    name: Boise Core
+    center_lat: 43.61
+    center_lng: -116.21
+    zoom: 11.8
+    bbox:
+      min_lat: 43.5
+      max_lat: 43.7
+      min_lng: -116.34
+      max_lng: -116.08
+    submarkets:
+    - Downtown & Capitol
+    - North End & Hyde Park
+    - Boise Bench & South Cole
+    - East Boise & Harris Ranch
+    - West Boise & Vista
+    - BoDo & Riverfront
+    city_id: boise
+datasets:
+  permits:
+    endpoint: https://services1.arcgis.com/WHM6qC35aMtyAAlN/arcgis/rest/services/PDS_BuildingPermits_HighImpact/FeatureServer/0
+    platform: arcgis
+    watermark_col: IssuedDate
+    id_keys:
+    - RecordID
+    - OBJECTID
+    - id
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: IssuedDate DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - RecordID
+      cost:
+      - JobValue
+      issued_date:
+      - IssuedDate
+      latitude:
+      - Y
+      longitude:
+      - X
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  crime:
+    endpoint: https://services1.arcgis.com/WHM6qC35aMtyAAlN/arcgis/rest/services/BPD_Crimes_Public/FeatureServer
+    platform: arcgis
+    watermark_col: OccurredDateTime
+    id_keys:
+    - OBJECTID
+    - DRNumber
+    topic: raw.municipal.crime
+    interval_seconds: 300.0
+    producer_key: crime
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: OccurredDateTime DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - OBJECTID
+      - DRNumber
+      offense_type:
+      - IncidentType
+      - CrimeCodeDescription
+      - CrimeType
+      occurred_date:
+      - OccurredDateTime
+      - ReportedDate
+      borough:
+      - District
+      - PatrolArea
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 1000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'ID'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- boise_id
+- boise id
+- ada_county
+- ada county
+job_suffix: boise

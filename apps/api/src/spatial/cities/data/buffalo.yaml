@@ -1,0 +1,323 @@
+city_id: buffalo
+name: Buffalo
+state: NY
+center:
+  lat: 42.8864
+  lng: -78.8784
+metro_bbox:
+  min_lat: 42.82
+  max_lat: 42.97
+  min_lng: -78.93
+  max_lng: -78.78
+division_bboxes:
+  DOWNTOWN_WATERFRONT:
+    min_lat: 42.87
+    max_lat: 42.891
+    min_lng: -78.89
+    max_lng: -78.856
+  WEST_SIDE:
+    min_lat: 42.892
+    max_lat: 42.917
+    min_lng: -78.892
+    max_lng: -78.866
+  NORTH_BUFFALO:
+    min_lat: 42.931
+    max_lat: 42.95
+    min_lng: -78.892
+    max_lng: -78.862
+  BLACK_ROCK:
+    min_lat: 42.928
+    max_lat: 42.947
+    min_lng: -78.918
+    max_lng: -78.89
+  EAST_SIDE:
+    min_lat: 42.884
+    max_lat: 42.904
+    min_lng: -78.852
+    max_lng: -78.818
+  UNIVERSITY_HEIGHTS:
+    min_lat: 42.95
+    max_lat: 42.967
+    min_lng: -78.836
+    max_lng: -78.806
+submarkets:
+  Canalside:
+    name: Canalside
+    borough: DOWNTOWN_WATERFRONT
+    lat: 42.8772
+    lng: -78.8811
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.82
+    capex: 6400000.0
+    permit_vel: 32.0
+    shift_ratio: 1.46
+    sla: 55.0
+    description: Erie Canal terminus waterfront with the Cobblestone entertainment
+      district, KeyBank Center adjacency, and heritage-interpreted infill along the
+      recreated canals.
+    city_id: buffalo
+  Larkinville:
+    name: Larkinville
+    borough: DOWNTOWN_WATERFRONT
+    lat: 42.8845
+    lng: -78.8643
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.83
+    capex: 6800000.0
+    permit_vel: 34.0
+    shift_ratio: 1.48
+    sla: 56.0
+    description: Larkin Square and the Exchange Street corridor with adaptive reuse
+      of the historic Larkin complex, food-truck programming, and downtown-adjacent
+      office conversion.
+    city_id: buffalo
+  Allentown:
+    name: Allentown
+    borough: WEST_SIDE
+    lat: 42.8997
+    lng: -78.879
+    zoom: 14.5
+    pitch: 52.0
+    base_lims: 0.85
+    capex: 6100000.0
+    permit_vel: 30.0
+    shift_ratio: 1.47
+    sla: 55.0
+    description: Historic preservation district along Allen Street with galleries,
+      music venues, Italianate rowhouses, and the Cottage District's Victorian stock
+      renovation.
+    city_id: buffalo
+  Elmwood Village:
+    name: Elmwood Village
+    borough: WEST_SIDE
+    lat: 42.9094
+    lng: -78.8772
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.88
+    capex: 7200000.0
+    permit_vel: 33.0
+    shift_ratio: 1.5
+    sla: 58.0
+    description: Elmwood Avenue retail spine between the Olmsted parkways and Delaware
+      Park with the Bidwell farmers market, mixed-use storefronts, and the metro's
+      strongest walk-up rents.
+    city_id: buffalo
+  Hertel Avenue:
+    name: Hertel Avenue
+    borough: NORTH_BUFFALO
+    lat: 42.9408
+    lng: -78.8772
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.86
+    capex: 6600000.0
+    permit_vel: 31.0
+    shift_ratio: 1.48
+    sla: 56.0
+    description: The Hertel Strip in North Buffalo with its Italian-heritage commercial
+      row, parkside bungalow belts, and restaurant-led storefront revitalization.
+    city_id: buffalo
+  Black Rock:
+    name: Black Rock
+    borough: BLACK_ROCK
+    lat: 42.9374
+    lng: -78.9019
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.79
+    capex: 5200000.0
+    permit_vel: 26.0
+    shift_ratio: 1.4
+    sla: 50.0
+    description: Historic 19th-century village on the Niagara River edge (annexed
+      1854) with the Amherst Street corridor, Scajaquada Creek frontage, and early-stage
+      riverfront reinvestment.
+    city_id: buffalo
+  Broadway-Fillmore:
+    name: Broadway-Fillmore
+    borough: EAST_SIDE
+    lat: 42.894
+    lng: -78.8346
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.78
+    capex: 5400000.0
+    permit_vel: 28.0
+    shift_ratio: 1.42
+    sla: 51.0
+    description: Broadway Market and the Fillmore commercial row with Polish-heritage
+      housing stock, stabilization-level values, and corridor redevelopment groundwork
+      on the East Side.
+    city_id: buffalo
+  University Heights:
+    name: University Heights
+    borough: UNIVERSITY_HEIGHTS
+    lat: 42.9585
+    lng: -78.8218
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.8
+    capex: 5600000.0
+    permit_vel: 29.0
+    shift_ratio: 1.43
+    sla: 52.0
+    description: UB South Campus district at the Main Street metro-rail terminus with
+      the student-rental belt, Sugar City creative reuse, and Amherst-line demand
+      spillover.
+    city_id: buffalo
+divisions:
+  DOWNTOWN_WATERFRONT:
+    name: DOWNTOWN_WATERFRONT
+    center_lat: 42.8805
+    center_lng: -78.8727
+    zoom: 14.0
+    bbox:
+      min_lat: 42.87
+      max_lat: 42.891
+      min_lng: -78.89
+      max_lng: -78.856
+    submarkets:
+    - Canalside
+    - Larkinville
+    city_id: buffalo
+  WEST_SIDE:
+    name: WEST_SIDE
+    center_lat: 42.9045
+    center_lng: -78.8781
+    zoom: 14.0
+    bbox:
+      min_lat: 42.892
+      max_lat: 42.917
+      min_lng: -78.892
+      max_lng: -78.866
+    submarkets:
+    - Allentown
+    - Elmwood Village
+    city_id: buffalo
+  NORTH_BUFFALO:
+    name: NORTH_BUFFALO
+    center_lat: 42.9408
+    center_lng: -78.8772
+    zoom: 14.0
+    bbox:
+      min_lat: 42.931
+      max_lat: 42.95
+      min_lng: -78.892
+      max_lng: -78.862
+    submarkets:
+    - Hertel Avenue
+    city_id: buffalo
+  BLACK_ROCK:
+    name: BLACK_ROCK
+    center_lat: 42.9374
+    center_lng: -78.9019
+    zoom: 14.0
+    bbox:
+      min_lat: 42.928
+      max_lat: 42.947
+      min_lng: -78.918
+      max_lng: -78.89
+    submarkets:
+    - Black Rock
+    city_id: buffalo
+  EAST_SIDE:
+    name: EAST_SIDE
+    center_lat: 42.894
+    center_lng: -78.8346
+    zoom: 13.5
+    bbox:
+      min_lat: 42.884
+      max_lat: 42.904
+      min_lng: -78.852
+      max_lng: -78.818
+    submarkets:
+    - Broadway-Fillmore
+    city_id: buffalo
+  UNIVERSITY_HEIGHTS:
+    name: UNIVERSITY_HEIGHTS
+    center_lat: 42.9585
+    center_lng: -78.8218
+    zoom: 14.0
+    bbox:
+      min_lat: 42.95
+      max_lat: 42.967
+      min_lng: -78.836
+      max_lng: -78.806
+    submarkets:
+    - University Heights
+    city_id: buffalo
+datasets:
+  sla:
+    endpoint: https://data.buffalony.gov/resource/4pp3-qkuj.json
+    platform: socrata
+    watermark_col: issdttm
+    id_keys:
+    - uniqkey
+    - licenseno
+    - aplickey
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: issdttm DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: issdttm IS NOT NULL
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - licenseno
+      - uniqkey
+      dba:
+      - businessname
+      premises_name:
+      - businessname
+      license_type:
+      - descript
+      - code
+      effective_date:
+      - issdttm
+      expiration_date:
+      - expdttm
+      status:
+      - licstatus
+      address_street:
+      - address
+      borough:
+      - neighborhood
+      latitude:
+      - latitude
+      longitude:
+      - longitude
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- buffalo_ny
+- buffalo-ny
+- buffalo ny
+job_suffix: buffalo

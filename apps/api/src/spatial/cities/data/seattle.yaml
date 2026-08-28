@@ -1,0 +1,745 @@
+city_id: seattle
+name: Seattle Metro
+state: WA
+center:
+  lat: 47.6062
+  lng: -122.3321
+metro_bbox:
+  min_lat: 47.28
+  max_lat: 47.78
+  min_lng: -122.43
+  max_lng: -122.0
+division_bboxes:
+  SEATTLE_CORE:
+    min_lat: 47.58
+    max_lat: 47.645
+    min_lng: -122.37
+    max_lng: -122.29
+  NORTH_KING:
+    min_lat: 47.645
+    max_lat: 47.745
+    min_lng: -122.425
+    max_lng: -122.28
+  EASTSIDE:
+    min_lat: 47.5
+    max_lat: 47.77
+    min_lng: -122.26
+    max_lng: -122.01
+  SOUTH_KING:
+    min_lat: 47.29
+    max_lat: 47.59
+    min_lng: -122.42
+    max_lng: -122.15
+submarkets:
+  Downtown Core & Waterfront:
+    name: Downtown Core & Waterfront
+    borough: SEATTLE_CORE
+    lat: 47.6097
+    lng: -122.333
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.9
+    capex: 13500000.0
+    permit_vel: 55.0
+    shift_ratio: 1.58
+    sla: 66.0
+    description: Pike Place-Third Avenue retail spine, office towers, and waterfront
+      redevelopment core anchored by the Convention Center expansion and waterfront
+      park rebuild.
+    city_id: seattle
+  South Lake Union:
+    name: South Lake Union
+    borough: SEATTLE_CORE
+    lat: 47.6264
+    lng: -122.3381
+    zoom: 15.0
+    pitch: 50.0
+    base_lims: 0.94
+    capex: 14000000.0
+    permit_vel: 64.0
+    shift_ratio: 1.7
+    sla: 72.0
+    description: Amazon headquarters biotech and life-science district with the region's
+      densest construction crane count and streetcar-served mixed-use infill.
+    city_id: seattle
+  Belltown/Denny Triangle:
+    name: Belltown/Denny Triangle
+    borough: SEATTLE_CORE
+    lat: 47.615
+    lng: -122.345
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.87
+    capex: 9800000.0
+    permit_vel: 52.0
+    shift_ratio: 1.52
+    sla: 76.0
+    description: Condo towers, nightlife corridors, and convention-center expansion
+      infill between Denny Park and Elliott Bay.
+    city_id: seattle
+  Capitol Hill/First Hill:
+    name: Capitol Hill/First Hill
+    borough: SEATTLE_CORE
+    lat: 47.618
+    lng: -122.315
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.86
+    capex: 9200000.0
+    permit_vel: 48.0
+    shift_ratio: 1.46
+    sla: 80.0
+    description: Dense mixed-use nightlife and medical-institutional ridge including
+      Swedish Medical Center, Seattle University, and Link light-rail station areas.
+    city_id: seattle
+  Pioneer Square/Chinatown-ID:
+    name: Pioneer Square/Chinatown-ID
+    borough: SEATTLE_CORE
+    lat: 47.5995
+    lng: -122.3315
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.82
+    capex: 8400000.0
+    permit_vel: 46.0
+    shift_ratio: 1.44
+    sla: 68.0
+    description: Historic loft and stadium-district adaptive reuse with light-rail
+      gateway traffic, Climate Pledge Arena demand, and SODO industrial edge dynamics.
+    city_id: seattle
+  Ballard:
+    name: Ballard
+    borough: NORTH_KING
+    lat: 47.6685
+    lng: -122.3862
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.88
+    capex: 10200000.0
+    permit_vel: 58.0
+    shift_ratio: 1.56
+    sla: 74.0
+    description: Maritime-industrial heritage converting to Nordic-themed retail,
+      brewery corridors, and multifamily development along Ballard Avenue and Leary
+      Way.
+    city_id: seattle
+  Fremont/Wallingford:
+    name: Fremont/Wallingford
+    borough: NORTH_KING
+    lat: 47.658
+    lng: -122.343
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.87
+    capex: 9600000.0
+    permit_vel: 54.0
+    shift_ratio: 1.5
+    sla: 70.0
+    description: Eccentric creative corridor under the Aurora Bridge with tech satellite
+      offices, canal-front retail, and Google campus expansion.
+    city_id: seattle
+  University District/Roosevelt:
+    name: University District/Roosevelt
+    borough: NORTH_KING
+    lat: 47.6605
+    lng: -122.313
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.85
+    capex: 8800000.0
+    permit_vel: 56.0
+    shift_ratio: 1.48
+    sla: 62.0
+    description: University of Washington anchor economy with Link-rail transit-oriented
+      upzoning along Roosevelt Avenue and the Ave commercial spine.
+    city_id: seattle
+  Queen Anne/Magnolia:
+    name: Queen Anne/Magnolia
+    borough: SEATTLE_CORE
+    lat: 47.635
+    lng: -122.36
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.84
+    capex: 8000000.0
+    permit_vel: 38.0
+    shift_ratio: 1.34
+    sla: 54.0
+    description: Hilltop residential enclaves overlooking Uptown arts retail, Seattle
+      Center, and Interbay rail-served industrial land.
+    city_id: seattle
+  Northgate/Lake City:
+    name: Northgate/Lake City
+    borough: NORTH_KING
+    lat: 47.712
+    lng: -122.312
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.81
+    capex: 7200000.0
+    permit_vel: 50.0
+    shift_ratio: 1.38
+    sla: 44.0
+    description: Transit-oriented mall redevelopment into the NHL Kraken practice
+      facility and ped-friendly district plus north-end affordable infill frontier.
+    city_id: seattle
+  Downtown Bellevue:
+    name: Downtown Bellevue
+    borough: EASTSIDE
+    lat: 47.6101
+    lng: -122.2015
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.93
+    capex: 13800000.0
+    permit_vel: 60.0
+    shift_ratio: 1.62
+    sla: 64.0
+    description: Second CBD of the metro with Amazon and Microsoft towers, Bellevue
+      Square luxury retail, and East Link light-rail expansion.
+    city_id: seattle
+  Kirkland Waterfront:
+    name: Kirkland Waterfront
+    borough: EASTSIDE
+    lat: 47.6815
+    lng: -122.2087
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.86
+    capex: 9000000.0
+    permit_vel: 40.0
+    shift_ratio: 1.4
+    sla: 56.0
+    description: Lakeside Google-corridor office market with MarinaPark civic frontage
+      and boutique downtown retail along Lake Washington.
+    city_id: seattle
+  Redmond/Overlake:
+    name: Redmond/Overlake
+    borough: EASTSIDE
+    lat: 47.658
+    lng: -122.125
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.89
+    capex: 10600000.0
+    permit_vel: 52.0
+    shift_ratio: 1.5
+    sla: 50.0
+    description: Microsoft campus belt plus light-rail-linked downtown village redevelopment
+      along the Redmond Technology Station corridor.
+    city_id: seattle
+  Woodinville Wine Country:
+    name: Woodinville Wine Country
+    borough: EASTSIDE
+    lat: 47.7546
+    lng: -122.1589
+    zoom: 13.5
+    pitch: 35.0
+    base_lims: 0.79
+    capex: 6500000.0
+    permit_vel: 30.0
+    shift_ratio: 1.26
+    sla: 82.0
+    description: Wine-country tourism district with Hollywood Hill tasting rooms,
+      Tourist Mill light-industrial, and SR-522 logistics frontage.
+    city_id: seattle
+  Issaquah/Sammamish:
+    name: Issaquah/Sammamish
+    borough: EASTSIDE
+    lat: 47.54
+    lng: -122.035
+    zoom: 13.5
+    pitch: 35.0
+    base_lims: 0.85
+    capex: 8600000.0
+    permit_vel: 42.0
+    shift_ratio: 1.36
+    sla: 46.0
+    description: I-90 master-planned growth engine combining Grand Ridge tech campuses,
+      Highlands rooftops, and Costco headquarters roots.
+    city_id: seattle
+  West Seattle/Junction:
+    name: West Seattle/Junction
+    borough: SOUTH_KING
+    lat: 47.5612
+    lng: -122.3868
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.83
+    capex: 7800000.0
+    permit_vel: 44.0
+    shift_ratio: 1.4
+    sla: 64.0
+    description: Beach-community retail node on California Avenue SW with bridge-constrained
+      supply dynamics and Alki waterfront demand.
+    city_id: seattle
+  Beacon Hill/Columbia City:
+    name: Beacon Hill/Columbia City
+    borough: SOUTH_KING
+    lat: 47.568
+    lng: -122.296
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.82
+    capex: 7000000.0
+    permit_vel: 48.0
+    shift_ratio: 1.46
+    sla: 58.0
+    description: Link light-rail multicultural corridor with rapid Rainier Valley
+      gentrification, landmark Columbia City historic district, and upzoned station
+      areas.
+    city_id: seattle
+  Georgetown/South Park:
+    name: Georgetown/South Park
+    borough: SOUTH_KING
+    lat: 47.545
+    lng: -122.314
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.74
+    capex: 5200000.0
+    permit_vel: 36.0
+    shift_ratio: 1.28
+    sla: 48.0
+    description: Artist-industrial enclave amid Duwamish heavy manufacturing, airport
+      freight corridors, and Airport Way adaptive reuse.
+    city_id: seattle
+  Renton/Southcenter:
+    name: Renton/Southcenter
+    borough: SOUTH_KING
+    lat: 47.462
+    lng: -122.24
+    zoom: 13.5
+    pitch: 35.0
+    base_lims: 0.8
+    capex: 8200000.0
+    permit_vel: 46.0
+    shift_ratio: 1.32
+    sla: 42.0
+    description: Boeing 737 plant plus Southcenter regional mall and the I-405 hotel-office
+      cluster on the Cedar River waterfront.
+    city_id: seattle
+  Kent Valley:
+    name: Kent Valley
+    borough: SOUTH_KING
+    lat: 47.3809
+    lng: -122.2348
+    zoom: 13.0
+    pitch: 35.0
+    base_lims: 0.72
+    capex: 4800000.0
+    permit_vel: 28.0
+    shift_ratio: 1.22
+    sla: 35.0
+    description: Puget Sound's largest warehouse and logistics submarket along Valley
+      Freeway and the BNSF rail line.
+    city_id: seattle
+divisions:
+  SEATTLE_CORE:
+    name: SEATTLE_CORE
+    center_lat: 47.612
+    center_lng: -122.33
+    zoom: 12.5
+    bbox:
+      min_lat: 47.58
+      max_lat: 47.645
+      min_lng: -122.37
+      max_lng: -122.29
+    submarkets:
+    - Downtown Core & Waterfront
+    - South Lake Union
+    - Belltown/Denny Triangle
+    - Capitol Hill/First Hill
+    - Pioneer Square/Chinatown-ID
+    - Queen Anne/Magnolia
+    city_id: seattle
+  NORTH_KING:
+    name: NORTH_KING
+    center_lat: 47.695
+    center_lng: -122.353
+    zoom: 12.0
+    bbox:
+      min_lat: 47.645
+      max_lat: 47.745
+      min_lng: -122.425
+      max_lng: -122.28
+    submarkets:
+    - Ballard
+    - Fremont/Wallingford
+    - University District/Roosevelt
+    - Northgate/Lake City
+    city_id: seattle
+  EASTSIDE:
+    name: EASTSIDE
+    center_lat: 47.635
+    center_lng: -122.135
+    zoom: 11.5
+    bbox:
+      min_lat: 47.5
+      max_lat: 47.77
+      min_lng: -122.26
+      max_lng: -122.01
+    submarkets:
+    - Downtown Bellevue
+    - Kirkland Waterfront
+    - Redmond/Overlake
+    - Woodinville Wine Country
+    - Issaquah/Sammamish
+    city_id: seattle
+  SOUTH_KING:
+    name: SOUTH_KING
+    center_lat: 47.44
+    center_lng: -122.285
+    zoom: 11.5
+    bbox:
+      min_lat: 47.29
+      max_lat: 47.59
+      min_lng: -122.42
+      max_lng: -122.15
+    submarkets:
+    - West Seattle/Junction
+    - Beacon Hill/Columbia City
+    - Georgetown/South Park
+    - Renton/Southcenter
+    - Kent Valley
+    city_id: seattle
+datasets:
+  permits:
+    endpoint: https://data.seattle.gov/resource/76t5-zqzr.json
+    platform: socrata
+    watermark_col: issueddate
+    id_keys:
+    - permitnum
+    - id
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map: {}
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: https://data.seattle.gov/resource/5ngg-rpne.json
+    platform: socrata
+    watermark_col: createddate
+    id_keys:
+    - servicerequestnumber
+    - id
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - servicerequestnumber
+      created_date:
+      - createddate
+      complaint_type:
+      - webintakeservicerequests
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://data.wa.gov/resource/vgcw-qfjm.json
+    platform: socrata
+    watermark_col: applicationdate
+    id_keys:
+    - license
+    - ubi
+    - id
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map: {}
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  deeds:
+    endpoint: https://services.arcgis.com/Ej0PsM5Aw677QF1W/arcgis/rest/services/PARCEL_SALES3YR_AREA_287/FeatureServer/0
+    platform: arcgis
+    watermark_col: SaleDate
+    id_keys:
+    - ExciseTaxNum
+    - PIN
+    - OBJECTID
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map: {}
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 1000
+    expected_cadence_days: 7
+    alarm_exempt: true
+    alarm_exempt_reason: KNOWN-DEAD publication; no live anonymous replacement (US-163)
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  crime:
+    endpoint: https://data.seattle.gov/resource/tazs-3rd5.json
+    platform: socrata
+    watermark_col: offense_date
+    id_keys:
+    - offense_id
+    - report_number
+    topic: raw.municipal.crime
+    interval_seconds: 1800.0
+    producer_key: crime
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map: {}
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  energy_benchmark:
+    endpoint: https://data.seattle.gov/resource/teqw-tu6e.json
+    platform: socrata
+    watermark_col: datayear
+    id_keys:
+    - osebuildingid
+    - datayear
+    topic: raw.context.observations
+    interval_seconds: 86400.0
+    producer_key: energy_benchmark
+    endpoint_by_year: {}
+    watermark_type: text
+    watermark_format: '%Y'
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      asset_id:
+      - osebuildingid
+      asset_name:
+      - buildingname
+      - address
+      period:
+      - datayear
+      latitude:
+      - latitude
+      longitude:
+      - longitude
+      address:
+      - address
+      zipcode:
+      - zipcode
+      borough:
+      - neighborhood
+      source_neighborhood:
+      - neighborhood
+      category:
+      - epapropertytype
+      - buildingtype
+      - largestpropertyusetype
+      compliance:
+      - compliancestatus
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 365
+    alarm_exempt: true
+    alarm_exempt_reason: "annual disclosure \u2014 one publication per year by design\
+      \ (US-363 \xA72.7)"
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  bike_ped:
+    endpoint: https://data.seattle.gov/resource/65db-xm6k.json
+    platform: socrata
+    watermark_col: date
+    id_keys:
+    - date
+    topic: raw.context.observations
+    interval_seconds: 86400.0
+    producer_key: bike_ped
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      period:
+      - date
+      count_total:
+      - fremont_bridge
+      count_northbound:
+      - fremont_bridge_nb
+      count_southbound:
+      - fremont_bridge_sb
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 35
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints:
+      wide_layout: true
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- sea
+- king_county
+- king-county
+- king county
+- puget_sound
+- puget-sound
+- puget sound
+- bellevue
+job_suffix: seattle

@@ -1,0 +1,377 @@
+city_id: milwaukee
+name: Milwaukee
+state: WI
+center:
+  lat: 43.0389
+  lng: -87.9065
+metro_bbox:
+  min_lat: 42.85
+  max_lat: 43.2
+  min_lng: -88.1
+  max_lng: -87.8
+division_bboxes:
+  MILWAUKEE_CORE:
+    min_lat: 42.9
+    max_lat: 43.18
+    min_lng: -88.08
+    max_lng: -87.85
+submarkets:
+  Downtown & East Town:
+    name: Downtown & East Town
+    borough: MILWAUKEE_CORE
+    lat: 43.0389
+    lng: -87.9065
+    zoom: 13.2
+    pitch: 48.0
+    base_lims: 0.81
+    capex: 8200000.0
+    permit_vel: 36.0
+    shift_ratio: 1.4
+    sla: 64.0
+    description: Lakefront central business district with the Deer District, arena-adjacent
+      hospitality, and dense bar/restaurant license activity.
+    city_id: milwaukee
+  Bay View:
+    name: Bay View
+    borough: MILWAUKEE_CORE
+    lat: 42.9998
+    lng: -87.9057
+    zoom: 13.0
+    pitch: 46.0
+    base_lims: 0.78
+    capex: 5600000.0
+    permit_vel: 30.0
+    shift_ratio: 1.36
+    sla: 58.0
+    description: South-side historic mill district with a strong independent tavern
+      and restaurant corridor along Kinnickinnic Avenue.
+    city_id: milwaukee
+  Walker's Point:
+    name: Walker's Point
+    borough: MILWAUKEE_CORE
+    lat: 43.022
+    lng: -87.9147
+    zoom: 13.0
+    pitch: 46.0
+    base_lims: 0.79
+    capex: 6100000.0
+    permit_vel: 32.0
+    shift_ratio: 1.37
+    sla: 60.0
+    description: South-of-downtown food-and-beverage hub with concentrated liquor
+      license turnover and adaptive reuse of industrial buildings.
+    city_id: milwaukee
+  Riverwest & Brewers Hill:
+    name: Riverwest & Brewers Hill
+    borough: MILWAUKEE_CORE
+    lat: 43.0604
+    lng: -87.9179
+    zoom: 13.0
+    pitch: 44.0
+    base_lims: 0.75
+    capex: 4800000.0
+    permit_vel: 27.0
+    shift_ratio: 1.33
+    sla: 56.0
+    description: North-side river neighborhoods with neighborhood taverns, music venues,
+      and owner-operator license density.
+    city_id: milwaukee
+  Westown & Washington Heights:
+    name: Westown & Washington Heights
+    borough: MILWAUKEE_CORE
+    lat: 43.052
+    lng: -87.97
+    zoom: 12.8
+    pitch: 42.0
+    base_lims: 0.74
+    capex: 5200000.0
+    permit_vel: 26.0
+    shift_ratio: 1.32
+    sla: 54.0
+    description: West-side corridor with mixed commercial-residential stock and steady
+      service-sector license renewal activity.
+    city_id: milwaukee
+divisions:
+  MILWAUKEE_CORE:
+    name: Milwaukee
+    center_lat: 43.0389
+    center_lng: -87.9065
+    zoom: 11.2
+    bbox:
+      min_lat: 42.9
+      max_lat: 43.18
+      min_lng: -88.08
+      max_lng: -87.85
+    submarkets:
+    - Downtown & East Town
+    - Bay View
+    - Walker's Point
+    - Riverwest & Brewers Hill
+    - Westown & Washington Heights
+    city_id: milwaukee
+datasets:
+  sla:
+    endpoint: https://milwaukeemaps.milwaukee.gov/arcgis/rest/services/regulation/license/MapServer/0
+    platform: arcgis
+    watermark_col: GIS_DATETIME
+    id_keys:
+    - LICENSE_ID
+    - OBJECTID
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - LICENSE_ID
+      effective_date:
+      - EFFECTIVE_DATE
+      expiration_date:
+      - EXPIRATION_DATE
+      license_type:
+      - LIC_TYPE_ABBR
+      - PROFESSION_FULL_NAME
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  permits:
+    endpoint: https://data.milwaukee.gov/dataset/9bada2e0-fad5-4545-8674-1b2c8c4e9f2f/resource/828e9630-d7cb-42e4-960e-964eae916397/download/buildingpermits.csv
+    platform: csv
+    watermark_col: date_issued
+    id_keys:
+    - record_id
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: date_issued ASC
+    id_col: record_id
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Milwaukee, WI
+    field_map:
+      job_id:
+      - record_id
+      address_street:
+      - address
+      issuance_date:
+      - date_issued
+      filing_date:
+      - date_opened
+      job_type:
+      - permit_type
+      cost:
+      - construction_total_cost
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 90
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  deeds:
+    endpoint: https://data.milwaukee.gov/dataset/7a8b81f6-d750-4f62-aee8-30ffce1c64ce/resource/1f2dbf65-3ff9-49a2-a9ef-eb0b6c503017/download/armslengthsales_2025_valid_20260417.csv
+    platform: csv
+    watermark_col: sale_date
+    id_keys:
+    - propertyid
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year:
+      '2024': https://data.milwaukee.gov/dataset/7a8b81f6-d750-4f62-aee8-30ffce1c64ce/resource/01651dab-2be7-40c6-a9d6-31254fe02e29/download/armslengthsales_2024_valid_20250917.csv
+      '2025': https://data.milwaukee.gov/dataset/7a8b81f6-d750-4f62-aee8-30ffce1c64ce/resource/1f2dbf65-3ff9-49a2-a9ef-eb0b6c503017/download/armslengthsales_2025_valid_20260417.csv
+    watermark_type: text
+    watermark_format: '%m/%d/%Y'
+    watermark_exclude: []
+    order_by: sale_date ASC
+    id_col: propertyid
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Milwaukee, WI
+    field_map:
+      doc_id:
+      - propertyid
+      bbl:
+      - taxkey
+      address_street:
+      - address
+      document_amount:
+      - sale_price
+      recorded_date:
+      - sale_date
+      doc_type:
+      - proptype
+      borough:
+      - district
+      - nbhd
+    ingestion_mode: snapshot
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 365
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  crime:
+    endpoint: ckan://data.milwaukee.gov/87843297-a6fa-46d4-ba5d-cb342fb2d3bb
+    platform: ckan
+    watermark_col: Incident_Last_Edited
+    id_keys:
+    - Case_Number
+    topic: raw.municipal.crime
+    interval_seconds: 300.0
+    producer_key: crime
+    endpoint_by_year: {}
+    watermark_type: timestamp
+    watermark_format: '%Y-%m-%d %H:%M:%S'
+    watermark_exclude: []
+    order_by: Incident_Last_Edited ASC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - Case_Number
+      latitude:
+      - Address_Latitude
+      longitude:
+      - Address_Longitude
+      offense_type:
+      - Offense_All
+      occurred_date:
+      - Incident_Date
+      borough:
+      - Police_District
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: ckan://data.milwaukee.gov/bf2b508a-5bfa-49da-8846-d87ffeee020a
+    platform: ckan
+    watermark_col: CREATIONDATE
+    id_keys:
+    - _id
+    topic: raw.municipal.311
+    interval_seconds: 300.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: timestamp
+    watermark_format: '%Y-%m-%d %H:%M:%S'
+    watermark_exclude: []
+    order_by: CREATIONDATE ASC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Milwaukee, WI
+    field_map:
+      incident_id:
+      - _id
+      incident_address:
+      - OBJECTDESC
+      complaint_type:
+      - TITLE
+      created_date:
+      - CREATIONDATE
+      closed_date:
+      - CLOSEDDATETIME
+    ingestion_mode: incremental
+    oid_field: _id
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- mke
+- mke_wi
+job_suffix: mke

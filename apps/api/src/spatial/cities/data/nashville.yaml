@@ -1,0 +1,287 @@
+city_id: nashville
+name: Nashville / Davidson County
+state: TN
+center:
+  lat: 36.1627
+  lng: -86.7818
+metro_bbox:
+  min_lat: 35.94
+  max_lat: 36.44
+  min_lng: -87.16
+  max_lng: -86.46
+division_bboxes:
+  NASHVILLE_CORE:
+    min_lat: 35.98
+    max_lat: 36.4
+    min_lng: -87.1
+    max_lng: -86.5
+submarkets:
+  Downtown & Riverfront:
+    name: Downtown & Riverfront
+    borough: NASHVILLE_CORE
+    lat: 36.1612
+    lng: -86.7775
+    zoom: 13.8
+    pitch: 50.0
+    base_lims: 0.86
+    capex: 7900000.0
+    permit_vel: 40.0
+    shift_ratio: 1.48
+    sla: 61.0
+    description: Cumberland River core spanning Broadway honky-tonk blocks, the East
+      Bank stadium district, and high-rise hotel and multifamily redevelopment.
+    city_id: nashville
+  The Gulch & Midtown:
+    name: The Gulch & Midtown
+    borough: NASHVILLE_CORE
+    lat: 36.15
+    lng: -86.8
+    zoom: 13.6
+    pitch: 48.0
+    base_lims: 0.85
+    capex: 7200000.0
+    permit_vel: 38.0
+    shift_ratio: 1.45
+    sla: 59.0
+    description: Transit-adjacent mixed-use corridor between the Gulch towers, Music
+      Row, and the Vanderbilt-adjacent Midtown bar and residential strip.
+    city_id: nashville
+  East Nashville & Five Points:
+    name: East Nashville & Five Points
+    borough: NASHVILLE_CORE
+    lat: 36.18
+    lng: -86.751
+    zoom: 13.4
+    pitch: 46.0
+    base_lims: 0.82
+    capex: 5500000.0
+    permit_vel: 33.0
+    shift_ratio: 1.41
+    sla: 56.0
+    description: River-east bungalow neighborhoods anchored by the Five Points commercial
+      node with steady residential infill and renovation demand.
+    city_id: nashville
+  Belmont & Hillsboro Village:
+    name: Belmont & Hillsboro Village
+    borough: NASHVILLE_CORE
+    lat: 36.1285
+    lng: -86.801
+    zoom: 13.4
+    pitch: 46.0
+    base_lims: 0.83
+    capex: 5200000.0
+    permit_vel: 31.0
+    shift_ratio: 1.39
+    sla: 55.0
+    description: University-district market between Belmont and Vanderbilt campuses
+      with student rental demand, retail frontage, and older-stock renovation.
+    city_id: nashville
+  Antioch & Southeast Corridor:
+    name: Antioch & Southeast Corridor
+    borough: NASHVILLE_CORE
+    lat: 36.0545
+    lng: -86.601
+    zoom: 12.8
+    pitch: 44.0
+    base_lims: 0.76
+    capex: 4300000.0
+    permit_vel: 27.0
+    shift_ratio: 1.34
+    sla: 52.0
+    description: Southeast Davidson growth belt along Antioch Pike and the Cullum/Percy
+      Priest corridors with townhome and big-box repositioning activity.
+    city_id: nashville
+divisions:
+  NASHVILLE_CORE:
+    name: Davidson County
+    center_lat: 36.1627
+    center_lng: -86.7818
+    zoom: 10.8
+    bbox:
+      min_lat: 35.98
+      max_lat: 36.4
+      min_lng: -87.1
+      max_lng: -86.5
+    submarkets:
+    - Downtown & Riverfront
+    - The Gulch & Midtown
+    - East Nashville & Five Points
+    - Belmont & Hillsboro Village
+    - Antioch & Southeast Corridor
+    city_id: nashville
+datasets:
+  permits:
+    endpoint: https://services2.arcgis.com/HdTo6HJqh92wn4D8/arcgis/rest/services/Building_Permits_Issued_2/FeatureServer/0
+    platform: arcgis
+    watermark_col: Date_Issued
+    id_keys:
+    - Permit__
+    - ObjectId
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - Permit__
+      issuance_date:
+      - Date_Issued
+      filing_date:
+      - Date_Entered
+      cost:
+      - Const_Cost
+      latitude:
+      - Lat
+      longitude:
+      - Lon
+    ingestion_mode: incremental
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://services2.arcgis.com/HdTo6HJqh92wn4D8/arcgis/rest/services/Residential_Short_Term_Rental_Permits_view/FeatureServer/0
+    platform: arcgis
+    watermark_col: Date_Issued
+    id_keys:
+    - Permit__
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Permit__
+      effective_date:
+      - Date_Issued
+      expiration_date:
+      - Expiration_Date
+      license_type:
+      - Permit_Subtype_Description
+      - Permit_Type
+      status:
+      - Permit_Status
+      latitude:
+      - Lat
+      longitude:
+      - Lon
+    ingestion_mode: incremental
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: https://services2.arcgis.com/HdTo6HJqh92wn4D8/arcgis/rest/services/hubNashville_311_Service_Requests_Current_Year_view/FeatureServer/0
+    platform: arcgis
+    watermark_col: Date_Time_Opened
+    id_keys:
+    - Request__
+    - GlobalID
+    - OBJECTID
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: Latitude IS NOT NULL
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - Request__
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      created_date:
+      - Date_Time_Opened
+      closed_date:
+      - Date_Time_Closed
+      status:
+      - Status
+      complaint_type:
+      - Request_Type
+      - Subrequest_Type
+      incident_address:
+      - Address
+      zipcode:
+      - ZIP
+      borough:
+      - Council_District
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- nashville_tn
+job_suffix: bna

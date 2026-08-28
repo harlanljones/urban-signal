@@ -1,0 +1,278 @@
+city_id: denver
+name: Denver
+state: CO
+center:
+  lat: 39.7392
+  lng: -104.9903
+metro_bbox:
+  min_lat: 39.55
+  max_lat: 39.95
+  min_lng: -105.2
+  max_lng: -104.5
+division_bboxes:
+  DENVER_CORE:
+    min_lat: 39.6
+    max_lat: 39.85
+    min_lng: -105.1
+    max_lng: -104.7
+submarkets:
+  Downtown & Union Station:
+    name: Downtown & Union Station
+    borough: DENVER_CORE
+    lat: 39.7527
+    lng: -104.9992
+    zoom: 13.6
+    pitch: 48.0
+    base_lims: 0.87
+    capex: 8200000.0
+    permit_vel: 44.0
+    shift_ratio: 1.5
+    sla: 62.0
+    description: Central business and transit district with office, hospitality, and
+      high-density residential redevelopment.
+    city_id: denver
+  RiNo & Five Points:
+    name: RiNo & Five Points
+    borough: DENVER_CORE
+    lat: 39.769
+    lng: -104.978
+    zoom: 13.4
+    pitch: 46.0
+    base_lims: 0.84
+    capex: 7400000.0
+    permit_vel: 41.0
+    shift_ratio: 1.46
+    sla: 59.0
+    description: North-central creative and industrial-reuse corridor with continuing
+      mixed-use infill activity.
+    city_id: denver
+  Capitol Hill & Cheesman Park:
+    name: Capitol Hill & Cheesman Park
+    borough: DENVER_CORE
+    lat: 39.734
+    lng: -104.975
+    zoom: 13.2
+    pitch: 44.0
+    base_lims: 0.8
+    capex: 5900000.0
+    permit_vel: 34.0
+    shift_ratio: 1.41
+    sla: 56.0
+    description: Established central neighborhoods with renovation, multifamily, and
+      neighborhood-retail permit signals.
+    city_id: denver
+  Cherry Creek & Congress Park:
+    name: Cherry Creek & Congress Park
+    borough: DENVER_CORE
+    lat: 39.717
+    lng: -104.953
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.82
+    capex: 6800000.0
+    permit_vel: 36.0
+    shift_ratio: 1.43
+    sla: 58.0
+    description: Retail and residential corridor east of the core with redevelopment
+      and high-value renovation activity.
+    city_id: denver
+divisions:
+  DENVER_CORE:
+    name: Denver Core
+    center_lat: 39.7527
+    center_lng: -104.9992
+    zoom: 11.8
+    bbox:
+      min_lat: 39.6
+      max_lat: 39.85
+      min_lng: -105.1
+      max_lng: -104.7
+    submarkets:
+    - Downtown & Union Station
+    - RiNo & Five Points
+    - Capitol Hill & Cheesman Park
+    - Cherry Creek & Congress Park
+    city_id: denver
+datasets:
+  permits:
+    endpoint: https://services1.arcgis.com/zdB7qR0BtYrg0Xpl/arcgis/rest/services/ODC_DEV_RESIDENTIALCONSTPERMIT_P/FeatureServer/316
+    platform: arcgis
+    watermark_col: DATE_ISSUED
+    id_keys:
+    - PERMIT_NUM
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - PERMIT_NUM
+      issuance_date:
+      - DATE_ISSUED
+      filing_date:
+      - DATE_RECEIVED
+      job_type:
+      - CLASS
+      cost:
+      - VALUATION
+      address_street:
+      - ADDRESS
+      proposed_units:
+      - UNITS
+      borough:
+      - NEIGHBORHOOD
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints:
+      commercial: https://services1.arcgis.com/zdB7qR0BtYrg0Xpl/arcgis/rest/services/ODC_DEV_COMMERCIALCONSTPERMIT_P/FeatureServer/317
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: https://services1.arcgis.com/zdB7qR0BtYrg0Xpl/arcgis/rest/services/ODC_service_requests_311/FeatureServer/66
+    platform: arcgis
+    watermark_col: Case_Created_Date
+    id_keys:
+    - OBJECTID
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      incident_id:
+      - OBJECTID
+      complaint_type:
+      - Type
+      - Topic
+      - Case_Summary
+      created_date:
+      - Case_Created_dttm
+      closed_date:
+      - Case_Closed_dttm
+      status:
+      - Case_Status
+      incident_address:
+      - Incident_Address_1
+      zipcode:
+      - Incident_Zip_Code
+      - Customer_Zip_Code
+      borough:
+      - Neighborhood
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'CO'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- denver_co
+- denver-co
+job_suffix: denver

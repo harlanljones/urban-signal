@@ -1,0 +1,471 @@
+city_id: orlando
+name: Orlando / Orange County
+state: FL
+center:
+  lat: 28.5383
+  lng: -81.3792
+metro_bbox:
+  min_lat: 28.34
+  max_lat: 28.64
+  min_lng: -81.52
+  max_lng: -81.22
+division_bboxes:
+  DOWNTOWN_LAKE_EOLA:
+    min_lat: 28.52
+    max_lat: 28.56
+    min_lng: -81.4
+    max_lng: -81.35
+  NORTH_COLLEGE_PARK:
+    min_lat: 28.555
+    max_lat: 28.62
+    min_lng: -81.42
+    max_lng: -81.36
+  EAST_BALDWIN_PARK:
+    min_lat: 28.54
+    max_lat: 28.6
+    min_lng: -81.36
+    max_lng: -81.28
+  SOUTH_ORANGE_CONWAY:
+    min_lat: 28.48
+    max_lat: 28.535
+    min_lng: -81.4
+    max_lng: -81.3
+  WEST_IDRIVE_METROWEST:
+    min_lat: 28.43
+    max_lat: 28.54
+    min_lng: -81.52
+    max_lng: -81.4
+  SOUTHEAST_LAKE_NONA:
+    min_lat: 28.34
+    max_lat: 28.48
+    min_lng: -81.36
+    max_lng: -81.22
+submarkets:
+  Downtown Orlando:
+    name: Downtown Orlando
+    borough: DOWNTOWN_LAKE_EOLA
+    lat: 28.5383
+    lng: -81.3792
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.9
+    capex: 11000000.0
+    permit_vel: 48.0
+    shift_ratio: 1.6
+    sla: 70.0
+    description: Church Street and Lake Eola civic core with office-to-residential
+      conversions and the densest business-tax pipeline.
+    city_id: orlando
+  Thornton Park:
+    name: Thornton Park
+    borough: DOWNTOWN_LAKE_EOLA
+    lat: 28.543
+    lng: -81.368
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.86
+    capex: 8200000.0
+    permit_vel: 36.0
+    shift_ratio: 1.48
+    sla: 64.0
+    description: Brick-street bungalow grid east of Lake Eola with renovation-led
+      licensing and neighborhood retail.
+    city_id: orlando
+  SoDo:
+    name: SoDo
+    borough: DOWNTOWN_LAKE_EOLA
+    lat: 28.53
+    lng: -81.376
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.84
+    capex: 7600000.0
+    permit_vel: 34.0
+    shift_ratio: 1.45
+    sla: 61.0
+    description: South of Downtown warehouse and creative-office conversions along
+      Orange Avenue.
+    city_id: orlando
+  College Park:
+    name: College Park
+    borough: NORTH_COLLEGE_PARK
+    lat: 28.577
+    lng: -81.393
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.85
+    capex: 7200000.0
+    permit_vel: 33.0
+    shift_ratio: 1.46
+    sla: 60.0
+    description: North-of-downtown streetcar suburb with Edgewater Drive retail and
+      high STR turnover.
+    city_id: orlando
+  Ivanhoe Village:
+    name: Ivanhoe Village
+    borough: NORTH_COLLEGE_PARK
+    lat: 28.568
+    lng: -81.377
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.83
+    capex: 6800000.0
+    permit_vel: 31.0
+    shift_ratio: 1.43
+    sla: 58.0
+    description: Mills Avenue corridor between downtown and College Park with adaptive-reuse
+      commercial.
+    city_id: orlando
+  Princeton / Silver Star:
+    name: Princeton / Silver Star
+    borough: NORTH_COLLEGE_PARK
+    lat: 28.585
+    lng: -81.405
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.74
+    capex: 4800000.0
+    permit_vel: 26.0
+    shift_ratio: 1.32
+    sla: 50.0
+    description: Industrial-adjacent north side with contractor and service-license
+      density along Silver Star.
+    city_id: orlando
+  Baldwin Park:
+    name: Baldwin Park
+    borough: EAST_BALDWIN_PARK
+    lat: 28.57
+    lng: -81.325
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.88
+    capex: 9400000.0
+    permit_vel: 38.0
+    shift_ratio: 1.52
+    sla: 66.0
+    description: Master-planned New Urbanist village on the former Navy base with
+      mixed-use and professional offices.
+    city_id: orlando
+  Milk District:
+    name: Milk District
+    borough: EAST_BALDWIN_PARK
+    lat: 28.548
+    lng: -81.351
+    zoom: 14.5
+    pitch: 48.0
+    base_lims: 0.82
+    capex: 6100000.0
+    permit_vel: 32.0
+    shift_ratio: 1.44
+    sla: 57.0
+    description: Colonialtown east-of-downtown grid with brewery/retail conversions
+      and short-term rental pressure.
+    city_id: orlando
+  Audubon Park:
+    name: Audubon Park
+    borough: EAST_BALDWIN_PARK
+    lat: 28.569
+    lng: -81.351
+    zoom: 14.0
+    pitch: 44.0
+    base_lims: 0.8
+    capex: 5600000.0
+    permit_vel: 28.0
+    shift_ratio: 1.4
+    sla: 54.0
+    description: Garden-district bungalows along Corrine Drive with independent retail
+      and renovation licenses.
+    city_id: orlando
+  South Orange:
+    name: South Orange
+    borough: SOUTH_ORANGE_CONWAY
+    lat: 28.522
+    lng: -81.377
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.81
+    capex: 7000000.0
+    permit_vel: 30.0
+    shift_ratio: 1.41
+    sla: 56.0
+    description: Orlando Health medical corridor on South Orange Avenue with professional
+      and clinical licensing.
+    city_id: orlando
+  Conway:
+    name: Conway
+    borough: SOUTH_ORANGE_CONWAY
+    lat: 28.498
+    lng: -81.331
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.72
+    capex: 4200000.0
+    permit_vel: 24.0
+    shift_ratio: 1.3
+    sla: 46.0
+    description: Lakeside residential south of downtown with small-lot infill and
+      neighborhood services.
+    city_id: orlando
+  Airport North:
+    name: Airport North
+    borough: SOUTH_ORANGE_CONWAY
+    lat: 28.49
+    lng: -81.32
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.68
+    capex: 3900000.0
+    permit_vel: 22.0
+    shift_ratio: 1.26
+    sla: 42.0
+    description: MCO-adjacent logistics and hospitality licensing north of the airfield.
+    city_id: orlando
+  International Drive / Florida Center:
+    name: International Drive / Florida Center
+    borough: WEST_IDRIVE_METROWEST
+    lat: 28.46
+    lng: -81.467
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.87
+    capex: 12500000.0
+    permit_vel: 52.0
+    shift_ratio: 1.58
+    sla: 68.0
+    description: Tourist-corridor hospitality, retail, and body-art licensing along
+      International Drive.
+    city_id: orlando
+  Metro West:
+    name: Metro West
+    borough: WEST_IDRIVE_METROWEST
+    lat: 28.513
+    lng: -81.485
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.76
+    capex: 5400000.0
+    permit_vel: 27.0
+    shift_ratio: 1.34
+    sla: 50.0
+    description: West-side planned community and office park with service and contractor
+      licenses.
+    city_id: orlando
+  Kirkman / Universal Edge:
+    name: Kirkman / Universal Edge
+    borough: WEST_IDRIVE_METROWEST
+    lat: 28.49
+    lng: -81.455
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.79
+    capex: 6300000.0
+    permit_vel: 29.0
+    shift_ratio: 1.38
+    sla: 53.0
+    description: Kirkman Road hospitality and contractor spine at the Universal resort
+      edge.
+    city_id: orlando
+  Lake Nona South / Medical City:
+    name: Lake Nona South / Medical City
+    borough: SOUTHEAST_LAKE_NONA
+    lat: 28.368
+    lng: -81.275
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.89
+    capex: 13000000.0
+    permit_vel: 44.0
+    shift_ratio: 1.56
+    sla: 67.0
+    description: Nemours / UCF Medical City campus with physician and professional-firm
+      licensing.
+    city_id: orlando
+  Lake Nona Central:
+    name: Lake Nona Central
+    borough: SOUTHEAST_LAKE_NONA
+    lat: 28.425
+    lng: -81.255
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.84
+    capex: 8800000.0
+    permit_vel: 36.0
+    shift_ratio: 1.49
+    sla: 62.0
+    description: Town-center mixed-use and residential buildout east of the airport.
+    city_id: orlando
+  Airport South:
+    name: Airport South
+    borough: SOUTHEAST_LAKE_NONA
+    lat: 28.431
+    lng: -81.308
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.7
+    capex: 4100000.0
+    permit_vel: 23.0
+    shift_ratio: 1.28
+    sla: 44.0
+    description: Airside industrial and cargo licensing south of MCO.
+    city_id: orlando
+divisions:
+  DOWNTOWN_LAKE_EOLA:
+    name: DOWNTOWN_LAKE_EOLA
+    center_lat: 28.538
+    center_lng: -81.374
+    zoom: 13.5
+    bbox:
+      min_lat: 28.52
+      max_lat: 28.56
+      min_lng: -81.4
+      max_lng: -81.35
+    submarkets:
+    - Downtown Orlando
+    - Thornton Park
+    - SoDo
+    city_id: orlando
+  NORTH_COLLEGE_PARK:
+    name: NORTH_COLLEGE_PARK
+    center_lat: 28.577
+    center_lng: -81.392
+    zoom: 13.0
+    bbox:
+      min_lat: 28.555
+      max_lat: 28.62
+      min_lng: -81.42
+      max_lng: -81.36
+    submarkets:
+    - College Park
+    - Ivanhoe Village
+    - Princeton / Silver Star
+    city_id: orlando
+  EAST_BALDWIN_PARK:
+    name: EAST_BALDWIN_PARK
+    center_lat: 28.562
+    center_lng: -81.342
+    zoom: 13.0
+    bbox:
+      min_lat: 28.54
+      max_lat: 28.6
+      min_lng: -81.36
+      max_lng: -81.28
+    submarkets:
+    - Baldwin Park
+    - Milk District
+    - Audubon Park
+    city_id: orlando
+  SOUTH_ORANGE_CONWAY:
+    name: SOUTH_ORANGE_CONWAY
+    center_lat: 28.503
+    center_lng: -81.343
+    zoom: 12.5
+    bbox:
+      min_lat: 28.48
+      max_lat: 28.535
+      min_lng: -81.4
+      max_lng: -81.3
+    submarkets:
+    - South Orange
+    - Conway
+    - Airport North
+    city_id: orlando
+  WEST_IDRIVE_METROWEST:
+    name: WEST_IDRIVE_METROWEST
+    center_lat: 28.488
+    center_lng: -81.469
+    zoom: 12.5
+    bbox:
+      min_lat: 28.43
+      max_lat: 28.54
+      min_lng: -81.52
+      max_lng: -81.4
+    submarkets:
+    - International Drive / Florida Center
+    - Metro West
+    - Kirkman / Universal Edge
+    city_id: orlando
+  SOUTHEAST_LAKE_NONA:
+    name: SOUTHEAST_LAKE_NONA
+    center_lat: 28.408
+    center_lng: -81.279
+    zoom: 12.0
+    bbox:
+      min_lat: 28.34
+      max_lat: 28.48
+      min_lng: -81.36
+      max_lng: -81.22
+    submarkets:
+    - Lake Nona South / Medical City
+    - Lake Nona Central
+    - Airport South
+    city_id: orlando
+datasets:
+  sla:
+    endpoint: https://data.cityoforlando.net/resource/7388-4re5.json
+    platform: socrata
+    watermark_col: received_date
+    id_keys:
+    - case_number
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: received_date DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Orlando, FL
+    field_map:
+      license_id:
+      - case_number
+      license_type:
+      - license_type
+      - license_category
+      premises_name:
+      - business_name
+      dba:
+      - business_name
+      - business_owner_name
+      effective_date:
+      - last_licensed_issue_date
+      - received_date
+      - business_open_date
+      status:
+      - license_status
+      address_street:
+      - business_address
+      borough:
+      - neighborhood_name
+      - commissioner_district
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints:
+      str_licenses: https://data.cityoforlando.net/resource/ssrj-rbua.json
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- orlando_fl
+- orlando fl
+- mco
+- orange_county_fl
+- orange county fl
+job_suffix: orlando

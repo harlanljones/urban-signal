@@ -1,0 +1,383 @@
+city_id: omaha
+name: Omaha
+state: NE
+center:
+  lat: 41.258
+  lng: -95.937
+metro_bbox:
+  min_lat: 41.17
+  max_lat: 41.37
+  min_lng: -96.25
+  max_lng: -95.88
+division_bboxes:
+  DOWNTOWN_OLD_MARKET:
+    min_lat: 41.249
+    max_lat: 41.268
+    min_lng: -95.95
+    max_lng: -95.925
+  MIDTOWN_DUNDEE:
+    min_lat: 41.25
+    max_lat: 41.274
+    min_lng: -95.992
+    max_lng: -95.958
+  AKSARBEN_VILLAGE:
+    min_lat: 41.242
+    max_lat: 41.256
+    min_lng: -95.992
+    max_lng: -95.972
+  NORTH_OMAHA:
+    min_lat: 41.262
+    max_lat: 41.33
+    min_lng: -96.01
+    max_lng: -95.938
+  SOUTH_OMAHA:
+    min_lat: 41.2
+    max_lat: 41.248
+    min_lng: -95.95
+    max_lng: -95.918
+  WEST_MILLARD:
+    min_lat: 41.205
+    max_lat: 41.29
+    min_lng: -96.24
+    max_lng: -96.08
+submarkets:
+  Downtown & Old Market:
+    name: Downtown & Old Market
+    borough: DOWNTOWN_OLD_MARKET
+    lat: 41.258
+    lng: -95.937
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.88
+    capex: 7200000.0
+    permit_vel: 38.0
+    shift_ratio: 1.48
+    sla: 60.0
+    description: Gene Leahy Mall riverfront core with the Old Market entertainment
+      grid, office conversions, and the densest Mayor's Hotline volume in the metro.
+    city_id: omaha
+  Midtown Crossing:
+    name: Midtown Crossing
+    borough: MIDTOWN_DUNDEE
+    lat: 41.2565
+    lng: -95.968
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.85
+    capex: 6400000.0
+    permit_vel: 34.0
+    shift_ratio: 1.45
+    sla: 58.0
+    description: Turner Park mixed-use district between downtown and Dundee with multifamily
+      infill and steady restaurant-corridor 311 demand.
+    city_id: omaha
+  Dundee:
+    name: Dundee
+    borough: MIDTOWN_DUNDEE
+    lat: 41.268
+    lng: -95.98
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.84
+    capex: 5800000.0
+    permit_vel: 30.0
+    shift_ratio: 1.42
+    sla: 56.0
+    description: Historic bungalow neighborhood around Underwood Avenue with renovation-led
+      permitting and tree-canopy service requests.
+    city_id: omaha
+  Aksarben Village:
+    name: Aksarben Village
+    borough: AKSARBEN_VILLAGE
+    lat: 41.249
+    lng: -95.981
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.87
+    capex: 8100000.0
+    permit_vel: 36.0
+    shift_ratio: 1.5
+    sla: 60.0
+    description: Former racetrack redevelopment anchored by the Chromatin riverfront-adjacent
+      office campus, University of Nebraska Omaha expansion, and apartment growth.
+    city_id: omaha
+  North Omaha:
+    name: North Omaha
+    borough: NORTH_OMAHA
+    lat: 41.295
+    lng: -95.96
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.68
+    capex: 3100000.0
+    permit_vel: 20.0
+    shift_ratio: 1.24
+    sla: 44.0
+    description: Historic northside corridor with concentrated disinvestment signals,
+      code-enforcement-heavy 311 demand, and targeted reinvestment along Ames Avenue.
+    city_id: omaha
+  Benson:
+    name: Benson
+    borough: NORTH_OMAHA
+    lat: 41.272
+    lng: -95.996
+    zoom: 14.0
+    pitch: 44.0
+    base_lims: 0.8
+    capex: 4600000.0
+    permit_vel: 28.0
+    shift_ratio: 1.38
+    sla: 52.0
+    description: Music-venue and brewery commercial node on Maple Street with older
+      housing stock and active neighborhood-association permit engagement.
+    city_id: omaha
+  South Omaha:
+    name: South Omaha
+    borough: SOUTH_OMAHA
+    lat: 41.22
+    lng: -95.935
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.72
+    capex: 3900000.0
+    permit_vel: 24.0
+    shift_ratio: 1.3
+    sla: 48.0
+    description: Stockyards-heritage Latino commercial district around 24th Street
+      with owner-occupied infill and high trash/dumping 311 volume.
+    city_id: omaha
+  West Omaha:
+    name: West Omaha
+    borough: WEST_MILLARD
+    lat: 41.271
+    lng: -96.17
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.9
+    capex: 9400000.0
+    permit_vel: 42.0
+    shift_ratio: 1.55
+    sla: 64.0
+    description: Employment and retail belt along Dodge Street toward 180th with the
+      metro's newest single-family stock and highest permit velocity.
+    city_id: omaha
+  Millard:
+    name: Millard
+    borough: WEST_MILLARD
+    lat: 41.229
+    lng: -96.123
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.86
+    capex: 7000000.0
+    permit_vel: 32.0
+    shift_ratio: 1.46
+    sla: 58.0
+    description: Annexed southwest suburban grid with school-driven residential growth,
+      teardown-rebuild lots, and storm-drain 311 clusters.
+    city_id: omaha
+divisions:
+  DOWNTOWN_OLD_MARKET:
+    name: DOWNTOWN_OLD_MARKET
+    center_lat: 41.258
+    center_lng: -95.937
+    zoom: 14.5
+    bbox:
+      min_lat: 41.249
+      max_lat: 41.268
+      min_lng: -95.95
+      max_lng: -95.925
+    submarkets:
+    - Downtown & Old Market
+    city_id: omaha
+  MIDTOWN_DUNDEE:
+    name: MIDTOWN_DUNDEE
+    center_lat: 41.262
+    center_lng: -95.974
+    zoom: 14.0
+    bbox:
+      min_lat: 41.25
+      max_lat: 41.274
+      min_lng: -95.992
+      max_lng: -95.958
+    submarkets:
+    - Midtown Crossing
+    - Dundee
+    city_id: omaha
+  AKSARBEN_VILLAGE:
+    name: AKSARBEN_VILLAGE
+    center_lat: 41.249
+    center_lng: -95.981
+    zoom: 14.0
+    bbox:
+      min_lat: 41.242
+      max_lat: 41.256
+      min_lng: -95.992
+      max_lng: -95.972
+    submarkets:
+    - Aksarben Village
+    city_id: omaha
+  NORTH_OMAHA:
+    name: NORTH_OMAHA
+    center_lat: 41.284
+    center_lng: -95.975
+    zoom: 12.5
+    bbox:
+      min_lat: 41.262
+      max_lat: 41.33
+      min_lng: -96.01
+      max_lng: -95.938
+    submarkets:
+    - North Omaha
+    - Benson
+    city_id: omaha
+  SOUTH_OMAHA:
+    name: SOUTH_OMAHA
+    center_lat: 41.22
+    center_lng: -95.935
+    zoom: 13.0
+    bbox:
+      min_lat: 41.2
+      max_lat: 41.248
+      min_lng: -95.95
+      max_lng: -95.918
+    submarkets:
+    - South Omaha
+    city_id: omaha
+  WEST_MILLARD:
+    name: WEST_MILLARD
+    center_lat: 41.25
+    center_lng: -96.145
+    zoom: 12.0
+    bbox:
+      min_lat: 41.205
+      max_lat: 41.29
+      min_lng: -96.24
+      max_lng: -96.08
+    submarkets:
+    - West Omaha
+    - Millard
+    city_id: omaha
+datasets:
+  '311':
+    endpoint: https://dcgis.org/server/rest/services/Cityworks/Mayors_Hotline_Dashboard_Interactive/MapServer/0
+    platform: arcgis
+    watermark_col: DATETIMEINIT
+    id_keys:
+    - OBJECTID
+    - REQUESTID
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: DATETIMEINIT DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Omaha, NE
+    field_map:
+      incident_id:
+      - OBJECTID
+      - REQUESTID
+      complaint_type:
+      - PROBLEMCODE
+      - REQCATEGORY
+      created_date:
+      - DATETIMEINIT
+      closed_date:
+      - DATETIMECLOSED
+      status:
+      - STATUS
+      incident_address:
+      - PROBADDRESS
+      descriptor:
+      - DESCRIPTION
+      - DETAILS
+      - PROBLEMCODE
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'NE'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- omaha_ne
+- omaha-ne
+- omaha ne
+- oma
+job_suffix: omaha

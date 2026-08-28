@@ -1,0 +1,1230 @@
+city_id: san_francisco
+name: San Francisco Bay Area
+state: CA
+center:
+  lat: 37.7749
+  lng: -122.4194
+metro_bbox:
+  min_lat: 37.15
+  max_lat: 38.1
+  min_lng: -122.65
+  max_lng: -121.75
+division_bboxes:
+  SAN_FRANCISCO_CORE:
+    min_lat: 37.7
+    max_lat: 37.835
+    min_lng: -122.525
+    max_lng: -122.355
+  EAST_BAY:
+    min_lat: 37.45
+    max_lat: 38.05
+    min_lng: -122.4
+    max_lng: -121.75
+  PENINSULA:
+    min_lat: 37.42
+    max_lat: 37.7
+    min_lng: -122.52
+    max_lng: -122.18
+  SILICON_VALLEY_SOUTH_BAY:
+    min_lat: 37.15
+    max_lat: 37.46
+    min_lng: -122.2
+    max_lng: -121.75
+  MARIN_NORTH_BAY:
+    min_lat: 37.835
+    max_lat: 38.1
+    min_lng: -122.65
+    max_lng: -122.4
+submarkets:
+  Downtown:
+    name: Downtown
+    borough: SAN_FRANCISCO_CORE
+    lat: 37.7879
+    lng: -122.4074
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.88
+    capex: 12500000.0
+    permit_vel: 52.0
+    shift_ratio: 1.5
+    sla: 60.0
+    description: San Francisco central retail and commercial corridor anchored by
+      Union Square, Market Street transit, and high-density hotel flagships.
+    city_id: san_francisco
+  SoMa:
+    name: SoMa
+    borough: SAN_FRANCISCO_CORE
+    lat: 37.7785
+    lng: -122.395
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.92
+    capex: 14000000.0
+    permit_vel: 64.0
+    shift_ratio: 1.68
+    sla: 70.0
+    description: South of Market tech campus core and cultural anchor with high-density
+      residential towers, Moscone Center, and adaptive warehouse conversions.
+    city_id: san_francisco
+  Financial District:
+    name: Financial District
+    borough: SAN_FRANCISCO_CORE
+    lat: 37.7946
+    lng: -122.4
+    zoom: 14.5
+    pitch: 60.0
+    base_lims: 0.9
+    capex: 15000000.0
+    permit_vel: 48.0
+    shift_ratio: 1.58
+    sla: 55.0
+    description: West Coast banking capital and high-rise commercial hub featuring
+      the Transamerica Pyramid, Salesforce Tower, and premium office towers.
+    city_id: san_francisco
+  Mission:
+    name: Mission
+    borough: SAN_FRANCISCO_CORE
+    lat: 37.7599
+    lng: -122.4148
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.89
+    capex: 8800000.0
+    permit_vel: 56.0
+    shift_ratio: 1.55
+    sla: 78.0
+    description: Historic cultural and culinary corridor centered on Valencia and
+      Mission streets with vibrant murals, Michelin-starred dining, and transit access.
+    city_id: san_francisco
+  Hayes Valley:
+    name: Hayes Valley
+    borough: SAN_FRANCISCO_CORE
+    lat: 37.7758
+    lng: -122.4245
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.87
+    capex: 7800000.0
+    permit_vel: 44.0
+    shift_ratio: 1.42
+    sla: 68.0
+    description: Boutique shopping and arts enclave adjacent to the Civic Center performing
+      arts complex with high pedestrian activity and designer retail.
+    city_id: san_francisco
+  Marina:
+    name: Marina
+    borough: SAN_FRANCISCO_CORE
+    lat: 37.8037
+    lng: -122.4368
+    zoom: 14.5
+    pitch: 40.0
+    base_lims: 0.86
+    capex: 8200000.0
+    permit_vel: 38.0
+    shift_ratio: 1.36
+    sla: 72.0
+    description: Scenic bayfront district featuring Mediterranean-style architecture,
+      Chestnut Street shopping, Palace of Fine Arts, and Marina Green parkland.
+    city_id: san_francisco
+  Mission Bay:
+    name: Mission Bay
+    borough: SAN_FRANCISCO_CORE
+    lat: 37.771
+    lng: -122.3912
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.94
+    capex: 13500000.0
+    permit_vel: 68.0
+    shift_ratio: 1.72
+    sla: 62.0
+    description: Master-planned life sciences and healthcare district anchored by
+      UCSF Mission Bay medical campus and the Golden State Warriors Chase Center.
+    city_id: san_francisco
+  Dogpatch:
+    name: Dogpatch
+    borough: SAN_FRANCISCO_CORE
+    lat: 37.7587
+    lng: -122.3876
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.84
+    capex: 8000000.0
+    permit_vel: 50.0
+    shift_ratio: 1.46
+    sla: 58.0
+    description: Historic maritime and industrial neighborhood along Third Street
+      transformed into an artisanal manufacturing, brewery, and contemporary loft
+      district.
+    city_id: san_francisco
+  Potrero Hill:
+    name: Potrero Hill
+    borough: SAN_FRANCISCO_CORE
+    lat: 37.758
+    lng: -122.4005
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.83
+    capex: 7500000.0
+    permit_vel: 42.0
+    shift_ratio: 1.38
+    sla: 50.0
+    description: Sunny residential neighborhood with dramatic skyline vistas, 18th
+      Street village retail, and design showroom conversions.
+    city_id: san_francisco
+  North Beach:
+    name: North Beach
+    borough: SAN_FRANCISCO_CORE
+    lat: 37.8005
+    lng: -122.4098
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.85
+    capex: 7900000.0
+    permit_vel: 36.0
+    shift_ratio: 1.34
+    sla: 82.0
+    description: San Francisco's historic Little Italy and Beat Generation enclave
+      along Columbus Avenue with dense trattorias, cafes, and historic nightlife.
+    city_id: san_francisco
+  Pacific Heights:
+    name: Pacific Heights
+    borough: SAN_FRANCISCO_CORE
+    lat: 37.7925
+    lng: -122.4352
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.91
+    capex: 11500000.0
+    permit_vel: 32.0
+    shift_ratio: 1.28
+    sla: 52.0
+    description: Prestigious hilltop enclave known for Billionaire's Row mansions,
+      Fillmore Street upscale retail, and sweeping views of the Golden Gate.
+    city_id: san_francisco
+  Castro:
+    name: Castro
+    borough: SAN_FRANCISCO_CORE
+    lat: 37.7609
+    lng: -122.435
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.85
+    capex: 7600000.0
+    permit_vel: 46.0
+    shift_ratio: 1.4
+    sla: 76.0
+    description: World-renowned historic LGBTQ+ cultural capital centered on Castro
+      and 18th streets with iconic Victorian architecture and active retail corridors.
+    city_id: san_francisco
+  Sunset:
+    name: Sunset
+    borough: SAN_FRANCISCO_CORE
+    lat: 37.7535
+    lng: -122.483
+    zoom: 13.5
+    pitch: 35.0
+    base_lims: 0.78
+    capex: 5400000.0
+    permit_vel: 34.0
+    shift_ratio: 1.22
+    sla: 40.0
+    description: Expansive coastal residential district bordered by Golden Gate Park
+      and Ocean Beach with vibrant commercial spines on Irving, Judah, and Noriega.
+    city_id: san_francisco
+  Richmond:
+    name: Richmond
+    borough: SAN_FRANCISCO_CORE
+    lat: 37.7795
+    lng: -122.474
+    zoom: 13.5
+    pitch: 35.0
+    base_lims: 0.79
+    capex: 5600000.0
+    permit_vel: 35.0
+    shift_ratio: 1.24
+    sla: 46.0
+    description: Northwest residential district along Clement and Geary boulevards
+      featuring exceptional culinary diversity, park access, and multi-family infill.
+    city_id: san_francisco
+  Nob Hill:
+    name: Nob Hill
+    borough: SAN_FRANCISCO_CORE
+    lat: 37.792
+    lng: -122.415
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.88
+    capex: 9200000.0
+    permit_vel: 37.0
+    shift_ratio: 1.35
+    sla: 64.0
+    description: Historic luxury hilltop neighborhood crowned by landmark hotels (Fairmont,
+      Mark Hopkins), Grace Cathedral, and historic cable car lines.
+    city_id: san_francisco
+  Tenderloin:
+    name: Tenderloin
+    borough: SAN_FRANCISCO_CORE
+    lat: 37.7833
+    lng: -122.4167
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.72
+    capex: 4600000.0
+    permit_vel: 49.0
+    shift_ratio: 1.38
+    sla: 54.0
+    description: Historic central district featuring dense SRO and apartment stock,
+      Little Saigon culinary spine, and emerging arts venues.
+    city_id: san_francisco
+  Presidio:
+    name: Presidio
+    borough: SAN_FRANCISCO_CORE
+    lat: 37.7989
+    lng: -122.4662
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.82
+    capex: 6800000.0
+    permit_vel: 25.0
+    shift_ratio: 1.2
+    sla: 35.0
+    description: Former military garrison turned iconic national parkland with historic
+      officer quarters, Lucasfilm campus, and Presidio Tunnel Tops.
+    city_id: san_francisco
+  Downtown Oakland:
+    name: Downtown Oakland
+    borough: EAST_BAY
+    lat: 37.8044
+    lng: -122.2711
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.86
+    capex: 9800000.0
+    permit_vel: 58.0
+    shift_ratio: 1.56
+    sla: 62.0
+    description: Civic and commercial heart of the East Bay centered around City Center,
+      BART transit hub, and major residential high-rises.
+    city_id: san_francisco
+  Uptown Oakland:
+    name: Uptown Oakland
+    borough: EAST_BAY
+    lat: 37.8105
+    lng: -122.2685
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.88
+    capex: 9400000.0
+    permit_vel: 60.0
+    shift_ratio: 1.6
+    sla: 76.0
+    description: Premier entertainment and arts district featuring the Fox and Paramount
+      Theatres, Telegraph Avenue dining, and creative headquarters.
+    city_id: san_francisco
+  Jack London Square:
+    name: Jack London Square
+    borough: EAST_BAY
+    lat: 37.7946
+    lng: -122.2764
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.82
+    capex: 7800000.0
+    permit_vel: 45.0
+    shift_ratio: 1.42
+    sla: 58.0
+    description: Historic waterfront dining, ferry terminal, and logistics-adjacent
+      development corridor along the Oakland Estuary.
+    city_id: san_francisco
+  Berkeley Downtown:
+    name: Berkeley Downtown
+    borough: EAST_BAY
+    lat: 37.8703
+    lng: -122.2681
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.87
+    capex: 8900000.0
+    permit_vel: 52.0
+    shift_ratio: 1.48
+    sla: 56.0
+    description: UC Berkeley gateway and transit center with Shattuck Avenue retail,
+      Berkeley Rep arts anchors, and dense student housing development.
+    city_id: san_francisco
+  West Berkeley:
+    name: West Berkeley
+    borough: EAST_BAY
+    lat: 37.868
+    lng: -122.298
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.81
+    capex: 6900000.0
+    permit_vel: 44.0
+    shift_ratio: 1.38
+    sla: 48.0
+    description: Artisanal, biotech, and retail corridor along Fourth Street with
+      light industrial conversions and innovative makerspaces.
+    city_id: san_francisco
+  Rockridge:
+    name: Rockridge
+    borough: EAST_BAY
+    lat: 37.8444
+    lng: -122.2518
+    zoom: 14.5
+    pitch: 40.0
+    base_lims: 0.85
+    capex: 7200000.0
+    permit_vel: 34.0
+    shift_ratio: 1.3
+    sla: 52.0
+    description: Affluent North Oakland neighborhood along College Avenue featuring
+      gourmet dining, bookstore boutiques, and BART transit connectivity.
+    city_id: san_francisco
+  Temescal:
+    name: Temescal
+    borough: EAST_BAY
+    lat: 37.8347
+    lng: -122.2638
+    zoom: 14.5
+    pitch: 40.0
+    base_lims: 0.83
+    capex: 6700000.0
+    permit_vel: 48.0
+    shift_ratio: 1.44
+    sla: 64.0
+    description: Trendy culinary corridor along Telegraph Avenue featuring Temescal
+      Alleys, artisanal food scene, and transit-oriented infill.
+    city_id: san_francisco
+  Emeryville:
+    name: Emeryville
+    borough: EAST_BAY
+    lat: 37.8313
+    lng: -122.2852
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.85
+    capex: 9100000.0
+    permit_vel: 55.0
+    shift_ratio: 1.52
+    sla: 54.0
+    description: Biotech, animation (Pixar), and major retail center between Oakland
+      and Berkeley with high-density mixed-use development.
+    city_id: san_francisco
+  Alameda:
+    name: Alameda
+    borough: EAST_BAY
+    lat: 37.7652
+    lng: -122.2416
+    zoom: 13.5
+    pitch: 35.0
+    base_lims: 0.8
+    capex: 6200000.0
+    permit_vel: 36.0
+    shift_ratio: 1.28
+    sla: 44.0
+    description: Island city community known for Victorian architecture, historic
+      Park and Webster street retail, and Alameda Point waterfront reuse.
+    city_id: san_francisco
+  Fremont Downtown:
+    name: Fremont Downtown
+    borough: EAST_BAY
+    lat: 37.5485
+    lng: -121.9886
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.85
+    capex: 8500000.0
+    permit_vel: 45.0
+    shift_ratio: 1.4
+    sla: 52.0
+    description: Major East Bay tech manufacturing and residential hub centered around
+      Capitol Avenue, BART, and Tesla Gigafactory corridor.
+    city_id: san_francisco
+  Hayward Downtown:
+    name: Hayward Downtown
+    borough: EAST_BAY
+    lat: 37.6688
+    lng: -122.0808
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.79
+    capex: 6100000.0
+    permit_vel: 38.0
+    shift_ratio: 1.3
+    sla: 42.0
+    description: Central East Bay transit corridor featuring historic B Street revitalization,
+      Cal State East Bay connectivity, and mixed-use housing.
+    city_id: san_francisco
+  San Leandro Downtown:
+    name: San Leandro Downtown
+    borough: EAST_BAY
+    lat: 37.7249
+    lng: -122.1561
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.8
+    capex: 6400000.0
+    permit_vel: 40.0
+    shift_ratio: 1.32
+    sla: 46.0
+    description: Tech campus and 3D printing/industrial tech center along East 14th
+      Street with TOD development near BART.
+    city_id: san_francisco
+  Richmond CA:
+    name: Richmond CA
+    borough: EAST_BAY
+    lat: 37.9358
+    lng: -122.3477
+    zoom: 13.5
+    pitch: 35.0
+    base_lims: 0.76
+    capex: 5400000.0
+    permit_vel: 37.0
+    shift_ratio: 1.27
+    sla: 40.0
+    description: North Bay / East Bay gateway featuring Macdonald Avenue revitalization,
+      Richmond Ferry Terminal, and waterfront industrial reuse.
+    city_id: san_francisco
+  Walnut Creek Downtown:
+    name: Walnut Creek Downtown
+    borough: EAST_BAY
+    lat: 37.9101
+    lng: -122.0652
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.88
+    capex: 9200000.0
+    permit_vel: 46.0
+    shift_ratio: 1.45
+    sla: 58.0
+    description: Premier Contra Costa commercial and luxury shopping destination anchored
+      by Broadway Plaza, high-density residential, and BART.
+    city_id: san_francisco
+  Concord Downtown:
+    name: Concord Downtown
+    borough: EAST_BAY
+    lat: 37.978
+    lng: -122.0311
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.81
+    capex: 6700000.0
+    permit_vel: 42.0
+    shift_ratio: 1.34
+    sla: 48.0
+    description: Todos Santos Plaza dining and community core with major BART connectivity
+      and regional transit-oriented infill.
+    city_id: san_francisco
+  Pleasanton Downtown:
+    name: Pleasanton Downtown
+    borough: EAST_BAY
+    lat: 37.6624
+    lng: -121.8747
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.87
+    capex: 8800000.0
+    permit_vel: 44.0
+    shift_ratio: 1.42
+    sla: 54.0
+    description: Historic Main Street Tri-Valley enclave and Hacienda Business Park
+      corporate campus anchor with affluent demographics.
+    city_id: san_francisco
+  Dublin Downtown:
+    name: Dublin Downtown
+    borough: EAST_BAY
+    lat: 37.7021
+    lng: -121.9358
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.86
+    capex: 8400000.0
+    permit_vel: 50.0
+    shift_ratio: 1.48
+    sla: 56.0
+    description: Rapidly expanding Tri-Valley commercial core at the I-580/I-680 junction
+      with modern master-planned residential communities.
+    city_id: san_francisco
+  Livermore Downtown:
+    name: Livermore Downtown
+    borough: EAST_BAY
+    lat: 37.6819
+    lng: -121.768
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.83
+    capex: 7200000.0
+    permit_vel: 41.0
+    shift_ratio: 1.36
+    sla: 50.0
+    description: Eastern Tri-Valley wine country and national laboratory (LLNL) technology
+      anchor featuring a vibrant First Street cultural corridor.
+    city_id: san_francisco
+  San Mateo Downtown:
+    name: San Mateo Downtown
+    borough: PENINSULA
+    lat: 37.563
+    lng: -122.3255
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.86
+    capex: 8600000.0
+    permit_vel: 46.0
+    shift_ratio: 1.42
+    sla: 56.0
+    description: Vibrant Peninsula dining hub centered on 3rd and 4th avenues with
+      Central Park, Caltrain station, and tech office infill.
+    city_id: san_francisco
+  Burlingame Ave:
+    name: Burlingame Ave
+    borough: PENINSULA
+    lat: 37.5779
+    lng: -122.3481
+    zoom: 14.5
+    pitch: 40.0
+    base_lims: 0.88
+    capex: 8400000.0
+    permit_vel: 38.0
+    shift_ratio: 1.34
+    sla: 54.0
+    description: Upscale Peninsula retail and dining corridor known for tree-lined
+      streetscapes, luxury boutiques, and affluent demographics.
+    city_id: san_francisco
+  Redwood City Downtown:
+    name: Redwood City Downtown
+    borough: PENINSULA
+    lat: 37.4852
+    lng: -122.2281
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.87
+    capex: 9500000.0
+    permit_vel: 54.0
+    shift_ratio: 1.54
+    sla: 60.0
+    description: '''Climate Best by Government Test'' county seat experiencing significant
+      downtown tech office expansion and transit-oriented housing.'
+    city_id: san_francisco
+  Menlo Park:
+    name: Menlo Park
+    borough: PENINSULA
+    lat: 37.4538
+    lng: -122.1822
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.91
+    capex: 11200000.0
+    permit_vel: 40.0
+    shift_ratio: 1.45
+    sla: 48.0
+    description: Venture capital capital on Sand Hill Road with Santa Cruz Avenue
+      downtown retail and Meta global headquarters.
+    city_id: san_francisco
+  South San Francisco:
+    name: South San Francisco
+    borough: PENINSULA
+    lat: 37.6547
+    lng: -122.4077
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.89
+    capex: 12800000.0
+    permit_vel: 62.0
+    shift_ratio: 1.65
+    sla: 50.0
+    description: '''The Birthplace of Biotechnology'' featuring the world''s premier
+      life sciences cluster around Oyster Point and Grand Avenue downtown.'
+    city_id: san_francisco
+  Daly City:
+    name: Daly City
+    borough: PENINSULA
+    lat: 37.6879
+    lng: -122.4702
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.81
+    capex: 6800000.0
+    permit_vel: 42.0
+    shift_ratio: 1.3
+    sla: 44.0
+    description: '''Gateway to the Peninsula'' with Westlake Shopping Center, major
+      BART transit hub, and dense multi-family residential communities.'
+    city_id: san_francisco
+  San Bruno:
+    name: San Bruno
+    borough: PENINSULA
+    lat: 37.6305
+    lng: -122.4111
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.84
+    capex: 7600000.0
+    permit_vel: 46.0
+    shift_ratio: 1.38
+    sla: 48.0
+    description: YouTube global headquarters campus and San Mateo Avenue commercial
+      district adjacent to SFO International Airport.
+    city_id: san_francisco
+  Palo Alto University Ave:
+    name: Palo Alto University Ave
+    borough: SILICON_VALLEY_SOUTH_BAY
+    lat: 37.4444
+    lng: -122.1609
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.95
+    capex: 13200000.0
+    permit_vel: 42.0
+    shift_ratio: 1.52
+    sla: 62.0
+    description: Stanford University commercial anchor and global startup epicenter
+      with prestigious University Avenue dining and tech office presence.
+    city_id: san_francisco
+  Mountain View Castro St:
+    name: Mountain View Castro St
+    borough: SILICON_VALLEY_SOUTH_BAY
+    lat: 37.391
+    lng: -122.0808
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.92
+    capex: 11800000.0
+    permit_vel: 50.0
+    shift_ratio: 1.58
+    sla: 66.0
+    description: Castro Street dining corridor and Caltrain/VTA transit hub anchored
+      by Googleplex and surrounding tech innovation hubs.
+    city_id: san_francisco
+  Sunnyvale Downtown:
+    name: Sunnyvale Downtown
+    borough: SILICON_VALLEY_SOUTH_BAY
+    lat: 37.377
+    lng: -122.03
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.89
+    capex: 10500000.0
+    permit_vel: 54.0
+    shift_ratio: 1.5
+    sla: 58.0
+    description: Historic Murphy Avenue and modern CityLine town center development
+      in the heart of Silicon Valley defense and aerospace/tech corridor.
+    city_id: san_francisco
+  Downtown San Jose:
+    name: Downtown San Jose
+    borough: SILICON_VALLEY_SOUTH_BAY
+    lat: 37.3382
+    lng: -121.8863
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.88
+    capex: 11000000.0
+    permit_vel: 59.0
+    shift_ratio: 1.57
+    sla: 68.0
+    description: Capital of Silicon Valley featuring San Pedro Square Market, Adobe
+      headquarters towers, SAP Center, and major high-rise housing.
+    city_id: san_francisco
+  Santana Row:
+    name: Santana Row
+    borough: SILICON_VALLEY_SOUTH_BAY
+    lat: 37.3216
+    lng: -121.9478
+    zoom: 15.0
+    pitch: 50.0
+    base_lims: 0.93
+    capex: 12000000.0
+    permit_vel: 48.0
+    shift_ratio: 1.62
+    sla: 75.0
+    description: Premier European-style luxury lifestyle district combining flagship
+      luxury retail, fine dining, Class A creative office, and residential lofts.
+    city_id: san_francisco
+  Cupertino:
+    name: Cupertino
+    borough: SILICON_VALLEY_SOUTH_BAY
+    lat: 37.323
+    lng: -122.0322
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.91
+    capex: 10800000.0
+    permit_vel: 36.0
+    shift_ratio: 1.4
+    sla: 50.0
+    description: Global headquarters of Apple Inc. featuring Apple Park, Main Street
+      Cupertino mixed-use core, and top-tier educational institutions.
+    city_id: san_francisco
+  Santa Clara:
+    name: Santa Clara
+    borough: SILICON_VALLEY_SOUTH_BAY
+    lat: 37.3541
+    lng: -121.9552
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.9
+    capex: 11400000.0
+    permit_vel: 52.0
+    shift_ratio: 1.52
+    sla: 60.0
+    description: Silicon Valley technology powerhouse anchored by Intel headquarters,
+      Nvidia campus, Santa Clara University, and Levi's Stadium corridor.
+    city_id: san_francisco
+  North San Jose:
+    name: North San Jose
+    borough: SILICON_VALLEY_SOUTH_BAY
+    lat: 37.3888
+    lng: -121.9214
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.87
+    capex: 10200000.0
+    permit_vel: 55.0
+    shift_ratio: 1.5
+    sla: 58.0
+    description: Major technology innovation corridor along North First Street featuring
+      Cisco headquarters, major R&D campuses, and VTA transit.
+    city_id: san_francisco
+  Sausalito:
+    name: Sausalito
+    borough: MARIN_NORTH_BAY
+    lat: 37.859
+    lng: -122.4853
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.86
+    capex: 7900000.0
+    permit_vel: 28.0
+    shift_ratio: 1.3
+    sla: 65.0
+    description: Picturesque waterfront town across the Golden Gate with Bridgeway
+      promenade shopping, ferry connectivity, and historic houseboat enclaves.
+    city_id: san_francisco
+  Mill Valley:
+    name: Mill Valley
+    borough: MARIN_NORTH_BAY
+    lat: 37.906
+    lng: -122.545
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.87
+    capex: 7500000.0
+    permit_vel: 26.0
+    shift_ratio: 1.26
+    sla: 52.0
+    description: Redwood-canopied enclave at the base of Mount Tamalpais with historic
+      downtown plaza, boutique retail, and outdoor recreation access.
+    city_id: san_francisco
+  San Rafael Downtown:
+    name: San Rafael Downtown
+    borough: MARIN_NORTH_BAY
+    lat: 37.9735
+    lng: -122.5311
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.8
+    capex: 6400000.0
+    permit_vel: 39.0
+    shift_ratio: 1.32
+    sla: 48.0
+    description: Marin County's economic and transit center along Fourth Street with
+      SMART rail station, cultural district, and bio/gaming development.
+    city_id: san_francisco
+  Corte Madera:
+    name: Corte Madera
+    borough: MARIN_NORTH_BAY
+    lat: 37.9256
+    lng: -122.5275
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.82
+    capex: 6600000.0
+    permit_vel: 31.0
+    shift_ratio: 1.28
+    sla: 44.0
+    description: North Bay retail powerhouse featuring The Village at Corte Madera
+      and Town Center shopping centers with marshland preservation.
+    city_id: san_francisco
+divisions:
+  SAN_FRANCISCO_CORE:
+    name: SAN_FRANCISCO_CORE
+    center_lat: 37.7749
+    center_lng: -122.4194
+    zoom: 12.5
+    bbox:
+      min_lat: 37.7
+      max_lat: 37.835
+      min_lng: -122.525
+      max_lng: -122.355
+    submarkets:
+    - Downtown
+    - SoMa
+    - Financial District
+    - Mission
+    - Hayes Valley
+    - Marina
+    - Mission Bay
+    - Dogpatch
+    - Potrero Hill
+    - North Beach
+    - Pacific Heights
+    - Castro
+    - Sunset
+    - Richmond
+    - Nob Hill
+    - Tenderloin
+    - Presidio
+    city_id: san_francisco
+  EAST_BAY:
+    name: EAST_BAY
+    center_lat: 37.8044
+    center_lng: -122.2711
+    zoom: 12.0
+    bbox:
+      min_lat: 37.45
+      max_lat: 38.05
+      min_lng: -122.4
+      max_lng: -121.75
+    submarkets:
+    - Downtown Oakland
+    - Uptown Oakland
+    - Jack London Square
+    - Berkeley Downtown
+    - West Berkeley
+    - Rockridge
+    - Temescal
+    - Emeryville
+    - Alameda
+    - Fremont Downtown
+    - Hayward Downtown
+    - San Leandro Downtown
+    - Richmond CA
+    - Walnut Creek Downtown
+    - Concord Downtown
+    - Pleasanton Downtown
+    - Dublin Downtown
+    - Livermore Downtown
+    city_id: san_francisco
+  PENINSULA:
+    name: PENINSULA
+    center_lat: 37.5485
+    center_lng: -122.315
+    zoom: 11.5
+    bbox:
+      min_lat: 37.42
+      max_lat: 37.7
+      min_lng: -122.52
+      max_lng: -122.18
+    submarkets:
+    - San Mateo Downtown
+    - Burlingame Ave
+    - Redwood City Downtown
+    - Menlo Park
+    - South San Francisco
+    - Daly City
+    - San Bruno
+    city_id: san_francisco
+  SILICON_VALLEY_SOUTH_BAY:
+    name: SILICON_VALLEY_SOUTH_BAY
+    center_lat: 37.3688
+    center_lng: -122.0363
+    zoom: 11.5
+    bbox:
+      min_lat: 37.15
+      max_lat: 37.46
+      min_lng: -122.2
+      max_lng: -121.75
+    submarkets:
+    - Palo Alto University Ave
+    - Mountain View Castro St
+    - Sunnyvale Downtown
+    - Downtown San Jose
+    - Santana Row
+    - Cupertino
+    - Santa Clara
+    - North San Jose
+    city_id: san_francisco
+  MARIN_NORTH_BAY:
+    name: MARIN_NORTH_BAY
+    center_lat: 37.915
+    center_lng: -122.518
+    zoom: 11.5
+    bbox:
+      min_lat: 37.835
+      max_lat: 38.1
+      min_lng: -122.65
+      max_lng: -122.4
+    submarkets:
+    - Sausalito
+    - Mill Valley
+    - San Rafael Downtown
+    - Corte Madera
+    city_id: san_francisco
+datasets:
+  permits:
+    endpoint: https://data.sfgov.org/resource/i98e-djp9.json
+    platform: socrata
+    watermark_col: issued_date
+    id_keys:
+    - permit_number
+    - id
+    - application_number
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map: {}
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: https://data.sfgov.org/resource/vw6y-z8j6.json
+    platform: socrata
+    watermark_col: requested_datetime
+    id_keys:
+    - service_request_id
+    - id
+    - unique_key
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map: {}
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://data.sfgov.org/resource/g8m3-pdis.json
+    platform: socrata
+    watermark_col: location_start_date
+    id_keys:
+    - location_id
+    - certificate_number
+    - id
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map: {}
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  deeds:
+    endpoint: https://data.sfgov.org/resource/wv5m-vpq2.json
+    platform: socrata
+    watermark_col: data_loaded_at
+    id_keys:
+    - parcel_number
+    - block_and_lot_number
+    - id
+    - doc_id
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map: {}
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: true
+    alarm_exempt_reason: "SUSPECTED STALL \u2014 frozen since 2026-06-26, no replacement\
+      \ (US-164)"
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  crime:
+    endpoint: https://data.sfgov.org/resource/wg3w-h783.json
+    platform: socrata
+    watermark_col: incident_datetime
+    id_keys:
+    - incident_number
+    - row_id
+    topic: raw.municipal.crime
+    interval_seconds: 1800.0
+    producer_key: crime
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map: {}
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  gbfs:
+    endpoint: https://gbfs.lyft.com/gbfs/2.3/bay/gbfs.json
+    platform: gbfs
+    watermark_col: ''
+    id_keys:
+    - station_id
+    - system_id
+    topic: raw.mobility.station_change
+    interval_seconds: 3600.0
+    producer_key: gbfs
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map: {}
+    ingestion_mode: snapshot
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints:
+      system_id: bay
+      operator: lyft
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- san-francisco
+- san francisco
+- sf
+- bay_area
+- bay-area
+- bay area
+- sf_bay_area
+- sf-bay-area
+- sf bay area
+job_suffix: sf

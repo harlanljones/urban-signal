@@ -2,10 +2,9 @@
 
 import pytest
 
+from src.spatial import city_data, registry_derivation
 from src.spatial.city_data import aliases_from_definitions, build_registration, validate_definition
 from src.spatial.city_registry import CityId, FeedType
-from src.spatial import registry_derivation
-
 
 DEMO = {
     "city_id": "nyc",
@@ -54,6 +53,34 @@ def test_registry_factory_accepts_a_demo_city_without_city_registry_edits():
     )
     assert set(registry) == {CityId.CHICAGO}
     assert registry[CityId.CHICAGO].datasets[FeedType.PERMITS].producer_key == "permits"
+
+
+def test_registry_factory_rejects_unsupported_city_as_one_atomic_build():
+    unsupported = {**DEMO, "city_id": "atlantis", "aliases": []}
+
+    with pytest.raises(ValueError, match="unknown city_id"):
+        registry_derivation.build_registry_from_data([DEMO, unsupported])
+
+
+def test_data_only_runtime_falls_back_when_any_city_id_is_unsupported(monkeypatch):
+    unsupported = {**DEMO, "city_id": "atlantis", "aliases": []}
+    monkeypatch.setattr(city_data, "load_definitions", lambda directory: [DEMO, unsupported])
+
+    assert registry_derivation.build_runtime_exports() is None
+
+
+def test_unknown_feed_keys_remain_string_compatible():
+    definition = {**DEMO, "datasets": {"new_signal": DEMO["datasets"]["permits"]}}
+
+    registration = build_registration(
+        definition,
+        city_id_type=CityId,
+        feed_type=FeedType,
+    )
+
+    feed = next(iter(registration.datasets))
+    assert feed == "new_signal"
+    assert feed.value == "new_signal"
 
 
 def test_aliases_are_normalized_and_collisions_are_rejected():

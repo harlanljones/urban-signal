@@ -1,0 +1,542 @@
+city_id: albuquerque
+name: Albuquerque / Bernalillo County
+state: NM
+center:
+  lat: 35.0844
+  lng: -106.6504
+metro_bbox:
+  min_lat: 34.94
+  max_lat: 35.22
+  min_lng: -106.85
+  max_lng: -106.47
+division_bboxes:
+  DOWNTOWN_CORE:
+    min_lat: 35.06
+    max_lat: 35.12
+    min_lng: -106.7
+    max_lng: -106.62
+  NOB_HILL_UNM:
+    min_lat: 35.06
+    max_lat: 35.11
+    min_lng: -106.63
+    max_lng: -106.54
+  NORTHEAST_HEIGHTS:
+    min_lat: 35.09
+    max_lat: 35.18
+    min_lng: -106.6
+    max_lng: -106.48
+  NORTH_VALLEY:
+    min_lat: 35.12
+    max_lat: 35.22
+    min_lng: -106.7
+    max_lng: -106.58
+  WEST_MESA:
+    min_lat: 35.08
+    max_lat: 35.2
+    min_lng: -106.85
+    max_lng: -106.68
+  SOUTH_VALLEY:
+    min_lat: 34.94
+    max_lat: 35.07
+    min_lng: -106.75
+    max_lng: -106.55
+submarkets:
+  Downtown Albuquerque:
+    name: Downtown Albuquerque
+    borough: DOWNTOWN_CORE
+    lat: 35.0844
+    lng: -106.6504
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.88
+    capex: 9200000.0
+    permit_vel: 44.0
+    shift_ratio: 1.52
+    sla: 64.0
+    description: Civic and rail-runner core around Central and 2nd with office-to-residential
+      conversions and the densest issued-permit volume.
+    city_id: albuquerque
+  Old Town:
+    name: Old Town
+    borough: DOWNTOWN_CORE
+    lat: 35.0964
+    lng: -106.6698
+    zoom: 15.0
+    pitch: 50.0
+    base_lims: 0.84
+    capex: 6800000.0
+    permit_vel: 28.0
+    shift_ratio: 1.38
+    sla: 56.0
+    description: Plaza-centered historic adobe stock with renovation-heavy permitting
+      and preservation overlays west of downtown.
+    city_id: albuquerque
+  Barelas:
+    name: Barelas
+    borough: DOWNTOWN_CORE
+    lat: 35.0735
+    lng: -106.6565
+    zoom: 14.5
+    pitch: 48.0
+    base_lims: 0.78
+    capex: 5400000.0
+    permit_vel: 31.0
+    shift_ratio: 1.42
+    sla: 52.0
+    description: South-of-downtown rail and warehouse district with adaptive reuse
+      along 4th Street and the Barelas-South Valley seam.
+    city_id: albuquerque
+  Nob Hill:
+    name: Nob Hill
+    borough: NOB_HILL_UNM
+    lat: 35.0808
+    lng: -106.6056
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.86
+    capex: 7600000.0
+    permit_vel: 38.0
+    shift_ratio: 1.48
+    sla: 60.0
+    description: Route 66 commercial spine east of downtown with storefront renovation,
+      ADU pressure, and the metro's densest street-retail permits.
+    city_id: albuquerque
+  UNM / University:
+    name: UNM / University
+    borough: NOB_HILL_UNM
+    lat: 35.0843
+    lng: -106.6198
+    zoom: 14.5
+    pitch: 48.0
+    base_lims: 0.83
+    capex: 8100000.0
+    permit_vel: 41.0
+    shift_ratio: 1.5
+    sla: 62.0
+    description: Campus-adjacent rental and medical-office stock with student-housing
+      infill and hospital-corridor permitting.
+    city_id: albuquerque
+  International District:
+    name: International District
+    borough: NOB_HILL_UNM
+    lat: 35.071
+    lng: -106.561
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.7
+    capex: 3900000.0
+    permit_vel: 24.0
+    shift_ratio: 1.28
+    sla: 44.0
+    description: Central-east corridor along Zuni and Central with small-lot commercial
+      rehab and high 311-to-permit imbalance.
+    city_id: albuquerque
+  Uptown:
+    name: Uptown
+    borough: NORTHEAST_HEIGHTS
+    lat: 35.104
+    lng: -106.571
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.85
+    capex: 8800000.0
+    permit_vel: 40.0
+    shift_ratio: 1.46
+    sla: 61.0
+    description: Louisiana and I-40 office-retail node with mixed-use tower conversions
+      and the Heights' densest commercial permit pipeline.
+    city_id: albuquerque
+  Far Northeast Heights:
+    name: Far Northeast Heights
+    borough: NORTHEAST_HEIGHTS
+    lat: 35.145
+    lng: -106.525
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.8
+    capex: 6200000.0
+    permit_vel: 33.0
+    shift_ratio: 1.4
+    sla: 55.0
+    description: Post-war tract grid toward the Sandias with teardown/rebuild and
+      ADU permitting on large lots.
+    city_id: albuquerque
+  Foothills:
+    name: Foothills
+    borough: NORTHEAST_HEIGHTS
+    lat: 35.096
+    lng: -106.498
+    zoom: 13.0
+    pitch: 44.0
+    base_lims: 0.87
+    capex: 9400000.0
+    permit_vel: 26.0
+    shift_ratio: 1.36
+    sla: 50.0
+    description: High-value east-edge estate stock under Open Space constraints, dominated
+      by renovation rather than new construction.
+    city_id: albuquerque
+  North Valley:
+    name: North Valley
+    borough: NORTH_VALLEY
+    lat: 35.161
+    lng: -106.642
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.82
+    capex: 7100000.0
+    permit_vel: 32.0
+    shift_ratio: 1.41
+    sla: 54.0
+    description: Acequia-irrigated lots along 4th Street with estate infill, horse-property
+      splits, and Los Ranchos-adjacent permitting.
+    city_id: albuquerque
+  Journal Center:
+    name: Journal Center
+    borough: NORTH_VALLEY
+    lat: 35.148
+    lng: -106.589
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.79
+    capex: 6500000.0
+    permit_vel: 36.0
+    shift_ratio: 1.44
+    sla: 57.0
+    description: I-25 north employment campus with office, industrial, and limited
+      residential conversion permits.
+    city_id: albuquerque
+  Alameda:
+    name: Alameda
+    borough: NORTH_VALLEY
+    lat: 35.192
+    lng: -106.646
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.76
+    capex: 4800000.0
+    permit_vel: 22.0
+    shift_ratio: 1.3
+    sla: 46.0
+    description: Northern city-limit villages along the Rio Grande with sparse permitting
+      and agricultural-lot pressure.
+    city_id: albuquerque
+  West Central / Atrisco:
+    name: West Central / Atrisco
+    borough: WEST_MESA
+    lat: 35.095
+    lng: -106.722
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.74
+    capex: 5100000.0
+    permit_vel: 29.0
+    shift_ratio: 1.35
+    sla: 48.0
+    description: Central Avenue west of the river with corridor commercial rehab and
+      Atrisco-grant residential infill.
+    city_id: albuquerque
+  Taylor Ranch / Petroglyph:
+    name: Taylor Ranch / Petroglyph
+    borough: WEST_MESA
+    lat: 35.158
+    lng: -106.732
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.81
+    capex: 6700000.0
+    permit_vel: 37.0
+    shift_ratio: 1.45
+    sla: 58.0
+    description: Northwest mesa master-planned tracts against Petroglyph National
+      Monument with high single-family permit velocity.
+    city_id: albuquerque
+  Volcano Cliffs:
+    name: Volcano Cliffs
+    borough: WEST_MESA
+    lat: 35.168
+    lng: -106.762
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.77
+    capex: 5800000.0
+    permit_vel: 34.0
+    shift_ratio: 1.43
+    sla: 53.0
+    description: Far-west escarpment growth edge with new-construction permitting
+      on volcanic-mesa lots.
+    city_id: albuquerque
+  South Valley:
+    name: South Valley
+    borough: SOUTH_VALLEY
+    lat: 35.022
+    lng: -106.682
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.72
+    capex: 4300000.0
+    permit_vel: 25.0
+    shift_ratio: 1.32
+    sla: 46.0
+    description: Unincorporated-adjacent south valley with agricultural-lot splits,
+      owner-builder permits, and Isleta-road commercial.
+    city_id: albuquerque
+  Sunport / Airport:
+    name: Sunport / Airport
+    borough: SOUTH_VALLEY
+    lat: 35.041
+    lng: -106.609
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.75
+    capex: 7200000.0
+    permit_vel: 30.0
+    shift_ratio: 1.38
+    sla: 51.0
+    description: Airport and Yale industrial belt with warehouse, hotel, and limited
+      residential permitting south of Gibson.
+    city_id: albuquerque
+  Mesa del Sol:
+    name: Mesa del Sol
+    borough: SOUTH_VALLEY
+    lat: 34.995
+    lng: -106.622
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.8
+    capex: 8600000.0
+    permit_vel: 39.0
+    shift_ratio: 1.47
+    sla: 59.0
+    description: Master-planned south mesa with the city's largest greenfield residential
+      and employment-center pipeline.
+    city_id: albuquerque
+divisions:
+  DOWNTOWN_CORE:
+    name: DOWNTOWN_CORE
+    center_lat: 35.084
+    center_lng: -106.65
+    zoom: 13.5
+    bbox:
+      min_lat: 35.06
+      max_lat: 35.12
+      min_lng: -106.7
+      max_lng: -106.62
+    submarkets:
+    - Downtown Albuquerque
+    - Old Town
+    - Barelas
+    city_id: albuquerque
+  NOB_HILL_UNM:
+    name: NOB_HILL_UNM
+    center_lat: 35.081
+    center_lng: -106.605
+    zoom: 13.0
+    bbox:
+      min_lat: 35.06
+      max_lat: 35.11
+      min_lng: -106.63
+      max_lng: -106.54
+    submarkets:
+    - Nob Hill
+    - UNM / University
+    - International District
+    city_id: albuquerque
+  NORTHEAST_HEIGHTS:
+    name: NORTHEAST_HEIGHTS
+    center_lat: 35.125
+    center_lng: -106.545
+    zoom: 12.5
+    bbox:
+      min_lat: 35.09
+      max_lat: 35.18
+      min_lng: -106.6
+      max_lng: -106.48
+    submarkets:
+    - Uptown
+    - Far Northeast Heights
+    - Foothills
+    city_id: albuquerque
+  NORTH_VALLEY:
+    name: NORTH_VALLEY
+    center_lat: 35.165
+    center_lng: -106.64
+    zoom: 12.5
+    bbox:
+      min_lat: 35.12
+      max_lat: 35.22
+      min_lng: -106.7
+      max_lng: -106.58
+    submarkets:
+    - North Valley
+    - Journal Center
+    - Alameda
+    city_id: albuquerque
+  WEST_MESA:
+    name: WEST_MESA
+    center_lat: 35.14
+    center_lng: -106.745
+    zoom: 12.5
+    bbox:
+      min_lat: 35.08
+      max_lat: 35.2
+      min_lng: -106.85
+      max_lng: -106.68
+    submarkets:
+    - West Central / Atrisco
+    - Taylor Ranch / Petroglyph
+    - Volcano Cliffs
+    city_id: albuquerque
+  SOUTH_VALLEY:
+    name: SOUTH_VALLEY
+    center_lat: 35.02
+    center_lng: -106.64
+    zoom: 12.0
+    bbox:
+      min_lat: 34.94
+      max_lat: 35.07
+      min_lng: -106.75
+      max_lng: -106.55
+    submarkets:
+    - South Valley
+    - Sunport / Airport
+    - Mesa del Sol
+    city_id: albuquerque
+datasets:
+  permits:
+    endpoint: https://data.cabq.gov/business/buildingpermits/BuildingPermitsCABQ-en-us.csv
+    platform: csv
+    watermark_col: IssueDate
+    id_keys:
+    - ApplicationPermitNumber
+    topic: raw.municipal.permits
+    interval_seconds: 1800.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: text
+    watermark_format: '%Y%m%d'
+    watermark_exclude:
+    - '20261224'
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: Status NOT IN ('Expired')
+    needs_geocode: true
+    geocode_context: Albuquerque, NM
+    field_map:
+      job_id:
+      - ApplicationPermitNumber
+      - applicationpermitnumber
+      issuance_date:
+      - IssueDate
+      - issuedate
+      job_type:
+      - TypeofWork
+      - typeofwork
+      cost:
+      - PlanCheckValuation
+      - plancheckvaluation
+      proposed_units:
+      - NumberOfUnits
+      - numberofunits
+      status:
+      - Status
+      - status
+      address_street:
+      - address_street
+      - SiteNumber
+      - sitenumber
+      - SiteStreet
+      - sitestreet
+      - SiteStreetType
+      - sitestreettype
+      - SiteStreetDirectional
+      - sitestreetdirectional
+      zipcode:
+      - SiteZip
+      - sitezip
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'NM'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- albuquerque_nm
+- albuquerque nm
+- abq
+- bernalillo
+- bernalillo_county
+- bernalillo county
+job_suffix: albuquerque

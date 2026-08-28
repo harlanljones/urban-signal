@@ -1,0 +1,666 @@
+city_id: tampa
+name: Tampa / Hillsborough County
+state: FL
+center:
+  lat: 27.9506
+  lng: -82.4572
+metro_bbox:
+  min_lat: 27.84
+  max_lat: 28.16
+  min_lng: -82.6
+  max_lng: -82.22
+division_bboxes:
+  DOWNTOWN_CHANNEL:
+    min_lat: 27.92
+    max_lat: 27.97
+    min_lng: -82.47
+    max_lng: -82.41
+  HYDE_PARK_BAYSHORE:
+    min_lat: 27.9
+    max_lat: 27.95
+    min_lng: -82.49
+    max_lng: -82.44
+  WESTSHORE_INTERNATIONAL:
+    min_lat: 27.93
+    max_lat: 27.98
+    min_lng: -82.57
+    max_lng: -82.5
+  SOUTH_TAMPA_PALMA:
+    min_lat: 27.86
+    max_lat: 27.93
+    min_lng: -82.52
+    max_lng: -82.45
+  TAMPA_HEIGHTS_SEMINOLE:
+    min_lat: 27.97
+    max_lat: 28.02
+    min_lng: -82.43
+    max_lng: -82.37
+  CARROLLWOOD_NORTH:
+    min_lat: 28.03
+    max_lat: 28.1
+    min_lng: -82.52
+    max_lng: -82.43
+  BRANDON_EAST:
+    min_lat: 27.9
+    max_lat: 27.99
+    min_lng: -82.35
+    max_lng: -82.25
+submarkets:
+  Downtown Tampa Core:
+    name: Downtown Tampa Core
+    borough: DOWNTOWN_CHANNEL
+    lat: 27.948
+    lng: -82.458
+    zoom: 15.0
+    pitch: 55.0
+    base_lims: 0.9
+    capex: 11000000.0
+    permit_vel: 52.0
+    shift_ratio: 1.68
+    sla: 70.0
+    description: Central business district around Curtis Hixon Park with riverwalk
+      towers, office-to-residential conversions, and the Tampa Convention Center spine.
+    city_id: tampa
+  Channel District & Water Street:
+    name: Channel District & Water Street
+    borough: DOWNTOWN_CHANNEL
+    lat: 27.938
+    lng: -82.45
+    zoom: 15.0
+    pitch: 52.0
+    base_lims: 0.92
+    capex: 12500000.0
+    permit_vel: 58.0
+    shift_ratio: 1.72
+    sla: 72.0
+    description: Water Street mixed-use redevelopment and luxury residential towers
+      on the former ship channel, the metro's densest permit pipeline.
+    city_id: tampa
+  Marina & Tampa Riverwalk:
+    name: Marina & Tampa Riverwalk
+    borough: DOWNTOWN_CHANNEL
+    lat: 27.945
+    lng: -82.465
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.86
+    capex: 8800000.0
+    permit_vel: 44.0
+    shift_ratio: 1.55
+    sla: 64.0
+    description: Ashley Drive marina frontage and riverwalk-adjacent mid-rise infill
+      between downtown and Hyde Park.
+    city_id: tampa
+  Hyde Park Village:
+    name: Hyde Park Village
+    borough: HYDE_PARK_BAYSHORE
+    lat: 27.935
+    lng: -82.465
+    zoom: 14.5
+    pitch: 48.0
+    base_lims: 0.88
+    capex: 9200000.0
+    permit_vel: 47.0
+    shift_ratio: 1.57
+    sla: 66.0
+    description: Historic streetcar suburb of bungalow and masonry stock around Hyde
+      Park Village, with teardown/rebuild pressure on large lots.
+    city_id: tampa
+  Bayshore Boulevard:
+    name: Bayshore Boulevard
+    borough: HYDE_PARK_BAYSHORE
+    lat: 27.915
+    lng: -82.47
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.87
+    capex: 9600000.0
+    permit_vel: 42.0
+    shift_ratio: 1.54
+    sla: 63.0
+    description: Tampa's signature waterfront boulevard with estate-scale homes and
+      consistent luxury renovation permits.
+    city_id: tampa
+  SoHo (South Howard):
+    name: SoHo (South Howard)
+    borough: HYDE_PARK_BAYSHORE
+    lat: 27.93
+    lng: -82.48
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.84
+    capex: 7000000.0
+    permit_vel: 39.0
+    shift_ratio: 1.49
+    sla: 60.0
+    description: South Howard Avenue hospitality and retail corridor with apartment-infill
+      and adaptive reuse of commercial storefronts.
+    city_id: tampa
+  International Plaza & Westshore:
+    name: International Plaza & Westshore
+    borough: WESTSHORE_INTERNATIONAL
+    lat: 27.955
+    lng: -82.54
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.9
+    capex: 11500000.0
+    permit_vel: 50.0
+    shift_ratio: 1.64
+    sla: 67.0
+    description: Westshore business district anchored by International Plaza and Tampa
+      International Airport, with office-to-residential conversion interest.
+    city_id: tampa
+  Tampa Airport & Carrollwood Commons:
+    name: Tampa Airport & Carrollwood Commons
+    borough: WESTSHORE_INTERNATIONAL
+    lat: 27.97
+    lng: -82.555
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.8
+    capex: 6200000.0
+    permit_vel: 34.0
+    shift_ratio: 1.41
+    sla: 54.0
+    description: Airport-adjacent commercial edge and hotel/warehouse permitting northwest
+      of the Westshore core.
+    city_id: tampa
+  Rocky Point & Bayport:
+    name: Rocky Point & Bayport
+    borough: WESTSHORE_INTERNATIONAL
+    lat: 27.965
+    lng: -82.545
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.82
+    capex: 6800000.0
+    permit_vel: 37.0
+    shift_ratio: 1.45
+    sla: 58.0
+    description: Rocky Point peninsula resort and office campus with bayfront redevelopment
+      and limited single-family turnover.
+    city_id: tampa
+  Palma Ceia & Swann:
+    name: Palma Ceia & Swann
+    borough: SOUTH_TAMPA_PALMA
+    lat: 27.91
+    lng: -82.49
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.86
+    capex: 8500000.0
+    permit_vel: 40.0
+    shift_ratio: 1.52
+    sla: 62.0
+    description: Established south Tampa neighborhood of masonry homes and palm-lined
+      streets with steady renovation permitting.
+    city_id: tampa
+  Gandy / MacDill Access:
+    name: Gandy / MacDill Access
+    borough: SOUTH_TAMPA_PALMA
+    lat: 27.88
+    lng: -82.5
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.78
+    capex: 5200000.0
+    permit_vel: 31.0
+    shift_ratio: 1.38
+    sla: 50.0
+    description: Gandy Boulevard corridor and MacDill AFB gateway with light industrial
+      and workforce-housing permitting.
+    city_id: tampa
+  Culbreath & Beach Park:
+    name: Culbreath & Beach Park
+    borough: SOUTH_TAMPA_PALMA
+    lat: 27.905
+    lng: -82.51
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.83
+    capex: 7200000.0
+    permit_vel: 33.0
+    shift_ratio: 1.43
+    sla: 56.0
+    description: Bay-front estate pocket southwest of Palma Ceia with low-volume,
+      high-value teardown-rebuild activity.
+    city_id: tampa
+  Tampa Heights & Armature Works:
+    name: Tampa Heights & Armature Works
+    borough: TAMPA_HEIGHTS_SEMINOLE
+    lat: 27.995
+    lng: -82.41
+    zoom: 14.5
+    pitch: 48.0
+    base_lims: 0.85
+    capex: 7800000.0
+    permit_vel: 46.0
+    shift_ratio: 1.53
+    sla: 61.0
+    description: Riverfront revival north of downtown around Armature Works with food-hall
+      and mid-rise residential infill.
+    city_id: tampa
+  Ybor City & Historic District:
+    name: Ybor City & Historic District
+    borough: TAMPA_HEIGHTS_SEMINOLE
+    lat: 27.97
+    lng: -82.425
+    zoom: 14.5
+    pitch: 48.0
+    base_lims: 0.84
+    capex: 7400000.0
+    permit_vel: 43.0
+    shift_ratio: 1.5
+    sla: 59.0
+    description: Historic cigar-worker district turned nightlife and mixed-use quarter
+      with adaptive reuse and infill townhomes.
+    city_id: tampa
+  Seminole Heights Bungalows:
+    name: Seminole Heights Bungalows
+    borough: TAMPA_HEIGHTS_SEMINOLE
+    lat: 28.005
+    lng: -82.4
+    zoom: 14.0
+    pitch: 44.0
+    base_lims: 0.8
+    capex: 5800000.0
+    permit_vel: 38.0
+    shift_ratio: 1.44
+    sla: 54.0
+    description: Craftsman-bungalow streetcar suburb with renovation-led permits and
+      Historic District overlay constraints.
+    city_id: tampa
+  Carrollwood & Village Lake:
+    name: Carrollwood & Village Lake
+    borough: CARROLLWOOD_NORTH
+    lat: 28.07
+    lng: -82.49
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.74
+    capex: 4800000.0
+    permit_vel: 30.0
+    shift_ratio: 1.32
+    sla: 47.0
+    description: North Tampa suburban lake community with pool-home turnover and scattered
+      teardown-rebuild on large lots.
+    city_id: tampa
+  North Dale Mabry Corridor:
+    name: North Dale Mabry Corridor
+    borough: CARROLLWOOD_NORTH
+    lat: 28.05
+    lng: -82.5
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.72
+    capex: 4400000.0
+    permit_vel: 27.0
+    shift_ratio: 1.29
+    sla: 44.0
+    description: Dale Mabry highway spine with commercial-strip redevelopment and
+      garden-apartment infill north of the airport.
+    city_id: tampa
+  Brandon Town Center:
+    name: Brandon Town Center
+    borough: BRANDON_EAST
+    lat: 27.94
+    lng: -82.3
+    zoom: 13.0
+    pitch: 38.0
+    base_lims: 0.66
+    capex: 3800000.0
+    permit_vel: 34.0
+    shift_ratio: 1.26
+    sla: 41.0
+    description: East Hillsborough retail and apartment hub around Westfield Brandon
+      with ongoing multifamily infill.
+    city_id: tampa
+  FishHawk & Lithia (east edge):
+    name: FishHawk & Lithia (east edge)
+    borough: BRANDON_EAST
+    lat: 27.92
+    lng: -82.27
+    zoom: 12.5
+    pitch: 38.0
+    base_lims: 0.58
+    capex: 3000000.0
+    permit_vel: 22.0
+    shift_ratio: 1.18
+    sla: 35.0
+    description: Master-planned exurban edge at the metro's eastern boundary, permitted
+      through Hillsborough County rather than the City of Tampa.
+    city_id: tampa
+divisions:
+  DOWNTOWN_CHANNEL:
+    name: DOWNTOWN_CHANNEL
+    center_lat: 27.944
+    center_lng: -82.444
+    zoom: 13.5
+    bbox:
+      min_lat: 27.92
+      max_lat: 27.97
+      min_lng: -82.47
+      max_lng: -82.41
+    submarkets:
+    - Downtown Tampa Core
+    - Channel District & Water Street
+    - Marina & Tampa Riverwalk
+    city_id: tampa
+  HYDE_PARK_BAYSHORE:
+    name: HYDE_PARK_BAYSHORE
+    center_lat: 27.925
+    center_lng: -82.465
+    zoom: 13.5
+    bbox:
+      min_lat: 27.9
+      max_lat: 27.95
+      min_lng: -82.49
+      max_lng: -82.44
+    submarkets:
+    - Hyde Park Village
+    - Bayshore Boulevard
+    - SoHo (South Howard)
+    city_id: tampa
+  WESTSHORE_INTERNATIONAL:
+    name: WESTSHORE_INTERNATIONAL
+    center_lat: 27.957
+    center_lng: -82.535
+    zoom: 13.0
+    bbox:
+      min_lat: 27.93
+      max_lat: 27.98
+      min_lng: -82.57
+      max_lng: -82.5
+    submarkets:
+    - International Plaza & Westshore
+    - Tampa Airport & Carrollwood Commons
+    - Rocky Point & Bayport
+    city_id: tampa
+  SOUTH_TAMPA_PALMA:
+    name: SOUTH_TAMPA_PALMA
+    center_lat: 27.895
+    center_lng: -82.487
+    zoom: 13.0
+    bbox:
+      min_lat: 27.86
+      max_lat: 27.93
+      min_lng: -82.52
+      max_lng: -82.45
+    submarkets:
+    - Palma Ceia & Swann
+    - Gandy / MacDill Access
+    - Culbreath & Beach Park
+    city_id: tampa
+  TAMPA_HEIGHTS_SEMINOLE:
+    name: TAMPA_HEIGHTS_SEMINOLE
+    center_lat: 27.99
+    center_lng: -82.415
+    zoom: 13.0
+    bbox:
+      min_lat: 27.97
+      max_lat: 28.02
+      min_lng: -82.43
+      max_lng: -82.37
+    submarkets:
+    - Tampa Heights & Armature Works
+    - Ybor City & Historic District
+    - Seminole Heights Bungalows
+    city_id: tampa
+  CARROLLWOOD_NORTH:
+    name: CARROLLWOOD_NORTH
+    center_lat: 28.06
+    center_lng: -82.485
+    zoom: 12.5
+    bbox:
+      min_lat: 28.03
+      max_lat: 28.1
+      min_lng: -82.52
+      max_lng: -82.43
+    submarkets:
+    - Carrollwood & Village Lake
+    - North Dale Mabry Corridor
+    city_id: tampa
+  BRANDON_EAST:
+    name: BRANDON_EAST
+    center_lat: 27.935
+    center_lng: -82.29
+    zoom: 12.5
+    bbox:
+      min_lat: 27.9
+      max_lat: 27.99
+      min_lng: -82.35
+      max_lng: -82.25
+    submarkets:
+    - Brandon Town Center
+    - FishHawk & Lithia (east edge)
+    city_id: tampa
+datasets:
+  permits:
+    endpoint: https://arcgis.tampagov.net/arcgis/rest/services/Planning/PermitsAll/FeatureServer/0
+    platform: arcgis
+    watermark_col: LASTUPDATE
+    id_keys:
+    - RECORD_ID
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: LASTUPDATE DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - RECORD_ID
+      issuance_date:
+      - LASTUPDATE
+      status:
+      - PROJECTSTATUS
+      job_type:
+      - RECORDTYPE
+      - PROJECTDESCRIPTION
+      - OCCUPANCYTYPE
+      cost:
+      - NEWCONSTRUCTIONSF
+      address_street:
+      - ADDRESS
+      zipcode:
+      - ZIP
+      borough:
+      - NEIGHBORHOOD
+      - COUNCIL
+      proposed_units:
+      - NBROFUNITS
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://arcgis.tampagov.net/arcgis/rest/services/Planning/AlcoholBeverage/FeatureServer/0
+    platform: arcgis
+    watermark_col: HISTORY_ACT_DT
+    id_keys:
+    - ORD_PERMIT
+    - APP_NUM
+    - OBJECTID
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - ORD_PERMIT
+      - APP_NUM
+      license_type:
+      - ABSALETYPE
+      - AB_CLASS_PREFIX
+      - AB_CLASS_SUFFIX
+      premises_name:
+      - BUS_NAME
+      dba:
+      - BUS_NAME
+      effective_date:
+      - HISTORY_ACT_DT
+      expiration_date:
+      - MTH24_END_DT
+      status:
+      - HISTORY_ACTION
+      address_street:
+      - PERMIT_ADDR
+      - BUS_OWNER_MAIL_ADD
+      zipcode:
+      - PERMIT_ZIP
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  crime:
+    endpoint: https://arcgis.tampagov.net/arcgis/rest/services/CallsforService/FirePoliceCalls/MapServer/1
+    platform: arcgis
+    watermark_col: occ_date
+    id_keys:
+    - ESRI_OID
+    - report_number
+    topic: raw.municipal.crime
+    interval_seconds: 300.0
+    producer_key: crime
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - report_number
+      offense_type:
+      - case_description
+      occurred_date:
+      - occ_date
+    ingestion_mode: incremental
+    oid_field: ESRI_OID
+    max_record_count: 1000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  street_cut:
+    endpoint: https://arcgis.tampagov.net/arcgis/rest/services/Transportation/ROWPermits/FeatureServer/0
+    platform: arcgis
+    watermark_col: ISSUEDDATE
+    id_keys:
+    - OBJECTID
+    - RECORDID
+    topic: raw.municipal.street_cut
+    interval_seconds: 600.0
+    producer_key: street_cut
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - RECORDID
+      latitude:
+      - LATITUDE
+      longitude:
+      - LONGITUDE
+      issued_date:
+      - ISSUEDDATE
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 1000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- tampa_fl
+- tampa fl
+- hillsborough_county
+- hillsborough county
+job_suffix: tampa

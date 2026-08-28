@@ -1,0 +1,352 @@
+city_id: pittsburgh
+name: Pittsburgh
+state: PA
+center:
+  lat: 40.4417
+  lng: -80.0
+metro_bbox:
+  min_lat: 40.35
+  max_lat: 40.55
+  min_lng: -80.1
+  max_lng: -79.8
+division_bboxes:
+  PITTSBURGH_CORE:
+    min_lat: 40.4
+    max_lat: 40.5
+    min_lng: -80.05
+    max_lng: -79.9
+submarkets:
+  Downtown (Golden Triangle):
+    name: Downtown (Golden Triangle)
+    borough: PITTSBURGH_CORE
+    lat: 40.4417
+    lng: -80.0
+    zoom: 13.2
+    pitch: 48.0
+    base_lims: 0.83
+    capex: 9800000.0
+    permit_vel: 42.0
+    shift_ratio: 1.43
+    sla: 56.0
+    description: Confluence of the three rivers with towers, transit, and dense mixed-use
+      residential conversion activity.
+    city_id: pittsburgh
+  North Side & Allegheny Center:
+    name: North Side & Allegheny Center
+    borough: PITTSBURGH_CORE
+    lat: 40.4564
+    lng: -80.0064
+    zoom: 13.0
+    pitch: 46.0
+    base_lims: 0.81
+    capex: 7600000.0
+    permit_vel: 37.0
+    shift_ratio: 1.4
+    sla: 54.0
+    description: Stadium-adjacent historic district with the Mexican War Streets,
+      infill townhomes, and civic redevelopment.
+    city_id: pittsburgh
+  East Liberty & Shadyside:
+    name: East Liberty & Shadyside
+    borough: PITTSBURGH_CORE
+    lat: 40.4609
+    lng: -79.9164
+    zoom: 13.0
+    pitch: 46.0
+    base_lims: 0.85
+    capex: 8900000.0
+    permit_vel: 44.0
+    shift_ratio: 1.45
+    sla: 58.0
+    description: East-end transit corridor with the most concentrated multifamily
+      construction pipeline in the city.
+    city_id: pittsburgh
+  South Side Flats:
+    name: South Side Flats
+    borough: PITTSBURGH_CORE
+    lat: 40.4305
+    lng: -79.986
+    zoom: 13.0
+    pitch: 44.0
+    base_lims: 0.8
+    capex: 7100000.0
+    permit_vel: 36.0
+    shift_ratio: 1.39
+    sla: 55.0
+    description: Riverfront entertainment corridor with dense commercial streets,
+      adaptive reuse, and bar/restaurant turnover.
+    city_id: pittsburgh
+  Lawrenceville & Strip District:
+    name: Lawrenceville & Strip District
+    borough: PITTSBURGH_CORE
+    lat: 40.4707
+    lng: -79.9664
+    zoom: 13.0
+    pitch: 44.0
+    base_lims: 0.84
+    capex: 8200000.0
+    permit_vel: 40.0
+    shift_ratio: 1.44
+    sla: 57.0
+    description: Butler Street arts corridor with rapid retail, brewery, and residential
+      loft conversion activity.
+    city_id: pittsburgh
+divisions:
+  PITTSBURGH_CORE:
+    name: Pittsburgh
+    center_lat: 40.4417
+    center_lng: -80.0
+    zoom: 11.8
+    bbox:
+      min_lat: 40.4
+      max_lat: 40.5
+      min_lng: -80.05
+      max_lng: -79.9
+    submarkets:
+    - Downtown (Golden Triangle)
+    - North Side & Allegheny Center
+    - East Liberty & Shadyside
+    - South Side Flats
+    - Lawrenceville & Strip District
+    city_id: pittsburgh
+datasets:
+  permits:
+    endpoint: ckan://data.wprdc.org/f4d1177a-f597-4c32-8cbf-7885f56253f6
+    platform: ckan
+    watermark_col: issue_date
+    id_keys:
+    - permit_id
+    - parcel_num
+    - _id
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - permit_id
+      issuance_date:
+      - issue_date
+      cost:
+      - total_project_value
+      address_street:
+      - address
+      status:
+      - status
+      job_type:
+      - permit_type
+      - work_type
+      zipcode:
+      - zip_code
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  deeds:
+    endpoint: ckan://data.wprdc.org/5bbe6c55-bce6-4edb-9d04-68edeb6bf7b1
+    platform: ckan
+    watermark_col: SALEDATE
+    id_keys:
+    - PARID
+    - RECORDDATE
+    - SALEDATE
+    - DEEDBOOK
+    - DEEDPAGE
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - PARID
+      - DEEDBOOK
+      - DEEDPAGE
+      bbl:
+      - PARID
+      document_amount:
+      - PRICE
+      recorded_date:
+      - RECORDDATE
+      doc_type:
+      - INSTRTYP
+      borough:
+      - MUNIDESC
+      - PROPERTYCITY
+      incident_address:
+      - FULL_ADDRESS
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: ckan://data.wprdc.org/5202679a-d243-402e-b82a-63189995a942
+    platform: ckan
+    watermark_col: created_date_utc
+    id_keys:
+    - unique_id
+    - case_number
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - unique_id
+      - case_number
+      latitude:
+      - latitude
+      longitude:
+      - longitude
+      created_date:
+      - created_date_utc
+      closed_date:
+      - closed_date_utc
+      complaint_type:
+      - subject
+      incident_address:
+      - street
+      borough:
+      - neighborhood
+      - council_district
+      - ward
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'PA'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- pgh
+- pittsburgh_pa
+- burgh
+job_suffix: pgh

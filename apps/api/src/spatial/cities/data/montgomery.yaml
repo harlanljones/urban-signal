@@ -1,0 +1,277 @@
+city_id: montgomery
+name: Montgomery County
+state: MD
+center:
+  lat: 39.14
+  lng: -77.19
+metro_bbox:
+  min_lat: 38.9
+  max_lat: 39.35
+  min_lng: -77.6
+  max_lng: -76.8
+division_bboxes:
+  MONTGOMERY_CORE:
+    min_lat: 38.98
+    max_lat: 39.3
+    min_lng: -77.45
+    max_lng: -77.0
+submarkets:
+  Bethesda & Friendship Heights:
+    name: Bethesda & Friendship Heights
+    borough: MONTGOMERY_CORE
+    lat: 38.995
+    lng: -77.095
+    zoom: 12.8
+    pitch: 45.0
+    base_lims: 0.82
+    capex: 7200000.0
+    permit_vel: 34.0
+    shift_ratio: 1.4
+    sla: 55.0
+    description: Dense urban and mixed-use corridor along the District boundary.
+    city_id: montgomery
+  Rockville & Gaithersburg:
+    name: Rockville & Gaithersburg
+    borough: MONTGOMERY_CORE
+    lat: 39.12
+    lng: -77.19
+    zoom: 11.8
+    pitch: 43.0
+    base_lims: 0.78
+    capex: 6100000.0
+    permit_vel: 38.0
+    shift_ratio: 1.36
+    sla: 52.0
+    description: County employment and civic center with sustained permit activity.
+    city_id: montgomery
+  Silver Spring & Wheaton:
+    name: Silver Spring & Wheaton
+    borough: MONTGOMERY_CORE
+    lat: 39.045
+    lng: -77.045
+    zoom: 12.2
+    pitch: 44.0
+    base_lims: 0.76
+    capex: 5400000.0
+    permit_vel: 31.0
+    shift_ratio: 1.34
+    sla: 50.0
+    description: Transit-oriented inner-county neighborhoods with redevelopment pressure.
+    city_id: montgomery
+  Upcounty:
+    name: Upcounty
+    borough: MONTGOMERY_CORE
+    lat: 39.235
+    lng: -77.3
+    zoom: 11.2
+    pitch: 40.0
+    base_lims: 0.7
+    capex: 4300000.0
+    permit_vel: 26.0
+    shift_ratio: 1.28
+    sla: 46.0
+    description: Growing northern county communities and lower-density development
+      belt.
+    city_id: montgomery
+divisions:
+  MONTGOMERY_CORE:
+    name: Montgomery County
+    center_lat: 39.14
+    center_lng: -77.19
+    zoom: 10.8
+    bbox:
+      min_lat: 38.98
+      max_lat: 39.3
+      min_lng: -77.45
+      max_lng: -77.0
+    submarkets:
+    - Bethesda & Friendship Heights
+    - Rockville & Gaithersburg
+    - Silver Spring & Wheaton
+    - Upcounty
+    city_id: montgomery
+datasets:
+  permits:
+    endpoint: https://data.montgomerycountymd.gov/resource/m88u-pqki.json
+    platform: socrata
+    watermark_col: issueddate
+    id_keys:
+    - permitno
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - permitno
+      issuance_date:
+      - issueddate
+      filing_date:
+      - addeddate
+      address_street:
+      - stno
+      - stname
+      - suffix
+      - postdir
+      zipcode:
+      - zip
+      job_type:
+      - worktype
+      - applicationtype
+      - usecode
+      status:
+      - status
+      latitude:
+      - location.latitude
+      longitude:
+      - location.longitude
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints:
+      commercial: https://data.montgomerycountymd.gov/resource/i26v-w6bd.json
+      demolition: https://data.montgomerycountymd.gov/resource/b6ht-fw3x.json
+      electrical: https://data.montgomerycountymd.gov/resource/qxie-8qnp.json
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://data.montgomerycountymd.gov/resource/c6rw-fazn.json
+    platform: socrata
+    watermark_col: ''
+    id_keys:
+    - licensee_number
+    - licensee_name
+    topic: raw.municipal.sla
+    interval_seconds: 900.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - licensee_number
+      license_type:
+      - channel_type
+      premises_name:
+      - licensee_name
+      - account_name
+      address_street:
+      - street
+      zipcode:
+      - zip
+      latitude:
+      - location.latitude
+      longitude:
+      - location.longitude
+    ingestion_mode: snapshot
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: true
+    alarm_exempt_reason: "SUSPECTED STALL \u2014 no date col, rowsUpdatedAt frozen\
+      \ 2026-04-01 (US-164)"
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  deeds:
+    endpoint: https://opendata.maryland.gov/resource/kb22-is2w.json
+    platform: socrata
+    watermark_col: sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89
+    id_keys:
+    - account_id_mdp_field_acctid
+    - sales_segment_1_transfer_number_mdp_field_transno1_sdat_field_79
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - account_id_mdp_field_acctid
+      bbl:
+      - account_id_mdp_field_acctid
+      document_amount:
+      - sales_segment_1_consideration_mdp_field_considr1_sdat_field_90
+      recorded_date:
+      - sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89
+      party1_grantor:
+      - sales_segment_1_grantor_name_mdp_field_grntnam1_sdat_field_80
+      latitude:
+      - mdp_latitude_mdp_field_digycord_converted_to_wgs84
+      longitude:
+      - mdp_longitude_mdp_field_digxcord_converted_to_wgs84
+    ingestion_mode: snapshot
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- montgomery_county
+- montgomery county
+- montgomery_md
+- moco
+job_suffix: montgomery

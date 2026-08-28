@@ -5911,5 +5911,9 @@ USE_DERIVED_REGISTRY = True
 if USE_DERIVED_REGISTRY:
     from src.spatial import registry_derivation
 
-    REGISTRY = registry_derivation.build_registry_from_registrations()
-    ALIASES = registry_derivation.build_aliases_from_registrations()
+    _RUNTIME_EXPORTS = registry_derivation.build_runtime_exports()
+    if _RUNTIME_EXPORTS is None:
+        REGISTRY = registry_derivation.build_registry_from_registrations()
+        ALIASES = registry_derivation.build_aliases_from_registrations()
+    else:
+        REGISTRY, ALIASES = _RUNTIME_EXPORTS

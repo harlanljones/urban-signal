@@ -1,0 +1,1578 @@
+city_id: nyc
+name: New York City
+state: NY
+center:
+  lat: 40.7128
+  lng: -74.006
+metro_bbox:
+  min_lat: 40.48
+  max_lat: 40.93
+  min_lng: -74.28
+  max_lng: -73.68
+division_bboxes:
+  MANHATTAN:
+    min_lat: 40.7
+    max_lat: 40.882
+    min_lng: -74.02
+    max_lng: -73.907
+  BROOKLYN:
+    min_lat: 40.57
+    max_lat: 40.74
+    min_lng: -74.05
+    max_lng: -73.83
+  QUEENS:
+    min_lat: 40.54
+    max_lat: 40.8
+    min_lng: -73.96
+    max_lng: -73.7
+  BRONX:
+    min_lat: 40.785
+    max_lat: 40.915
+    min_lng: -73.935
+    max_lng: -73.765
+  STATEN_ISLAND:
+    min_lat: 40.495
+    max_lat: 40.65
+    min_lng: -74.255
+    max_lng: -74.05
+submarkets:
+  SoHo:
+    name: SoHo
+    borough: MANHATTAN
+    lat: 40.7233
+    lng: -74.003
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.88
+    capex: 8500000.0
+    permit_vel: 42.0
+    shift_ratio: 1.45
+    sla: 48.0
+    description: Cast-iron historic district with luxury retail, high capex conversions,
+      and thriving hospitality.
+    city_id: nyc
+  Tribeca:
+    name: Tribeca
+    borough: MANHATTAN
+    lat: 40.7163
+    lng: -74.0086
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.92
+    capex: 12500000.0
+    permit_vel: 38.0
+    shift_ratio: 1.52
+    sla: 36.0
+    description: Cobblestone enclave featuring ultra-luxury residential lofts and
+      Michelin-caliber dining.
+    city_id: nyc
+  West Village:
+    name: West Village
+    borough: MANHATTAN
+    lat: 40.7358
+    lng: -74.0036
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.85
+    capex: 7200000.0
+    permit_vel: 31.0
+    shift_ratio: 1.38
+    sla: 55.0
+    description: Historic brownstone core with premier pedestrian retail corridors
+      and boutique nightlife.
+    city_id: nyc
+  Greenwich Village:
+    name: Greenwich Village
+    borough: MANHATTAN
+    lat: 40.7336
+    lng: -73.9969
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.82
+    capex: 6800000.0
+    permit_vel: 35.0
+    shift_ratio: 1.34
+    sla: 62.0
+    description: Academic and cultural hub centered around Washington Square Park
+      with high retail footfall.
+    city_id: nyc
+  East Village:
+    name: East Village
+    borough: MANHATTAN
+    lat: 40.7265
+    lng: -73.9815
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.79
+    capex: 5400000.0
+    permit_vel: 48.0
+    shift_ratio: 1.29
+    sla: 78.0
+    description: High-density nightlife corridor with dense tenement stock and active
+      hospitality licensing.
+    city_id: nyc
+  Lower East Side:
+    name: Lower East Side
+    borough: MANHATTAN
+    lat: 40.715
+    lng: -73.9843
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.81
+    capex: 6100000.0
+    permit_vel: 52.0
+    shift_ratio: 1.41
+    sla: 82.0
+    description: Dynamic submarket undergoing rapid mixed-use redevelopment and nightlife
+      densification.
+    city_id: nyc
+  Chinatown:
+    name: Chinatown
+    borough: MANHATTAN
+    lat: 40.7158
+    lng: -73.997
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.68
+    capex: 4200000.0
+    permit_vel: 29.0
+    shift_ratio: 1.18
+    sla: 44.0
+    description: Historic cultural district with dense ground-floor commercial activity
+      and adaptive reuse.
+    city_id: nyc
+  Financial District:
+    name: Financial District
+    borough: MANHATTAN
+    lat: 40.7075
+    lng: -74.009
+    zoom: 14.0
+    pitch: 60.0
+    base_lims: 0.86
+    capex: 11000000.0
+    permit_vel: 56.0
+    shift_ratio: 1.6
+    sla: 52.0
+    description: Downtown financial center transitioning rapidly into 24/7 mixed-use
+      residential towers.
+    city_id: nyc
+  Chelsea:
+    name: Chelsea
+    borough: MANHATTAN
+    lat: 40.7465
+    lng: -74.0014
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.87
+    capex: 8900000.0
+    permit_vel: 44.0
+    shift_ratio: 1.42
+    sla: 58.0
+    description: Art gallery epicenter adjacent to High Line with high-value residential
+      and tech offices.
+    city_id: nyc
+  Flatiron / NoMad:
+    name: Flatiron / NoMad
+    borough: MANHATTAN
+    lat: 40.7411
+    lng: -73.9897
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.9
+    capex: 9800000.0
+    permit_vel: 46.0
+    shift_ratio: 1.48
+    sla: 64.0
+    description: Premier commercial innovation and lifestyle corridor with Michelin
+      dining and luxury hotels.
+    city_id: nyc
+  Hell's Kitchen:
+    name: Hell's Kitchen
+    borough: MANHATTAN
+    lat: 40.7638
+    lng: -73.9918
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.78
+    capex: 5900000.0
+    permit_vel: 40.0
+    shift_ratio: 1.25
+    sla: 72.0
+    description: Theater-adjacent hospitality and residential corridor with sustained
+      permit activity.
+    city_id: nyc
+  Midtown East:
+    name: Midtown East
+    borough: MANHATTAN
+    lat: 40.7527
+    lng: -73.9772
+    zoom: 14.0
+    pitch: 60.0
+    base_lims: 0.89
+    capex: 14000000.0
+    permit_vel: 58.0
+    shift_ratio: 1.55
+    sla: 60.0
+    description: Global corporate headquarters hub anchored by Grand Central Terminal
+      redevelopment.
+    city_id: nyc
+  Upper East Side:
+    name: Upper East Side
+    borough: MANHATTAN
+    lat: 40.7736
+    lng: -73.9566
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.83
+    capex: 7800000.0
+    permit_vel: 36.0
+    shift_ratio: 1.22
+    sla: 42.0
+    description: Established affluent residential enclave along Central Park and Museum
+      Mile.
+    city_id: nyc
+  Upper West Side:
+    name: Upper West Side
+    borough: MANHATTAN
+    lat: 40.787
+    lng: -73.9754
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.82
+    capex: 7400000.0
+    permit_vel: 34.0
+    shift_ratio: 1.2
+    sla: 40.0
+    description: Historic residential district flanked by Central and Riverside Parks
+      with strong family demographics.
+    city_id: nyc
+  Harlem:
+    name: Harlem
+    borough: MANHATTAN
+    lat: 40.8116
+    lng: -73.9465
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.74
+    capex: 4800000.0
+    permit_vel: 45.0
+    shift_ratio: 1.35
+    sla: 38.0
+    description: Historic cultural hub with active 125th Street commercial corridor
+      and brownstone revitalization.
+    city_id: nyc
+  East Harlem:
+    name: East Harlem
+    borough: MANHATTAN
+    lat: 40.7957
+    lng: -73.9389
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.69
+    capex: 4100000.0
+    permit_vel: 39.0
+    shift_ratio: 1.28
+    sla: 30.0
+    description: Up-zoned residential corridor experiencing influx of affordable and
+      market-rate developments.
+    city_id: nyc
+  Washington Heights:
+    name: Washington Heights
+    borough: MANHATTAN
+    lat: 40.8417
+    lng: -73.9387
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.65
+    capex: 3600000.0
+    permit_vel: 32.0
+    shift_ratio: 1.19
+    sla: 28.0
+    description: Uptown medical and educational anchor centered around Columbia University
+      Irving Medical Center.
+    city_id: nyc
+  Inwood:
+    name: Inwood
+    borough: MANHATTAN
+    lat: 40.8677
+    lng: -73.9212
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.62
+    capex: 3200000.0
+    permit_vel: 28.0
+    shift_ratio: 1.16
+    sla: 24.0
+    description: Northernmost tip of Manhattan with significant rezoning-driven multifamily
+      development.
+    city_id: nyc
+  Williamsburg:
+    name: Williamsburg
+    borough: BROOKLYN
+    lat: 40.7145
+    lng: -73.9555
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.91
+    capex: 9500000.0
+    permit_vel: 64.0
+    shift_ratio: 1.65
+    sla: 85.0
+    description: Global creative epicenter with waterfront high-rises, thriving retail,
+      and dense entertainment.
+    city_id: nyc
+  Greenpoint:
+    name: Greenpoint
+    borough: BROOKLYN
+    lat: 40.7305
+    lng: -73.9515
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.86
+    capex: 8200000.0
+    permit_vel: 49.0
+    shift_ratio: 1.54
+    sla: 56.0
+    description: North Brooklyn waterfront neighborhood seeing massive luxury residential
+      expansion along the East River.
+    city_id: nyc
+  Bushwick:
+    name: Bushwick
+    borough: BROOKLYN
+    lat: 40.6944
+    lng: -73.9213
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.76
+    capex: 4900000.0
+    permit_vel: 58.0
+    shift_ratio: 1.48
+    sla: 68.0
+    description: Industrial-to-creative conversion zone with high nightlife velocity
+      and loft conversions.
+    city_id: nyc
+  DUMBO:
+    name: DUMBO
+    borough: BROOKLYN
+    lat: 40.7033
+    lng: -73.989
+    zoom: 15.0
+    pitch: 55.0
+    base_lims: 0.94
+    capex: 11500000.0
+    permit_vel: 33.0
+    shift_ratio: 1.58
+    sla: 41.0
+    description: Boutique tech, advertising, and luxury residential enclave beneath
+      the Manhattan & Brooklyn Bridges.
+    city_id: nyc
+  Downtown Brooklyn:
+    name: Downtown Brooklyn
+    borough: BROOKLYN
+    lat: 40.6925
+    lng: -73.987
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.88
+    capex: 10200000.0
+    permit_vel: 67.0
+    shift_ratio: 1.62
+    sla: 54.0
+    description: Brooklyn's civic and commercial core undergoing skyscraper residential
+      boom.
+    city_id: nyc
+  Brooklyn Heights:
+    name: Brooklyn Heights
+    borough: BROOKLYN
+    lat: 40.696
+    lng: -73.9933
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.89
+    capex: 8100000.0
+    permit_vel: 26.0
+    shift_ratio: 1.24
+    sla: 32.0
+    description: Historic landmarked district with premier promenade views and high-value
+      brownstones.
+    city_id: nyc
+  Cobble Hill / Boerum Hill:
+    name: Cobble Hill / Boerum Hill
+    borough: BROOKLYN
+    lat: 40.6865
+    lng: -73.993
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.84
+    capex: 6700000.0
+    permit_vel: 30.0
+    shift_ratio: 1.31
+    sla: 46.0
+    description: Charming tree-lined rowhouse district with flourishing boutique dining
+      corridors along Atlantic and Court.
+    city_id: nyc
+  Fort Greene:
+    name: Fort Greene
+    borough: BROOKLYN
+    lat: 40.692
+    lng: -73.9742
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.83
+    capex: 6400000.0
+    permit_vel: 37.0
+    shift_ratio: 1.36
+    sla: 44.0
+    description: Cultural hub anchored by BAM and Fort Greene Park with active historic
+      conversions.
+    city_id: nyc
+  Clinton Hill:
+    name: Clinton Hill
+    borough: BROOKLYN
+    lat: 40.6894
+    lng: -73.9644
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.8
+    capex: 5800000.0
+    permit_vel: 36.0
+    shift_ratio: 1.33
+    sla: 38.0
+    description: Victorian mansion and Pratt-adjacent enclave experiencing sustained
+      residential demand.
+    city_id: nyc
+  Bed-Stuy:
+    name: Bed-Stuy
+    borough: BROOKLYN
+    lat: 40.6872
+    lng: -73.9418
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.75
+    capex: 4600000.0
+    permit_vel: 54.0
+    shift_ratio: 1.42
+    sla: 45.0
+    description: Historic brownstone district undergoing extensive gut rehabilitation
+      and commercial revitalization.
+    city_id: nyc
+  Crown Heights:
+    name: Crown Heights
+    borough: BROOKLYN
+    lat: 40.6694
+    lng: -73.9422
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.73
+    capex: 4300000.0
+    permit_vel: 47.0
+    shift_ratio: 1.37
+    sla: 41.0
+    description: Franklin and Nostrand corridor renewal with accelerating food/beverage
+      and multifamily investments.
+    city_id: nyc
+  Park Slope:
+    name: Park Slope
+    borough: BROOKLYN
+    lat: 40.671
+    lng: -73.9777
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.87
+    capex: 7600000.0
+    permit_vel: 33.0
+    shift_ratio: 1.27
+    sla: 49.0
+    description: Prime residential community along Prospect Park with exceptional
+      school districts and high property equity.
+    city_id: nyc
+  Gowanus:
+    name: Gowanus
+    borough: BROOKLYN
+    lat: 40.6734
+    lng: -73.9903
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.85
+    capex: 8800000.0
+    permit_vel: 61.0
+    shift_ratio: 1.7
+    sla: 47.0
+    description: Post-industrial canal corridor undergoing massive city rezoning for
+      thousands of new residential units.
+    city_id: nyc
+  Prospect Heights:
+    name: Prospect Heights
+    borough: BROOKLYN
+    lat: 40.6774
+    lng: -73.9665
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.84
+    capex: 6900000.0
+    permit_vel: 38.0
+    shift_ratio: 1.39
+    sla: 43.0
+    description: Vibrant enclave anchored by Barclays Center, Brooklyn Museum, and
+      Vanderbilt Avenue dining.
+    city_id: nyc
+  Prospect Lefferts Gardens:
+    name: Prospect Lefferts Gardens
+    borough: BROOKLYN
+    lat: 40.659
+    lng: -73.9514
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.71
+    capex: 4100000.0
+    permit_vel: 39.0
+    shift_ratio: 1.32
+    sla: 29.0
+    description: Historic manor district seeing new mid-rise multifamily development
+      near Prospect Park's east side.
+    city_id: nyc
+  Sunset Park:
+    name: Sunset Park
+    borough: BROOKLYN
+    lat: 40.6455
+    lng: -74.0124
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.69
+    capex: 4500000.0
+    permit_vel: 35.0
+    shift_ratio: 1.26
+    sla: 31.0
+    description: Waterfront innovation campus (Industry City) and vibrant multi-ethnic
+      commercial corridors.
+    city_id: nyc
+  Bay Ridge:
+    name: Bay Ridge
+    borough: BROOKLYN
+    lat: 40.6262
+    lng: -74.0329
+    zoom: 13.5
+    pitch: 35.0
+    base_lims: 0.67
+    capex: 3800000.0
+    permit_vel: 27.0
+    shift_ratio: 1.15
+    sla: 35.0
+    description: Stable southwestern waterfront neighborhood with commercial avenues
+      (3rd & 5th) and harbor views.
+    city_id: nyc
+  Flatbush:
+    name: Flatbush
+    borough: BROOKLYN
+    lat: 40.652
+    lng: -73.959
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.7
+    capex: 4200000.0
+    permit_vel: 43.0
+    shift_ratio: 1.3
+    sla: 33.0
+    description: Central Brooklyn hub with high transit connectivity, commercial density,
+      and major mid-rise development.
+    city_id: nyc
+  Red Hook:
+    name: Red Hook
+    borough: BROOKLYN
+    lat: 40.675
+    lng: -74.01
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.77
+    capex: 5500000.0
+    permit_vel: 25.0
+    shift_ratio: 1.35
+    sla: 37.0
+    description: Maritime and artisanal warehouse district with strong destination
+      retail and last-mile logistics.
+    city_id: nyc
+  Coney Island:
+    name: Coney Island
+    borough: BROOKLYN
+    lat: 40.5749
+    lng: -73.9859
+    zoom: 13.5
+    pitch: 35.0
+    base_lims: 0.63
+    capex: 3900000.0
+    permit_vel: 23.0
+    shift_ratio: 1.21
+    sla: 26.0
+    description: Iconic oceanfront amusement and residential area with large-scale
+      affordable and market developments.
+    city_id: nyc
+  Long Island City:
+    name: Long Island City
+    borough: QUEENS
+    lat: 40.7447
+    lng: -73.9485
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.92
+    capex: 10800000.0
+    permit_vel: 72.0
+    shift_ratio: 1.68
+    sla: 66.0
+    description: Rapidly expanding high-density waterfront skyline with unmatched
+      transit proximity to Midtown.
+    city_id: nyc
+  Astoria:
+    name: Astoria
+    borough: QUEENS
+    lat: 40.7644
+    lng: -73.9235
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.81
+    capex: 5900000.0
+    permit_vel: 46.0
+    shift_ratio: 1.37
+    sla: 70.0
+    description: Premier cultural and culinary enclave with resilient retail corridors
+      and steady multifamily infill.
+    city_id: nyc
+  Sunnyside:
+    name: Sunnyside
+    borough: QUEENS
+    lat: 40.7433
+    lng: -73.9196
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.75
+    capex: 4500000.0
+    permit_vel: 31.0
+    shift_ratio: 1.25
+    sla: 39.0
+    description: Close-knit residential enclave featuring Sunnyside Gardens historic
+      planned community and Queens Blvd retail.
+    city_id: nyc
+  Woodside:
+    name: Woodside
+    borough: QUEENS
+    lat: 40.7454
+    lng: -73.903
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.72
+    capex: 4100000.0
+    permit_vel: 33.0
+    shift_ratio: 1.22
+    sla: 36.0
+    description: Key transit interchange with diverse commercial spine along Roosevelt
+      Avenue.
+    city_id: nyc
+  Jackson Heights:
+    name: Jackson Heights
+    borough: QUEENS
+    lat: 40.7557
+    lng: -73.8831
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.74
+    capex: 4300000.0
+    permit_vel: 37.0
+    shift_ratio: 1.28
+    sla: 48.0
+    description: Historic garden apartment district renowned for multicultural gastronomy
+      and commercial vitality.
+    city_id: nyc
+  Elmhurst:
+    name: Elmhurst
+    borough: QUEENS
+    lat: 40.7368
+    lng: -73.8784
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.71
+    capex: 4200000.0
+    permit_vel: 35.0
+    shift_ratio: 1.24
+    sla: 34.0
+    description: Major commercial center with Queens Center Mall anchor and medical
+      institutional presence.
+    city_id: nyc
+  Corona:
+    name: Corona
+    borough: QUEENS
+    lat: 40.7448
+    lng: -73.8643
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.68
+    capex: 3700000.0
+    permit_vel: 32.0
+    shift_ratio: 1.2
+    sla: 30.0
+    description: Dense family community bordering Flushing Meadows Corona Park with
+      vibrant street retail.
+    city_id: nyc
+  Flushing:
+    name: Flushing
+    borough: QUEENS
+    lat: 40.7675
+    lng: -73.8331
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.86
+    capex: 8700000.0
+    permit_vel: 55.0
+    shift_ratio: 1.51
+    sla: 62.0
+    description: Major Asian commercial, financial, and residential hub with intense
+      development around Main Street.
+    city_id: nyc
+  Ridgewood:
+    name: Ridgewood
+    borough: QUEENS
+    lat: 40.7081
+    lng: -73.9015
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.78
+    capex: 4800000.0
+    permit_vel: 41.0
+    shift_ratio: 1.39
+    sla: 51.0
+    description: National historic brick rowhouse district attracting Bushwick spillover
+      and artisanal retail.
+    city_id: nyc
+  Forest Hills:
+    name: Forest Hills
+    borough: QUEENS
+    lat: 40.7181
+    lng: -73.8448
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.79
+    capex: 5200000.0
+    permit_vel: 30.0
+    shift_ratio: 1.23
+    sla: 42.0
+    description: Prestigious neighborhood with Austin Street commercial core and historic
+      Forest Hills Gardens.
+    city_id: nyc
+  Jamaica:
+    name: Jamaica
+    borough: QUEENS
+    lat: 40.7027
+    lng: -73.789
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.73
+    capex: 5400000.0
+    permit_vel: 44.0
+    shift_ratio: 1.36
+    sla: 35.0
+    description: Key intermodal transit hub (JFK AirTrain / LIRR) driving major high-density
+      downtown redevelopment.
+    city_id: nyc
+  Long Island City / Sunnyside Yards:
+    name: Long Island City / Sunnyside Yards
+    borough: QUEENS
+    lat: 40.7505
+    lng: -73.935
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.87
+    capex: 9200000.0
+    permit_vel: 58.0
+    shift_ratio: 1.59
+    sla: 49.0
+    description: Strategic master-planned corridor linking Queensboro Plaza with Sunnyside
+      Yards rail infrastructure.
+    city_id: nyc
+  Mott Haven:
+    name: Mott Haven
+    borough: BRONX
+    lat: 40.809
+    lng: -73.9225
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.79
+    capex: 6700000.0
+    permit_vel: 53.0
+    shift_ratio: 1.53
+    sla: 44.0
+    description: Waterfront renaissance corridor with high-volume luxury rental developments
+      and creative conversions.
+    city_id: nyc
+  Port Morris:
+    name: Port Morris
+    borough: BRONX
+    lat: 40.801
+    lng: -73.914
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.76
+    capex: 5800000.0
+    permit_vel: 42.0
+    shift_ratio: 1.46
+    sla: 38.0
+    description: Industrial waterfront district featuring craft breweries, film studios,
+      and commercial conversion.
+    city_id: nyc
+  South Bronx / Hub:
+    name: South Bronx / Hub
+    borough: BRONX
+    lat: 40.8175
+    lng: -73.918
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.72
+    capex: 4800000.0
+    permit_vel: 45.0
+    shift_ratio: 1.34
+    sla: 33.0
+    description: The historic 'Hub' retail core at 149th & 3rd Avenue with major civic
+      and retail foot traffic.
+    city_id: nyc
+  Grand Concourse:
+    name: Grand Concourse
+    borough: BRONX
+    lat: 40.838
+    lng: -73.9185
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.7
+    capex: 4400000.0
+    permit_vel: 38.0
+    shift_ratio: 1.27
+    sla: 29.0
+    description: Grand Art Deco residential boulevard anchored by the Bronx Museum
+      of the Arts and courthouse district.
+    city_id: nyc
+  Highbridge:
+    name: Highbridge
+    borough: BRONX
+    lat: 40.8375
+    lng: -73.927
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.66
+    capex: 3600000.0
+    permit_vel: 29.0
+    shift_ratio: 1.21
+    sla: 22.0
+    description: Hilly residential community adjacent to High Bridge pedestrian span
+      and Harlem River crossings.
+    city_id: nyc
+  Fordham / Belmont (Arthur Ave):
+    name: Fordham / Belmont (Arthur Ave)
+    borough: BRONX
+    lat: 40.853
+    lng: -73.8885
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.75
+    capex: 4700000.0
+    permit_vel: 36.0
+    shift_ratio: 1.3
+    sla: 53.0
+    description: Arthur Avenue 'Little Italy' food corridor and Fordham University
+      institutional anchor.
+    city_id: nyc
+  Kingsbridge:
+    name: Kingsbridge
+    borough: BRONX
+    lat: 40.881
+    lng: -73.9035
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.68
+    capex: 3900000.0
+    permit_vel: 31.0
+    shift_ratio: 1.23
+    sla: 27.0
+    description: Broadway commercial shopping corridor with Kingsbridge Armory redevelopment
+      potential.
+    city_id: nyc
+  Riverdale:
+    name: Riverdale
+    borough: BRONX
+    lat: 40.893
+    lng: -73.9125
+    zoom: 13.5
+    pitch: 35.0
+    base_lims: 0.73
+    capex: 4900000.0
+    permit_vel: 22.0
+    shift_ratio: 1.14
+    sla: 24.0
+    description: Scenic estate and cooperative residential community overlooking the
+      Hudson River and Palisades.
+    city_id: nyc
+  Pelham Bay:
+    name: Pelham Bay
+    borough: BRONX
+    lat: 40.8505
+    lng: -73.832
+    zoom: 13.5
+    pitch: 35.0
+    base_lims: 0.67
+    capex: 3500000.0
+    permit_vel: 25.0
+    shift_ratio: 1.17
+    sla: 28.0
+    description: Eastern Bronx coastal neighborhood near Pelham Bay Park and City
+      Island with strong residential stability.
+    city_id: nyc
+  St. George:
+    name: St. George
+    borough: STATEN_ISLAND
+    lat: 40.6437
+    lng: -74.0764
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.74
+    capex: 5200000.0
+    permit_vel: 34.0
+    shift_ratio: 1.35
+    sla: 31.0
+    description: Civic capital and Staten Island Ferry terminal district with waterfront
+      outlet retail and bay views.
+    city_id: nyc
+  Tompkinsville:
+    name: Tompkinsville
+    borough: STATEN_ISLAND
+    lat: 40.6275
+    lng: -74.0775
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.68
+    capex: 3800000.0
+    permit_vel: 26.0
+    shift_ratio: 1.24
+    sla: 25.0
+    description: North Shore transit corridor undergoing Bay Street zoning-led revitalization.
+    city_id: nyc
+  Stapleton:
+    name: Stapleton
+    borough: STATEN_ISLAND
+    lat: 40.6269
+    lng: -74.0772
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.7
+    capex: 4100000.0
+    permit_vel: 28.0
+    shift_ratio: 1.28
+    sla: 27.0
+    description: Historic maritime waterfront district seeing modern URBY residential
+      development and craft culinary scene.
+    city_id: nyc
+  Port Richmond:
+    name: Port Richmond
+    borough: STATEN_ISLAND
+    lat: 40.635
+    lng: -74.125
+    zoom: 13.5
+    pitch: 35.0
+    base_lims: 0.64
+    capex: 3200000.0
+    permit_vel: 21.0
+    shift_ratio: 1.18
+    sla: 22.0
+    description: Kill Van Kull waterfront neighborhood with commercial avenue retail
+      and industrial legacy.
+    city_id: nyc
+  New Dorp:
+    name: New Dorp
+    borough: STATEN_ISLAND
+    lat: 40.5735
+    lng: -74.1165
+    zoom: 13.5
+    pitch: 35.0
+    base_lims: 0.69
+    capex: 3600000.0
+    permit_vel: 24.0
+    shift_ratio: 1.19
+    sla: 32.0
+    description: East Shore commercial center anchored by New Dorp Lane dining and
+      shopping.
+    city_id: nyc
+  Tottenville:
+    name: Tottenville
+    borough: STATEN_ISLAND
+    lat: 40.5125
+    lng: -74.247
+    zoom: 13.0
+    pitch: 30.0
+    base_lims: 0.65
+    capex: 3400000.0
+    permit_vel: 18.0
+    shift_ratio: 1.12
+    sla: 19.0
+    description: South Shore historic residential community on the Arthur Kill with
+      single-family suburban character.
+    city_id: nyc
+divisions:
+  MANHATTAN:
+    name: MANHATTAN
+    center_lat: 40.7831
+    center_lng: -73.9712
+    zoom: 12.0
+    bbox:
+      min_lat: 40.7
+      max_lat: 40.882
+      min_lng: -74.02
+      max_lng: -73.907
+    submarkets:
+    - SoHo
+    - Tribeca
+    - West Village
+    - Greenwich Village
+    - East Village
+    - Lower East Side
+    - Chinatown
+    - Financial District
+    - Chelsea
+    - Flatiron / NoMad
+    - Hell's Kitchen
+    - Midtown East
+    - Upper East Side
+    - Upper West Side
+    - Harlem
+    - East Harlem
+    - Washington Heights
+    - Inwood
+    city_id: nyc
+  BROOKLYN:
+    name: BROOKLYN
+    center_lat: 40.6782
+    center_lng: -73.9442
+    zoom: 12.0
+    bbox:
+      min_lat: 40.57
+      max_lat: 40.74
+      min_lng: -74.05
+      max_lng: -73.83
+    submarkets:
+    - Williamsburg
+    - Greenpoint
+    - Bushwick
+    - DUMBO
+    - Downtown Brooklyn
+    - Brooklyn Heights
+    - Cobble Hill / Boerum Hill
+    - Fort Greene
+    - Clinton Hill
+    - Bed-Stuy
+    - Crown Heights
+    - Park Slope
+    - Gowanus
+    - Prospect Heights
+    - Prospect Lefferts Gardens
+    - Sunset Park
+    - Bay Ridge
+    - Flatbush
+    - Red Hook
+    - Coney Island
+    city_id: nyc
+  QUEENS:
+    name: QUEENS
+    center_lat: 40.7282
+    center_lng: -73.7949
+    zoom: 11.5
+    bbox:
+      min_lat: 40.54
+      max_lat: 40.8
+      min_lng: -73.96
+      max_lng: -73.7
+    submarkets:
+    - Long Island City
+    - Astoria
+    - Sunnyside
+    - Woodside
+    - Jackson Heights
+    - Elmhurst
+    - Corona
+    - Flushing
+    - Ridgewood
+    - Forest Hills
+    - Jamaica
+    - Long Island City / Sunnyside Yards
+    city_id: nyc
+  BRONX:
+    name: BRONX
+    center_lat: 40.8448
+    center_lng: -73.8648
+    zoom: 12.0
+    bbox:
+      min_lat: 40.785
+      max_lat: 40.915
+      min_lng: -73.935
+      max_lng: -73.765
+    submarkets:
+    - Mott Haven
+    - Port Morris
+    - South Bronx / Hub
+    - Grand Concourse
+    - Highbridge
+    - Fordham / Belmont (Arthur Ave)
+    - Kingsbridge
+    - Riverdale
+    - Pelham Bay
+    city_id: nyc
+  STATEN_ISLAND:
+    name: STATEN_ISLAND
+    center_lat: 40.5795
+    center_lng: -74.1502
+    zoom: 11.5
+    bbox:
+      min_lat: 40.495
+      max_lat: 40.65
+      min_lng: -74.255
+      max_lng: -74.05
+    submarkets:
+    - St. George
+    - Tompkinsville
+    - Stapleton
+    - Port Richmond
+    - New Dorp
+    - Tottenville
+    city_id: nyc
+datasets:
+  permits:
+    endpoint: https://data.cityofnewyork.us/resource/ipu4-2q9a.json
+    platform: socrata
+    watermark_col: issuance_date
+    id_keys:
+    - job__
+    - job_number
+    - job_filing_number
+    - id
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map: {}
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: https://data.cityofnewyork.us/resource/erm2-nwe9.json
+    platform: socrata
+    watermark_col: created_date
+    id_keys:
+    - unique_key
+    - id
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map: {}
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://data.ny.gov/resource/9s3h-dpkz.json
+    platform: socrata
+    watermark_col: effectivedate
+    id_keys:
+    - licensepermitid
+    - legacyserialnumber
+    - serial_number
+    - id
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map: {}
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  deeds:
+    endpoint: https://data.cityofnewyork.us/resource/bnx9-e6tj.json
+    platform: socrata
+    watermark_col: recorded_datetime
+    id_keys:
+    - document_id
+    - doc_id
+    - id
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map: {}
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 21
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  crime:
+    endpoint: https://data.cityofnewyork.us/resource/5uac-w243.json
+    platform: socrata
+    watermark_col: cmplnt_fr_dt
+    id_keys:
+    - cmplnt_num
+    topic: raw.municipal.crime
+    interval_seconds: 1800.0
+    producer_key: crime
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map: {}
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  evictions:
+    endpoint: https://data.cityofnewyork.us/resource/6z8x-wfk4.json
+    platform: socrata
+    watermark_col: executed_date
+    id_keys:
+    - court_index_number
+    - docket_number
+    topic: raw.municipal.evictions
+    interval_seconds: 900.0
+    producer_key: evictions
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      eviction_id:
+      - court_index_number
+      - docket_number
+      latitude:
+      - latitude
+      longitude:
+      - longitude
+      executed_date:
+      - executed_date
+      borough:
+      - borough
+      zipcode:
+      - eviction_zip
+      residential_commercial:
+      - residential_commercial_ind
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  energy_benchmark:
+    endpoint: https://data.cityofnewyork.us/resource/5zyy-y8am.json
+    platform: socrata
+    watermark_col: report_year
+    id_keys:
+    - property_id
+    - report_year
+    topic: raw.context.observations
+    interval_seconds: 86400.0
+    producer_key: energy_benchmark
+    endpoint_by_year: {}
+    watermark_type: text
+    watermark_format: '%Y'
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      asset_id:
+      - property_id
+      asset_name:
+      - property_name
+      - address_1
+      period:
+      - report_year
+      latitude:
+      - latitude
+      longitude:
+      - longitude
+      address:
+      - address_1
+      zipcode:
+      - postal_code
+      borough:
+      - borough
+      - city
+      source_neighborhood:
+      - nta2020
+      category:
+      - primary_property_type
+      - primary_property_type_self
+      compliance:
+      - reason_s_for_no_score
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 365
+    alarm_exempt: true
+    alarm_exempt_reason: "annual disclosure \u2014 one publication per year by design\
+      \ (US-363 \xA72.7)"
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  bike_ped:
+    endpoint: https://data.cityofnewyork.us/resource/ct66-47at.json
+    platform: socrata
+    watermark_col: timestamp
+    id_keys:
+    - flowid
+    - sensor_id
+    - timestamp
+    topic: raw.context.observations
+    interval_seconds: 3600.0
+    producer_key: bike_ped
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: status != 'deleted'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      asset_id:
+      - sensor_id
+      period:
+      - timestamp
+      count:
+      - counts
+      travel_mode:
+      - travelmode
+      direction:
+      - direction
+      status:
+      - status
+      granularity:
+      - granularity
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints:
+      sensor_registry: https://data.cityofnewyork.us/resource/6up2-gnw8.json
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  gbfs:
+    endpoint: https://gbfs.lyft.com/gbfs/2.3/bkn/gbfs.json
+    platform: gbfs
+    watermark_col: ''
+    id_keys:
+    - station_id
+    - system_id
+    topic: raw.mobility.station_change
+    interval_seconds: 3600.0
+    producer_key: gbfs
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map: {}
+    ingestion_mode: snapshot
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints:
+      system_id: bkn
+      operator: lyft
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- new_york
+- new-york
+- new york
+- new york city
+- ny
+job_suffix: ''

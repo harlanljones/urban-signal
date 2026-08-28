@@ -1,0 +1,267 @@
+city_id: fort_worth
+name: Fort Worth / Tarrant County
+state: TX
+center:
+  lat: 32.755
+  lng: -97.33
+metro_bbox:
+  min_lat: 32.4
+  max_lat: 33.05
+  min_lng: -97.75
+  max_lng: -96.95
+division_bboxes:
+  FORT_WORTH_CORE:
+    min_lat: 32.55
+    max_lat: 33.0
+    min_lng: -97.65
+    max_lng: -97.05
+submarkets:
+  Downtown & Sundance:
+    name: Downtown & Sundance
+    borough: FORT_WORTH_CORE
+    lat: 32.755
+    lng: -97.33
+    zoom: 14.2
+    pitch: 52.0
+    base_lims: 0.9
+    capex: 12000000.0
+    permit_vel: 58.0
+    shift_ratio: 1.62
+    sla: 68.0
+    description: Central business district and Sundance Square with mixed-use towers,
+      hotel, and residential conversion permitting.
+    city_id: fort_worth
+  Near Southside:
+    name: Near Southside
+    borough: FORT_WORTH_CORE
+    lat: 32.71
+    lng: -97.32
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.85
+    capex: 8200000.0
+    permit_vel: 47.0
+    shift_ratio: 1.55
+    sla: 63.0
+    description: Medical-district-adjacent infill and adaptive-reuse neighborhood
+      with steady residential and commercial permitting.
+    city_id: fort_worth
+  Cultural District:
+    name: Cultural District
+    borough: FORT_WORTH_CORE
+    lat: 32.745
+    lng: -97.365
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.87
+    capex: 9800000.0
+    permit_vel: 49.0
+    shift_ratio: 1.58
+    sla: 65.0
+    description: Museums, parks, and fabricating district with infill multifamily
+      and hospitality permitting near the Trinity trails.
+    city_id: fort_worth
+  TCU / West Cliff:
+    name: TCU / West Cliff
+    borough: FORT_WORTH_CORE
+    lat: 32.706
+    lng: -97.365
+    zoom: 13.8
+    pitch: 44.0
+    base_lims: 0.83
+    capex: 7400000.0
+    permit_vel: 43.0
+    shift_ratio: 1.51
+    sla: 61.0
+    description: University-adjacent streetcar-era neighborhoods with renovation-led
+      and teardown/rebuild permitting.
+    city_id: fort_worth
+  Arlington Heights & Hospital District:
+    name: Arlington Heights & Hospital District
+    borough: FORT_WORTH_CORE
+    lat: 32.735
+    lng: -97.395
+    zoom: 13.8
+    pitch: 42.0
+    base_lims: 0.82
+    capex: 6900000.0
+    permit_vel: 41.0
+    shift_ratio: 1.49
+    sla: 60.0
+    description: Established west-side residential corridors near the hospital district
+      with steady redevelopment permitting.
+    city_id: fort_worth
+  North Fort Worth / Alliance:
+    name: North Fort Worth / Alliance
+    borough: FORT_WORTH_CORE
+    lat: 32.9
+    lng: -97.3
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.84
+    capex: 7800000.0
+    permit_vel: 45.0
+    shift_ratio: 1.52
+    sla: 62.0
+    description: High-growth northern edge around the Alliance logistics corridor
+      with master-planned residential and industrial permitting.
+    city_id: fort_worth
+divisions:
+  FORT_WORTH_CORE:
+    name: Fort Worth Core
+    center_lat: 32.76
+    center_lng: -97.33
+    zoom: 11.8
+    bbox:
+      min_lat: 32.55
+      max_lat: 33.0
+      min_lng: -97.65
+      max_lng: -97.05
+    submarkets:
+    - Downtown & Sundance
+    - Near Southside
+    - Cultural District
+    - TCU / West Cliff
+    - Arlington Heights & Hospital District
+    - North Fort Worth / Alliance
+    city_id: fort_worth
+datasets:
+  permits:
+    endpoint: https://mapit.fortworthtexas.gov/ags/rest/services/CIVIC/Permits/FeatureServer/0
+    platform: arcgis
+    watermark_col: File_Date
+    id_keys:
+    - Unique_ID
+    - Permit_No
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: File_Date DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Fort Worth, TX
+    field_map:
+      job_id:
+      - Unique_ID
+      - Permit_No
+      - OBJECTID
+      latitude:
+      - SHAPE__Y
+      - Y
+      longitude:
+      - SHAPE__X
+      - X
+      cost:
+      - JobValue
+      job_type:
+      - Permit_Type
+      - Permit_SubType
+      - Permit_Category
+      - B1_WORK_DESC
+      issuance_date:
+      - File_Date
+      - Status_Date
+      filing_date:
+      - File_Date
+      status:
+      - Current_Status
+      address_street:
+      - Addr_No
+      - Street_Name
+      zipcode:
+      - Zip_Code
+      bbl:
+      - B1_LOT
+      - B1_BLOCK
+      - B1_TRACT
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 1000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'TX'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- fort worth
+- fortworth
+- fort worth tx
+- tarrant_county
+- tarrant county
+job_suffix: fort_worth

@@ -1,0 +1,736 @@
+city_id: washington_dc
+name: Washington DC
+state: DC
+center:
+  lat: 38.9072
+  lng: -77.0369
+metro_bbox:
+  min_lat: 38.79
+  max_lat: 38.995
+  min_lng: -77.12
+  max_lng: -76.909
+division_bboxes:
+  DOWNTOWN_NOMA_CAPITOL_RIVERFRONT:
+    min_lat: 38.877
+    max_lat: 38.913
+    min_lng: -77.036
+    max_lng: -76.995
+  CAPITOL_HILL_EAST_END:
+    min_lat: 38.879
+    max_lat: 38.9
+    min_lng: -76.995
+    max_lng: -76.972
+  DUPONT_KALORAMA_UPTOWN:
+    min_lat: 38.9
+    max_lat: 38.926
+    min_lng: -77.062
+    max_lng: -77.022
+  GEORGETOWN_FOGGY_BOTTOM:
+    min_lat: 38.893
+    max_lat: 38.915
+    min_lng: -77.1
+    max_lng: -77.045
+  COLUMBIA_HEIGHTS_PETWORTH:
+    min_lat: 38.926
+    max_lat: 38.962
+    min_lng: -77.04
+    max_lng: -77.0
+  BROOKLAND_RHODE_ISLAND_AVE:
+    min_lat: 38.926
+    max_lat: 38.948
+    min_lng: -77.0
+    max_lng: -76.955
+  HILL_EAST_FAIRLINTON:
+    min_lat: 38.868
+    max_lat: 38.884
+    min_lng: -76.986
+    max_lng: -76.952
+  ANACOSTIA_EAST_OF_THE_RIVER:
+    min_lat: 38.845
+    max_lat: 38.878
+    min_lng: -76.988
+    max_lng: -76.93
+submarkets:
+  Penn Quarter:
+    name: Penn Quarter
+    borough: DOWNTOWN_NOMA_CAPITOL_RIVERFRONT
+    lat: 38.8963
+    lng: -77.023
+    zoom: 15.0
+    pitch: 50.0
+    base_lims: 0.92
+    capex: 12000000.0
+    permit_vel: 58.0
+    shift_ratio: 1.7
+    sla: 75.0
+    description: Museum-and-theater core between the Mall and Gallery Place with Capital
+      One Arena foot traffic, office-to-residential conversions, and the heaviest
+      downtown permit velocity.
+    city_id: washington_dc
+  Southwest Waterfront/The Wharf:
+    name: Southwest Waterfront/The Wharf
+    borough: DOWNTOWN_NOMA_CAPITOL_RIVERFRONT
+    lat: 38.8795
+    lng: -77.0185
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.88
+    capex: 10500000.0
+    permit_vel: 44.0
+    shift_ratio: 1.55
+    sla: 62.0
+    description: Phased mixed-use waterfront rebuild along Maine Avenue with The Wharf's
+      concert piers, hotel inventory, and continued phase-two infill toward the Arena
+      Stage axis.
+    city_id: washington_dc
+  NoMa/H Street NE:
+    name: NoMa/H Street NE
+    borough: DOWNTOWN_NOMA_CAPITOL_RIVERFRONT
+    lat: 38.9065
+    lng: -77.0015
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.86
+    capex: 9800000.0
+    permit_vel: 52.0
+    shift_ratio: 1.58
+    sla: 58.0
+    description: Red Line-anchored high-density residential boom north of Union Station
+      feeding the H Street NE streetcar nightlife spine across the Florida Avenue
+      gap.
+    city_id: washington_dc
+  Union Market:
+    name: Union Market
+    borough: DOWNTOWN_NOMA_CAPITOL_RIVERFRONT
+    lat: 38.9085
+    lng: -77.0055
+    zoom: 15.0
+    pitch: 50.0
+    base_lims: 0.84
+    capex: 9000000.0
+    permit_vel: 48.0
+    shift_ratio: 1.52
+    sla: 55.0
+    description: Food-hall epicenter of a master-planned five-million-square-foot
+      development district where Edison-era warehouse fabric meets tower cranes along
+      Neal Place.
+    city_id: washington_dc
+  Capitol Hill:
+    name: Capitol Hill
+    borough: CAPITOL_HILL_EAST_END
+    lat: 38.885
+    lng: -76.989
+    zoom: 14.5
+    pitch: 40.0
+    base_lims: 0.9
+    capex: 8600000.0
+    permit_vel: 30.0
+    shift_ratio: 1.44
+    sla: 70.0
+    description: Rowhouse historic district of congressional staff housing east of
+      the Capitol grounds with Barracks Row retail and tight single-family supply.
+    city_id: washington_dc
+  Eastern Market:
+    name: Eastern Market
+    borough: CAPITOL_HILL_EAST_END
+    lat: 38.8843
+    lng: -76.993
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.87
+    capex: 7200000.0
+    permit_vel: 26.0
+    shift_ratio: 1.36
+    sla: 66.0
+    description: Landmark 1873 public-market square anchoring weekend vendor crowds,
+      7th Street SE boutiques, and premium rowhouse renovations on Capitol Hill's
+      north slope.
+    city_id: washington_dc
+  Dupont Circle:
+    name: Dupont Circle
+    borough: DUPONT_KALORAMA_UPTOWN
+    lat: 38.9097
+    lng: -77.0444
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.91
+    capex: 10200000.0
+    permit_vel: 34.0
+    shift_ratio: 1.5
+    sla: 72.0
+    description: Embassy-row traffic circle with Connecticut Avenue Class-B office
+      stock converting to residential, gallery retail, and Metro Red Line density.
+    city_id: washington_dc
+  Kalorama Heights:
+    name: Kalorama Heights
+    borough: DUPONT_KALORAMA_UPTOWN
+    lat: 38.9145
+    lng: -77.05
+    zoom: 14.5
+    pitch: 35.0
+    base_lims: 0.89
+    capex: 11500000.0
+    permit_vel: 22.0
+    shift_ratio: 1.46
+    sla: 68.0
+    description: Mansion-belt enclave of presidential residencies and embassy compounds
+      where turnover is rare and renovation permits carry outsized contract values.
+    city_id: washington_dc
+  Adams Morgan:
+    name: Adams Morgan
+    borough: DUPONT_KALORAMA_UPTOWN
+    lat: 38.9165
+    lng: -77.0437
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.83
+    capex: 7000000.0
+    permit_vel: 32.0
+    shift_ratio: 1.42
+    sla: 60.0
+    description: Nightlife-and-immigration commercial strip on 18th Street with aging
+      walk-up stock primed for repositioning and Columbia Road corridor investment.
+    city_id: washington_dc
+  U Street Corridor:
+    name: U Street Corridor
+    borough: DUPONT_KALORAMA_UPTOWN
+    lat: 38.916
+    lng: -77.028
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.85
+    capex: 9200000.0
+    permit_vel: 50.0
+    shift_ratio: 1.56
+    sla: 64.0
+    description: Black Broadway heritage corridor of music venues and Victorian rowhouses
+      now ringed by Green/Yellow Line transit-oriented tower development.
+    city_id: washington_dc
+  Georgetown Waterfront:
+    name: Georgetown Waterfront
+    borough: GEORGETOWN_FOGGY_BOTTOM
+    lat: 38.905
+    lng: -77.069
+    zoom: 14.5
+    pitch: 40.0
+    base_lims: 0.9
+    capex: 11000000.0
+    permit_vel: 28.0
+    shift_ratio: 1.54
+    sla: 74.0
+    description: Federal-row retail and Washington Harbour park frontage on the Potomac
+      with luxury condo scarcity value and C&O Canal-adjacent restoration work.
+    city_id: washington_dc
+  Foggy Bottom/West End:
+    name: Foggy Bottom/West End
+    borough: GEORGETOWN_FOGGY_BOTTOM
+    lat: 38.9
+    lng: -77.051
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.87
+    capex: 9600000.0
+    permit_vel: 36.0
+    shift_ratio: 1.48
+    sla: 63.0
+    description: George Washington University hospital-and-dormitory economy beside
+      the Kennedy Center, with State Department demand and West End condo redevelopment.
+    city_id: washington_dc
+  Columbia Heights:
+    name: Columbia Heights
+    borough: COLUMBIA_HEIGHTS_PETWORTH
+    lat: 38.9288
+    lng: -77.0277
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.82
+    capex: 7600000.0
+    permit_vel: 46.0
+    shift_ratio: 1.5
+    sla: 56.0
+    description: Green/Yellow Line retail hub around DC USA with dense multifamily
+      conversion pipeline along 14th Street NW's northern stretch.
+    city_id: washington_dc
+  Petworth:
+    name: Petworth
+    borough: COLUMBIA_HEIGHTS_PETWORTH
+    lat: 38.9378
+    lng: -77.0234
+    zoom: 14.5
+    pitch: 40.0
+    base_lims: 0.78
+    capex: 6000000.0
+    permit_vel: 40.0
+    shift_ratio: 1.44
+    sla: 48.0
+    description: Porched-rowhouse family market around Upshur Street strip retail
+      with steady gut-renovation velocity and Georgia Avenue investment frontage.
+    city_id: washington_dc
+  Takoma DC:
+    name: Takoma DC
+    borough: COLUMBIA_HEIGHTS_PETWORTH
+    lat: 38.9565
+    lng: -77.014
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.72
+    capex: 4800000.0
+    permit_vel: 24.0
+    shift_ratio: 1.28
+    sla: 40.0
+    description: Historic bungalow quarter at the Maryland line around the Takoma
+      Metro station with craftsman restoration work and small-lot infill.
+    city_id: washington_dc
+  Brookland/CUA:
+    name: Brookland/CUA
+    borough: BROOKLAND_RHODE_ISLAND_AVE
+    lat: 38.9332
+    lng: -76.986
+    zoom: 14.5
+    pitch: 40.0
+    base_lims: 0.68
+    capex: 5200000.0
+    permit_vel: 34.0
+    shift_ratio: 1.36
+    sla: 44.0
+    description: Little Rome university district where Catholic University institutional
+      demand meets Arts Walk mixed-use build-out on the Rhode Island Avenue bridge.
+    city_id: washington_dc
+  Anacostia Historic District:
+    name: Anacostia Historic District
+    borough: ANACOSTIA_EAST_OF_THE_RIVER
+    lat: 38.8676
+    lng: -76.9846
+    zoom: 14.5
+    pitch: 40.0
+    base_lims: 0.62
+    capex: 3800000.0
+    permit_vel: 26.0
+    shift_ratio: 1.34
+    sla: 36.0
+    description: Frederick Douglass home-side cottage district around the 11th Street
+      Bridge landing where the Bridge District waterfront project resets East-of-the-River
+      values.
+    city_id: washington_dc
+  Congress Heights/St. Elizabeths:
+    name: Congress Heights/St. Elizabeths
+    borough: ANACOSTIA_EAST_OF_THE_RIVER
+    lat: 38.849
+    lng: -76.9665
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.55
+    capex: 3000000.0
+    permit_vel: 22.0
+    shift_ratio: 1.12
+    sla: 30.0
+    description: "Camp Simms retail rebuild and the St. Elizabeths campus conversion\
+      \ \u2014 DHS headquarters, hospital shell reuse, and the district's largest\
+      \ land-bank opportunity."
+    city_id: washington_dc
+divisions:
+  DOWNTOWN_NOMA_CAPITOL_RIVERFRONT:
+    name: DOWNTOWN_NOMA_CAPITOL_RIVERFRONT
+    center_lat: 38.897
+    center_lng: -77.012
+    zoom: 13.0
+    bbox:
+      min_lat: 38.877
+      max_lat: 38.913
+      min_lng: -77.036
+      max_lng: -76.995
+    submarkets:
+    - Penn Quarter
+    - Southwest Waterfront/The Wharf
+    - NoMa/H Street NE
+    - Union Market
+    city_id: washington_dc
+  CAPITOL_HILL_EAST_END:
+    name: CAPITOL_HILL_EAST_END
+    center_lat: 38.8895
+    center_lng: -76.9835
+    zoom: 13.5
+    bbox:
+      min_lat: 38.879
+      max_lat: 38.9
+      min_lng: -76.995
+      max_lng: -76.972
+    submarkets:
+    - Capitol Hill
+    - Eastern Market
+    city_id: washington_dc
+  DUPONT_KALORAMA_UPTOWN:
+    name: DUPONT_KALORAMA_UPTOWN
+    center_lat: 38.914
+    center_lng: -77.042
+    zoom: 13.0
+    bbox:
+      min_lat: 38.9
+      max_lat: 38.926
+      min_lng: -77.062
+      max_lng: -77.022
+    submarkets:
+    - Dupont Circle
+    - Kalorama Heights
+    - Adams Morgan
+    - U Street Corridor
+    city_id: washington_dc
+  GEORGETOWN_FOGGY_BOTTOM:
+    name: GEORGETOWN_FOGGY_BOTTOM
+    center_lat: 38.9025
+    center_lng: -77.062
+    zoom: 13.5
+    bbox:
+      min_lat: 38.893
+      max_lat: 38.915
+      min_lng: -77.1
+      max_lng: -77.045
+    submarkets:
+    - Georgetown Waterfront
+    - Foggy Bottom/West End
+    city_id: washington_dc
+  COLUMBIA_HEIGHTS_PETWORTH:
+    name: COLUMBIA_HEIGHTS_PETWORTH
+    center_lat: 38.941
+    center_lng: -77.02
+    zoom: 13.0
+    bbox:
+      min_lat: 38.926
+      max_lat: 38.962
+      min_lng: -77.04
+      max_lng: -77.0
+    submarkets:
+    - Columbia Heights
+    - Petworth
+    - Takoma DC
+    city_id: washington_dc
+  BROOKLAND_RHODE_ISLAND_AVE:
+    name: BROOKLAND_RHODE_ISLAND_AVE
+    center_lat: 38.937
+    center_lng: -76.978
+    zoom: 13.5
+    bbox:
+      min_lat: 38.926
+      max_lat: 38.948
+      min_lng: -77.0
+      max_lng: -76.955
+    submarkets:
+    - Brookland/CUA
+    city_id: washington_dc
+  HILL_EAST_FAIRLINTON:
+    name: HILL_EAST_FAIRLINTON
+    center_lat: 38.876
+    center_lng: -76.969
+    zoom: 13.5
+    bbox:
+      min_lat: 38.868
+      max_lat: 38.884
+      min_lng: -76.986
+      max_lng: -76.952
+    submarkets: []
+    city_id: washington_dc
+  ANACOSTIA_EAST_OF_THE_RIVER:
+    name: ANACOSTIA_EAST_OF_THE_RIVER
+    center_lat: 38.858
+    center_lng: -76.962
+    zoom: 13.0
+    bbox:
+      min_lat: 38.845
+      max_lat: 38.878
+      min_lng: -76.988
+      max_lng: -76.93
+    submarkets:
+    - Anacostia Historic District
+    - Congress Heights/St. Elizabeths
+    city_id: washington_dc
+datasets:
+  permits:
+    endpoint: https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/18
+    platform: arcgis
+    watermark_col: ISSUE_DATE
+    id_keys:
+    - PERMIT_ID
+    - DCRAINTERNALNUMBER
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year:
+      '2023': https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/15
+      '2024': https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/16
+      '2025': https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/17
+      '2026': https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/18
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - PERMIT_ID
+      latitude:
+      - LATITUDE
+      longitude:
+      - LONGITUDE
+      issuance_date:
+      - ISSUE_DATE
+      job_type:
+      - PERMIT_TYPE_NAME
+      - PERMIT_SUBTYPE_NAME
+      cost:
+      - FEES_PAID
+      borough:
+      - WARD
+      zipcode:
+      - ZIPCODE
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  '311':
+    endpoint: https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/21
+    platform: arcgis
+    watermark_col: ADDDATE
+    id_keys:
+    - SERVICEREQUESTID
+    - GLOBALID
+    - OBJECTID
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year:
+      '2022': https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/14
+      '2023': https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/15
+      '2024': https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/16
+      '2025': https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/18
+      '2026': https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/21
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - SERVICEREQUESTID
+      latitude:
+      - LATITUDE
+      longitude:
+      - LONGITUDE
+      complaint_type:
+      - SERVICECODEDESCRIPTION
+      created_date:
+      - ADDDATE
+      closed_date:
+      - RESOLUTIONDATE
+      status:
+      - SERVICEORDERSTATUS
+      incident_address:
+      - STREETADDRESS
+      borough:
+      - WARD
+      zipcode:
+      - ZIPCODE
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 1000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/0
+    platform: arcgis
+    watermark_col: INITIALISSUEDATE
+    id_keys:
+    - CUSTOMERNUMBER
+    - GLOBALID
+    - OBJECTID
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: PREMISEINDC = 'Yes'
+    needs_geocode: true
+    geocode_context: Washington, DC
+    field_map:
+      license_id:
+      - CUSTOMERNUMBER
+      license_type:
+      - LICENSETYPE
+      effective_date:
+      - LICENSESTARTDATE
+      expiration_date:
+      - LICENSEENDDATE
+      borough:
+      - WARD
+      address_street:
+      - PREMISEADDRESS
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  deeds:
+    endpoint: https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Property_and_Land_WebMercator/FeatureServer/57
+    platform: arcgis
+    watermark_col: SALE_DATE
+    id_keys:
+    - SSL
+    - ROW_NUMBER
+    - OBJECTID
+    - id
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - ROW_NUMBER
+      bbl:
+      - SSL
+      document_amount:
+      - SALE_PRICE
+      recorded_date:
+      - SALE_DATE
+      doc_type:
+      - QUALIFIED
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join:
+      parcel_layer: https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Property_and_Land_WebMercator/FeatureServer/33
+      join_key: SSL
+      geometry_source: centroid
+    non_spatial: null
+    zip_member: null
+  gbfs:
+    endpoint: https://gbfs.capitalbikeshare.com/gbfs/gbfs.json
+    platform: gbfs
+    watermark_col: ''
+    id_keys:
+    - station_id
+    - system_id
+    topic: raw.mobility.station_change
+    interval_seconds: 3600.0
+    producer_key: gbfs
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map: {}
+    ingestion_mode: snapshot
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints:
+      system_id: dca-cabi
+      operator: lyft
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- washington-dc
+- washington dc
+- dc
+- district_of_columbia
+- district of columbia
+job_suffix: dc

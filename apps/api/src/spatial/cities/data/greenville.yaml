@@ -1,0 +1,363 @@
+city_id: greenville
+name: Greenville
+state: SC
+center:
+  lat: 34.8497
+  lng: -82.3992
+metro_bbox:
+  min_lat: 34.76
+  max_lat: 34.93
+  min_lng: -82.48
+  max_lng: -82.31
+division_bboxes:
+  DOWNTOWN_MAIN_STREET:
+    min_lat: 34.842
+    max_lat: 34.86
+    min_lng: -82.41
+    max_lng: -82.388
+  WEST_END:
+    min_lat: 34.83
+    max_lat: 34.855
+    min_lng: -82.435
+    max_lng: -82.393
+  NORTH_MAIN:
+    min_lat: 34.858
+    max_lat: 34.88
+    min_lng: -82.415
+    max_lng: -82.39
+  AUGUSTA_ROAD:
+    min_lat: 34.828
+    max_lat: 34.845
+    min_lng: -82.398
+    max_lng: -82.378
+  EASTSIDE:
+    min_lat: 34.822
+    max_lat: 34.865
+    min_lng: -82.38
+    max_lng: -82.335
+  PARIS_MOUNTAIN:
+    min_lat: 34.88
+    max_lat: 34.925
+    min_lng: -82.43
+    max_lng: -82.37
+submarkets:
+  Downtown:
+    name: Downtown
+    borough: DOWNTOWN_MAIN_STREET
+    lat: 34.8497
+    lng: -82.3992
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.86
+    capex: 6400000.0
+    permit_vel: 29.0
+    shift_ratio: 1.46
+    sla: 52.0
+    description: Main Street core with the Falls Park riverfront, hotel/office adaptive
+      reuse, and the award-winning downtown mixed-use permitting corridor.
+    city_id: greenville
+  West End:
+    name: West End
+    borough: WEST_END
+    lat: 34.8413
+    lng: -82.403
+    zoom: 14.5
+    pitch: 52.0
+    base_lims: 0.88
+    capex: 6900000.0
+    permit_vel: 31.0
+    shift_ratio: 1.5
+    sla: 55.0
+    description: Historic warehouse district below the Reedy River with Fluor Field
+      anchors, loft conversions, and the metro's strongest restaurant-row foot traffic.
+    city_id: greenville
+  Village of West Greenville:
+    name: Village of West Greenville
+    borough: WEST_END
+    lat: 34.8455
+    lng: -82.4235
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.84
+    capex: 5800000.0
+    permit_vel: 26.0
+    shift_ratio: 1.44
+    sla: 50.0
+    description: Pendleton Street arts district with mill-structure studios, cottage
+      infill, and artist-led commercial rehabilitation permits.
+    city_id: greenville
+  North Main:
+    name: North Main
+    borough: NORTH_MAIN
+    lat: 34.867
+    lng: -82.401
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.85
+    capex: 6100000.0
+    permit_vel: 24.0
+    shift_ratio: 1.42
+    sla: 51.0
+    description: North Main Street corridor of bungalow stock and infill townhomes
+      between downtown and the Paris Mountain slopes.
+    city_id: greenville
+  Augusta Road:
+    name: Augusta Road
+    borough: AUGUSTA_ROAD
+    lat: 34.837
+    lng: -82.386
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.89
+    capex: 7200000.0
+    permit_vel: 28.0
+    shift_ratio: 1.51
+    sla: 56.0
+    description: Augusta Street retail-residential spine with walkable shopfronts,
+      pre-war renovation, and steady high-valuation alteration permits.
+    city_id: greenville
+  Overbrook:
+    name: Overbrook
+    borough: EASTSIDE
+    lat: 34.8565
+    lng: -82.367
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.83
+    capex: 5500000.0
+    permit_vel: 23.0
+    shift_ratio: 1.4
+    sla: 49.0
+    description: Overbrook/Stone Avenue east side with starter-home turnover, duplex
+      conversions, and Stone Ave mixed-use nodes.
+    city_id: greenville
+  Verdae:
+    name: Verdae
+    borough: EASTSIDE
+    lat: 34.833
+    lng: -82.346
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.82
+    capex: 7800000.0
+    permit_vel: 27.0
+    shift_ratio: 1.47
+    sla: 53.0
+    description: Verdae Boulevard and Woodruff Road growth belt with master-planned
+      multifamily, office park expansion, and the metro's largest new-build valuations.
+    city_id: greenville
+  Paris Mountain Edge:
+    name: Paris Mountain Edge
+    borough: PARIS_MOUNTAIN
+    lat: 34.902
+    lng: -82.396
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.81
+    capex: 6600000.0
+    permit_vel: 21.0
+    shift_ratio: 1.38
+    sla: 48.0
+    description: South slopes of Paris Mountain at the city's north edge with view-lot
+      estate builds and state-park-adjacent low-density permitting.
+    city_id: greenville
+divisions:
+  DOWNTOWN_MAIN_STREET:
+    name: DOWNTOWN_MAIN_STREET
+    center_lat: 34.8497
+    center_lng: -82.3992
+    zoom: 14.0
+    bbox:
+      min_lat: 34.842
+      max_lat: 34.86
+      min_lng: -82.41
+      max_lng: -82.388
+    submarkets:
+    - Downtown
+    city_id: greenville
+  WEST_END:
+    name: WEST_END
+    center_lat: 34.8413
+    center_lng: -82.403
+    zoom: 14.0
+    bbox:
+      min_lat: 34.83
+      max_lat: 34.855
+      min_lng: -82.435
+      max_lng: -82.393
+    submarkets:
+    - West End
+    - Village of West Greenville
+    city_id: greenville
+  NORTH_MAIN:
+    name: NORTH_MAIN
+    center_lat: 34.867
+    center_lng: -82.401
+    zoom: 13.5
+    bbox:
+      min_lat: 34.858
+      max_lat: 34.88
+      min_lng: -82.415
+      max_lng: -82.39
+    submarkets:
+    - North Main
+    city_id: greenville
+  AUGUSTA_ROAD:
+    name: AUGUSTA_ROAD
+    center_lat: 34.837
+    center_lng: -82.386
+    zoom: 14.0
+    bbox:
+      min_lat: 34.828
+      max_lat: 34.845
+      min_lng: -82.398
+      max_lng: -82.378
+    submarkets:
+    - Augusta Road
+    city_id: greenville
+  EASTSIDE:
+    name: EASTSIDE
+    center_lat: 34.8565
+    center_lng: -82.367
+    zoom: 13.0
+    bbox:
+      min_lat: 34.822
+      max_lat: 34.865
+      min_lng: -82.38
+      max_lng: -82.335
+    submarkets:
+    - Overbrook
+    - Verdae
+    city_id: greenville
+  PARIS_MOUNTAIN:
+    name: PARIS_MOUNTAIN
+    center_lat: 34.902
+    center_lng: -82.396
+    zoom: 13.0
+    bbox:
+      min_lat: 34.88
+      max_lat: 34.925
+      min_lng: -82.43
+      max_lng: -82.37
+    submarkets:
+    - Paris Mountain Edge
+    city_id: greenville
+datasets:
+  permits:
+    endpoint: https://citygis.greenvillesc.gov/arcgis/rest/services/InfoHUB/BuildingPermits_PriorTwoYears/MapServer/0
+    platform: arcgis
+    watermark_col: NewIssueDate
+    id_keys:
+    - PERMIT_NUM
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: NewIssueDate DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Greenville, SC
+    field_map:
+      job_id:
+      - PERMIT_NUM
+      - OBJECTID
+      issuance_date:
+      - NewIssueDate
+      filing_date:
+      - APPLICDATE
+      status:
+      - BP_STATUS
+      - Status
+      job_type:
+      - PERMIT_TYPE
+      cost:
+      - PERMIT_VALUATION
+      address_street:
+      - STREETADDRESS
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 7000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'SC'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- greenville_sc
+- greenville-sc
+- greenville sc
+job_suffix: greenville

@@ -1,0 +1,297 @@
+city_id: tucson
+name: Tucson
+state: AZ
+center:
+  lat: 32.2226
+  lng: -110.9723
+metro_bbox:
+  min_lat: 32.15
+  max_lat: 32.43
+  min_lng: -111.06
+  max_lng: -110.78
+division_bboxes:
+  DOWNTOWN_CORE:
+    min_lat: 32.208
+    max_lat: 32.228
+    min_lng: -110.982
+    max_lng: -110.964
+  FOURTH_AVENUE_UNIVERSITY:
+    min_lat: 32.224
+    max_lat: 32.238
+    min_lng: -110.97
+    max_lng: -110.943
+  MIDTOWN:
+    min_lat: 32.215
+    max_lat: 32.26
+    min_lng: -110.943
+    max_lng: -110.89
+  CATALINA_FOOTHILLS:
+    min_lat: 32.295
+    max_lat: 32.345
+    min_lng: -110.98
+    max_lng: -110.89
+  ORO_VALLEY_EDGE:
+    min_lat: 32.36
+    max_lat: 32.415
+    min_lng: -111.01
+    max_lng: -110.935
+submarkets:
+  Downtown Tucson:
+    name: Downtown Tucson
+    borough: DOWNTOWN_CORE
+    lat: 32.2226
+    lng: -110.9723
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.84
+    capex: 8200000.0
+    permit_vel: 38.0
+    shift_ratio: 1.52
+    sla: 62.0
+    description: Congress Street core with the Fox Tucson Theatre, the Rio Nuevo redevelopment
+      blocks, and adaptive-reuse of the warehouse district's commercial stock.
+    city_id: tucson
+  Armory Park:
+    name: Armory Park
+    borough: DOWNTOWN_CORE
+    lat: 32.2159
+    lng: -110.9688
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.85
+    capex: 7400000.0
+    permit_vel: 34.0
+    shift_ratio: 1.49
+    sla: 59.0
+    description: Historic residential district south of the convention center with
+      Victorian and Sonoran rowhouse restoration and the Tucson Museum of Art edge.
+    city_id: tucson
+  Barrio Viejo:
+    name: Barrio Viejo
+    borough: DOWNTOWN_CORE
+    lat: 32.2145
+    lng: -110.9772
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.82
+    capex: 6800000.0
+    permit_vel: 31.0
+    shift_ratio: 1.46
+    sla: 56.0
+    description: Sonoran rowhouse barrio west of I-10 with adobe rehabilitation, courtyarded
+      short-stay conversions, and the Convento cultural frontage.
+    city_id: tucson
+  Fourth Avenue:
+    name: Fourth Avenue
+    borough: FOURTH_AVENUE_UNIVERSITY
+    lat: 32.2262
+    lng: -110.9662
+    zoom: 14.5
+    pitch: 52.0
+    base_lims: 0.86
+    capex: 7900000.0
+    permit_vel: 37.0
+    shift_ratio: 1.51
+    sla: 60.0
+    description: Historic merchant strip between downtown and campus with storefront
+      retail, patio-dining infill, and the streetcar-linked foot-traffic economy.
+    city_id: tucson
+  University of Arizona:
+    name: University of Arizona
+    borough: FOURTH_AVENUE_UNIVERSITY
+    lat: 32.2312
+    lng: -110.948
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.87
+    capex: 9100000.0
+    permit_vel: 41.0
+    shift_ratio: 1.55
+    sla: 64.0
+    description: Main Gate and campus corridor with student-housing turnover, lab
+      and tech-transfer adjacency, and the university's anchor-institution demand.
+    city_id: tucson
+  Midtown:
+    name: Midtown
+    borough: MIDTOWN
+    lat: 32.232
+    lng: -110.915
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.81
+    capex: 7200000.0
+    permit_vel: 33.0
+    shift_ratio: 1.45
+    sla: 57.0
+    description: Broadway and Speedway midtown belt with post-war commercial strip
+      retrofit, medical office demand, and the Grant/Alvernon rental core.
+    city_id: tucson
+  Catalina Foothills edge:
+    name: Catalina Foothills edge
+    borough: CATALINA_FOOTHILLS
+    lat: 32.328
+    lng: -110.938
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.9
+    capex: 10500000.0
+    permit_vel: 36.0
+    shift_ratio: 1.57
+    sla: 66.0
+    description: Skyline and Campbell foothills belt with luxury resort adjacency,
+      view-lot renovation, and the metro's top valuation band at the Santa Catalinas.
+    city_id: tucson
+  Oro Valley edge:
+    name: Oro Valley edge
+    borough: ORO_VALLEY_EDGE
+    lat: 32.3907
+    lng: -110.9757
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.88
+    capex: 9600000.0
+    permit_vel: 32.0
+    shift_ratio: 1.53
+    sla: 63.0
+    description: "Northwest master-planned edge along Oracle Road and La Ca\xF1ada\
+      \ with golf-community stock, Innovation Park biotech adjacency, and steady license\
+      \ growth."
+    city_id: tucson
+divisions:
+  DOWNTOWN_CORE:
+    name: DOWNTOWN_CORE
+    center_lat: 32.22
+    center_lng: -110.972
+    zoom: 13.5
+    bbox:
+      min_lat: 32.208
+      max_lat: 32.228
+      min_lng: -110.982
+      max_lng: -110.964
+    submarkets:
+    - Downtown Tucson
+    - Armory Park
+    - Barrio Viejo
+    city_id: tucson
+  FOURTH_AVENUE_UNIVERSITY:
+    name: FOURTH_AVENUE_UNIVERSITY
+    center_lat: 32.2287
+    center_lng: -110.9571
+    zoom: 13.5
+    bbox:
+      min_lat: 32.224
+      max_lat: 32.238
+      min_lng: -110.97
+      max_lng: -110.943
+    submarkets:
+    - Fourth Avenue
+    - University of Arizona
+    city_id: tucson
+  MIDTOWN:
+    name: MIDTOWN
+    center_lat: 32.232
+    center_lng: -110.915
+    zoom: 13.0
+    bbox:
+      min_lat: 32.215
+      max_lat: 32.26
+      min_lng: -110.943
+      max_lng: -110.89
+    submarkets:
+    - Midtown
+    city_id: tucson
+  CATALINA_FOOTHILLS:
+    name: CATALINA_FOOTHILLS
+    center_lat: 32.328
+    center_lng: -110.938
+    zoom: 12.5
+    bbox:
+      min_lat: 32.295
+      max_lat: 32.345
+      min_lng: -110.98
+      max_lng: -110.89
+    submarkets:
+    - Catalina Foothills edge
+    city_id: tucson
+  ORO_VALLEY_EDGE:
+    name: ORO_VALLEY_EDGE
+    center_lat: 32.3907
+    center_lng: -110.9757
+    zoom: 12.5
+    bbox:
+      min_lat: 32.36
+      max_lat: 32.415
+      min_lng: -111.01
+      max_lng: -110.935
+    submarkets:
+    - Oro Valley edge
+    city_id: tucson
+datasets:
+  sla:
+    endpoint: https://gis.tucsonaz.gov/arcgis/rest/services/PublicMaps/OpenData_EconomicDevelopment/MapServer/3
+    platform: arcgis
+    watermark_col: DT_START
+    id_keys:
+    - ACC_NUM
+    - LIC_TYPE
+    - OBJECTID
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: DT_START DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: DT_START <= CURRENT_TIMESTAMP
+    needs_geocode: true
+    geocode_context: Tucson, AZ
+    field_map:
+      license_id:
+      - ACC_NUM
+      dba:
+      - ACC_NAME
+      premises_name:
+      - ACC_NAME
+      license_type:
+      - LIC_TYPE
+      - NAIC_DESC
+      status:
+      - LIC_STATUS
+      effective_date:
+      - DT_START
+      address_street:
+      - FULLADDRESS
+      zipcode:
+      - ZIP_CODE
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 30
+    alarm_exempt: true
+    alarm_exempt_reason: 'slow/annual effective cadence: newest non-future DT_START
+      rows land ~2 per 60d (layer IS maintained - future-dated applications present);
+      DT_START<=CURRENT_TIMESTAMP where guard excludes future sentinels; alarm would
+      false-positive on the slow issuance pace'
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- tucson_az
+- tucson-az
+- tucson az
+- tuscon
+job_suffix: tucson

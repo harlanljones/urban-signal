@@ -1,0 +1,695 @@
+city_id: louisville
+name: Louisville / Jefferson County
+state: KY
+center:
+  lat: 38.2527
+  lng: -85.7585
+metro_bbox:
+  min_lat: 38.1
+  max_lat: 38.35
+  min_lng: -85.95
+  max_lng: -85.55
+division_bboxes:
+  DOWNTOWN_NULU:
+    min_lat: 38.24
+    max_lat: 38.27
+    min_lng: -85.775
+    max_lng: -85.735
+  HIGHLANDS_GERMANTOWN:
+    min_lat: 38.2
+    max_lat: 38.255
+    min_lng: -85.75
+    max_lng: -85.66
+  CLIFTON_CRESCENT_HILL:
+    min_lat: 38.245
+    max_lat: 38.285
+    min_lng: -85.73
+    max_lng: -85.66
+  OLD_LOUISVILLE_SHELBY_PARK:
+    min_lat: 38.195
+    max_lat: 38.235
+    min_lng: -85.79
+    max_lng: -85.74
+  ST_MATTHEWS_EAST:
+    min_lat: 38.245
+    max_lat: 38.285
+    min_lng: -85.69
+    max_lng: -85.61
+  WEST_PORTLAND:
+    min_lat: 38.245
+    max_lat: 38.285
+    min_lng: -85.83
+    max_lng: -85.78
+submarkets:
+  Downtown & Waterfront:
+    name: Downtown & Waterfront
+    borough: DOWNTOWN_NULU
+    lat: 38.257
+    lng: -85.758
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.9
+    capex: 11000000.0
+    permit_vel: 52.0
+    shift_ratio: 1.62
+    sla: 72.0
+    description: Central business district along the Ohio River waterfront with the
+      KFC Yum! Center and riverfront redevelopment driving mixed-use permits.
+    city_id: louisville
+  NuLu (East Market District):
+    name: NuLu (East Market District)
+    borough: DOWNTOWN_NULU
+    lat: 38.247
+    lng: -85.745
+    zoom: 14.5
+    pitch: 52.0
+    base_lims: 0.87
+    capex: 9200000.0
+    permit_vel: 46.0
+    shift_ratio: 1.57
+    sla: 68.0
+    description: East Market Street gallery-and-boutique corridor converting industrial
+      stock to hospitality and residential above retail.
+    city_id: louisville
+  Phoenix Hill & Shelby Street:
+    name: Phoenix Hill & Shelby Street
+    borough: DOWNTOWN_NULU
+    lat: 38.242
+    lng: -85.752
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.83
+    capex: 6400000.0
+    permit_vel: 39.0
+    shift_ratio: 1.49
+    sla: 60.0
+    description: Hill-edge infill between downtown and the Highlands with small-lot
+      townhome and adaptive-reuse activity.
+    city_id: louisville
+  Bardstown Road Highlands:
+    name: Bardstown Road Highlands
+    borough: HIGHLANDS_GERMANTOWN
+    lat: 38.235
+    lng: -85.685
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.86
+    capex: 8600000.0
+    permit_vel: 41.0
+    shift_ratio: 1.54
+    sla: 65.0
+    description: "The commercial spine of the Highlands \u2014 independent retail,\
+      \ music venues, and dense mid-rise multifamily."
+    city_id: louisville
+  GermanTown & Paristown:
+    name: GermanTown & Paristown
+    borough: HIGHLANDS_GERMANTOWN
+    lat: 38.225
+    lng: -85.735
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.82
+    capex: 6100000.0
+    permit_vel: 35.0
+    shift_ratio: 1.46
+    sla: 58.0
+    description: Post-industrial bungalow grid rehabbing into breweries, maker spaces,
+      and infill townhomes.
+    city_id: louisville
+  Douglass Loop:
+    name: Douglass Loop
+    borough: HIGHLANDS_GERMANTOWN
+    lat: 38.215
+    lng: -85.675
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.8
+    capex: 5500000.0
+    permit_vel: 31.0
+    shift_ratio: 1.43
+    sla: 55.0
+    description: South Highlands village node with renovation-led permitting and strict
+      neighborhood overlay review.
+    city_id: louisville
+  Clifton & Frankfort Ave:
+    name: Clifton & Frankfort Ave
+    borough: CLIFTON_CRESCENT_HILL
+    lat: 38.265
+    lng: -85.715
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.85
+    capex: 7900000.0
+    permit_vel: 43.0
+    shift_ratio: 1.52
+    sla: 63.0
+    description: Walkable neighborhood commercial corridor with mixed-use infill and
+      hospitality conversions.
+    city_id: louisville
+  Crescent Hill:
+    name: Crescent Hill
+    borough: CLIFTON_CRESCENT_HILL
+    lat: 38.275
+    lng: -85.685
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.83
+    capex: 6800000.0
+    permit_vel: 37.0
+    shift_ratio: 1.47
+    sla: 59.0
+    description: Streetcar-era bungalow district around the reservoir with renovation-heavy
+      permits.
+    city_id: louisville
+  Bonnycastle:
+    name: Bonnycastle
+    borough: CLIFTON_CRESCENT_HILL
+    lat: 38.255
+    lng: -85.69
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.81
+    capex: 6200000.0
+    permit_vel: 33.0
+    shift_ratio: 1.45
+    sla: 57.0
+    description: Established residential pocket between the Highlands and Crescent
+      Hill with teardown/rebuild pressure.
+    city_id: louisville
+  Old Louisville:
+    name: Old Louisville
+    borough: OLD_LOUISVILLE_SHELBY_PARK
+    lat: 38.215
+    lng: -85.765
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.84
+    capex: 7000000.0
+    permit_vel: 34.0
+    shift_ratio: 1.48
+    sla: 58.0
+    description: Nationally significant Victorian residential district with historic-preservation
+      overlay permitting.
+    city_id: louisville
+  Shelby Park:
+    name: Shelby Park
+    borough: OLD_LOUISVILLE_SHELBY_PARK
+    lat: 38.225
+    lng: -85.755
+    zoom: 14.0
+    pitch: 44.0
+    base_lims: 0.83
+    capex: 6600000.0
+    permit_vel: 38.0
+    shift_ratio: 1.46
+    sla: 57.0
+    description: South-of-downtown park neighborhood undergoing cafe-and-townhome
+      infill.
+    city_id: louisville
+  Smoketown:
+    name: Smoketown
+    borough: OLD_LOUISVILLE_SHELBY_PARK
+    lat: 38.235
+    lng: -85.755
+    zoom: 14.0
+    pitch: 42.0
+    base_lims: 0.79
+    capex: 5200000.0
+    permit_vel: 29.0
+    shift_ratio: 1.4
+    sla: 53.0
+    description: Historic Black neighborhood near downtown with early-stage redevelopment
+      and new-construction permits.
+    city_id: louisville
+  St. Matthews:
+    name: St. Matthews
+    borough: ST_MATTHEWS_EAST
+    lat: 38.26
+    lng: -85.65
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.88
+    capex: 9400000.0
+    permit_vel: 49.0
+    shift_ratio: 1.58
+    sla: 64.0
+    description: Established inner-suburb retail node with mall-adjacent mixed-use
+      and multifamily redevelopment.
+    city_id: louisville
+  Eastpoint & Lyndon:
+    name: Eastpoint & Lyndon
+    borough: ST_MATTHEWS_EAST
+    lat: 38.27
+    lng: -85.63
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.76
+    capex: 4900000.0
+    permit_vel: 27.0
+    shift_ratio: 1.36
+    sla: 50.0
+    description: Eastern Jefferson County edge with office-to-residential conversions
+      and suburban infill.
+    city_id: louisville
+  Hurstbourne:
+    name: Hurstbourne
+    borough: ST_MATTHEWS_EAST
+    lat: 38.275
+    lng: -85.62
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.74
+    capex: 4400000.0
+    permit_vel: 24.0
+    shift_ratio: 1.32
+    sla: 47.0
+    description: I-64 corridor office park and hotel district with selective redevelopment
+      pressure.
+    city_id: louisville
+  Portland:
+    name: Portland
+    borough: WEST_PORTLAND
+    lat: 38.265
+    lng: -85.8
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.79
+    capex: 5600000.0
+    permit_vel: 33.0
+    shift_ratio: 1.45
+    sla: 55.0
+    description: River-front historic neighborhood with early-stage industrial-to-residential
+      conversion and flood-recovery investment.
+    city_id: louisville
+  Shawnee & Chickasaw:
+    name: Shawnee & Chickasaw
+    borough: WEST_PORTLAND
+    lat: 38.255
+    lng: -85.815
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.75
+    capex: 4700000.0
+    permit_vel: 26.0
+    shift_ratio: 1.37
+    sla: 49.0
+    description: Western Louisville park-side neighborhoods with renovation-led permits
+      and affordability overlays.
+    city_id: louisville
+  Russell:
+    name: Russell
+    borough: WEST_PORTLAND
+    lat: 38.245
+    lng: -85.795
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.77
+    capex: 5100000.0
+    permit_vel: 30.0
+    shift_ratio: 1.41
+    sla: 52.0
+    description: Historic West End neighborhood with new-construction and rehab permitting
+      near the Portland renewal zone.
+    city_id: louisville
+divisions:
+  DOWNTOWN_NULU:
+    name: DOWNTOWN_NULU
+    center_lat: 38.249
+    center_lng: -85.75
+    zoom: 13.5
+    bbox:
+      min_lat: 38.24
+      max_lat: 38.27
+      min_lng: -85.775
+      max_lng: -85.735
+    submarkets:
+    - Downtown & Waterfront
+    - NuLu (East Market District)
+    - Phoenix Hill & Shelby Street
+    city_id: louisville
+  HIGHLANDS_GERMANTOWN:
+    name: HIGHLANDS_GERMANTOWN
+    center_lat: 38.225
+    center_lng: -85.705
+    zoom: 13.0
+    bbox:
+      min_lat: 38.2
+      max_lat: 38.255
+      min_lng: -85.75
+      max_lng: -85.66
+    submarkets:
+    - Bardstown Road Highlands
+    - GermanTown & Paristown
+    - Douglass Loop
+    city_id: louisville
+  CLIFTON_CRESCENT_HILL:
+    name: CLIFTON_CRESCENT_HILL
+    center_lat: 38.265
+    center_lng: -85.7
+    zoom: 13.0
+    bbox:
+      min_lat: 38.245
+      max_lat: 38.285
+      min_lng: -85.73
+      max_lng: -85.66
+    submarkets:
+    - Clifton & Frankfort Ave
+    - Crescent Hill
+    - Bonnycastle
+    city_id: louisville
+  OLD_LOUISVILLE_SHELBY_PARK:
+    name: OLD_LOUISVILLE_SHELBY_PARK
+    center_lat: 38.218
+    center_lng: -85.76
+    zoom: 13.0
+    bbox:
+      min_lat: 38.195
+      max_lat: 38.235
+      min_lng: -85.79
+      max_lng: -85.74
+    submarkets:
+    - Old Louisville
+    - Shelby Park
+    - Smoketown
+    city_id: louisville
+  ST_MATTHEWS_EAST:
+    name: ST_MATTHEWS_EAST
+    center_lat: 38.268
+    center_lng: -85.635
+    zoom: 12.5
+    bbox:
+      min_lat: 38.245
+      max_lat: 38.285
+      min_lng: -85.69
+      max_lng: -85.61
+    submarkets:
+    - St. Matthews
+    - Eastpoint & Lyndon
+    - Hurstbourne
+    city_id: louisville
+  WEST_PORTLAND:
+    name: WEST_PORTLAND
+    center_lat: 38.255
+    center_lng: -85.805
+    zoom: 12.5
+    bbox:
+      min_lat: 38.245
+      max_lat: 38.285
+      min_lng: -85.83
+      max_lng: -85.78
+    submarkets:
+    - Portland
+    - Shawnee & Chickasaw
+    - Russell
+    city_id: louisville
+datasets:
+  '311':
+    endpoint: https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/metro_311_2026/FeatureServer/0
+    platform: arcgis
+    watermark_col: requested_datetime
+    id_keys:
+    - service_request_id
+    - ObjectId
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - service_request_id
+      - ObjectId
+      latitude:
+      - latitude
+      longitude:
+      - longitude
+      complaint_type:
+      - service_name
+      - description
+      created_date:
+      - requested_datetime
+      closed_date:
+      - closed_date
+      - updated_datetime
+      incident_address:
+      - address
+      borough:
+      - council_district
+      zipcode:
+      - zip_code
+      status:
+      - status_description
+    ingestion_mode: incremental
+    oid_field: ObjectId
+    max_record_count: 2000
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: true
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/ABC_State_ActiveLicenses/FeatureServer/0
+    platform: arcgis
+    watermark_col: IssueDate
+    id_keys:
+    - LicenseNumber
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: County = 'Jefferson'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - LicenseNumber
+      - ObjectId
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      effective_date:
+      - IssueDate
+      - EffectiveDate
+      expiration_date:
+      - ExpiryDate
+      license_type:
+      - LicenseType
+      premises_name:
+      - Licensee
+      dba:
+      - DBA
+      address_street:
+      - PremisesStreet
+      - PremisesCityState
+      status:
+      - Status
+      borough:
+      - County
+      - City
+    ingestion_mode: incremental
+    oid_field: ObjectId
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  crime:
+    endpoint: https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/crime_data_2025/FeatureServer
+    platform: arcgis
+    watermark_col: date_occurred
+    id_keys:
+    - incident_number
+    - ObjectId
+    topic: raw.municipal.crime
+    interval_seconds: 300.0
+    producer_key: crime
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Louisville, KY
+    field_map:
+      incident_id:
+      - incident_number
+      offense_type:
+      - offense_code_name
+      - offense_classification
+      occurred_date:
+      - date_occurred
+      reported_date:
+      - date_reported
+      address:
+      - block_address
+    ingestion_mode: incremental
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  permits:
+    endpoint: https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/active_construction_permits/FeatureServer
+    platform: arcgis
+    watermark_col: ISSUE_DATE
+    id_keys:
+    - PERMIT_NUMBER
+    - ObjectId
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - PERMIT_NUMBER
+      cost:
+      - PROJECT_COSTS
+      - PERMIT_FEE
+      latitude:
+      - LATITUDE
+      longitude:
+      - LONGITUDE
+      issued_date:
+      - ISSUE_DATE
+    ingestion_mode: incremental
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  street_cut:
+    endpoint: https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/Louisville_KY_ROW_Construction_Permits_new/FeatureServer
+    platform: arcgis
+    watermark_col: FROM_DATE
+    id_keys:
+    - PERMIT_NO
+    - ObjectId
+    topic: raw.municipal.street_cut
+    interval_seconds: 300.0
+    producer_key: street_cut
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - PERMIT_NO
+      latitude:
+      - LATITUDE
+      longitude:
+      - LONGITUDE
+      issued_date:
+      - FROM_DATE
+    ingestion_mode: incremental
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- louisville_ky
+- louisville ky
+- jefferson_county_ky
+- jefferson county ky
+job_suffix: louisville

@@ -1,0 +1,542 @@
+city_id: durham
+name: Durham / Durham County
+state: NC
+center:
+  lat: 36.0014
+  lng: -78.9018
+metro_bbox:
+  min_lat: 35.88
+  max_lat: 36.18
+  min_lng: -78.99
+  max_lng: -78.78
+division_bboxes:
+  DOWNTOWN_DUKE:
+    min_lat: 35.97
+    max_lat: 36.02
+    min_lng: -78.94
+    max_lng: -78.88
+  NORTH_DURHAM:
+    min_lat: 36.02
+    max_lat: 36.13
+    min_lng: -78.92
+    max_lng: -78.82
+  EAST_DURHAM:
+    min_lat: 35.99
+    max_lat: 36.05
+    min_lng: -78.87
+    max_lng: -78.8
+  SOUTH_DURHAM:
+    min_lat: 35.88
+    max_lat: 35.99
+    min_lng: -78.95
+    max_lng: -78.82
+  WEST_DURHAM:
+    min_lat: 35.99
+    max_lat: 36.06
+    min_lng: -78.99
+    max_lng: -78.94
+submarkets:
+  Downtown Durham:
+    name: Downtown Durham
+    borough: DOWNTOWN_DUKE
+    lat: 35.994
+    lng: -78.8986
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.91
+    capex: 11500000.0
+    permit_vel: 54.0
+    shift_ratio: 1.62
+    sla: 68.0
+    description: City-core of Durham's revitalization with tower, office-to-residential,
+      and hospitality permitting around the ballpark and Main Street.
+    city_id: durham
+  Duke University & West Campus:
+    name: Duke University & West Campus
+    borough: DOWNTOWN_DUKE
+    lat: 35.997
+    lng: -78.939
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.89
+    capex: 10200000.0
+    permit_vel: 41.0
+    shift_ratio: 1.55
+    sla: 64.0
+    description: University-anchored edge with institutional demand, graduate-housing
+      construction, and West Campus expansion permits.
+    city_id: durham
+  Ninth Street District:
+    name: Ninth Street District
+    borough: DOWNTOWN_DUKE
+    lat: 35.997
+    lng: -78.93
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.85
+    capex: 7800000.0
+    permit_vel: 38.0
+    shift_ratio: 1.5
+    sla: 61.0
+    description: Corridor of retail, student housing, and mixed-use infill between
+      downtown and the Duke campus.
+    city_id: durham
+  Trinity Park & Old West Durham:
+    name: Trinity Park & Old West Durham
+    borough: DOWNTOWN_DUKE
+    lat: 35.999
+    lng: -78.918
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.86
+    capex: 8200000.0
+    permit_vel: 36.0
+    shift_ratio: 1.48
+    sla: 60.0
+    description: Historic streetcar-era bungalow districts with renovation-led permitting
+      and neighborhood-conservation overlays.
+    city_id: durham
+  Northgate & Duke North:
+    name: Northgate & Duke North
+    borough: NORTH_DURHAM
+    lat: 36.058
+    lng: -78.905
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.8
+    capex: 6400000.0
+    permit_vel: 33.0
+    shift_ratio: 1.42
+    sla: 55.0
+    description: Northern growth edge with master-planned residential and North Durham
+      commercial redevelopment near the beltline.
+    city_id: durham
+  Roxboro Road Corridor:
+    name: Roxboro Road Corridor
+    borough: NORTH_DURHAM
+    lat: 36.08
+    lng: -78.89
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.77
+    capex: 5600000.0
+    permit_vel: 30.0
+    shift_ratio: 1.39
+    sla: 53.0
+    description: Arterial corridor with infill multifamily, aging retail teardown/rebuild,
+      and transit-adjacent reinvestment.
+    city_id: durham
+  Bahama & Northern Edge:
+    name: Bahama & Northern Edge
+    borough: NORTH_DURHAM
+    lat: 36.11
+    lng: -78.86
+    zoom: 12.5
+    pitch: 38.0
+    base_lims: 0.6
+    capex: 3200000.0
+    permit_vel: 22.0
+    shift_ratio: 1.22
+    sla: 40.0
+    description: Exurban northern boundary of the metro with low-volume, high-lot
+      residential permitting.
+    city_id: durham
+  East Durham & Holloway:
+    name: East Durham & Holloway
+    borough: EAST_DURHAM
+    lat: 36.005
+    lng: -78.855
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.78
+    capex: 5900000.0
+    permit_vel: 34.0
+    shift_ratio: 1.41
+    sla: 54.0
+    description: Established inner-ring neighborhoods with storefront renewal, infill
+      housing, and corridor-scale improvement.
+    city_id: durham
+  Wheeler Hill:
+    name: Wheeler Hill
+    borough: EAST_DURHAM
+    lat: 35.995
+    lng: -78.84
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.75
+    capex: 5200000.0
+    permit_vel: 31.0
+    shift_ratio: 1.37
+    sla: 52.0
+    description: Hill-edge residential district with renovation capital and steady
+      teardown/rebuild pressure.
+    city_id: durham
+  Lyon Park:
+    name: Lyon Park
+    borough: EAST_DURHAM
+    lat: 36.02
+    lng: -78.835
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.74
+    capex: 5000000.0
+    permit_vel: 29.0
+    shift_ratio: 1.36
+    sla: 51.0
+    description: Transitional east-side neighborhood with housing rehabilitation and
+      small-lot development.
+    city_id: durham
+  Southpoint & 15-501:
+    name: Southpoint & 15-501
+    borough: SOUTH_DURHAM
+    lat: 35.905
+    lng: -78.905
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.88
+    capex: 9800000.0
+    permit_vel: 47.0
+    shift_ratio: 1.56
+    sla: 62.0
+    description: Southern retail and mixed-use hub with continued multifamily and
+      commercial permitting around the 15-501 / 54 interchange.
+    city_id: durham
+  Hope Valley & Croasdaile:
+    name: Hope Valley & Croasdaile
+    borough: SOUTH_DURHAM
+    lat: 35.94
+    lng: -78.92
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.82
+    capex: 6900000.0
+    permit_vel: 35.0
+    shift_ratio: 1.45
+    sla: 57.0
+    description: Established southwest neighborhoods with renovation-led permits and
+      estate-stock teardown/rebuild.
+    city_id: durham
+  Lakewood & Woodcroft:
+    name: Lakewood & Woodcroft
+    borough: SOUTH_DURHAM
+    lat: 35.97
+    lng: -78.93
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.8
+    capex: 6200000.0
+    permit_vel: 33.0
+    shift_ratio: 1.43
+    sla: 56.0
+    description: Southwest residential hills with infill housing and corridor densification
+      near Duke and Southpoint.
+    city_id: durham
+  Research Triangle Park Edge:
+    name: Research Triangle Park Edge
+    borough: SOUTH_DURHAM
+    lat: 35.9
+    lng: -78.87
+    zoom: 12.5
+    pitch: 40.0
+    base_lims: 0.84
+    capex: 8800000.0
+    permit_vel: 39.0
+    shift_ratio: 1.47
+    sla: 58.0
+    description: Southern edge shading into Research Triangle Park with employment-adjacent
+      commercial and residential permitting.
+    city_id: durham
+  Eno River & Hillsborough Rd:
+    name: Eno River & Hillsborough Rd
+    borough: WEST_DURHAM
+    lat: 36.02
+    lng: -78.965
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.73
+    capex: 4800000.0
+    permit_vel: 27.0
+    shift_ratio: 1.35
+    sla: 49.0
+    description: Northwest river-edge edge with protected greenway, estate stock,
+      and limited new-construction pressure.
+    city_id: durham
+  Parkwood:
+    name: Parkwood
+    borough: WEST_DURHAM
+    lat: 35.995
+    lng: -78.955
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.76
+    capex: 5400000.0
+    permit_vel: 30.0
+    shift_ratio: 1.38
+    sla: 53.0
+    description: Post-war west-side residential corridor with steady redevelopment
+      and corridor densification.
+    city_id: durham
+divisions:
+  DOWNTOWN_DUKE:
+    name: Downtown / Duke
+    center_lat: 35.995
+    center_lng: -78.91
+    zoom: 13.5
+    bbox:
+      min_lat: 35.97
+      max_lat: 36.02
+      min_lng: -78.94
+      max_lng: -78.88
+    submarkets:
+    - Downtown Durham
+    - Duke University & West Campus
+    - Ninth Street District
+    - Trinity Park & Old West Durham
+    city_id: durham
+  NORTH_DURHAM:
+    name: North Durham
+    center_lat: 36.06
+    center_lng: -78.88
+    zoom: 12.5
+    bbox:
+      min_lat: 36.02
+      max_lat: 36.13
+      min_lng: -78.92
+      max_lng: -78.82
+    submarkets:
+    - Northgate & Duke North
+    - Roxboro Road Corridor
+    - Bahama & Northern Edge
+    city_id: durham
+  EAST_DURHAM:
+    name: East Durham
+    center_lat: 36.01
+    center_lng: -78.84
+    zoom: 13.0
+    bbox:
+      min_lat: 35.99
+      max_lat: 36.05
+      min_lng: -78.87
+      max_lng: -78.8
+    submarkets:
+    - East Durham & Holloway
+    - Wheeler Hill
+    - Lyon Park
+    city_id: durham
+  SOUTH_DURHAM:
+    name: South Durham
+    center_lat: 35.93
+    center_lng: -78.9
+    zoom: 12.5
+    bbox:
+      min_lat: 35.88
+      max_lat: 35.99
+      min_lng: -78.95
+      max_lng: -78.82
+    submarkets:
+    - Southpoint & 15-501
+    - Hope Valley & Croasdaile
+    - Lakewood & Woodcroft
+    - Research Triangle Park Edge
+    city_id: durham
+  WEST_DURHAM:
+    name: West Durham
+    center_lat: 36.0
+    center_lng: -78.96
+    zoom: 12.5
+    bbox:
+      min_lat: 35.99
+      max_lat: 36.06
+      min_lng: -78.99
+      max_lng: -78.94
+    submarkets:
+    - Eno River & Hillsborough Rd
+    - Parkwood
+    city_id: durham
+datasets:
+  permits:
+    endpoint: https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Inspections/MapServer/12
+    platform: arcgis
+    watermark_col: ISSUE_DATE
+    id_keys:
+    - PermitNum
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - PermitNum
+      - OBJECTID
+      issuance_date:
+      - ISSUE_DATE
+      job_type:
+      - BLDB_ACTIVITY
+      - BLDB_ACTIVITY_1
+      - TYPE
+      - BLD_Type
+      cost:
+      - BLD_Cost
+      address_street:
+      - LOCATION_ADDR
+      bbl:
+      - PIN15
+      - PIN
+      - PID
+      status:
+      - PmtStatus
+      proposed_units:
+      - DWELLING_UNITS
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  deeds:
+    endpoint: https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4
+    platform: arcgis
+    watermark_col: PKG_SALE_DATE
+    id_keys:
+    - PIN
+    - OBJECTID_1
+    - OBJECTID
+    topic: raw.municipal.deeds
+    interval_seconds: 1800.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - PIN
+      - OBJECTID_1
+      - OBJECTID
+      bbl:
+      - PIN
+      - PIN_EXT
+      recorded_date:
+      - PKG_SALE_DATE
+      - DEED_DATE
+      document_amount:
+      - PKG_SALE_PRICE
+      - LAND_SALE_PRICE
+      party1_grantor:
+      - PROPERTY_OWNER
+      borough:
+      - NEIGHBORHOOD
+      - CITY
+    ingestion_mode: snapshot
+    oid_field: OBJECTID_1
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'NC'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- durham_nc
+- durham nc
+- durham_county
+- durham county
+job_suffix: durham
