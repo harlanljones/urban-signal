@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "id": "macon_bibb",
+  "name": "Macon-Bibb County",
+  "state": "GA",
+  "center": {
+    "lat": 32.8366,
+    "lng": -83.6324
+  },
+  "metro_bbox": {
+    "min_lat": 32.67,
+    "max_lat": 32.93,
+    "min_lng": -83.85,
+    "max_lng": -83.45
+  },
+  "divisions": {
+    "DOWNTOWN_CORE": {
+      "name": "DOWNTOWN_CORE",
+      "center": { "lat": 32.838, "lng": -83.628 },
+      "bbox": { "min_lat": 32.82, "max_lat": 32.86, "min_lng": -83.67, "max_lng": -83.6 },
+      "submarkets": ["Downtown Macon", "Riverfront & Amphitheater", "Mercer University District"]
+    },
+    "WEST_MACON": {
+      "name": "WEST_MACON",
+      "center": { "lat": 32.83, "lng": -83.735 },
+      "bbox": { "min_lat": 32.79, "max_lat": 32.87, "min_lng": -83.85, "max_lng": -83.68 },
+      "submarkets": ["Eisenhower Parkway Corridor", "I-475 West Industrial"]
+    },
+    "NORTH_MACON": {
+      "name": "NORTH_MACON",
+      "center": { "lat": 32.9, "lng": -83.68 },
+      "bbox": { "min_lat": 32.87, "max_lat": 32.93, "min_lng": -83.78, "max_lng": -83.58 },
+      "submarkets": ["North Macon Retail (Bass Rd)"]
+    },
+    "EAST_MACON": {
+      "name": "EAST_MACON",
+      "center": { "lat": 32.85, "lng": -83.56 },
+      "bbox": { "min_lat": 32.8, "max_lat": 32.9, "min_lng": -83.62, "max_lng": -83.45 },
+      "submarkets": ["Ocmulgee Mounds / East Macon"]
+    },
+    "SOUTH_BIBB": {
+      "name": "SOUTH_BIBB",
+      "center": { "lat": 32.735, "lng": -83.66 },
+      "bbox": { "min_lat": 32.67, "max_lat": 32.8, "min_lng": -83.78, "max_lng": -83.55 },
+      "submarkets": ["Airport & Industrial South"]
+    }
+  },
+  "submarkets": {
+    "Downtown Macon": {
+      "name": "Downtown Macon",
+      "division": "DOWNTOWN_CORE",
+      "center": { "lat": 32.8366, "lng": -83.6266 },
+      "description": "Historic core along Cherry, Poplar, and 2nd Street with adaptive reuse and hospitality momentum."
+    },
+    "Riverfront & Amphitheater": {
+      "name": "Riverfront & Amphitheater",
+      "division": "DOWNTOWN_CORE",
+      "center": { "lat": 32.834, "lng": -83.621 },
+      "description": "Ocmulgee riverfront entertainment and open-space anchors at the downtown edge."
+    },
+    "Mercer University District": {
+      "name": "Mercer University District",
+      "division": "DOWNTOWN_CORE",
+      "center": { "lat": 32.8287, "lng": -83.6513 },
+      "description": "Campus-adjacent mixed-use and student housing southwest of downtown."
+    },
+    "Eisenhower Parkway Corridor": {
+      "name": "Eisenhower Parkway Corridor",
+      "division": "WEST_MACON",
+      "center": { "lat": 32.806, "lng": -83.69 },
+      "description": "Eisenhower retail and commercial corridor including redevelopment around the mall."
+    },
+    "I-475 West Industrial": {
+      "name": "I-475 West Industrial",
+      "division": "WEST_MACON",
+      "center": { "lat": 32.823, "lng": -83.757 },
+      "description": "Industrial and logistics ribbon near I‑475 with hospitality and highway services."
+    },
+    "North Macon Retail (Bass Rd)": {
+      "name": "North Macon Retail (Bass Rd)",
+      "division": "NORTH_MACON",
+      "center": { "lat": 32.912, "lng": -83.718 },
+      "description": "Bass Road / Riverside Drive retail concentration and adjacent residential growth."
+    },
+    "Ocmulgee Mounds / East Macon": {
+      "name": "Ocmulgee Mounds / East Macon",
+      "division": "EAST_MACON",
+      "center": { "lat": 32.8348, "lng": -83.602 },
+      "description": "Emery Hwy corridor and Ocmulgee Mounds vicinity east of downtown."
+    },
+    "Airport & Industrial South": {
+      "name": "Airport & Industrial South",
+      "division": "SOUTH_BIBB",
+      "center": { "lat": 32.693, "lng": -83.649 },
+      "description": "Middle Georgia Regional Airport area and adjacent industrial parks."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "ISSUEDATE",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/macon_bibb.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
+
