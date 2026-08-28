@@ -2609,6 +2609,28 @@
       ],
       "center": { "lat": 32.3519, "lng": -95.3006 },
       "evidence_path": "apps/api/src/spatial/cities/tyler.py"
+    },
+    {
+      "id": "lake_charles",
+      "name": "Lake Charles",
+      "state": "LA",
+      "divisions": "3 divisions",
+      "division_count": 3,
+      "submarket_count": 3,
+      "feeds": [false, false, true, false],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": { "lat": 30.2266, "lng": -93.2174 },
+      "evidence_path": "apps/api/src/spatial/cities/lake_charles.py"
     }
   ],
   "pipeline": [
