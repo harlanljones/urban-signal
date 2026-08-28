@@ -581,6 +581,13 @@ from src.spatial.cities.lakeland import (
     LAKELAND_SUBMARKETS,
     is_in_lakeland_metro,
 )
+from src.spatial.cities.augusta import (
+    AUGUSTA_DIVISION_BBOXES,
+    AUGUSTA_DIVISIONS,
+    AUGUSTA_METRO_BBOX,
+    AUGUSTA_SUBMARKETS,
+    is_in_augusta_metro,
+)
 __all__ = [
     "PIERCE_METRO_BBOX",
     "PIERCE_DIVISION_BBOXES",
@@ -988,5 +995,9 @@ __all__ = [
     "LAKELAND_DIVISIONS",
     "LAKELAND_SUBMARKETS",
     "is_in_lakeland_metro",
+    "AUGUSTA_METRO_BBOX",
+    "AUGUSTA_DIVISION_BBOXES",
+    "AUGUSTA_DIVISIONS",
+    "AUGUSTA_SUBMARKETS",
+    "is_in_augusta_metro",
 ]
-*** End Patch*** End Patch
