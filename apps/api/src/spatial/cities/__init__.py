@@ -525,6 +525,13 @@ from src.spatial.cities.odessa import (
     ODESSA_SUBMARKETS,
     is_in_odessa_metro,
 )
+from src.spatial.cities.alexandria import (
+    ALEXANDRIA_DIVISION_BBOXES,
+    ALEXANDRIA_DIVISIONS,
+    ALEXANDRIA_METRO_BBOX,
+    ALEXANDRIA_SUBMARKETS,
+    is_in_alexandria_metro,
+)
 from src.spatial.cities.lake_charles import (
     LAKE_CHARLES_DIVISION_BBOXES,
     LAKE_CHARLES_DIVISIONS,
@@ -921,4 +928,9 @@ __all__ = [
     "ODESSA_DIVISIONS",
     "ODESSA_SUBMARKETS",
     "is_in_odessa_metro",
+    "ALEXANDRIA_METRO_BBOX",
+    "ALEXANDRIA_DIVISION_BBOXES",
+    "ALEXANDRIA_DIVISIONS",
+    "ALEXANDRIA_SUBMARKETS",
+    "is_in_alexandria_metro",
 ]
