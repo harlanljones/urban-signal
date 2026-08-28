@@ -829,6 +829,15 @@ class Settings(BaseSettings):
         description="Wake County parcel sales MapServer layer URL",
     )
 
+    # Macon-Bibb County, GA (ArcGIS): Building Permits (2010‑Present) polygon layer.
+    arcgis_macon_bibb_permits_url: str = Field(
+        default=(
+            "https://services6.arcgis.com/Yx1h0qHJ9wIpQWuU/arcgis/rest/services/"
+            "Building_Permits_Public/FeatureServer/0"
+        ),
+        description="Macon-Bibb County Building Permits (2010‑Present) ArcGIS FeatureServer layer URL",
+    )
+
     # San Antonio, TX (CKAN + ArcGIS, US-141): live building permits datastore
     # and point-based 311 service calls.
     ckan_san_antonio_permits_endpoint: str = Field(
