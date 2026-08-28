@@ -1486,6 +1486,7 @@ def get_dashboard_html() -> str:
       amarillo: { name: 'Amarillo' },
       beaumont: { name: 'Beaumont' },
       waco: { name: 'Waco' },
+<<<<<<< HEAD
       jackson_ms: { name: 'Jackson' },
       macon_bibb: { name: 'Macon-Bibb County' },
       ocala: { name: 'Ocala / Marion County' },
@@ -1502,6 +1503,7 @@ def get_dashboard_html() -> str:
       jonesboro: { name: 'Jonesboro' },
       charleston_sc: { name: 'Charleston, SC' },
       lakeland: { name: 'Lakeland' },
+      augusta: { name: 'Augusta, GA' },
     };
 
     let map = null;
