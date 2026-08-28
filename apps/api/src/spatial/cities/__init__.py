@@ -476,7 +476,6 @@ from src.spatial.cities.waco import (
     WACO_SUBMARKETS,
     is_in_waco_metro,
 )
-<<<<<<< HEAD
 from src.spatial.cities.jackson_ms import (
     JACKSON_MS_DIVISION_BBOXES,
     JACKSON_MS_DIVISIONS,
@@ -574,13 +573,6 @@ from src.spatial.cities.charleston_sc import (
     CHARLESTON_SC_METRO_BBOX,
     CHARLESTON_SC_SUBMARKETS,
     is_in_charleston_sc_metro,
-)
-from src.spatial.cities.cape_coral import (
-    CAPE_CORAL_DIVISION_BBOXES,
-    CAPE_CORAL_DIVISIONS,
-    CAPE_CORAL_METRO_BBOX,
-    CAPE_CORAL_SUBMARKETS,
-    is_in_cape_coral_metro,
 )
 from src.spatial.cities.lakeland import (
     LAKELAND_DIVISION_BBOXES,

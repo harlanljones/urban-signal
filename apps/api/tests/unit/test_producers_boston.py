@@ -33,6 +33,7 @@ def test_boston_registers_ckan_feeds_and_no_sales_feed():
         FeedType.PERMITS,
         FeedType.COMPLAINTS_311,
         FeedType.SLA,
+        FeedType.DEEDS,
         FeedType.CRIME,
     }
     assert REGISTRY[city].datasets[FeedType.PERMITS].platform == "ckan"
@@ -43,7 +44,7 @@ def test_boston_registers_ckan_feeds_and_no_sales_feed():
     assert sla.id_keys == ["license_num", "_id"]
     assert sla.state_plane_crs == "EPSG:2249"
     assert sla.state_plane_units == "US survey feet"
-    assert FeedType.DEEDS not in REGISTRY[city].datasets
+    # Boston uses Property Assessment as a proxy DEEDS snapshot
 
 
 def test_boston_resources_and_field_maps_are_pinned():
