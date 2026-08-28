@@ -29,7 +29,7 @@ AMARILLO_DIVISION_BBOXES: Dict[str, Dict[str, float]] = {
     "CENTRAL_CORE": {"min_lat": 35.175, "max_lat": 35.235, "min_lng": -101.885, "max_lng": -101.780},
     "WEST_SIDE": {"min_lat": 35.150, "max_lat": 35.270, "min_lng": -102.000, "max_lng": -101.885},
     "EAST_GATE": {"min_lat": 35.160, "max_lat": 35.260, "min_lng": -101.780, "max_lng": -101.650},
-    "SOUTH_STRIPS": {"min_lat": 35.080, "max_lat": 35.175, "min_lng": -101.960, "max_lng": -101.780},
+    "SOUTH_STRIPS": {"min_lat": 35.080, "max_lat": 35.190, "min_lng": -101.960, "max_lng": -101.780},
     "NORTH_LOOP": {"min_lat": 35.235, "max_lat": 35.330, "min_lng": -101.930, "max_lng": -101.760},
 }
 
