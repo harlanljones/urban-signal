@@ -5,22 +5,22 @@ Date: 2026-08-28
 Scope: Validate Overture “Buildings” (global footprints with GERS IDs, monthly GeoParquet on S3/Azure) as a candidate base/context layer. Deliver a small, reproducible evaluation and document licensing obligations.
 
 What shipped in this leaf:
-- Validation runner: `data/eval/overture/buildings_validate.py` (DuckDB-based; remote S3 bbox or local subset).
-- Tiny fixtures for CI/offline: `data/fixtures/overture/buildings_sample.geojson` and an “authoritative” toy set `authoritative_sample.geojson`.
+- Validation runner: `scripts/overture_buildings_validate.py` (DuckDB-based; remote S3 bbox or local subset).
+- Tiny fixtures for CI/offline: `scripts/fixtures/overture/buildings_sample.geojson` and an “authoritative” toy set `scripts/fixtures/overture/authoritative_sample.geojson`.
 - This note (results + how-to + licensing).
 
 How to run (remote; representative metros):
 
 ```bash
 # New Orleans, LA (US city)
-python data/eval/overture/buildings_validate.py \
+python scripts/overture_buildings_validate.py \
   --city new_orleans \
   --bbox "-90.33,29.78,-89.75,30.13" \
   --release "2026-08-19.0" \
   --out metrics_new_orleans.json
 
 # London, UK (international city)
-python data/eval/overture/buildings_validate.py \
+python scripts/overture_buildings_validate.py \
   --city london \
   --bbox "-0.5103,51.2868,0.3340,51.6919" \
   --release "2026-08-19.0" \
@@ -30,9 +30,9 @@ python data/eval/overture/buildings_validate.py \
 How to run (offline/CI with fixtures):
 
 ```bash
-python data/eval/overture/buildings_validate.py \
-  --overture-local data/fixtures/overture/buildings_sample.geojson \
-  --authoritative-local data/fixtures/overture/authoritative_sample.geojson \
+python scripts/overture_buildings_validate.py \
+  --overture-local scripts/fixtures/overture/buildings_sample.geojson \
+  --authoritative-local scripts/fixtures/overture/authoritative_sample.geojson \
   --city sample \
   --out metrics_fixture.json
 ```

@@ -1,0 +1,33 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "id": "auth_1", "height": 13.0, "levels": 3 },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-73.98988, 40.74992],
+          [-73.98988, 40.75018],
+          [-73.98952, 40.75018],
+          [-73.98952, 40.74992],
+          [-73.98988, 40.74992]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "auth_2", "height": 25.0, "levels": 6 },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-73.98938, 40.74982],
+          [-73.98938, 40.75012],
+          [-73.98898, 40.75012],
+          [-73.98898, 40.74982],
+          [-73.98938, 40.74982]
+        ]]
+      }
+    }
+  ]
+}
