@@ -476,6 +476,13 @@ from src.spatial.cities.macon_bibb import (
     MACON_BIBB_SUBMARKETS,
     is_in_macon_bibb_metro,
 )
+from src.spatial.cities.tyler import (
+    TYLER_DIVISION_BBOXES,
+    TYLER_DIVISIONS,
+    TYLER_METRO_BBOX,
+    TYLER_SUBMARKETS,
+    is_in_tyler_metro,
+)
 
 __all__ = [
     "PIERCE_METRO_BBOX",
@@ -814,4 +821,9 @@ __all__ = [
     "MACON_BIBB_DIVISIONS",
     "MACON_BIBB_SUBMARKETS",
     "is_in_macon_bibb_metro",
+    "TYLER_METRO_BBOX",
+    "TYLER_DIVISION_BBOXES",
+    "TYLER_DIVISIONS",
+    "TYLER_SUBMARKETS",
+    "is_in_tyler_metro",
 ]
