@@ -117,7 +117,7 @@ class GbfsProducer:
                 continue
             self.producer.produce(
                 topic=settings.topic_station_change,
-                key=f"{event.city_id}:{system_id}:{event.station_id}",
+                key=f"{system_id}:{event.station_id}",
                 payload=event,
             )
             streamed += 1
@@ -133,7 +133,11 @@ class GbfsProducer:
         # Persist only after producing: if the process dies mid-emit the next
         # poll re-derives the same diff from the old state rather than losing
         # the transitions entirely.
-        self.snapshot.save_state(system_id, merged)
+        self.snapshot.save_state(
+            system_id,
+            merged,
+            status_snapshot=self.snapshot.last_status_snapshot,
+        )
         self.producer.flush()
         logger.info(
             "%s GBFS %s (v%s): streamed %d transitions, state now %d stations",

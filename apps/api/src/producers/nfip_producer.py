@@ -5,10 +5,12 @@ from __future__ import annotations
 from datetime import UTC, date, datetime
 from typing import Any
 
+from pathlib import Path
+
 from src.config import settings
 from src.producers.base_producer import BaseKafkaProducer
 from src.producers.openfema_client import OpenFemaClient, odata_date_filter
-from src.schemas.models import InsuranceLossEvent
+from src.schemas.models import ContextObservationEvent, InsuranceLossEvent
 from src.spatial.geography_crosswalk import GeographyCrosswalk
 from src.spatial.h3_indexer import H3SpatialIndexer
 
@@ -40,12 +42,10 @@ def _datetime(value: Any) -> datetime | None:
 
 
 class NfipProducer:
-    """Convert privacy-safe NFIP claims into tract-centroid events."""
+    """Convert privacy-safe NFIP claims and county declarations into events."""
 
     def __init__(self, bootstrap_servers: str | None = None, client: Any = None,
                  crosswalk: GeographyCrosswalk | None = None, indexer: Any = None):
-        from pathlib import Path
-
         self.client = client or OpenFemaClient()
         self.nfip = self.client
         # Scheduler wrappers expose the common client surface so the interlock
@@ -57,6 +57,11 @@ class NfipProducer:
         self.producer = BaseKafkaProducer(
             bootstrap_servers=bootstrap_servers,
             schema_file_path=Path(__file__).parent.parent / "schemas" / "avro" / "insurance_loss_event.avsc",
+            dlq_topic=settings.topic_dlq,
+        )
+        self.context_producer = BaseKafkaProducer(
+            bootstrap_servers=bootstrap_servers,
+            schema_file_path=Path(__file__).parent.parent / "schemas" / "avro" / "context_observation_event.avsc",
             dlq_topic=settings.topic_dlq,
         )
 
@@ -107,4 +112,75 @@ class NfipProducer:
                 self.producer.produce(settings.topic_insurance_loss, f"{event.city_id}:{event.claim_id}", event)
                 emitted += 1
         self.producer.flush()
+        return emitted
+
+    def parse_declaration(self, row: dict[str, Any]) -> tuple[ContextObservationEvent | None, str | None]:
+        """Turn a county-level declaration into a context observation.
+
+        Declarations have no point geometry and are not insurance-loss events;
+        the county Gazetteer centroid supplies a coarse context location.
+        """
+        state_fips = row.get("fipsStateCode") or row.get("stateFips")
+        county_fips = row.get("fipsCountyCode") or row.get("countyFips")
+        if state_fips is not None and county_fips is not None:
+            fips_text = str(state_fips).zfill(2) + str(county_fips).zfill(3)
+        else:
+            fips_text = str(row.get("placeCode") or "")
+        point = self.crosswalk.county_point(fips_text)
+        if point is None:
+            return None, "FEMA declaration has no county centroid"
+        city_id = self.crosswalk.city_for_point(point.latitude, point.longitude)
+        if city_id is None:
+            return None, "FEMA declaration county is outside registered metros"
+        declaration_date = _datetime(row.get("declarationDate") or row.get("lastRefresh"))
+        if declaration_date is None:
+            return None, "FEMA declaration has no parseable declarationDate"
+        h3 = self.indexer.get_multi_res_hierarchy(point.latitude, point.longitude)
+        declaration_id = str(row.get("femaDeclarationString") or row.get("id") or fips_text)
+        return ContextObservationEvent(
+            city_id=city_id,
+            observation_id=f"fema_declaration:{declaration_id}",
+            source="fema_declaration",
+            asset_id=declaration_id,
+            asset_name=row.get("declarationTitle") or row.get("incidentType"),
+            metric="declared_disaster",
+            value=1.0,
+            unit="declaration",
+            period_start=declaration_date,
+            period_type="day",
+            category=row.get("incidentType"),
+            latitude=point.latitude,
+            longitude=point.longitude,
+            **h3,
+        ), None
+
+    def run_declarations(self, since: Any = None, limit: int | None = None, **_: Any) -> int:
+        """Emit county-level declarations to the context topic, never claims."""
+        endpoint = settings.openfema_disaster_declarations_endpoint
+        where = odata_date_filter("declarationDate", since) if since else None
+        emitted = 0
+        for batch in self.client.paginate(
+            endpoint_url=endpoint,
+            where_clause=where,
+            order_by="declarationDate,femaDeclarationString",
+            max_records=limit,
+        ):
+            for row in batch:
+                event, reason = self.parse_declaration(row)
+                declaration_id = str(row.get("femaDeclarationString") or row.get("id") or "unknown")
+                if event is None:
+                    self.context_producer.route_to_dlq(
+                        settings.topic_context_observations,
+                        declaration_id,
+                        row,
+                        reason or "invalid declaration",
+                    )
+                    continue
+                self.context_producer.produce(
+                    settings.topic_context_observations,
+                    "event:" + event.city_id + ":" + event.observation_id,
+                    event,
+                )
+                emitted += 1
+        self.context_producer.flush()
         return emitted

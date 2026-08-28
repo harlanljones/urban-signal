@@ -167,6 +167,9 @@ class TestGeographyCrosswalk:
             ("Denver-Aurora-Lakewood, CO", "denver"),
             ("Washington-Arlington-Alexandria, DC-VA-MD-WV", "washington_dc"),
             ("Miami-Fort Lauderdale-Pompano Beach, FL", "miami_dade"),
+            ("Columbus, GA-AL", "columbus_ga"),
+            ("Columbus, GA-AL Metro Area", "columbus_ga"),
+            ("Columbus, OH Metro Area", "columbus"),
         ],
     )
     def test_publisher_metro_labels_resolve(self, crosswalk, label, expected):
@@ -177,6 +180,14 @@ class TestGeographyCrosswalk:
         # hand Oklahoma's rents to Miami-Dade; the state half prevents it.
         assert crosswalk.city_for_metro_name("Miami, OK") is None
         assert ("miami", "fl") in METRO_NAME_OVERRIDES
+
+    def test_columbus_ga_is_not_columbus_oh(self, crosswalk):
+        # Bare alias "columbus" is Columbus, OH. Columbus, GA-AL (CBSA 17980)
+        # landed on main after this PR was cut; without a (city, state)
+        # override it would steal Ohio's series or drop GA as unreachable.
+        assert ("columbus", "ga") in METRO_NAME_OVERRIDES
+        assert crosswalk.city_for_metro_name("Columbus, GA-AL") == "columbus_ga"
+        assert crosswalk.city_for_metro_name("Columbus, OH") == "columbus"
 
     def test_every_registered_city_is_reachable_except_the_submarkets(self, crosswalk):
         from src.spatial.city_registry import REGISTRY

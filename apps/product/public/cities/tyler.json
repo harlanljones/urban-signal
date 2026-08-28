@@ -54,7 +54,7 @@
         "lng": -95.22
       },
       "bbox": {
-        "min_lat": 32.32,
+        "min_lat": 32.31,
         "max_lat": 32.42,
         "min_lng": -95.27,
         "max_lng": -95.15
@@ -176,4 +176,3 @@
   "evidence_path": "apps/api/src/spatial/cities/tyler.py",
   "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
 }
-

@@ -5,87 +5,155 @@
   "state": "GA",
   "center": {
     "lat": 33.476,
-    "lng": -82.010
+    "lng": -82.01
   },
   "metro_bbox": {
     "min_lat": 33.25,
     "max_lat": 33.65,
-    "min_lng": -82.20,
+    "min_lng": -82.2,
     "max_lng": -81.85
   },
   "divisions": {
     "DOWNTOWN_MEDICAL": {
       "name": "DOWNTOWN_MEDICAL",
-      "center": { "lat": 33.478, "lng": -81.968 },
-      "bbox": { "min_lat": 33.450, "max_lat": 33.505, "min_lng": -81.995, "max_lng": -81.955 },
-      "submarkets": ["Downtown & Broad Street", "Medical District & AU"]
+      "center": {
+        "lat": 33.478,
+        "lng": -81.968
+      },
+      "bbox": {
+        "min_lat": 33.45,
+        "max_lat": 33.505,
+        "min_lng": -81.995,
+        "max_lng": -81.955
+      },
+      "submarkets": [
+        "Downtown & Broad Street",
+        "Medical District & AU"
+      ]
     },
     "WEST_AUGUSTA": {
       "name": "WEST_AUGUSTA",
-      "center": { "lat": 33.508, "lng": -82.050 },
-      "bbox": { "min_lat": 33.470, "max_lat": 33.560, "min_lng": -82.120, "max_lng": -82.010 },
-      "submarkets": ["Summerville & AU Campus", "West Augusta Retail Spine"]
+      "center": {
+        "lat": 33.508,
+        "lng": -82.05
+      },
+      "bbox": {
+        "min_lat": 33.47,
+        "max_lat": 33.56,
+        "min_lng": -82.12,
+        "max_lng": -82.01
+      },
+      "submarkets": [
+        "Summerville & AU Campus",
+        "West Augusta Retail Spine"
+      ]
     },
     "SOUTH_AUGUSTA": {
       "name": "SOUTH_AUGUSTA",
-      "center": { "lat": 33.385, "lng": -82.015 },
-      "bbox": { "min_lat": 33.300, "max_lat": 33.430, "min_lng": -82.110, "max_lng": -81.970 },
-      "submarkets": ["Deans Bridge & Regency", "Fort Eisenhower Gateway"]
+      "center": {
+        "lat": 33.385,
+        "lng": -82.015
+      },
+      "bbox": {
+        "min_lat": 33.3,
+        "max_lat": 33.43,
+        "min_lng": -82.11,
+        "max_lng": -81.97
+      },
+      "submarkets": [
+        "Deans Bridge & Regency",
+        "Fort Eisenhower Gateway"
+      ]
     },
     "EAST_AUGUSTA": {
       "name": "EAST_AUGUSTA",
-      "center": { "lat": 33.500, "lng": -81.925 },
-      "bbox": { "min_lat": 33.450, "max_lat": 33.540, "min_lng": -81.950, "max_lng": -81.890 },
-      "submarkets": ["East Augusta Riverport", "Laney-Walker & Bethlehem"]
+      "center": {
+        "lat": 33.5,
+        "lng": -81.925
+      },
+      "bbox": {
+        "min_lat": 33.45,
+        "max_lat": 33.54,
+        "min_lng": -81.95,
+        "max_lng": -81.89
+      },
+      "submarkets": [
+        "East Augusta Riverport",
+        "Laney-Walker & Bethlehem"
+      ]
     }
   },
   "submarkets": {
     "Downtown & Broad Street": {
       "name": "Downtown & Broad Street",
       "division": "DOWNTOWN_MEDICAL",
-      "center": { "lat": 33.475, "lng": -81.970 },
+      "center": {
+        "lat": 33.475,
+        "lng": -81.97
+      },
       "description": "Historic Broad Street corridor and Riverwalk mixed-use spine with steady renovation permits."
     },
     "Medical District & AU": {
       "name": "Medical District & AU",
       "division": "DOWNTOWN_MEDICAL",
-      "center": { "lat": 33.476, "lng": -81.962 },
+      "center": {
+        "lat": 33.476,
+        "lng": -81.962
+      },
       "description": "Augusta University and adjacent medical complex with institutional capital and infill housing."
     },
     "Summerville & AU Campus": {
       "name": "Summerville & AU Campus",
       "division": "WEST_AUGUSTA",
-      "center": { "lat": 33.486, "lng": -82.022 },
-      "description": "Historic Summerville neighborhood around AU campus; renovation-led permits."
+      "center": {
+        "lat": 33.486,
+        "lng": -82.022
+      },
+      "description": "Historic Summerville neighborhood around AU Summerville campus; renovation-led permits."
     },
     "West Augusta Retail Spine": {
       "name": "West Augusta Retail Spine",
       "division": "WEST_AUGUSTA",
-      "center": { "lat": 33.505, "lng": -82.070 },
+      "center": {
+        "lat": 33.505,
+        "lng": -82.07
+      },
       "description": "Washington Rd commercial corridor and adjacent residential pockets with steady tenant improvements."
     },
     "Deans Bridge & Regency": {
       "name": "Deans Bridge & Regency",
       "division": "SOUTH_AUGUSTA",
-      "center": { "lat": 33.390, "lng": -82.030 },
+      "center": {
+        "lat": 33.39,
+        "lng": -82.03
+      },
       "description": "South Augusta arterial corridor with small-format commercial rehab and single-family turnover."
     },
     "Fort Eisenhower Gateway": {
       "name": "Fort Eisenhower Gateway",
       "division": "SOUTH_AUGUSTA",
-      "center": { "lat": 33.405, "lng": -81.995 },
+      "center": {
+        "lat": 33.405,
+        "lng": -81.995
+      },
       "description": "Gateway area serving Fort Eisenhower with workforce housing and service permitting."
     },
     "East Augusta Riverport": {
       "name": "East Augusta Riverport",
       "division": "EAST_AUGUSTA",
-      "center": { "lat": 33.505, "lng": -81.925 },
+      "center": {
+        "lat": 33.505,
+        "lng": -81.925
+      },
       "description": "Industrial riverfront and logistics-adjacent redevelopment on the GA side of the Savannah River."
     },
     "Laney-Walker & Bethlehem": {
       "name": "Laney-Walker & Bethlehem",
       "division": "EAST_AUGUSTA",
-      "center": { "lat": 33.470, "lng": -81.930 },
+      "center": {
+        "lat": 33.47,
+        "lng": -81.93
+      },
       "description": "Historic neighborhoods east of downtown with ongoing small-lot infill and rehab."
     }
   },
@@ -108,4 +176,3 @@
   "evidence_path": "apps/api/src/spatial/cities/augusta.py",
   "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
 }
-

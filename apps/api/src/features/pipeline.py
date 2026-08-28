@@ -118,6 +118,33 @@ class SpatialFeaturePipeline:
                 ingested_at TIMESTAMP
             );
 
+            CREATE TABLE IF NOT EXISTS raw_poi_change (
+                event_key VARCHAR PRIMARY KEY,
+                poi_id VARCHAR,
+                source VARCHAR,
+                event_type VARCHAR,
+                event_date TIMESTAMP,
+                latitude DOUBLE,
+                longitude DOUBLE,
+                h3_res7 VARCHAR,
+                h3_res8 VARCHAR,
+                h3_res9 VARCHAR,
+                ingested_at TIMESTAMP
+            );
+
+            CREATE TABLE IF NOT EXISTS raw_insurance_loss (
+                claim_id VARCHAR PRIMARY KEY,
+                event_date TIMESTAMP,
+                amount_paid_building DOUBLE,
+                amount_paid_contents DOUBLE,
+                latitude DOUBLE,
+                longitude DOUBLE,
+                h3_res7 VARCHAR,
+                h3_res8 VARCHAR,
+                h3_res9 VARCHAR,
+                ingested_at TIMESTAMP
+            );
+
             CREATE TABLE IF NOT EXISTS feature_store_h3 (
                 h3_index VARCHAR,
                 h3_resolution INTEGER,
@@ -246,6 +273,44 @@ class SpatialFeaturePipeline:
             """)
             self.con.unregister("df_street_cut_temp")
 
+    def insert_poi_changes(self, df: pd.DataFrame):
+        """Batch insert POI openings/closings as context-only observations."""
+        if not df.empty:
+            cols = [
+                "event_key", "poi_id", "source", "event_type", "event_date",
+                "latitude", "longitude", "h3_res7", "h3_res8", "h3_res9", "ingested_at",
+            ]
+            filtered = df.copy()
+            for c in cols:
+                if c not in filtered.columns:
+                    filtered[c] = None
+            filtered = filtered[cols]
+            self.con.register("df_poi_change_temp", filtered)
+            self.con.execute("""
+                INSERT OR REPLACE INTO raw_poi_change
+                SELECT * FROM df_poi_change_temp
+            """)
+            self.con.unregister("df_poi_change_temp")
+
+    def insert_insurance_losses(self, df: pd.DataFrame):
+        """Batch insert NFIP claims as context-only distress observations."""
+        if not df.empty:
+            cols = [
+                "claim_id", "event_date", "amount_paid_building", "amount_paid_contents",
+                "latitude", "longitude", "h3_res7", "h3_res8", "h3_res9", "ingested_at",
+            ]
+            filtered = df.copy()
+            for c in cols:
+                if c not in filtered.columns:
+                    filtered[c] = None
+            filtered = filtered[cols]
+            self.con.register("df_insurance_loss_temp", filtered)
+            self.con.execute("""
+                INSERT OR REPLACE INTO raw_insurance_loss
+                SELECT * FROM df_insurance_loss_temp
+            """)
+            self.con.unregister("df_insurance_loss_temp")
+
     def compute_h3_cell_features(
         self,
         h3_index: str,
@@ -337,6 +402,31 @@ class SpatialFeaturePipeline:
             sla_move_ins_90d = flow_res[0] or 0
             sla_move_outs_90d = flow_res[1] or 0
 
+        # 3c. POI churn context (US-369): release-dated vendor observations
+        # are intentionally context-only and never enter the LIMS formula.
+        poi_res = self.con.execute(f"""
+            SELECT
+                SUM(CASE WHEN event_type = 'poi_opened' THEN 1 ELSE 0 END) AS opened,
+                SUM(CASE WHEN event_type = 'poi_closed' THEN 1 ELSE 0 END) AS closed
+            FROM raw_poi_change
+            WHERE {col_name} = ? AND event_date <= ? AND event_date >= ?
+        """, [h3_index, dt_str, dt_90d]).fetchone()
+        poi_opened_90d = int(poi_res[0] or 0)
+        poi_closed_90d = int(poi_res[1] or 0)
+        poi_net_churn_90d = poi_opened_90d - poi_closed_90d
+
+        # 3d. NFIP flood-loss distress context (US-370). Claims are counted
+        # and summed for ablation/evaluation only; neither value enters LIMS.
+        nfip_res = self.con.execute(f"""
+            SELECT
+                COUNT(*) AS claim_count,
+                COALESCE(SUM(amount_paid_building + amount_paid_contents), 0.0) AS paid_total
+            FROM raw_insurance_loss
+            WHERE {col_name} = ? AND event_date <= ? AND event_date >= ?
+        """, [h3_index, dt_str, dt_180d]).fetchone()
+        nfip_claim_count_180d = int(nfip_res[0] or 0)
+        nfip_paid_amount_180d = float(nfip_res[1] or 0.0)
+
         # 4. Deeds query
         deeds_res = self.con.execute(f"""
             SELECT
@@ -374,6 +464,11 @@ class SpatialFeaturePipeline:
             "sla_move_outs_90d": int(sla_move_outs_90d),
             "deed_total_volume_180d": round(float(deed_vol), 2),
             "deed_transaction_count_180d": int(deed_cnt),
+            "poi_opened_count_90d": poi_opened_90d,
+            "poi_closed_count_90d": poi_closed_90d,
+            "poi_net_churn_90d": poi_net_churn_90d,
+            "nfip_claim_count_180d": nfip_claim_count_180d,
+            "nfip_paid_amount_180d": round(nfip_paid_amount_180d, 2),
             "lims_score": lims,
         }
 

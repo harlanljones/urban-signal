@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "id": "asheville",
-  "name": "Asheville, NC",
+  "name": "Asheville",
   "state": "NC",
   "center": {
     "lat": 35.5951,
@@ -16,94 +16,184 @@
   "divisions": {
     "DOWNTOWN_CORE": {
       "name": "DOWNTOWN_CORE",
-      "center": { "lat": 35.5955, "lng": -82.5515 },
-      "bbox": { "min_lat": 35.585, "max_lat": 35.610, "min_lng": -82.565, "max_lng": -82.530 },
-      "submarkets": ["Downtown Asheville", "Pack Square"]
+      "center": {
+        "lat": 35.5955,
+        "lng": -82.5515
+      },
+      "bbox": {
+        "min_lat": 35.585,
+        "max_lat": 35.61,
+        "min_lng": -82.565,
+        "max_lng": -82.53
+      },
+      "submarkets": [
+        "Downtown Asheville",
+        "Pack Square"
+      ]
     },
     "RIVER_ARTS": {
       "name": "RIVER_ARTS",
-      "center": { "lat": 35.5865, "lng": -82.5680 },
-      "bbox": { "min_lat": 35.575, "max_lat": 35.600, "min_lng": -82.585, "max_lng": -82.545 },
-      "submarkets": ["River Arts District"]
+      "center": {
+        "lat": 35.5865,
+        "lng": -82.568
+      },
+      "bbox": {
+        "min_lat": 35.575,
+        "max_lat": 35.6,
+        "min_lng": -82.585,
+        "max_lng": -82.545
+      },
+      "submarkets": [
+        "River Arts District"
+      ]
     },
     "WEST_ASHEVILLE": {
       "name": "WEST_ASHEVILLE",
-      "center": { "lat": 35.5900, "lng": -82.6000 },
-      "bbox": { "min_lat": 35.565, "max_lat": 35.620, "min_lng": -82.635, "max_lng": -82.565 },
-      "submarkets": ["West Asheville Haywood Rd"]
+      "center": {
+        "lat": 35.59,
+        "lng": -82.6
+      },
+      "bbox": {
+        "min_lat": 35.565,
+        "max_lat": 35.62,
+        "min_lng": -82.635,
+        "max_lng": -82.565
+      },
+      "submarkets": [
+        "West Asheville Haywood Rd"
+      ]
     },
     "NORTH_ASHEVILLE": {
       "name": "NORTH_ASHEVILLE",
-      "center": { "lat": 35.6350, "lng": -82.5450 },
-      "bbox": { "min_lat": 35.620, "max_lat": 35.670, "min_lng": -82.590, "max_lng": -82.520 },
-      "submarkets": ["North Asheville & Grove Park", "Beaver Lake"]
+      "center": {
+        "lat": 35.635,
+        "lng": -82.545
+      },
+      "bbox": {
+        "min_lat": 35.62,
+        "max_lat": 35.67,
+        "min_lng": -82.59,
+        "max_lng": -82.52
+      },
+      "submarkets": [
+        "North Asheville & Grove Park",
+        "Beaver Lake"
+      ]
     },
     "EAST_ASHEVILLE": {
       "name": "EAST_ASHEVILLE",
-      "center": { "lat": 35.5980, "lng": -82.4900 },
-      "bbox": { "min_lat": 35.575, "max_lat": 35.620, "min_lng": -82.520, "max_lng": -82.460 },
-      "submarkets": ["East Asheville"]
+      "center": {
+        "lat": 35.598,
+        "lng": -82.49
+      },
+      "bbox": {
+        "min_lat": 35.575,
+        "max_lat": 35.62,
+        "min_lng": -82.52,
+        "max_lng": -82.46
+      },
+      "submarkets": [
+        "East Asheville"
+      ]
     },
     "SOUTH_ASHEVILLE": {
       "name": "SOUTH_ASHEVILLE",
-      "center": { "lat": 35.5250, "lng": -82.5200 },
-      "bbox": { "min_lat": 35.470, "max_lat": 35.570, "min_lng": -82.560, "max_lng": -82.470 },
-      "submarkets": ["Biltmore Village", "South Asheville & Arden"]
+      "center": {
+        "lat": 35.525,
+        "lng": -82.52
+      },
+      "bbox": {
+        "min_lat": 35.47,
+        "max_lat": 35.57,
+        "min_lng": -82.56,
+        "max_lng": -82.47
+      },
+      "submarkets": [
+        "Biltmore Village",
+        "South Asheville & Arden"
+      ]
     }
   },
   "submarkets": {
     "Downtown Asheville": {
       "name": "Downtown Asheville",
       "division": "DOWNTOWN_CORE",
-      "center": { "lat": 35.5955, "lng": -82.5515 },
+      "center": {
+        "lat": 35.5955,
+        "lng": -82.5515
+      },
       "description": "Pack Square to South Slope with adaptive reuse, hospitality, and mixed-use permitting momentum."
     },
     "Pack Square": {
       "name": "Pack Square",
       "division": "DOWNTOWN_CORE",
-      "center": { "lat": 35.5952, "lng": -82.5503 },
+      "center": {
+        "lat": 35.5952,
+        "lng": -82.5503
+      },
       "description": "Civic center with office-to-lodging reuse and storefront reinvestment along Biltmore Ave."
     },
     "River Arts District": {
       "name": "River Arts District",
       "division": "RIVER_ARTS",
-      "center": { "lat": 35.5825, "lng": -82.5715 },
+      "center": {
+        "lat": 35.5825,
+        "lng": -82.5715
+      },
       "description": "Warehouse-to-studio conversions and infill along the French Broad River corridor."
     },
     "West Asheville Haywood Rd": {
       "name": "West Asheville Haywood Rd",
       "division": "WEST_ASHEVILLE",
-      "center": { "lat": 35.5790, "lng": -82.5930 },
+      "center": {
+        "lat": 35.579,
+        "lng": -82.593
+      },
       "description": "Haywood Road corridor with small-format commercial rehab and residential infill."
     },
     "North Asheville & Grove Park": {
       "name": "North Asheville & Grove Park",
       "division": "NORTH_ASHEVILLE",
-      "center": { "lat": 35.6260, "lng": -82.5420 },
+      "center": {
+        "lat": 35.626,
+        "lng": -82.542
+      },
       "description": "Historic Grove Park and Charlotte St corridor with steady alteration permits."
     },
     "Beaver Lake": {
       "name": "Beaver Lake",
       "division": "NORTH_ASHEVILLE",
-      "center": { "lat": 35.6410, "lng": -82.5580 },
+      "center": {
+        "lat": 35.641,
+        "lng": -82.558
+      },
       "description": "North edge lake community with single-family additions and site improvements."
     },
     "East Asheville": {
       "name": "East Asheville",
       "division": "EAST_ASHEVILLE",
-      "center": { "lat": 35.5960, "lng": -82.4810 },
+      "center": {
+        "lat": 35.596,
+        "lng": -82.481
+      },
       "description": "Tunnel Road corridor with neighborhood-serving retail nodes and residential turnover."
     },
     "Biltmore Village": {
       "name": "Biltmore Village",
       "division": "SOUTH_ASHEVILLE",
-      "center": { "lat": 35.5650, "lng": -82.5430 },
+      "center": {
+        "lat": 35.565,
+        "lng": -82.543
+      },
       "description": "Historic village district at the estate gateway with hospitality and mixed-use rehab."
     },
     "South Asheville & Arden": {
       "name": "South Asheville & Arden",
       "division": "SOUTH_ASHEVILLE",
-      "center": { "lat": 35.4830, "lng": -82.5130 },
+      "center": {
+        "lat": 35.483,
+        "lng": -82.513
+      },
       "description": "Airport/Arden growth belt with retail pads and suburban multifamily infill."
     }
   },
@@ -121,4 +211,3 @@
   "evidence_path": "apps/api/src/spatial/cities/asheville.py",
   "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
 }
-

@@ -3,7 +3,10 @@
   "id": "texarkana",
   "name": "Texarkana",
   "state": "TX",
-  "center": { "lat": 33.4251, "lng": -94.0477 },
+  "center": {
+    "lat": 33.4251,
+    "lng": -94.0477
+  },
   "metro_bbox": {
     "min_lat": 33.35,
     "max_lat": 33.6,
@@ -13,92 +16,173 @@
   "divisions": {
     "CENTRAL_CORE": {
       "name": "CENTRAL_CORE",
-      "center": { "lat": 33.428, "lng": -94.046 },
-      "bbox": { "min_lat": 33.41, "max_lat": 33.45, "min_lng": -94.08, "max_lng": -94.02 },
-      "submarkets": ["Downtown State Line", "Texas Blvd & 7th St"]
+      "center": {
+        "lat": 33.428,
+        "lng": -94.046
+      },
+      "bbox": {
+        "min_lat": 33.41,
+        "max_lat": 33.45,
+        "min_lng": -94.08,
+        "max_lng": -94.02
+      },
+      "submarkets": [
+        "Downtown State Line",
+        "Texas Blvd & 7th St"
+      ]
     },
     "TEXAS_WEST": {
       "name": "TEXAS_WEST",
-      "center": { "lat": 33.435, "lng": -94.185 },
-      "bbox": { "min_lat": 33.4, "max_lat": 33.49, "min_lng": -94.25, "max_lng": -94.12 },
-      "submarkets": ["Wake Village & Nash"]
+      "center": {
+        "lat": 33.435,
+        "lng": -94.185
+      },
+      "bbox": {
+        "min_lat": 33.4,
+        "max_lat": 33.49,
+        "min_lng": -94.25,
+        "max_lng": -94.12
+      },
+      "submarkets": [
+        "Wake Village & Nash"
+      ]
     },
     "ARKANSAS_EAST": {
       "name": "ARKANSAS_EAST",
-      "center": { "lat": 33.455, "lng": -94.015 },
-      "bbox": { "min_lat": 33.41, "max_lat": 33.5, "min_lng": -94.06, "max_lng": -93.95 },
-      "submarkets": ["Broad St & Arkansas Blvd", "East Arkansas Industrial"]
+      "center": {
+        "lat": 33.455,
+        "lng": -94.015
+      },
+      "bbox": {
+        "min_lat": 33.41,
+        "max_lat": 33.5,
+        "min_lng": -94.06,
+        "max_lng": -93.95
+      },
+      "submarkets": [
+        "Broad St & Arkansas Blvd",
+        "East Arkansas Industrial"
+      ]
     },
     "I30_CORRIDOR": {
       "name": "I30_CORRIDOR",
-      "center": { "lat": 33.47, "lng": -94.14 },
-      "bbox": { "min_lat": 33.45, "max_lat": 33.52, "min_lng": -94.2, "max_lng": -94.05 },
-      "submarkets": ["I-30 at Richmond Rd", "I-30 at Summerhill"]
+      "center": {
+        "lat": 33.47,
+        "lng": -94.14
+      },
+      "bbox": {
+        "min_lat": 33.45,
+        "max_lat": 33.52,
+        "min_lng": -94.2,
+        "max_lng": -94.05
+      },
+      "submarkets": [
+        "I-30 at Richmond Rd",
+        "I-30 at Summerhill"
+      ]
     },
     "SOUTH_STRIP": {
       "name": "SOUTH_STRIP",
-      "center": { "lat": 33.395, "lng": -94.055 },
-      "bbox": { "min_lat": 33.35, "max_lat": 33.42, "min_lng": -94.1, "max_lng": -94.0 },
-      "submarkets": ["South State Line Retail"]
+      "center": {
+        "lat": 33.395,
+        "lng": -94.055
+      },
+      "bbox": {
+        "min_lat": 33.35,
+        "max_lat": 33.42,
+        "min_lng": -94.1,
+        "max_lng": -94.0
+      },
+      "submarkets": [
+        "South State Line Retail"
+      ]
     }
   },
   "submarkets": {
     "Downtown State Line": {
       "name": "Downtown State Line",
       "division": "CENTRAL_CORE",
-      "center": { "lat": 33.43, "lng": -94.046 },
+      "center": {
+        "lat": 33.43,
+        "lng": -94.046
+      },
       "description": "Historic downtown straddling State Line Ave with civic anchors and hospitality infill."
     },
     "Texas Blvd & 7th St": {
       "name": "Texas Blvd & 7th St",
       "division": "CENTRAL_CORE",
-      "center": { "lat": 33.424, "lng": -94.052 },
+      "center": {
+        "lat": 33.424,
+        "lng": -94.052
+      },
       "description": "West-of-core crossroads with small-format retail and services."
     },
     "I-30 at Richmond Rd": {
       "name": "I-30 at Richmond Rd",
       "division": "I30_CORRIDOR",
-      "center": { "lat": 33.476, "lng": -94.169 },
+      "center": {
+        "lat": 33.476,
+        "lng": -94.169
+      },
       "description": "Regional retail node and hospitality cluster at Richmond Rd & I-30."
     },
     "I-30 at Summerhill": {
       "name": "I-30 at Summerhill",
       "division": "I30_CORRIDOR",
-      "center": { "lat": 33.462, "lng": -94.074 },
+      "center": {
+        "lat": 33.462,
+        "lng": -94.074
+      },
       "description": "Interchange commercial cluster with auto-oriented retail and services."
     },
     "Wake Village & Nash": {
       "name": "Wake Village & Nash",
       "division": "TEXAS_WEST",
-      "center": { "lat": 33.43, "lng": -94.17 },
+      "center": {
+        "lat": 33.43,
+        "lng": -94.17
+      },
       "description": "West-side suburban municipalities with industrial and highway services."
     },
     "Broad St & Arkansas Blvd": {
       "name": "Broad St & Arkansas Blvd",
       "division": "ARKANSAS_EAST",
-      "center": { "lat": 33.441, "lng": -94.033 },
+      "center": {
+        "lat": 33.441,
+        "lng": -94.033
+      },
       "description": "Arkansas-side commercial corridor and civic services east of State Line Ave."
     },
     "East Arkansas Industrial": {
       "name": "East Arkansas Industrial",
       "division": "ARKANSAS_EAST",
-      "center": { "lat": 33.467, "lng": -93.995 },
+      "center": {
+        "lat": 33.467,
+        "lng": -93.995
+      },
       "description": "Industrial/logistics clusters along Oats/Arkansas Blvd towards the airport approach."
     },
     "South State Line Retail": {
       "name": "South State Line Retail",
       "division": "SOUTH_STRIP",
-      "center": { "lat": 33.399, "lng": -94.042 },
+      "center": {
+        "lat": 33.399,
+        "lng": -94.042
+      },
       "description": "Auto-oriented retail and services belt along State Line/US-71/US-82."
     }
   },
   "feeds": {
     "permits": null,
     "311": null,
-    "sla": { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" },
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
     "deeds": null
   },
   "evidence_path": "apps/api/src/spatial/cities/texarkana.py",
   "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
 }
-

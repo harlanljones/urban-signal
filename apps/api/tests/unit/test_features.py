@@ -4,6 +4,7 @@ import math
 from datetime import datetime, timedelta, timezone
 import pandas as pd
 import pytest
+import h3
 from src.features.lims_calculator import LIMSCalculator
 from src.features.pipeline import SpatialFeaturePipeline
 from src.features.shift_dynamics import ComplaintShiftDynamics
@@ -124,6 +125,97 @@ def _sla_row(license_id, effective_date, expiration_date, now):
         "h3_res9": SLA_CELL,
         "ingested_at": now,
     }
+
+
+def test_poi_churn_context_counts_openings_closings_and_net_without_affecting_lims():
+    pipeline = SpatialFeaturePipeline(db_path=":memory:")
+    now = datetime.now(timezone.utc)
+    rows = pd.DataFrame([
+        {
+            "event_key": "fsq:p-open:dt=recent:poi_opened",
+            "poi_id": "p-open",
+            "source": "fsq",
+            "event_type": "poi_opened",
+            "event_date": now - timedelta(days=20),
+            "latitude": 40.7233,
+            "longitude": -74.0030,
+            "h3_res7": h3.cell_to_parent(SLA_CELL, 7),
+            "h3_res8": h3.cell_to_parent(SLA_CELL, 8),
+            "h3_res9": SLA_CELL,
+            "ingested_at": now,
+        },
+        {
+            "event_key": "fsq:p-closed:dt=recent:poi_closed",
+            "poi_id": "p-closed",
+            "source": "fsq",
+            "event_type": "poi_closed",
+            "event_date": now - timedelta(days=40),
+            "latitude": 40.7233,
+            "longitude": -74.0030,
+            "h3_res7": h3.cell_to_parent(SLA_CELL, 7),
+            "h3_res8": h3.cell_to_parent(SLA_CELL, 8),
+            "h3_res9": SLA_CELL,
+            "ingested_at": now,
+        },
+        {
+            "event_key": "fsq:p-old:dt=old:poi_opened",
+            "poi_id": "p-old",
+            "source": "fsq",
+            "event_type": "poi_opened",
+            "event_date": now - timedelta(days=120),
+            "latitude": 40.7233,
+            "longitude": -74.0030,
+            "h3_res7": h3.cell_to_parent(SLA_CELL, 7),
+            "h3_res8": h3.cell_to_parent(SLA_CELL, 8),
+            "h3_res9": SLA_CELL,
+            "ingested_at": now,
+        },
+    ])
+    pipeline.insert_poi_changes(rows)
+    features = pipeline.compute_h3_cell_features(SLA_CELL, as_of_date=now)
+    assert features["poi_opened_count_90d"] == 1
+    assert features["poi_closed_count_90d"] == 1
+    assert features["poi_net_churn_90d"] == 0
+
+
+def test_nfip_distress_context_uses_180_day_window_without_affecting_lims():
+    pipeline = SpatialFeaturePipeline(db_path=":memory:")
+    now = datetime.now(timezone.utc)
+    rows = pd.DataFrame([
+        {
+            "claim_id": "recent",
+            "event_date": now - timedelta(days=30),
+            "amount_paid_building": 1200.0,
+            "amount_paid_contents": 300.0,
+            "latitude": 40.7,
+            "longitude": -74.0,
+            "h3_res7": h3.cell_to_parent(SLA_CELL, 7),
+            "h3_res8": h3.cell_to_parent(SLA_CELL, 8),
+            "h3_res9": SLA_CELL,
+            "ingested_at": now,
+        },
+        {
+            "claim_id": "old",
+            "event_date": now - timedelta(days=200),
+            "amount_paid_building": 9999.0,
+            "amount_paid_contents": 1.0,
+            "latitude": 40.7,
+            "longitude": -74.0,
+            "h3_res7": h3.cell_to_parent(SLA_CELL, 7),
+            "h3_res8": h3.cell_to_parent(SLA_CELL, 8),
+            "h3_res9": SLA_CELL,
+            "ingested_at": now,
+        },
+    ])
+    baseline = SpatialFeaturePipeline(db_path=":memory:")
+    baseline_features = baseline.compute_h3_cell_features(SLA_CELL, as_of_date=now)
+
+    pipeline.insert_insurance_losses(rows)
+    features = pipeline.compute_h3_cell_features(SLA_CELL, as_of_date=now)
+
+    assert features["nfip_claim_count_180d"] == 1
+    assert features["nfip_paid_amount_180d"] == 1500.0
+    assert features["lims_score"] == baseline_features["lims_score"]
 
 
 def test_sla_flow_derivation_is_ablation_gated(monkeypatch):

@@ -35,7 +35,27 @@ def _feat_dict(lims_score: float = 10.0) -> dict:
         "sla_move_outs_90d": 0,
         "deed_total_volume_180d": 500000.0,
         "deed_transaction_count_180d": 1,
+        "poi_opened_count_90d": 2,
+        "poi_closed_count_90d": 1,
+        "poi_net_churn_90d": 1,
         "lims_score": lims_score,
+    }
+
+
+def _poi_record(cell: str) -> dict:
+    now = datetime.now(timezone.utc)
+    return {
+        "poi_id": "poi-1",
+        "source": "fsq",
+        "event_type": "poi_opened",
+        "release_id": "dt=2026-08-11",
+        "event_date": now.isoformat(),
+        "latitude": 40.7233,
+        "longitude": -74.0030,
+        "h3_res7": h3.cell_to_parent(cell, 7),
+        "h3_res8": h3.cell_to_parent(cell, 8),
+        "h3_res9": cell,
+        "ingested_at": now.isoformat(),
     }
 
 
@@ -195,6 +215,27 @@ class TestInsertMapping:
         }
         real_worker.process_record(record, settings.topic_deeds, "k1")
         assert self._count(real_worker, "raw_deeds") == 1
+
+    def test_poi_row_lands_in_duckdb(self, real_worker):
+        real_worker.process_record(_poi_record(CELL), settings.topic_poi_change, "poi-k1")
+        assert self._count(real_worker, "raw_poi_change") == 1
+
+    def test_insurance_loss_row_lands_in_duckdb(self, real_worker):
+        record = {
+            "city_id": "chicago",
+            "claim_id": "claim-1",
+            "event_date": datetime.now(timezone.utc).isoformat(),
+            "amount_paid_building": 1200.0,
+            "amount_paid_contents": 300.0,
+            "latitude": 41.88,
+            "longitude": -87.63,
+            "h3_res7": h3.cell_to_parent(CELL, 7),
+            "h3_res8": h3.cell_to_parent(CELL, 8),
+            "h3_res9": CELL,
+            "ingested_at": datetime.now(timezone.utc).isoformat(),
+        }
+        real_worker.process_record(record, settings.topic_insurance_loss, "claim-k1")
+        assert self._count(real_worker, "raw_insurance_loss") == 1
 
     def test_unknown_topic_record_still_gated_but_not_inserted(self, real_worker):
         record = _permit_record(CELL)

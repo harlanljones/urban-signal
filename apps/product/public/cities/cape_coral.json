@@ -16,8 +16,16 @@
   "divisions": {
     "CAPE_CORE_WATERFRONT": {
       "name": "CAPE_CORE_WATERFRONT",
-      "center": { "lat": 26.568, "lng": -81.957 },
-      "bbox": { "min_lat": 26.55, "max_lat": 26.65, "min_lng": -82.05, "max_lng": -81.92 },
+      "center": {
+        "lat": 26.568,
+        "lng": -81.957
+      },
+      "bbox": {
+        "min_lat": 26.55,
+        "max_lat": 26.65,
+        "min_lng": -82.05,
+        "max_lng": -81.92
+      },
       "submarkets": [
         "Cape Coral Pkwy & Marina",
         "Bimini Basin & Downtown",
@@ -26,8 +34,16 @@
     },
     "CAPE_SW_ISLES": {
       "name": "CAPE_SW_ISLES",
-      "center": { "lat": 26.555, "lng": -82.026 },
-      "bbox": { "min_lat": 26.52, "max_lat": 26.6, "min_lng": -82.1, "max_lng": -82.0 },
+      "center": {
+        "lat": 26.555,
+        "lng": -82.026
+      },
+      "bbox": {
+        "min_lat": 26.52,
+        "max_lat": 26.6,
+        "min_lng": -82.1,
+        "max_lng": -82.0
+      },
       "submarkets": [
         "Southwest Isles & Cape Harbour",
         "Surfside & Veterans Pkwy"
@@ -35,24 +51,48 @@
     },
     "CAPE_NW_GATOR": {
       "name": "CAPE_NW_GATOR",
-      "center": { "lat": 26.665, "lng": -82.03 },
-      "bbox": { "min_lat": 26.6, "max_lat": 26.72, "min_lng": -82.1, "max_lng": -81.98 },
+      "center": {
+        "lat": 26.665,
+        "lng": -82.03
+      },
+      "bbox": {
+        "min_lat": 26.6,
+        "max_lat": 26.72,
+        "min_lng": -82.1,
+        "max_lng": -81.98
+      },
       "submarkets": [
         "Northwest Cape & Burnt Store"
       ]
     },
     "FORT_MYERS_CORE": {
       "name": "FORT_MYERS_CORE",
-      "center": { "lat": 26.642, "lng": -81.871 },
-      "bbox": { "min_lat": 26.6, "max_lat": 26.67, "min_lng": -81.91, "max_lng": -81.83 },
+      "center": {
+        "lat": 26.642,
+        "lng": -81.871
+      },
+      "bbox": {
+        "min_lat": 26.6,
+        "max_lat": 26.67,
+        "min_lng": -81.91,
+        "max_lng": -81.83
+      },
       "submarkets": [
         "Downtown Fort Myers River District"
       ]
     },
     "NORTH_FORT_MYERS": {
       "name": "NORTH_FORT_MYERS",
-      "center": { "lat": 26.71, "lng": -81.89 },
-      "bbox": { "min_lat": 26.67, "max_lat": 26.76, "min_lng": -81.95, "max_lng": -81.82 },
+      "center": {
+        "lat": 26.71,
+        "lng": -81.89
+      },
+      "bbox": {
+        "min_lat": 26.67,
+        "max_lat": 26.76,
+        "min_lng": -81.95,
+        "max_lng": -81.82
+      },
       "submarkets": [
         "North Fort Myers & Hancock Bridge"
       ]
@@ -62,49 +102,73 @@
     "Cape Coral Pkwy & Marina": {
       "name": "Cape Coral Pkwy & Marina",
       "division": "CAPE_CORE_WATERFRONT",
-      "center": { "lat": 26.562, "lng": -81.948 },
+      "center": {
+        "lat": 26.562,
+        "lng": -81.948
+      },
       "description": "Cape Coral Parkway corridor and yacht club/marina district with steady residential reinvestment."
     },
     "Bimini Basin & Downtown": {
       "name": "Bimini Basin & Downtown",
       "division": "CAPE_CORE_WATERFRONT",
-      "center": { "lat": 26.563, "lng": -81.956 },
+      "center": {
+        "lat": 26.563,
+        "lng": -81.956
+      },
       "description": "Downtown Cape Coral and Bimini Basin waterfront infill with mixed-use and hospitality momentum."
     },
     "Pelican Blvd & Mohawk": {
       "name": "Pelican Blvd & Mohawk",
       "division": "CAPE_CORE_WATERFRONT",
-      "center": { "lat": 26.58, "lng": -81.976 },
+      "center": {
+        "lat": 26.58,
+        "lng": -81.976
+      },
       "description": "Southwest grid of canals with teardowns and substantial single-family rebuild permits."
     },
     "Southwest Isles & Cape Harbour": {
       "name": "Southwest Isles & Cape Harbour",
       "division": "CAPE_SW_ISLES",
-      "center": { "lat": 26.54, "lng": -82.026 },
+      "center": {
+        "lat": 26.54,
+        "lng": -82.026
+      },
       "description": "Cape Harbour and deepwater canal neighborhoods with high-value renovation and pool permits."
     },
     "Surfside & Veterans Pkwy": {
       "name": "Surfside & Veterans Pkwy",
       "division": "CAPE_SW_ISLES",
-      "center": { "lat": 26.575, "lng": -82.03 },
+      "center": {
+        "lat": 26.575,
+        "lng": -82.03
+      },
       "description": "Retail and residential mix along Veterans Parkway with steady small-scale permits."
     },
     "Northwest Cape & Burnt Store": {
       "name": "Northwest Cape & Burnt Store",
       "division": "CAPE_NW_GATOR",
-      "center": { "lat": 26.655, "lng": -82.045 },
+      "center": {
+        "lat": 26.655,
+        "lng": -82.045
+      },
       "description": "Exurban expansion corridor toward Burnt Store Road with new single-family starts."
     },
     "Downtown Fort Myers River District": {
       "name": "Downtown Fort Myers River District",
       "division": "FORT_MYERS_CORE",
-      "center": { "lat": 26.642, "lng": -81.871 },
+      "center": {
+        "lat": 26.642,
+        "lng": -81.871
+      },
       "description": "Historic riverfront core with mid-rise infill and hospitality redevelopment."
     },
     "North Fort Myers & Hancock Bridge": {
       "name": "North Fort Myers & Hancock Bridge",
       "division": "NORTH_FORT_MYERS",
-      "center": { "lat": 26.685, "lng": -81.89 },
+      "center": {
+        "lat": 26.685,
+        "lng": -81.89
+      },
       "description": "Commercial strips and older subdivisions north of the river with moderate permit activity."
     }
   },
@@ -127,4 +191,3 @@
   "evidence_path": "apps/api/src/spatial/cities/cape_coral.py",
   "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
 }
-
