@@ -43,6 +43,7 @@ from src.producers.watermarks import (
     typed_watermark_entry,
 )
 from src.spatial.cities.rochester import (
+    REGISTRATION,
     ROCHESTER_CENTER,
     ROCHESTER_CITY_ID,
     ROCHESTER_DEEDS_ENDPOINT,
@@ -51,13 +52,11 @@ from src.spatial.cities.rochester import (
     ROCHESTER_FEED_SPECS,
     ROCHESTER_METRO_BBOX,
     ROCHESTER_SUBMARKETS,
-    REGISTRATION,
     get_rochester_dataset,
     is_in_rochester,
     is_in_rochester_metro,
 )
 from src.spatial.city_registry import FeedType
-
 
 # ---------------------------------------------------------------------------
 # Live fixtures (2026-08-28 re-probe, maps.cityofrochester.gov

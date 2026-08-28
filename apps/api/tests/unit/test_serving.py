@@ -1,10 +1,12 @@
 """Unit and integration tests for FastAPI serving endpoints."""
 
 import asyncio
+from unittest.mock import MagicMock
 
 import httpx
 import pytest
 from src.serving.app import create_app
+from src.serving.router import get_feature_pipeline, get_inference_engine
 
 
 class SyncASGIClient:
@@ -32,7 +34,43 @@ class SyncASGIClient:
         return self.request("POST", url, **kwargs)
 
 
-app = create_app()
+def _mock_prediction(h3_index, feature_dict, include_shap=True):
+    return {
+        "h3_index": h3_index,
+        "resolution": 9,
+        "centroid_lat": 40.725,
+        "centroid_lng": -73.997,
+        "lims_score": float(feature_dict.get("lims_score", 90.0)),
+        "delta_6m_p10": 0.01,
+        "delta_6m_p50": 0.02,
+        "delta_6m_p90": 0.03,
+        "delta_12m_spillover": 0.04,
+        "prob_18m_macro_outperformance": 0.05,
+        "is_catalyst": True,
+        "shap_attributions": {} if include_shap else None,
+        "inference_latency_ms": 0.0,
+    }
+
+
+def _build_test_app():
+    shared_feature_pipeline = MagicMock()
+    shared_feature_pipeline.compute_h3_cell_features.return_value = {"lims_score": 90.0}
+    shared_inference_engine = MagicMock()
+    shared_inference_engine.predict_cell_features.side_effect = _mock_prediction
+
+    async def provide_shared_feature_pipeline():
+        return shared_feature_pipeline
+
+    async def provide_shared_inference_engine():
+        return shared_inference_engine
+
+    app = create_app()
+    app.dependency_overrides[get_feature_pipeline] = provide_shared_feature_pipeline
+    app.dependency_overrides[get_inference_engine] = provide_shared_inference_engine
+    return app
+
+
+app = _build_test_app()
 client = SyncASGIClient(app)
 
 

@@ -181,20 +181,20 @@ class TestWashingtonDcRegistration:
         assert reg.metro_bbox is DC_METRO_BBOX
         assert len(reg.divisions) == 8
 
-    def test_all_four_feeds_are_arcgis(self):
+    def test_registered_feeds_preserve_original_arcgis_contract(self):
         from src.spatial.city_registry import REGISTRY, CityId, FeedType
 
         datasets = REGISTRY[CityId.WASHINGTON_DC].datasets
-        # The four original feeds; signal-survey FeedTypes (US-72) are
-        # registered by their own tickets, not here.
-        assert set(datasets) == {
+        original_feeds = {
             FeedType.PERMITS,
             FeedType.COMPLAINTS_311,
             FeedType.SLA,
             FeedType.DEEDS,
         }
-        for feed, spec in datasets.items():
-            assert spec.platform == "arcgis", feed
+        assert original_feeds <= set(datasets)
+        for feed in original_feeds:
+            assert datasets[feed].platform == "arcgis", feed
+        assert datasets[FeedType.GBFS].platform == "gbfs"
 
     def test_job_names_are_namespaced(self):
         from src.spatial.city_registry import CityId, FeedType
@@ -236,7 +236,7 @@ class TestWashingtonDcRegistration:
         from src.spatial.city_registry import REGISTRY, CityId, FeedType, get_dataset
 
         dc = CityId.WASHINGTON_DC
-        for feed in set(REGISTRY[dc].datasets):
+        for feed in set(REGISTRY[dc].datasets) - {FeedType.GBFS}:
             spec = get_dataset(dc, feed)
             assert spec.oid_field == "OBJECTID", feed
         assert get_dataset(dc, FeedType.PERMITS).max_record_count == 2000

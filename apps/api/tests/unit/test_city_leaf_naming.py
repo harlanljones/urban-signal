@@ -44,6 +44,6 @@ def test_leaf_has_canonical_constants(name):
 
 
 def test_all_expected_leaf_modules_present():
-    # 94 hand-authored Metro leaf modules plus NYC (cities/nyc.py, US-176),
+    # 95 hand-authored Metro leaf modules plus NYC (cities/nyc.py, US-176),
     # whose geometry still lives in src.spatial.submarkets.
-    assert len(_LEAF_MODULES) == 95
+    assert len(_LEAF_MODULES) == 96

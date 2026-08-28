@@ -149,6 +149,7 @@ ANSI_DATE_LITERAL_HOSTS = (
     "maps2.dcgis.dc.gov",
     "milwaukeemaps.milwaukee.gov",
     "gis.charlottenc.gov",
+    "gis.tucsonaz.gov",
 )
 
 

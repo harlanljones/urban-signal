@@ -27,12 +27,15 @@ from prometheus_client import Counter
 from src.config import settings
 from src.producers.base_producer import BaseKafkaProducer
 from src.producers.complaints_311_producer import Complaints311Producer
+from src.producers.context_observations_producer import ContextObservationsProducer
 from src.producers.crime_incidents_producer import CrimeIncidentsProducer
 from src.producers.deeds_acris_producer import DeedsACRISProducer
 from src.producers.dob_permits_producer import DOBPermitsProducer
+from src.producers.ev_charging_producer import EvChargingProducer
 from src.producers.evictions_producer import EvictionsProducer
-from src.producers.context_observations_producer import ContextObservationsProducer
 from src.producers.gbfs_producer import GbfsProducer
+from src.producers.nfip_producer import NfipProducer
+from src.producers.nrel_afdc_client import NrelAfdcClient
 from src.producers.sla_licenses_producer import SLALicensesProducer
 from src.producers.street_cut_permits_producer import StreetCutPermitsProducer
 from src.producers.watermarks import (
@@ -40,6 +43,7 @@ from src.producers.watermarks import (
     watermark_comparison,
     watermark_exclude_clause,
 )
+from src.spatial.national_feeds import NATIONAL_FEEDS, NationalFeed, schedulable_feeds
 
 logger = logging.getLogger(__name__)
 
@@ -232,10 +236,23 @@ class MunicipalIngestionScheduler:
             "energy_benchmark": ContextObservationsProducer(bootstrap_servers=self.bootstrap_servers),
             "bike_ped": ContextObservationsProducer(bootstrap_servers=self.bootstrap_servers),
             "gbfs": GbfsProducer(bootstrap_servers=self.bootstrap_servers),
+            "nfip_claims": NfipProducer(bootstrap_servers=self.bootstrap_servers),
+            # The setting is intentionally optional while NREL remains
+            # unverified. Pass a non-empty sentinel so constructing the
+            # disabled producer does not require a credential-bearing setting.
+            "ev_charging": EvChargingProducer(
+                bootstrap_servers=self.bootstrap_servers,
+                client=NrelAfdcClient(api_key=os.environ.get("NREL_API_KEY") or "UNCONFIGURED"),
+            ),
         }
 
         # Socrata Endpoints & Target Topics mapping derived from city registry
-        from src.spatial.city_registry import REGISTRY, get_job_name, resolve_endpoint, resolve_zip_member
+        from src.spatial.city_registry import (
+            REGISTRY,
+            get_job_name,
+            resolve_endpoint,
+            resolve_zip_member,
+        )
 
         self.job_metadata: dict[str, dict[str, Any]] = {}
         self.configs: dict[str, JobConfig] = {}
@@ -280,8 +297,47 @@ class MunicipalIngestionScheduler:
                 self.configs[job_name] = JobConfig(
                     name=job_name,
                     interval_seconds=ds.interval_seconds,
+                    # GBFS is wired as an explicit stream job below, but keep
+                    # it opt-in until its per-city endpoint has been verified
+                    # by the scheduler runtime. This also preserves the
+                    # municipal poll loop's existing network surface.
+                    enabled=ds.platform != "gbfs",
                     watermark_column=ds.watermark_col,
                 )
+
+        # National feeds are one job per source, not one job per city. Keep
+        # every implemented source visible in the scheduler, but leave an
+        # unverified or credentialed source disabled until its registry spec
+        # makes it safe to poll (US-363). Disaster declarations and POI
+        # changes remain registered metadata without a producer implementation
+        # and therefore do not become runnable jobs here.
+        runnable_national = {spec.feed for spec in schedulable_feeds()}
+        national_specs = {
+            spec.feed: spec
+            for spec in schedulable_feeds()
+            if spec.feed in (NationalFeed.NFIP_CLAIMS, NationalFeed.EV_CHARGING)
+        }
+        for feed in (NationalFeed.NFIP_CLAIMS, NationalFeed.EV_CHARGING):
+            spec = NATIONAL_FEEDS[feed]
+            job_name = spec.feed.value
+            self.job_metadata[job_name] = {
+                "endpoint": spec.endpoint,
+                "endpoint_base": spec.endpoint,
+                "topic": spec.topic,
+                "watermark_col": spec.watermark_col,
+                "id_keys": spec.id_keys,
+                "producer_key": spec.producer_key,
+                "platform": spec.platform,
+                "ingestion_mode": spec.ingestion_mode,
+                "national_feed": spec.feed,
+                "auth_env": spec.auth_env,
+            }
+            self.configs[job_name] = JobConfig(
+                name=job_name,
+                interval_seconds=spec.interval_seconds,
+                enabled=feed in runnable_national and feed in national_specs,
+                watermark_column=spec.watermark_col or None,
+            )
 
         self.metrics: dict[str, JobMetrics] = {k: JobMetrics() for k in self.configs}
         self.backoffs: dict[str, ExponentialBackoffTracker] = {k: ExponentialBackoffTracker() for k in self.configs}
@@ -292,6 +348,44 @@ class MunicipalIngestionScheduler:
         self.state_file: str | None = settings.scheduler_state_file or None
         if self.state_file:
             self._load_state()
+
+    def _poll_stream_job(self, job_name: str, limit: int | None = None) -> dict[str, Any]:
+        """Run a non-Socrata producer through the scheduler metrics seam."""
+        met = self.metrics[job_name]
+        meta = self.job_metadata[job_name]
+        producer = self.producers[meta["producer_key"]]
+        met.total_runs += 1
+        met.last_run_timestamp = datetime.now(UTC)
+        try:
+            if meta.get("platform") == "gbfs":
+                count = producer.run_stream(city_id=meta["city_id"], limit=limit)
+            elif meta.get("national_feed") == NationalFeed.NFIP_CLAIMS:
+                count = producer.run_stream(since=met.high_watermark, limit=limit)
+            else:
+                count = producer.run_stream(limit=limit)
+            count = int(count or 0)
+            met.records_fetched += count
+            met.records_published += count
+            met.last_status = "SUCCESS"
+            met.last_error = None
+            met.high_watermark = datetime.now(UTC).isoformat() if count and meta.get("national_feed") else met.high_watermark
+            self.backoffs[job_name].record_success()
+        except Exception as poll_err:  # noqa: BLE001 - producer failures are isolated per job
+            met.errors_count += 1
+            met.last_status = "ERROR"
+            met.last_error = str(poll_err)
+            self.backoffs[job_name].record_failure()
+            logger.error("Job '%s' failed: %s", job_name, poll_err)
+        self._save_state()
+        return {
+            "job": job_name,
+            "status": met.last_status,
+            "records_fetched": count if met.last_status == "SUCCESS" else 0,
+            "records_published": count if met.last_status == "SUCCESS" else 0,
+            "duplicates_skipped": 0,
+            "high_watermark": met.high_watermark,
+            "error": met.last_error,
+        }
 
     def _load_state(self) -> None:
         """Restore persisted high watermarks into job metrics (US-106)."""
@@ -495,6 +589,9 @@ class MunicipalIngestionScheduler:
         """Executes a single poll cycle for a specific municipal dataset."""
         if job_name not in self.configs:
             raise KeyError(f"Invalid job name '{job_name}'")
+
+        if self.job_metadata[job_name].get("platform") == "gbfs" or self.job_metadata[job_name].get("national_feed"):
+            return self._poll_stream_job(job_name, limit=limit)
 
         cfg = self.configs[job_name]
         met = self.metrics[job_name]
