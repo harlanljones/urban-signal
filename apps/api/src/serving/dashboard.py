@@ -1488,6 +1488,7 @@ def get_dashboard_html() -> str:
       jackson_ms: { name: 'Jackson' },
       macon_bibb: { name: 'Macon-Bibb County' },
       ocala: { name: 'Ocala / Marion County' },
+      tyler: { name: 'Tyler' },
     };
 
     let map = null;
