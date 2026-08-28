@@ -20,13 +20,13 @@
     "NORTHWEST": {
       "name": "NORTHWEST",
       "center": { "lat": 29.69, "lng": -82.38 },
-      "bbox": { "min_lat": 29.67, "max_lat": 29.75, "min_lng": -82.44, "max_lng": -82.32 },
+      "bbox": { "min_lat": 29.65, "max_lat": 29.75, "min_lng": -82.44, "max_lng": -82.32 },
       "submarkets": ["Millhopper / Thornebrook", "Oaks Mall / Newberry Rd"]
     },
     "NORTHEAST": {
       "name": "NORTHEAST",
       "center": { "lat": 29.69, "lng": -82.285 },
-      "bbox": { "min_lat": 29.66, "max_lat": 29.75, "min_lng": -82.32, "max_lng": -82.22 },
+      "bbox": { "min_lat": 29.645, "max_lat": 29.75, "min_lng": -82.32, "max_lng": -82.22 },
       "submarkets": ["East Gainesville", "GNV Airport Area"]
     },
     "SOUTHWEST_SOUTHEAST": {

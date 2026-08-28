@@ -32,13 +32,13 @@ GAINESVILLE_DIVISION_BBOXES: Dict[str, Dict[str, float]] = {
         "max_lng": -82.30,
     },
     "NORTHWEST": {
-        "min_lat": 29.67,
+        "min_lat": 29.65,
         "max_lat": 29.75,
         "min_lng": -82.44,
         "max_lng": -82.32,
     },
     "NORTHEAST": {
-        "min_lat": 29.66,
+        "min_lat": 29.645,
         "max_lat": 29.75,
         "min_lng": -82.32,
         "max_lng": -82.22,

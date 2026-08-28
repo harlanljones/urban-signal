@@ -4478,8 +4478,12 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 interval_seconds=600.0,
                 producer_key="permits",
                 order_by="issue DESC",
+                expected_cadence_days=1,
                 field_map=GAINESVILLE_PERMITS_FIELD_MAP,
             ),
+            # US-364: SNAP retailers as the food-retail SLA slice (FL).
+            # Municipal 311 is stale post-2021 and is not registered.
+            FeedType.SLA: snap_sla_spec("FL"),
         },
     ),
     CityId.MIAMI_DADE: CityRegistration(

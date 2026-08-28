@@ -26,9 +26,9 @@ Register Gainesville, FL as a new Urban Signal metro (`CityId.gainesville`) with
 
 ## Current step
 
-Additive rebase of US-293 onto origin/main (26237f0). Shared files took incoming main, then Gainesville-only lines were re-applied. Leftover `<<<<<<< HEAD` markers from main in METRO_META/facts.json were stripped so the files parse.
+Additive rebase onto origin/main is complete. PR #31 should update in place on `cursor/gainesville-metro-9b36`. Tests green (unit + interlock). Stop — do not start Columbus/Melbourne/Ocala.
 
 ## Next step
 
-Finish rebase, byte-sync dashboard static copy, run `pytest -m interlock` and Gainesville tests, push to `cursor/gainesville-metro-9b36` so PR #31 updates in place. Do not merge. Do not start Columbus/Melbourne/Ocala.
+Human merge of #31. No further city onboarding from this stream.
 
