@@ -488,6 +488,13 @@ from src.spatial.cities.texarkana import (
     TEXARKANA_METRO_BBOX,
     TEXARKANA_SUBMARKETS,
 )
+from src.spatial.cities.odessa import (
+    ODESSA_CENTER,
+    ODESSA_DIVISION_BBOXES,
+    ODESSA_DIVISIONS,
+    ODESSA_METRO_BBOX,
+    ODESSA_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -577,6 +584,7 @@ class CityId(str, Enum):
     ABILENE = "abilene"
     TEXARKANA = "texarkana"
     MIDLAND = "midland"
+    ODESSA = "odessa"
 
 
 class FeedType(str, Enum):
@@ -1202,6 +1210,10 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "midland_tx": CityId.MIDLAND,
     "midland-tx": CityId.MIDLAND,
     "midland tx": CityId.MIDLAND,
+    # Odessa, TX
+    "odessa": CityId.ODESSA,
+    "odessa_tx": CityId.ODESSA,
+    "odessa tx": CityId.ODESSA,
 }
 
 
@@ -5248,6 +5260,23 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         job_suffix="midland",
         # US-279: initial registration with SNAP SLA (TX slice). EnerGov/PermitMidland
         # has no open public API endpoint; do not register permits until verifiable.
+        datasets={
+            FeedType.SLA: snap_sla_spec("TX"),
+        },
+    ),
+    CityId.ODESSA: CityRegistration(
+        city_id=CityId.ODESSA,
+        name="Odessa",
+        state="TX",
+        center=ODESSA_CENTER,
+        metro_bbox=ODESSA_METRO_BBOX,
+        division_bboxes=ODESSA_DIVISION_BBOXES,
+        submarkets=ODESSA_SUBMARKETS,
+        divisions=ODESSA_DIVISIONS,
+        job_suffix="odessa",
+        # US-280: initial registration with SNAP SLA (TX slice). A verifiable
+        # public city permits feed was not found during registration; register
+        # SNAP-only and expand when a municipal permits API is proven.
         datasets={
             FeedType.SLA: snap_sla_spec("TX"),
         },

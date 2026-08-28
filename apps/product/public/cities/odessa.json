@@ -1,0 +1,179 @@
+{
+  "schema_version": 2,
+  "id": "odessa",
+  "name": "Odessa",
+  "state": "TX",
+  "center": {
+    "lat": 31.845,
+    "lng": -102.367
+  },
+  "metro_bbox": {
+    "min_lat": 31.76,
+    "max_lat": 31.94,
+    "min_lng": -102.45,
+    "max_lng": -102.26
+  },
+  "divisions": {
+    "CENTRAL_CORE": {
+      "name": "CENTRAL_CORE",
+      "center": {
+        "lat": 31.85,
+        "lng": -102.36
+      },
+      "bbox": {
+        "min_lat": 31.83,
+        "max_lat": 31.88,
+        "min_lng": -102.39,
+        "max_lng": -102.34
+      },
+      "submarkets": [
+        "Downtown Odessa",
+        "Midtown JBS Parkway"
+      ]
+    },
+    "WEST_SIDE": {
+      "name": "WEST_SIDE",
+      "center": {
+        "lat": 31.85,
+        "lng": -102.42
+      },
+      "bbox": {
+        "min_lat": 31.82,
+        "max_lat": 31.88,
+        "min_lng": -102.45,
+        "max_lng": -102.39
+      },
+      "submarkets": [
+        "West Loop & Andrews Hwy"
+      ]
+    },
+    "SOUTH_STRIPS": {
+      "name": "SOUTH_STRIPS",
+      "center": {
+        "lat": 31.79,
+        "lng": -102.35
+      },
+      "bbox": {
+        "min_lat": 31.76,
+        "max_lat": 31.82,
+        "min_lng": -102.43,
+        "max_lng": -102.3
+      },
+      "submarkets": [
+        "I-20 Service Corridor"
+      ]
+    },
+    "EAST_GATE": {
+      "name": "EAST_GATE",
+      "center": {
+        "lat": 31.875,
+        "lng": -102.295
+      },
+      "bbox": {
+        "min_lat": 31.84,
+        "max_lat": 31.91,
+        "min_lng": -102.32,
+        "max_lng": -102.27
+      },
+      "submarkets": [
+        "UTPB & TX-191"
+      ]
+    },
+    "NORTH_LOOP": {
+      "name": "NORTH_LOOP",
+      "center": {
+        "lat": 31.91,
+        "lng": -102.38
+      },
+      "bbox": {
+        "min_lat": 31.88,
+        "max_lat": 31.94,
+        "min_lng": -102.43,
+        "max_lng": -102.3
+      },
+      "submarkets": [
+        "North Odessa Retail",
+        "Odessa-Schlemeyer Field"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Odessa": {
+      "name": "Downtown Odessa",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 31.845,
+        "lng": -102.367
+      },
+      "description": "Courthouse, city center, and downtown commercial core with hospitality and civic anchors."
+    },
+    "Midtown JBS Parkway": {
+      "name": "Midtown JBS Parkway",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 31.86,
+        "lng": -102.352
+      },
+      "description": "JBS Parkway commercial spine connecting downtown with east Odessa retail corridors."
+    },
+    "West Loop & Andrews Hwy": {
+      "name": "West Loop & Andrews Hwy",
+      "division": "WEST_SIDE",
+      "center": {
+        "lat": 31.855,
+        "lng": -102.41
+      },
+      "description": "Highway-oriented services and light industrial corridors west of Loop 338."
+    },
+    "I-20 Service Corridor": {
+      "name": "I-20 Service Corridor",
+      "division": "SOUTH_STRIPS",
+      "center": {
+        "lat": 31.79,
+        "lng": -102.36
+      },
+      "description": "Logistics, equipment yards, and highway services along I-20 south of the core."
+    },
+    "UTPB & TX-191": {
+      "name": "UTPB & TX-191",
+      "division": "EAST_GATE",
+      "center": {
+        "lat": 31.88,
+        "lng": -102.3
+      },
+      "description": "UT Permian Basin campus area and TX-191 retail/office growth corridor."
+    },
+    "North Odessa Retail": {
+      "name": "North Odessa Retail",
+      "division": "NORTH_LOOP",
+      "center": {
+        "lat": 31.905,
+        "lng": -102.35
+      },
+      "description": "42nd Street retail corridors and surrounding residential belts."
+    },
+    "Odessa-Schlemeyer Field": {
+      "name": "Odessa-Schlemeyer Field",
+      "division": "NORTH_LOOP",
+      "center": {
+        "lat": 31.915,
+        "lng": -102.405
+      },
+      "description": "General-aviation airport vicinity with logistics, hospitality, and industrial services."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/odessa.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
+

@@ -1496,6 +1496,8 @@ def get_dashboard_html() -> str:
       abilene: { name: 'Abilene' },
       texarkana: { name: 'Texarkana' },
       midland: { name: 'Midland' },
+      odessa: { name: 'Odessa' },
+      odessa: { name: 'Odessa' },
     };
 
     let map = null;
