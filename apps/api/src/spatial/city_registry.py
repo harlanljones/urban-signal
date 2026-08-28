@@ -419,6 +419,7 @@ from src.spatial.cities.beaumont import (
     BEAUMONT_DIVISIONS,
     BEAUMONT_METRO_BBOX,
     BEAUMONT_SUBMARKETS,
+)
 from src.spatial.cities.waco import (
     WACO_CENTER,
     WACO_DIVISION_BBOXES,
@@ -439,6 +440,13 @@ from src.spatial.cities.macon_bibb import (
     MACON_BIBB_DIVISIONS,
     MACON_BIBB_METRO_BBOX,
     MACON_BIBB_SUBMARKETS,
+)
+from src.spatial.cities.tyler import (
+    TYLER_CENTER,
+    TYLER_DIVISION_BBOXES,
+    TYLER_DIVISIONS,
+    TYLER_METRO_BBOX,
+    TYLER_SUBMARKETS,
 )
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
@@ -521,6 +529,7 @@ class CityId(str, Enum):
     WACO = "waco"
     JACKSON_MS = "jackson_ms"
     MACON_BIBB = "macon_bibb"
+    TYLER = "tyler"
 
 
 class FeedType(str, Enum):
@@ -1104,6 +1113,10 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "macon bibb": CityId.MACON_BIBB,
     "macon": CityId.MACON_BIBB,
     "macon_ga": CityId.MACON_BIBB,
+    # Tyler, TX
+    "tyler": CityId.TYLER,
+    "tyler_tx": CityId.TYLER,
+    "tyler tx": CityId.TYLER,
 }
 
 
@@ -5059,6 +5072,22 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 },
             ),
             FeedType.SLA: snap_sla_spec("GA"),
+        },
+    ),
+    CityId.TYLER: CityRegistration(
+        city_id=CityId.TYLER,
+        name="Tyler",
+        state="TX",
+        center=TYLER_CENTER,
+        metro_bbox=TYLER_METRO_BBOX,
+        division_bboxes=TYLER_DIVISION_BBOXES,
+        submarkets=TYLER_SUBMARKETS,
+        divisions=TYLER_DIVISIONS,
+        job_suffix="tyler",
+        # US-273: initial registration with SNAP SLA (TX slice). City permits
+        # via data.texas.gov require verification; register when public API confirmed.
+        datasets={
+            FeedType.SLA: snap_sla_spec("TX"),
         },
     ),
 }
