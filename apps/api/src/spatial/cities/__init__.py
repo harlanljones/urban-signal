@@ -484,6 +484,13 @@ from src.spatial.cities.tyler import (
     is_in_tyler_metro,
 )
 
+from src.spatial.cities.lake_charles import (
+    LAKE_CHARLES_DIVISION_BBOXES,
+    LAKE_CHARLES_DIVISIONS,
+    LAKE_CHARLES_METRO_BBOX,
+    LAKE_CHARLES_SUBMARKETS,
+    is_in_lake_charles_metro,
+)
 __all__ = [
     "PIERCE_METRO_BBOX",
     "PIERCE_DIVISION_BBOXES",
@@ -826,4 +833,9 @@ __all__ = [
     "TYLER_DIVISIONS",
     "TYLER_SUBMARKETS",
     "is_in_tyler_metro",
+    "LAKE_CHARLES_METRO_BBOX",
+    "LAKE_CHARLES_DIVISION_BBOXES",
+    "LAKE_CHARLES_DIVISIONS",
+    "LAKE_CHARLES_SUBMARKETS",
+    "is_in_lake_charles_metro",
 ]
