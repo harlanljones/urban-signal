@@ -66,7 +66,7 @@ def test_cleveland_geometry_is_self_consistent():
     assert {m.city_id for m in CLEVELAND_SUBMARKETS.values()} == {"cleveland"}
 
 
-def test_cleveland_registers_three_verified_feeds():
+def test_cleveland_registers_three_verified_feeds_and_snap_sla():
     from src.spatial.city_registry import REGISTRY, get_dataset, normalize_city
 
     city = CityId.CLEVELAND
@@ -78,6 +78,7 @@ def test_cleveland_registers_three_verified_feeds():
         FeedType.PERMITS,
         FeedType.COMPLAINTS_311,
         FeedType.DEEDS,
+        FeedType.SLA,
     }
 
     permits = get_dataset(city, FeedType.PERMITS)
@@ -97,9 +98,6 @@ def test_cleveland_registers_three_verified_feeds():
     assert deeds.watermark_col == "last_transfer_date"
     assert deeds.id_keys == ["PARCEL_ID", "OBJECTID"]
     assert deeds.field_map == CLEVELAND_DEEDS_FIELD_MAP
-
-    with pytest.raises(KeyError, match="no.*feed"):
-        get_dataset(city, FeedType.SLA)
 
 
 PERMIT_ROW = {

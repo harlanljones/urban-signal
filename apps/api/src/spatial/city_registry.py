@@ -2495,6 +2495,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 ingestion_mode='snapshot',
                 field_map={'doc_id': ['account_id_mdp_field_acctid'], 'bbl': ['account_id_mdp_field_acctid'], 'document_amount': ['sales_segment_1_consideration_mdp_field_considr1_sdat_field_90'], 'recorded_date': ['sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89'], 'party1_grantor': ['sales_segment_1_grantor_name_mdp_field_grntnam1_sdat_field_80'], 'latitude': ['mdp_latitude_mdp_field_digycord_converted_to_wgs84'], 'longitude': ['mdp_longitude_mdp_field_digxcord_converted_to_wgs84']},
             ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
+            # State-level filter (v1 coarseness): rows outside the metro bbox
+            # still carry global H3 tags; metro scoping stays downstream.
+            FeedType.SLA: snap_sla_spec("MD"),
         },
     ),
     CityId.COLUMBUS: CityRegistration(
@@ -2704,6 +2708,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 where="applicationDept LIKE '%BUILDING%' OR applicationDept LIKE '%LAND USE%'",
                 field_map={'job_id': ['applicationNumber'], 'issuance_date': ['issuedDate', 'applicationDate'], 'filing_date': ['applicationDate'], 'cost': ['buildingValuation', 'projectValue'], 'address_street': ['siteAddress'], 'status': ['applicationStatus'], 'job_type': ['applicationType', 'workType', 'buildingType'], 'proposed_units': ['dwellingUnits'], 'proposed_stories': ['stories']},
             ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
+            # State-level filter (v1 coarseness): rows outside the metro bbox
+            # still carry global H3 tags; metro scoping stays downstream.
+            FeedType.SLA: snap_sla_spec("WA"),
         },
     ),
     CityId.MILWAUKEE: CityRegistration(
@@ -2842,6 +2850,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 max_record_count=7500,
                 field_map={'incident_id': ['REQUEST_NO'], 'created_date': ['RECEIVED_DATE'], 'complaint_type': ['REQUEST_TYPE'], 'incident_address': ['FULL_ADDRESS'], 'borough': ['COUNCIL_DISTRICT']},
             ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
+            # State-level filter (v1 coarseness): rows outside the metro bbox
+            # still carry global H3 tags; metro scoping stays downstream.
+            FeedType.SLA: snap_sla_spec("NC"),
         },
     ),
     CityId.PITTSBURGH: CityRegistration(
@@ -2908,6 +2920,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 expected_cadence_days=7,
                 field_map={'incident_id': ['unique_id', 'case_number'], 'latitude': ['latitude'], 'longitude': ['longitude'], 'created_date': ['created_date_utc'], 'closed_date': ['closed_date_utc'], 'complaint_type': ['subject'], 'incident_address': ['street'], 'borough': ['neighborhood', 'council_district', 'ward']},
             ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
+            # State-level filter (v1 coarseness): rows outside the metro bbox
+            # still carry global H3 tags; metro scoping stays downstream.
+            FeedType.SLA: snap_sla_spec("PA"),
         },
     ),
     CityId.SAN_DIEGO: CityRegistration(
@@ -3004,6 +3020,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 max_record_count=2000,
                 field_map={'incident_id': ['SERVICEREQUESTID', 'EXTERNALSERVICEREQUEST'], 'created_date': ['REQUESTEDDATETIME'], 'closed_date': ['CLOSEDDATETIME'], 'status': ['STATUS'], 'complaint_type': ['ACTIVITY', 'SERVICENAME'], 'incident_address': ['ADDRESS'], 'borough': ['COUNCILDISTRICT'], 'zipcode': ['ZIPCODE'], 'latitude': ['LAT'], 'longitude': ['LONG_']},
             ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
+            # State-level filter (v1 coarseness): rows outside the metro bbox
+            # still carry global H3 tags; metro scoping stays downstream.
+            FeedType.SLA: snap_sla_spec("IN"),
         },
     ),
     CityId.HOUSTON: CityRegistration(
@@ -3039,6 +3059,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 max_record_count=2000,
                 field_map={'incident_id': ['CASE_NUMBER'], 'latitude': ['LATITUDE'], 'longitude': ['LONGITUDE'], 'complaint_type': ['CASE_TYPE'], 'created_date': ['CREATED_ON'], 'closed_date': ['CLOSED_ON'], 'status': ['STATUS'], 'incident_address': ['ADDRESS', 'STREET'], 'zipcode': ['ZIP'], 'borough': ['SUPERNEIGHBORHOOD', 'COUNCIL_DISTRICT']},
             ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
+            # State-level filter (v1 coarseness): rows outside the metro bbox
+            # still carry global H3 tags; metro scoping stays downstream.
+            FeedType.SLA: snap_sla_spec("TX"),
         },
     ),
     CityId.WICHITA: CityRegistration(
@@ -3127,6 +3151,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 max_record_count=1000,
                 field_map={'doc_id': ['PIN', 'PARCELID', 'OBJECTID'], 'recorded_date': ['SALE1DATE'], 'document_amount': ['SALE1CONSD'], 'bbl': ['PIN', 'PARCELID'], 'party2_grantee': ['OWNERNAME1'], 'doc_type': ['SALE1TYPE', 'DEEDTYPE', 'TYPE'], 'borough': ['MUNICIPALITY', 'CITY']},
             ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
+            # State-level filter (v1 coarseness): rows outside the metro bbox
+            # still carry global H3 tags; metro scoping stays downstream.
+            FeedType.SLA: snap_sla_spec("TN"),
         },
     ),
     CityId.CLEVELAND: CityRegistration(
@@ -3187,6 +3215,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 max_record_count=2000,
                 field_map={'doc_id': ['PARCEL_ID', 'PARCEL_NUMBER', 'OBJECTID'], 'recorded_date': ['last_transfer_date'], 'document_amount': ['sale_price', 'transfer_amount'], 'bbl': ['parcel_number', 'PARCEL_NUMBER', 'PARCEL_ID'], 'party1_grantor': ['grantor'], 'party2_grantee': ['grantee'], 'doc_type': ['document_type', 'deed_type'], 'borough': ['ward', 'neighborhood']},
             ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
+            # State-level filter (v1 coarseness): rows outside the metro bbox
+            # still carry global H3 tags; metro scoping stays downstream.
+            FeedType.SLA: snap_sla_spec("OH"),
         },
     ),
     CityId.HARTFORD: CityRegistration(
@@ -3353,6 +3385,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 max_record_count=2000,
                 field_map={'incident_id': ['ServiceRequestNumber', 'SRNumber', 'REQUEST_ID', 'OBJECTID'], 'created_date': ['OpenedDateTime'], 'closed_date': ['ClosedDateTime', 'ClosedDate'], 'status': ['Status', 'STATUS'], 'complaint_type': ['ServiceName', 'RequestType', 'Type'], 'incident_address': ['Address', 'StreetAddress'], 'borough': ['CouncilDistrict', 'Neighborhood'], 'zipcode': ['ZipCode', 'ZIP']},
             ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
+            # State-level filter (v1 coarseness): rows outside the metro bbox
+            # still carry global H3 tags; metro scoping stays downstream.
+            FeedType.SLA: snap_sla_spec("TX"),
         },
     ),
     CityId.SACRAMENTO: CityRegistration(
@@ -3398,6 +3434,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 max_record_count=2000,
                 field_map={'incident_id': ['ReferenceNumber', 'OBJECTID'], 'created_date': ['DateCreated'], 'closed_date': ['DateClosed'], 'status': ['PublicStatus'], 'complaint_type': ['CategoryLevel2', 'CategoryLevel1', 'CategoryName'], 'incident_address': ['Address'], 'borough': ['Neighborhood', 'CouncilDistrictNumber'], 'zipcode': ['ZIP']},
             ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
+            # State-level filter (v1 coarseness): rows outside the metro bbox
+            # still carry global H3 tags; metro scoping stays downstream.
+            FeedType.SLA: snap_sla_spec("CA"),
         },
     ),
     CityId.RENO: CityRegistration(
@@ -3433,6 +3473,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 watermark_format='%m/%d/%Y',
                 field_map={'doc_id': ['PIN', 'OBJECTID'], 'bbl': ['PIN'], 'document_amount': ['SALEPRICE'], 'recorded_date': ['SALEDATE'], 'borough': ['CITY', 'SUBNAME']},
             ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
+            # State-level filter (v1 coarseness): rows outside the metro bbox
+            # still carry global H3 tags; metro scoping stays downstream.
+            FeedType.SLA: snap_sla_spec("NV"),
         },
     ),
     CityId.SPOKANE: CityRegistration(
@@ -3517,6 +3561,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 retention_days=90,
                 field_map={'incident_id': ['RowNumber', 'REFNO'], 'created_date': ['ADDDTTM'], 'closed_date': ['RESDTTM', 'ModDTTM'], 'status': ['RESFLAG', 'RESCODE'], 'complaint_type': ['PROBDESC', 'CatName', 'ProbDesc2'], 'incident_address': ['ADDRESS', 'LOC'], 'borough': ['NEIGH_COM', 'DISTRICT']},
             ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
+            # State-level filter (v1 coarseness): rows outside the metro bbox
+            # still carry global H3 tags; metro scoping stays downstream.
+            FeedType.SLA: snap_sla_spec("OH"),
         },
     ),
     CityId.TULSA: CityRegistration(
@@ -3560,6 +3608,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 max_record_count=1000,
                 field_map={'incident_id': ['INCIDENT_NUM', 'OBJECTID'], 'offense_type': ['CRIME_TYPE'], 'occurred_date': ['START_DATE']},
             ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
+            # State-level filter (v1 coarseness): rows outside the metro bbox
+            # still carry global H3 tags; metro scoping stays downstream.
+            FeedType.SLA: snap_sla_spec("OK"),
         },
     ),
     CityId.EL_PASO: CityRegistration(
@@ -3605,6 +3657,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 alarm_exempt_reason="frozen 2018-2021 historical building-permit snapshot",
                 field_map={'job_id': ['B1_ALT_ID'], 'cost': ['JOBVALUE'], 'issued_date': ['Issued_Dat']},
             ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
+            # State-level filter (v1 coarseness): rows outside the metro bbox
+            # still carry global H3 tags; metro scoping stays downstream.
+            FeedType.SLA: snap_sla_spec("TX"),
         },
     ),
     CityId.DURHAM: CityRegistration(
@@ -3647,6 +3703,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 max_record_count=2000,
                 field_map={'doc_id': ['PIN', 'OBJECTID_1', 'OBJECTID'], 'bbl': ['PIN', 'PIN_EXT'], 'recorded_date': ['PKG_SALE_DATE', 'DEED_DATE'], 'document_amount': ['PKG_SALE_PRICE', 'LAND_SALE_PRICE'], 'party1_grantor': ['PROPERTY_OWNER'], 'borough': ['NEIGHBORHOOD', 'CITY']},
             ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
+            # State-level filter (v1 coarseness): rows outside the metro bbox
+            # still carry global H3 tags; metro scoping stays downstream.
+            FeedType.SLA: snap_sla_spec("NC"),
         },
     ),
     CityId.DALLAS: CityRegistration(
@@ -3895,6 +3955,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                     'address': ['ADDRESS'],
                 },
             ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
+            # State-level filter (v1 coarseness): rows outside the metro bbox
+            # still carry global H3 tags; metro scoping stays downstream.
+            FeedType.SLA: snap_sla_spec("CA"),
         },
     ),
     CityId.TAMPA: CityRegistration(
@@ -4026,6 +4090,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 expected_cadence_days=7,
                 field_map={'incident_id': ['incidentnumber', 'OBJECTID'], 'offense_type': ['incidenttypedescription'], 'occurred_date': ['incidentdate'], 'latitude': ['latitude'], 'longitude': ['longitude'], 'address': ['location']},
             ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
+            # State-level filter (v1 coarseness): rows outside the metro bbox
+            # still carry global H3 tags; metro scoping stays downstream.
+            FeedType.SLA: snap_sla_spec("NV"),
         },
     ),
     CityId.BOISE: CityRegistration(
@@ -4103,6 +4171,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 geocode_context='Fort Worth, TX',
                 field_map=FORT_WORTH_PERMITS_FIELD_MAP,
             ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
+            # State-level filter (v1 coarseness): rows outside the metro bbox
+            # still carry global H3 tags; metro scoping stays downstream.
+            FeedType.SLA: snap_sla_spec("TX"),
         },
     ),
     CityId.HONOLULU: CityRegistration(
@@ -4136,6 +4208,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 geocode_context="Honolulu, HI",
                 field_map=HONOLULU_FIELD_MAP["311"],
             ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
+            # State-level filter (v1 coarseness): rows outside the metro bbox
+            # still carry global H3 tags; metro scoping stays downstream.
+            FeedType.SLA: snap_sla_spec("HI"),
         },
     ),
     CityId.ORLANDO: CityRegistration(
@@ -4285,6 +4361,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 order_by="REPORTED_DATE DESC",
                 field_map=MEMPHIS_FIELD_MAP["311"],
             ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
+            # State-level filter (v1 coarseness): rows outside the metro bbox
+            # still carry global H3 tags; metro scoping stays downstream.
+            FeedType.SLA: snap_sla_spec("TN"),
         },
     ),
     CityId.PHOENIX: CityRegistration(
@@ -4367,6 +4447,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 geocode_context="Albuquerque, NM",
                 field_map=ALBUQUERQUE_FIELD_MAP["permits"],
             ),
+            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
+            # State-level filter (v1 coarseness): rows outside the metro bbox
+            # still carry global H3 tags; metro scoping stays downstream.
+            FeedType.SLA: snap_sla_spec("NM"),
         },
     ),
     CityId.ST_LOUIS: CityRegistration(

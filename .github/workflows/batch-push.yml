@@ -113,7 +113,12 @@ jobs:
         run: bunx wrangler kv bulk put ../../dist/kv-bulk.json --binding SNAPSHOT --remote
 
   deploy-dashboard:
-    if: github.event_name != 'pull_request'
+    # Snapshot-push already gates on validate's result (incl. skipped), so gate
+    # on it alone; always() is required to escape transitive skip from validate.
+    if: >-
+      always() &&
+      github.event_name != 'pull_request' &&
+      needs.snapshot-push.result == 'success'
     needs: snapshot-push
     runs-on: ubuntu-latest
     steps:

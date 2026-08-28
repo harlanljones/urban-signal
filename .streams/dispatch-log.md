@@ -657,3 +657,33 @@ Only one stream edits code; no interlock contention. Commit policy: none of
 the streams git-commit — changesets land uncommitted for the maintainer.
 
 | 2026-08-27 — us364-snap outcome | leaf: apps/api/tests/unit/test_producers_snap.py (+5 refreshed per-city tests) | spine: apps/api/src/config.py, apps/api/src/spatial/city_registry.py | completed | US-364: SNAP registered as FeedType.SLA on 6-metro starter set (dallas/denver/columbus/raleigh/boise/wichita) via shared snap_sla_spec(state); snapshot mode, cadence 14d; facts re-exported. Gates: interlock 22 passed, suite 1585 passed/3 skipped, product lint green, ruff zero-new-findings. Yield: 11 new tests + 6 registrations + product facts. |
+
+## 2026-08-28 — Parallel fleet round (9 streams)
+
+| Stream id | Leaf claim | Spine needed | Task |
+|---|---|---|---|
+| ci-watch | none (read-only) | none | watch 965b312 runs; verify deploy-dashboard + byte-sync + deep links |
+| snap-extend | tests | config.py + city_registry.py | extend SNAP SLA to remaining SLA-less metros |
+| ci-workflow-patch | none | .github/workflows/batch-push.yml (uncommitted patch) | fix deploy-dashboard skip on non-push events |
+| snap-zip-backfill-design | none (design comment) | none | design auth-date backfill from 2005–2025 zip; comment on US-364 |
+| triage-ne | triage probe docs (docs/research/probe-*.md) | none | row-level probes US-313/315/316/317/349/351/352/353 |
+| triage-midatl | same | none | US-314/318/319/320/343/344/348/354 |
+| triage-south | same | none | US-339/340/341/345/346/357/358/359 |
+| triage-west | same | none | US-321/323/325/326/328/329/330/331/332 |
+| triage-stale-sweep | none (Linear comments only) | none | status comments on 13 already-answered tickets (registered/REJECT) |
+
+Only snap-extend edits app code; ci-workflow-patch touches only the workflow
+file. No commits by agents.
+| snap-extend | apps/api/src/spatial/city_registry.py, apps/api/tests/unit/test_producers_*.py (14 files) | apps/product artifacts via facts:export | US-364 SNAP SLA extended to 21 SLA-less metros (incl. prince_georges); interlock 22 + full suite 1585p/3s + ruff parity + product lint green |
+
+| Stream id | Outcome |
+|---|---|
+| ci-watch | PASS — validate+snapshot+deploy all green on 965b312; byte-sync OK (CF script only); 5 deep links live in served METRO_META; staleness green. Wave-3 fully on the map. |
+| snap-extend | 21 specs added (incl. prince_georges) — REGISTRY has zero SLA-less metros. interlock 22, suite 1588/3, facts+lint green, ruff parity. Uncommitted. |
+| ci-workflow-patch | Root cause: validate `if:` excludes dispatch/schedule → transitive needs-skip of deploy-dashboard. Patch applied (uncommitted) to batch-push.yml:116. Gap documented: validate never runs on cron/dispatch (nightly deploys unvalidated) — ticket filed. |
+| snap-zip-backfill-design | Zip probed: 95MB/703k rows, Record ID join 93-96%, M/D/YYYY dates; ~294k events/one-shot. Design comment on US-364 (option a: one-shot script + field-map addition). |
+| triage-ne | 3 ready-for-agent: Buffalo (SLA-1), Rochester (D-1), Syracuse (SLA-1). 5 stays with evidence. 8 probe docs. |
+| triage-midatl | ready-for-agent: Lynchburg (P1/SLA1), Virginia Beach (P2/SLA2/D2), Huntsville (P2, watermark caveat). 5 stays. 8 probe docs. |
+| triage-south | ready-for-agent: Greenville (P1), Omaha (311-1), Toledo (311-1). 5 stays. 8 probe docs. |
+| triage-west | ready-for-agent: Henderson (P1/SLA2), Aurora CO (P1/SLA1), Anchorage (D1), Tucson (SLA2). 5 stays. 9 probe docs. |
+| triage-stale-sweep | 13 status comments: 8 registered, 5 reject-evidence. Labels/states untouched. |

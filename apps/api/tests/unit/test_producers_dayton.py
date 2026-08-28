@@ -45,11 +45,11 @@ def test_dayton_geometry_is_self_consistent():
     assert {meta.city_id for meta in DAYTON_SUBMARKETS.values()} == {"dayton"}
 
 
-def test_dayton_registers_rolling_311_only():
+def test_dayton_registers_rolling_311_and_snap_sla():
     city = CityId.DAYTON
     assert normalize_city("dayton oh") is city
     assert normalize_city("montgomery county oh") is city
-    assert set(REGISTRY[city].datasets) == {FeedType.COMPLAINTS_311}
+    assert set(REGISTRY[city].datasets) == {FeedType.COMPLAINTS_311, FeedType.SLA}
     complaints = get_dataset(city, FeedType.COMPLAINTS_311)
     assert complaints.platform == "arcgis"
     assert complaints.watermark_col == "ADDDTTM"
@@ -57,7 +57,7 @@ def test_dayton_registers_rolling_311_only():
     assert complaints.rolling_window_days == 90
     assert complaints.retention_days == 90
     assert complaints.field_map == DAYTON_FIELD_MAP
-    for feed in (FeedType.PERMITS, FeedType.SLA, FeedType.DEEDS):
+    for feed in (FeedType.PERMITS, FeedType.DEEDS):
         with pytest.raises(KeyError, match="no.*feed"):
             get_dataset(city, feed)
 

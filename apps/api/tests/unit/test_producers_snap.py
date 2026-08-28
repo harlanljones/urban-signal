@@ -3,7 +3,9 @@
 The SNAP registration reuses the existing SLALicenseEvent machinery — no new
 producer code. One national ArcGIS FeatureServer (usda-fns org, item
 8b260f9a10b0459aa441ad8588c2251c) is sliced per starter metro with a State
-where-clause, so all six specs come from the shared ``snap_sla_spec`` helper.
+where-clause, so every spec comes from the shared ``snap_sla_spec`` helper
+(six-metro starter set in 965b312, then extended to every remaining
+SLA-less registered metro in the US-364 follow-up).
 
 Probed live 2026-08-27:
 
@@ -43,6 +45,33 @@ SNAP_STARTER_METROS = [
     ("raleigh", "NC"),
     ("boise", "ID"),
     ("wichita", "KS"),
+]
+
+# US-364 extension: every remaining SLA-less registered metro at edit time.
+# Metros sharing a state each carry their own spec with the same filter
+# (dallas/fort_worth both TX in the starter shape) — duplication accepted.
+SNAP_EXTENDED_METROS = [
+    ("albuquerque", "NM"),
+    ("charlotte", "NC"),
+    ("chattanooga", "TN"),
+    ("cleveland", "OH"),
+    ("dayton", "OH"),
+    ("durham", "NC"),
+    ("el_paso", "TX"),
+    ("fort_worth", "TX"),
+    ("honolulu", "HI"),
+    ("houston", "TX"),
+    ("indianapolis", "IN"),
+    ("las_vegas", "NV"),
+    ("memphis", "TN"),
+    ("pierce", "WA"),
+    ("pittsburgh", "PA"),
+    ("prince_georges", "MD"),
+    ("reno", "NV"),
+    ("sacramento", "CA"),
+    ("san_antonio", "TX"),
+    ("san_jose", "CA"),
+    ("tulsa", "OK"),
 ]
 
 
@@ -167,7 +196,7 @@ class TestSnapRegistrationShape:
             assert get_dataset(city, FeedType.SLA).where == where
 
     def test_specs_share_the_snap_snapshot_contract(self):
-        """All six registrations share one endpoint/field-map helper and
+        """All 27 registrations share one endpoint/field-map helper and
         declare the verified-live acquisition contract: snapshot mode (no
         per-row date field exists), Record_ID/ObjectId ids, ObjectId OID,
         14-day cadence per FNS's published refresh statement."""
@@ -175,7 +204,7 @@ class TestSnapRegistrationShape:
 
         specs = [
             get_dataset(normalize_city(city_value), FeedType.SLA)
-            for city_value, _state in SNAP_STARTER_METROS
+            for city_value, _state in SNAP_STARTER_METROS + SNAP_EXTENDED_METROS
         ]
         for spec in specs:
             assert spec.ingestion_mode == "snapshot"
@@ -209,12 +238,32 @@ class TestSnapRegistrationShape:
         assert resolve_field_map("dallas", FeedType.SLA) is SNAP_SLA_FIELD_MAP
         assert resolve_field_map("wichita", FeedType.SLA) is SNAP_SLA_FIELD_MAP
 
-    def test_non_starter_sla_less_city_still_raises(self):
-        """houston has no SLA feed yet (not in the US-364 starter set)."""
-        from src.spatial.city_registry import CityId, FeedType, get_dataset
+    def test_extended_set_registers_sla_specs(self):
+        """The US-364 extension: every remaining SLA-less registered metro
+        gets its own SNAP spec with the same snapshot contract, sliced by
+        its state's two-letter code (verified live per state)."""
+        from src.spatial.city_registry import FeedType, get_dataset, normalize_city
 
-        with pytest.raises(KeyError, match="no.*feed"):
-            get_dataset(CityId.HOUSTON, FeedType.SLA)
+        for city_value, state in SNAP_EXTENDED_METROS:
+            spec = get_dataset(normalize_city(city_value), FeedType.SLA)
+            assert SNAP_ENDPOINT_FRAG in spec.endpoint, city_value
+            assert spec.where == f"State = '{state}'", city_value
+            assert spec.ingestion_mode == "snapshot"
+            assert spec.watermark_col == ""
+            assert spec.expected_cadence_days == 14
+            assert spec.field_map is SNAP_SLA_FIELD_MAP
+            assert spec.needs_geocode is False
+
+    def test_every_registered_metro_has_sla(self):
+        """The extension closes the set: no registered metro is SLA-less, so
+        the former 'houston raises' pin is superseded by full coverage.
+        Pre-existing metro-scoped SLA specs carry no where-clause; SNAP
+        specs are the State-sliced ones."""
+        from src.spatial.city_registry import REGISTRY, FeedType, get_dataset
+
+        for city_id in REGISTRY:
+            spec = get_dataset(city_id, FeedType.SLA)
+            assert spec is not None, city_id
 
 
 class TestSnapParsing:

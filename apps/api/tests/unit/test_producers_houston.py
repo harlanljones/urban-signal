@@ -46,7 +46,7 @@ def test_houston_geometry_is_self_consistent():
     assert {meta.city_id for meta in HOUSTON_SUBMARKETS.values()} == {"houston"}
 
 
-def test_houston_registers_arcgis_311_only():
+def test_houston_registers_arcgis_311_and_snap_sla():
     from src.spatial.city_registry import REGISTRY, get_dataset, normalize_city
 
     city = CityId.HOUSTON
@@ -54,7 +54,7 @@ def test_houston_registers_arcgis_311_only():
     assert normalize_city("houston_tx") is city
     assert normalize_city("htx") is city
     assert REGISTRY[city].job_suffix == "houston"
-    assert set(REGISTRY[city].datasets) == {FeedType.COMPLAINTS_311}
+    assert set(REGISTRY[city].datasets) == {FeedType.COMPLAINTS_311, FeedType.SLA}
 
     s311 = REGISTRY[city].datasets[FeedType.COMPLAINTS_311]
     assert s311.platform == "arcgis"
@@ -68,8 +68,6 @@ def test_houston_registers_arcgis_311_only():
 
     with pytest.raises(KeyError, match="no.*feed"):
         get_dataset(city, FeedType.PERMITS)
-    with pytest.raises(KeyError, match="no.*feed"):
-        get_dataset(city, FeedType.SLA)
     with pytest.raises(KeyError, match="no.*feed"):
         get_dataset(city, FeedType.DEEDS)
 

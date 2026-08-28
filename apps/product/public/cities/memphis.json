@@ -260,7 +260,12 @@
       "interval_seconds": 180.0,
       "topic": "raw.municipal.311"
     },
-    "sla": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
     "deeds": null
   },
   "evidence_path": "apps/api/src/spatial/cities/memphis.py",

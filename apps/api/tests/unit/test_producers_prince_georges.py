@@ -36,7 +36,11 @@ def test_prince_georges_registers_311_and_sdat_deeds():
     assert normalize_city("pgco") is city
     assert normalize_city("prince george's county") is city
     assert REGISTRY[city].job_suffix == "pgmd"
-    assert set(REGISTRY[city].datasets) == {FeedType.COMPLAINTS_311, FeedType.DEEDS}
+    assert set(REGISTRY[city].datasets) == {
+        FeedType.COMPLAINTS_311,
+        FeedType.DEEDS,
+        FeedType.SLA,
+    }
 
     c311 = REGISTRY[city].datasets[FeedType.COMPLAINTS_311]
     assert c311.watermark_col == "date_request_opened"

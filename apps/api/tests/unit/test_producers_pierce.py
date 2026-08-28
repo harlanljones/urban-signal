@@ -53,7 +53,7 @@ def test_pierce_geometry_is_self_consistent():
     assert {meta.city_id for meta in PIERCE_SUBMARKETS.values()} == {"pierce"}
 
 
-def test_pierce_registers_arcgis_permits_only():
+def test_pierce_registers_arcgis_permits_and_snap_sla():
     from src.spatial.city_registry import REGISTRY, get_dataset, normalize_city
 
     city = CityId.PIERCE
@@ -61,7 +61,7 @@ def test_pierce_registers_arcgis_permits_only():
     assert normalize_city("pierce_county") is city
     assert normalize_city("tacoma") is city
     assert REGISTRY[city].job_suffix == "pco"
-    assert set(REGISTRY[city].datasets) == {FeedType.PERMITS}
+    assert set(REGISTRY[city].datasets) == {FeedType.PERMITS, FeedType.SLA}
 
     permits = REGISTRY[city].datasets[FeedType.PERMITS]
     assert permits.platform == "arcgis"
@@ -78,8 +78,6 @@ def test_pierce_registers_arcgis_permits_only():
 
     with pytest.raises(KeyError, match="no.*feed"):
         get_dataset(city, FeedType.COMPLAINTS_311)
-    with pytest.raises(KeyError, match="no.*feed"):
-        get_dataset(city, FeedType.SLA)
     with pytest.raises(KeyError, match="no.*feed"):
         get_dataset(city, FeedType.DEEDS)
 

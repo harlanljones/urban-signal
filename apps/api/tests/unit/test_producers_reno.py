@@ -38,11 +38,11 @@ def test_reno_geometry_is_self_consistent():
     assert {meta.city_id for meta in RENO_SUBMARKETS.values()} == {"reno"}
 
 
-def test_reno_registers_deeds_only():
+def test_reno_registers_deeds_and_snap_sla():
     city = CityId.RENO
-    assert normalize_city("reno nv") is city
+    assert normalize_city("reno") is city
     assert normalize_city("washoe county") is city
-    assert set(REGISTRY[city].datasets) == {FeedType.DEEDS}
+    assert set(REGISTRY[city].datasets) == {FeedType.DEEDS, FeedType.SLA}
 
     deeds = get_dataset(city, FeedType.DEEDS)
     assert deeds.platform == "arcgis"
@@ -53,7 +53,7 @@ def test_reno_registers_deeds_only():
     assert deeds.watermark_type == "text"
     assert deeds.watermark_format == "%m/%d/%Y"
 
-    for feed in (FeedType.PERMITS, FeedType.COMPLAINTS_311, FeedType.SLA):
+    for feed in (FeedType.PERMITS, FeedType.COMPLAINTS_311):
         with pytest.raises(KeyError, match="no.*feed"):
             get_dataset(city, feed)
 

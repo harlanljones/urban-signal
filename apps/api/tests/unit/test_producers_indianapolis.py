@@ -44,7 +44,7 @@ def test_indianapolis_geometry_is_self_consistent():
     assert {meta.borough for meta in INDIANAPOLIS_SUBMARKETS.values()} == set(INDIANAPOLIS_DIVISIONS)
 
 
-def test_indianapolis_registers_only_the_311_feed():
+def test_indianapolis_registers_the_311_feed_and_snap_sla():
     from src.spatial.city_registry import REGISTRY, normalize_city
 
     city = CityId.INDIANAPOLIS
@@ -52,7 +52,7 @@ def test_indianapolis_registers_only_the_311_feed():
     assert normalize_city("indianapolis_in") is city
     assert normalize_city("indy") is city
     assert REGISTRY[city].job_suffix == "indianapolis"
-    assert set(REGISTRY[city].datasets) == {FeedType.COMPLAINTS_311}
+    assert set(REGISTRY[city].datasets) == {FeedType.COMPLAINTS_311, FeedType.SLA}
 
 
 def test_indianapolis_311_spec_pins_the_live_schema():
@@ -70,12 +70,12 @@ def test_indianapolis_311_spec_pins_the_live_schema():
 
 
 def test_indianapolis_hard_excludes_unregistered_feeds():
-    """311-only registration: permits (Accela ACA), licenses (INBiz SOS paid),
-    and deeds (nightly parcel snapshot) have no open feed — get_dataset must
-    raise a readable KeyError for them."""
+    """311 + SNAP SLA registration: permits (Accela ACA), licenses (INBiz SOS
+    paid), and deeds (nightly parcel snapshot) have no open feed — get_dataset
+    must raise a readable KeyError for them."""
     from src.spatial.city_registry import get_dataset
 
-    for feed in (FeedType.PERMITS, FeedType.SLA, FeedType.DEEDS):
+    for feed in (FeedType.PERMITS, FeedType.DEEDS):
         with pytest.raises(KeyError) as excinfo:
             get_dataset(CityId.INDIANAPOLIS, feed)
         message = str(excinfo.value)

@@ -54,14 +54,18 @@ def test_chattanooga_geometry_is_self_consistent():
     assert {meta.city_id for meta in CHATTANOOGA_SUBMARKETS.values()} == {"chattanooga"}
 
 
-def test_chattanooga_registers_permits_and_deeds_only():
+def test_chattanooga_registers_permits_deeds_and_snap_sla():
     from src.spatial.city_registry import REGISTRY, get_dataset, normalize_city
 
     city = CityId.CHATTANOOGA
     assert normalize_city("chattanooga") is city
     assert normalize_city("hamilton county tn") is city
     assert REGISTRY[city].job_suffix == "chattanooga"
-    assert set(REGISTRY[city].datasets) == {FeedType.PERMITS, FeedType.DEEDS}
+    assert set(REGISTRY[city].datasets) == {
+        FeedType.PERMITS,
+        FeedType.DEEDS,
+        FeedType.SLA,
+    }
 
     permits = get_dataset(city, FeedType.PERMITS)
     assert permits.platform == "csv"
@@ -79,8 +83,6 @@ def test_chattanooga_registers_permits_and_deeds_only():
 
     with pytest.raises(KeyError, match="no.*feed"):
         get_dataset(city, FeedType.COMPLAINTS_311)
-    with pytest.raises(KeyError, match="no.*feed"):
-        get_dataset(city, FeedType.SLA)
 
 
 PERMIT_ROW = {

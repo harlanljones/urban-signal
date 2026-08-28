@@ -42,7 +42,11 @@ def test_tulsa_registers_rolling_311_and_crime():
     city = CityId.TULSA
     assert normalize_city("tulsa ok") is city
     assert normalize_city("tulsa county") is city
-    assert set(REGISTRY[city].datasets) == {FeedType.COMPLAINTS_311, FeedType.CRIME}
+    assert set(REGISTRY[city].datasets) == {
+        FeedType.COMPLAINTS_311,
+        FeedType.CRIME,
+        FeedType.SLA,
+    }
     complaints = get_dataset(city, FeedType.COMPLAINTS_311)
     assert complaints.platform == "arcgis"
     assert complaints.watermark_col == "case_opened"
@@ -50,7 +54,7 @@ def test_tulsa_registers_rolling_311_and_crime():
     assert complaints.rolling_window_days == 30
     assert complaints.retention_days == 30
     assert complaints.field_map == TULSA_FIELD_MAP
-    for feed in (FeedType.PERMITS, FeedType.SLA, FeedType.DEEDS):
+    for feed in (FeedType.PERMITS, FeedType.DEEDS):
         with pytest.raises(KeyError, match="no.*feed"):
             get_dataset(city, feed)
 

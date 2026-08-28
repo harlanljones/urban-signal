@@ -77,7 +77,7 @@ def test_pittsburgh_geometry_is_self_consistent():
 
 
 def test_pittsburgh_registers_ckan_permits_deeds_and_311():
-    from src.spatial.city_registry import get_dataset, normalize_city
+    from src.spatial.city_registry import normalize_city
 
     city = CityId.PITTSBURGH
     assert normalize_city("pittsburgh") is city
@@ -87,6 +87,7 @@ def test_pittsburgh_registers_ckan_permits_deeds_and_311():
         FeedType.PERMITS,
         FeedType.DEEDS,
         FeedType.COMPLAINTS_311,
+        FeedType.SLA,
     }
 
     permits = REGISTRY[city].datasets[FeedType.PERMITS]
@@ -96,9 +97,6 @@ def test_pittsburgh_registers_ckan_permits_deeds_and_311():
     assert permits.producer_key == "permits"
     assert permits.expected_cadence_days == 7
     assert permits.field_map == PITTSBURGH_FIELD_MAP
-
-    with pytest.raises(KeyError, match="no.*feed"):
-        get_dataset(city, FeedType.SLA)
 
 
 def test_pittsburgh_deeds_spec_pins_ckan_source_and_field_map():
