@@ -202,6 +202,13 @@ from src.spatial.cities.indianapolis import (
     INDIANAPOLIS_SUBMARKETS,
     is_in_indianapolis_metro,
 )
+from src.spatial.cities.beaumont import (
+    BEAUMONT_DIVISION_BBOXES,
+    BEAUMONT_DIVISIONS,
+    BEAUMONT_METRO_BBOX,
+    BEAUMONT_SUBMARKETS,
+    is_in_beaumont_metro,
+)
 from src.spatial.cities.wichita import (
     WICHITA_DIVISION_BBOXES,
     WICHITA_DIVISIONS,
@@ -768,6 +775,11 @@ __all__ = [
     "AMARILLO_DIVISIONS",
     "AMARILLO_SUBMARKETS",
     "is_in_amarillo_metro",
+    "BEAUMONT_METRO_BBOX",
+    "BEAUMONT_DIVISION_BBOXES",
+    "BEAUMONT_DIVISIONS",
+    "BEAUMONT_SUBMARKETS",
+    "is_in_beaumont_metro",
     "WACO_METRO_BBOX",
     "WACO_DIVISION_BBOXES",
     "WACO_DIVISIONS",

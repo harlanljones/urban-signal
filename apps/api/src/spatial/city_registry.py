@@ -408,6 +408,11 @@ from src.spatial.cities.amarillo import (
     AMARILLO_METRO_BBOX,
     AMARILLO_SUBMARKETS,
 )
+from src.spatial.cities.beaumont import (
+    BEAUMONT_DIVISION_BBOXES,
+    BEAUMONT_DIVISIONS,
+    BEAUMONT_METRO_BBOX,
+    BEAUMONT_SUBMARKETS,
 from src.spatial.cities.waco import (
     WACO_CENTER,
     WACO_DIVISION_BBOXES,
@@ -498,6 +503,7 @@ class CityId(str, Enum):
     OMAHA = "omaha"
     TOLEDO = "toledo"
     AMARILLO = "amarillo"
+    BEAUMONT = "beaumont"
     WACO = "waco"
     MACON_BIBB = "macon_bibb"
 
@@ -1059,6 +1065,11 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "amarillo": CityId.AMARILLO,
     "amarillo_tx": CityId.AMARILLO,
     "amarillo tx": CityId.AMARILLO,
+    # Beaumont, TX
+    "beaumont": CityId.BEAUMONT,
+    "beaumont_tx": CityId.BEAUMONT,
+    "beaumont-tx": CityId.BEAUMONT,
+    "beaumont tx": CityId.BEAUMONT,
     # Waco, TX
     "waco": CityId.WACO,
     "waco_tx": CityId.WACO,
@@ -4920,6 +4931,22 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         job_suffix="amarillo",
         # US-270: initial registration with SNAP SLA (TX slice). City permits
         # via data.texas.gov not verifiable; do not register until public API exists.
+        datasets={
+            FeedType.SLA: snap_sla_spec("TX"),
+        },
+    ),
+    CityId.BEAUMONT: CityRegistration(
+        city_id=CityId.BEAUMONT,
+        name="Beaumont",
+        state="TX",
+        center={"lat": 30.0840, "lng": -94.1010},
+        metro_bbox=BEAUMONT_METRO_BBOX,
+        division_bboxes=BEAUMONT_DIVISION_BBOXES,
+        submarkets=BEAUMONT_SUBMARKETS,
+        divisions=BEAUMONT_DIVISIONS,
+        job_suffix="beaumont",
+        # US-271: no verifiable public building-permits or 311 feed. Register
+        # SNAP retailers as the SLA slice for Texas (US-364 precedent).
         datasets={
             FeedType.SLA: snap_sla_spec("TX"),
         },

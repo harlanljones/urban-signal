@@ -2495,6 +2495,12 @@
       "evidence_path": "apps/api/src/spatial/cities/amarillo.py"
     },
     {
+      "id": "beaumont",
+      "name": "Beaumont",
+      "state": "TX",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
       "id": "waco",
       "name": "Waco",
       "state": "TX",
@@ -2519,6 +2525,10 @@
         null
       ],
       "center": {
+        "lat": 30.084,
+        "lng": -94.101
+      },
+      "evidence_path": "apps/api/src/spatial/cities/beaumont.py"
         "lat": 31.5493,
         "lng": -97.1467
       },
