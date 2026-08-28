@@ -21,6 +21,7 @@ from src.producers.field_maps_honolulu import FIELD_MAP as HONOLULU_FIELD_MAP
 from src.producers.field_maps_orlando import SLA_FIELD_MAP as ORLANDO_SLA_FIELD_MAP
 from src.producers.field_maps_miami_dade import FIELD_MAP as MIAMI_DADE_FIELD_MAP
 from src.producers.field_maps_memphis import FIELD_MAP as MEMPHIS_FIELD_MAP
+from src.producers.field_maps_gainesville import FIELD_MAP as GAINESVILLE_PERMITS_FIELD_MAP
 from src.producers.field_maps_phoenix import FIELD_MAP as PHOENIX_FIELD_MAP
 from src.producers.field_maps_albuquerque import FIELD_MAP as ALBUQUERQUE_FIELD_MAP
 from src.producers.field_maps_st_louis import FIELD_MAP as ST_LOUIS_FIELD_MAP
@@ -340,6 +341,12 @@ from src.spatial.cities.orlando import (
     ORLANDO_METRO_BBOX,
     ORLANDO_SUBMARKETS,
 )
+from src.spatial.cities.gainesville import (
+    GAINESVILLE_DIVISION_BBOXES,
+    GAINESVILLE_DIVISIONS,
+    GAINESVILLE_METRO_BBOX,
+    GAINESVILLE_SUBMARKETS,
+)
 from src.spatial.cities.miami_dade import (
     MIAMI_DADE_DIVISION_BBOXES,
     MIAMI_DADE_DIVISIONS,
@@ -520,6 +527,7 @@ class CityId(str, Enum):
     FORT_WORTH = "fort_worth"
     HONOLULU = "honolulu"
     ORLANDO = "orlando"
+    GAINESVILLE = "gainesville"
     OCALA = "ocala"
     MIAMI_DADE = "miami_dade"
     MEMPHIS = "memphis"
@@ -1018,6 +1026,11 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "mco": CityId.ORLANDO,
     "orange_county_fl": CityId.ORLANDO,
     "orange county fl": CityId.ORLANDO,
+
+    # Gainesville, FL
+    "gainesville": CityId.GAINESVILLE,
+    "gainesville_fl": CityId.GAINESVILLE,
+    "gainesville fl": CityId.GAINESVILLE,
 
     # Ocala / Marion County, FL
     "ocala": CityId.OCALA,
@@ -4442,6 +4455,30 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                     "str_licenses": settings.socrata_orlando_str_endpoint,
                 },
                 field_map=ORLANDO_SLA_FIELD_MAP,
+            ),
+        },
+    ),
+    CityId.GAINESVILLE: CityRegistration(
+        city_id=CityId.GAINESVILLE,
+        name="Gainesville",
+        state="FL",
+        center={"lat": 29.6516, "lng": -82.3248},
+        metro_bbox=GAINESVILLE_METRO_BBOX,
+        division_bboxes=GAINESVILLE_DIVISION_BBOXES,
+        submarkets=GAINESVILLE_SUBMARKETS,
+        divisions=GAINESVILLE_DIVISIONS,
+        job_suffix="gainesville",
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.socrata_gainesville_permits_endpoint,
+                platform="socrata",
+                watermark_col="issue",
+                id_keys=["permit"],
+                topic=settings.topic_permits,
+                interval_seconds=600.0,
+                producer_key="permits",
+                order_by="issue DESC",
+                field_map=GAINESVILLE_PERMITS_FIELD_MAP,
             ),
         },
     ),

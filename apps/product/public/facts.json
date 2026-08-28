@@ -2595,10 +2595,6 @@
       "evidence_path": "apps/api/src/spatial/cities/waco.py"
     },
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
       "id": "jackson_ms",
       "name": "Jackson",
       "state": "MS",
@@ -2879,6 +2875,36 @@
         "lng": -77.948
       },
       "evidence_path": "apps/api/src/spatial/cities/wilmington_nc.py"
+    },
+    {
+      "id": "gainesville",
+      "name": "Gainesville",
+      "state": "FL",
+      "divisions": "4 divisions",
+      "division_count": 4,
+      "submarket_count": 8,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "socrata",
+          "watermark_col": "issue",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 29.6516,
+        "lng": -82.3248
+      },
+      "evidence_path": "apps/api/src/spatial/cities/gainesville.py"
     }
   ],
   "pipeline": [

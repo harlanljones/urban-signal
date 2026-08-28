@@ -26,9 +26,9 @@ Register Gainesville, FL as a new Urban Signal metro (`CityId.gainesville`) with
 
 ## Current step
 
-Scaffold leaf module, field map, and test using live column names; prepare spine edits (registry, config setting, cities/__init__, dashboard METRO_META).
+Additive rebase of US-293 onto origin/main (26237f0). Shared files took incoming main, then Gainesville-only lines were re-applied. Leftover `<<<<<<< HEAD` markers from main in METRO_META/facts.json were stripped so the files parse.
 
 ## Next step
 
-Implement spine registration, add METRO_META and byte-sync `apps/dashboard/public/index.html`, regenerate product facts, then run `pytest -m interlock` and open PR linked to US-293.
+Finish rebase, byte-sync dashboard static copy, run `pytest -m interlock` and Gainesville tests, push to `cursor/gainesville-metro-9b36` so PR #31 updates in place. Do not merge. Do not start Columbus/Melbourne/Ocala.
 
