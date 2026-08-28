@@ -55,7 +55,7 @@ import os
 import zipfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -67,6 +67,20 @@ ZCTA_GAZETTEER_URL = (
 CBSA_GAZETTEER_URL = (
     f"https://www2.census.gov/geo/docs/maps-data/data/gazetteer/"
     f"{GAZETTEER_YEAR}_Gazetteer/{GAZETTEER_YEAR}_Gaz_cbsa_national.zip"
+)
+# US-363 §1.4: NFIP claim coordinates are privacy-truncated to 0.1 degrees —
+# roughly 11 km, far coarser than a res-8 hexagon — so claims must be tagged
+# through `censusGeoid` instead. This is the tract centroid table that makes
+# that possible (2.4 MB, verified 200 live 2026-08-28).
+TRACT_GAZETTEER_URL = (
+    f"https://www2.census.gov/geo/docs/maps-data/data/gazetteer/"
+    f"{GAZETTEER_YEAR}_Gazetteer/{GAZETTEER_YEAR}_Gaz_tracts_national.zip"
+)
+# FEMA disaster declarations are county-level (fipsStateCode + fipsCountyCode)
+# with no point at all. 3,222 counties, 138 KB, verified 200 live 2026-08-28.
+COUNTY_GAZETTEER_URL = (
+    f"https://www2.census.gov/geo/docs/maps-data/data/gazetteer/"
+    f"{GAZETTEER_YEAR}_Gazetteer/{GAZETTEER_YEAR}_Gaz_counties_national.zip"
 )
 
 DEFAULT_CACHE_DIR = Path(__file__).resolve().parents[2] / "data" / "crosswalk"
@@ -134,6 +148,9 @@ class GeographyCrosswalk:
         self._cbsas: Optional[Dict[str, GeographyPoint]] = None
         self._cbsa_by_name: Optional[Dict[str, str]] = None
         self._cbsa_by_primary: Optional[Dict[Tuple[str, str], str]] = None
+        self._tracts: Optional[Dict[str, GeographyPoint]] = None
+        self._tract_stems_cache: Optional[Dict[str, List[GeographyPoint]]] = None
+        self._counties: Optional[Dict[str, GeographyPoint]] = None
         self._city_bboxes: Optional[list[tuple[str, Dict[str, float], float]]] = None
 
     # ----------------------------------------------------------------- #
@@ -206,10 +223,71 @@ class GeographyCrosswalk:
         self._cbsa_by_primary = by_primary
         return table
 
-    def load(self) -> "GeographyCrosswalk":
+    def _load_tracts(self) -> Dict[str, GeographyPoint]:
+        if self._tracts is not None:
+            return self._tracts
+        table: Dict[str, GeographyPoint] = {}
+        for row in _read_gazetteer(
+            self._payload(TRACT_GAZETTEER_URL, f"{GAZETTEER_YEAR}_Gaz_tracts_national.zip")
+        ):
+            geoid = row.get("GEOID", "")
+            lat, lng = row.get("INTPTLAT"), row.get("INTPTLONG")
+            if not geoid or not lat or not lng:
+                continue
+            try:
+                table[geoid] = GeographyPoint(geoid, "tract", geoid, float(lat), float(lng))
+            except ValueError:
+                continue
+        self._tracts = table
+        return table
+
+    def _load_counties(self) -> Dict[str, GeographyPoint]:
+        if self._counties is not None:
+            return self._counties
+        table: Dict[str, GeographyPoint] = {}
+        for row in _read_gazetteer(
+            self._payload(COUNTY_GAZETTEER_URL, f"{GAZETTEER_YEAR}_Gaz_counties_national.zip")
+        ):
+            geoid = row.get("GEOID", "")
+            lat, lng = row.get("INTPTLAT"), row.get("INTPTLONG")
+            if not geoid or not lat or not lng:
+                continue
+            try:
+                table[geoid] = GeographyPoint(
+                    geoid, "county", row.get("NAME", geoid), float(lat), float(lng)
+                )
+            except ValueError:
+                continue
+        self._counties = table
+        return table
+
+    def county_point(self, fips: Any) -> Optional[GeographyPoint]:
+        """Look up a county centroid from a 5-digit state+county FIPS code."""
+        text = "".join(ch for ch in str(fips or "") if ch.isdigit())
+        if len(text) < 5:
+            return None
+        return self._load_counties().get(text[:5])
+
+    def city_for_county_fips(self, fips: Any) -> Optional[str]:
+        """Registered city whose metro bbox contains a county's internal point.
+
+        Coarser than the ZIP path by construction — a county can span several
+        markets, or none. It exists for the one feed that publishes nothing
+        finer (FEMA disaster declarations), and a county whose centroid falls
+        outside every registered metro resolves to ``None`` rather than being
+        attached to a neighbour.
+        """
+        point = self.county_point(fips)
+        return self.city_for_point(point.latitude, point.longitude) if point else None
+
+    def load(self, tracts: bool = False, counties: bool = False) -> "GeographyCrosswalk":
         """Prime both tables (and the on-disk cache). Safe to call repeatedly."""
         self._load_zctas()
         self._load_cbsas()
+        if tracts:
+            self._load_tracts()
+        if counties:
+            self._load_counties()
         return self
 
     # ----------------------------------------------------------------- #
@@ -325,6 +403,65 @@ class GeographyCrosswalk:
             return exact
         key = metro_primary_key(name)
         return self._cbsa_by_primary.get(key) if key else None
+
+    def _tract_stems(self) -> Dict[str, List[GeographyPoint]]:
+        """Tracts indexed by their 9-character state+county+tract-base prefix."""
+        if self._tract_stems_cache is not None:
+            return self._tract_stems_cache
+        stems: Dict[str, List[GeographyPoint]] = {}
+        for geoid, point in self._load_tracts().items():
+            stems.setdefault(geoid[:9], []).append(point)
+        self._tract_stems_cache = stems
+        return stems
+
+    def tract_point(self, geoid: Any) -> Optional[GeographyPoint]:
+        """Look up a tract centroid from a FEMA ``censusGeoid``.
+
+        FEMA publishes a 12-character **block group** id (``482012227001``);
+        the tract is its first 11 characters. Two things make a bare dict
+        lookup insufficient:
+
+        * **Tracts split between censuses.** Harris County's ``48201222700``
+          became ``48201222701`` and ``48201222702`` in the 2020 tabulation,
+          and a claim filed under the old id matches neither. A split tract's
+          children partition their parent, so any child's centroid lies inside
+          the old tract — the fallback takes the first child by GEOID, which
+          is deterministic and always inside the right county.
+        * **Id length varies.** Block, block-group and bare tract ids all
+          appear across FEMA entities; everything is normalized to 11 digits.
+
+        Returns ``None`` rather than a guess when neither path matches, so the
+        caller can fall back to the ZIP centroid or the DLQ.
+        """
+        text = "".join(ch for ch in str(geoid or "") if ch.isdigit())
+        if len(text) < 11:
+            return None
+        tract = text[:11]
+        exact = self._load_tracts().get(tract)
+        if exact is not None:
+            return exact
+        children = self._tract_stems().get(tract[:9])
+        if not children:
+            return None
+        return sorted(children, key=lambda p: p.geography_id)[0]
+
+    def city_for_tract(self, geoid: Any) -> Optional[str]:
+        point = self.tract_point(geoid)
+        return self.city_for_point(point.latitude, point.longitude) if point else None
+
+    def tract_to_h3(self, geoid: Any, indexer: Any) -> Dict[str, Optional[str]]:
+        """Tract centroid -> H3 hierarchy.
+
+        A centroid tag, like ``zip_to_h3``: a tract is much larger than a
+        res-9 hexagon, so this places the tract's signal on one cell rather
+        than claiming the loss occurred there. It is still far better than the
+        0.1-degree-truncated coordinate FEMA publishes, which cannot even
+        place a claim in the right city reliably.
+        """
+        point = self.tract_point(geoid)
+        if point is None:
+            return {"h3_res7": None, "h3_res8": None, "h3_res9": None}
+        return indexer.get_multi_res_hierarchy(point.latitude, point.longitude)
 
     def zip_to_h3(self, zcta: str, indexer: Any) -> Dict[str, Optional[str]]:
         """ZCTA centroid -> the multi-resolution H3 hierarchy.

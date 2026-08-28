@@ -62,6 +62,22 @@ class Settings(BaseSettings):
         default="raw.context.observations",
         description="Periodic per-asset context measurements (energy benchmarking, bike/ped counters)",
     )
+    topic_station_change: str = Field(
+        default="raw.mobility.station_change",
+        description="GBFS docked-station installs/removals (US-363 §1.2)",
+    )
+    topic_poi_change: str = Field(
+        default="raw.poi.change",
+        description="POI openings/closings from release deltas (US-363 §1.3)",
+    )
+    topic_infrastructure: str = Field(
+        default="raw.infrastructure.assets",
+        description="New fixed infrastructure: ev_station | small_cell | grid_capacity (US-363 §1.5)",
+    )
+    topic_insurance_loss: str = Field(
+        default="raw.federal.insurance_loss",
+        description="Paid NFIP flood claims, distress context (US-363 §1.4)",
+    )
     topic_enriched_h3: str = Field(default="enriched.spatial.h3")
     topic_catalyst_alerts: str = Field(default="alerts.catalyst")
     topic_dlq: str = Field(default="dlq.schema.failures")
@@ -219,6 +235,96 @@ class Settings(BaseSettings):
     socrata_chicago_cdot_permits_endpoint: str = Field(
         default="https://data.cityofchicago.org/resource/pubx-yq2d.json",
         description="Chicago CDOT permit master (street-cut companion; unpolled until companion polling lands)",
+    )
+
+    # --- US-363 §1.2 GBFS docked bikeshare (snapshot diff) ---
+    # Auto-discovery roots. Every one verified 200 live 2026-08-28; Citi Bike
+    # (bkn) publishes GBFS 2.3 with ttl=60 and 2,508 stations whose
+    # station_information and station_status id spaces match exactly (98 of
+    # them pre-activation, is_installed=0).
+    #
+    # LICENSE GATE. Only the Lyft-operated pool is registered. Lyft's Data
+    # License Agreement grants product use while prohibiting re-hosting the
+    # raw feed as a standalone dataset, which is what we do — we derive
+    # events and keep a state store, never republish the feed.
+    # Lime/Bird/Spin/Bolt/Veo are BARRED (internal-non-commercial-only,
+    # 10-minute retention, no-database-augmentation clauses) and must not be
+    # added here without new written terms.
+    gbfs_nyc_discovery_endpoint: str = Field(
+        default="https://gbfs.lyft.com/gbfs/2.3/bkn/gbfs.json",
+        description="Citi Bike (Lyft) GBFS 2.3 auto-discovery root",
+    )
+    gbfs_chicago_discovery_endpoint: str = Field(
+        default="https://gbfs.lyft.com/gbfs/2.3/chi/gbfs.json",
+        description="Divvy (Lyft) GBFS 2.3 auto-discovery root",
+    )
+    gbfs_san_francisco_discovery_endpoint: str = Field(
+        default="https://gbfs.lyft.com/gbfs/2.3/bay/gbfs.json",
+        description="Bay Wheels (Lyft) GBFS 2.3 auto-discovery root",
+    )
+    # NOT `gbfs.lyft.com/gbfs/2.3/dca/` — that slug is a live-but-empty stub
+    # (HTTP 200, fresh last_updated, `"stations": []`, verified 2026-08-28).
+    # The real Capital Bikeshare system is `dca-cabi` on GBFS **1.1** with 866
+    # stations, reached through the operator's own discovery root. Registering
+    # the stub would have seeded an empty state store and then emitted 866
+    # spurious installs the first time a populated feed was polled.
+    gbfs_washington_dc_discovery_endpoint: str = Field(
+        default="https://gbfs.capitalbikeshare.com/gbfs/gbfs.json",
+        description="Capital Bikeshare (Lyft, system dca-cabi) GBFS 1.1 auto-discovery root",
+    )
+    gbfs_state_dir: str = Field(
+        default="./data/gbfs_state",
+        description="Directory holding the per-system station state store (US-363 §1.2)",
+    )
+
+    # --- US-363 §1.3 POI release deltas (Foursquare OS Places) ---
+    # RELOCATED SOURCE, verified 2026-08-28: the anonymous S3 bucket
+    # `fsq-os-places-us-east-1` now contains only LICENSE.txt and NOTICE.txt —
+    # the release partitions are gone. FSQ moved the dataset to a GATED
+    # Hugging Face repo (anonymous download returns 401). The
+    # `release/dt=<date>/{places,deltas,categories}/parquet/` layout is
+    # preserved; 21 releases exist, latest dt=2026-08-11 with 10 delta
+    # partitions. Apache-2.0 still applies, and NOTICE.txt attribution must be
+    # preserved wherever the data or its derivatives are distributed.
+    fsq_places_repo: str = Field(
+        default="foursquare/fsq-os-places",
+        description="Hugging Face dataset repo for FSQ OS Places (gated; needs HF_TOKEN)",
+    )
+    fsq_places_api_base: str = Field(
+        default="https://huggingface.co",
+        description="Hugging Face API/resolve host for the FSQ release listing and partitions",
+    )
+    poi_state_dir: str = Field(
+        default="./data/poi_state",
+        description="Directory holding the last-processed POI release marker (US-363 §1.3)",
+    )
+
+    # --- US-363 §1.4 OpenFEMA ---
+    # NfipClaims v3 verified live 2026-08-28 (HTTP 200). v2 `FimaNfipClaims` is
+    # deprecated — frozen 2026-06-01, removal 2026-10-15 — and must not be
+    # used. DisasterDeclarationsSummaries remains v2-only (v3 404s).
+    openfema_nfip_claims_endpoint: str = Field(
+        default="https://www.fema.gov/api/open/v3/NfipClaims",
+        description="OpenFEMA NFIP claims v3 (OData). Coordinates are 0.1-degree truncated.",
+    )
+    openfema_disaster_declarations_endpoint: str = Field(
+        default="https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries",
+        description="OpenFEMA disaster declarations (v2 only; v3 404s as of 2026-08-28)",
+    )
+
+    # --- US-363 §1.5 NREL AFDC EV charging ---
+    # UNVERIFIED HOST. developer.nrel.gov and afdc.energy.gov do not resolve
+    # from this network (DNS failure, 2026-08-28) — the same block the
+    # research sweep hit. The client is built to the documented contract and
+    # exercised against fixtures; spot-verify developer.nrel.gov/terms/ and
+    # one live page before enabling the job.
+    nrel_afdc_endpoint: str = Field(
+        default="https://developer.nrel.gov/api/alt-fuel-stations/v1.json",
+        description="NREL AFDC alternative-fuel stations (needs NREL_API_KEY)",
+    )
+    ev_charging_state_dir: str = Field(
+        default="./data/ev_charging_state",
+        description="Directory holding the AFDC station snapshot for diffing (US-363 §1.5)",
     )
 
     # --- US-363 §2.7 building energy benchmarking (annual, zero new machinery) ---
@@ -1228,6 +1334,71 @@ class Settings(BaseSettings):
     arcgis_toledo_311_url: str = Field(
         default="https://gis.toledo.oh.gov/arcgis/rest/services/Public/CityWorks_ServiceRequest_2022/MapServer/0",
         description="Toledo Engage 311 Cityworks ArcGIS MapServer URL",
+    )
+
+    # Buffalo, NY (US-349): restaurant-license SLA (Socrata). Native WGS84
+    # latitude/longitude; NULLs-first ordering demands the issdttm IS NOT
+    # NULL where guard; gpsx/gpsy are mixed-CRS and never candidates.
+    socrata_buffalo_sla_endpoint: str = Field(
+        default="https://data.buffalony.gov/resource/4pp3-qkuj.json",
+        description="Buffalo restaurant licenses Socrata resource URL (SLA)",
+    )
+
+    # Rochester, NY (US-351): deeds/sales via the Monroe County RPS tax-parcel
+    # open-data layer (native parcel polygons, monthly roll with lag).
+    arcgis_rochester_deeds_url: str = Field(
+        default="https://maps.cityofrochester.gov/server/rest/services/Open_Data/Tax_Parcels_Open_Data/FeatureServer/0",
+        description="Rochester tax parcel open data ArcGIS FeatureServer URL (deeds)",
+    )
+
+    # Syracuse, NY (US-352): rental-registry SLA (native WGS84 coords,
+    # event-driven RR_app_received watermark; PII dropped at field map).
+    arcgis_syracuse_sla_url: str = Field(
+        default="https://services6.arcgis.com/bdPqSfflsdgFRVVM/arcgis/rest/services/Syracuse_Rental_Registry/FeatureServer/0",
+        description="Syracuse rental registry ArcGIS FeatureServer URL (SLA)",
+    )
+
+    # Lynchburg, VA (US-318): single ODPDynamic MapServer, layers 37 (permits),
+    # 33 (SLA), 34 (deeds), 41 (parcel-join geometry source). Layer 34
+    # publishes no objectIdField — ESRI_OID ordering is mandatory.
+    arcgis_lynchburg_permits_url: str = Field(
+        default="https://mapviewer.lynchburgva.gov/arcgis/rest/services/OpenData/ODPDynamic/MapServer/37",
+        description="Lynchburg ODP building permits ArcGIS MapServer URL (layer 37)",
+    )
+    arcgis_lynchburg_sla_url: str = Field(
+        default="https://mapviewer.lynchburgva.gov/arcgis/rest/services/OpenData/ODPDynamic/MapServer/33",
+        description="Lynchburg ODP business licenses ArcGIS MapServer URL (layer 33)",
+    )
+    arcgis_lynchburg_deeds_url: str = Field(
+        default="https://mapviewer.lynchburgva.gov/arcgis/rest/services/OpenData/ODPDynamic/MapServer/34",
+        description="Lynchburg ODP property transfers ArcGIS MapServer URL (layer 34)",
+    )
+    arcgis_lynchburg_parcel_layer_url: str = Field(
+        default="https://mapviewer.lynchburgva.gov/arcgis/rest/services/OpenData/ODPDynamic/MapServer/41",
+        description="Lynchburg ODP parcel polygon layer URL (deeds geometry join)",
+    )
+
+    # Greenville, SC (US-340): rolling two-year building-permits window
+    # (NewIssueDate watermark is not where-queryable; outSR=4326 geometry).
+    arcgis_greenville_permits_url: str = Field(
+        default="https://citygis.greenvillesc.gov/arcgis/rest/services/InfoHUB/BuildingPermits_PriorTwoYears/MapServer/0",
+        description="Greenville building permits ArcGIS MapServer URL",
+    )
+
+    # Anchorage, AK (US-330): assessor property-information deeds (daily
+    # batch republication; future-dated Deed_Date sentinels excluded at the
+    # source via where guard).
+    arcgis_anchorage_deeds_url: str = Field(
+        default="https://services2.arcgis.com/Ce3DhLRthdwbHlfF/arcgis/rest/services/PropertyInformation_Hosted/FeatureServer/0",
+        description="Anchorage property information ArcGIS FeatureServer URL (deeds)",
+    )
+
+    # Tucson, AZ (US-328): economic-development SLA snapshot (future-dated
+    # DT_START application sentinels excluded via where guard; ANSI-date
+    # host — gis.tucsonaz.gov is listed in ANSI_DATE_LITERAL_HOSTS).
+    arcgis_tucson_sla_url: str = Field(
+        default="https://gis.tucsonaz.gov/arcgis/rest/services/PublicMaps/OpenData_EconomicDevelopment/MapServer/3",
+        description="Tucson economic development licenses ArcGIS MapServer URL (SLA)",
     )
 
     # Albuquerque / Bernalillo County (US-205): daily CABQ building-permits
