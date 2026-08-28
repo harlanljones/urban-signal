@@ -2596,6 +2596,7 @@
     },
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
       "id": "jackson_ms",
       "name": "Jackson",
       "state": "MS",
@@ -2789,6 +2790,23 @@
       ],
       "center": { "lat": 33.476, "lng": -82.010 },
       "evidence_path": "apps/api/src/spatial/cities/augusta.py"
+    },
+    {
+      "id": "port_st_lucie",
+      "name": "Port St. Lucie",
+      "state": "FL",
+      "divisions": "3 divisions",
+      "division_count": 3,
+      "submarket_count": 6,
+      "feeds": [true, false, true, false],
+      "platforms": [
+        { "platform": "arcgis", "watermark_col": "DateIssued", "interval_seconds": 300.0, "topic": "raw.municipal.permits" },
+        null,
+        { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" },
+        null
+      ],
+      "center": { "lat": 27.28, "lng": -80.36 },
+      "evidence_path": "apps/api/src/spatial/cities/port_st_lucie.py"
     }
   ],
   "pipeline": [

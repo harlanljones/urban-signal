@@ -1261,6 +1261,11 @@ class Settings(BaseSettings):
         default="https://gismims.lakelandgov.net/portal/rest/services/Public_CED/Lakeland_CED_Permits/MapServer/0",
         description="Lakeland iMS Public CED permits ArcGIS MapServer layer URL",
     )
+    # Port St. Lucie, FL (US-289): public Building Permits FeatureServer (weekly updates)
+    arcgis_port_st_lucie_permits_url: str = Field(
+        default="https://services1.arcgis.com/YdUP5V6WwzeG8T8r/arcgis/rest/services/Permits/FeatureServer/0",
+        description="Port St. Lucie building permits ArcGIS FeatureServer layer URL",
+    )
 
     # Las Vegas / Clark County (US-145): address-only ArcGIS tables. Both
     # feeds declare ADR-0004 geocoding in the city registry.
