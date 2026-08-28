@@ -2688,6 +2688,18 @@
       "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
       "center": { "lat": 31.3113, "lng": -92.4451 },
       "evidence_path": "apps/api/src/spatial/cities/alexandria.py"
+    },
+    {
+      "id": "jonesboro",
+      "name": "Jonesboro",
+      "state": "AR",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 7,
+      "feeds": [false, false, true, false],
+      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
+      "center": { "lat": 35.8423, "lng": -90.7043 },
+      "evidence_path": "apps/api/src/spatial/cities/jonesboro.py"
     }
   ],
   "pipeline": [

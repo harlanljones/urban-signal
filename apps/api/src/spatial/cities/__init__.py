@@ -546,6 +546,13 @@ from src.spatial.cities.midland import (
     MIDLAND_SUBMARKETS,
     is_in_midland_metro,
 )
+from src.spatial.cities.jonesboro import (
+    JONESBORO_DIVISION_BBOXES,
+    JONESBORO_DIVISIONS,
+    JONESBORO_METRO_BBOX,
+    JONESBORO_SUBMARKETS,
+    is_in_jonesboro_metro,
+)
 __all__ = [
     "PIERCE_METRO_BBOX",
     "PIERCE_DIVISION_BBOXES",
@@ -933,4 +940,9 @@ __all__ = [
     "ALEXANDRIA_DIVISIONS",
     "ALEXANDRIA_SUBMARKETS",
     "is_in_alexandria_metro",
+    "JONESBORO_METRO_BBOX",
+    "JONESBORO_DIVISION_BBOXES",
+    "JONESBORO_DIVISIONS",
+    "JONESBORO_SUBMARKETS",
+    "is_in_jonesboro_metro",
 ]
