@@ -376,6 +376,11 @@ Kubernetes Secrets, and production credential requirements. Start from
 | `ONNX_EXECUTION_PROVIDER` | `CPUExecutionProvider` | ONNX Provider (`CPUExecutionProvider`; use CUDA explicitly on GPU hosts) |
 | `WEBHOOK_ALERT_URLS` | `[]` | JSON array of URLs for real-time catalyst alert dispatching |
 
+ACS pilot (US-361) uses the Census Data API for ACS 5-year pulls. Live fetch requires a free Census API key:
+
+- Set `CENSUS_API_KEY` in your environment or `.env` (see `.env.example`).
+- Tests run on recorded fixtures and do not require network access or a key.
+
 ### GitHub Actions deployment and monitoring
 
 The repository ships two workflows under `.github/workflows/`:
