@@ -1464,6 +1464,7 @@ def get_dashboard_html() -> str:
       durham: { name: 'Durham / Durham County' },
       dallas: { name: 'Dallas / Dallas County' },
       louisville: { name: 'Louisville / Jefferson County' },
+      lexington: { name: 'Lexington / Fayette County' },
       portland: { name: 'Portland / Multnomah County' },
       san_jose: { name: 'San Jose / Santa Clara County' },
       cape_coral: { name: 'Cape Coral–Fort Myers' },
