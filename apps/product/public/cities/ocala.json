@@ -1,0 +1,73 @@
+{
+  "schema_version": 2,
+  "id": "ocala",
+  "name": "Ocala / Marion County",
+  "state": "FL",
+  "center": { "lat": 29.1872, "lng": -82.1401 },
+  "metro_bbox": {
+    "min_lat": 28.95,
+    "max_lat": 29.45,
+    "min_lng": -82.45,
+    "max_lng": -81.95
+  },
+  "divisions": {
+    "OCALA_CORE": {
+      "name": "OCALA_CORE",
+      "center": { "lat": 29.1872, "lng": -82.1401 },
+      "bbox": { "min_lat": 29.08, "max_lat": 29.28, "min_lng": -82.22, "max_lng": -82.02 },
+      "submarkets": [
+        "Downtown Ocala",
+        "West Ocala",
+        "Silver Springs",
+        "Southeast Ocala",
+        "Northeast Ocala"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Ocala": {
+      "name": "Downtown Ocala",
+      "division": "OCALA_CORE",
+      "center": { "lat": 29.1872, "lng": -82.1401 },
+      "description": "Historic courthouse square and Magnolia Ave corridor with mixed-use infill and neighborhood services."
+    },
+    "West Ocala": {
+      "name": "West Ocala",
+      "division": "OCALA_CORE",
+      "center": { "lat": 29.185, "lng": -82.18 },
+      "description": "Residential and commercial reinvestment west of US‑441 with corridor retail and small‑lot rehab."
+    },
+    "Silver Springs": {
+      "name": "Silver Springs",
+      "division": "OCALA_CORE",
+      "center": { "lat": 29.216, "lng": -82.059 },
+      "description": "East‑side gateway anchored by Silver Springs State Park and commercial corridors along SR‑40."
+    },
+    "Southeast Ocala": {
+      "name": "Southeast Ocala",
+      "division": "OCALA_CORE",
+      "center": { "lat": 29.15, "lng": -82.12 },
+      "description": "Established neighborhoods and medical/office clusters southeast of downtown with steady renovation."
+    },
+    "Northeast Ocala": {
+      "name": "Northeast Ocala",
+      "division": "OCALA_CORE",
+      "center": { "lat": 29.23, "lng": -82.12 },
+      "description": "Northeast residential districts and neighborhood retail along NE 36th Ave and Bonnie Heath Blvd."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/ocala.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
+
