@@ -1440,6 +1440,7 @@ def get_dashboard_html() -> str:
       washington_dc: { name: 'Washington DC' },
       prince_georges: { name: 'Prince George\'s County' },
       columbus: { name: 'Columbus' },
+      columbus_ga: { name: 'Columbus, GA' },
       nashville: { name: 'Nashville / Davidson County' },
       kansas_city: { name: 'Kansas City' },
       pierce: { name: 'Pierce County' },

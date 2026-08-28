@@ -39,6 +39,12 @@ from src.spatial.cities.portland import (
     PORTLAND_SLA_FIELD_MAP,
     PORTLAND_SUBMARKETS,
 )
+from src.spatial.cities.columbus_ga import (
+    COLUMBUS_GA_DIVISION_BBOXES,
+    COLUMBUS_GA_DIVISIONS,
+    COLUMBUS_GA_METRO_BBOX,
+    COLUMBUS_GA_SUBMARKETS,
+)
 from src.spatial.cities.chicago import (
     CHICAGO_DIVISION_BBOXES,
     CHICAGO_DIVISIONS,
@@ -478,6 +484,7 @@ class CityId(str, Enum):
     NYC = "nyc"
     CHICAGO = "chicago"
     SAN_FRANCISCO = "san_francisco"
+    COLUMBUS_GA = "columbus_ga"
     SEATTLE = "seattle"
     LOS_ANGELES = "los_angeles"
     NEW_ORLEANS = "new_orleans"
@@ -793,6 +800,10 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     # Columbus
     "columbus": CityId.COLUMBUS,
     "columbus_oh": CityId.COLUMBUS,
+    # Columbus, GA — do not claim plain 'columbus'
+    "columbus_ga": CityId.COLUMBUS_GA,
+    "columbus-ga": CityId.COLUMBUS_GA,
+    "columbus ga": CityId.COLUMBUS_GA,
 
     # Nashville
     "nashville": CityId.NASHVILLE,
@@ -2767,6 +2778,45 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
             # State-level filter (v1 coarseness): rows outside the metro bbox
             # still carry global H3 tags; metro scoping stays downstream.
             FeedType.SLA: snap_sla_spec("OH"),
+        },
+    ),
+    CityId.COLUMBUS_GA: CityRegistration(
+        city_id=CityId.COLUMBUS_GA,
+        name="Columbus, GA",
+        state="GA",
+        center={"lat": 32.4610, "lng": -84.9877},
+        metro_bbox=COLUMBUS_GA_METRO_BBOX,
+        division_bboxes=COLUMBUS_GA_DIVISION_BBOXES,
+        submarkets=COLUMBUS_GA_SUBMARKETS,
+        divisions=COLUMBUS_GA_DIVISIONS,
+        job_suffix="colga",
+        # Verified ArcGIS permits (MapServer /0 Residential; client uses outSR=4326).
+        # Scheduler does not poll companion_endpoints today; commercial/pool
+        # layers can follow as future companions if/when that path grows.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_columbus_ga_permits_url,
+                platform="arcgis",
+                watermark_col="Issued",
+                id_keys=["PermitNumber", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                
+                expected_cadence_days=7,
+                oid_field="OBJECTID",
+                max_record_count=2000,
+                field_map={
+                    "job_id": ["PermitNumber"],
+                    "issuance_date": ["Issued"],
+                    "cost": ["Valuation"],
+                    "address_street": ["Address"],
+                    "status": ["PermitStatus"],
+                    "job_type": ["WorkClass", "InspectionDivision"],
+                },
+            ),
+            # SLA fallback — SNAP retailers (state slice).
+            FeedType.SLA: snap_sla_spec("GA"),
         },
     ),
     CityId.NASHVILLE: CityRegistration(
