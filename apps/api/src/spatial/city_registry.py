@@ -495,6 +495,13 @@ from src.spatial.cities.odessa import (
     ODESSA_METRO_BBOX,
     ODESSA_SUBMARKETS,
 )
+from src.spatial.cities.alexandria import (
+    ALEXANDRIA_CENTER,
+    ALEXANDRIA_DIVISION_BBOXES,
+    ALEXANDRIA_DIVISIONS,
+    ALEXANDRIA_METRO_BBOX,
+    ALEXANDRIA_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -585,6 +592,7 @@ class CityId(str, Enum):
     TEXARKANA = "texarkana"
     MIDLAND = "midland"
     ODESSA = "odessa"
+    ALEXANDRIA = "alexandria"
 
 
 class FeedType(str, Enum):
@@ -1214,6 +1222,13 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "odessa": CityId.ODESSA,
     "odessa_tx": CityId.ODESSA,
     "odessa tx": CityId.ODESSA,
+    # Alexandria, LA
+    "alexandria": CityId.ALEXANDRIA,
+    "alexandria_la": CityId.ALEXANDRIA,
+    "alexandria la": CityId.ALEXANDRIA,
+    "rapides": CityId.ALEXANDRIA,
+    "rapides_parish": CityId.ALEXANDRIA,
+    "rapides parish": CityId.ALEXANDRIA,
 }
 
 
@@ -5114,6 +5129,19 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         job_suffix="lake_charles",
         # Initial registration: SLA via USDA SNAP Retailers (LA slice).
         # Calcasieu Parish/Lake Charles permit endpoints will be added when a public API is verified.
+    CityId.ALEXANDRIA: CityRegistration(
+        city_id=CityId.ALEXANDRIA,
+        name="Alexandria",
+        state="LA",
+        center=ALEXANDRIA_CENTER,
+        metro_bbox=ALEXANDRIA_METRO_BBOX,
+        division_bboxes=ALEXANDRIA_DIVISION_BBOXES,
+        submarkets=ALEXANDRIA_SUBMARKETS,
+        divisions=ALEXANDRIA_DIVISIONS,
+        job_suffix="alexandria",
+        # US-281: initial registration with SNAP SLA (LA slice). City permits
+        # run through My Permit Now; no verifiable public API was found for
+        # Alexandria/Rapides at registration time.
         datasets={
             FeedType.SLA: snap_sla_spec("LA"),
         },
@@ -5314,6 +5342,8 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
             FeedType.SLA: snap_sla_spec("AR"),
         },
     ),
+=======
+>>>>>>> 7636987 (api(spine): register CityId.alexandria with aliases and SNAP SLA (LA); import Alexandria leaf)
 }
 
 
