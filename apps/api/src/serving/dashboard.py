@@ -1495,6 +1495,8 @@ def get_dashboard_html() -> str:
       monroe: { name: 'Monroe' },
       abilene: { name: 'Abilene' },
       abilene: { name: 'Abilene' },
+      texarkana: { name: 'Texarkana' },
+      texarkana: { name: 'Texarkana' },
     };
 
     let map = null;
