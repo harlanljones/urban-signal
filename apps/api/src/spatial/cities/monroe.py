@@ -29,7 +29,7 @@ MONROE_CENTER: Dict[str, float] = {"lat": 32.5093, "lng": -92.1193}
 # Division bounding boxes (strict subsets of MONROE_METRO_BBOX)
 MONROE_DIVISION_BBOXES: Dict[str, Dict[str, float]] = {
     # Downtown Monroe, Riverfront, ULM-adjacent core
-    "CENTRAL_CORE": {"min_lat": 32.495, "max_lat": 32.545, "min_lng": -92.140, "max_lng": -92.070},
+    "CENTRAL_CORE": {"min_lat": 32.495, "max_lat": 32.545, "min_lng": -92.140, "max_lng": -92.060},
     # West Monroe including Antique Alley and I-20 commercial corridor
     "WEST_BANK": {"min_lat": 32.490, "max_lat": 32.570, "min_lng": -92.230, "max_lng": -92.120},
     # North Monroe and Sterlington Road (US-165 North) corridor
