@@ -1451,6 +1451,7 @@ def get_dashboard_html() -> str:
       indianapolis: { name: 'Indianapolis / Marion County' },
       houston: { name: 'Houston' },
       wichita: { name: 'Wichita' },
+      melbourne: { name: 'Melbourne / Palm Bay' },
       chattanooga: { name: 'Chattanooga / Hamilton County' },
       cleveland: { name: 'Cleveland / Cuyahoga County' },
       hartford: { name: 'Hartford' },

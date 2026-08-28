@@ -592,6 +592,7 @@ class CityId(str, Enum):
     TAMPA = "tampa"
     LAS_VEGAS = "las_vegas"
     BOISE = "boise"
+    MELBOURNE = "melbourne"
     FORT_WORTH = "fort_worth"
     HONOLULU = "honolulu"
     ORLANDO = "orlando"
@@ -1490,6 +1491,37 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 expected_cadence_days=1,
                 companion_endpoints={'system_id': 'bkn', 'operator': 'lyft'},
             ),
+        },
+    ),
+    CityId.MELBOURNE: CityRegistration(
+        city_id=CityId.MELBOURNE,
+        name="Melbourne / Palm Bay / Titusville",
+        state="FL",
+        center={"lat": 28.0836, "lng": -80.6081},
+        metro_bbox=MELBOURNE_METRO_BBOX,
+        division_bboxes=MELBOURNE_DIVISION_BBOXES,
+        submarkets=MELBOURNE_SUBMARKETS,
+        divisions=MELBOURNE_DIVISIONS,
+        job_suffix="melbourne",
+        # Partial: PERMITS + SNAP SLA fallback (state-sliced 'FL').
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_brevard_permits_url,
+                platform="arcgis",
+                watermark_col="ISSUEDATE",
+                id_keys=["FOLDERSEQUENCE", "OBJECTID0"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                expected_cadence_days=1,
+                oid_field="OBJECTID0",
+                max_record_count=1000,
+                order_by="ISSUEDATE DESC",
+            ),
+            # USDA FNS SNAP retailers as the SLA slice (Florida state filter).
+            # Rows outside the metro bbox still carry global H3 tags; metro
+            # scoping happens downstream in spatialization.
+            FeedType.SLA: snap_sla_spec("FL"),
         },
     ),
     CityId.CHICAGO: CityRegistration(

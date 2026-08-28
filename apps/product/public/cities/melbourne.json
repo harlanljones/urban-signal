@@ -1,0 +1,144 @@
+{
+  "schema_version": 2,
+  "id": "melbourne",
+  "name": "Melbourne / Palm Bay / Titusville",
+  "state": "FL",
+  "center": { "lat": 28.0836, "lng": -80.6081 },
+  "metro_bbox": {
+    "min_lat": 27.88,
+    "max_lat": 28.72,
+    "min_lng": -80.90,
+    "max_lng": -80.40
+  },
+  "divisions": {
+    "MELBOURNE_CORE": {
+      "name": "MELBOURNE_CORE",
+      "center": { "lat": 28.105, "lng": -80.620 },
+      "bbox": { "min_lat": 28.03, "max_lat": 28.18, "min_lng": -80.70, "max_lng": -80.55 },
+      "submarkets": ["Downtown Melbourne", "Eau Gallie Arts District", "West Melbourne Gateway"]
+    },
+    "PALM_BAY_SOUTH": {
+      "name": "PALM_BAY_SOUTH",
+      "center": { "lat": 28.000, "lng": -80.640 },
+      "bbox": { "min_lat": 27.90, "max_lat": 28.05, "min_lng": -80.75, "max_lng": -80.58 },
+      "submarkets": ["Palm Bay Center", "Malabar & South Babcock", "St. Johns Heritage Parkway"]
+    },
+    "BEACH_BARRIER": {
+      "name": "BEACH_BARRIER",
+      "center": { "lat": 28.140, "lng": -80.580 },
+      "bbox": { "min_lat": 28.04, "max_lat": 28.28, "min_lng": -80.62, "max_lng": -80.52 },
+      "submarkets": ["Indialantic & Indian Harbour", "Satellite Beach", "Patrick & South Beaches"]
+    },
+    "VIERA_SUNTREE": {
+      "name": "VIERA_SUNTREE",
+      "center": { "lat": 28.255, "lng": -80.690 },
+      "bbox": { "min_lat": 28.18, "max_lat": 28.36, "min_lng": -80.80, "max_lng": -80.58 },
+      "submarkets": ["Viera Town Center", "Suntree"]
+    },
+    "TITUSVILLE_NORTH": {
+      "name": "TITUSVILLE_NORTH",
+      "center": { "lat": 28.610, "lng": -80.800 },
+      "bbox": { "min_lat": 28.50, "max_lat": 28.70, "min_lng": -80.90, "max_lng": -80.70 },
+      "submarkets": ["Titusville Historic Core", "Mims & Space Coast Gateway"]
+    }
+  },
+  "submarkets": {
+    "Downtown Melbourne": {
+      "name": "Downtown Melbourne",
+      "division": "MELBOURNE_CORE",
+      "center": { "lat": 28.078, "lng": -80.608 },
+      "description": "Historic downtown along New Haven Ave with infill mixed-use and renovation permits."
+    },
+    "Eau Gallie Arts District": {
+      "name": "Eau Gallie Arts District",
+      "division": "MELBOURNE_CORE",
+      "center": { "lat": 28.128, "lng": -80.626 },
+      "description": "EGAD waterfront arts district with adaptive reuse and small-format retail licensing."
+    },
+    "West Melbourne Gateway": {
+      "name": "West Melbourne Gateway",
+      "division": "MELBOURNE_CORE",
+      "center": { "lat": 28.071, "lng": -80.660 },
+      "description": "West Melbourne retail/industrial edge and SR-192 corridor redevelopment."
+    },
+    "Palm Bay Center": {
+      "name": "Palm Bay Center",
+      "division": "PALM_BAY_SOUTH",
+      "center": { "lat": 28.034, "lng": -80.620 },
+      "description": "Palm Bay municipal center and Malabar Road corridor with steady renovation permitting."
+    },
+    "Malabar & South Babcock": {
+      "name": "Malabar & South Babcock",
+      "division": "PALM_BAY_SOUTH",
+      "center": { "lat": 27.990, "lng": -80.623 },
+      "description": "South Palm Bay neighborhoods around Malabar Road and Babcock Street."
+    },
+    "St. Johns Heritage Parkway": {
+      "name": "St. Johns Heritage Parkway",
+      "division": "PALM_BAY_SOUTH",
+      "center": { "lat": 27.965, "lng": -80.678 },
+      "description": "Exurban growth corridor west of I-95 with single-family subdivision activity."
+    },
+    "Indialantic & Indian Harbour": {
+      "name": "Indialantic & Indian Harbour",
+      "division": "BEACH_BARRIER",
+      "center": { "lat": 28.109, "lng": -80.577 },
+      "description": "Barrier-island beachfront communities with teardowns, additions, and hospitality licensing."
+    },
+    "Satellite Beach": {
+      "name": "Satellite Beach",
+      "division": "BEACH_BARRIER",
+      "center": { "lat": 28.176, "lng": -80.593 },
+      "description": "Mid-island coastal neighborhoods with renovations and small mixed-use infill."
+    },
+    "Patrick & South Beaches": {
+      "name": "Patrick & South Beaches",
+      "division": "BEACH_BARRIER",
+      "center": { "lat": 28.070, "lng": -80.565 },
+      "description": "South beaches and Patrick SFB edge; lower-volume, higher-value residential work."
+    },
+    "Viera Town Center": {
+      "name": "Viera Town Center",
+      "division": "VIERA_SUNTREE",
+      "center": { "lat": 28.243, "lng": -80.728 },
+      "description": "Planned town-center mixed-use and institutional buildout west of I-95."
+    },
+    "Suntree": {
+      "name": "Suntree",
+      "division": "VIERA_SUNTREE",
+      "center": { "lat": 28.210, "lng": -80.673 },
+      "description": "Established golf-course community with steady renovation permitting."
+    },
+    "Titusville Historic Core": {
+      "name": "Titusville Historic Core",
+      "division": "TITUSVILLE_NORTH",
+      "center": { "lat": 28.613, "lng": -80.807 },
+      "description": "US-1 riverfront historic core with adaptive reuse and small hospitality licensing."
+    },
+    "Mims & Space Coast Gateway": {
+      "name": "Mims & Space Coast Gateway",
+      "division": "TITUSVILLE_NORTH",
+      "center": { "lat": 28.650, "lng": -80.840 },
+      "description": "Northern gateway communities with industrial and logistics permitting along I-95."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "ISSUEDATE",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/melbourne.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
+
