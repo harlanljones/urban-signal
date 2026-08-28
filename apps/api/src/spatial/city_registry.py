@@ -408,6 +408,13 @@ from src.spatial.cities.amarillo import (
     AMARILLO_METRO_BBOX,
     AMARILLO_SUBMARKETS,
 )
+from src.spatial.cities.waco import (
+    WACO_CENTER,
+    WACO_DIVISION_BBOXES,
+    WACO_DIVISIONS,
+    WACO_METRO_BBOX,
+    WACO_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -484,6 +491,7 @@ class CityId(str, Enum):
     OMAHA = "omaha"
     TOLEDO = "toledo"
     AMARILLO = "amarillo"
+    WACO = "waco"
 
 
 class FeedType(str, Enum):
@@ -1043,6 +1051,10 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "amarillo": CityId.AMARILLO,
     "amarillo_tx": CityId.AMARILLO,
     "amarillo tx": CityId.AMARILLO,
+    # Waco, TX
+    "waco": CityId.WACO,
+    "waco_tx": CityId.WACO,
+    "waco tx": CityId.WACO,
 }
 
 
@@ -4894,6 +4906,23 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         job_suffix="amarillo",
         # US-270: initial registration with SNAP SLA (TX slice). City permits
         # via data.texas.gov not verifiable; do not register until public API exists.
+        datasets={
+            FeedType.SLA: snap_sla_spec("TX"),
+        },
+    ),
+    CityId.WACO: CityRegistration(
+        city_id=CityId.WACO,
+        name="Waco",
+        state="TX",
+        center=WACO_CENTER,
+        metro_bbox=WACO_METRO_BBOX,
+        division_bboxes=WACO_DIVISION_BBOXES,
+        submarkets=WACO_SUBMARKETS,
+        divisions=WACO_DIVISIONS,
+        job_suffix="waco",
+        # US-272: initial registration with SNAP SLA (TX slice). A verifiable
+        # public city permits feed via data.texas.gov was not found; register
+        # SNAP-only and expand when a municipal permits API is proven.
         datasets={
             FeedType.SLA: snap_sla_spec("TX"),
         },
