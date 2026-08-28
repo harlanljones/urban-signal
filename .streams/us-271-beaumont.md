@@ -19,11 +19,19 @@ Onboard Beaumont, TX as a new Urban Signal metro. Implement the leaf geometry an
 ## Decisions
 
 - 2026-08-28 — Initial claim created. Will verify public feeds (permits, county GIS) and proceed leaf-first.
+- 2026-08-28 — Feed verification:
+  - Beaumont ArcGIS services discovered:
+    - Cityworks Planning & Community Development MapServer: `https://gis.beaumonttexas.gov/arcgis/rest/services/Cityworks/PlanningAndComDev/MapServer?f=pjson` (no permits layer; addresses/zoning/streets only).
+    - CityWorks PLL service: `https://gis.beaumonttexas.gov/arcgis/rest/services/CityWorks_PLL/FeatureServer?f=pjson` (addresses, boundaries; no explicit permits layer exposed).
+    - Demo open cases: `https://gis.beaumonttexas.gov/arcgis/rest/services/CWDemoPM_OpenCases/MapServer/1?f=pjson` (parcel-join polygons, no issuance/created date column — unsuitable as an incremental permits feed).
+  - Texas Open Data (data.texas.gov): no city-specific Beaumont building-permits dataset located (collateral finds include Collin CAD permits and statewide tax permits; neither are Beaumont permits).
+  - 311 is SeeClickFix-based; no public Open311 or ArcGIS 311 layer found.
+  - Conclusion: no verifiable public building-permits feed at this time; register SNAP SLA (TX slice) only per US-364 precedent.
 
 ## Current step
 
-Create leaf module `apps/api/src/spatial/cities/beaumont.py` with metro bbox, one division bbox, and 4–5 submarkets. Add unit tests to assert containment and naming.
+Spine wired: `REGISTRY` + `ALIASES` + `METRO_META` updated and dashboard byte-synced.
 
 ## Next step
 
-Verify live permits endpoints. If unavailable, register only SNAP SLA (TX slice) in the spine, add aliases, add Beaumont to METRO_META, byte-sync `apps/dashboard/public/index.html`, and run `pytest -m interlock` from `apps/api`.*** End Patch***} >>>
+Run `pytest -m interlock` from `apps/api` (local deps permitting) and open PR with verification notes. Monitor CI interlock suite for containment and dashboard wiring.
