@@ -434,6 +434,7 @@ from src.spatial.cities.waco import (
     WACO_METRO_BBOX,
     WACO_SUBMARKETS,
 )
+<<<<<<< HEAD
 from src.spatial.cities.lake_charles import (
     LAKE_CHARLES_DIVISION_BBOXES,
     LAKE_CHARLES_DIVISIONS,
@@ -535,6 +536,14 @@ from src.spatial.cities.augusta import (
     AUGUSTA_DIVISIONS,
     AUGUSTA_METRO_BBOX,
     AUGUSTA_SUBMARKETS,
+=======
+from src.spatial.cities.lexington import (
+    LEXINGTON_CENTER,
+    LEXINGTON_DIVISION_BBOXES,
+    LEXINGTON_DIVISIONS,
+    LEXINGTON_METRO_BBOX,
+    LEXINGTON_SUBMARKETS,
+>>>>>>> 828194a (US-290: add CityId.LEXINGTON, aliases, and REGISTRY entry (SLA via KY ABC Fayette filter))
 )
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
@@ -617,6 +626,7 @@ class CityId(str, Enum):
     BEAUMONT = "beaumont"
     WACO = "waco"
 <<<<<<< HEAD
+<<<<<<< HEAD
     JACKSON_MS = "jackson_ms"
     MACON_BIBB = "macon_bibb"
     TYLER = "tyler"
@@ -634,6 +644,7 @@ class CityId(str, Enum):
     LAKELAND = "lakeland"
     AUGUSTA = "augusta"
     PORT_ST_LUCIE = "port_st_lucie"
+    LEXINGTON = "lexington"
 
 
 class FeedType(str, Enum):
@@ -1233,6 +1244,7 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "waco_tx": CityId.WACO,
     "waco tx": CityId.WACO,
 <<<<<<< HEAD
+<<<<<<< HEAD
     # Jackson, MS
     "jackson_ms": CityId.JACKSON_MS,
     "jackson-ms": CityId.JACKSON_MS,
@@ -1304,6 +1316,10 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "port st lucie": CityId.PORT_ST_LUCIE,
     "psl": CityId.PORT_ST_LUCIE,
     "port saint lucie": CityId.PORT_ST_LUCIE,
+    # Lexington, KY
+    "lexington": CityId.LEXINGTON,
+    "lexington_ky": CityId.LEXINGTON,
+    "lexington ky": CityId.LEXINGTON,
 }
 
 
@@ -5224,6 +5240,7 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         },
     ),
 <<<<<<< HEAD
+<<<<<<< HEAD
     CityId.LAKE_CHARLES: CityRegistration(
         city_id=CityId.LAKE_CHARLES,
         name="Lake Charles",
@@ -5384,6 +5401,36 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
             ),
             # US-364: USDA FNS SNAP retailers as the food-retail SLA slice (FL).
             FeedType.SLA: snap_sla_spec("FL"),
+        },
+    ),
+    CityId.LEXINGTON: CityRegistration(
+        city_id=CityId.LEXINGTON,
+        name="Lexington / Fayette County",
+        state="KY",
+        center=LEXINGTON_CENTER,
+        metro_bbox=LEXINGTON_METRO_BBOX,
+        division_bboxes=LEXINGTON_DIVISION_BBOXES,
+        submarkets=LEXINGTON_SUBMARKETS,
+        divisions=LEXINGTON_DIVISIONS,
+        job_suffix="lexington",
+        # US-290: prefer verified public feed — Kentucky ABC active licenses
+        # (ArcGIS) filtered to Fayette County. Permits/311 pending verification.
+        datasets={
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.arcgis_louisville_abc_url,
+                platform="arcgis",
+                watermark_col="IssueDate",
+                id_keys=["LicenseNumber", "ObjectId"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                
+                expected_cadence_days=7,
+                oid_field="ObjectId",
+                max_record_count=2000,
+                where="County = 'Fayette'",
+                field_map=LOUISVILLE_SLA_FIELD_MAP,
+            ),
         },
     ),
     CityId.TYLER: CityRegistration(
@@ -5562,6 +5609,36 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
             # US-364: USDA FNS SNAP retailers as the food-retail SLA slice (FL).
 >>>>>>> 717ce8a (US-289: Register CityId.port_st_lucie with REGISTRY + ALIASES; add settings.arcgis_port_st_lucie_permits_url; include SNAP SLA (FL))
             FeedType.SLA: snap_sla_spec("FL"),
+=======
+    CityId.LEXINGTON: CityRegistration(
+        city_id=CityId.LEXINGTON,
+        name="Lexington / Fayette County",
+        state="KY",
+        center=LEXINGTON_CENTER,
+        metro_bbox=LEXINGTON_METRO_BBOX,
+        division_bboxes=LEXINGTON_DIVISION_BBOXES,
+        submarkets=LEXINGTON_SUBMARKETS,
+        divisions=LEXINGTON_DIVISIONS,
+        job_suffix="lexington",
+        # US-290: prefer verified public feed — Kentucky ABC active licenses
+        # (ArcGIS) filtered to Fayette County. Permits/311 pending verification.
+        datasets={
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.arcgis_louisville_abc_url,
+                platform="arcgis",
+                watermark_col="IssueDate",
+                id_keys=["LicenseNumber", "ObjectId"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                
+                expected_cadence_days=7,
+                oid_field="ObjectId",
+                max_record_count=2000,
+                where="County = 'Fayette'",
+                field_map=LOUISVILLE_SLA_FIELD_MAP,
+            ),
+>>>>>>> 828194a (US-290: add CityId.LEXINGTON, aliases, and REGISTRY entry (SLA via KY ABC Fayette filter))
         },
     ),
 }
