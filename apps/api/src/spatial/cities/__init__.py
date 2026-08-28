@@ -28,6 +28,13 @@ from src.spatial.cities.columbus import (
     COLUMBUS_SUBMARKETS,
     is_in_columbus_metro,
 )
+from src.spatial.cities.columbus_ga import (
+    COLUMBUS_GA_DIVISION_BBOXES,
+    COLUMBUS_GA_DIVISIONS,
+    COLUMBUS_GA_METRO_BBOX,
+    COLUMBUS_GA_SUBMARKETS,
+    is_in_columbus_ga_metro,
+)
 from src.spatial.cities.nashville import (
     NASHVILLE_DIVISION_BBOXES,
     NASHVILLE_DIVISIONS,
@@ -729,6 +736,11 @@ __all__ = [
     "COLUMBUS_DIVISIONS",
     "COLUMBUS_SUBMARKETS",
     "is_in_columbus_metro",
+    "COLUMBUS_GA_METRO_BBOX",
+    "COLUMBUS_GA_DIVISION_BBOXES",
+    "COLUMBUS_GA_DIVISIONS",
+    "COLUMBUS_GA_SUBMARKETS",
+    "is_in_columbus_ga_metro",
     "NASHVILLE_METRO_BBOX",
     "NASHVILLE_DIVISION_BBOXES",
     "NASHVILLE_DIVISIONS",
