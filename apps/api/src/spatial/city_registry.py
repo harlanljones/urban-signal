@@ -5037,6 +5037,8 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
             FeedType.SLA: snap_sla_spec("LA"),
         },
     ),
+        },
+    ),
     CityId.JACKSON_MS: CityRegistration(
         city_id=CityId.JACKSON_MS,
         name="Jackson",
