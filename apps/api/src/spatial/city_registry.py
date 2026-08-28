@@ -401,6 +401,13 @@ from src.spatial.cities.toledo import (
     TOLEDO_METRO_BBOX,
     TOLEDO_SUBMARKETS,
 )
+from src.spatial.cities.amarillo import (
+    AMARILLO_CENTER,
+    AMARILLO_DIVISION_BBOXES,
+    AMARILLO_DIVISIONS,
+    AMARILLO_METRO_BBOX,
+    AMARILLO_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -476,6 +483,7 @@ class CityId(str, Enum):
     VIRGINIA_BEACH = "virginia_beach"
     OMAHA = "omaha"
     TOLEDO = "toledo"
+    AMARILLO = "amarillo"
 
 
 class FeedType(str, Enum):
@@ -1030,6 +1038,11 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "toledo_oh": CityId.TOLEDO,
     "toledo-oh": CityId.TOLEDO,
     "toledo oh": CityId.TOLEDO,
+
+    # Amarillo, TX
+    "amarillo": CityId.AMARILLO,
+    "amarillo_tx": CityId.AMARILLO,
+    "amarillo tx": CityId.AMARILLO,
 }
 
 
@@ -4867,6 +4880,22 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 field_map=TOLEDO_FIELD_MAP["311"],
             ),
             FeedType.SLA: snap_sla_spec("OH"),
+        },
+    ),
+    CityId.AMARILLO: CityRegistration(
+        city_id=CityId.AMARILLO,
+        name="Amarillo",
+        state="TX",
+        center=AMARILLO_CENTER,
+        metro_bbox=AMARILLO_METRO_BBOX,
+        division_bboxes=AMARILLO_DIVISION_BBOXES,
+        submarkets=AMARILLO_SUBMARKETS,
+        divisions=AMARILLO_DIVISIONS,
+        job_suffix="amarillo",
+        # US-270: initial registration with SNAP SLA (TX slice). City permits
+        # via data.texas.gov not verifiable; do not register until public API exists.
+        datasets={
+            FeedType.SLA: snap_sla_spec("TX"),
         },
     ),
 }

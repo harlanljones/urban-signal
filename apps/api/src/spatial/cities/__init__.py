@@ -434,6 +434,14 @@ from src.spatial.cities.toledo import (
     is_in_toledo_metro,
 )
 
+from src.spatial.cities.amarillo import (
+    AMARILLO_DIVISION_BBOXES,
+    AMARILLO_DIVISIONS,
+    AMARILLO_METRO_BBOX,
+    AMARILLO_SUBMARKETS,
+    is_in_amarillo_metro,
+)
+
 __all__ = [
     "PIERCE_METRO_BBOX",
     "PIERCE_DIVISION_BBOXES",
@@ -741,4 +749,9 @@ __all__ = [
     "TOLEDO_DIVISIONS",
     "TOLEDO_SUBMARKETS",
     "is_in_toledo_metro",
+    "AMARILLO_METRO_BBOX",
+    "AMARILLO_DIVISION_BBOXES",
+    "AMARILLO_DIVISIONS",
+    "AMARILLO_SUBMARKETS",
+    "is_in_amarillo_metro",
 ]
