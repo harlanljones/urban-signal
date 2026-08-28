@@ -1485,7 +1485,6 @@ def get_dashboard_html() -> str:
       amarillo: { name: 'Amarillo' },
       beaumont: { name: 'Beaumont' },
       waco: { name: 'Waco' },
-<<<<<<< HEAD
       jackson_ms: { name: 'Jackson' },
       macon_bibb: { name: 'Macon-Bibb County' },
       ocala: { name: 'Ocala / Marion County' },
@@ -1493,6 +1492,7 @@ def get_dashboard_html() -> str:
       lake_charles: { name: 'Lake Charles' },
       fort_smith: { name: 'Fort Smith, AR' },
       longview: { name: 'Longview' },
+      monroe: { name: 'Monroe' },
     };
 
     let map = null;
