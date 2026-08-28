@@ -459,6 +459,13 @@ from src.spatial.cities.fort_smith import (
     FORT_SMITH_METRO_BBOX,
     FORT_SMITH_SUBMARKETS,
 )
+from src.spatial.cities.longview import (
+    LONGVIEW_CENTER,
+    LONGVIEW_DIVISION_BBOXES,
+    LONGVIEW_DIVISIONS,
+    LONGVIEW_METRO_BBOX,
+    LONGVIEW_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -543,6 +550,7 @@ class CityId(str, Enum):
     TYLER = "tyler"
     LAKE_CHARLES = "lake_charles"
     FORT_SMITH = "fort_smith"
+    LONGVIEW = "longview"
 
 
 class FeedType(str, Enum):
@@ -1145,6 +1153,10 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "fort smith": CityId.FORT_SMITH,
     "fort_smith_ar": CityId.FORT_SMITH,
     "fort smith ar": CityId.FORT_SMITH,
+    # Longview, TX
+    "longview": CityId.LONGVIEW,
+    "longview_tx": CityId.LONGVIEW,
+    "longview tx": CityId.LONGVIEW,
 }
 
 
@@ -5130,6 +5142,23 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         job_suffix="tyler",
         # US-273: initial registration with SNAP SLA (TX slice). City permits
         # via data.texas.gov require verification; register when public API confirmed.
+        datasets={
+            FeedType.SLA: snap_sla_spec("TX"),
+        },
+    ),
+    CityId.LONGVIEW: CityRegistration(
+        city_id=CityId.LONGVIEW,
+        name="Longview",
+        state="TX",
+        center=LONGVIEW_CENTER,
+        metro_bbox=LONGVIEW_METRO_BBOX,
+        division_bboxes=LONGVIEW_DIVISION_BBOXES,
+        submarkets=LONGVIEW_SUBMARKETS,
+        divisions=LONGVIEW_DIVISIONS,
+        job_suffix="longview",
+        # US-276: initial registration with SNAP SLA (TX slice). No verifiable
+        # public city permits endpoint confirmed pre-commit; register SNAP-only
+        # and expand once a municipal permits API is proven.
         datasets={
             FeedType.SLA: snap_sla_spec("TX"),
         },

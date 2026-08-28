@@ -2653,6 +2653,28 @@
       ],
       "center": { "lat": 35.3859, "lng": -94.3985 },
       "evidence_path": "apps/api/src/spatial/cities/fort_smith.py"
+    },
+    {
+      "id": "longview",
+      "name": "Longview",
+      "state": "TX",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 7,
+      "feeds": [false, false, true, false],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": { "lat": 32.5007, "lng": -94.7405 },
+      "evidence_path": "apps/api/src/spatial/cities/longview.py"
     }
   ],
   "pipeline": [

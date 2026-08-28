@@ -490,6 +490,13 @@ from src.spatial.cities.fort_smith import (
     FORT_SMITH_SUBMARKETS,
     is_in_fort_smith_metro,
 )
+from src.spatial.cities.longview import (
+    LONGVIEW_DIVISION_BBOXES,
+    LONGVIEW_DIVISIONS,
+    LONGVIEW_METRO_BBOX,
+    LONGVIEW_SUBMARKETS,
+    is_in_longview_metro,
+)
 
 from src.spatial.cities.lake_charles import (
     LAKE_CHARLES_DIVISION_BBOXES,
@@ -850,4 +857,9 @@ __all__ = [
     "FORT_SMITH_DIVISIONS",
     "FORT_SMITH_SUBMARKETS",
     "is_in_fort_smith_metro",
+    "LONGVIEW_METRO_BBOX",
+    "LONGVIEW_DIVISION_BBOXES",
+    "LONGVIEW_DIVISIONS",
+    "LONGVIEW_SUBMARKETS",
+    "is_in_longview_metro",
 ]

@@ -1,0 +1,179 @@
+{
+  "schema_version": 2,
+  "id": "longview",
+  "name": "Longview",
+  "state": "TX",
+  "center": {
+    "lat": 32.5007,
+    "lng": -94.7405
+  },
+  "metro_bbox": {
+    "min_lat": 32.4,
+    "max_lat": 32.62,
+    "min_lng": -94.9,
+    "max_lng": -94.55
+  },
+  "divisions": {
+    "CENTRAL_CORE": {
+      "name": "CENTRAL_CORE",
+      "center": {
+        "lat": 32.505,
+        "lng": -94.735
+      },
+      "bbox": {
+        "min_lat": 32.48,
+        "max_lat": 32.53,
+        "min_lng": -94.76,
+        "max_lng": -94.7
+      },
+      "submarkets": [
+        "Downtown Longview"
+      ]
+    },
+    "WEST_SIDE": {
+      "name": "WEST_SIDE",
+      "center": {
+        "lat": 32.54,
+        "lng": -94.81
+      },
+      "bbox": {
+        "min_lat": 32.49,
+        "max_lat": 32.58,
+        "min_lng": -94.9,
+        "max_lng": -94.78
+      },
+      "submarkets": [
+        "Longview Mall & West Loop 281",
+        "White Oak & Gladewater Edge"
+      ]
+    },
+    "SOUTH_STRIPS": {
+      "name": "SOUTH_STRIPS",
+      "center": {
+        "lat": 32.455,
+        "lng": -94.73
+      },
+      "bbox": {
+        "min_lat": 32.4,
+        "max_lat": 32.49,
+        "min_lng": -94.85,
+        "max_lng": -94.68
+      },
+      "submarkets": [
+        "South Longview / Estes Pkwy"
+      ]
+    },
+    "EAST_BELT": {
+      "name": "EAST_BELT",
+      "center": {
+        "lat": 32.54,
+        "lng": -94.64
+      },
+      "bbox": {
+        "min_lat": 32.47,
+        "max_lat": 32.58,
+        "min_lng": -94.68,
+        "max_lng": -94.55
+      },
+      "submarkets": [
+        "Eastman Industrial Corridor",
+        "Hallsville Gateway"
+      ]
+    },
+    "NORTH_LOOP": {
+      "name": "NORTH_LOOP",
+      "center": {
+        "lat": 32.59,
+        "lng": -94.74
+      },
+      "bbox": {
+        "min_lat": 32.56,
+        "max_lat": 32.62,
+        "min_lng": -94.85,
+        "max_lng": -94.65
+      },
+      "submarkets": [
+        "Judson Road Corridor"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Longview": {
+      "name": "Downtown Longview",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 32.501,
+        "lng": -94.74
+      },
+      "description": "Civic and historic commercial core with adaptive reuse and hospitality infill."
+    },
+    "Longview Mall & West Loop 281": {
+      "name": "Longview Mall & West Loop 281",
+      "division": "WEST_SIDE",
+      "center": {
+        "lat": 32.536,
+        "lng": -94.787
+      },
+      "description": "Regional retail cluster and commercial corridors along W Loop 281."
+    },
+    "White Oak & Gladewater Edge": {
+      "name": "White Oak & Gladewater Edge",
+      "division": "WEST_SIDE",
+      "center": {
+        "lat": 32.555,
+        "lng": -94.86
+      },
+      "description": "Western edge trade area spanning White Oak and Gladewater approach."
+    },
+    "Eastman Industrial Corridor": {
+      "name": "Eastman Industrial Corridor",
+      "division": "EAST_BELT",
+      "center": {
+        "lat": 32.553,
+        "lng": -94.655
+      },
+      "description": "Industrial belt and logistics support east of the core near Eastman facilities."
+    },
+    "Hallsville Gateway": {
+      "name": "Hallsville Gateway",
+      "division": "EAST_BELT",
+      "center": {
+        "lat": 32.505,
+        "lng": -94.575
+      },
+      "description": "Eastern approach toward Hallsville with highway-oriented services and emerging nodes."
+    },
+    "South Longview / Estes Pkwy": {
+      "name": "South Longview / Estes Pkwy",
+      "division": "SOUTH_STRIPS",
+      "center": {
+        "lat": 32.45,
+        "lng": -94.716
+      },
+      "description": "Southern growth belt and logistics along Estes Parkway and I-20 access."
+    },
+    "Judson Road Corridor": {
+      "name": "Judson Road Corridor",
+      "division": "NORTH_LOOP",
+      "center": {
+        "lat": 32.563,
+        "lng": -94.743
+      },
+      "description": "North arc commercial spine and employment clusters along Judson Road and Loop 281."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/longview.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
+
