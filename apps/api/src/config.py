@@ -1088,6 +1088,11 @@ class Settings(BaseSettings):
         default="https://data.cityoforlando.net/resource/ssrj-rbua.json",
         description="Orlando Short Term Rental Licenses Socrata endpoint (SLA companion)",
     )
+    # Gainesville, FL (Socrata): native-point permits with latitude/longitude and location_1.
+    socrata_gainesville_permits_endpoint: str = Field(
+        default="https://data.cityofgainesville.org/resource/p798-x3nx.json",
+        description="Gainesville building permits Socrata endpoint",
+    )
 
     # Miami-Dade County (US-199): ArcGIS Hub permits table + LBT SLA snapshot
     # + PaGis last-sale points. No 311. Companions are metadata-only.

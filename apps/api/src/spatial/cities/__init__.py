@@ -609,6 +609,13 @@ from src.spatial.cities.wilmington_nc import (
     WILMINGTON_NC_SUBMARKETS,
     is_in_wilmington_nc_metro,
 )
+from src.spatial.cities.gainesville import (
+    GAINESVILLE_DIVISION_BBOXES,
+    GAINESVILLE_DIVISIONS,
+    GAINESVILLE_METRO_BBOX,
+    GAINESVILLE_SUBMARKETS,
+    is_in_gainesville_metro,
+)
 
 __all__ = [
     "PIERCE_METRO_BBOX",
@@ -1037,4 +1044,9 @@ __all__ = [
     "WILMINGTON_NC_DIVISIONS",
     "WILMINGTON_NC_SUBMARKETS",
     "is_in_wilmington_nc_metro",
+    "GAINESVILLE_METRO_BBOX",
+    "GAINESVILLE_DIVISION_BBOXES",
+    "GAINESVILLE_DIVISIONS",
+    "GAINESVILLE_SUBMARKETS",
+    "is_in_gainesville_metro",
 ]

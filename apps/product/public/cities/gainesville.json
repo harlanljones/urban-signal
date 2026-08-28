@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "id": "gainesville",
+  "name": "Gainesville",
+  "state": "FL",
+  "center": { "lat": 29.6516, "lng": -82.3248 },
+  "metro_bbox": {
+    "min_lat": 29.55,
+    "max_lat": 29.75,
+    "min_lng": -82.5,
+    "max_lng": -82.2
+  },
+  "divisions": {
+    "DOWNTOWN_UF": {
+      "name": "DOWNTOWN_UF",
+      "center": { "lat": 29.65, "lng": -82.335 },
+      "bbox": { "min_lat": 29.63, "max_lat": 29.67, "min_lng": -82.36, "max_lng": -82.3 },
+      "submarkets": ["Downtown Gainesville", "Midtown", "Innovation District"]
+    },
+    "NORTHWEST": {
+      "name": "NORTHWEST",
+      "center": { "lat": 29.69, "lng": -82.38 },
+      "bbox": { "min_lat": 29.65, "max_lat": 29.75, "min_lng": -82.44, "max_lng": -82.32 },
+      "submarkets": ["Millhopper / Thornebrook", "Oaks Mall / Newberry Rd"]
+    },
+    "NORTHEAST": {
+      "name": "NORTHEAST",
+      "center": { "lat": 29.69, "lng": -82.285 },
+      "bbox": { "min_lat": 29.645, "max_lat": 29.75, "min_lng": -82.32, "max_lng": -82.22 },
+      "submarkets": ["East Gainesville", "GNV Airport Area"]
+    },
+    "SOUTHWEST_SOUTHEAST": {
+      "name": "SOUTHWEST_SOUTHEAST",
+      "center": { "lat": 29.615, "lng": -82.405 },
+      "bbox": { "min_lat": 29.55, "max_lat": 29.66, "min_lng": -82.5, "max_lng": -82.28 },
+      "submarkets": ["Butler Plaza / Archer Rd", "Haile Plantation"]
+    }
+  },
+  "submarkets": {
+    "Downtown Gainesville": {
+      "name": "Downtown Gainesville",
+      "division": "DOWNTOWN_UF",
+      "center": { "lat": 29.6516, "lng": -82.3248 },
+      "description": "Historic downtown core centered on University Ave and Main St with adaptive reuse."
+    },
+    "Midtown": {
+      "name": "Midtown",
+      "division": "DOWNTOWN_UF",
+      "center": { "lat": 29.653, "lng": -82.338 },
+      "description": "University-adjacent district at NW 13th St and University Ave with mixed-use infill."
+    },
+    "Innovation District": {
+      "name": "Innovation District",
+      "division": "DOWNTOWN_UF",
+      "center": { "lat": 29.65, "lng": -82.33 },
+      "description": "UF-adjacent startup cluster and research space between downtown and campus."
+    },
+    "Millhopper / Thornebrook": {
+      "name": "Millhopper / Thornebrook",
+      "division": "NORTHWEST",
+      "center": { "lat": 29.688, "lng": -82.379 },
+      "description": "Northwest neighborhood retail and residential near Millhopper Road and 43rd St."
+    },
+    "Oaks Mall / Newberry Rd": {
+      "name": "Oaks Mall / Newberry Rd",
+      "division": "NORTHWEST",
+      "center": { "lat": 29.653, "lng": -82.413 },
+      "description": "Regional retail corridor around Oaks Mall and Newberry Road."
+    },
+    "East Gainesville": {
+      "name": "East Gainesville",
+      "division": "NORTHEAST",
+      "center": { "lat": 29.651, "lng": -82.285 },
+      "description": "Residential east side with corridor reinvestment along Hawthorne Rd."
+    },
+    "GNV Airport Area": {
+      "name": "GNV Airport Area",
+      "division": "NORTHEAST",
+      "center": { "lat": 29.691, "lng": -82.275 },
+      "description": "Industrial and logistics near Gainesville Regional Airport."
+    },
+    "Butler Plaza / Archer Rd": {
+      "name": "Butler Plaza / Archer Rd",
+      "division": "SOUTHWEST_SOUTHEAST",
+      "center": { "lat": 29.622, "lng": -82.384 },
+      "description": "Southwest retail and multifamily corridor along Archer Road."
+    },
+    "Haile Plantation": {
+      "name": "Haile Plantation",
+      "division": "SOUTHWEST_SOUTHEAST",
+      "center": { "lat": 29.611, "lng": -82.449 },
+      "description": "Master-planned community southwest of I-75 with residential reinvestment."
+    }
+  }
+}
+

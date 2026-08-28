@@ -1474,6 +1474,7 @@ def get_dashboard_html() -> str:
       fort_worth: { name: 'Fort Worth / Tarrant County' },
       honolulu: { name: 'Honolulu / City and County of Honolulu' },
       orlando: { name: 'Orlando / Orange County' },
+      gainesville: { name: 'Gainesville' },
       miami_dade: { name: 'Miami-Dade County' },
       memphis: { name: 'Memphis / Shelby County' },
       phoenix: { name: 'Phoenix / Maricopa County' },
@@ -1487,10 +1488,6 @@ def get_dashboard_html() -> str:
       amarillo: { name: 'Amarillo' },
       beaumont: { name: 'Beaumont' },
       waco: { name: 'Waco' },
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
       jackson_ms: { name: 'Jackson' },
       macon_bibb: { name: 'Macon-Bibb County' },
       ocala: { name: 'Ocala / Marion County' },
