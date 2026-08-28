@@ -242,8 +242,8 @@
     "311": null,
     "sla": {
       "platform": "socrata",
-      "watermark_col": "date_received",
-      "interval_seconds": 600.0,
+      "watermark_col": "",
+      "interval_seconds": 21600.0,
       "topic": "raw.municipal.sla"
     },
     "deeds": null

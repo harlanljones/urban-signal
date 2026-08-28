@@ -56,6 +56,8 @@ class Settings(BaseSettings):
     # original feeds. Registered by their own tickets (US-71/81/92/93); an
     # unregistered member simply has no jobs and no topics until then.
     topic_crime: str = Field(default="raw.municipal.crime", description="Crime incident records topic")
+    topic_violations: str = Field(default="raw.municipal.violations", description="Building/property code-enforcement violations topic (US-209)")
+    topic_inspections: str = Field(default="raw.municipal.inspections", description="Food-establishment inspection/licensing outcomes topic (US-209)")
     topic_street_cut: str = Field(default="raw.municipal.street_cut", description="Street-cut/utility permit records topic")
     topic_evictions: str = Field(default="raw.municipal.evictions", description="Eviction filings/executions topic")
     topic_str: str = Field(default="raw.municipal.str", description="Short-term rental registrations topic")
@@ -180,6 +182,70 @@ class Settings(BaseSettings):
             "PARCEL_SALES3YR_AREA_287/FeatureServer/0"
         ),
         description="King County Parcel Sales Last 3 Years ArcGIS FeatureServer layer URL",
+    )
+
+    # Savannah / Chatham County (ArcGIS Server, SAGIS)
+    arcgis_savannah_permits_endpoint: str = Field(
+        default=(
+            "https://pub.sagis.org/arcgis/rest/services/Savannah/"
+            "BuildingPermit_FC/FeatureServer/1"
+        ),
+        description="Savannah Residential Building Permits FeatureServer layer URL",
+    )
+    arcgis_savannah_permits_commercial_endpoint: str = Field(
+        default=(
+            "https://pub.sagis.org/arcgis/rest/services/Savannah/"
+            "BuildingPermit_FC/FeatureServer/0"
+        ),
+        description="Savannah Commercial Building Permits FeatureServer layer URL",
+    )
+
+    # Bowling Green / Warren County (city ArcGIS Server)
+    arcgis_bowling_green_permits_endpoint: str = Field(
+        default=(
+            "https://webgis.bgky.org/server/rest/services/CCPC/"
+            "CCPC_Building_Permits_2010/FeatureServer/5"
+        ),
+        description="Bowling Green CCPC Building Permits FeatureServer layer URL",
+    )
+
+    # Tallahassee / Leon County (joint City/County ArcGIS Server)
+    arcgis_tallahassee_permits_endpoint: str = Field(
+        default=(
+            "https://intervector.leoncountyfl.gov/intervector/rest/services/"
+            "MapServices/TLC_OverlayPermitsActive_D_WM/MapServer/0"
+        ),
+        description="Tallahassee TLC Active Permits MapServer layer URL",
+    )
+    arcgis_tallahassee_311_endpoint: str = Field(
+        default=(
+            "https://intervector.leoncountyfl.gov/intervector/rest/services/"
+            "MapServices/LCPW_InforServiceRequest_D_WM/MapServer/1"
+        ),
+        description="Tallahassee Infor Service Requests MapServer layer URL",
+    )
+    arcgis_tallahassee_deeds_endpoint: str = Field(
+        default=(
+            "https://intervector.leoncountyfl.gov/intervector/rest/services/"
+            "MapServices/LCPA_Last3YearsSales_D_WM/MapServer/0"
+        ),
+        description="Tallahassee LCPA Last 3 Years Sales MapServer layer URL",
+    )
+
+    # Spartanburg County (on-prem ArcGIS Server)
+    arcgis_spartanburg_permits_url: str = Field(
+        default=(
+            "https://maps.spartanburgcounty.org/server/rest/services/"
+            "EnerGov/EnerGov_Spatial_Collections/FeatureServer/5"
+        ),
+        description="Spartanburg EnerGov Permits FeatureServer layer URL",
+    )
+    arcgis_spartanburg_sla_url: str = Field(
+        default=(
+            "https://maps.spartanburgcounty.org/server/rest/services/"
+            "EnerGov/EnerGov_Spatial_Collections/FeatureServer/5"
+        ),
+        description="Spartanburg EnerGov Business Licenses FeatureServer layer URL",
     )
 
     # Los Angeles (Socrata)
@@ -472,6 +538,32 @@ class Settings(BaseSettings):
         default="https://data.texas.gov/resource/7hf9-qc9f.json",
         description="Austin/TABC liquor license SLA endpoint (US-136)",
     )
+    # US-372 state license registries. The $select composes a namespaced
+    # license_type (license_type_ns) so the several registries sharing
+    # topic_sla stay distinguishable downstream; httpx merges the client's
+    # pagination params with the URL's $select (leaf-verified through
+    # SocrataClient.paginate — see field_maps_state_licenses.py).
+    socrata_tabc_active_endpoint: str = Field(
+        default=(
+            "https://data.texas.gov/resource/7hf9-qc9f.json"
+            "?$select=*, 'tabc:' || license_type as license_type_ns"
+        ),
+        description="TABC active liquor licenses, namespaced license_type (US-372)",
+    )
+    socrata_co_liquor_endpoint: str = Field(
+        default=(
+            "https://data.colorado.gov/resource/ier5-5ms2.json"
+            "?$select=*, 'co_liquor:' || license_type as license_type_ns"
+        ),
+        description="CO liquor licenses (geocoded points), namespaced license_type (US-372)",
+    )
+    socrata_or_ccb_endpoint: str = Field(
+        default=(
+            "https://data.oregon.gov/resource/g77e-6bhs.json"
+            "?$select=*, 'or_ccb:' || license_type as license_type_ns"
+        ),
+        description="OR CCB active contractor licenses, namespaced license_type (US-372)",
+    )
     # US-71: APD NIBRS Group A Offenses (Socrata `thrk-bqb6`). Rows carry no
     # lat/lng — only zip_code + census_block_group — so coordinates resolve from
     # the zip_code context via the ADR-0004 geocoder at parse time.
@@ -559,6 +651,18 @@ class Settings(BaseSettings):
     ckan_boston_property_assessment_endpoint: str = Field(
         default="ckan://data.boston.gov/e02c44d2-3c64-459c-8fe2-e1ce5f38a035",
         description="Boston Property Assessment FY2026 CKAN resource (DEEDS proxy; snapshot)",
+    )
+    # US-209: Boston Building & Property Violations (ISD code enforcement). Direct
+    # lat/long columns; status_dttm watermark; case_no id.
+    ckan_boston_violations_endpoint: str = Field(
+        default="ckan://data.boston.gov/705244a6-70a6-4ff8-ab8e-56441aff18e7",
+        description="Boston Building and Property Violations CKAN resource (US-209)",
+    )
+    # US-209: Boston Food Establishment Inspections. `location` is a "(lat, lng)"
+    # string tuple; licenseno id; resultdttm / status_date watermark.
+    ckan_boston_inspections_endpoint: str = Field(
+        default="ckan://data.boston.gov/03693648-2c62-4a2c-a4ec-48de2ee14e18",
+        description="Boston Food Establishment Inspections CKAN resource (US-209)",
     )
 
     # Baton Rouge / East Baton Rouge Parish (Socrata).

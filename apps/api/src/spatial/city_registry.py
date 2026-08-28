@@ -37,6 +37,15 @@ from src.producers.field_maps_lynchburg import FIELD_MAP as LYNCHBURG_FIELD_MAP
 from src.producers.field_maps_greenville import FIELD_MAP as GREENVILLE_FIELD_MAP
 from src.producers.field_maps_anchorage import DEEDS_FIELD_MAP as ANCHORAGE_DEEDS_FIELD_MAP
 from src.producers.field_maps_tucson import SLA_FIELD_MAP as TUCSON_SLA_FIELD_MAP
+from src.producers.field_maps_savannah import FIELD_MAP as SAVANNAH_FIELD_MAP
+from src.producers.field_maps_bowling_green import FIELD_MAP as BOWLING_GREEN_FIELD_MAP
+from src.producers.field_maps_tallahassee import FIELD_MAP as TALLAHASSEE_FIELD_MAP
+from src.producers.field_maps_spartanburg import FIELD_MAP as SPARTANBURG_FIELD_MAP
+from src.producers.field_maps_state_licenses import (
+    CO_LIQUOR_FIELD_MAP,
+    OR_CCB_FIELD_MAP,
+    TABC_ACTIVE_FIELD_MAP,
+)
 from src.producers.field_maps_boston_licensing import FIELD_MAP as BOSTON_LICENSING_FIELD_MAP
 from src.producers.field_maps_counters import (
     NYC_COUNTS_FIELD_MAP,
@@ -365,6 +374,30 @@ from src.spatial.cities.orlando import (
     ORLANDO_DIVISIONS,
     ORLANDO_METRO_BBOX,
     ORLANDO_SUBMARKETS,
+)
+from src.spatial.cities.savannah import (
+    SAVANNAH_DIVISION_BBOXES,
+    SAVANNAH_DIVISIONS,
+    SAVANNAH_METRO_BBOX,
+    SAVANNAH_SUBMARKETS,
+)
+from src.spatial.cities.bowling_green import (
+    BOWLING_GREEN_DIVISION_BBOXES,
+    BOWLING_GREEN_DIVISIONS,
+    BOWLING_GREEN_METRO_BBOX,
+    BOWLING_GREEN_SUBMARKETS,
+)
+from src.spatial.cities.tallahassee import (
+    TALLAHASSEE_DIVISION_BBOXES,
+    TALLAHASSEE_DIVISIONS,
+    TALLAHASSEE_METRO_BBOX,
+    TALLAHASSEE_SUBMARKETS,
+)
+from src.spatial.cities.spartanburg import (
+    SPARTANBURG_DIVISION_BBOXES,
+    SPARTANBURG_DIVISIONS,
+    SPARTANBURG_METRO_BBOX,
+    SPARTANBURG_SUBMARKETS,
 )
 from src.spatial.cities.gainesville import (
     GAINESVILLE_DIVISION_BBOXES,
@@ -745,6 +778,10 @@ class CityId(str, Enum):
     GREENVILLE = "greenville"
     ANCHORAGE = "anchorage"
     TUCSON = "tucson"
+    SAVANNAH = "savannah"
+    BOWLING_GREEN = "bowling_green"
+    TALLAHASSEE = "tallahassee"
+    SPARTANBURG = "spartanburg"
     ABILENE = "abilene"
     ALEXANDRIA = "alexandria"
     ASHEVILLE = "asheville"
@@ -775,6 +812,8 @@ class FeedType(str, Enum):
     # family gate, and each signal carries its own ablation requirement
     # before it may enter LIMS.
     CRIME = "crime"
+    VIOLATIONS = "violations"
+    INSPECTIONS = "inspections"
     STREET_CUT = "street_cut"
     EVICTIONS = "evictions"
     STR = "str"
@@ -1424,6 +1463,36 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "tucson-az": CityId.TUCSON,
     "tucson az": CityId.TUCSON,
     "tuscon": CityId.TUCSON,
+    # Savannah / Chatham County, GA
+    "savannah": CityId.SAVANNAH,
+    "savannah_ga": CityId.SAVANNAH,
+    "savannah ga": CityId.SAVANNAH,
+    "sav": CityId.SAVANNAH,
+    "chatham_county_ga": CityId.SAVANNAH,
+    "chatham county ga": CityId.SAVANNAH,
+    # Bowling Green / Warren County, KY
+    "bowling_green": CityId.BOWLING_GREEN,
+    "bowling green": CityId.BOWLING_GREEN,
+    "bowling_green_ky": CityId.BOWLING_GREEN,
+    "bowling green ky": CityId.BOWLING_GREEN,
+    "bowling-green": CityId.BOWLING_GREEN,
+    "bgky": CityId.BOWLING_GREEN,
+    "warren_county_ky": CityId.BOWLING_GREEN,
+    "warren county ky": CityId.BOWLING_GREEN,
+    # Tallahassee / Leon County, FL
+    "tallahassee": CityId.TALLAHASSEE,
+    "tallahassee_fl": CityId.TALLAHASSEE,
+    "tallahassee fl": CityId.TALLAHASSEE,
+    "leon_county_fl": CityId.TALLAHASSEE,
+    "leon county fl": CityId.TALLAHASSEE,
+    "tlh": CityId.TALLAHASSEE,
+    # Spartanburg, SC
+    "spartanburg": CityId.SPARTANBURG,
+    "spartanburg_sc": CityId.SPARTANBURG,
+    "spartanburg-sc": CityId.SPARTANBURG,
+    "spartanburg sc": CityId.SPARTANBURG,
+    "spartanburg county": CityId.SPARTANBURG,
+    "spartanburg_county_sc": CityId.SPARTANBURG,
     "abilene": CityId.ABILENE,
     "abilene_tx": CityId.ABILENE,
     "abilene tx": CityId.ABILENE,
@@ -2486,22 +2555,27 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
             # `7hf9-qc9f` "TABC License Information"). Address-only — no lat/lng
             # columns — so needs_geocode flips the coordinate requirement and the
             # ADR 0004 geocoder resolves coordinates at parse time.
-            # watermark = current_issued_date, the published issuance cursor
-            # for this slowly-churning license file.
+            # US-372 migration: namespaced endpoint + shared TABC map so all
+            # four TX slices carry `tabc:`-prefixed license_type values, and
+            # watermark current_issued_date -> status_change_date (fresher
+            # cursor: captures renewals/status mutations; leaf-verified max
+            # 2026-08-26 vs current_issued_date max 2026-08-25).
             FeedType.SLA: DatasetSpec(
-                endpoint=settings.socrata_austin_tabc_endpoint,
+                endpoint=settings.socrata_tabc_active_endpoint,
                 platform="socrata",
-                watermark_col="current_issued_date",
+                watermark_col="status_change_date",
                 id_keys=["license_id", "master_file_id"],
                 topic=settings.topic_sla,
-                interval_seconds=600.0,
+                interval_seconds=3600.0,
                 producer_key="sla",
-                
-                expected_cadence_days=7,
+
+                expected_cadence_days=1,
+                ingestion_mode="incremental",
                 needs_geocode=True,
                 geocode_context='TX',
                 where="county = 'Travis'",
-                field_map={'license_id': ['license_id'], 'license_type': ['license_type'], 'effective_date': ['current_issued_date'], 'expiration_date': ['expiration_date'], 'premises_name': ['owner'], 'dba': ['trade_name'], 'address_street': ['address'], 'status': ['license_status']},
+                order_by="status_change_date DESC",
+                field_map=TABC_ACTIVE_FIELD_MAP,
             ),
             # US-265 note: Austin NIBRS crime (thrk-bqb6) is NOT registered — the
             # feed publishes no lat/lng and no street address (zip_code only),
@@ -2686,6 +2760,63 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 needs_geocode=False,
                 expected_cadence_days=7,
             ),
+            # US-209: Boston Building & Property Violations (CKAN 705244a6-...).
+            # Direct lat/long columns; status_dttm watermark; case_no id.
+            # ISD code-enforcement — a new signal family (US-72) subject to
+            # ablation rule before any LIMS use.
+            FeedType.VIOLATIONS: DatasetSpec(
+                endpoint=settings.ckan_boston_violations_endpoint,
+                platform="ckan",
+                watermark_col="status_dttm",
+                id_keys=["case_no", "_id"],
+                topic="raw.municipal.violations",
+                interval_seconds=600.0,
+                producer_key="violations",
+                field_map={
+                    "violation_id": ["case_no"],
+                    "code": ["code"],
+                    "status": ["status"],
+                    "description": ["description", "value"],
+                    "borough": ["ward"],
+                    "address": ["violation_stno", "violation_street", "violation_city", "violation_state"],
+                    "zipcode": ["violation_zip"],
+                    "latitude": ["latitude"],
+                    "longitude": ["longitude"],
+                    "status_date": ["status_dttm"],
+                },
+                needs_geocode=False,
+                expected_cadence_days=7,
+            ),
+            # US-209: Boston Food Establishment Inspections (CKAN 03693648-...).
+            # `location` is a "(lat, lng)" string tuple parsed by the producer.
+            # licenseno id; status_date / resultdttm watermark.
+            FeedType.INSPECTIONS: DatasetSpec(
+                endpoint=settings.ckan_boston_inspections_endpoint,
+                platform="ckan",
+                watermark_col="status_date",
+                id_keys=["licenseno", "_id"],
+                topic="raw.municipal.inspections",
+                interval_seconds=600.0,
+                producer_key="inspections",
+                field_map={
+                    "inspection_id": ["licenseno", "property_id"],
+                    "business_name": ["businessname", "dbaname"],
+                    "license_category": ["licensecat"],
+                    "license_status": ["licstatus"],
+                    "result": ["result"],
+                    "violation_level": ["viol_level"],
+                    "violation_desc": ["violdesc"],
+                    "borough": ["city"],
+                    "address": ["address", "zip"],
+                    "zipcode": ["zip"],
+                    "latitude": ["location"],
+                    "longitude": ["location"],
+                    "issued_date": ["issdttm"],
+                    "result_date": ["resultdttm", "status_date"],
+                },
+                needs_geocode=False,
+                expected_cadence_days=7,
+            ),
         },
     ),
     CityId.MONTGOMERY: CityRegistration(
@@ -2854,10 +2985,26 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 max_record_count=2000,
                 field_map={'latitude': ['Latitude'], 'longitude': ['Longitude'], 'incident_id': ['OBJECTID'], 'complaint_type': ['Type', 'Topic', 'Case_Summary'], 'created_date': ['Case_Created_dttm'], 'closed_date': ['Case_Closed_dttm'], 'status': ['Case_Status'], 'incident_address': ['Incident_Address_1'], 'zipcode': ['Incident_Zip_Code', 'Customer_Zip_Code'], 'borough': ['Neighborhood']},
             ),
-            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
-            # The US-73 licenses descope stands for Denver's own business-
-            # license source; this registration is the national FNS feed.
-            FeedType.SLA: snap_sla_spec("CO"),
+            # US-372: CO liquor licenses (state full registry, geocoded points
+            # in `location`) replaces the SNAP retailer stand-in as Denver's
+            # SLA slice. Snapshot mode: `expiration` is expiry-style, not an
+            # arrival cursor — freshness rides Socrata rowsUpdatedAt (KC SLA
+            # precedent, US-134). The US-73 licenses descope stands for
+            # Denver's own business-license source.
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.socrata_co_liquor_endpoint,
+                platform="socrata",
+                watermark_col="",
+                id_keys=["license_number", "licensee_name"],
+                topic=settings.topic_sla,
+                interval_seconds=21600.0,
+                producer_key="sla",
+                expected_cadence_days=31,
+                ingestion_mode="snapshot",
+                where="city = 'Denver'",
+                needs_geocode=False,
+                field_map=CO_LIQUOR_FIELD_MAP,
+            ),
         },
     ),
     CityId.MINNEAPOLIS: CityRegistration(
@@ -3887,10 +4034,26 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 max_record_count=2000,
                 field_map={'incident_id': ['CASE_NUMBER'], 'latitude': ['LATITUDE'], 'longitude': ['LONGITUDE'], 'complaint_type': ['CASE_TYPE'], 'created_date': ['CREATED_ON'], 'closed_date': ['CLOSED_ON'], 'status': ['STATUS'], 'incident_address': ['ADDRESS', 'STREET'], 'zipcode': ['ZIP'], 'borough': ['SUPERNEIGHBORHOOD', 'COUNCIL_DISTRICT']},
             ),
-            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
-            # State-level filter (v1 coarseness): rows outside the metro bbox
-            # still carry global H3 tags; metro scoping stays downstream.
-            FeedType.SLA: snap_sla_spec("TX"),
+            # US-372: TABC active licenses, Harris County slice, replaces the
+            # SNAP retailer stand-in. Address-only rows geocode through the
+            # ADR-0004 replay geocoder; classify on primary_status (license_
+            # status compounds "Active - Renewal Pending").
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.socrata_tabc_active_endpoint,
+                platform="socrata",
+                watermark_col="status_change_date",
+                id_keys=["license_id", "master_file_id"],
+                topic=settings.topic_sla,
+                interval_seconds=3600.0,
+                producer_key="sla",
+                expected_cadence_days=1,
+                ingestion_mode="incremental",
+                where="county = 'Harris'",
+                needs_geocode=True,
+                geocode_context="TX",
+                order_by="status_change_date DESC",
+                field_map=TABC_ACTIVE_FIELD_MAP,
+            ),
         },
     ),
     CityId.WICHITA: CityRegistration(
@@ -4213,10 +4376,24 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 max_record_count=2000,
                 field_map={'incident_id': ['ServiceRequestNumber', 'SRNumber', 'REQUEST_ID', 'OBJECTID'], 'created_date': ['OpenedDateTime'], 'closed_date': ['ClosedDateTime', 'ClosedDate'], 'status': ['Status', 'STATUS'], 'complaint_type': ['ServiceName', 'RequestType', 'Type'], 'incident_address': ['Address', 'StreetAddress'], 'borough': ['CouncilDistrict', 'Neighborhood'], 'zipcode': ['ZipCode', 'ZIP']},
             ),
-            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
-            # State-level filter (v1 coarseness): rows outside the metro bbox
-            # still carry global H3 tags; metro scoping stays downstream.
-            FeedType.SLA: snap_sla_spec("TX"),
+            # US-372: TABC active licenses, Bexar County slice, replaces the
+            # SNAP retailer stand-in (same contract as the Houston slice).
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.socrata_tabc_active_endpoint,
+                platform="socrata",
+                watermark_col="status_change_date",
+                id_keys=["license_id", "master_file_id"],
+                topic=settings.topic_sla,
+                interval_seconds=3600.0,
+                producer_key="sla",
+                expected_cadence_days=1,
+                ingestion_mode="incremental",
+                where="county = 'Bexar'",
+                needs_geocode=True,
+                geocode_context="TX",
+                order_by="status_change_date DESC",
+                field_map=TABC_ACTIVE_FIELD_MAP,
+            ),
         },
     ),
     CityId.SACRAMENTO: CityRegistration(
@@ -4584,10 +4761,24 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
             # publishes no lat/lng and no street-address column, so it cannot be
             # geocoded by ADR-0004. Deferred pending a coordinate- or
             # address-bearing Dallas crime resource.
-            # US-364: USDA FNS SNAP retailers as the food-retail SLA slice.
-            # State-level filter (v1 coarseness): rows outside the metro bbox
-            # still carry global H3 tags; metro scoping stays downstream.
-            FeedType.SLA: snap_sla_spec("TX"),
+            # US-372: TABC active licenses, Dallas County slice, replaces the
+            # SNAP retailer stand-in (same contract as the Houston slice).
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.socrata_tabc_active_endpoint,
+                platform="socrata",
+                watermark_col="status_change_date",
+                id_keys=["license_id", "master_file_id"],
+                topic=settings.topic_sla,
+                interval_seconds=3600.0,
+                producer_key="sla",
+                expected_cadence_days=1,
+                ingestion_mode="incremental",
+                where="county = 'Dallas'",
+                needs_geocode=True,
+                geocode_context="TX",
+                order_by="status_change_date DESC",
+                field_map=TABC_ACTIVE_FIELD_MAP,
+            ),
         },
     ),
     CityId.LOUISVILLE: CityRegistration(
@@ -4703,17 +4894,28 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 order_by='ISSUEDATE DESC',
                 field_map=PORTLAND_PERMITS_FIELD_MAP,
             ),
+            # US-372: OR CCB active contractor licenses replaces the OLCC
+            # applications feed as Portland's SLA slice (dispatch decision
+            # 2026-08-28: ADR 0007 one-endpoint-per-feedtype; a second
+            # feed-type route was rejected as new machinery). Snapshot mode:
+            # orig_regis_date is MM/DD/YYYY text with no server-side date
+            # conversion — a text watermark would false-alarm the probe
+            # lexicographically (KC SLA precedent, US-134); freshness rides
+            # Socrata rowsUpdatedAt.
             FeedType.SLA: DatasetSpec(
-                endpoint=settings.socrata_portland_olcc_applications_endpoint,
+                endpoint=settings.socrata_or_ccb_endpoint,
                 platform="socrata",
-                watermark_col="date_received",
-                id_keys=["trade_name", "address"],
+                watermark_col="",
+                id_keys=["license_number", "related_key"],
                 topic=settings.topic_sla,
-                interval_seconds=600.0,
+                interval_seconds=21600.0,
                 producer_key="sla",
-                
-                expected_cadence_days=7,
+
+                expected_cadence_days=1,
+                ingestion_mode="snapshot",
+                where="city = 'PORTLAND' AND state = 'OR'",
                 needs_geocode=True,
+                geocode_context='Portland, OR',
                 field_map=PORTLAND_SLA_FIELD_MAP,
             ),
         },
@@ -6431,6 +6633,181 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
             # North Carolina fallback for SLA until a Wilmington-specific
             # municipal registry is verified.
             FeedType.SLA: snap_sla_spec("NC"),
+        },
+    ),
+    CityId.SAVANNAH: CityRegistration(
+        city_id=CityId.SAVANNAH,
+        name="Savannah / Chatham County",
+        state="GA",
+        center={"lat": 32.0767, "lng": -81.0943},
+        metro_bbox=SAVANNAH_METRO_BBOX,
+        division_bboxes=SAVANNAH_DIVISION_BBOXES,
+        submarkets=SAVANNAH_SUBMARKETS,
+        divisions=SAVANNAH_DIVISIONS,
+        job_suffix="savannah",
+        # Partial: residential permits primary; the /0 commercial layer is an
+        # SLA-style companion (same schema, same FeedType). 311/SLA/deeds not
+        # viable (no live register on pub.sagis.org).
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_savannah_permits_endpoint,
+                platform="arcgis",
+                watermark_col="IssuedDate_DATE",
+                id_keys=["PermitNumber", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=600.0,
+                producer_key="permits",
+                expected_cadence_days=7,
+                order_by="OBJECTID",
+                oid_field="OBJECTID",
+                max_record_count=2000,
+                needs_geocode=True,
+                geocode_context="Savannah, GA",
+                companion_endpoints={
+                    "commercial_building_permits": settings.arcgis_savannah_permits_commercial_endpoint,
+                },
+                field_map=SAVANNAH_FIELD_MAP["permits"],
+            ),
+        },
+    ),
+    CityId.BOWLING_GREEN: CityRegistration(
+        city_id=CityId.BOWLING_GREEN,
+        name="Bowling Green / Warren County",
+        state="KY",
+        center={"lat": 36.9892, "lng": -86.4436},
+        metro_bbox=BOWLING_GREEN_METRO_BBOX,
+        division_bboxes=BOWLING_GREEN_DIVISION_BBOXES,
+        submarkets=BOWLING_GREEN_SUBMARKETS,
+        divisions=BOWLING_GREEN_DIVISIONS,
+        job_suffix="bowling_green",
+        # Partial: county-wide CCPC permits only. needs_geocode is defensive —
+        # native KY North State Plane points (outSR=4326); non_spatial NOT set.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_bowling_green_permits_endpoint,
+                platform="arcgis",
+                watermark_col="created_date",
+                id_keys=["PermitNum", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=600.0,
+                producer_key="permits",
+                expected_cadence_days=1,
+                order_by="OBJECTID",
+                oid_field="OBJECTID",
+                max_record_count=2000,
+                needs_geocode=True,
+                geocode_context="Bowling Green, KY",
+                field_map=BOWLING_GREEN_FIELD_MAP["permits"],
+            ),
+        },
+    ),
+    CityId.TALLAHASSEE: CityRegistration(
+        city_id=CityId.TALLAHASSEE,
+        name="Tallahassee / Leon County",
+        state="FL",
+        center={"lat": 30.4383, "lng": -84.2807},
+        metro_bbox=TALLAHASSEE_METRO_BBOX,
+        division_bboxes=TALLAHASSEE_DIVISION_BBOXES,
+        submarkets=TALLAHASSEE_SUBMARKETS,
+        divisions=TALLAHASSEE_DIVISIONS,
+        job_suffix="tallahassee",
+        # 3 of 4 families live on the joint City/County ArcGIS Server; SLA has
+        # no BTR register. All feeds native geometric (needs_geocode False);
+        # every layer publishes no objectIdField, so oid_field is explicit.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_tallahassee_permits_endpoint,
+                platform="arcgis",
+                watermark_col="AppliedDate",
+                id_keys=["PermitNum", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=600.0,
+                producer_key="permits",
+                expected_cadence_days=7,
+                order_by="OBJECTID",
+                oid_field="OBJECTID",
+                max_record_count=8000,
+                needs_geocode=False,
+                field_map=TALLAHASSEE_FIELD_MAP["permits"],
+            ),
+            FeedType.COMPLAINTS_311: DatasetSpec(
+                endpoint=settings.arcgis_tallahassee_311_endpoint,
+                platform="arcgis",
+                watermark_col="CALLDTTM",
+                id_keys=["SERVNO", "ESRI_OID"],
+                topic=settings.topic_311,
+                interval_seconds=600.0,
+                producer_key="311",
+                expected_cadence_days=1,
+                order_by="ESRI_OID",
+                oid_field="ESRI_OID",
+                where="CALLDTTM <= CURRENT_TIMESTAMP",
+                needs_geocode=False,
+                field_map=TALLAHASSEE_FIELD_MAP["311"],
+            ),
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.arcgis_tallahassee_deeds_endpoint,
+                platform="arcgis",
+                watermark_col="SALES_SALEDT",
+                id_keys=["SALES_SALEKEY", "OBJECTID"],
+                topic=settings.topic_deeds,
+                interval_seconds=600.0,
+                producer_key="deeds",
+                expected_cadence_days=1,
+                order_by="OBJECTID",
+                oid_field="OBJECTID",
+                needs_geocode=False,
+                field_map=TALLAHASSEE_FIELD_MAP["deeds"],
+            ),
+        },
+    ),
+    CityId.SPARTANBURG: CityRegistration(
+        city_id=CityId.SPARTANBURG,
+        name="Spartanburg County",
+        state="SC",
+        center={"lat": 34.9497, "lng": -81.9320},
+        metro_bbox=SPARTANBURG_METRO_BBOX,
+        division_bboxes=SPARTANBURG_DIVISION_BBOXES,
+        submarkets=SPARTANBURG_SUBMARKETS,
+        divisions=SPARTANBURG_DIVISIONS,
+        job_suffix="spartanburg",
+        # County on-prem EnerGov (no jurisdiction column; metro = "center, not
+        # extent"). 311 is CodeManagement only (no RequestManagement) and DEEDS
+        # is a CAMA snapshot — both not registered. The `where` module filters
+        # are load-bearing. SLA is a slow trickle (cadence 30).
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_spartanburg_permits_url,
+                platform="arcgis",
+                watermark_col="ApplicationDate",
+                id_keys=["CaseNumber", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=600.0,
+                producer_key="permits",
+                expected_cadence_days=1,
+                order_by="OBJECTID",
+                oid_field="OBJECTID",
+                max_record_count=2000,
+                where="ModuleName='PermitManagement'",
+                needs_geocode=False,
+                field_map=SPARTANBURG_FIELD_MAP["permits"],
+            ),
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.arcgis_spartanburg_sla_url,
+                platform="arcgis",
+                watermark_col="ApplicationDate",
+                id_keys=["CaseNumber", "CaseID", "OBJECTID"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                expected_cadence_days=30,
+                order_by="OBJECTID",
+                oid_field="OBJECTID",
+                max_record_count=2000,
+                where="ModuleName IN ('BusinessLicenseEntity','BusinessLicenseManagement')",
+                needs_geocode=False,
+                field_map=SPARTANBURG_FIELD_MAP["sla"],
+            ),
         },
     ),
 }

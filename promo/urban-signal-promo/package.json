@@ -1,0 +1,12 @@
+{
+  "name": "urban-signal-promo",
+  "private": true,
+  "displayName": "Urban Signal Promo",
+  "version": "1.0.0",
+  "main": "index.tsx",
+  "scripts": {
+    "check": "dapi check",
+    "capture": "dapi capture"
+  },
+  "projectId": "MdaqYAyQMaa5wVzOGr5V9"
+}

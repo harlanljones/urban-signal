@@ -7,7 +7,9 @@ greater metro (Vancouver, WA edge included loosely in the permissive metro bbox)
 Portland registers as a **TWO-FEED partial city** like Los Angeles / Austin:
 
 * PERMITS — Portland Maps / `data.portlandoregon.gov` building permits (Socrata).
-* SLA — Oregon Liquor Control Commission (OLCC) liquor licenses.
+* SLA — Oregon Construction Contractors Board (CCB) active contractor
+  licenses (`g77e-6bhs`, US-372). Replaces the former OLCC applications feed
+  (dispatch decision 2026-08-28: ADR 0007 one-endpoint-per-feedtype).
 
 DEEDS and COMPLAINTS_311 are deliberately **absent** from this leaf: no open
 recorded-deeds endpoint is published for Multnomah County at the precision this
@@ -25,7 +27,13 @@ the exact resource ID; only the endpoint strings are placeholders.
 
 from typing import Dict
 
+from src.config import settings
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
+# US-372: Portland's SLA map IS the shared OR CCB map (one object, so
+# registry / field_maps_portland re-export / tests all stay identity-equal).
+from src.producers.field_maps_state_licenses import (
+    OR_CCB_FIELD_MAP as PORTLAND_SLA_FIELD_MAP,
+)
 
 # Greater Portland metro bounding box. Portland proper sits ~45.40–45.60 N,
 # -122.75 to -122.55 W; the metro bbox is permissive and also admits the
@@ -282,9 +290,7 @@ PORTLAND_PERMITS_ENDPOINT: str = (
     "https://www.portlandmaps.com/od/rest/services/"
     "COP_OpenData_PlanningDevelopment/MapServer/89"
 )
-PORTLAND_SLA_ENDPOINT: str = (
-    "https://data.oregon.gov/resource/qad4-bnxp.json"
-)
+PORTLAND_SLA_ENDPOINT: str = settings.socrata_or_ccb_endpoint
 
 PORTLAND_PERMITS_FIELD_MAP: Dict[str, list] = {
     "job_id": ["FOLDERNUMB", "OBJECTID", "permit_number"],
@@ -300,20 +306,6 @@ PORTLAND_PERMITS_FIELD_MAP: Dict[str, list] = {
     "borough": ["NBRHOOD", "PDXBND", "district", "neighborhood"],
     "proposed_units": ["NEW_UNITS", "proposed_units"],
     "proposed_stories": ["proposed_stories", "number_of_stories"],
-}
-
-PORTLAND_SLA_FIELD_MAP: Dict[str, list] = {
-    "license_id": ["license_number", "trade_name", "address"],
-    "license_type": ["license_type", "application_type"],
-    "dba": ["dba", "trade_name", "doing_business_as"],
-    "premises_name": ["business_name", "licensee_name", "trade_name"],
-    "effective_date": ["date_received", "issue_date", "effective_date"],
-    "expiration_date": ["expiration_date"],
-    "status": ["application_status", "license_status", "status"],
-    "address_street": ["address", "premise_address"],
-    "latitude": ["latitude"],
-    "longitude": ["longitude"],
-    "borough": ["district", "police_district"],
 }
 
 # Spine-foldable spec data. `field_map` references the maps above.
@@ -333,14 +325,14 @@ PORTLAND_FEED_SPECS: Dict[str, Dict[str, object]] = {
     "sla": {
         "endpoint": PORTLAND_SLA_ENDPOINT,
         "platform": "socrata",
-        "watermark_col": "date_received",
-        "id_keys": ["trade_name", "address"],
+        "watermark_col": "",
+        "id_keys": ["license_number", "related_key"],
         "topic_key": "topic_sla",
-        "interval_seconds": 600.0,
+        "interval_seconds": 21600.0,
         "producer_key": "sla",
         "field_map": PORTLAND_SLA_FIELD_MAP,
-        "expected_cadence_days": 7,
-        "extra": {"needs_geocode": True, "scope": "Oregon OLCC liquor applications received (address-only Portland rows)"},
+        "expected_cadence_days": 1,
+        "extra": {"ingestion_mode": "snapshot", "needs_geocode": True, "geocode_context": "Portland, OR", "where": "city = 'PORTLAND' AND state = 'OR'", "scope": "OR CCB active contractor licenses, Portland slice (address-only; ADR-0004)"},
     },
 }
 

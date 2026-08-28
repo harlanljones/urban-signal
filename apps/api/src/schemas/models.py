@@ -165,6 +165,58 @@ class CrimeEvent(BaseModel):
     ingested_at: datetime = Field(default_factory=_utc_now)
 
 
+class ViolationEvent(BaseModel):
+    """Municipal building / property code-enforcement violation (US-209).
+
+    ISD-style inspection outcomes (unsafe structures, housing code) — a
+    signal-family feed distinct from 311 service requests. Never a LIMS input
+    without its own ablation study (US-72 family gate)."""
+
+    city_id: str = Field(default="boston")
+    violation_id: str = Field(..., description="Unique case / violation number")
+    code: str = Field(default="", description="Enforcement code (e.g. 121.2)")
+    status: Optional[str] = None
+    description: Optional[str] = None
+    borough: Optional[str] = None
+    address: Optional[str] = None
+    zipcode: Optional[str] = None
+    latitude: Optional[float] = Field(default=None, ge=-90.0, le=90.0)
+    longitude: Optional[float] = Field(default=None, ge=-180.0, le=180.0)
+    status_date: Optional[datetime] = None
+    h3_res7: Optional[str] = None
+    h3_res8: Optional[str] = None
+    h3_res9: Optional[str] = None
+    ingested_at: datetime = Field(default_factory=_utc_now)
+
+
+class InspectionEvent(BaseModel):
+    """Municipal food-establishment inspection / licensing outcome (US-209).
+
+    Licensed-business inspection results (result, violation level, license
+    category) — a periodic per-license measurement, not a 311 service request.
+    Subject to the US-72 ablation rule before any LIMS use."""
+
+    city_id: str = Field(default="boston")
+    inspection_id: str = Field(..., description="Unique license / inspection number")
+    business_name: Optional[str] = None
+    license_category: Optional[str] = None
+    license_status: Optional[str] = None
+    result: Optional[str] = None
+    violation_level: Optional[str] = None
+    violation_desc: Optional[str] = None
+    borough: Optional[str] = None
+    address: Optional[str] = None
+    zipcode: Optional[str] = None
+    latitude: Optional[float] = Field(default=None, ge=-90.0, le=90.0)
+    longitude: Optional[float] = Field(default=None, ge=-180.0, le=180.0)
+    issued_date: Optional[datetime] = None
+    result_date: Optional[datetime] = None
+    h3_res7: Optional[str] = None
+    h3_res8: Optional[str] = None
+    h3_res9: Optional[str] = None
+    ingested_at: datetime = Field(default_factory=_utc_now)
+
+
 class StreetCutEvent(BaseModel):
     """Street-cut / utility permit / street-closure event (US-81).
 

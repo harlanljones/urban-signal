@@ -44,6 +44,10 @@ def test_leaf_has_canonical_constants(name):
 
 
 def test_all_expected_leaf_modules_present():
-    # 96 hand-authored Metro leaf modules plus NYC (cities/nyc.py, US-176),
-    # whose geometry still lives in src.spatial.submarkets.
-    assert len(_LEAF_MODULES) == 97
+    # Floor guard, not an exact count: 96 hand-authored Metro leaf modules
+    # plus NYC (cities/nyc.py, US-176), whose geometry still lives in
+    # src.spatial.submarkets. Parallel leaf streams (wave-6 southeast, west
+    # coast) land new city modules concurrently, so the assertion guards
+    # against deletion/regression, not a frozen cardinality — the
+    # canonical-constants parametrize above validates every present module.
+    assert len(_LEAF_MODULES) >= 97

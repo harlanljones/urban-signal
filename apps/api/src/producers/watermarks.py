@@ -150,6 +150,10 @@ ANSI_DATE_LITERAL_HOSTS = (
     "milwaukeemaps.milwaukee.gov",
     "gis.charlottenc.gov",
     "gis.tucsonaz.gov",
+    "pub.sagis.org",
+    "webgis.bgky.org",
+    "intervector.leoncountyfl.gov",
+    "maps.spartanburgcounty.org",
 )
 
 

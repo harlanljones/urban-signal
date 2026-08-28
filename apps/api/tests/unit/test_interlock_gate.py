@@ -38,6 +38,8 @@ FEED_TOPICS = {
     # US-72 signal-survey members: unregistered until their own tickets, but
     # the topic mapping is fixed now so a future registration can't drift.
     FeedType.CRIME: settings.topic_crime,
+    FeedType.VIOLATIONS: settings.topic_violations,
+    FeedType.INSPECTIONS: settings.topic_inspections,
     FeedType.STREET_CUT: settings.topic_street_cut,
     FeedType.EVICTIONS: settings.topic_evictions,
     FeedType.STR: settings.topic_str,

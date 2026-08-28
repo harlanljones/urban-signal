@@ -1,0 +1,208 @@
+{
+  "schema_version": 2,
+  "id": "savannah",
+  "name": "Savannah / Chatham County",
+  "state": "GA",
+  "center": {
+    "lat": 32.0767,
+    "lng": -81.0943
+  },
+  "metro_bbox": {
+    "min_lat": 31.93,
+    "max_lat": 32.19,
+    "min_lng": -81.37,
+    "max_lng": -81.03
+  },
+  "divisions": {
+    "HISTORIC_CORE": {
+      "name": "HISTORIC_CORE",
+      "center": {
+        "lat": 32.0777,
+        "lng": -81.08
+      },
+      "bbox": {
+        "min_lat": 32.045,
+        "max_lat": 32.095,
+        "min_lng": -81.105,
+        "max_lng": -81.045
+      },
+      "submarkets": [
+        "Landmark Historic District",
+        "Victorian District"
+      ]
+    },
+    "MIDTOWN": {
+      "name": "MIDTOWN",
+      "center": {
+        "lat": 32.05,
+        "lng": -81.1
+      },
+      "bbox": {
+        "min_lat": 32.03,
+        "max_lat": 32.07,
+        "min_lng": -81.135,
+        "max_lng": -81.06
+      },
+      "submarkets": [
+        "Ardsley Park",
+        "Parkside"
+      ]
+    },
+    "WEST_SIDE": {
+      "name": "WEST_SIDE",
+      "center": {
+        "lat": 32.065,
+        "lng": -81.132
+      },
+      "bbox": {
+        "min_lat": 32.035,
+        "max_lat": 32.095,
+        "min_lng": -81.15,
+        "max_lng": -81.115
+      },
+      "submarkets": [
+        "Woodville",
+        "Liberty City"
+      ]
+    },
+    "SOUTH_SIDE": {
+      "name": "SOUTH_SIDE",
+      "center": {
+        "lat": 32.02,
+        "lng": -81.13
+      },
+      "bbox": {
+        "min_lat": 31.965,
+        "max_lat": 32.06,
+        "min_lng": -81.175,
+        "max_lng": -81.1
+      },
+      "submarkets": [
+        "Oglethorpe Mall",
+        "Chatham Parkway"
+      ]
+    },
+    "WEST_CHATHAM": {
+      "name": "WEST_CHATHAM",
+      "center": {
+        "lat": 32.105,
+        "lng": -81.28
+      },
+      "bbox": {
+        "min_lat": 32.02,
+        "max_lat": 32.19,
+        "min_lng": -81.36,
+        "max_lng": -81.2
+      },
+      "submarkets": [
+        "Godley Station",
+        "New Hampstead"
+      ]
+    }
+  },
+  "submarkets": {
+    "Landmark Historic District": {
+      "name": "Landmark Historic District",
+      "division": "HISTORIC_CORE",
+      "center": {
+        "lat": 32.081,
+        "lng": -81.0918
+      },
+      "description": "Oglethorpe's garden-bar National Historic Landmark grid from Johnson Square to Broughton: host/conversion capex, adaptive-reuse hospitality, and the tourist retail core."
+    },
+    "Victorian District": {
+      "name": "Victorian District",
+      "division": "HISTORIC_CORE",
+      "center": {
+        "lat": 32.0607,
+        "lng": -81.0631
+      },
+      "description": "Post-victorian residential grid radiating east from Bull Street: remodeling, short-term-rental conversion, and the Forsyth Park neighborhood built-out."
+    },
+    "Ardsley Park": {
+      "name": "Ardsley Park",
+      "division": "MIDTOWN",
+      "center": {
+        "lat": 32.055,
+        "lng": -81.078
+      },
+      "description": "Early-1900s master-planned historic district of stately brick residences and the Victory Drive / Habersham retail node."
+    },
+    "Parkside": {
+      "name": "Parkside",
+      "division": "MIDTOWN",
+      "center": {
+        "lat": 32.0599,
+        "lng": -81.1075
+      },
+      "description": "Midtown residential corridor around Daffin Park and the 36th Street commercial strip with steady repair-trade permitting and infill interest."
+    },
+    "Woodville": {
+      "name": "Woodville",
+      "division": "WEST_SIDE",
+      "center": {
+        "lat": 32.0889,
+        "lng": -81.1418
+      },
+      "description": "Working residential and industrial-adjacent neighborhoods northwest of downtown near the campus and railyard edge."
+    },
+    "Liberty City": {
+      "name": "Liberty City",
+      "division": "WEST_SIDE",
+      "center": {
+        "lat": 32.0481,
+        "lng": -81.1279
+      },
+      "description": "West-side mixed residential block facing the new-construction pipeline along the Walmont redevelopment frontage."
+    },
+    "Oglethorpe Mall": {
+      "name": "Oglethorpe Mall",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 32.0058,
+        "lng": -81.1174
+      },
+      "description": "Abercorn Expressway retail-and-multifamily corridor anchored by the Oglethorpe Mall area, absorbing strip-refit and buildout demand."
+    },
+    "Chatham Parkway": {
+      "name": "Chatham Parkway",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 32.0512,
+        "lng": -81.1655
+      },
+      "description": "High-capex commercial park at the pooler interchange gateway: hotel, medical-office, and industrial-box erections."
+    },
+    "Godley Station": {
+      "name": "Godley Station",
+      "division": "WEST_CHATHAM",
+      "center": {
+        "lat": 32.1814,
+        "lng": -81.259
+      },
+      "description": "Master-planned West Chatham annexation on the I-95 / SR-21 corridor with the metro's heaviest new single-family submarket velocity — its permit coordinates set the metro's north edge."
+    },
+    "New Hampstead": {
+      "name": "New Hampstead",
+      "division": "WEST_CHATHAM",
+      "center": {
+        "lat": 32.13,
+        "lng": -81.3505
+      },
+      "description": "Far-west annexed and planned-residential district (pooler-adjacent) whose permit coordinates pin the metro box's western edge."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "IssuedDate_DATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/savannah.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

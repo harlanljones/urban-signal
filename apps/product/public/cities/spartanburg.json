@@ -1,0 +1,228 @@
+{
+  "schema_version": 2,
+  "id": "spartanburg",
+  "name": "Spartanburg County",
+  "state": "SC",
+  "center": {
+    "lat": 34.9497,
+    "lng": -81.932
+  },
+  "metro_bbox": {
+    "min_lat": 34.57,
+    "max_lat": 35.21,
+    "min_lng": -82.24,
+    "max_lng": -81.69
+  },
+  "divisions": {
+    "DOWNTOWN_CORE": {
+      "name": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 34.949,
+        "lng": -81.932
+      },
+      "bbox": {
+        "min_lat": 34.92,
+        "max_lat": 34.98,
+        "min_lng": -81.96,
+        "max_lng": -81.9
+      },
+      "submarkets": [
+        "Downtown Spartanburg",
+        "Northside / Rail Yard"
+      ]
+    },
+    "EAST_CITY": {
+      "name": "EAST_CITY",
+      "center": {
+        "lat": 34.947,
+        "lng": -81.89
+      },
+      "bbox": {
+        "min_lat": 34.92,
+        "max_lat": 34.99,
+        "min_lng": -81.9,
+        "max_lng": -81.84
+      },
+      "submarkets": [
+        "Eastside / Hillcrest"
+      ]
+    },
+    "WEST_CITY": {
+      "name": "WEST_CITY",
+      "center": {
+        "lat": 34.957,
+        "lng": -81.975
+      },
+      "bbox": {
+        "min_lat": 34.92,
+        "max_lat": 35.0,
+        "min_lng": -82.03,
+        "max_lng": -81.96
+      },
+      "submarkets": [
+        "Westgate"
+      ]
+    },
+    "BLUE_RIDGE_FOOTHILLS": {
+      "name": "BLUE_RIDGE_FOOTHILLS",
+      "center": {
+        "lat": 35.06,
+        "lng": -82.1
+      },
+      "bbox": {
+        "min_lat": 34.99,
+        "max_lat": 35.21,
+        "min_lng": -82.24,
+        "max_lng": -81.9
+      },
+      "submarkets": [
+        "Inman / Campobello",
+        "Landrum / Chesnee"
+      ]
+    },
+    "I85_CORRIDOR": {
+      "name": "I85_CORRIDOR",
+      "center": {
+        "lat": 34.92,
+        "lng": -82.1
+      },
+      "bbox": {
+        "min_lat": 34.86,
+        "max_lat": 34.99,
+        "min_lng": -82.15,
+        "max_lng": -81.9
+      },
+      "submarkets": [
+        "Greer / Reidville",
+        "Duncan / Lyman"
+      ]
+    },
+    "SOUTH_COUNTY": {
+      "name": "SOUTH_COUNTY",
+      "center": {
+        "lat": 34.78,
+        "lng": -81.95
+      },
+      "bbox": {
+        "min_lat": 34.57,
+        "max_lat": 34.89,
+        "min_lng": -82.05,
+        "max_lng": -81.69
+      },
+      "submarkets": [
+        "Woodruff",
+        "Roebuck"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Spartanburg": {
+      "name": "Downtown Spartanburg",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 34.9494,
+        "lng": -81.932
+      },
+      "description": "Main Street commercial core with the city's densest renovation pipeline: upper-floor apartment conversions, facade grants, and the Hub City Mills adaptive-reuse anchors."
+    },
+    "Northside / Rail Yard": {
+      "name": "Northside / Rail Yard",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 34.96,
+        "lng": -81.935
+      },
+      "description": "Warehouse-and-rail district just north of the core where historic cotton-mill and freight stock is converting to lofts, breweries, and make-ready industrial space."
+    },
+    "Eastside / Hillcrest": {
+      "name": "Eastside / Hillcrest",
+      "division": "EAST_CITY",
+      "center": {
+        "lat": 34.947,
+        "lng": -81.888
+      },
+      "description": "Historic brick rowhouse and bungalow belt east of the core converging on Hillcrest Commons, catching first-time-buyer turnover and infill restoration."
+    },
+    "Westgate": {
+      "name": "Westgate",
+      "division": "WEST_CITY",
+      "center": {
+        "lat": 34.955,
+        "lng": -81.978
+      },
+      "description": "Working grid west of the core along the old W.O. Ezell corridor, mixing single-family repair-trade permitting with light industrial and retail refit demand."
+    },
+    "Inman / Campobello": {
+      "name": "Inman / Campobello",
+      "division": "BLUE_RIDGE_FOOTHILLS",
+      "center": {
+        "lat": 35.046,
+        "lng": -82.095
+      },
+      "description": "Foothills bedroom towns along the SC-9 / SC-11 spine absorbing Greenville-Spartanburg spillover and new single-family subdivisions in the I-26 north corridor."
+    },
+    "Landrum / Chesnee": {
+      "name": "Landrum / Chesnee",
+      "division": "BLUE_RIDGE_FOOTHILLS",
+      "center": {
+        "lat": 35.128,
+        "lng": -82.03
+      },
+      "description": "Northern escarpment hamlets near the Tryon horse-country edge, where estate infill, small-downtown boutiques, and farm-parcel fragmentation drive the permit mix."
+    },
+    "Greer / Reidville": {
+      "name": "Greer / Reidville",
+      "division": "I85_CORRIDOR",
+      "center": {
+        "lat": 34.913,
+        "lng": -82.08
+      },
+      "description": "I-85 inland-port and logistics corridor anchored by BMW-adjacent supplier parks, striking a balance between industrial build-out and fast-growing single-family subdivisions."
+    },
+    "Duncan / Lyman": {
+      "name": "Duncan / Lyman",
+      "division": "I85_CORRIDOR",
+      "center": {
+        "lat": 34.93,
+        "lng": -82.135
+      },
+      "description": "Southern I-85 industrial core (Trough Road / Reidville Road reach) with heavy warehouse, cold-chain, and flex permitting around the county's biggest employment nodes."
+    },
+    "Woodruff": {
+      "name": "Woodruff",
+      "division": "SOUTH_COUNTY",
+      "center": {
+        "lat": 34.739,
+        "lng": -82.032
+      },
+      "description": "Southern agricultural county seat on the Enoree, anchored by a regional industrial park and steady small-town Main Street refit activity."
+    },
+    "Roebuck": {
+      "name": "Roebuck",
+      "division": "SOUTH_COUNTY",
+      "center": {
+        "lat": 34.878,
+        "lng": -81.962
+      },
+      "description": "South-east county unincorporated belt spreading from the Dorman Centre retail node, mixing subdivision infill, ranch-plus-acreage, and neighborhood-shopping refit."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "ApplicationDate",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "ApplicationDate",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/spartanburg.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

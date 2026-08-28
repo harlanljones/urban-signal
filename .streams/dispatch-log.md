@@ -760,3 +760,84 @@ Gates after hold: full suite 2211 collected / 0 failed / 3 skipped (live probes 
 US-387 (validate-on-cron) NOT applied here: already landed on main independently via PR #4 (`cursor/us-387-validate-on-schedule-dispatch-c7d1`, merged 2026-08-28T05:11Z) — validate.if now includes schedule + workflow_dispatch. Re-applying would have duplicated the change.
 Note for the merge: origin/main is 4 commits ahead of this branch (58248e5 PR#4 US-387, 6798594, ac0f1f3 PR#3 US-207, 9d10f14 US-209 Boston DEEDS/CKAN) — US-209 touches config.py + city_registry.py, so expect a merge to reconcile there and the registry count to move past 69.
 US-344 Huntsville stays EXCLUDED (conditional on the mid-Sept watermark re-probe per its probe doc).
+
+## 2026-08-28 — US-372 spine hold (us372-spine) — claimed + closed
+
+Spine holder for the us372-state-licenses leaf delta, scoped by Harlan to THREE registrations:
+CO liquor `ier5-5ms2`→Denver, TX TABC `7hf9-qc9f`→Houston/Dallas/Austin/SA, OR CCB `g77e-6bhs`→Portland.
+Outcome: gate 24/24 green; config + registry edited; scheduler NO-OP; Portland SLA SWAP OLCC→CCB per
+Harlan's answer (ADR 0007 one-endpoint-per-feedtype). Stream: .streams/us372-spine.md.
+Pre-existing failure left untouched: test_city_leaf_naming (101 vs 97 — southeast-wave debt).
+Follow-ups (done, not spine): Maricopa CSV probe doc, FRED_API_KEY env wiring, Tier 2 ETL plan.
+
+## 2026-08-28 — Wave 6 Southeast (orchestrator) — RESEARCH COMPLETE, spine NOT applied
+
+RESOLVED/DONE: US-334 orlando (already registered wave-3 via US-194; verified REGISTRY+ALIASES+METRO_META+index.html+snapshot/tiles; `pytest -m interlock` 24/24 on main @ 4acb689).
+NEW REGISTRATIONS FOUND (spine payload in .streams/southeast-wave.md; spine hold NOT applied — see BLOCKER): US-298 savannah (PERMITS), US-300 bowling_green (PERMITS), US-303 tallahassee (PERMITS+311+DEEDS), US-301 spartanburg (PERMITS+SLA). ANSI_DATE_LITERAL_HOSTS must add pub.sagis.org / webgis.bgky.org / intervector.leoncountyfl.gov / maps.spartanburgcounty.org.
+RESOLUTION-ONLY (already registered, gate-enforced): US-337 miami_dade (city_registry.py:4903), US-335 memphis (city_registry.py:4969).
+NOT-VIABLE (research complete; re-probe triggers recorded): US-299 myrtle_beach, US-302 athens_clarke, US-341 columbia_sc, US-343 knoxville, US-345 mobile, US-339 birmingham, US-306 biloxi, US-305 gulfport, US-304 pensacola.
+KEEP-DEFERRED (vendor SPA no bulk REST / county-shaped data): US-336 atlanta, US-338 jacksonville, US-342 fort_lauderdale.
+EXCLUDED (standing): US-344 huntsville (conditional mid-Sept re-probe). IN REVIEW (untouched): US-293 gainesville.
+
+BLOCKER (external, 2026-08-28): branch switched main -> `chore/restore-metros-and-columbus` mid-session; batch-1/2 southeast leaf .py files (savannah/bowling_green/tallahassee/spartanburg + field_maps + tests) LOST (not on disk, not in the only stash) — must be regenerated; AND a concurrent west-coast wave (anaheim/chandler/inland_empire/long_beach) is mid-spine-hold on the SAME spine files (city_registry.py, config.py, dashboard.py, index.html, test_city_leaf_naming.py) on that branch. Spine hold deferred until west hold lands on a stable branch + southeast leaf modules rebuilt. Full trail in .streams/southeast-wave.md.
+
+## 2026-08-28 — US-240 Las Cruces, NM (leaf, west-las_cruces) — COMPLETE
+
+TWO-FEED PARTIAL registration verified live from the city's official ArcGIS Server
+(`maps.las-cruces.org/gis/rest/services/Information_Services/MapServer`, org
+ejcbAsQEUUGWEyzb, native WKID 4326 point geometry — no State Plane issue):
+- PERMITS: BuildingPermits/1, 82,433 rows, Issued_Date watermark (2016-10-03 →
+  2026-08-21T06:00Z), 0 future-dated, 0 null-geometry.
+- SLA: Business_Registrations/2, 26,508 rows, LastUpdateDate watermark
+  (2018-12-09 → 2026-08-21T06:00Z).
+311 = Tyler Portico (no open API), deeds = county parcel data only — both Tier 3,
+stayed unregistered. Leaf files: cities/las_cruces.py, producers/field_maps_las_cruces.py,
+tests/unit/test_producers_las_cruces.py (42 tests). Gates: 42 passed, -k las_cruces
+44 passed, interlock 24/24, ruff clean. Spine delta documented in
+.streams/west-las_cruces.md. No git commit.
+
+### Wave 7 (West region) close-out — 30 of 30 tickets (2026-08-28)
+
+**20 REGISTER** (leaf files built, verified, spine delta staged; 0 REJECT with evidence), **5 REJECT** (no verifiable feed — GP slee, Coeur d'Alene, Ogden, Cheyenne, Santa Clarita), **5 partial** (1-2 feeds only):
+
+| Ticket | Slug | Feeds | Tests | Verdict |
+|---|---|---|---|---|
+| US-222 | inland_empire | PERMITS + CRIME | 47 | REGISTER |
+| US-223 | oakland | 311 + CRIME | 35 | REGISTER |
+| US-224 | long_beach | SLA + CRIME | 49 | REGISTER |
+| US-225 | eugene | 311 + SLA + DEEDS | 45 | REGISTER |
+| US-226 | salem_or | PERMITS + SLA | 47 | REGISTER |
+| US-227 | scottsdale | PERMITS + SLA | 52 | REGISTER |
+| US-228 | chandler | PERMITS | 32 | REGISTER |
+| US-229 | tempe | 3 feeds | 59 | REGISTER |
+| US-230 | stockton | (verified) | 33 | REGISTER |
+| US-231 | modesto | SLA-only | 34 | REGISTER |
+| US-232 | oxnard_ventura | SLA+311+CRIME | 37 | REGISTER |
+| US-233 | vancouver_wa | PERMITS | 46 | REGISTER |
+| US-234 | billings | PERMITS + 311 | 40 | REGISTER |
+| US-235 | missoula | PERMITS | 32 | REGISTER |
+| US-236 | bozeman | PERMITS + CRIME | 41 | REGISTER |
+| US-237 | bend | PERMITS+SLA+311+CRIME | 59 | REGISTER |
+| US-238 | medford | PERMITS+SLA+311 | 39 | REGISTER |
+| US-239 | yakima | PERMITS | 34 | REGISTER |
+| US-240 | las_cruces | PERMITS + SLA | 42 | REGISTER |
+| US-241 | santa_fe | 311 | 33 | REGISTER |
+| US-242 | greeley | — | — | REJECT (no feed) |
+| US-243 | nampa | ROW-permits | 30 | REGISTER |
+| US-244 | coeur_dalene | — | — | REJECT (stale, county offline) |
+| US-245 | boulder | PERMITS + SLA | 43 | REGISTER |
+| US-246 | ogden | — | — | REJECT (EnerGov only) |
+| US-247 | santa_rosa | CRIME | 32 | REGISTER |
+| US-248 | cheyenne | — | — | REJECT (stale 2014-2024) |
+| US-249 | anaheim | PERMITS + SLA | 42 | REGISTER |
+| US-250 | glendale_az | 311 + SLA | 40 | REGISTER |
+| US-251 | santa_clarita | — | — | REJECT (Accela token-protected) |
+
+**Phase 3 (serial spine hold) PENDING** — blocked by concurrent `southeast-wave` and wave-6 hold queue. Once the interlock is free: 1 hold = CityId enum + aliases + REGISTRY (25 cities) + config endpoints + cities/__init__ exports + dashboard METRO_META + regenerated index.html + leaf-count pin + snap_sla_spec for SLA-feed cities + ANSI_DATE_LITERAL_HOSTS additions (medford, chandler, inland_empire, stockton reported). 5 REJECTs get wontfix/closing comments.
+
+### 2026-08-28 (later) — Wave 6 Southeast SPINE HOLD APPLIED (orchestrator, serial)
+
+Leaf modules regenerated (savannah/bowling_green/tallahassee/spartanburg + field_maps + tests) after the mid-session branch switch dropped the batch-1/2 writes. Spine applied in one hold: CityId enum (+SAVANNAH/BOWLING_GREEN/TALLAHASSEE/SPARTANBURG), _HANDWRITTEN_ALIASES (+27), config.py (+8 endpoint settings), cities/__init__ imports + __all__ (+4), REGISTRY entries (savannah PERMITS+companion, bowling_green PERMITS, tallahassee PERMITS+311+DEEDS, spartanburg PERMITS+SLA), watermarks.py ANSI_DATE_LITERAL_HOSTS (+pub.sagis.org/webgis.bgky.org/intervector.leoncountyfl.gov/maps.spartanburgcounty.org), serving/dashboard.py METRO_META (+4), regenerated apps/dashboard/public/index.html via scripts/export_dashboard.py.
+State after hold: `pytest -m interlock` 24 passed / 0 failed (all four cities wired on the map + snapshot + res-5 tiles + closure/containment/completeness + endpoints-in-settings + platform clients). Leaf suites + canonical-naming 303 passed; test_watermarks 7 passed; config Settings model loads with the new endpoint defaults. One leaf test reconciled (test_producers_bowling_green.py::test_not_registered_city_no_borough_resolution -> test_registered_city_resolves_borough) per the wave's "orchestrator reconciles when the spine lands" rule.
+RESOLVED on Linear (comment + Done): US-298 savannah, US-300 bowling_green, US-303 tallahassee, US-301 spartanburg (registered); US-337 miami_dade, US-335 memphis (already registered); US-299 myrtle_beach, US-302 athens_clarke, US-341 columbia_sc, US-343 knoxville, US-345 mobile, US-339 birmingham, US-306 biloxi, US-305 gulfport, US-304 pensacola (NOT-VIABLE); US-336 atlanta, US-338 jacksonville, US-342 fort_lauderdale (KEEP-DEFERRED). US-334 orlando previously Done. Remaining open by standing: US-344 huntsville (excluded/conditional re-probe), US-293 gainesville (In Review).
+COMMITS DEFERRED: git commit/push are permission-denied in this session — all wave-6 leaf, spine, index.html, and registry changes are UNCOMMITTED on the working tree. Human must commit before merge. NOTE the tree also carries untracked west-coast leaf files (anaheim/chandler/inland_empire/long_beach + .streams/west-*.md) and uncommitted US-372 CO liquor-license edits (config.py + city_registry.py diff) from sibling waves.

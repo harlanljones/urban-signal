@@ -437,8 +437,8 @@
         },
         {
           "platform": "socrata",
-          "watermark_col": "current_issued_date",
-          "interval_seconds": 600.0,
+          "watermark_col": "status_change_date",
+          "interval_seconds": 3600.0,
           "topic": "raw.municipal.sla"
         },
         null
@@ -646,9 +646,9 @@
           "topic": "raw.municipal.311"
         },
         {
-          "platform": "arcgis",
+          "platform": "socrata",
           "watermark_col": "",
-          "interval_seconds": 1800.0,
+          "interval_seconds": 21600.0,
           "topic": "raw.municipal.sla"
         },
         null
@@ -1281,9 +1281,9 @@
           "topic": "raw.municipal.311"
         },
         {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
+          "platform": "socrata",
+          "watermark_col": "status_change_date",
+          "interval_seconds": 3600.0,
           "topic": "raw.municipal.sla"
         },
         null
@@ -1526,9 +1526,9 @@
           "topic": "raw.municipal.311"
         },
         {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
+          "platform": "socrata",
+          "watermark_col": "status_change_date",
+          "interval_seconds": 3600.0,
           "topic": "raw.municipal.sla"
         },
         null
@@ -1831,9 +1831,9 @@
           "topic": "raw.municipal.311"
         },
         {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
+          "platform": "socrata",
+          "watermark_col": "status_change_date",
+          "interval_seconds": 3600.0,
           "topic": "raw.municipal.sla"
         },
         null
@@ -1907,8 +1907,8 @@
         null,
         {
           "platform": "socrata",
-          "watermark_col": "date_received",
-          "interval_seconds": 600.0,
+          "watermark_col": "",
+          "interval_seconds": 21600.0,
           "topic": "raw.municipal.sla"
         },
         null
@@ -3588,6 +3588,141 @@
         "lng": -77.948
       },
       "evidence_path": "apps/api/src/spatial/cities/wilmington_nc.py"
+    },
+    {
+      "id": "savannah",
+      "name": "Savannah / Chatham County",
+      "state": "GA",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 10,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "IssuedDate_DATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 32.0767,
+        "lng": -81.0943
+      },
+      "evidence_path": "apps/api/src/spatial/cities/savannah.py"
+    },
+    {
+      "id": "bowling_green",
+      "name": "Bowling Green / Warren County",
+      "state": "KY",
+      "divisions": "7 divisions",
+      "division_count": 7,
+      "submarket_count": 10,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "created_date",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 36.9892,
+        "lng": -86.4436
+      },
+      "evidence_path": "apps/api/src/spatial/cities/bowling_green.py"
+    },
+    {
+      "id": "tallahassee",
+      "name": "Tallahassee / Leon County",
+      "state": "FL",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 10,
+      "feeds": [
+        true,
+        true,
+        false,
+        true
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "AppliedDate",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "CALLDTTM",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALES_SALEDT",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 30.4383,
+        "lng": -84.2807
+      },
+      "evidence_path": "apps/api/src/spatial/cities/tallahassee.py"
+    },
+    {
+      "id": "spartanburg",
+      "name": "Spartanburg County",
+      "state": "SC",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 10,
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "ApplicationDate",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "ApplicationDate",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 34.9497,
+        "lng": -81.932
+      },
+      "evidence_path": "apps/api/src/spatial/cities/spartanburg.py"
     }
   ],
   "pipeline": [

@@ -1,0 +1,233 @@
+{
+  "schema_version": 2,
+  "id": "tallahassee",
+  "name": "Tallahassee / Leon County",
+  "state": "FL",
+  "center": {
+    "lat": 30.4383,
+    "lng": -84.2807
+  },
+  "metro_bbox": {
+    "min_lat": 30.29,
+    "max_lat": 30.63,
+    "min_lng": -84.7,
+    "max_lng": -84.05
+  },
+  "divisions": {
+    "DOWNTOWN_CAPITAL": {
+      "name": "DOWNTOWN_CAPITAL",
+      "center": {
+        "lat": 30.4275,
+        "lng": -84.28
+      },
+      "bbox": {
+        "min_lat": 30.405,
+        "max_lat": 30.45,
+        "min_lng": -84.3,
+        "max_lng": -84.26
+      },
+      "submarkets": [
+        "Downtown / Capitol",
+        "Myers Park / South Monroe"
+      ]
+    },
+    "MIDTOWN_NORTH": {
+      "name": "MIDTOWN_NORTH",
+      "center": {
+        "lat": 30.468,
+        "lng": -84.282
+      },
+      "bbox": {
+        "min_lat": 30.455,
+        "max_lat": 30.48,
+        "min_lng": -84.295,
+        "max_lng": -84.27
+      },
+      "submarkets": [
+        "Midtown",
+        "Lafayette / North Monroe"
+      ]
+    },
+    "NORTHEAST_KILLEARN": {
+      "name": "NORTHEAST_KILLEARN",
+      "center": {
+        "lat": 30.51,
+        "lng": -84.23
+      },
+      "bbox": {
+        "min_lat": 30.478,
+        "max_lat": 30.545,
+        "min_lng": -84.265,
+        "max_lng": -84.195
+      },
+      "submarkets": [
+        "Killearn Lakes",
+        "Betton Hills / Buckhead"
+      ]
+    },
+    "NORTHWEST_LAKE_JACKSON": {
+      "name": "NORTHWEST_LAKE_JACKSON",
+      "center": {
+        "lat": 30.49,
+        "lng": -84.37
+      },
+      "bbox": {
+        "min_lat": 30.458,
+        "max_lat": 30.533,
+        "min_lng": -84.39,
+        "max_lng": -84.35
+      },
+      "submarkets": [
+        "Lake Jackson",
+        "West Tallahassee / Jackson Bluff"
+      ]
+    },
+    "SOUTHSIDE_BOND": {
+      "name": "SOUTHSIDE_BOND",
+      "center": {
+        "lat": 30.39,
+        "lng": -84.27
+      },
+      "bbox": {
+        "min_lat": 30.372,
+        "max_lat": 30.408,
+        "min_lng": -84.288,
+        "max_lng": -84.255
+      },
+      "submarkets": [
+        "Southside / Bond"
+      ]
+    },
+    "SOUTHEAST_SOUTHWOOD": {
+      "name": "SOUTHEAST_SOUTHWOOD",
+      "center": {
+        "lat": 30.426,
+        "lng": -84.198
+      },
+      "bbox": {
+        "min_lat": 30.412,
+        "max_lat": 30.44,
+        "min_lng": -84.215,
+        "max_lng": -84.182
+      },
+      "submarkets": [
+        "Southwood"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown / Capitol": {
+      "name": "Downtown / Capitol",
+      "division": "DOWNTOWN_CAPITAL",
+      "center": {
+        "lat": 30.43916,
+        "lng": -84.28413
+      },
+      "description": "State-capitol core anchoring the city's design, institutional and adaptive-reuse pipeline — pinned to Sales row PARID 2136340006080."
+    },
+    "Myers Park / South Monroe": {
+      "name": "Myers Park / South Monroe",
+      "division": "DOWNTOWN_CAPITAL",
+      "center": {
+        "lat": 30.41057,
+        "lng": -84.27399
+      },
+      "description": "Historic bungalow grid and the South Monroe commercial corridor with steady fix-and-flip turnover — pinned to Sales row PARID 310775  E0130."
+    },
+    "Midtown": {
+      "name": "Midtown",
+      "division": "MIDTOWN_NORTH",
+      "center": {
+        "lat": 30.46439,
+        "lng": -84.2913
+      },
+      "description": "Walkable densest retail/craft-hosts district north of downtown anchored by Lake Ella — pinned to Sales row PARID 212360  E0040."
+    },
+    "Lafayette / North Monroe": {
+      "name": "Lafayette / North Monroe",
+      "division": "MIDTOWN_NORTH",
+      "center": {
+        "lat": 30.4722,
+        "lng": -84.27865
+      },
+      "description": "Residential-commercial seam along the North Monroe / US-27 corridor with office-to-residence conversions — pinned to Sales row PARID 212423  10060."
+    },
+    "Killearn Lakes": {
+      "name": "Killearn Lakes",
+      "division": "NORTHEAST_KILLEARN",
+      "center": {
+        "lat": 30.53835,
+        "lng": -84.21013
+      },
+      "description": "Master-planned northeast set of lakeside subdivisions drawing the metro's higher-value move-up trades — pinned to Sales row PARID 142560 AS0050."
+    },
+    "Betton Hills / Buckhead": {
+      "name": "Betton Hills / Buckhead",
+      "division": "NORTHEAST_KILLEARN",
+      "center": {
+        "lat": 30.48527,
+        "lng": -84.25132
+      },
+      "description": "Leafy mid-century residential district and the Buckhead commercial node along Thomasville Road — pinned to Sales row PARID 111790  A0180."
+    },
+    "Lake Jackson": {
+      "name": "Lake Jackson",
+      "division": "NORTHWEST_LAKE_JACKSON",
+      "center": {
+        "lat": 30.52554,
+        "lng": -84.38255
+      },
+      "description": "Lake-lined northwest subdivisions on the Bannerman Road corridor with estate infill — pinned to Sales row PARID 253622  B0040."
+    },
+    "West Tallahassee / Jackson Bluff": {
+      "name": "West Tallahassee / Jackson Bluff",
+      "division": "NORTHWEST_LAKE_JACKSON",
+      "center": {
+        "lat": 30.46353,
+        "lng": -84.36692
+      },
+      "description": "Jackson Bluff Road industrial and working-edge corridor absorbing code-enforcement and repair demand — pinned to Sales row PARID 211941  B0070."
+    },
+    "Southside / Bond": {
+      "name": "Southside / Bond",
+      "division": "SOUTHSIDE_BOND",
+      "center": {
+        "lat": 30.38206,
+        "lng": -84.27208
+      },
+      "description": "South Monroe and Southside commercial-industrial pocket with investor-led single-family turnover — pinned to Sales row PARID 311930  C0010."
+    },
+    "Southwood": {
+      "name": "Southwood",
+      "division": "SOUTHEAST_SOUTHWOOD",
+      "center": {
+        "lat": 30.4263,
+        "lng": -84.19719
+      },
+      "description": "New-urbanist planned community off Tram Road and the SE growth corridor with steady new-construction and resale velocity — pinned to Sales row PARID 310270  A0270."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "AppliedDate",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "CALLDTTM",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SALES_SALEDT",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/tallahassee.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

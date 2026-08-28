@@ -1,0 +1,238 @@
+{
+  "schema_version": 2,
+  "id": "bowling_green",
+  "name": "Bowling Green / Warren County",
+  "state": "KY",
+  "center": {
+    "lat": 36.9892,
+    "lng": -86.4436
+  },
+  "metro_bbox": {
+    "min_lat": 36.79,
+    "max_lat": 37.19,
+    "min_lng": -86.67,
+    "max_lng": -86.12
+  },
+  "divisions": {
+    "DOWNTOWN_UNIVERSITY": {
+      "name": "DOWNTOWN_UNIVERSITY",
+      "center": {
+        "lat": 36.988,
+        "lng": -86.45
+      },
+      "bbox": {
+        "min_lat": 36.945,
+        "max_lat": 37.01,
+        "min_lng": -86.51,
+        "max_lng": -86.4
+      },
+      "submarkets": [
+        "Fountain Square",
+        "WKU"
+      ]
+    },
+    "EAST_LOOP": {
+      "name": "EAST_LOOP",
+      "center": {
+        "lat": 36.97,
+        "lng": -86.396
+      },
+      "bbox": {
+        "min_lat": 36.945,
+        "max_lat": 37.005,
+        "min_lng": -86.42,
+        "max_lng": -86.31
+      },
+      "submarkets": [
+        "Mt Victor",
+        "Lovers Lane"
+      ]
+    },
+    "SCOTTSVILLE_CORRIDOR": {
+      "name": "SCOTTSVILLE_CORRIDOR",
+      "center": {
+        "lat": 36.89,
+        "lng": -86.4
+      },
+      "bbox": {
+        "min_lat": 36.83,
+        "max_lat": 36.945,
+        "min_lng": -86.45,
+        "max_lng": -86.35
+      },
+      "submarkets": [
+        "Scottsville Rd"
+      ]
+    },
+    "NASHVILLE_SOUTHWEST": {
+      "name": "NASHVILLE_SOUTHWEST",
+      "center": {
+        "lat": 36.9,
+        "lng": -86.51
+      },
+      "bbox": {
+        "min_lat": 36.8,
+        "max_lat": 36.945,
+        "min_lng": -86.6,
+        "max_lng": -86.45
+      },
+      "submarkets": [
+        "Nashville Rd"
+      ]
+    },
+    "CAMPBELL_SOUTH": {
+      "name": "CAMPBELL_SOUTH",
+      "center": {
+        "lat": 36.86,
+        "lng": -86.38
+      },
+      "bbox": {
+        "min_lat": 36.8,
+        "max_lat": 36.9,
+        "min_lng": -86.45,
+        "max_lng": -86.3
+      },
+      "submarkets": [
+        "Three Springs Rd"
+      ]
+    },
+    "RUSSELLVILLE_NORTHWEST": {
+      "name": "RUSSELLVILLE_NORTHWEST",
+      "center": {
+        "lat": 37.01,
+        "lng": -86.58
+      },
+      "bbox": {
+        "min_lat": 36.95,
+        "max_lat": 37.08,
+        "min_lng": -86.67,
+        "max_lng": -86.5
+      },
+      "submarkets": [
+        "Russellville Rd"
+      ]
+    },
+    "EAST_COUNTY_TRANSPARK": {
+      "name": "EAST_COUNTY_TRANSPARK",
+      "center": {
+        "lat": 36.965,
+        "lng": -86.29
+      },
+      "bbox": {
+        "min_lat": 36.9,
+        "max_lat": 37.05,
+        "min_lng": -86.35,
+        "max_lng": -86.12
+      },
+      "submarkets": [
+        "KY Transpark",
+        "Bluestem Sheldrake"
+      ]
+    }
+  },
+  "submarkets": {
+    "Fountain Square": {
+      "name": "Fountain Square",
+      "division": "DOWNTOWN_UNIVERSITY",
+      "center": {
+        "lat": 36.99,
+        "lng": -86.442
+      },
+      "description": "Court-square retail and civic core between the Barren River and Center Street, dense with renovation, infill apartments, and restaurant refits."
+    },
+    "WKU": {
+      "name": "WKU",
+      "division": "DOWNTOWN_UNIVERSITY",
+      "center": {
+        "lat": 36.9865,
+        "lng": -86.458
+      },
+      "description": "Western Kentucky University campus corridor and its Hilltopper student-housing ring feeding multi-family and street-retail GI on Normal and State Streets."
+    },
+    "Mt Victor": {
+      "name": "Mt Victor",
+      "division": "EAST_LOOP",
+      "center": {
+        "lat": 36.978,
+        "lng": -86.394
+      },
+      "description": "Mt Victor Lane and the Loop-side apartment/multifamily corridor east of downtown absorbing the 2025+ large-scale multifamily filings."
+    },
+    "Lovers Lane": {
+      "name": "Lovers Lane",
+      "division": "EAST_LOOP",
+      "center": {
+        "lat": 36.96,
+        "lng": -86.4
+      },
+      "description": "Established Lovers Lane subdivisions between the Loop and Us-31W, mixing owner-occupied infill, deck/fence permits, and turn-by-investor resales."
+    },
+    "Scottsville Rd": {
+      "name": "Scottsville Rd",
+      "division": "SCOTTSVILLE_CORRIDOR",
+      "center": {
+        "lat": 36.88,
+        "lng": -86.395
+      },
+      "description": "US-231 Scottsville Road retail-and-residential corridor running south-east to the county line, fed by Alvaton/Plano commuter infill."
+    },
+    "Nashville Rd": {
+      "name": "Nashville Rd",
+      "division": "NASHVILLE_SOUTHWEST",
+      "center": {
+        "lat": 36.88,
+        "lng": -86.52
+      },
+      "description": "US-31W Nashville Road southwest of the river toward the I-65/I-165 interchange, a legacy highway strip with steady retail refit and light industrial."
+    },
+    "Three Springs Rd": {
+      "name": "Three Springs Rd",
+      "division": "CAMPBELL_SOUTH",
+      "center": {
+        "lat": 36.86,
+        "lng": -86.4
+      },
+      "description": "Three Springs Road and the Campbell-area south-side neighborhoods, a family-residential ring converting past working land to infill lots."
+    },
+    "Russellville Rd": {
+      "name": "Russellville Rd",
+      "division": "RUSSELLVILLE_NORTHWEST",
+      "center": {
+        "lat": 37.02,
+        "lng": -86.56
+      },
+      "description": "Russellville Road northwest toward the county line, pockets of estate infill and minor commercial off the US-68/231 junction."
+    },
+    "KY Transpark": {
+      "name": "KY Transpark",
+      "division": "EAST_COUNTY_TRANSPARK",
+      "center": {
+        "lat": 36.98,
+        "lng": -86.305
+      },
+      "description": "Kentucky Transpark industrial/advanced-manufacturing campus on the east edge, drawing warehouse, flex, and build-to-suit filings off the I-65 exits."
+    },
+    "Bluestem Sheldrake": {
+      "name": "Bluestem Sheldrake",
+      "division": "EAST_COUNTY_TRANSPARK",
+      "center": {
+        "lat": 36.945,
+        "lng": -86.27
+      },
+      "description": "Far-east Bluestem and Sheldrake district low-density acreage, infill single-family and agricultural-periphery permits seeded by Transpark employment."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "created_date",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/bowling_green.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

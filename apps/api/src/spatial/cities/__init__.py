@@ -679,6 +679,34 @@ from src.spatial.cities.melbourne import (
     MELBOURNE_SUBMARKETS,
     is_in_melbourne_metro,
 )
+from src.spatial.cities.savannah import (
+    SAVANNAH_DIVISION_BBOXES,
+    SAVANNAH_DIVISIONS,
+    SAVANNAH_METRO_BBOX,
+    SAVANNAH_SUBMARKETS,
+    is_in_savannah_metro,
+)
+from src.spatial.cities.bowling_green import (
+    BOWLING_GREEN_DIVISION_BBOXES,
+    BOWLING_GREEN_DIVISIONS,
+    BOWLING_GREEN_METRO_BBOX,
+    BOWLING_GREEN_SUBMARKETS,
+    is_in_bowling_green_metro,
+)
+from src.spatial.cities.tallahassee import (
+    TALLAHASSEE_DIVISION_BBOXES,
+    TALLAHASSEE_DIVISIONS,
+    TALLAHASSEE_METRO_BBOX,
+    TALLAHASSEE_SUBMARKETS,
+    is_in_tallahassee_metro,
+)
+from src.spatial.cities.spartanburg import (
+    SPARTANBURG_DIVISION_BBOXES,
+    SPARTANBURG_DIVISIONS,
+    SPARTANBURG_METRO_BBOX,
+    SPARTANBURG_SUBMARKETS,
+    is_in_spartanburg_metro,
+)
 
 __all__ = [
     "PIERCE_METRO_BBOX",
@@ -1157,4 +1185,24 @@ __all__ = [
     "MELBOURNE_DIVISIONS",
     "MELBOURNE_SUBMARKETS",
     "is_in_melbourne_metro",
+    "SAVANNAH_METRO_BBOX",
+    "SAVANNAH_DIVISION_BBOXES",
+    "SAVANNAH_DIVISIONS",
+    "SAVANNAH_SUBMARKETS",
+    "is_in_savannah_metro",
+    "BOWLING_GREEN_METRO_BBOX",
+    "BOWLING_GREEN_DIVISION_BBOXES",
+    "BOWLING_GREEN_DIVISIONS",
+    "BOWLING_GREEN_SUBMARKETS",
+    "is_in_bowling_green_metro",
+    "TALLAHASSEE_METRO_BBOX",
+    "TALLAHASSEE_DIVISION_BBOXES",
+    "TALLAHASSEE_DIVISIONS",
+    "TALLAHASSEE_SUBMARKETS",
+    "is_in_tallahassee_metro",
+    "SPARTANBURG_METRO_BBOX",
+    "SPARTANBURG_DIVISION_BBOXES",
+    "SPARTANBURG_DIVISIONS",
+    "SPARTANBURG_SUBMARKETS",
+    "is_in_spartanburg_metro",
 ]

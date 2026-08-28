@@ -29,6 +29,7 @@ from src.producers.base_producer import BaseKafkaProducer
 from src.producers.complaints_311_producer import Complaints311Producer
 from src.producers.context_observations_producer import ContextObservationsProducer
 from src.producers.crime_incidents_producer import CrimeIncidentsProducer
+from src.producers.enforcement_signals_producer import InspectionsProducer, ViolationsProducer
 from src.producers.deeds_acris_producer import DeedsACRISProducer
 from src.producers.dob_permits_producer import DOBPermitsProducer
 from src.producers.ev_charging_producer import EvChargingProducer
@@ -228,6 +229,8 @@ class MunicipalIngestionScheduler:
             "sla": SLALicensesProducer(bootstrap_servers=self.bootstrap_servers),
 "deeds": DeedsACRISProducer(bootstrap_servers=self.bootstrap_servers),
             "crime": CrimeIncidentsProducer(bootstrap_servers=self.bootstrap_servers),
+            "violations": ViolationsProducer(bootstrap_servers=self.bootstrap_servers),
+            "inspections": InspectionsProducer(bootstrap_servers=self.bootstrap_servers),
             "street_cut": StreetCutPermitsProducer(bootstrap_servers=self.bootstrap_servers),
             "evictions": EvictionsProducer(bootstrap_servers=self.bootstrap_servers),
             # US-363 §2.7/§2.8: one producer serves both context-measurement

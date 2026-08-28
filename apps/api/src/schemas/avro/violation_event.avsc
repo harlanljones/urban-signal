@@ -1,0 +1,23 @@
+{
+  "type": "record",
+  "name": "ViolationEvent",
+  "namespace": "org.urbandev.events",
+  "doc": "Municipal building / property code-enforcement violation",
+  "fields": [
+    { "name": "city_id", "type": "string", "default": "boston" },
+    { "name": "violation_id", "type": "string" },
+    { "name": "code", "type": "string", "default": "" },
+    { "name": "status", "type": ["null", "string"], "default": null },
+    { "name": "description", "type": ["null", "string"], "default": null },
+    { "name": "borough", "type": ["null", "string"], "default": null },
+    { "name": "address", "type": ["null", "string"], "default": null },
+    { "name": "zipcode", "type": ["null", "string"], "default": null },
+    { "name": "latitude", "type": ["null", "double"], "default": null },
+    { "name": "longitude", "type": ["null", "double"], "default": null },
+    { "name": "status_date", "type": ["null", "string"], "default": null },
+    { "name": "h3_res7", "type": ["null", "string"], "default": null },
+    { "name": "h3_res8", "type": ["null", "string"], "default": null },
+    { "name": "h3_res9", "type": ["null", "string"], "default": null },
+    { "name": "ingested_at", "type": "string" }
+  ]
+}

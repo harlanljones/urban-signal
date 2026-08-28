@@ -86,9 +86,9 @@
       "topic": "raw.municipal.311"
     },
     "sla": {
-      "platform": "arcgis",
+      "platform": "socrata",
       "watermark_col": "",
-      "interval_seconds": 1800.0,
+      "interval_seconds": 21600.0,
       "topic": "raw.municipal.sla"
     },
     "deeds": null
