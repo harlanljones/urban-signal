@@ -314,11 +314,91 @@ I have stopped writing shared paths and committed only my own files. Not mine
 and not touched by me: `nfip_producer.py`, `nrel_afdc_client.py`,
 `ev_charging_producer.py` and the five test modules above.
 
+## Phase 4 — §1.3 `poi_diff_producer` (2026-08-28)
+
+Scope narrowed by the user after the collision: the other session keeps §1.4
+`nfip_producer` and §1.5 `nrel_afdc_client`/`ev_charging_producer`; I built
+§1.3, the component neither of us had.
+
+### Schema, from Foursquare''s public docs (fetched 2026-08-28)
+The docs pages are readable without the gate even though the data is not, so
+the contract is verified even where the partitions are not:
+
+- **Delta files carry three columns only**: `fsq_place_id`, `action`
+  (add|update|remove|merge), `redirect` (surviving id for a merge, null
+  otherwise). **No geometry, no name, no category.** Every attribute an event
+  needs therefore comes from joining delta ids against the release''s `places`
+  partitions — that join is the expensive half of the job and the reason the
+  producer stages files rather than streaming them.
+- **Places** supply `latitude`/`longitude`, `name`, `address`,
+  `fsq_category_ids`/`_labels`, `date_closed` and `unresolved_flags`
+  (closed | duplicate | delete | privatevenue | inappropriate).
+
+### Classification — deliberately conservative
+Naive added/removed counts are GERS-matcher noise, so:
+- `add` -> `poi_opened` (1.0); `remove` -> `poi_closed` (0.9)
+- `merge` **with** a redirect -> `poi_closed` at 0.4: a merge is a database
+  operation, one record absorbed into another, and only sometimes a real
+  closing. A merge **without** a redirect is an unexplained disappearance and
+  is treated as a removal.
+- `update` is **not** churn unless the place itself says so — `date_closed`
+  set (0.6) or an unresolved `closed` flag (0.3, halved because an unresolved
+  flag is by definition uncorroborated).
+- `duplicate`/`delete`/`privatevenue`/`inappropriate` suppress every action:
+  those are not venues whose opening or closing means anything.
+- **Event date is the release date, never `date_closed`.** FSQ''s own docs say
+  `date_closed` is "the date the POI was marked as closed in our database",
+  which is not the day it closed; using it would dress a detection date up as
+  ground truth.
+
+### Licensing fails closed
+Foursquare excludes 38 category ids from commercial use, and that list lives
+in the release''s own `categories` partition — behind the same gate as the
+data. `NON_COMMERCIAL_CATEGORY_IDS` is therefore **deliberately empty** and
+`check_licensing()` **refuses to run** while it is: running without the list
+is not a degraded run, it is an unlicensed one. `strict_licensing=False`
+exists for tests and explicitly non-commercial exploration and logs that it
+is doing so.
+
+### Other design points
+- The metro-bbox filter is pushed into the DuckDB join, not applied in Python:
+  a release covers the planet and we want ~62 metros.
+- Parquet is read through DuckDB (already a dependency); pyarrow is not
+  installed and is not worth adding for one reader.
+- Release discovery is public (the repo *listing* is ungated) so "is there a
+  new release?" needs no token; only the partitions do.
+- A release with no delta partitions is skipped, never treated as a quiet
+  month — the first release in the repo has no predecessor to diff.
+- State marker is written temp-then-rename, like the GBFS store.
+
+`src/producers/poi_diff_producer.py` + `tests/unit/test_poi_diff_producer.py`
+(41 tests). The other session added a `build_events` seam and made `__init__`
+injectable while I was writing the tests; the two designs converged rather
+than clobbered, and every test passes against the merged file.
+
+### Gates at handoff
+`pytest -m interlock` **24 passed / 0 failures / 0 errors**. All US-363
+modules together: **203 tests passed** (poi 41, gbfs+national 37, series 61,
+context observations 47, plus the other session''s snapshot/openfema/nfip/
+nrel/ev/scheduler modules).
+
+Note: the other session briefly reddened the gate by registering
+`EvChargingProducer` without the `socrata` attribute
+`test_platform_clients_exposed` requires; they fixed it within a few minutes
+and the gate is green as of this handoff.
+
 ## Current step
-Phase 3 committed. **Stopped pending direction** — §1.3 `poi_diff_producer`
-is the only component neither agent has built, and §1.4/§1.5 need the two
-implementations reconciled before either is trustworthy.
+Done for this session. Four of the eight register-now items are committed by
+me (§2.7, §2.8, §1.1, §1.2) plus the event-schema decision, the national feed
+registry, `OpenFemaClient` and `poi_diff_producer`. §1.4/§1.5 belong to the
+concurrent session.
 
 ## Next step
-Reconcile with the other agent''s §1.4/§1.5 work (or have one of us drop it),
-then build `poi_diff_producer` against the gated Hugging Face channel.
+1. Populate `NON_COMMERCIAL_CATEGORY_IDS` from the `categories` partition on
+   the first authenticated run, then drop `strict_licensing=False`.
+2. Request Hugging Face access for `foursquare/fsq-os-places` and set
+   `HF_TOKEN`; the POI feed is registered but not schedulable without it.
+3. Spot-verify `developer.nrel.gov/terms/` from a network that resolves it and
+   flip `verified=True` on the AFDC spec.
+4. Consumer + `EnrichedH3Feature` wiring for the four new event types, and the
+   dashboard surfacing that AGENTS.md''s registration rule demands by analogy.
