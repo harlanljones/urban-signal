@@ -2546,12 +2546,7 @@
       "divisions": "5 divisions",
       "division_count": 5,
       "submarket_count": 9,
-      "feeds": [
-        false,
-        false,
-        true,
-        false
-      ],
+      "feeds": [false, false, true, false],
       "platforms": [
         null,
         null,
@@ -2563,10 +2558,7 @@
         },
         null
       ],
-      "center": {
-        "lat": 32.2989,
-        "lng": -90.1847
-      },
+      "center": { "lat": 32.2989, "lng": -90.1847 },
       "evidence_path": "apps/api/src/spatial/cities/jackson_ms.py"
     },
     {
@@ -2595,6 +2587,28 @@
       ],
       "center": { "lat": 32.8366, "lng": -83.6324 },
       "evidence_path": "apps/api/src/spatial/cities/macon_bibb.py"
+    },
+    {
+      "id": "tyler",
+      "name": "Tyler",
+      "state": "TX",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 6,
+      "feeds": [false, false, true, false],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": { "lat": 32.3519, "lng": -95.3006 },
+      "evidence_path": "apps/api/src/spatial/cities/tyler.py"
     }
   ],
   "pipeline": [

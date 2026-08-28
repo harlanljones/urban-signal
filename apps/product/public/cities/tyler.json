@@ -1,0 +1,179 @@
+{
+  "schema_version": 2,
+  "id": "tyler",
+  "name": "Tyler",
+  "state": "TX",
+  "center": {
+    "lat": 32.3519,
+    "lng": -95.3006
+  },
+  "metro_bbox": {
+    "min_lat": 32.25,
+    "max_lat": 32.45,
+    "min_lng": -95.45,
+    "max_lng": -95.15
+  },
+  "divisions": {
+    "CENTRAL_CORE": {
+      "name": "CENTRAL_CORE",
+      "center": {
+        "lat": 32.352,
+        "lng": -95.3
+      },
+      "bbox": {
+        "min_lat": 32.335,
+        "max_lat": 32.37,
+        "min_lng": -95.33,
+        "max_lng": -95.27
+      },
+      "submarkets": [
+        "Downtown Tyler",
+        "Medical District"
+      ]
+    },
+    "WEST_SIDE": {
+      "name": "WEST_SIDE",
+      "center": {
+        "lat": 32.365,
+        "lng": -95.395
+      },
+      "bbox": {
+        "min_lat": 32.32,
+        "max_lat": 32.42,
+        "min_lng": -95.45,
+        "max_lng": -95.34
+      },
+      "submarkets": [
+        "West Loop 323"
+      ]
+    },
+    "EAST_GATE": {
+      "name": "EAST_GATE",
+      "center": {
+        "lat": 32.36,
+        "lng": -95.22
+      },
+      "bbox": {
+        "min_lat": 32.32,
+        "max_lat": 32.42,
+        "min_lng": -95.27,
+        "max_lng": -95.15
+      },
+      "submarkets": [
+        "University Area"
+      ]
+    },
+    "SOUTH_STRIPS": {
+      "name": "SOUTH_STRIPS",
+      "center": {
+        "lat": 32.3,
+        "lng": -95.32
+      },
+      "bbox": {
+        "min_lat": 32.25,
+        "max_lat": 32.33,
+        "min_lng": -95.43,
+        "max_lng": -95.25
+      },
+      "submarkets": [
+        "Azalea District",
+        "South Broadway Corridor"
+      ]
+    },
+    "NORTH_LOOP": {
+      "name": "NORTH_LOOP",
+      "center": {
+        "lat": 32.41,
+        "lng": -95.33
+      },
+      "bbox": {
+        "min_lat": 32.37,
+        "max_lat": 32.45,
+        "min_lng": -95.42,
+        "max_lng": -95.22
+      },
+      "submarkets": [
+        "North Loop & Industrial"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Tyler": {
+      "name": "Downtown Tyler",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 32.3519,
+        "lng": -95.3006
+      },
+      "description": "Courthouse square, arts venues, and mixed commercial infill around downtown core."
+    },
+    "Medical District": {
+      "name": "Medical District",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 32.345,
+        "lng": -95.306
+      },
+      "description": "Hospital and clinical cluster west of downtown with steady facilities investment."
+    },
+    "West Loop 323": {
+      "name": "West Loop 323",
+      "division": "WEST_SIDE",
+      "center": {
+        "lat": 32.36,
+        "lng": -95.38
+      },
+      "description": "Auto-oriented commercial corridor along Loop 323 with retail pads and services."
+    },
+    "University Area": {
+      "name": "University Area",
+      "division": "EAST_GATE",
+      "center": {
+        "lat": 32.315,
+        "lng": -95.245
+      },
+      "description": "UT Tyler campus and adjacent commercial/medical growth east of Broadway."
+    },
+    "Azalea District": {
+      "name": "Azalea District",
+      "division": "SOUTH_STRIPS",
+      "center": {
+        "lat": 32.32,
+        "lng": -95.3
+      },
+      "description": "Historic residential and garden district with neighborhood-serving retail and renovations."
+    },
+    "South Broadway Corridor": {
+      "name": "South Broadway Corridor",
+      "division": "SOUTH_STRIPS",
+      "center": {
+        "lat": 32.3,
+        "lng": -95.305
+      },
+      "description": "Regional retail spine with highway-oriented pads and steady tenant rollover."
+    },
+    "North Loop & Industrial": {
+      "name": "North Loop & Industrial",
+      "division": "NORTH_LOOP",
+      "center": {
+        "lat": 32.405,
+        "lng": -95.34
+      },
+      "description": "Industrial and logistics belt near Loop 323 with light manufacturing and services."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/tyler.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
+
