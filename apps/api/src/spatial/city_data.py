@@ -86,7 +86,9 @@ def validate_definition(raw: Mapping[str, Any]) -> dict[str, Any]:
     return normalized
 
 
-def load_definitions(directory: Path = DATA_DIR) -> list[dict[str, Any]]:
+def load_definitions(
+    directory: Path = DATA_DIR, *, allow_unknown_city_ids: bool = False
+) -> list[dict[str, Any]]:
     """Load and validate every non-example YAML definition in ``directory``."""
     definitions: list[dict[str, Any]] = []
     seen: set[str] = set()
@@ -94,12 +96,13 @@ def load_definitions(directory: Path = DATA_DIR) -> list[dict[str, Any]]:
         if path.name.startswith("_"):
             continue
         definition = validate_definition(yaml.safe_load(path.read_text(encoding="utf-8")))
-        from src.spatial.city_registry import CityId
+        if not allow_unknown_city_ids:
+            from src.spatial.city_registry import CityId
 
-        try:
-            CityId(definition["city_id"])
-        except (TypeError, ValueError) as exc:
-            raise ValueError(f"unknown city_id {definition['city_id']!r}") from exc
+            try:
+                CityId(definition["city_id"])
+            except (TypeError, ValueError) as exc:
+                raise ValueError(f"unknown city_id {definition['city_id']!r}") from exc
         if definition["city_id"] in seen:
             raise ValueError(f"duplicate city_id {definition['city_id']!r}")
         seen.add(definition["city_id"])
@@ -146,6 +149,7 @@ def build_registration(
     city_id_type: Any,
     feed_type: Any,
     endpoint_resolver: Callable[[str], Any] = lambda name: name,
+    allow_unknown_city_ids: bool = False,
 ) -> Any:
     """Build a ``CityRegistration`` from one validated definition."""
     from src.spatial.city_registry import CityRegistration
@@ -154,14 +158,17 @@ def build_registration(
     try:
         city_id = city_id_type(data["city_id"])
     except (TypeError, ValueError) as exc:
-        raise ValueError(f"unknown city_id {data['city_id']!r}") from exc
+        if not allow_unknown_city_ids:
+            raise ValueError(f"unknown city_id {data['city_id']!r}") from exc
+        city_id = data["city_id"]
+    city_label = getattr(city_id, "value", city_id)
     submarkets = {
-        name: _dataclass_from_data(SubmarketMeta, value, f"{city_id.value}.submarkets.{name}")
-        for name, value in _as_mapping(data["submarkets"], f"{city_id.value}.submarkets").items()
+        name: _dataclass_from_data(SubmarketMeta, value, f"{city_label}.submarkets.{name}")
+        for name, value in _as_mapping(data["submarkets"], f"{city_label}.submarkets").items()
     }
     divisions = {
-        name: _dataclass_from_data(BoroughMeta, value, f"{city_id.value}.divisions.{name}")
-        for name, value in _as_mapping(data["divisions"], f"{city_id.value}.divisions").items()
+        name: _dataclass_from_data(BoroughMeta, value, f"{city_label}.divisions.{name}")
+        for name, value in _as_mapping(data["divisions"], f"{city_label}.divisions").items()
     }
     datasets = {
         _feed_key(feed, feed_type): _build_dataset(value, endpoint_resolver)
@@ -182,20 +189,30 @@ def build_registration(
 
 
 def aliases_from_definitions(
-    definitions: Iterable[Mapping[str, Any]], city_id_type: Any
+    definitions: Iterable[Mapping[str, Any]],
+    city_id_type: Any,
+    *,
+    allow_unknown_city_ids: bool = False,
 ) -> dict[str, Any]:
     """Create an alias map and reject aliases that collide across cities."""
     aliases: dict[str, Any] = {}
     for raw in definitions:
         definition = validate_definition(raw)
-        city_id = city_id_type(definition["city_id"])
+        try:
+            city_id = city_id_type(definition["city_id"])
+        except (TypeError, ValueError) as exc:
+            if not allow_unknown_city_ids:
+                raise ValueError(f"unknown city_id {definition['city_id']!r}") from exc
+            city_id = definition["city_id"]
+        city_label = getattr(city_id, "value", city_id)
         for alias in [definition["city_id"], *definition.get("aliases", [])]:
             key = str(alias).strip().lower()
             if not key:
-                raise ValueError(f"{city_id.value} contains an empty alias")
+                raise ValueError(f"{getattr(city_id, 'value', city_id)} contains an empty alias")
             previous = aliases.setdefault(key, city_id)
             if previous != city_id:
                 raise ValueError(
-                    f"alias {key!r} maps to both {previous.value!r} and {city_id.value!r}"
+                    f"alias {key!r} maps to both {getattr(previous, 'value', previous)!r} "
+                    f"and {city_label!r}"
                 )
     return aliases

@@ -32,7 +32,9 @@ from typing import Any
 from src.spatial.registration import SpatialRegistration
 
 
-def build_registry_from_data(definitions, endpoint_resolver=lambda name: name):
+def build_registry_from_data(
+    definitions, endpoint_resolver=lambda name: name, *, allow_unknown_city_ids=False
+):
     """Build registrations directly from validated declarative definitions.
 
     This factory is deliberately separate from the legacy fallback below so a
@@ -49,13 +51,16 @@ def build_registry_from_data(definitions, endpoint_resolver=lambda name: name):
                 city_id_type=city_registry.CityId,
                 feed_type=city_registry.FeedType,
                 endpoint_resolver=endpoint_resolver,
+                allow_unknown_city_ids=allow_unknown_city_ids,
             )
             for definition in definitions
         )
     }
 
 
-def build_aliases_from_data(definitions: Iterable[dict[str, Any]]) -> dict[str, object]:
+def build_aliases_from_data(
+    definitions: Iterable[dict[str, Any]], *, allow_unknown_city_ids=False
+) -> dict[str, object]:
     from src.spatial import city_registry
     from src.spatial.city_data import validate_definition
 
@@ -65,29 +70,38 @@ def build_aliases_from_data(definitions: Iterable[dict[str, Any]]) -> dict[str, 
         try:
             city_id = city_registry.CityId(definition["city_id"])
         except (TypeError, ValueError) as exc:
-            raise ValueError(f"unknown city_id {definition['city_id']!r}") from exc
+            if not allow_unknown_city_ids:
+                raise ValueError(f"unknown city_id {definition['city_id']!r}") from exc
+            city_id = definition["city_id"]
         for alias in [definition["city_id"], *definition.get("aliases", [])]:
             key = str(alias).strip().lower()
             if not key:
-                raise ValueError(f"{city_id.value} contains an empty alias")
+                raise ValueError(f"{getattr(city_id, 'value', city_id)} contains an empty alias")
             previous = aliases.setdefault(key, city_id)
             if previous != city_id:
                 raise ValueError(
-                    f"alias {key!r} maps to both {previous.value!r} and {city_id.value!r}"
+                    f"alias {key!r} maps to both {getattr(previous, 'value', previous)!r} "
+                    f"and {getattr(city_id, 'value', city_id)!r}"
                 )
     return aliases
 
 
-def build_runtime_exports(endpoint_resolver=lambda name: name):
+def build_runtime_exports(endpoint_resolver=lambda name: name, *, allow_unknown_city_ids=False):
     from src.config import settings
     from src.spatial import city_registry
     from src.spatial.city_data import load_definitions
 
     try:
-        definitions = load_definitions(Path(settings.city_data_dir))
+        definitions = load_definitions(
+            Path(settings.city_data_dir), allow_unknown_city_ids=allow_unknown_city_ids
+        )
         if not definitions:
             return None
-        registry = build_registry_from_data(definitions, endpoint_resolver)
+        registry = build_registry_from_data(
+            definitions,
+            endpoint_resolver,
+            allow_unknown_city_ids=allow_unknown_city_ids,
+        )
         legacy_ids = set(city_registry._HANDWRITTEN_REGISTRY)
         if not legacy_ids.issubset(registry):
             return None
@@ -103,7 +117,9 @@ def build_runtime_exports(endpoint_resolver=lambda name: name):
                 divisions=source.divisions,
             )
         aliases = build_aliases_from_registrations()
-        aliases.update(build_aliases_from_data(definitions))
+        aliases.update(
+            build_aliases_from_data(definitions, allow_unknown_city_ids=allow_unknown_city_ids)
+        )
         return registry, aliases
     except Exception:
         return None
