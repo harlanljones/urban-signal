@@ -476,6 +476,7 @@ from src.spatial.cities.waco import (
     WACO_SUBMARKETS,
     is_in_waco_metro,
 )
+<<<<<<< HEAD
 from src.spatial.cities.jackson_ms import (
     JACKSON_MS_DIVISION_BBOXES,
     JACKSON_MS_DIVISIONS,
@@ -609,6 +610,14 @@ from src.spatial.cities.asheville import (
     ASHEVILLE_SUBMARKETS,
     is_in_asheville_metro,
 )
+from src.spatial.cities.wilmington_nc import (
+    WILMINGTON_NC_DIVISION_BBOXES,
+    WILMINGTON_NC_DIVISIONS,
+    WILMINGTON_NC_METRO_BBOX,
+    WILMINGTON_NC_SUBMARKETS,
+    is_in_wilmington_nc_metro,
+)
+
 __all__ = [
     "PIERCE_METRO_BBOX",
     "PIERCE_DIVISION_BBOXES",
@@ -1031,4 +1040,9 @@ __all__ = [
     "LEXINGTON_DIVISIONS",
     "LEXINGTON_SUBMARKETS",
     "is_in_lexington_metro",
+    "WILMINGTON_NC_METRO_BBOX",
+    "WILMINGTON_NC_DIVISION_BBOXES",
+    "WILMINGTON_NC_DIVISIONS",
+    "WILMINGTON_NC_SUBMARKETS",
+    "is_in_wilmington_nc_metro",
 ]
