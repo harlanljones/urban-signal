@@ -1485,6 +1485,7 @@ def get_dashboard_html() -> str:
       amarillo: { name: 'Amarillo' },
       waco: { name: 'Waco' },
       jackson_ms: { name: 'Jackson' },
+      macon_bibb: { name: 'Macon-Bibb County' },
     };
 
     let map = null;

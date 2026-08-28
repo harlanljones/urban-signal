@@ -455,6 +455,13 @@ from src.spatial.cities.jackson_ms import (
     JACKSON_MS_SUBMARKETS,
     is_in_jackson_ms_metro,
 )
+from src.spatial.cities.macon_bibb import (
+    MACON_BIBB_DIVISION_BBOXES,
+    MACON_BIBB_DIVISIONS,
+    MACON_BIBB_METRO_BBOX,
+    MACON_BIBB_SUBMARKETS,
+    is_in_macon_bibb_metro,
+)
 
 __all__ = [
     "PIERCE_METRO_BBOX",
@@ -778,4 +785,9 @@ __all__ = [
     "JACKSON_MS_DIVISIONS",
     "JACKSON_MS_SUBMARKETS",
     "is_in_jackson_ms_metro",
+    "MACON_BIBB_METRO_BBOX",
+    "MACON_BIBB_DIVISION_BBOXES",
+    "MACON_BIBB_DIVISIONS",
+    "MACON_BIBB_SUBMARKETS",
+    "is_in_macon_bibb_metro",
 ]

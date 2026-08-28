@@ -2558,6 +2558,33 @@
         "lng": -90.1847
       },
       "evidence_path": "apps/api/src/spatial/cities/jackson_ms.py"
+    },
+    {
+      "id": "macon_bibb",
+      "name": "Macon-Bibb County",
+      "state": "GA",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 8,
+      "feeds": [true, false, true, false],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "ISSUEDATE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": { "lat": 32.8366, "lng": -83.6324 },
+      "evidence_path": "apps/api/src/spatial/cities/macon_bibb.py"
     }
   ],
   "pipeline": [
