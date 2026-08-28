@@ -1,0 +1,198 @@
+{
+  "schema_version": 2,
+  "id": "jackson_ms",
+  "name": "Jackson",
+  "state": "MS",
+  "center": {
+    "lat": 32.2989,
+    "lng": -90.1847
+  },
+  "metro_bbox": {
+    "min_lat": 32.15,
+    "max_lat": 32.5,
+    "min_lng": -90.45,
+    "max_lng": -89.85
+  },
+  "divisions": {
+    "DOWNTOWN_CORE": {
+      "name": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 32.305,
+        "lng": -90.185
+      },
+      "bbox": {
+        "min_lat": 32.28,
+        "max_lat": 32.33,
+        "min_lng": -90.22,
+        "max_lng": -90.16
+      },
+      "submarkets": [
+        "Downtown Jackson",
+        "Fondren & Belhaven"
+      ]
+    },
+    "NORTH_JACKSON_MADISON": {
+      "name": "NORTH_JACKSON_MADISON",
+      "center": {
+        "lat": 32.41,
+        "lng": -90.18
+      },
+      "bbox": {
+        "min_lat": 32.34,
+        "max_lat": 32.5,
+        "min_lng": -90.35,
+        "max_lng": -89.95
+      },
+      "submarkets": [
+        "Ridgeland & Colony Park",
+        "Madison Town Center"
+      ]
+    },
+    "WEST_CLINTON": {
+      "name": "WEST_CLINTON",
+      "center": {
+        "lat": 32.365,
+        "lng": -90.32
+      },
+      "bbox": {
+        "min_lat": 32.3,
+        "max_lat": 32.45,
+        "min_lng": -90.45,
+        "max_lng": -90.23
+      },
+      "submarkets": [
+        "JSU & West Capitol",
+        "Clinton Main Street"
+      ]
+    },
+    "EAST_FLOWOOD_RANKIN": {
+      "name": "EAST_FLOWOOD_RANKIN",
+      "center": {
+        "lat": 32.33,
+        "lng": -90.02
+      },
+      "bbox": {
+        "min_lat": 32.26,
+        "max_lat": 32.41,
+        "min_lng": -90.15,
+        "max_lng": -89.85
+      },
+      "submarkets": [
+        "Flowood & Dogwood",
+        "Pearl & Airport Corridor"
+      ]
+    },
+    "SOUTH_BELT_BYRAM": {
+      "name": "SOUTH_BELT_BYRAM",
+      "center": {
+        "lat": 32.22,
+        "lng": -90.23
+      },
+      "bbox": {
+        "min_lat": 32.15,
+        "max_lat": 32.3,
+        "min_lng": -90.35,
+        "max_lng": -90.12
+      },
+      "submarkets": [
+        "Byram & South Jackson"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Jackson": {
+      "name": "Downtown Jackson",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 32.2989,
+        "lng": -90.1847
+      },
+      "description": "Capitol complex, government, and mixed-use reinvestment core."
+    },
+    "Fondren & Belhaven": {
+      "name": "Fondren & Belhaven",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 32.3235,
+        "lng": -90.176
+      },
+      "description": "Historic neighborhoods north of downtown with medical and cultural anchors."
+    },
+    "JSU & West Capitol": {
+      "name": "JSU & West Capitol",
+      "division": "WEST_CLINTON",
+      "center": {
+        "lat": 32.298,
+        "lng": -90.21
+      },
+      "description": "Jackson State University district and West Capitol corridor reinvestment."
+    },
+    "Clinton Main Street": {
+      "name": "Clinton Main Street",
+      "division": "WEST_CLINTON",
+      "center": {
+        "lat": 32.341,
+        "lng": -90.328
+      },
+      "description": "Historic downtown Clinton and MS College vicinity with corridor infill."
+    },
+    "Flowood & Dogwood": {
+      "name": "Flowood & Dogwood",
+      "division": "EAST_FLOWOOD_RANKIN",
+      "center": {
+        "lat": 32.332,
+        "lng": -90.067
+      },
+      "description": "Lakeland Drive medical/retail spine and Dogwood Festival commercial hub."
+    },
+    "Pearl & Airport Corridor": {
+      "name": "Pearl & Airport Corridor",
+      "division": "EAST_FLOWOOD_RANKIN",
+      "center": {
+        "lat": 32.275,
+        "lng": -90.08
+      },
+      "description": "Pearl retail corridors and JAN airport approaches along MS-475."
+    },
+    "Ridgeland & Colony Park": {
+      "name": "Ridgeland & Colony Park",
+      "division": "NORTH_JACKSON_MADISON",
+      "center": {
+        "lat": 32.42,
+        "lng": -90.14
+      },
+      "description": "I-55 frontage retail/office belts and mixed-use nodes in Ridgeland."
+    },
+    "Madison Town Center": {
+      "name": "Madison Town Center",
+      "division": "NORTH_JACKSON_MADISON",
+      "center": {
+        "lat": 32.462,
+        "lng": -90.124
+      },
+      "description": "Madison center and Highland Colony nodes with steady suburban infill."
+    },
+    "Byram & South Jackson": {
+      "name": "Byram & South Jackson",
+      "division": "SOUTH_BELT_BYRAM",
+      "center": {
+        "lat": 32.196,
+        "lng": -90.246
+      },
+      "description": "South I-55 growth belt with highway-oriented retail and services."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/jackson_ms.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

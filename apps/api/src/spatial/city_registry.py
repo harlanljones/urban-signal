@@ -420,6 +420,13 @@ from src.spatial.cities.waco import (
     WACO_METRO_BBOX,
     WACO_SUBMARKETS,
 )
+from src.spatial.cities.jackson_ms import (
+    JACKSON_MS_CENTER,
+    JACKSON_MS_DIVISION_BBOXES,
+    JACKSON_MS_DIVISIONS,
+    JACKSON_MS_METRO_BBOX,
+    JACKSON_MS_SUBMARKETS,
+)
 from src.spatial.cities.macon_bibb import (
     MACON_BIBB_CENTER,
     MACON_BIBB_DIVISION_BBOXES,
@@ -505,6 +512,7 @@ class CityId(str, Enum):
     AMARILLO = "amarillo"
     BEAUMONT = "beaumont"
     WACO = "waco"
+    JACKSON_MS = "jackson_ms"
     MACON_BIBB = "macon_bibb"
 
 
@@ -1074,6 +1082,10 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "waco": CityId.WACO,
     "waco_tx": CityId.WACO,
     "waco tx": CityId.WACO,
+    # Jackson, MS
+    "jackson_ms": CityId.JACKSON_MS,
+    "jackson-ms": CityId.JACKSON_MS,
+    "jackson ms": CityId.JACKSON_MS,
     # Macon-Bibb, GA
     "macon_bibb": CityId.MACON_BIBB,
     "macon-bibb": CityId.MACON_BIBB,
@@ -1159,7 +1171,7 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                
+
                 expected_cadence_days=7,
             ),
             FeedType.COMPLAINTS_311: DatasetSpec(
@@ -4968,6 +4980,23 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
             FeedType.SLA: snap_sla_spec("TX"),
         },
     ),
+    CityId.JACKSON_MS: CityRegistration(
+        city_id=CityId.JACKSON_MS,
+        name="Jackson",
+        state="MS",
+        center=JACKSON_MS_CENTER,
+        metro_bbox=JACKSON_MS_METRO_BBOX,
+        division_bboxes=JACKSON_MS_DIVISION_BBOXES,
+        submarkets=JACKSON_MS_SUBMARKETS,
+        divisions=JACKSON_MS_DIVISIONS,
+        job_suffix="jackson_ms",
+        # US-288: initial registration with SNAP-only SLA (MS slice). No
+        # verifiable public permits/311 feed on open.jacksonms.gov as of claim.
+        # Do not fake endpoints; expand when a municipal API is proven.
+        datasets={
+            FeedType.SLA: snap_sla_spec("MS"),
+        },
+    ),
     CityId.MACON_BIBB: CityRegistration(
         city_id=CityId.MACON_BIBB,
         name="Macon-Bibb County",
@@ -4988,7 +5017,7 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
-                
+
                 expected_cadence_days=7,
                 oid_field="OBJECTID0",
                 max_record_count=1000,
