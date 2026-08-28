@@ -2540,6 +2540,7 @@
       "evidence_path": "apps/api/src/spatial/cities/waco.py"
     },
     {
+<<<<<<< HEAD
       "id": "jackson_ms",
       "name": "Jackson",
       "state": "MS",
@@ -2675,6 +2676,18 @@
       "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
       "center": { "lat": 31.997, "lng": -102.078 },
       "evidence_path": "apps/api/src/spatial/cities/midland.py"
+    },
+    {
+      "id": "alexandria",
+      "name": "Alexandria",
+      "state": "LA",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 7,
+      "feeds": [false, false, true, false],
+      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
+      "center": { "lat": 31.3113, "lng": -92.4451 },
+      "evidence_path": "apps/api/src/spatial/cities/alexandria.py"
     }
   ],
   "pipeline": [
