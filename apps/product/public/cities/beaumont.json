@@ -1,0 +1,67 @@
+{
+  "schema_version": 2,
+  "id": "beaumont",
+  "name": "Beaumont",
+  "state": "TX",
+  "center": { "lat": 30.084, "lng": -94.101 },
+  "metro_bbox": { "min_lat": 29.9, "max_lat": 30.2, "min_lng": -94.3, "max_lng": -93.85 },
+  "divisions": {
+    "BEAUMONT_CORE": {
+      "name": "Beaumont Core",
+      "center": { "lat": 30.084, "lng": -94.13 },
+      "bbox": { "min_lat": 29.95, "max_lat": 30.18, "min_lng": -94.25, "max_lng": -93.9 },
+      "submarkets": [
+        "Downtown Beaumont",
+        "West End",
+        "South Park",
+        "North End",
+        "Calder Highlands"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Beaumont": {
+      "name": "Downtown Beaumont",
+      "division": "BEAUMONT_CORE",
+      "center": { "lat": 30.084, "lng": -94.101 },
+      "description": "Civic and riverfront core around Crockett Street, Edison Museum, and Downtown arts venues."
+    },
+    "West End": {
+      "name": "West End",
+      "division": "BEAUMONT_CORE",
+      "center": { "lat": 30.1, "lng": -94.166 },
+      "description": "Retail and residential corridor around Dowlen Road and Phelan with steady renovation activity."
+    },
+    "South Park": {
+      "name": "South Park",
+      "division": "BEAUMONT_CORE",
+      "center": { "lat": 30.041, "lng": -94.122 },
+      "description": "Neighborhoods south of US-90 with university-adjacent housing stock and service demand."
+    },
+    "North End": {
+      "name": "North End",
+      "division": "BEAUMONT_CORE",
+      "center": { "lat": 30.11, "lng": -94.116 },
+      "description": "Historic residential grid north of downtown with rehabilitation pressure and code-enforcement load."
+    },
+    "Calder Highlands": {
+      "name": "Calder Highlands",
+      "division": "BEAUMONT_CORE",
+      "center": { "lat": 30.084, "lng": -94.148 },
+      "description": "Calder Avenue corridor and established neighborhoods with infill and alteration permits."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/beaumont.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
