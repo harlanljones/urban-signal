@@ -434,9 +434,6 @@ from src.spatial.cities.waco import (
     WACO_METRO_BBOX,
     WACO_SUBMARKETS,
 )
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 from src.spatial.cities.lake_charles import (
     LAKE_CHARLES_DIVISION_BBOXES,
     LAKE_CHARLES_DIVISIONS,
@@ -531,6 +528,13 @@ from src.spatial.cities.lakeland import (
     LAKELAND_DIVISIONS,
     LAKELAND_METRO_BBOX,
     LAKELAND_SUBMARKETS,
+)
+from src.spatial.cities.augusta import (
+    AUGUSTA_CENTER,
+    AUGUSTA_DIVISION_BBOXES,
+    AUGUSTA_DIVISIONS,
+    AUGUSTA_METRO_BBOX,
+    AUGUSTA_SUBMARKETS,
 )
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
@@ -627,6 +631,7 @@ class CityId(str, Enum):
     JONESBORO = "jonesboro"
     CHARLESTON_SC = "charleston_sc"
     LAKELAND = "lakeland"
+    AUGUSTA = "augusta"
 
 
 class FeedType(str, Enum):
@@ -1286,6 +1291,10 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "charleston_sc": CityId.CHARLESTON_SC,
     "charleston sc": CityId.CHARLESTON_SC,
     "charleston-sc": CityId.CHARLESTON_SC,
+    # Augusta, GA
+    "augusta": CityId.AUGUSTA,
+    "augusta_ga": CityId.AUGUSTA,
+    "augusta ga": CityId.AUGUSTA,
 }
 
 
@@ -5205,8 +5214,6 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
             FeedType.SLA: snap_sla_spec("TX"),
         },
     ),
-<<<<<<< HEAD
-<<<<<<< HEAD
     CityId.LAKE_CHARLES: CityRegistration(
         city_id=CityId.LAKE_CHARLES,
         name="Lake Charles",
@@ -5320,6 +5327,39 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                     "filing_date": ["INDATE"],
                     "address_street": ["PROPSTREET"],
                     "zipcode": ["PROPPOSTAL"],
+    CityId.AUGUSTA: CityRegistration(
+        city_id=CityId.AUGUSTA,
+        name="Augusta",
+        state="GA",
+        center=AUGUSTA_CENTER,
+        metro_bbox=AUGUSTA_METRO_BBOX,
+        division_bboxes=AUGUSTA_DIVISION_BBOXES,
+        submarkets=AUGUSTA_SUBMARKETS,
+        divisions=AUGUSTA_DIVISIONS,
+        job_suffix="augusta",
+        # Verified public datasets: CityView permits table (ArcGIS MapServer table,
+        # address-only, geocoded at parse time) and SNAP Retailers GA slice as SLA.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_augusta_permits_url,
+                platform="arcgis",
+                watermark_col="DATE_ISSUE",
+                id_keys=["PERMITNUMBER", "PERM_NUM"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                expected_cadence_days=7,
+                needs_geocode=True,
+                geocode_context="Augusta, GA",
+                oid_field="OBJECTID",
+                max_record_count=15000,
+                field_map={
+                    "job_id": ["PERMITNUMBER", "PERM_NUM"],
+                    "address_street": ["JOBADDRESS"],
+                    "issuance_date": ["DATE_ISSUE", "DATE_ENTERED"],
+                    "filing_date": ["DATE_ENTERED"],
+                    "cost": ["WORKCOST"],
+                    "status": ["PERMIT_STATUS"],
                 },
             ),
             FeedType.SLA: snap_sla_spec("GA"),

@@ -1301,6 +1301,13 @@ class Settings(BaseSettings):
         default="https://services5.arcgis.com/cuQhNeNcUrgLmYGD/arcgis/rest/services/Tulsa_Crime_Time_Display/FeatureServer/0",
         description="Tulsa crime ArcGIS FeatureServer",
     )
+    # Augusta, GA (US-287): CityView permits table (non-spatial; address-only).
+    # Registered as PERMITS with ADR-0004 geocoding; 311 requires an API key and
+    # is not registered. SLA uses SNAP GA slice.
+    arcgis_augusta_permits_url: str = Field(
+        default="https://gismap.augustaga.gov/arcgis/rest/services/EnterpriseApps/iasWorld_Permit/MapServer/1",
+        description="Augusta CityView permits ArcGIS MapServer table URL (address-only, geocoded)",
+    )
     arcgis_el_paso_permits_url: str = Field(
         default="https://services1.arcgis.com/hyTVSIhR7dHyDsJF/arcgis/rest/services/NewResi2018_19/FeatureServer/0",
         description="El Paso residential building permits ArcGIS FeatureServer (frozen 2018-2021 snapshot)",
