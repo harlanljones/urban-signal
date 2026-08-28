@@ -672,6 +672,13 @@ from src.spatial.cities.tucson import (
     TUCSON_SUBMARKETS,
     is_in_tucson_metro,
 )
+from src.spatial.cities.melbourne import (
+    MELBOURNE_DIVISION_BBOXES,
+    MELBOURNE_DIVISIONS,
+    MELBOURNE_METRO_BBOX,
+    MELBOURNE_SUBMARKETS,
+    is_in_melbourne_metro,
+)
 
 __all__ = [
     "PIERCE_METRO_BBOX",
@@ -1145,4 +1152,9 @@ __all__ = [
     "TUCSON_DIVISIONS",
     "TUCSON_SUBMARKETS",
     "is_in_tucson_metro",
+    "MELBOURNE_METRO_BBOX",
+    "MELBOURNE_DIVISION_BBOXES",
+    "MELBOURNE_DIVISIONS",
+    "MELBOURNE_SUBMARKETS",
+    "is_in_melbourne_metro",
 ]

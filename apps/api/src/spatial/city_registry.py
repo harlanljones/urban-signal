@@ -381,6 +381,12 @@ from src.spatial.cities.ocala import (
     OCALA_METRO_BBOX,
     OCALA_SUBMARKETS,
 )
+from src.spatial.cities.melbourne import (
+    MELBOURNE_DIVISION_BBOXES,
+    MELBOURNE_DIVISIONS,
+    MELBOURNE_METRO_BBOX,
+    MELBOURNE_SUBMARKETS,
+)
 from src.spatial.cities.memphis import (
     MEMPHIS_DIVISION_BBOXES,
     MEMPHIS_DIVISIONS,
@@ -1129,6 +1135,13 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "ocala": CityId.OCALA,
     "ocala_fl": CityId.OCALA,
     "ocala fl": CityId.OCALA,
+
+    # Melbourne / Palm Bay / Titusville (Brevard County, FL)
+    "melbourne": CityId.MELBOURNE,
+    "melbourne_fl": CityId.MELBOURNE,
+    "melbourne fl": CityId.MELBOURNE,
+    "palm_bay": CityId.MELBOURNE,
+    "palm bay": CityId.MELBOURNE,
 
     # Miami-Dade County, FL (not City of Miami / Broward — ADR 0007)
     "miami_dade": CityId.MIAMI_DADE,
