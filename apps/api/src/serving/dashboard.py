@@ -1489,6 +1489,7 @@ def get_dashboard_html() -> str:
       macon_bibb: { name: 'Macon-Bibb County' },
       ocala: { name: 'Ocala / Marion County' },
       tyler: { name: 'Tyler' },
+      lake_charles: { name: 'Lake Charles' },
     };
 
     let map = null;
