@@ -2617,16 +2617,27 @@
       "evidence_path": "apps/api/src/spatial/cities/longview.py"
     },
     {
+<<<<<<< HEAD
       "id": "monroe",
       "name": "Monroe",
       "state": "LA",
+=======
+      "id": "abilene",
+      "name": "Abilene",
+      "state": "TX",
+>>>>>>> 11b1f04 (US-278: Register CityId.abilene with REGISTRY + ALIASES (SNAP SLA TX), export from cities package, wire METRO_META and byte-sync dashboard; update product facts and city brief)
       "divisions": "5 divisions",
       "division_count": 5,
       "submarket_count": 8,
       "feeds": [false, false, true, false],
       "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
+<<<<<<< HEAD
       "center": { "lat": 32.5093, "lng": -92.1193 },
       "evidence_path": "apps/api/src/spatial/cities/monroe.py"
+=======
+      "center": { "lat": 32.4487, "lng": -99.7331 },
+      "evidence_path": "apps/api/src/spatial/cities/abilene.py"
+>>>>>>> 11b1f04 (US-278: Register CityId.abilene with REGISTRY + ALIASES (SNAP SLA TX), export from cities package, wire METRO_META and byte-sync dashboard; update product facts and city brief)
     }
   ],
   "pipeline": [

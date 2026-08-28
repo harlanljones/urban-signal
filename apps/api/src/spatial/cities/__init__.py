@@ -462,6 +462,7 @@ from src.spatial.cities.waco import (
     WACO_SUBMARKETS,
     is_in_waco_metro,
 )
+<<<<<<< HEAD
 from src.spatial.cities.jackson_ms import (
     JACKSON_MS_DIVISION_BBOXES,
     JACKSON_MS_DIVISIONS,
@@ -497,12 +498,20 @@ from src.spatial.cities.longview import (
     LONGVIEW_SUBMARKETS,
     is_in_longview_metro,
 )
+<<<<<<< HEAD
 from src.spatial.cities.monroe import (
     MONROE_DIVISION_BBOXES,
     MONROE_DIVISIONS,
     MONROE_METRO_BBOX,
     MONROE_SUBMARKETS,
     is_in_monroe_metro,
+)
+from src.spatial.cities.abilene import (
+    ABILENE_DIVISION_BBOXES,
+    ABILENE_DIVISIONS,
+    ABILENE_METRO_BBOX,
+    ABILENE_SUBMARKETS,
+    is_in_abilene_metro,
 )
 
 from src.spatial.cities.lake_charles import (
@@ -874,4 +883,9 @@ __all__ = [
     "MONROE_DIVISIONS",
     "MONROE_SUBMARKETS",
     "is_in_monroe_metro",
+    "ABILENE_METRO_BBOX",
+    "ABILENE_DIVISION_BBOXES",
+    "ABILENE_DIVISIONS",
+    "ABILENE_SUBMARKETS",
+    "is_in_abilene_metro",
 ]

@@ -473,6 +473,13 @@ from src.spatial.cities.monroe import (
     MONROE_METRO_BBOX,
     MONROE_SUBMARKETS,
 )
+from src.spatial.cities.abilene import (
+    ABILENE_CENTER,
+    ABILENE_DIVISION_BBOXES,
+    ABILENE_DIVISIONS,
+    ABILENE_METRO_BBOX,
+    ABILENE_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -559,6 +566,7 @@ class CityId(str, Enum):
     FORT_SMITH = "fort_smith"
     LONGVIEW = "longview"
     MONROE = "monroe"
+    ABILENE = "abilene"
 
 
 class FeedType(str, Enum):
@@ -1169,6 +1177,10 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "monroe": CityId.MONROE,
     "monroe_la": CityId.MONROE,
     "monroe la": CityId.MONROE,
+    # Abilene, TX
+    "abilene": CityId.ABILENE,
+    "abilene_tx": CityId.ABILENE,
+    "abilene tx": CityId.ABILENE,
 }
 
 
@@ -5170,6 +5182,22 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         job_suffix="tyler",
         # US-273: initial registration with SNAP SLA (TX slice). City permits
         # via data.texas.gov require verification; register when public API confirmed.
+        datasets={
+            FeedType.SLA: snap_sla_spec("TX"),
+        },
+    ),
+    CityId.ABILENE: CityRegistration(
+        city_id=CityId.ABILENE,
+        name="Abilene",
+        state="TX",
+        center=ABILENE_CENTER,
+        metro_bbox=ABILENE_METRO_BBOX,
+        division_bboxes=ABILENE_DIVISION_BBOXES,
+        submarkets=ABILENE_SUBMARKETS,
+        divisions=ABILENE_DIVISIONS,
+        job_suffix="abilene",
+        # US-278: initial registration with SNAP SLA (TX slice). Verify
+        # municipal permits via a public API before enabling permits feed.
         datasets={
             FeedType.SLA: snap_sla_spec("TX"),
         },
