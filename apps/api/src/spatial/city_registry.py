@@ -1508,15 +1508,23 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
             FeedType.PERMITS: DatasetSpec(
                 endpoint=settings.arcgis_brevard_permits_url,
                 platform="arcgis",
-                watermark_col="ISSUEDATE",
-                id_keys=["FOLDERSEQUENCE", "OBJECTID0"],
+                watermark_col="issueDate",
+                id_keys=["ApplicationNumber", "OBJECTID"],
                 topic=settings.topic_permits,
                 interval_seconds=300.0,
                 producer_key="permits",
                 expected_cadence_days=1,
-                oid_field="OBJECTID0",
+                oid_field="OBJECTID",
                 max_record_count=1000,
-                order_by="ISSUEDATE DESC",
+                order_by="issueDate DESC",
+                field_map={
+                    "job_id": ["ApplicationNumber"],
+                    "issuance_date": ["issueDate", "PermitDate", "ApplicationDate"],
+                    "status": ["PermitStatus"],
+                    "job_type": ["ApplicationType", "PermitType"],
+                    "address_street": ["ADDRESS"],
+                    "cost": ["EstimateValuation"],
+                },
             ),
             # USDA FNS SNAP retailers as the SLA slice (Florida state filter).
             # Rows outside the metro bbox still carry global H3 tags; metro

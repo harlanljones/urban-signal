@@ -1900,7 +1900,7 @@
       "platforms": [
         {
           "platform": "arcgis",
-          "watermark_col": "ISSUEDATE",
+          "watermark_col": "issueDate",
           "interval_seconds": 300.0,
           "topic": "raw.municipal.permits"
         },
