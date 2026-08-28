@@ -1,0 +1,60 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "id": "bldg_1", "height": 12.5, "levels": 3 },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-73.9899, 40.7499],
+          [-73.9899, 40.7502],
+          [-73.9895, 40.7502],
+          [-73.9895, 40.7499],
+          [-73.9899, 40.7499]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "bldg_2", "height": 24.0, "levels": 6 },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-73.9894, 40.7498],
+          [-73.9894, 40.7501],
+          [-73.9890, 40.7501],
+          [-73.9890, 40.7498],
+          [-73.9894, 40.7498]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "bldg_2_dup", "height": 24.0, "levels": 6 },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-73.9894, 40.7498],
+          [-73.9894, 40.7501],
+          [-73.9890, 40.7501],
+          [-73.9890, 40.7498],
+          [-73.9894, 40.7498]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "bldg_invalid", "height": null, "levels": null },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-73.9897, 40.7497],
+          [-73.9893, 40.7497],
+          [-73.9895, 40.7499],
+          [-73.9897, 40.7497]
+        ]]
+      }
+    }
+  ]
+}
