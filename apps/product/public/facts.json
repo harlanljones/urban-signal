@@ -2595,6 +2595,7 @@
       "evidence_path": "apps/api/src/spatial/cities/waco.py"
     },
     {
+<<<<<<< HEAD
       "id": "jackson_ms",
       "name": "Jackson",
       "state": "MS",
@@ -2771,6 +2772,23 @@
       "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
       "center": { "lat": 32.781, "lng": -79.931 },
       "evidence_path": "apps/api/src/spatial/cities/charleston_sc.py"
+    },
+    {
+      "id": "augusta",
+      "name": "Augusta",
+      "state": "GA",
+      "divisions": "4 divisions",
+      "division_count": 4,
+      "submarket_count": 8,
+      "feeds": [true, false, true, false],
+      "platforms": [
+        { "platform": "arcgis", "watermark_col": "DATE_ISSUE", "interval_seconds": 300.0, "topic": "raw.municipal.permits" },
+        null,
+        { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" },
+        null
+      ],
+      "center": { "lat": 33.476, "lng": -82.010 },
+      "evidence_path": "apps/api/src/spatial/cities/augusta.py"
     }
   ],
   "pipeline": [
