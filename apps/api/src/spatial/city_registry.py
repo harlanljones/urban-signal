@@ -453,6 +453,12 @@ from src.spatial.cities.tyler import (
     TYLER_METRO_BBOX,
     TYLER_SUBMARKETS,
 )
+from src.spatial.cities.fort_smith import (
+    FORT_SMITH_DIVISION_BBOXES,
+    FORT_SMITH_DIVISIONS,
+    FORT_SMITH_METRO_BBOX,
+    FORT_SMITH_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -536,6 +542,7 @@ class CityId(str, Enum):
     MACON_BIBB = "macon_bibb"
     TYLER = "tyler"
     LAKE_CHARLES = "lake_charles"
+    FORT_SMITH = "fort_smith"
 
 
 class FeedType(str, Enum):
@@ -1133,6 +1140,11 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "tyler": CityId.TYLER,
     "tyler_tx": CityId.TYLER,
     "tyler tx": CityId.TYLER,
+    # Fort Smith, AR
+    "fort_smith": CityId.FORT_SMITH,
+    "fort smith": CityId.FORT_SMITH,
+    "fort_smith_ar": CityId.FORT_SMITH,
+    "fort smith ar": CityId.FORT_SMITH,
 }
 
 
@@ -5037,8 +5049,6 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
             FeedType.SLA: snap_sla_spec("LA"),
         },
     ),
-        },
-    ),
     CityId.JACKSON_MS: CityRegistration(
         city_id=CityId.JACKSON_MS,
         name="Jackson",
@@ -5122,6 +5132,22 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         # via data.texas.gov require verification; register when public API confirmed.
         datasets={
             FeedType.SLA: snap_sla_spec("TX"),
+        },
+    ),
+    CityId.FORT_SMITH: CityRegistration(
+        city_id=CityId.FORT_SMITH,
+        name="Fort Smith",
+        state="AR",
+        center={"lat": 35.3859, "lng": -94.3985},
+        metro_bbox=FORT_SMITH_METRO_BBOX,
+        division_bboxes=FORT_SMITH_DIVISION_BBOXES,
+        submarkets=FORT_SMITH_SUBMARKETS,
+        divisions=FORT_SMITH_DIVISIONS,
+        job_suffix="fort_smith",
+        # US-275: initial registration SNAP-only (AR slice). No public municipal
+        # permits API verified at claim; expand when a city permits feed is proven.
+        datasets={
+            FeedType.SLA: snap_sla_spec("AR"),
         },
     ),
 }
