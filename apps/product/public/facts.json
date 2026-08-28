@@ -2463,6 +2463,36 @@
         "lng": -83.5379
       },
       "evidence_path": "apps/api/src/spatial/cities/toledo.py"
+    },
+    {
+      "id": "amarillo",
+      "name": "Amarillo",
+      "state": "TX",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 8,
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 35.207,
+        "lng": -101.833
+      },
+      "evidence_path": "apps/api/src/spatial/cities/amarillo.py"
     }
   ],
   "pipeline": [
