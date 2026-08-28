@@ -1,0 +1,189 @@
+{
+  "schema_version": 2,
+  "id": "waco",
+  "name": "Waco",
+  "state": "TX",
+  "center": {
+    "lat": 31.5493,
+    "lng": -97.1467
+  },
+  "metro_bbox": {
+    "min_lat": 31.4,
+    "max_lat": 31.72,
+    "min_lng": -97.35,
+    "max_lng": -96.95
+  },
+  "divisions": {
+    "CENTRAL_CORE": {
+      "name": "CENTRAL_CORE",
+      "center": {
+        "lat": 31.551,
+        "lng": -97.138
+      },
+      "bbox": {
+        "min_lat": 31.52,
+        "max_lat": 31.58,
+        "min_lng": -97.18,
+        "max_lng": -97.1
+      },
+      "submarkets": [
+        "Downtown Waco",
+        "Baylor University District",
+        "Magnolia Silos & Market"
+      ]
+    },
+    "WEST_SIDE": {
+      "name": "WEST_SIDE",
+      "center": {
+        "lat": 31.52,
+        "lng": -97.25
+      },
+      "bbox": {
+        "min_lat": 31.45,
+        "max_lat": 31.58,
+        "min_lng": -97.35,
+        "max_lng": -97.2
+      },
+      "submarkets": [
+        "West Waco / Woodway"
+      ]
+    },
+    "SOUTH_STRIPS": {
+      "name": "SOUTH_STRIPS",
+      "center": {
+        "lat": 31.465,
+        "lng": -97.21
+      },
+      "bbox": {
+        "min_lat": 31.4,
+        "max_lat": 31.5,
+        "min_lng": -97.3,
+        "max_lng": -97.12
+      },
+      "submarkets": [
+        "Hewitt & South Bosque"
+      ]
+    },
+    "EAST_GATE": {
+      "name": "EAST_GATE",
+      "center": {
+        "lat": 31.57,
+        "lng": -97.08
+      },
+      "bbox": {
+        "min_lat": 31.5,
+        "max_lat": 31.65,
+        "min_lng": -97.12,
+        "max_lng": -96.95
+      },
+      "submarkets": [
+        "East Waco & Elm Ave"
+      ]
+    },
+    "NORTH_LOOP": {
+      "name": "NORTH_LOOP",
+      "center": {
+        "lat": 31.635,
+        "lng": -97.14
+      },
+      "bbox": {
+        "min_lat": 31.58,
+        "max_lat": 31.72,
+        "min_lng": -97.25,
+        "max_lng": -97.0
+      },
+      "submarkets": [
+        "Bellmead & Lacy-Lakeview",
+        "Airport Corridor"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Waco": {
+      "name": "Downtown Waco",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 31.553,
+        "lng": -97.138
+      },
+      "description": "Courthouse, Convention Center, and riverfront core with adaptive reuse and hospitality infill."
+    },
+    "Baylor University District": {
+      "name": "Baylor University District",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 31.547,
+        "lng": -97.121
+      },
+      "description": "Campus-adjacent mixed-use, student housing, and services along University Parks & I-35."
+    },
+    "Magnolia Silos & Market": {
+      "name": "Magnolia Silos & Market",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 31.5493,
+        "lng": -97.129
+      },
+      "description": "Tourism anchor district around the Silos and Market grounds with hospitality momentum."
+    },
+    "West Waco / Woodway": {
+      "name": "West Waco / Woodway",
+      "division": "WEST_SIDE",
+      "center": {
+        "lat": 31.512,
+        "lng": -97.223
+      },
+      "description": "US-84 corridor retail, medical clusters, and residential-adjacent commercial grid."
+    },
+    "Hewitt & South Bosque": {
+      "name": "Hewitt & South Bosque",
+      "division": "SOUTH_STRIPS",
+      "center": {
+        "lat": 31.465,
+        "lng": -97.2
+      },
+      "description": "Southern growth belt near Hewitt with highway-oriented retail and services."
+    },
+    "East Waco & Elm Ave": {
+      "name": "East Waco & Elm Ave",
+      "division": "EAST_GATE",
+      "center": {
+        "lat": 31.56,
+        "lng": -97.108
+      },
+      "description": "Historic East Waco corridor and I-35 east frontage experiencing steady small-scale reinvestment."
+    },
+    "Bellmead & Lacy-Lakeview": {
+      "name": "Bellmead & Lacy-Lakeview",
+      "division": "NORTH_LOOP",
+      "center": {
+        "lat": 31.625,
+        "lng": -97.097
+      },
+      "description": "North/east belt communities with logistics, light industrial, and highway services along I-35."
+    },
+    "Airport Corridor": {
+      "name": "Airport Corridor",
+      "division": "NORTH_LOOP",
+      "center": {
+        "lat": 31.611,
+        "lng": -97.228
+      },
+      "description": "Waco Regional Airport vicinity and Industrial Blvd with logistics and hospitality ribbons."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/waco.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
+

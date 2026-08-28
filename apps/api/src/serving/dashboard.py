@@ -1483,6 +1483,7 @@ def get_dashboard_html() -> str:
       omaha: { name: 'Omaha' },
       toledo: { name: 'Toledo' },
       amarillo: { name: 'Amarillo' },
+      waco: { name: 'Waco' },
     };
 
     let map = null;
