@@ -1477,6 +1477,13 @@ def get_dashboard_html() -> str:
       virginia_beach: { name: 'Virginia Beach' },
       omaha: { name: 'Omaha' },
       toledo: { name: 'Toledo' },
+      buffalo: { name: 'Buffalo, NY' },
+      rochester: { name: 'Rochester, NY' },
+      syracuse: { name: 'Syracuse, NY' },
+      lynchburg: { name: 'Lynchburg, VA' },
+      greenville: { name: 'Greenville, SC' },
+      anchorage: { name: 'Anchorage, AK' },
+      tucson: { name: 'Tucson, AZ' },
     };
 
     let map = null;

@@ -2463,6 +2463,241 @@
         "lng": -83.5379
       },
       "evidence_path": "apps/api/src/spatial/cities/toledo.py"
+    },
+    {
+      "id": "buffalo",
+      "name": "Buffalo",
+      "state": "NY",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 8,
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "socrata",
+          "watermark_col": "issdttm",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 42.8864,
+        "lng": -78.8784
+      },
+      "evidence_path": "apps/api/src/spatial/cities/buffalo.py"
+    },
+    {
+      "id": "rochester",
+      "name": "Rochester",
+      "state": "NY",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 8,
+      "feeds": [
+        false,
+        false,
+        true,
+        true
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALE_DATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 43.156,
+        "lng": -77.612
+      },
+      "evidence_path": "apps/api/src/spatial/cities/rochester.py"
+    },
+    {
+      "id": "syracuse",
+      "name": "Syracuse",
+      "state": "NY",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 8,
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "RR_app_received",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 43.0481,
+        "lng": -76.1474
+      },
+      "evidence_path": "apps/api/src/spatial/cities/syracuse.py"
+    },
+    {
+      "id": "lynchburg",
+      "name": "Lynchburg",
+      "state": "VA",
+      "divisions": "3 divisions",
+      "division_count": 3,
+      "submarket_count": 7,
+      "feeds": [
+        true,
+        false,
+        true,
+        true
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "StartDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "LicenseIssued",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "SaleDate",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 37.4135,
+        "lng": -79.1422
+      },
+      "evidence_path": "apps/api/src/spatial/cities/lynchburg.py"
+    },
+    {
+      "id": "greenville",
+      "name": "Greenville",
+      "state": "SC",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 8,
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "NewIssueDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 34.8497,
+        "lng": -82.3992
+      },
+      "evidence_path": "apps/api/src/spatial/cities/greenville.py"
+    },
+    {
+      "id": "anchorage",
+      "name": "Anchorage",
+      "state": "AK",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 8,
+      "feeds": [
+        false,
+        false,
+        true,
+        true
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "Deed_Date",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 61.2176,
+        "lng": -149.8997
+      },
+      "evidence_path": "apps/api/src/spatial/cities/anchorage.py"
+    },
+    {
+      "id": "tucson",
+      "name": "Tucson",
+      "state": "AZ",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 8,
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "DT_START",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 32.2226,
+        "lng": -110.9723
+      },
+      "evidence_path": "apps/api/src/spatial/cities/tucson.py"
     }
   ],
   "pipeline": [

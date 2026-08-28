@@ -29,6 +29,29 @@ from typing import Dict, List
 from src.spatial.registration import SpatialRegistration
 
 
+def build_registry_from_data(definitions, endpoint_resolver=lambda name: name):
+    """Build registrations directly from validated declarative definitions.
+
+    This factory is deliberately separate from the legacy fallback below so a
+    caller can validate and promote a data migration in one interlock hold.
+    """
+    from src.spatial import city_registry
+    from src.spatial.city_data import build_registration
+
+    return {
+        registration.city_id: registration
+        for registration in (
+            build_registration(
+                definition,
+                city_id_type=city_registry.CityId,
+                feed_type=city_registry.FeedType,
+                endpoint_resolver=endpoint_resolver,
+            )
+            for definition in definitions
+        )
+    }
+
+
 def _leaf_registration(city_id):
     """Return the ``REGISTRATION`` object for a ``CityId`` leaf module.
 

@@ -1,0 +1,208 @@
+{
+  "schema_version": 2,
+  "id": "rochester",
+  "name": "Rochester",
+  "state": "NY",
+  "center": {
+    "lat": 43.156,
+    "lng": -77.612
+  },
+  "metro_bbox": {
+    "min_lat": 43.1,
+    "max_lat": 43.27,
+    "min_lng": -77.71,
+    "max_lng": -77.53
+  },
+  "divisions": {
+    "DOWNTOWN_RIVER": {
+      "name": "DOWNTOWN_RIVER",
+      "center": {
+        "lat": 43.147,
+        "lng": -77.621
+      },
+      "bbox": {
+        "min_lat": 43.13,
+        "max_lat": 43.17,
+        "min_lng": -77.65,
+        "max_lng": -77.6
+      },
+      "submarkets": [
+        "Center City",
+        "Corn Hill"
+      ]
+    },
+    "EAST_SIDE_CULTURAL": {
+      "name": "EAST_SIDE_CULTURAL",
+      "center": {
+        "lat": 43.1515,
+        "lng": -77.592
+      },
+      "bbox": {
+        "min_lat": 43.14,
+        "max_lat": 43.165,
+        "min_lng": -77.61,
+        "max_lng": -77.575
+      },
+      "submarkets": [
+        "Park Avenue",
+        "Neighborhood of the Arts"
+      ]
+    },
+    "NORTH_LAKESHORE": {
+      "name": "NORTH_LAKESHORE",
+      "center": {
+        "lat": 43.227,
+        "lng": -77.563
+      },
+      "bbox": {
+        "min_lat": 43.21,
+        "max_lat": 43.27,
+        "min_lng": -77.6,
+        "max_lng": -77.535
+      },
+      "submarkets": [
+        "Charlotte"
+      ]
+    },
+    "NORTHWEST_GORGE": {
+      "name": "NORTHWEST_GORGE",
+      "center": {
+        "lat": 43.185,
+        "lng": -77.635
+      },
+      "bbox": {
+        "min_lat": 43.16,
+        "max_lat": 43.21,
+        "min_lng": -77.66,
+        "max_lng": -77.61
+      },
+      "submarkets": [
+        "Maplewood"
+      ]
+    },
+    "SOUTHWEST_WARD": {
+      "name": "SOUTHWEST_WARD",
+      "center": {
+        "lat": 43.12,
+        "lng": -77.643
+      },
+      "bbox": {
+        "min_lat": 43.1,
+        "max_lat": 43.14,
+        "min_lng": -77.67,
+        "max_lng": -77.615
+      },
+      "submarkets": [
+        "19th Ward"
+      ]
+    },
+    "NORTHEAST_UPPER": {
+      "name": "NORTHEAST_UPPER",
+      "center": {
+        "lat": 43.177,
+        "lng": -77.596
+      },
+      "bbox": {
+        "min_lat": 43.165,
+        "max_lat": 43.2,
+        "min_lng": -77.61,
+        "max_lng": -77.555
+      },
+      "submarkets": [
+        "Upper Falls"
+      ]
+    }
+  },
+  "submarkets": {
+    "Center City": {
+      "name": "Center City",
+      "division": "DOWNTOWN_RIVER",
+      "center": {
+        "lat": 43.151,
+        "lng": -77.618
+      },
+      "description": "The Main Street CBD west of the Genesee with office-to-residential conversions, theROC anchor projects, and the city's densest mixed-use pipeline."
+    },
+    "Corn Hill": {
+      "name": "Corn Hill",
+      "division": "DOWNTOWN_RIVER",
+      "center": {
+        "lat": 43.143,
+        "lng": -77.624
+      },
+      "description": "The third-oldest residential neighborhood in Rochester: Italianate and Victorian rowhouses on the bluff southwest of downtown with steady restoration trades."
+    },
+    "Park Avenue": {
+      "name": "Park Avenue",
+      "division": "EAST_SIDE_CULTURAL",
+      "center": {
+        "lat": 43.15,
+        "lng": -77.596
+      },
+      "description": "The East Avenue corridor's boutique retail spine of mansions cut into apartments, restaurant-row licensing, and high-turnover condo stock."
+    },
+    "Neighborhood of the Arts": {
+      "name": "Neighborhood of the Arts",
+      "division": "EAST_SIDE_CULTURAL",
+      "center": {
+        "lat": 43.153,
+        "lng": -77.588
+      },
+      "description": "The Memorial Art Gallery / Village Gate district around University Avenue where loft conversions and gallery-space retrofits drive the permit mix."
+    },
+    "Charlotte": {
+      "name": "Charlotte",
+      "division": "NORTH_LAKESHORE",
+      "center": {
+        "lat": 43.227,
+        "lng": -77.563
+      },
+      "description": "The Ontario lakeshore village at the river mouth with seasonal cottage turnover, pier-adjacent hospitality licensing, and flood-zone rebuild work."
+    },
+    "Maplewood": {
+      "name": "Maplewood",
+      "division": "NORTHWEST_GORGE",
+      "center": {
+        "lat": 43.172,
+        "lng": -77.625
+      },
+      "description": "The Dewey Avenue grid west of the Genesee gorge around Maplewood Park with solid pre-war housing stock and investor renovation flow."
+    },
+    "19th Ward": {
+      "name": "19th Ward",
+      "division": "SOUTHWEST_WARD",
+      "center": {
+        "lat": 43.12,
+        "lng": -77.643
+      },
+      "description": "The Thurston Road/Arnett Boulevard ward south of the UR campus with craftsman-bungalow stock, a deep rental register, and block-by-block reinvestment."
+    },
+    "Upper Falls": {
+      "name": "Upper Falls",
+      "division": "NORTHEAST_UPPER",
+      "center": {
+        "lat": 43.177,
+        "lng": -77.596
+      },
+      "description": "The north-central ward along Upper Falls Boulevard where the city's lowest sale prices meet the heaviest vacancy-to-acquisition conversion flow."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SALE_DATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/rochester.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

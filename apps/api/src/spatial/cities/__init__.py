@@ -433,6 +433,55 @@ from src.spatial.cities.toledo import (
     TOLEDO_SUBMARKETS,
     is_in_toledo_metro,
 )
+from src.spatial.cities.buffalo import (
+    BUFFALO_DIVISION_BBOXES,
+    BUFFALO_DIVISIONS,
+    BUFFALO_METRO_BBOX,
+    BUFFALO_SUBMARKETS,
+    is_in_buffalo_metro,
+)
+from src.spatial.cities.rochester import (
+    ROCHESTER_DIVISION_BBOXES,
+    ROCHESTER_DIVISIONS,
+    ROCHESTER_METRO_BBOX,
+    ROCHESTER_SUBMARKETS,
+    is_in_rochester_metro,
+)
+from src.spatial.cities.syracuse import (
+    SYRACUSE_DIVISION_BBOXES,
+    SYRACUSE_DIVISIONS,
+    SYRACUSE_METRO_BBOX,
+    SYRACUSE_SUBMARKETS,
+    is_in_syracuse_metro,
+)
+from src.spatial.cities.lynchburg import (
+    LYNCHBURG_DIVISION_BBOXES,
+    LYNCHBURG_DIVISIONS,
+    LYNCHBURG_METRO_BBOX,
+    LYNCHBURG_SUBMARKETS,
+    is_in_lynchburg_metro,
+)
+from src.spatial.cities.greenville import (
+    GREENVILLE_DIVISION_BBOXES,
+    GREENVILLE_DIVISIONS,
+    GREENVILLE_METRO_BBOX,
+    GREENVILLE_SUBMARKETS,
+    is_in_greenville_metro,
+)
+from src.spatial.cities.anchorage import (
+    ANCHORAGE_DIVISION_BBOXES,
+    ANCHORAGE_DIVISIONS,
+    ANCHORAGE_METRO_BBOX,
+    ANCHORAGE_SUBMARKETS,
+    is_in_anchorage_metro,
+)
+from src.spatial.cities.tucson import (
+    TUCSON_DIVISION_BBOXES,
+    TUCSON_DIVISIONS,
+    TUCSON_METRO_BBOX,
+    TUCSON_SUBMARKETS,
+    is_in_tucson_metro,
+)
 
 __all__ = [
     "PIERCE_METRO_BBOX",
@@ -741,4 +790,39 @@ __all__ = [
     "TOLEDO_DIVISIONS",
     "TOLEDO_SUBMARKETS",
     "is_in_toledo_metro",
+    "BUFFALO_METRO_BBOX",
+    "BUFFALO_DIVISION_BBOXES",
+    "BUFFALO_DIVISIONS",
+    "BUFFALO_SUBMARKETS",
+    "is_in_buffalo_metro",
+    "ROCHESTER_METRO_BBOX",
+    "ROCHESTER_DIVISION_BBOXES",
+    "ROCHESTER_DIVISIONS",
+    "ROCHESTER_SUBMARKETS",
+    "is_in_rochester_metro",
+    "SYRACUSE_METRO_BBOX",
+    "SYRACUSE_DIVISION_BBOXES",
+    "SYRACUSE_DIVISIONS",
+    "SYRACUSE_SUBMARKETS",
+    "is_in_syracuse_metro",
+    "LYNCHBURG_METRO_BBOX",
+    "LYNCHBURG_DIVISION_BBOXES",
+    "LYNCHBURG_DIVISIONS",
+    "LYNCHBURG_SUBMARKETS",
+    "is_in_lynchburg_metro",
+    "GREENVILLE_METRO_BBOX",
+    "GREENVILLE_DIVISION_BBOXES",
+    "GREENVILLE_DIVISIONS",
+    "GREENVILLE_SUBMARKETS",
+    "is_in_greenville_metro",
+    "ANCHORAGE_METRO_BBOX",
+    "ANCHORAGE_DIVISION_BBOXES",
+    "ANCHORAGE_DIVISIONS",
+    "ANCHORAGE_SUBMARKETS",
+    "is_in_anchorage_metro",
+    "TUCSON_METRO_BBOX",
+    "TUCSON_DIVISION_BBOXES",
+    "TUCSON_DIVISIONS",
+    "TUCSON_SUBMARKETS",
+    "is_in_tucson_metro",
 ]

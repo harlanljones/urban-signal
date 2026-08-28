@@ -29,6 +29,13 @@ from src.producers.field_maps_henderson import FIELD_MAP as HENDERSON_FIELD_MAP
 from src.producers.field_maps_virginia_beach import FIELD_MAP as VIRGINIA_BEACH_FIELD_MAP
 from src.producers.field_maps_omaha import FIELD_MAP as OMAHA_FIELD_MAP
 from src.producers.field_maps_toledo import FIELD_MAP as TOLEDO_FIELD_MAP
+from src.producers.field_maps_buffalo import SLA_FIELD_MAP as BUFFALO_SLA_FIELD_MAP
+from src.producers.field_maps_rochester import DEEDS_FIELD_MAP as ROCHESTER_DEEDS_FIELD_MAP
+from src.producers.field_maps_syracuse import SYRACUSE_SLA_FIELD_MAP
+from src.producers.field_maps_lynchburg import FIELD_MAP as LYNCHBURG_FIELD_MAP
+from src.producers.field_maps_greenville import FIELD_MAP as GREENVILLE_FIELD_MAP
+from src.producers.field_maps_anchorage import DEEDS_FIELD_MAP as ANCHORAGE_DEEDS_FIELD_MAP
+from src.producers.field_maps_tucson import SLA_FIELD_MAP as TUCSON_SLA_FIELD_MAP
 from src.producers.field_maps_boston_licensing import FIELD_MAP as BOSTON_LICENSING_FIELD_MAP
 from src.producers.field_maps_counters import (
     NYC_COUNTS_FIELD_MAP,
@@ -410,6 +417,51 @@ from src.spatial.cities.toledo import (
     TOLEDO_METRO_BBOX,
     TOLEDO_SUBMARKETS,
 )
+from src.spatial.cities.buffalo import (
+    BUFFALO_DIVISION_BBOXES,
+    BUFFALO_DIVISIONS,
+    BUFFALO_METRO_BBOX,
+    BUFFALO_SUBMARKETS,
+)
+from src.spatial.cities.rochester import (
+    ROCHESTER_CENTER,
+    ROCHESTER_DIVISION_BBOXES,
+    ROCHESTER_DIVISIONS,
+    ROCHESTER_METRO_BBOX,
+    ROCHESTER_SUBMARKETS,
+)
+from src.spatial.cities.syracuse import (
+    SYRACUSE_DIVISION_BBOXES,
+    SYRACUSE_DIVISIONS,
+    SYRACUSE_METRO_BBOX,
+    SYRACUSE_SUBMARKETS,
+)
+from src.spatial.cities.lynchburg import (
+    LYNCHBURG_CENTER,
+    LYNCHBURG_DIVISION_BBOXES,
+    LYNCHBURG_DIVISIONS,
+    LYNCHBURG_METRO_BBOX,
+    LYNCHBURG_SUBMARKETS,
+)
+from src.spatial.cities.greenville import (
+    GREENVILLE_DIVISION_BBOXES,
+    GREENVILLE_DIVISIONS,
+    GREENVILLE_METRO_BBOX,
+    GREENVILLE_SUBMARKETS,
+)
+from src.spatial.cities.anchorage import (
+    ANCHORAGE_CENTER,
+    ANCHORAGE_DIVISION_BBOXES,
+    ANCHORAGE_DIVISIONS,
+    ANCHORAGE_METRO_BBOX,
+    ANCHORAGE_SUBMARKETS,
+)
+from src.spatial.cities.tucson import (
+    TUCSON_DIVISION_BBOXES,
+    TUCSON_DIVISIONS,
+    TUCSON_METRO_BBOX,
+    TUCSON_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -485,6 +537,13 @@ class CityId(str, Enum):
     VIRGINIA_BEACH = "virginia_beach"
     OMAHA = "omaha"
     TOLEDO = "toledo"
+    BUFFALO = "buffalo"
+    ROCHESTER = "rochester"
+    SYRACUSE = "syracuse"
+    LYNCHBURG = "lynchburg"
+    GREENVILLE = "greenville"
+    ANCHORAGE = "anchorage"
+    TUCSON = "tucson"
 
 
 class FeedType(str, Enum):
@@ -508,6 +567,12 @@ class FeedType(str, Enum):
     # covariates, subject to the standing ablation rule before LIMS.
     ENERGY_BENCHMARK = "energy_benchmark"
     BIKE_PED = "bike_ped"
+
+    # US-363 §1.2/§2.1. A GBFS system maps one-to-one onto a metro, so docked
+    # bikeshare is city-shaped and registers here. The other three US-363
+    # components (POI deltas, OpenFEMA, NREL AFDC) are national files that
+    # cover every metro at once and live in `national_feeds.py` instead.
+    GBFS = "gbfs"
 
 
 @runtime_checkable
@@ -1046,6 +1111,49 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "toledo_oh": CityId.TOLEDO,
     "toledo-oh": CityId.TOLEDO,
     "toledo oh": CityId.TOLEDO,
+
+    # Buffalo, NY
+    "buffalo": CityId.BUFFALO,
+    "buffalo_ny": CityId.BUFFALO,
+    "buffalo-ny": CityId.BUFFALO,
+    "buffalo ny": CityId.BUFFALO,
+
+    # Rochester, NY
+    "rochester": CityId.ROCHESTER,
+    "rochester_ny": CityId.ROCHESTER,
+    "rochester-ny": CityId.ROCHESTER,
+    "rochester ny": CityId.ROCHESTER,
+
+    # Syracuse, NY
+    "syracuse": CityId.SYRACUSE,
+    "syracuse_ny": CityId.SYRACUSE,
+    "syracuse-ny": CityId.SYRACUSE,
+    "syracuse ny": CityId.SYRACUSE,
+
+    # Lynchburg, VA
+    "lynchburg": CityId.LYNCHBURG,
+    "lynchburg_va": CityId.LYNCHBURG,
+    "lynchburg-va": CityId.LYNCHBURG,
+    "lynchburg va": CityId.LYNCHBURG,
+
+    # Greenville, SC
+    "greenville": CityId.GREENVILLE,
+    "greenville_sc": CityId.GREENVILLE,
+    "greenville-sc": CityId.GREENVILLE,
+    "greenville sc": CityId.GREENVILLE,
+
+    # Anchorage, AK
+    "anchorage": CityId.ANCHORAGE,
+    "anchorage_ak": CityId.ANCHORAGE,
+    "anchorage-ak": CityId.ANCHORAGE,
+    "anchorage ak": CityId.ANCHORAGE,
+
+    # Tucson, AZ
+    "tucson": CityId.TUCSON,
+    "tucson_az": CityId.TUCSON,
+    "tucson-az": CityId.TUCSON,
+    "tucson az": CityId.TUCSON,
+    "tuscon": CityId.TUCSON,
 }
 
 
@@ -1240,6 +1348,25 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 companion_endpoints={'sensor_registry': settings.socrata_nyc_bike_ped_sensors_endpoint},
                 field_map=NYC_COUNTS_FIELD_MAP,
             ),
+            # US-363 §2.1: docked bikeshare via snapshot diff. No watermark
+            # column exists — GBFS changes state in place — so
+            # `ingestion_mode: snapshot` and the station state store carry the
+            # ingestion contract. Citi Bike (bkn), GBFS 2.3, 2,508 stations verified 2026-08-28.
+            # LICENSE: Lyft's Data License Agreement permits product use and
+            # bars re-hosting the raw feed; we derive events and never
+            # republish. Lime/Bird/Spin/Bolt/Veo are barred outright.
+            FeedType.GBFS: DatasetSpec(
+                endpoint=settings.gbfs_nyc_discovery_endpoint,
+                platform="gbfs",
+                watermark_col="",
+                id_keys=["station_id", "system_id"],
+                topic=settings.topic_station_change,
+                interval_seconds=3600.0,
+                producer_key="gbfs",
+                ingestion_mode="snapshot",
+                expected_cadence_days=1,
+                companion_endpoints={'system_id': 'bkn', 'operator': 'lyft'},
+            ),
         },
     ),
     CityId.CHICAGO: CityRegistration(
@@ -1368,6 +1495,25 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 alarm_exempt_reason='annual disclosure, one reporting year behind by publication practice (US-363 §2.7)',
                 field_map=CHICAGO_ENERGY_FIELD_MAP,
             ),
+            # US-363 §2.1: docked bikeshare via snapshot diff. No watermark
+            # column exists — GBFS changes state in place — so
+            # `ingestion_mode: snapshot` and the station state store carry the
+            # ingestion contract. Divvy (chi), GBFS 2.3, discovery verified 200 on 2026-08-28.
+            # LICENSE: Lyft's Data License Agreement permits product use and
+            # bars re-hosting the raw feed; we derive events and never
+            # republish. Lime/Bird/Spin/Bolt/Veo are barred outright.
+            FeedType.GBFS: DatasetSpec(
+                endpoint=settings.gbfs_chicago_discovery_endpoint,
+                platform="gbfs",
+                watermark_col="",
+                id_keys=["station_id", "system_id"],
+                topic=settings.topic_station_change,
+                interval_seconds=3600.0,
+                producer_key="gbfs",
+                ingestion_mode="snapshot",
+                expected_cadence_days=1,
+                companion_endpoints={'system_id': 'chi', 'operator': 'lyft'},
+            ),
         },
     ),
     CityId.SAN_FRANCISCO: CityRegistration(
@@ -1442,6 +1588,25 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 producer_key="crime",
                 
                 expected_cadence_days=7,
+            ),
+            # US-363 §2.1: docked bikeshare via snapshot diff. No watermark
+            # column exists — GBFS changes state in place — so
+            # `ingestion_mode: snapshot` and the station state store carry the
+            # ingestion contract. Bay Wheels (bay), GBFS 2.3, discovery verified 200 on 2026-08-28.
+            # LICENSE: Lyft's Data License Agreement permits product use and
+            # bars re-hosting the raw feed; we derive events and never
+            # republish. Lime/Bird/Spin/Bolt/Veo are barred outright.
+            FeedType.GBFS: DatasetSpec(
+                endpoint=settings.gbfs_san_francisco_discovery_endpoint,
+                platform="gbfs",
+                watermark_col="",
+                id_keys=["station_id", "system_id"],
+                topic=settings.topic_station_change,
+                interval_seconds=3600.0,
+                producer_key="gbfs",
+                ingestion_mode="snapshot",
+                expected_cadence_days=1,
+                companion_endpoints={'system_id': 'bay', 'operator': 'lyft'},
             ),
         },
     ),
@@ -2622,6 +2787,28 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 max_record_count=2000,
                 parcel_join={'parcel_layer': 'https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Property_and_Land_WebMercator/FeatureServer/33', 'join_key': 'SSL', 'geometry_source': 'centroid'},
                 field_map={'doc_id': ['ROW_NUMBER'], 'bbl': ['SSL'], 'document_amount': ['SALE_PRICE'], 'recorded_date': ['SALE_DATE'], 'doc_type': ['QUALIFIED']},
+            ),
+            # US-363 §2.1: docked bikeshare via snapshot diff. No watermark
+            # column exists — GBFS changes state in place — so
+            # `ingestion_mode: snapshot` and the station state store carry the
+            # ingestion contract. Capital Bikeshare, GBFS **1.1**, system
+            # `dca-cabi`, 866 stations verified 2026-08-28. Reached through the
+            # operator's discovery root, NOT gbfs.lyft.com/.../dca/, which is a
+            # live-but-empty stub (see the config note).
+            # LICENSE: Lyft's Data License Agreement permits product use and
+            # bars re-hosting the raw feed; we derive events and never
+            # republish. Lime/Bird/Spin/Bolt/Veo are barred outright.
+            FeedType.GBFS: DatasetSpec(
+                endpoint=settings.gbfs_washington_dc_discovery_endpoint,
+                platform="gbfs",
+                watermark_col="",
+                id_keys=["station_id", "system_id"],
+                topic=settings.topic_station_change,
+                interval_seconds=3600.0,
+                producer_key="gbfs",
+                ingestion_mode="snapshot",
+                expected_cadence_days=1,
+                companion_endpoints={'system_id': 'dca-cabi', 'operator': 'lyft'},
             ),
         },
     ),
@@ -4963,6 +5150,291 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 field_map=TOLEDO_FIELD_MAP["311"],
             ),
             FeedType.SLA: snap_sla_spec("OH"),
+        },
+    ),
+    CityId.BUFFALO: CityRegistration(
+        city_id=CityId.BUFFALO,
+        name="Buffalo",
+        state="NY",
+        center={"lat": 42.8864, "lng": -78.8784},
+        metro_bbox=BUFFALO_METRO_BBOX,
+        division_bboxes=BUFFALO_DIVISION_BBOXES,
+        submarkets=BUFFALO_SUBMARKETS,
+        divisions=BUFFALO_DIVISIONS,
+        job_suffix="buffalo",
+        # US-349: partial — restaurant-license SLA only (Tier 1). Native
+        # WGS84 latitude/longitude; gpsx/gpsy are mixed-CRS and never
+        # candidates. Socrata NULLs-first ordering demands the where guard.
+        datasets={
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.socrata_buffalo_sla_endpoint,
+                platform="socrata",
+                watermark_col="issdttm",
+                id_keys=["uniqkey", "licenseno", "aplickey"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                expected_cadence_days=7,
+                needs_geocode=False,
+                where="issdttm IS NOT NULL",
+                order_by="issdttm DESC",
+                field_map=BUFFALO_SLA_FIELD_MAP,
+            ),
+        },
+    ),
+    CityId.ROCHESTER: CityRegistration(
+        city_id=CityId.ROCHESTER,
+        name="Rochester",
+        state="NY",
+        center=ROCHESTER_CENTER,
+        metro_bbox=ROCHESTER_METRO_BBOX,
+        division_bboxes=ROCHESTER_DIVISION_BBOXES,
+        submarkets=ROCHESTER_SUBMARKETS,
+        divisions=ROCHESTER_DIVISIONS,
+        job_suffix="rochester",
+        # US-351: partial — deeds/sales via the Monroe County RPS tax-parcel
+        # layer (native parcel polygons). Monthly roll with lag (Jul rows
+        # stop 07/22; Aug=0 at the 2026-08-28 re-probe — re-probe before
+        # declaring stalled). $1 quitclaims kept at ingest. SLA is the SNAP
+        # state slice (US-364).
+        datasets={
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.arcgis_rochester_deeds_url,
+                platform="arcgis",
+                watermark_col="SALE_DATE",
+                id_keys=["PRINTKEY", "PARCELID", "SALE_DATE"],
+                topic=settings.topic_deeds,
+                interval_seconds=600.0,
+                producer_key="deeds",
+                expected_cadence_days=30,
+                needs_geocode=False,
+                watermark_type="text",
+                watermark_format="%m/%d/%Y",
+                oid_field="OBJECTID",
+                max_record_count=100000,
+                non_spatial=False,
+                field_map=ROCHESTER_DEEDS_FIELD_MAP,
+            ),
+            FeedType.SLA: snap_sla_spec("NY"),
+        },
+    ),
+    CityId.SYRACUSE: CityRegistration(
+        city_id=CityId.SYRACUSE,
+        name="Syracuse",
+        state="NY",
+        center={"lat": 43.0481, "lng": -76.1474},
+        metro_bbox=SYRACUSE_METRO_BBOX,
+        division_bboxes=SYRACUSE_DIVISION_BBOXES,
+        submarkets=SYRACUSE_SUBMARKETS,
+        divisions=SYRACUSE_DIVISIONS,
+        job_suffix="syracuse",
+        # US-352: partial — rental-registry SLA only (Tier 1, event-driven).
+        # Native WGS84 Latitude/Longitude; PII dropped at the field map;
+        # frozen Permit_Requests and absent 311/deeds are NOT registered.
+        datasets={
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.arcgis_syracuse_sla_url,
+                platform="arcgis",
+                watermark_col="RR_app_received",
+                id_keys=["SBL"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                expected_cadence_days=1,
+                needs_geocode=False,
+                oid_field="ObjectId",
+                max_record_count=1000,
+                order_by="RR_app_received DESC",
+                field_map=SYRACUSE_SLA_FIELD_MAP,
+            ),
+        },
+    ),
+    CityId.LYNCHBURG: CityRegistration(
+        city_id=CityId.LYNCHBURG,
+        name="Lynchburg",
+        state="VA",
+        center=LYNCHBURG_CENTER,
+        metro_bbox=LYNCHBURG_METRO_BBOX,
+        division_bboxes=LYNCHBURG_DIVISION_BBOXES,
+        submarkets=LYNCHBURG_SUBMARKETS,
+        divisions=LYNCHBURG_DIVISIONS,
+        job_suffix="lynchburg",
+        # US-318: full three-family — permits (37), SLA (33), deeds (34) on
+        # one ODPDynamic MapServer. Deeds are an address-less transfer table:
+        # coordinates arrive via the LRSN -> layer-41 parcel-centroid join
+        # (DC precedent) with ADR-0004 as the lossless fallback. Layer 34
+        # publishes no objectIdField — ESRI_OID ordering is mandatory.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_lynchburg_permits_url,
+                platform="arcgis",
+                watermark_col="StartDate",
+                id_keys=["RecordNo", "OBJECTID"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                expected_cadence_days=1,
+                needs_geocode=True,
+                geocode_context="Lynchburg, VA",
+                order_by="OBJECTID",
+                oid_field="OBJECTID",
+                max_record_count=50000,
+                non_spatial=True,
+                field_map=LYNCHBURG_FIELD_MAP["permits"],
+            ),
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.arcgis_lynchburg_sla_url,
+                platform="arcgis",
+                watermark_col="LicenseIssued",
+                id_keys=["LicenseNumber", "OBJECTID"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                expected_cadence_days=365,
+                needs_geocode=True,
+                geocode_context="Lynchburg, VA",
+                order_by="OBJECTID",
+                oid_field="OBJECTID",
+                max_record_count=50000,
+                non_spatial=True,
+                field_map=LYNCHBURG_FIELD_MAP["sla"],
+            ),
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.arcgis_lynchburg_deeds_url,
+                platform="arcgis",
+                watermark_col="SaleDate",
+                id_keys=["LRSN", "DocumentNo"],
+                topic=settings.topic_deeds,
+                interval_seconds=600.0,
+                producer_key="deeds",
+                expected_cadence_days=1,
+                needs_geocode=True,
+                geocode_context="Lynchburg, VA",
+                order_by="ESRI_OID",
+                oid_field="ESRI_OID",
+                max_record_count=50000,
+                non_spatial=True,
+                parcel_join={
+                    "parcel_layer": settings.arcgis_lynchburg_parcel_layer_url,
+                    "join_key": "LRSN",
+                    "geometry_source": "centroid",
+                },
+                field_map=LYNCHBURG_FIELD_MAP["deeds"],
+            ),
+        },
+    ),
+    CityId.GREENVILLE: CityRegistration(
+        city_id=CityId.GREENVILLE,
+        name="Greenville",
+        state="SC",
+        center={"lat": 34.8497, "lng": -82.3992},
+        metro_bbox=GREENVILLE_METRO_BBOX,
+        division_bboxes=GREENVILLE_DIVISION_BBOXES,
+        submarkets=GREENVILLE_SUBMARKETS,
+        divisions=GREENVILLE_DIVISIONS,
+        job_suffix="greenville",
+        # US-340: partial — building permits only (Tier 1, rolling two-year
+        # window; NewIssueDate is not where-queryable and time= is ignored).
+        # SLA is the SNAP state slice (US-364).
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.arcgis_greenville_permits_url,
+                platform="arcgis",
+                watermark_col="NewIssueDate",
+                id_keys=["PERMIT_NUM"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                expected_cadence_days=1,
+                needs_geocode=True,
+                geocode_context="Greenville, SC",
+                oid_field="OBJECTID",
+                max_record_count=7000,
+                order_by="NewIssueDate DESC",
+                field_map=GREENVILLE_FIELD_MAP["permits"],
+            ),
+            FeedType.SLA: snap_sla_spec("SC"),
+        },
+    ),
+    CityId.ANCHORAGE: CityRegistration(
+        city_id=CityId.ANCHORAGE,
+        name="Anchorage",
+        state="AK",
+        center=ANCHORAGE_CENTER,
+        metro_bbox=ANCHORAGE_METRO_BBOX,
+        division_bboxes=ANCHORAGE_DIVISION_BBOXES,
+        submarkets=ANCHORAGE_SUBMARKETS,
+        divisions=ANCHORAGE_DIVISIONS,
+        job_suffix="anchorage",
+        # US-330: partial — assessor property-information deeds (daily batch
+        # republication; recordings land business days, so Fri->Mon is a
+        # normal 3-day watermark gap — alarm fires only when the daily batch
+        # stalls past a full weekend + Monday). Future-dated Deed_Date
+        # sentinels excluded at the source. SLA is the SNAP state slice
+        # (US-364). Deed_Date/PUBDATE epochs are stamped noon UTC, not AKST.
+        datasets={
+            FeedType.DEEDS: DatasetSpec(
+                endpoint=settings.arcgis_anchorage_deeds_url,
+                platform="arcgis",
+                watermark_col="Deed_Date",
+                id_keys=["Parcel_ID", "GIS_ParcelNum11", "OBJECTID"],
+                topic=settings.topic_deeds,
+                interval_seconds=600.0,
+                producer_key="deeds",
+                expected_cadence_days=3,
+                needs_geocode=False,
+                where="Deed_Date <= CURRENT_TIMESTAMP",
+                order_by="Deed_Date DESC",
+                oid_field="OBJECTID",
+                max_record_count=2000,
+                non_spatial=False,
+                field_map=ANCHORAGE_DEEDS_FIELD_MAP,
+            ),
+            FeedType.SLA: snap_sla_spec("AK"),
+        },
+    ),
+    CityId.TUCSON: CityRegistration(
+        city_id=CityId.TUCSON,
+        name="Tucson",
+        state="AZ",
+        center={"lat": 32.2226, "lng": -110.9723},
+        metro_bbox=TUCSON_METRO_BBOX,
+        division_bboxes=TUCSON_DIVISION_BBOXES,
+        submarkets=TUCSON_SUBMARKETS,
+        divisions=TUCSON_DIVISIONS,
+        job_suffix="tucson",
+        # US-328: partial — economic-development SLA snapshot. Future-dated
+        # DT_START application sentinels are excluded at the source (static
+        # watermark_exclude cannot pin rolling sentinels). ANSI-date host
+        # (gis.tucsonaz.gov in ANSI_DATE_LITERAL_HOSTS). Store SR WKID 2868
+        # AZ-East feet — coords only via outSR=4326 geometry lift.
+        datasets={
+            FeedType.SLA: DatasetSpec(
+                endpoint=settings.arcgis_tucson_sla_url,
+                platform="arcgis",
+                watermark_col="DT_START",
+                id_keys=["ACC_NUM", "LIC_TYPE", "OBJECTID"],
+                topic=settings.topic_sla,
+                interval_seconds=600.0,
+                producer_key="sla",
+                expected_cadence_days=30,
+                alarm_exempt=True,
+                alarm_exempt_reason=(
+                    "slow/annual effective cadence: newest non-future DT_START "
+                    "rows land ~2 per 60d (layer IS maintained - future-dated "
+                    "applications present); DT_START<=CURRENT_TIMESTAMP where "
+                    "guard excludes future sentinels; alarm would false-positive "
+                    "on the slow issuance pace"
+                ),
+                ingestion_mode="snapshot",
+                needs_geocode=True,
+                geocode_context="Tucson, AZ",
+                where="DT_START <= CURRENT_TIMESTAMP",
+                order_by="DT_START DESC",
+                oid_field="OBJECTID",
+                max_record_count=2000,
+                field_map=TUCSON_SLA_FIELD_MAP,
+            ),
         },
     ),
 }

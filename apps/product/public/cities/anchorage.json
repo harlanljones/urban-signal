@@ -1,0 +1,193 @@
+{
+  "schema_version": 2,
+  "id": "anchorage",
+  "name": "Anchorage",
+  "state": "AK",
+  "center": {
+    "lat": 61.2176,
+    "lng": -149.8997
+  },
+  "metro_bbox": {
+    "min_lat": 60.8,
+    "max_lat": 61.5,
+    "min_lng": -150.25,
+    "max_lng": -148.95
+  },
+  "divisions": {
+    "DOWNTOWN_CORE": {
+      "name": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 61.2103,
+        "lng": -149.8864
+      },
+      "bbox": {
+        "min_lat": 61.197,
+        "max_lat": 61.232,
+        "min_lng": -149.925,
+        "max_lng": -149.862
+      },
+      "submarkets": [
+        "Downtown Anchorage",
+        "South Addition"
+      ]
+    },
+    "MIDTOWN_EAST": {
+      "name": "MIDTOWN_EAST",
+      "center": {
+        "lat": 61.1935,
+        "lng": -149.8725
+      },
+      "bbox": {
+        "min_lat": 61.185,
+        "max_lat": 61.2,
+        "min_lng": -149.915,
+        "max_lng": -149.82
+      },
+      "submarkets": [
+        "Midtown",
+        "Rogers Park"
+      ]
+    },
+    "EAST_ANCHORAGE": {
+      "name": "EAST_ANCHORAGE",
+      "center": {
+        "lat": 61.21,
+        "lng": -149.787
+      },
+      "bbox": {
+        "min_lat": 61.188,
+        "max_lat": 61.23,
+        "min_lng": -149.815,
+        "max_lng": -149.735
+      },
+      "submarkets": [
+        "Russian Jack"
+      ]
+    },
+    "WEST_ANCH": {
+      "name": "WEST_ANCH",
+      "center": {
+        "lat": 61.17,
+        "lng": -149.9785
+      },
+      "bbox": {
+        "min_lat": 61.135,
+        "max_lat": 61.2,
+        "min_lng": -150.03,
+        "max_lng": -149.895
+      },
+      "submarkets": [
+        "Sand Lake",
+        "Turnagain"
+      ]
+    },
+    "EAGLE_RIVER_CHUGIAK": {
+      "name": "EAGLE_RIVER_CHUGIAK",
+      "center": {
+        "lat": 61.322,
+        "lng": -149.548
+      },
+      "bbox": {
+        "min_lat": 61.28,
+        "max_lat": 61.45,
+        "min_lng": -149.66,
+        "max_lng": -149.42
+      },
+      "submarkets": [
+        "Eagle River & Chugiak"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Anchorage": {
+      "name": "Downtown Anchorage",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 61.2176,
+        "lng": -149.8997
+      },
+      "description": "The 4th Avenue/City Hall core on the Knik Arm shoreline with office-to-residential conversions, the waterfront redevelopment arc, and the state government office base."
+    },
+    "South Addition": {
+      "name": "South Addition",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 61.203,
+        "lng": -149.873
+      },
+      "description": "The 1910s grid south of downtown around the Delaney Park Strip with craftsman and art-deco stock, small-lot infill, and the West Anchorage restaurant row."
+    },
+    "Midtown": {
+      "name": "Midtown",
+      "division": "MIDTOWN_EAST",
+      "center": {
+        "lat": 61.1955,
+        "lng": -149.903
+      },
+      "description": "The C Street/Northern Lights office-retail node between downtown and the airport with 1980s commercial stock cycling toward multifamily conversion."
+    },
+    "Rogers Park": {
+      "name": "Rogers Park",
+      "division": "MIDTOWN_EAST",
+      "center": {
+        "lat": 61.1915,
+        "lng": -149.842
+      },
+      "description": "The post-war tract grid east of the Debarr corridor around Rogers Park Elementary with steady renovation trades and duplex conversion pressure."
+    },
+    "Russian Jack": {
+      "name": "Russian Jack",
+      "division": "EAST_ANCHORAGE",
+      "center": {
+        "lat": 61.21,
+        "lng": -149.787
+      },
+      "description": "The northeast hills around Russian Jack Springs Park with 1960s-70s subdivisions, deep starter-home turnover, and the Muldoon-edge rental register."
+    },
+    "Sand Lake": {
+      "name": "Sand Lake",
+      "division": "WEST_ANCH",
+      "center": {
+        "lat": 61.15,
+        "lng": -149.99
+      },
+      "description": "The lake-country southwest around the airport was with mid-century ramblers, floatplane-adjacent lots, and steady executive teardown/rebuild."
+    },
+    "Turnagain": {
+      "name": "Turnagain",
+      "division": "WEST_ANCH",
+      "center": {
+        "lat": 61.19,
+        "lng": -149.967
+      },
+      "description": "The bluff-top residential arm west of Spenard with Cook Inlet views, chunky 1950s-60s stock, and renovation-led permit flow near Kincaid."
+    },
+    "Eagle River & Chugiak": {
+      "name": "Eagle River & Chugiak",
+      "division": "EAGLE_RIVER_CHUGIAK",
+      "center": {
+        "lat": 61.322,
+        "lng": -149.548
+      },
+      "description": "The Glenn Highway bedroom corridor from Eagle River through Chugiak to Eklutna with 12,927 live assessor parcels, JBER-driven demand, and large-lot subdivision growth."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "Deed_Date",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/anchorage.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

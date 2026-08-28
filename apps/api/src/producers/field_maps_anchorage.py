@@ -25,6 +25,15 @@ unregistered per ``docs/research/probe-anchorage.md``):
   ``party1_grantor`` (the seller) does not exist on this feed and stays
   unmapped.
 * ``bbl`` — ``Parcel_ID`` (+ ``GIS_ParcelNum11``) for parcel-style joins.
+* ``address_street`` — ``Parcel_Address`` is the layer's composed site
+  address ("2101 W 47TH AVE"). The five ``GIS_Site_Street_*`` parts carry the
+  same information split across number/pre/name/suf/type, which
+  ``first_mapped`` cannot concatenate — mapping a 5-candidate list there
+  would yield a bare street number, so the composed column is the only
+  correct candidate.
+* ``zipcode`` — ``GIS_Site_Zipcode``. Declarative: the deeds row parser
+  reads no zip column today, but the map pins the feed's address surface
+  (probe payload contract) and any future address consumer resolves it.
 
 Deliberately unmapped: ``document_amount`` (no sale-price/consideration
 column exists; assessed values must not masquerade as deed amounts — parses
@@ -33,18 +42,28 @@ deed-type column; the producer's generic chain picks up ``Property_Type``,
 e.g. "RESIDENTIAL").
 
 Schemas verified live 2026-08-28 against the layer's ``?f=pjson`` metadata
-(78 attribute fields; ``Deed_Date`` and ``PUBDATE`` are the only
-``esriFieldTypeDate`` columns).
+(84 attribute fields; ``Deed_Date`` and ``PUBDATE`` are the only
+``esriFieldTypeDate`` columns) and against the newest non-future rows
+re-captured byte-verbatim.
 """
 
 from typing import Dict, List
 
-FIELD_MAP: Dict[str, Dict[str, List[str]]] = {
-    "deeds": {
-        "doc_id": ["Parcel_ID", "GIS_ParcelNum11", "OBJECTID", "id"],
-        "recorded_date": ["Deed_Date"],
-        "borough": ["GIS_Site_City", "Tax_District"],
-        "party2_grantee": ["Owner_Name"],
-        "bbl": ["Parcel_ID", "GIS_ParcelNum11"],
-    },
+DEEDS_FIELD_MAP: Dict[str, List[str]] = {
+    "doc_id": ["Parcel_ID", "GIS_ParcelNum11", "OBJECTID", "id"],
+    "recorded_date": ["Deed_Date"],
+    "borough": ["GIS_Site_City", "Tax_District"],
+    "party2_grantee": ["Owner_Name"],
+    "bbl": ["Parcel_ID", "GIS_ParcelNum11"],
+    "address_street": ["Parcel_Address"],
+    "zipcode": ["GIS_Site_Zipcode"],
 }
+
+FIELD_MAP: Dict[str, Dict[str, List[str]]] = {
+    "deeds": DEEDS_FIELD_MAP,
+}
+
+__all__ = [
+    "DEEDS_FIELD_MAP",
+    "FIELD_MAP",
+]

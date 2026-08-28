@@ -1,0 +1,203 @@
+{
+  "schema_version": 2,
+  "id": "syracuse",
+  "name": "Syracuse",
+  "state": "NY",
+  "center": {
+    "lat": 43.0481,
+    "lng": -76.1474
+  },
+  "metro_bbox": {
+    "min_lat": 42.99,
+    "max_lat": 43.13,
+    "min_lng": -76.24,
+    "max_lng": -76.05
+  },
+  "divisions": {
+    "DOWNTOWN_CORE": {
+      "name": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 43.0503,
+        "lng": -76.1525
+      },
+      "bbox": {
+        "min_lat": 43.042,
+        "max_lat": 43.058,
+        "min_lng": -76.166,
+        "max_lng": -76.145
+      },
+      "submarkets": [
+        "Downtown",
+        "Armory Square"
+      ]
+    },
+    "UNIVERSITY_EAST": {
+      "name": "UNIVERSITY_EAST",
+      "center": {
+        "lat": 43.0392,
+        "lng": -76.1271
+      },
+      "bbox": {
+        "min_lat": 43.034,
+        "max_lat": 43.048,
+        "min_lng": -76.136,
+        "max_lng": -76.11
+      },
+      "submarkets": [
+        "University Area",
+        "Westcott"
+      ]
+    },
+    "EASTWOOD": {
+      "name": "EASTWOOD",
+      "center": {
+        "lat": 43.075,
+        "lng": -76.106
+      },
+      "bbox": {
+        "min_lat": 43.066,
+        "max_lat": 43.084,
+        "min_lng": -76.122,
+        "max_lng": -76.092
+      },
+      "submarkets": [
+        "Eastwood"
+      ]
+    },
+    "STRATHMORE": {
+      "name": "STRATHMORE",
+      "center": {
+        "lat": 43.027,
+        "lng": -76.179
+      },
+      "bbox": {
+        "min_lat": 43.018,
+        "max_lat": 43.036,
+        "min_lng": -76.198,
+        "max_lng": -76.162
+      },
+      "submarkets": [
+        "Strathmore"
+      ]
+    },
+    "NORTH_SIDE": {
+      "name": "NORTH_SIDE",
+      "center": {
+        "lat": 43.071,
+        "lng": -76.152
+      },
+      "bbox": {
+        "min_lat": 43.06,
+        "max_lat": 43.082,
+        "min_lng": -76.166,
+        "max_lng": -76.138
+      },
+      "submarkets": [
+        "North Side"
+      ]
+    },
+    "OUTER_COMSTOCK": {
+      "name": "OUTER_COMSTOCK",
+      "center": {
+        "lat": 43.0336,
+        "lng": -76.1285
+      },
+      "bbox": {
+        "min_lat": 43.026,
+        "max_lat": 43.04,
+        "min_lng": -76.142,
+        "max_lng": -76.114
+      },
+      "submarkets": [
+        "Outer Comstock"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown": {
+      "name": "Downtown",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 43.0503,
+        "lng": -76.1525
+      },
+      "description": "Civic and office core around Clinton Square and the Commons with conversion-condo activity and hotel-adjacent mixed-use interest."
+    },
+    "Armory Square": {
+      "name": "Armory Square",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 43.0471,
+        "lng": -76.1572
+      },
+      "description": "Warehouse-district entertainment core with loft conversions, restaurant rows, and the strongest downtown rental demand."
+    },
+    "University Area": {
+      "name": "University Area",
+      "division": "UNIVERSITY_EAST",
+      "center": {
+        "lat": 43.0392,
+        "lng": -76.1271
+      },
+      "description": "SU hill and the Howard St corridor with perpetual student-rental churn, hospital-system adjacency, and the metro's tightest registration pressure."
+    },
+    "Westcott": {
+      "name": "Westcott",
+      "division": "UNIVERSITY_EAST",
+      "center": {
+        "lat": 43.042,
+        "lng": -76.118
+      },
+      "description": "Westcott Street neighborhood of two- to four-family student and faculty housing with steady turnover and storefront revitalization."
+    },
+    "Eastwood": {
+      "name": "Eastwood",
+      "division": "EASTWOOD",
+      "center": {
+        "lat": 43.075,
+        "lng": -76.106
+      },
+      "description": "Northeast village-in-the-city on James Street with duplex stock, Medley Centre adjacency, and value-priced rental conversions."
+    },
+    "Strathmore": {
+      "name": "Strathmore",
+      "division": "STRATHMORE",
+      "center": {
+        "lat": 43.027,
+        "lng": -76.179
+      },
+      "description": "Southwest hillside of 1920s singles and upper-flat conversions bordering the golf course with the metro's most stable owner-occupancy."
+    },
+    "North Side": {
+      "name": "North Side",
+      "division": "NORTH_SIDE",
+      "center": {
+        "lat": 43.071,
+        "lng": -76.152
+      },
+      "description": "Little Italy and the North Salina corridor with older multi-family stock, refugee-settlement rental demand, and heavy registry activity."
+    },
+    "Outer Comstock": {
+      "name": "Outer Comstock",
+      "division": "OUTER_COMSTOCK",
+      "center": {
+        "lat": 43.0336,
+        "lng": -76.1285
+      },
+      "description": "Comstock Avenue student-rental belt southeast of campus with large legacy houses cut into units and the highest per-property registrant churn."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "RR_app_received",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/syracuse.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

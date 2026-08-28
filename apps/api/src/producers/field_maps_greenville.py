@@ -29,7 +29,11 @@ never candidates.
 # column spellings. Live layer (2026-08-28): OBJECTID is the OID, geometry is
 # the coordinate source, NewIssueDate is the daily watermark.
 PERMITS_FIELD_MAP: dict[str, list[str]] = {
-    "job_id": ["PERMIT_NUM"],
+    # OBJECTID is the OID fallback (Henderson precedent): live rows always
+    # carry PERMIT_NUM (it is the id_keys head), but the OID keeps
+    # coordinate-less/dedup edge rows addressable if a permit number is
+    # ever missing client-side.
+    "job_id": ["PERMIT_NUM", "OBJECTID"],
     "issuance_date": ["NewIssueDate"],
     "filing_date": ["APPLICDATE"],
     "status": ["BP_STATUS", "Status"],
