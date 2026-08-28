@@ -1490,6 +1490,7 @@ def get_dashboard_html() -> str:
       ocala: { name: 'Ocala / Marion County' },
       tyler: { name: 'Tyler' },
       lake_charles: { name: 'Lake Charles' },
+      fort_smith: { name: 'Fort Smith, AR' },
     };
 
     let map = null;
