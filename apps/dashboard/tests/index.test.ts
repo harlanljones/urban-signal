@@ -149,6 +149,44 @@ export function testEnv(options: { html?: string } = {}) {
           }
           return null;
         }
+        if (key.startsWith("national/")) {
+          // US-383 national hex layer: index + two res-6 chunks.
+          if (key === "national/index") {
+            return JSON.stringify({
+              generated_at: "2026-08-28T00:00:00+00:00",
+              resolutions: {
+                "6": {
+                  count: 2,
+                  byte_size: 260,
+                  sha256: "a".repeat(64),
+                  parents: ["832830fffffffff", "8326b9fffffffff"],
+                  generated_at: "2026-08-28T00:00:00+00:00",
+                },
+              },
+            });
+          }
+          if (key === "national/6/832830fffffffff") {
+            return JSON.stringify({
+              res: 6,
+              parent: "832830fffffffff",
+              year: 2023,
+              signal_source: "census_lehd_lodes8",
+              cols: ["h3", "jobs", "workers", "jobs_pct", "workers_pct"],
+              rows: [["892a10708b7ffff", 1200, 900, 71.5, 66.25]],
+            });
+          }
+          if (key === "national/6/8326b9fffffffff") {
+            return JSON.stringify({
+              res: 6,
+              parent: "8326b9fffffffff",
+              year: 2023,
+              signal_source: "census_lehd_lodes8",
+              cols: ["h3", "jobs", "workers", "jobs_pct", "workers_pct"],
+              rows: [["8926b9fffffffff", 40, null, 12.5, null]],
+            });
+          }
+          return null;
+        }
         if (key.startsWith("gridtiles/")) {
           const parent = key.slice("gridtiles/".length);
           if (parent === "852830bbfffffff") {
@@ -334,6 +372,99 @@ test("gridtiles rejects a missing, malformed, or oversized parents parameter", a
   expect(tooMany.status).toBe(400);
 });
 
+// ---------------------------------------------------------------------------
+// GET /api/v1/national[/res] — national hex layer (US-383)
+// ---------------------------------------------------------------------------
+
+test("national index returns the per-resolution chunk inventory", async () => {
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/national`), testEnv() as never);
+
+  expect(response.status).toBe(200);
+  const payload = (await response.json()) as {
+    generated_at: string;
+    resolutions: Record<string, { count: number; parents: string[] }>;
+  };
+  expect(payload.resolutions["6"].count).toBe(2);
+  expect(payload.resolutions["6"].parents).toContain("832830fffffffff");
+  expect(response.headers.get("etag")).toBeTruthy();
+});
+
+test("national index honors ETag revalidation", async () => {
+  const first = await worker.fetch(new Request(`${ORIGIN}/api/v1/national`), testEnv() as never);
+  const etag = first.headers.get("etag") ?? "";
+  const revalidated = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/national`, { headers: { "if-none-match": etag } }),
+    testEnv() as never,
+  );
+  expect(revalidated.status).toBe(304);
+});
+
+test("national chunks merge rows across parents and report missing", async () => {
+  const response = await worker.fetch(
+    new Request(
+      `${ORIGIN}/api/v1/national/6?parents=832830fffffffff,8326b9fffffffff,8329999ffffffff`,
+    ),
+    testEnv() as never,
+  );
+
+  expect(response.status).toBe(200);
+  const payload = (await response.json()) as {
+    res: number;
+    count: number;
+    cols: string[];
+    rows: unknown[][];
+    missing: string[];
+  };
+  expect(payload.res).toBe(6);
+  expect(payload.count).toBe(2);
+  expect(payload.cols).toEqual(["h3", "jobs", "workers", "jobs_pct", "workers_pct"]);
+  expect(payload.missing).toEqual(["8329999ffffffff"]);
+  expect(payload.rows.map((row) => row[0])).toEqual(["892a10708b7ffff", "8926b9fffffffff"]);
+  expect(response.headers.get("etag")).toBeTruthy();
+});
+
+test("national chunks honor ETag revalidation", async () => {
+  const first = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/national/6?parents=832830fffffffff`),
+    testEnv() as never,
+  );
+  const etag = first.headers.get("etag") ?? "";
+  const revalidated = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/national/6?parents=832830fffffffff`, {
+      headers: { "if-none-match": etag },
+    }),
+    testEnv() as never,
+  );
+  expect(revalidated.status).toBe(304);
+});
+
+test("national chunks reject invalid resolution and bad parents", async () => {
+  const badRes = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/national/9?parents=832830fffffffff`),
+    testEnv() as never,
+  );
+  expect(badRes.status).toBe(400);
+
+  const noParents = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/national/6`),
+    testEnv() as never,
+  );
+  expect(noParents.status).toBe(400);
+
+  const malformed = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/national/6?parents=not-a-parent`),
+    testEnv() as never,
+  );
+  expect(malformed.status).toBe(400);
+
+  const oversized = Array.from({ length: 65 }, (_, i) => i.toString(16).padStart(15, "0")).join(",");
+  const tooMany = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/national/6?parents=${oversized}`),
+    testEnv() as never,
+  );
+  expect(tooMany.status).toBe(400);
+});
+
 test("catalysts/all returns the combined attributed feed", async () => {
   const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/catalysts/all`), testEnv() as never);
 
@@ -457,7 +588,7 @@ test("openapi.json describes every public data route", async () => {
   expect(response.status).toBe(200);
   const spec = (await response.json()) as { openapi: string; paths: Record<string, unknown> };
   expect(spec.openapi).toMatch(/^3\.1\./);
-  for (const path of ["/health", "/api/v1/cities", "/api/v1/submarkets", "/api/v1/grid", "/api/v1/catalysts", "/api/v1/predict", "/api/v1/manifest", "/api/v1/gridtiles", "/api/v1/catalysts/all"]) {
+  for (const path of ["/health", "/api/v1/cities", "/api/v1/submarkets", "/api/v1/grid", "/api/v1/catalysts", "/api/v1/predict", "/api/v1/manifest", "/api/v1/gridtiles", "/api/v1/national", "/api/v1/national/{res}", "/api/v1/catalysts/all"]) {
     expect(spec.paths[path]).toBeTruthy();
   }
 });

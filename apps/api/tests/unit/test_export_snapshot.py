@@ -50,7 +50,10 @@ def snapshot(tmp_path: Path) -> dict[str, Any]:
 
 
 def asyncio_run_build(
-    tmp_path: Path, cities=None, include_legacy_cells: bool = True
+    tmp_path: Path,
+    cities=None,
+    include_legacy_cells: bool = True,
+    national_dir: Path | None = None,
 ) -> dict[str, Any]:
     import asyncio
 
@@ -60,6 +63,7 @@ def asyncio_run_build(
             engine=StubEngine(),
             cities=cities,
             include_legacy_cells=include_legacy_cells,
+            national_dir=national_dir,
         )
     )
 
@@ -106,6 +110,186 @@ def test_skip_legacy_cells_omits_single_key(tmp_path: Path):
     assert "cells/index_meta" in keys
     cell_shards = {key for key in keys if key.startswith("cells/") and key != "cells/index_meta"}
     assert cell_shards
+
+
+# ---------------------------------------------------------------------------
+# National layer publishing (US-383)
+# ---------------------------------------------------------------------------
+
+NATIONAL_FIXTURE_COLUMNS = (
+    "h3_index",
+    "jobs_c000",
+    "workers_c000",
+    "jobs_c000_national_pct",
+    "workers_c000_national_pct",
+    "year",
+    "signal_source",
+)
+
+
+def _national_fixture_frame(rows: list[dict[str, Any]]):
+    import polars as pl
+
+    return pl.DataFrame(
+        rows,
+        schema={
+            "h3_index": pl.String,
+            "jobs_c000": pl.Int64,
+            "workers_c000": pl.Int64,
+            "jobs_c000_national_pct": pl.Float64,
+            "workers_c000_national_pct": pl.Float64,
+            "year": pl.Int64,
+            "signal_source": pl.String,
+        },
+    )
+
+
+def _write_national_fixture(root: Path) -> tuple[str, str]:
+    """Two res-6 res-3 chunks (one with data, one all-null) + one res-4 chunk.
+
+    Returns (parent_with_data, parent_all_null).
+    """
+    cell_nyc = h3.latlng_to_cell(40.7128, -74.006, 6)
+    cell_la = h3.latlng_to_cell(34.0522, -118.2437, 6)
+    parent_data = h3.cell_to_parent(cell_nyc, 3)
+    parent_null = h3.cell_to_parent(cell_la, 3)
+    assert parent_data != parent_null
+
+    res6_dir = root / "national" / "res6"
+    res6_dir.mkdir(parents=True, exist_ok=True)
+    _national_fixture_frame(
+        [
+            {
+                "h3_index": cell_nyc,
+                "jobs_c000": 1200,
+                "workers_c000": 900,
+                "jobs_c000_national_pct": 71.5,
+                "workers_c000_national_pct": 66.25,
+                "year": 2023,
+                "signal_source": "census_lehd_lodes8",
+            },
+            {
+                "h3_index": h3.latlng_to_cell(40.7135, -74.005, 6),
+                "jobs_c000": 300,
+                "workers_c000": None,
+                "jobs_c000_national_pct": 40.0,
+                "workers_c000_national_pct": None,
+                "year": 2023,
+                "signal_source": "census_lehd_lodes8",
+            },
+            {
+                # all-null row: must be dropped from the published chunk
+                "h3_index": h3.latlng_to_cell(40.714, -74.004, 6),
+                "jobs_c000": None,
+                "workers_c000": None,
+                "jobs_c000_national_pct": None,
+                "workers_c000_national_pct": None,
+                "year": 2023,
+                "signal_source": "census_lehd_lodes8",
+            },
+        ]
+    ).write_parquet(res6_dir / f"{parent_data}.parquet")
+    _national_fixture_frame(
+        [
+            {
+                "h3_index": cell_la,
+                "jobs_c000": None,
+                "workers_c000": None,
+                "jobs_c000_national_pct": None,
+                "workers_c000_national_pct": None,
+                "year": 2023,
+                "signal_source": "census_lehd_lodes8",
+            }
+        ]
+    ).write_parquet(res6_dir / f"{parent_null}.parquet")
+
+    res4_dir = root / "national" / "res4"
+    res4_dir.mkdir(parents=True, exist_ok=True)
+    _national_fixture_frame(
+        [
+            {
+                "h3_index": h3.cell_to_parent(cell_nyc, 4),
+                "jobs_c000": 1500,
+                "workers_c000": 950,
+                "jobs_c000_national_pct": 88.0,
+                "workers_c000_national_pct": 80.5,
+                "year": 2023,
+                "signal_source": "census_lehd_lodes8",
+            }
+        ]
+    ).write_parquet(res4_dir / f"{h3.cell_to_parent(cell_nyc, 3)}.parquet")
+    return parent_data, parent_null
+
+
+def test_national_layers_published_from_national_dir(tmp_path: Path):
+    import hashlib
+
+    national_dir = tmp_path / "national-out"
+    parent_data, parent_null = _write_national_fixture(national_dir)
+
+    manifest = asyncio_run_build(tmp_path, cities=["nyc"], national_dir=national_dir)
+
+    assert "national" in manifest
+    block = manifest["national"]["resolutions"]
+    assert block["6"] == {"count": 2, "chunks": 1}
+    assert block["4"] == {"count": 1, "chunks": 1}
+
+    keys = set(manifest["keys"])
+    assert f"national/6/{parent_data}" in keys
+    assert "national/index" in keys
+    # all-null chunk is skipped — absent key means "no data" on the route
+    assert f"national/6/{parent_null}" not in keys
+
+    chunk = json.loads((tmp_path / "dist" / "national" / "6" / f"{parent_data}.json").read_text())
+    assert chunk["cols"] == ["h3", "jobs", "workers", "jobs_pct", "workers_pct"]
+    assert chunk["year"] == 2023
+    assert chunk["signal_source"] == "census_lehd_lodes8"
+    assert [row[0] for row in chunk["rows"]] == sorted(row[0] for row in chunk["rows"])
+    assert len(chunk["rows"]) == 2
+    for row in chunk["rows"]:
+        assert row[1] is not None or row[2] is not None
+
+    index = json.loads((tmp_path / "dist" / "national" / "index.json").read_text())
+    res6 = index["resolutions"]["6"]
+    assert res6["parents"] == [parent_data]
+    assert res6["count"] == 2
+    assert res6["chunks"][parent_data]["rows"] == 2
+    assert res6["chunks"][parent_data]["sha256"] == hashlib.sha256(
+        (tmp_path / "dist" / "national" / "6" / f"{parent_data}.json").read_bytes()
+    ).hexdigest()
+    assert res6["byte_size"] == res6["chunks"][parent_data]["bytes"]
+
+
+def test_national_absent_by_default(snapshot: dict[str, Any]):
+    assert "national" not in snapshot
+    assert not [key for key in snapshot["keys"] if key.startswith("national/")]
+
+
+def test_national_chunk_over_budget_raises(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    from src.export import snapshot_builder as sb
+
+    monkeypatch.setattr(sb, "NATIONAL_MAX_CHUNK_BYTES", 10)
+    national_dir = tmp_path / "national-out"
+    _write_national_fixture(national_dir)
+    with pytest.raises(ValueError, match="US-383 budget"):
+        asyncio_run_build(tmp_path, cities=["nyc"], national_dir=national_dir)
+
+
+def test_manifest_boot_payload_national_regression(tmp_path: Path):
+    """Acceptance: national block must not bloat the boot manifest by >10%."""
+    national_dir = tmp_path / "national-out"
+    _write_national_fixture(national_dir)
+
+    before = asyncio_run_build(tmp_path / "b", cities=["nyc"])
+    after = asyncio_run_build(tmp_path / "a", cities=["nyc"], national_dir=national_dir)
+
+    size_before = len(json.dumps(before, separators=(",", ":")))
+    size_after = len(json.dumps(after, separators=(",", ":")))
+    regression = (size_after - size_before) / size_before
+    assert regression < 0.10, (
+        f"national manifest block grew the boot payload by {regression:.1%} "
+        f"({size_before} -> {size_after} bytes); move detail into national/index"
+    )
 
 
 def test_grid_artifact_is_feature_collection(snapshot: dict[str, Any], tmp_path: Path):

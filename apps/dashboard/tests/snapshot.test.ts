@@ -6,6 +6,8 @@ import {
   querySubmarkets,
   lookupPrediction,
   listCities,
+  fetchNationalIndex,
+  fetchNationalRows,
 } from "../src/snapshot";
 
 const ORIGIN = "https://urban-signal.test";
@@ -176,4 +178,43 @@ test("lookupPrediction strips shap from the legacy fallback when includeShap is 
     includeShap: false,
   })) as any;
   expect(result.shap_attributions).toBeUndefined();
+});
+
+// ---------------------------------------------------------------------------
+// fetchNationalIndex / fetchNationalRows — US-383 transport-free helpers
+// ---------------------------------------------------------------------------
+
+test("fetchNationalIndex returns the published index document", async () => {
+  const result = (await fetchNationalIndex(testEnv() as any)) as any;
+  expect(result.resolutions["6"].count).toBe(2);
+  expect(result.resolutions["6"].parents).toContain("8326b9fffffffff");
+});
+
+test("fetchNationalIndex errors when no national snapshot is published", async () => {
+  const emptyEnv = { SNAPSHOT: { get: async () => null } };
+  const result = await fetchNationalIndex(emptyEnv as any);
+  expect("error" in result).toBe(true);
+});
+
+test("fetchNationalRows merges chunk rows and reports missing parents", async () => {
+  const result = (await fetchNationalRows(testEnv() as any, {
+    res: 6,
+    parents: ["832830fffffffff", "8326b9fffffffff", "8329999ffffffff"],
+  })) as any;
+  expect(result.res).toBe(6);
+  expect(result.count).toBe(2);
+  expect(result.cols).toEqual(["h3", "jobs", "workers", "jobs_pct", "workers_pct"]);
+  expect(result.missing).toEqual(["8329999ffffffff"]);
+  expect(result.rows).toEqual([
+    ["892a10708b7ffff", 1200, 900, 71.5, 66.25],
+    ["8926b9fffffffff", 40, null, 12.5, null],
+  ]);
+});
+
+test("fetchNationalRows rejects resolutions outside the national pyramid", async () => {
+  const result = await fetchNationalRows(testEnv() as any, {
+    res: 9,
+    parents: ["832830fffffffff"],
+  });
+  expect("error" in result).toBe(true);
 });

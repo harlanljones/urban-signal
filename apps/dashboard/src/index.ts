@@ -33,6 +33,9 @@ import {
   queryCatalysts,
   querySubmarkets,
   lookupPrediction,
+  fetchNationalIndex,
+  fetchNationalRows,
+  MAX_NATIONAL_PARENTS_PER_REQUEST,
   CATALYST_DEFAULT_LIMIT,
   CATALYST_MAX_LIMIT,
 } from "./snapshot";
@@ -944,6 +947,47 @@ function openApiSpec(origin: string): Response {
           },
         },
       },
+      "/api/v1/national": {
+        get: {
+          operationId: "getNationalIndex",
+          summary:
+            "National hex layer index: per-resolution chunk inventories (parents, sizes, sha256).",
+          responses: {
+            "200": openApiResponse("National layer index document."),
+            "304": { description: "ETag match — index unchanged." },
+            "404": openApiResponse("No national layer snapshot published."),
+          },
+        },
+      },
+      "/api/v1/national/{res}": {
+        get: {
+          operationId: "getNationalChunks",
+          summary:
+            "Fetch national hex chunk rows by resolution and comma-separated res-3 parent indexes (max 64).",
+          parameters: [
+            {
+              name: "res",
+              in: "path",
+              required: true,
+              schema: { type: "integer", enum: [4, 5, 6] },
+              description: "National hex resolution.",
+            },
+            {
+              name: "parents",
+              in: "query",
+              required: true,
+              schema: { type: "string" },
+              description:
+                "Comma-separated res-3 H3 parent indexes. Discover valid parents via /api/v1/national.",
+            },
+          ],
+          responses: {
+            "200": openApiResponse("Merged chunk rows across requested parents; lists missing parents."),
+            "304": { description: "ETag match — chunks unchanged." },
+            "400": openApiResponse("Invalid resolution, missing/malformed parents, or over the per-request cap."),
+          },
+        },
+      },
       "/api/v1/submarkets": {
         get: {
           operationId: "listSubmarkets",
@@ -1097,6 +1141,8 @@ ${cityLines}
 - \`GET ${origin}/api/v1/cities\` — supported metros.
 - \`GET ${origin}/api/v1/manifest\` — snapshot metadata incl. res-5 tile index.
 - \`GET ${origin}/api/v1/gridtiles?parents=<csv>\` — viewport tiles (max 32 parents).
+- \`GET ${origin}/api/v1/national\` — national hex layer index (per-res chunk inventories).
+- \`GET ${origin}/api/v1/national/{res}?parents=<csv>\` — national hex rows (res 4/5/6, max 64 res-3 parents).
 - \`GET ${origin}/api/v1/submarkets?city_id=<id>[&borough=<name>]\` — submarket dictionary.
 - \`GET ${origin}/api/v1/grid?city_id=<id>\` — full H3 grid (large).
 - \`GET ${origin}/api/v1/catalysts/all\` — all metros' catalysts, attributed + ranked.
@@ -1370,6 +1416,40 @@ export default {
           type: "FeatureCollection",
           features,
         });
+        const etag = `"${(await sha256Hex(body)).slice(0, 32)}"`;
+        if (etagMatches(request, etag)) return new Response(null, { status: 304 });
+        return withHeaders(body, 200, { ...baseHeaders, etag });
+      }
+
+      // GET /api/v1/national — national hex layer index (per-res chunk inventories)
+      if (url.pathname === "/api/v1/national") {
+        const result = await fetchNationalIndex(env);
+        if ("error" in result) return jsonError(404, result.error);
+        const body = JSON.stringify(result);
+        const etag = `"${(await sha256Hex(body)).slice(0, 32)}"`;
+        if (etagMatches(request, etag)) return new Response(null, { status: 304 });
+        return withHeaders(body, 200, { ...baseHeaders, etag });
+      }
+
+      // GET /api/v1/national/{res}?parents=<res-3-parent-csv>
+      // National display-layer chunks published by the batch snapshot builder
+      // from the national-builder output tree (US-383).
+      const nationalMatch = url.pathname.match(/^\/api\/v1\/national\/(\d+)$/);
+      if (nationalMatch) {
+        const rawParents = url.searchParams.get("parents");
+        if (!rawParents || !rawParents.trim()) {
+          return jsonError(400, "Query parameter 'parents' is required (comma-separated res-3 H3 parent indexes).");
+        }
+        const parents = parseTileParents(rawParents);
+        if (!parents) {
+          return jsonError(400, "Malformed 'parents' value: expected comma-separated 15-char hex H3 indexes.");
+        }
+        if (parents.length > MAX_NATIONAL_PARENTS_PER_REQUEST) {
+          return jsonError(400, `Too many parents requested (${parents.length}); max ${MAX_NATIONAL_PARENTS_PER_REQUEST} per call.`);
+        }
+        const result = await fetchNationalRows(env, { res: Number(nationalMatch[1]), parents });
+        if ("error" in result) return jsonError(400, result.error);
+        const body = JSON.stringify(result);
         const etag = `"${(await sha256Hex(body)).slice(0, 32)}"`;
         if (etagMatches(request, etag)) return new Response(null, { status: 304 });
         return withHeaders(body, 200, { ...baseHeaders, etag });

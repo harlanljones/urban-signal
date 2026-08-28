@@ -456,3 +456,87 @@ class TestSnapshotWiring:
         assert json.loads(
             (tmp_path / "dist" / "manifest.json").read_text()
         )["tile_resolution"] == manifest["tile_resolution"]
+
+
+@pytest.mark.interlock
+class TestNationalWiring:
+    """US-383: the national hex layer is not servable until the snapshot
+    publishes its chunks and the worker route reads them. A national build
+    without a matching publish + route leaves US-384 rendering nothing.
+    """
+
+    WORKER_SRC = REPO_ROOT / "apps" / "dashboard" / "src" / "index.ts"
+    WORKER_SNAPSHOT_SRC = REPO_ROOT / "apps" / "dashboard" / "src" / "snapshot.ts"
+
+    @staticmethod
+    def _national_fixture(root: Path) -> Path:
+        import polars as pl
+
+        frame = pl.DataFrame(
+            [{"h3_index": "892a10708b7ffff", "jobs_c000": 1200, "workers_c000": 900,
+              "jobs_c000_national_pct": 71.5, "workers_c000_national_pct": 66.25,
+              "year": 2023, "signal_source": "census_lehd_lodes8"}],
+            schema={
+                "h3_index": pl.String,
+                "jobs_c000": pl.Int64,
+                "workers_c000": pl.Int64,
+                "jobs_c000_national_pct": pl.Float64,
+                "workers_c000_national_pct": pl.Float64,
+                "year": pl.Int64,
+                "signal_source": pl.String,
+            },
+        )
+        res_dir = root / "national" / "res6"
+        res_dir.mkdir(parents=True, exist_ok=True)
+        frame.write_parquet(res_dir / "832830fffffffff.parquet")
+        return root
+
+    def test_national_layers_published_with_manifest_block(self, tmp_path):
+        import asyncio
+
+        from src.export.snapshot_builder import NATIONAL_MAX_CHUNK_BYTES, build_snapshot
+
+        class StubEngine:
+            def predict_cell_features(self, h3_index, feature_dict, include_shap=True):
+                return {"h3_index": h3_index, "lims_score": 50.0}
+
+        manifest = asyncio.run(
+            build_snapshot(
+                tmp_path / "dist",
+                engine=StubEngine(),
+                cities=["nyc"],
+                national_dir=self._national_fixture(tmp_path / "national-out"),
+            )
+        )
+        block = manifest.get("national", {}).get("resolutions", {})
+        assert block.get("6", {}).get("count") == 1, (
+            "national builder data was not published into the snapshot manifest "
+            "national block — the national hex layer cannot boot"
+        )
+        assert "national/index" in manifest["keys"], (
+            "national/index integrity key missing from the publish"
+        )
+        for key, meta in manifest["keys"].items():
+            if key.startswith("national/"):
+                assert meta["bytes"] <= NATIONAL_MAX_CHUNK_BYTES, (
+                    f"{key} is {meta['bytes']:,} bytes, over the US-383 "
+                    f"{NATIONAL_MAX_CHUNK_BYTES:,}-byte national chunk budget"
+                )
+
+    def test_worker_route_serves_national_chunks(self):
+        if not self.WORKER_SRC.exists():
+            pytest.skip("apps/dashboard deployment surface removed — no worker route to check")
+        src = self.WORKER_SRC.read_text()
+        assert "/api/v1/national/" in src, (
+            "worker has no /api/v1/national/{res} route — national chunks are "
+            "published to KV but unreachable"
+        )
+        assert "fetchNationalIndex" in src, (
+            "worker route does not read the national/index document — clients "
+            "cannot discover which res-3 parents to fetch"
+        )
+        snapshot_src = self.WORKER_SNAPSHOT_SRC.read_text()
+        assert 'kvJson(env, "national/index")' in snapshot_src, (
+            "snapshot query module no longer reads the national/index key — the "
+            "worker cannot serve the national layer index"
+        )

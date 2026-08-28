@@ -198,6 +198,64 @@ export async function lookupPrediction(
 }
 
 // ---------------------------------------------------------------------------
+// National hex layer (US-383)
+// ---------------------------------------------------------------------------
+
+export const NATIONAL_RESOLUTIONS = [4, 5, 6] as const;
+// CONUS spans ~40 res-3 parents; one call must be able to fetch a full
+// resolution's display set, so the cap sits above the gridtiles viewport cap.
+export const MAX_NATIONAL_PARENTS_PER_REQUEST = 64;
+
+export interface NationalIndexDocument {
+  generated_at: string;
+  resolutions: Record<
+    string,
+    { count: number; byte_size: number; sha256: string; parents: string[]; generated_at: string }
+  >;
+}
+
+export type NationalIndexOutcome = NationalIndexDocument | { error: string };
+
+export async function fetchNationalIndex(env: Env): Promise<NationalIndexOutcome> {
+  const entry = await kvJson(env, "national/index");
+  if (!entry) return { error: "No national layer snapshot published." };
+  return entry.value as NationalIndexDocument;
+}
+
+export interface NationalRowsResult {
+  res: number;
+  count: number;
+  cols: string[];
+  rows: unknown[][];
+  missing: string[];
+}
+
+export type NationalRowsOutcome = NationalRowsResult | { error: string };
+
+export async function fetchNationalRows(
+  env: Env,
+  opts: { res: number; parents: string[] }
+): Promise<NationalRowsOutcome> {
+  if (!(NATIONAL_RESOLUTIONS as readonly number[]).includes(opts.res)) {
+    return { error: `'res' must be one of ${NATIONAL_RESOLUTIONS.join(", ")}.` };
+  }
+  const rows: unknown[][] = [];
+  const missing: string[] = [];
+  let cols: string[] | null = null;
+  for (const parent of opts.parents) {
+    const entry = await kvJson(env, `national/${opts.res}/${parent}`);
+    if (!entry) {
+      missing.push(parent);
+      continue;
+    }
+    const chunk = entry.value as { cols?: string[]; rows?: unknown[][] };
+    if (!cols && chunk.cols) cols = chunk.cols;
+    rows.push(...(chunk.rows ?? []));
+  }
+  return { res: opts.res, count: rows.length, cols: cols ?? [], rows, missing };
+}
+
+// ---------------------------------------------------------------------------
 // City catalog
 // ---------------------------------------------------------------------------
 

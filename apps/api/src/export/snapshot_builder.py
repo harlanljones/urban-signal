@@ -16,8 +16,13 @@ identical to the live serving API. Output layout (per run):
                                    point lookups read exactly one key, and no single
                                    value can approach the 25 MiB KV cap)
     <out>/cells/index_meta.json    Sharding metadata {sharded, total, generated_at}
+    <out>/national/{res}/{p}.json  National hex chunk per res-3 parent (rows =
+                                   hexes with data; absent hex means no data)
+    <out>/national/index.json      Per-res {count, byte_size, sha256, parents,
+                                   chunks{parent:{bytes,sha256,rows}}}
     <out>/manifest.json            Run metadata (generated_at, cities, keys, counts,
-                                   tile_index, metro_index, tile_resolution)
+                                   tile_index, metro_index, tile_resolution,
+                                   national summary when national data published)
     <out>/kv-bulk.json             Single file for `wrangler kv bulk put`
 
 Normalization: raw LIMS scores are sigmoid(z) against fixed NYC-calibrated baselines,
@@ -31,20 +36,24 @@ no matter when they reach the client.
 
 import argparse
 import asyncio
+import hashlib
 import json
 import logging
 import math
 import os
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 import h3
+import polars as pl
 
 from src.serving import router as api_router
 from src.serving.engine import MultiHorizonInferenceEngine
 from src.spatial.city_registry import REGISTRY, CityId
+from src.spatial.national_grid import NATIONAL_RESOLUTIONS
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +68,10 @@ TILE_RESOLUTION = 5
 MAX_KV_VALUE_BYTES = 20 * 1024 * 1024  # KV hard cap is 25 MiB per value
 MAX_MANIFEST_BYTES = 10 * 1024 * 1024  # boot manifest fetched by every visitor
 MAX_BULK_BYTES = 512 * 1024 * 1024
+# National chunks (US-383): ticket budget per key — tighter than the KV cap by
+# design so a res-6 shard (~254 KB measured) can never silently creep toward it.
+NATIONAL_MAX_CHUNK_BYTES = 5 * 1024 * 1024
+NATIONAL_COLS = ("h3", "jobs", "workers", "jobs_pct", "workers_pct")
 # Cells inference is the dominant build cost; ONNX sessions are thread-safe for
 # concurrent run() calls, and pool.map preserves submission order so the publish
 # stays deterministic.
@@ -215,11 +228,119 @@ def _flatten_catalysts(catalysts_by_city: dict[str, dict[str, Any]]) -> dict[str
     }
 
 
+def _publish_national_layers(
+    out_dir: Path,
+    national_dir: Path,
+    register: Callable[[str, Path, Any], int],
+) -> dict[str, Any] | None:
+    """Publish national hex chunk JSONs + the ``national/index`` key.
+
+    Reads the national builder's output tree (``<national_dir>/national/res*/
+    {res3_parent}.parquet``, one chunk per res-3 parent) and emits one KV key
+    per non-empty chunk (``national/{res}/{parent}``) plus a single
+    ``national/index`` integrity key. Returns the manifest ``national`` summary
+    block, or None when ``national_dir`` carries no national data (the caller
+    then omits the block — backward compatible).
+
+    Chunks publish only rows with at least one non-null metric: an absent hex
+    means "no data" (honesty rule) and an absent chunk key surfaces as
+    ``missing[]`` on the route. Format measured 2026-08-28 (US-383): compact
+    JSON rows-of-arrays costs ~254 KB per res-6 res-3 chunk vs ~201 KB
+    base64-packed binary (0.79x) — the 21% saving does not justify a bespoke
+    binary codec in both runtimes, so chunks stay plain JSON.
+    """
+    national_root = Path(national_dir) / "national"
+    if not national_root.is_dir():
+        logger.info("No national layers at %s; publishing metro-only snapshot", national_root)
+        return None
+
+    generated_at = datetime.now(UTC).isoformat()
+    index_block: dict[str, dict[str, Any]] = {}
+    summary_block: dict[str, dict[str, Any]] = {}
+    for res in NATIONAL_RESOLUTIONS:
+        res_dir = national_root / f"res{res}"
+        if not res_dir.is_dir():
+            continue
+        chunk_meta: dict[str, dict[str, Any]] = {}
+        total_rows = 0
+        total_bytes = 0
+        for parquet_path in sorted(res_dir.glob("*.parquet")):
+            parent = parquet_path.stem
+            frame = pl.read_parquet(parquet_path)
+            if frame.is_empty():
+                continue
+            payload = {
+                "res": res,
+                "parent": parent,
+                "year": int(frame["year"][0]),
+                "signal_source": str(frame["signal_source"][0]),
+                "cols": list(NATIONAL_COLS),
+                "rows": frame.filter(
+                    pl.col("jobs_c000").is_not_null() | pl.col("workers_c000").is_not_null()
+                )
+                .sort("h3_index")
+                .select(
+                    pl.col("h3_index"),
+                    pl.col("jobs_c000").alias("jobs"),
+                    pl.col("workers_c000").alias("workers"),
+                    pl.col("jobs_c000_national_pct").alias("jobs_pct"),
+                    pl.col("workers_c000_national_pct").alias("workers_pct"),
+                )
+                .rows(),
+            }
+            key = f"national/{res}/{parent}"
+            blob = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+            if not payload["rows"]:
+                logger.info("National chunk %s has no data rows; no key published", key)
+                continue
+            if len(blob) > NATIONAL_MAX_CHUNK_BYTES:
+                raise ValueError(
+                    f"National chunk '{key}' is {len(blob):,} bytes, over the "
+                    f"{NATIONAL_MAX_CHUNK_BYTES:,}-byte US-383 budget. Shard it further "
+                    f"(res-2 parents) before publishing."
+                )
+            register(key, out_dir / "national" / str(res) / f"{parent}.json", payload)
+            chunk_meta[parent] = {
+                "bytes": len(blob),
+                "sha256": hashlib.sha256(blob).hexdigest(),
+                "rows": len(payload["rows"]),
+            }
+            total_rows += len(payload["rows"])
+            total_bytes += len(blob)
+        if not chunk_meta:
+            logger.warning("National res%d carried no data rows; skipped from publish", res)
+            continue
+        rolling = hashlib.sha256(
+            "\n".join(
+                f"{parent} {chunk_meta[parent]['sha256']}" for parent in sorted(chunk_meta)
+            ).encode("utf-8")
+        ).hexdigest()
+        index_block[str(res)] = {
+            "count": total_rows,
+            "byte_size": total_bytes,
+            "sha256": rolling,
+            "parents": sorted(chunk_meta),
+            "chunks": chunk_meta,
+            "generated_at": generated_at,
+        }
+        summary_block[str(res)] = {"count": total_rows, "chunks": len(chunk_meta)}
+
+    if not index_block:
+        return None
+    register(
+        "national/index",
+        out_dir / "national" / "index.json",
+        {"generated_at": generated_at, "resolutions": index_block},
+    )
+    return {"generated_at": generated_at, "resolutions": summary_block}
+
+
 async def build_snapshot(
     out_dir: Path,
     engine: MultiHorizonInferenceEngine | None = None,
     cities: list[str] | None = None,
     include_legacy_cells: bool = True,
+    national_dir: Path | None = None,
 ) -> dict[str, Any]:
     """Build all snapshot artifacts into out_dir and return the manifest dict.
 
@@ -227,6 +348,12 @@ async def build_snapshot(
     during the compat window so an already-deployed worker (which reads the
     single key) keeps serving while ``cells/{h3}`` shards roll out. Flip to
     False once the worker's per-cell lookup path is live everywhere.
+
+    ``national_dir`` points at a national-builder output root
+    (``<national_dir>/national/res*/{res3_parent}.parquet``). When given (and
+    data exists), national hex chunks + ``national/index`` are published and the
+    manifest gains a ``national`` summary block; when omitted the snapshot is
+    metro-only and the manifest carries no national block.
     """
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -239,7 +366,7 @@ async def build_snapshot(
     keys_index: dict[str, dict[str, Any]] = {}
     counts: dict[str, Any] = {}
 
-    def register(key: str, path: Path, payload: Any) -> None:
+    def register(key: str, path: Path, payload: Any) -> int:
         size = _write_json(path, payload)
         if size > MAX_KV_VALUE_BYTES:
             raise ValueError(
@@ -248,6 +375,7 @@ async def build_snapshot(
             )
         keys_index[key] = {"bytes": size}
         kv_entries.append({"key": key, "value": json.dumps(payload, separators=(",", ":"))})
+        return size
 
     grids: dict[str, dict[str, Any]] = {}
     catalysts_by_city: dict[str, dict[str, Any]] = {}
@@ -348,7 +476,11 @@ async def build_snapshot(
         _flatten_catalysts(catalysts_by_city),
     )
 
-    manifest = {
+    national_block: dict[str, Any] | None = None
+    if national_dir is not None:
+        national_block = _publish_national_layers(out_dir, national_dir, register)
+
+    manifest: dict[str, Any] = {
         "generated_at": datetime.now(UTC).isoformat(),
         "app_version": _app_version(),
         "cities": cities,
@@ -363,6 +495,8 @@ async def build_snapshot(
         "tile_index": tile_index,
         "metro_index": _build_metro_index(grids),
     }
+    if national_block is not None:
+        manifest["national"] = national_block
     manifest_size = _write_json(out_dir / "manifest.json", manifest)
     if manifest_size > MAX_MANIFEST_BYTES:
         raise ValueError(
@@ -415,12 +549,21 @@ def main() -> None:
         action="store_true",
         help="Do not write the monolithic cells/index value (per-cell shards only)",
     )
+    parser.add_argument(
+        "--national-dir",
+        default=None,
+        help=(
+            "National-builder output root (contains national/res*/ res-3 parquet "
+            "chunks); omit to publish a metro-only snapshot"
+        ),
+    )
     args = parser.parse_args()
     asyncio.run(
         build_snapshot(
             Path(args.out),
             cities=args.cities,
             include_legacy_cells=not args.skip_legacy_cells,
+            national_dir=Path(args.national_dir) if args.national_dir else None,
         )
     )
 
