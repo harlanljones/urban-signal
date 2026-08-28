@@ -31,6 +31,15 @@ from src.producers.field_maps_virginia_beach import FIELD_MAP as VIRGINIA_BEACH_
 from src.producers.field_maps_omaha import FIELD_MAP as OMAHA_FIELD_MAP
 from src.producers.field_maps_toledo import FIELD_MAP as TOLEDO_FIELD_MAP
 from src.producers.field_maps_boston_licensing import FIELD_MAP as BOSTON_LICENSING_FIELD_MAP
+from src.producers.field_maps_counters import (
+    NYC_COUNTS_FIELD_MAP,
+    SEATTLE_FREMONT_FIELD_MAP,
+)
+from src.producers.field_maps_energy_benchmark import (
+    CHICAGO_ENERGY_FIELD_MAP,
+    NYC_ENERGY_FIELD_MAP,
+    SEATTLE_ENERGY_FIELD_MAP,
+)
 from src.spatial.cities.portland import (
     PORTLAND_DIVISION_BBOXES,
     PORTLAND_DIVISIONS,
@@ -569,6 +578,13 @@ class FeedType(str, Enum):
     STREET_CUT = "street_cut"
     EVICTIONS = "evictions"
     STR = "str"
+
+    # US-363 context-measurement families. Neither is a signal in the
+    # move-in/out sense: both are periodic per-asset measurements that ride
+    # one shared ``ContextObservationEvent`` onto ``EnrichedH3Feature`` as
+    # covariates, subject to the standing ablation rule before LIMS.
+    ENERGY_BENCHMARK = "energy_benchmark"
+    BIKE_PED = "bike_ped"
 
 
 @runtime_checkable
@@ -1301,6 +1317,52 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 expected_cadence_days=7,
                 field_map={'eviction_id': ['court_index_number', 'docket_number'], 'latitude': ['latitude'], 'longitude': ['longitude'], 'executed_date': ['executed_date'], 'borough': ['borough'], 'zipcode': ['eviction_zip'], 'residential_commercial': ['residential_commercial_ind']},
             ),
+            # US-363 §2.7: LL84 benchmarking disclosure. Annual — the whole
+            # cohort republishes at once, so `report_year` is the watermark and
+            # it is a text one (Socrata types the column as a string).
+            # Re-probed 2026-08-28: max report_year 2024, n=103,259 (2024
+            # cohort 39,090; 1,354 null coordinates = 3.5%). Native lat/lng, so
+            # needs_geocode stays false. alarm_exempt: a once-a-year feed is
+            # stale by construction for ~11 months of every year.
+            FeedType.ENERGY_BENCHMARK: DatasetSpec(
+                endpoint=settings.socrata_nyc_energy_benchmark_endpoint,
+                platform="socrata",
+                watermark_col="report_year",
+                id_keys=["property_id", "report_year"],
+                topic=settings.topic_context_observations,
+                interval_seconds=86400.0,
+                producer_key="energy_benchmark",
+                expected_cadence_days=365,
+                watermark_type='text',
+                watermark_format='%Y',
+                alarm_exempt=True,
+                alarm_exempt_reason='annual disclosure — one publication per year by design (US-363 §2.7)',
+                field_map=NYC_ENERGY_FIELD_MAP,
+            ),
+            # US-363 §2.8: DOT automated counts. 21,016,786 15-minute rows,
+            # max timestamp 2026-08-27T05:00 (same-day fresh, re-probed
+            # 2026-08-28). The counts feed carries NO geometry: `sensor_id`
+            # joins the counter registry `6up2-gnw8` (67 sensors), declared
+            # here as a companion endpoint. The producer folds rows to one
+            # observation per (sensor, mode, day) before producing — a
+            # per-row event stream would be 21M messages for a per-hex mean.
+            FeedType.BIKE_PED: DatasetSpec(
+                endpoint=settings.socrata_nyc_bike_ped_counts_endpoint,
+                platform="socrata",
+                watermark_col="timestamp",
+                id_keys=["flowid", "sensor_id", "timestamp"],
+                topic=settings.topic_context_observations,
+                interval_seconds=3600.0,
+                producer_key="bike_ped",
+                expected_cadence_days=1,
+                # `status` is one of raw / modified / deleted (counted live
+                # 2026-08-28: 18,579,562 / 2,435,656 / 1,568). A `deleted` row
+                # is a retracted observation, so it is filtered server-side
+                # rather than summed into a day's flow.
+                where="status != 'deleted'",
+                companion_endpoints={'sensor_registry': settings.socrata_nyc_bike_ped_sensors_endpoint},
+                field_map=NYC_COUNTS_FIELD_MAP,
+            ),
         },
     ),
     CityId.CHICAGO: CityRegistration(
@@ -1407,6 +1469,27 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                     "end_date": ["applicationenddate"],
                     "fees": ["totalfees"],
                 },
+            ),
+            # US-363 §2.7: Chicago energy benchmarking. Re-probed 2026-08-28:
+            # max data_year 2023, n=28,329 — the feed genuinely lags NYC and
+            # Seattle by a reporting year, which is a data property, not a
+            # staleness incident. Native lat/lng plus a Socrata `location`
+            # container (the field map reads both). `reporting_status` is the
+            # compliance string here; there is no `compliancestatus` column.
+            FeedType.ENERGY_BENCHMARK: DatasetSpec(
+                endpoint=settings.socrata_chicago_energy_benchmark_endpoint,
+                platform="socrata",
+                watermark_col="data_year",
+                id_keys=["row_id", "id", "data_year"],
+                topic=settings.topic_context_observations,
+                interval_seconds=86400.0,
+                producer_key="energy_benchmark",
+                expected_cadence_days=365,
+                watermark_type='text',
+                watermark_format='%Y',
+                alarm_exempt=True,
+                alarm_exempt_reason='annual disclosure, one reporting year behind by publication practice (US-363 §2.7)',
+                field_map=CHICAGO_ENERGY_FIELD_MAP,
             ),
         },
     ),
@@ -1580,6 +1663,44 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 producer_key="crime",
                 
                 expected_cadence_days=7,
+            ),
+            # US-363 §2.7: Seattle benchmarking. Re-probed 2026-08-28: max
+            # datayear 2024, n=34,699. Carries the richest compliance signal of
+            # the three (`compliancestatus`) plus `ghgemissionsintensity`.
+            FeedType.ENERGY_BENCHMARK: DatasetSpec(
+                endpoint=settings.socrata_seattle_energy_benchmark_endpoint,
+                platform="socrata",
+                watermark_col="datayear",
+                id_keys=["osebuildingid", "datayear"],
+                topic=settings.topic_context_observations,
+                interval_seconds=86400.0,
+                producer_key="energy_benchmark",
+                expected_cadence_days=365,
+                watermark_type='text',
+                watermark_format='%Y',
+                alarm_exempt=True,
+                alarm_exempt_reason='annual disclosure — one publication per year by design (US-363 §2.7)',
+                field_map=SEATTLE_ENERGY_FIELD_MAP,
+            ),
+            # US-363 §2.8: Fremont Bridge hourly bike counts. 121,211 rows,
+            # max date 2026-07-31T23:00 — the documented ~4-week lag, hence
+            # the 35-day cadence declaration. WIDE layout: one row per hour
+            # with nb/sb columns and no sensor id, because there is exactly
+            # one sensor. `wide_layout` tells the producer to take the
+            # directional columns (never the undirected total, which would
+            # double-count the day) and to use the module's fixed coordinate
+            # instead of a registry join.
+            FeedType.BIKE_PED: DatasetSpec(
+                endpoint=settings.socrata_seattle_bike_ped_counts_endpoint,
+                platform="socrata",
+                watermark_col="date",
+                id_keys=["date"],
+                topic=settings.topic_context_observations,
+                interval_seconds=86400.0,
+                producer_key="bike_ped",
+                expected_cadence_days=35,
+                companion_endpoints={'wide_layout': True},
+                field_map=SEATTLE_FREMONT_FIELD_MAP,
             ),
         },
     ),

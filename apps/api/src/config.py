@@ -55,6 +55,13 @@ class Settings(BaseSettings):
     topic_street_cut: str = Field(default="raw.municipal.street_cut", description="Street-cut/utility permit records topic")
     topic_evictions: str = Field(default="raw.municipal.evictions", description="Eviction filings/executions topic")
     topic_str: str = Field(default="raw.municipal.str", description="Short-term rental registrations topic")
+    # US-363 context/measurement families. `context_observations` carries both
+    # energy benchmarking (§2.7) and bike/ped counters (§2.8) — one typed
+    # ContextObservationEvent shape, one topic, two sources.
+    topic_context_observations: str = Field(
+        default="raw.context.observations",
+        description="Periodic per-asset context measurements (energy benchmarking, bike/ped counters)",
+    )
     topic_enriched_h3: str = Field(default="enriched.spatial.h3")
     topic_catalyst_alerts: str = Field(default="alerts.catalyst")
     topic_dlq: str = Field(default="dlq.schema.failures")
@@ -214,6 +221,37 @@ class Settings(BaseSettings):
         description="Chicago CDOT permit master (street-cut companion; unpolled until companion polling lands)",
     )
 
+    # --- US-363 §2.7 building energy benchmarking (annual, zero new machinery) ---
+    # All three re-probed live 2026-08-28. Coordinates are native on every
+    # feed, so `needs_geocode` stays false; Chicago lags a reporting year.
+    socrata_nyc_energy_benchmark_endpoint: str = Field(
+        default="https://data.cityofnewyork.us/resource/5zyy-y8am.json",
+        description="NYC LL84 energy & water benchmarking disclosure (max report_year 2024, n=103,259)",
+    )
+    socrata_chicago_energy_benchmark_endpoint: str = Field(
+        default="https://data.cityofchicago.org/resource/xq83-jr8c.json",
+        description="Chicago energy benchmarking (max data_year 2023 — the feed lags, n=28,329)",
+    )
+    socrata_seattle_energy_benchmark_endpoint: str = Field(
+        default="https://data.seattle.gov/resource/teqw-tu6e.json",
+        description="Seattle building energy benchmarking (max datayear 2024, n=34,699)",
+    )
+    # --- US-363 §2.8 bike/ped counters (daily rollup, zero new machinery) ---
+    # NYC counts carry no geometry: `6up2-gnw8` is the sensor registry the
+    # spec declares as a companion endpoint. Seattle's Fremont feed is one
+    # fixed structure with no registry at all.
+    socrata_nyc_bike_ped_counts_endpoint: str = Field(
+        default="https://data.cityofnewyork.us/resource/ct66-47at.json",
+        description="NYC DOT bike/ped/scooter counts, 15-minute directional (21.0M rows, same-day fresh)",
+    )
+    socrata_nyc_bike_ped_sensors_endpoint: str = Field(
+        default="https://data.cityofnewyork.us/resource/6up2-gnw8.json",
+        description="NYC DOT counter registry — lat/lon for ct66-47at sensor_id (67 sensors live)",
+    )
+    socrata_seattle_bike_ped_counts_endpoint: str = Field(
+        default="https://data.seattle.gov/resource/65db-xm6k.json",
+        description="Seattle Fremont Bridge hourly bike counts (~4-week lag, n=121,211)",
+    )
     # San Diego (US-91): static-CSV open-data portal (seshat.datasd.org) — no
     # Socrata/ArcGIS API. Year-scoped approvals file; rotate per year (D3).
     csv_san_diego_permits_endpoint: str = Field(

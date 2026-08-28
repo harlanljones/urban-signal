@@ -31,6 +31,7 @@ from src.producers.crime_incidents_producer import CrimeIncidentsProducer
 from src.producers.deeds_acris_producer import DeedsACRISProducer
 from src.producers.dob_permits_producer import DOBPermitsProducer
 from src.producers.evictions_producer import EvictionsProducer
+from src.producers.context_observations_producer import ContextObservationsProducer
 from src.producers.sla_licenses_producer import SLALicensesProducer
 from src.producers.street_cut_permits_producer import StreetCutPermitsProducer
 from src.producers.watermarks import (
@@ -223,6 +224,12 @@ class MunicipalIngestionScheduler:
             "crime": CrimeIncidentsProducer(bootstrap_servers=self.bootstrap_servers),
             "street_cut": StreetCutPermitsProducer(bootstrap_servers=self.bootstrap_servers),
             "evictions": EvictionsProducer(bootstrap_servers=self.bootstrap_servers),
+            # US-363 §2.7/§2.8: one producer serves both context-measurement
+            # feeds, dispatching on FeedType inside run_stream. Two keys, one
+            # instance — the gate checks producer_key -> platform clients, not
+            # producer_key -> distinct object.
+            "energy_benchmark": ContextObservationsProducer(bootstrap_servers=self.bootstrap_servers),
+            "bike_ped": ContextObservationsProducer(bootstrap_servers=self.bootstrap_servers),
         }
 
         # Socrata Endpoints & Target Topics mapping derived from city registry

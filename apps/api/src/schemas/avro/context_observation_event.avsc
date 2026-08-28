@@ -1,0 +1,30 @@
+{
+  "type": "record",
+  "name": "ContextObservationEvent",
+  "namespace": "org.urbandev.events",
+  "doc": "Periodic per-asset context measurement (energy benchmarking, bike/ped counters). Context covariate only — never a LIMS term.",
+  "fields": [
+    { "name": "city_id", "type": "string", "default": "nyc" },
+    { "name": "observation_id", "type": "string" },
+    { "name": "source", "type": "string" },
+    { "name": "asset_id", "type": "string" },
+    { "name": "asset_name", "type": ["null", "string"], "default": null },
+    { "name": "metric", "type": "string" },
+    { "name": "value", "type": "double" },
+    { "name": "unit", "type": ["null", "string"], "default": null },
+    { "name": "period_start", "type": "string" },
+    { "name": "period_end", "type": ["null", "string"], "default": null },
+    { "name": "period_type", "type": "string", "default": "year" },
+    { "name": "category", "type": ["null", "string"], "default": null },
+    { "name": "address", "type": ["null", "string"], "default": null },
+    { "name": "borough", "type": ["null", "string"], "default": null },
+    { "name": "source_neighborhood", "type": ["null", "string"], "default": null },
+    { "name": "zipcode", "type": ["null", "string"], "default": null },
+    { "name": "latitude", "type": ["null", "double"], "default": null },
+    { "name": "longitude", "type": ["null", "double"], "default": null },
+    { "name": "h3_res7", "type": ["null", "string"], "default": null },
+    { "name": "h3_res8", "type": ["null", "string"], "default": null },
+    { "name": "h3_res9", "type": ["null", "string"], "default": null },
+    { "name": "ingested_at", "type": "string" }
+  ]
+}
