@@ -2722,6 +2722,36 @@
       "evidence_path": "apps/api/src/spatial/cities/macon_bibb.py"
     },
     {
+      "id": "ocala",
+      "name": "Ocala / Marion County",
+      "state": "FL",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 29.1872,
+        "lng": -82.1401
+      },
+      "evidence_path": "apps/api/src/spatial/cities/ocala.py"
+    },
+    {
       "id": "lakeland",
       "name": "Lakeland",
       "state": "FL",
