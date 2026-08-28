@@ -466,6 +466,13 @@ from src.spatial.cities.longview import (
     LONGVIEW_METRO_BBOX,
     LONGVIEW_SUBMARKETS,
 )
+from src.spatial.cities.monroe import (
+    MONROE_CENTER,
+    MONROE_DIVISION_BBOXES,
+    MONROE_DIVISIONS,
+    MONROE_METRO_BBOX,
+    MONROE_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -551,6 +558,7 @@ class CityId(str, Enum):
     LAKE_CHARLES = "lake_charles"
     FORT_SMITH = "fort_smith"
     LONGVIEW = "longview"
+    MONROE = "monroe"
 
 
 class FeedType(str, Enum):
@@ -1157,6 +1165,10 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "longview": CityId.LONGVIEW,
     "longview_tx": CityId.LONGVIEW,
     "longview tx": CityId.LONGVIEW,
+    # Monroe, LA
+    "monroe": CityId.MONROE,
+    "monroe_la": CityId.MONROE,
+    "monroe la": CityId.MONROE,
 }
 
 
@@ -5057,6 +5069,22 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         job_suffix="lake_charles",
         # Initial registration: SLA via USDA SNAP Retailers (LA slice).
         # Calcasieu Parish/Lake Charles permit endpoints will be added when a public API is verified.
+        datasets={
+            FeedType.SLA: snap_sla_spec("LA"),
+        },
+    ),
+    CityId.MONROE: CityRegistration(
+        city_id=CityId.MONROE,
+        name="Monroe",
+        state="LA",
+        center=MONROE_CENTER,
+        metro_bbox=MONROE_METRO_BBOX,
+        division_bboxes=MONROE_DIVISION_BBOXES,
+        submarkets=MONROE_SUBMARKETS,
+        divisions=MONROE_DIVISIONS,
+        job_suffix="monroe",
+        # US-277: initial registration with SNAP SLA (LA slice). No verifiable
+        # public permits endpoint exists (parish/city use citizen portals).
         datasets={
             FeedType.SLA: snap_sla_spec("LA"),
         },

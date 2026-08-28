@@ -2547,17 +2547,7 @@
       "division_count": 5,
       "submarket_count": 9,
       "feeds": [false, false, true, false],
-      "platforms": [
-        null,
-        null,
-        {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
-          "topic": "raw.municipal.sla"
-        },
-        null
-      ],
+      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
       "center": { "lat": 32.2989, "lng": -90.1847 },
       "evidence_path": "apps/api/src/spatial/cities/jackson_ms.py"
     },
@@ -2570,19 +2560,9 @@
       "submarket_count": 8,
       "feeds": [true, false, true, false],
       "platforms": [
-        {
-          "platform": "arcgis",
-          "watermark_col": "ISSUEDATE",
-          "interval_seconds": 300.0,
-          "topic": "raw.municipal.permits"
-        },
+        { "platform": "arcgis", "watermark_col": "ISSUEDATE", "interval_seconds": 300.0, "topic": "raw.municipal.permits" },
         null,
-        {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
-          "topic": "raw.municipal.sla"
-        },
+        { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" },
         null
       ],
       "center": { "lat": 32.8366, "lng": -83.6324 },
@@ -2596,17 +2576,7 @@
       "division_count": 5,
       "submarket_count": 6,
       "feeds": [false, false, true, false],
-      "platforms": [
-        null,
-        null,
-        {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
-          "topic": "raw.municipal.sla"
-        },
-        null
-      ],
+      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
       "center": { "lat": 32.3519, "lng": -95.3006 },
       "evidence_path": "apps/api/src/spatial/cities/tyler.py"
     },
@@ -2618,17 +2588,7 @@
       "division_count": 3,
       "submarket_count": 3,
       "feeds": [false, false, true, false],
-      "platforms": [
-        null,
-        null,
-        {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
-          "topic": "raw.municipal.sla"
-        },
-        null
-      ],
+      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
       "center": { "lat": 30.2266, "lng": -93.2174 },
       "evidence_path": "apps/api/src/spatial/cities/lake_charles.py"
     },
@@ -2640,17 +2600,7 @@
       "division_count": 1,
       "submarket_count": 5,
       "feeds": [false, false, true, false],
-      "platforms": [
-        null,
-        null,
-        {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
-          "topic": "raw.municipal.sla"
-        },
-        null
-      ],
+      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
       "center": { "lat": 35.3859, "lng": -94.3985 },
       "evidence_path": "apps/api/src/spatial/cities/fort_smith.py"
     },
@@ -2662,19 +2612,21 @@
       "division_count": 5,
       "submarket_count": 7,
       "feeds": [false, false, true, false],
-      "platforms": [
-        null,
-        null,
-        {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
-          "topic": "raw.municipal.sla"
-        },
-        null
-      ],
+      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
       "center": { "lat": 32.5007, "lng": -94.7405 },
       "evidence_path": "apps/api/src/spatial/cities/longview.py"
+    },
+    {
+      "id": "monroe",
+      "name": "Monroe",
+      "state": "LA",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 8,
+      "feeds": [false, false, true, false],
+      "platforms": [null, null, { "platform": "arcgis", "watermark_col": "", "interval_seconds": 1800.0, "topic": "raw.municipal.sla" }, null],
+      "center": { "lat": 32.5093, "lng": -92.1193 },
+      "evidence_path": "apps/api/src/spatial/cities/monroe.py"
     }
   ],
   "pipeline": [

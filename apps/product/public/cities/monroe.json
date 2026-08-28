@@ -1,0 +1,188 @@
+{
+  "schema_version": 2,
+  "id": "monroe",
+  "name": "Monroe",
+  "state": "LA",
+  "center": {
+    "lat": 32.5093,
+    "lng": -92.1193
+  },
+  "metro_bbox": {
+    "min_lat": 32.42,
+    "max_lat": 32.62,
+    "min_lng": -92.27,
+    "max_lng": -91.98
+  },
+  "divisions": {
+    "CENTRAL_CORE": {
+      "name": "CENTRAL_CORE",
+      "center": {
+        "lat": 32.52,
+        "lng": -92.11
+      },
+      "bbox": {
+        "min_lat": 32.495,
+        "max_lat": 32.545,
+        "min_lng": -92.14,
+        "max_lng": -92.07
+      },
+      "submarkets": [
+        "Downtown Monroe & Riverfront",
+        "ULM / Bayou Desiard"
+      ]
+    },
+    "WEST_BANK": {
+      "name": "WEST_BANK",
+      "center": {
+        "lat": 32.525,
+        "lng": -92.17
+      },
+      "bbox": {
+        "min_lat": 32.49,
+        "max_lat": 32.57,
+        "min_lng": -92.23,
+        "max_lng": -92.12
+      },
+      "submarkets": [
+        "West Monroe / Antique Alley",
+        "I-20 Retail Corridor (West Monroe)"
+      ]
+    },
+    "NORTH_LOOP": {
+      "name": "NORTH_LOOP",
+      "center": {
+        "lat": 32.59,
+        "lng": -92.085
+      },
+      "bbox": {
+        "min_lat": 32.56,
+        "max_lat": 32.62,
+        "min_lng": -92.18,
+        "max_lng": -91.99
+      },
+      "submarkets": [
+        "Sterlington Road / US-165 North"
+      ]
+    },
+    "SOUTH_STRIPS": {
+      "name": "SOUTH_STRIPS",
+      "center": {
+        "lat": 32.465,
+        "lng": -92.12
+      },
+      "bbox": {
+        "min_lat": 32.42,
+        "max_lat": 32.51,
+        "min_lng": -92.2,
+        "max_lng": -92.05
+      },
+      "submarkets": [
+        "South Monroe / Richwood"
+      ]
+    },
+    "EAST_GATE": {
+      "name": "EAST_GATE",
+      "center": {
+        "lat": 32.54,
+        "lng": -92.03
+      },
+      "bbox": {
+        "min_lat": 32.495,
+        "max_lat": 32.59,
+        "min_lng": -92.08,
+        "max_lng": -91.98
+      },
+      "submarkets": [
+        "Pecanland Mall & Millhaven",
+        "Monroe Regional Airport Vicinity"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Monroe & Riverfront": {
+      "name": "Downtown Monroe & Riverfront",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 32.509,
+        "lng": -92.1185
+      },
+      "description": "Historic downtown on the Ouachita River with civic anchors and small-scale adaptive reuse."
+    },
+    "ULM / Bayou Desiard": {
+      "name": "ULM / Bayou Desiard",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 32.529,
+        "lng": -92.067
+      },
+      "description": "University of Louisiana at Monroe district; campus-adjacent residential and services."
+    },
+    "West Monroe / Antique Alley": {
+      "name": "West Monroe / Antique Alley",
+      "division": "WEST_BANK",
+      "center": {
+        "lat": 32.516,
+        "lng": -92.145
+      },
+      "description": "Antique Alley and West Monroe core across the Ouachita with main-street retail ribbons."
+    },
+    "I-20 Retail Corridor (West Monroe)": {
+      "name": "I-20 Retail Corridor (West Monroe)",
+      "division": "WEST_BANK",
+      "center": {
+        "lat": 32.511,
+        "lng": -92.18
+      },
+      "description": "Interstate-oriented commercial and hospitality nodes along I-20 in West Monroe."
+    },
+    "Pecanland Mall & Millhaven": {
+      "name": "Pecanland Mall & Millhaven",
+      "division": "EAST_GATE",
+      "center": {
+        "lat": 32.504,
+        "lng": -92.062
+      },
+      "description": "Regional retail hub around Pecanland Mall and Millhaven corridor east of downtown."
+    },
+    "Monroe Regional Airport Vicinity": {
+      "name": "Monroe Regional Airport Vicinity",
+      "division": "EAST_GATE",
+      "center": {
+        "lat": 32.51,
+        "lng": -92.037
+      },
+      "description": "Airport-adjacent logistics and services east of the core along Central Ave/Millhaven."
+    },
+    "Sterlington Road / US-165 North": {
+      "name": "Sterlington Road / US-165 North",
+      "division": "NORTH_LOOP",
+      "center": {
+        "lat": 32.585,
+        "lng": -92.077
+      },
+      "description": "Growth corridor along US-165 toward Sterlington with medical and neighborhood services."
+    },
+    "South Monroe / Richwood": {
+      "name": "South Monroe / Richwood",
+      "division": "SOUTH_STRIPS",
+      "center": {
+        "lat": 32.445,
+        "lng": -92.1
+      },
+      "description": "Southern belt toward Richwood along US-165 with highway services and residential infill."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/monroe.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

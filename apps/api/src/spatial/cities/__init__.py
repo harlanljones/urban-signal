@@ -497,6 +497,13 @@ from src.spatial.cities.longview import (
     LONGVIEW_SUBMARKETS,
     is_in_longview_metro,
 )
+from src.spatial.cities.monroe import (
+    MONROE_DIVISION_BBOXES,
+    MONROE_DIVISIONS,
+    MONROE_METRO_BBOX,
+    MONROE_SUBMARKETS,
+    is_in_monroe_metro,
+)
 
 from src.spatial.cities.lake_charles import (
     LAKE_CHARLES_DIVISION_BBOXES,
@@ -862,4 +869,9 @@ __all__ = [
     "LONGVIEW_DIVISIONS",
     "LONGVIEW_SUBMARKETS",
     "is_in_longview_metro",
+    "MONROE_METRO_BBOX",
+    "MONROE_DIVISION_BBOXES",
+    "MONROE_DIVISIONS",
+    "MONROE_SUBMARKETS",
+    "is_in_monroe_metro",
 ]
