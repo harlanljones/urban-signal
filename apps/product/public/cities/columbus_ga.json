@@ -1,0 +1,178 @@
+{
+  "schema_version": 2,
+  "id": "columbus_ga",
+  "name": "Columbus, GA",
+  "state": "GA",
+  "center": {
+    "lat": 32.461,
+    "lng": -84.9877
+  },
+  "metro_bbox": {
+    "min_lat": 32.35,
+    "max_lat": 32.65,
+    "min_lng": -85.15,
+    "max_lng": -84.75
+  },
+  "divisions": {
+    "DOWNTOWN_RIVERFRONT": {
+      "name": "DOWNTOWN_RIVERFRONT",
+      "center": {
+        "lat": 32.463,
+        "lng": -84.987
+      },
+      "bbox": {
+        "min_lat": 32.44,
+        "max_lat": 32.49,
+        "min_lng": -85.04,
+        "max_lng": -84.96
+      },
+      "submarkets": [
+        "Uptown",
+        "Riverwalk"
+      ]
+    },
+    "MIDTOWN": {
+      "name": "MIDTOWN",
+      "center": {
+        "lat": 32.486,
+        "lng": -84.956
+      },
+      "bbox": {
+        "min_lat": 32.455,
+        "max_lat": 32.525,
+        "min_lng": -84.99,
+        "max_lng": -84.91
+      },
+      "submarkets": [
+        "Midtown Medical",
+        "East Midtown"
+      ]
+    },
+    "NORTHSIDE": {
+      "name": "NORTHSIDE",
+      "center": {
+        "lat": 32.57,
+        "lng": -84.952
+      },
+      "bbox": {
+        "min_lat": 32.52,
+        "max_lat": 32.615,
+        "min_lng": -85.02,
+        "max_lng": -84.88
+      },
+      "submarkets": [
+        "North Columbus",
+        "Bradley Park"
+      ]
+    },
+    "SOUTH_GATEWAY": {
+      "name": "SOUTH_GATEWAY",
+      "center": {
+        "lat": 32.392,
+        "lng": -84.955
+      },
+      "bbox": {
+        "min_lat": 32.365,
+        "max_lat": 32.44,
+        "min_lng": -85.07,
+        "max_lng": -84.91
+      },
+      "submarkets": [
+        "South Columbus",
+        "Benning Gateway"
+      ]
+    }
+  },
+  "submarkets": {
+    "Uptown": {
+      "name": "Uptown",
+      "division": "DOWNTOWN_RIVERFRONT",
+      "center": {
+        "lat": 32.461,
+        "lng": -84.9877
+      },
+      "description": "Broadway & riverwalk mixed-use core with adaptive reuse, hospitality, and student housing."
+    },
+    "Riverwalk": {
+      "name": "Riverwalk",
+      "division": "DOWNTOWN_RIVERFRONT",
+      "center": {
+        "lat": 32.4665,
+        "lng": -84.9985
+      },
+      "description": "Chattahoochee riverfront recreation and tourism corridor, west of Broadway."
+    },
+    "Midtown Medical": {
+      "name": "Midtown Medical",
+      "division": "MIDTOWN",
+      "center": {
+        "lat": 32.4785,
+        "lng": -84.9675
+      },
+      "description": "Columbus Midtown medical/education spine and surrounding residential blocks."
+    },
+    "East Midtown": {
+      "name": "East Midtown",
+      "division": "MIDTOWN",
+      "center": {
+        "lat": 32.492,
+        "lng": -84.934
+      },
+      "description": "Residential grid and commercial nodes along Warm Springs Rd to CSU."
+    },
+    "North Columbus": {
+      "name": "North Columbus",
+      "division": "NORTHSIDE",
+      "center": {
+        "lat": 32.575,
+        "lng": -84.96
+      },
+      "description": "Retail and employment centers around Veterans Pkwy and Whitesville Rd."
+    },
+    "Bradley Park": {
+      "name": "Bradley Park",
+      "division": "NORTHSIDE",
+      "center": {
+        "lat": 32.56,
+        "lng": -84.935
+      },
+      "description": "Master-planned retail/office district and surrounding residential infill."
+    },
+    "South Columbus": {
+      "name": "South Columbus",
+      "division": "SOUTH_GATEWAY",
+      "center": {
+        "lat": 32.4005,
+        "lng": -84.968
+      },
+      "description": "US-280/Buena Vista Rd corridor reinvestment and Fort Benning-adjacent housing."
+    },
+    "Benning Gateway": {
+      "name": "Benning Gateway",
+      "division": "SOUTH_GATEWAY",
+      "center": {
+        "lat": 32.38,
+        "lng": -84.94
+      },
+      "description": "Gateway area north of Fort Benning with service retail and residential turnover."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "Issued",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/columbus_ga.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
