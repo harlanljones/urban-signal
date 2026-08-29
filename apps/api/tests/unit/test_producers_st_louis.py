@@ -230,6 +230,18 @@ class TestFeedRegistration:
     def test_partial_city_registers_three_feeds(self):
         assert set(ST_LOUIS_FEED_SPECS) == {"311", "permits", "sla"}
 
+    def test_specs_are_city_hosted_transactional_sources(self):
+        """Keep the registration on the probed St. Louis publishing surface."""
+        for spec in ST_LOUIS_FEED_SPECS.values():
+            assert spec["platform"] == "csv"
+            assert "stlouis-mo.gov" in spec["endpoint"]
+            assert "socrata" not in spec["endpoint"].lower()
+            assert "arcgis" not in spec["endpoint"].lower()
+
+    def test_producer_keys_match_feed_names(self):
+        for feed_name, spec in ST_LOUIS_FEED_SPECS.items():
+            assert spec["producer_key"] == feed_name
+
     def test_311_spec_is_zip_year_member_mercator(self):
         extra = STL_311_SPEC["extra"]
         assert STL_311_SPEC["platform"] == "csv"
