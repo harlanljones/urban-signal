@@ -51,13 +51,14 @@ FEED_TOPICS = {
     FeedType.GBFS: settings.topic_station_change,
 }
 
-KNOWN_PLATFORMS = {"socrata", "arcgis", "carto", "ckan", "csv", "excel", "gbfs"}
+KNOWN_PLATFORMS = {"socrata", "arcgis", "accela", "carto", "ckan", "csv", "excel", "gbfs"}
 
 # URI scheme each platform's endpoint must carry (carto/ckan use opaque
 # client-parsed URIs; see the client modules).
 PLATFORM_SCHEMES = {
     "socrata": "https://",
     "arcgis": "https://",
+    "accela": "https://",
     "carto": "carto://",
     "ckan": "ckan://",
     "csv": "https://",
@@ -85,6 +86,7 @@ SPINE_INVARIANTS = {
     "apps/api/src/producers/complaints_311_producer.py": ["producer keys resolve", "dataset specs complete"],
     "apps/api/src/producers/sla_licenses_producer.py": ["producer keys resolve", "dataset specs complete"],
     "apps/api/src/producers/deeds_acris_producer.py": ["producer keys resolve", "dataset specs complete"],
+    "apps/api/src/producers/accela_client.py": ["Accela client reuses ArcGIS REST pagination"],
 }
 
 CITY_EXPORT_NAMES = {
@@ -128,6 +130,7 @@ CITY_EXPORT_NAMES = {
     CityId.LAS_VEGAS: ("LAS_VEGAS_METRO_BBOX", "LAS_VEGAS_DIVISION_BBOXES", "LAS_VEGAS_DIVISIONS", "LAS_VEGAS_SUBMARKETS"),
     CityId.BOISE: ("BOISE_METRO_BBOX", "BOISE_DIVISION_BBOXES", "BOISE_DIVISIONS", "BOISE_SUBMARKETS"),
     CityId.RENO: ("RENO_METRO_BBOX", "RENO_DIVISION_BBOXES", "RENO_DIVISIONS", "RENO_SUBMARKETS"),
+    CityId.MADISON: ("MADISON_METRO_BBOX", "MADISON_DIVISION_BBOXES", "MADISON_DIVISIONS", "MADISON_SUBMARKETS"),
 }
 
 EXPORT_ATTR_MAP = {

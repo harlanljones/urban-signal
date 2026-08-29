@@ -127,6 +127,13 @@ from src.spatial.cities.milwaukee import (
     MILWAUKEE_METRO_BBOX,
     MILWAUKEE_SUBMARKETS,
 )
+from src.spatial.cities.madison import (
+    MADISON_DIVISION_BBOXES,
+    MADISON_DIVISIONS,
+    MADISON_METRO_BBOX,
+    MADISON_PERMITS_FIELD_MAP,
+    MADISON_SUBMARKETS,
+)
 from src.spatial.cities.charlotte import (
     CHARLOTTE_DIVISION_BBOXES,
     CHARLOTTE_DIVISIONS,
@@ -723,6 +730,7 @@ class CityId(str, Enum):
     MINNEAPOLIS = "minneapolis"
     PIERCE = "pierce"
     MILWAUKEE = "milwaukee"
+    MADISON = "madison"
     CHARLOTTE = "charlotte"
     PITTSBURGH = "pittsburgh"
     SAN_DIEGO = "san_diego"
@@ -1092,6 +1100,11 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "milwaukee": CityId.MILWAUKEE,
     "mke": CityId.MILWAUKEE,
     "mke_wi": CityId.MILWAUKEE,
+
+    # Madison, WI
+    "madison": CityId.MADISON,
+    "madison_wi": CityId.MADISON,
+    "madison wi": CityId.MADISON,
 
     # Charlotte / Mecklenburg, NC
     "charlotte": CityId.CHARLOTTE,
@@ -3791,6 +3804,32 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 needs_geocode=True,
                 geocode_context="Milwaukee, WI",
                 field_map={'incident_id': ['_id'], 'incident_address': ['OBJECTDESC'], 'complaint_type': ['TITLE'], 'created_date': ['CREATIONDATE'], 'closed_date': ['CLOSEDDATETIME']},
+            ),
+        },
+    ),
+    CityId.MADISON: CityRegistration(
+        city_id=CityId.MADISON,
+        name="Madison",
+        state="WI",
+        center={"lat": 43.0747, "lng": -89.3844},
+        metro_bbox=MADISON_METRO_BBOX,
+        division_bboxes=MADISON_DIVISION_BBOXES,
+        submarkets=MADISON_SUBMARKETS,
+        divisions=MADISON_DIVISIONS,
+        job_suffix="mad",
+        # Madison's public building-permit records are served by Accela ACA;
+        # no usable 311, SLA, or deeds transaction feed was found in the Hub.
+        datasets={
+            FeedType.PERMITS: DatasetSpec(
+                endpoint=settings.accela_madison_permits_endpoint,
+                platform="accela",
+                watermark_col="IssuedDate",
+                id_keys=["RecordID", "RecordNumber"],
+                topic=settings.topic_permits,
+                interval_seconds=300.0,
+                producer_key="permits",
+                expected_cadence_days=7,
+                field_map=MADISON_PERMITS_FIELD_MAP,
             ),
         },
     ),
