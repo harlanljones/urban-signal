@@ -616,6 +616,13 @@ from src.spatial.cities.wilmington_nc import (
     WILMINGTON_NC_SUBMARKETS,
     is_in_wilmington_nc_metro,
 )
+from src.spatial.cities.grand_rapids import (
+    GRAND_RAPIDS_DIVISION_BBOXES,
+    GRAND_RAPIDS_DIVISIONS,
+    GRAND_RAPIDS_METRO_BBOX,
+    GRAND_RAPIDS_SUBMARKETS,
+    is_in_grand_rapids_metro,
+)
 from src.spatial.cities.gainesville import (
     GAINESVILLE_DIVISION_BBOXES,
     GAINESVILLE_DIVISIONS,
@@ -1140,6 +1147,11 @@ __all__ = [
     "WILMINGTON_NC_DIVISIONS",
     "WILMINGTON_NC_SUBMARKETS",
     "is_in_wilmington_nc_metro",
+    "GRAND_RAPIDS_METRO_BBOX",
+    "GRAND_RAPIDS_DIVISION_BBOXES",
+    "GRAND_RAPIDS_DIVISIONS",
+    "GRAND_RAPIDS_SUBMARKETS",
+    "is_in_grand_rapids_metro",
     "GAINESVILLE_METRO_BBOX",
     "GAINESVILLE_DIVISION_BBOXES",
     "GAINESVILLE_DIVISIONS",

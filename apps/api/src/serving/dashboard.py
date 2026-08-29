@@ -1529,6 +1529,7 @@ def get_dashboard_html() -> str:
       port_st_lucie: { name: 'Port St. Lucie' },
       asheville: { name: 'Asheville, NC' },
       wilmington_nc: { name: 'Wilmington, NC' },
+      grand_rapids: { name: 'Grand Rapids, MI' },
       buffalo: { name: 'Buffalo, NY' },
       rochester: { name: 'Rochester, NY' },
       syracuse: { name: 'Syracuse, NY' },
