@@ -1105,6 +1105,36 @@
       "evidence_path": "apps/api/src/spatial/cities/milwaukee.py"
     },
     {
+      "id": "madison",
+      "name": "Madison",
+      "state": "WI",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "accela",
+          "watermark_col": "IssuedDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 43.0747,
+        "lng": -89.3844
+      },
+      "evidence_path": "apps/api/src/spatial/cities/madison.py"
+    },
+    {
       "id": "charlotte",
       "name": "Charlotte",
       "state": "NC",

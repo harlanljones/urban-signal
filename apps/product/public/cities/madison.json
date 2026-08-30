@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "id": "madison",
+  "name": "Madison",
+  "state": "WI",
+  "center": {
+    "lat": 43.0747,
+    "lng": -89.3844
+  },
+  "metro_bbox": {
+    "min_lat": 42.9,
+    "max_lat": 43.25,
+    "min_lng": -89.65,
+    "max_lng": -89.15
+  },
+  "divisions": {
+    "MADISON_CORE": {
+      "name": "Madison",
+      "center": {
+        "lat": 43.0747,
+        "lng": -89.3844
+      },
+      "bbox": {
+        "min_lat": 42.95,
+        "max_lat": 43.18,
+        "min_lng": -89.55,
+        "max_lng": -89.25
+      },
+      "submarkets": [
+        "Downtown & Capitol",
+        "Near West",
+        "Near East & Atwood",
+        "South Madison",
+        "West Beltline"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & Capitol": {
+      "name": "Downtown & Capitol",
+      "division": "MADISON_CORE",
+      "center": {
+        "lat": 43.0747,
+        "lng": -89.3844
+      },
+      "description": "State Street, Capitol Square, and the downtown lakefront civic and mixed-use core."
+    },
+    "Near West": {
+      "name": "Near West",
+      "division": "MADISON_CORE",
+      "center": {
+        "lat": 43.0612,
+        "lng": -89.4335
+      },
+      "description": "University-adjacent neighborhoods and established commercial corridors west of downtown."
+    },
+    "Near East & Atwood": {
+      "name": "Near East & Atwood",
+      "division": "MADISON_CORE",
+      "center": {
+        "lat": 43.0898,
+        "lng": -89.3472
+      },
+      "description": "Atwood and Williamson Street corridors with neighborhood retail and adaptive reuse."
+    },
+    "South Madison": {
+      "name": "South Madison",
+      "division": "MADISON_CORE",
+      "center": {
+        "lat": 43.0334,
+        "lng": -89.3848
+      },
+      "description": "South-side reinvestment and redevelopment corridors linking the central city to suburban growth."
+    },
+    "West Beltline": {
+      "name": "West Beltline",
+      "division": "MADISON_CORE",
+      "center": {
+        "lat": 43.052,
+        "lng": -89.505
+      },
+      "description": "Employment, retail, and residential growth nodes along Madison's western Beltline edge."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "accela",
+      "watermark_col": "IssuedDate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/madison.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
