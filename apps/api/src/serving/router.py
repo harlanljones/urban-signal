@@ -274,7 +274,12 @@ async def get_grid_geojson(
     include_shap: bool = Query(default=False),
     engine: MultiHorizonInferenceEngine = Depends(get_inference_engine),
 ):
-    """Retrieve GeoJSON FeatureCollection of H3 hex grid covering commercial submarkets with optional borough and submarket filtering."""
+    """Retrieve GeoJSON FeatureCollection of H3 hex grid covering commercial submarkets with optional borough and submarket filtering.
+
+    ``resolution`` doubles as the LOD level (7/8/9, default 9): a coarser
+    resolution renders fewer, larger hexes for zoomed-out views, matching the
+    edge /api/v1/gridtiles?res= LOD pyramid (US-412).
+    """
     features = []
     seen_cells = set()
     norm_city = _get_validated_city_id(city_id, default="nyc")

@@ -62,6 +62,7 @@ LONG_ROWS = "long_rows"
 PROFILE_BULK_CSV = "bulk_csv"
 PROFILE_REST_API = "rest_api"
 PROFILE_CENSUS_API = "census_api"
+PROFILE_SOCRATA = "socrata"
 
 _ISO_DATE = re.compile(r"^(\d{4})-(\d{2})-(\d{2})$")
 _ISO_MONTH = re.compile(r"^(\d{4})-(\d{2})$")
@@ -390,6 +391,43 @@ class SeriesClient:
                 unit=spec.unit,
             )
 
+    def parse_soda_rows(
+        self,
+        spec: SeriesSpec,
+        payload: Any,
+        vintage: str,
+    ) -> Iterator[SeriesObservation]:
+        """Socrata SODA JSON returns a list of dicts; each row is one (geo, period, value)."""
+        if not isinstance(payload, list):
+            return
+        for row in payload:
+            if not isinstance(row, dict):
+                continue
+            geography_id = str(row.get(spec.geography_col) or "").strip()
+            if not geography_id:
+                continue
+            metro_hint = str(row.get(spec.metro_col) or "").strip() if spec.metro_col else None
+            city_id = self.resolve_city(spec, geography_id, metro_hint)
+            if city_id is None:
+                continue
+            periods = [row.get(c) for c in spec.period_cols if row.get(c)]
+            period = build_period(periods, spec.period_type)
+            if period is None:
+                continue
+            value = to_float(row.get(spec.value_col))
+            if value is None:
+                continue
+            yield SeriesObservation(
+                series_id=spec.series_id,
+                geography_level=spec.geography_level,
+                geography_id=geography_id,
+                period=period,
+                value=value * spec.value_scale,
+                source_vintage=vintage,
+                city_id=city_id,
+                unit=spec.unit,
+            )
+
     # ----------------------------------------------------------------- #
     # fetch                                                              #
     # ----------------------------------------------------------------- #
@@ -424,6 +462,9 @@ class SeriesClient:
                 {"Authorization": f"Bearer {token}"} if token else None,
             )
             return list(self.parse_hud_payload(spec, payload, stamp))
+        if spec.profile == PROFILE_SOCRATA:
+            payload = self._get_json(spec.dataset_id)
+            return list(self.parse_soda_rows(spec, payload, stamp))
         raise SeriesFetchError(f"{spec.series_id}: unknown profile {spec.profile!r}")
 
     def parse_hud_payload(

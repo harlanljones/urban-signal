@@ -52,7 +52,9 @@ import polars as pl
 
 from src.serving import router as api_router
 from src.serving.engine import MultiHorizonInferenceEngine
+from src.spatial import coverage
 from src.spatial.city_registry import REGISTRY, CityId
+from src.spatial.h3_indexer import H3SpatialIndexer
 from src.spatial.national_grid import NATIONAL_RESOLUTIONS
 
 logger = logging.getLogger(__name__)
@@ -63,6 +65,18 @@ DEFAULT_K_RING = 1
 CATALYST_THRESHOLD = 84.0
 CATALYST_LIMIT = 50
 TILE_RESOLUTION = 5
+# Metro LOD pyramid (US-411): res 9 is the dense grid, res 8/7 are coarser
+# aggregates published as their own tile sets so zoomed-out views show metro
+# LIMS (blended with national LODES elsewhere) instead of a dead zone.
+LOD_RESOLUTIONS = coverage.METRO_LOD_RESOLUTIONS  # (7, 8, 9)
+# Tile parent resolution per LOD level: coarse LOD needs coarser parents so a
+# metro spans only a handful of chunks and each stays under the 5 MiB budget.
+LOD_TILE_PARENT_RES = {7: 4, 8: 4, 9: TILE_RESOLUTION}
+# LOD aggregate features carry the averaged raw metric values (US-415 method A:
+# average raw, THEN rank). These are the averaged CELL_FEATURE_KEYS +
+# NORMALIZED_METRICS, deduped — built lazily below once both tuples exist.
+def _lod_aggregate_keys() -> tuple[str, ...]:
+    return tuple(dict.fromkeys((*CELL_FEATURE_KEYS, *NORMALIZED_METRICS)))
 # Size budgets (US-385): a publish that would exceed Workers KV limits must fail
 # the build here, not inside `wrangler kv bulk put` at 2 AM.
 MAX_KV_VALUE_BYTES = 20 * 1024 * 1024  # KV hard cap is 25 MiB per value
@@ -158,8 +172,10 @@ def _features_bbox(features: list[dict[str, Any]]) -> dict[str, float] | None:
     return {"min_lat": min_lat, "max_lat": max_lat, "min_lng": min_lng, "max_lng": max_lng}
 
 
-def _bucket_grid_tiles(grids: dict[str, dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
-    """Group normalized grid features under res-5 parent H3 indexes.
+def _bucket_grid_tiles(
+    grids: dict[str, dict[str, Any]], tile_res: int = TILE_RESOLUTION
+) -> dict[str, list[dict[str, Any]]]:
+    """Group normalized grid features under parent H3 indexes at ``tile_res``.
 
     Also stamps city_id/city_name server-side so merged-tile clients never need
     per-city attribution logic.
@@ -176,9 +192,129 @@ def _bucket_grid_tiles(grids: dict[str, dict[str, Any]]) -> dict[str, list[dict[
             seen_cells.add(cell)
             props.setdefault("city_id", city)
             props["city_name"] = city_name
-            parent = h3.cell_to_parent(cell, TILE_RESOLUTION)
+            parent = h3.cell_to_parent(cell, tile_res)
             tiles.setdefault(parent, []).append(feature)
     return tiles
+
+
+def _aggregate_grid_to_res(
+    grid: dict[str, Any], city: str, to_res: int
+) -> dict[str, Any]:
+    """Roll a res-9 grid up to a coarser LOD resolution (US-411).
+
+    US-415 method A: average the RAW metric values per parent cell, never
+    average child percentiles. Features carry the averaged
+    ``LOD_AGGREGATE_KEYS`` values plus a parent-boundary polygon and centroid,
+    so ``_apply_percentile_normalization`` can rank the aggregate surface
+    against itself (each LOD level is its own national rank space).
+    """
+    aggregate_keys = _lod_aggregate_keys()
+    parents: dict[str, dict[str, Any]] = {}
+    for feature in grid.get("features", []):
+        props = feature.get("properties", {})
+        cell = props.get("h3_index")
+        if not cell:
+            continue
+        parent = h3.cell_to_parent(cell, to_res)
+        bucket = parents.setdefault(
+            parent,
+            {"h3_index": parent, "resolution": to_res, "_children": 0, "_acc": {}},
+        )
+        bucket["_children"] += 1
+        for key in aggregate_keys:
+            value = props.get(key)
+            if value is None:
+                continue
+            acc = bucket["_acc"]
+            acc[key] = acc.get(key, 0.0) + float(value)
+
+    features: list[dict[str, Any]] = []
+    for parent, bucket in parents.items():
+        acc = bucket["_acc"]
+        aggregate_props: dict[str, Any] = {
+            "h3_index": parent,
+            "resolution": to_res,
+            "city_id": city,
+            "submarket": None,
+            "borough": None,
+            "source": "lod_aggregate",
+            "_child_cells": bucket["_children"],
+        }
+        for key in aggregate_keys:
+            if key in acc:
+                aggregate_props[key] = round(acc[key] / bucket["_children"], 6)
+        centroid = h3.cell_to_latlng(parent)
+        aggregate_props["centroid_lat"] = centroid[0]
+        aggregate_props["centroid_lng"] = centroid[1]
+        boundary = H3SpatialIndexer.h3_to_boundary(parent, geojson_format=True)
+        if boundary and boundary[0] != boundary[-1]:
+            boundary.append(boundary[0])
+        features.append(
+            {
+                "type": "Feature",
+                "id": parent,
+                "geometry": {"type": "Polygon", "coordinates": [boundary]},
+                "properties": aggregate_props,
+            }
+        )
+    return {"type": "FeatureCollection", "city_id": city, "features": features}
+
+
+def _dense_metro_grid(
+    city: str,
+    engine: MultiHorizonInferenceEngine,
+    max_ring: int = coverage.DEFAULT_MAX_RING,
+    max_dist_km: float | None = coverage.DEFAULT_MAX_DIST_KM,
+) -> dict[str, Any]:
+    """Build a dense res-9 grid for one metro (US-411 ``--dense-metro``).
+
+    Uses the coverage seam to render every bounded k-ring cell around the
+    metro's submarket centers, assigning each cell to its nearest submarket so
+    synthetic features mirror ``router.get_grid_geojson``. Cells outside any
+    submarket's ``max_dist_km`` bound are omitted (honesty rule).
+    """
+    cells = coverage.metro_cells(city, res=9, max_ring=max_ring, max_dist_km=max_dist_km)
+    features: list[dict[str, Any]] = []
+    for cell in cells:
+        assignment = coverage.assign_cell(cell, city, max_dist_km=max_dist_km)
+        if assignment is None:
+            continue
+        meta = coverage.submarket_meta(city, assignment.submarket)
+        if meta is None:
+            continue
+        meta_dict = api_router._submarket_to_dict(meta)
+        synthetic_feats = {
+            "capex_density_decayed": meta_dict["capex"],
+            "permit_velocity": (
+                meta_dict["permit_vel"]
+                if meta_dict["permit_vel"] <= 1.0
+                else meta_dict["permit_vel"] / 100.0
+            ),
+            "shift_ratio_311": meta_dict["shift_ratio"],
+            "sla_new_filings_90d": int(meta_dict["sla"]),
+            "lims_score": meta_dict["base_lims"],
+        }
+        pred = engine.predict_cell_features(cell, synthetic_feats, include_shap=False)
+        boundary = H3SpatialIndexer.h3_to_boundary(cell, geojson_format=True)
+        if boundary and boundary[0] != boundary[-1]:
+            boundary.append(boundary[0])
+        features.append(
+            {
+                "type": "Feature",
+                "id": cell,
+                "geometry": {"type": "Polygon", "coordinates": [boundary]},
+                "properties": {
+                    "submarket": meta_dict["name"],
+                    "borough": meta_dict["borough"],
+                    "city_id": city,
+                    "coverage_source": assignment.source,
+                    "coverage_distance_km": assignment.distance_km,
+                    **synthetic_feats,
+                    **pred,
+                },
+            }
+        )
+    return {"type": "FeatureCollection", "city_id": city, "features": features}
 
 
 def _build_metro_index(grids: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
@@ -341,6 +477,7 @@ async def build_snapshot(
     cities: list[str] | None = None,
     include_legacy_cells: bool = True,
     national_dir: Path | None = None,
+    dense_metro: bool = False,
 ) -> dict[str, Any]:
     """Build all snapshot artifacts into out_dir and return the manifest dict.
 
@@ -354,6 +491,12 @@ async def build_snapshot(
     data exists), national hex chunks + ``national/index`` are published and the
     manifest gains a ``national`` summary block; when omitted the snapshot is
     metro-only and the manifest carries no national block.
+
+    ``dense_metro`` switches the res-9 grid from ``router.get_grid_geojson``'s
+    k_ring=1 render set to the bounded k_ring=3 coverage seam
+    (``coverage.metro_cells``, 1.5 km bound) so urban cores are continuous.
+    LOD aggregates (res 8/7) are always built regardless; ``dense_metro`` only
+    changes the leaf-level density (US-411).
     """
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -383,15 +526,18 @@ async def build_snapshot(
 
     for city in cities:
         logger.info("Building snapshot artifacts for city '%s'", city)
-        grids[city] = await api_router.get_grid_geojson(
-            city_id=city,
-            resolution=DEFAULT_RESOLUTION,
-            k_ring=DEFAULT_K_RING,
-            borough=None,
-            submarket=None,
-            include_shap=False,
-            engine=engine,
-        )
+        if dense_metro:
+            grids[city] = _dense_metro_grid(city, engine)
+        else:
+            grids[city] = await api_router.get_grid_geojson(
+                city_id=city,
+                resolution=DEFAULT_RESOLUTION,
+                k_ring=DEFAULT_K_RING,
+                borough=None,
+                submarket=None,
+                include_shap=False,
+                engine=engine,
+            )
         catalysts_by_city[city] = await api_router.get_active_catalysts(
             city_id=city,
             min_lims=CATALYST_THRESHOLD,
@@ -403,7 +549,15 @@ async def build_snapshot(
         submarkets_by_city[city] = await api_router.list_submarkets(city_id=city, borough=None)
 
     # Percentiles must see every exported metro before anything reaches KV.
+    # res-9 is its own national rank space (unchanged); each LOD aggregate
+    # level is ranked against ITS complete publish (US-415 method A — average
+    # raw, then rank per level, never average child percentiles).
     _apply_percentile_normalization(grids)
+    grids_by_res: dict[int, dict[str, dict[str, Any]]] = {DEFAULT_RESOLUTION: grids}
+    for res in (8, 7):
+        lod_grids = {city: _aggregate_grid_to_res(grids[city], city, res) for city in cities}
+        _apply_percentile_normalization(lod_grids)
+        grids_by_res[res] = lod_grids
 
     cells_requests: list[tuple[str, dict[str, Any]]] = []
     seen_cells: set[str] = set()
@@ -454,21 +608,42 @@ async def build_snapshot(
     if include_legacy_cells:
         register("cells/index", out_dir / "cells.json", cells_by_index)
 
-    tiles = _bucket_grid_tiles(grids)
+    # LOD pyramid tiles (US-411): each resolution is bucketed under its own
+    # tile-parent resolution and published as gridtiles_res{res}/{parent}.
+    # res-9 also keeps the legacy `gridtiles/{parent}` + `tile_index` shim for
+    # the deployed edge worker during the compat window (same pattern as
+    # cells/index → cells/{h3}).
+    tile_indexes: dict[str, dict[str, dict[str, Any]]] = {}
     tile_index: dict[str, dict[str, Any]] = {}
-    for parent, features in sorted(tiles.items()):
-        payload = {
-            "type": "FeatureCollection",
-            "tile_parent": parent,
-            "tile_resolution": TILE_RESOLUTION,
-            "features": features,
-        }
-        register(f"gridtiles/{parent}", out_dir / "gridtiles" / f"{parent}.json", payload)
-        tile_index[parent] = {
-            "count": len(features),
-            "cities": sorted({str(f["properties"]["city_id"]) for f in features}),
-            "bbox": _features_bbox(features),
-        }
+    for res in LOD_RESOLUTIONS:
+        res_grids = grids_by_res[res]
+        tile_parent_res = LOD_TILE_PARENT_RES[res]
+        tiles = _bucket_grid_tiles(res_grids, tile_res=tile_parent_res)
+        res_index: dict[str, dict[str, Any]] = {}
+        for parent, features in sorted(tiles.items()):
+            payload = {
+                "type": "FeatureCollection",
+                "tile_parent": parent,
+                "tile_resolution": tile_parent_res,
+                "lod_resolution": res,
+                "features": features,
+            }
+            register(
+                f"gridtiles_res{res}/{parent}",
+                out_dir / "gridtiles_res" / str(res) / f"{parent}.json",
+                payload,
+            )
+            res_index[parent] = {
+                "count": len(features),
+                "cities": sorted({str(f["properties"]["city_id"]) for f in features}),
+                "bbox": _features_bbox(features),
+            }
+            if res == DEFAULT_RESOLUTION:
+                # legacy shim mirrors res-9 exactly
+                register(f"gridtiles/{parent}", out_dir / "gridtiles" / f"{parent}.json", payload)
+        tile_indexes[str(res)] = res_index
+        if res == DEFAULT_RESOLUTION:
+            tile_index = res_index
 
     register(
         "catalysts/index",
@@ -493,6 +668,11 @@ async def build_snapshot(
         "keys": keys_index,
         "tile_resolution": TILE_RESOLUTION,
         "tile_index": tile_index,
+        "tile_indexes": tile_indexes,
+        "lod": {
+            "resolutions": list(LOD_RESOLUTIONS),
+            "tile_parent_res": {str(r): LOD_TILE_PARENT_RES[r] for r in LOD_RESOLUTIONS},
+        },
         "metro_index": _build_metro_index(grids),
     }
     if national_block is not None:
@@ -501,7 +681,7 @@ async def build_snapshot(
     if manifest_size > MAX_MANIFEST_BYTES:
         raise ValueError(
             f"Manifest is {manifest_size:,} bytes, over the {MAX_MANIFEST_BYTES:,}-byte boot "
-            f"budget. Slim it (split tile_index into its own key) before publishing."
+            f"budget. Slim it (split tile_indexes into their own key) before publishing."
         )
     register("manifest", out_dir / "manifest.json", manifest)
 
@@ -557,6 +737,11 @@ def main() -> None:
             "chunks); omit to publish a metro-only snapshot"
         ),
     )
+    parser.add_argument(
+        "--dense-metro",
+        action="store_true",
+        help="Use bounded k_ring=3 coverage (coverage.metro_cells) for continuous urban hexes",
+    )
     args = parser.parse_args()
     asyncio.run(
         build_snapshot(
@@ -564,6 +749,7 @@ def main() -> None:
             cities=args.cities,
             include_legacy_cells=not args.skip_legacy_cells,
             national_dir=Path(args.national_dir) if args.national_dir else None,
+            dense_metro=args.dense_metro,
         )
     )
 

@@ -11,6 +11,8 @@ from src.export.snapshot_builder import (
     CATALYST_THRESHOLD,
     DEFAULT_K_RING,
     DEFAULT_RESOLUTION,
+    LOD_RESOLUTIONS,
+    LOD_TILE_PARENT_RES,
     TILE_RESOLUTION,
     build_snapshot,
 )
@@ -80,6 +82,9 @@ def test_manifest_shape(snapshot: dict[str, Any]):
         expected_keys |= {f"grid/{city}", f"catalysts/{city}", f"submarkets/{city}"}
     for parent in snapshot["tile_index"]:
         expected_keys.add(f"gridtiles/{parent}")
+    for res in LOD_RESOLUTIONS:
+        for parent in snapshot["tile_indexes"][str(res)]:
+            expected_keys.add(f"gridtiles_res{res}/{parent}")
     keys = set(snapshot["keys"])
     cell_shards = {key for key in keys if key.startswith("cells/") and key != "cells/index_meta"}
     assert expected_keys | cell_shards == keys
@@ -341,6 +346,11 @@ def test_subset_city_export(tmp_path: Path):
     cell_shards = {
         key for key in bulk_keys if key.startswith("cells/") and key != "cells/index_meta"
     }
+    lod_keys = {
+        f"gridtiles_res{res}/{parent}"
+        for res in LOD_RESOLUTIONS
+        for parent in manifest["tile_indexes"][str(res)]
+    }
     # No keys from unselected cities may leak; cell shards are exactly nyc's cells.
     assert bulk_keys == {
         "manifest",
@@ -351,6 +361,7 @@ def test_subset_city_export(tmp_path: Path):
         "catalysts/nyc",
         "submarkets/nyc",
         *{f"gridtiles/{parent}" for parent in manifest["tile_index"]},
+        *lod_keys,
         *cell_shards,
     }
 
@@ -480,3 +491,105 @@ def test_metro_index_matches_registry(snapshot: dict[str, Any]):
         assert bbox["min_lat"] <= metro["center"]["lat"] or bbox is not None
         assert bbox["min_lat"] <= bbox["max_lat"]
         assert bbox["min_lng"] <= bbox["max_lng"]
+
+
+# ---------------------------------------------------------------------------
+# LOD pyramid (US-411)
+# ---------------------------------------------------------------------------
+
+
+def test_manifest_has_lod_block_and_tile_indexes(snapshot: dict[str, Any]):
+    assert snapshot["lod"]["resolutions"] == list(LOD_RESOLUTIONS)
+    for res in LOD_RESOLUTIONS:
+        assert snapshot["lod"]["tile_parent_res"][str(res)] == LOD_TILE_PARENT_RES[res]
+    assert set(snapshot["tile_indexes"].keys()) == {str(res) for res in LOD_RESOLUTIONS}
+    # legacy shim equals res-9 tile index
+    assert snapshot["tile_index"] == snapshot["tile_indexes"]["9"]
+
+
+def test_lod_tiles_recompute_to_stated_parents(snapshot: dict[str, Any], tmp_path: Path):
+    """Every LOD tile's features sit under the parent named in tile_indexes."""
+    seen_cells: dict[int, set[str]] = {res: set() for res in LOD_RESOLUTIONS}
+    for res in LOD_RESOLUTIONS:
+        tile_parent_res = LOD_TILE_PARENT_RES[res]
+        for parent, meta in snapshot["tile_indexes"][str(res)].items():
+            payload = json.loads(
+                (tmp_path / "dist" / "gridtiles_res" / str(res) / f"{parent}.json").read_text()
+            )
+            assert payload["tile_parent"] == parent
+            assert payload["tile_resolution"] == tile_parent_res
+            assert payload["lod_resolution"] == res
+            assert len(payload["features"]) == meta["count"]
+            for feature in payload["features"]:
+                cell = feature["properties"]["h3_index"]
+                assert h3.cell_to_parent(cell, tile_parent_res) == parent
+                assert cell not in seen_cells[res], "a cell must land in exactly one tile per res"
+                seen_cells[res].add(cell)
+                assert "city_id" in feature["properties"]
+
+
+def test_lod_coarser_has_fewer_cells(snapshot: dict[str, Any]):
+    """res-7 tiles hold fewer cells than res-8, which holds fewer than res-9."""
+    def total(res: int) -> int:
+        return sum(meta["count"] for meta in snapshot["tile_indexes"][str(res)].values())
+
+    assert total(7) <= total(8) <= total(9)
+    assert total(9) > 0
+
+
+def test_lod_percentiles_ranked_per_level(snapshot: dict[str, Any], tmp_path: Path):
+    """Each LOD aggregate level carries its own national/metro percentile ranks."""
+    for res in (7, 8):
+        parent = min(snapshot["tile_indexes"][str(res)])
+        tile_path = tmp_path / "dist" / "gridtiles_res" / str(res) / f"{parent}.json"
+        payload = json.loads(tile_path.read_text())
+        assert payload["features"]
+        for feature in payload["features"]:
+            props = feature["properties"]
+            assert props["resolution"] == res
+            for metric in NORMALIZED_METRICS:
+                assert f"{metric}_national_pct" in props
+                assert f"{metric}_metro_pct" in props
+
+
+def test_dense_metro_flag_renders_continuous_grid(tmp_path: Path):
+    """--dense-metro path: bounded k_ring=3 coverage fills more than k_ring=1."""
+    import asyncio
+
+    manifest = asyncio.run(
+        build_snapshot(
+            tmp_path / "dense",
+            engine=StubEngine(),
+            cities=["nyc", "chicago"],
+            include_legacy_cells=False,
+            dense_metro=True,
+        )
+    )
+    # Dense res-9 grid must contain more features than the k_ring=1 default would
+    # (measured ~4.2× in US-409). At minimum, strictly more than 442.
+    from src.spatial.city_registry import REGISTRY
+
+    nyc_submarkets = len(REGISTRY[CityId("nyc")].submarkets)
+    # k_ring=1 ≈ submarkets × 7; dense bounded ≈ submarkets × ~28
+    assert manifest["counts"]["nyc"]["grid_features"] > nyc_submarkets * 10
+
+
+def test_dense_grid_features_have_coverage_source(tmp_path: Path):
+    """Dense-mode features carry the honesty badge (coverage_source/distance)."""
+    import asyncio
+
+    out = tmp_path / "dense"
+    asyncio.run(
+        build_snapshot(
+            out,
+            engine=StubEngine(),
+            cities=["nyc"],
+            include_legacy_cells=False,
+            dense_metro=True,
+        )
+    )
+    grid = json.loads((out / "grid" / "nyc.json").read_text())
+    assert grid["features"]
+    sources = {f["properties"].get("coverage_source") for f in grid["features"]}
+    assert sources <= {"center", "bounded"}
+    assert "bounded" in sources, "dense grid must contain interpolated (bounded) cells"

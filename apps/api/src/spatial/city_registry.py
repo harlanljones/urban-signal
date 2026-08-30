@@ -59,6 +59,20 @@ from src.producers.field_maps_energy_benchmark import (
 from src.producers.field_maps_cape_coral import FIELD_MAP as CAPE_CORAL_FIELD_MAP
 from src.producers.field_maps_port_st_lucie import FIELD_MAP as PORT_ST_LUCIE_FIELD_MAP
 from src.producers.field_maps_wilmington_nc import FIELD_MAP as WILMINGTON_NC_FIELD_MAP
+from src.producers.field_maps_asheville_deeds import ASHEVILLE_DEEDS_FIELD_MAP
+from src.producers.field_maps_fl_cadastral import FL_CADASTRAL_FIELD_MAP
+from src.producers.field_maps_tx_trec import (
+    TX_TDLR_FIELD_MAP,
+    TX_TREC_APP_FIELD_MAP,
+    TX_TREC_BROKER_FIELD_MAP,
+)
+from src.producers.asheville_deeds_spec import ASHEVILLE_DEEDS_SPEC
+from src.producers.fl_cadastral_spec import fl_cadastral_spec
+from src.producers.tx_trec_specs import (
+    tx_tdlr_spec,
+    tx_trec_app_spec,
+    tx_trec_broker_spec,
+)
 from src.spatial.cities.portland import (
     PORTLAND_DIVISION_BBOXES,
     PORTLAND_DIVISIONS,
@@ -5327,6 +5341,9 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
                 },
                 field_map=ORLANDO_SLA_FIELD_MAP,
             ),
+            # US-398: FL Statewide Cadastral construction-activity PERMITS proxy
+            # (Orange CO_NO=48), annual assessment-derived, not an event stream.
+            FeedType.PERMITS: DatasetSpec(**fl_cadastral_spec(48)),
         },
     ),
     CityId.GAINESVILLE: CityRegistration(
@@ -5892,8 +5909,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         job_suffix="amarillo",
         # US-270: initial registration with SNAP SLA (TX slice). City permits
         # via data.texas.gov not verifiable; do not register until public API exists.
+        # US-397: upgraded to TX TREC broker/sales-agent license registry
+        # (Potter County slice, daily).
         datasets={
-            FeedType.SLA: snap_sla_spec("TX"),
+            FeedType.SLA: DatasetSpec(**tx_trec_broker_spec("Potter")),
         },
     ),
     CityId.BEAUMONT: CityRegistration(
@@ -5908,8 +5927,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         job_suffix="beaumont",
         # US-271: no verifiable public building-permits or 311 feed. Register
         # SNAP retailers as the SLA slice for Texas (US-364 precedent).
+        # US-397: upgraded to TX TREC broker/sales-agent license registry
+        # (Jefferson County slice, daily).
         datasets={
-            FeedType.SLA: snap_sla_spec("TX"),
+            FeedType.SLA: DatasetSpec(**tx_trec_broker_spec("Jefferson")),
         },
     ),
     CityId.WACO: CityRegistration(
@@ -5925,8 +5946,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         # US-272: initial registration with SNAP SLA (TX slice). A verifiable
         # public city permits feed via data.texas.gov was not found; register
         # SNAP-only and expand when a municipal permits API is proven.
+        # US-397: upgraded to TX TREC broker/sales-agent license registry
+        # (McLennan County slice, daily).
         datasets={
-            FeedType.SLA: snap_sla_spec("TX"),
+            FeedType.SLA: DatasetSpec(**tx_trec_broker_spec("McLennan")),
         },
     ),
     CityId.JACKSON_MS: CityRegistration(
@@ -5959,8 +5982,11 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         # US-297: initial registration with SNAP-only SLA (FL slice). A verifiable
         # public Marion County/Ocala permits layer was not found on the ArcGIS Hub.
         # Do not fake endpoints; prefer SNAP until a municipal API is proven.
+        # US-398: FL Statewide Cadastral adds a construction-activity PERMITS
+        # proxy (Marion CO_NO=42), annual assessment-derived, not an event stream.
         datasets={
             FeedType.SLA: snap_sla_spec("FL"),
+            FeedType.PERMITS: DatasetSpec(**fl_cadastral_spec(42)),
         },
     ),
     CityId.MACON_BIBB: CityRegistration(
@@ -6010,8 +6036,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         job_suffix="tyler",
         # US-273: initial registration with SNAP SLA (TX slice). City permits
         # via data.texas.gov require verification; register when public API confirmed.
+        # US-397: upgraded to TX TREC broker/sales-agent license registry
+        # (Smith County slice, daily).
         datasets={
-            FeedType.SLA: snap_sla_spec("TX"),
+            FeedType.SLA: DatasetSpec(**tx_trec_broker_spec("Smith")),
         },
     ),
     CityId.AUGUSTA: CityRegistration(
@@ -6347,8 +6375,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         job_suffix="abilene",
         # US-278: initial registration with SNAP SLA (TX slice). Verify
         # municipal permits via a public API before enabling permits feed.
+        # US-397: upgraded to TX TREC broker/sales-agent license registry
+        # (Taylor County slice, daily) — county-resolved SLA covariate.
         datasets={
-            FeedType.SLA: snap_sla_spec("TX"),
+            FeedType.SLA: DatasetSpec(**tx_trec_broker_spec("Taylor")),
         },
     ),
     CityId.ALEXANDRIA: CityRegistration(
@@ -6378,11 +6408,12 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         submarkets=ASHEVILLE_SUBMARKETS,
         divisions=ASHEVILLE_DIVISIONS,
         job_suffix="avl",
-        # Initial registration with SNAP SLA (NC slice). A verifiable public
-        # permits/311/deeds API was not found on data-avl.opendata.arcgis.com
-        # during US-291; prefer municipal feeds when proven.
+        # US-399: Buncombe County Property roll (DEEDS supplement, roll-grade,
+        # price reconstructed from NC excise stamps Stamps x 500; snapshot).
+        # Added alongside the SNAP SLA.
         datasets={
             FeedType.SLA: snap_sla_spec("NC"),
+            FeedType.DEEDS: DatasetSpec(**ASHEVILLE_DEEDS_SPEC),
         },
     ),
     CityId.CAPE_CORAL: CityRegistration(
@@ -6554,8 +6585,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         # US-276: initial registration with SNAP SLA (TX slice). No verifiable
         # public city permits endpoint confirmed pre-commit; register SNAP-only
         # and expand once a municipal permits API is proven.
+        # US-397: upgraded to TX TREC broker/sales-agent license registry
+        # (Gregg County slice, daily).
         datasets={
-            FeedType.SLA: snap_sla_spec("TX"),
+            FeedType.SLA: DatasetSpec(**tx_trec_broker_spec("Gregg")),
         },
     ),
     CityId.MIDLAND: CityRegistration(
@@ -6570,8 +6603,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         job_suffix="midland",
         # US-279: initial registration with SNAP SLA (TX slice). EnerGov/PermitMidland
         # has no open public API endpoint; do not register permits until verifiable.
+        # US-397: upgraded to TX TREC broker/sales-agent license registry
+        # (Midland County slice, daily).
         datasets={
-            FeedType.SLA: snap_sla_spec("TX"),
+            FeedType.SLA: DatasetSpec(**tx_trec_broker_spec("Midland")),
         },
     ),
     CityId.MONROE: CityRegistration(
@@ -6603,8 +6638,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         # US-280: initial registration with SNAP SLA (TX slice). A verifiable
         # public city permits feed was not found during registration; register
         # SNAP-only and expand when a municipal permits API is proven.
+        # US-397: upgraded to TX TREC broker/sales-agent license registry
+        # (Ector County slice, daily).
         datasets={
-            FeedType.SLA: snap_sla_spec("TX"),
+            FeedType.SLA: DatasetSpec(**tx_trec_broker_spec("Ector")),
         },
     ),
     CityId.PORT_ST_LUCIE: CityRegistration(
@@ -6651,8 +6688,10 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
         # US-282: initial registration with SNAP SLA (TX slice). Public municipal
         # permits endpoints were not verifiable on both sides; do not invent a
         # dual-state slice until the registry supports it. Expand when feeds are proven.
+        # US-397: upgraded to TX TREC broker/sales-agent license registry
+        # (Bowie County slice, daily).
         datasets={
-            FeedType.SLA: snap_sla_spec("TX"),
+            FeedType.SLA: DatasetSpec(**tx_trec_broker_spec("Bowie")),
         },
     ),
     CityId.WILMINGTON_NC: CityRegistration(

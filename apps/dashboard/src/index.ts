@@ -35,6 +35,8 @@ import {
   lookupPrediction,
   fetchNationalIndex,
   fetchNationalRows,
+  fetchGridTiles,
+  METRO_LOD_RESOLUTIONS,
   MAX_NATIONAL_PARENTS_PER_REQUEST,
   CATALYST_DEFAULT_LIMIT,
   CATALYST_MAX_LIMIT,
@@ -105,6 +107,8 @@ export interface Manifest {
   catalyst_threshold: number;
   tile_resolution?: number;
   tile_index?: Record<string, TileIndexEntry>;
+  tile_indexes?: Record<string, Record<string, TileIndexEntry>>;
+  lod?: { resolutions: number[]; tile_parent_res: Record<string, number> };
   metro_index?: MetroMeta[];
 }
 
@@ -769,11 +773,12 @@ Full H3 (resolution 9) grid with per-cell metrics. Large payload — prefer ETag
 Snapshot metadata: supported metros with camera bboxes/centers, the res-5 H3
 grid-tile index (parent -> count/cities/bbox), and publish thresholds.
 
-### GET /api/v1/gridtiles?parents=852830bbfffffff,852ab2c3fffffff
-Viewport tiles for lazy loading: merged GeoJSON for up to 32 res-5 parent
-indexes. Valid parents come from \`tile_index\` in /api/v1/manifest. Each cell
-carries \`<metric>_metro_pct\` and \`<metric>_national_pct\` percentile ranks so
-all metros render on one comparable color scale.
+    ### GET /api/v1/gridtiles?parents=852830bbfffffff,852ab2c3fffffff[&res=7|8|9]
+    Viewport tiles for lazy loading: merged GeoJSON for up to 32 H3 parent
+    indexes at a metro LOD resolution (default res 9, legacy keys). Valid
+    parents come from \`tile_indexes\` in /api/v1/manifest. Each cell carries
+    \`<metric>_metro_pct\` and \`<metric>_national_pct\` percentile ranks so
+    all metros render on one comparable color scale.
 
 ### GET /api/v1/catalysts/all
 Every metro's active catalysts in one document, attributed with city_id/city_name
@@ -1001,14 +1006,14 @@ function openApiSpec(origin: string): Response {
         get: {
           operationId: "getManifest",
           summary:
-            "Snapshot metadata: metros with camera bboxes, res-5 grid-tile index, thresholds.",
+            "Snapshot metadata: metros with camera bboxes, res-aware LOD grid-tile index, thresholds.",
           responses: { "200": openApiResponse("Manifest document.") },
         },
       },
       "/api/v1/gridtiles": {
         get: {
           operationId: "getGridTiles",
-          summary: "Fetch viewport tiles by comma-separated res-5 H3 parent indexes (max 32).",
+          summary: "Fetch viewport tiles by comma-separated H3 parent indexes (max 32), at a metro LOD resolution.",
           parameters: [
             {
               name: "parents",
@@ -1016,13 +1021,21 @@ function openApiSpec(origin: string): Response {
               required: true,
               schema: { type: "string" },
               description:
-                "Comma-separated 15-char hex res-5 H3 parent indexes. Discover valid parents via /api/v1/manifest tile_index.",
+                "Comma-separated 15-char hex H3 parent indexes. Discover valid parents via /api/v1/manifest tile_indexes.",
+            },
+            {
+              name: "res",
+              in: "query",
+              required: false,
+              schema: { type: "integer", enum: [7, 8, 9], default: 9 },
+              description:
+                "Metro LOD resolution (7/8/9). Defaults to 9 (legacy gridtiles/{parent} shim).",
             },
           ],
           responses: {
             "200": openApiResponse("Merged FeatureCollection across requested tiles; lists missing parents."),
             "304": { description: "ETag match — tiles unchanged." },
-            "400": openApiResponse("Missing/malformed parents or over the per-request cap."),
+            "400": openApiResponse("Missing/malformed parents, invalid res, or over the per-request cap."),
           },
         },
       },
@@ -1495,12 +1508,14 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
         });
       }
 
-      // GET /api/v1/gridtiles?parents=<h3-res5-parents-csv>
+      // GET /api/v1/gridtiles?parents=<h3-parents-csv>[&res=7|8|9]
       // Viewport lazy-loading units produced by the batch snapshot builder.
+      // `res` selects the metro LOD level (defaults to 9 for the legacy
+      // `gridtiles/{parent}` shim). res-aware keys are gridtiles_res{res}/{parent}.
       if (url.pathname === "/api/v1/gridtiles") {
         const rawParents = url.searchParams.get("parents");
         if (!rawParents || !rawParents.trim()) {
-          return jsonError(400, "Query parameter 'parents' is required (comma-separated res-5 H3 parent indexes).");
+          return jsonError(400, "Query parameter 'parents' is required (comma-separated H3 parent indexes).");
         }
         const parents = parseTileParents(rawParents);
         if (!parents) {
@@ -1510,25 +1525,46 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
           return jsonError(400, `Too many parents requested (${parents.length}); max ${MAX_TILE_PARENTS_PER_REQUEST} per call.`);
         }
 
-        const entries = await Promise.all(parents.map((parent) => kvJson(env, `gridtiles/${parent}`)));
-        const features: Record<string, unknown>[] = [];
-        const missing: string[] = [];
-        for (let i = 0; i < parents.length; i += 1) {
-          const entry = entries[i];
-          if (!entry) {
-            missing.push(parents[i]);
-            continue;
-          }
-          const payload = entry.value as { features?: Record<string, unknown>[] };
-          features.push(...(payload.features ?? []));
+        const resRaw = url.searchParams.get("res");
+        if (resRaw && !(METRO_LOD_RESOLUTIONS as readonly number[]).includes(Number(resRaw))) {
+          return jsonError(400, `'res' must be one of ${METRO_LOD_RESOLUTIONS.join(", ")}.`);
         }
-        const body = JSON.stringify({
-          count: features.length,
-          requested: parents.length,
-          missing,
-          type: "FeatureCollection",
-          features,
-        });
+        const res = resRaw ? Number(resRaw) : 9;
+
+        let body: string;
+        if (res === 9 && !resRaw) {
+          // Legacy shim path: reads the plain gridtiles/{parent} keys (unchanged).
+          const entries = await Promise.all(parents.map((parent) => kvJson(env, `gridtiles/${parent}`)));
+          const features: Record<string, unknown>[] = [];
+          const missing: string[] = [];
+          for (let i = 0; i < parents.length; i += 1) {
+            const entry = entries[i];
+            if (!entry) {
+              missing.push(parents[i]);
+              continue;
+            }
+            const payload = entry.value as { features?: Record<string, unknown>[] };
+            features.push(...(payload.features ?? []));
+          }
+          body = JSON.stringify({
+            count: features.length,
+            requested: parents.length,
+            missing,
+            type: "FeatureCollection",
+            features,
+          });
+        } else {
+          const result = await fetchGridTiles(env, { res, parents });
+          if ("error" in result) return jsonError(400, result.error);
+          body = JSON.stringify({
+            count: result.count,
+            requested: parents.length,
+            missing: result.missing,
+            res: result.res,
+            type: "FeatureCollection",
+            features: result.features,
+          });
+        }
         const etag = `"${(await sha256Hex(body)).slice(0, 32)}"`;
         if (etagMatches(request, etag)) return notModified(baseHeaders, etag);
         return withHeaders(body, 200, { ...baseHeaders, etag });

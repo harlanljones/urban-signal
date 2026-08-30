@@ -440,7 +440,16 @@ class TestSeriesRegistry:
                 assert spec.auth_env, f"{spec.series_id} needs auth but names no env var"
 
     def test_keyless_series_are_the_ones_that_can_run_unattended(self):
-        assert set(KEYLESS_SERIES) == {"zori_zip", "zhvi_zip", "zhvf_metro", "fhfa_hpi_metro"}
+        assert set(KEYLESS_SERIES) == {
+            "zori_zip",
+            "zhvi_zip",
+            "zhvf_metro",
+            "fhfa_hpi_metro",
+            "ntd_upt",
+            "ntd_vrm",
+            "ntd_vrh",
+            "ntd_voms",
+        }
 
     def test_every_series_is_revision_aware(self):
         # These publishers reissue and revise full history; an append-only

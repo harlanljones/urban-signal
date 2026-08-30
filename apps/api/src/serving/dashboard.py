@@ -1554,13 +1554,24 @@ def get_dashboard_html() -> str:
     const tilesInFlight = new Set();
     let tileFetchesActive = 0;
     let tileLoadGeneration = 0;
+    let activeLodRes = 9; // LOD level whose parents are currently being fetched
     let gridDirty = false;
     let viewportDebounceTimer = 0;
     let nationalDebounceTimer = 0;
     const TILE_PARENTS_PER_REQUEST = 32;
     const TILE_FETCH_CONCURRENCY = 2;
-    const ZOOM_FLOOR = 6;
-    const NATIONAL_HIDE_ZOOM = 12; // hide national overlay above this to avoid double-draw
+    const ZOOM_FLOOR = 6; // below this: national layer only (LODES)
+    // Metro LOD pyramid (US-411/413): select the display resolution based on
+    // zoom level so the map never shows a dead zone between national and metro.
+    const GRID_LOD_RESOLUTIONS = [7, 8, 9];
+    const LOD_TO_PARENT_RES = { 7: 4, 8: 4, 9: 5 };
+    const LOD_PARENT_STEP = { 7: 0.45, 8: 0.45, 9: 0.14 };
+    const LOD_PARENT_SAMPLES = { 7: 800, 8: 800, 9: 4000 };
+    function lodForZoom(z) {
+      if (z >= 11) return 9;
+      if (z >= 9) return 8;
+      return 7;
+    }
 
     // National overlay cache: per-resolution res-3-parent -> features[]
     const nationalCache = {
@@ -1639,7 +1650,7 @@ def get_dashboard_html() -> str:
     }
 
     // ---- National LOD overlay (MapLibre geojson) ---------------------------
-    // Renders res-4/5/6 all-metros hexes below NATIONAL_HIDE_ZOOM as MapLibre
+    // Renders res-4/5/6 all-metros hexes below z 12 as a blended fallback
     // geojson layers fed by /api/v1/national/{res}. Shares the metric
     // `_national_pct` ramp with the metro res-9 layers; flat fill in 2D,
     // fill-extrusion in 3D. (Deck.gl was removed — US-391: the UMD bundles
@@ -1682,9 +1693,9 @@ def get_dashboard_html() -> str:
       const hint = document.getElementById('zoom-hint');
       // Retire the "Zoom in..." dead-zone message
       if (hint) hint.hidden = true;
-      // Show/hide overlay by zoom to avoid double-draw with metro res-9
+      // Show/hide overlay by zoom; blended fallback (LODES) visible below z 12
       updateNationalLayerVisibilities();
-      if (z >= NATIONAL_HIDE_ZOOM) return;
+      if (z >= 12) return; // metro LOD covers the view above the blended band
 
       const res = nationalResForZoom(z);
       nationalActiveRes = res;
@@ -1858,7 +1869,9 @@ def get_dashboard_html() -> str:
     function updateNationalLayerVisibilities() {
       if (!map) return;
       const z = map.getZoom();
-      const overlayVisible = z < NATIONAL_HIDE_ZOOM;
+      // National overlay stays visible below z 12 as a blended fallback
+      // (LODES jobs/workers) where metro tiles are absent (US-413).
+      const overlayVisible = z < 12;
       const setVis = (id, visible) => {
         if (map.getLayer(id)) {
           map.setLayoutProperty(id, 'visibility', visible ? 'visible' : 'none');
@@ -2456,7 +2469,7 @@ def get_dashboard_html() -> str:
       viewportDebounceTimer = setTimeout(updateViewportTiles, 220);
     }
 
-    function res5ParentsCoveringBounds(bounds) {
+    function parentsCoveringBounds(bounds, res) {
       if (typeof h3 === 'undefined' || !bounds) return [];
       const west = bounds.getWest();
       const east = bounds.getEast();
@@ -2469,12 +2482,15 @@ def get_dashboard_html() -> str:
       const minLng = Math.max(-179.9, west - lngPad);
       const maxLng = Math.min(179.9, east + lngPad);
       const parents = new Set();
-      const stepLat = 0.14; // under a res-5 hex diameter so sampling cannot skip a tile
+      // Sample step stays under the parent-hex diameter for this resolution so
+      // sampling cannot skip a tile; coarser LOD uses coarser parents.
+      const stepLat = LOD_PARENT_STEP[res] || 0.14;
+      const maxSamples = LOD_PARENT_SAMPLES[res] || 4000;
       let samples = 0;
-      for (let lat = minLat; lat <= maxLat && samples < 4000; lat += stepLat) {
+      for (let lat = minLat; lat <= maxLat && samples < maxSamples; lat += stepLat) {
         const stepLng = stepLat / Math.max(0.25, Math.cos(lat * Math.PI / 180));
-        for (let lng = minLng; lng <= maxLng && samples < 4000; lng += stepLng) {
-          parents.add(h3.latLngToCell(lat, lng, 5));
+        for (let lng = minLng; lng <= maxLng && samples < maxSamples; lng += stepLng) {
+          parents.add(h3.latLngToCell(lat, lng, res));
           samples += 1;
         }
       }
@@ -2493,16 +2509,18 @@ def get_dashboard_html() -> str:
 
     function updateViewportTiles() {
       if (!map || !snapshotManifest) return;
-      const tileIndex = snapshotManifest.tile_index || {};
+      const z = map.getZoom();
       const hint = document.getElementById('zoom-hint');
-      if (hint) hint.hidden = true; // dead-zone hint retired; national overlay covers country view
-      if (map.getZoom() < ZOOM_FLOOR) {
+      if (hint) hint.hidden = true; // dead-zone hint retired; LOD pyramid covers country view
+      if (z < ZOOM_FLOOR) {
         setHexLayersVisible(false);
-        return; // below metro band: do not fetch res-9 tiles
+        return; // below metro band: do not fetch metro tiles
       }
-      // Above the floor, visibilities are managed by updateLayerVisibilities()
-
-      const candidates = res5ParentsCoveringBounds(map.getBounds())
+      // Pick the LOD level for this zoom and fetch only that level's parents.
+      const res = lodForZoom(z);
+      const tileIndexes = snapshotManifest.tile_indexes || {};
+      const tileIndex = tileIndexes[String(res)] || snapshotManifest.tile_index || {};
+      const candidates = parentsCoveringBounds(map.getBounds(), LOD_TO_PARENT_RES[res] || 5)
         .filter((parent) => Object.prototype.hasOwnProperty.call(tileIndex, parent))
         .filter((parent) => !fetchedTiles.has(parent) && !tilesInFlight.has(parent));
 
@@ -2511,6 +2529,7 @@ def get_dashboard_html() -> str:
 
       pendingTileParents.length = 0;
       pendingTileParents.push(...candidates);
+      activeLodRes = res;
       drainTileQueue();
     }
 
@@ -2530,8 +2549,9 @@ def get_dashboard_html() -> str:
 
     async function fetchTileBatch(batch) {
       const generation = tileLoadGeneration;
+      const res = activeLodRes || 9;
       try {
-        const resp = await fetch(`/api/v1/gridtiles?parents=${batch.join(',')}`);
+        const resp = await fetch(`/api/v1/gridtiles?res=${res}&parents=${batch.join(',')}`);
         if (resp.ok) {
           const payload = await resp.json();
           if (generation === tileLoadGeneration) mergeTilePayload(payload);
@@ -2733,8 +2753,10 @@ def get_dashboard_html() -> str:
     function updateLayerVisibilities() {
       if (!map) return;
       const z = map.getZoom();
-      // Hide metro res-9 when national overlay would double-draw (below NATIONAL_HIDE_ZOOM)
-      const showMetro = z >= ZOOM_FLOOR && z >= NATIONAL_HIDE_ZOOM;
+      // Metro LOD pyramid renders at every zoom above the floor — no dead zone
+      // between the national layer and the metro hexes (US-413). The national
+      // overlay doubles as the LODES fallback only below the metro band.
+      const showMetro = z >= ZOOM_FLOOR;
       setHexLayersVisible(showMetro);
       // National overlay visibility is driven by zoom + perspective
       updateNationalLayerVisibilities();

@@ -205,8 +205,7 @@ export async function lookupPrediction(
 // National hex layer (US-383)
 // ---------------------------------------------------------------------------
 
-export const NATIONAL_RESOLUTIONS = [4, 5, 6] as const;
-// CONUS spans ~40 res-3 parents; one call must be able to fetch a full
+export const NATIONAL_RESOLUTIONS = [4, 5, 6] as const;// CONUS spans ~40 res-3 parents; one call must be able to fetch a full
 // resolution's display set, so the cap sits above the gridtiles viewport cap.
 export const MAX_NATIONAL_PARENTS_PER_REQUEST = 64;
 
@@ -260,6 +259,55 @@ export async function fetchNationalRows(
     rows.push(...(chunk.rows ?? []));
   }
   return { res: opts.res, count: rows.length, cols: cols ?? [], rows, missing };
+}
+
+// ---------------------------------------------------------------------------
+// Metro LOD grid tiles (US-412)
+// ---------------------------------------------------------------------------
+
+/** Metro LOD levels published as `gridtiles_res{res}/{parent}` by the snapshot
+ *  builder (US-411). Kept here so the HTTP adapter and the dashboard share one
+ *  source of truth for valid `res` values on /api/v1/gridtiles. */
+export const METRO_LOD_RESOLUTIONS = [7, 8, 9] as const;
+
+export interface GridTilesResult {
+  res: number;
+  count: number;
+  features: Record<string, unknown>[];
+  missing: string[];
+}
+
+export type GridTilesOutcome = GridTilesResult | { error: string };
+
+/** Transport-free res-aware viewport tile fetch.
+ *
+ * Reads `gridtiles_res{res}/{parent}` KV values and merges their GeoJSON
+ * features, reporting parents absent from KV. `res` must be one of
+ * `METRO_LOD_RESOLUTIONS`; the legacy shim (res 9 published under the plain
+ * `gridtiles/{parent}` keys) is handled by the HTTP adapter, not here.
+ */
+export async function fetchGridTiles(
+  env: Env,
+  opts: { res: number; parents: string[] }
+): Promise<GridTilesOutcome> {
+  if (!(METRO_LOD_RESOLUTIONS as readonly number[]).includes(opts.res)) {
+    return { error: `'res' must be one of ${METRO_LOD_RESOLUTIONS.join(", ")}.` };
+  }
+  const entries = await Promise.all(
+    opts.parents.map((parent) => kvJson(env, `gridtiles_res${opts.res}/${parent}`))
+  );
+  const features: Record<string, unknown>[] = [];
+  const missing: string[] = [];
+  for (let i = 0; i < opts.parents.length; i += 1) {
+    const entry = entries[i];
+    if (!entry) {
+      missing.push(opts.parents[i]);
+      continue;
+    }
+    const payload = entry.value as { features?: Record<string, unknown>[] };
+    features.push(...(payload.features ?? []));
+  }
+  return { res: opts.res, count: features.length, features, missing };
 }
 
 // ---------------------------------------------------------------------------

@@ -886,3 +886,21 @@ All five streams are pure leaf (research docs under `docs/research/`, plus one
 dashboard leaf for US-391). `serving/dashboard.py` is not in
 `docs/agents/spine-manifest.txt`, so no interlock hold is required. Interlock
 gate verified green (`pytest -m interlock`, 24 passed) before dispatch.
+
+### 2026-08-30 — next-ticket frontier wave (US-397/398/399/400/401/402/403/404/406) — feed registration + leaf clients
+
+Dispatched 6 parallel leaf subagents (TX TREC/TDLR; FL cadastral + Asheville; NOAA weather; environmental stress; transit; CVC index). All leaf work landed and passed (220 new tests). Serial spine hold applied for the feed registrations: config.py endpoint settings + city_registry.py DatasetSpec registration (TX TREC broker SLA on 9 feedless TX metros, FL cadastral PERMITS on Ocala+Orlando, Asheville DEEDS) + series_registry NTD series + SeriesClient SODA profile. Interlock gate green (24 passed) after every hold. US-405 skipped (blocked by US-374/378/379, all In Progress).
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| us397-tx-trec-tdlr | TX TREC/TDLR specs + field maps + tests | config.py + city_registry.py (TREC broker SLA, 9 metros) | 2026-08-30 | completed — 18 tests, SLA registered, interlock green | specs/field-maps/tests + registry wiring |
+| us398-fl-cadastral | FL cadastral spec + field map + tests | config.py + city_registry.py (PERMITS Ocala/Orlando) | 2026-08-30 | completed — 17 tests, registered, interlock green | spec/field-map/tests + registry wiring |
+| us399-asheville-deeds | Buncombe roll spec + field map + tests | config.py + city_registry.py (DEEDS Asheville) | 2026-08-30 | completed — 53 tests, registered, interlock green | spec/field-map/tests + registry wiring |
+| us400-noaa-weather | GHCN-D + NWS clients + tests | none (feature covariates) | 2026-08-30 | completed — 30 tests | clients + tests |
+| us401-environmental-stress | AirNow/USDM/StormEvents/NWIS/tide clients + tests | none (feature covariates) | 2026-08-30 | completed — 29 tests | clients + tests |
+| us402-ntd-ridership | NTD SeriesSpec + tests | series_registry.py + series_client.py (leaf) | 2026-08-30 | completed — 14 tests, 4 series registered | spec + registry + SODA branch |
+| us403-gtfs-static | GtfsStaticClient + tests | none | 2026-08-30 | completed — 17 tests | client + tests |
+| us404-mta-marta | MTA GTFS-RT client + MARTA spec + tests | none (MARTA needs Atlanta metro — deferred) | 2026-08-30 | completed — 14 tests | clients + tests |
+| us406-cvc-index | CVC composite index + tests | none (feature store) | 2026-08-30 | completed — 28 tests | feature module + tests |
+
+Yield 9/9. All tickets resolved on Linear with evidence comments + completed state. Changes left uncommitted on the working tree.

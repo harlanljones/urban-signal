@@ -41,8 +41,14 @@ from src.producers.series_client import (
     PROFILE_BULK_CSV,
     PROFILE_CENSUS_API,
     PROFILE_REST_API,
+    PROFILE_SOCRATA,
     WIDE_DATES_AS_COLUMNS,
     SeriesSpec,
+)
+
+from src.producers.ntd_spec import (
+    NTD_MEASURES,
+    NTD_MONTHLY_RIDERSHIP_ENDPOINT,
 )
 
 ZILLOW_ATTRIBUTION = "Data Provided by Zillow Group"
@@ -176,6 +182,34 @@ SERIES_REGISTRY: Dict[str, SeriesSpec] = {
             "source, different table and geography."
         ),
     ),
+    # US-402: FTA NTD Complete Monthly Ridership — keyless Socrata SODA mirror
+    # (datahub.transportation.gov 8bui-9xvu), weekly refresh, ~2-month lag.
+    # Four measures each keyed separately so a metric is never overwritten.
+    **{
+        f"ntd_{measure}": SeriesSpec(
+            series_id=f"ntd_{measure}",
+            source="ntd",
+            dataset_id=NTD_MONTHLY_RIDERSHIP_ENDPOINT,
+            profile=PROFILE_SOCRATA,
+            layout=LONG_ROWS,
+            geography_level="metro",
+            geography_col="uza_name",
+            metro_col="uza_name",
+            value_col=measure,
+            period_cols=["date"],
+            period_type="month",
+            auth="none",
+            unit=NTD_MEASURES[measure],
+            cadence_days=7,
+            ingestion_mode="full",
+            notes=(
+                "FTA NTD Complete Monthly Ridership (Socrata 8bui-9xvu). Weekly "
+                "refresh, ~2-month lag. Keyed (city_id, series_id, month); one SODA "
+                "query covers every registered city."
+            ),
+        )
+        for measure in NTD_MEASURES
+    },
 }
 
 # Series that need no credential and can therefore run unattended today.

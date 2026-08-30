@@ -47,6 +47,16 @@ export function testEnv(options: { html?: string } = {}) {
             resolution: 9,
             k_ring: 1,
             catalyst_threshold: 85,
+            tile_resolution: 5,
+            tile_index: {
+              "852830bbfffffff": { count: 1, cities: ["nyc"], bbox: { min_lat: 40.7, max_lat: 40.8, min_lng: -74.0, max_lng: -73.9 } },
+            },
+            tile_indexes: {
+              "7": { "842830fffffffff": { count: 1, cities: ["nyc"], bbox: { min_lat: 40.6, max_lat: 40.9, min_lng: -74.1, max_lng: -73.8 } } },
+              "8": { "842a101ffffffff": { count: 1, cities: ["nyc"], bbox: { min_lat: 40.65, max_lat: 40.85, min_lng: -74.05, max_lng: -73.9 } } },
+              "9": { "852830bbfffffff": { count: 1, cities: ["nyc"], bbox: { min_lat: 40.7, max_lat: 40.8, min_lng: -74.0, max_lng: -73.9 } } },
+            },
+            lod: { resolutions: [7, 8, 9], tile_parent_res: { "7": 4, "8": 4, "9": 5 } },
           });
         }
         if (key.startsWith("grid/")) {
@@ -221,6 +231,47 @@ export function testEnv(options: { html?: string } = {}) {
           }
           return null;
         }
+        if (key.startsWith("gridtiles_res")) {
+          // US-411/412 LOD pyramid: gridtiles_res{res}/{parent}
+          const m = key.match(/^gridtiles_res(\d+)\/(.+)$/);
+          if (m) {
+            const lodRes = Number(m[1]);
+            const parentKey = m[2];
+            if (lodRes === 7 && parentKey === "842830fffffffff") {
+              return JSON.stringify({
+                type: "FeatureCollection",
+                tile_parent: parentKey,
+                tile_resolution: 4,
+                lod_resolution: 7,
+                features: [
+                  {
+                    type: "Feature",
+                    id: "8728308ffffffffff",
+                    geometry: { type: "Polygon", coordinates: [[[-74.1, 40.6], [-74.1, 40.9], [-73.8, 40.9], [-74.1, 40.6]]] },
+                    properties: { h3_index: "8728308ffffffffff", city_id: "nyc", city_name: "New York City", lims_score: 89.0, lims_score_national_pct: 60, lims_score_metro_pct: 55, resolution: 7, source: "lod_aggregate" },
+                  },
+                ],
+              });
+            }
+            if (lodRes === 8 && parentKey === "842a101ffffffff") {
+              return JSON.stringify({
+                type: "FeatureCollection",
+                tile_parent: parentKey,
+                tile_resolution: 4,
+                lod_resolution: 8,
+                features: [
+                  {
+                    type: "Feature",
+                    id: "882a107087fffff",
+                    geometry: { type: "Polygon", coordinates: [[[-74.05, 40.65], [-74.05, 40.85], [-73.9, 40.85], [-74.05, 40.65]]] },
+                    properties: { h3_index: "882a107087fffff", city_id: "nyc", city_name: "New York City", lims_score: 93.0, lims_score_national_pct: 80, lims_score_metro_pct: 70, resolution: 8, source: "lod_aggregate" },
+                  },
+                ],
+              });
+            }
+          }
+          return null;
+        }
         if (key === "catalysts/index") {
           return JSON.stringify({
             count: 3,
@@ -370,6 +421,105 @@ test("gridtiles rejects a missing, malformed, or oversized parents parameter", a
     testEnv() as never,
   );
   expect(tooMany.status).toBe(400);
+});
+
+// ---------------------------------------------------------------------------
+// GET /api/v1/gridtiles?res= — metro LOD pyramid (US-411/412)
+// ---------------------------------------------------------------------------
+
+test("gridtiles?res=7 serves the LOD-res-7 tile set", async () => {
+  const response = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/gridtiles?res=7&parents=842830fffffffff`),
+    testEnv() as never,
+  );
+
+  expect(response.status).toBe(200);
+  const payload = (await response.json()) as {
+    res: number;
+    count: number;
+    requested: number;
+    missing: string[];
+    features: { properties: { h3_index: string; source: string; resolution: number } }[];
+  };
+  expect(payload.res).toBe(7);
+  expect(payload.count).toBe(1);
+  expect(payload.missing).toEqual([]);
+  expect(payload.features[0].properties.h3_index).toBe("8728308ffffffffff");
+  expect(payload.features[0].properties.source).toBe("lod_aggregate");
+  expect(payload.features[0].properties.resolution).toBe(7);
+});
+
+test("gridtiles?res=8 serves the LOD-res-8 tile set", async () => {
+  const response = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/gridtiles?res=8&parents=842a101ffffffff`),
+    testEnv() as never,
+  );
+
+  expect(response.status).toBe(200);
+  const payload = (await response.json()) as {
+    res: number;
+    count: number;
+    missing: string[];
+  };
+  expect(payload.res).toBe(8);
+  expect(payload.count).toBe(1);
+  expect(payload.missing).toEqual([]);
+});
+
+test("gridtiles?res=7 reports a missing parent in missing[]", async () => {
+  const response = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/gridtiles?res=7&parents=842830fffffffff,8429999ffffffff`),
+    testEnv() as never,
+  );
+
+  expect(response.status).toBe(200);
+  const payload = (await response.json()) as { count: number; requested: number; missing: string[] };
+  expect(payload.count).toBe(1);
+  expect(payload.missing).toEqual(["8429999ffffffff"]);
+});
+
+test("gridtiles rejects an invalid res value", async () => {
+  const bad = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/gridtiles?res=3&parents=842830fffffffff`),
+    testEnv() as never,
+  );
+  expect(bad.status).toBe(400);
+
+  const nationalRes = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/gridtiles?res=6&parents=842830fffffffff`),
+    testEnv() as never,
+  );
+  expect(nationalRes.status).toBe(400);
+});
+
+test("gridtiles?res=9 explicit uses the LOD res-9 key set (not the legacy shim)", async () => {
+  // The fixture has no gridtiles_res9/{parent}, so an explicit res=9 request
+  // must come back empty + missing rather than falling through to legacy.
+  const response = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/gridtiles?res=9&parents=852830bbfffffff`),
+    testEnv() as never,
+  );
+
+  expect(response.status).toBe(200);
+  const payload = (await response.json()) as { res: number; count: number; missing: string[] };
+  expect(payload.res).toBe(9);
+  expect(payload.count).toBe(0);
+  expect(payload.missing).toEqual(["852830bbfffffff"]);
+});
+
+test("gridtiles LOD response honors ETag revalidation", async () => {
+  const first = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/gridtiles?res=8&parents=842a101ffffffff`),
+    testEnv() as never,
+  );
+  const etag = first.headers.get("etag") ?? "";
+  const revalidated = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/gridtiles?res=8&parents=842a101ffffffff`, {
+      headers: { "if-none-match": etag },
+    }),
+    testEnv() as never,
+  );
+  expect(revalidated.status).toBe(304);
 });
 
 // ---------------------------------------------------------------------------

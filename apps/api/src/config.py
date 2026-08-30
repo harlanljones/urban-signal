@@ -1739,6 +1739,56 @@ class Settings(BaseSettings):
         description="USDA FNS SNAP retailer locations ArcGIS FeatureServer layer URL",
     )
 
+    # US-397: TX state-registry SLA supplements (county-sliced Socrata feeds).
+    # TREC broker/sales-agent stock, TREC initial-license applications (flow),
+    # and TDLR all-license registry — all data.texas.gov, daily refresh.
+    socrata_tx_trec_broker_endpoint: str = Field(
+        default=(
+            "https://data.texas.gov/resource/s7ft-44qi.json"
+            "?$select=*, 'trec_broker:' || license_type as license_type_ns"
+        ),
+        description="TX TREC Broker & Sales Agent License Holders (county-sliced, daily)",
+    )
+    socrata_tx_trec_app_endpoint: str = Field(
+        default=(
+            "https://data.texas.gov/resource/bf5n-799f.json"
+            "?$select=*, 'trec_app:' || license_type as license_type_ns"
+        ),
+        description="TX TREC Applications for Initial License Issuance (flow, daily)",
+    )
+    socrata_tx_tdlr_endpoint: str = Field(
+        default=(
+            "https://data.texas.gov/resource/7358-krk7.json"
+            "?$select=*, 'tdlr:' || license_type as license_type_ns, :updated_at"
+        ),
+        description="TX TDLR All Licenses (contractor/trades slice, daily)",
+    )
+
+    # US-398: FL Statewide Cadastral — one national ArcGIS layer aggregating all
+    # 67 FL counties' appraiser rolls; PERMITS new-supply proxy via year-built
+    # cohort. Annual assessment cadence.
+    arcgis_fl_cadastral_url: str = Field(
+        default=(
+            "https://services9.arcgis.com/Gh9awoU677aKree0/arcgis/rest/services/"
+            "Florida_Statewide_Cadastral/FeatureServer/0"
+        ),
+        description="FL Statewide Cadastral appraiser-roll construction-activity layer",
+    )
+
+    # US-399: Buncombe County (NC) Property roll — Asheville DEEDS supplement.
+    # Roll-grade (last sale per parcel); price reconstructed from NC excise
+    # stamps (Stamps x 500). Snapshot, annual reappraisal cadence.
+    arcgis_asheville_deeds_url: str = Field(
+        default="https://gis.buncombecounty.org/arcgis/rest/services/opendata/FeatureServer/1",
+        description="Buncombe County NC Property roll layer (Asheville DEEDS supplement)",
+    )
+
+    # US-404: MARTA station entrances/exits (Atlanta) — Socrata, weekly.
+    socrata_marta_endpoint: str = Field(
+        default="https://data.atlantaga.gov/resource/nwqk-3q5y.json",
+        description="MARTA station entrances/exits (Atlanta) Socrata endpoint",
+    )
+
     # Address geocoding (ADR 0004): confidence floor gates wrong-cell risk —
     # below it, events keep null H3 rather than a guessed coordinate.
     geocode_confidence_floor: float = Field(

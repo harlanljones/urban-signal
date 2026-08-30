@@ -8,6 +8,7 @@ import {
   listCities,
   fetchNationalIndex,
   fetchNationalRows,
+  fetchGridTiles,
 } from "../src/snapshot";
 
 beforeEach(() => clearSnapshotCaches());
@@ -219,4 +220,36 @@ test("fetchNationalRows rejects resolutions outside the national pyramid", async
     parents: ["832830fffffffff"],
   });
   expect("error" in result).toBe(true);
+});
+
+// ---------------------------------------------------------------------------
+// fetchGridTiles — US-412 res-aware metro LOD grid tiles
+// ---------------------------------------------------------------------------
+
+test("fetchGridTiles returns merged features for res-7", async () => {
+  const result = (await fetchGridTiles(testEnv() as any, {
+    res: 7,
+    parents: ["842830fffffffff"],
+  })) as any;
+  expect(result.res).toBe(7);
+  expect(result.count).toBe(1);
+  expect(result.features[0].properties.h3_index).toBe("8728308ffffffffff");
+  expect(result.features[0].properties.source).toBe("lod_aggregate");
+  expect(result.missing).toEqual([]);
+});
+
+test("fetchGridTiles reports missing parents", async () => {
+  const result = (await fetchGridTiles(testEnv() as any, {
+    res: 7,
+    parents: ["842830fffffffff", "8429999ffffffff"],
+  })) as any;
+  expect(result.count).toBe(1);
+  expect(result.missing).toEqual(["8429999ffffffff"]);
+});
+
+test("fetchGridTiles errors on an invalid res value", async () => {
+  const result = await fetchGridTiles(testEnv() as any, { res: 3, parents: ["842830fffffffff"] });
+  expect("error" in result).toBe(true);
+  const result2 = await fetchGridTiles(testEnv() as any, { res: 6, parents: ["842830fffffffff"] });
+  expect("error" in result2).toBe(true);
 });
