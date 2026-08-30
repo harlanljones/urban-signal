@@ -41,11 +41,6 @@ def get_dashboard_html() -> str:
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" />
   <script defer src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
   
-  <!-- deck.gl UMD (no bundler) -->
-  <script src="https://unpkg.com/@deck.gl/core@8.9.36/dist.min.js"></script>
-  <script src="https://unpkg.com/@deck.gl/geo-layers@8.9.36/dist.min.js"></script>
-  <script src="https://unpkg.com/@deck.gl/mapbox@8.9.36/dist.min.js"></script>
-  
   <!-- Chart.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   
@@ -1541,7 +1536,6 @@ def get_dashboard_html() -> str:
     const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     let map = null;
-    let deckOverlay = null; // deck.gl MapboxOverlay
     let gridGeoJSON = null;
     let shapChart = null;
     let currentPerspective = '3D';
@@ -1642,29 +1636,12 @@ def get_dashboard_html() -> str:
       return R * c;
     }
 
-    // ---- deck.gl national LOD overlay --------------------------------------
-    function deckSupported() {
-      try {
-        return typeof deck !== 'undefined' && !!document.createElement('canvas').getContext('webgl');
-      } catch (_) {
-        return false;
-      }
-    }
-
-    function initDeckOverlay() {
-      if (!map || !deckSupported()) return;
-      try {
-        const hasWebGL2 = !!document.createElement('canvas').getContext('webgl2');
-        // Interleaved when WebGL2 is available (shares MapLibre context); separate canvas fallback on WebGL1
-        deckOverlay = new deck.MapboxOverlay({ interleaved: hasWebGL2, layers: [] });
-        deckOverlay.setMap(map);
-        // Initial paint
-        scheduleNationalLoad();
-      } catch (err) {
-        console.warn('deck.gl overlay failed to initialize:', err);
-      }
-    }
-
+    // ---- National LOD overlay (MapLibre geojson) ---------------------------
+    // Renders res-4/5/6 all-metros hexes below NATIONAL_HIDE_ZOOM as MapLibre
+    // geojson layers fed by /api/v1/national/{res}. Shares the metric
+    // `_national_pct` ramp with the metro res-9 layers; flat fill in 2D,
+    // fill-extrusion in 3D. (Deck.gl was removed — US-391: the UMD bundles
+    // clobbered the global `deck` namespace and the overlay never rendered.)
     function nationalResForZoom(z) {
       if (z < 5) return 4;
       if (z < 8) return 5;
@@ -1698,17 +1675,14 @@ def get_dashboard_html() -> str:
     }
 
     async function updateNationalOverlay() {
-      if (!map || !deckOverlay) return;
+      if (!map) return;
       const z = map.getZoom();
       const hint = document.getElementById('zoom-hint');
       // Retire the "Zoom in..." dead-zone message
       if (hint) hint.hidden = true;
       // Show/hide overlay by zoom to avoid double-draw with metro res-9
-      const overlayVisible = z < NATIONAL_HIDE_ZOOM;
-      if (!overlayVisible) {
-        try { deckOverlay.setProps({ layers: [] }); } catch (_) {}
-        return;
-      }
+      updateNationalLayerVisibilities();
+      if (z >= NATIONAL_HIDE_ZOOM) return;
 
       const res = nationalResForZoom(z);
       nationalActiveRes = res;
@@ -1734,7 +1708,7 @@ def get_dashboard_html() -> str:
               const resp = await fetch(url);
               if (!resp.ok) return;
               const payload = await resp.json();
-              const feats = (payload && payload.features) || [];
+              const feats = nationalRowsToFeatures(payload);
               // Cache by the reported parent when present; otherwise group by computed res-3 parent
               for (const feature of feats) {
                 const cell = feature?.properties?.h3_index;
@@ -1758,85 +1732,160 @@ def get_dashboard_html() -> str:
         if (arr && arr.length) feats = feats.concat(arr);
       }
       nationalActive[res] = feats;
-
-      // Update deck overlay layers
-      try {
-        deckOverlay.setProps({ layers: buildNationalLayers(res) });
-      } catch (e) {
-        console.debug('overlay setProps failed:', e);
-      }
+      applyNationalData();
     }
 
-    function pctFromProps(props) {
-      // Prefer the current metric's national percentile; fall back to first *_national_pct present
-      const primary = props[`${currentMetric}_national_pct`];
-      if (Number.isFinite(Number(primary))) return Number(primary);
-      for (const [k, v] of Object.entries(props)) {
-        if (k.endsWith('_national_pct') && Number.isFinite(Number(v))) return Number(v);
-      }
-      return null;
-    }
-
-    function colorForPct(pct) {
-      // Returns [r,g,b, a] with shared ramp stops
-      if (pct === null || pct === undefined) return [80, 80, 90, 130];
-      if (pct < 50) {
-        // 0 -> #34d399
-        return [52, 211, 153, 200];
-      } else if (pct < 75) {
-        // 50 -> #fbbf24
-        return [251, 191, 36, 220];
-      } else if (pct < 90) {
-        // 75 -> #fb923c
-        return [251, 146, 60, 230];
-      }
-      // 90+ -> #f43f5e
-      return [244, 63, 94, 235];
-    }
-
-    function buildNationalLayers(activeRes) {
-      const mkLayer = (res) => {
-        const data = nationalActive[res] || [];
-        const visible = nationalActiveRes === res;
-        return new deck.H3HexagonLayer({
-          id: `national-h3-r${res}`,
-          data,
-          visible,
-          pickable: true,
-          extruded: currentPerspective === '3D',
-          // High-precision path is fine at res4/res5 counts; res6 benefits from instancing path
-          highPrecision: res <= 5,
-          getHexagon: (d) => (d?.properties?.h3_index) || d?.h3_index || '',
-          getFillColor: (d) => colorForPct(pctFromProps((d && d.properties) || {})),
-          getElevation: (d) => {
-            const pct = pctFromProps((d && d.properties) || {});
-            if (!Number.isFinite(pct)) return 0;
-            // Match MapLibre 3D emphasis roughly per metric; reuse lims scaling by default
-            const factors = {
-              lims_score: 18,
-              delta_6m_p50: 40,
-              delta_12m_spillover: 45,
-              prob_18m_macro_outperformance: 9,
-            };
-            const factor = factors[currentMetric] || 18;
-            const base = Math.max(0, (pct ?? 50) - 40);
-            return base * factor;
-          },
-          onClick: (info) => {
-            const props = (info && info.object && (info.object.properties || info.object)) || {};
-            const h3idx = props.h3_index;
-            if (h3idx) {
-              const c = (typeof h3 !== 'undefined' && h3.cellToLatLng) ? h3.cellToLatLng(h3idx) : [null, null];
-              inspectH3CellWithNationalFallback(h3idx, c[0], c[1], props);
-            }
-          },
-          updateTriggers: {
-            getFillColor: currentMetric + (currentPerspective === '3D' ? '-3d' : '-2d'),
-            getElevation: currentMetric,
-          },
+    // The national API serves rows-of-arrays chunks ({cols, rows}), so the
+    // client turns each row into a GeoJSON Polygon using h3.cellToBoundary.
+    function nationalRowsToFeatures(payload) {
+      if (!payload || !Array.isArray(payload.cols) || !Array.isArray(payload.rows)) return [];
+      const cols = payload.cols;
+      const out = [];
+      for (const row of payload.rows) {
+        const props = {};
+        cols.forEach((col, i) => { props[col] = row[i]; });
+        const cell = props.h3;
+        if (!cell || typeof h3 === 'undefined') continue;
+        // Honesty rule: skip hexes with no percentile data so the overlay never
+        // invents a color for a null row.
+        const jobsPct = Number(props.jobs_pct);
+        const workersPct = Number(props.workers_pct);
+        if (!Number.isFinite(jobsPct) && !Number.isFinite(workersPct)) continue;
+        let boundary;
+        try {
+          boundary = h3.cellToBoundary(cell);
+        } catch (_) {
+          continue;
+        }
+        // h3 boundary is [lat, lng]; GeoJSON wants [lng, lat]; close the ring.
+        const ring = boundary.map(([lat, lng]) => [lng, lat]);
+        ring.push(ring[0]);
+        props.h3_index = cell;
+        const c = h3.cellToLatLng(cell);
+        props.centroid_lat = c[0];
+        props.centroid_lng = c[1];
+        out.push({
+          type: 'Feature',
+          geometry: { type: 'Polygon', coordinates: [ring] },
+          properties: props
         });
+      }
+      return out;
+    }
+
+    function applyNationalData() {
+      if (!map || !map.getSource('national-hex-source')) return;
+      map.getSource('national-hex-source')
+        .setData({ type: 'FeatureCollection', features: nationalActive[nationalActiveRes] || [] });
+      map.triggerRepaint();
+    }
+
+    // MapLibre geojson layers carrying the national LOD hexes. Three layers:
+    // flat fill (2D), subtle outline, and fill-extrusion (3D). The color/height
+    // expressions read the selected metric's *_national_pct when the national
+    // payload carries it, falling back to the LODES jobs/workers percentiles.
+    function setupNationalLayers() {
+      if (!map || map.getSource('national-hex-source')) return;
+      map.addSource('national-hex-source', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] }
+      });
+      map.addLayer({
+        id: 'national-h3-fill',
+        type: 'fill',
+        source: 'national-hex-source',
+        layout: { visibility: 'none' },
+        paint: {
+          'fill-color': nationalColorExpression(),
+          'fill-opacity': 0.7
+        }
+      });
+      map.addLayer({
+        id: 'national-h3-line',
+        type: 'line',
+        source: 'national-hex-source',
+        paint: {
+          'line-color': 'rgba(255, 255, 255, 0.22)',
+          'line-width': 0.6
+        }
+      });
+      map.addLayer({
+        id: 'national-h3-extrusion',
+        type: 'fill-extrusion',
+        source: 'national-hex-source',
+        layout: { visibility: 'none' },
+        paint: {
+          'fill-extrusion-color': nationalColorExpression(),
+          'fill-extrusion-height': nationalHeightExpression(),
+          'fill-extrusion-base': 0,
+          'fill-extrusion-opacity': 0.85
+        }
+      });
+      map.on('click', 'national-h3-fill', onNationalHexClick);
+      map.on('click', 'national-h3-extrusion', onNationalHexClick);
+      updateNationalLayerVisibilities();
+    }
+
+    function nationalColorExpression() {
+      return [
+        'interpolate', ['linear'],
+        ['coalesce', ['get', `${currentMetric}_national_pct`], ['get', 'jobs_pct'], ['get', 'workers_pct']],
+        0, '#34d399',
+        50, '#fbbf24',
+        75, '#fb923c',
+        90, '#f43f5e'
+      ];
+    }
+
+    function nationalHeightExpression() {
+      // Match MapLibre 3D emphasis roughly per metric; reuse lims scaling by default
+      const factors = {
+        lims_score: 18,
+        delta_6m_p50: 40,
+        delta_12m_spillover: 45,
+        prob_18m_macro_outperformance: 9,
       };
-      return [mkLayer(4), mkLayer(5), mkLayer(6)];
+      const factor = factors[currentMetric] || 18;
+      return [
+        '*',
+        ['max', 0, ['-', ['coalesce', ['get', `${currentMetric}_national_pct`], ['get', 'jobs_pct'], ['get', 'workers_pct']], 40]],
+        factor
+      ];
+    }
+
+    function updateNationalLayerVisibilities() {
+      if (!map) return;
+      const z = map.getZoom();
+      const overlayVisible = z < NATIONAL_HIDE_ZOOM;
+      const setVis = (id, visible) => {
+        if (map.getLayer(id)) {
+          map.setLayoutProperty(id, 'visibility', visible ? 'visible' : 'none');
+        }
+      };
+      setVis('national-h3-fill', overlayVisible && currentPerspective === '2D');
+      setVis('national-h3-line', overlayVisible);
+      setVis('national-h3-extrusion', overlayVisible && currentPerspective === '3D');
+    }
+
+    function updateNationalLayerPaint() {
+      if (!map) return;
+      if (map.getLayer('national-h3-fill')) {
+        map.setPaintProperty('national-h3-fill', 'fill-color', nationalColorExpression());
+      }
+      if (map.getLayer('national-h3-extrusion')) {
+        map.setPaintProperty('national-h3-extrusion', 'fill-extrusion-color', nationalColorExpression());
+        map.setPaintProperty('national-h3-extrusion', 'fill-extrusion-height', nationalHeightExpression());
+      }
+    }
+
+    function onNationalHexClick(e) {
+      if (!e.features || !e.features.length) return;
+      const props = e.features[0].properties || {};
+      const h3idx = props.h3_index;
+      if (h3idx) {
+        const c = (typeof h3 !== 'undefined' && h3.cellToLatLng) ? h3.cellToLatLng(h3idx) : [null, null];
+        inspectH3CellWithNationalFallback(h3idx, c[0], c[1], props);
+      }
     }
 
     async function inspectH3CellWithNationalFallback(h3Index, lat, lng, natProps) {
@@ -2312,7 +2361,7 @@ def get_dashboard_html() -> str:
         map.on('load', () => {
           map.resize();
           setupGridLayers();
-          initDeckOverlay();
+          setupNationalLayers();
           map.on('moveend', () => { scheduleViewportLoad(); scheduleNationalLoad(); });
           map.on('zoomend', () => { scheduleViewportLoad(); scheduleNationalLoad(); updateLayerVisibilities(); });
           scheduleViewportLoad();
@@ -2659,10 +2708,8 @@ def get_dashboard_html() -> str:
         map.setPaintProperty('h3-hex-extrusion', 'fill-extrusion-color', colorExpr);
         map.setPaintProperty('h3-hex-extrusion', 'fill-extrusion-height', heightFactor);
       }
-      // Reflect metric change on deck.gl overlay
-      if (deckOverlay) {
-        try { deckOverlay.setProps({ layers: buildNationalLayers(nationalActiveRes || nationalResForZoom(map.getZoom())) }); } catch (_) {}
-      }
+      // Reflect metric change on the national LOD overlay
+      updateNationalLayerPaint();
     }
     function setPerspective(mode) {
       currentPerspective = mode;
@@ -2687,7 +2734,8 @@ def get_dashboard_html() -> str:
       // Hide metro res-9 when national overlay would double-draw (below NATIONAL_HIDE_ZOOM)
       const showMetro = z >= ZOOM_FLOOR && z >= NATIONAL_HIDE_ZOOM;
       setHexLayersVisible(showMetro);
-      // deck overlay visibility is controlled in updateNationalOverlay()
+      // National overlay visibility is driven by zoom + perspective
+      updateNationalLayerVisibilities();
       scheduleNationalLoad();
     }
 

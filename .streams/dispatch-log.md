@@ -865,3 +865,24 @@ COMMITS DEFERRED: git commit/push are permission-denied in this session — all 
 | Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
 |---|---|---|---|---|---|
 | US-217 | Tulsa city/producer/test leaf files | none; stop if required | 2026-08-30 | blocked — no feasible leaf-only source; required integration crosses shared spine | baseline Tulsa contract tests pass; no implementation changes |
+
+### 2026-08-30 — next-ticket frontier (validation docs + dashboard bug fix) — US-172/173/389/390/391
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| validate-ntd (US-172) | `docs/research/ntd-transit-gtfs-validation.md` + leaf `src/spatial/ntd_transit.py` + test | none | 2026-08-30 | completed — DEFER; doc + 9-test leaf module, Socrata mirror + 4/5 GTFS feeds live | validation doc + leaf module + tests |
+| assess-noaa (US-173) | `docs/research/noaa-climate-validation.md` + leaf `src/spatial/noaa_climate.py` + test | none | 2026-08-30 | completed — ADOPT data path/DEFER integration; GHCND daily CSVs no-token live, ~1–3-day lag | validation doc + leaf module + tests |
+| validate-nfhl (US-389) | `docs/research/fema-nfhl-validation.md` + leaf `src/spatial/nfhl_rollup.py` + test | none | 2026-08-30 | completed — DEFER; polygon→H3 rollup proven (10 tests), live NFHL polygon queries | validation doc + leaf module + tests |
+| validate-airnow-aqs (US-390) | `docs/research/airnow-aqs-validation.md` + leaf `src/spatial/airnow_signal.py` + test | none | 2026-08-30 | completed — ADOPT signal/DEFER registration; AQS test-key live, AirNow file product credential-free | validation doc + leaf module + tests |
+| fix-deckgl-overlay (US-391) | `apps/api/src/serving/dashboard.py` (leaf; not in spine manifest) + byte-synced `apps/dashboard/public/index.html` via `scripts/export_dashboard.py` | none | 2026-08-30 | completed — dropped deck.gl, national LOD as MapLibre geojson layers; 32 serving tests + interlock green, byte-sync exact | dashboard fix + synced index.html |
+
+All five streams completed with durable artifacts (yield 5/5). `serving/dashboard.py` is
+not in `docs/agents/spine-manifest.txt`, so no interlock hold was needed; `pytest -m
+interlock` remained green (24 passed) after all changes. Changes left uncommitted on the
+working tree. Tickets resolved on Linear with evidence comments + completed state:
+US-172, US-173, US-389, US-390, US-391.
+
+All five streams are pure leaf (research docs under `docs/research/`, plus one
+dashboard leaf for US-391). `serving/dashboard.py` is not in
+`docs/agents/spine-manifest.txt`, so no interlock hold is required. Interlock
+gate verified green (`pytest -m interlock`, 24 passed) before dispatch.
