@@ -232,6 +232,71 @@ class TestLouisvilleProducerCarry:
         assert event.latitude == pytest.approx(38.195082)
 
 
+class TestLouisvilleSupplementalFeeds:
+    """Exercise the US-265 ArcGIS supplements through existing producers."""
+
+    @pytest.fixture
+    def crime(self):
+        with patch("src.producers.crime_incidents_producer.BaseKafkaProducer"):
+            from src.producers.crime_incidents_producer import CrimeIncidentsProducer
+
+            return CrimeIncidentsProducer()
+
+    @pytest.fixture
+    def permits(self):
+        with patch("src.producers.dob_permits_producer.BaseKafkaProducer"):
+            from src.producers.dob_permits_producer import DOBPermitsProducer
+
+            return DOBPermitsProducer()
+
+    @pytest.fixture
+    def street_cut(self):
+        with patch("src.producers.street_cut_permits_producer.BaseKafkaProducer"):
+            from src.producers.street_cut_permits_producer import StreetCutPermitsProducer
+
+            return StreetCutPermitsProducer()
+
+    def test_crime_arcgis_shape_geocodes_and_preserves_louisville(self, crime):
+        row = {
+            "incident_number": "LMPD-2026-0001",
+            "offense_code_name": "BURGLARY",
+            "date_occurred": "2026-08-22T04:00:00+00:00",
+            "date_reported": "2026-08-23T04:00:00+00:00",
+            "block_address": "100 BLOCK S 4TH ST",
+        }
+        with patch(
+            "src.spatial.geocoder.geocode_row_if_declared",
+            return_value=(38.2527, -85.7585),
+        ):
+            event = crime.parse_socrata_row(row, city_id="louisville")
+
+        assert event is not None
+        assert event.city_id == "louisville"
+        assert event.incident_id == "LMPD-2026-0001"
+        assert event.offense_type == "BURGLARY"
+        assert event.latitude == pytest.approx(38.2527)
+        assert event.longitude == pytest.approx(-85.7585)
+
+    def test_active_permit_arcgis_shape_preserves_louisville(self, permits):
+        event = permits.parse_socrata_row(
+            {
+                "PERMIT_NUMBER": "BP-2026-0042",
+                "PROJECT_COSTS": "125000",
+                "LATITUDE": 38.2600,
+                "LONGITUDE": -85.6500,
+                "ISSUE_DATE": "2026-08-21T04:00:00+00:00",
+                "PERMIT_TYPE": "NEW CONSTRUCTION",
+            },
+            city_id="louisville",
+        )
+
+        assert event is not None
+        assert event.city_id == "louisville"
+        assert event.job_id == "BP-2026-0042"
+        assert event.latitude == pytest.approx(38.2600)
+        assert event.longitude == pytest.approx(-85.6500)
+        assert event.estimated_cost == pytest.approx(125000)
+
 class TestLouisvilleSpineRegistration:
     def test_registered_feeds_and_scope(self):
         from src.spatial.city_registry import CityId, FeedType, REGISTRY, normalize_city

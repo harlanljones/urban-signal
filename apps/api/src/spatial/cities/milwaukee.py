@@ -204,6 +204,91 @@ MILWAUKEE_DEEDS_SPEC: dict = {
 }
 
 
+# =============================================================================
+# CKAN supplementation candidates (US-220).
+#
+# These plain dictionaries are intentionally leaf-owned.  The serial spine
+# hold can bind a candidate to an existing FeedType/topic after reviewing the
+# event-family fit.  Empty or non-machine-readable candidates stay documented
+# here rather than being registered as if they were live feeds.
+# =============================================================================
+
+MILWAUKEE_SUPPLEMENTAL_FEED_SPECS: dict[str, dict] = {
+    "fire_calls": {
+        "endpoint": "ckan://data.milwaukee.gov/cdf51c45-5fe3-415e-a08c-14ed134dcb64",
+        "platform": "ckan",
+        "watermark_col": "IncidentStarted",
+        "id_keys": ["IncidentNumber"],
+        "interval_seconds": 300.0,
+        "producer_key": "fire_calls",
+        "extra": {
+            "expected_cadence_days": 7,
+            "scope": "Milwaukee Fire Department calls for service (fire and EMS dispatch)",
+            "coordinate_columns": ["latitude", "longitude"],
+        },
+    },
+    "ems_calls": {
+        "endpoint": "ckan://data.milwaukee.gov/06fd2a64-4348-461a-bda4-5e09b2500615",
+        "platform": "ckan",
+        "watermark_col": "IncidentAdded",
+        "id_keys": ["_id"],
+        "interval_seconds": 300.0,
+        "producer_key": "ems_calls",
+        "extra": {
+            "expected_cadence_days": 7,
+            "scope": "Milwaukee EMS call-type summary (no coordinates in source)",
+        },
+    },
+    "vacant_buildings": {
+        "endpoint": "ckan://data.milwaukee.gov/46dca88b-fec0-48f1-bda6-7296249ea61f",
+        "platform": "ckan",
+        "watermark_col": "DATEOPENED",
+        "id_keys": ["PARCELNBR", "_id"],
+        "interval_seconds": 86400.0,
+        "producer_key": "vacant_buildings",
+        "extra": {
+            "expected_cadence_days": 30,
+            "needs_geocode": True,
+            "geocode_context": "Milwaukee, WI",
+            "scope": "Milwaukee vacant/abandoned building register",
+        },
+    },
+    "liquor_licenses": {
+        "endpoint": "ckan://data.milwaukee.gov/45c027b5-fa66-4de2-aa7e-d9314292093d",
+        "platform": "ckan",
+        "watermark_col": "EFF_DATE",
+        "id_keys": ["TAXKEY", "TAXKEY_NUMBER"],
+        "interval_seconds": 86400.0,
+        "producer_key": "sla",
+        "extra": {
+            "expected_cadence_days": 365,
+            "needs_geocode": True,
+            "geocode_context": "Milwaukee, WI",
+            "scope": "Milwaukee liquor-license snapshot (address split across HOUSE_NR/STREET/STTYPE)",
+        },
+    },
+    "delinquent_tax_accounts": {
+        "endpoint": "ckan://data.milwaukee.gov/8f1367e1-6f8f-44cc-8ed6-2eecd8267ec7",
+        "platform": "ckan",
+        "watermark_col": "Levy Year",
+        "id_keys": ["Tax Key #", "Levy Year"],
+        "interval_seconds": 86400.0,
+        "producer_key": "tax_delinquency",
+        "extra": {
+            "expected_cadence_days": 365,
+            "needs_geocode": True,
+            "geocode_context": "Milwaukee, WI",
+            "scope": "Milwaukee delinquent real-estate tax accounts",
+        },
+    },
+}
+
+MILWAUKEE_SUPPLEMENTAL_NOT_VIABLE: dict[str, str] = {
+    "traffic_crashes": "live CKAN datastore has schema but zero records",
+    "zoning": "researched resource ID is not present in the live CKAN datastore",
+}
+
+
 from src.spatial.registration import SpatialRegistration
 
 REGISTRATION = SpatialRegistration(

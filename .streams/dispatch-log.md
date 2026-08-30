@@ -1,11 +1,23 @@
 # Dispatch log
 
+## 2026-08-30 — city registration/feed supplementation (El Paso) — Linear US-221
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-el-paso | `src/spatial/cities/el_paso.py` + El Paso-specific tests | config.py, city_registry.py, cities/__init__.py, producer spine if required | 2026-08-30 | blocked at shared feed/schema hold; existing leaf contract verified | no implementation artifact; evidence in stream log |
+
 The orchestrator appends one row per launched stream, then closes it out with
 an outcome. Without this record a stream that produced nothing (failure mode
 F2) leaves no evidence it ever existed, and stream yield is not computable.
 
 Format: one table per dispatch date. Yield = streams with a committed,
 durable artifact ÷ streams dispatched.
+
+## 2026-08-30 — Milwaukee feed supplementation (US-220)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-milwaukee-us220 | Milwaukee CKAN city specs + field maps + tests | city registry/config/producer wiring, dashboard/export | current session | completed; targeted tests green; five viable candidates, two rejected by live probe | leaf specs/maps/tests |
 
 ## 2026-08-23 — city expansion (Seattle / Los Angeles / research)
 
@@ -530,6 +542,12 @@ Phase 3 (serial interlock) PENDING — orchestrator applies spine deltas one at 
 |---|---|---|---|---|---|
 | city-louisville | `apps/api/src/spatial/cities/louisville.py`, `apps/api/src/producers/field_maps_louisville.py`, `apps/api/tests/unit/test_producers_louisville.py` | config.py, city_registry.py, cities/__init__.py, dashboard, snapshot export, interlock tests | current session | implemented; focused tests, interlock, facts, product build, and site-content verification green; Linear US-148 done | Louisville annual 311 + Jefferson County ABC active-license registration |
 
+## 2026-08-30 — Louisville feed supplementation — Linear US-219
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| US-219 | `apps/api/tests/unit/test_producers_louisville.py` | shared street-cut producer + field-map/registry wiring required; forbidden by leaf scope | current session | blocked — CRIME/PERMITS leaf contracts pass; STREET_CUT drops Louisville `PERMIT_NO` rows and emits hard-coded Chicago IDs | 2 passing leaf contract tests |
+
 ## 2026-08-26 — city registration (San Jose) — Linear US-147
 
 | Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
@@ -841,3 +859,9 @@ Leaf modules regenerated (savannah/bowling_green/tallahassee/spartanburg + field
 State after hold: `pytest -m interlock` 24 passed / 0 failed (all four cities wired on the map + snapshot + res-5 tiles + closure/containment/completeness + endpoints-in-settings + platform clients). Leaf suites + canonical-naming 303 passed; test_watermarks 7 passed; config Settings model loads with the new endpoint defaults. One leaf test reconciled (test_producers_bowling_green.py::test_not_registered_city_no_borough_resolution -> test_registered_city_resolves_borough) per the wave's "orchestrator reconciles when the spine lands" rule.
 RESOLVED on Linear (comment + Done): US-298 savannah, US-300 bowling_green, US-303 tallahassee, US-301 spartanburg (registered); US-337 miami_dade, US-335 memphis (already registered); US-299 myrtle_beach, US-302 athens_clarke, US-341 columbia_sc, US-343 knoxville, US-345 mobile, US-339 birmingham, US-306 biloxi, US-305 gulfport, US-304 pensacola (NOT-VIABLE); US-336 atlanta, US-338 jacksonville, US-342 fort_lauderdale (KEEP-DEFERRED). US-334 orlando previously Done. Remaining open by standing: US-344 huntsville (excluded/conditional re-probe), US-293 gainesville (In Review).
 COMMITS DEFERRED: git commit/push are permission-denied in this session — all wave-6 leaf, spine, index.html, and registry changes are UNCOMMITTED on the working tree. Human must commit before merge. NOTE the tree also carries untracked west-coast leaf files (anaheim/chandler/inland_empire/long_beach + .streams/west-*.md) and uncommitted US-372 CO liquor-license edits (config.py + city_registry.py diff) from sibling waves.
+
+### 2026-08-30 — Tulsa feed supplementation — Linear US-217
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| US-217 | Tulsa city/producer/test leaf files | none; stop if required | 2026-08-30 | blocked — no feasible leaf-only source; required integration crosses shared spine | baseline Tulsa contract tests pass; no implementation changes |
