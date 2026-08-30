@@ -7,7 +7,7 @@
  * Beats:
  *   0.0–4.0   brand lockup + hex field
  *   4.0–8.0   the forecast promise
- *   8.0–12.0  the signal (49 metros · 4 feeds · 1 H3 grid)
+ *   8.0–12.0  the signal (101 metros · 4 feeds · 1 H3 grid)
  *  12.0–16.0  the pipeline (ingest → stream → grid → infer)
  *  16.0–20.0  call to action → live dashboard
  *
@@ -287,7 +287,7 @@ export default function Promo() {
             THE SIGNAL
           </Reveal>
 
-          <CountUp target={49} x={180} y={430} width={600} height={240} start={8} end={12} delay={0.35} size={200} color={lime} />
+          <CountUp target={101} x={180} y={430} width={600} height={240} start={8} end={12} delay={0.35} size={200} color={lime} />
           <CountUp target={4} x={660} y={430} width={600} height={240} start={8} end={12} delay={0.55} size={200} color={lime} />
           <CountUp target={1} x={1140} y={430} width={600} height={240} start={8} end={12} delay={0.75} size={200} color={lime} />
 

@@ -18,7 +18,7 @@ can be dropped on top later if the project source for it is approved.
 - Streams through **Apache Kafka** onto an **Uber H3** multi-resolution grid (Res 7, 8, 9)
 - Predicts appreciation **6–18 months ahead** of public market listings
 - **ONNX Runtime GPU inference** (CUDA FP16) on **Kubernetes**
-- **49 registered metros** shown on the live national dashboard
+- **101 registered metros** shown on the live national dashboard
 - Live dashboard: **https://us-dash.harlanljones.com/**
 
 Nothing beyond these facts is claimed. No fake metrics, no invented
@@ -30,7 +30,7 @@ testimonials, no overstated language.
 |---|--------|------|------|
 | 1 | 0–4 s | Brand lockup | Eyebrow `REAL-TIME SPATIAL INTELLIGENCE`, title **Urban Signal**, rule, mono tagline |
 | 2 | 4–8 s | The forecast | **6–18 months** / *ahead of the market* / mono qualifier |
-| 3 | 8–12 s | The signal | Counting **49** metros · **4** feeds · **1** H3 grid + mono footnote |
+| 3 | 8–12 s | The signal | Counting **101** metros · **4** feeds · **1** H3 grid + mono footnote |
 | 4 | 12–16 s | The pipeline | Terminal-style `>` ingest/stream/grid/infer log |
 | 5 | 16–20 s | CTA | **Explore the live dashboard** → `us-dash.harlanljones.com`, then fade to black |
 
