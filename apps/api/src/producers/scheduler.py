@@ -33,12 +33,16 @@ from src.producers.enforcement_signals_producer import InspectionsProducer, Viol
 from src.producers.deeds_acris_producer import DeedsACRISProducer
 from src.producers.dob_permits_producer import DOBPermitsProducer
 from src.producers.ev_charging_producer import EvChargingProducer
+from src.producers.carrier_license_producer import CarrierLicenseProducer
+from src.producers.head_start_producer import HeadStartProducer
+from src.producers.nces_anchor_producer import NcesAnchorProducer
 from src.producers.evictions_producer import EvictionsProducer
 from src.producers.gbfs_producer import GbfsProducer
 from src.producers.nfip_producer import NfipProducer
 from src.producers.nrel_afdc_client import NrelAfdcClient
 from src.producers.poi_diff_producer import PoiDiffProducer
 from src.producers.sla_licenses_producer import SLALicensesProducer
+from src.producers.sba_loan_producer import SbaLoanProducer
 from src.producers.street_cut_permits_producer import StreetCutPermitsProducer
 from src.producers.watermarks import (
     typed_watermark_entry,
@@ -247,13 +251,27 @@ class MunicipalIngestionScheduler:
                 bootstrap_servers=self.bootstrap_servers,
                 strict_licensing=True,
             ),
-            # The setting is intentionally optional while NREL remains
-            # unverified. Pass a non-empty sentinel so constructing the
-            # disabled producer does not require a credential-bearing setting.
+            # US-371: the API key stays environment-backed; settings.nrel_api_key
+            # (default "") exists so `NrelAfdcClient()` constructs standalone.
+            # The sentinel keeps the disabled producer constructible without a
+            # credential while the host remains egress-unverified.
             "ev_charging": EvChargingProducer(
                 bootstrap_servers=self.bootstrap_servers,
-                client=NrelAfdcClient(api_key=os.environ.get("NREL_API_KEY") or "UNCONFIGURED"),
+                client=NrelAfdcClient(
+                    api_key=settings.nrel_api_key or os.environ.get("NREL_API_KEY") or "UNCONFIGURED"
+                ),
             ),
+            # US-373: the FMCSA national carrier family — one producer serves
+            # the three DatasetSpec-shaped national resources, dispatching on
+            # the job's carrier_spec key inside run_stream.
+            "carrier": CarrierLicenseProducer(bootstrap_servers=self.bootstrap_servers),
+            # US-375/US-376: the anchor-institution family — NCES school churn
+            # (annual) and the Head Start daily snapshot share one event and
+            # one topic.
+            "nces_anchor": NcesAnchorProducer(bootstrap_servers=self.bootstrap_servers),
+            "head_start": HeadStartProducer(bootstrap_servers=self.bootstrap_servers),
+            # US-378: SBA 7(a)/504 loan approvals — cumulative FOIA snapshot per program.
+            "sba_loan": SbaLoanProducer(bootstrap_servers=self.bootstrap_servers),
         }
 
         # Socrata Endpoints & Target Topics mapping derived from city registry
@@ -329,6 +347,7 @@ class MunicipalIngestionScheduler:
                 NationalFeed.DISASTER_DECLARATIONS,
                 NationalFeed.POI_CHANGE,
                 NationalFeed.EV_CHARGING,
+                NationalFeed.SBA_LOAN,
             )
         }
         for feed in (
@@ -336,6 +355,7 @@ class MunicipalIngestionScheduler:
             NationalFeed.DISASTER_DECLARATIONS,
             NationalFeed.POI_CHANGE,
             NationalFeed.EV_CHARGING,
+            NationalFeed.SBA_LOAN,
         ):
             spec = NATIONAL_FEEDS[feed]
             job_name = spec.feed.value
@@ -358,6 +378,80 @@ class MunicipalIngestionScheduler:
                 watermark_column=spec.watermark_col or None,
             )
 
+        # US-373: FMCSA national carrier family, beside NATIONAL_FEEDS in
+        # DatasetSpec shape (see fmcsa_specs.py — deliberately unregistered
+        # in the city REGISTRY). Zero config additions; the census carries a
+        # monthly full-snapshot rollover because A→I flips happen in-place
+        # without moving add_date.
+        from src.producers.fmcsa_specs import (
+            FMCSA_AUTHHIST_SPEC,
+            FMCSA_CENSUS_SPEC,
+            FMCSA_OOS_SPEC,
+        )
+        carrier_specs = (
+            ("fmcsa_census", FMCSA_CENSUS_SPEC),
+            ("fmcsa_authhist", FMCSA_AUTHHIST_SPEC),
+            ("fmcsa_oos", FMCSA_OOS_SPEC),
+        )
+        for job_name, spec in carrier_specs:
+            self.job_metadata[job_name] = {
+                "endpoint": spec["endpoint"],
+                "endpoint_base": spec["endpoint"],
+                "topic": spec["topic"],
+                "watermark_col": spec["watermark_col"],
+                "watermark_format": spec.get("watermark_format"),
+                "id_keys": spec["id_keys"],
+                "producer_key": spec["producer_key"],
+                "platform": spec["platform"],
+                "ingestion_mode": spec["ingestion_mode"],
+                "national_feed": "carrier_family",
+                "carrier_spec": job_name,
+            }
+            self.configs[job_name] = JobConfig(
+                name=job_name,
+                interval_seconds=spec["interval_seconds"],
+                enabled=True,
+                watermark_column=spec["watermark_col"] or None,
+            )
+
+        # US-375/US-376: national anchor-institution jobs. Both produce to
+        # topic_anchor_institutions; the gate's registry invariants do not
+        # apply (no per-city endpoints).
+        self.job_metadata["nces_anchor"] = {
+            "endpoint": "https://nces.ed.gov/ccd/data/zip/",
+            "endpoint_base": "https://nces.ed.gov/ccd/data/zip/",
+            "topic": settings.topic_anchor_institutions,
+            "watermark_col": "",
+            "id_keys": ["ncessch"],
+            "producer_key": "nces_anchor",
+            "platform": "csv",
+            "ingestion_mode": "full",
+            "national_feed": "anchor_family",
+        }
+        self.configs["nces_anchor"] = JobConfig(
+            name="nces_anchor",
+            interval_seconds=7 * 86400.0,
+            enabled=True,
+            watermark_column=None,
+        )
+        self.job_metadata["head_start"] = {
+            "endpoint": settings.head_start_locations_url,
+            "endpoint_base": settings.head_start_locations_url,
+            "topic": settings.topic_anchor_institutions,
+            "watermark_col": "",
+            "id_keys": ["grant_number", "service_location_name"],
+            "producer_key": "head_start",
+            "platform": "csv",
+            "ingestion_mode": "snapshot",
+            "national_feed": "anchor_family",
+        }
+        self.configs["head_start"] = JobConfig(
+            name="head_start",
+            interval_seconds=86400.0,
+            enabled=True,
+            watermark_column=None,
+        )
+
         self.metrics: dict[str, JobMetrics] = {k: JobMetrics() for k in self.configs}
         self.backoffs: dict[str, ExponentialBackoffTracker] = {k: ExponentialBackoffTracker() for k in self.configs}
 
@@ -378,6 +472,8 @@ class MunicipalIngestionScheduler:
         try:
             if meta.get("platform") == "gbfs":
                 count = producer.run_stream(city_id=meta["city_id"], limit=limit)
+            elif meta.get("national_feed") == "carrier_family":
+                count = producer.run_stream(spec=meta.get("carrier_spec"), limit=limit)
             elif meta.get("national_feed") == NationalFeed.NFIP_CLAIMS:
                 count = producer.run_stream(since=met.high_watermark, limit=limit)
             elif meta.get("national_feed") == NationalFeed.DISASTER_DECLARATIONS:

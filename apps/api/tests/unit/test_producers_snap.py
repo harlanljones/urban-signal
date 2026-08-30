@@ -250,13 +250,19 @@ class TestSnapRegistrationShape:
             assert spec.needs_geocode is False
 
     def test_every_registered_metro_has_sla(self):
-        """The extension closes the set: no registered metro is SLA-less, so
-        the former 'houston raises' pin is superseded by full coverage.
-        Pre-existing metro-scoped SLA specs carry no where-clause; SNAP
-        specs are the State-sliced ones."""
+        """The extension closed the set, then the southeast wave (wave 6)
+        registered three metros whose probes found no SLA-grade feed:
+        savannah (PERMITS+companion), bowling_green (PERMITS) and
+        tallahassee (PERMITS+311+DEEDS). Every other registered metro
+        carries an SLA spec."""
         from src.spatial.city_registry import REGISTRY, FeedType, get_dataset
 
+        sla_less = {"savannah", "bowling_green", "tallahassee"}
         for city_id in REGISTRY:
+            if city_id.value in sla_less:
+                with pytest.raises(KeyError):
+                    get_dataset(city_id, FeedType.SLA)
+                continue
             spec = get_dataset(city_id, FeedType.SLA)
             assert spec is not None, city_id
 

@@ -38,6 +38,7 @@ class NationalFeed(str, Enum):
     NFIP_CLAIMS = "nfip_claims"
     DISASTER_DECLARATIONS = "disaster_declarations"
     EV_CHARGING = "ev_charging"
+    SBA_LOAN = "sba_loan"
 
 
 @dataclass
@@ -163,6 +164,23 @@ NATIONAL_FEEDS: Dict[NationalFeed, NationalFeedSpec] = {
             "developer.nrel.gov/terms/ and one live response before enabling "
             "the job; `verified=False` is what keeps it out of the scheduled "
             "set until someone does."
+        ),
+    ),
+    NationalFeed.SBA_LOAN: NationalFeedSpec(
+        feed=NationalFeed.SBA_LOAN,
+        endpoint="https://data.sba.gov/dataset/7a-504-foia",
+        platform="csv",
+        topic=settings.topic_sba_loans,
+        producer_key="sba_loan",
+        id_keys=["locationid", "program"],
+        ingestion_mode="full",
+        interval_seconds=86400.0,
+        expected_cadence_days=90,
+        notes=(
+            "Cumulative FOIA snapshot per program (504 + 7a). Quarterly update "
+            "cadence; the filename as-of date is the watermark. Addresses are "
+            "SBA-truncated to 49 chars — geocode street-first with zip+city "
+            "fallback. 504 rows carry project_county for county-join downstream."
         ),
     ),
 }

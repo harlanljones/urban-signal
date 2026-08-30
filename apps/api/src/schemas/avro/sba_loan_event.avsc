@@ -1,0 +1,30 @@
+{
+  "type": "record",
+  "name": "SbaLoanEvent",
+  "namespace": "org.urbandev.events",
+  "doc": "SBA 7(a) or 504 loan approval (US-378). Cumulative FOIA snapshot per program; geocoded street-first with zip+city fallback.",
+  "fields": [
+    { "name": "city_id", "type": "string", "default": "national" },
+    { "name": "program", "type": "string" },
+    { "name": "location_id", "type": "string" },
+    { "name": "approval_date", "type": ["null", "string"], "default": null },
+    { "name": "gross_approval", "type": ["null", "double"], "default": null },
+    { "name": "sba_guaranteed_approval", "type": ["null", "double"], "default": null },
+    { "name": "naics_sector", "type": ["null", "int"], "default": null },
+    { "name": "fixed_asset", "type": "boolean", "default": false },
+    { "name": "status", "type": ["null", "string"], "default": null },
+    { "name": "borrower_name", "type": ["null", "string"], "default": null },
+    { "name": "borrower_street", "type": ["null", "string"], "default": null },
+    { "name": "borrower_city", "type": ["null", "string"], "default": null },
+    { "name": "borrower_state", "type": ["null", "string"], "default": null },
+    { "name": "borrower_zip", "type": ["null", "string"], "default": null },
+    { "name": "project_county", "type": ["null", "string"], "default": null },
+    { "name": "latitude", "type": ["null", "double"], "default": null },
+    { "name": "longitude", "type": ["null", "double"], "default": null },
+    { "name": "as_of_date", "type": ["null", "string"], "default": null },
+    { "name": "h3_res7", "type": ["null", "string"], "default": null },
+    { "name": "h3_res8", "type": ["null", "string"], "default": null },
+    { "name": "h3_res9", "type": ["null", "string"], "default": null },
+    { "name": "ingested_at", "type": "string" }
+  ]
+}

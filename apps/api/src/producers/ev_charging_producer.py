@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+import json
 from pathlib import Path
 from typing import Any
 
@@ -36,7 +37,7 @@ def _date(value: Any) -> datetime | None:
 
 class EvChargingProducer:
     def __init__(self, bootstrap_servers: str | None = None, client: Any = None, indexer: Any = None,
-                 crosswalk: GeographyCrosswalk | None = None):
+                 crosswalk: GeographyCrosswalk | None = None, state_dir: str | Path | None = None):
         self.client = client or NrelAfdcClient()
         self.ev_charging = self.client
         # Keep the scheduler's common producer surface uniform. AFDC is the
@@ -49,6 +50,31 @@ class EvChargingProducer:
             schema_file_path=Path(__file__).parent.parent / "schemas" / "avro" / "infrastructure_event.avsc",
             dlq_topic=settings.topic_dlq,
         )
+        # US-371: the AFDC file is a full ~80k-station snapshot, not a delta.
+        # Without persisted state every poll would re-emit every station as
+        # "opened". The state file maps station id -> status_code; a station
+        # absent from it is new (emit), a status flip is a transition (emit),
+        # anything else is stock (skip).
+        self.state_dir = Path(state_dir) if state_dir else Path(settings.ev_charging_state_dir)
+        self.state_path = self.state_dir / "stations.json"
+        self._seen: dict[str, str] | None = None
+
+    def _load_state(self) -> dict[str, str]:
+        if self._seen is None:
+            if self.state_path.exists():
+                try:
+                    self._seen = {str(k): str(v) for k, v in json.loads(self.state_path.read_text()).items()}
+                except (OSError, ValueError):
+                    self._seen = {}
+            else:
+                self._seen = {}
+        return self._seen
+
+    def _save_state(self) -> None:
+        if self._seen is None:
+            return
+        self.state_path.parent.mkdir(parents=True, exist_ok=True)
+        self.state_path.write_text(json.dumps(self._seen, sort_keys=True))
 
     def build_event(self, row: dict[str, Any], detected_at: datetime | None = None) -> InfrastructureEvent | None:
         try:
@@ -73,13 +99,27 @@ class EvChargingProducer:
         )
 
     def run_stream(self, limit: int | None = None, **_: Any) -> int:
+        seen = self._load_state()
         emitted = 0
+        current: dict[str, str] = {}
         for batch in self.client.paginate(settings.nrel_afdc_endpoint, max_records=limit):
             for row in batch:
+                station_id = str(row.get("id", ""))
+                status = str(row.get("status_code") or "")
+                if station_id:
+                    current[station_id] = status
+                # First sight or a status transition is an event; stock is not.
+                if station_id in seen and seen[station_id] == status:
+                    continue
                 event = self.build_event(row)
                 if event is None:
                     continue
                 self.producer.produce(settings.topic_infrastructure, f"{event.city_id}:{event.asset_id}", event)
                 emitted += 1
         self.producer.flush()
+        # Persist only a completed pass: a limited (test/backfill) poll must
+        # not mark unseen stock as already-emitted.
+        if limit is None:
+            seen.update(current)
+            self._save_state()
         return emitted

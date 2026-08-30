@@ -1,0 +1,26 @@
+{
+  "type": "record",
+  "name": "AnchorInstitutionEvent",
+  "namespace": "urbansignal",
+  "doc": "An anchor institution opened, closed or reopened (US-375). One shape for the whole anchor tier: NCES CCD+EDGE school churn (category school|charter) and the Head Start daily feed (category head_start, US-376). Lat/lng required — unsited rows are DLQed, never guessed.",
+  "fields": [
+    {"name": "city_id", "type": "string", "doc": "Resolved via crosswalk point-in-metro"},
+    {"name": "institution_id", "type": "string", "doc": "Source's stable id (NCES NCESSCH for schools)"},
+    {"name": "source", "type": "string", "doc": "nces_ccd | head_start"},
+    {"name": "category", "type": "string", "doc": "school | charter | head_start"},
+    {"name": "event_type", "type": "string", "doc": "opened | closed | reopened"},
+    {"name": "name", "type": ["null", "string"], "default": null},
+    {"name": "address", "type": ["null", "string"], "default": null},
+    {"name": "zipcode", "type": ["null", "string"], "default": null},
+    {"name": "capacity", "type": ["null", "int"], "default": null, "doc": "Funded slots (Head Start) / seats (schools) when published"},
+    {"name": "status", "type": ["null", "string"], "default": null, "doc": "Raw source status (CCD UPDATED_STATUS_TEXT)"},
+    {"name": "school_year", "type": ["null", "string"], "default": null},
+    {"name": "latitude", "type": "double"},
+    {"name": "longitude", "type": "double"},
+    {"name": "event_date", "type": {"type": "long", "logicalType": "timestamp-millis"}, "doc": "CCD EFFECTIVE_DATE"},
+    {"name": "h3_res7", "type": ["null", "string"], "default": null},
+    {"name": "h3_res8", "type": ["null", "string"], "default": null},
+    {"name": "h3_res9", "type": ["null", "string"], "default": null},
+    {"name": "ingested_at", "type": {"type": "long", "logicalType": "timestamp-millis"}}
+  ]
+}

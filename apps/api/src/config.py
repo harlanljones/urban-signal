@@ -87,6 +87,27 @@ class Settings(BaseSettings):
     topic_enriched_h3: str = Field(default="enriched.spatial.h3")
     topic_catalyst_alerts: str = Field(default="alerts.catalyst")
     topic_dlq: str = Field(default="dlq.schema.failures")
+    # US-375/US-376: the anchor-institution tier (NCES school churn + Head
+    # Start daily service locations share one event and one topic).
+    topic_anchor_institutions: str = Field(
+        default="raw.anchor.institutions",
+        description="AnchorInstitutionEvent topic: school|charter churn + Head Start openings",
+    )
+# US-378: SBA 7(a)/504 loan approvals — cumulative FOIA snapshot per program.
+    topic_sba_loans: str = Field(
+        default="raw.sba.loans",
+        description="SBA 7(a)/504 loan approvals topic (US-378)",
+    )
+    # US-376: the Head Start daily service-location snapshot.
+    # US-376: the Head Start daily service-location snapshot.
+    head_start_locations_url: str = Field(
+        default="https://s3foa.s3.us-east-1.amazonaws.com/HS_Service_Locations.csv",
+        description="Head Start service locations CSV (daily refresh, pre-geocoded)",
+    )
+    head_start_state_dir: str = Field(
+        default="./data/head_start_state",
+        description="Directory holding the Head Start site snapshot for status diffing",
+    )
 
     # Scheduler durable watermark state (US-106): JSON file holding per-job
     # high watermarks so restarts resume instead of re-paging from the start.
@@ -391,6 +412,13 @@ class Settings(BaseSettings):
     nrel_afdc_endpoint: str = Field(
         default="https://developer.nrel.gov/api/alt-fuel-stations/v1.json",
         description="NREL AFDC alternative-fuel stations (needs NREL_API_KEY)",
+    )
+    # US-371: the key itself lives in the environment (NREL_API_KEY); this
+    # optional setting makes `NrelAfdcClient()` constructible without an
+    # AttributeError and keeps the scheduler free of hardcoded sentinels.
+    nrel_api_key: str = Field(
+        default="",
+        description="NREL developer API key for the AFDC alt-fuel-stations feed (free key)",
     )
     ev_charging_state_dir: str = Field(
         default="./data/ev_charging_state",

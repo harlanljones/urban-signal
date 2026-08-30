@@ -382,6 +382,52 @@ class PoiChangeEvent(BaseModel):
     ingested_at: datetime = Field(default_factory=_utc_now)
 
 
+class AnchorInstitutionEvent(BaseModel):
+    """An anchor institution opened, closed or reopened (US-375).
+
+    One shape for the whole *anchor institution* tier — national school churn
+    (NCES CCD + EDGE geocodes) today, the Head Start daily feed (US-376)
+    tomorrow, which reuses it unchanged via ``category="head_start"`` +
+    ``capacity``.
+
+    Latitude/longitude are required: the producer DLQs any directory row the
+    EDGE geocode file cannot site, so every emitted event carries geometry.
+    """
+
+    city_id: str = Field(default="nyc")
+    institution_id: str = Field(..., description="Source's stable id (NCES NCESSCH for schools)")
+    source: str = Field(default="nces_ccd", description="nces_ccd | head_start")
+    category: str = Field(..., description="school | charter | head_start")
+    event_type: str = Field(..., description="opened | closed | reopened")
+    name: Optional[str] = None
+    address: Optional[str] = None
+    zipcode: Optional[str] = None
+    capacity: Optional[int] = Field(default=None, ge=0, description="Funded slots (Head Start) / seats (schools) when published")
+    status: Optional[str] = Field(default=None, description="Raw source status, e.g. CCD UPDATED_STATUS_TEXT")
+    school_year: Optional[str] = Field(default=None, description="Source school year, e.g. 2023-2024")
+    latitude: float = Field(..., ge=-90.0, le=90.0)
+    longitude: float = Field(..., ge=-180.0, le=180.0)
+    event_date: datetime = Field(..., description="CCD EFFECTIVE_DATE (head_start: detection date)")
+    h3_res7: Optional[str] = None
+    h3_res8: Optional[str] = None
+    h3_res9: Optional[str] = None
+    ingested_at: datetime = Field(default_factory=_utc_now)
+
+    @field_validator("category")
+    @classmethod
+    def _category_vocab(cls, value: str) -> str:
+        if value not in ("school", "charter", "head_start"):
+            raise ValueError("category must be one of school | charter | head_start")
+        return value
+
+    @field_validator("event_type")
+    @classmethod
+    def _event_type_vocab(cls, value: str) -> str:
+        if value not in ("opened", "closed", "reopened"):
+            raise ValueError("event_type must be one of opened | closed | reopened")
+        return value
+
+
 class InfrastructureEvent(BaseModel):
     """New fixed infrastructure appeared — a capex proxy (US-363 §1.5, §5).
 
@@ -523,6 +569,51 @@ class EnrichedH3Feature(BaseModel):
     counter_sensor_count: int = Field(default=0)
     lims_score: float = Field(default=0.0, description="Leading Indicator Momentum Score [0..100]")
     created_at: datetime = Field(default_factory=_utc_now)
+
+
+class SbaLoanEvent(BaseModel):
+    """An SBA 7(a) or 504 loan approval (US-378).
+
+    Every row in the cumulative FOIA file is inventory. The watermark is the
+    file as-of date; there is no per-row watermark. Status repeats across
+    program runs for the same LocationID (a 504 PIF and a 7a CHGOFF are
+    separate events sharing the borrower address).
+
+    The borrower address is SBA-truncated (up to 49 chars, ending with a
+    literal ``.``), so the geocode contract is street-first with a zip+city
+    fallback; 504 rows additionally carry ``project_county`` for county-join
+    downstream.
+    """
+
+    city_id: str = Field(default="national")
+    program: str = Field(..., description="504 | 7a")
+    location_id: str = Field(..., description="SBA LocationID, float-string normalized to integer digits")
+    approval_date: Optional[datetime] = Field(default=None, description="ApprovalDate")
+    gross_approval: Optional[float] = Field(default=None, ge=0.0)
+    sba_guaranteed_approval: Optional[float] = Field(default=None, ge=0.0)
+    naics_sector: Optional[int] = Field(default=None, ge=0, le=99)
+    fixed_asset: bool = Field(default=False, description="504 = True (real estate/machinery), 7a = False (working capital)")
+    status: Optional[str] = Field(default=None, description="pif | chgoff | exempt | cancld | raw text")
+    borrower_name: Optional[str] = None
+    borrower_street: Optional[str] = Field(default=None, description="SBA-truncated street (up to 49 chars)")
+    borrower_city: Optional[str] = None
+    borrower_state: Optional[str] = None
+    borrower_zip: Optional[str] = None
+    project_county: Optional[str] = Field(default=None, description="504-only: project county for fallback precision")
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    as_of_date: Optional[datetime] = Field(default=None, description="File as-of date parsed from the FOIA filename")
+    h3_res7: Optional[str] = None
+    h3_res8: Optional[str] = None
+    h3_res9: Optional[str] = None
+    ingested_at: datetime = Field(default_factory=_utc_now)
+
+    @field_validator("program")
+    @classmethod
+    def _program_vocab(cls, value: str) -> str:
+        if value not in ("504", "7a"):
+            raise ValueError(f"program must be one of ('504', '7a'), got {value!r}")
+        return value
 
 
 class CatalystAlert(BaseModel):
