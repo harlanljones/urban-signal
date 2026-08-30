@@ -3590,6 +3590,31 @@
       "evidence_path": "apps/api/src/spatial/cities/wilmington_nc.py"
     },
     {
+      "id": "grand_rapids",
+      "name": "Grand Rapids, MI",
+      "state": "MI",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 5,
+      "feeds": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 42.9634,
+        "lng": -85.6681
+      },
+      "evidence_path": "apps/api/src/spatial/cities/grand_rapids.py"
+    },
+    {
       "id": "savannah",
       "name": "Savannah / Chatham County",
       "state": "GA",

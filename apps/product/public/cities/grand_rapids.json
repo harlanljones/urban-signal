@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "id": "grand_rapids",
+  "name": "Grand Rapids, MI",
+  "state": "MI",
+  "center": {
+    "lat": 42.9634,
+    "lng": -85.6681
+  },
+  "metro_bbox": {
+    "min_lat": 42.7,
+    "max_lat": 43.25,
+    "min_lng": -85.95,
+    "max_lng": -85.25
+  },
+  "divisions": {
+    "GRAND_RAPIDS_CORE": {
+      "name": "Grand Rapids / Kent County",
+      "center": {
+        "lat": 42.9634,
+        "lng": -85.6681
+      },
+      "bbox": {
+        "min_lat": 42.78,
+        "max_lat": 43.18,
+        "min_lng": -85.85,
+        "max_lng": -85.45
+      },
+      "submarkets": [
+        "Downtown Grand Rapids",
+        "Midtown & Medical Mile",
+        "West Side",
+        "Eastown & Wealthy Street",
+        "North Kent Growth Corridor"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Grand Rapids": {
+      "name": "Downtown Grand Rapids",
+      "division": "GRAND_RAPIDS_CORE",
+      "center": {
+        "lat": 42.9634,
+        "lng": -85.6681
+      },
+      "description": "Riverfront civic and entertainment core with adaptive reuse, office conversion, and mixed-use investment."
+    },
+    "Midtown & Medical Mile": {
+      "name": "Midtown & Medical Mile",
+      "division": "GRAND_RAPIDS_CORE",
+      "center": {
+        "lat": 42.965,
+        "lng": -85.621
+      },
+      "description": "Medical and educational anchor corridor with institutional expansion, housing, and neighborhood services."
+    },
+    "West Side": {
+      "name": "West Side",
+      "division": "GRAND_RAPIDS_CORE",
+      "center": {
+        "lat": 42.963,
+        "lng": -85.704
+      },
+      "description": "Historic west-side neighborhoods with small-business corridors, rehabilitation, and infill housing."
+    },
+    "Eastown & Wealthy Street": {
+      "name": "Eastown & Wealthy Street",
+      "division": "GRAND_RAPIDS_CORE",
+      "center": {
+        "lat": 42.956,
+        "lng": -85.626
+      },
+      "description": "Walkable east-side commercial nodes with independent retail, dining, and residential reinvestment."
+    },
+    "North Kent Growth Corridor": {
+      "name": "North Kent Growth Corridor",
+      "division": "GRAND_RAPIDS_CORE",
+      "center": {
+        "lat": 43.04,
+        "lng": -85.6
+      },
+      "description": "North-side employment and suburban growth corridor with commercial expansion and new housing supply."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/grand_rapids.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
