@@ -692,6 +692,12 @@ from src.spatial.cities.wilmington_nc import (
     WILMINGTON_NC_METRO_BBOX,
     WILMINGTON_NC_SUBMARKETS,
 )
+from src.spatial.cities.grand_rapids import (
+    GRAND_RAPIDS_DIVISION_BBOXES,
+    GRAND_RAPIDS_DIVISIONS,
+    GRAND_RAPIDS_METRO_BBOX,
+    GRAND_RAPIDS_SUBMARKETS,
+)
 from src.spatial.submarkets import (
     NYC_BOROUGHS,
     NYC_BOROUGH_BBOXES,
@@ -807,6 +813,7 @@ class CityId(str, Enum):
     PORT_ST_LUCIE = "port_st_lucie"
     TEXARKANA = "texarkana"
     WILMINGTON_NC = "wilmington_nc"
+    GRAND_RAPIDS = "grand_rapids"
 
 
 class FeedType(str, Enum):
@@ -1576,6 +1583,11 @@ _HANDWRITTEN_ALIASES: Dict[str, CityId] = {
     "wilmington_nc": CityId.WILMINGTON_NC,
     "wilmington-nc": CityId.WILMINGTON_NC,
     "wilmington nc": CityId.WILMINGTON_NC,
+    "grand_rapids": CityId.GRAND_RAPIDS,
+    "grand-rapids": CityId.GRAND_RAPIDS,
+    "grand rapids": CityId.GRAND_RAPIDS,
+    "grand_rapids_mi": CityId.GRAND_RAPIDS,
+    "grand rapids mi": CityId.GRAND_RAPIDS,
 }
 
 
@@ -6673,6 +6685,20 @@ _HANDWRITTEN_REGISTRY: Dict[CityId, CityRegistration] = {
             # municipal registry is verified.
             FeedType.SLA: snap_sla_spec("NC"),
         },
+    ),
+    CityId.GRAND_RAPIDS: CityRegistration(
+        city_id=CityId.GRAND_RAPIDS,
+        name="Grand Rapids, MI",
+        state="MI",
+        center={"lat": 42.9634, "lng": -85.6681},
+        metro_bbox=GRAND_RAPIDS_METRO_BBOX,
+        division_bboxes=GRAND_RAPIDS_DIVISION_BBOXES,
+        submarkets=GRAND_RAPIDS_SUBMARKETS,
+        divisions=GRAND_RAPIDS_DIVISIONS,
+        job_suffix="grand_rapids",
+        # Verified 2026-08-28: the Hub is reference-only and Accela ACA is
+        # UI-only. Keep the metro map-visible without inventing a feed.
+        datasets={},
     ),
     CityId.SAVANNAH: CityRegistration(
         city_id=CityId.SAVANNAH,
