@@ -8,6 +8,7 @@ from typing import Any
 
 from src.config import settings
 from src.producers.arcgis_client import ArcGISClient
+from src.producers.accela_client import AccelaClient
 from src.producers.base_producer import BaseKafkaProducer
 from src.producers.carto_client import CartoClient
 from src.producers.ckan_client import CkanClient
@@ -83,6 +84,7 @@ class DOBPermitsProducer:
         )
         self.socrata = SocrataClient()
         self.arcgis = ArcGISClient()
+        self.accela = AccelaClient()
         self.carto = CartoClient()
         self.ckan = CkanClient()
         self.csv = CSVClient()
@@ -98,6 +100,7 @@ class DOBPermitsProducer:
         clients = {
             "socrata": getattr(self, "socrata", None),
             "arcgis": getattr(self, "arcgis", None),
+            "accela": getattr(self, "accela", None),
             "carto": getattr(self, "carto", None),
             "ckan": getattr(self, "ckan", None),
             "csv": getattr(self, "csv", None),

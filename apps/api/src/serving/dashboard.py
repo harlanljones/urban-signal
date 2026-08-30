@@ -1455,6 +1455,7 @@ def get_dashboard_html() -> str:
       kansas_city: { name: 'Kansas City' },
       pierce: { name: 'Pierce County' },
       milwaukee: { name: 'Milwaukee' },
+      madison: { name: 'Madison' },
       charlotte: { name: 'Charlotte' },
       pittsburgh: { name: 'Pittsburgh' },
       san_diego: { name: 'San Diego' },

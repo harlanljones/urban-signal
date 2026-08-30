@@ -63,6 +63,13 @@ from src.spatial.cities.milwaukee import (
     MILWAUKEE_SUBMARKETS,
     is_in_milwaukee_metro,
 )
+from src.spatial.cities.madison import (
+    MADISON_DIVISION_BBOXES,
+    MADISON_DIVISIONS,
+    MADISON_METRO_BBOX,
+    MADISON_SUBMARKETS,
+    is_in_madison_metro,
+)
 from src.spatial.cities.charlotte import (
     CHARLOTTE_DIVISION_BBOXES,
     CHARLOTTE_DIVISIONS,

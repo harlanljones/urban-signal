@@ -894,6 +894,12 @@ class Settings(BaseSettings):
         description="Columbus Building Permits FeatureServer layer URL",
     )
 
+    # Madison, WI (US-356): public Accela permitting surface.
+    accela_madison_permits_endpoint: str = Field(
+        default="https://aca-prod.accela.com/MADISON/Cap/CapHome.aspx",
+        description="Madison Accela Citizen Access building-permit endpoint",
+    )
+
     # Columbus, OH (ArcGIS, US-127): Franklin County Auditor sales-dashboard
     # points layer. Annual snapshot of validated arms-length sales with native
     # point geometry (outSR=4326); carries a dual old/new column set

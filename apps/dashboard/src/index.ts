@@ -56,6 +56,8 @@ const DATA_SKILL_NAME = "urban-signal-data-api";
 const MCP_SKILL_NAME = "urban-signal-mcp";
 
 const CITY_ALIASES: Record<string, string> = {
+  madison: "madison",
+  madison_wi: "madison",
   nyc: "nyc",
   chicago: "chicago",
   san_francisco: "san_francisco",
