@@ -1569,6 +1569,90 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+  inspections:
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    delimiter: null
+    endpoint: https://data.cityofnewyork.us/resource/43nn-pn8j.json
+    endpoint_by_year: {}
+    expected_cadence_days: 1
+    fallback_endpoints: []
+    field_map:
+      address:
+      - address
+      borough:
+      - boro
+      - borough
+      business_name:
+      - dba
+      - business_name
+      inspection_id:
+      - camis
+      - inspection_id
+      issued_date:
+      - inspection_date
+      - issued_date
+      latitude:
+      - latitude
+      license_category:
+      - cuisine_description
+      - inspection_type
+      - license_category
+      license_status:
+      - action
+      - license_status
+      longitude:
+      - longitude
+      result:
+      - action
+      - grade
+      - result
+      result_date:
+      - grade_date
+      - record_date
+      - result_date
+      violation_desc:
+      - violation_description
+      - violation_desc
+      violation_level:
+      - critical_flag
+      - violation_level
+      zipcode:
+      - zipcode
+      - zip
+    geocode_context: null
+    id_col: null
+    id_keys:
+    - camis
+    - inspection_id
+    ingestion_mode: incremental
+    interval_seconds: 600.0
+    max_record_count: null
+    needs_geocode: false
+    non_spatial: null
+    oid_field: null
+    order_by: null
+    parcel_join: {}
+    platform: socrata
+    producer_key: inspections
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    select: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    topic: raw.municipal.inspections
+    watermark_col: inspection_date
+    watermark_exclude: []
+    watermark_format: null
+    watermark_type: null
+    where: null
+    zip_member: null
 aliases:
 - new_york
 - new-york

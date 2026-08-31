@@ -538,6 +538,74 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+  deeds:
+    alarm_exempt: true
+    alarm_exempt_reason: AGOL CSV download returns no Last-Modified; item `modified`
+      (2026-08-03) lives on the metadata API (US-392)
+    annual_rotation: false
+    companion_endpoints: {}
+    delimiter: '|'
+    endpoint: https://www.arcgis.com/sharing/rest/content/items/f3484c72a938497286adc4e5de7e9963/data
+    endpoint_by_year: {}
+    expected_cadence_days: 7
+    fallback_endpoints: []
+    field_map:
+      address_street:
+      - SITUSADDRESS
+      bbl:
+      - PARCELNUMBER
+      borough:
+      - SITUSCITY
+      doc_id:
+      - DEEDNUMBER
+      - PARCELNUMBER
+      doc_type:
+      - DEEDTYPE
+      document_amount:
+      - SALEPRICE
+      party1_grantor:
+      - GRANTOROWNERNAME
+      party2_grantee:
+      - GRANTEEOWNERNAME
+      recorded_date:
+      - DEEDDATE_MMDDYYYY
+      sale_date:
+      - SALEDATE_MMYYYY
+      status:
+      - DEEDSTATUS
+      zipcode:
+      - SITUSZIP
+    geocode_context: Maricopa County, AZ
+    id_col: null
+    id_keys:
+    - PARCELNUMBER
+    - DEEDNUMBER
+    ingestion_mode: snapshot
+    interval_seconds: 86400.0
+    max_record_count: null
+    needs_geocode: true
+    non_spatial: null
+    oid_field: null
+    order_by: null
+    parcel_join: {}
+    platform: csv
+    producer_key: deeds
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    select: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    topic: raw.municipal.deeds
+    watermark_col: ''
+    watermark_exclude: []
+    watermark_format: null
+    watermark_type: null
+    where: null
+    zip_member: Sales_Affidavits.txt
 aliases:
 - phx
 - phoenix_az

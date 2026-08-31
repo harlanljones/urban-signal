@@ -595,7 +595,7 @@
         true,
         true,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -616,7 +616,12 @@
           "interval_seconds": 600.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "ckan",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 42.355,
@@ -3167,13 +3172,18 @@
       "division_count": 6,
       "submarket_count": 18,
       "feeds": [
-        false,
+        true,
         false,
         true,
         false
       ],
       "platforms": [
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 86400.0,
+          "topic": "raw.municipal.permits"
+        },
         null,
         {
           "platform": "socrata",
@@ -3310,7 +3320,7 @@
         true,
         false,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -3326,7 +3336,12 @@
           "interval_seconds": 600.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "csv",
+          "watermark_col": "",
+          "interval_seconds": 86400.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 33.4484,

@@ -462,6 +462,61 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+  permits:
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    delimiter: null
+    endpoint: https://services9.arcgis.com/Gh9awoU677aKree0/arcgis/rest/services/Florida_Statewide_Cadastral/FeatureServer/0
+    endpoint_by_year: {}
+    expected_cadence_days: 365
+    fallback_endpoints: []
+    field_map:
+      bbl:
+      - PARCEL_ID
+      borough:
+      - CO_NO
+      cost:
+      - NCONST_VAL
+      issuance_date:
+      - EFF_YR_BLT
+      job_id:
+      - OBJECTID
+      - PARCEL_ID
+      status:
+      - JV_CHNG
+    geocode_context: null
+    id_col: null
+    id_keys:
+    - OBJECTID
+    - PARCEL_ID
+    ingestion_mode: snapshot
+    interval_seconds: 86400.0
+    max_record_count: 2000
+    needs_geocode: false
+    non_spatial: null
+    oid_field: OBJECTID
+    order_by: null
+    parcel_join: {}
+    platform: arcgis
+    producer_key: permits
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    select: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    topic: raw.municipal.permits
+    watermark_col: ''
+    watermark_exclude: []
+    watermark_format: null
+    watermark_type: null
+    where: ASMNT_YR = 2025 AND CO_NO = 48
+    zip_member: null
 aliases:
 - orlando_fl
 - orlando fl
