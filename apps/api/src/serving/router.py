@@ -226,7 +226,11 @@ async def get_active_catalysts(
     submarkets_map = get_submarkets(city_id=norm_city, borough_or_division=borough)
     norm_borough = borough.strip().upper().replace(" ", "_").replace("-", "_") if borough else None
 
-    # Evaluate submarket centers and adjacent k-ring cells
+    # One row per submarket cluster. The centre cell and its k-ring neighbours
+    # describe the SAME cluster, so emitting a row per cell duplicated every
+    # submarket in the feed (the dashboard showed "Fulton Market" at both 95.0
+    # and 93.5 — the centre and its first ring). Evaluate the ring only to pick
+    # the cluster's strongest unclaimed cell, then emit that one.
     for sm_name, meta in submarkets_map.items():
         if len(catalysts) >= limit:
             break
@@ -234,26 +238,34 @@ async def get_active_catalysts(
         center_cell = indexer.latlng_to_h3(meta_dict["lat"], meta_dict["lng"], resolution=resolution)
         cells_to_eval = [center_cell] + list(indexer.get_k_ring(center_cell, k=1))
 
+        # score decreases with ring distance, so the first unclaimed cell is the
+        # strongest one this cluster can still contribute.
+        best: tuple[str, int, float] | None = None
         for idx, cell in enumerate(cells_to_eval):
             if cell in seen_cells:
                 continue
-            seen_cells.add(cell)
             score = max(meta_dict["base_lims"] - idx * 1.5, 0.0)
             if score >= min_lims:
-                synthetic_feats = {
-                    "capex_density_decayed": max(meta_dict["capex"] * (1.0 - idx * 0.05), 0.0),
-                    "permit_velocity": meta_dict["permit_vel"] if meta_dict["permit_vel"] <= 1.0 else meta_dict["permit_vel"] / 100.0,
-                    "shift_ratio_311": meta_dict["shift_ratio"],
-                    "sla_new_filings_90d": int(meta_dict["sla"]),
-                    "lims_score": score,
-                }
-                pred = engine.predict_cell_features(cell, synthetic_feats, include_shap=True)
-                pred["submarket"] = meta_dict["name"]
-                pred["borough"] = meta_dict["borough"]
-                pred["city_id"] = norm_city
-                catalysts.append(pred)
-                if len(catalysts) >= limit:
-                    break
+                best = (cell, idx, score)
+                break
+
+        if best is None:
+            continue
+
+        cell, idx, score = best
+        seen_cells.add(cell)
+        synthetic_feats = {
+            "capex_density_decayed": max(meta_dict["capex"] * (1.0 - idx * 0.05), 0.0),
+            "permit_velocity": meta_dict["permit_vel"] if meta_dict["permit_vel"] <= 1.0 else meta_dict["permit_vel"] / 100.0,
+            "shift_ratio_311": meta_dict["shift_ratio"],
+            "sla_new_filings_90d": int(meta_dict["sla"]),
+            "lims_score": score,
+        }
+        pred = engine.predict_cell_features(cell, synthetic_feats, include_shap=True)
+        pred["submarket"] = meta_dict["name"]
+        pred["borough"] = meta_dict["borough"]
+        pred["city_id"] = norm_city
+        catalysts.append(pred)
 
     return {
         "city_id": norm_city,

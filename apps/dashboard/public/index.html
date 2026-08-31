@@ -1694,9 +1694,9 @@
       const hint = document.getElementById('zoom-hint');
       // Retire the "Zoom in..." dead-zone message
       if (hint) hint.hidden = true;
-      // Show/hide overlay by zoom; blended fallback (LODES) visible below z 12
+      // Show/hide overlay by zoom; the LODES overlay owns zooms below ZOOM_FLOOR
       updateNationalLayerVisibilities();
-      if (z >= 12) return; // metro LOD covers the view above the blended band
+      if (z >= ZOOM_FLOOR) return; // metro LOD owns every zoom at/above the floor
 
       const res = nationalResForZoom(z);
       nationalActiveRes = res;
@@ -1870,9 +1870,15 @@
     function updateNationalLayerVisibilities() {
       if (!map) return;
       const z = map.getZoom();
-      // National overlay stays visible below z 12 as a blended fallback
-      // (LODES jobs/workers) where metro tiles are absent (US-413).
-      const overlayVisible = z < 12;
+      // The national overlay and the metro LOD pyramid occupy DISJOINT zoom
+      // bands (US-422). The overlay previously stayed up until z12 while the
+      // metro pyramid already started at ZOOM_FLOOR, so six zoom levels drew
+      // both at once: the coarse res-6 national cells (~3km across, extruded
+      // in 3D) covered the metro hexes, and because that grid is a uniform
+      // country-wide tiling with no land mask it spilled over rivers, bays and
+      // airports. lodForZoom() covers every zoom >= ZOOM_FLOOR, so the blend
+      // is redundant — hand off cleanly at the floor instead.
+      const overlayVisible = z < ZOOM_FLOOR;
       const setVis = (id, visible) => {
         if (map.getLayer(id)) {
           map.setLayoutProperty(id, 'visibility', visible ? 'visible' : 'none');

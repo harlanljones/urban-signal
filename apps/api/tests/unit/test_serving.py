@@ -602,3 +602,53 @@ def test_no_cross_city_leakage():
     assert res_nyc_ct.status_code == 200
     assert res_nyc_ct.json()["city_id"] == "nyc"
     assert res_nyc_ct.json()["borough"] == "MANHATTAN"
+
+
+# ---------------------------------------------------------------------------
+# Catalyst feed is a *cluster* feed — one row per submarket (US-420)
+# ---------------------------------------------------------------------------
+
+
+def test_catalysts_are_deduped_to_one_row_per_submarket():
+    """The feed is titled 'Catalyst Clusters'; k-ring neighbours of one submarket
+    centre must not each emit their own row (dashboard showed 'Fulton Market'
+    twice, at 95.0 and 93.5 — the centre cell and its first ring neighbour)."""
+    response = client.get("/api/v1/catalysts?min_lims=75.0&limit=500")
+    assert response.status_code == 200
+    catalysts = response.json()["catalysts"]
+
+    keys = [(c["city_id"], c["submarket"]) for c in catalysts]
+    duplicates = {k for k in keys if keys.count(k) > 1}
+    assert not duplicates, f"submarket appears more than once in the feed: {sorted(duplicates)}"
+
+
+def test_catalyst_row_keeps_the_strongest_cell_of_its_cluster():
+    """Deduping must retain the highest-LIMS cell (the centre), not an arbitrary one."""
+    response = client.get("/api/v1/catalysts?min_lims=75.0&limit=500")
+    catalysts = response.json()["catalysts"]
+    assert catalysts, "expected at least one catalyst"
+    for c in catalysts:
+        assert c["lims_score"] >= 75.0
+
+
+def test_national_overlay_hands_off_to_metro_at_the_zoom_floor():
+    """The national LODES layer and the metro LOD pyramid must occupy disjoint
+    zoom bands (US-422).
+
+    The overlay used to stay visible until z12 while the metro pyramid started
+    at ZOOM_FLOOR (6), so six zoom levels drew both. At metro zoom the coarse
+    res-6 national prisms sat on top of the metro hexes: they read as
+    kilometres-wide blocks and, being a uniform country-wide tiling with no
+    land mask, they spilled across the East River, Upper Bay and the airports.
+    """
+    res = client.get("/dashboard")
+    assert res.status_code == 200
+    html = res.text
+
+    # Both bands are expressed against the same constant — no hardcoded z12.
+    assert "const overlayVisible = z < ZOOM_FLOOR;" in html
+    assert "if (z >= ZOOM_FLOOR) return;" in html
+
+    # The old overlapping band is gone.
+    assert "const overlayVisible = z < 12;" not in html
+    assert "if (z >= 12) return;" not in html

@@ -18,6 +18,77 @@ from src.spatial.h3_indexer import H3SpatialIndexer
 
 logger = logging.getLogger(__name__)
 
+# ---------------------------------------------------------------------------
+# Synthetic serving baseline (US-421)
+# ---------------------------------------------------------------------------
+#
+# No trained 6-month model is persisted anywhere in this repo; the serving
+# engine stands one up at boot. The previous baseline sampled all twelve
+# FEATURE_COLUMNS uniformly on [0, 100] and fit an arbitrary-scale target.
+# Real serving rows look nothing like that: `router.get_active_catalysts` and
+# `get_grid_geojson` populate only five of the twelve columns (the other seven
+# default to 0.0 because no submarket-level source exists for them), capex
+# arrives around 3e6-1.4e7, and LIMS sits in the 60-95 band. Training on a
+# disjoint support made every tree fall through to one leaf, so p50 was a
+# constant ~1.39 that the dashboard rendered as "+139.1% 6M" on every row.
+#
+# The sampler below mirrors the serving row shape exactly — same five populated
+# columns, same ranges, same seven zeros — and the target carries fractional
+# 6-month return semantics so the dashboard's `value * 100` renders a
+# percentage rather than a three-digit number.
+SYNTHETIC_TRAINING_ROWS = 4000
+SYNTHETIC_SEED = 42
+
+# Feature ranges taken from the submarket registry (src/spatial/submarkets.py).
+_LIMS_RANGE = (55.0, 97.0)
+_CAPEX_RANGE = (2.0e6, 1.6e7)
+_PERMIT_VEL_RANGE = (0.10, 0.80)   # router divides raw velocity by 100
+_SHIFT_RATIO_RANGE = (1.00, 1.85)
+_SLA_RANGE = (5.0, 95.0)
+
+
+def build_synthetic_baseline(
+    n_rows: int = SYNTHETIC_TRAINING_ROWS,
+    seed: int = SYNTHETIC_SEED,
+) -> LightGBMQuantilePredictor:
+    """Fit the boot-time quantile baseline on serving-shaped synthetic rows.
+
+    Returns a predictor whose p10/p50/p90 outputs are fractional 6-month
+    returns that vary with the input row.
+    """
+    rng = np.random.default_rng(seed)
+
+    lims = rng.uniform(*_LIMS_RANGE, n_rows)
+    capex = rng.uniform(*_CAPEX_RANGE, n_rows)
+    permit_vel = rng.uniform(*_PERMIT_VEL_RANGE, n_rows)
+    shift_ratio = rng.uniform(*_SHIFT_RATIO_RANGE, n_rows)
+    sla = rng.uniform(*_SLA_RANGE, n_rows)
+
+    frame = pd.DataFrame(
+        {col: np.zeros(n_rows, dtype=float) for col in FEATURE_COLUMNS}
+    )
+    frame["lims_score"] = lims
+    frame["capex_density_decayed"] = capex
+    frame["permit_velocity"] = permit_vel
+    frame["shift_ratio_311"] = shift_ratio
+    frame["sla_new_filings_90d"] = sla
+
+    # Fractional 6-month return: a ~-2%..+18% band led by LIMS, with capex
+    # density, permit velocity and 311 shift as secondary lifts.
+    target = (
+        -0.02
+        + 0.14 * ((lims - _LIMS_RANGE[0]) / (_LIMS_RANGE[1] - _LIMS_RANGE[0]))
+        + 0.03 * (capex / _CAPEX_RANGE[1])
+        + 0.04 * permit_vel
+        + 0.02 * (shift_ratio - 1.0)
+        + 0.01 * (sla / _SLA_RANGE[1])
+        + rng.normal(0.0, 0.012, n_rows)
+    )
+
+    predictor = LightGBMQuantilePredictor()
+    predictor.train(frame, pd.Series(target), n_estimators=200)
+    return predictor
+
 
 class MultiHorizonInferenceEngine:
     """Orchestrates real-time multi-horizon predictions across LightGBM, ST-GNN, and DCN-v2 models."""
@@ -38,16 +109,8 @@ class MultiHorizonInferenceEngine:
 
     def _init_models(self):
         """Initialize or train default synthetic weights for immediate serving."""
-        # Train baseline LightGBM model
-        np.random.seed(42)
-        dummy_X = pd.DataFrame(np.random.rand(200, len(FEATURE_COLUMNS)) * 100.0, columns=FEATURE_COLUMNS)
-        dummy_y = (
-            0.0001 * dummy_X["capex_density_decayed"]
-            + 0.05 * dummy_X["permit_velocity"]
-            + 0.02 * dummy_X["shift_ratio_311"]
-            + np.random.randn(200) * 0.01
-        )
-        self.lgbm_predictor.train(dummy_X, dummy_y, n_estimators=50)
+        # Train baseline LightGBM model over the support serving actually queries
+        self.lgbm_predictor = build_synthetic_baseline()
         self.explainer.fit_explainer(self.lgbm_predictor.models[0.5])
 
         # Export and load DCN-v2 ONNX model
