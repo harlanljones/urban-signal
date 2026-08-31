@@ -151,8 +151,9 @@ def test_probe_registry_uses_registered_city_feeds_without_manual_config():
     )
     assert {result.city_id for result in results} == {"nyc"}
     # permits, 311, sla, deeds, crime (US-71), evictions (US-93),
-    # energy_benchmark + bike_ped (US-363 §2.7/§2.8), GBFS (US-363 §1.2).
-    assert len(results) == 9
+    # energy_benchmark + bike_ped (US-363 §2.7/§2.8), GBFS (US-363 §1.2),
+    # inspections (NYC food-service inspections).
+    assert len(results) == 10
     assert all(not result.stale for result in results)
 
 
