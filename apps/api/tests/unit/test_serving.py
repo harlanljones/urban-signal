@@ -526,7 +526,7 @@ def test_dashboard_html_national_view_and_lazy_tiles():
 
     # Viewport-driven tile loading against the manifest tile index.
     assert "updateViewportTiles" in html
-    assert "/api/v1/gridtiles?parents=" in html
+    assert "/api/v1/gridtiles?res=" in html
     assert "snapshotManifest.tile_index" in html
     assert "fetchManifest" in html
 
