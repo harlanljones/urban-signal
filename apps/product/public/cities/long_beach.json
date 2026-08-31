@@ -1,0 +1,253 @@
+{
+  "schema_version": 2,
+  "id": "long_beach",
+  "name": "Long Beach",
+  "state": "CA",
+  "center": {
+    "lat": 33.7695,
+    "lng": -118.193
+  },
+  "metro_bbox": {
+    "min_lat": 33.72,
+    "max_lat": 33.885,
+    "min_lng": -118.29,
+    "max_lng": -118.05
+  },
+  "divisions": {
+    "DOWNTOWN_SHORELINE": {
+      "name": "DOWNTOWN_SHORELINE",
+      "center": {
+        "lat": 33.7695,
+        "lng": -118.193
+      },
+      "bbox": {
+        "min_lat": 33.755,
+        "max_lat": 33.785,
+        "min_lng": -118.205,
+        "max_lng": -118.185
+      },
+      "submarkets": [
+        "Downtown Shoreline",
+        "East Village"
+      ]
+    },
+    "BELMONT_SHORE": {
+      "name": "BELMONT_SHORE",
+      "center": {
+        "lat": 33.759,
+        "lng": -118.1525
+      },
+      "bbox": {
+        "min_lat": 33.749,
+        "max_lat": 33.774,
+        "min_lng": -118.168,
+        "max_lng": -118.138
+      },
+      "submarkets": [
+        "Belmont Shore",
+        "Belmont Heights"
+      ]
+    },
+    "NAPLES": {
+      "name": "NAPLES",
+      "center": {
+        "lat": 33.756,
+        "lng": -118.167
+      },
+      "bbox": {
+        "min_lat": 33.749,
+        "max_lat": 33.762,
+        "min_lng": -118.178,
+        "max_lng": -118.161
+      },
+      "submarkets": [
+        "Naples"
+      ]
+    },
+    "CAMBODIA_TOWN": {
+      "name": "CAMBODIA_TOWN",
+      "center": {
+        "lat": 33.781,
+        "lng": -118.1745
+      },
+      "bbox": {
+        "min_lat": 33.775,
+        "max_lat": 33.79,
+        "min_lng": -118.185,
+        "max_lng": -118.168
+      },
+      "submarkets": [
+        "Cambodia Town"
+      ]
+    },
+    "WRIGLEY": {
+      "name": "WRIGLEY",
+      "center": {
+        "lat": 33.792,
+        "lng": -118.201
+      },
+      "bbox": {
+        "min_lat": 33.78,
+        "max_lat": 33.808,
+        "min_lng": -118.215,
+        "max_lng": -118.195
+      },
+      "submarkets": [
+        "Wrigley"
+      ]
+    },
+    "BIXBY_KNOLLS": {
+      "name": "BIXBY_KNOLLS",
+      "center": {
+        "lat": 33.8195,
+        "lng": -118.19
+      },
+      "bbox": {
+        "min_lat": 33.805,
+        "max_lat": 33.835,
+        "min_lng": -118.21,
+        "max_lng": -118.175
+      },
+      "submarkets": [
+        "Bixby Knolls"
+      ]
+    },
+    "CAL_HEIGHTS": {
+      "name": "CAL_HEIGHTS",
+      "center": {
+        "lat": 33.8155,
+        "lng": -118.156
+      },
+      "bbox": {
+        "min_lat": 33.805,
+        "max_lat": 33.83,
+        "min_lng": -118.175,
+        "max_lng": -118.145
+      },
+      "submarkets": [
+        "California Heights"
+      ]
+    },
+    "NORTH_LONG_BEACH": {
+      "name": "NORTH_LONG_BEACH",
+      "center": {
+        "lat": 33.853,
+        "lng": -118.1935
+      },
+      "bbox": {
+        "min_lat": 33.835,
+        "max_lat": 33.885,
+        "min_lng": -118.23,
+        "max_lng": -118.15
+      },
+      "submarkets": [
+        "North Long Beach"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Shoreline": {
+      "name": "Downtown Shoreline",
+      "division": "DOWNTOWN_SHORELINE",
+      "center": {
+        "lat": 33.7695,
+        "lng": -118.193
+      },
+      "description": "Waterfront core with Shoreline Village, the Pike outlets, and the convention-center hotel belt — the metro's densest mixed-use licensing corridor."
+    },
+    "East Village": {
+      "name": "East Village",
+      "division": "DOWNTOWN_SHORELINE",
+      "center": {
+        "lat": 33.7735,
+        "lng": -118.1885
+      },
+      "description": "Arts-district edge of downtown with loft conversions, the East Village arts park, and adaptive-reuse storefront licensing along First Street."
+    },
+    "Belmont Shore": {
+      "name": "Belmont Shore",
+      "division": "BELMONT_SHORE",
+      "center": {
+        "lat": 33.759,
+        "lng": -118.1525
+      },
+      "description": "Second Street retail spine a block off the bay — the metro's strongest walkable shopfront corridor with steady restaurant and boutique turnover."
+    },
+    "Belmont Heights": {
+      "name": "Belmont Heights",
+      "division": "BELMONT_SHORE",
+      "center": {
+        "lat": 33.7625,
+        "lng": -118.162
+      },
+      "description": "Craftsman and Spanish-revival blocks between Broadway and 7th with high-valuation renovation permits and Fourth Street's antique row."
+    },
+    "Naples": {
+      "name": "Naples",
+      "division": "NAPLES",
+      "center": {
+        "lat": 33.756,
+        "lng": -118.167
+      },
+      "description": "Treasure Island and the Naples canals — premium waterfront homes with low velocity but the metro's highest per-permit valuations."
+    },
+    "Cambodia Town": {
+      "name": "Cambodia Town",
+      "division": "CAMBODIA_TOWN",
+      "center": {
+        "lat": 33.781,
+        "lng": -118.1745
+      },
+      "description": "Anaheim Street corridor between Junipero and Cherry — the officially designated Cambodian business district with small-plate restaurant turnover."
+    },
+    "Wrigley": {
+      "name": "Wrigley",
+      "division": "WRIGLEY",
+      "center": {
+        "lat": 33.792,
+        "lng": -118.201
+      },
+      "description": "Wrigley Village west of Long Beach Boulevard with 1920s bungalow stock, the innovative-starts school campus, and infill permitting along Pacific."
+    },
+    "Bixby Knolls": {
+      "name": "Bixby Knolls",
+      "division": "BIXBY_KNOLLS",
+      "center": {
+        "lat": 33.8195,
+        "lng": -118.19
+      },
+      "description": "Atlantic Avenue corridor with mid-century retail, the Expo-line-adjacent freight villages, and steady commercial rehabilitation permits."
+    },
+    "California Heights": {
+      "name": "California Heights",
+      "division": "CAL_HEIGHTS",
+      "center": {
+        "lat": 33.8155,
+        "lng": -118.156
+      },
+      "description": "Historic-district bungalow belt (California Heights/Cal Heights) with the metro's steadiest single-family renovation and duplex-conversion flow."
+    },
+    "North Long Beach": {
+      "name": "North Long Beach",
+      "division": "NORTH_LONG_BEACH",
+      "center": {
+        "lat": 33.853,
+        "lng": -118.1935
+      },
+      "description": "Uptown corridor around Atlantic and Artesia with the Uptown Renaissance plan, ADU-heavy permitting, and the metro's fastest rent-shift slope."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "MILESTONEDATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/long_beach.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

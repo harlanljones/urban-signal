@@ -1,0 +1,283 @@
+{
+  "schema_version": 2,
+  "id": "modesto",
+  "name": "Modesto",
+  "state": "CA",
+  "center": {
+    "lat": 37.6391,
+    "lng": -120.9969
+  },
+  "metro_bbox": {
+    "min_lat": 37.6,
+    "max_lat": 37.7,
+    "min_lng": -121.05,
+    "max_lng": -120.93
+  },
+  "divisions": {
+    "DOWNTOWN_CORE": {
+      "name": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 37.64,
+        "lng": -120.996
+      },
+      "bbox": {
+        "min_lat": 37.63,
+        "max_lat": 37.648,
+        "min_lng": -121.005,
+        "max_lng": -120.985
+      },
+      "submarkets": [
+        "Downtown Modesto",
+        "Virginia Corridor South"
+      ]
+    },
+    "GRACEADA_MCHENRY": {
+      "name": "GRACEADA_MCHENRY",
+      "center": {
+        "lat": 37.652,
+        "lng": -120.991
+      },
+      "bbox": {
+        "min_lat": 37.648,
+        "max_lat": 37.656,
+        "min_lng": -121.0,
+        "max_lng": -120.982
+      },
+      "submarkets": [
+        "Graceada Park Historic District"
+      ]
+    },
+    "COLLEGE_AREA_MJC": {
+      "name": "COLLEGE_AREA_MJC",
+      "center": {
+        "lat": 37.647,
+        "lng": -120.975
+      },
+      "bbox": {
+        "min_lat": 37.64,
+        "max_lat": 37.656,
+        "min_lng": -120.982,
+        "max_lng": -120.968
+      },
+      "submarkets": [
+        "Modesto Junior College East",
+        "College & El Vista"
+      ]
+    },
+    "LA_LOMA_EAST": {
+      "name": "LA_LOMA_EAST",
+      "center": {
+        "lat": 37.634,
+        "lng": -120.97
+      },
+      "bbox": {
+        "min_lat": 37.628,
+        "max_lat": 37.64,
+        "min_lng": -120.978,
+        "max_lng": -120.962
+      },
+      "submarkets": [
+        "La Loma"
+      ]
+    },
+    "VILLAGE_ONE_NORTHEAST": {
+      "name": "VILLAGE_ONE_NORTHEAST",
+      "center": {
+        "lat": 37.666,
+        "lng": -120.978
+      },
+      "bbox": {
+        "min_lat": 37.656,
+        "max_lat": 37.676,
+        "min_lng": -120.99,
+        "max_lng": -120.966
+      },
+      "submarkets": [
+        "Village One",
+        "Sherwood Forest & Sylvan"
+      ]
+    },
+    "KIERNAN_CORRIDOR_NORTH": {
+      "name": "KIERNAN_CORRIDOR_NORTH",
+      "center": {
+        "lat": 37.683,
+        "lng": -120.958
+      },
+      "bbox": {
+        "min_lat": 37.676,
+        "max_lat": 37.7,
+        "min_lng": -120.98,
+        "max_lng": -120.94
+      },
+      "submarkets": [
+        "Kiernan Business Corridor",
+        "Pelandale Corridor"
+      ]
+    },
+    "SOUTHWEST_AIRPORT": {
+      "name": "SOUTHWEST_AIRPORT",
+      "center": {
+        "lat": 37.622,
+        "lng": -121.01
+      },
+      "bbox": {
+        "min_lat": 37.6,
+        "max_lat": 37.63,
+        "min_lng": -121.04,
+        "max_lng": -121.0
+      },
+      "submarkets": [
+        "Airport Neighborhood",
+        "West Modesto & Beard Industrial Edge"
+      ]
+    },
+    "SOUTHEAST_SCENIC": {
+      "name": "SOUTHEAST_SCENIC",
+      "center": {
+        "lat": 37.64,
+        "lng": -120.949
+      },
+      "bbox": {
+        "min_lat": 37.63,
+        "max_lat": 37.65,
+        "min_lng": -120.96,
+        "max_lng": -120.938
+      },
+      "submarkets": [
+        "Rosemount & Scenic"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Modesto": {
+      "name": "Downtown Modesto",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 37.6394,
+        "lng": -120.9969
+      },
+      "description": "Tenth Street Plaza core with the Gallo Center for the Arts, facade-rehab permitting, adaptive reuse of the historic commercial grid, and the city's densest business-license churn."
+    },
+    "Virginia Corridor South": {
+      "name": "Virginia Corridor South",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 37.6445,
+        "lng": -120.993
+      },
+      "description": "Mid-century belt along the Virginia Corridor greenway with renovation-led permitting and small-office conversions."
+    },
+    "Graceada Park Historic District": {
+      "name": "Graceada Park Historic District",
+      "division": "GRACEADA_MCHENRY",
+      "center": {
+        "lat": 37.6494,
+        "lng": -120.9904
+      },
+      "description": "Graceada Park, the McHenry Mansion and Museum district, and the city's finest century-old housing stock with restoration-grade permit cadence."
+    },
+    "Modesto Junior College East": {
+      "name": "Modesto Junior College East",
+      "division": "COLLEGE_AREA_MJC",
+      "center": {
+        "lat": 37.6495,
+        "lng": -120.9777
+      },
+      "description": "MJC east-campus rental belt with steady tenant turnover, duplex conversions, and college-service licensing."
+    },
+    "College & El Vista": {
+      "name": "College & El Vista",
+      "division": "COLLEGE_AREA_MJC",
+      "center": {
+        "lat": 37.644,
+        "lng": -120.973
+      },
+      "description": "El Vista Avenue corridor of post-war tracts with basement-finish and roof-permit cadence."
+    },
+    "La Loma": {
+      "name": "La Loma",
+      "division": "LA_LOMA_EAST",
+      "center": {
+        "lat": 37.636,
+        "lng": -120.973
+      },
+      "description": "East-side grid around La Loma Park with owner-occupied vintage housing and incremental renovation permitting."
+    },
+    "Village One": {
+      "name": "Village One",
+      "division": "VILLAGE_ONE_NORTHEAST",
+      "center": {
+        "lat": 37.664,
+        "lng": -120.976
+      },
+      "description": "One of Modesto's largest planned-unit developments — curvilinear 1970s-80s housing with steady remodel volume and neighborhood-retail licensing."
+    },
+    "Sherwood Forest & Sylvan": {
+      "name": "Sherwood Forest & Sylvan",
+      "division": "VILLAGE_ONE_NORTHEAST",
+      "center": {
+        "lat": 37.67,
+        "lng": -120.988
+      },
+      "description": "Sylvan Avenue retail spine beside Sherwood Forest Park with pool/deck auxiliary permits and small-business churn."
+    },
+    "Kiernan Business Corridor": {
+      "name": "Kiernan Business Corridor",
+      "division": "KIERNAN_CORRIDOR_NORTH",
+      "center": {
+        "lat": 37.686,
+        "lng": -120.954
+      },
+      "description": "Kiernan Avenue northeast growth corridor with new-build retail and medical pads, UC Merced-adjacent logistics, and the metro's fastest permit velocity."
+    },
+    "Pelandale Corridor": {
+      "name": "Pelandale Corridor",
+      "division": "KIERNAN_CORRIDOR_NORTH",
+      "center": {
+        "lat": 37.679,
+        "lng": -120.964
+      },
+      "description": "Pelandale Avenue big-box and dining row with pad-site filings and highway-99-adjacent service licensing."
+    },
+    "Airport Neighborhood": {
+      "name": "Airport Neighborhood",
+      "division": "SOUTHWEST_AIRPORT",
+      "center": {
+        "lat": 37.617,
+        "lng": -121.008
+      },
+      "description": "Housing south of the Modesto City-County Airport with industrial-adjacent infill and steady alteration permitting."
+    },
+    "West Modesto & Beard Industrial Edge": {
+      "name": "West Modesto & Beard Industrial Edge",
+      "division": "SOUTHWEST_AIRPORT",
+      "center": {
+        "lat": 37.626,
+        "lng": -121.012
+      },
+      "description": "Highway 99 frontage against the Beard Industrial District with warehouse conversions and trade licensing volume."
+    },
+    "Rosemount & Scenic": {
+      "name": "Rosemount & Scenic",
+      "division": "SOUTHEAST_SCENIC",
+      "center": {
+        "lat": 37.639,
+        "lng": -120.947
+      },
+      "description": "Scenic Drive heights above the Oakdale Road retail spine with ranch-scale lots and remodel-led permitting."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/modesto.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

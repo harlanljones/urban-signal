@@ -321,6 +321,7 @@ class MunicipalIngestionScheduler:
                     "watermark_exclude": ds.watermark_exclude or [],
                     "base_where": ds.where,
                     "zip_member": zip_member,
+                    "delimiter": ds.delimiter,
                 }
                 self.configs[job_name] = JobConfig(
                     name=job_name,
@@ -794,6 +795,7 @@ class MunicipalIngestionScheduler:
                     "watermark_format",
                     "watermark_exclude",
                     "zip_member",
+                    "delimiter",
                 )
                 if meta.get(k)
             }

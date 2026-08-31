@@ -1,0 +1,223 @@
+{
+  "schema_version": 2,
+  "id": "santa_fe",
+  "name": "Santa Fe",
+  "state": "NM",
+  "center": {
+    "lat": 35.6869,
+    "lng": -105.9372
+  },
+  "metro_bbox": {
+    "min_lat": 35.6,
+    "max_lat": 35.75,
+    "min_lng": -106.05,
+    "max_lng": -105.85
+  },
+  "divisions": {
+    "DOWNTOWN_PLAZA": {
+      "name": "DOWNTOWN_PLAZA",
+      "center": {
+        "lat": 35.6869,
+        "lng": -105.9372
+      },
+      "bbox": {
+        "min_lat": 35.678,
+        "max_lat": 35.695,
+        "min_lng": -105.948,
+        "max_lng": -105.925
+      },
+      "submarkets": [
+        "Downtown Plaza",
+        "Baca Street"
+      ]
+    },
+    "SOUTH_CAPITOL": {
+      "name": "SOUTH_CAPITOL",
+      "center": {
+        "lat": 35.67,
+        "lng": -105.95
+      },
+      "bbox": {
+        "min_lat": 35.66,
+        "max_lat": 35.68,
+        "min_lng": -105.965,
+        "max_lng": -105.935
+      },
+      "submarkets": [
+        "South Capitol",
+        "Siler Road"
+      ]
+    },
+    "RAILYARD": {
+      "name": "RAILYARD",
+      "center": {
+        "lat": 35.677,
+        "lng": -105.95
+      },
+      "bbox": {
+        "min_lat": 35.67,
+        "max_lat": 35.69,
+        "min_lng": -105.96,
+        "max_lng": -105.94
+      },
+      "submarkets": [
+        "Railyard"
+      ]
+    },
+    "EASTSIDE": {
+      "name": "EASTSIDE",
+      "center": {
+        "lat": 35.685,
+        "lng": -105.925
+      },
+      "bbox": {
+        "min_lat": 35.675,
+        "max_lat": 35.698,
+        "min_lng": -105.935,
+        "max_lng": -105.91
+      },
+      "submarkets": [
+        "Eastside",
+        "Casa Solana"
+      ]
+    },
+    "CERRO_GORDO": {
+      "name": "CERRO_GORDO",
+      "center": {
+        "lat": 35.7,
+        "lng": -105.9
+      },
+      "bbox": {
+        "min_lat": 35.686,
+        "max_lat": 35.72,
+        "min_lng": -105.92,
+        "max_lng": -105.885
+      },
+      "submarkets": [
+        "Cerro Gordo",
+        "Agua Fria"
+      ]
+    },
+    "SOUTHSIDE": {
+      "name": "SOUTHSIDE",
+      "center": {
+        "lat": 35.64,
+        "lng": -105.985
+      },
+      "bbox": {
+        "min_lat": 35.62,
+        "max_lat": 35.665,
+        "min_lng": -106.03,
+        "max_lng": -105.96
+      },
+      "submarkets": [
+        "Southside"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Plaza": {
+      "name": "Downtown Plaza",
+      "division": "DOWNTOWN_PLAZA",
+      "center": {
+        "lat": 35.6869,
+        "lng": -105.9372
+      },
+      "description": "Historic Santa Fe Plaza core with Palace of the Governors, San Miguel Chapel, and the central mixed-use retail/hospitality corridor."
+    },
+    "Baca Street": {
+      "name": "Baca Street",
+      "division": "DOWNTOWN_PLAZA",
+      "center": {
+        "lat": 35.6895,
+        "lng": -105.9305
+      },
+      "description": "Baca Street corridor east of the Plaza with Victorian-era cottages, infill townhomes, and steady renovation permit activity."
+    },
+    "South Capitol": {
+      "name": "South Capitol",
+      "division": "SOUTH_CAPITOL",
+      "center": {
+        "lat": 35.67,
+        "lng": -105.95
+      },
+      "description": "South Capitol neighborhood with the New Mexico State Capitol, government offices, and the emerging Siler Road creative-zone mixed-use corridor."
+    },
+    "Siler Road": {
+      "name": "Siler Road",
+      "division": "SOUTH_CAPITOL",
+      "center": {
+        "lat": 35.665,
+        "lng": -105.952
+      },
+      "description": "Siler Road industrial-artist corridor with warehouse conversions, maker spaces, and light-industrial redevelopment."
+    },
+    "Railyard": {
+      "name": "Railyard",
+      "division": "RAILYARD",
+      "center": {
+        "lat": 35.677,
+        "lng": -105.95
+      },
+      "description": "Santa Fe Railyard district with the Farmers Market, railyard parks, gallery spaces, and the Guadalupe Street retail corridor."
+    },
+    "Eastside": {
+      "name": "Eastside",
+      "division": "EASTSIDE",
+      "center": {
+        "lat": 35.685,
+        "lng": -105.925
+      },
+      "description": "Eastside including Canyon Road gallery district, Museum Hill, and the historic Acequia Madre neighborhood with high-value adobe renovation permits."
+    },
+    "Casa Solana": {
+      "name": "Casa Solana",
+      "division": "EASTSIDE",
+      "center": {
+        "lat": 35.68,
+        "lng": -105.93
+      },
+      "description": "Casa Solana mid-century residential neighborhood with ranch-style homes, lot splits, and steady alteration permits."
+    },
+    "Cerro Gordo": {
+      "name": "Cerro Gordo",
+      "division": "CERRO_GORDO",
+      "center": {
+        "lat": 35.7,
+        "lng": -105.9
+      },
+      "description": "Cerro Gordo foothills east of downtown with view-lot estate builds, hillside adobe construction, and National Forest adjacency."
+    },
+    "Agua Fria": {
+      "name": "Agua Fria",
+      "division": "CERRO_GORDO",
+      "center": {
+        "lat": 35.708,
+        "lng": -105.905
+      },
+      "description": "Agua Fria Village historic settlement west of the Plaza with agricultural-lot conversions, traditional adobe rehab, and new single-family infill."
+    },
+    "Southside": {
+      "name": "Southside",
+      "division": "SOUTHSIDE",
+      "center": {
+        "lat": 35.64,
+        "lng": -105.985
+      },
+      "description": "Southside corridor along Airport Road and Cerrillos Road with master-planned subdivisions, big-box retail, and the metro's highest new-build permit volume."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "CreationDate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/santa_fe.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

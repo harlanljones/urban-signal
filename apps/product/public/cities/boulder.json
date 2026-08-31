@@ -1,0 +1,253 @@
+{
+  "schema_version": 2,
+  "id": "boulder",
+  "name": "Boulder",
+  "state": "CO",
+  "center": {
+    "lat": 40.015,
+    "lng": -105.27
+  },
+  "metro_bbox": {
+    "min_lat": 39.94,
+    "max_lat": 40.09,
+    "min_lng": -105.33,
+    "max_lng": -105.14
+  },
+  "divisions": {
+    "DOWNTOWN_WEST": {
+      "name": "DOWNTOWN_WEST",
+      "center": {
+        "lat": 40.019,
+        "lng": -105.283
+      },
+      "bbox": {
+        "min_lat": 39.99,
+        "max_lat": 40.035,
+        "min_lng": -105.32,
+        "max_lng": -105.26
+      },
+      "submarkets": [
+        "Downtown",
+        "Mapleton Hill",
+        "Whittier"
+      ]
+    },
+    "UNIVERSITY_HILL": {
+      "name": "UNIVERSITY_HILL",
+      "center": {
+        "lat": 40.0076,
+        "lng": -105.2708
+      },
+      "bbox": {
+        "min_lat": 39.98,
+        "max_lat": 40.015,
+        "min_lng": -105.285,
+        "max_lng": -105.255
+      },
+      "submarkets": [
+        "University Hill"
+      ]
+    },
+    "CENTRAL_EAST": {
+      "name": "CENTRAL_EAST",
+      "center": {
+        "lat": 40.02,
+        "lng": -105.25
+      },
+      "bbox": {
+        "min_lat": 40.0,
+        "max_lat": 40.035,
+        "min_lng": -105.255,
+        "max_lng": -105.22
+      },
+      "submarkets": [
+        "Boulder Junction"
+      ]
+    },
+    "NORTH_BOULDER": {
+      "name": "NORTH_BOULDER",
+      "center": {
+        "lat": 40.047,
+        "lng": -105.28
+      },
+      "bbox": {
+        "min_lat": 40.035,
+        "max_lat": 40.07,
+        "min_lng": -105.32,
+        "max_lng": -105.245
+      },
+      "submarkets": [
+        "North Boulder",
+        "Holiday"
+      ]
+    },
+    "SOUTH_BOULDER": {
+      "name": "SOUTH_BOULDER",
+      "center": {
+        "lat": 39.98,
+        "lng": -105.255
+      },
+      "bbox": {
+        "min_lat": 39.94,
+        "max_lat": 40.0,
+        "min_lng": -105.32,
+        "max_lng": -105.245
+      },
+      "submarkets": [
+        "Table Mesa"
+      ]
+    },
+    "SOUTHEAST_BOULDER": {
+      "name": "SOUTHEAST_BOULDER",
+      "center": {
+        "lat": 39.975,
+        "lng": -105.2
+      },
+      "bbox": {
+        "min_lat": 39.94,
+        "max_lat": 40.0,
+        "min_lng": -105.245,
+        "max_lng": -105.14
+      },
+      "submarkets": [
+        "Martin Acres",
+        "Southeast Boulder"
+      ]
+    },
+    "GUNBARREL": {
+      "name": "GUNBARREL",
+      "center": {
+        "lat": 40.062,
+        "lng": -105.195
+      },
+      "bbox": {
+        "min_lat": 40.035,
+        "max_lat": 40.09,
+        "min_lng": -105.245,
+        "max_lng": -105.14
+      },
+      "submarkets": [
+        "Gunbarrel"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown": {
+      "name": "Downtown",
+      "division": "DOWNTOWN_WEST",
+      "center": {
+        "lat": 40.0193,
+        "lng": -105.2738
+      },
+      "description": "Pearl Street Mall core with the Civic Area, Boulder Theater, and the city's densest mixed-use adaptive-reuse permitting."
+    },
+    "Mapleton Hill": {
+      "name": "Mapleton Hill",
+      "division": "DOWNTOWN_WEST",
+      "center": {
+        "lat": 40.024,
+        "lng": -105.282
+      },
+      "description": "West-side historic district of Victorians and Craftsman stock with renovation-led and restoration permitting."
+    },
+    "University Hill": {
+      "name": "University Hill",
+      "division": "UNIVERSITY_HILL",
+      "center": {
+        "lat": 40.0076,
+        "lng": -105.2708
+      },
+      "description": "The Hill commercial strip and CU Boulder-adjacent student housing with rental-license churn and storefront turnover."
+    },
+    "Whittier": {
+      "name": "Whittier",
+      "division": "DOWNTOWN_WEST",
+      "center": {
+        "lat": 40.027,
+        "lng": -105.27
+      },
+      "description": "Central Boulder neighborhood with bungalow infill, ADU additions, and steady renovation permitting."
+    },
+    "Boulder Junction": {
+      "name": "Boulder Junction",
+      "division": "CENTRAL_EAST",
+      "center": {
+        "lat": 40.032,
+        "lng": -105.232
+      },
+      "description": "East Boulder transit village around the RTD station with new-build mixed-use, office, and multifamily permitting."
+    },
+    "North Boulder": {
+      "name": "North Boulder",
+      "division": "NORTH_BOULDER",
+      "center": {
+        "lat": 40.047,
+        "lng": -105.28
+      },
+      "description": "North Boulder (NoBo) growth corridor along Broadway with master-planned housing, mixed-use pads, and utility work."
+    },
+    "Holiday": {
+      "name": "Holiday",
+      "division": "NORTH_BOULDER",
+      "center": {
+        "lat": 40.062,
+        "lng": -105.28
+      },
+      "description": "Holiday neighborhood at the north city edge with ranch stock, additions, and the North Boulder Rec Center belt."
+    },
+    "Table Mesa": {
+      "name": "Table Mesa",
+      "division": "SOUTH_BOULDER",
+      "center": {
+        "lat": 39.978,
+        "lng": -105.25
+      },
+      "description": "Post-war South Boulder residential belt with mid-century renovations, solar retrofits, and remodel permits."
+    },
+    "Martin Acres": {
+      "name": "Martin Acres",
+      "division": "SOUTHEAST_BOULDER",
+      "center": {
+        "lat": 39.982,
+        "lng": -105.235
+      },
+      "description": "Martin Acres tract housing with renovation-led permitting and steady rental-license coverage."
+    },
+    "Southeast Boulder": {
+      "name": "Southeast Boulder",
+      "division": "SOUTHEAST_BOULDER",
+      "center": {
+        "lat": 39.999,
+        "lng": -105.235
+      },
+      "description": "Southeast Boulder residential and light-commercial belt with in-fill housing and Flatirons Business Park-adjacent permitting."
+    },
+    "Gunbarrel": {
+      "name": "Gunbarrel",
+      "division": "GUNBARREL",
+      "center": {
+        "lat": 40.062,
+        "lng": -105.195
+      },
+      "description": "Gunbarrel master-planned area at the NE city fringe with office parks, townhome infill, and residential build-out."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "IssuedDate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "APPLIEDDATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/boulder.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

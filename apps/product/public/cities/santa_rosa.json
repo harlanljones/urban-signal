@@ -1,0 +1,238 @@
+{
+  "schema_version": 2,
+  "id": "santa_rosa",
+  "name": "Santa Rosa, CA",
+  "state": "CA",
+  "center": {
+    "lat": 38.4405,
+    "lng": -122.7144
+  },
+  "metro_bbox": {
+    "min_lat": 38.3,
+    "max_lat": 38.58,
+    "min_lng": -122.95,
+    "max_lng": -122.45
+  },
+  "divisions": {
+    "DOWNTOWN": {
+      "name": "DOWNTOWN",
+      "center": {
+        "lat": 38.4405,
+        "lng": -122.7144
+      },
+      "bbox": {
+        "min_lat": 38.432,
+        "max_lat": 38.446,
+        "min_lng": -122.726,
+        "max_lng": -122.706
+      },
+      "submarkets": [
+        "Downtown",
+        "Railroad Square",
+        "West End"
+      ]
+    },
+    "NORTHWEST": {
+      "name": "NORTHWEST",
+      "center": {
+        "lat": 38.49,
+        "lng": -122.745
+      },
+      "bbox": {
+        "min_lat": 38.47,
+        "max_lat": 38.53,
+        "min_lng": -122.77,
+        "max_lng": -122.72
+      },
+      "submarkets": [
+        "Northwest Santa Rosa",
+        "Larkfield-Wikiup"
+      ]
+    },
+    "NORTH_EAST": {
+      "name": "NORTH_EAST",
+      "center": {
+        "lat": 38.456,
+        "lng": -122.696
+      },
+      "bbox": {
+        "min_lat": 38.445,
+        "max_lat": 38.47,
+        "min_lng": -122.712,
+        "max_lng": -122.68
+      },
+      "submarkets": [
+        "North Santa Rosa"
+      ]
+    },
+    "ROSELAND": {
+      "name": "ROSELAND",
+      "center": {
+        "lat": 38.425,
+        "lng": -122.73
+      },
+      "bbox": {
+        "min_lat": 38.41,
+        "max_lat": 38.435,
+        "min_lng": -122.745,
+        "max_lng": -122.71
+      },
+      "submarkets": [
+        "Roseland",
+        "Southwest Santa Rosa"
+      ]
+    },
+    "SOUTHEAST": {
+      "name": "SOUTHEAST",
+      "center": {
+        "lat": 38.405,
+        "lng": -122.665
+      },
+      "bbox": {
+        "min_lat": 38.39,
+        "max_lat": 38.42,
+        "min_lng": -122.69,
+        "max_lng": -122.64
+      },
+      "submarkets": [
+        "Bennett Valley",
+        "Southeast Santa Rosa"
+      ]
+    },
+    "EAST": {
+      "name": "EAST",
+      "center": {
+        "lat": 38.458,
+        "lng": -122.64
+      },
+      "bbox": {
+        "min_lat": 38.44,
+        "max_lat": 38.47,
+        "min_lng": -122.66,
+        "max_lng": -122.61
+      },
+      "submarkets": [
+        "Rincon Valley",
+        "Fountaingrove"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown": {
+      "name": "Downtown",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 38.4405,
+        "lng": -122.7144
+      },
+      "description": "Old Courthouse Square core with the historic Empire building, Railroad Square adaptive reuse, and the downtown mixed-use permitting corridor."
+    },
+    "Railroad Square": {
+      "name": "Railroad Square",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 38.438,
+        "lng": -122.722
+      },
+      "description": "Historic transit-adjacent district with artisan studios, brewery taprooms, and converted warehouse retail."
+    },
+    "West End": {
+      "name": "West End",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 38.436,
+        "lng": -122.718
+      },
+      "description": "West Ninth Street corridor with bungalow infill, small-scale commercial rehab, and West End studio conversions."
+    },
+    "Northwest Santa Rosa": {
+      "name": "Northwest Santa Rosa",
+      "division": "NORTHWEST",
+      "center": {
+        "lat": 38.48,
+        "lng": -122.74
+      },
+      "description": "Mendocino Avenue north corridor with post-war residential, Mark West business park, and Airport Boulevard industrial infill."
+    },
+    "Larkfield-Wikiup": {
+      "name": "Larkfield-Wikiup",
+      "division": "NORTHWEST",
+      "center": {
+        "lat": 38.51,
+        "lng": -122.75
+      },
+      "description": "Unincorporated north Sonoma County suburban fringe with ranch-style homes, auto-oriented retail, and steady renovation permits."
+    },
+    "North Santa Rosa": {
+      "name": "North Santa Rosa",
+      "division": "NORTH_EAST",
+      "center": {
+        "lat": 38.46,
+        "lng": -122.7
+      },
+      "description": "Cleveland Avenue and Mendocino Avenue north of downtown with mid-century housing stock, strip retail, and steady alteration permits."
+    },
+    "Roseland": {
+      "name": "Roseland",
+      "division": "ROSELAND",
+      "center": {
+        "lat": 38.431,
+        "lng": -122.736
+      },
+      "description": "Sebastopol Road corridor with immigrant-owned small businesses, Hispanic cultural district, and the Roseland Village mixed-use node."
+    },
+    "Southwest Santa Rosa": {
+      "name": "Southwest Santa Rosa",
+      "division": "ROSELAND",
+      "center": {
+        "lat": 38.42,
+        "lng": -122.72
+      },
+      "description": "West College Avenue corridor with suburban residential, St. Joseph Health campus, and Yulupa Avenue retail pads."
+    },
+    "Bennett Valley": {
+      "name": "Bennett Valley",
+      "division": "SOUTHEAST",
+      "center": {
+        "lat": 38.404,
+        "lng": -122.657
+      },
+      "description": "Bennett Valley Road corridor with golf-course residential, Annadel State Park edge, and the Bennett Valley Village center."
+    },
+    "Southeast Santa Rosa": {
+      "name": "Southeast Santa Rosa",
+      "division": "SOUTHEAST",
+      "center": {
+        "lat": 38.41,
+        "lng": -122.68
+      },
+      "description": "South Avenue corridor with mid-century residential, Oliver's Market area, and Yulupa Boulevard retail."
+    },
+    "Rincon Valley": {
+      "name": "Rincon Valley",
+      "division": "EAST",
+      "center": {
+        "lat": 38.4569,
+        "lng": -122.6483
+      },
+      "description": "Mission Boulevard east corridor with suburban subdivisions, Rincon Valley Library anchor, and steady new-build permit volume."
+    },
+    "Fountaingrove": {
+      "name": "Fountaingrove",
+      "division": "EAST",
+      "center": {
+        "lat": 38.46,
+        "lng": -122.63
+      },
+      "description": "East hills master-planned community with custom homes, winery estate lots, and the Fountaingrove golf course residential belt."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/santa_rosa.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

@@ -1,0 +1,203 @@
+{
+  "schema_version": 2,
+  "id": "nampa",
+  "name": "Nampa, ID",
+  "state": "ID",
+  "center": {
+    "lat": 43.58,
+    "lng": -116.564
+  },
+  "metro_bbox": {
+    "min_lat": 43.5,
+    "max_lat": 43.67,
+    "min_lng": -116.66,
+    "max_lng": -116.46
+  },
+  "divisions": {
+    "DOWNTOWN": {
+      "name": "DOWNTOWN",
+      "center": {
+        "lat": 43.58,
+        "lng": -116.564
+      },
+      "bbox": {
+        "min_lat": 43.57,
+        "max_lat": 43.59,
+        "min_lng": -116.578,
+        "max_lng": -116.55
+      },
+      "submarkets": [
+        "Downtown Nampa",
+        "Old Nampa"
+      ]
+    },
+    "UNIVERSITY": {
+      "name": "UNIVERSITY",
+      "center": {
+        "lat": 43.562,
+        "lng": -116.564
+      },
+      "bbox": {
+        "min_lat": 43.552,
+        "max_lat": 43.572,
+        "min_lng": -116.576,
+        "max_lng": -116.55
+      },
+      "submarkets": [
+        "College of Western Idaho"
+      ]
+    },
+    "WEST_NAMPA": {
+      "name": "WEST_NAMPA",
+      "center": {
+        "lat": 43.595,
+        "lng": -116.615
+      },
+      "bbox": {
+        "min_lat": 43.58,
+        "max_lat": 43.61,
+        "min_lng": -116.64,
+        "max_lng": -116.585
+      },
+      "submarkets": [
+        "West Nampa",
+        "Middleton Road Edge"
+      ]
+    },
+    "SOUTH_NAMPA": {
+      "name": "SOUTH_NAMPA",
+      "center": {
+        "lat": 43.555,
+        "lng": -116.565
+      },
+      "bbox": {
+        "min_lat": 43.54,
+        "max_lat": 43.57,
+        "min_lng": -116.59,
+        "max_lng": -116.54
+      },
+      "submarkets": [
+        "South Nampa"
+      ]
+    },
+    "NORTH_NAMPA": {
+      "name": "NORTH_NAMPA",
+      "center": {
+        "lat": 43.622,
+        "lng": -116.58
+      },
+      "bbox": {
+        "min_lat": 43.6,
+        "max_lat": 43.645,
+        "min_lng": -116.61,
+        "max_lng": -116.55
+      },
+      "submarkets": [
+        "North Nampa"
+      ]
+    },
+    "EAST_NAMPA": {
+      "name": "EAST_NAMPA",
+      "center": {
+        "lat": 43.575,
+        "lng": -116.52
+      },
+      "bbox": {
+        "min_lat": 43.55,
+        "max_lat": 43.6,
+        "min_lng": -116.55,
+        "max_lng": -116.49
+      },
+      "submarkets": [
+        "East Nampa"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Nampa": {
+      "name": "Downtown Nampa",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 43.58,
+        "lng": -116.564
+      },
+      "description": "Downtown Nampa core along 1st/3rd Streets with the Civic Center, the Nampa Public Library, and the downtown business district retail spine."
+    },
+    "Old Nampa": {
+      "name": "Old Nampa",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 43.577,
+        "lng": -116.569
+      },
+      "description": "Historic residential neighborhood south of downtown with pre-war bungalow stock, the Old Nampa Neighborhood Association, and steady renovation permits."
+    },
+    "College of Western Idaho": {
+      "name": "College of Western Idaho",
+      "division": "UNIVERSITY",
+      "center": {
+        "lat": 43.562,
+        "lng": -116.564
+      },
+      "description": "University District around the College of Western Idaho Nampa Campus with student-housing turnover, academic infrastructure, and the Nampa Workforce Center."
+    },
+    "West Nampa": {
+      "name": "West Nampa",
+      "division": "WEST_NAMPA",
+      "center": {
+        "lat": 43.595,
+        "lng": -116.615
+      },
+      "description": "Flamingo Avenue and Midland Boulevard corridor with master-planned subdivisions, the West Nampa growth belt, and the Middleton Road edge."
+    },
+    "Middleton Road Edge": {
+      "name": "Middleton Road Edge",
+      "division": "WEST_NAMPA",
+      "center": {
+        "lat": 43.605,
+        "lng": -116.635
+      },
+      "description": "Western approach corridor along Middleton Road with new subdivision build-out and the transition to agricultural land."
+    },
+    "South Nampa": {
+      "name": "South Nampa",
+      "division": "SOUTH_NAMPA",
+      "center": {
+        "lat": 43.555,
+        "lng": -116.565
+      },
+      "description": "South Nampa corridor along 14th Avenue South and Franklin Boulevard with light industrial, utility infrastructure, and water line replacement projects."
+    },
+    "North Nampa": {
+      "name": "North Nampa",
+      "division": "NORTH_NAMPA",
+      "center": {
+        "lat": 43.622,
+        "lng": -116.58
+      },
+      "description": "North Nampa corridor north of Interstate 84 with the Urban Renewal District, Northside Boulevard, and the Garrity Boulevard industrial-commercial spine."
+    },
+    "East Nampa": {
+      "name": "East Nampa",
+      "division": "EAST_NAMPA",
+      "center": {
+        "lat": 43.575,
+        "lng": -116.52
+      },
+      "description": "East Nampa Opportunity Zone corridor along the East Nampa commercial strip with the Nampa Municipal Airport edge and large-lot commercial development."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "CreationDate",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/nampa.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

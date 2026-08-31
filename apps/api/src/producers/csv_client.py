@@ -191,11 +191,12 @@ class CSVClient:
             raise RuntimeError("CSV endpoint list is empty")
 
         zip_member = kwargs.get("zip_member")
+        delimiter = kwargs.get("delimiter", ",")
         if zip_member:
             csv_text = _read_zip_member(response.content, zip_member)
         else:
             csv_text = response.text
-        reader = csv.DictReader(io.StringIO(csv_text))
+        reader = csv.DictReader(io.StringIO(csv_text), delimiter=delimiter)
         # Municipal CSVs use title case, spaces, and punctuation inconsistently;
         # normalize them so shared field maps apply uniformly.
         if reader.fieldnames:

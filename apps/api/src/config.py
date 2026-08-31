@@ -296,6 +296,13 @@ class Settings(BaseSettings):
         default="https://data.cityofnewyork.us/resource/6z8x-wfk4.json",
         description="NYC Marshal's executed evictions endpoint",
     )
+    # NYC DOHMH Restaurant Inspections (US-208): food-safety/public-health,
+    # native lat/lng + point, `camis` stable PK, `inspection_date` calendar
+    # watermark. Probed live 2026-08-30 (n≈296K, fresh 2026-08-27).
+    socrata_nyc_inspections_endpoint: str = Field(
+        default="https://data.cityofnewyork.us/resource/43nn-pn8j.json",
+        description="NYC DOHMH Restaurant Inspection Results endpoint",
+    )
     socrata_chicago_crime_endpoint: str = Field(
         default="https://data.cityofchicago.org/resource/ijzp-q8t2.json",
         description="Chicago crime incidents endpoint",
@@ -598,6 +605,14 @@ class Settings(BaseSettings):
     socrata_austin_crime_endpoint: str = Field(
         default="https://data.austintexas.gov/resource/thrk-bqb6.json",
         description="Austin APD NIBRS Group A Offenses Socrata endpoint (US-71)",
+    )
+    # US-210: Austin Code Complaint Cases (Socrata `6wtj-zbtb`, the underlying
+    # dataset behind the `3g2y-5uvh` story asset). Native lat/lng + point,
+    # stable case_id PK, opened_date watermark. Probed live 2026-08-30
+    # (n=82,854). VIOLATIONS-family code enforcement, distinct from 311.
+    socrata_austin_violations_endpoint: str = Field(
+        default="https://data.austintexas.gov/resource/6wtj-zbtb.json",
+        description="Austin Code Complaint Cases endpoint (US-210)",
     )
 
     # Cincinnati (Socrata) — PERMITS, 311, and business licenses; no sales
@@ -1448,6 +1463,15 @@ class Settings(BaseSettings):
         default="https://mapportal.phoenix.gov/pds/rest/services/ShapePHX/ShapePHX_Short_Term_Rentals/MapServer/0",
         description="Phoenix ShapePHX Short Term Rentals ArcGIS MapServer URL (SLA)",
     )
+    # US-392: Maricopa County Sales Affidavits — ArcGIS Online CSV Collection,
+    # item f3484c72a938497286adc4e5de7e9963. Public anonymous download (61 MB
+    # ZIP, `Data/Sales_Affidavits.txt` pipe-delimited member). Probe 2026-08-28:
+    # 912,806 rows, fresh (item modified 2026-08-03), no Last-Modified header on
+    # the download — freshness via AGOL item metadata or alarm_exempt.
+    csv_phoenix_deeds_endpoint: str = Field(
+        default="https://www.arcgis.com/sharing/rest/content/items/f3484c72a938497286adc4e5de7e9963/data",
+        description="Maricopa County Sales Affidavits CSV Collection download URL (US-392)",
+    )
 
     # Aurora, CO (US-326): issued building permits MapServer 44 (full history,
     # IssueDate watermark) + non-home business licenses MapServer 77 (Issue_Date
@@ -1856,6 +1880,199 @@ class Settings(BaseSettings):
     webhook_alert_urls: Annotated[list[str], NoDecode] = Field(
         default_factory=list,
         description="Endpoints to dispatch catalyst alerts",
+    )
+
+    # ------------------------------------------------------------------ #
+    # West-metro registration wave (US-222..US-251): per-city feed endpoints.
+    # Each endpoint is referenced by the matching REGISTRY DatasetSpec.
+    # ------------------------------------------------------------------ #
+    arcgis_rivco_permits_url: str = Field(
+        default="https://gis.countyofriverside.us/arcgis_mapping/rest/services/OpenData/General/MapServer/280",
+        description="Riverside County Accela permits ArcGIS MapServer URL (inland_empire)",
+    )
+    arcgis_riverside_crime_url: str = Field(
+        default="https://services.arcgis.com/Fu2oOWg1Aw7azh41/arcgis/rest/services/View_CrimesRPD/FeatureServer/4",
+        description="City of Riverside PD crime ArcGIS FeatureServer URL (inland_empire)",
+    )
+    arcgis_stockton_sla_url: str = Field(
+        default="https://gisportal.stocktonca.gov/arcgis2/rest/services/OpenCounter/OpenCounterMap/MapServer/7",
+        description="Stockton liquor licenses ArcGIS MapServer URL (SLA)",
+    )
+    boulder_permits_endpoint: str = Field(
+        default="https://services.arcgis.com/ePKBjXrBZ2vEEgWd/arcgis/rest/services/Construction_Permits/FeatureServer/0",
+        description="Boulder construction permits ArcGIS FeatureServer URL",
+    )
+    boulder_sla_endpoint: str = Field(
+        default="https://gis.bouldercolorado.gov/ags_svr1/rest/services/plan/RentalHousingLicenses/MapServer/0",
+        description="Boulder rental housing licenses ArcGIS MapServer URL (SLA)",
+    )
+    chandler_permits_endpoint: str = Field(
+        default="https://gis.chandleraz.gov/portalserver/rest/services/Tolemi/Building_Blocks/MapServer/0",
+        description="Chandler building-blelock permits ArcGIS MapServer URL",
+    )
+    arcgis_modesto_sla_url: str = Field(
+        default="https://gis.modestogov.com/hosting/rest/services/ExternalServices/Map_Layer_Service_External/FeatureServer/7",
+        description="Modesto business licenses ArcGIS FeatureServer URL (SLA)",
+    )
+    arcgis_bend_permits_url: str = Field(
+        default="https://services5.arcgis.com/JisFYcK2mIVg9ueP/arcgis/rest/services/Permit_Applications_Point/FeatureServer/0",
+        description="Bend permit applications ArcGIS FeatureServer URL",
+    )
+    arcgis_bend_sla_url: str = Field(
+        default="https://services5.arcgis.com/JisFYcK2mIVg9ueP/arcgis/rest/services/License_Application_Points_(Business_Registrations)/FeatureServer/0",
+        description="Bend business licenses ArcGIS FeatureServer URL (SLA)",
+    )
+    arcgis_bend_311_url: str = Field(
+        default="https://services5.arcgis.com/JisFYcK2mIVg9ueP/arcgis/rest/services/Code_Enforcement_Cases_Polygon_(Public)/FeatureServer/0",
+        description="Bend code enforcement cases ArcGIS FeatureServer URL (311)",
+    )
+    arcgis_bend_crime_url: str = Field(
+        default="https://services5.arcgis.com/JisFYcK2mIVg9ueP/arcgis/rest/services/Public_Calls/FeatureServer/0",
+        description="Bend public calls for service ArcGIS FeatureServer URL (crime)",
+    )
+    arcgis_vancouver_wa_permits_url: str = Field(
+        default="https://services.arcgis.com/oNvpY90qsPDizwkN/arcgis/rest/services/Permits_and_Code_Enforcement_Data_(public_view)/FeatureServer/0",
+        description="Vancouver WA permits ArcGIS FeatureServer URL",
+    )
+    arcgis_anaheim_permits_url: str = Field(
+        default="https://services3.arcgis.com/hPs600I3X0RTaaaq/arcgis/rest/services/Accela_Building_Permits/FeatureServer/0",
+        description="Anaheim Accela building permits ArcGIS FeatureServer URL",
+    )
+    arcgis_anaheim_sla_url: str = Field(
+        default="https://services3.arcgis.com/hPs600I3X0RTaaaq/arcgis/rest/services/ActiveBusinessLicenses/FeatureServer/0",
+        description="Anaheim active business licenses ArcGIS FeatureServer URL (SLA)",
+    )
+    socrata_santa_rosa_crime_endpoint: str = Field(
+        default="https://data.sonomacounty.ca.gov/resource/3rsj-iche.json",
+        description="Sonoma County Sheriff incident data Socrata endpoint (Santa Rosa crime)",
+    )
+    socrata_oakland_311_endpoint: str = Field(
+        default="https://data.oaklandca.gov/resource/quth-gb8e.json",
+        description="Oakland 311 service requests Socrata endpoint",
+    )
+    socrata_oakland_crime_endpoint: str = Field(
+        default="https://data.oaklandca.gov/resource/ppgh-7dqv.json",
+        description="Oakland OPD CrimeWatch data Socrata endpoint",
+    )
+    arcgis_nampa_permits_endpoint: str = Field(
+        default="https://utility.arcgis.com/usrsvcs/servers/7751a4c516434f1d947c67cd78a4d968/rest/services/Public/PublicRoadClosures/FeatureServer/3",
+        description="Nampa ROW road-closure permits ArcGIS FeatureServer URL",
+    )
+    arcgis_yakima_permits_endpoint: str = Field(
+        default="https://gis.yakimawa.gov/arcgis/rest/services/Planning/BuildingPermits/FeatureServer/0",
+        description="Yakima building permits ArcGIS FeatureServer URL",
+    )
+    arcgis_oxnard_ventura_sla_endpoint: str = Field(
+        default="https://services.arcgis.com/dBVj4EXO3IdRPOqb/arcgis/rest/services/OpenData_PSI_BusinessLicenses/FeatureServer/0",
+        description="Ventura business licenses ArcGIS FeatureServer URL (SLA)",
+    )
+    arcgis_oxnard_ventura_311_endpoint: str = Field(
+        default="https://services.arcgis.com/dBVj4EXO3IdRPOqb/arcgis/rest/services/Graffiti_Responses_Read_Only/FeatureServer/0",
+        description="Ventura graffiti-response requests ArcGIS FeatureServer URL (311)",
+    )
+    arcgis_oxnard_ventura_crime_endpoint: str = Field(
+        default="https://services.arcgis.com/dBVj4EXO3IdRPOqb/arcgis/rest/services/OpenData_Police_Crimes/FeatureServer/0",
+        description="Ventura police crimes ArcGIS FeatureServer URL",
+    )
+    arcgis_medford_permits_endpoint: str = Field(
+        default="https://maps.medfordmaps.org/arcgis/rest/services/TRAKiTExport/TRAKiTPermits_service/FeatureServer/1",
+        description="Medford TRAKiT permits ArcGIS FeatureServer URL",
+    )
+    arcgis_medford_sla_endpoint: str = Field(
+        default="https://maps.medfordmaps.org/arcgis/rest/services/MLI2/MLI_TRAKiT_Service/FeatureServer/14",
+        description="Medford TRAKiT business licenses ArcGIS FeatureServer URL (SLA)",
+    )
+    arcgis_medford_311_endpoint: str = Field(
+        default="https://maps.medfordmaps.org/arcgis/rest/services/MLI2/MLI_TRAKiT_Service/FeatureServer/12",
+        description="Medford TRAKiT code enforcement cases ArcGIS FeatureServer URL (311)",
+    )
+    arcgis_tempe_permits_endpoint: str = Field(
+        default="https://services.arcgis.com/lQySeXwbBg53XWDi/arcgis/rest/services/building_permits/FeatureServer/0",
+        description="Tempe building permits ArcGIS FeatureServer URL",
+    )
+    arcgis_tempe_complaints_311_endpoint: str = Field(
+        default="https://services.arcgis.com/lQySeXwbBg53XWDi/arcgis/rest/services/code_complaints/FeatureServer/0",
+        description="Tempe code complaints ArcGIS FeatureServer URL (311)",
+    )
+    arcgis_tempe_crime_endpoint: str = Field(
+        default="https://services.arcgis.com/lQySeXwbBg53XWDi/arcgis/rest/services/General_Offenses_(Open_Data)/FeatureServer/0",
+        description="Tempe general offenses ArcGIS FeatureServer URL (crime)",
+    )
+    arcgis_bozeman_permits_url: str = Field(
+        default="https://services3.arcgis.com/f4hk1qcfxRJ0L2BU/arcgis/rest/services/BP_Comm_Dev_Report_Data_view/FeatureServer/0",
+        description="Bozeman building permits ArcGIS FeatureServer URL",
+    )
+    arcgis_bozeman_crime_url: str = Field(
+        default="https://gisweb.bozeman.net/hosted/rest/services/BPD_CFS_Public_30_Days/FeatureServer/0",
+        description="Bozeman BPD calls-for-service ArcGIS FeatureServer URL (crime)",
+    )
+    arcgis_missoula_permits_url: str = Field(
+        default="https://services.arcgis.com/HfwHS0BxZBQ1E5DY/arcgis/rest/services/AddressesWithPermits_mso/FeatureServer/0",
+        description="Missoula address permits ArcGIS FeatureServer URL",
+    )
+    arcgis_santa_fe_311_url: str = Field(
+        default="https://services7.arcgis.com/p0Gk2nDbPs7KEqSZ/arcgis/rest/services/CRM_Report_A_Problem_New_Public/FeatureServer/0",
+        description="Santa Fe CRM report-a-problem ArcGIS FeatureServer URL (311)",
+    )
+    arcgis_eugene_311_url: str = Field(
+        default="https://services3.arcgis.com/F7NiRLGNbA2hh7gE/arcgis/rest/services/2020_2021CampingWorkOrders/FeatureServer/0",
+        description="Eugene camping work orders ArcGIS FeatureServer URL (311)",
+    )
+    arcgis_eugene_sla_url: str = Field(
+        default="https://services3.arcgis.com/F7NiRLGNbA2hh7gE/arcgis/rest/services/Food_Service_Establishments_Updated_VIEW_CBE/FeatureServer/0",
+        description="Eugene food-service establishments ArcGIS FeatureServer URL (SLA)",
+    )
+    arcgis_eugene_deeds_url: str = Field(
+        default="https://services3.arcgis.com/F7NiRLGNbA2hh7gE/arcgis/rest/services/CityLandDeeds/FeatureServer/0",
+        description="Eugene city land deeds ArcGIS FeatureServer URL",
+    )
+    arcgis_glendale_az_311_url: str = Field(
+        default="https://gismaps.glendaleaz.com/gisserver/rest/services/OpenData/GLENDALEONE_EXTERNAL_REQUESTS_PTS/MapServer/0",
+        description="Glendale GlendaleOne 311 ArcGIS MapServer URL",
+    )
+    arcgis_glendale_az_sla_url: str = Field(
+        default="https://gismaps.glendaleaz.com/gisserver/rest/services/OpenData/Business_Licenses/MapServer/1",
+        description="Glendale business licenses ArcGIS MapServer URL (SLA)",
+    )
+    scottsdale_permits_endpoint: str = Field(
+        default="https://maps.scottsdaleaz.gov/arcgis/rest/services/OpenData_Tabular/MapServer/12",
+        description="Scottsdale building permits ArcGIS MapServer table URL",
+    )
+    scottsdale_sla_endpoint: str = Field(
+        default="https://maps.scottsdaleaz.gov/arcgis/rest/services/OpenData_Tabular/MapServer/6",
+        description="Scottsdale business licenses ArcGIS MapServer table URL (SLA)",
+    )
+    long_beach_sla_endpoint: str = Field(
+        default="https://services6.arcgis.com/yCArG7wGXGyWLqav/arcgis/rest/services/Business_Licenses_Public_View/FeatureServer/0",
+        description="Long Beach business licenses ArcGIS FeatureServer URL (SLA)",
+    )
+    long_beach_crime_endpoint: str = Field(
+        default="https://services6.arcgis.com/yCArG7wGXGyWLqav/arcgis/rest/services/Police_Crime_Mapping/FeatureServer/0",
+        description="Long Beach police crime mapping ArcGIS FeatureServer URL",
+    )
+    las_cruces_permits_endpoint: str = Field(
+        default="https://maps.las-cruces.org/gis/rest/services/Information_Services/MapServer/1",
+        description="Las Cruces building permits ArcGIS MapServer URL",
+    )
+    las_cruces_busreg_endpoint: str = Field(
+        default="https://maps.las-cruces.org/gis/rest/services/Information_Services/MapServer/2",
+        description="Las Cruces business registration arcGIS MapServer URL (SLA)",
+    )
+    billings_permits_url: str = Field(
+        default="https://billingsgis.com/arcgis_public/rest/services/ArcOnline_Public/BuildingPermits_CodeViolations_EXT/MapServer/0",
+        description="Billings building permits ArcGIS MapServer URL",
+    )
+    billings_311_url: str = Field(
+        default="https://services6.arcgis.com/rCC3yWJa2mjYtKDP/arcgis/rest/services/Requests_public_00e63199176f44b788fd43684476713d/FeatureServer/0",
+        description="Billings 311/service requests ArcGIS FeatureServer URL",
+    )
+    salem_or_permits_endpoint: str = Field(
+        default="https://services.arcgis.com/kIA6yS9KDGqZL7U3/arcgis/rest/services/Structure_Permits/FeatureServer/0",
+        description="Salem OR structure permits ArcGIS FeatureServer URL",
+    )
+    salem_or_sla_endpoint: str = Field(
+        default="https://services.arcgis.com/kIA6yS9KDGqZL7U3/arcgis/rest/services/Amanda_MultiFamily_Licenses_Data/FeatureServer/0",
+        description="Salem OR multi-family enterprise licenses ArcGIS FeatureServer URL (SLA)",
     )
 
     @field_validator("webhook_alert_urls", mode="before")

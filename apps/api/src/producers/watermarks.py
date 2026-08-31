@@ -154,6 +154,10 @@ ANSI_DATE_LITERAL_HOSTS = (
     "webgis.bgky.org",
     "intervector.leoncountyfl.gov",
     "maps.spartanburgcounty.org",
+    "gisportal.stocktonca.gov",
+    "gis.countyofriverside.us",
+    "gis.chandleraz.gov",
+    "maps.medfordmaps.org",
 )
 
 

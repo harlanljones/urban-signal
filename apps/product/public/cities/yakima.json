@@ -1,0 +1,213 @@
+{
+  "schema_version": 2,
+  "id": "yakima",
+  "name": "Yakima",
+  "state": "WA",
+  "center": {
+    "lat": 46.6021,
+    "lng": -120.5059
+  },
+  "metro_bbox": {
+    "min_lat": 46.545,
+    "max_lat": 46.635,
+    "min_lng": -120.66,
+    "max_lng": -120.37
+  },
+  "divisions": {
+    "DOWNTOWN": {
+      "name": "DOWNTOWN",
+      "center": {
+        "lat": 46.6021,
+        "lng": -120.5059
+      },
+      "bbox": {
+        "min_lat": 46.595,
+        "max_lat": 46.609,
+        "min_lng": -120.514,
+        "max_lng": -120.498
+      },
+      "submarkets": [
+        "Downtown"
+      ]
+    },
+    "NORTH_YAKIMA": {
+      "name": "NORTH_YAKIMA",
+      "center": {
+        "lat": 46.618,
+        "lng": -120.507
+      },
+      "bbox": {
+        "min_lat": 46.605,
+        "max_lat": 46.63,
+        "min_lng": -120.528,
+        "max_lng": -120.495
+      },
+      "submarkets": [
+        "Nob Hill",
+        "North Yakima"
+      ]
+    },
+    "WEST_VALLEY": {
+      "name": "WEST_VALLEY",
+      "center": {
+        "lat": 46.59,
+        "lng": -120.57
+      },
+      "bbox": {
+        "min_lat": 46.575,
+        "max_lat": 46.6,
+        "min_lng": -120.655,
+        "max_lng": -120.52
+      },
+      "submarkets": [
+        "Summitview",
+        "West Valley"
+      ]
+    },
+    "SOUTH_16TH": {
+      "name": "SOUTH_16TH",
+      "center": {
+        "lat": 46.564,
+        "lng": -120.498
+      },
+      "bbox": {
+        "min_lat": 46.552,
+        "max_lat": 46.576,
+        "min_lng": -120.512,
+        "max_lng": -120.483
+      },
+      "submarkets": [
+        "South 16th",
+        "South Yakima"
+      ]
+    },
+    "TERRACE_HEIGHTS": {
+      "name": "TERRACE_HEIGHTS",
+      "center": {
+        "lat": 46.606,
+        "lng": -120.447
+      },
+      "bbox": {
+        "min_lat": 46.596,
+        "max_lat": 46.62,
+        "min_lng": -120.462,
+        "max_lng": -120.433
+      },
+      "submarkets": [
+        "Terrace Heights"
+      ]
+    },
+    "EAST_VALLEY": {
+      "name": "EAST_VALLEY",
+      "center": {
+        "lat": 46.572,
+        "lng": -120.415
+      },
+      "bbox": {
+        "min_lat": 46.55,
+        "max_lat": 46.592,
+        "min_lng": -120.432,
+        "max_lng": -120.378
+      },
+      "submarkets": [
+        "East Valley"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown": {
+      "name": "Downtown",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 46.6021,
+        "lng": -120.5059
+      },
+      "description": "Yakima Avenue / Front Street downtown core with the Capitol Theatre, civic buildings, and the riverfront Millennium Plaza — the metro's densest mixed-use permitting corridor."
+    },
+    "Nob Hill": {
+      "name": "Nob Hill",
+      "division": "NORTH_YAKIMA",
+      "center": {
+        "lat": 46.6085,
+        "lng": -120.519
+      },
+      "description": "Nob Hill Boulevard corridor of mid-century housing, retail nodes, and steady infill between downtown and the north hill residential belt."
+    },
+    "North Yakima": {
+      "name": "North Yakima",
+      "division": "NORTH_YAKIMA",
+      "center": {
+        "lat": 46.618,
+        "lng": -120.507
+      },
+      "description": "N 1st–20th / Washington Ave northside stock with single-family turnover, duplex conversions, and quiet corridor infill."
+    },
+    "Summitview": {
+      "name": "Summitview",
+      "division": "WEST_VALLEY",
+      "center": {
+        "lat": 46.59,
+        "lng": -120.56
+      },
+      "description": "Summitview Avenue west corridor — the city's primary retail-commercial spine with grocery anchors, office parks, and steady mixed-use permitting."
+    },
+    "West Valley": {
+      "name": "West Valley",
+      "division": "WEST_VALLEY",
+      "center": {
+        "lat": 46.584,
+        "lng": -120.63
+      },
+      "description": "40th Ave / Wide Hollow Rd edge of the West Valley school-district corridor with newer subdivisions, townhome infill, and the metro's largest new-build SFR valuations."
+    },
+    "South 16th": {
+      "name": "South 16th",
+      "division": "SOUTH_16TH",
+      "center": {
+        "lat": 46.562,
+        "lng": -120.498
+      },
+      "description": "S 16th Ave industrial-adjacent belt with older single-family stock, light-industrial conversions, and affordable-housing permitting."
+    },
+    "South Yakima": {
+      "name": "South Yakima",
+      "division": "SOUTH_16TH",
+      "center": {
+        "lat": 46.572,
+        "lng": -120.492
+      },
+      "description": "S 1st / S Front St south-central neighborhood with bungalow infill, corner-store retail, and steady small-scale alteration permits."
+    },
+    "Terrace Heights": {
+      "name": "Terrace Heights",
+      "division": "TERRACE_HEIGHTS",
+      "center": {
+        "lat": 46.606,
+        "lng": -120.447
+      },
+      "description": "East-bank residential district across the Yakima River (Terrace Heights Dr / Keys Rd) with starter homes, ag-edge lots, and new single-family builds."
+    },
+    "East Valley": {
+      "name": "East Valley",
+      "division": "EAST_VALLEY",
+      "center": {
+        "lat": 46.575,
+        "lng": -120.42
+      },
+      "description": "East Valley corridor toward Moxee — farm-town edge with rural residential splits, ag support structures, and low-density infill permitting."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "IssuedOnDate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/yakima.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

@@ -1,0 +1,238 @@
+{
+  "schema_version": 2,
+  "id": "bozeman",
+  "name": "Bozeman, MT",
+  "state": "MT",
+  "center": {
+    "lat": 45.677,
+    "lng": -111.0429
+  },
+  "metro_bbox": {
+    "min_lat": 45.63,
+    "max_lat": 45.74,
+    "min_lng": -111.13,
+    "max_lng": -110.98
+  },
+  "divisions": {
+    "DOWNTOWN": {
+      "name": "DOWNTOWN",
+      "center": {
+        "lat": 45.6777,
+        "lng": -111.0387
+      },
+      "bbox": {
+        "min_lat": 45.673,
+        "max_lat": 45.682,
+        "min_lng": -111.044,
+        "max_lng": -111.025
+      },
+      "submarkets": [
+        "Downtown",
+        "Bozeman Armory"
+      ]
+    },
+    "MIDTOWN": {
+      "name": "MIDTOWN",
+      "center": {
+        "lat": 45.69,
+        "lng": -111.047
+      },
+      "bbox": {
+        "min_lat": 45.678,
+        "max_lat": 45.706,
+        "min_lng": -111.057,
+        "max_lng": -111.035
+      },
+      "submarkets": [
+        "North 7th Avenue",
+        "Bozeman Health"
+      ]
+    },
+    "NORTH_PARK": {
+      "name": "NORTH_PARK",
+      "center": {
+        "lat": 45.708,
+        "lng": -111.055
+      },
+      "bbox": {
+        "min_lat": 45.7,
+        "max_lat": 45.717,
+        "min_lng": -111.064,
+        "max_lng": -111.046
+      },
+      "submarkets": [
+        "North Park"
+      ]
+    },
+    "STORY_MILL": {
+      "name": "STORY_MILL",
+      "center": {
+        "lat": 45.687,
+        "lng": -111.028
+      },
+      "bbox": {
+        "min_lat": 45.684,
+        "max_lat": 45.69,
+        "min_lng": -111.032,
+        "max_lng": -111.024
+      },
+      "submarkets": [
+        "Story Mill"
+      ]
+    },
+    "SOUTH_TECH": {
+      "name": "SOUTH_TECH",
+      "center": {
+        "lat": 45.6695,
+        "lng": -111.0705
+      },
+      "bbox": {
+        "min_lat": 45.667,
+        "max_lat": 45.672,
+        "min_lng": -111.074,
+        "max_lng": -111.067
+      },
+      "submarkets": [
+        "South Bozeman Tech"
+      ]
+    },
+    "VALLEY_WEST": {
+      "name": "VALLEY_WEST",
+      "center": {
+        "lat": 45.661,
+        "lng": -111.077
+      },
+      "bbox": {
+        "min_lat": 45.645,
+        "max_lat": 45.675,
+        "min_lng": -111.09,
+        "max_lng": -111.06
+      },
+      "submarkets": [
+        "Valley West"
+      ]
+    },
+    "BRIDGER_COLLEGE": {
+      "name": "BRIDGER_COLLEGE",
+      "center": {
+        "lat": 45.6699,
+        "lng": -111.0482
+      },
+      "bbox": {
+        "min_lat": 45.65,
+        "max_lat": 45.675,
+        "min_lng": -111.055,
+        "max_lng": -111.035
+      },
+      "submarkets": [
+        "Bridger College",
+        "Baxter/Highland"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown": {
+      "name": "Downtown",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 45.6777,
+        "lng": -111.0387
+      },
+      "description": "Main Street core with the Emerson Center, the Ellen Theatre, and the downtown mixed-use corridor anchored by redevelopment along Main, Willson, and Tracy."
+    },
+    "Bozeman Armory": {
+      "name": "Bozeman Armory",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 45.676,
+        "lng": -111.041
+      },
+      "description": "Armory block south of Main with the historic Armory Hall, gallery district, and craft-beer-anchored infill along the MSU boulevard edge."
+    },
+    "North 7th Avenue": {
+      "name": "North 7th Avenue",
+      "division": "MIDTOWN",
+      "center": {
+        "lat": 45.69,
+        "lng": -111.047
+      },
+      "description": "North 7th Avenue industrial-to-residential corridor with Midtown Urban Renewal District incentives, warehouse conversions, and the Cannery District redevelopment."
+    },
+    "Bozeman Health": {
+      "name": "Bozeman Health",
+      "division": "MIDTOWN",
+      "center": {
+        "lat": 45.685,
+        "lng": -111.045
+      },
+      "description": "Bozeman Health Deaconess Hospital anchor corridor with medical-office demand, clinic expansion, and associated multifamily development."
+    },
+    "North Park": {
+      "name": "North Park",
+      "division": "NORTH_PARK",
+      "center": {
+        "lat": 45.708,
+        "lng": -111.055
+      },
+      "description": "North Park Urban Renewal District at the city's north edge with master-planned residential subdivisions, the North Park business park, and new-build hometracts."
+    },
+    "Story Mill": {
+      "name": "Story Mill",
+      "division": "STORY_MILL",
+      "center": {
+        "lat": 45.687,
+        "lng": -111.028
+      },
+      "description": "Northeast Neighborhood Urban Renewal District with the Story Mill community garden, Baxter Meadows, and the historic mill-redevelopment corridor along E Story Mill Road."
+    },
+    "South Bozeman Tech": {
+      "name": "South Bozeman Tech",
+      "division": "SOUTH_TECH",
+      "center": {
+        "lat": 45.6695,
+        "lng": -111.0705
+      },
+      "description": "South Bozeman Technology District west of 19th Avenue with tech-firm campuses, R&D flex space, and the metro's highest commercial-valuation corridor."
+    },
+    "Valley West": {
+      "name": "Valley West",
+      "division": "VALLEY_WEST",
+      "center": {
+        "lat": 45.661,
+        "lng": -111.077
+      },
+      "description": "Valley West Drive and West Main Street corridor with low-density residential subdivisions, big-box retail, and the West Main auto-oriented commercial strip."
+    },
+    "Bridger College": {
+      "name": "Bridger College",
+      "division": "BRIDGER_COLLEGE",
+      "center": {
+        "lat": 45.6699,
+        "lng": -111.0482
+      },
+      "description": "Montana State University campus anchor corridor with College Street student housing, university mixed-use development, and the Grant Street innovation belt."
+    },
+    "Baxter/Highland": {
+      "name": "Baxter/Highland",
+      "division": "BRIDGER_COLLEGE",
+      "center": {
+        "lat": 45.653,
+        "lng": -111.05
+      },
+      "description": "Baxter Lane and Highland Boulevard southern corridor with single-family stock, the Highland Park subdivision, and steady low-valuation alteration permits."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "PERMIT_ISSUE_DATE",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/bozeman.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

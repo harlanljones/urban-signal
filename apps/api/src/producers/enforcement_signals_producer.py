@@ -76,17 +76,29 @@ class ViolationsProducer:
             )
         return client
 
-    def parse_row(self, row: dict[str, Any]) -> ViolationEvent | None:
+    def parse_row(self, row: dict[str, Any], city_id: str | None = None) -> ViolationEvent | None:
         try:
             from src.producers.field_maps import first_mapped, resolve_field_map
-            from src.spatial.city_registry import FeedType
+            from src.spatial.city_registry import FeedType, normalize_city
 
-            violation_id = str(first_mapped(row, {"violation_id": ["case_no"]}, "violation_id") or "").strip()
+            if city_id is not None:
+                norm_c = normalize_city(city_id)
+                resolved_city = norm_c.value if norm_c else city_id.lower()
+            else:
+                resolved_city = "boston"
+
+            field_map = resolve_field_map(resolved_city, FeedType.VIOLATIONS)
+
+            violation_id = str(
+                first_mapped(row, field_map, "violation_id")
+                or row.get("case_no")
+                or ""
+            ).strip()
             if not violation_id:
                 return None
 
-            lat_raw = first_mapped(row, {"latitude": ["latitude"]}, "latitude") or row.get("latitude")
-            lng_raw = first_mapped(row, {"longitude": ["longitude"]}, "longitude") or row.get("longitude")
+            lat_raw = first_mapped(row, field_map, "latitude") or row.get("latitude")
+            lng_raw = first_mapped(row, field_map, "longitude") or row.get("longitude")
             if not lat_raw or not lng_raw:
                 return None
             lat = float(lat_raw)
@@ -95,17 +107,46 @@ class ViolationsProducer:
                 return None
 
             h3_res = self.spatial_indexer.get_multi_res_hierarchy(lat, lng)
-            status_date = first_mapped(row, {"status_date": ["status_dttm"]}, "status_date") or row.get("status_dttm")
+            status_date = (
+                first_mapped(row, field_map, "status_date")
+                or row.get("status_dttm")
+                or row.get("opened_date")
+            )
 
             return ViolationEvent(
-                city_id="boston",
+                city_id=resolved_city,
                 violation_id=violation_id,
-                code=str(first_mapped(row, {"code": ["code"]}, "code") or row.get("code", "")),
-                status=str(row.get("status", "")) or None,
-                description=first_mapped(row, {"description": ["description", "value"]}, "description") or row.get("description"),
-                borough=str(row.get("ward", "")) or None,
-                address=first_mapped(row, {"address": ["violation_stno", "violation_street"]}, "address") or row.get("violation_street"),
-                zipcode=str(row.get("violation_zip", "")) or None,
+                code=str(
+                    first_mapped(row, field_map, "code")
+                    or row.get("code")
+                    or row.get("case_type")
+                    or ""
+                ),
+                status=str(first_mapped(row, field_map, "status") or row.get("status") or "") or None,
+                description=str(
+                    first_mapped(row, field_map, "description")
+                    or row.get("description")
+                    or row.get("case_type")
+                    or ""
+                ) or None,
+                borough=str(first_mapped(row, field_map, "borough") or row.get("ward") or row.get("city") or "") or None,
+                address=str(
+                    first_mapped(row, field_map, "address")
+                    or row.get("violation_street")
+                    or row.get("address")
+                    or (
+                        f"{row.get('house_number', '')} {row.get('street_name', '')}".strip()
+                        if row.get("house_number") or row.get("street_name")
+                        else None
+                    )
+                ) or None,
+                zipcode=str(
+                    first_mapped(row, field_map, "zipcode")
+                    or row.get("zip")
+                    or row.get("zip_code")
+                    or row.get("violation_zip")
+                    or ""
+                ) or None,
                 latitude=lat,
                 longitude=lng,
                 status_date=_parse_datetime(status_date),
@@ -132,7 +173,7 @@ class ViolationsProducer:
         count = 0
         for batch in client.paginate(endpoint_url=endpoint, **client_kwargs, where_clause=where_clause, batch_size=1000, max_records=limit):
             for row in batch:
-                event = self.parse_row(row)
+                event = self.parse_row(row, city_id=cid.value)
                 if event:
                     key = f"{event.city_id}:{event.violation_id}"
                     self.producer.produce(topic=settings.topic_violations, key=key, payload=event)
@@ -177,37 +218,81 @@ class InspectionsProducer:
             )
         return client
 
-    def parse_row(self, row: dict[str, Any]) -> InspectionEvent | None:
+    def parse_row(self, row: dict[str, Any], city_id: str | None = None) -> InspectionEvent | None:
         try:
-            inspection_id = str(row.get("licenseno") or row.get("property_id", "")).strip()
+            from src.producers.field_maps import first_mapped, resolve_field_map
+            from src.spatial.city_registry import FeedType, normalize_city
+
+            if city_id is not None:
+                norm_c = normalize_city(city_id)
+                resolved_city = norm_c.value if norm_c else city_id.lower()
+            else:
+                resolved_city = "boston"
+
+            field_map = resolve_field_map(resolved_city, FeedType.INSPECTIONS)
+
+            inspection_id = str(
+                first_mapped(row, field_map, "inspection_id")
+                or row.get("licenseno")
+                or row.get("property_id")
+                or ""
+            ).strip()
             if not inspection_id:
                 return None
 
             lat, lng = None, None
-            raw_loc = row.get("location")
-            if raw_loc:
-                parsed = _parse_location_tuple(raw_loc)
-                if parsed:
-                    lat, lng = parsed
+            lat_raw = first_mapped(row, field_map, "latitude") or row.get("latitude")
+            lng_raw = first_mapped(row, field_map, "longitude") or row.get("longitude")
+            if lat_raw is not None and lng_raw is not None:
+                try:
+                    lat, lng = float(lat_raw), float(lng_raw)
+                except (ValueError, TypeError):
+                    lat, lng = None, None
             if lat is None or lng is None:
+                raw_loc = row.get("location")
+                if raw_loc:
+                    parsed = _parse_location_tuple(raw_loc)
+                    if parsed:
+                        lat, lng = parsed
+            if lat is None or lng is None:
+                return None
+            if lat == 0.0 and lng == 0.0:
                 return None
 
             h3_res = self.spatial_indexer.get_multi_res_hierarchy(lat, lng)
-            issued_date = row.get("issdttm")
-            result_date = row.get("resultdttm") or row.get("status_date")
+            issued_date = first_mapped(row, field_map, "issued_date") or row.get("issdttm")
+            result_date = first_mapped(row, field_map, "result_date") or row.get("resultdttm") or row.get("status_date")
 
             return InspectionEvent(
-                city_id="boston",
+                city_id=resolved_city,
                 inspection_id=inspection_id,
-                business_name=str(row.get("businessname", "")) or None,
-                license_category=str(row.get("licensecat", "")) or None,
-                license_status=str(row.get("licstatus", "")) or None,
-                result=str(row.get("result", "")) or None,
-                violation_level=str(row.get("viol_level", "")) or None,
-                violation_desc=str(row.get("violdesc", "")) or None,
-                borough=str(row.get("city", "")) or None,
-                address=str(row.get("address", "")) or None,
-                zipcode=str(row.get("zip", "")) or None,
+                business_name=str(
+                    first_mapped(row, field_map, "business_name") or row.get("businessname") or row.get("dba") or ""
+                ) or None,
+                license_category=str(
+                    first_mapped(row, field_map, "license_category") or row.get("licensecat") or ""
+                ) or None,
+                license_status=str(
+                    first_mapped(row, field_map, "license_status") or row.get("licstatus") or row.get("action") or ""
+                ) or None,
+                result=str(first_mapped(row, field_map, "result") or row.get("result") or row.get("grade") or "") or None,
+                violation_level=str(
+                    first_mapped(row, field_map, "violation_level") or row.get("viol_level") or row.get("critical_flag") or ""
+                ) or None,
+                violation_desc=str(
+                    first_mapped(row, field_map, "violation_desc") or row.get("violdesc") or row.get("violation_description") or ""
+                ) or None,
+                borough=str(first_mapped(row, field_map, "borough") or row.get("city") or row.get("boro") or "") or None,
+                address=str(
+                    first_mapped(row, field_map, "address")
+                    or row.get("address")
+                    or (
+                        f"{row.get('building', '')} {row.get('street', '')}".strip()
+                        if row.get("building") or row.get("street")
+                        else None
+                    )
+                ) or None,
+                zipcode=str(first_mapped(row, field_map, "zipcode") or row.get("zip") or row.get("zipcode") or "") or None,
                 latitude=lat,
                 longitude=lng,
                 issued_date=_parse_datetime(issued_date),
@@ -235,7 +320,7 @@ class InspectionsProducer:
         count = 0
         for batch in client.paginate(endpoint_url=endpoint, **client_kwargs, where_clause=where_clause, batch_size=1000, max_records=limit):
             for row in batch:
-                event = self.parse_row(row)
+                event = self.parse_row(row, city_id=cid.value)
                 if event:
                     key = f"{event.city_id}:{event.inspection_id}"
                     self.producer.produce(topic=settings.topic_inspections, key=key, payload=event)

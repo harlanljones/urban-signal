@@ -1,0 +1,253 @@
+{
+  "schema_version": 2,
+  "id": "vancouver_wa",
+  "name": "Vancouver",
+  "state": "WA",
+  "center": {
+    "lat": 45.6282,
+    "lng": -122.6785
+  },
+  "metro_bbox": {
+    "min_lat": 45.56,
+    "max_lat": 45.74,
+    "min_lng": -122.81,
+    "max_lng": -122.41
+  },
+  "divisions": {
+    "DOWNTOWN_CORE": {
+      "name": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 45.6282,
+        "lng": -122.6785
+      },
+      "bbox": {
+        "min_lat": 45.62,
+        "max_lat": 45.652,
+        "min_lng": -122.7,
+        "max_lng": -122.64
+      },
+      "submarkets": [
+        "Downtown / Esther Short",
+        "Uptown Village"
+      ]
+    },
+    "FRUIT_VALLEY_NORTHWEST": {
+      "name": "FRUIT_VALLEY_NORTHWEST",
+      "center": {
+        "lat": 45.6667,
+        "lng": -122.7211
+      },
+      "bbox": {
+        "min_lat": 45.648,
+        "max_lat": 45.69,
+        "min_lng": -122.745,
+        "max_lng": -122.64
+      },
+      "submarkets": [
+        "Fruit Valley",
+        "Northwest Vancouver",
+        "West Minnehaha"
+      ]
+    },
+    "CENTRAL_VANCOUVER": {
+      "name": "CENTRAL_VANCOUVER",
+      "center": {
+        "lat": 45.6454,
+        "lng": -122.621
+      },
+      "bbox": {
+        "min_lat": 45.615,
+        "max_lat": 45.655,
+        "min_lng": -122.655,
+        "max_lng": -122.585
+      },
+      "submarkets": [
+        "Fourth Plain / Bagley Downs",
+        "Maplewood"
+      ]
+    },
+    "BURNT_BRIDGE_NORTH": {
+      "name": "BURNT_BRIDGE_NORTH",
+      "center": {
+        "lat": 45.656,
+        "lng": -122.5917
+      },
+      "bbox": {
+        "min_lat": 45.615,
+        "max_lat": 45.695,
+        "min_lng": -122.61,
+        "max_lng": -122.5
+      },
+      "submarkets": [
+        "Walnut Grove",
+        "Burnt Bridge Creek / Image"
+      ]
+    },
+    "CASCADE_EASTSIDE": {
+      "name": "CASCADE_EASTSIDE",
+      "center": {
+        "lat": 45.6205,
+        "lng": -122.5117
+      },
+      "bbox": {
+        "min_lat": 45.595,
+        "max_lat": 45.65,
+        "min_lng": -122.56,
+        "max_lng": -122.48
+      },
+      "submarkets": [
+        "Cascade Park / First Place",
+        "East Mill Plain"
+      ]
+    },
+    "FISHERS_LANDING_SE": {
+      "name": "FISHERS_LANDING_SE",
+      "center": {
+        "lat": 45.6041,
+        "lng": -122.49
+      },
+      "bbox": {
+        "min_lat": 45.585,
+        "max_lat": 45.625,
+        "min_lng": -122.535,
+        "max_lng": -122.47
+      },
+      "submarkets": [
+        "Fisher's Landing",
+        "Columbia River / Northfield"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown / Esther Short": {
+      "name": "Downtown / Esther Short",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 45.6282,
+        "lng": -122.6785
+      },
+      "description": "Esther Short Park and the Columbia River waterfront core with the convention center, the Waterfront Vancouver redevelopment, and the downtown Main Street retail spine."
+    },
+    "Uptown Village": {
+      "name": "Uptown Village",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 45.6325,
+        "lng": -122.6715
+      },
+      "description": "Main Street's historic north stretch above Esther Short with walkable shopfronts, taverns, and mixed-use infill between downtown and the Hough neighborhood."
+    },
+    "Fruit Valley": {
+      "name": "Fruit Valley",
+      "division": "FRUIT_VALLEY_NORTHWEST",
+      "center": {
+        "lat": 45.6667,
+        "lng": -122.7211
+      },
+      "description": "Northwest industrial-flavored corridor along NW Fruit Valley Road with rail-adjacent warehouses, tract housing, and the western gateway to the Burnt Bridge Creek trail."
+    },
+    "Northwest Vancouver": {
+      "name": "Northwest Vancouver",
+      "division": "FRUIT_VALLEY_NORTHWEST",
+      "center": {
+        "lat": 45.6665,
+        "lng": -122.679
+      },
+      "description": "Established postwar single-family quadrant between NW 78th Street and the Fruit Valley road, steady remodel and addition permitting."
+    },
+    "West Minnehaha": {
+      "name": "West Minnehaha",
+      "division": "FRUIT_VALLEY_NORTHWEST",
+      "center": {
+        "lat": 45.6589,
+        "lng": -122.6512
+      },
+      "description": "Minnehaha Street west-of-I-5 corridor with mid-century bungalows, small multifamily, and light commercial nodes along the state highway."
+    },
+    "Fourth Plain / Bagley Downs": {
+      "name": "Fourth Plain / Bagley Downs",
+      "division": "CENTRAL_VANCOUVER",
+      "center": {
+        "lat": 45.6454,
+        "lng": -122.621
+      },
+      "description": "Fourth Plain Boulevard's diverse retail corridor and Bagley Downs residential grid — the metro's densest row of small-business permits and multicultural storefronts."
+    },
+    "Maplewood": {
+      "name": "Maplewood",
+      "division": "CENTRAL_VANCOUVER",
+      "center": {
+        "lat": 45.6341,
+        "lng": -122.6337
+      },
+      "description": "Central post-war neighborhood between Fourth Plain and Mill Plain with bungalow turnover, duplex conversions, and the NE Andresen mixed-use strip."
+    },
+    "Walnut Grove": {
+      "name": "Walnut Grove",
+      "division": "BURNT_BRIDGE_NORTH",
+      "center": {
+        "lat": 45.6644,
+        "lng": -122.5917
+      },
+      "description": "Northern residential belt along NE 63rd Street between I-5 and NE 112th with ranch homes, green-lot infill, and new-build subdivisions."
+    },
+    "Burnt Bridge Creek / Image": {
+      "name": "Burnt Bridge Creek / Image",
+      "division": "BURNT_BRIDGE_NORTH",
+      "center": {
+        "lat": 45.656,
+        "lng": -122.5206
+      },
+      "description": "Burnt Bridge Creek greenbelt neighborhoods and the Image corridor with creek-adjacent redevelopment, trail access, and steady infill permitting."
+    },
+    "Cascade Park / First Place": {
+      "name": "Cascade Park / First Place",
+      "division": "CASCADE_EASTSIDE",
+      "center": {
+        "lat": 45.6323,
+        "lng": -122.5205
+      },
+      "description": "Cascade Park retail core and First Place's master-planned subdivisions — the metro's highest-volume new-home permitting belt east of I-205."
+    },
+    "East Mill Plain": {
+      "name": "East Mill Plain",
+      "division": "CASCADE_EASTSIDE",
+      "center": {
+        "lat": 45.6205,
+        "lng": -122.5117
+      },
+      "description": "East Mill Plain Boulevard corridor with big-box retail, garden apartments, and the SE 164th Avenue growth node at the city's east edge."
+    },
+    "Fisher's Landing": {
+      "name": "Fisher's Landing",
+      "division": "FISHERS_LANDING_SE",
+      "center": {
+        "lat": 45.6041,
+        "lng": -122.49
+      },
+      "description": "SE 164th/Fisher's Landing East office-retail node with newer multifamily, medical campus employment, and Columbia River-adjacent high-value permits."
+    },
+    "Columbia River / Northfield": {
+      "name": "Columbia River / Northfield",
+      "division": "FISHERS_LANDING_SE",
+      "center": {
+        "lat": 45.5888,
+        "lng": -122.5004
+      },
+      "description": "Riverfront southern edge along SE Columbia River Way with townhome infill, marina-adjacent development, and view-lot turnover."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "csm_issued_date",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/vancouver_wa.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

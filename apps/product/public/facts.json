@@ -2177,13 +2177,18 @@
       "division_count": 6,
       "submarket_count": 18,
       "feeds": [
-        false,
+        true,
         false,
         true,
         false
       ],
       "platforms": [
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 86400.0,
+          "topic": "raw.municipal.permits"
+        },
         null,
         {
           "platform": "socrata",
@@ -2325,7 +2330,7 @@
         true,
         false,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -2341,7 +2346,12 @@
           "interval_seconds": 600.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "csv",
+          "watermark_col": "",
+          "interval_seconds": 86400.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 33.4484,
@@ -2621,9 +2631,9 @@
         null,
         null,
         {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
+          "platform": "socrata",
+          "watermark_col": "updated",
+          "interval_seconds": 3600.0,
           "topic": "raw.municipal.sla"
         },
         null
@@ -2651,9 +2661,9 @@
         null,
         null,
         {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
+          "platform": "socrata",
+          "watermark_col": "updated",
+          "interval_seconds": 3600.0,
           "topic": "raw.municipal.sla"
         },
         null
@@ -2681,9 +2691,9 @@
         null,
         null,
         {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
+          "platform": "socrata",
+          "watermark_col": "updated",
+          "interval_seconds": 3600.0,
           "topic": "raw.municipal.sla"
         },
         null
@@ -2732,13 +2742,18 @@
       "division_count": 1,
       "submarket_count": 5,
       "feeds": [
-        false,
+        true,
         false,
         true,
         false
       ],
       "platforms": [
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 86400.0,
+          "topic": "raw.municipal.permits"
+        },
         null,
         {
           "platform": "arcgis",
@@ -2806,9 +2821,9 @@
         null,
         null,
         {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
+          "platform": "socrata",
+          "watermark_col": "updated",
+          "interval_seconds": 3600.0,
           "topic": "raw.municipal.sla"
         },
         null
@@ -3106,9 +3121,9 @@
         null,
         null,
         {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
+          "platform": "socrata",
+          "watermark_col": "updated",
+          "interval_seconds": 3600.0,
           "topic": "raw.municipal.sla"
         },
         null
@@ -3160,7 +3175,7 @@
         false,
         false,
         true,
-        false
+        true
       ],
       "platforms": [
         null,
@@ -3171,7 +3186,12 @@
           "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "DeedDate",
+          "interval_seconds": 86400.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 35.5951,
@@ -3416,9 +3436,9 @@
         null,
         null,
         {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
+          "platform": "socrata",
+          "watermark_col": "updated",
+          "interval_seconds": 3600.0,
           "topic": "raw.municipal.sla"
         },
         null
@@ -3446,9 +3466,9 @@
         null,
         null,
         {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
+          "platform": "socrata",
+          "watermark_col": "updated",
+          "interval_seconds": 3600.0,
           "topic": "raw.municipal.sla"
         },
         null
@@ -3506,9 +3526,9 @@
         null,
         null,
         {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
+          "platform": "socrata",
+          "watermark_col": "updated",
+          "interval_seconds": 3600.0,
           "topic": "raw.municipal.sla"
         },
         null
@@ -3571,9 +3591,9 @@
         null,
         null,
         {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
+          "platform": "socrata",
+          "watermark_col": "updated",
+          "interval_seconds": 3600.0,
           "topic": "raw.municipal.sla"
         },
         null
@@ -3778,6 +3798,826 @@
         "lng": -81.932
       },
       "evidence_path": "apps/api/src/spatial/cities/spartanburg.py"
+    },
+    {
+      "id": "inland_empire",
+      "name": "Inland Empire (Riverside County anchor)",
+      "state": "CA",
+      "divisions": "7 divisions",
+      "division_count": 7,
+      "submarket_count": 14,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "APPLIED_DATE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 33.9803,
+        "lng": -117.3769
+      },
+      "evidence_path": "apps/api/src/spatial/cities/inland_empire.py"
+    },
+    {
+      "id": "stockton",
+      "name": "Stockton",
+      "state": "CA",
+      "divisions": "7 divisions",
+      "division_count": 7,
+      "submarket_count": 14,
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "OriginalIssueDate",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 37.9577,
+        "lng": -121.29
+      },
+      "evidence_path": "apps/api/src/spatial/cities/stockton.py"
+    },
+    {
+      "id": "boulder",
+      "name": "Boulder",
+      "state": "CO",
+      "divisions": "7 divisions",
+      "division_count": 7,
+      "submarket_count": 11,
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "IssuedDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "APPLIEDDATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 40.015,
+        "lng": -105.27
+      },
+      "evidence_path": "apps/api/src/spatial/cities/boulder.py"
+    },
+    {
+      "id": "chandler",
+      "name": "Chandler",
+      "state": "AZ",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 10,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "CREATE_DT",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 33.306,
+        "lng": -111.8412
+      },
+      "evidence_path": "apps/api/src/spatial/cities/chandler.py"
+    },
+    {
+      "id": "modesto",
+      "name": "Modesto",
+      "state": "CA",
+      "divisions": "8 divisions",
+      "division_count": 8,
+      "submarket_count": 13,
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 37.6391,
+        "lng": -120.9969
+      },
+      "evidence_path": "apps/api/src/spatial/cities/modesto.py"
+    },
+    {
+      "id": "bend",
+      "name": "Bend, OR",
+      "state": "OR",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 10,
+      "feeds": [
+        true,
+        true,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "ApplicationDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "CaseReportedDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "LicenseExpirationDate",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 44.0575,
+        "lng": -121.315
+      },
+      "evidence_path": "apps/api/src/spatial/cities/bend.py"
+    },
+    {
+      "id": "vancouver_wa",
+      "name": "Vancouver",
+      "state": "WA",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 13,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "csm_issued_date",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 45.6282,
+        "lng": -122.6785
+      },
+      "evidence_path": "apps/api/src/spatial/cities/vancouver_wa.py"
+    },
+    {
+      "id": "anaheim",
+      "name": "Anaheim / Orange County",
+      "state": "CA",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 10,
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "permitissued",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "applicationdate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 33.8355,
+        "lng": -117.914
+      },
+      "evidence_path": "apps/api/src/spatial/cities/anaheim.py"
+    },
+    {
+      "id": "santa_rosa",
+      "name": "Santa Rosa, CA",
+      "state": "CA",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 12,
+      "feeds": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 38.4405,
+        "lng": -122.7144
+      },
+      "evidence_path": "apps/api/src/spatial/cities/santa_rosa.py"
+    },
+    {
+      "id": "oakland",
+      "name": "Oakland",
+      "state": "CA",
+      "divisions": "7 divisions",
+      "division_count": 7,
+      "submarket_count": 13,
+      "feeds": [
+        false,
+        true,
+        false,
+        false
+      ],
+      "platforms": [
+        null,
+        {
+          "platform": "socrata",
+          "watermark_col": "datetimeinit",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 37.804,
+        "lng": -122.2712
+      },
+      "evidence_path": "apps/api/src/spatial/cities/oakland.py"
+    },
+    {
+      "id": "nampa",
+      "name": "Nampa, ID",
+      "state": "ID",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 8,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "CreationDate",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 43.58,
+        "lng": -116.564
+      },
+      "evidence_path": "apps/api/src/spatial/cities/nampa.py"
+    },
+    {
+      "id": "yakima",
+      "name": "Yakima",
+      "state": "WA",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 9,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "IssuedOnDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 46.6021,
+        "lng": -120.5059
+      },
+      "evidence_path": "apps/api/src/spatial/cities/yakima.py"
+    },
+    {
+      "id": "oxnard_ventura",
+      "name": "Oxnard–Ventura, CA",
+      "state": "CA",
+      "divisions": "7 divisions",
+      "division_count": 7,
+      "submarket_count": 14,
+      "feeds": [
+        false,
+        true,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "ReportedOn",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "DATEISSUE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 34.2795,
+        "lng": -119.297
+      },
+      "evidence_path": "apps/api/src/spatial/cities/oxnard_ventura.py"
+    },
+    {
+      "id": "medford",
+      "name": "Medford, OR",
+      "state": "OR",
+      "divisions": "8 divisions",
+      "division_count": 8,
+      "submarket_count": 11,
+      "feeds": [
+        true,
+        true,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "ISSUED",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "STARTED",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "ISSUED",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 42.3266,
+        "lng": -122.8756
+      },
+      "evidence_path": "apps/api/src/spatial/cities/medford.py"
+    },
+    {
+      "id": "tempe",
+      "name": "Tempe",
+      "state": "AZ",
+      "divisions": "9 divisions",
+      "division_count": 9,
+      "submarket_count": 13,
+      "feeds": [
+        true,
+        true,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "AppliedDateDtm",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "CaseOpenDate",
+          "interval_seconds": 180.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 33.4267,
+        "lng": -111.9398
+      },
+      "evidence_path": "apps/api/src/spatial/cities/tempe.py"
+    },
+    {
+      "id": "bozeman",
+      "name": "Bozeman, MT",
+      "state": "MT",
+      "divisions": "7 divisions",
+      "division_count": 7,
+      "submarket_count": 10,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "PERMIT_ISSUE_DATE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 45.677,
+        "lng": -111.0429
+      },
+      "evidence_path": "apps/api/src/spatial/cities/bozeman.py"
+    },
+    {
+      "id": "missoula",
+      "name": "Missoula",
+      "state": "MT",
+      "divisions": "7 divisions",
+      "division_count": 7,
+      "submarket_count": 20,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "ApplicationDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 46.8721,
+        "lng": -113.994
+      },
+      "evidence_path": "apps/api/src/spatial/cities/missoula.py"
+    },
+    {
+      "id": "santa_fe",
+      "name": "Santa Fe",
+      "state": "NM",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 10,
+      "feeds": [
+        false,
+        true,
+        false,
+        false
+      ],
+      "platforms": [
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "CreationDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 35.6869,
+        "lng": -105.9372
+      },
+      "evidence_path": "apps/api/src/spatial/cities/santa_fe.py"
+    },
+    {
+      "id": "eugene",
+      "name": "Eugene",
+      "state": "OR",
+      "divisions": "8 divisions",
+      "division_count": 8,
+      "submarket_count": 15,
+      "feeds": [
+        false,
+        true,
+        true,
+        true
+      ],
+      "platforms": [
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "CreatedOn",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "DATE_",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 44.051,
+        "lng": -123.092
+      },
+      "evidence_path": "apps/api/src/spatial/cities/eugene.py"
+    },
+    {
+      "id": "glendale_az",
+      "name": "Glendale, AZ",
+      "state": "AZ",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 9,
+      "feeds": [
+        false,
+        true,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "Request_Date",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "IssuedOn",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 33.55,
+        "lng": -112.22
+      },
+      "evidence_path": "apps/api/src/spatial/cities/glendale_az.py"
+    },
+    {
+      "id": "scottsdale",
+      "name": "Scottsdale, AZ",
+      "state": "AZ",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 10,
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "IssueDate",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "BusinessStartDate",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 33.4942,
+        "lng": -111.9261
+      },
+      "evidence_path": "apps/api/src/spatial/cities/scottsdale.py"
+    },
+    {
+      "id": "long_beach",
+      "name": "Long Beach",
+      "state": "CA",
+      "divisions": "8 divisions",
+      "division_count": 8,
+      "submarket_count": 10,
+      "feeds": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "MILESTONEDATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 33.7695,
+        "lng": -118.193
+      },
+      "evidence_path": "apps/api/src/spatial/cities/long_beach.py"
+    },
+    {
+      "id": "las_cruces",
+      "name": "Las Cruces, NM",
+      "state": "NM",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 9,
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "Issued_Date",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "LastUpdateDate",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 32.312,
+        "lng": -106.778
+      },
+      "evidence_path": "apps/api/src/spatial/cities/las_cruces.py"
+    },
+    {
+      "id": "billings",
+      "name": "Billings",
+      "state": "MT",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 10,
+      "feeds": [
+        true,
+        true,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "Issue_Date",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "created_date",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.311"
+        },
+        null,
+        null
+      ],
+      "center": {
+        "lat": 45.7833,
+        "lng": -108.5007
+      },
+      "evidence_path": "apps/api/src/spatial/cities/billings.py"
+    },
+    {
+      "id": "salem_or",
+      "name": "Salem, OR",
+      "state": "OR",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 9,
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "ISSUEDDATE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "INDATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 44.9429,
+        "lng": -123.0351
+      },
+      "evidence_path": "apps/api/src/spatial/cities/salem_or.py"
     }
   ],
   "pipeline": [

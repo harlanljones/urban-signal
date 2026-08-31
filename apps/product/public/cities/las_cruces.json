@@ -1,0 +1,218 @@
+{
+  "schema_version": 2,
+  "id": "las_cruces",
+  "name": "Las Cruces, NM",
+  "state": "NM",
+  "center": {
+    "lat": 32.312,
+    "lng": -106.778
+  },
+  "metro_bbox": {
+    "min_lat": 32.2,
+    "max_lat": 32.5,
+    "min_lng": -106.95,
+    "max_lng": -106.55
+  },
+  "divisions": {
+    "DOWNTOWN_CORE": {
+      "name": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 32.312,
+        "lng": -106.778
+      },
+      "bbox": {
+        "min_lat": 32.305,
+        "max_lat": 32.32,
+        "min_lng": -106.795,
+        "max_lng": -106.765
+      },
+      "submarkets": [
+        "Downtown Las Cruces",
+        "Las Cruces Plaza"
+      ]
+    },
+    "MESILLA_VALLEY": {
+      "name": "MESILLA_VALLEY",
+      "center": {
+        "lat": 32.2775,
+        "lng": -106.8
+      },
+      "bbox": {
+        "min_lat": 32.27,
+        "max_lat": 32.285,
+        "min_lng": -106.815,
+        "max_lng": -106.79
+      },
+      "submarkets": [
+        "Mesilla Historic District"
+      ]
+    },
+    "EAST_MESA": {
+      "name": "EAST_MESA",
+      "center": {
+        "lat": 32.282,
+        "lng": -106.745
+      },
+      "bbox": {
+        "min_lat": 32.265,
+        "max_lat": 32.295,
+        "min_lng": -106.76,
+        "max_lng": -106.7
+      },
+      "submarkets": [
+        "NMSU Corridor",
+        "East Mesa Growth"
+      ]
+    },
+    "SONOMA_RANCH": {
+      "name": "SONOMA_RANCH",
+      "center": {
+        "lat": 32.352,
+        "lng": -106.735
+      },
+      "bbox": {
+        "min_lat": 32.34,
+        "max_lat": 32.365,
+        "min_lng": -106.75,
+        "max_lng": -106.7
+      },
+      "submarkets": [
+        "Sonoma Ranch"
+      ]
+    },
+    "NORTHERN_LC": {
+      "name": "NORTHERN_LC",
+      "center": {
+        "lat": 32.347,
+        "lng": -106.77
+      },
+      "bbox": {
+        "min_lat": 32.335,
+        "max_lat": 32.36,
+        "min_lng": -106.79,
+        "max_lng": -106.75
+      },
+      "submarkets": [
+        "Telshor/Medical District",
+        "Las Colinas"
+      ]
+    },
+    "WEST_MESA": {
+      "name": "WEST_MESA",
+      "center": {
+        "lat": 32.305,
+        "lng": -106.85
+      },
+      "bbox": {
+        "min_lat": 32.29,
+        "max_lat": 32.32,
+        "min_lng": -106.9,
+        "max_lng": -106.8
+      },
+      "submarkets": [
+        "West Mesa"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Las Cruces": {
+      "name": "Downtown Las Cruces",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 32.312,
+        "lng": -106.778
+      },
+      "description": "Main Street downtown corridor with the historic Plaza, the Rio Grande Theatre, and mixed-use redevelopment of the commercial core."
+    },
+    "Las Cruces Plaza": {
+      "name": "Las Cruces Plaza",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 32.3125,
+        "lng": -106.771
+      },
+      "description": "Historic Plaza district with the Doña Ana County Courthouse, the Cathedral of the Immaculate Heart of Mary, and century-old storefront retail."
+    },
+    "Mesilla Historic District": {
+      "name": "Mesilla Historic District",
+      "division": "MESILLA_VALLEY",
+      "center": {
+        "lat": 32.2775,
+        "lng": -106.8
+      },
+      "description": "Historic Mesilla town square with adobe architecture, the Basilica of San Albino, and a tourist-oriented arts and dining economy."
+    },
+    "NMSU Corridor": {
+      "name": "NMSU Corridor",
+      "division": "EAST_MESA",
+      "center": {
+        "lat": 32.282,
+        "lng": -106.745
+      },
+      "description": "New Mexico State University corridor with student housing, tech-transfer spin-offs, and the Arrowhead Research Park."
+    },
+    "East Mesa Growth": {
+      "name": "East Mesa Growth",
+      "division": "EAST_MESA",
+      "center": {
+        "lat": 32.28,
+        "lng": -106.72
+      },
+      "description": "Eastern growth corridor along Lohman Avenue with new subdivisions, strip retail, and the expanding Las Cruces airport edge."
+    },
+    "Sonoma Ranch": {
+      "name": "Sonoma Ranch",
+      "division": "SONOMA_RANCH",
+      "center": {
+        "lat": 32.352,
+        "lng": -106.735
+      },
+      "description": "Northwest master-planned community with golf-course residential, Sonoma Ranch Elementary, and the emerging Sonoma Marketplace retail."
+    },
+    "Telshor/Medical District": {
+      "name": "Telshor/Medical District",
+      "division": "NORTHERN_LC",
+      "center": {
+        "lat": 32.347,
+        "lng": -106.77
+      },
+      "description": "Telshor Boulevard medical corridor with Memorial Medical Center, MountainView Regional, and the highest concentration of medical office and ancillary services."
+    },
+    "Las Colinas": {
+      "name": "Las Colinas",
+      "division": "NORTHERN_LC",
+      "center": {
+        "lat": 32.345,
+        "lng": -106.765
+      },
+      "description": "Northern residential area with Mesilla Valley Hospital, established neighborhoods, and the Foothills Road corridor."
+    },
+    "West Mesa": {
+      "name": "West Mesa",
+      "division": "WEST_MESA",
+      "center": {
+        "lat": 32.305,
+        "lng": -106.85
+      },
+      "description": "West side of the Rio Grande valley with agricultural land, rural residential, and the Doña Ana County Government Center."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "Issued_Date",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "LastUpdateDate",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/las_cruces.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

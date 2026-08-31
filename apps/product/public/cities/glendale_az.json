@@ -1,0 +1,218 @@
+{
+  "schema_version": 2,
+  "id": "glendale_az",
+  "name": "Glendale, AZ",
+  "state": "AZ",
+  "center": {
+    "lat": 33.55,
+    "lng": -112.22
+  },
+  "metro_bbox": {
+    "min_lat": 33.5,
+    "max_lat": 33.71,
+    "min_lng": -112.47,
+    "max_lng": -112.14
+  },
+  "divisions": {
+    "OCOTILLO": {
+      "name": "OCOTILLO",
+      "center": {
+        "lat": 33.53,
+        "lng": -112.19
+      },
+      "bbox": {
+        "min_lat": 33.5,
+        "max_lat": 33.56,
+        "min_lng": -112.205,
+        "max_lng": -112.14
+      },
+      "submarkets": [
+        "Downtown Glendale",
+        "Ocotillo / 43rd Ave Corridor"
+      ]
+    },
+    "YUCCA": {
+      "name": "YUCCA",
+      "center": {
+        "lat": 33.53,
+        "lng": -112.26
+      },
+      "bbox": {
+        "min_lat": 33.5,
+        "max_lat": 33.56,
+        "min_lng": -112.47,
+        "max_lng": -112.205
+      },
+      "submarkets": [
+        "Westgate",
+        "Manistee Estates"
+      ]
+    },
+    "BARREL": {
+      "name": "BARREL",
+      "center": {
+        "lat": 33.585,
+        "lng": -112.3
+      },
+      "bbox": {
+        "min_lat": 33.56,
+        "max_lat": 33.61,
+        "min_lng": -112.47,
+        "max_lng": -112.205
+      },
+      "submarkets": [
+        "Grand Avenue / Barrel Corridor"
+      ]
+    },
+    "CACTUS": {
+      "name": "CACTUS",
+      "center": {
+        "lat": 33.585,
+        "lng": -112.16
+      },
+      "bbox": {
+        "min_lat": 33.56,
+        "max_lat": 33.61,
+        "min_lng": -112.205,
+        "max_lng": -112.14
+      },
+      "submarkets": [
+        "51st Ave / Cactus District"
+      ]
+    },
+    "CHOLLA": {
+      "name": "CHOLLA",
+      "center": {
+        "lat": 33.66,
+        "lng": -112.17
+      },
+      "bbox": {
+        "min_lat": 33.61,
+        "max_lat": 33.71,
+        "min_lng": -112.205,
+        "max_lng": -112.14
+      },
+      "submarkets": [
+        "Arrowhead",
+        "Thunderbird"
+      ]
+    },
+    "SAHUARO": {
+      "name": "SAHUARO",
+      "center": {
+        "lat": 33.66,
+        "lng": -112.3
+      },
+      "bbox": {
+        "min_lat": 33.61,
+        "max_lat": 33.71,
+        "min_lng": -112.47,
+        "max_lng": -112.205
+      },
+      "submarkets": [
+        "Sahuaro Ranch"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Glendale": {
+      "name": "Downtown Glendale",
+      "division": "OCOTILLO",
+      "center": {
+        "lat": 33.5388,
+        "lng": -112.1859
+      },
+      "description": "Historic downtown core on Glendale Avenue with the Antique Row shopping district, Murphy Park, and steady storefront commercial-renovation permitting around the Water Tower."
+    },
+    "Ocotillo / 43rd Ave Corridor": {
+      "name": "Ocotillo / 43rd Ave Corridor",
+      "division": "OCOTILLO",
+      "center": {
+        "lat": 33.52,
+        "lng": -112.18
+      },
+      "description": "Southeast council-district corridor of post-war tract housing and neighborhood retail along 43rd/51st avenues with renovation-led 311 and business-license churn."
+    },
+    "Westgate": {
+      "name": "Westgate",
+      "division": "YUCCA",
+      "center": {
+        "lat": 33.5381,
+        "lng": -112.2599
+      },
+      "description": "West Valley entertainment district anchored by State Farm Stadium, Desert Diamond Arena, and the Westgate dining/retail row with high hospitality license density."
+    },
+    "Manistee Estates": {
+      "name": "Manistee Estates",
+      "division": "YUCCA",
+      "center": {
+        "lat": 33.5276,
+        "lng": -112.215
+      },
+      "description": "Established residential district west of downtown with the historic Manistee Ranch, mature-canopy lots, and steady addition/renovation permitting."
+    },
+    "Grand Avenue / Barrel Corridor": {
+      "name": "Grand Avenue / Barrel Corridor",
+      "division": "BARREL",
+      "center": {
+        "lat": 33.575,
+        "lng": -112.23
+      },
+      "description": "West-central corridor along Grand Avenue with light-industrial, warehouse, and auto-services business licensing and water/sewer service-request volume."
+    },
+    "51st Ave / Cactus District": {
+      "name": "51st Ave / Cactus District",
+      "division": "CACTUS",
+      "center": {
+        "lat": 33.565,
+        "lng": -112.155
+      },
+      "description": "East-central district hugging the Phoenix border with mid-century housing, strip-retail revitalization, and strong trash/street service-request cadence."
+    },
+    "Arrowhead": {
+      "name": "Arrowhead",
+      "division": "CHOLLA",
+      "center": {
+        "lat": 33.6289,
+        "lng": -112.1697
+      },
+      "description": "Master-planned northeast Glendale around Arrowhead Towne Center with golf-course estates, big-box retail, and the city's highest-value new-construction permits."
+    },
+    "Thunderbird": {
+      "name": "Thunderbird",
+      "division": "CHOLLA",
+      "center": {
+        "lat": 33.611,
+        "lng": -112.143
+      },
+      "description": "Northeast neighborhoods along Thunderbird Road near the Thunderbird School / ASU West campus with mixed multifamily and commercial infill."
+    },
+    "Sahuaro Ranch": {
+      "name": "Sahuaro Ranch",
+      "division": "SAHUARO",
+      "center": {
+        "lat": 33.63,
+        "lng": -112.2139
+      },
+      "description": "Northwest district around historic Sahuaro Ranch Park with tract-housing renovation, ranchette lots, and retail-anchored corridors at 59th/67th avenues."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "Request_Date",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "IssuedOn",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/glendale_az.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

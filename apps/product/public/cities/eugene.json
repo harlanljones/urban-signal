@@ -1,0 +1,313 @@
+{
+  "schema_version": 2,
+  "id": "eugene",
+  "name": "Eugene",
+  "state": "OR",
+  "center": {
+    "lat": 44.051,
+    "lng": -123.092
+  },
+  "metro_bbox": {
+    "min_lat": 43.96,
+    "max_lat": 44.14,
+    "min_lng": -123.3,
+    "max_lng": -122.96
+  },
+  "divisions": {
+    "DOWNTOWN": {
+      "name": "DOWNTOWN",
+      "center": {
+        "lat": 44.051,
+        "lng": -123.092
+      },
+      "bbox": {
+        "min_lat": 44.044,
+        "max_lat": 44.058,
+        "min_lng": -123.1,
+        "max_lng": -123.08
+      },
+      "submarkets": [
+        "Downtown",
+        "Jefferson Westside"
+      ]
+    },
+    "WHITAKER": {
+      "name": "WHITAKER",
+      "center": {
+        "lat": 44.06,
+        "lng": -123.098
+      },
+      "bbox": {
+        "min_lat": 44.054,
+        "max_lat": 44.07,
+        "min_lng": -123.108,
+        "max_lng": -123.09
+      },
+      "submarkets": [
+        "Whiteaker",
+        "Trainsong"
+      ]
+    },
+    "FRIENDLY": {
+      "name": "FRIENDLY",
+      "center": {
+        "lat": 44.032,
+        "lng": -123.098
+      },
+      "bbox": {
+        "min_lat": 44.02,
+        "max_lat": 44.045,
+        "min_lng": -123.12,
+        "max_lng": -123.07
+      },
+      "submarkets": [
+        "Friendly",
+        "South University"
+      ]
+    },
+    "SOUTH_EUGENE": {
+      "name": "SOUTH_EUGENE",
+      "center": {
+        "lat": 44.01,
+        "lng": -123.09
+      },
+      "bbox": {
+        "min_lat": 43.99,
+        "max_lat": 44.025,
+        "min_lng": -123.12,
+        "max_lng": -123.055
+      },
+      "submarkets": [
+        "South Eugene",
+        "Fairmount"
+      ]
+    },
+    "CAL_YOUNG": {
+      "name": "CAL_YOUNG",
+      "center": {
+        "lat": 44.07,
+        "lng": -123.052
+      },
+      "bbox": {
+        "min_lat": 44.06,
+        "max_lat": 44.085,
+        "min_lng": -123.07,
+        "max_lng": -123.035
+      },
+      "submarkets": [
+        "Cal Young",
+        "Harlow"
+      ]
+    },
+    "SANTA_CLARA": {
+      "name": "SANTA_CLARA",
+      "center": {
+        "lat": 44.11,
+        "lng": -123.09
+      },
+      "bbox": {
+        "min_lat": 44.09,
+        "max_lat": 44.135,
+        "min_lng": -123.13,
+        "max_lng": -123.05
+      },
+      "submarkets": [
+        "Santa Clara"
+      ]
+    },
+    "BETHEL": {
+      "name": "BETHEL",
+      "center": {
+        "lat": 44.07,
+        "lng": -123.155
+      },
+      "bbox": {
+        "min_lat": 44.05,
+        "max_lat": 44.09,
+        "min_lng": -123.18,
+        "max_lng": -123.12
+      },
+      "submarkets": [
+        "Bethel",
+        "West Eugene"
+      ]
+    },
+    "CHURCHILL": {
+      "name": "CHURCHILL",
+      "center": {
+        "lat": 44.03,
+        "lng": -123.165
+      },
+      "bbox": {
+        "min_lat": 44.01,
+        "max_lat": 44.05,
+        "min_lng": -123.2,
+        "max_lng": -123.13
+      },
+      "submarkets": [
+        "Churchill",
+        "Amazon"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown": {
+      "name": "Downtown",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 44.051,
+        "lng": -123.092
+      },
+      "description": "Eugene's downtown core with the 5th Street Market District, Hult Center, and the Broadway retail corridor — the metro's primary office and entertainment hub."
+    },
+    "Jefferson Westside": {
+      "name": "Jefferson Westside",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 44.053,
+        "lng": -123.098
+      },
+      "description": "West-side downtown residential neighborhood with historic craftsman bungalows, infill apartments, and proximity to the riverfront."
+    },
+    "Whiteaker": {
+      "name": "Whiteaker",
+      "division": "WHITAKER",
+      "center": {
+        "lat": 44.06,
+        "lng": -123.098
+      },
+      "description": "Eugene's historic working-class neighborhood turned arts district with Blair Boulevard restaurant row, breweries, and live-work artist compounds."
+    },
+    "Trainsong": {
+      "name": "Trainsong",
+      "division": "WHITAKER",
+      "center": {
+        "lat": 44.064,
+        "lng": -123.102
+      },
+      "description": "Rail-adjacent industrial-edge neighborhood transitioning with new infill and light-industrial redevelopment."
+    },
+    "Friendly": {
+      "name": "Friendly",
+      "division": "FRIENDLY",
+      "center": {
+        "lat": 44.032,
+        "lng": -123.098
+      },
+      "description": "South-central residential neighborhood around Friendly Street with mature tree canopy, mid-century homes, and steady renovation permits."
+    },
+    "South University": {
+      "name": "South University",
+      "division": "FRIENDLY",
+      "center": {
+        "lat": 44.035,
+        "lng": -123.078
+      },
+      "description": "University of Oregon adjacent student and faculty housing with high turnover, rental conversions, and steady remodel permits."
+    },
+    "South Eugene": {
+      "name": "South Eugene",
+      "division": "SOUTH_EUGENE",
+      "center": {
+        "lat": 44.01,
+        "lng": -123.09
+      },
+      "description": "Upper south hills with premium residential stock, Spencer Butte views, and the highest-valued single-family homes in the metro."
+    },
+    "Fairmount": {
+      "name": "Fairmount",
+      "division": "SOUTH_EUGENE",
+      "center": {
+        "lat": 44.02,
+        "lng": -123.065
+      },
+      "description": "Southeast Eugene foothills neighborhood with University of Oregon family housing, multi-family conversions, and steady renovation permits."
+    },
+    "Cal Young": {
+      "name": "Cal Young",
+      "division": "CAL_YOUNG",
+      "center": {
+        "lat": 44.07,
+        "lng": -123.052
+      },
+      "description": "Northeast Eugene's primary commercial corridor with Coburg Road retail, Olympic Village, and the area's densest suburban multifamily stock."
+    },
+    "Harlow": {
+      "name": "Harlow",
+      "division": "CAL_YOUNG",
+      "center": {
+        "lat": 44.077,
+        "lng": -123.06
+      },
+      "description": "Mid-century suburban neighborhood of ranch homes, duplex infill, and aging-housing-stock renovation permits."
+    },
+    "Santa Clara": {
+      "name": "Santa Clara",
+      "division": "SANTA_CLARA",
+      "center": {
+        "lat": 44.11,
+        "lng": -123.09
+      },
+      "description": "Northern Eugene suburban corridor with River Road commercial strip, new single-family subdivisions, and farm-adjacent residential"
+    },
+    "Bethel": {
+      "name": "Bethel",
+      "division": "BETHEL",
+      "center": {
+        "lat": 44.07,
+        "lng": -123.155
+      },
+      "description": "West Eugene's largest suburban neighborhood with Royal Avenue retail, new infrastructure, and the metro's most affordable single-family stock."
+    },
+    "West Eugene": {
+      "name": "West Eugene",
+      "division": "BETHEL",
+      "center": {
+        "lat": 44.07,
+        "lng": -123.17
+      },
+      "description": "Western industrial and residential edge with the West Eugene Enterprise Zone, light-industrial parks, and workforce housing stock."
+    },
+    "Churchill": {
+      "name": "Churchill",
+      "division": "CHURCHILL",
+      "center": {
+        "lat": 44.03,
+        "lng": -123.165
+      },
+      "description": "Southwest Eugene residential area around Churchill High School with mid-century ranch homes, rolling hills, and steady renovation permits."
+    },
+    "Amazon": {
+      "name": "Amazon",
+      "division": "CHURCHILL",
+      "center": {
+        "lat": 44.035,
+        "lng": -123.15
+      },
+      "description": "Amazon Creek corridor residential area with creek-side parks, mixed zoning, and the Amazon Marketplace commercial node."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "CreatedOn",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "DATE_",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/eugene.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

@@ -206,7 +206,12 @@
       "interval_seconds": 1800.0,
       "topic": "raw.municipal.sla"
     },
-    "deeds": null
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "DeedDate",
+      "interval_seconds": 86400.0,
+      "topic": "raw.municipal.deeds"
+    }
   },
   "evidence_path": "apps/api/src/spatial/cities/asheville.py",
   "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"

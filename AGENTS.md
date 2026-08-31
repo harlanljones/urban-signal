@@ -40,3 +40,52 @@ This is enforced, not conventional: `apps/api/tests/unit/test_interlock_gate.py:
 and `TestSnapshotWiring` fail any `pytest -m interlock` run where a registered
 city is missing from the map. Wire the dashboard (or accept a red gate) in the
 same spine hold as the registry entry — never "docs later".
+
+### CI/CD pre-flight (must run before ending any task)
+
+**Every change in this repo breaks CI/CD consistently unless the full pre-flight
+passes first.** The `batch-push-deploy` workflow runs the gates below on every
+push/PR to `main`; a failure blocks deployment. Run the pre-flight before
+ending any task, not as a fixup afterward.
+
+Single command:
+
+```bash
+python3 scripts/verify_cicd_preflight.py
+```
+
+What it checks (in order, stops on first failure):
+
+1. **API interlock gate** — `pytest -m interlock` from `apps/api` (24 tests,
+   covers closure, completeness, containment, dashboard wiring, snapshot export,
+   and grid-tile coverage). Fails when a registered city is missing from the map
+   or a registered endpoint has no settings field.
+
+2. **Dashboard ↔ product-site cross-reference** — parses the `METRO_META` block
+   out of `serving/dashboard.py` AND its byte-synced
+   `apps/dashboard/public/index.html`, then compares both against `REGISTRY`
+   and `apps/product/public/facts.json`. Fails when a city change landed on one
+   surface but not the other (a new city on the dashboard map with no product
+   page, or a product metro with no map chip). A registry change is only
+   complete when the dashboard, the static copy, and the product facts all carry
+   the same city set.
+
+3. **Product facts drift** — `cd apps/product && bun run facts:check` — compares
+   `facts.json` + `cities/*.json` against the live `REGISTRY`. Fails when any
+   registry change (new city, new feed, changed endpoint) is not reflected in
+   the product-site artifacts. **This is the most commonly broken gate** — fix
+   with `bun run facts:export` from `apps/product`.
+
+4. **Product site lint** — `cd apps/product && bun run lint` — builds the full
+   product site (`dist/`), verifies agent surfaces, and confirms every route
+   renders correctly for all registered cities.
+
+5. **Dashboard export** — `python3 scripts/export_dashboard.py` — regenerates
+   `apps/dashboard/public/index.html` from `serving/dashboard.py` and confirms
+   byte-sync is exact.
+
+6. **Ruff on changed files** — `ruff check` on any new or modified Python files
+   in `apps/api/src/` and `apps/api/tests/`.
+
+A clean pre-flight before the final commit means the CI push will pass. Run it
+after every significant change, not just at the end.

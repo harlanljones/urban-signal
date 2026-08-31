@@ -1,0 +1,228 @@
+{
+  "schema_version": 2,
+  "id": "billings",
+  "name": "Billings",
+  "state": "MT",
+  "center": {
+    "lat": 45.7833,
+    "lng": -108.5007
+  },
+  "metro_bbox": {
+    "min_lat": 45.72,
+    "max_lat": 45.87,
+    "min_lng": -108.65,
+    "max_lng": -108.38
+  },
+  "divisions": {
+    "DOWNTOWN": {
+      "name": "DOWNTOWN",
+      "center": {
+        "lat": 45.7835,
+        "lng": -108.5045
+      },
+      "bbox": {
+        "min_lat": 45.775,
+        "max_lat": 45.794,
+        "min_lng": -108.52,
+        "max_lng": -108.492
+      },
+      "submarkets": [
+        "Downtown"
+      ]
+    },
+    "MIDTOWN": {
+      "name": "MIDTOWN",
+      "center": {
+        "lat": 45.7875,
+        "lng": -108.546
+      },
+      "bbox": {
+        "min_lat": 45.776,
+        "max_lat": 45.802,
+        "min_lng": -108.562,
+        "max_lng": -108.52
+      },
+      "submarkets": [
+        "Midtown",
+        "MetraPark District"
+      ]
+    },
+    "WEST_END": {
+      "name": "WEST_END",
+      "center": {
+        "lat": 45.777,
+        "lng": -108.6
+      },
+      "bbox": {
+        "min_lat": 45.766,
+        "max_lat": 45.796,
+        "min_lng": -108.625,
+        "max_lng": -108.562
+      },
+      "submarkets": [
+        "West End",
+        "Rimrock"
+      ]
+    },
+    "SOUTH_SIDE": {
+      "name": "SOUTH_SIDE",
+      "center": {
+        "lat": 45.762,
+        "lng": -108.531
+      },
+      "bbox": {
+        "min_lat": 45.742,
+        "max_lat": 45.776,
+        "min_lng": -108.555,
+        "max_lng": -108.505
+      },
+      "submarkets": [
+        "South Side",
+        "Southgate"
+      ]
+    },
+    "BILLINGS_HEIGHTS": {
+      "name": "BILLINGS_HEIGHTS",
+      "center": {
+        "lat": 45.815,
+        "lng": -108.482
+      },
+      "bbox": {
+        "min_lat": 45.802,
+        "max_lat": 45.845,
+        "min_lng": -108.545,
+        "max_lng": -108.44
+      },
+      "submarkets": [
+        "Billings Heights",
+        "Airport District"
+      ]
+    },
+    "LOCKWOOD": {
+      "name": "LOCKWOOD",
+      "center": {
+        "lat": 45.802,
+        "lng": -108.414
+      },
+      "bbox": {
+        "min_lat": 45.79,
+        "max_lat": 45.818,
+        "min_lng": -108.44,
+        "max_lng": -108.39
+      },
+      "submarkets": [
+        "Lockwood"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown": {
+      "name": "Downtown",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 45.7835,
+        "lng": -108.5045
+      },
+      "description": "Montana Avenue / 27th Street CBD core with the courthouse square, historic Skypoint, and the densest commercial permitting corridor in south-central Montana."
+    },
+    "Midtown": {
+      "name": "Midtown",
+      "division": "MIDTOWN",
+      "center": {
+        "lat": 45.7875,
+        "lng": -108.546
+      },
+      "description": "Grand Avenue corridor between downtown and the West End with mid-century retail strips, motel conversions, and steady small-bay remodel permits."
+    },
+    "MetraPark District": {
+      "name": "MetraPark District",
+      "division": "MIDTOWN",
+      "center": {
+        "lat": 45.7915,
+        "lng": -108.523
+      },
+      "description": "First Interstate Arena at MetraPark and the airport-adjacent event campus with parking-lot infill, hospitality upgrades, and big-box reuse permits."
+    },
+    "West End": {
+      "name": "West End",
+      "division": "WEST_END",
+      "center": {
+        "lat": 45.7795,
+        "lng": -108.59
+      },
+      "description": "King Avenue / Grand Avenue growth belt with medical-office expansion (Billings Clinic West), auto-oriented retail redevelopment, and the metro's largest new-construction valuations."
+    },
+    "Rimrock": {
+      "name": "Rimrock",
+      "division": "WEST_END",
+      "center": {
+        "lat": 45.7723,
+        "lng": -108.602
+      },
+      "description": "Rimrock Mall and West Park Promenade trade area with enclosed-mall redevelopment, grocery-anchored pads, and the last infill parcels along King Ave."
+    },
+    "South Side": {
+      "name": "South Side",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 45.765,
+        "lng": -108.535
+      },
+      "description": "Historic South Side below I-90 with the South Park greenbelt, brick bungalow stock, and affordable single-family infill along the Midland rail corridor."
+    },
+    "Southgate": {
+      "name": "Southgate",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 45.753,
+        "lng": -108.522
+      },
+      "description": "Southgate Drive corridor at the city's south edge with newer subdivisions, the Southgate Mall trade area, and incremental multifamily infill."
+    },
+    "Billings Heights": {
+      "name": "Billings Heights",
+      "division": "BILLINGS_HEIGHTS",
+      "center": {
+        "lat": 45.815,
+        "lng": -108.482
+      },
+      "description": "Main Street north-of-the-river residential plateau with ranch inventory, box-retail nodes, and steady single-family and duplex permitting."
+    },
+    "Airport District": {
+      "name": "Airport District",
+      "division": "BILLINGS_HEIGHTS",
+      "center": {
+        "lat": 45.8077,
+        "lng": -108.5427
+      },
+      "description": "Billings Logan International Airport and the surrounding aviation/logistics employment zone with hangar construction, freight expansion, and hotel permitting."
+    },
+    "Lockwood": {
+      "name": "Lockwood",
+      "division": "LOCKWOOD",
+      "center": {
+        "lat": 45.802,
+        "lng": -108.414
+      },
+      "description": "Unincorporated Lockwood community east of the city line with I-90-adjacent trade parcels, light-industrial expansion, and affordable-acreage home building."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "Issue_Date",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "created_date",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/billings.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

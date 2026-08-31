@@ -1,0 +1,218 @@
+{
+  "schema_version": 2,
+  "id": "salem_or",
+  "name": "Salem, OR",
+  "state": "OR",
+  "center": {
+    "lat": 44.9429,
+    "lng": -123.0351
+  },
+  "metro_bbox": {
+    "min_lat": 44.84,
+    "max_lat": 45.01,
+    "min_lng": -123.13,
+    "max_lng": -122.93
+  },
+  "divisions": {
+    "DOWNTOWN": {
+      "name": "DOWNTOWN",
+      "center": {
+        "lat": 44.9429,
+        "lng": -123.0351
+      },
+      "bbox": {
+        "min_lat": 44.93,
+        "max_lat": 44.955,
+        "min_lng": -123.045,
+        "max_lng": -123.028
+      },
+      "submarkets": [
+        "Downtown Salem"
+      ]
+    },
+    "NE_SALEM": {
+      "name": "NE_SALEM",
+      "center": {
+        "lat": 44.978,
+        "lng": -123.002
+      },
+      "bbox": {
+        "min_lat": 44.955,
+        "max_lat": 45.005,
+        "min_lng": -123.045,
+        "max_lng": -122.95
+      },
+      "submarkets": [
+        "Northgate",
+        "Grant-Highland"
+      ]
+    },
+    "SE_MILL_CREEK": {
+      "name": "SE_MILL_CREEK",
+      "center": {
+        "lat": 44.89,
+        "lng": -123.04
+      },
+      "bbox": {
+        "min_lat": 44.855,
+        "max_lat": 44.92,
+        "min_lng": -123.07,
+        "max_lng": -122.97
+      },
+      "submarkets": [
+        "Mill Creek",
+        "Faye Wright"
+      ]
+    },
+    "WEST_SALEM": {
+      "name": "WEST_SALEM",
+      "center": {
+        "lat": 44.935,
+        "lng": -123.065
+      },
+      "bbox": {
+        "min_lat": 44.89,
+        "max_lat": 44.96,
+        "min_lng": -123.12,
+        "max_lng": -123.045
+      },
+      "submarkets": [
+        "West Salem"
+      ]
+    },
+    "SOUTH_SALEM": {
+      "name": "SOUTH_SALEM",
+      "center": {
+        "lat": 44.89,
+        "lng": -123.06
+      },
+      "bbox": {
+        "min_lat": 44.85,
+        "max_lat": 44.93,
+        "min_lng": -123.09,
+        "max_lng": -123.01
+      },
+      "submarkets": [
+        "South Salem",
+        "Sunnyslope"
+      ]
+    },
+    "EAST_LANCASTER": {
+      "name": "EAST_LANCASTER",
+      "center": {
+        "lat": 44.94,
+        "lng": -122.95
+      },
+      "bbox": {
+        "min_lat": 44.88,
+        "max_lat": 44.965,
+        "min_lng": -122.978,
+        "max_lng": -122.93
+      },
+      "submarkets": [
+        "East Lancaster"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Salem": {
+      "name": "Downtown Salem",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 44.9429,
+        "lng": -123.0351
+      },
+      "description": "Liberty and Chemeketa core with the Riverfront Park, the Salem Convention Center, and the downtown retail and office corridor anchored by the Capitol Mall and Willamette University."
+    },
+    "Northgate": {
+      "name": "Northgate",
+      "division": "NE_SALEM",
+      "center": {
+        "lat": 44.9944,
+        "lng": -122.9942
+      },
+      "description": "Silverton Road and Northgate industrial-commercial corridor with warehousing, auto dealerships, and the city's heaviest commercial permit volume."
+    },
+    "Grant-Highland": {
+      "name": "Grant-Highland",
+      "division": "NE_SALEM",
+      "center": {
+        "lat": 44.958,
+        "lng": -123.035
+      },
+      "description": "Grant and Highland neighborhoods east of downtown with pre-war housing stock, farmland-residential transition, and the Fairview Cemetery area infill."
+    },
+    "Mill Creek": {
+      "name": "Mill Creek",
+      "division": "SE_MILL_CREEK",
+      "center": {
+        "lat": 44.8885,
+        "lng": -123.0557
+      },
+      "description": "Southeast Mill Creek corridor along Kuebler Boulevard with ranch-style subdivisions, solar-retrofit permits, and the Pringle Creek greenway."
+    },
+    "Faye Wright": {
+      "name": "Faye Wright",
+      "division": "SE_MILL_CREEK",
+      "center": {
+        "lat": 44.896,
+        "lng": -123.02
+      },
+      "description": "Delta Highway and South Commercial corridor with apartment complexes, big-box retail, and the Faye Wright neighborhood's steady residential service permits."
+    },
+    "West Salem": {
+      "name": "West Salem",
+      "division": "WEST_SALEM",
+      "center": {
+        "lat": 44.935,
+        "lng": -123.065
+      },
+      "description": "Edgewater Street and Wallace Marine Park neighborhood west of the Willamette with bridge-access downtown adjacency, river-view renovations, and steady commercial infill."
+    },
+    "South Salem": {
+      "name": "South Salem",
+      "division": "SOUTH_SALEM",
+      "center": {
+        "lat": 44.876,
+        "lng": -123.071
+      },
+      "description": "Liberty Road South and South Gateway corridor with orchard-retreat-to-subdivision infill, the Minto-Brown Island Park adjacency, and the city's south-edge residential growth."
+    },
+    "Sunnyslope": {
+      "name": "Sunnyslope",
+      "division": "SOUTH_SALEM",
+      "center": {
+        "lat": 44.905,
+        "lng": -123.055
+      },
+      "description": "Sunnyslope neighborhood south of Bush's Pasture Park with mid-century homes, ranch-style additions, and the Mission Street corridor's steady alterations."
+    },
+    "East Lancaster": {
+      "name": "East Lancaster",
+      "division": "EAST_LANCASTER",
+      "center": {
+        "lat": 44.942,
+        "lng": -122.967
+      },
+      "description": "Lancaster Drive and I-5 commercial corridor with auto-oriented retail, motel-strip conversions, and the East Salem residential belt's steady apartment-license renewals."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "ISSUEDDATE",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "INDATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/salem_or.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

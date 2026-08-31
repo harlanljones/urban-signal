@@ -1,0 +1,283 @@
+{
+  "schema_version": 2,
+  "id": "oxnard_ventura",
+  "name": "Oxnard–Ventura, CA",
+  "state": "CA",
+  "center": {
+    "lat": 34.2795,
+    "lng": -119.297
+  },
+  "metro_bbox": {
+    "min_lat": 34.23,
+    "max_lat": 34.356,
+    "min_lng": -119.345,
+    "max_lng": -119.128
+  },
+  "divisions": {
+    "DOWNTOWN_VENTURA": {
+      "name": "DOWNTOWN_VENTURA",
+      "center": {
+        "lat": 34.2795,
+        "lng": -119.297
+      },
+      "bbox": {
+        "min_lat": 34.272,
+        "max_lat": 34.283,
+        "min_lng": -119.3235,
+        "max_lng": -119.279
+      },
+      "submarkets": [
+        "Downtown Ventura & Mission"
+      ]
+    },
+    "WESTSIDE_TAYLOR_RANCH": {
+      "name": "WESTSIDE_TAYLOR_RANCH",
+      "center": {
+        "lat": 34.299,
+        "lng": -119.293
+      },
+      "bbox": {
+        "min_lat": 34.2835,
+        "max_lat": 34.351,
+        "min_lng": -119.34,
+        "max_lng": -119.276
+      },
+      "submarkets": [
+        "Westside & Ventura Avenue",
+        "Taylor Ranch & Two Trees",
+        "North Avenue"
+      ]
+    },
+    "MIDTOWN_SANJON": {
+      "name": "MIDTOWN_SANJON",
+      "center": {
+        "lat": 34.275,
+        "lng": -119.274
+      },
+      "bbox": {
+        "min_lat": 34.2625,
+        "max_lat": 34.283,
+        "min_lng": -119.2785,
+        "max_lng": -119.245
+      },
+      "submarkets": [
+        "Midtown Ventura",
+        "Sanjon & Surfers Point"
+      ]
+    },
+    "PIERPONT_HARBOR": {
+      "name": "PIERPONT_HARBOR",
+      "center": {
+        "lat": 34.26,
+        "lng": -119.27
+      },
+      "bbox": {
+        "min_lat": 34.235,
+        "max_lat": 34.262,
+        "min_lng": -119.2755,
+        "max_lng": -119.252
+      },
+      "submarkets": [
+        "Pierpont Bay",
+        "Ventura Harbor & Keys"
+      ]
+    },
+    "OLIVAS_RIVERBANK": {
+      "name": "OLIVAS_RIVERBANK",
+      "center": {
+        "lat": 34.245,
+        "lng": -119.235
+      },
+      "bbox": {
+        "min_lat": 34.235,
+        "max_lat": 34.252,
+        "min_lng": -119.2515,
+        "max_lng": -119.2115
+      },
+      "submarkets": [
+        "Olivas & River North Bank"
+      ]
+    },
+    "COLLEGE_CORRIDOR": {
+      "name": "COLLEGE_CORRIDOR",
+      "center": {
+        "lat": 34.279,
+        "lng": -119.232
+      },
+      "bbox": {
+        "min_lat": 34.2525,
+        "max_lat": 34.299,
+        "min_lng": -119.2445,
+        "max_lng": -119.2095
+      },
+      "submarkets": [
+        "College Area",
+        "Telegraph & Thille"
+      ]
+    },
+    "EAST_END_SATICOY": {
+      "name": "EAST_END_SATICOY",
+      "center": {
+        "lat": 34.29,
+        "lng": -119.168
+      },
+      "bbox": {
+        "min_lat": 34.2435,
+        "max_lat": 34.305,
+        "min_lng": -119.206,
+        "max_lng": -119.1385
+      },
+      "submarkets": [
+        "Wells Corridor",
+        "Serra & Juanamaria",
+        "Saticoy"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Ventura & Mission": {
+      "name": "Downtown Ventura & Mission",
+      "division": "DOWNTOWN_VENTURA",
+      "center": {
+        "lat": 34.2795,
+        "lng": -119.297
+      },
+      "description": "Main Street and California Street core around the Mission with adaptive-reuse storefronts, hotel conversions, and the city's densest business-license churn."
+    },
+    "Westside & Ventura Avenue": {
+      "name": "Westside & Ventura Avenue",
+      "division": "WESTSIDE_TAYLOR_RANCH",
+      "center": {
+        "lat": 34.299,
+        "lng": -119.293
+      },
+      "description": "Historic Ventura Avenue oil-town corridor with small-business licensing, garage-conversion permitting, and art-city warehouse reuse."
+    },
+    "Taylor Ranch & Two Trees": {
+      "name": "Taylor Ranch & Two Trees",
+      "division": "WESTSIDE_TAYLOR_RANCH",
+      "center": {
+        "lat": 34.3,
+        "lng": -119.31
+      },
+      "description": "Hillside subdivision below the Two Trees landmark with view-lot remodels, pool/deck auxiliary permits, and quiet commercial churn."
+    },
+    "North Avenue": {
+      "name": "North Avenue",
+      "division": "WESTSIDE_TAYLOR_RANCH",
+      "center": {
+        "lat": 34.325,
+        "lng": -119.292
+      },
+      "description": "North Avenue valley edge with tract-home turnover and school-adjacent renovation permits."
+    },
+    "Midtown Ventura": {
+      "name": "Midtown Ventura",
+      "division": "MIDTOWN_SANJON",
+      "center": {
+        "lat": 34.275,
+        "lng": -119.274
+      },
+      "description": "Midtown Main and Telegraph commercial strip with the city's own EconDevAreas tag, medical-office leasing, and steady alteration permitting."
+    },
+    "Sanjon & Surfers Point": {
+      "name": "Sanjon & Surfers Point",
+      "division": "MIDTOWN_SANJON",
+      "center": {
+        "lat": 34.2808,
+        "lng": -119.268
+      },
+      "description": "Beach-side midtown strip by Surfers Point with short-stay turnover, coastal-inn licensing, and boardwalk retail."
+    },
+    "Pierpont Bay": {
+      "name": "Pierpont Bay",
+      "division": "PIERPONT_HARBOR",
+      "center": {
+        "lat": 34.26,
+        "lng": -119.27
+      },
+      "description": "Oceanfront tract between the dunes and Harbor Boulevard with beach-house remodels and high-valuation coastal permits."
+    },
+    "Ventura Harbor & Keys": {
+      "name": "Ventura Harbor & Keys",
+      "division": "PIERPONT_HARBOR",
+      "center": {
+        "lat": 34.2445,
+        "lng": -119.259
+      },
+      "description": "Harbor village, marina, and the canal-front Keys with tourism-led licensing, charter operations, and village retail churn."
+    },
+    "Olivas & River North Bank": {
+      "name": "Olivas & River North Bank",
+      "division": "OLIVAS_RIVERBANK",
+      "center": {
+        "lat": 34.245,
+        "lng": -119.235
+      },
+      "description": "Olivas Links and the Santa Clara River north bank with golf/resort adjacency, equestrian parcels, and light commercial turnover."
+    },
+    "College Area": {
+      "name": "College Area",
+      "division": "COLLEGE_CORRIDOR",
+      "center": {
+        "lat": 34.279,
+        "lng": -119.232
+      },
+      "description": "College corridor around Pacific View Mall with medical and office leasing, apartment turnover, and retail-pad repositioning."
+    },
+    "Telegraph & Thille": {
+      "name": "Telegraph & Thille",
+      "division": "COLLEGE_CORRIDOR",
+      "center": {
+        "lat": 34.262,
+        "lng": -119.223
+      },
+      "description": "Telegraph Road east flats with auto-row licensing, duplex conversions, and infill townhome filings."
+    },
+    "Wells Corridor": {
+      "name": "Wells Corridor",
+      "division": "EAST_END_SATICOY",
+      "center": {
+        "lat": 34.29,
+        "lng": -119.168
+      },
+      "description": "Wells Road commercial spine with neighborhood retail, clinic licensing, and steady residential renovation."
+    },
+    "Serra & Juanamaria": {
+      "name": "Serra & Juanamaria",
+      "division": "EAST_END_SATICOY",
+      "center": {
+        "lat": 34.272,
+        "lng": -119.188
+      },
+      "description": "Post-war east-end tracts around Serra School with starter-home turnover and garage-conversion permits."
+    },
+    "Saticoy": {
+      "name": "Saticoy",
+      "division": "EAST_END_SATICOY",
+      "center": {
+        "lat": 34.278,
+        "lng": -119.154
+      },
+      "description": "Historic Saticoy village at the SOAR edge with ag-service businesses, warehouse reuse, and slow-license churn."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "ReportedOn",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "DATEISSUE",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/oxnard_ventura.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

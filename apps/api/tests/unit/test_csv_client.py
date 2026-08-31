@@ -117,3 +117,22 @@ def test_csv_client_zip_member_missing_raises():
 def test_read_zip_member_rejects_boolean_flag():
     with pytest.raises(ValueError, match="member filename"):
         _read_zip_member(b"PK\x03\x04not-a-real-zip", True)
+
+
+def test_csv_client_reads_pipe_delimited_rows():
+    """Maricopa sales affidavits are pipe-delimited (US-392)."""
+    payload = (
+        "PARCELNUMBER|SALEPRICE|DEEDNUMBER|SITUSADDRESS\n"
+        "20904027B|210000|000000267|22026 N 24TH AVE\n"
+        "11234567C|180000|000000268|123 MAIN ST\n"
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, text=payload, request=request)
+
+    client = CSVClient(httpx.Client(transport=httpx.MockTransport(handler)))
+    batches = list(client.paginate("https://example.test/sales.txt", delimiter="|"))
+    assert len(batches) == 1
+    assert batches[0][0]["parcelnumber"] == "20904027B"
+    assert batches[0][0]["saleprice"] == "210000"
+    assert batches[0][1]["deednumber"] == "000000268"

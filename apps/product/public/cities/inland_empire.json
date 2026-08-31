@@ -1,0 +1,278 @@
+{
+  "schema_version": 2,
+  "id": "inland_empire",
+  "name": "Inland Empire (Riverside County anchor)",
+  "state": "CA",
+  "center": {
+    "lat": 33.9803,
+    "lng": -117.3769
+  },
+  "metro_bbox": {
+    "min_lat": 33.4,
+    "max_lat": 34.03,
+    "min_lng": -117.67,
+    "max_lng": -116.05
+  },
+  "divisions": {
+    "DOWNTOWN_RIVERSIDE": {
+      "name": "DOWNTOWN_RIVERSIDE",
+      "center": {
+        "lat": 33.9803,
+        "lng": -117.3769
+      },
+      "bbox": {
+        "min_lat": 33.955,
+        "max_lat": 34.005,
+        "min_lng": -117.42,
+        "max_lng": -117.29
+      },
+      "submarkets": [
+        "Downtown Riverside",
+        "UCR Eastside"
+      ]
+    },
+    "CORONA_NORCO": {
+      "name": "CORONA_NORCO",
+      "center": {
+        "lat": 33.8754,
+        "lng": -117.5662
+      },
+      "bbox": {
+        "min_lat": 33.85,
+        "max_lat": 33.96,
+        "min_lng": -117.62,
+        "max_lng": -117.5
+      },
+      "submarkets": [
+        "Corona",
+        "Norco"
+      ]
+    },
+    "MORENO_VALLEY": {
+      "name": "MORENO_VALLEY",
+      "center": {
+        "lat": 33.941,
+        "lng": -117.272
+      },
+      "bbox": {
+        "min_lat": 33.88,
+        "max_lat": 33.97,
+        "min_lng": -117.32,
+        "max_lng": -117.2
+      },
+      "submarkets": [
+        "Moreno Valley Central"
+      ]
+    },
+    "MENIFEE_PERRIS": {
+      "name": "MENIFEE_PERRIS",
+      "center": {
+        "lat": 33.786,
+        "lng": -117.213
+      },
+      "bbox": {
+        "min_lat": 33.66,
+        "max_lat": 33.83,
+        "min_lng": -117.28,
+        "max_lng": -117.12
+      },
+      "submarkets": [
+        "Perris",
+        "Menifee"
+      ]
+    },
+    "TEMECULA_MURRIETA": {
+      "name": "TEMECULA_MURRIETA",
+      "center": {
+        "lat": 33.4903,
+        "lng": -117.1486
+      },
+      "bbox": {
+        "min_lat": 33.45,
+        "max_lat": 33.6,
+        "min_lng": -117.25,
+        "max_lng": -117.1
+      },
+      "submarkets": [
+        "Old Town Temecula",
+        "Murrieta"
+      ]
+    },
+    "HEMET_SAN_JACINTO": {
+      "name": "HEMET_SAN_JACINTO",
+      "center": {
+        "lat": 33.7476,
+        "lng": -116.9718
+      },
+      "bbox": {
+        "min_lat": 33.7,
+        "max_lat": 33.82,
+        "min_lng": -117.03,
+        "max_lng": -116.9
+      },
+      "submarkets": [
+        "Hemet",
+        "San Jacinto"
+      ]
+    },
+    "COACHELLA_VALLEY": {
+      "name": "COACHELLA_VALLEY",
+      "center": {
+        "lat": 33.8295,
+        "lng": -116.5454
+      },
+      "bbox": {
+        "min_lat": 33.6,
+        "max_lat": 33.88,
+        "min_lng": -116.62,
+        "max_lng": -116.1
+      },
+      "submarkets": [
+        "Palm Springs",
+        "Palm Desert",
+        "Indio"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Riverside": {
+      "name": "Downtown Riverside",
+      "division": "DOWNTOWN_RIVERSIDE",
+      "center": {
+        "lat": 33.9803,
+        "lng": -117.3769
+      },
+      "description": "Mission Inn historic core with the Fox Performing Arts Center, adaptive-reuse hotels, and the county's densest permit corridor."
+    },
+    "UCR Eastside": {
+      "name": "UCR Eastside",
+      "division": "DOWNTOWN_RIVERSIDE",
+      "center": {
+        "lat": 33.9739,
+        "lng": -117.3265
+      },
+      "description": "University district east of downtown with student-housing infill, campus-adjacent retail, and steady multifamily permitting."
+    },
+    "Corona": {
+      "name": "Corona",
+      "division": "CORONA_NORCO",
+      "center": {
+        "lat": 33.8754,
+        "lng": -117.5662
+      },
+      "description": "I-15/91 logistics-and-roofline city at the county's west gate with tract turnover and industrial infill permits."
+    },
+    "Norco": {
+      "name": "Norco",
+      "division": "CORONA_NORCO",
+      "center": {
+        "lat": 33.9311,
+        "lng": -117.5504
+      },
+      "description": "Horsetown USA half-acre-lot stock with barn-and-arena improvement permits and slow, stable turnover."
+    },
+    "Moreno Valley Central": {
+      "name": "Moreno Valley Central",
+      "division": "MORENO_VALLEY",
+      "center": {
+        "lat": 33.941,
+        "lng": -117.272
+      },
+      "description": "Mall-and-medical core of one of the Inland Empire's fastest-growing cities with warehouse-adjacent housing demand."
+    },
+    "Perris": {
+      "name": "Perris",
+      "division": "MENIFEE_PERRIS",
+      "center": {
+        "lat": 33.786,
+        "lng": -117.213
+      },
+      "description": "Rail-and-warehouse valley south of Riverside with entry-price turnover and large master-planned pipelines."
+    },
+    "Menifee": {
+      "name": "Menifee",
+      "division": "MENIFEE_PERRIS",
+      "center": {
+        "lat": 33.7176,
+        "lng": -117.1707
+      },
+      "description": "Retirement-growth city of tract builders and 55+ communities with the county's steadiest new-build cadence."
+    },
+    "Old Town Temecula": {
+      "name": "Old Town Temecula",
+      "division": "TEMECULA_MURRIETA",
+      "center": {
+        "lat": 33.4903,
+        "lng": -117.1486
+      },
+      "description": "Wine-country gateway with hotel/restaurant adaptive reuse and the metro's highest commercial valuations."
+    },
+    "Murrieta": {
+      "name": "Murrieta",
+      "division": "TEMECULA_MURRIETA",
+      "center": {
+        "lat": 33.5577,
+        "lng": -117.2028
+      },
+      "description": "Family-suburb spine along the 15/215 junction with medical-office growth and steady tract-infill permits."
+    },
+    "Hemet": {
+      "name": "Hemet",
+      "division": "HEMET_SAN_JACINTO",
+      "center": {
+        "lat": 33.7476,
+        "lng": -116.9718
+      },
+      "description": "San Jacinto Valley retirement market with low-basis stock and value-add renovation permits."
+    },
+    "San Jacinto": {
+      "name": "San Jacinto",
+      "division": "HEMET_SAN_JACINTO",
+      "center": {
+        "lat": 33.7812,
+        "lng": -116.9586
+      },
+      "description": "Valley-edge city with starter-home turnover and small multifamily conversions."
+    },
+    "Palm Springs": {
+      "name": "Palm Springs",
+      "division": "COACHELLA_VALLEY",
+      "center": {
+        "lat": 33.8295,
+        "lng": -116.5454
+      },
+      "description": "Mid-century resort core with hotel renovation, vacation-rental churn, and premium second-home turnover."
+    },
+    "Palm Desert": {
+      "name": "Palm Desert",
+      "division": "COACHELLA_VALLEY",
+      "center": {
+        "lat": 33.7166,
+        "lng": -116.3762
+      },
+      "description": "El Paseo retail spine and country-club stock with steady high-valuation alteration permits."
+    },
+    "Indio": {
+      "name": "Indio",
+      "division": "COACHELLA_VALLEY",
+      "center": {
+        "lat": 33.7206,
+        "lng": -116.219
+      },
+      "description": "East-valley growth city with festival-economy demand and tract-builder pipelines."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "APPLIED_DATE",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/inland_empire.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

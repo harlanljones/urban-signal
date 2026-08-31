@@ -1,0 +1,303 @@
+{
+  "schema_version": 2,
+  "id": "tempe",
+  "name": "Tempe",
+  "state": "AZ",
+  "center": {
+    "lat": 33.4267,
+    "lng": -111.9398
+  },
+  "metro_bbox": {
+    "min_lat": 33.31,
+    "max_lat": 33.47,
+    "min_lng": -111.99,
+    "max_lng": -111.83
+  },
+  "divisions": {
+    "DOWNTOWN_RIO_SALADO": {
+      "name": "DOWNTOWN_RIO_SALADO",
+      "center": {
+        "lat": 33.427,
+        "lng": -111.94
+      },
+      "bbox": {
+        "min_lat": 33.417,
+        "max_lat": 33.446,
+        "min_lng": -111.955,
+        "max_lng": -111.93
+      },
+      "submarkets": [
+        "Downtown Mill Avenue",
+        "Hayden Ferry Lakeside"
+      ]
+    },
+    "ASU_CAMPUS_EDGE": {
+      "name": "ASU_CAMPUS_EDGE",
+      "center": {
+        "lat": 33.4245,
+        "lng": -111.9225
+      },
+      "bbox": {
+        "min_lat": 33.417,
+        "max_lat": 33.446,
+        "min_lng": -111.93,
+        "max_lng": -111.915
+      },
+      "submarkets": [
+        "ASU Campus & University Drive"
+      ]
+    },
+    "ESCALANTE_HISTORIC": {
+      "name": "ESCALANTE_HISTORIC",
+      "center": {
+        "lat": 33.43,
+        "lng": -111.9025
+      },
+      "bbox": {
+        "min_lat": 33.417,
+        "max_lat": 33.446,
+        "min_lng": -111.915,
+        "max_lng": -111.89
+      },
+      "submarkets": [
+        "Escalante Historic District"
+      ]
+    },
+    "PAPAGO_NORTH_TEMPE": {
+      "name": "PAPAGO_NORTH_TEMPE",
+      "center": {
+        "lat": 33.455,
+        "lng": -111.94
+      },
+      "bbox": {
+        "min_lat": 33.446,
+        "max_lat": 33.465,
+        "min_lng": -111.985,
+        "max_lng": -111.895
+      },
+      "submarkets": [
+        "Papago Park & North Tempe"
+      ]
+    },
+    "DIABLO_DOUBLE_BUTTE": {
+      "name": "DIABLO_DOUBLE_BUTTE",
+      "center": {
+        "lat": 33.41,
+        "lng": -111.97
+      },
+      "bbox": {
+        "min_lat": 33.393,
+        "max_lat": 33.446,
+        "min_lng": -111.985,
+        "max_lng": -111.955
+      },
+      "submarkets": [
+        "Diablo Stadium Corridor"
+      ]
+    },
+    "ALAMEDA": {
+      "name": "ALAMEDA",
+      "center": {
+        "lat": 33.405,
+        "lng": -111.9425
+      },
+      "bbox": {
+        "min_lat": 33.393,
+        "max_lat": 33.417,
+        "min_lng": -111.955,
+        "max_lng": -111.93
+      },
+      "submarkets": [
+        "Alameda Park & Hudson Manor"
+      ]
+    },
+    "MILLS_APACHE": {
+      "name": "MILLS_APACHE",
+      "center": {
+        "lat": 33.405,
+        "lng": -111.91
+      },
+      "bbox": {
+        "min_lat": 33.393,
+        "max_lat": 33.417,
+        "min_lng": -111.93,
+        "max_lng": -111.888
+      },
+      "submarkets": [
+        "Apache Boulevard Light Rail",
+        "Mills Avenue & Emerald Park"
+      ]
+    },
+    "KIWANIS_THE_LAKES": {
+      "name": "KIWANIS_THE_LAKES",
+      "center": {
+        "lat": 33.375,
+        "lng": -111.92
+      },
+      "bbox": {
+        "min_lat": 33.355,
+        "max_lat": 33.393,
+        "min_lng": -111.985,
+        "max_lng": -111.855
+      },
+      "submarkets": [
+        "Kiwanis Park",
+        "The Lakes",
+        "Corona del Sol"
+      ]
+    },
+    "CORONA_SOUTH_TEMPE": {
+      "name": "CORONA_SOUTH_TEMPE",
+      "center": {
+        "lat": 33.3325,
+        "lng": -111.9075
+      },
+      "bbox": {
+        "min_lat": 33.31,
+        "max_lat": 33.355,
+        "min_lng": -111.985,
+        "max_lng": -111.83
+      },
+      "submarkets": [
+        "South Tempe Rural Corridor"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Mill Avenue": {
+      "name": "Downtown Mill Avenue",
+      "division": "DOWNTOWN_RIO_SALADO",
+      "center": {
+        "lat": 33.4267,
+        "lng": -111.9398
+      },
+      "description": "Mill Avenue entertainment spine with adaptive-reuse lofts, patio-retail turnover, and the metro's densest evening shift traffic."
+    },
+    "Hayden Ferry Lakeside": {
+      "name": "Hayden Ferry Lakeside",
+      "division": "DOWNTOWN_RIO_SALADO",
+      "center": {
+        "lat": 33.4313,
+        "lng": -111.9437
+      },
+      "description": "Tempe Town Lake south-shore office/residential district with class-A build-outs and the city's highest permit valuations."
+    },
+    "ASU Campus & University Drive": {
+      "name": "ASU Campus & University Drive",
+      "division": "ASU_CAMPUS_EDGE",
+      "center": {
+        "lat": 33.4245,
+        "lng": -111.9285
+      },
+      "description": "Campus-edge student-housing belt with continual renovation permitting, annual tenant turnover, and university-anchored retail."
+    },
+    "Escalante Historic District": {
+      "name": "Escalante Historic District",
+      "division": "ESCALANTE_HISTORIC",
+      "center": {
+        "lat": 33.43,
+        "lng": -111.908
+      },
+      "description": "Historic bungalow district with steady renovation, garage-conversion filings, and infill near the Mesa border."
+    },
+    "Papago Park & North Tempe": {
+      "name": "Papago Park & North Tempe",
+      "division": "PAPAGO_NORTH_TEMPE",
+      "center": {
+        "lat": 33.452,
+        "lng": -111.935
+      },
+      "description": "North-edge recreation and research belt with hotel/office repositioning and riverfront-adjacent multifamily filings."
+    },
+    "Diablo Stadium Corridor": {
+      "name": "Diablo Stadium Corridor",
+      "division": "DIABLO_DOUBLE_BUTTE",
+      "center": {
+        "lat": 33.401,
+        "lng": -111.9595
+      },
+      "description": "West Tempe stadium district with seasonal hospitality churn and spring-training-driven short-term demand."
+    },
+    "Alameda Park & Hudson Manor": {
+      "name": "Alameda Park & Hudson Manor",
+      "division": "ALAMEDA",
+      "center": {
+        "lat": 33.4075,
+        "lng": -111.937
+      },
+      "description": "Mid-century central neighborhoods with starter-home turnover, SES-panel permits, and rental-to-own conversions."
+    },
+    "Apache Boulevard Light Rail": {
+      "name": "Apache Boulevard Light Rail",
+      "division": "MILLS_APACHE",
+      "center": {
+        "lat": 33.4147,
+        "lng": -111.913
+      },
+      "description": "Light-rail spine with transit-oriented multifamily, international-food retail, and corridor infill permitting."
+    },
+    "Mills Avenue & Emerald Park": {
+      "name": "Mills Avenue & Emerald Park",
+      "division": "MILLS_APACHE",
+      "center": {
+        "lat": 33.404,
+        "lng": -111.922
+      },
+      "description": "Mills/Emerald character area with duplex conversions and small-plex new builds feeding steady rental supply."
+    },
+    "Kiwanis Park": {
+      "name": "Kiwanis Park",
+      "division": "KIWANIS_THE_LAKES",
+      "center": {
+        "lat": 33.382,
+        "lng": -111.8747
+      },
+      "description": "Park-anchored east Tempe with townhome infill and roof/HVAC replacement cadence on 1970s-80s stock."
+    },
+    "The Lakes": {
+      "name": "The Lakes",
+      "division": "KIWANIS_THE_LAKES",
+      "center": {
+        "lat": 33.372,
+        "lng": -111.9445
+      },
+      "description": "Lakeside community near Baseline with stable owner-occupancy and water-adjacent amenity premiums."
+    },
+    "Corona del Sol": {
+      "name": "Corona del Sol",
+      "division": "KIWANIS_THE_LAKES",
+      "center": {
+        "lat": 33.3745,
+        "lng": -111.905
+      },
+      "description": "School-district-driven family market with pool permits and kitchen/bath remodel velocity."
+    },
+    "South Tempe Rural Corridor": {
+      "name": "South Tempe Rural Corridor",
+      "division": "CORONA_SOUTH_TEMPE",
+      "center": {
+        "lat": 33.34,
+        "lng": -111.92
+      },
+      "description": "South-edge pockets along the Chandler boundary with no-hoA infill lots and low-rise commercial pads."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "AppliedDateDtm",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "CaseOpenDate",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/tempe.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

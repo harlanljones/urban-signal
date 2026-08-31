@@ -176,9 +176,9 @@
     "permits": null,
     "311": null,
     "sla": {
-      "platform": "arcgis",
-      "watermark_col": "",
-      "interval_seconds": 1800.0,
+      "platform": "socrata",
+      "watermark_col": "updated",
+      "interval_seconds": 3600.0,
       "topic": "raw.municipal.sla"
     },
     "deeds": null

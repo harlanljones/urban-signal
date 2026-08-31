@@ -1,0 +1,233 @@
+{
+  "schema_version": 2,
+  "id": "bend",
+  "name": "Bend, OR",
+  "state": "OR",
+  "center": {
+    "lat": 44.0575,
+    "lng": -121.315
+  },
+  "metro_bbox": {
+    "min_lat": 43.98,
+    "max_lat": 44.12,
+    "min_lng": -121.38,
+    "max_lng": -121.23
+  },
+  "divisions": {
+    "DOWNTOWN_CORE": {
+      "name": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 44.053,
+        "lng": -121.32
+      },
+      "bbox": {
+        "min_lat": 44.04,
+        "max_lat": 44.06,
+        "min_lng": -121.335,
+        "max_lng": -121.305
+      },
+      "submarkets": [
+        "Downtown",
+        "Old Mill District"
+      ]
+    },
+    "WESTSIDE": {
+      "name": "WESTSIDE",
+      "center": {
+        "lat": 44.03,
+        "lng": -121.355
+      },
+      "bbox": {
+        "min_lat": 44.015,
+        "max_lat": 44.045,
+        "min_lng": -121.375,
+        "max_lng": -121.335
+      },
+      "submarkets": [
+        "Westside & Century Drive"
+      ]
+    },
+    "NORTHWEST_CROSSING": {
+      "name": "NORTHWEST_CROSSING",
+      "center": {
+        "lat": 44.07,
+        "lng": -121.348
+      },
+      "bbox": {
+        "min_lat": 44.055,
+        "max_lat": 44.095,
+        "min_lng": -121.37,
+        "max_lng": -121.325
+      },
+      "submarkets": [
+        "Northwest Crossing",
+        "Awbrey Butte"
+      ]
+    },
+    "EAST_BEND": {
+      "name": "EAST_BEND",
+      "center": {
+        "lat": 44.075,
+        "lng": -121.295
+      },
+      "bbox": {
+        "min_lat": 44.055,
+        "max_lat": 44.095,
+        "min_lng": -121.31,
+        "max_lng": -121.25
+      },
+      "submarkets": [
+        "Orchard District",
+        "River West"
+      ]
+    },
+    "SOUTHEAST_BEND": {
+      "name": "SOUTHEAST_BEND",
+      "center": {
+        "lat": 44.03,
+        "lng": -121.31
+      },
+      "bbox": {
+        "min_lat": 44.0,
+        "max_lat": 44.055,
+        "min_lng": -121.335,
+        "max_lng": -121.29
+      },
+      "submarkets": [
+        "Old Farm District",
+        "Southern Crossing"
+      ]
+    },
+    "SOUTH_BEND": {
+      "name": "SOUTH_BEND",
+      "center": {
+        "lat": 43.997,
+        "lng": -121.285
+      },
+      "bbox": {
+        "min_lat": 43.98,
+        "max_lat": 44.01,
+        "min_lng": -121.33,
+        "max_lng": -121.25
+      },
+      "submarkets": [
+        "Larkspur"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown": {
+      "name": "Downtown",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 44.0575,
+        "lng": -121.315
+      },
+      "description": "Wall Street and Bond Street core with hotel/adaptive-reuse projects, the pedestrian riverfront, and the metro's densest mixed-use permitting corridor."
+    },
+    "Old Mill District": {
+      "name": "Old Mill District",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 44.048,
+        "lng": -121.327
+      },
+      "description": "Redeveloped lumber-mill campus on the Deschutes River with destination retail, amphitheater, offices, and riverfront multifamily infill."
+    },
+    "Westside & Century Drive": {
+      "name": "Westside & Century Drive",
+      "division": "WESTSIDE",
+      "center": {
+        "lat": 44.03,
+        "lng": -121.352
+      },
+      "description": "Century Drive corridor and southwest residential hills with strip-center retail, medical offices, and steady residential renovation permits."
+    },
+    "Northwest Crossing": {
+      "name": "Northwest Crossing",
+      "division": "NORTHWEST_CROSSING",
+      "center": {
+        "lat": 44.072,
+        "lng": -121.345
+      },
+      "description": "New-urbanist planned community with mixed-use Main Street, alley-loaded cottages, and the metro's strongest new-build permit pipeline."
+    },
+    "Awbrey Butte": {
+      "name": "Awbrey Butte",
+      "division": "NORTHWEST_CROSSING",
+      "center": {
+        "lat": 44.065,
+        "lng": -121.36
+      },
+      "description": "Upper-west hillside with view-lot estate builds, Skyline Ranch Road development, and top-end residential construction permits."
+    },
+    "Orchard District": {
+      "name": "Orchard District",
+      "division": "EAST_BEND",
+      "center": {
+        "lat": 44.069,
+        "lng": -121.303
+      },
+      "description": "Northeast historic orchard neighborhood with Craftsman-era housing, NE 3rd Street retail spine, and moderate renovation and ADU permits."
+    },
+    "River West": {
+      "name": "River West",
+      "division": "EAST_BEND",
+      "center": {
+        "lat": 44.076,
+        "lng": -121.305
+      },
+      "description": "North riverfront corridor along the Deschutes with park-adjacent residential and light industrial-to-residential conversions."
+    },
+    "Old Farm District": {
+      "name": "Old Farm District",
+      "division": "SOUTHEAST_BEND",
+      "center": {
+        "lat": 44.032,
+        "lng": -121.313
+      },
+      "description": "Historic southeast farm settlement around Reed Market Road with mid-century ranch stock and steady infill and redevelopment permits."
+    },
+    "Southern Crossing": {
+      "name": "Southern Crossing",
+      "division": "SOUTHEAST_BEND",
+      "center": {
+        "lat": 44.042,
+        "lng": -121.314
+      },
+      "description": "South-central neighborhood around SE 3rd and Reed Market with a densifying mixed-use node and growing multifamily development."
+    },
+    "Larkspur": {
+      "name": "Larkspur",
+      "division": "SOUTH_BEND",
+      "center": {
+        "lat": 43.997,
+        "lng": -121.278
+      },
+      "description": "Southern Bend residential fringe with Larkspur Trail Park, recent master-planned tracts, and family-oriented new construction."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "ApplicationDate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "CaseReportedDate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "LicenseExpirationDate",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/bend.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

@@ -109,3 +109,134 @@ def test_location_tuple_parser():
     assert _parse_location_tuple("(0.0, 0.0)") is None
     assert _parse_location_tuple("not a tuple") is None
     assert _parse_location_tuple(None) is None
+
+
+# ---------------------------------------------------------------------------
+# NYC DOHMH Restaurant Inspections (US-208) — Socrata, native lat/lng
+# ---------------------------------------------------------------------------
+
+NYC_INSPECTION_ROW = {
+    "camis": "50051779",
+    "dba": "1000 Degrees Pizza",
+    "boro": "MANHATTAN",
+    "building": "123",
+    "street": "BROADWAY",
+    "zipcode": "10007",
+    "cuisine_description": "Pizza",
+    "inspection_date": "2026-08-27T00:00:00.000",
+    "action": "Violations were cited in the following area(s).",
+    "violation_code": "04L",
+    "violation_description": "Food not protected during storage, preparation, display, transportation and service",
+    "critical_flag": "CRITICAL",
+    "score": "13",
+    "grade": "A",
+    "grade_date": "2026-08-27T00:00:00.000",
+    "record_date": "2026-08-28T00:00:00.000",
+    "inspection_type": "Cycle Inspection / Initial Inspection",
+    "latitude": "40.7128",
+    "longitude": "-74.0060",
+    "location": {"type": "Point", "coordinates": [-74.0060, 40.7128]},
+}
+
+
+def test_nyc_inspection_parses_native_latlng():
+    with patch.object(InspectionsProducer, "__init__", lambda self, bootstrap_servers=None: None):
+        prod = InspectionsProducer()
+        prod.spatial_indexer = __import__("src.spatial.h3_indexer", fromlist=["H3SpatialIndexer"]).H3SpatialIndexer()
+        event = prod.parse_row(NYC_INSPECTION_ROW, city_id="nyc")
+        assert event is not None
+        assert event.inspection_id == "50051779"
+        assert event.business_name == "1000 Degrees Pizza"
+        assert event.borough == "MANHATTAN"
+        assert event.address == "123 BROADWAY"
+        assert event.zipcode == "10007"
+        assert event.latitude == 40.7128
+        assert event.longitude == -74.0060
+        assert event.issued_date is not None
+        assert event.h3_res9 is not None
+
+
+def test_nyc_inspection_drops_zero_coords():
+    with patch.object(InspectionsProducer, "__init__", lambda self, bootstrap_servers=None: None):
+        prod = InspectionsProducer()
+        bad = dict(NYC_INSPECTION_ROW)
+        bad["latitude"] = "0"
+        bad["longitude"] = "0"
+        assert prod.parse_row(bad, city_id="nyc") is None
+
+
+# ---------------------------------------------------------------------------
+# Austin Code Complaint Cases (US-210) — Socrata, native lat/lng
+# ---------------------------------------------------------------------------
+
+AUSTIN_VIOLATION_ROW = {
+    "case_id": "2025-005905 CC",
+    "priority": "High",
+    "status": "Open",
+    "address": "2400 DORMARION LN",
+    "house_number": "2400",
+    "street_name": "DORMARION LN",
+    "city": "AUSTIN",
+    "state": "TX",
+    "zip_code": "78745",
+    "opened_date": "2026-08-15T00:00:00.000",
+    "closed_date": None,
+    "department": "Code",
+    "case_type": "Zoning",
+    "description": "Unpermitted construction",
+    "latitude": "30.2100",
+    "longitude": "-97.7700",
+    "location": {"type": "Point", "coordinates": [-97.7700, 30.2100]},
+}
+
+
+def test_austin_violation_parses_native_latlng():
+    with patch.object(ViolationsProducer, "__init__", lambda self, bootstrap_servers=None: None):
+        prod = ViolationsProducer()
+        prod.spatial_indexer = __import__("src.spatial.h3_indexer", fromlist=["H3SpatialIndexer"]).H3SpatialIndexer()
+        event = prod.parse_row(AUSTIN_VIOLATION_ROW, city_id="austin")
+        assert event is not None
+        assert event.violation_id == "2025-005905 CC"
+        assert event.code == "Zoning"
+        assert event.status == "Open"
+        assert event.description == "Unpermitted construction"
+        assert event.latitude == 30.2100
+        assert event.longitude == -97.7700
+        assert event.status_date is not None
+        assert event.h3_res9 is not None
+
+
+def test_austin_violation_drops_missing_coords():
+    with patch.object(ViolationsProducer, "__init__", lambda self, bootstrap_servers=None: None):
+        prod = ViolationsProducer()
+        bad = dict(AUSTIN_VIOLATION_ROW)
+        bad.pop("latitude")
+        bad.pop("longitude")
+        assert prod.parse_row(bad, city_id="austin") is None
+
+
+# ---------------------------------------------------------------------------
+# Maricopa County Sales Affidavits (US-392) — pipe-delimited CSV, DEEDS
+# ---------------------------------------------------------------------------
+
+def test_phoenix_registers_deeds_csv():
+    from src.spatial.city_registry import REGISTRY, CityId, FeedType, get_dataset
+
+    reg = REGISTRY[CityId.PHOENIX]
+    assert FeedType.DEEDS in reg.datasets
+    spec = get_dataset(CityId.PHOENIX, FeedType.DEEDS)
+    assert spec.platform == "csv"
+    assert spec.delimiter == "|"
+    assert spec.zip_member == "Sales_Affidavits.txt"
+    assert spec.ingestion_mode == "snapshot"
+    assert spec.watermark_col == ""
+    assert spec.id_keys == ["PARCELNUMBER", "DEEDNUMBER"]
+
+
+def test_maricopa_field_map_targets():
+    from src.producers.field_maps_maricopa_deeds import MARICOPA_DEEDS_FIELD_MAP
+
+    assert MARICOPA_DEEDS_FIELD_MAP["doc_id"] == ["DEEDNUMBER", "PARCELNUMBER"]
+    assert MARICOPA_DEEDS_FIELD_MAP["document_amount"] == ["SALEPRICE"]
+    assert MARICOPA_DEEDS_FIELD_MAP["recorded_date"] == ["DEEDDATE_MMDDYYYY"]
+    assert MARICOPA_DEEDS_FIELD_MAP["address_street"] == ["SITUSADDRESS"]

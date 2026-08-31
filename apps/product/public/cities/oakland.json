@@ -1,0 +1,268 @@
+{
+  "schema_version": 2,
+  "id": "oakland",
+  "name": "Oakland",
+  "state": "CA",
+  "center": {
+    "lat": 37.804,
+    "lng": -122.2712
+  },
+  "metro_bbox": {
+    "min_lat": 37.696,
+    "max_lat": 37.885,
+    "min_lng": -122.36,
+    "max_lng": -122.114
+  },
+  "divisions": {
+    "WEST_OAKLAND": {
+      "name": "WEST_OAKLAND",
+      "center": {
+        "lat": 37.8045,
+        "lng": -122.303
+      },
+      "bbox": {
+        "min_lat": 37.795,
+        "max_lat": 37.812,
+        "min_lng": -122.335,
+        "max_lng": -122.282
+      },
+      "submarkets": [
+        "West Oakland"
+      ]
+    },
+    "DOWNTOWN_CORE": {
+      "name": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 37.806,
+        "lng": -122.269
+      },
+      "bbox": {
+        "min_lat": 37.794,
+        "max_lat": 37.812,
+        "min_lng": -122.282,
+        "max_lng": -122.264
+      },
+      "submarkets": [
+        "Downtown Oakland",
+        "Uptown"
+      ]
+    },
+    "LAKE_MERRITT_GRAND_LAKE": {
+      "name": "LAKE_MERRITT_GRAND_LAKE",
+      "center": {
+        "lat": 37.802,
+        "lng": -122.252
+      },
+      "bbox": {
+        "min_lat": 37.792,
+        "max_lat": 37.815,
+        "min_lng": -122.264,
+        "max_lng": -122.24
+      },
+      "submarkets": [
+        "Lake Merritt",
+        "Grand Lake"
+      ]
+    },
+    "NORTH_OAKLAND": {
+      "name": "NORTH_OAKLAND",
+      "center": {
+        "lat": 37.835,
+        "lng": -122.279
+      },
+      "bbox": {
+        "min_lat": 37.815,
+        "max_lat": 37.86,
+        "min_lng": -122.31,
+        "max_lng": -122.249
+      },
+      "submarkets": [
+        "Temescal",
+        "Rockridge"
+      ]
+    },
+    "HILLS_MONTCLAIR": {
+      "name": "HILLS_MONTCLAIR",
+      "center": {
+        "lat": 37.841,
+        "lng": -122.215
+      },
+      "bbox": {
+        "min_lat": 37.815,
+        "max_lat": 37.878,
+        "min_lng": -122.249,
+        "max_lng": -122.185
+      },
+      "submarkets": [
+        "Montclair",
+        "Skyline Hills"
+      ]
+    },
+    "EAST_OAKLAND_FRUITVALE": {
+      "name": "EAST_OAKLAND_FRUITVALE",
+      "center": {
+        "lat": 37.766,
+        "lng": -122.222
+      },
+      "bbox": {
+        "min_lat": 37.74,
+        "max_lat": 37.792,
+        "min_lng": -122.245,
+        "max_lng": -122.15
+      },
+      "submarkets": [
+        "Fruitvale",
+        "San Antonio"
+      ]
+    },
+    "EASTMONT_DEEP_EAST": {
+      "name": "EASTMONT_DEEP_EAST",
+      "center": {
+        "lat": 37.725,
+        "lng": -122.185
+      },
+      "bbox": {
+        "min_lat": 37.696,
+        "max_lat": 37.74,
+        "min_lng": -122.22,
+        "max_lng": -122.14
+      },
+      "submarkets": [
+        "Eastmont",
+        "Elmhurst"
+      ]
+    }
+  },
+  "submarkets": {
+    "West Oakland": {
+      "name": "West Oakland",
+      "division": "WEST_OAKLAND",
+      "center": {
+        "lat": 37.806,
+        "lng": -122.295
+      },
+      "description": "Mandela Parkway corridor with Victorian rowhouse stock, the Seventh Street cultural heritage blocks, and infill reinvestment beside the Port and West Oakland BART."
+    },
+    "Downtown Oakland": {
+      "name": "Downtown Oakland",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 37.804,
+        "lng": -122.2712
+      },
+      "description": "Frank Ogawa Plaza and the CBD core with the 19th Street BART office market, new residential towers, and the Chinatown-adjacent retail spine."
+    },
+    "Uptown": {
+      "name": "Uptown",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 37.809,
+        "lng": -122.267
+      },
+      "description": "Telegraph Avenue entertainment district with the Fox and Paramount theatres, the Uptown Station office conversion, and Oakland's densest bar-and-restaurant turnover."
+    },
+    "Lake Merritt": {
+      "name": "Lake Merritt",
+      "division": "LAKE_MERRITT_GRAND_LAKE",
+      "center": {
+        "lat": 37.797,
+        "lng": -122.256
+      },
+      "description": "Lakeside apartment belt with the Cleveland Heights edge, Adams Point multifamily stock, and the Lakeshore retail corridor ringing the nation's first wildlife refuge."
+    },
+    "Grand Lake": {
+      "name": "Grand Lake",
+      "division": "LAKE_MERRITT_GRAND_LAKE",
+      "center": {
+        "lat": 37.8075,
+        "lng": -122.249
+      },
+      "description": "Grand Avenue retailer strip below the Grand Lake Theatre with walkable cafe-frontage blocks, Craftsman renovation demand, and Lakeview terrace housing."
+    },
+    "Temescal": {
+      "name": "Temescal",
+      "division": "NORTH_OAKLAND",
+      "center": {
+        "lat": 37.8285,
+        "lng": -122.268
+      },
+      "description": "Telegraph/51st merchant district with restaurant-row foot traffic, former-industrial live-work conversions, and the MacArthur BART transit-adjacent infill."
+    },
+    "Rockridge": {
+      "name": "Rockridge",
+      "division": "NORTH_OAKLAND",
+      "center": {
+        "lat": 37.841,
+        "lng": -122.253
+      },
+      "description": "College Avenue premium retail spine with bungalow-stock renovation, College Prep/BART walkability, and the metro's top single-family valuation band."
+    },
+    "Montclair": {
+      "name": "Montclair",
+      "division": "HILLS_MONTCLAIR",
+      "center": {
+        "lat": 37.841,
+        "lng": -122.216
+      },
+      "description": "Mountain Boulevard village core with hillside view lots, mid-century estate turnover, and the Montclair village retail block."
+    },
+    "Skyline Hills": {
+      "name": "Skyline Hills",
+      "division": "HILLS_MONTCLAIR",
+      "center": {
+        "lat": 37.842,
+        "lng": -122.195
+      },
+      "description": "Skyline Boulevard crest neighborhoods with canyon-view properties, Joaquin Miller/Chabot park adjacency, and low-density custom-build permitting."
+    },
+    "Fruitvale": {
+      "name": "Fruitvale",
+      "division": "EAST_OAKLAND_FRUITVALE",
+      "center": {
+        "lat": 37.775,
+        "lng": -122.215
+      },
+      "description": "International Boulevard Latino commercial spine with the Fruitvale BART transit village, mixed-use Paseo redevelopment, and dense multifamily turnover."
+    },
+    "San Antonio": {
+      "name": "San Antonio",
+      "division": "EAST_OAKLAND_FRUITVALE",
+      "center": {
+        "lat": 37.7905,
+        "lng": -122.2345
+      },
+      "description": "East Lake and San Antonio flatlands with the Park Street bridge-frontage blocks, oldest Victorian stock in the metro, and strong small-multifamily conversion demand."
+    },
+    "Eastmont": {
+      "name": "Eastmont",
+      "division": "EASTMONT_DEEP_EAST",
+      "center": {
+        "lat": 37.732,
+        "lng": -122.19
+      },
+      "description": "Eastmont Town Center district with the 73rd/98th Avenue corridors, large-lot single-family stock, and community-benefit redevelopment along Foothill."
+    },
+    "Elmhurst": {
+      "name": "Elmhurst",
+      "division": "EASTMONT_DEEP_EAST",
+      "center": {
+        "lat": 37.718,
+        "lng": -122.165
+      },
+      "description": "Southernmost flatlands along the San Leandro border with post-war starter stock, the Hegenberger logistics corridor, and airport-adjacent industrial conversion."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": {
+      "platform": "socrata",
+      "watermark_col": "datetimeinit",
+      "interval_seconds": 180.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/oakland.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

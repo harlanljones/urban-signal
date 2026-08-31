@@ -1,0 +1,223 @@
+{
+  "schema_version": 2,
+  "id": "chandler",
+  "name": "Chandler",
+  "state": "AZ",
+  "center": {
+    "lat": 33.306,
+    "lng": -111.8412
+  },
+  "metro_bbox": {
+    "min_lat": 33.2,
+    "max_lat": 33.37,
+    "min_lng": -111.98,
+    "max_lng": -111.75
+  },
+  "divisions": {
+    "WEST_CHANDLER_MARLBOROUGH": {
+      "name": "WEST_CHANDLER_MARLBOROUGH",
+      "center": {
+        "lat": 33.347,
+        "lng": -111.9
+      },
+      "bbox": {
+        "min_lat": 33.325,
+        "max_lat": 33.37,
+        "min_lng": -111.98,
+        "max_lng": -111.855
+      },
+      "submarkets": [
+        "Marlborough Park Estates",
+        "West Chandler Kyrene Belt"
+      ]
+    },
+    "PRICE_ROAD_CORRIDOR": {
+      "name": "PRICE_ROAD_CORRIDOR",
+      "center": {
+        "lat": 33.307,
+        "lng": -111.87
+      },
+      "bbox": {
+        "min_lat": 33.29,
+        "max_lat": 33.325,
+        "min_lng": -111.98,
+        "max_lng": -111.855
+      },
+      "submarkets": [
+        "Andersen Springs & Chandler Blvd",
+        "Intel Ocotillo Tech Belt"
+      ]
+    },
+    "DOWNTOWN_HISTORIC_CORE": {
+      "name": "DOWNTOWN_HISTORIC_CORE",
+      "center": {
+        "lat": 33.306,
+        "lng": -111.841
+      },
+      "bbox": {
+        "min_lat": 33.29,
+        "max_lat": 33.325,
+        "min_lng": -111.855,
+        "max_lng": -111.825
+      },
+      "submarkets": [
+        "Downtown Historic Core"
+      ]
+    },
+    "AIRPORT_EAST_GATEWAY": {
+      "name": "AIRPORT_EAST_GATEWAY",
+      "center": {
+        "lat": 33.29,
+        "lng": -111.795
+      },
+      "bbox": {
+        "min_lat": 33.28,
+        "max_lat": 33.37,
+        "min_lng": -111.825,
+        "max_lng": -111.75
+      },
+      "submarkets": [
+        "Chandler Municipal Airport"
+      ]
+    },
+    "OCOTILLO_SOUTH_LAKES": {
+      "name": "OCOTILLO_SOUTH_LAKES",
+      "center": {
+        "lat": 33.245,
+        "lng": -111.845
+      },
+      "bbox": {
+        "min_lat": 33.2,
+        "max_lat": 33.28,
+        "min_lng": -111.98,
+        "max_lng": -111.825
+      },
+      "submarkets": [
+        "Ocotillo Lakes",
+        "Fulton Ranch"
+      ]
+    },
+    "SOUTHEAST_SUN_GROVES": {
+      "name": "SOUTHEAST_SUN_GROVES",
+      "center": {
+        "lat": 33.212,
+        "lng": -111.785
+      },
+      "bbox": {
+        "min_lat": 33.2,
+        "max_lat": 33.28,
+        "min_lng": -111.825,
+        "max_lng": -111.75
+      },
+      "submarkets": [
+        "Sun Groves",
+        "Springfield, Cooper Commons & Circle G"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Historic Core": {
+      "name": "Downtown Historic Core",
+      "division": "DOWNTOWN_HISTORIC_CORE",
+      "center": {
+        "lat": 33.306,
+        "lng": -111.8412
+      },
+      "description": "Dr. A.J. Chandler park and the ostrich-farm heritage grid around San Marcos and Arizona Avenue, with adaptive reuse, murals-and-patios retail, and steady downtown infill permitting."
+    },
+    "Andersen Springs & Chandler Blvd": {
+      "name": "Andersen Springs & Chandler Blvd",
+      "division": "PRICE_ROAD_CORRIDOR",
+      "center": {
+        "lat": 33.3075,
+        "lng": -111.8725
+      },
+      "description": "Office-park and apartment belt along the Chandler Boulevard frontage with build-to-rent infill, valley-metro commuter demand, and steady TI/tenant-improvement permitting."
+    },
+    "Intel Ocotillo Tech Belt": {
+      "name": "Intel Ocotillo Tech Belt",
+      "division": "PRICE_ROAD_CORRIDOR",
+      "center": {
+        "lat": 33.3163,
+        "lng": -111.856
+      },
+      "description": "Price Road Corridor employment core anchored by the Intel Ocotillo campus and supplier vendors, with the metro's highest-valuation commercial trades and engineering-led permit velocity."
+    },
+    "Marlborough Park Estates": {
+      "name": "Marlborough Park Estates",
+      "division": "WEST_CHANDLER_MARLBOROUGH",
+      "center": {
+        "lat": 33.348,
+        "lng": -111.8918
+      },
+      "description": "North Chandler residential belt around the MARLBOROUGH ESTATES plat (recorded 1973) with pool/deck auxiliary permits, roof-replacement cadence, and Kyrene-school family churn."
+    },
+    "West Chandler Kyrene Belt": {
+      "name": "West Chandler Kyrene Belt",
+      "division": "WEST_CHANDLER_MARLBOROUGH",
+      "center": {
+        "lat": 33.34,
+        "lng": -111.92
+      },
+      "description": "Western edge toward the Kyrene corridor with 1970s-80s tract stock, renovation-led permitting, and the I-10/Pecos logistics commute shed."
+    },
+    "Chandler Municipal Airport": {
+      "name": "Chandler Municipal Airport",
+      "division": "AIRPORT_EAST_GATEWAY",
+      "center": {
+        "lat": 33.2906,
+        "lng": -111.7968
+      },
+      "description": "Reliever-airport industrial district with hangar and flight-school tenancy, airpark-adjacent light industrial trades, and the East Valley logistics gateway."
+    },
+    "Ocotillo Lakes": {
+      "name": "Ocotillo Lakes",
+      "division": "OCOTILLO_SOUTH_LAKES",
+      "center": {
+        "lat": 33.2495,
+        "lng": -111.8355
+      },
+      "description": "Lake-amenity master plan of 58 recorded Ocotillo plats with golf-front custom stock, waterfront renovation, and the city's steadiest high-valuation residential trades."
+    },
+    "Fulton Ranch": {
+      "name": "Fulton Ranch",
+      "division": "OCOTILLO_SOUTH_LAKES",
+      "center": {
+        "lat": 33.2402,
+        "lng": -111.8506
+      },
+      "description": "Master-planned village on the Gila River canal system with estate lots, village-retail pads, and continued build-out permitting at the metro's southwest edge."
+    },
+    "Sun Groves": {
+      "name": "Sun Groves",
+      "division": "SOUTHEAST_SUN_GROVES",
+      "center": {
+        "lat": 33.212,
+        "lng": -111.764
+      },
+      "description": "Southeast-corner subdivision family of twelve recorded parcels with newer-roof stock, Chandler Heights corridor retail pads, and the metro's fastest family-formation churn."
+    },
+    "Springfield, Cooper Commons & Circle G": {
+      "name": "Springfield, Cooper Commons & Circle G",
+      "division": "SOUTHEAST_SUN_GROVES",
+      "center": {
+        "lat": 33.2118,
+        "lng": -111.7982
+      },
+      "description": "Southeast master-planned belt of the SPRINGFIELD, COOPER COMMONS and CIRCLE G AT RIGGS HOMESTEAD RANCH plats with elementary-school build-out, horse-property transition lots, and pool/ patio auxiliary permitting."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "CREATE_DT",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/chandler.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

@@ -1,0 +1,338 @@
+{
+  "schema_version": 2,
+  "id": "missoula",
+  "name": "Missoula",
+  "state": "MT",
+  "center": {
+    "lat": 46.8721,
+    "lng": -113.994
+  },
+  "metro_bbox": {
+    "min_lat": 46.78,
+    "max_lat": 46.94,
+    "min_lng": -114.13,
+    "max_lng": -113.92
+  },
+  "divisions": {
+    "DOWNTOWN": {
+      "name": "DOWNTOWN",
+      "center": {
+        "lat": 46.8715,
+        "lng": -113.9955
+      },
+      "bbox": {
+        "min_lat": 46.866,
+        "max_lat": 46.878,
+        "min_lng": -114.002,
+        "max_lng": -113.988
+      },
+      "submarkets": [
+        "Heart of Missoula",
+        "Riverfront"
+      ]
+    },
+    "UNIVERSITY": {
+      "name": "UNIVERSITY",
+      "center": {
+        "lat": 46.86,
+        "lng": -114.0
+      },
+      "bbox": {
+        "min_lat": 46.85,
+        "max_lat": 46.866,
+        "min_lng": -114.02,
+        "max_lng": -113.98
+      },
+      "submarkets": [
+        "University District",
+        "Franklin to the Fort",
+        "Lewis & Clark"
+      ]
+    },
+    "SOUTHSIDE": {
+      "name": "SOUTHSIDE",
+      "center": {
+        "lat": 46.836,
+        "lng": -114.025
+      },
+      "bbox": {
+        "min_lat": 46.822,
+        "max_lat": 46.85,
+        "min_lng": -114.05,
+        "max_lng": -114.0
+      },
+      "submarkets": [
+        "Southgate Triangle",
+        "South 39th Street",
+        "Two Rivers"
+      ]
+    },
+    "WEST_MIDTOWN": {
+      "name": "WEST_MIDTOWN",
+      "center": {
+        "lat": 46.862,
+        "lng": -114.035
+      },
+      "bbox": {
+        "min_lat": 46.846,
+        "max_lat": 46.885,
+        "min_lng": -114.06,
+        "max_lng": -114.002
+      },
+      "submarkets": [
+        "Westside",
+        "Rose Park",
+        "River Road",
+        "Moose Can Gully"
+      ]
+    },
+    "NORTHSIDE": {
+      "name": "NORTHSIDE",
+      "center": {
+        "lat": 46.893,
+        "lng": -114.03
+      },
+      "bbox": {
+        "min_lat": 46.878,
+        "max_lat": 46.93,
+        "min_lng": -114.1,
+        "max_lng": -113.99
+      },
+      "submarkets": [
+        "Northside",
+        "Grant Creek",
+        "Marshall Canyon"
+      ]
+    },
+    "RATTLESNAKE": {
+      "name": "RATTLESNAKE",
+      "center": {
+        "lat": 46.899,
+        "lng": -113.962
+      },
+      "bbox": {
+        "min_lat": 46.878,
+        "max_lat": 46.93,
+        "min_lng": -114.002,
+        "max_lng": -113.92
+      },
+      "submarkets": [
+        "Lower Rattlesnake",
+        "Upper Rattlesnake",
+        "Captain John Mullan"
+      ]
+    },
+    "SOUTHEAST": {
+      "name": "SOUTHEAST",
+      "center": {
+        "lat": 46.818,
+        "lng": -114.018
+      },
+      "bbox": {
+        "min_lat": 46.78,
+        "max_lat": 46.846,
+        "min_lng": -114.1,
+        "max_lng": -113.95
+      },
+      "submarkets": [
+        "Miller Creek",
+        "Farviews / Pattee Canyon"
+      ]
+    }
+  },
+  "submarkets": {
+    "Heart of Missoula": {
+      "name": "Heart of Missoula",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 46.8721,
+        "lng": -113.994
+      },
+      "description": "Central downtown core with Higgins Avenue retail, the Wilma, and the Missoula Farmers Market adjacency."
+    },
+    "Riverfront": {
+      "name": "Riverfront",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 46.871,
+        "lng": -113.9965
+      },
+      "description": "Clark Fork riverfront corridor with Caras Park, the Brennan's Wave surf amenity, and mixed-use redevelopment."
+    },
+    "University District": {
+      "name": "University District",
+      "division": "UNIVERSITY",
+      "center": {
+        "lat": 46.8595,
+        "lng": -113.9842
+      },
+      "description": "University of Montana campus-adjacent historic district with student housing turnover and academic-adjacent licensing."
+    },
+    "Franklin to the Fort": {
+      "name": "Franklin to the Fort",
+      "division": "UNIVERSITY",
+      "center": {
+        "lat": 46.857,
+        "lng": -114.003
+      },
+      "description": "Transitional corridor between UM and the South Hills with single-family infill and small-scale commercial."
+    },
+    "Lewis & Clark": {
+      "name": "Lewis & Clark",
+      "division": "UNIVERSITY",
+      "center": {
+        "lat": 46.865,
+        "lng": -114.018
+      },
+      "description": "Southwest residential neighborhood of mid-century ranch homes with steady renovation permitting."
+    },
+    "Southgate Triangle": {
+      "name": "Southgate Triangle",
+      "division": "SOUTHSIDE",
+      "center": {
+        "lat": 46.838,
+        "lng": -114.02
+      },
+      "description": "Southgate Mall retail node and surrounding garden-apartment stock with commercial renovation and tenant-improvement permits."
+    },
+    "South 39th Street": {
+      "name": "South 39th Street",
+      "division": "SOUTHSIDE",
+      "center": {
+        "lat": 46.8305,
+        "lng": -114.015
+      },
+      "description": "South-central residential corridor of post-war single-family homes with modest renovation cyclics."
+    },
+    "Two Rivers": {
+      "name": "Two Rivers",
+      "division": "SOUTHSIDE",
+      "center": {
+        "lat": 46.828,
+        "lng": -114.04
+      },
+      "description": "Clark Fork / Bitterroot confluence neighborhood with large-lot single-family and rural-urban fringe permitting."
+    },
+    "Westside": {
+      "name": "Westside",
+      "division": "WEST_MIDTOWN",
+      "center": {
+        "lat": 46.873,
+        "lng": -114.026
+      },
+      "description": "West Missoula corridor with Reserve Street commercial spine and working-class single-family stock."
+    },
+    "Rose Park": {
+      "name": "Rose Park",
+      "division": "WEST_MIDTOWN",
+      "center": {
+        "lat": 46.878,
+        "lng": -114.007
+      },
+      "description": "Rose Park neighborhood with early-20th-century bungalows, mature tree canopy, and steady kitchen/bathroom renovation permits."
+    },
+    "River Road": {
+      "name": "River Road",
+      "division": "WEST_MIDTOWN",
+      "center": {
+        "lat": 46.852,
+        "lng": -114.055
+      },
+      "description": "West-side river corridor of newer subdivisions and large-lot residential with new-build permitting volume."
+    },
+    "Moose Can Gully": {
+      "name": "Moose Can Gully",
+      "division": "WEST_MIDTOWN",
+      "center": {
+        "lat": 46.846,
+        "lng": -114.052
+      },
+      "description": "Southwest gully neighborhood of exurban subdivisions with well-septic permitting and rural character."
+    },
+    "Northside": {
+      "name": "Northside",
+      "division": "NORTHSIDE",
+      "center": {
+        "lat": 46.884,
+        "lng": -113.996
+      },
+      "description": "North Missoula industrial-residential mix with the rail yard, Northside neighborhood, and warehouse-to-residential conversions."
+    },
+    "Grant Creek": {
+      "name": "Grant Creek",
+      "division": "NORTHSIDE",
+      "center": {
+        "lat": 46.91,
+        "lng": -114.065
+      },
+      "description": "Northern valley corridor with master-planned subdivisions, golf course adjacency, and hotel/commercial development."
+    },
+    "Marshall Canyon": {
+      "name": "Marshall Canyon",
+      "division": "NORTHSIDE",
+      "center": {
+        "lat": 46.887,
+        "lng": -114.03
+      },
+      "description": "Marshall Mountain foothills neighborhood with newer single-family construction and wildland-urban interface permitting."
+    },
+    "Lower Rattlesnake": {
+      "name": "Lower Rattlesnake",
+      "division": "RATTLESNAKE",
+      "center": {
+        "lat": 46.887,
+        "lng": -113.97
+      },
+      "description": "Established Rattlesnake Valley floor neighborhood with leafy streets, mid-century homes, and steady renovation permits."
+    },
+    "Upper Rattlesnake": {
+      "name": "Upper Rattlesnake",
+      "division": "RATTLESNAKE",
+      "center": {
+        "lat": 46.916,
+        "lng": -113.955
+      },
+      "description": "Upper Rattlesnake Creek corridor with large estate lots, high-value remodels, and hillside building permits."
+    },
+    "Captain John Mullan": {
+      "name": "Captain John Mullan",
+      "division": "RATTLESNAKE",
+      "center": {
+        "lat": 46.894,
+        "lng": -113.938
+      },
+      "description": "East Mullan Road corridor with big-box retail, office parks, and the metro's largest commercial permit pipeline."
+    },
+    "Miller Creek": {
+      "name": "Miller Creek",
+      "division": "SOUTHEAST",
+      "center": {
+        "lat": 46.801,
+        "lng": -114.055
+      },
+      "description": "Southern exurban corridor along Miller Creek Road with new subdivisions, well/septic permits, and rural-residential growth."
+    },
+    "Farviews / Pattee Canyon": {
+      "name": "Farviews / Pattee Canyon",
+      "division": "SOUTHEAST",
+      "center": {
+        "lat": 46.836,
+        "lng": -113.982
+      },
+      "description": "Southeast hillside neighborhood with Pattee Canyon recreation access, custom home construction, and forest-interface permits."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "ApplicationDate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/missoula.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

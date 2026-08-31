@@ -1,0 +1,228 @@
+{
+  "schema_version": 2,
+  "id": "scottsdale",
+  "name": "Scottsdale, AZ",
+  "state": "AZ",
+  "center": {
+    "lat": 33.4942,
+    "lng": -111.9261
+  },
+  "metro_bbox": {
+    "min_lat": 33.44,
+    "max_lat": 33.91,
+    "min_lng": -112.0,
+    "max_lng": -111.73
+  },
+  "divisions": {
+    "OLD_TOWN": {
+      "name": "OLD_TOWN",
+      "center": {
+        "lat": 33.493,
+        "lng": -111.9258
+      },
+      "bbox": {
+        "min_lat": 33.49,
+        "max_lat": 33.512,
+        "min_lng": -111.945,
+        "max_lng": -111.912
+      },
+      "submarkets": [
+        "Old Town Scottsdale",
+        "Arts District"
+      ]
+    },
+    "SOUTH_SCOTTSDALE": {
+      "name": "SOUTH_SCOTTSDALE",
+      "center": {
+        "lat": 33.462,
+        "lng": -111.921
+      },
+      "bbox": {
+        "min_lat": 33.44,
+        "max_lat": 33.49,
+        "min_lng": -111.965,
+        "max_lng": -111.88
+      },
+      "submarkets": [
+        "Los Arcos Corridor",
+        "SkySong District"
+      ]
+    },
+    "GAINEY_RANCH": {
+      "name": "GAINEY_RANCH",
+      "center": {
+        "lat": 33.5864,
+        "lng": -111.8959
+      },
+      "bbox": {
+        "min_lat": 33.568,
+        "max_lat": 33.604,
+        "min_lng": -111.93,
+        "max_lng": -111.88
+      },
+      "submarkets": [
+        "Gainey Village"
+      ]
+    },
+    "AIRPARK": {
+      "name": "AIRPARK",
+      "center": {
+        "lat": 33.6229,
+        "lng": -111.9103
+      },
+      "bbox": {
+        "min_lat": 33.604,
+        "max_lat": 33.638,
+        "min_lng": -111.96,
+        "max_lng": -111.89
+      },
+      "submarkets": [
+        "Scottsdale Airpark"
+      ]
+    },
+    "DC_RANCH": {
+      "name": "DC_RANCH",
+      "center": {
+        "lat": 33.6562,
+        "lng": -111.9168
+      },
+      "bbox": {
+        "min_lat": 33.638,
+        "max_lat": 33.678,
+        "min_lng": -111.95,
+        "max_lng": -111.885
+      },
+      "submarkets": [
+        "DC Ranch / Market Street",
+        "Cavasson Corridor"
+      ]
+    },
+    "NORTH_SCOTTSDALE": {
+      "name": "NORTH_SCOTTSDALE",
+      "center": {
+        "lat": 33.706,
+        "lng": -111.909
+      },
+      "bbox": {
+        "min_lat": 33.678,
+        "max_lat": 33.905,
+        "min_lng": -111.98,
+        "max_lng": -111.755
+      },
+      "submarkets": [
+        "Troon",
+        "Desert Highlands / Happy Valley"
+      ]
+    }
+  },
+  "submarkets": {
+    "Old Town Scottsdale": {
+      "name": "Old Town Scottsdale",
+      "division": "OLD_TOWN",
+      "center": {
+        "lat": 33.4926,
+        "lng": -111.9253
+      },
+      "description": "Fifth Avenue and Main Street entertainment core with gallery frontage, hotel conversions, and the entertainment-district patio economy."
+    },
+    "Arts District": {
+      "name": "Arts District",
+      "division": "OLD_TOWN",
+      "center": {
+        "lat": 33.4962,
+        "lng": -111.9341
+      },
+      "description": "Gallery row west of Scottsdale Road with museum adjacency, art-walk retail, and boutique office conversions."
+    },
+    "Los Arcos Corridor": {
+      "name": "Los Arcos Corridor",
+      "division": "SOUTH_SCOTTSDALE",
+      "center": {
+        "lat": 33.464,
+        "lng": -111.9255
+      },
+      "description": "McDowell and Scottsdale Road retail belt with post-war strip retrofit, infill multifamily, and the Los Arcos redevelopment blocks."
+    },
+    "SkySong District": {
+      "name": "SkySong District",
+      "division": "SOUTH_SCOTTSDALE",
+      "center": {
+        "lat": 33.4874,
+        "lng": -111.9211
+      },
+      "description": "ASU SkySong innovation campus corridor with research-office demand, student-adjacent rentals, and steady tenant-improvement permitting."
+    },
+    "Gainey Village": {
+      "name": "Gainey Village",
+      "division": "GAINEY_RANCH",
+      "center": {
+        "lat": 33.5864,
+        "lng": -111.8959
+      },
+      "description": "Gainey Ranch corporate and village core with golf-community stock, Class A office along Doubletree, and stable license renewals."
+    },
+    "Scottsdale Airpark": {
+      "name": "Scottsdale Airpark",
+      "division": "AIRPARK",
+      "center": {
+        "lat": 33.6229,
+        "lng": -111.9103
+      },
+      "description": "Airport and Loop 101 office corridor with aviation-adjacent industrial, WestWorld event demand, and the metro's densest corporate lease belt."
+    },
+    "DC Ranch / Market Street": {
+      "name": "DC Ranch / Market Street",
+      "division": "DC_RANCH",
+      "center": {
+        "lat": 33.6562,
+        "lng": -111.9168
+      },
+      "description": "Master-planned DC Ranch village with Market Street retail, custom-lot rebuilds, and the metro's top household-income band."
+    },
+    "Cavasson Corridor": {
+      "name": "Cavasson Corridor",
+      "division": "DC_RANCH",
+      "center": {
+        "lat": 33.6565,
+        "lng": -111.9087
+      },
+      "description": "Hayden Road corporate corridor anchored by the Cavasson master plan (Scripps/ASU campus) — evidenced by live tenant-improvement permitting at 18700 N Hayden."
+    },
+    "Troon": {
+      "name": "Troon",
+      "division": "NORTH_SCOTTSDALE",
+      "center": {
+        "lat": 33.706,
+        "lng": -111.909
+      },
+      "description": "Golf-community custom-home edge at the McDowell Sonoran Preserve with view-lot rebuilds and luxury remodel demand."
+    },
+    "Desert Highlands / Happy Valley": {
+      "name": "Desert Highlands / Happy Valley",
+      "division": "NORTH_SCOTTSDALE",
+      "center": {
+        "lat": 33.6803,
+        "lng": -111.8612
+      },
+      "description": "Happy Valley Road gate-community belt (Desert Highlands, Troon North edges) — evidenced by live SFR-CUSTOM and NATIVE PLANT permits at 10040 E Happy Valley Rd."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "IssueDate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "BusinessStartDate",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/scottsdale.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

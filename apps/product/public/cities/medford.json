@@ -1,0 +1,273 @@
+{
+  "schema_version": 2,
+  "id": "medford",
+  "name": "Medford, OR",
+  "state": "OR",
+  "center": {
+    "lat": 42.3266,
+    "lng": -122.8756
+  },
+  "metro_bbox": {
+    "min_lat": 42.26,
+    "max_lat": 42.41,
+    "min_lng": -122.99,
+    "max_lng": -122.78
+  },
+  "divisions": {
+    "DOWNTOWN_MEDFORD": {
+      "name": "DOWNTOWN_MEDFORD",
+      "center": {
+        "lat": 42.3266,
+        "lng": -122.8756
+      },
+      "bbox": {
+        "min_lat": 42.32,
+        "max_lat": 42.336,
+        "min_lng": -122.884,
+        "max_lng": -122.866
+      },
+      "submarkets": [
+        "Downtown"
+      ]
+    },
+    "MIDTOWN_MEDFORD_CENTER": {
+      "name": "MIDTOWN_MEDFORD_CENTER",
+      "center": {
+        "lat": 42.3418,
+        "lng": -122.8786
+      },
+      "bbox": {
+        "min_lat": 42.334,
+        "max_lat": 42.35,
+        "min_lng": -122.888,
+        "max_lng": -122.865
+      },
+      "submarkets": [
+        "Medford Center"
+      ]
+    },
+    "EAST_MEDFORD": {
+      "name": "EAST_MEDFORD",
+      "center": {
+        "lat": 42.339,
+        "lng": -122.85
+      },
+      "bbox": {
+        "min_lat": 42.318,
+        "max_lat": 42.372,
+        "min_lng": -122.862,
+        "max_lng": -122.82
+      },
+      "submarkets": [
+        "East Medford",
+        "McAndrews Corridor"
+      ]
+    },
+    "SOUTH_MEDFORD": {
+      "name": "SOUTH_MEDFORD",
+      "center": {
+        "lat": 42.3,
+        "lng": -122.87
+      },
+      "bbox": {
+        "min_lat": 42.278,
+        "max_lat": 42.318,
+        "min_lng": -122.888,
+        "max_lng": -122.83
+      },
+      "submarkets": [
+        "South Medford",
+        "Stewart Meadows"
+      ]
+    },
+    "NORTH_MEDFORD": {
+      "name": "NORTH_MEDFORD",
+      "center": {
+        "lat": 42.363,
+        "lng": -122.855
+      },
+      "bbox": {
+        "min_lat": 42.348,
+        "max_lat": 42.39,
+        "min_lng": -122.888,
+        "max_lng": -122.828
+      },
+      "submarkets": [
+        "North Medford",
+        "Airport Edge"
+      ]
+    },
+    "RIVERSIDE_BEAR_CREEK": {
+      "name": "RIVERSIDE_BEAR_CREEK",
+      "center": {
+        "lat": 42.3237,
+        "lng": -122.8541
+      },
+      "bbox": {
+        "min_lat": 42.302,
+        "max_lat": 42.338,
+        "min_lng": -122.868,
+        "max_lng": -122.845
+      },
+      "submarkets": [
+        "Riverside"
+      ]
+    },
+    "CENTRAL_POINT_EDGE": {
+      "name": "CENTRAL_POINT_EDGE",
+      "center": {
+        "lat": 42.3759,
+        "lng": -122.9162
+      },
+      "bbox": {
+        "min_lat": 42.368,
+        "max_lat": 42.402,
+        "min_lng": -122.94,
+        "max_lng": -122.89
+      },
+      "submarkets": [
+        "Central Point"
+      ]
+    },
+    "JACKSONVILLE_EDGE": {
+      "name": "JACKSONVILLE_EDGE",
+      "center": {
+        "lat": 42.3134,
+        "lng": -122.9701
+      },
+      "bbox": {
+        "min_lat": 42.3,
+        "max_lat": 42.342,
+        "min_lng": -122.985,
+        "max_lng": -122.93
+      },
+      "submarkets": [
+        "Jacksonville"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown": {
+      "name": "Downtown",
+      "division": "DOWNTOWN_MEDFORD",
+      "center": {
+        "lat": 42.3266,
+        "lng": -122.8756
+      },
+      "description": "Main Street core with the Medford City Hall, the Rogue Credit Union, and the mixed-use permitting corridor along Riverside Avenue."
+    },
+    "Medford Center": {
+      "name": "Medford Center",
+      "division": "MIDTOWN_MEDFORD_CENTER",
+      "center": {
+        "lat": 42.3418,
+        "lng": -122.8786
+      },
+      "description": "Crater Lake Highway midtown corridor with the Medford Center mall, big-box retail, and the city's highest commercial permit velocity."
+    },
+    "East Medford": {
+      "name": "East Medford",
+      "division": "EAST_MEDFORD",
+      "center": {
+        "lat": 42.333,
+        "lng": -122.848
+      },
+      "description": "East of I-5 along McAndrews Road with master-planned subdivisions, Blackthorn Drive residential infill, and the Rogue Valley Medical Center adjacency."
+    },
+    "McAndrews Corridor": {
+      "name": "McAndrews Corridor",
+      "division": "EAST_MEDFORD",
+      "center": {
+        "lat": 42.343,
+        "lng": -122.853
+      },
+      "description": "E McAndrews Road commercial strip with tenant-improvement remodels, auto dealerships, and the Medford Town Center retail node."
+    },
+    "South Medford": {
+      "name": "South Medford",
+      "division": "SOUTH_MEDFORD",
+      "center": {
+        "lat": 42.31,
+        "lng": -122.87
+      },
+      "description": "South Central Avenue corridor with post-war single-family stock, the Stewart Meadows golf community, and steady replacement-permit activity."
+    },
+    "Stewart Meadows": {
+      "name": "Stewart Meadows",
+      "division": "SOUTH_MEDFORD",
+      "center": {
+        "lat": 42.294,
+        "lng": -122.865
+      },
+      "description": "Stewart Meadows / Roxy Ann Peak foothills edge with newer residential subdivisions, golf-course views, and the Foothills Christian Church node."
+    },
+    "North Medford": {
+      "name": "North Medford",
+      "division": "NORTH_MEDFORD",
+      "center": {
+        "lat": 42.3583,
+        "lng": -122.8527
+      },
+      "description": "North Medford along N Keene Way Drive with CRATER LAKE AVE intersections, residential subdivisions, and the Rogue Valley International Airport edge."
+    },
+    "Airport Edge": {
+      "name": "Airport Edge",
+      "division": "NORTH_MEDFORD",
+      "center": {
+        "lat": 42.372,
+        "lng": -122.858
+      },
+      "description": "Biddle Road industrial corridor and Rogue Valley International-Medford Airport perimeter with light-industrial and aviation-support permitting."
+    },
+    "Riverside": {
+      "name": "Riverside",
+      "division": "RIVERSIDE_BEAR_CREEK",
+      "center": {
+        "lat": 42.3237,
+        "lng": -122.8541
+      },
+      "description": "Bear Creek greenway corridor with the Riverside Park, Hawthorne Park, and the pre-war bungalow stock along the east-side streamside."
+    },
+    "Central Point": {
+      "name": "Central Point",
+      "division": "CENTRAL_POINT_EDGE",
+      "center": {
+        "lat": 42.3759,
+        "lng": -122.9162
+      },
+      "description": "Central Point town center at the junction of I-5 and OR-99 with the Jackson County Expo Park, the North Medford industrial edge, and Crater Rock Museum."
+    },
+    "Jacksonville": {
+      "name": "Jacksonville",
+      "division": "JACKSONVILLE_EDGE",
+      "center": {
+        "lat": 42.3134,
+        "lng": -122.9701
+      },
+      "description": "Historic Jacksonville town west of Medford with the Britt Music & Arts Festival, Britta Road wine-tourism, and the Applegate Valley growth edge."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "ISSUED",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "STARTED",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "ISSUED",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/medford.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

@@ -1,0 +1,228 @@
+{
+  "schema_version": 2,
+  "id": "anaheim",
+  "name": "Anaheim / Orange County",
+  "state": "CA",
+  "center": {
+    "lat": 33.8355,
+    "lng": -117.914
+  },
+  "metro_bbox": {
+    "min_lat": 33.75,
+    "max_lat": 33.91,
+    "min_lng": -118.01,
+    "max_lng": -117.69
+  },
+  "divisions": {
+    "DOWNTOWN_ANAHEIM": {
+      "name": "DOWNTOWN_ANAHEIM",
+      "center": {
+        "lat": 33.8385,
+        "lng": -117.9175
+      },
+      "bbox": {
+        "min_lat": 33.825,
+        "max_lat": 33.852,
+        "min_lng": -117.935,
+        "max_lng": -117.9
+      },
+      "submarkets": [
+        "Downtown Anaheim",
+        "The Colony"
+      ]
+    },
+    "RESORT_DISTRICT": {
+      "name": "RESORT_DISTRICT",
+      "center": {
+        "lat": 33.81,
+        "lng": -117.9175
+      },
+      "bbox": {
+        "min_lat": 33.795,
+        "max_lat": 33.825,
+        "min_lng": -117.935,
+        "max_lng": -117.9
+      },
+      "submarkets": [
+        "Disneyland Resort & Convention Center",
+        "Harbor Boulevard Hotel Belt"
+      ]
+    },
+    "PLATINUM_TRIANGLE": {
+      "name": "PLATINUM_TRIANGLE",
+      "center": {
+        "lat": 33.805,
+        "lng": -117.8825
+      },
+      "bbox": {
+        "min_lat": 33.788,
+        "max_lat": 33.825,
+        "min_lng": -117.9,
+        "max_lng": -117.865
+      },
+      "submarkets": [
+        "Honda Center & Angel Stadium"
+      ]
+    },
+    "ANAHEIM_CANYON": {
+      "name": "ANAHEIM_CANYON",
+      "center": {
+        "lat": 33.854,
+        "lng": -117.8725
+      },
+      "bbox": {
+        "min_lat": 33.838,
+        "max_lat": 33.87,
+        "min_lng": -117.9,
+        "max_lng": -117.845
+      },
+      "submarkets": [
+        "Anaheim Canyon Industrial"
+      ]
+    },
+    "WEST_ANAHEIM": {
+      "name": "WEST_ANAHEIM",
+      "center": {
+        "lat": 33.823,
+        "lng": -117.9725
+      },
+      "bbox": {
+        "min_lat": 33.795,
+        "max_lat": 33.852,
+        "min_lng": -118.01,
+        "max_lng": -117.935
+      },
+      "submarkets": [
+        "West Anaheim Magnolia Belt",
+        "Brookhurst Southwest"
+      ]
+    },
+    "ANAHEIM_HILLS": {
+      "name": "ANAHEIM_HILLS",
+      "center": {
+        "lat": 33.83,
+        "lng": -117.78
+      },
+      "bbox": {
+        "min_lat": 33.75,
+        "max_lat": 33.91,
+        "min_lng": -117.845,
+        "max_lng": -117.69
+      },
+      "submarkets": [
+        "Nohl Ranch Hills",
+        "Weir Canyon East"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Anaheim": {
+      "name": "Downtown Anaheim",
+      "division": "DOWNTOWN_ANAHEIM",
+      "center": {
+        "lat": 33.8355,
+        "lng": -117.914
+      },
+      "description": "Center City Promenade mixed-use core with facade grants, adaptive reuse of the 1920s packers corridor, and steady tenant-improvement permitting."
+    },
+    "The Colony": {
+      "name": "The Colony",
+      "division": "DOWNTOWN_ANAHEIM",
+      "center": {
+        "lat": 33.8398,
+        "lng": -117.9253
+      },
+      "description": "Historic 1910s-20s residential grid with Craftsman restoration-led permitting and Mills-Act-adjacent churn."
+    },
+    "Disneyland Resort & Convention Center": {
+      "name": "Disneyland Resort & Convention Center",
+      "division": "RESORT_DISTRICT",
+      "center": {
+        "lat": 33.8106,
+        "lng": -117.9194
+      },
+      "description": "Theme-park, hotel, and convention anchor with the metro's densest entertainment-adjacent licensing and continuous capital expansion."
+    },
+    "Harbor Boulevard Hotel Belt": {
+      "name": "Harbor Boulevard Hotel Belt",
+      "division": "RESORT_DISTRICT",
+      "center": {
+        "lat": 33.8005,
+        "lng": -117.928
+      },
+      "description": "South Harbor motel-to-hotel repositioning strip with Transient-Occupancy-driven renovations and walkable park-gateway demand."
+    },
+    "Honda Center & Angel Stadium": {
+      "name": "Honda Center & Angel Stadium",
+      "division": "PLATINUM_TRIANGLE",
+      "center": {
+        "lat": 33.804,
+        "lng": -117.8845
+      },
+      "description": "Platinum Triangle arena-stadium district with high-rise entitlements, ARTIC-adjacent office, and the metro's largest planned-growth pipeline."
+    },
+    "West Anaheim Magnolia Belt": {
+      "name": "West Anaheim Magnolia Belt",
+      "division": "WEST_ANAHEIM",
+      "center": {
+        "lat": 33.829,
+        "lng": -117.965
+      },
+      "description": "Post-war tract housing along the Magnolia/ Brookhurst retail spine with renovation-led permitting and small-business licensing churn."
+    },
+    "Brookhurst Southwest": {
+      "name": "Brookhurst Southwest",
+      "division": "WEST_ANAHEIM",
+      "center": {
+        "lat": 33.806,
+        "lng": -117.948
+      },
+      "description": "Little Arabia commercial corridor and surrounding garden-apartment stock with restaurant licensing turnover and duplex infill."
+    },
+    "Anaheim Canyon Industrial": {
+      "name": "Anaheim Canyon Industrial",
+      "division": "ANAHEIM_CANYON",
+      "center": {
+        "lat": 33.848,
+        "lng": -117.864
+      },
+      "description": "Northeast industrial and food-manufacturing district along the 91 with warehouse conversions, TTM industrial condos, and steady TI permitting."
+    },
+    "Nohl Ranch Hills": {
+      "name": "Nohl Ranch Hills",
+      "division": "ANAHEIM_HILLS",
+      "center": {
+        "lat": 33.838,
+        "lng": -117.797
+      },
+      "description": "Master-planned hillside subdivisions around Nohl Ranch Road with pool/deck auxiliary permits and high-valuation remodel cadence."
+    },
+    "Weir Canyon East": {
+      "name": "Weir Canyon East",
+      "division": "ANAHEIM_HILLS",
+      "center": {
+        "lat": 33.85,
+        "lng": -117.755
+      },
+      "description": "Eastern hillside edge toward Weir and Gypsum canyons with newer single-family stock, solar permitting volume, and wildland-adjacent rebuild cycles."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "permitissued",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "applicationdate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/anaheim.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

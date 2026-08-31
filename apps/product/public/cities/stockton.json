@@ -1,0 +1,278 @@
+{
+  "schema_version": 2,
+  "id": "stockton",
+  "name": "Stockton",
+  "state": "CA",
+  "center": {
+    "lat": 37.9577,
+    "lng": -121.29
+  },
+  "metro_bbox": {
+    "min_lat": 37.85,
+    "max_lat": 38.1,
+    "min_lng": -121.44,
+    "max_lng": -121.16
+  },
+  "divisions": {
+    "DOWNTOWN_WATERFRONT": {
+      "name": "DOWNTOWN_WATERFRONT",
+      "center": {
+        "lat": 37.957,
+        "lng": -121.294
+      },
+      "bbox": {
+        "min_lat": 37.944,
+        "max_lat": 37.97,
+        "min_lng": -121.31,
+        "max_lng": -121.278
+      },
+      "submarkets": [
+        "Downtown Core",
+        "Banner Island & Waterfront"
+      ]
+    },
+    "MIDTOWN_MIRACLE_MILE": {
+      "name": "MIDTOWN_MIRACLE_MILE",
+      "center": {
+        "lat": 37.973,
+        "lng": -121.322
+      },
+      "bbox": {
+        "min_lat": 37.956,
+        "max_lat": 37.99,
+        "min_lng": -121.335,
+        "max_lng": -121.31
+      },
+      "submarkets": [
+        "Miracle Mile",
+        "University of the Pacific"
+      ]
+    },
+    "NORTH_LINCOLN_VILLAGE": {
+      "name": "NORTH_LINCOLN_VILLAGE",
+      "center": {
+        "lat": 37.983,
+        "lng": -121.24
+      },
+      "bbox": {
+        "min_lat": 37.962,
+        "max_lat": 38.005,
+        "min_lng": -121.278,
+        "max_lng": -121.205
+      },
+      "submarkets": [
+        "Lincoln Village & Park Nine",
+        "Eastland Plaza"
+      ]
+    },
+    "WEST_BROOKSIDE": {
+      "name": "WEST_BROOKSIDE",
+      "center": {
+        "lat": 37.96,
+        "lng": -121.351
+      },
+      "bbox": {
+        "min_lat": 37.95,
+        "max_lat": 37.97,
+        "min_lng": -121.368,
+        "max_lng": -121.335
+      },
+      "submarkets": [
+        "Brookside",
+        "West Lane & Country Club"
+      ]
+    },
+    "SOUTHWEST_SPANOS": {
+      "name": "SOUTHWEST_SPANOS",
+      "center": {
+        "lat": 37.925,
+        "lng": -121.336
+      },
+      "bbox": {
+        "min_lat": 37.9,
+        "max_lat": 37.95,
+        "min_lng": -121.368,
+        "max_lng": -121.305
+      },
+      "submarkets": [
+        "Quail Lakes & Heritage",
+        "Spanos Park"
+      ]
+    },
+    "SOUTH_CENTRAL": {
+      "name": "SOUTH_CENTRAL",
+      "center": {
+        "lat": 37.92,
+        "lng": -121.3
+      },
+      "bbox": {
+        "min_lat": 37.895,
+        "max_lat": 37.944,
+        "min_lng": -121.305,
+        "max_lng": -121.285
+      },
+      "submarkets": [
+        "South Stockton & Fairgrounds",
+        "El Dorado & South Central"
+      ]
+    },
+    "SOUTHEAST_WESTON": {
+      "name": "SOUTHEAST_WESTON",
+      "center": {
+        "lat": 37.925,
+        "lng": -121.25
+      },
+      "bbox": {
+        "min_lat": 37.895,
+        "max_lat": 37.955,
+        "min_lng": -121.285,
+        "max_lng": -121.205
+      },
+      "submarkets": [
+        "Weston Ranch",
+        "Airport & Arch Road Industrial"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Core": {
+      "name": "Downtown Core",
+      "division": "DOWNTOWN_WATERFRONT",
+      "center": {
+        "lat": 37.9577,
+        "lng": -121.29
+      },
+      "description": "Civic-center and Hunter Square core with the arena-waterfront entertainment district, historic Mariclare and Medico-Dental building reuse, and adaptive-reuse permitting."
+    },
+    "Banner Island & Waterfront": {
+      "name": "Banner Island & Waterfront",
+      "division": "DOWNTOWN_WATERFRONT",
+      "center": {
+        "lat": 37.9535,
+        "lng": -121.301
+      },
+      "description": "Banner Island ballpark district and the Weber Point waterfront promenade with stadium-adjacent hospitality licensing and event-economy turnover."
+    },
+    "Miracle Mile": {
+      "name": "Miracle Mile",
+      "division": "MIDTOWN_MIRACLE_MILE",
+      "center": {
+        "lat": 37.9666,
+        "lng": -121.319
+      },
+      "description": "Pacific Avenue's Miracle Mile with independent restaurants and taprooms, the Fox/Bob Hope theatre block, and the metro's densest on-sale license strip."
+    },
+    "University of the Pacific": {
+      "name": "University of the Pacific",
+      "division": "MIDTOWN_MIRACLE_MILE",
+      "center": {
+        "lat": 37.9802,
+        "lng": -121.3122
+      },
+      "description": "UOP campus and Lincoln Center shopping belt with student-housing turnover, medical-office demand, and steady neighborhood-retail licensing."
+    },
+    "Lincoln Village & Park Nine": {
+      "name": "Lincoln Village & Park Nine",
+      "division": "NORTH_LINCOLN_VILLAGE",
+      "center": {
+        "lat": 37.974,
+        "lng": -121.2755
+      },
+      "description": "Post-war Lincoln Village tracts east of the El Dorado corridor with renovation-led permitting and neighborhood-market license churn."
+    },
+    "Eastland Plaza": {
+      "name": "Eastland Plaza",
+      "division": "NORTH_LINCOLN_VILLAGE",
+      "center": {
+        "lat": 37.965,
+        "lng": -121.274
+      },
+      "description": "Eastland Plaza and East Harding Way retail node with family-market grocers, strip-lot refurbishment, and off-sale license turnover."
+    },
+    "Brookside": {
+      "name": "Brookside",
+      "division": "WEST_BROOKSIDE",
+      "center": {
+        "lat": 37.9505,
+        "lng": -121.342
+      },
+      "description": "Brookside planned community west of I-5 with office-park retrofit, Trinity Parkway retail pads, and high-valuation residential permitting."
+    },
+    "West Lane & Country Club": {
+      "name": "West Lane & Country Club",
+      "division": "WEST_BROOKSIDE",
+      "center": {
+        "lat": 37.962,
+        "lng": -121.343
+      },
+      "description": "Country Club Boulevard commercial spine with the golf-course anchor, westside strip retail, and steady service-business licensing."
+    },
+    "Quail Lakes & Heritage": {
+      "name": "Quail Lakes & Heritage",
+      "division": "SOUTHWEST_SPANOS",
+      "center": {
+        "lat": 37.9455,
+        "lng": -121.329
+      },
+      "description": "Quail Lakes shopping district and the Heritage planned community with pool/roof permitting and family-restaurant licensing."
+    },
+    "Spanos Park": {
+      "name": "Spanos Park",
+      "division": "SOUTHWEST_SPANOS",
+      "center": {
+        "lat": 37.933,
+        "lng": -121.313
+      },
+      "description": "Spanos Park residential-golf community along West Eight Mile Road with new-build tract permitting and clubhouse-adjacent hospitality."
+    },
+    "South Stockton & Fairgrounds": {
+      "name": "South Stockton & Fairgrounds",
+      "division": "SOUTH_CENTRAL",
+      "center": {
+        "lat": 37.937,
+        "lng": -121.289
+      },
+      "description": "San Joaquin County Fairgrounds district and the California Street corridor with community-reinvestment permits and neighborhood-market licensing."
+    },
+    "El Dorado & South Central": {
+      "name": "El Dorado & South Central",
+      "division": "SOUTH_CENTRAL",
+      "center": {
+        "lat": 37.918,
+        "lng": -121.2965
+      },
+      "description": "South El Dorado Street spine with taquerias and markets, Wilson Elementary-area infill, and steady small-operator license turnover."
+    },
+    "Weston Ranch": {
+      "name": "Weston Ranch",
+      "division": "SOUTHEAST_WESTON",
+      "center": {
+        "lat": 37.925,
+        "lng": -121.282
+      },
+      "description": "Master-planned Weston Ranch along Manthey Road with builder-driven new-construction permitting and neighborhood retail pads."
+    },
+    "Airport & Arch Road Industrial": {
+      "name": "Airport & Arch Road Industrial",
+      "division": "SOUTHEAST_WESTON",
+      "center": {
+        "lat": 37.902,
+        "lng": -121.258
+      },
+      "description": "Stockton Metropolitan Airport and Arch Airport industrial belt with logistics-warehouse permits and cannabis-license adjacency to the southeast."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "OriginalIssueDate",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/stockton.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
