@@ -965,3 +965,11 @@ code/registry/dashboard changes; local git policy — left uncommitted).
 Closing comments added to both tickets via `linear issue comment add` (watermark
 evidence + probe-doc path + re-probe trigger), then `--state Done --add-label
 wontfix`. No leaves built, no re-probe performed (evidence already on disk).
+
+## 2026-08-31 — US-408 map LOD research wave (parallel, leaf-only) — Linear US-416/417/418
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| us416-maplibre-perf | docs/research/us-416-maplibre-perf.md | none (research) | 2026-08-31 | done | docs/research/us-416-maplibre-perf.md |
+| us417-mvt-pmtiles-cloudflare | docs/research/us-417-mvt-pmtiles-cloudflare.md | none (research) | 2026-08-31 | done | docs/research/us-417-mvt-pmtiles-cloudflare.md |
+| us418-lims-lodes-blend-honesty | docs/research/us-418-lims-lodes-blend-honesty.md | none (research) | 2026-08-31 | done | docs/research/us-418-lims-lodes-blend-honesty.md |

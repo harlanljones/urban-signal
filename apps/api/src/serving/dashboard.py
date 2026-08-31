@@ -822,8 +822,25 @@ def get_dashboard_html() -> str:
     .legend-bar {
       height: 6px;
       border-radius: 3px;
-      background: linear-gradient(to right, #34d399, #fbbf24, #fb923c, #f43f5e);
+      /* Regenerated at runtime from HEX_RAMP (same stops as the map layers). */
+      background: linear-gradient(to right, #1f3a52, #2f6f8f 35%, #5aa9a4 60%, #d9bd63 80%, #f2685c 92%);
       margin-bottom: 4px;
+    }
+
+    .legend-ticks {
+      position: relative;
+      height: 10px;
+      margin-bottom: 4px;
+    }
+
+    .legend-tick {
+      position: absolute;
+      top: 0;
+      transform: translateX(-50%);
+      font-size: 9px;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      line-height: 10px;
     }
 
     .legend-range-labels {
@@ -832,6 +849,85 @@ def get_dashboard_html() -> str:
       font-size: 10px;
       font-family: var(--font-mono);
       color: var(--text-muted);
+    }
+
+    .legend-note {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 9px;
+      letter-spacing: 0.02em;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .legend-key-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-key-swatch {
+      width: 14px;
+      height: 8px;
+      border-radius: 2px;
+      flex: none;
+    }
+
+    .legend-key-swatch.baseline {
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(113, 129, 152, 0.5) 0 3px,
+        transparent 3px 6px
+      );
+      border: 1px solid rgba(113, 129, 152, 0.5);
+    }
+
+    /* Map orientation readout: scale bar + zoom/coordinate telemetry */
+    .map-readout {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      z-index: 50;
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      pointer-events: none;
+    }
+
+    .map-scale-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .map-scale-label {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    .map-scale-rule {
+      height: 4px;
+      border: 1px solid rgba(167, 181, 201, 0.7);
+      border-top: none;
+      background: rgba(167, 181, 201, 0.25);
+    }
+
+    .map-coords {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      color: var(--text-muted);
+      background: var(--bg-glass);
+      backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 4px 8px;
     }
 
     /* Inspector Empty & Active States */
@@ -1406,11 +1502,24 @@ def get_dashboard_html() -> str:
           <span id="legend-metric-title">LIMS Momentum Score</span>
         </div>
         <div class="legend-bar"></div>
+        <div class="legend-ticks" id="legend-ticks" aria-hidden="true"></div>
         <div class="legend-range-labels">
-          <span id="legend-min">0.0</span>
-          <span id="legend-mid">50.0</span>
-          <span id="legend-max">100.0</span>
+          <span id="legend-min">0</span>
+          <span id="legend-max">100</span>
         </div>
+        <div class="legend-note">
+          <span class="legend-key-row">Height &prop; value (3D view) &middot; percentile 0&ndash;100</span>
+          <span class="legend-key-row"><span class="legend-key-swatch baseline"></span><span>Registry baseline &mdash; no precomputed snapshot</span></span>
+        </div>
+      </div>
+
+      <!-- Map orientation readout: scale bar + zoom/coordinates -->
+      <div class="map-readout" aria-hidden="true">
+        <div class="map-scale-bar">
+          <span class="map-scale-label" id="map-scale-label">1 km</span>
+          <div class="map-scale-rule" id="map-scale-rule" style="width: 80px;"></div>
+        </div>
+        <div class="map-coords"><span id="map-zoom-readout">z0.0</span> &middot; <span id="map-coords-readout">&mdash;</span></div>
       </div>
     </main>
 
@@ -1732,8 +1841,10 @@ __METRO_META__
         type: 'line',
         source: 'national-hex-source',
         paint: {
-          'line-color': 'rgba(255, 255, 255, 0.22)',
-          'line-width': 0.6
+          // Boundary-only stroke that scales with zoom: quiet at national
+          // view, never a white grid checkerboard.
+          'line-color': 'rgba(148, 163, 184, 0.22)',
+          'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.4, 6, 0.7]
         }
       });
       map.addLayer({
@@ -1754,14 +1865,9 @@ __METRO_META__
     }
 
     function nationalColorExpression() {
-      return [
-        'interpolate', ['linear'],
-        ['coalesce', ['get', `${currentMetric}_national_pct`], ['get', 'jobs_pct'], ['get', 'workers_pct']],
-        0, '#34d399',
-        50, '#fbbf24',
-        75, '#fb923c',
-        90, '#f43f5e'
-      ];
+      return hexRampExpr(
+        ['coalesce', ['get', `${currentMetric}_national_pct`], ['get', 'jobs_pct'], ['get', 'workers_pct']]
+      );
     }
 
     function nationalHeightExpression() {
@@ -1870,24 +1976,58 @@ __METRO_META__
         {
           id: 'style-background',
           type: 'background',
-          paint: { 'background-color': '#080c14' }
+          paint: { 'background-color': '#080d17' }
         },
         {
           id: 'basemap-dark-layer',
           type: 'raster',
           source: 'basemap-dark',
           minzoom: 0,
-          maxzoom: 20
+          maxzoom: 20,
+          paint: {
+            // Night-shift tonal treatment: pull the stock Esri dark-gray tiles
+            // into the ink canvas so the H3 field reads as the hero, not a
+            // screenshot pasted on top of a basemap.
+            'raster-saturation': -0.45,
+            'raster-contrast': 0.12,
+            'raster-brightness-max': 0.82,
+            'raster-opacity': 0.88
+          }
         },
         {
           id: 'basemap-dark-labels-layer',
           type: 'raster',
           source: 'basemap-dark-labels',
           minzoom: 0,
-          maxzoom: 20
+          maxzoom: 20,
+          paint: {
+            // Reference labels stay readable but never compete with the hexes.
+            'raster-saturation': -0.3,
+            'raster-brightness-max': 0.75,
+            'raster-opacity': 0.5
+          }
         }
       ]
     };
+
+    // Authored percentile ramp (US-431): cool→warm divergence tuned for the
+    // dark canvas. Low = quiet ink-blue (zero evidence), mid = teal, high =
+    // gold, and the reserved coral accent is earned only above the 92nd
+    // percentile (concentrated catalyst). Deliberately NOT a traffic light.
+    // The legend bar + ticks are regenerated from this same constant.
+    const HEX_RAMP = [
+      [0, '#1f3a52'],
+      [35, '#2f6f8f'],
+      [60, '#5aa9a4'],
+      [80, '#d9bd63'],
+      [92, '#f2685c']
+    ];
+
+    function hexRampExpr(inputExpr) {
+      const out = ['interpolate', ['linear'], inputExpr];
+      for (const [stop, color] of HEX_RAMP) out.push(stop, color);
+      return out;
+    }
 
     function normalizeBorough(b) {
       if (!b) return '';
@@ -2299,6 +2439,10 @@ __METRO_META__
           setupNationalLayers();
           map.on('moveend', () => { scheduleViewportLoad(); scheduleNationalLoad(); });
           map.on('zoomend', () => { scheduleViewportLoad(); scheduleNationalLoad(); updateLayerVisibilities(); });
+          // Orientation telemetry: keep the readout in sync with the camera.
+          map.on('move', updateMapReadout);
+          updateMapReadout();
+          regenerateLegend();
           scheduleViewportLoad();
           scheduleNationalLoad();
           setInterval(fetchCatalysts, 15000);
@@ -2540,32 +2684,34 @@ __METRO_META__
         data: gridGeoJSON || { type: 'FeatureCollection', features: [] }
       });
 
-      // 2D Fill Layer
+      // 2D Fill Layer — value-aware opacity so high-percentile cells read as
+      // emphasis instead of every cell sitting at one flat alpha.
       map.addLayer({
         id: 'h3-hex-fill',
         type: 'fill',
         source: 'h3-grid-source',
         layout: { visibility: currentPerspective === '2D' ? 'visible' : 'none' },
         paint: {
-          'fill-color': [
-            'interpolate', ['linear'], ['get', 'lims_score_national_pct'],
-            0, '#34d399',
-            50, '#fbbf24',
-            75, '#fb923c',
-            90, '#f43f5e'
-          ],
-          'fill-opacity': 0.78
+          'fill-color': hexRampExpr(['get', 'lims_score_national_pct']),
+          'fill-opacity': [
+            'interpolate', ['linear'],
+            ['coalesce', ['get', 'lims_score_national_pct'], 0],
+            0, 0.42,
+            50, 0.6,
+            92, 0.88
+          ]
         }
       });
 
-      // 2D Line Outline Layer
+      // 2D Line Outline Layer — zoom-scaled boundary stroke, slate rather
+      // than white, so the dense metro grid never reads as checkerboard noise.
       map.addLayer({
         id: 'h3-hex-line',
         type: 'line',
         source: 'h3-grid-source',
         paint: {
-          'line-color': 'rgba(255, 255, 255, 0.25)',
-          'line-width': 1.0
+          'line-color': 'rgba(148, 163, 184, 0.2)',
+          'line-width': ['interpolate', ['linear'], ['zoom'], 6, 0.4, 10, 0.8, 14, 1.2]
         }
       });
 
@@ -2576,13 +2722,7 @@ __METRO_META__
         source: 'h3-grid-source',
         layout: { visibility: currentPerspective === '3D' ? 'visible' : 'none' },
         paint: {
-          'fill-extrusion-color': [
-            'interpolate', ['linear'], ['get', 'lims_score_national_pct'],
-            0, '#34d399',
-            50, '#fbbf24',
-            75, '#fb923c',
-            90, '#f43f5e'
-          ],
+          'fill-extrusion-color': hexRampExpr(['get', 'lims_score_national_pct']),
           'fill-extrusion-height': [
             '*',
             ['max', 0, ['-', ['coalesce', ['get', 'lims_score_national_pct'], 50], 40]],
@@ -2593,7 +2733,19 @@ __METRO_META__
         }
       });
 
-      // Selected Hex Highlight Outline
+      // Selected Hex Highlight — fill companion + outline so the selection
+      // stays legible on a busy neighborhood (color + geometry, plus the
+      // inspector panel opening is the primary non-color signal).
+      map.addLayer({
+        id: 'h3-hex-selected-fill',
+        type: 'fill',
+        source: 'h3-grid-source',
+        filter: ['==', ['get', 'h3_index'], ''],
+        paint: {
+          'fill-color': 'rgba(56, 189, 248, 0.3)',
+          'fill-opacity': 1
+        }
+      });
       map.addLayer({
         id: 'h3-hex-selected',
         type: 'line',
@@ -2601,7 +2753,7 @@ __METRO_META__
         filter: ['==', ['get', 'h3_index'], ''],
         paint: {
           'line-color': '#38bdf8',
-          'line-width': 3
+          'line-width': 2.5
         }
       });
     }
@@ -2614,7 +2766,6 @@ __METRO_META__
       const pctProp = `${currentMetric}_national_pct`;
       const legendTitle = document.getElementById('legend-metric-title');
       const legendMin = document.getElementById('legend-min');
-      const legendMid = document.getElementById('legend-mid');
       const legendMax = document.getElementById('legend-max');
 
       let titleSuffix = ' — National Percentile';
@@ -2625,16 +2776,16 @@ __METRO_META__
         prob_18m_macro_outperformance: '18M Macro Outperformance'
       })[currentMetric] + titleSuffix;
       if (legendMin) legendMin.innerText = '0';
-      if (legendMid) legendMid.innerText = '50';
       if (legendMax) legendMax.innerText = '100';
 
       // One shared percentile color ramp; only extrusion height differs per metric.
-      const colorExpr = [
-        'interpolate', ['linear'], ['get', pctProp],
-        0, '#34d399',
-        50, '#fbbf24',
-        75, '#fb923c',
-        90, '#f43f5e'
+      const colorExpr = hexRampExpr(['get', pctProp]);
+      const opacityExpr = [
+        'interpolate', ['linear'],
+        ['coalesce', ['get', pctProp], 0],
+        0, 0.42,
+        50, 0.6,
+        92, 0.88
       ];
       const heightFactor = {
         lims_score: ['*', ['max', 0, ['-', ['coalesce', ['get', pctProp], 50], 40]], 18],
@@ -2645,6 +2796,7 @@ __METRO_META__
 
       if (map.getLayer('h3-hex-fill')) {
         map.setPaintProperty('h3-hex-fill', 'fill-color', colorExpr);
+        map.setPaintProperty('h3-hex-fill', 'fill-opacity', opacityExpr);
       }
       if (map.getLayer('h3-hex-extrusion')) {
         map.setPaintProperty('h3-hex-extrusion', 'fill-extrusion-color', colorExpr);
@@ -2652,6 +2804,56 @@ __METRO_META__
       }
       // Reflect metric change on the national LOD overlay
       updateNationalLayerPaint();
+    }
+
+    // Legend truth (US-431): the gradient bar and its stop ticks are
+    // regenerated from HEX_RAMP — the same constant that drives the map
+    // layers — so the legend can never drift from what is rendered.
+    function regenerateLegend() {
+      const bar = document.querySelector('.map-legend-card .legend-bar');
+      if (bar) {
+        const gradient = 'linear-gradient(to right, ' + HEX_RAMP.map(([stop, color]) => `${color} ${stop}%`).join(', ') + ')';
+        bar.style.background = gradient;
+      }
+      const ticks = document.getElementById('legend-ticks');
+      if (ticks) {
+        const stops = [0, 50, 75, 90].filter((s) => s > 0 && s < 100);
+        ticks.replaceChildren(...stops.map((stop) => {
+          const span = document.createElement('span');
+          span.className = 'legend-tick';
+          span.style.left = `${stop}%`;
+          span.textContent = String(stop);
+          return span;
+        }));
+      }
+    }
+
+    // Orientation readout (US-431): scale bar + zoom/coordinate telemetry so a
+    // deep link like ?city=nyc has an anchor. Pure telemetry — reads the
+    // camera, invents nothing.
+    function updateMapReadout() {
+      if (!map) return;
+      const zoomEl = document.getElementById('map-zoom-readout');
+      const coordsEl = document.getElementById('map-coords-readout');
+      const scaleLabel = document.getElementById('map-scale-label');
+      const scaleRule = document.getElementById('map-scale-rule');
+      const z = map.getZoom();
+      const center = map.getCenter();
+      if (zoomEl) zoomEl.textContent = `z${z.toFixed(1)}`;
+      if (coordsEl) coordsEl.textContent = `${center.lat.toFixed(4)}, ${center.lng.toFixed(4)}`;
+      if (scaleLabel && scaleRule) {
+        // Meters per pixel at the map center latitude (Web Mercator).
+        const mPerPx = 156543.03392 * Math.cos((center.lat * Math.PI) / 180) / Math.pow(2, z);
+        const maxPx = 90;
+        const nice = [25, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000];
+        let meters = nice[nice.length - 1];
+        for (const candidate of nice) {
+          if (candidate / mPerPx <= maxPx) { meters = candidate; break; }
+        }
+        const px = Math.round(meters / mPerPx);
+        scaleRule.style.width = `${px}px`;
+        scaleLabel.textContent = meters >= 1000 ? `${meters / 1000} km` : `${meters} m`;
+      }
     }
     function setPerspective(mode) {
       currentPerspective = mode;
@@ -2823,6 +3025,7 @@ __METRO_META__
 
         if (map.getLayer('h3-hex-selected')) {
           map.setFilter('h3-hex-selected', ['==', ['get', 'h3_index'], h3Index]);
+          if (map.getLayer('h3-hex-selected-fill')) map.setFilter('h3-hex-selected-fill', ['==', ['get', 'h3_index'], h3Index]);
         }
       }
 
@@ -2888,6 +3091,7 @@ __METRO_META__
       }
       if (map && map.getLayer('h3-hex-selected')) {
         map.setFilter('h3-hex-selected', ['==', ['get', 'h3_index'], props.h3_index]);
+          if (map.getLayer('h3-hex-selected-fill')) map.setFilter('h3-hex-selected-fill', ['==', ['get', 'h3_index'], props.h3_index]);
       }
 
       const container = document.getElementById('inspector-content');
