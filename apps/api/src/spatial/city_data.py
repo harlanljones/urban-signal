@@ -66,8 +66,9 @@ def validate_definition(raw: Mapping[str, Any]) -> dict[str, Any]:
     if set(center) != {"lat", "lng"}:
         raise ValueError(f"{city_id}.center must contain only lat and lng")
     datasets = _as_mapping(definition["datasets"], f"{city_id}.datasets")
-    if not datasets:
-        raise ValueError(f"{city_id}.datasets must not be empty")
+    # Feedless registrations are legitimate (partial-registration rule,
+    # docs/agents/parallel-streams.md): a city may register geometry before
+    # any feed is wired, and get_dataset() raises for the rest.
     normalized = dict(definition)
     normalized["city_id"] = city_id
     normalized["center"] = {"lat": float(center["lat"]), "lng": float(center["lng"])}

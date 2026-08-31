@@ -304,7 +304,7 @@ class TestFeedRegistration:
         assert spec.state_plane_crs == "EPSG:2232"
         assert spec.state_plane_x_col == "PropX"
         assert spec.state_plane_y_col == "PropY"
-        assert spec.field_map is PERMITS_FIELD_MAP
+        assert spec.field_map == PERMITS_FIELD_MAP
 
     def test_sla_spec_is_snapshot_with_state_plane_declared(self):
         spec = get_aurora_dataset(FeedType.SLA)
@@ -323,7 +323,7 @@ class TestFeedRegistration:
         assert spec.state_plane_units == "ftUS"
         assert spec.state_plane_x_col == "X"
         assert spec.state_plane_y_col == "Y"
-        assert spec.field_map is SLA_FIELD_MAP
+        assert spec.field_map == SLA_FIELD_MAP
         assert spec.companion_endpoints["liquor"] == AURORA_SLA_LIQUOR_ENDPOINT
 
     def test_sla_companions_are_metadata_only(self):

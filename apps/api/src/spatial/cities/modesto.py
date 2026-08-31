@@ -1,3 +1,27 @@
+SLA_FIELD_MAP = {
+    "license_id": ["ACCOUNTNUM"],
+    "dba": ["BUSNAME"],
+    "premises_name": ["BUSNAME"],
+    "address_street": ["LOCSTADDR1"],
+    "zipcode": ["LOCZIP1"],
+}
+
+FIELD_MAP = {
+    "sla": SLA_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Modesto, CA"
+
+DROPPED_NONADDRESS_COLUMNS = (
+    "LOCSTNUM",
+    "LOCSUITE",
+    "LOCCITY",
+    "LOCST",
+    "LOCZIP2",
+    "LOCPHNUM",
+    "GlobalID",
+)
+
 """Modesto / Stanislaus County spatial registry and geometry.
 
 Provides neighborhood metadata, division catalog, and geographic bounding
@@ -54,10 +78,6 @@ Live-probe evidence that defines this leaf (2026-08-28, US-231):
   parcel-CAMA precedent).
 """
 
-from src.producers.field_maps_modesto import (
-    GEOCODE_CONTEXT,
-    SLA_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 MODESTO_CITY_ID: str = "modesto"

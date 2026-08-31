@@ -1,3 +1,51 @@
+PERMITS_FIELD_MAP = {
+    "job_id": ["ApplicationNumber", "OBJECTID"],
+    "issuance_date": ["IssueDate"],
+    "filing_date": ["ApplicationDate"],
+    "cost": ["ProjectValuation"],
+    "status": ["ApplicationStatus", "StatusDesc", "OverallStatus"],
+    "job_type": ["TypeDesc", "ApplicationType", "BldgUse"],
+    "address_street": ["Address"],
+    "proposed_units": ["Units"],
+}
+
+SLA_FIELD_MAP = {
+    "license_id": ["LicenseNumber", "BusinessNumber", "OBJECTID"],
+    "license_type": ["BusinessTypeDesc", "ClassDescription1", "BusinessTypeCode"],
+    "dba": ["BusinessName"],
+    "premises_name": ["BusinessName"],
+    "effective_date": ["BR_BusinessOpenedDate"],
+    "expiration_date": ["LicenseExpirationDate"],
+    "status": ["BusinessStatusDesc", "LicenseStatusDesc"],
+    "address_street": ["BusinessLocation"],
+}
+
+COMPLAINTS_311_FIELD_MAP = {
+    "incident_id": ["CaseNumber", "OBJECTID"],
+    "complaint_type": ["TypeDescription"],
+    "created_date": ["CaseReportedDate"],
+    "status": ["CaseStatus", "StatusDesc"],
+    "incident_address": ["Address"],
+}
+
+CRIME_FIELD_MAP = {
+    "incident_id": ["IncidentNumber", "OBJECTID"],
+    "offense_type": ["CallType"],
+    "reported_date": ["CreateDateTime"],
+    "address": ["CallAddress"],
+    "incident_address": ["CallAddress"],
+    "borough": ["Neighborhood"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+    "sla": SLA_FIELD_MAP,
+    "311": COMPLAINTS_311_FIELD_MAP,
+    "crime": CRIME_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Bend, OR"
+
 """Bend, OR spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -42,13 +90,6 @@ Live-probe caveats that define this leaf (probed 2026-08-28, US-237):
   ADR-0004 fallback for rows that arrive without geometry.
 """
 
-from src.producers.field_maps_bend import (
-    COMPLAINTS_311_FIELD_MAP,
-    CRIME_FIELD_MAP,
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-    SLA_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 BEND_CITY_ID: str = "bend"

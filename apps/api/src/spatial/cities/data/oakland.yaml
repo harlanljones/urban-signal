@@ -1,0 +1,469 @@
+city_id: oakland
+name: Oakland
+state: CA
+center:
+  lat: 37.804
+  lng: -122.2712
+metro_bbox:
+  min_lat: 37.696
+  max_lat: 37.885
+  min_lng: -122.36
+  max_lng: -122.114
+division_bboxes:
+  WEST_OAKLAND:
+    min_lat: 37.795
+    max_lat: 37.812
+    min_lng: -122.335
+    max_lng: -122.282
+  DOWNTOWN_CORE:
+    min_lat: 37.794
+    max_lat: 37.812
+    min_lng: -122.282
+    max_lng: -122.264
+  LAKE_MERRITT_GRAND_LAKE:
+    min_lat: 37.792
+    max_lat: 37.815
+    min_lng: -122.264
+    max_lng: -122.24
+  NORTH_OAKLAND:
+    min_lat: 37.815
+    max_lat: 37.86
+    min_lng: -122.31
+    max_lng: -122.249
+  HILLS_MONTCLAIR:
+    min_lat: 37.815
+    max_lat: 37.878
+    min_lng: -122.249
+    max_lng: -122.185
+  EAST_OAKLAND_FRUITVALE:
+    min_lat: 37.74
+    max_lat: 37.792
+    min_lng: -122.245
+    max_lng: -122.15
+  EASTMONT_DEEP_EAST:
+    min_lat: 37.696
+    max_lat: 37.74
+    min_lng: -122.22
+    max_lng: -122.14
+submarkets:
+  West Oakland:
+    name: West Oakland
+    borough: WEST_OAKLAND
+    lat: 37.806
+    lng: -122.295
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.82
+    capex: 7400000.0
+    permit_vel: 34.0
+    shift_ratio: 1.53
+    sla: 58.0
+    description: Mandela Parkway corridor with Victorian rowhouse stock, the Seventh
+      Street cultural heritage blocks, and infill reinvestment beside the Port and
+      West Oakland BART.
+    city_id: oakland
+  Downtown Oakland:
+    name: Downtown Oakland
+    borough: DOWNTOWN_CORE
+    lat: 37.804
+    lng: -122.2712
+    zoom: 14.5
+    pitch: 54.0
+    base_lims: 0.87
+    capex: 11800000.0
+    permit_vel: 42.0
+    shift_ratio: 1.58
+    sla: 68.0
+    description: Frank Ogawa Plaza and the CBD core with the 19th Street BART office
+      market, new residential towers, and the Chinatown-adjacent retail spine.
+    city_id: oakland
+  Uptown:
+    name: Uptown
+    borough: DOWNTOWN_CORE
+    lat: 37.809
+    lng: -122.267
+    zoom: 14.5
+    pitch: 52.0
+    base_lims: 0.89
+    capex: 10400000.0
+    permit_vel: 39.0
+    shift_ratio: 1.56
+    sla: 66.0
+    description: Telegraph Avenue entertainment district with the Fox and Paramount
+      theatres, the Uptown Station office conversion, and Oakland's densest bar-and-restaurant
+      turnover.
+    city_id: oakland
+  Lake Merritt:
+    name: Lake Merritt
+    borough: LAKE_MERRITT_GRAND_LAKE
+    lat: 37.797
+    lng: -122.256
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.88
+    capex: 9600000.0
+    permit_vel: 35.0
+    shift_ratio: 1.52
+    sla: 63.0
+    description: Lakeside apartment belt with the Cleveland Heights edge, Adams Point
+      multifamily stock, and the Lakeshore retail corridor ringing the nation's first
+      wildlife refuge.
+    city_id: oakland
+  Grand Lake:
+    name: Grand Lake
+    borough: LAKE_MERRITT_GRAND_LAKE
+    lat: 37.8075
+    lng: -122.249
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.86
+    capex: 8200000.0
+    permit_vel: 32.0
+    shift_ratio: 1.49
+    sla: 60.0
+    description: Grand Avenue retailer strip below the Grand Lake Theatre with walkable
+      cafe-frontage blocks, Craftsman renovation demand, and Lakeview terrace housing.
+    city_id: oakland
+  Temescal:
+    name: Temescal
+    borough: NORTH_OAKLAND
+    lat: 37.8285
+    lng: -122.268
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.87
+    capex: 8900000.0
+    permit_vel: 37.0
+    shift_ratio: 1.54
+    sla: 64.0
+    description: Telegraph/51st merchant district with restaurant-row foot traffic,
+      former-industrial live-work conversions, and the MacArthur BART transit-adjacent
+      infill.
+    city_id: oakland
+  Rockridge:
+    name: Rockridge
+    borough: NORTH_OAKLAND
+    lat: 37.841
+    lng: -122.253
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.91
+    capex: 13500000.0
+    permit_vel: 31.0
+    shift_ratio: 1.5
+    sla: 72.0
+    description: College Avenue premium retail spine with bungalow-stock renovation,
+      College Prep/BART walkability, and the metro's top single-family valuation band.
+    city_id: oakland
+  Montclair:
+    name: Montclair
+    borough: HILLS_MONTCLAIR
+    lat: 37.841
+    lng: -122.216
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.9
+    capex: 11200000.0
+    permit_vel: 28.0
+    shift_ratio: 1.47
+    sla: 70.0
+    description: Mountain Boulevard village core with hillside view lots, mid-century
+      estate turnover, and the Montclair village retail block.
+    city_id: oakland
+  Skyline Hills:
+    name: Skyline Hills
+    borough: HILLS_MONTCLAIR
+    lat: 37.842
+    lng: -122.195
+    zoom: 13.0
+    pitch: 44.0
+    base_lims: 0.84
+    capex: 7800000.0
+    permit_vel: 24.0
+    shift_ratio: 1.44
+    sla: 56.0
+    description: Skyline Boulevard crest neighborhoods with canyon-view properties,
+      Joaquin Miller/Chabot park adjacency, and low-density custom-build permitting.
+    city_id: oakland
+  Fruitvale:
+    name: Fruitvale
+    borough: EAST_OAKLAND_FRUITVALE
+    lat: 37.775
+    lng: -122.215
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.81
+    capex: 6800000.0
+    permit_vel: 33.0
+    shift_ratio: 1.55
+    sla: 55.0
+    description: International Boulevard Latino commercial spine with the Fruitvale
+      BART transit village, mixed-use Paseo redevelopment, and dense multifamily turnover.
+    city_id: oakland
+  San Antonio:
+    name: San Antonio
+    borough: EAST_OAKLAND_FRUITVALE
+    lat: 37.7905
+    lng: -122.2345
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.8
+    capex: 6200000.0
+    permit_vel: 31.0
+    shift_ratio: 1.52
+    sla: 53.0
+    description: East Lake and San Antonio flatlands with the Park Street bridge-frontage
+      blocks, oldest Victorian stock in the metro, and strong small-multifamily conversion
+      demand.
+    city_id: oakland
+  Eastmont:
+    name: Eastmont
+    borough: EASTMONT_DEEP_EAST
+    lat: 37.732
+    lng: -122.19
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.78
+    capex: 5600000.0
+    permit_vel: 29.0
+    shift_ratio: 1.56
+    sla: 50.0
+    description: Eastmont Town Center district with the 73rd/98th Avenue corridors,
+      large-lot single-family stock, and community-benefit redevelopment along Foothill.
+    city_id: oakland
+  Elmhurst:
+    name: Elmhurst
+    borough: EASTMONT_DEEP_EAST
+    lat: 37.718
+    lng: -122.165
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.77
+    capex: 5400000.0
+    permit_vel: 27.0
+    shift_ratio: 1.54
+    sla: 49.0
+    description: Southernmost flatlands along the San Leandro border with post-war
+      starter stock, the Hegenberger logistics corridor, and airport-adjacent industrial
+      conversion.
+    city_id: oakland
+divisions:
+  WEST_OAKLAND:
+    name: WEST_OAKLAND
+    center_lat: 37.8045
+    center_lng: -122.303
+    zoom: 13.5
+    bbox:
+      min_lat: 37.795
+      max_lat: 37.812
+      min_lng: -122.335
+      max_lng: -122.282
+    submarkets:
+    - West Oakland
+    city_id: oakland
+  DOWNTOWN_CORE:
+    name: DOWNTOWN_CORE
+    center_lat: 37.806
+    center_lng: -122.269
+    zoom: 13.5
+    bbox:
+      min_lat: 37.794
+      max_lat: 37.812
+      min_lng: -122.282
+      max_lng: -122.264
+    submarkets:
+    - Downtown Oakland
+    - Uptown
+    city_id: oakland
+  LAKE_MERRITT_GRAND_LAKE:
+    name: LAKE_MERRITT_GRAND_LAKE
+    center_lat: 37.802
+    center_lng: -122.252
+    zoom: 13.5
+    bbox:
+      min_lat: 37.792
+      max_lat: 37.815
+      min_lng: -122.264
+      max_lng: -122.24
+    submarkets:
+    - Lake Merritt
+    - Grand Lake
+    city_id: oakland
+  NORTH_OAKLAND:
+    name: NORTH_OAKLAND
+    center_lat: 37.835
+    center_lng: -122.279
+    zoom: 13.5
+    bbox:
+      min_lat: 37.815
+      max_lat: 37.86
+      min_lng: -122.31
+      max_lng: -122.249
+    submarkets:
+    - Temescal
+    - Rockridge
+    city_id: oakland
+  HILLS_MONTCLAIR:
+    name: HILLS_MONTCLAIR
+    center_lat: 37.841
+    center_lng: -122.215
+    zoom: 13.0
+    bbox:
+      min_lat: 37.815
+      max_lat: 37.878
+      min_lng: -122.249
+      max_lng: -122.185
+    submarkets:
+    - Montclair
+    - Skyline Hills
+    city_id: oakland
+  EAST_OAKLAND_FRUITVALE:
+    name: EAST_OAKLAND_FRUITVALE
+    center_lat: 37.766
+    center_lng: -122.222
+    zoom: 13.0
+    bbox:
+      min_lat: 37.74
+      max_lat: 37.792
+      min_lng: -122.245
+      max_lng: -122.15
+    submarkets:
+    - Fruitvale
+    - San Antonio
+    city_id: oakland
+  EASTMONT_DEEP_EAST:
+    name: EASTMONT_DEEP_EAST
+    center_lat: 37.725
+    center_lng: -122.185
+    zoom: 13.0
+    bbox:
+      min_lat: 37.696
+      max_lat: 37.74
+      min_lng: -122.22
+      max_lng: -122.14
+    submarkets:
+    - Eastmont
+    - Elmhurst
+    city_id: oakland
+datasets:
+  '311':
+    endpoint: https://data.oaklandca.gov/resource/quth-gb8e.json
+    platform: socrata
+    watermark_col: datetimeinit
+    id_keys:
+    - requestid
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Oakland, CA
+    field_map:
+      incident_id:
+      - requestid
+      latitude:
+      - sry
+      longitude:
+      - srx
+      created_date:
+      - datetimeinit
+      closed_date:
+      - datetimeclosed
+      complaint_type:
+      - reqcategory
+      borough:
+      - councildistrict
+      incident_address:
+      - probaddress
+      zipcode:
+      - zipcode
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  crime:
+    endpoint: https://data.oaklandca.gov/resource/ppgh-7dqv.json
+    platform: socrata
+    watermark_col: datetime
+    id_keys:
+    - casenumber
+    - description
+    topic: raw.municipal.crime
+    interval_seconds: 1800.0
+    producer_key: crime
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Oakland, CA
+    field_map:
+      incident_id:
+      - casenumber
+      offense_type:
+      - crimetype
+      occurred_date:
+      - datetime
+      borough:
+      - policebeat
+      address:
+      - address
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- oakland_ca
+- oakland ca
+- oak
+- oak-town
+- east_bay
+- east bay
+- alameda_county
+- alameda county
+job_suffix: oakland

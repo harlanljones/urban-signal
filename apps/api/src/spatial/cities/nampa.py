@@ -1,3 +1,28 @@
+PERMITS_FIELD_MAP = {
+    "job_id": ["identifier", "OBJECTID"],
+    "issuance_date": ["CreationDate"],
+    "status": ["Status"],
+    "job_type": ["type_", "subtype_"],
+    "address_street": ["street"],
+}
+
+STREET_CUT_FIELD_MAP = PERMITS_FIELD_MAP
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Nampa, ID"
+
+DROPPED_PII_COLUMNS = (
+    "pocname",
+    "pocemail",
+    "pocphone",
+    "permitcontractor",
+    "Creator",
+    "Editor",
+)
+
 """Nampa, ID spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -37,10 +62,6 @@ Live-probe caveats that define this leaf (probed 2026-08-28):
   positives on the slow issuance pace of road closures.
 """
 
-from src.producers.field_maps_nampa import (
-    GEOCODE_CONTEXT,
-    STREET_CUT_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 NAMPA_CITY_ID: str = "nampa"

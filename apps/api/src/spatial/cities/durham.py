@@ -1,3 +1,49 @@
+FIELD_MAP = {
+    "permits": {
+        # Permit number is the human id; OBJECTID is the ArcGIS OID fallback.
+        "job_id": ["PermitNum", "OBJECTID", "id"],
+        # Total building cost is the closest single permit-value column.
+        "cost": ["BLD_Cost", "ESTIMATED_ELEC_COST", "ESTIMATED_MECH_COST", "ESTIMATED_OTH_COST"],
+        # Building activity / project type drive job-type classification.
+        "job_type": ["BLDB_ACTIVITY", "BLDB_ACTIVITY_1", "PROJECT_TYPE", "TYPE"],
+        # Layer time watermark; esriFieldTypeDate (epoch-ms -> ISO by client).
+        "issuance_date": ["ISSUE_DATE"],
+        "status": ["PmtStatus"],
+        # No clean street-address column exists; PROJECT_NAME is the best-effort
+        # descriptor. Coordinates come from the Point geometry, so an address is
+        # not required to geolocate the event.
+        "address_street": ["PROJECT_NAME", "DESCRIPTION"],
+        # Parcel identifiers for block/lot-style joins if ever needed.
+        "bbl": ["PIN", "PARCEL_ID", "PID"],
+    },
+    "deeds": {
+        # Real-estate id (REID) is the stable assessor key; PIN/PARCEL_PK and the
+        # layer OID (OBJECTID_1) are fallbacks.
+        "doc_id": ["REID", "PIN", "PARCEL_PK", "OBJECTID_1", "OBJECTID", "id"],
+        # Recorded deed date is the watermark; sale dates fall back behind it.
+        "recorded_date": ["DEED_DATE", "PKG_SALE_DATE", "LAND_SALE_DATE"],
+        # Document amount from the recorded sale prices; total assessed value is
+        # a weaker fallback.
+        "document_amount": [
+            "PKG_SALE_PRICE",
+            "LAND_SALE_PRICE",
+            "TOTAL_PROP_VALUE",
+            "COST_TOTAL_VALUE",
+        ],
+        # Land class / parcel type describe the property kind.
+        "doc_type": ["LAND_CLASS", "PARCEL_TYPE"],
+        # Borough resolves from the neighborhood string; township/city behind it.
+        "borough": ["NEIGHBORHOOD", "TOWNSHIP", "CITY"],
+        # Assessor parcel table has no grantor/grantee split; owner is the
+        # best-effort grantor column. Grantee left unmapped.
+        "party1_grantor": ["PROPERTY_OWNER"],
+        # Parcel identifier.
+        "bbl": ["PIN", "REID", "PARCEL_PK"],
+    },
+}
+
+DURHAM_FIELD_MAP = FIELD_MAP
+
 """Durham, NC spatial registry and geometry.
 
 Provides neighborhood metadata, submarket catalog, division bounding boxes, and
@@ -22,7 +68,6 @@ edit is a pure copy and the module stays import-cycle-free (it never imports
 
 from typing import Dict
 
-from src.producers.field_maps_durham import FIELD_MAP as DURHAM_FIELD_MAP
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 # Greater Durham metro bounding box. Permissive: it only has to keep every live

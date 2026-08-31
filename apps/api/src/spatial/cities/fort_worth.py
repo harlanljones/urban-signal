@@ -1,3 +1,19 @@
+FIELD_MAP = {
+    "job_id": ["Unique_ID", "Permit_No", "OBJECTID"],
+    "latitude": ["SHAPE__Y", "Y"],
+    "longitude": ["SHAPE__X", "X"],
+    "cost": ["JobValue"],
+    "job_type": ["Permit_Type", "Permit_SubType", "Permit_Category", "B1_WORK_DESC"],
+    "issuance_date": ["File_Date", "Status_Date"],
+    "filing_date": ["File_Date"],
+    "status": ["Current_Status"],
+    "address_street": ["Addr_No", "Street_Name"],
+    "zipcode": ["Zip_Code"],
+    "bbl": ["B1_LOT", "B1_BLOCK", "B1_TRACT"],
+}
+
+FORT_WORTH_PERMITS_FIELD_MAP = FIELD_MAP
+
 """Fort Worth / Tarrant County spatial registry and geometry.
 
 Provides neighborhood metadata, submarket catalog, division bounding boxes, and
@@ -18,7 +34,6 @@ the spine edit is a pure copy.
 
 from typing import Dict
 
-from src.producers.field_maps_fort_worth import FIELD_MAP as FORT_WORTH_PERMITS_FIELD_MAP
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 # Greater Fort Worth / Tarrant County core metro bounding box. Permissive: it

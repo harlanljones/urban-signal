@@ -1,0 +1,393 @@
+city_id: wilmington_nc
+name: Wilmington, NC
+state: NC
+center:
+  lat: 34.235
+  lng: -77.948
+metro_bbox:
+  min_lat: 33.92
+  max_lat: 34.39
+  min_lng: -78.1
+  max_lng: -77.7
+division_bboxes:
+  DOWNTOWN_RIVERFRONT:
+    min_lat: 34.2
+    max_lat: 34.26
+    min_lng: -77.97
+    max_lng: -77.9
+  NORTH_SIDE:
+    min_lat: 34.26
+    max_lat: 34.38
+    min_lng: -77.98
+    max_lng: -77.85
+  WEST_SIDE:
+    min_lat: 34.2
+    max_lat: 34.32
+    min_lng: -78.1
+    max_lng: -77.98
+  BEACHES:
+    min_lat: 34.15
+    max_lat: 34.25
+    min_lng: -77.9
+    max_lng: -77.7
+  SOUTH_CAPE_FEAR:
+    min_lat: 33.95
+    max_lat: 34.2
+    min_lng: -78.05
+    max_lng: -77.88
+submarkets:
+  Downtown Wilmington:
+    name: Downtown Wilmington
+    borough: DOWNTOWN_RIVERFRONT
+    lat: 34.236
+    lng: -77.949
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.82
+    capex: 6200000.0
+    permit_vel: 34.0
+    shift_ratio: 1.34
+    sla: 56.0
+    description: Historic core and Riverwalk district with adaptive reuse and hospitality
+      infill.
+    city_id: wilmington_nc
+  Riverwalk & Castle Street:
+    name: Riverwalk & Castle Street
+    borough: DOWNTOWN_RIVERFRONT
+    lat: 34.23
+    lng: -77.942
+    zoom: 14.5
+    pitch: 48.0
+    base_lims: 0.8
+    capex: 5400000.0
+    permit_vel: 30.0
+    shift_ratio: 1.3
+    sla: 54.0
+    description: Southern downtown corridor with small-scale mixed-use and streetscape
+      reinvestment.
+    city_id: wilmington_nc
+  Northchase & Murrayville:
+    name: Northchase & Murrayville
+    borough: NORTH_SIDE
+    lat: 34.294
+    lng: -77.9
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.74
+    capex: 4800000.0
+    permit_vel: 26.0
+    shift_ratio: 1.22
+    sla: 50.0
+    description: Northern growth belt with residential infill and logistics-adjacent
+      services.
+    city_id: wilmington_nc
+  Ogden & Porters Neck:
+    name: Ogden & Porters Neck
+    borough: NORTH_SIDE
+    lat: 34.285
+    lng: -77.87
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.75
+    capex: 5000000.0
+    permit_vel: 27.0
+    shift_ratio: 1.24
+    sla: 51.0
+    description: Northeast residential/commercial corridors along Market St and Porters
+      Neck Rd.
+    city_id: wilmington_nc
+  Leland Gateway & West Bank:
+    name: Leland Gateway & West Bank
+    borough: WEST_SIDE
+    lat: 34.225
+    lng: -78.03
+    zoom: 13.2
+    pitch: 40.0
+    base_lims: 0.72
+    capex: 4300000.0
+    permit_vel: 23.0
+    shift_ratio: 1.2
+    sla: 46.0
+    description: 'Cape Fear west bank gateway: logistics, light industrial, and highway
+      retail.'
+    city_id: wilmington_nc
+  Navassa Industrial:
+    name: Navassa Industrial
+    borough: WEST_SIDE
+    lat: 34.282
+    lng: -78.06
+    zoom: 13.0
+    pitch: 38.0
+    base_lims: 0.7
+    capex: 3900000.0
+    permit_vel: 22.0
+    shift_ratio: 1.18
+    sla: 44.0
+    description: Industrial belt northwest of the river with rail-adjacent parcels.
+    city_id: wilmington_nc
+  UNCW & Eastwood:
+    name: UNCW & Eastwood
+    borough: BEACHES
+    lat: 34.225
+    lng: -77.87
+    zoom: 14.0
+    pitch: 44.0
+    base_lims: 0.78
+    capex: 5600000.0
+    permit_vel: 31.0
+    shift_ratio: 1.4
+    sla: 53.0
+    description: Campus-adjacent district with student housing and services along
+      Eastwood Rd.
+    city_id: wilmington_nc
+  Mayfaire & Military Cutoff:
+    name: Mayfaire & Military Cutoff
+    borough: BEACHES
+    lat: 34.244
+    lng: -77.826
+    zoom: 14.0
+    pitch: 44.0
+    base_lims: 0.79
+    capex: 6000000.0
+    permit_vel: 33.0
+    shift_ratio: 1.42
+    sla: 55.0
+    description: Mixed-use retail and office cluster near Mayfaire and Military Cutoff.
+    city_id: wilmington_nc
+  Wrightsville Beach:
+    name: Wrightsville Beach
+    borough: BEACHES
+    lat: 34.208
+    lng: -77.796
+    zoom: 13.8
+    pitch: 40.0
+    base_lims: 0.76
+    capex: 5200000.0
+    permit_vel: 28.0
+    shift_ratio: 1.28
+    sla: 50.0
+    description: Barrier island hospitality and residential reinvestment.
+    city_id: wilmington_nc
+  Shipyard Blvd & Port:
+    name: Shipyard Blvd & Port
+    borough: SOUTH_CAPE_FEAR
+    lat: 34.179
+    lng: -77.959
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.74
+    capex: 5000000.0
+    permit_vel: 27.0
+    shift_ratio: 1.26
+    sla: 49.0
+    description: Southern logistics and port-adjacent industrial/hospitality belt.
+    city_id: wilmington_nc
+  Carolina & Kure Beach:
+    name: Carolina & Kure Beach
+    borough: SOUTH_CAPE_FEAR
+    lat: 34.036
+    lng: -77.898
+    zoom: 13.2
+    pitch: 38.0
+    base_lims: 0.72
+    capex: 4400000.0
+    permit_vel: 24.0
+    shift_ratio: 1.22
+    sla: 46.0
+    description: Southern barrier-island towns with steady small-scale hospitality
+      and residential activity.
+    city_id: wilmington_nc
+divisions:
+  DOWNTOWN_RIVERFRONT:
+    name: Downtown Riverfront
+    center_lat: 34.235
+    center_lng: -77.944
+    zoom: 13.8
+    bbox:
+      min_lat: 34.2
+      max_lat: 34.26
+      min_lng: -77.97
+      max_lng: -77.9
+    submarkets:
+    - Downtown Wilmington
+    - Riverwalk & Castle Street
+    city_id: wilmington_nc
+  NORTH_SIDE:
+    name: North Side
+    center_lat: 34.31
+    center_lng: -77.91
+    zoom: 12.8
+    bbox:
+      min_lat: 34.26
+      max_lat: 34.38
+      min_lng: -77.98
+      max_lng: -77.85
+    submarkets:
+    - Northchase & Murrayville
+    - Ogden & Porters Neck
+    city_id: wilmington_nc
+  WEST_SIDE:
+    name: West Side
+    center_lat: 34.26
+    center_lng: -78.03
+    zoom: 12.8
+    bbox:
+      min_lat: 34.2
+      max_lat: 34.32
+      min_lng: -78.1
+      max_lng: -77.98
+    submarkets:
+    - Leland Gateway & West Bank
+    - Navassa Industrial
+    city_id: wilmington_nc
+  BEACHES:
+    name: Beaches
+    center_lat: 34.22
+    center_lng: -77.82
+    zoom: 13.0
+    bbox:
+      min_lat: 34.15
+      max_lat: 34.25
+      min_lng: -77.9
+      max_lng: -77.7
+    submarkets:
+    - UNCW & Eastwood
+    - Mayfaire & Military Cutoff
+    - Wrightsville Beach
+    city_id: wilmington_nc
+  SOUTH_CAPE_FEAR:
+    name: South Cape Fear
+    center_lat: 34.1
+    center_lng: -77.94
+    zoom: 12.8
+    bbox:
+      min_lat: 33.95
+      max_lat: 34.2
+      min_lng: -78.05
+      max_lng: -77.88
+    submarkets:
+    - Shipyard Blvd & Port
+    - Carolina & Kure Beach
+    city_id: wilmington_nc
+datasets:
+  permits:
+    endpoint: https://gis.nhcgov.com/server/rest/services/Thematic/BuildingPermits/FeatureServer/0
+    platform: arcgis
+    watermark_col: ISSUE_DATE
+    id_keys:
+    - PERMIT_NUMBER
+    - PMPERMITID
+    - OBJECTID
+    - id
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - PERMIT_NUMBER
+      - PMPERMITID
+      - OBJECTID
+      - id
+      issuance_date:
+      - ISSUE_DATE
+      cost:
+      - VALUATION
+      - TOTAL_FEE_AMOUNT
+      job_type:
+      - PERMIT_TYPE
+      - WORK_CLASS
+      status:
+      - PERMIT_STATUS
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 10000
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'NC'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- wilmington-nc
+- wilmington nc
+job_suffix: wilmington_nc

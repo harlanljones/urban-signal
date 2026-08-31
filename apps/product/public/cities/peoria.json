@@ -1,0 +1,133 @@
+{
+  "schema_version": 2,
+  "id": "peoria",
+  "name": "Peoria",
+  "state": "IL",
+  "center": {
+    "lat": 40.6936,
+    "lng": -89.589
+  },
+  "metro_bbox": {
+    "min_lat": 40.45,
+    "max_lat": 41.05,
+    "min_lng": -90.05,
+    "max_lng": -89.35
+  },
+  "divisions": {
+    "PEORIA_CORE": {
+      "name": "Peoria",
+      "center": {
+        "lat": 40.6936,
+        "lng": -89.589
+      },
+      "bbox": {
+        "min_lat": 40.66,
+        "max_lat": 40.83,
+        "min_lng": -89.72,
+        "max_lng": -89.55
+      },
+      "submarkets": [
+        "Downtown Peoria",
+        "North Peoria",
+        "West Bluff",
+        "Peoria Heights"
+      ]
+    },
+    "PEORIA_EAST": {
+      "name": "East Peoria / Tazewell",
+      "center": {
+        "lat": 40.6664,
+        "lng": -89.5801
+      },
+      "bbox": {
+        "min_lat": 40.52,
+        "max_lat": 40.72,
+        "min_lng": -89.68,
+        "max_lng": -89.4
+      },
+      "submarkets": [
+        "East Peoria",
+        "Morton",
+        "Pekin"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Peoria": {
+      "name": "Downtown Peoria",
+      "division": "PEORIA_CORE",
+      "center": {
+        "lat": 40.6936,
+        "lng": -89.589
+      },
+      "description": "Riverfront core around the Warehouse District with mixed-use conversion and medical-campus spillover."
+    },
+    "North Peoria": {
+      "name": "North Peoria",
+      "division": "PEORIA_CORE",
+      "center": {
+        "lat": 40.76,
+        "lng": -89.6
+      },
+      "description": "Northern growth corridor along Knoxville and Sheridan with retail centres and newer subdivisions."
+    },
+    "West Bluff": {
+      "name": "West Bluff",
+      "division": "PEORIA_CORE",
+      "center": {
+        "lat": 40.698,
+        "lng": -89.618
+      },
+      "description": "Historic bluff neighbourhoods west of downtown anchored by Bradley University and steady rehab activity."
+    },
+    "Peoria Heights": {
+      "name": "Peoria Heights",
+      "division": "PEORIA_CORE",
+      "center": {
+        "lat": 40.7472,
+        "lng": -89.572
+      },
+      "description": "Village district above the river bluff with boutique retail along Prospect Road and infill housing."
+    },
+    "East Peoria": {
+      "name": "East Peoria",
+      "division": "PEORIA_EAST",
+      "center": {
+        "lat": 40.6664,
+        "lng": -89.5801
+      },
+      "description": "East-bank commercial strip along IL-8 and the Levee District with riverfront redevelopment."
+    },
+    "Morton": {
+      "name": "Morton",
+      "division": "PEORIA_EAST",
+      "center": {
+        "lat": 40.6114,
+        "lng": -89.4587
+      },
+      "description": "Suburban Tazewell village with distribution employment and consistent single-family construction."
+    },
+    "Pekin": {
+      "name": "Pekin",
+      "division": "PEORIA_EAST",
+      "center": {
+        "lat": 40.5675,
+        "lng": -89.6407
+      },
+      "description": "Tazewell County seat south of the metro with industrial riverfront and established residential stock."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": null,
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "date_of_sale",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/peoria.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

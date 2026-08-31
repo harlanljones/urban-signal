@@ -298,7 +298,7 @@ class TestFeedRegistration:
         assert spec.parcel_join == {}
         assert spec.state_plane_x_col is None
         assert spec.state_plane_y_col is None
-        assert spec.field_map is BOWLING_GREEN_PERMITS_FIELD_MAP
+        assert spec.field_map == BOWLING_GREEN_PERMITS_FIELD_MAP
 
     def test_absent_feeds_raise_readable_errors(self):
         for absent_feed in (FeedType.COMPLAINTS_311, FeedType.SLA, FeedType.DEEDS, FeedType.STR):

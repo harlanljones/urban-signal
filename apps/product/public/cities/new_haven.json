@@ -1,0 +1,208 @@
+{
+  "schema_version": 2,
+  "id": "new_haven",
+  "name": "New Haven",
+  "state": "CT",
+  "center": {
+    "lat": 41.3083,
+    "lng": -72.9279
+  },
+  "metro_bbox": {
+    "min_lat": 41.27,
+    "max_lat": 41.35,
+    "min_lng": -72.99,
+    "max_lng": -72.86
+  },
+  "divisions": {
+    "DOWNTOWN": {
+      "name": "DOWNTOWN",
+      "center": {
+        "lat": 41.305,
+        "lng": -72.92
+      },
+      "bbox": {
+        "min_lat": 41.29,
+        "max_lat": 41.32,
+        "min_lng": -72.94,
+        "max_lng": -72.9
+      },
+      "submarkets": [
+        "Downtown",
+        "Wooster Square"
+      ]
+    },
+    "EAST_ROCK": {
+      "name": "EAST_ROCK",
+      "center": {
+        "lat": 41.327,
+        "lng": -72.905
+      },
+      "bbox": {
+        "min_lat": 41.315,
+        "max_lat": 41.337,
+        "min_lng": -72.925,
+        "max_lng": -72.89
+      },
+      "submarkets": [
+        "East Rock"
+      ]
+    },
+    "WESTVILLE": {
+      "name": "WESTVILLE",
+      "center": {
+        "lat": 41.33,
+        "lng": -72.977
+      },
+      "bbox": {
+        "min_lat": 41.315,
+        "max_lat": 41.34,
+        "min_lng": -72.99,
+        "max_lng": -72.955
+      },
+      "submarkets": [
+        "Westville"
+      ]
+    },
+    "FAIR_HAVEN": {
+      "name": "FAIR_HAVEN",
+      "center": {
+        "lat": 41.321,
+        "lng": -72.894
+      },
+      "bbox": {
+        "min_lat": 41.305,
+        "max_lat": 41.335,
+        "min_lng": -72.905,
+        "max_lng": -72.87
+      },
+      "submarkets": [
+        "Fair Haven"
+      ]
+    },
+    "DIXWELL": {
+      "name": "DIXWELL",
+      "center": {
+        "lat": 41.326,
+        "lng": -72.929
+      },
+      "bbox": {
+        "min_lat": 41.31,
+        "max_lat": 41.34,
+        "min_lng": -72.94,
+        "max_lng": -72.91
+      },
+      "submarkets": [
+        "Dixwell",
+        "Newhallville"
+      ]
+    },
+    "THE_HILL": {
+      "name": "THE_HILL",
+      "center": {
+        "lat": 41.29,
+        "lng": -72.946
+      },
+      "bbox": {
+        "min_lat": 41.28,
+        "max_lat": 41.3,
+        "min_lng": -72.965,
+        "max_lng": -72.925
+      },
+      "submarkets": [
+        "The Hill"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown": {
+      "name": "Downtown",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 41.3083,
+        "lng": -72.9279
+      },
+      "description": "Civic and commercial core around the historic New Haven Green with the Chapel Street retail spine, arts venues, and office-to-residential conversion."
+    },
+    "Wooster Square": {
+      "name": "Wooster Square",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 41.297,
+        "lng": -72.912
+      },
+      "description": "Historic Italianate rowhouse district around Wooster Square Park with the frank-pepe pizza anchor, Union Station adjacency, and steady residential rehab."
+    },
+    "East Rock": {
+      "name": "East Rock",
+      "division": "EAST_ROCK",
+      "center": {
+        "lat": 41.327,
+        "lng": -72.905
+      },
+      "description": "Green-bluff neighborhood of late-19th-century houses on the State Street ridge with the Orange Street corridor and strong owner-occupancy."
+    },
+    "Westville": {
+      "name": "Westville",
+      "division": "WESTVILLE",
+      "center": {
+        "lat": 41.33,
+        "lng": -72.977
+      },
+      "description": "West Rock edge village along Whalley Avenue with the Arts Council hub, tree-lined side streets, and the metro's most stable single-family stock."
+    },
+    "Fair Haven": {
+      "name": "Fair Haven",
+      "division": "FAIR_HAVEN",
+      "center": {
+        "lat": 41.321,
+        "lng": -72.894
+      },
+      "description": "Quinnipiac River waterfront neighborhood with the Grand Avenue commercial row, immigrant-led storefront vitality, and stabilization-level reinvestment."
+    },
+    "Dixwell": {
+      "name": "Dixwell",
+      "division": "DIXWELL",
+      "center": {
+        "lat": 41.322,
+        "lng": -72.934
+      },
+      "description": "Historic African American neighborhood on the Dixwell Avenue spine with Winchester Avenue corridor infill and mixed-income redevelopment."
+    },
+    "Newhallville": {
+      "name": "Newhallville",
+      "division": "DIXWELL",
+      "center": {
+        "lat": 41.331,
+        "lng": -72.923
+      },
+      "description": "North-of-Downtown neighborhood of multi-family and worker housing along Winchester and Shelton Avenues with transit-adjacent redevelopment groundwork."
+    },
+    "The Hill": {
+      "name": "The Hill",
+      "division": "THE_HILL",
+      "center": {
+        "lat": 41.29,
+        "lng": -72.946
+      },
+      "description": "Southwest neighborhood around Columbus Avenue with the Trowbridge Square district, Long Wharf adjacency, and early-stage corridor reinvestment."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "socrata",
+      "watermark_col": "recordrefreshedon",
+      "interval_seconds": 3600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": {
+      "platform": "socrata",
+      "watermark_col": "daterecorded",
+      "interval_seconds": 3600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/new_haven.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

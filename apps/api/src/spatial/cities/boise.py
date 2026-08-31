@@ -1,3 +1,19 @@
+FIELD_MAP = {
+    "job_id": ["RecordID", "RECORDID", "OBJECTID", "PERMITNUMBER", "PERMIT_NUMBER", "PERMITNO"],
+    "latitude": ["SHAPE__Y", "Y"],
+    "longitude": ["SHAPE__X", "X"],
+    "cost": ["ESTIMATEDCOST", "ESTIMATED_COST", "PROJECTCOST", "TOTALCOST"],
+    "job_type": ["ResidentialType", "ResidentialSubtype", "PERMITTYPE", "PERMIT_TYPE", "WORKDESCRIPTION"],
+    "issuance_date": ["IssuedDate", "ISSUEDATE", "ISSUE_DATE", "DATEISSUED"],
+    "filing_date": ["ReceiveDate", "APPLICATIONDATE", "APPLICATION_DATE", "DATEFILED"],
+    "status": ["PermitStatus", "Status", "STATUS", "PERMITSTATUS"],
+    "address_street": ["PropertyAddress", "Match_addr", "SITE_ADDRESS", "SITEADDRESS", "PROPERTYADDRESS", "ADDRESS"],
+    "zipcode": ["ZIPCODE", "ZIP", "POSTALCODE"],
+    "bbl": ["PARCELNUMBER", "PARCEL_NUMBER", "APN"],
+}
+
+BOISE_PERMITS_FIELD_MAP = FIELD_MAP
+
 """Boise / Ada County spatial registry and geometry.
 
 Provides neighborhood metadata, submarket catalog, division bounding boxes, and
@@ -18,7 +34,6 @@ spine edit is a pure copy.
 
 from typing import Dict
 
-from src.producers.field_maps_boise import FIELD_MAP as BOISE_PERMITS_FIELD_MAP
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 # Greater Boise / Ada County metro bounding box. Permissive: it only has to keep

@@ -1,0 +1,274 @@
+city_id: jonesboro
+name: Jonesboro
+state: AR
+center:
+  lat: 35.8423
+  lng: -90.7043
+metro_bbox:
+  min_lat: 35.7
+  max_lat: 36.0
+  min_lng: -90.85
+  max_lng: -90.55
+division_bboxes:
+  CENTRAL_CORE:
+    min_lat: 35.81
+    max_lat: 35.88
+    min_lng: -90.74
+    max_lng: -90.66
+  A_STATE_DISTRICT:
+    min_lat: 35.83
+    max_lat: 35.92
+    min_lng: -90.71
+    max_lng: -90.6
+  WEST_BELT:
+    min_lat: 35.78
+    max_lat: 35.9
+    min_lng: -90.85
+    max_lng: -90.73
+  SOUTH_GATE:
+    min_lat: 35.7
+    max_lat: 35.82
+    min_lng: -90.82
+    max_lng: -90.65
+  NORTHEAST_BELT:
+    min_lat: 35.88
+    max_lat: 36.0
+    min_lng: -90.74
+    max_lng: -90.56
+submarkets:
+  Downtown Jonesboro:
+    name: Downtown Jonesboro
+    borough: CENTRAL_CORE
+    lat: 35.835
+    lng: -90.704
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.78
+    capex: 3600000.0
+    permit_vel: 18.0
+    shift_ratio: 1.18
+    sla: 46.0
+    description: Historic Main Street core with courthouse square, small business
+      reinvestment, and adaptive reuse.
+    city_id: jonesboro
+  Main & Union Corridor:
+    name: Main & Union Corridor
+    borough: CENTRAL_CORE
+    lat: 35.842
+    lng: -90.69
+    zoom: 14.5
+    pitch: 48.0
+    base_lims: 0.76
+    capex: 3200000.0
+    permit_vel: 16.0
+    shift_ratio: 1.16
+    sla: 44.0
+    description: Central east-west spine linking downtown to Caraway with mixed small-format
+      commercial.
+    city_id: jonesboro
+  Arkansas State University:
+    name: Arkansas State University
+    borough: A_STATE_DISTRICT
+    lat: 35.8445
+    lng: -90.653
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.74
+    capex: 3000000.0
+    permit_vel: 15.0
+    shift_ratio: 1.14
+    sla: 42.0
+    description: Campus and Johnson Ave corridor with student housing infill and institutional
+      projects.
+    city_id: jonesboro
+  Caraway & Highland Retail:
+    name: Caraway & Highland Retail
+    borough: A_STATE_DISTRICT
+    lat: 35.855
+    lng: -90.68
+    zoom: 14.0
+    pitch: 44.0
+    base_lims: 0.72
+    capex: 2800000.0
+    permit_vel: 14.0
+    shift_ratio: 1.12
+    sla: 40.0
+    description: Commercial strips serving the campus and neighborhoods along Caraway
+      and Highland.
+    city_id: jonesboro
+  West Jonesboro & Valley View:
+    name: West Jonesboro & Valley View
+    borough: WEST_BELT
+    lat: 35.82
+    lng: -90.775
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.7
+    capex: 2600000.0
+    permit_vel: 13.0
+    shift_ratio: 1.1
+    sla: 38.0
+    description: Westside growth belt toward Valley View with suburban residential
+      and service nodes.
+    city_id: jonesboro
+  South Jonesboro Industrial:
+    name: South Jonesboro Industrial
+    borough: SOUTH_GATE
+    lat: 35.76
+    lng: -90.72
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.68
+    capex: 2400000.0
+    permit_vel: 12.0
+    shift_ratio: 1.08
+    sla: 36.0
+    description: Industrial and logistics corridor south of downtown with highway-oriented
+      retail.
+    city_id: jonesboro
+  Nettleton & NE Commercial:
+    name: Nettleton & NE Commercial
+    borough: NORTHEAST_BELT
+    lat: 35.905
+    lng: -90.65
+    zoom: 13.8
+    pitch: 40.0
+    base_lims: 0.69
+    capex: 2500000.0
+    permit_vel: 12.0
+    shift_ratio: 1.1
+    sla: 38.0
+    description: Northeast belt around Nettleton and Brookland approach with steady
+      small-scale reinvestment.
+    city_id: jonesboro
+divisions:
+  CENTRAL_CORE:
+    name: CENTRAL_CORE
+    center_lat: 35.8423
+    center_lng: -90.7043
+    zoom: 13.8
+    bbox:
+      min_lat: 35.81
+      max_lat: 35.88
+      min_lng: -90.74
+      max_lng: -90.66
+    submarkets:
+    - Downtown Jonesboro
+    - Main & Union Corridor
+    city_id: jonesboro
+  A_STATE_DISTRICT:
+    name: A_STATE_DISTRICT
+    center_lat: 35.85
+    center_lng: -90.66
+    zoom: 13.5
+    bbox:
+      min_lat: 35.83
+      max_lat: 35.92
+      min_lng: -90.71
+      max_lng: -90.6
+    submarkets:
+    - Arkansas State University
+    - Caraway & Highland Retail
+    city_id: jonesboro
+  WEST_BELT:
+    name: WEST_BELT
+    center_lat: 35.84
+    center_lng: -90.79
+    zoom: 13.2
+    bbox:
+      min_lat: 35.78
+      max_lat: 35.9
+      min_lng: -90.85
+      max_lng: -90.73
+    submarkets:
+    - West Jonesboro & Valley View
+    city_id: jonesboro
+  SOUTH_GATE:
+    name: SOUTH_GATE
+    center_lat: 35.76
+    center_lng: -90.72
+    zoom: 13.0
+    bbox:
+      min_lat: 35.7
+      max_lat: 35.82
+      min_lng: -90.82
+      max_lng: -90.65
+    submarkets:
+    - South Jonesboro Industrial
+    city_id: jonesboro
+  NORTHEAST_BELT:
+    name: NORTHEAST_BELT
+    center_lat: 35.93
+    center_lng: -90.64
+    zoom: 13.0
+    bbox:
+      min_lat: 35.88
+      max_lat: 36.0
+      min_lng: -90.74
+      max_lng: -90.56
+    submarkets:
+    - Nettleton & NE Commercial
+    city_id: jonesboro
+datasets:
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'AR'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- jonesboro_ar
+- jonesboro ar
+job_suffix: jonesboro

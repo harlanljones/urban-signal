@@ -1,0 +1,398 @@
+city_id: spartanburg
+name: Spartanburg County
+state: SC
+center:
+  lat: 34.9497
+  lng: -81.932
+metro_bbox:
+  min_lat: 34.57
+  max_lat: 35.21
+  min_lng: -82.24
+  max_lng: -81.69
+division_bboxes:
+  DOWNTOWN_CORE:
+    min_lat: 34.92
+    max_lat: 34.98
+    min_lng: -81.96
+    max_lng: -81.9
+  EAST_CITY:
+    min_lat: 34.92
+    max_lat: 34.99
+    min_lng: -81.9
+    max_lng: -81.84
+  WEST_CITY:
+    min_lat: 34.92
+    max_lat: 35.0
+    min_lng: -82.03
+    max_lng: -81.96
+  BLUE_RIDGE_FOOTHILLS:
+    min_lat: 34.99
+    max_lat: 35.21
+    min_lng: -82.24
+    max_lng: -81.9
+  I85_CORRIDOR:
+    min_lat: 34.86
+    max_lat: 34.99
+    min_lng: -82.15
+    max_lng: -81.9
+  SOUTH_COUNTY:
+    min_lat: 34.57
+    max_lat: 34.89
+    min_lng: -82.05
+    max_lng: -81.69
+submarkets:
+  Downtown Spartanburg:
+    name: Downtown Spartanburg
+    borough: DOWNTOWN_CORE
+    lat: 34.9494
+    lng: -81.932
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.85
+    capex: 5200000.0
+    permit_vel: 30.0
+    shift_ratio: 1.45
+    sla: 55.0
+    description: 'Main Street commercial core with the city''s densest renovation
+      pipeline: upper-floor apartment conversions, facade grants, and the Hub City
+      Mills adaptive-reuse anchors.'
+    city_id: spartanburg
+  Northside / Rail Yard:
+    name: Northside / Rail Yard
+    borough: DOWNTOWN_CORE
+    lat: 34.96
+    lng: -81.935
+    zoom: 14.5
+    pitch: 42.0
+    base_lims: 0.78
+    capex: 3900000.0
+    permit_vel: 22.0
+    shift_ratio: 1.3
+    sla: 44.0
+    description: Warehouse-and-rail district just north of the core where historic
+      cotton-mill and freight stock is converting to lofts, breweries, and make-ready
+      industrial space.
+    city_id: spartanburg
+  Eastside / Hillcrest:
+    name: Eastside / Hillcrest
+    borough: EAST_CITY
+    lat: 34.947
+    lng: -81.888
+    zoom: 14.0
+    pitch: 38.0
+    base_lims: 0.74
+    capex: 2900000.0
+    permit_vel: 18.0
+    shift_ratio: 1.26
+    sla: 40.0
+    description: Historic brick rowhouse and bungalow belt east of the core converging
+      on Hillcrest Commons, catching first-time-buyer turnover and infill restoration.
+    city_id: spartanburg
+  Westgate:
+    name: Westgate
+    borough: WEST_CITY
+    lat: 34.955
+    lng: -81.978
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.72
+    capex: 2600000.0
+    permit_vel: 16.0
+    shift_ratio: 1.22
+    sla: 38.0
+    description: Working grid west of the core along the old W.O. Ezell corridor,
+      mixing single-family repair-trade permitting with light industrial and retail
+      refit demand.
+    city_id: spartanburg
+  Inman / Campobello:
+    name: Inman / Campobello
+    borough: BLUE_RIDGE_FOOTHILLS
+    lat: 35.046
+    lng: -82.095
+    zoom: 13.5
+    pitch: 34.0
+    base_lims: 0.7
+    capex: 2300000.0
+    permit_vel: 14.0
+    shift_ratio: 1.2
+    sla: 34.0
+    description: Foothills bedroom towns along the SC-9 / SC-11 spine absorbing Greenville-Spartanburg
+      spillover and new single-family subdivisions in the I-26 north corridor.
+    city_id: spartanburg
+  Landrum / Chesnee:
+    name: Landrum / Chesnee
+    borough: BLUE_RIDGE_FOOTHILLS
+    lat: 35.128
+    lng: -82.03
+    zoom: 13.0
+    pitch: 32.0
+    base_lims: 0.68
+    capex: 2100000.0
+    permit_vel: 13.0
+    shift_ratio: 1.18
+    sla: 32.0
+    description: Northern escarpment hamlets near the Tryon horse-country edge, where
+      estate infill, small-downtown boutiques, and farm-parcel fragmentation drive
+      the permit mix.
+    city_id: spartanburg
+  Greer / Reidville:
+    name: Greer / Reidville
+    borough: I85_CORRIDOR
+    lat: 34.913
+    lng: -82.08
+    zoom: 14.0
+    pitch: 36.0
+    base_lims: 0.78
+    capex: 4200000.0
+    permit_vel: 26.0
+    shift_ratio: 1.34
+    sla: 46.0
+    description: I-85 inland-port and logistics corridor anchored by BMW-adjacent
+      supplier parks, striking a balance between industrial build-out and fast-growing
+      single-family subdivisions.
+    city_id: spartanburg
+  Duncan / Lyman:
+    name: Duncan / Lyman
+    borough: I85_CORRIDOR
+    lat: 34.93
+    lng: -82.135
+    zoom: 14.0
+    pitch: 36.0
+    base_lims: 0.76
+    capex: 3900000.0
+    permit_vel: 24.0
+    shift_ratio: 1.32
+    sla: 44.0
+    description: Southern I-85 industrial core (Trough Road / Reidville Road reach)
+      with heavy warehouse, cold-chain, and flex permitting around the county's biggest
+      employment nodes.
+    city_id: spartanburg
+  Woodruff:
+    name: Woodruff
+    borough: SOUTH_COUNTY
+    lat: 34.739
+    lng: -82.032
+    zoom: 13.5
+    pitch: 34.0
+    base_lims: 0.66
+    capex: 1900000.0
+    permit_vel: 12.0
+    shift_ratio: 1.16
+    sla: 30.0
+    description: Southern agricultural county seat on the Enoree, anchored by a regional
+      industrial park and steady small-town Main Street refit activity.
+    city_id: spartanburg
+  Roebuck:
+    name: Roebuck
+    borough: SOUTH_COUNTY
+    lat: 34.878
+    lng: -81.962
+    zoom: 13.5
+    pitch: 33.0
+    base_lims: 0.69
+    capex: 2500000.0
+    permit_vel: 15.0
+    shift_ratio: 1.24
+    sla: 36.0
+    description: South-east county unincorporated belt spreading from the Dorman Centre
+      retail node, mixing subdivision infill, ranch-plus-acreage, and neighborhood-shopping
+      refit.
+    city_id: spartanburg
+divisions:
+  DOWNTOWN_CORE:
+    name: DOWNTOWN_CORE
+    center_lat: 34.949
+    center_lng: -81.932
+    zoom: 14.5
+    bbox:
+      min_lat: 34.92
+      max_lat: 34.98
+      min_lng: -81.96
+      max_lng: -81.9
+    submarkets:
+    - Downtown Spartanburg
+    - Northside / Rail Yard
+    city_id: spartanburg
+  EAST_CITY:
+    name: EAST_CITY
+    center_lat: 34.947
+    center_lng: -81.89
+    zoom: 14.0
+    bbox:
+      min_lat: 34.92
+      max_lat: 34.99
+      min_lng: -81.9
+      max_lng: -81.84
+    submarkets:
+    - Eastside / Hillcrest
+    city_id: spartanburg
+  WEST_CITY:
+    name: WEST_CITY
+    center_lat: 34.957
+    center_lng: -81.975
+    zoom: 14.0
+    bbox:
+      min_lat: 34.92
+      max_lat: 35.0
+      min_lng: -82.03
+      max_lng: -81.96
+    submarkets:
+    - Westgate
+    city_id: spartanburg
+  BLUE_RIDGE_FOOTHILLS:
+    name: BLUE_RIDGE_FOOTHILLS
+    center_lat: 35.06
+    center_lng: -82.1
+    zoom: 12.5
+    bbox:
+      min_lat: 34.99
+      max_lat: 35.21
+      min_lng: -82.24
+      max_lng: -81.9
+    submarkets:
+    - Inman / Campobello
+    - Landrum / Chesnee
+    city_id: spartanburg
+  I85_CORRIDOR:
+    name: I85_CORRIDOR
+    center_lat: 34.92
+    center_lng: -82.1
+    zoom: 12.5
+    bbox:
+      min_lat: 34.86
+      max_lat: 34.99
+      min_lng: -82.15
+      max_lng: -81.9
+    submarkets:
+    - Greer / Reidville
+    - Duncan / Lyman
+    city_id: spartanburg
+  SOUTH_COUNTY:
+    name: SOUTH_COUNTY
+    center_lat: 34.78
+    center_lng: -81.95
+    zoom: 12.0
+    bbox:
+      min_lat: 34.57
+      max_lat: 34.89
+      min_lng: -82.05
+      max_lng: -81.69
+    submarkets:
+    - Woodruff
+    - Roebuck
+    city_id: spartanburg
+datasets:
+  permits:
+    endpoint: https://maps.spartanburgcounty.org/server/rest/services/EnerGov/EnerGov_Spatial_Collections/FeatureServer/5
+    platform: arcgis
+    watermark_col: ApplicationDate
+    id_keys:
+    - CaseNumber
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 600.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: OBJECTID
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: ModuleName='PermitManagement'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - CaseNumber
+      - OBJECTID
+      job_type:
+      - WorkClass
+      - CaseType
+      issuance_date:
+      - ApplicationDate
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  sla:
+    endpoint: https://maps.spartanburgcounty.org/server/rest/services/EnerGov/EnerGov_Spatial_Collections/FeatureServer/5
+    platform: arcgis
+    watermark_col: ApplicationDate
+    id_keys:
+    - CaseNumber
+    - CaseID
+    - OBJECTID
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: OBJECTID
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: ModuleName IN ('BusinessLicenseEntity','BusinessLicenseManagement')
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - CaseNumber
+      - CaseID
+      - OBJECTID
+      dba:
+      - ProjectName
+      - CaseNumber
+      premises_name:
+      - ProjectName
+      - CaseNumber
+      license_type:
+      - CaseType
+      effective_date:
+      - ApplicationDate
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- spartanburg_sc
+- spartanburg-sc
+- spartanburg sc
+- spartanburg county
+- spartanburg_county_sc
+job_suffix: spartanburg

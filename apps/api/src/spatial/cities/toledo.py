@@ -1,3 +1,24 @@
+COMPLAINTS_311_FIELD_MAP = {
+    "incident_id": ["REQUEST_ID"],
+    "complaint_type": ["DESCRIPTION"],
+    "created_date": ["INIT_DATE"],
+    "closed_date": ["CLOSED_DATE"],
+    "status": ["STATUS"],
+    "incident_address": ["LOCATION"],
+    "zipcode": ["PROBZIP"],
+    "borough": ["DISTRICT"],
+}
+
+FIELD_MAP = {
+    "311": COMPLAINTS_311_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Toledo, OH"
+
+DROPPED_PII_COLUMNS = (
+    "INIT_BY",
+)
+
 """Toledo / Lucas County spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -39,7 +60,6 @@ REQUEST_ID 796130):
 
 from typing import Dict
 
-from src.producers.field_maps_toledo import COMPLAINTS_311_FIELD_MAP, GEOCODE_CONTEXT
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 TOLEDO_CITY_ID: str = "toledo"

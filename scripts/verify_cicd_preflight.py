@@ -60,23 +60,26 @@ def _check_cross_reference() -> None:
     surface was updated but the other was not.
     """
     from src.spatial.city_registry import REGISTRY
+    from src.serving.dashboard import get_dashboard_html
 
     registry = {k.value for k in REGISTRY}
-    dashboard_src = _metro_meta_ids(DASHBOARD_PY.read_text())
+    # METRO_META is generated from REGISTRY (US-427) and no longer exists as a
+    # literal in the source — read the dashboard side through its interface.
+    dashboard_src = _metro_meta_ids(get_dashboard_html())
     dashboard_static = _metro_meta_ids(DASHBOARD_HTML.read_text())
     facts = {m["id"] for m in json.loads(FACTS_JSON.read_text())["metros"]}
 
     problems: list[str] = []
     if dashboard_src != registry:
         problems.append(
-            "dashboard METRO_META differs from REGISTRY "
+            "rendered dashboard METRO_META differs from REGISTRY "
             f"(missing={sorted(registry - dashboard_src)}, "
             f"extra={sorted(dashboard_src - registry)})"
         )
     if dashboard_static != dashboard_src:
         problems.append(
             "byte-synced apps/dashboard/public/index.html METRO_META differs from "
-            "serving/dashboard.py (missing="
+            "rendered get_dashboard_html() (missing="
             f"{sorted(dashboard_src - dashboard_static)}, "
             f"extra={sorted(dashboard_static - dashboard_src)})"
         )

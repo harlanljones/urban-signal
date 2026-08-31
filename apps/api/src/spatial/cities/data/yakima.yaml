@@ -1,0 +1,324 @@
+city_id: yakima
+name: Yakima
+state: WA
+center:
+  lat: 46.6021
+  lng: -120.5059
+metro_bbox:
+  min_lat: 46.545
+  max_lat: 46.635
+  min_lng: -120.66
+  max_lng: -120.37
+division_bboxes:
+  DOWNTOWN:
+    min_lat: 46.595
+    max_lat: 46.609
+    min_lng: -120.514
+    max_lng: -120.498
+  NORTH_YAKIMA:
+    min_lat: 46.605
+    max_lat: 46.63
+    min_lng: -120.528
+    max_lng: -120.495
+  WEST_VALLEY:
+    min_lat: 46.575
+    max_lat: 46.6
+    min_lng: -120.655
+    max_lng: -120.52
+  SOUTH_16TH:
+    min_lat: 46.552
+    max_lat: 46.576
+    min_lng: -120.512
+    max_lng: -120.483
+  TERRACE_HEIGHTS:
+    min_lat: 46.596
+    max_lat: 46.62
+    min_lng: -120.462
+    max_lng: -120.433
+  EAST_VALLEY:
+    min_lat: 46.55
+    max_lat: 46.592
+    min_lng: -120.432
+    max_lng: -120.378
+submarkets:
+  Downtown:
+    name: Downtown
+    borough: DOWNTOWN
+    lat: 46.6021
+    lng: -120.5059
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.84
+    capex: 5800000.0
+    permit_vel: 18.0
+    shift_ratio: 1.38
+    sla: 52.0
+    description: "Yakima Avenue / Front Street downtown core with the Capitol Theatre,\
+      \ civic buildings, and the riverfront Millennium Plaza \u2014 the metro's densest\
+      \ mixed-use permitting corridor."
+    city_id: yakima
+  Nob Hill:
+    name: Nob Hill
+    borough: NORTH_YAKIMA
+    lat: 46.6085
+    lng: -120.519
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.83
+    capex: 5200000.0
+    permit_vel: 14.0
+    shift_ratio: 1.34
+    sla: 48.0
+    description: Nob Hill Boulevard corridor of mid-century housing, retail nodes,
+      and steady infill between downtown and the north hill residential belt.
+    city_id: yakima
+  North Yakima:
+    name: North Yakima
+    borough: NORTH_YAKIMA
+    lat: 46.618
+    lng: -120.507
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.82
+    capex: 4900000.0
+    permit_vel: 12.0
+    shift_ratio: 1.3
+    sla: 45.0
+    description: "N 1st\u201320th / Washington Ave northside stock with single-family\
+      \ turnover, duplex conversions, and quiet corridor infill."
+    city_id: yakima
+  Summitview:
+    name: Summitview
+    borough: WEST_VALLEY
+    lat: 46.59
+    lng: -120.56
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.85
+    capex: 6100000.0
+    permit_vel: 16.0
+    shift_ratio: 1.4
+    sla: 50.0
+    description: "Summitview Avenue west corridor \u2014 the city's primary retail-commercial\
+      \ spine with grocery anchors, office parks, and steady mixed-use permitting."
+    city_id: yakima
+  West Valley:
+    name: West Valley
+    borough: WEST_VALLEY
+    lat: 46.584
+    lng: -120.63
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.86
+    capex: 6800000.0
+    permit_vel: 15.0
+    shift_ratio: 1.42
+    sla: 49.0
+    description: 40th Ave / Wide Hollow Rd edge of the West Valley school-district
+      corridor with newer subdivisions, townhome infill, and the metro's largest new-build
+      SFR valuations.
+    city_id: yakima
+  South 16th:
+    name: South 16th
+    borough: SOUTH_16TH
+    lat: 46.562
+    lng: -120.498
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.81
+    capex: 4600000.0
+    permit_vel: 10.0
+    shift_ratio: 1.28
+    sla: 42.0
+    description: S 16th Ave industrial-adjacent belt with older single-family stock,
+      light-industrial conversions, and affordable-housing permitting.
+    city_id: yakima
+  South Yakima:
+    name: South Yakima
+    borough: SOUTH_16TH
+    lat: 46.572
+    lng: -120.492
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.82
+    capex: 5000000.0
+    permit_vel: 11.0
+    shift_ratio: 1.29
+    sla: 44.0
+    description: S 1st / S Front St south-central neighborhood with bungalow infill,
+      corner-store retail, and steady small-scale alteration permits.
+    city_id: yakima
+  Terrace Heights:
+    name: Terrace Heights
+    borough: TERRACE_HEIGHTS
+    lat: 46.606
+    lng: -120.447
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.83
+    capex: 5400000.0
+    permit_vel: 13.0
+    shift_ratio: 1.33
+    sla: 47.0
+    description: East-bank residential district across the Yakima River (Terrace Heights
+      Dr / Keys Rd) with starter homes, ag-edge lots, and new single-family builds.
+    city_id: yakima
+  East Valley:
+    name: East Valley
+    borough: EAST_VALLEY
+    lat: 46.575
+    lng: -120.42
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.8
+    capex: 4700000.0
+    permit_vel: 9.0
+    shift_ratio: 1.26
+    sla: 40.0
+    description: "East Valley corridor toward Moxee \u2014 farm-town edge with rural\
+      \ residential splits, ag support structures, and low-density infill permitting."
+    city_id: yakima
+divisions:
+  DOWNTOWN:
+    name: DOWNTOWN
+    center_lat: 46.6021
+    center_lng: -120.5059
+    zoom: 14.0
+    bbox:
+      min_lat: 46.595
+      max_lat: 46.609
+      min_lng: -120.514
+      max_lng: -120.498
+    submarkets:
+    - Downtown
+    city_id: yakima
+  NORTH_YAKIMA:
+    name: NORTH_YAKIMA
+    center_lat: 46.618
+    center_lng: -120.507
+    zoom: 13.5
+    bbox:
+      min_lat: 46.605
+      max_lat: 46.63
+      min_lng: -120.528
+      max_lng: -120.495
+    submarkets:
+    - Nob Hill
+    - North Yakima
+    city_id: yakima
+  WEST_VALLEY:
+    name: WEST_VALLEY
+    center_lat: 46.59
+    center_lng: -120.57
+    zoom: 13.0
+    bbox:
+      min_lat: 46.575
+      max_lat: 46.6
+      min_lng: -120.655
+      max_lng: -120.52
+    submarkets:
+    - Summitview
+    - West Valley
+    city_id: yakima
+  SOUTH_16TH:
+    name: SOUTH_16TH
+    center_lat: 46.564
+    center_lng: -120.498
+    zoom: 13.5
+    bbox:
+      min_lat: 46.552
+      max_lat: 46.576
+      min_lng: -120.512
+      max_lng: -120.483
+    submarkets:
+    - South 16th
+    - South Yakima
+    city_id: yakima
+  TERRACE_HEIGHTS:
+    name: TERRACE_HEIGHTS
+    center_lat: 46.606
+    center_lng: -120.447
+    zoom: 13.5
+    bbox:
+      min_lat: 46.596
+      max_lat: 46.62
+      min_lng: -120.462
+      max_lng: -120.433
+    submarkets:
+    - Terrace Heights
+    city_id: yakima
+  EAST_VALLEY:
+    name: EAST_VALLEY
+    center_lat: 46.572
+    center_lng: -120.415
+    zoom: 13.0
+    bbox:
+      min_lat: 46.55
+      max_lat: 46.592
+      min_lng: -120.432
+      max_lng: -120.378
+    submarkets:
+    - East Valley
+    city_id: yakima
+datasets:
+  permits:
+    endpoint: https://gis.yakimawa.gov/arcgis/rest/services/Planning/BuildingPermits/FeatureServer/0
+    platform: arcgis
+    watermark_col: IssuedOnDate
+    id_keys:
+    - PermitID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: IssuedOnDate DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Yakima, WA
+    field_map:
+      job_id:
+      - PermitID
+      - OBJECTID
+      issuance_date:
+      - IssuedOnDate
+      filing_date:
+      - SubmittedOnDate
+      status:
+      - PermitStatus
+      job_type:
+      - PermitType
+      address_street:
+      - SiteStreet
+      zipcode:
+      - SiteZipCode
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- yakima_wa
+- yakima-wa
+- yakima wa
+job_suffix: yakima

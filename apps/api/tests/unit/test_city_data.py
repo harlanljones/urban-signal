@@ -66,11 +66,16 @@ def test_registry_factory_rejects_unsupported_city_as_one_atomic_build():
         registry_derivation.build_registry_from_data([DEMO, unsupported])
 
 
-def test_data_only_runtime_falls_back_when_any_city_id_is_unsupported(monkeypatch):
+def test_data_only_runtime_rejects_unsupported_city_id(monkeypatch):
+    """US-428: the corpus is the single construction path — an unknown CityId
+    is a loud failure, not a silent None fallback."""
     unsupported = {**DEMO, "city_id": "atlantis", "aliases": []}
-    monkeypatch.setattr(city_data, "load_definitions", lambda directory: [DEMO, unsupported])
+    monkeypatch.setattr(
+        city_data, "load_definitions", lambda directory, allow_unknown_city_ids=False: [DEMO, unsupported]
+    )
 
-    assert registry_derivation.build_runtime_exports() is None
+    with pytest.raises(ValueError, match="unknown city_id"):
+        registry_derivation.build_runtime_exports()
 
 
 def test_temporary_corpus_accepts_all_existing_cities_plus_data_only_city(

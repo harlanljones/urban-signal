@@ -1,3 +1,43 @@
+GEOCODE_CONTEXT = "Lynchburg, VA"
+
+PERMITS_FIELD_MAP = {
+    "job_id": ["RecordNo", "OBJECTID"],
+    "job_type": ["SubType", "Type"],
+    "issuance_date": ["StartDate"],
+    "address_street": ["Address"],
+    "bbl": ["ParcelID"],
+    "borough": ["Neighborhood"],
+    "cost": ["JobValue"],
+    "status": ["Status"],
+}
+
+SLA_FIELD_MAP = {
+    "license_id": ["LicenseNumber", "Company", "TradeName"],
+    "dba": ["TradeName", "Company"],
+    "premises_name": ["Company"],
+    "license_type": ["BusinessType"],
+    "effective_date": ["LicenseIssued"],
+    "expiration_date": ["LicenseExpires"],
+    "address_street": ["MailAddress1"],
+    "zipcode": ["MailZip"],
+    "status": ["Status"],
+}
+
+DEEDS_FIELD_MAP = {
+    "doc_id": ["DocumentNo", "ESRI_OID"],
+    "bbl": ["LRSN"],
+    "document_amount": ["SaleAmount"],
+    "recorded_date": ["SaleDate"],
+    "party1_grantor": ["Seller"],
+    "party2_grantee": ["Buyer"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+    "sla": SLA_FIELD_MAP,
+    "deeds": DEEDS_FIELD_MAP,
+}
+
 """Lynchburg Metro Submarket Registry and Spatial Layer for Urban Signal.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -56,13 +96,6 @@ arms-length transfers are kept.
 
 from typing import Dict
 
-from src.producers.field_maps_lynchburg import (
-    DEEDS_FIELD_MAP,
-    FIELD_MAP,
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-    SLA_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 LYNCHBURG_CITY_ID: str = "lynchburg"

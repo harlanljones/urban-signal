@@ -1,3 +1,23 @@
+CRIME_FIELD_MAP = {
+    "incident_id": ["id", "incident_number"],
+    "offense_type": ["incident_type"],
+    "occurred_date": ["date_time"],
+    "reported_date": ["upload"],
+    "borough": ["city"],
+    "address": ["intersection", "location_address"],
+}
+
+FIELD_MAP = {
+    "crime": CRIME_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Santa Rosa, CA"
+
+DROPPED_PII_COLUMNS = (
+    "agency_code",
+    "agency",
+)
+
 """Santa Rosa, CA / Sonoma County spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -38,10 +58,6 @@ US-247):
 """
 
 
-from src.producers.field_maps_santa_rosa import (
-    CRIME_FIELD_MAP,
-    GEOCODE_CONTEXT,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 SANTA_ROSA_CITY_ID: str = "santa_rosa"

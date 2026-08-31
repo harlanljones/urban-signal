@@ -1,0 +1,285 @@
+city_id: abilene
+name: Abilene
+state: TX
+center:
+  lat: 32.4487
+  lng: -99.7331
+metro_bbox:
+  min_lat: 32.3
+  max_lat: 32.57
+  min_lng: -99.9
+  max_lng: -99.55
+division_bboxes:
+  CENTRAL_CORE:
+    min_lat: 32.43
+    max_lat: 32.47
+    min_lng: -99.76
+    max_lng: -99.7
+  WEST_SIDE:
+    min_lat: 32.4
+    max_lat: 32.5
+    min_lng: -99.9
+    max_lng: -99.72
+  SOUTH_BELT:
+    min_lat: 32.3
+    max_lat: 32.42
+    min_lng: -99.85
+    max_lng: -99.65
+  EAST_GATE:
+    min_lat: 32.44
+    max_lat: 32.56
+    min_lng: -99.73
+    max_lng: -99.55
+  NORTH_LOOP:
+    min_lat: 32.5
+    max_lat: 32.57
+    min_lng: -99.85
+    max_lng: -99.6
+submarkets:
+  Downtown Abilene:
+    name: Downtown Abilene
+    borough: CENTRAL_CORE
+    lat: 32.4487
+    lng: -99.7331
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.8
+    capex: 5100000.0
+    permit_vel: 20.0
+    shift_ratio: 1.18
+    sla: 45.0
+    description: Historic courthouse, cultural district, and mixed-use main-street
+      blocks.
+    city_id: abilene
+  SoDA District:
+    name: SoDA District
+    borough: CENTRAL_CORE
+    lat: 32.444
+    lng: -99.733
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.79
+    capex: 4800000.0
+    permit_vel: 18.0
+    shift_ratio: 1.16
+    sla: 44.0
+    description: South Downtown Abilene arts & dining corridor with adaptive reuse
+      momentum.
+    city_id: abilene
+  Buffalo Gap Road Corridor:
+    name: Buffalo Gap Road Corridor
+    borough: WEST_SIDE
+    lat: 32.43
+    lng: -99.77
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.74
+    capex: 4300000.0
+    permit_vel: 16.0
+    shift_ratio: 1.14
+    sla: 43.0
+    description: Retail and services spine along Buffalo Gap Rd and SW 14th connectors.
+    city_id: abilene
+  South 14th Commercial:
+    name: South 14th Commercial
+    borough: SOUTH_BELT
+    lat: 32.41
+    lng: -99.75
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.72
+    capex: 4000000.0
+    permit_vel: 15.0
+    shift_ratio: 1.12
+    sla: 42.0
+    description: South Abilene growth belt with highway-oriented retail and neighborhood
+      services.
+    city_id: abilene
+  Mall of Abilene / Southwest Dr:
+    name: Mall of Abilene / Southwest Dr
+    borough: SOUTH_BELT
+    lat: 32.39
+    lng: -99.7556
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.71
+    capex: 3800000.0
+    permit_vel: 14.0
+    shift_ratio: 1.1
+    sla: 42.0
+    description: Regional mall area and Southwest Dr commercial clusters.
+    city_id: abilene
+  Airport Corridor:
+    name: Airport Corridor
+    borough: SOUTH_BELT
+    lat: 32.41
+    lng: -99.68
+    zoom: 13.5
+    pitch: 38.0
+    base_lims: 0.7
+    capex: 3600000.0
+    permit_vel: 13.0
+    shift_ratio: 1.1
+    sla: 42.0
+    description: Abilene Regional Airport vicinity and industrial ribbons along TX-36.
+    city_id: abilene
+  ACU / Northeast District:
+    name: ACU / Northeast District
+    borough: EAST_GATE
+    lat: 32.47
+    lng: -99.71
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.73
+    capex: 4200000.0
+    permit_vel: 16.0
+    shift_ratio: 1.13
+    sla: 43.0
+    description: Abilene Christian University vicinity and northeast neighborhood
+      services.
+    city_id: abilene
+  North Abilene / I-20:
+    name: North Abilene / I-20
+    borough: NORTH_LOOP
+    lat: 32.54
+    lng: -99.73
+    zoom: 13.5
+    pitch: 38.0
+    base_lims: 0.69
+    capex: 3500000.0
+    permit_vel: 12.0
+    shift_ratio: 1.08
+    sla: 41.0
+    description: I-20 logistics and retail corridor with hospital and hospitality
+      clusters.
+    city_id: abilene
+divisions:
+  CENTRAL_CORE:
+    name: CENTRAL_CORE
+    center_lat: 32.448
+    center_lng: -99.7335
+    zoom: 13.8
+    bbox:
+      min_lat: 32.43
+      max_lat: 32.47
+      min_lng: -99.76
+      max_lng: -99.7
+    submarkets:
+    - Downtown Abilene
+    - SoDA District
+    city_id: abilene
+  WEST_SIDE:
+    name: WEST_SIDE
+    center_lat: 32.455
+    center_lng: -99.8
+    zoom: 13.2
+    bbox:
+      min_lat: 32.4
+      max_lat: 32.5
+      min_lng: -99.9
+      max_lng: -99.72
+    submarkets:
+    - Buffalo Gap Road Corridor
+    city_id: abilene
+  SOUTH_BELT:
+    name: SOUTH_BELT
+    center_lat: 32.365
+    center_lng: -99.74
+    zoom: 13.0
+    bbox:
+      min_lat: 32.3
+      max_lat: 32.42
+      min_lng: -99.85
+      max_lng: -99.65
+    submarkets:
+    - South 14th Commercial
+    - Mall of Abilene / Southwest Dr
+    - Airport Corridor
+    city_id: abilene
+  EAST_GATE:
+    name: EAST_GATE
+    center_lat: 32.505
+    center_lng: -99.64
+    zoom: 13.2
+    bbox:
+      min_lat: 32.44
+      max_lat: 32.56
+      min_lng: -99.73
+      max_lng: -99.55
+    submarkets:
+    - ACU / Northeast District
+    city_id: abilene
+  NORTH_LOOP:
+    name: NORTH_LOOP
+    center_lat: 32.535
+    center_lng: -99.72
+    zoom: 12.8
+    bbox:
+      min_lat: 32.5
+      max_lat: 32.57
+      min_lng: -99.85
+      max_lng: -99.6
+    submarkets:
+    - North Abilene / I-20
+    city_id: abilene
+datasets:
+  sla:
+    endpoint: https://data.texas.gov/resource/s7ft-44qi.json?$select=*, 'trec_broker:'
+      || license_type as license_type_ns
+    platform: socrata
+    watermark_col: updated
+    id_keys:
+    - license_number
+    topic: raw.municipal.sla
+    interval_seconds: 3600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: updated DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: county = 'Taylor'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - license_number
+      license_type:
+      - license_type_ns
+      effective_date:
+      - original_license_date
+      expiration_date:
+      - license_expiration_date
+      premises_name:
+      - full_name
+      status:
+      - status
+      borough:
+      - county
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- abilene_tx
+- abilene tx
+job_suffix: abilene

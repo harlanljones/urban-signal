@@ -274,7 +274,7 @@ class TestFeedRegistration:
         assert spec.expected_cadence_days == 7
         # Native-point layer is NOT a non-spatial table.
         assert spec.non_spatial in (None, False)
-        assert spec.field_map is PERMITS_FIELD_MAP
+        assert spec.field_map == PERMITS_FIELD_MAP
 
     @pytest.mark.parametrize(
         "absent_feed",

@@ -1,0 +1,518 @@
+city_id: bend
+name: Bend, OR
+state: OR
+center:
+  lat: 44.0575
+  lng: -121.315
+metro_bbox:
+  min_lat: 43.98
+  max_lat: 44.12
+  min_lng: -121.38
+  max_lng: -121.23
+division_bboxes:
+  DOWNTOWN_CORE:
+    min_lat: 44.04
+    max_lat: 44.06
+    min_lng: -121.335
+    max_lng: -121.305
+  WESTSIDE:
+    min_lat: 44.015
+    max_lat: 44.045
+    min_lng: -121.375
+    max_lng: -121.335
+  NORTHWEST_CROSSING:
+    min_lat: 44.055
+    max_lat: 44.095
+    min_lng: -121.37
+    max_lng: -121.325
+  EAST_BEND:
+    min_lat: 44.055
+    max_lat: 44.095
+    min_lng: -121.31
+    max_lng: -121.25
+  SOUTHEAST_BEND:
+    min_lat: 44.0
+    max_lat: 44.055
+    min_lng: -121.335
+    max_lng: -121.29
+  SOUTH_BEND:
+    min_lat: 43.98
+    max_lat: 44.01
+    min_lng: -121.33
+    max_lng: -121.25
+submarkets:
+  Downtown:
+    name: Downtown
+    borough: DOWNTOWN_CORE
+    lat: 44.0575
+    lng: -121.315
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.88
+    capex: 9800000.0
+    permit_vel: 38.0
+    shift_ratio: 1.52
+    sla: 61.0
+    description: Wall Street and Bond Street core with hotel/adaptive-reuse projects,
+      the pedestrian riverfront, and the metro's densest mixed-use permitting corridor.
+    city_id: bend
+  Old Mill District:
+    name: Old Mill District
+    borough: DOWNTOWN_CORE
+    lat: 44.048
+    lng: -121.327
+    zoom: 14.5
+    pitch: 52.0
+    base_lims: 0.9
+    capex: 10500000.0
+    permit_vel: 32.0
+    shift_ratio: 1.48
+    sla: 66.0
+    description: Redeveloped lumber-mill campus on the Deschutes River with destination
+      retail, amphitheater, offices, and riverfront multifamily infill.
+    city_id: bend
+  Westside & Century Drive:
+    name: Westside & Century Drive
+    borough: WESTSIDE
+    lat: 44.03
+    lng: -121.352
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.85
+    capex: 7400000.0
+    permit_vel: 28.0
+    shift_ratio: 1.44
+    sla: 55.0
+    description: Century Drive corridor and southwest residential hills with strip-center
+      retail, medical offices, and steady residential renovation permits.
+    city_id: bend
+  Northwest Crossing:
+    name: Northwest Crossing
+    borough: NORTHWEST_CROSSING
+    lat: 44.072
+    lng: -121.345
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.87
+    capex: 9200000.0
+    permit_vel: 33.0
+    shift_ratio: 1.5
+    sla: 58.0
+    description: New-urbanist planned community with mixed-use Main Street, alley-loaded
+      cottages, and the metro's strongest new-build permit pipeline.
+    city_id: bend
+  Awbrey Butte:
+    name: Awbrey Butte
+    borough: NORTHWEST_CROSSING
+    lat: 44.065
+    lng: -121.36
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.84
+    capex: 8500000.0
+    permit_vel: 26.0
+    shift_ratio: 1.45
+    sla: 53.0
+    description: Upper-west hillside with view-lot estate builds, Skyline Ranch Road
+      development, and top-end residential construction permits.
+    city_id: bend
+  Orchard District:
+    name: Orchard District
+    borough: EAST_BEND
+    lat: 44.069
+    lng: -121.303
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.8
+    capex: 6200000.0
+    permit_vel: 29.0
+    shift_ratio: 1.38
+    sla: 50.0
+    description: Northeast historic orchard neighborhood with Craftsman-era housing,
+      NE 3rd Street retail spine, and moderate renovation and ADU permits.
+    city_id: bend
+  River West:
+    name: River West
+    borough: EAST_BEND
+    lat: 44.076
+    lng: -121.305
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.78
+    capex: 5600000.0
+    permit_vel: 24.0
+    shift_ratio: 1.33
+    sla: 47.0
+    description: North riverfront corridor along the Deschutes with park-adjacent
+      residential and light industrial-to-residential conversions.
+    city_id: bend
+  Old Farm District:
+    name: Old Farm District
+    borough: SOUTHEAST_BEND
+    lat: 44.032
+    lng: -121.313
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.79
+    capex: 5800000.0
+    permit_vel: 27.0
+    shift_ratio: 1.36
+    sla: 49.0
+    description: Historic southeast farm settlement around Reed Market Road with mid-century
+      ranch stock and steady infill and redevelopment permits.
+    city_id: bend
+  Southern Crossing:
+    name: Southern Crossing
+    borough: SOUTHEAST_BEND
+    lat: 44.042
+    lng: -121.314
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.83
+    capex: 7000000.0
+    permit_vel: 30.0
+    shift_ratio: 1.42
+    sla: 52.0
+    description: South-central neighborhood around SE 3rd and Reed Market with a densifying
+      mixed-use node and growing multifamily development.
+    city_id: bend
+  Larkspur:
+    name: Larkspur
+    borough: SOUTH_BEND
+    lat: 43.997
+    lng: -121.278
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.76
+    capex: 5200000.0
+    permit_vel: 22.0
+    shift_ratio: 1.3
+    sla: 45.0
+    description: Southern Bend residential fringe with Larkspur Trail Park, recent
+      master-planned tracts, and family-oriented new construction.
+    city_id: bend
+divisions:
+  DOWNTOWN_CORE:
+    name: DOWNTOWN_CORE
+    center_lat: 44.053
+    center_lng: -121.32
+    zoom: 14.0
+    bbox:
+      min_lat: 44.04
+      max_lat: 44.06
+      min_lng: -121.335
+      max_lng: -121.305
+    submarkets:
+    - Downtown
+    - Old Mill District
+    city_id: bend
+  WESTSIDE:
+    name: WESTSIDE
+    center_lat: 44.03
+    center_lng: -121.355
+    zoom: 13.5
+    bbox:
+      min_lat: 44.015
+      max_lat: 44.045
+      min_lng: -121.375
+      max_lng: -121.335
+    submarkets:
+    - Westside & Century Drive
+    city_id: bend
+  NORTHWEST_CROSSING:
+    name: NORTHWEST_CROSSING
+    center_lat: 44.07
+    center_lng: -121.348
+    zoom: 13.5
+    bbox:
+      min_lat: 44.055
+      max_lat: 44.095
+      min_lng: -121.37
+      max_lng: -121.325
+    submarkets:
+    - Northwest Crossing
+    - Awbrey Butte
+    city_id: bend
+  EAST_BEND:
+    name: EAST_BEND
+    center_lat: 44.075
+    center_lng: -121.295
+    zoom: 13.5
+    bbox:
+      min_lat: 44.055
+      max_lat: 44.095
+      min_lng: -121.31
+      max_lng: -121.25
+    submarkets:
+    - Orchard District
+    - River West
+    city_id: bend
+  SOUTHEAST_BEND:
+    name: SOUTHEAST_BEND
+    center_lat: 44.03
+    center_lng: -121.31
+    zoom: 13.5
+    bbox:
+      min_lat: 44.0
+      max_lat: 44.055
+      min_lng: -121.335
+      max_lng: -121.29
+    submarkets:
+    - Old Farm District
+    - Southern Crossing
+    city_id: bend
+  SOUTH_BEND:
+    name: SOUTH_BEND
+    center_lat: 43.997
+    center_lng: -121.285
+    zoom: 13.0
+    bbox:
+      min_lat: 43.98
+      max_lat: 44.01
+      min_lng: -121.33
+      max_lng: -121.25
+    submarkets:
+    - Larkspur
+    city_id: bend
+datasets:
+  permits:
+    endpoint: https://services5.arcgis.com/JisFYcK2mIVg9ueP/arcgis/rest/services/Permit_Applications_Point/FeatureServer/0
+    platform: arcgis
+    watermark_col: ApplicationDate
+    id_keys:
+    - ApplicationNumber
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: ApplicationDate DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Bend, OR
+    field_map:
+      job_id:
+      - ApplicationNumber
+      - OBJECTID
+      issuance_date:
+      - IssueDate
+      filing_date:
+      - ApplicationDate
+      cost:
+      - ProjectValuation
+      status:
+      - ApplicationStatus
+      - StatusDesc
+      - OverallStatus
+      job_type:
+      - TypeDesc
+      - ApplicationType
+      - BldgUse
+      address_street:
+      - Address
+      proposed_units:
+      - Units
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  sla:
+    endpoint: https://services5.arcgis.com/JisFYcK2mIVg9ueP/arcgis/rest/services/License_Application_Points_(Business_Registrations)/FeatureServer/0
+    platform: arcgis
+    watermark_col: LicenseExpirationDate
+    id_keys:
+    - LicenseNumber
+    - BusinessNumber
+    - OBJECTID
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: LicenseExpirationDate DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Bend, OR
+    field_map:
+      license_id:
+      - LicenseNumber
+      - BusinessNumber
+      - OBJECTID
+      license_type:
+      - BusinessTypeDesc
+      - ClassDescription1
+      - BusinessTypeCode
+      dba:
+      - BusinessName
+      premises_name:
+      - BusinessName
+      effective_date:
+      - BR_BusinessOpenedDate
+      expiration_date:
+      - LicenseExpirationDate
+      status:
+      - BusinessStatusDesc
+      - LicenseStatusDesc
+      address_street:
+      - BusinessLocation
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  '311':
+    endpoint: https://services5.arcgis.com/JisFYcK2mIVg9ueP/arcgis/rest/services/Code_Enforcement_Cases_Polygon_(Public)/FeatureServer/0
+    platform: arcgis
+    watermark_col: CaseReportedDate
+    id_keys:
+    - CaseNumber
+    - OBJECTID
+    topic: raw.municipal.311
+    interval_seconds: 300.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: CaseReportedDate DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Bend, OR
+    field_map:
+      incident_id:
+      - CaseNumber
+      - OBJECTID
+      complaint_type:
+      - TypeDescription
+      created_date:
+      - CaseReportedDate
+      status:
+      - CaseStatus
+      - StatusDesc
+      incident_address:
+      - Address
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  crime:
+    endpoint: https://services5.arcgis.com/JisFYcK2mIVg9ueP/arcgis/rest/services/Public_Calls/FeatureServer/0
+    platform: arcgis
+    watermark_col: CreateDateTime
+    id_keys:
+    - IncidentNumber
+    - OBJECTID
+    topic: raw.municipal.crime
+    interval_seconds: 300.0
+    producer_key: crime
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: CreateDateTime DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Bend, OR
+    field_map:
+      incident_id:
+      - IncidentNumber
+      - OBJECTID
+      offense_type:
+      - CallType
+      reported_date:
+      - CreateDateTime
+      address:
+      - CallAddress
+      incident_address:
+      - CallAddress
+      borough:
+      - Neighborhood
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- bend_or
+- bend-or
+- bend or
+job_suffix: bend

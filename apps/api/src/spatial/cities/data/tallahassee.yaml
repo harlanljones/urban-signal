@@ -1,0 +1,473 @@
+city_id: tallahassee
+name: Tallahassee / Leon County
+state: FL
+center:
+  lat: 30.4383
+  lng: -84.2807
+metro_bbox:
+  min_lat: 30.29
+  max_lat: 30.63
+  min_lng: -84.7
+  max_lng: -84.05
+division_bboxes:
+  DOWNTOWN_CAPITAL:
+    min_lat: 30.405
+    max_lat: 30.45
+    min_lng: -84.3
+    max_lng: -84.26
+  MIDTOWN_NORTH:
+    min_lat: 30.455
+    max_lat: 30.48
+    min_lng: -84.295
+    max_lng: -84.27
+  NORTHEAST_KILLEARN:
+    min_lat: 30.478
+    max_lat: 30.545
+    min_lng: -84.265
+    max_lng: -84.195
+  NORTHWEST_LAKE_JACKSON:
+    min_lat: 30.458
+    max_lat: 30.533
+    min_lng: -84.39
+    max_lng: -84.35
+  SOUTHSIDE_BOND:
+    min_lat: 30.372
+    max_lat: 30.408
+    min_lng: -84.288
+    max_lng: -84.255
+  SOUTHEAST_SOUTHWOOD:
+    min_lat: 30.412
+    max_lat: 30.44
+    min_lng: -84.215
+    max_lng: -84.182
+submarkets:
+  Downtown / Capitol:
+    name: Downtown / Capitol
+    borough: DOWNTOWN_CAPITAL
+    lat: 30.43916
+    lng: -84.28413
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.85
+    capex: 5600000.0
+    permit_vel: 30.0
+    shift_ratio: 1.42
+    sla: 55.0
+    description: "State-capitol core anchoring the city's design, institutional and\
+      \ adaptive-reuse pipeline \u2014 pinned to Sales row PARID 2136340006080."
+    city_id: tallahassee
+  Myers Park / South Monroe:
+    name: Myers Park / South Monroe
+    borough: DOWNTOWN_CAPITAL
+    lat: 30.41057
+    lng: -84.27399
+    zoom: 14.0
+    pitch: 38.0
+    base_lims: 0.72
+    capex: 2600000.0
+    permit_vel: 18.0
+    shift_ratio: 1.26
+    sla: 40.0
+    description: "Historic bungalow grid and the South Monroe commercial corridor\
+      \ with steady fix-and-flip turnover \u2014 pinned to Sales row PARID 310775\
+      \  E0130."
+    city_id: tallahassee
+  Midtown:
+    name: Midtown
+    borough: MIDTOWN_NORTH
+    lat: 30.46439
+    lng: -84.2913
+    zoom: 14.5
+    pitch: 42.0
+    base_lims: 0.8
+    capex: 4200000.0
+    permit_vel: 24.0
+    shift_ratio: 1.34
+    sla: 48.0
+    description: "Walkable densest retail/craft-hosts district north of downtown anchored\
+      \ by Lake Ella \u2014 pinned to Sales row PARID 212360  E0040."
+    city_id: tallahassee
+  Lafayette / North Monroe:
+    name: Lafayette / North Monroe
+    borough: MIDTOWN_NORTH
+    lat: 30.4722
+    lng: -84.27865
+    zoom: 14.0
+    pitch: 38.0
+    base_lims: 0.74
+    capex: 3300000.0
+    permit_vel: 20.0
+    shift_ratio: 1.28
+    sla: 42.0
+    description: "Residential-commercial seam along the North Monroe / US-27 corridor\
+      \ with office-to-residence conversions \u2014 pinned to Sales row PARID 212423\
+      \  10060."
+    city_id: tallahassee
+  Killearn Lakes:
+    name: Killearn Lakes
+    borough: NORTHEAST_KILLEARN
+    lat: 30.53835
+    lng: -84.21013
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.82
+    capex: 3900000.0
+    permit_vel: 26.0
+    shift_ratio: 1.36
+    sla: 46.0
+    description: "Master-planned northeast set of lakeside subdivisions drawing the\
+      \ metro's higher-value move-up trades \u2014 pinned to Sales row PARID 142560\
+      \ AS0050."
+    city_id: tallahassee
+  Betton Hills / Buckhead:
+    name: Betton Hills / Buckhead
+    borough: NORTHEAST_KILLEARN
+    lat: 30.48527
+    lng: -84.25132
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.78
+    capex: 3600000.0
+    permit_vel: 22.0
+    shift_ratio: 1.3
+    sla: 44.0
+    description: "Leafy mid-century residential district and the Buckhead commercial\
+      \ node along Thomasville Road \u2014 pinned to Sales row PARID 111790  A0180."
+    city_id: tallahassee
+  Lake Jackson:
+    name: Lake Jackson
+    borough: NORTHWEST_LAKE_JACKSON
+    lat: 30.52554
+    lng: -84.38255
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.8
+    capex: 3700000.0
+    permit_vel: 24.0
+    shift_ratio: 1.32
+    sla: 45.0
+    description: "Lake-lined northwest subdivisions on the Bannerman Road corridor\
+      \ with estate infill \u2014 pinned to Sales row PARID 253622  B0040."
+    city_id: tallahassee
+  West Tallahassee / Jackson Bluff:
+    name: West Tallahassee / Jackson Bluff
+    borough: NORTHWEST_LAKE_JACKSON
+    lat: 30.46353
+    lng: -84.36692
+    zoom: 13.5
+    pitch: 32.0
+    base_lims: 0.68
+    capex: 2100000.0
+    permit_vel: 16.0
+    shift_ratio: 1.22
+    sla: 36.0
+    description: "Jackson Bluff Road industrial and working-edge corridor absorbing\
+      \ code-enforcement and repair demand \u2014 pinned to Sales row PARID 211941\
+      \  B0070."
+    city_id: tallahassee
+  Southside / Bond:
+    name: Southside / Bond
+    borough: SOUTHSIDE_BOND
+    lat: 30.38206
+    lng: -84.27208
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.7
+    capex: 2200000.0
+    permit_vel: 17.0
+    shift_ratio: 1.24
+    sla: 38.0
+    description: "South Monroe and Southside commercial-industrial pocket with investor-led\
+      \ single-family turnover \u2014 pinned to Sales row PARID 311930  C0010."
+    city_id: tallahassee
+  Southwood:
+    name: Southwood
+    borough: SOUTHEAST_SOUTHWOOD
+    lat: 30.4263
+    lng: -84.19719
+    zoom: 14.0
+    pitch: 38.0
+    base_lims: 0.76
+    capex: 3000000.0
+    permit_vel: 21.0
+    shift_ratio: 1.3
+    sla: 41.0
+    description: "New-urbanist planned community off Tram Road and the SE growth corridor\
+      \ with steady new-construction and resale velocity \u2014 pinned to Sales row\
+      \ PARID 310270  A0270."
+    city_id: tallahassee
+divisions:
+  DOWNTOWN_CAPITAL:
+    name: DOWNTOWN_CAPITAL
+    center_lat: 30.4275
+    center_lng: -84.28
+    zoom: 14.5
+    bbox:
+      min_lat: 30.405
+      max_lat: 30.45
+      min_lng: -84.3
+      max_lng: -84.26
+    submarkets:
+    - Downtown / Capitol
+    - Myers Park / South Monroe
+    city_id: tallahassee
+  MIDTOWN_NORTH:
+    name: MIDTOWN_NORTH
+    center_lat: 30.468
+    center_lng: -84.282
+    zoom: 14.0
+    bbox:
+      min_lat: 30.455
+      max_lat: 30.48
+      min_lng: -84.295
+      max_lng: -84.27
+    submarkets:
+    - Midtown
+    - Lafayette / North Monroe
+    city_id: tallahassee
+  NORTHEAST_KILLEARN:
+    name: NORTHEAST_KILLEARN
+    center_lat: 30.51
+    center_lng: -84.23
+    zoom: 13.5
+    bbox:
+      min_lat: 30.478
+      max_lat: 30.545
+      min_lng: -84.265
+      max_lng: -84.195
+    submarkets:
+    - Killearn Lakes
+    - Betton Hills / Buckhead
+    city_id: tallahassee
+  NORTHWEST_LAKE_JACKSON:
+    name: NORTHWEST_LAKE_JACKSON
+    center_lat: 30.49
+    center_lng: -84.37
+    zoom: 13.5
+    bbox:
+      min_lat: 30.458
+      max_lat: 30.533
+      min_lng: -84.39
+      max_lng: -84.35
+    submarkets:
+    - Lake Jackson
+    - West Tallahassee / Jackson Bluff
+    city_id: tallahassee
+  SOUTHSIDE_BOND:
+    name: SOUTHSIDE_BOND
+    center_lat: 30.39
+    center_lng: -84.27
+    zoom: 13.5
+    bbox:
+      min_lat: 30.372
+      max_lat: 30.408
+      min_lng: -84.288
+      max_lng: -84.255
+    submarkets:
+    - Southside / Bond
+    city_id: tallahassee
+  SOUTHEAST_SOUTHWOOD:
+    name: SOUTHEAST_SOUTHWOOD
+    center_lat: 30.426
+    center_lng: -84.198
+    zoom: 13.5
+    bbox:
+      min_lat: 30.412
+      max_lat: 30.44
+      min_lng: -84.215
+      max_lng: -84.182
+    submarkets:
+    - Southwood
+    city_id: tallahassee
+datasets:
+  permits:
+    endpoint: https://intervector.leoncountyfl.gov/intervector/rest/services/MapServices/TLC_OverlayPermitsActive_D_WM/MapServer/0
+    platform: arcgis
+    watermark_col: AppliedDate
+    id_keys:
+    - PermitNum
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 600.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: OBJECTID
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - PermitNum
+      - OBJECTID
+      job_type:
+      - PermitTypeMapped
+      - WorkClassMapped
+      - WorkClass
+      issuance_date:
+      - IssuedDate
+      address_street:
+      - OriginalAddress1
+      bbl:
+      - PIN
+      borough:
+      - Jurisdiction
+      - PermitClassMapped
+      cost:
+      - EstProjectCost
+      status:
+      - StatusCurrent
+      - StatusCurrentMapped
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 8000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  '311':
+    endpoint: https://intervector.leoncountyfl.gov/intervector/rest/services/MapServices/LCPW_InforServiceRequest_D_WM/MapServer/1
+    platform: arcgis
+    watermark_col: CALLDTTM
+    id_keys:
+    - SERVNO
+    - ESRI_OID
+    topic: raw.municipal.311
+    interval_seconds: 600.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: ESRI_OID
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: CALLDTTM <= CURRENT_TIMESTAMP
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - SERVNO
+      complaint_type:
+      - PROBDESC
+      - CATNAME
+      - DESCRIPT
+      created_date:
+      - CALLDTTM
+      closed_date:
+      - RESDTTM
+      incident_address:
+      - ADDRESS
+      - LOC
+      borough:
+      - DISTRICT
+      - COUNTY
+      - CATNAME
+      status:
+      - RESP
+      - RESCODE
+    ingestion_mode: incremental
+    oid_field: ESRI_OID
+    max_record_count: null
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  deeds:
+    endpoint: https://intervector.leoncountyfl.gov/intervector/rest/services/MapServices/LCPA_Last3YearsSales_D_WM/MapServer/0
+    platform: arcgis
+    watermark_col: SALES_SALEDT
+    id_keys:
+    - SALES_SALEKEY
+    - OBJECTID
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: OBJECTID
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - SALES_SALEKEY
+      - OBJECTID
+      bbl:
+      - SALES_PARID
+      document_amount:
+      - SALES_PRICE
+      - SALES_ADJPRICE
+      recorded_date:
+      - SALES_SALEDT
+      - SALES_RECORDDT
+      party1_grantor:
+      - SALES_OLDOWN
+      - SALES_OLDOWN2
+      party2_grantee:
+      - SALES_OWN1
+      - SALES_OWN2
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: null
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- tallahassee_fl
+- tallahassee fl
+- leon_county_fl
+- leon county fl
+- tlh
+job_suffix: tallahassee

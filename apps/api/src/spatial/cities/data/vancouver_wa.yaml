@@ -1,0 +1,392 @@
+city_id: vancouver_wa
+name: Vancouver
+state: WA
+center:
+  lat: 45.6282
+  lng: -122.6785
+metro_bbox:
+  min_lat: 45.56
+  max_lat: 45.74
+  min_lng: -122.81
+  max_lng: -122.41
+division_bboxes:
+  DOWNTOWN_CORE:
+    min_lat: 45.62
+    max_lat: 45.652
+    min_lng: -122.7
+    max_lng: -122.64
+  FRUIT_VALLEY_NORTHWEST:
+    min_lat: 45.648
+    max_lat: 45.69
+    min_lng: -122.745
+    max_lng: -122.64
+  CENTRAL_VANCOUVER:
+    min_lat: 45.615
+    max_lat: 45.655
+    min_lng: -122.655
+    max_lng: -122.585
+  BURNT_BRIDGE_NORTH:
+    min_lat: 45.615
+    max_lat: 45.695
+    min_lng: -122.61
+    max_lng: -122.5
+  CASCADE_EASTSIDE:
+    min_lat: 45.595
+    max_lat: 45.65
+    min_lng: -122.56
+    max_lng: -122.48
+  FISHERS_LANDING_SE:
+    min_lat: 45.585
+    max_lat: 45.625
+    min_lng: -122.535
+    max_lng: -122.47
+submarkets:
+  Downtown / Esther Short:
+    name: Downtown / Esther Short
+    borough: DOWNTOWN_CORE
+    lat: 45.6282
+    lng: -122.6785
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.87
+    capex: 6800000.0
+    permit_vel: 30.0
+    shift_ratio: 1.45
+    sla: 53.0
+    description: Esther Short Park and the Columbia River waterfront core with the
+      convention center, the Waterfront Vancouver redevelopment, and the downtown
+      Main Street retail spine.
+    city_id: vancouver_wa
+  Uptown Village:
+    name: Uptown Village
+    borough: DOWNTOWN_CORE
+    lat: 45.6325
+    lng: -122.6715
+    zoom: 14.5
+    pitch: 52.0
+    base_lims: 0.85
+    capex: 6100000.0
+    permit_vel: 27.0
+    shift_ratio: 1.43
+    sla: 51.0
+    description: Main Street's historic north stretch above Esther Short with walkable
+      shopfronts, taverns, and mixed-use infill between downtown and the Hough neighborhood.
+    city_id: vancouver_wa
+  Fruit Valley:
+    name: Fruit Valley
+    borough: FRUIT_VALLEY_NORTHWEST
+    lat: 45.6667
+    lng: -122.7211
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.83
+    capex: 5400000.0
+    permit_vel: 22.0
+    shift_ratio: 1.4
+    sla: 49.0
+    description: Northwest industrial-flavored corridor along NW Fruit Valley Road
+      with rail-adjacent warehouses, tract housing, and the western gateway to the
+      Burnt Bridge Creek trail.
+    city_id: vancouver_wa
+  Northwest Vancouver:
+    name: Northwest Vancouver
+    borough: FRUIT_VALLEY_NORTHWEST
+    lat: 45.6665
+    lng: -122.679
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.82
+    capex: 5200000.0
+    permit_vel: 21.0
+    shift_ratio: 1.39
+    sla: 48.0
+    description: Established postwar single-family quadrant between NW 78th Street
+      and the Fruit Valley road, steady remodel and addition permitting.
+    city_id: vancouver_wa
+  West Minnehaha:
+    name: West Minnehaha
+    borough: FRUIT_VALLEY_NORTHWEST
+    lat: 45.6589
+    lng: -122.6512
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.84
+    capex: 5600000.0
+    permit_vel: 24.0
+    shift_ratio: 1.42
+    sla: 50.0
+    description: Minnehaha Street west-of-I-5 corridor with mid-century bungalows,
+      small multifamily, and light commercial nodes along the state highway.
+    city_id: vancouver_wa
+  Fourth Plain / Bagley Downs:
+    name: Fourth Plain / Bagley Downs
+    borough: CENTRAL_VANCOUVER
+    lat: 45.6454
+    lng: -122.621
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.86
+    capex: 6300000.0
+    permit_vel: 28.0
+    shift_ratio: 1.44
+    sla: 52.0
+    description: "Fourth Plain Boulevard's diverse retail corridor and Bagley Downs\
+      \ residential grid \u2014 the metro's densest row of small-business permits\
+      \ and multicultural storefronts."
+    city_id: vancouver_wa
+  Maplewood:
+    name: Maplewood
+    borough: CENTRAL_VANCOUVER
+    lat: 45.6341
+    lng: -122.6337
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.84
+    capex: 5700000.0
+    permit_vel: 25.0
+    shift_ratio: 1.41
+    sla: 50.0
+    description: Central post-war neighborhood between Fourth Plain and Mill Plain
+      with bungalow turnover, duplex conversions, and the NE Andresen mixed-use strip.
+    city_id: vancouver_wa
+  Walnut Grove:
+    name: Walnut Grove
+    borough: BURNT_BRIDGE_NORTH
+    lat: 45.6644
+    lng: -122.5917
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.81
+    capex: 5800000.0
+    permit_vel: 23.0
+    shift_ratio: 1.39
+    sla: 48.0
+    description: Northern residential belt along NE 63rd Street between I-5 and NE
+      112th with ranch homes, green-lot infill, and new-build subdivisions.
+    city_id: vancouver_wa
+  Burnt Bridge Creek / Image:
+    name: Burnt Bridge Creek / Image
+    borough: BURNT_BRIDGE_NORTH
+    lat: 45.656
+    lng: -122.5206
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.83
+    capex: 6500000.0
+    permit_vel: 26.0
+    shift_ratio: 1.43
+    sla: 51.0
+    description: Burnt Bridge Creek greenbelt neighborhoods and the Image corridor
+      with creek-adjacent redevelopment, trail access, and steady infill permitting.
+    city_id: vancouver_wa
+  Cascade Park / First Place:
+    name: Cascade Park / First Place
+    borough: CASCADE_EASTSIDE
+    lat: 45.6323
+    lng: -122.5205
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.88
+    capex: 7400000.0
+    permit_vel: 31.0
+    shift_ratio: 1.5
+    sla: 55.0
+    description: "Cascade Park retail core and First Place's master-planned subdivisions\
+      \ \u2014 the metro's highest-volume new-home permitting belt east of I-205."
+    city_id: vancouver_wa
+  East Mill Plain:
+    name: East Mill Plain
+    borough: CASCADE_EASTSIDE
+    lat: 45.6205
+    lng: -122.5117
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.85
+    capex: 7000000.0
+    permit_vel: 29.0
+    shift_ratio: 1.47
+    sla: 53.0
+    description: East Mill Plain Boulevard corridor with big-box retail, garden apartments,
+      and the SE 164th Avenue growth node at the city's east edge.
+    city_id: vancouver_wa
+  Fisher's Landing:
+    name: Fisher's Landing
+    borough: FISHERS_LANDING_SE
+    lat: 45.6041
+    lng: -122.49
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.86
+    capex: 6900000.0
+    permit_vel: 28.0
+    shift_ratio: 1.46
+    sla: 52.0
+    description: SE 164th/Fisher's Landing East office-retail node with newer multifamily,
+      medical campus employment, and Columbia River-adjacent high-value permits.
+    city_id: vancouver_wa
+  Columbia River / Northfield:
+    name: Columbia River / Northfield
+    borough: FISHERS_LANDING_SE
+    lat: 45.5888
+    lng: -122.5004
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.82
+    capex: 6200000.0
+    permit_vel: 24.0
+    shift_ratio: 1.41
+    sla: 49.0
+    description: Riverfront southern edge along SE Columbia River Way with townhome
+      infill, marina-adjacent development, and view-lot turnover.
+    city_id: vancouver_wa
+divisions:
+  DOWNTOWN_CORE:
+    name: DOWNTOWN_CORE
+    center_lat: 45.6282
+    center_lng: -122.6785
+    zoom: 14.0
+    bbox:
+      min_lat: 45.62
+      max_lat: 45.652
+      min_lng: -122.7
+      max_lng: -122.64
+    submarkets:
+    - Downtown / Esther Short
+    - Uptown Village
+    city_id: vancouver_wa
+  FRUIT_VALLEY_NORTHWEST:
+    name: FRUIT_VALLEY_NORTHWEST
+    center_lat: 45.6667
+    center_lng: -122.7211
+    zoom: 13.0
+    bbox:
+      min_lat: 45.648
+      max_lat: 45.69
+      min_lng: -122.745
+      max_lng: -122.64
+    submarkets:
+    - Fruit Valley
+    - Northwest Vancouver
+    - West Minnehaha
+    city_id: vancouver_wa
+  CENTRAL_VANCOUVER:
+    name: CENTRAL_VANCOUVER
+    center_lat: 45.6454
+    center_lng: -122.621
+    zoom: 13.5
+    bbox:
+      min_lat: 45.615
+      max_lat: 45.655
+      min_lng: -122.655
+      max_lng: -122.585
+    submarkets:
+    - Fourth Plain / Bagley Downs
+    - Maplewood
+    city_id: vancouver_wa
+  BURNT_BRIDGE_NORTH:
+    name: BURNT_BRIDGE_NORTH
+    center_lat: 45.656
+    center_lng: -122.5917
+    zoom: 13.0
+    bbox:
+      min_lat: 45.615
+      max_lat: 45.695
+      min_lng: -122.61
+      max_lng: -122.5
+    submarkets:
+    - Walnut Grove
+    - Burnt Bridge Creek / Image
+    city_id: vancouver_wa
+  CASCADE_EASTSIDE:
+    name: CASCADE_EASTSIDE
+    center_lat: 45.6205
+    center_lng: -122.5117
+    zoom: 13.0
+    bbox:
+      min_lat: 45.595
+      max_lat: 45.65
+      min_lng: -122.56
+      max_lng: -122.48
+    submarkets:
+    - Cascade Park / First Place
+    - East Mill Plain
+    city_id: vancouver_wa
+  FISHERS_LANDING_SE:
+    name: FISHERS_LANDING_SE
+    center_lat: 45.6041
+    center_lng: -122.49
+    zoom: 13.0
+    bbox:
+      min_lat: 45.585
+      max_lat: 45.625
+      min_lng: -122.535
+      max_lng: -122.47
+    submarkets:
+    - Fisher's Landing
+    - Columbia River / Northfield
+    city_id: vancouver_wa
+datasets:
+  permits:
+    endpoint: https://services.arcgis.com/oNvpY90qsPDizwkN/arcgis/rest/services/Permits_and_Code_Enforcement_Data_(public_view)/FeatureServer/0
+    platform: arcgis
+    watermark_col: csm_issued_date
+    id_keys:
+    - CSM_CASENO
+    - sn
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: csm_issued_date DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: csm_issued_date <= CURRENT_TIMESTAMP
+    needs_geocode: true
+    geocode_context: Vancouver, WA
+    field_map:
+      job_id:
+      - CSM_CASENO
+      - sn
+      - OBJECTID
+      issuance_date:
+      - csm_issued_date
+      status:
+      - CSM_STATUS
+      job_type:
+      - worktype
+      - cst_description
+      address_street:
+      - PRIM_ADDR
+      proposed_units:
+      - CSM_NO_UNITS
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- vancouver-wa
+- vancouver wa
+- vancouver_washington
+- vancouver washington
+job_suffix: vancouver_wa

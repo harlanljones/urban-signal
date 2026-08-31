@@ -50,13 +50,12 @@ def test_unregistered_new_feeds_raise_readable_get_dataset_error():
 
 
 def test_only_cleared_signal_feeds_are_registered():
-    """US-72 made the taxonomy ingestible; US-71 registered crime where a
-    verified live feed exists (the four launch metros plus boise, boston,
-    las_vegas, louisville, milwaukee, san_jose, tampa, tulsa), US-81
-    registered street-cut in the metros with geocodable feeds (Chicago CDOT
-    closures plus Louisville and Tampa), and US-93 registered NYC-only
-    evictions as context/validation. STR remains unregistered (US-92 closed
-    not-worth-it)."""
+    """Signal-survey feeds are registered only where a verified live feed
+    exists. CRIME grew across the signal waves (the four launch metros plus
+    boise, boston, las_vegas, louisville, milwaukee, san_jose, tampa, tulsa,
+    and later west/southeast metros). STREET_CUT stays Chicago/Louisville/
+    Tampa (geocodable CDOT/closure feeds); EVICTIONS stays NYC-only;
+    STR remains unregistered (US-92 closed not-worth-it)."""
     registered_for = {
         FeedType.CRIME: {
             CityId.NYC,
@@ -71,6 +70,14 @@ def test_only_cleared_signal_feeds_are_registered():
             CityId.SAN_JOSE,
             CityId.TAMPA,
             CityId.TULSA,
+            CityId.BEND,
+            CityId.BOZEMAN,
+            CityId.INLAND_EMPIRE,
+            CityId.LONG_BEACH,
+            CityId.OAKLAND,
+            CityId.OXNARD_VENTURA,
+            CityId.SANTA_ROSA,
+            CityId.TEMPE,
         },
         FeedType.STREET_CUT: {CityId.CHICAGO, CityId.LOUISVILLE, CityId.TAMPA},
         FeedType.EVICTIONS: {CityId.NYC},

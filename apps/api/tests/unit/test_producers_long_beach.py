@@ -752,7 +752,7 @@ class TestLongBeachFeedSpec:
         assert spec.expected_cadence_days == 3
         assert spec.needs_geocode is True
         assert spec.geocode_context == "Long Beach, CA"
-        assert spec.field_map is SLA_FIELD_MAP
+        assert spec.field_map == SLA_FIELD_MAP
         assert spec.topic == "raw.municipal.sla"
         assert spec.interval_seconds == 600.0
 
@@ -769,7 +769,7 @@ class TestLongBeachFeedSpec:
         assert spec.expected_cadence_days == 14
         # Native coordinates satisfy the ADR-0004 crime gate — no geocode.
         assert spec.needs_geocode is False
-        assert spec.field_map is CRIME_FIELD_MAP
+        assert spec.field_map == CRIME_FIELD_MAP
         assert spec.topic == "raw.municipal.crime"
         assert spec.interval_seconds == 1800.0
 

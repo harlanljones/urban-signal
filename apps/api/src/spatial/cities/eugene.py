@@ -1,3 +1,32 @@
+COMPLAINTS_311_FIELD_MAP = {
+    "incident_id": ["FID", "GlobalID"],
+    "complaint_type": ["Title"],
+    "created_date": ["CreatedOn"],
+    "status": ["StatusText"],
+}
+
+SLA_FIELD_MAP = {
+    "license_id": ["UID", "GlobalID"],
+    "dba": ["Name"],
+    "premises_name": ["Name"],
+    "address_street": ["MatchAddr"],
+    "status": ["Active"],
+}
+
+DEEDS_FIELD_MAP = {
+    "doc_id": ["CITYDEED", "OBJECTID_1"],
+    "recorded_date": ["DATE_"],
+    "doc_type": ["ACQDIS"],
+}
+
+FIELD_MAP = {
+    "311": COMPLAINTS_311_FIELD_MAP,
+    "sla": SLA_FIELD_MAP,
+    "deeds": DEEDS_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Eugene, OR"
+
 """Eugene, OR spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -45,12 +74,6 @@ Live-probe caveats (original probe 2026-08-28, stream west-eugene):
 """
 
 
-from src.producers.field_maps_eugene import (
-    COMPLAINTS_311_FIELD_MAP,
-    DEEDS_FIELD_MAP,
-    GEOCODE_CONTEXT,
-    SLA_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 EUGENE_CITY_ID: str = "eugene"

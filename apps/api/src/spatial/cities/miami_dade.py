@@ -1,3 +1,52 @@
+GEOCODE_CONTEXT = "Miami-Dade County, FL"
+
+PERMITS_FIELD_MAP = {
+    "job_id": ["PermitNumber", "ProcessNumber", "ObjectId"],
+    "job_type": ["PermitType", "ApplicationTypeDescription"],
+    "cost": ["EstimatedValue"],
+    "issuance_date": ["PermitIssuedDate"],
+    "issued_date": ["PermitIssuedDate"],
+    "filing_date": ["ApplicationDate"],
+    "address_street": ["PropertyAddress"],
+    "incident_address": ["PropertyAddress"],
+    "borough": ["City"],
+    "bbl": ["FolioNumber"],
+    "proposed_units": ["StructureUnits"],
+    "proposed_stories": ["StructureFloors"],
+}
+
+SLA_FIELD_MAP = {
+    "license_id": ["ACCOUNTNO"],
+    "dba": ["BUSNAME"],
+    "premises_name": ["OWNERNAME"],
+    "license_type": ["CLASSDESC", "CATGRYNAME", "OCCDESC"],
+    "effective_date": ["BUSSDATE"],
+    "address_street": ["BUSADDR"],
+    "latitude": ["LAT"],
+    "longitude": ["LON"],
+    "status": ["ACCSTATUS", "PAIDSTATUS"],
+    "borough": ["BUSCITY"],
+    "zipcode": ["ZIPCODE"],
+}
+
+DEEDS_FIELD_MAP = {
+    "doc_id": ["OR_BK_1", "OR_PG_1", "FOLIO", "OBJECTID"],
+    "bbl": ["FOLIO"],
+    "document_amount": ["PRICE_1"],
+    "recorded_date": ["DOS_1"],
+    "party1_grantor": ["GRANTOR_1"],
+    "party2_grantee": ["GRANTEE_1"],
+    "address_street": ["TRUE_SITE_ADDR"],
+    "incident_address": ["TRUE_SITE_ADDR"],
+    "zipcode": ["TRUE_SITE_ZIP_CODE"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+    "sla": SLA_FIELD_MAP,
+    "deeds": DEEDS_FIELD_MAP,
+}
+
 """Miami-Dade County Metro Submarket Registry and Spatial Layer for Urban Signal.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -26,13 +75,6 @@ Endpoints were live-verified 2026-08-27 (wave-3-probe-miami-dade).
 
 from typing import Dict
 
-from src.producers.field_maps_miami_dade import (
-    DEEDS_FIELD_MAP,
-    FIELD_MAP,
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-    SLA_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 MIAMI_DADE_CITY_ID: str = "miami_dade"

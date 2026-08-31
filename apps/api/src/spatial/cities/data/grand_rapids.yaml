@@ -1,0 +1,118 @@
+city_id: grand_rapids
+name: Grand Rapids, MI
+state: MI
+center:
+  lat: 42.9634
+  lng: -85.6681
+metro_bbox:
+  min_lat: 42.7
+  max_lat: 43.25
+  min_lng: -85.95
+  max_lng: -85.25
+division_bboxes:
+  GRAND_RAPIDS_CORE:
+    min_lat: 42.78
+    max_lat: 43.18
+    min_lng: -85.85
+    max_lng: -85.45
+submarkets:
+  Downtown Grand Rapids:
+    name: Downtown Grand Rapids
+    borough: GRAND_RAPIDS_CORE
+    lat: 42.9634
+    lng: -85.6681
+    zoom: 13.2
+    pitch: 46.0
+    base_lims: 0.83
+    capex: 6900000.0
+    permit_vel: 32.0
+    shift_ratio: 1.39
+    sla: 56.0
+    description: Riverfront civic and entertainment core with adaptive reuse, office
+      conversion, and mixed-use investment.
+    city_id: grand_rapids
+  Midtown & Medical Mile:
+    name: Midtown & Medical Mile
+    borough: GRAND_RAPIDS_CORE
+    lat: 42.965
+    lng: -85.621
+    zoom: 13.0
+    pitch: 44.0
+    base_lims: 0.8
+    capex: 6100000.0
+    permit_vel: 29.0
+    shift_ratio: 1.36
+    sla: 58.0
+    description: Medical and educational anchor corridor with institutional expansion,
+      housing, and neighborhood services.
+    city_id: grand_rapids
+  West Side:
+    name: West Side
+    borough: GRAND_RAPIDS_CORE
+    lat: 42.963
+    lng: -85.704
+    zoom: 12.8
+    pitch: 43.0
+    base_lims: 0.77
+    capex: 4700000.0
+    permit_vel: 27.0
+    shift_ratio: 1.33
+    sla: 53.0
+    description: Historic west-side neighborhoods with small-business corridors, rehabilitation,
+      and infill housing.
+    city_id: grand_rapids
+  Eastown & Wealthy Street:
+    name: Eastown & Wealthy Street
+    borough: GRAND_RAPIDS_CORE
+    lat: 42.956
+    lng: -85.626
+    zoom: 12.9
+    pitch: 44.0
+    base_lims: 0.79
+    capex: 5200000.0
+    permit_vel: 28.0
+    shift_ratio: 1.35
+    sla: 55.0
+    description: Walkable east-side commercial nodes with independent retail, dining,
+      and residential reinvestment.
+    city_id: grand_rapids
+  North Kent Growth Corridor:
+    name: North Kent Growth Corridor
+    borough: GRAND_RAPIDS_CORE
+    lat: 43.04
+    lng: -85.6
+    zoom: 12.4
+    pitch: 40.0
+    base_lims: 0.76
+    capex: 6400000.0
+    permit_vel: 31.0
+    shift_ratio: 1.34
+    sla: 54.0
+    description: North-side employment and suburban growth corridor with commercial
+      expansion and new housing supply.
+    city_id: grand_rapids
+divisions:
+  GRAND_RAPIDS_CORE:
+    name: Grand Rapids / Kent County
+    center_lat: 42.9634
+    center_lng: -85.6681
+    zoom: 10.8
+    bbox:
+      min_lat: 42.78
+      max_lat: 43.18
+      min_lng: -85.85
+      max_lng: -85.45
+    submarkets:
+    - Downtown Grand Rapids
+    - Midtown & Medical Mile
+    - West Side
+    - Eastown & Wealthy Street
+    - North Kent Growth Corridor
+    city_id: grand_rapids
+datasets: {}
+aliases:
+- grand-rapids
+- grand rapids
+- grand_rapids_mi
+- grand rapids mi
+job_suffix: grand_rapids

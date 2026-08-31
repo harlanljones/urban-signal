@@ -1,0 +1,371 @@
+city_id: bridgeport
+name: Bridgeport
+state: CT
+center:
+  lat: 41.1792
+  lng: -73.1894
+metro_bbox:
+  min_lat: 41.135
+  max_lat: 41.215
+  min_lng: -73.27
+  max_lng: -73.15
+division_bboxes:
+  DOWNTOWN:
+    min_lat: 41.17
+    max_lat: 41.19
+    min_lng: -73.2
+    max_lng: -73.178
+  SOUTH_END:
+    min_lat: 41.15
+    max_lat: 41.172
+    min_lng: -73.205
+    max_lng: -73.18
+  WEST_SIDE:
+    min_lat: 41.172
+    max_lat: 41.192
+    min_lng: -73.222
+    max_lng: -73.19
+  BLACK_ROCK:
+    min_lat: 41.14
+    max_lat: 41.165
+    min_lng: -73.245
+    max_lng: -73.21
+  EAST_SIDE:
+    min_lat: 41.158
+    max_lat: 41.18
+    min_lng: -73.2
+    max_lng: -73.165
+  NORTH_END:
+    min_lat: 41.184
+    max_lat: 41.204
+    min_lng: -73.205
+    max_lng: -73.175
+submarkets:
+  Downtown:
+    name: Downtown
+    borough: DOWNTOWN
+    lat: 41.1792
+    lng: -73.1894
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.78
+    capex: 5200000.0
+    permit_vel: 28.0
+    shift_ratio: 1.36
+    sla: 50.0
+    description: Civic and transit core around Main and State Streets with the Hartford
+      Line station, Housatonic Community College, and adaptive-reuse of the McLevy
+      and Arcade blocks.
+    city_id: bridgeport
+  South End:
+    name: South End
+    borough: SOUTH_END
+    lat: 41.162
+    lng: -73.194
+    zoom: 13.5
+    pitch: 45.0
+    base_lims: 0.72
+    capex: 4300000.0
+    permit_vel: 24.0
+    shift_ratio: 1.3
+    sla: 47.0
+    description: Harbor-side residential wedge below downtown with the Seaside Park
+      frontage and long-standing multifamily stock facing light redevelopment.
+    city_id: bridgeport
+  West Side:
+    name: West Side
+    borough: WEST_SIDE
+    lat: 41.18
+    lng: -73.21
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.74
+    capex: 4500000.0
+    permit_vel: 25.0
+    shift_ratio: 1.32
+    sla: 48.0
+    description: West Side industrial-residential corridor along the Fairfield line
+      with dense rowhouse stock and the University of Bridgeport campus edge.
+    city_id: bridgeport
+  The Hollow:
+    name: The Hollow
+    borough: WEST_SIDE
+    lat: 41.182
+    lng: -73.199
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.7
+    capex: 3900000.0
+    permit_vel: 23.0
+    shift_ratio: 1.28
+    sla: 45.0
+    description: Working-class enclave north of I-95 around Coleman and Maplewood
+      Streets with stabilization-level values and small-business corridor reinvestment.
+    city_id: bridgeport
+  Black Rock:
+    name: Black Rock
+    borough: BLACK_ROCK
+    lat: 41.155
+    lng: -73.224
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.8
+    capex: 5600000.0
+    permit_vel: 26.0
+    shift_ratio: 1.4
+    sla: 52.0
+    description: Historic 19th-century harbor village at the Fairfield line with the
+      St. Mary's-by-the-Sea shore, Black Rock Harbor, and boutique marina-adjacent
+      redevelopment.
+    city_id: bridgeport
+  East Side:
+    name: East Side
+    borough: EAST_SIDE
+    lat: 41.168
+    lng: -73.19
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.73
+    capex: 4400000.0
+    permit_vel: 25.0
+    shift_ratio: 1.31
+    sla: 46.0
+    description: East Main Street corridor with legacy housing stock, the city's densest
+      immigrant commercial streets, and early corridor-street redevelopment groundwork.
+    city_id: bridgeport
+  East End:
+    name: East End
+    borough: EAST_SIDE
+    lat: 41.17
+    lng: -73.175
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.71
+    capex: 4200000.0
+    permit_vel: 22.0
+    shift_ratio: 1.29
+    sla: 44.0
+    description: Waterfront industrial and residential edge toward the Stratford line,
+      including Steel Point and the Sound-side parcels primed for mixed-use redevelopment.
+    city_id: bridgeport
+  North End:
+    name: North End
+    borough: NORTH_END
+    lat: 41.194
+    lng: -73.19
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.76
+    capex: 4700000.0
+    permit_vel: 24.0
+    shift_ratio: 1.33
+    sla: 49.0
+    description: North Avenue corridor reaching Beardsley Park and the Trumbull line,
+      with modest suburban-style residential streets and institutional demand.
+    city_id: bridgeport
+divisions:
+  DOWNTOWN:
+    name: DOWNTOWN
+    center_lat: 41.1792
+    center_lng: -73.1894
+    zoom: 13.5
+    bbox:
+      min_lat: 41.17
+      max_lat: 41.19
+      min_lng: -73.2
+      max_lng: -73.178
+    submarkets:
+    - Downtown
+    city_id: bridgeport
+  SOUTH_END:
+    name: SOUTH_END
+    center_lat: 41.162
+    center_lng: -73.194
+    zoom: 13.5
+    bbox:
+      min_lat: 41.15
+      max_lat: 41.172
+      min_lng: -73.205
+      max_lng: -73.18
+    submarkets:
+    - South End
+    city_id: bridgeport
+  WEST_SIDE:
+    name: WEST_SIDE
+    center_lat: 41.181
+    center_lng: -73.2045
+    zoom: 13.5
+    bbox:
+      min_lat: 41.172
+      max_lat: 41.192
+      min_lng: -73.222
+      max_lng: -73.19
+    submarkets:
+    - West Side
+    - The Hollow
+    city_id: bridgeport
+  BLACK_ROCK:
+    name: BLACK_ROCK
+    center_lat: 41.155
+    center_lng: -73.224
+    zoom: 13.5
+    bbox:
+      min_lat: 41.14
+      max_lat: 41.165
+      min_lng: -73.245
+      max_lng: -73.21
+    submarkets:
+    - Black Rock
+    city_id: bridgeport
+  EAST_SIDE:
+    name: EAST_SIDE
+    center_lat: 41.169
+    center_lng: -73.1825
+    zoom: 13.5
+    bbox:
+      min_lat: 41.158
+      max_lat: 41.18
+      min_lng: -73.2
+      max_lng: -73.165
+    submarkets:
+    - East Side
+    - East End
+    city_id: bridgeport
+  NORTH_END:
+    name: NORTH_END
+    center_lat: 41.194
+    center_lng: -73.19
+    zoom: 13.5
+    bbox:
+      min_lat: 41.184
+      max_lat: 41.204
+      min_lng: -73.205
+      max_lng: -73.175
+    submarkets:
+    - North End
+    city_id: bridgeport
+datasets:
+  sla:
+    endpoint: https://data.ct.gov/resource/ngch-56tr.json
+    platform: socrata
+    watermark_col: recordrefreshedon
+    id_keys:
+    - credentialid
+    topic: raw.municipal.sla
+    interval_seconds: 3600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: recordrefreshedon DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: city = 'BRIDGEPORT'
+    needs_geocode: true
+    geocode_context: Bridgeport, CT
+    field_map:
+      license_id:
+      - credentialid
+      - fullcredentialcode
+      license_type:
+      - credential
+      - credentialtype
+      effective_date:
+      - effectivedate
+      - issuedate
+      expiration_date:
+      - expirationdate
+      address_street:
+      - address
+      zipcode:
+      - zip
+      borough:
+      - city
+      premises_name:
+      - businessname
+      - name
+      dba:
+      - businessname
+      - name
+      status:
+      - status
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  deeds:
+    endpoint: https://data.ct.gov/resource/5mzw-sjtu.json
+    platform: socrata
+    watermark_col: daterecorded
+    id_keys:
+    - serialnumber
+    - listyear
+    topic: raw.municipal.deeds
+    interval_seconds: 3600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: daterecorded DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: town = 'Bridgeport'
+    needs_geocode: true
+    geocode_context: Bridgeport, CT
+    field_map:
+      doc_id:
+      - serialnumber
+      recorded_date:
+      - daterecorded
+      document_amount:
+      - saleamount
+      address_street:
+      - address
+      borough:
+      - town
+      doc_type:
+      - propertytype
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- bridgeport_ct
+- bridgeport ct
+job_suffix: bridgeport

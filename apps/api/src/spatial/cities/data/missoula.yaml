@@ -1,0 +1,515 @@
+city_id: missoula
+name: Missoula
+state: MT
+center:
+  lat: 46.8721
+  lng: -113.994
+metro_bbox:
+  min_lat: 46.78
+  max_lat: 46.94
+  min_lng: -114.13
+  max_lng: -113.92
+division_bboxes:
+  DOWNTOWN:
+    min_lat: 46.866
+    max_lat: 46.878
+    min_lng: -114.002
+    max_lng: -113.988
+  UNIVERSITY:
+    min_lat: 46.85
+    max_lat: 46.866
+    min_lng: -114.02
+    max_lng: -113.98
+  SOUTHSIDE:
+    min_lat: 46.822
+    max_lat: 46.85
+    min_lng: -114.05
+    max_lng: -114.0
+  WEST_MIDTOWN:
+    min_lat: 46.846
+    max_lat: 46.885
+    min_lng: -114.06
+    max_lng: -114.002
+  NORTHSIDE:
+    min_lat: 46.878
+    max_lat: 46.93
+    min_lng: -114.1
+    max_lng: -113.99
+  RATTLESNAKE:
+    min_lat: 46.878
+    max_lat: 46.93
+    min_lng: -114.002
+    max_lng: -113.92
+  SOUTHEAST:
+    min_lat: 46.78
+    max_lat: 46.846
+    min_lng: -114.1
+    max_lng: -113.95
+submarkets:
+  Heart of Missoula:
+    name: Heart of Missoula
+    borough: DOWNTOWN
+    lat: 46.8721
+    lng: -113.994
+    zoom: 15.0
+    pitch: 48.0
+    base_lims: 0.82
+    capex: 7200000.0
+    permit_vel: 38.0
+    shift_ratio: 1.44
+    sla: 54.0
+    description: Central downtown core with Higgins Avenue retail, the Wilma, and
+      the Missoula Farmers Market adjacency.
+    city_id: missoula
+  Riverfront:
+    name: Riverfront
+    borough: DOWNTOWN
+    lat: 46.871
+    lng: -113.9965
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.78
+    capex: 5800000.0
+    permit_vel: 32.0
+    shift_ratio: 1.38
+    sla: 50.0
+    description: Clark Fork riverfront corridor with Caras Park, the Brennan's Wave
+      surf amenity, and mixed-use redevelopment.
+    city_id: missoula
+  University District:
+    name: University District
+    borough: UNIVERSITY
+    lat: 46.8595
+    lng: -113.9842
+    zoom: 15.0
+    pitch: 48.0
+    base_lims: 0.8
+    capex: 6400000.0
+    permit_vel: 34.0
+    shift_ratio: 1.4
+    sla: 52.0
+    description: University of Montana campus-adjacent historic district with student
+      housing turnover and academic-adjacent licensing.
+    city_id: missoula
+  Franklin to the Fort:
+    name: Franklin to the Fort
+    borough: UNIVERSITY
+    lat: 46.857
+    lng: -114.003
+    zoom: 14.5
+    pitch: 44.0
+    base_lims: 0.74
+    capex: 4800000.0
+    permit_vel: 28.0
+    shift_ratio: 1.34
+    sla: 46.0
+    description: Transitional corridor between UM and the South Hills with single-family
+      infill and small-scale commercial.
+    city_id: missoula
+  Lewis & Clark:
+    name: Lewis & Clark
+    borough: UNIVERSITY
+    lat: 46.865
+    lng: -114.018
+    zoom: 14.0
+    pitch: 42.0
+    base_lims: 0.76
+    capex: 5200000.0
+    permit_vel: 30.0
+    shift_ratio: 1.36
+    sla: 48.0
+    description: Southwest residential neighborhood of mid-century ranch homes with
+      steady renovation permitting.
+    city_id: missoula
+  Southgate Triangle:
+    name: Southgate Triangle
+    borough: SOUTHSIDE
+    lat: 46.838
+    lng: -114.02
+    zoom: 14.5
+    pitch: 46.0
+    base_lims: 0.78
+    capex: 5600000.0
+    permit_vel: 32.0
+    shift_ratio: 1.38
+    sla: 50.0
+    description: Southgate Mall retail node and surrounding garden-apartment stock
+      with commercial renovation and tenant-improvement permits.
+    city_id: missoula
+  South 39th Street:
+    name: South 39th Street
+    borough: SOUTHSIDE
+    lat: 46.8305
+    lng: -114.015
+    zoom: 14.5
+    pitch: 44.0
+    base_lims: 0.74
+    capex: 4600000.0
+    permit_vel: 26.0
+    shift_ratio: 1.34
+    sla: 46.0
+    description: South-central residential corridor of post-war single-family homes
+      with modest renovation cyclics.
+    city_id: missoula
+  Two Rivers:
+    name: Two Rivers
+    borough: SOUTHSIDE
+    lat: 46.828
+    lng: -114.04
+    zoom: 14.0
+    pitch: 42.0
+    base_lims: 0.72
+    capex: 4200000.0
+    permit_vel: 24.0
+    shift_ratio: 1.32
+    sla: 44.0
+    description: Clark Fork / Bitterroot confluence neighborhood with large-lot single-family
+      and rural-urban fringe permitting.
+    city_id: missoula
+  Westside:
+    name: Westside
+    borough: WEST_MIDTOWN
+    lat: 46.873
+    lng: -114.026
+    zoom: 14.5
+    pitch: 46.0
+    base_lims: 0.76
+    capex: 5400000.0
+    permit_vel: 30.0
+    shift_ratio: 1.36
+    sla: 50.0
+    description: West Missoula corridor with Reserve Street commercial spine and working-class
+      single-family stock.
+    city_id: missoula
+  Rose Park:
+    name: Rose Park
+    borough: WEST_MIDTOWN
+    lat: 46.878
+    lng: -114.007
+    zoom: 14.5
+    pitch: 46.0
+    base_lims: 0.8
+    capex: 6000000.0
+    permit_vel: 34.0
+    shift_ratio: 1.4
+    sla: 52.0
+    description: Rose Park neighborhood with early-20th-century bungalows, mature
+      tree canopy, and steady kitchen/bathroom renovation permits.
+    city_id: missoula
+  River Road:
+    name: River Road
+    borough: WEST_MIDTOWN
+    lat: 46.852
+    lng: -114.055
+    zoom: 14.0
+    pitch: 42.0
+    base_lims: 0.72
+    capex: 4400000.0
+    permit_vel: 24.0
+    shift_ratio: 1.32
+    sla: 44.0
+    description: West-side river corridor of newer subdivisions and large-lot residential
+      with new-build permitting volume.
+    city_id: missoula
+  Moose Can Gully:
+    name: Moose Can Gully
+    borough: WEST_MIDTOWN
+    lat: 46.846
+    lng: -114.052
+    zoom: 14.0
+    pitch: 42.0
+    base_lims: 0.7
+    capex: 4000000.0
+    permit_vel: 22.0
+    shift_ratio: 1.3
+    sla: 42.0
+    description: Southwest gully neighborhood of exurban subdivisions with well-septic
+      permitting and rural character.
+    city_id: missoula
+  Northside:
+    name: Northside
+    borough: NORTHSIDE
+    lat: 46.884
+    lng: -113.996
+    zoom: 14.5
+    pitch: 46.0
+    base_lims: 0.78
+    capex: 5600000.0
+    permit_vel: 32.0
+    shift_ratio: 1.38
+    sla: 50.0
+    description: North Missoula industrial-residential mix with the rail yard, Northside
+      neighborhood, and warehouse-to-residential conversions.
+    city_id: missoula
+  Grant Creek:
+    name: Grant Creek
+    borough: NORTHSIDE
+    lat: 46.91
+    lng: -114.065
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.76
+    capex: 5400000.0
+    permit_vel: 28.0
+    shift_ratio: 1.36
+    sla: 48.0
+    description: Northern valley corridor with master-planned subdivisions, golf course
+      adjacency, and hotel/commercial development.
+    city_id: missoula
+  Marshall Canyon:
+    name: Marshall Canyon
+    borough: NORTHSIDE
+    lat: 46.887
+    lng: -114.03
+    zoom: 14.0
+    pitch: 42.0
+    base_lims: 0.74
+    capex: 4800000.0
+    permit_vel: 26.0
+    shift_ratio: 1.34
+    sla: 46.0
+    description: Marshall Mountain foothills neighborhood with newer single-family
+      construction and wildland-urban interface permitting.
+    city_id: missoula
+  Lower Rattlesnake:
+    name: Lower Rattlesnake
+    borough: RATTLESNAKE
+    lat: 46.887
+    lng: -113.97
+    zoom: 14.5
+    pitch: 46.0
+    base_lims: 0.8
+    capex: 6200000.0
+    permit_vel: 34.0
+    shift_ratio: 1.4
+    sla: 52.0
+    description: Established Rattlesnake Valley floor neighborhood with leafy streets,
+      mid-century homes, and steady renovation permits.
+    city_id: missoula
+  Upper Rattlesnake:
+    name: Upper Rattlesnake
+    borough: RATTLESNAKE
+    lat: 46.916
+    lng: -113.955
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.78
+    capex: 5800000.0
+    permit_vel: 30.0
+    shift_ratio: 1.38
+    sla: 50.0
+    description: Upper Rattlesnake Creek corridor with large estate lots, high-value
+      remodels, and hillside building permits.
+    city_id: missoula
+  Captain John Mullan:
+    name: Captain John Mullan
+    borough: RATTLESNAKE
+    lat: 46.894
+    lng: -113.938
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.82
+    capex: 6800000.0
+    permit_vel: 36.0
+    shift_ratio: 1.42
+    sla: 54.0
+    description: East Mullan Road corridor with big-box retail, office parks, and
+      the metro's largest commercial permit pipeline.
+    city_id: missoula
+  Miller Creek:
+    name: Miller Creek
+    borough: SOUTHEAST
+    lat: 46.801
+    lng: -114.055
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.72
+    capex: 4600000.0
+    permit_vel: 24.0
+    shift_ratio: 1.32
+    sla: 44.0
+    description: Southern exurban corridor along Miller Creek Road with new subdivisions,
+      well/septic permits, and rural-residential growth.
+    city_id: missoula
+  Farviews / Pattee Canyon:
+    name: Farviews / Pattee Canyon
+    borough: SOUTHEAST
+    lat: 46.836
+    lng: -113.982
+    zoom: 14.0
+    pitch: 44.0
+    base_lims: 0.74
+    capex: 5000000.0
+    permit_vel: 26.0
+    shift_ratio: 1.34
+    sla: 46.0
+    description: Southeast hillside neighborhood with Pattee Canyon recreation access,
+      custom home construction, and forest-interface permits.
+    city_id: missoula
+divisions:
+  DOWNTOWN:
+    name: DOWNTOWN
+    center_lat: 46.8715
+    center_lng: -113.9955
+    zoom: 14.5
+    bbox:
+      min_lat: 46.866
+      max_lat: 46.878
+      min_lng: -114.002
+      max_lng: -113.988
+    submarkets:
+    - Heart of Missoula
+    - Riverfront
+    city_id: missoula
+  UNIVERSITY:
+    name: UNIVERSITY
+    center_lat: 46.86
+    center_lng: -114.0
+    zoom: 14.0
+    bbox:
+      min_lat: 46.85
+      max_lat: 46.866
+      min_lng: -114.02
+      max_lng: -113.98
+    submarkets:
+    - University District
+    - Franklin to the Fort
+    - Lewis & Clark
+    city_id: missoula
+  SOUTHSIDE:
+    name: SOUTHSIDE
+    center_lat: 46.836
+    center_lng: -114.025
+    zoom: 13.5
+    bbox:
+      min_lat: 46.822
+      max_lat: 46.85
+      min_lng: -114.05
+      max_lng: -114.0
+    submarkets:
+    - Southgate Triangle
+    - South 39th Street
+    - Two Rivers
+    city_id: missoula
+  WEST_MIDTOWN:
+    name: WEST_MIDTOWN
+    center_lat: 46.862
+    center_lng: -114.035
+    zoom: 13.0
+    bbox:
+      min_lat: 46.846
+      max_lat: 46.885
+      min_lng: -114.06
+      max_lng: -114.002
+    submarkets:
+    - Westside
+    - Rose Park
+    - River Road
+    - Moose Can Gully
+    city_id: missoula
+  NORTHSIDE:
+    name: NORTHSIDE
+    center_lat: 46.893
+    center_lng: -114.03
+    zoom: 13.0
+    bbox:
+      min_lat: 46.878
+      max_lat: 46.93
+      min_lng: -114.1
+      max_lng: -113.99
+    submarkets:
+    - Northside
+    - Grant Creek
+    - Marshall Canyon
+    city_id: missoula
+  RATTLESNAKE:
+    name: RATTLESNAKE
+    center_lat: 46.899
+    center_lng: -113.962
+    zoom: 13.0
+    bbox:
+      min_lat: 46.878
+      max_lat: 46.93
+      min_lng: -114.002
+      max_lng: -113.92
+    submarkets:
+    - Lower Rattlesnake
+    - Upper Rattlesnake
+    - Captain John Mullan
+    city_id: missoula
+  SOUTHEAST:
+    name: SOUTHEAST
+    center_lat: 46.818
+    center_lng: -114.018
+    zoom: 13.0
+    bbox:
+      min_lat: 46.78
+      max_lat: 46.846
+      min_lng: -114.1
+      max_lng: -113.95
+    submarkets:
+    - Miller Creek
+    - Farviews / Pattee Canyon
+    city_id: missoula
+datasets:
+  permits:
+    endpoint: https://services.arcgis.com/HfwHS0BxZBQ1E5DY/arcgis/rest/services/AddressesWithPermits_mso/FeatureServer/0
+    platform: arcgis
+    watermark_col: ApplicationDate
+    id_keys:
+    - RecordID
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: ApplicationDate DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - RecordID
+      - OBJECTID
+      filing_date:
+      - ApplicationDate
+      status:
+      - RecordStatus
+      job_type:
+      - B1_PER_TYPE
+      - B1_PER_SUB_TYPE
+      description:
+      - DescriptionOfWork
+      address_street:
+      - Address
+      - FullAddress
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 1000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- missoula_mt
+- missoula-mt
+job_suffix: missoula

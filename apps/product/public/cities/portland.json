@@ -243,7 +243,7 @@
     "sla": {
       "platform": "socrata",
       "watermark_col": "",
-      "interval_seconds": 21600.0,
+      "interval_seconds": 600.0,
       "topic": "raw.municipal.sla"
     },
     "deeds": null

@@ -1,3 +1,36 @@
+PERMITS_FIELD_MAP = {
+    "job_id": ["PERMIT_NUMBER", "APPLICATION_NUMBER", "OBJECTID"],
+    "issuance_date": ["PERMIT_ISSUE_DATE"],
+    "filing_date": ["APPLICATION_DATE"],
+    "status": ["PERMIT_STATUS", "APPLICATION_STATUS"],
+    "job_type": ["PERMIT_TYPE", "APPLICATION_TYPE"],
+    "cost": ["VALUATION"],
+    "address_street": ["LOCATION"],
+    "proposed_units": ["New_Dwelling_Units"],
+}
+
+CRIME_FIELD_MAP = {
+    "incident_id": ["INCIDENT_NUMBER", "CASE_NUMBER", "OBJECTID"],
+    "offense_type": ["ALL_CALL_TYPES", "PRIMARY_CODE", "PRIMARY_DESCRIPTION"],
+    "occurred_date": ["DATE"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+    "crime": CRIME_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Bozeman, MT"
+
+DROPPED_NONADDRESS_COLUMNS = (
+    "LATITUDE",
+    "LONGITUDE",
+    "TIME",
+    "RESPONDING_AGENCIES",
+    "GlobalID",
+    "Shape",
+)
+
 """Bozeman, MT spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -38,11 +71,6 @@ Live-probe caveats that define this leaf (probed 2026-08-28, US-236):
   corridors (real neighborhoods named in city planning documents).
 """
 
-from src.producers.field_maps_bozeman import (
-    CRIME_FIELD_MAP,
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 BOZEMAN_CITY_ID: str = "bozeman"

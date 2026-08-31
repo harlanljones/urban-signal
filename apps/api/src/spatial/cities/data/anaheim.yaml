@@ -1,0 +1,398 @@
+city_id: anaheim
+name: Anaheim / Orange County
+state: CA
+center:
+  lat: 33.8355
+  lng: -117.914
+metro_bbox:
+  min_lat: 33.75
+  max_lat: 33.91
+  min_lng: -118.01
+  max_lng: -117.69
+division_bboxes:
+  DOWNTOWN_ANAHEIM:
+    min_lat: 33.825
+    max_lat: 33.852
+    min_lng: -117.935
+    max_lng: -117.9
+  RESORT_DISTRICT:
+    min_lat: 33.795
+    max_lat: 33.825
+    min_lng: -117.935
+    max_lng: -117.9
+  PLATINUM_TRIANGLE:
+    min_lat: 33.788
+    max_lat: 33.825
+    min_lng: -117.9
+    max_lng: -117.865
+  ANAHEIM_CANYON:
+    min_lat: 33.838
+    max_lat: 33.87
+    min_lng: -117.9
+    max_lng: -117.845
+  WEST_ANAHEIM:
+    min_lat: 33.795
+    max_lat: 33.852
+    min_lng: -118.01
+    max_lng: -117.935
+  ANAHEIM_HILLS:
+    min_lat: 33.75
+    max_lat: 33.91
+    min_lng: -117.845
+    max_lng: -117.69
+submarkets:
+  Downtown Anaheim:
+    name: Downtown Anaheim
+    borough: DOWNTOWN_ANAHEIM
+    lat: 33.8355
+    lng: -117.914
+    zoom: 14.5
+    pitch: 48.0
+    base_lims: 0.8
+    capex: 6200000.0
+    permit_vel: 34.0
+    shift_ratio: 1.42
+    sla: 56.0
+    description: Center City Promenade mixed-use core with facade grants, adaptive
+      reuse of the 1920s packers corridor, and steady tenant-improvement permitting.
+    city_id: anaheim
+  The Colony:
+    name: The Colony
+    borough: DOWNTOWN_ANAHEIM
+    lat: 33.8398
+    lng: -117.9253
+    zoom: 14.5
+    pitch: 46.0
+    base_lims: 0.74
+    capex: 4600000.0
+    permit_vel: 26.0
+    shift_ratio: 1.34
+    sla: 48.0
+    description: Historic 1910s-20s residential grid with Craftsman restoration-led
+      permitting and Mills-Act-adjacent churn.
+    city_id: anaheim
+  Disneyland Resort & Convention Center:
+    name: Disneyland Resort & Convention Center
+    borough: RESORT_DISTRICT
+    lat: 33.8106
+    lng: -117.9194
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.92
+    capex: 12500000.0
+    permit_vel: 48.0
+    shift_ratio: 1.62
+    sla: 68.0
+    description: Theme-park, hotel, and convention anchor with the metro's densest
+      entertainment-adjacent licensing and continuous capital expansion.
+    city_id: anaheim
+  Harbor Boulevard Hotel Belt:
+    name: Harbor Boulevard Hotel Belt
+    borough: RESORT_DISTRICT
+    lat: 33.8005
+    lng: -117.928
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.84
+    capex: 7200000.0
+    permit_vel: 36.0
+    shift_ratio: 1.48
+    sla: 60.0
+    description: South Harbor motel-to-hotel repositioning strip with Transient-Occupancy-driven
+      renovations and walkable park-gateway demand.
+    city_id: anaheim
+  Honda Center & Angel Stadium:
+    name: Honda Center & Angel Stadium
+    borough: PLATINUM_TRIANGLE
+    lat: 33.804
+    lng: -117.8845
+    zoom: 13.5
+    pitch: 48.0
+    base_lims: 0.88
+    capex: 9800000.0
+    permit_vel: 44.0
+    shift_ratio: 1.55
+    sla: 62.0
+    description: Platinum Triangle arena-stadium district with high-rise entitlements,
+      ARTIC-adjacent office, and the metro's largest planned-growth pipeline.
+    city_id: anaheim
+  West Anaheim Magnolia Belt:
+    name: West Anaheim Magnolia Belt
+    borough: WEST_ANAHEIM
+    lat: 33.829
+    lng: -117.965
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.76
+    capex: 5400000.0
+    permit_vel: 30.0
+    shift_ratio: 1.38
+    sla: 52.0
+    description: Post-war tract housing along the Magnolia/ Brookhurst retail spine
+      with renovation-led permitting and small-business licensing churn.
+    city_id: anaheim
+  Brookhurst Southwest:
+    name: Brookhurst Southwest
+    borough: WEST_ANAHEIM
+    lat: 33.806
+    lng: -117.948
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.74
+    capex: 5000000.0
+    permit_vel: 28.0
+    shift_ratio: 1.36
+    sla: 50.0
+    description: Little Arabia commercial corridor and surrounding garden-apartment
+      stock with restaurant licensing turnover and duplex infill.
+    city_id: anaheim
+  Anaheim Canyon Industrial:
+    name: Anaheim Canyon Industrial
+    borough: ANAHEIM_CANYON
+    lat: 33.848
+    lng: -117.864
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.82
+    capex: 7600000.0
+    permit_vel: 38.0
+    shift_ratio: 1.46
+    sla: 54.0
+    description: Northeast industrial and food-manufacturing district along the 91
+      with warehouse conversions, TTM industrial condos, and steady TI permitting.
+    city_id: anaheim
+  Nohl Ranch Hills:
+    name: Nohl Ranch Hills
+    borough: ANAHEIM_HILLS
+    lat: 33.838
+    lng: -117.797
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.84
+    capex: 7000000.0
+    permit_vel: 32.0
+    shift_ratio: 1.4
+    sla: 50.0
+    description: Master-planned hillside subdivisions around Nohl Ranch Road with
+      pool/deck auxiliary permits and high-valuation remodel cadence.
+    city_id: anaheim
+  Weir Canyon East:
+    name: Weir Canyon East
+    borough: ANAHEIM_HILLS
+    lat: 33.85
+    lng: -117.755
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.8
+    capex: 6400000.0
+    permit_vel: 28.0
+    shift_ratio: 1.36
+    sla: 46.0
+    description: Eastern hillside edge toward Weir and Gypsum canyons with newer single-family
+      stock, solar permitting volume, and wildland-adjacent rebuild cycles.
+    city_id: anaheim
+divisions:
+  DOWNTOWN_ANAHEIM:
+    name: DOWNTOWN_ANAHEIM
+    center_lat: 33.8385
+    center_lng: -117.9175
+    zoom: 14.0
+    bbox:
+      min_lat: 33.825
+      max_lat: 33.852
+      min_lng: -117.935
+      max_lng: -117.9
+    submarkets:
+    - Downtown Anaheim
+    - The Colony
+    city_id: anaheim
+  RESORT_DISTRICT:
+    name: RESORT_DISTRICT
+    center_lat: 33.81
+    center_lng: -117.9175
+    zoom: 13.5
+    bbox:
+      min_lat: 33.795
+      max_lat: 33.825
+      min_lng: -117.935
+      max_lng: -117.9
+    submarkets:
+    - Disneyland Resort & Convention Center
+    - Harbor Boulevard Hotel Belt
+    city_id: anaheim
+  PLATINUM_TRIANGLE:
+    name: PLATINUM_TRIANGLE
+    center_lat: 33.805
+    center_lng: -117.8825
+    zoom: 13.5
+    bbox:
+      min_lat: 33.788
+      max_lat: 33.825
+      min_lng: -117.9
+      max_lng: -117.865
+    submarkets:
+    - Honda Center & Angel Stadium
+    city_id: anaheim
+  ANAHEIM_CANYON:
+    name: ANAHEIM_CANYON
+    center_lat: 33.854
+    center_lng: -117.8725
+    zoom: 12.5
+    bbox:
+      min_lat: 33.838
+      max_lat: 33.87
+      min_lng: -117.9
+      max_lng: -117.845
+    submarkets:
+    - Anaheim Canyon Industrial
+    city_id: anaheim
+  WEST_ANAHEIM:
+    name: WEST_ANAHEIM
+    center_lat: 33.823
+    center_lng: -117.9725
+    zoom: 13.0
+    bbox:
+      min_lat: 33.795
+      max_lat: 33.852
+      min_lng: -118.01
+      max_lng: -117.935
+    submarkets:
+    - West Anaheim Magnolia Belt
+    - Brookhurst Southwest
+    city_id: anaheim
+  ANAHEIM_HILLS:
+    name: ANAHEIM_HILLS
+    center_lat: 33.83
+    center_lng: -117.78
+    zoom: 12.5
+    bbox:
+      min_lat: 33.75
+      max_lat: 33.91
+      min_lng: -117.845
+      max_lng: -117.69
+    submarkets:
+    - Nohl Ranch Hills
+    - Weir Canyon East
+    city_id: anaheim
+datasets:
+  permits:
+    endpoint: https://services3.arcgis.com/hPs600I3X0RTaaaq/arcgis/rest/services/Accela_Building_Permits/FeatureServer/0
+    platform: arcgis
+    watermark_col: permitissued
+    id_keys:
+    - casenumber
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: permitissued DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: permitissued <= CURRENT_TIMESTAMP
+    needs_geocode: true
+    geocode_context: Anaheim, CA
+    field_map:
+      job_id:
+      - casenumber
+      - OBJECTID
+      issuance_date:
+      - permitissued
+      filing_date:
+      - applicationreceived
+      status:
+      - casestatus
+      job_type:
+      - typeofwork
+      cost:
+      - jobvaluation
+      address_street:
+      - address
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 21
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  sla:
+    endpoint: https://services3.arcgis.com/hPs600I3X0RTaaaq/arcgis/rest/services/ActiveBusinessLicenses/FeatureServer/0
+    platform: arcgis
+    watermark_col: applicationdate
+    id_keys:
+    - casenumber
+    - objectid
+    topic: raw.municipal.sla
+    interval_seconds: 300.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: applicationdate DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Anaheim, CA
+    field_map:
+      license_id:
+      - casenumber
+      - objectid
+      dba:
+      - businessname
+      premises_name:
+      - businessname
+      license_type:
+      - naicscode
+      status:
+      - casestatus
+      effective_date:
+      - applicationdate
+      expiration_date:
+      - expirationdate
+      address_street:
+      - address
+    ingestion_mode: snapshot
+    oid_field: objectid
+    max_record_count: 10000
+    expected_cadence_days: 90
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- anaheim_ca
+- anaheim-ca
+- anaheim ca
+job_suffix: anaheim

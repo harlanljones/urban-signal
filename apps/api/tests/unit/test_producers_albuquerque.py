@@ -153,7 +153,7 @@ class TestFeedRegistration:
         assert spec.expected_cadence_days == 1
         assert spec.where == ALBUQUERQUE_PERMITS_WHERE
         assert spec.where == "Status NOT IN ('Expired')"
-        assert spec.field_map is ALBUQUERQUE_PERMITS_FIELD_MAP
+        assert spec.field_map == ALBUQUERQUE_PERMITS_FIELD_MAP
 
     @pytest.mark.parametrize(
         "absent_feed",

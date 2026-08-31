@@ -1,3 +1,34 @@
+PERMITS_FIELD_MAP = {
+    # OBJECTID is the OID fallback (Henderson precedent): live rows always
+    # carry PERMIT_NUM (it is the id_keys head), but the OID keeps
+    # coordinate-less/dedup edge rows addressable if a permit number is
+    # ever missing client-side.
+    "job_id": ["PERMIT_NUM", "OBJECTID"],
+    "issuance_date": ["NewIssueDate"],
+    "filing_date": ["APPLICDATE"],
+    "status": ["BP_STATUS", "Status"],
+    "job_type": ["PERMIT_TYPE"],
+    "cost": ["PERMIT_VALUATION"],
+    "address_street": ["STREETADDRESS"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Greenville, SC"
+
+DROPPED_PII_COLUMNS = (
+    "OWNER_NAME",
+    "OWNER_ADDR",
+    "OWNER_ADDR2",
+    "OWNER_ZIP",
+    "CONTRACTOR_NAME",
+    "CONT_ADDR",
+    "CONT_ADDR2",
+    "CONT_ZIP",
+)
+
 """Greenville, SC spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -53,10 +84,6 @@ US-340):
 
 from typing import Any
 
-from src.producers.field_maps_greenville import (
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 GREENVILLE_CITY_ID: str = "greenville"

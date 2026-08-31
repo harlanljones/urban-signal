@@ -1,3 +1,17 @@
+DEEDS_FIELD_MAP = {
+    "doc_id": ["Parcel_ID", "GIS_ParcelNum11", "OBJECTID", "id"],
+    "recorded_date": ["Deed_Date"],
+    "borough": ["GIS_Site_City", "Tax_District"],
+    "party2_grantee": ["Owner_Name"],
+    "bbl": ["Parcel_ID", "GIS_ParcelNum11"],
+    "address_street": ["Parcel_Address"],
+    "zipcode": ["GIS_Site_Zipcode"],
+}
+
+FIELD_MAP = {
+    "deeds": DEEDS_FIELD_MAP,
+}
+
 """Anchorage, AK spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -53,10 +67,6 @@ hook. The host accepts ISO-string date comparisons (``Deed_Date >
 
 from typing import Dict
 
-from src.producers.field_maps_anchorage import (
-    DEEDS_FIELD_MAP,
-    FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 ANCHORAGE_CITY_ID: str = "anchorage"

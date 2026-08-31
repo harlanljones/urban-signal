@@ -1,5 +1,7 @@
 """Interactive Geospatial Web Visualization Dashboard HTML/JS/CSS generator for Urban Signal."""
 
+from src.spatial.city_registry import REGISTRY
+
 def get_favicon_svg() -> str:
     """Brand favicon: layered-map mark in the dashboard's accent palette."""
     return (
@@ -17,6 +19,20 @@ def _favicon_data_uri() -> str:
         .replace("#", "%23")
         .replace(" ", "%20")
     )
+
+def _metro_meta_js() -> str:
+    """Render the METRO_META entries straight from REGISTRY (US-427).
+
+    Single source of truth: a city registered in REGISTRY appears on the map
+    with its registry display name; an unregistered city cannot. Entries keep
+    the ``<id>: { name: '...' },`` JS shape the CI/CD pre-flight parser
+    (scripts/verify_cicd_preflight.py) and the interlock gate read.
+    """
+    lines = []
+    for cid, reg in REGISTRY.items():
+        name = reg.name.replace("\\", "\\\\").replace("'", "\\'")
+        lines.append(f"      {cid.value}: {{ name: '{name}' }},")
+    return "\n".join(lines)
 
 def get_dashboard_html() -> str:
     favicon_link = (
@@ -1424,140 +1440,13 @@ def get_dashboard_html() -> str:
     // Dynamic submarkets catalog loaded per active city via /api/v1/submarkets
     let SUBMARKETS = {};
 
-    // Static metro metadata: chip label fallback + ?city= deep-link validation.
-    // Camera geometry comes from the snapshot manifest's metro_index; this map
-    // deliberately carries none so registration stays single-sourced. The block
-    // below is generated from the live REGISTRY (US-179) so a registered city
-    // can never fall off the map.
+    // Metro chip labels + ?city= deep-link validation, generated from the
+    // live REGISTRY by get_dashboard_html() (US-427) — this comment is now
+    // true. Camera geometry comes from the snapshot manifest's metro_index;
+    // this map deliberately carries none so registration stays single-sourced:
+    // register a city in REGISTRY and it appears here; it cannot fall off.
     const METRO_META = {
-      nyc: { name: 'New York City' },
-      chicago: { name: 'Chicago' },
-      san_francisco: { name: 'San Francisco Bay Area' },
-      seattle: { name: 'Seattle Metro' },
-      los_angeles: { name: 'Los Angeles Metro' },
-      new_orleans: { name: 'New Orleans Metro' },
-      norfolk: { name: 'Norfolk' },
-      detroit: { name: 'Detroit' },
-      austin: { name: 'Austin' },
-      cincinnati: { name: 'Cincinnati' },
-      boston: { name: 'Boston' },
-      montgomery: { name: 'Montgomery County' },
-      baton_rouge: { name: 'Baton Rouge / East Baton Rouge Parish' },
-      denver: { name: 'Denver' },
-      minneapolis: { name: 'Minneapolis' },
-      baltimore: { name: 'Baltimore' },
-      philadelphia: { name: 'Philadelphia' },
-      washington_dc: { name: 'Washington DC' },
-      prince_georges: { name: 'Prince George\'s County' },
-      columbus: { name: 'Columbus' },
-      columbus_ga: { name: 'Columbus, GA' },
-      nashville: { name: 'Nashville / Davidson County' },
-      kansas_city: { name: 'Kansas City' },
-      pierce: { name: 'Pierce County' },
-      milwaukee: { name: 'Milwaukee' },
-      madison: { name: 'Madison' },
-      charlotte: { name: 'Charlotte' },
-      pittsburgh: { name: 'Pittsburgh' },
-      san_diego: { name: 'San Diego' },
-      indianapolis: { name: 'Indianapolis / Marion County' },
-      houston: { name: 'Houston' },
-      wichita: { name: 'Wichita' },
-      melbourne: { name: 'Melbourne / Palm Bay' },
-      chattanooga: { name: 'Chattanooga / Hamilton County' },
-      cleveland: { name: 'Cleveland / Cuyahoga County' },
-      hartford: { name: 'Hartford' },
-      raleigh: { name: 'Raleigh / Wake County' },
-      san_antonio: { name: 'San Antonio / Bexar County' },
-      sacramento: { name: 'Sacramento / Sacramento County' },
-      reno: { name: 'Reno / Washoe County' },
-      spokane: { name: 'Spokane / Spokane County' },
-      dayton: { name: 'Dayton / Montgomery County' },
-      tulsa: { name: 'Tulsa / Tulsa County' },
-      el_paso: { name: 'El Paso / El Paso County' },
-      durham: { name: 'Durham / Durham County' },
-      dallas: { name: 'Dallas / Dallas County' },
-      louisville: { name: 'Louisville / Jefferson County' },
-      lexington: { name: 'Lexington / Fayette County' },
-      portland: { name: 'Portland / Multnomah County' },
-      san_jose: { name: 'San Jose / Santa Clara County' },
-      savannah: { name: 'Savannah / Chatham County' },
-      bowling_green: { name: 'Bowling Green / Warren County' },
-      tallahassee: { name: 'Tallahassee / Leon County' },
-      spartanburg: { name: 'Spartanburg County' },
-      cape_coral: { name: 'Cape Coral–Fort Myers' },
-      tampa: { name: 'Tampa / Hillsborough County' },
-      las_vegas: { name: 'Las Vegas / Clark County' },
-      boise: { name: 'Boise / Ada County' },
-      fort_worth: { name: 'Fort Worth / Tarrant County' },
-      honolulu: { name: 'Honolulu / City and County of Honolulu' },
-      orlando: { name: 'Orlando / Orange County' },
-      gainesville: { name: 'Gainesville' },
-      miami_dade: { name: 'Miami-Dade County' },
-      memphis: { name: 'Memphis / Shelby County' },
-      phoenix: { name: 'Phoenix / Maricopa County' },
-      albuquerque: { name: 'Albuquerque / Bernalillo County' },
-      st_louis: { name: 'St. Louis' },
-      aurora: { name: 'Aurora, CO' },
-      henderson: { name: 'Henderson, NV' },
-      virginia_beach: { name: 'Virginia Beach' },
-      omaha: { name: 'Omaha' },
-      toledo: { name: 'Toledo' },
-      amarillo: { name: 'Amarillo' },
-      beaumont: { name: 'Beaumont' },
-      waco: { name: 'Waco' },
-      jackson_ms: { name: 'Jackson' },
-      macon_bibb: { name: 'Macon-Bibb County' },
-      ocala: { name: 'Ocala / Marion County' },
-      tyler: { name: 'Tyler' },
-      lake_charles: { name: 'Lake Charles' },
-      fort_smith: { name: 'Fort Smith, AR' },
-      longview: { name: 'Longview' },
-      monroe: { name: 'Monroe' },
-      abilene: { name: 'Abilene' },
-      texarkana: { name: 'Texarkana' },
-      midland: { name: 'Midland' },
-      odessa: { name: 'Odessa' },
-      alexandria: { name: 'Alexandria' },
-      jonesboro: { name: 'Jonesboro' },
-      charleston_sc: { name: 'Charleston, SC' },
-      lakeland: { name: 'Lakeland' },
-      augusta: { name: 'Augusta, GA' },
-      port_st_lucie: { name: 'Port St. Lucie' },
-      asheville: { name: 'Asheville, NC' },
-      wilmington_nc: { name: 'Wilmington, NC' },
-      grand_rapids: { name: 'Grand Rapids, MI' },
-      buffalo: { name: 'Buffalo, NY' },
-      rochester: { name: 'Rochester, NY' },
-      syracuse: { name: 'Syracuse, NY' },
-      lynchburg: { name: 'Lynchburg, VA' },
-      greenville: { name: 'Greenville, SC' },
-      anchorage: { name: 'Anchorage, AK' },
-      tucson: { name: 'Tucson, AZ' },
-      inland_empire: { name: 'Inland Empire (Riverside County anchor)' },
-      stockton: { name: 'Stockton' },
-      boulder: { name: 'Boulder' },
-      chandler: { name: 'Chandler' },
-      modesto: { name: 'Modesto' },
-      bend: { name: 'Bend, OR' },
-      vancouver_wa: { name: 'Vancouver' },
-      anaheim: { name: 'Anaheim / Orange County' },
-      santa_rosa: { name: 'Santa Rosa, CA' },
-      oakland: { name: 'Oakland' },
-      nampa: { name: 'Nampa, ID' },
-      yakima: { name: 'Yakima' },
-      oxnard_ventura: { name: 'Oxnard–Ventura, CA' },
-      medford: { name: 'Medford, OR' },
-      tempe: { name: 'Tempe' },
-      bozeman: { name: 'Bozeman, MT' },
-      missoula: { name: 'Missoula' },
-      santa_fe: { name: 'Santa Fe' },
-      eugene: { name: 'Eugene' },
-      glendale_az: { name: 'Glendale, AZ' },
-      scottsdale: { name: 'Scottsdale, AZ' },
-      long_beach: { name: 'Long Beach' },
-      las_cruces: { name: 'Las Cruces, NM' },
-      billings: { name: 'Billings' },
-      salem_or: { name: 'Salem, OR' },
+__METRO_META__
     };
 
     const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -3406,4 +3295,4 @@ def get_dashboard_html() -> str:
 </body>
 </html>
 """
-    return html.replace("__FAVICON_LINK__", favicon_link)
+    return html.replace("__FAVICON_LINK__", favicon_link).replace("__METRO_META__", _metro_meta_js())

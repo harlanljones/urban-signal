@@ -1,0 +1,269 @@
+city_id: longview
+name: Longview
+state: TX
+center:
+  lat: 32.5007
+  lng: -94.7405
+metro_bbox:
+  min_lat: 32.4
+  max_lat: 32.62
+  min_lng: -94.9
+  max_lng: -94.55
+division_bboxes:
+  CENTRAL_CORE:
+    min_lat: 32.48
+    max_lat: 32.53
+    min_lng: -94.76
+    max_lng: -94.7
+  WEST_SIDE:
+    min_lat: 32.49
+    max_lat: 32.58
+    min_lng: -94.9
+    max_lng: -94.78
+  EAST_BELT:
+    min_lat: 32.47
+    max_lat: 32.58
+    min_lng: -94.68
+    max_lng: -94.55
+  SOUTH_STRIPS:
+    min_lat: 32.4
+    max_lat: 32.49
+    min_lng: -94.85
+    max_lng: -94.68
+  NORTH_LOOP:
+    min_lat: 32.56
+    max_lat: 32.62
+    min_lng: -94.85
+    max_lng: -94.65
+submarkets:
+  Downtown Longview:
+    name: Downtown Longview
+    borough: CENTRAL_CORE
+    lat: 32.501
+    lng: -94.74
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.74
+    capex: 4300000.0
+    permit_vel: 22.0
+    shift_ratio: 1.26
+    sla: 52.0
+    description: Civic and historic commercial core with adaptive reuse and hospitality
+      infill.
+    city_id: longview
+  Longview Mall & West Loop 281:
+    name: Longview Mall & West Loop 281
+    borough: WEST_SIDE
+    lat: 32.536
+    lng: -94.787
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.72
+    capex: 4100000.0
+    permit_vel: 21.0
+    shift_ratio: 1.22
+    sla: 50.0
+    description: Regional retail cluster and commercial corridors along W Loop 281.
+    city_id: longview
+  White Oak & Gladewater Edge:
+    name: White Oak & Gladewater Edge
+    borough: WEST_SIDE
+    lat: 32.555
+    lng: -94.86
+    zoom: 13.2
+    pitch: 40.0
+    base_lims: 0.7
+    capex: 3800000.0
+    permit_vel: 19.0
+    shift_ratio: 1.18
+    sla: 46.0
+    description: Western edge trade area spanning White Oak and Gladewater approach.
+    city_id: longview
+  Eastman Industrial Corridor:
+    name: Eastman Industrial Corridor
+    borough: EAST_BELT
+    lat: 32.553
+    lng: -94.655
+    zoom: 13.5
+    pitch: 38.0
+    base_lims: 0.69
+    capex: 3600000.0
+    permit_vel: 18.0
+    shift_ratio: 1.16
+    sla: 44.0
+    description: Industrial belt and logistics support east of the core near Eastman
+      facilities.
+    city_id: longview
+  Hallsville Gateway:
+    name: Hallsville Gateway
+    borough: EAST_BELT
+    lat: 32.505
+    lng: -94.575
+    zoom: 13.5
+    pitch: 38.0
+    base_lims: 0.68
+    capex: 3500000.0
+    permit_vel: 18.0
+    shift_ratio: 1.15
+    sla: 44.0
+    description: Eastern approach toward Hallsville with highway-oriented services
+      and emerging nodes.
+    city_id: longview
+  South Longview / Estes Pkwy:
+    name: South Longview / Estes Pkwy
+    borough: SOUTH_STRIPS
+    lat: 32.45
+    lng: -94.716
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.71
+    capex: 3700000.0
+    permit_vel: 20.0
+    shift_ratio: 1.2
+    sla: 46.0
+    description: Southern growth belt and logistics along Estes Parkway and I-20 access.
+    city_id: longview
+  Judson Road Corridor:
+    name: Judson Road Corridor
+    borough: NORTH_LOOP
+    lat: 32.563
+    lng: -94.743
+    zoom: 13.5
+    pitch: 38.0
+    base_lims: 0.73
+    capex: 4200000.0
+    permit_vel: 21.0
+    shift_ratio: 1.22
+    sla: 48.0
+    description: North arc commercial spine and employment clusters along Judson Road
+      and Loop 281.
+    city_id: longview
+divisions:
+  CENTRAL_CORE:
+    name: CENTRAL_CORE
+    center_lat: 32.505
+    center_lng: -94.735
+    zoom: 13.8
+    bbox:
+      min_lat: 32.48
+      max_lat: 32.53
+      min_lng: -94.76
+      max_lng: -94.7
+    submarkets:
+    - Downtown Longview
+    city_id: longview
+  WEST_SIDE:
+    name: WEST_SIDE
+    center_lat: 32.54
+    center_lng: -94.81
+    zoom: 13.2
+    bbox:
+      min_lat: 32.49
+      max_lat: 32.58
+      min_lng: -94.9
+      max_lng: -94.78
+    submarkets:
+    - Longview Mall & West Loop 281
+    - White Oak & Gladewater Edge
+    city_id: longview
+  SOUTH_STRIPS:
+    name: SOUTH_STRIPS
+    center_lat: 32.455
+    center_lng: -94.73
+    zoom: 13.0
+    bbox:
+      min_lat: 32.4
+      max_lat: 32.49
+      min_lng: -94.85
+      max_lng: -94.68
+    submarkets:
+    - South Longview / Estes Pkwy
+    city_id: longview
+  EAST_BELT:
+    name: EAST_BELT
+    center_lat: 32.54
+    center_lng: -94.64
+    zoom: 13.2
+    bbox:
+      min_lat: 32.47
+      max_lat: 32.58
+      min_lng: -94.68
+      max_lng: -94.55
+    submarkets:
+    - Eastman Industrial Corridor
+    - Hallsville Gateway
+    city_id: longview
+  NORTH_LOOP:
+    name: NORTH_LOOP
+    center_lat: 32.59
+    center_lng: -94.74
+    zoom: 12.8
+    bbox:
+      min_lat: 32.56
+      max_lat: 32.62
+      min_lng: -94.85
+      max_lng: -94.65
+    submarkets:
+    - Judson Road Corridor
+    city_id: longview
+datasets:
+  sla:
+    endpoint: https://data.texas.gov/resource/s7ft-44qi.json?$select=*, 'trec_broker:'
+      || license_type as license_type_ns
+    platform: socrata
+    watermark_col: updated
+    id_keys:
+    - license_number
+    topic: raw.municipal.sla
+    interval_seconds: 3600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: updated DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: county = 'Gregg'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - license_number
+      license_type:
+      - license_type_ns
+      effective_date:
+      - original_license_date
+      expiration_date:
+      - license_expiration_date
+      premises_name:
+      - full_name
+      status:
+      - status
+      borough:
+      - county
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- longview_tx
+- longview tx
+job_suffix: longview

@@ -1,3 +1,20 @@
+GEOCODE_CONTEXT = "Savannah, GA"
+
+PERMITS_FIELD_MAP = {
+    "job_id": ["PermitNumber", "OBJECTID"],
+    "job_type": ["WorkClass"],
+    "issuance_date": ["IssuedDate_DATE", "IssuedDate"],
+    "address_street": ["Address"],
+    "bbl": ["PIN"],
+    "borough": ["District"],
+    "cost": ["Permit_Value"],
+    "status": ["PermitStatus"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+}
+
 """Savannah Metro Submarket Registry and Spatial Layer for Urban Signal.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -56,11 +73,6 @@ null-issued In Review rows.
 
 from typing import Dict
 
-from src.producers.field_maps_savannah import (
-    FIELD_MAP,
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 SAVANNAH_CITY_ID: str = "savannah"

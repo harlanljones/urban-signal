@@ -1,3 +1,47 @@
+COMPLAINTS_311_FIELD_MAP = {
+    "incident_id": ["Request_Number", "OBJECTID"],
+    "complaint_type": ["Request_Type", "Request_Type_Group"],
+    "created_date": ["Request_Date"],
+    "closed_date": ["Close_Date"],
+    "status": ["Status"],
+    "borough": ["Council_District"],
+    "incident_address": ["FULL_ADDRESS"],
+}
+
+SLA_FIELD_MAP = {
+    "license_id": ["OBJECTID"],
+    "license_type": ["BusinessType", "LicenseType"],
+    "premises_name": ["BusinessName"],
+    "dba": ["BusinessName"],
+    "effective_date": ["IssuedOn"],
+    "expiration_date": ["ExpiresOn"],
+    "status": ["LicenseStatus"],
+    "borough": ["District"],
+    "address_street": ["AddressLine1"],
+    "zipcode": ["ZipCode"],
+}
+
+FIELD_MAP = {
+    "311": COMPLAINTS_311_FIELD_MAP,
+    "sla": SLA_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Glendale, AZ"
+
+DROPPED_NONADDRESS_COLUMNS = (
+    "Latitude",
+    "Longitude",
+    "ANON_BLOCK",
+    "Cross_Streets",
+    "Responsible_Department_Name",
+    "DateLoaded",
+    "City",
+    "State",
+    "ParcelLegalDesc",
+    "Shape",
+    "GlobalID",
+)
+
 """Glendale, AZ spatial registry and geometry (US-250).
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -38,11 +82,6 @@ Live-probe evidence (2026-08-28, US-250):
 """
 
 
-from src.producers.field_maps_glendale_az import (
-    COMPLAINTS_311_FIELD_MAP,
-    GEOCODE_CONTEXT,
-    SLA_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 GLENDALE_AZ_CITY_ID: str = "glendale_az"

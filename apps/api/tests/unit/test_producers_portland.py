@@ -164,8 +164,8 @@ class TestPortlandFieldMaps:
         assert first_mapped.__module__  # smoke import check
         from src.producers.field_maps import resolve_field_map
 
-        assert resolve_field_map("portland", FeedType.PERMITS) is PORTLAND_PERMITS_FIELD_MAP
-        assert resolve_field_map("portland", FeedType.SLA) is PORTLAND_SLA_FIELD_MAP
+        assert resolve_field_map("portland", FeedType.PERMITS) == PORTLAND_PERMITS_FIELD_MAP
+        assert resolve_field_map("portland", FeedType.SLA) == PORTLAND_SLA_FIELD_MAP
 
 
 class TestPortlandFeedSpecs:

@@ -1,0 +1,440 @@
+city_id: boulder
+name: Boulder
+state: CO
+center:
+  lat: 40.015
+  lng: -105.27
+metro_bbox:
+  min_lat: 39.94
+  max_lat: 40.09
+  min_lng: -105.33
+  max_lng: -105.14
+division_bboxes:
+  DOWNTOWN_WEST:
+    min_lat: 39.99
+    max_lat: 40.035
+    min_lng: -105.32
+    max_lng: -105.26
+  UNIVERSITY_HILL:
+    min_lat: 39.98
+    max_lat: 40.015
+    min_lng: -105.285
+    max_lng: -105.255
+  CENTRAL_EAST:
+    min_lat: 40.0
+    max_lat: 40.035
+    min_lng: -105.255
+    max_lng: -105.22
+  NORTH_BOULDER:
+    min_lat: 40.035
+    max_lat: 40.07
+    min_lng: -105.32
+    max_lng: -105.245
+  SOUTH_BOULDER:
+    min_lat: 39.94
+    max_lat: 40.0
+    min_lng: -105.32
+    max_lng: -105.245
+  SOUTHEAST_BOULDER:
+    min_lat: 39.94
+    max_lat: 40.0
+    min_lng: -105.245
+    max_lng: -105.14
+  GUNBARREL:
+    min_lat: 40.035
+    max_lat: 40.09
+    min_lng: -105.245
+    max_lng: -105.14
+submarkets:
+  Downtown:
+    name: Downtown
+    borough: DOWNTOWN_WEST
+    lat: 40.0193
+    lng: -105.2738
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.88
+    capex: 6800000.0
+    permit_vel: 32.0
+    shift_ratio: 1.48
+    sla: 56.0
+    description: Pearl Street Mall core with the Civic Area, Boulder Theater, and
+      the city's densest mixed-use adaptive-reuse permitting.
+    city_id: boulder
+  Mapleton Hill:
+    name: Mapleton Hill
+    borough: DOWNTOWN_WEST
+    lat: 40.024
+    lng: -105.282
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.86
+    capex: 5900000.0
+    permit_vel: 24.0
+    shift_ratio: 1.42
+    sla: 52.0
+    description: West-side historic district of Victorians and Craftsman stock with
+      renovation-led and restoration permitting.
+    city_id: boulder
+  University Hill:
+    name: University Hill
+    borough: UNIVERSITY_HILL
+    lat: 40.0076
+    lng: -105.2708
+    zoom: 14.0
+    pitch: 52.0
+    base_lims: 0.87
+    capex: 6200000.0
+    permit_vel: 27.0
+    shift_ratio: 1.45
+    sla: 54.0
+    description: The Hill commercial strip and CU Boulder-adjacent student housing
+      with rental-license churn and storefront turnover.
+    city_id: boulder
+  Whittier:
+    name: Whittier
+    borough: DOWNTOWN_WEST
+    lat: 40.027
+    lng: -105.27
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.84
+    capex: 5600000.0
+    permit_vel: 26.0
+    shift_ratio: 1.43
+    sla: 51.0
+    description: Central Boulder neighborhood with bungalow infill, ADU additions,
+      and steady renovation permitting.
+    city_id: boulder
+  Boulder Junction:
+    name: Boulder Junction
+    borough: CENTRAL_EAST
+    lat: 40.032
+    lng: -105.232
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.85
+    capex: 7200000.0
+    permit_vel: 31.0
+    shift_ratio: 1.46
+    sla: 53.0
+    description: East Boulder transit village around the RTD station with new-build
+      mixed-use, office, and multifamily permitting.
+    city_id: boulder
+  North Boulder:
+    name: North Boulder
+    borough: NORTH_BOULDER
+    lat: 40.047
+    lng: -105.28
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.85
+    capex: 6400000.0
+    permit_vel: 29.0
+    shift_ratio: 1.45
+    sla: 52.0
+    description: North Boulder (NoBo) growth corridor along Broadway with master-planned
+      housing, mixed-use pads, and utility work.
+    city_id: boulder
+  Holiday:
+    name: Holiday
+    borough: NORTH_BOULDER
+    lat: 40.062
+    lng: -105.28
+    zoom: 13.0
+    pitch: 44.0
+    base_lims: 0.83
+    capex: 5800000.0
+    permit_vel: 26.0
+    shift_ratio: 1.42
+    sla: 50.0
+    description: Holiday neighborhood at the north city edge with ranch stock, additions,
+      and the North Boulder Rec Center belt.
+    city_id: boulder
+  Table Mesa:
+    name: Table Mesa
+    borough: SOUTH_BOULDER
+    lat: 39.978
+    lng: -105.25
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.86
+    capex: 6000000.0
+    permit_vel: 27.0
+    shift_ratio: 1.44
+    sla: 53.0
+    description: Post-war South Boulder residential belt with mid-century renovations,
+      solar retrofits, and remodel permits.
+    city_id: boulder
+  Martin Acres:
+    name: Martin Acres
+    borough: SOUTHEAST_BOULDER
+    lat: 39.982
+    lng: -105.235
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.85
+    capex: 5900000.0
+    permit_vel: 26.0
+    shift_ratio: 1.43
+    sla: 52.0
+    description: Martin Acres tract housing with renovation-led permitting and steady
+      rental-license coverage.
+    city_id: boulder
+  Southeast Boulder:
+    name: Southeast Boulder
+    borough: SOUTHEAST_BOULDER
+    lat: 39.999
+    lng: -105.235
+    zoom: 13.0
+    pitch: 44.0
+    base_lims: 0.84
+    capex: 6100000.0
+    permit_vel: 28.0
+    shift_ratio: 1.44
+    sla: 52.0
+    description: Southeast Boulder residential and light-commercial belt with in-fill
+      housing and Flatirons Business Park-adjacent permitting.
+    city_id: boulder
+  Gunbarrel:
+    name: Gunbarrel
+    borough: GUNBARREL
+    lat: 40.062
+    lng: -105.195
+    zoom: 13.0
+    pitch: 44.0
+    base_lims: 0.82
+    capex: 6600000.0
+    permit_vel: 25.0
+    shift_ratio: 1.41
+    sla: 49.0
+    description: Gunbarrel master-planned area at the NE city fringe with office parks,
+      townhome infill, and residential build-out.
+    city_id: boulder
+divisions:
+  DOWNTOWN_WEST:
+    name: DOWNTOWN_WEST
+    center_lat: 40.019
+    center_lng: -105.283
+    zoom: 13.5
+    bbox:
+      min_lat: 39.99
+      max_lat: 40.035
+      min_lng: -105.32
+      max_lng: -105.26
+    submarkets:
+    - Downtown
+    - Mapleton Hill
+    - Whittier
+    city_id: boulder
+  UNIVERSITY_HILL:
+    name: UNIVERSITY_HILL
+    center_lat: 40.0076
+    center_lng: -105.2708
+    zoom: 13.5
+    bbox:
+      min_lat: 39.98
+      max_lat: 40.015
+      min_lng: -105.285
+      max_lng: -105.255
+    submarkets:
+    - University Hill
+    city_id: boulder
+  CENTRAL_EAST:
+    name: CENTRAL_EAST
+    center_lat: 40.02
+    center_lng: -105.25
+    zoom: 13.0
+    bbox:
+      min_lat: 40.0
+      max_lat: 40.035
+      min_lng: -105.255
+      max_lng: -105.22
+    submarkets:
+    - Boulder Junction
+    city_id: boulder
+  NORTH_BOULDER:
+    name: NORTH_BOULDER
+    center_lat: 40.047
+    center_lng: -105.28
+    zoom: 13.0
+    bbox:
+      min_lat: 40.035
+      max_lat: 40.07
+      min_lng: -105.32
+      max_lng: -105.245
+    submarkets:
+    - North Boulder
+    - Holiday
+    city_id: boulder
+  SOUTH_BOULDER:
+    name: SOUTH_BOULDER
+    center_lat: 39.98
+    center_lng: -105.255
+    zoom: 13.0
+    bbox:
+      min_lat: 39.94
+      max_lat: 40.0
+      min_lng: -105.32
+      max_lng: -105.245
+    submarkets:
+    - Table Mesa
+    city_id: boulder
+  SOUTHEAST_BOULDER:
+    name: SOUTHEAST_BOULDER
+    center_lat: 39.975
+    center_lng: -105.2
+    zoom: 12.5
+    bbox:
+      min_lat: 39.94
+      max_lat: 40.0
+      min_lng: -105.245
+      max_lng: -105.14
+    submarkets:
+    - Martin Acres
+    - Southeast Boulder
+    city_id: boulder
+  GUNBARREL:
+    name: GUNBARREL
+    center_lat: 40.062
+    center_lng: -105.195
+    zoom: 12.5
+    bbox:
+      min_lat: 40.035
+      max_lat: 40.09
+      min_lng: -105.245
+      max_lng: -105.14
+    submarkets:
+    - Gunbarrel
+    city_id: boulder
+datasets:
+  permits:
+    endpoint: https://services.arcgis.com/ePKBjXrBZ2vEEgWd/arcgis/rest/services/Construction_Permits/FeatureServer/0
+    platform: arcgis
+    watermark_col: IssuedDate
+    id_keys:
+    - PermitNum
+    - PermitID
+    - ObjectId
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: text
+    watermark_format: '%Y-%m-%d'
+    watermark_exclude: []
+    order_by: IssuedDate DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Boulder, CO
+    field_map:
+      job_id:
+      - PermitNum
+      - PermitID
+      - ObjectId
+      issuance_date:
+      - IssuedDate
+      filing_date:
+      - AppliedDate
+      status:
+      - StatusCurrent
+      job_type:
+      - PermitType
+      - PermitWorkType
+      cost:
+      - EstProjectCost
+      address_street:
+      - OriginalAddress
+      zipcode:
+      - OriginalZip
+      borough:
+      - OriginalCity
+    ingestion_mode: incremental
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  sla:
+    endpoint: https://gis.bouldercolorado.gov/ags_svr1/rest/services/plan/RentalHousingLicenses/MapServer/0
+    platform: arcgis
+    watermark_col: APPLIEDDATE
+    id_keys:
+    - LICENSENUMBER
+    - OBJECTID
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: APPLIEDDATE DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - LICENSENUMBER
+      dba:
+      - COMPLEXNAME
+      - PROFESSIONALLICENSEHOLDERNAME
+      premises_name:
+      - COMPLEXNAME
+      license_type:
+      - RENTALTYPE
+      status:
+      - LICENSESTATUS
+      effective_date:
+      - APPLIEDDATE
+      expiration_date:
+      - EXPIRATIONDATE
+      address_street:
+      - MAINADDRESS
+      borough:
+      - SUBCOMMUNITY
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: EPSG:2876
+    state_plane_units: ftUS
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- boulder_co
+- boulder-co
+- boulder co
+job_suffix: boulder

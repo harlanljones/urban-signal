@@ -1,3 +1,42 @@
+PERMITS_FIELD_MAP = {
+    # OBJECTID is the OID fallback (Henderson precedent) so coordinate-less
+    # rows stay addressable if a CASE_ID is ever missing client-side.
+    "job_id": ["CASE_ID", "OBJECTID"],
+    "issuance_date": ["APPLIED_DATE"],
+    "status": ["CASE_STATUS"],
+    "job_type": ["CASE_WORK_CLASS", "CASE_TYPE"],
+    # APN is the county parcel number; the bbl slot is the generic
+    # parcel-identifier carrier (boise/las_vegas APN precedent).
+    "bbl": ["APN"],
+    "proposed_units": ["UNIT_COUNT"],
+    "proposed_stories": ["FLOOR_COUNT"],
+}
+
+CRIME_FIELD_MAP = {
+    "incident_id": ["offenseid", "ObjectID"],
+    "offense_type": ["nibrsdesc"],
+    "occurred_date": ["offendate"],
+    # datecreated is the record/report creation timestamp; dateupdated is
+    # maintenance noise and deliberately not a candidate.
+    "reported_date": ["datecreated"],
+    "borough": ["COMMUNITY"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+    "crime": CRIME_FIELD_MAP,
+}
+
+DROPPED_NOISE_COLUMNS = (
+    "SHAPE.STArea()",
+    "SHAPE.STLength()",
+    "dateupdated",
+    "callid",
+    "InstanceID",
+    "GlobalID",
+    "rpdunique",
+)
+
 """Inland Empire (Riverside County anchor) spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -71,10 +110,6 @@ Live-probe evidence (all probed 2026-08-28 UTC, this stream):
 """
 
 
-from src.producers.field_maps_inland_empire import (
-    CRIME_FIELD_MAP,
-    PERMITS_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 INLAND_EMPIRE_CITY_ID: str = "inland_empire"

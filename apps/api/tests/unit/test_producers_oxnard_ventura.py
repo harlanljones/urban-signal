@@ -311,7 +311,7 @@ class TestFeedRegistration:
         assert spec.oid_field == "OBJECTID"
         assert spec.max_record_count == 16000
         assert spec.order_by == "DATEISSUE DESC"
-        assert spec.field_map is SLA_FIELD_MAP
+        assert spec.field_map == SLA_FIELD_MAP
         # Local vendor grid, not a declared state-plane zone.
         assert spec.state_plane_crs is None
         assert spec.state_plane_x_col is None
@@ -330,7 +330,7 @@ class TestFeedRegistration:
         assert spec.oid_field == "objectid"
         assert spec.max_record_count == 10000
         assert spec.order_by == "ReportedOn DESC"
-        assert spec.field_map is COMPLAINTS_311_FIELD_MAP
+        assert spec.field_map == COMPLAINTS_311_FIELD_MAP
 
     def test_crime_spec_matches_live_layer(self):
         spec = get_oxnard_ventura_dataset("crime")
@@ -345,7 +345,7 @@ class TestFeedRegistration:
         assert spec.oid_field == "ObjectID"
         assert spec.max_record_count == 2000
         assert spec.order_by == "Incident_Date_Start DESC"
-        assert spec.field_map is CRIME_FIELD_MAP
+        assert spec.field_map == CRIME_FIELD_MAP
 
     @pytest.mark.parametrize("absent_feed", ["permits", "deeds", "evictions", "street_cut"])
     def test_absent_feeds_raise_readable_errors(self, absent_feed):

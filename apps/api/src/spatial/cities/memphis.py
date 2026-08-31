@@ -1,3 +1,49 @@
+PERMITS_FIELD_MAP = {
+    "job_id": ["Record_ID", "ObjectId", "OBJECTID"],
+    "issuance_date": ["Issued_Date"],
+    "job_type": ["Construction_Type", "Sub_Type", "Description"],
+    "cost": ["Valuation"],
+    "address_street": ["Address"],
+    "zipcode": ["ZIP_Code"],
+    "borough": ["City"],
+    "latitude": ["Latitude"],
+    "longitude": ["Longitude"],
+}
+
+COMPLAINTS_311_FIELD_MAP = {
+    "incident_id": ["INCIDENT_NUMBER", "INCIDENT_ID", "OBJECTID"],
+    "complaint_type": ["REQUEST_TYPE", "DEPARTMENT"],
+    "created_date": ["REPORTED_DATE"],
+    "closed_date": ["RESOLVED_DATE"],
+    "status": ["REQUEST_STATUS"],
+    "incident_address": ["Location_Address"],
+    "zipcode": ["ZipCode"],
+    "descriptor": ["REQUEST_SUMMARY", "REQUEST_TYPE"],
+    "borough": ["neigh_desc", "cd_desc", "DEPARTMENT"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+    "311": COMPLAINTS_311_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Memphis, TN"
+
+DROPPED_PII_COLUMNS = (
+    "CONTACT_NAME",
+    "CONTACT_EMAIL",
+    "CONTACT_PHONE",
+    "CONTACT_NAME_FIRST",
+    "Owner_Name",
+    "Owner_Joint_Name",
+    "Owner_Location_Address",
+    "Owner_Unit_Address",
+    "MLGW_CUSTOMER",
+    "MLGW_CONTACT1",
+    "MLGW_CONTACT2",
+    "MLGW_EMAIL",
+)
+
 """Memphis / Shelby County spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -25,11 +71,6 @@ Live-probe caveats that define this leaf (2026-08-27, US-201):
 
 from typing import Dict
 
-from src.producers.field_maps_memphis import (
-    COMPLAINTS_311_FIELD_MAP,
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 MEMPHIS_CITY_ID: str = "memphis"

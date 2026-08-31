@@ -1,0 +1,279 @@
+city_id: port_st_lucie
+name: Port St. Lucie
+state: FL
+center:
+  lat: 27.28
+  lng: -80.36
+metro_bbox:
+  min_lat: 27.15
+  max_lat: 27.4
+  min_lng: -80.5
+  max_lng: -80.2
+division_bboxes:
+  TRADITION_WEST:
+    min_lat: 27.23
+    max_lat: 27.34
+    min_lng: -80.48
+    max_lng: -80.38
+  CENTRAL:
+    min_lat: 27.22
+    max_lat: 27.34
+    min_lng: -80.38
+    max_lng: -80.3
+  EAST_RIVER:
+    min_lat: 27.23
+    max_lat: 27.36
+    min_lng: -80.3
+    max_lng: -80.22
+submarkets:
+  Tradition & Western PSL:
+    name: Tradition & Western PSL
+    borough: TRADITION_WEST
+    lat: 27.275
+    lng: -80.43
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.78
+    capex: 5200000.0
+    permit_vel: 28.0
+    shift_ratio: 1.35
+    sla: 48.0
+    description: Master-planned Tradition area and western growth corridor along I-95.
+    city_id: port_st_lucie
+  St. Lucie West:
+    name: St. Lucie West
+    borough: TRADITION_WEST
+    lat: 27.32
+    lng: -80.405
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.8
+    capex: 5600000.0
+    permit_vel: 30.0
+    shift_ratio: 1.38
+    sla: 50.0
+    description: St. Lucie West town center, retail and multifamily infill.
+    city_id: port_st_lucie
+  Crosstown Parkway Corridor:
+    name: Crosstown Parkway Corridor
+    borough: CENTRAL
+    lat: 27.285
+    lng: -80.363
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.76
+    capex: 4800000.0
+    permit_vel: 26.0
+    shift_ratio: 1.32
+    sla: 46.0
+    description: "East\u2013west spine through central PSL with steady residential\
+      \ permitting."
+    city_id: port_st_lucie
+  PSL Blvd Central:
+    name: PSL Blvd Central
+    borough: CENTRAL
+    lat: 27.271
+    lng: -80.327
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.74
+    capex: 4400000.0
+    permit_vel: 24.0
+    shift_ratio: 1.28
+    sla: 44.0
+    description: Port St. Lucie Boulevard central corridor small-lot teardowns and
+      renovations.
+    city_id: port_st_lucie
+  US-1 & East PSL:
+    name: US-1 & East PSL
+    borough: EAST_RIVER
+    lat: 27.3
+    lng: -80.285
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.72
+    capex: 4200000.0
+    permit_vel: 22.0
+    shift_ratio: 1.24
+    sla: 42.0
+    description: US-1 commercial corridor and east-side infill near the North Fork
+      St. Lucie River.
+    city_id: port_st_lucie
+  Jensen Beach South Edge:
+    name: Jensen Beach South Edge
+    borough: EAST_RIVER
+    lat: 27.24
+    lng: -80.267
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.7
+    capex: 3800000.0
+    permit_vel: 20.0
+    shift_ratio: 1.2
+    sla: 40.0
+    description: Northern/eastern edge near Jensen Beach, river-adjacent residential
+      renewal.
+    city_id: port_st_lucie
+divisions:
+  TRADITION_WEST:
+    name: TRADITION_WEST
+    center_lat: 27.3
+    center_lng: -80.43
+    zoom: 12.8
+    bbox:
+      min_lat: 27.23
+      max_lat: 27.34
+      min_lng: -80.48
+      max_lng: -80.38
+    submarkets:
+    - Tradition & Western PSL
+    - St. Lucie West
+    city_id: port_st_lucie
+  CENTRAL:
+    name: CENTRAL
+    center_lat: 27.285
+    center_lng: -80.345
+    zoom: 12.8
+    bbox:
+      min_lat: 27.22
+      max_lat: 27.34
+      min_lng: -80.38
+      max_lng: -80.3
+    submarkets:
+    - Crosstown Parkway Corridor
+    - PSL Blvd Central
+    city_id: port_st_lucie
+  EAST_RIVER:
+    name: EAST_RIVER
+    center_lat: 27.3
+    center_lng: -80.27
+    zoom: 12.8
+    bbox:
+      min_lat: 27.23
+      max_lat: 27.36
+      min_lng: -80.3
+      max_lng: -80.22
+    submarkets:
+    - US-1 & East PSL
+    - Jensen Beach South Edge
+    city_id: port_st_lucie
+datasets:
+  permits:
+    endpoint: https://services1.arcgis.com/YdUP5V6WwzeG8T8r/arcgis/rest/services/Permits/FeatureServer/0
+    platform: arcgis
+    watermark_col: DateIssued
+    id_keys:
+    - PermitID
+    - AddressID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: DateIssued DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Port St. Lucie, FL
+    field_map:
+      job_id:
+      - PermitID
+      issuance_date:
+      - DateIssued
+      - AppliedDate
+      status:
+      - Status
+      job_type:
+      - PermitType
+      - ApplicationType
+      - BuildingType
+      address_street:
+      - ADDRESSWITHUNIT
+    ingestion_mode: incremental
+    oid_field: PermitID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'FL'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- port-st-lucie
+- port st lucie
+- psl
+- port saint lucie
+job_suffix: port_st_lucie

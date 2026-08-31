@@ -1,6 +1,7 @@
 """Configuration module using Pydantic Settings for Urban Signal."""
 
 import json
+from pathlib import Path
 from typing import Annotated
 
 from pydantic import Field, field_validator, model_validator
@@ -21,7 +22,7 @@ class Settings(BaseSettings):
     log_level: str = Field(default="INFO", description="Log level")
     service_name: str = Field(default="urban-signal-predictor")
     city_data_dir: str = Field(
-        default="./src/spatial/cities/data",
+        default=str(Path(__file__).resolve().parent / "spatial" / "cities" / "data"),
         description="Directory containing declarative city-registration definitions",
     )
 
@@ -810,6 +811,20 @@ class Settings(BaseSettings):
         description="Minneapolis On-Sale liquor licenses FeatureServer layer URL (companion Off_Sale registered as companion_endpoints)",
     )
 
+    # Peoria, IL (US-260). The deeds feed is on **Peoria County's** own ArcGIS
+    # server, not the city's — the ArcGIS Hub domain named in the ticket
+    # (peoria.opendata.arcgis.com) does not exist. Residential sales are
+    # year-sliced MapServer layers under one service; `endpoint_by_year` in the
+    # registry resolves the current year and the US-70 rollover drill guards New
+    # Year. Point geometry in Web Mercator, lifted to WGS84 via outSR=4326.
+    arcgis_peoria_deeds_url: str = Field(
+        default=(
+            "https://gis.peoriacounty.gov/arcgis/rest/services/DP/"
+            "ResidentialSales/MapServer/5"
+        ),
+        description="Peoria County current-year residential sales MapServer layer URL",
+    )
+
     # Detroit (ArcGIS FeatureServer — services2 host, camelCase ObjectId)
     arcgis_detroit_permits_url: str = Field(
         default=(
@@ -1120,6 +1135,36 @@ class Settings(BaseSettings):
         description="Connecticut State Licenses and Credentials Socrata endpoint",
     )
 
+    # Connecticut statewide Socrata feeds (US-419). SLA = State Licenses and
+    # Credentials (ngch-56tr); DEEDS = Real Estate Sales / conveyance tax
+    # (5mzw-sjtu). Both are filtered per-city/town at the registry level and
+    # are address-only (needs_geocode=True).
+    socrata_ct_sla_endpoint: str = Field(
+        default="https://data.ct.gov/resource/ngch-56tr.json",
+        description="Connecticut State Licenses and Credentials Socrata endpoint (statewide)",
+    )
+    socrata_ct_deeds_endpoint: str = Field(
+        default="https://data.ct.gov/resource/5mzw-sjtu.json",
+        description="Connecticut Real Estate Sales (2001-2024 GL) Socrata endpoint (statewide)",
+    )
+
+    # Worcester, MA (ArcGIS Hub, US-419). Both layers are non-spatial Tables
+    # (address-only) with text M/D/YYYY date columns.
+    arcgis_worcester_permits_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/j8dqo2DJE7mVUBU1/arcgis/rest/services/"
+            "Building_Permits/FeatureServer/0"
+        ),
+        description="Worcester building permits FeatureServer table URL",
+    )
+    arcgis_worcester_sla_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/j8dqo2DJE7mVUBU1/arcgis/rest/services/"
+            "Food_Establishment_Licenses/FeatureServer/0"
+        ),
+        description="Worcester food establishment licenses FeatureServer table URL",
+    )
+
     # Raleigh, NC / Wake County (ArcGIS, US-151): native point permits and
     # 311 plus polygon parcel sales for the deeds signal.
     arcgis_raleigh_permits_url: str = Field(
@@ -1353,6 +1398,16 @@ class Settings(BaseSettings):
     ckan_san_jose_311_endpoint: str = Field(
         default="ckan://data.sanjoseca.gov/d886727c-60f1-4be7-9a30-f6806375b1a3",
         description="San Jose 2026 311 service requests CKAN datastore resource",
+    )
+
+    # Laredo (US-263): CKAN OpenGov "City of Laredo Building Applications;
+    # Permits; Inspections" — resource 61972510-7b8c-488a-9e88-b73b0112f496,
+    # 91,198 rows, monthly bulk replace, watermark "PERMIT ISS. DATE" newest
+    # 2026-07-02, address-only STREET NBR + STREET (needs_geocode). 311/SLA/deeds
+    # are Tier 3; state super-feed SLA companion (TX TDLR/TREC/TABC Webb 48479).
+    ckan_laredo_permits_endpoint: str = Field(
+        default="ckan://data.openlaredo.com/61972510-7b8c-488a-9e88-b73b0112f496",
+        description="Laredo building permits CKAN datastore resource",
     )
 
     # Boise / Ada County (US-150): residential-only permits. The source layer

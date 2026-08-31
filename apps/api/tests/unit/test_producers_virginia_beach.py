@@ -350,7 +350,7 @@ class TestFeedRegistration:
         assert spec.max_record_count == 2000
         assert spec.expected_cadence_days == 1
         assert spec.non_spatial is True
-        assert spec.field_map is PERMITS_FIELD_MAP
+        assert spec.field_map == PERMITS_FIELD_MAP
 
     def test_sla_spec_declares_text_watermark_and_id_trio(self):
         spec = get_virginia_beach_dataset(FeedType.SLA)
@@ -364,7 +364,7 @@ class TestFeedRegistration:
         assert spec.needs_geocode is True
         assert spec.expected_cadence_days == 365
         assert spec.non_spatial is True
-        assert spec.field_map is SLA_FIELD_MAP
+        assert spec.field_map == SLA_FIELD_MAP
 
     def test_deeds_spec_declares_batch_cadence_and_address_only_contract(self):
         spec = get_virginia_beach_dataset(FeedType.DEEDS)

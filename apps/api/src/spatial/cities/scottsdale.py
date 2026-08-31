@@ -1,3 +1,46 @@
+PERMITS_FIELD_MAP = {
+    "job_id": ["PermitNumber", "permit_id"],
+    "issuance_date": ["IssueDate"],
+    "status": ["PermitStatus"],
+    "job_type": ["PermitType"],
+    "cost": ["Valuation"],
+    "address_street": ["Address"],
+    "latitude": ["Latitude"],
+    "longitude": ["Longitude"],
+}
+
+SLA_FIELD_MAP = {
+    "license_id": ["AcctNum"],
+    "dba": ["Company"],
+    "premises_name": ["Company"],
+    "license_type": ["LicType"],
+    "status": ["AcctStatus"],
+    "effective_date": ["BusinessStartDate"],
+    "address_street": ["ServAddrComp"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+    "sla": SLA_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Scottsdale, AZ"
+
+DROPPED_PII_COLUMNS = (
+    "Owner",
+    "Builder",
+    "ResponsibleParty",
+    "MailAddrComp",
+    "MailAddrCityStateZipComp",
+)
+
+DROPPED_NONADDRESS_COLUMNS = (
+    "ServCityStateZipComp",
+    "ESRI_OID",
+    "CityOfScottsdaleMap",
+    "Shape",
+)
+
 """Scottsdale, AZ spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -61,11 +104,6 @@ Live-probe evidence that defines this leaf (probed 2026-08-28, US-227):
   (Cavasson corridor permit; Desert Highlands / Happy Valley permits).
 """
 
-from src.producers.field_maps_scottsdale import (
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-    SLA_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 SCOTTSDALE_CITY_ID: str = "scottsdale"

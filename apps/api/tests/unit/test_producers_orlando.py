@@ -134,7 +134,7 @@ class TestFeedRegistration:
         assert spec.producer_key == "sla"
         assert spec.needs_geocode is True
         assert spec.geocode_context == "Orlando, FL"
-        assert spec.field_map is SLA_FIELD_MAP
+        assert spec.field_map == SLA_FIELD_MAP
         assert spec.companion_endpoints["str_licenses"] == ORLANDO_STR_ENDPOINT
 
     def test_str_companion_spec_is_also_sla(self):

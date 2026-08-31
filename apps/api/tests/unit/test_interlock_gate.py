@@ -9,6 +9,7 @@ Three invariant classes (see docs/adr/0001-agent-interlock.md):
   containment  -- declared geographic hierarchies actually nest
 """
 
+import importlib
 from pathlib import Path
 from unittest.mock import MagicMock
 
@@ -89,56 +90,31 @@ SPINE_INVARIANTS = {
     "apps/api/src/producers/accela_client.py": ["Accela client reuses ArcGIS REST pagination"],
 }
 
-CITY_EXPORT_NAMES = {
-    CityId.CHICAGO: ("CHICAGO_METRO_BBOX", "CHICAGO_DIVISION_BBOXES", "CHICAGO_DIVISIONS", "CHICAGO_SUBMARKETS"),
-    CityId.SAN_FRANCISCO: ("SAN_FRANCISCO_METRO_BBOX", "SAN_FRANCISCO_DIVISION_BBOXES", "SAN_FRANCISCO_DIVISIONS", "SAN_FRANCISCO_SUBMARKETS"),
-    CityId.SEATTLE: ("SEATTLE_METRO_BBOX", "SEATTLE_DIVISION_BBOXES", "SEATTLE_DIVISIONS", "SEATTLE_SUBMARKETS"),
-    CityId.LOS_ANGELES: ("LA_METRO_BBOX", "LA_DIVISION_BBOXES", "LA_DIVISIONS", "LA_SUBMARKETS"),
-    CityId.NEW_ORLEANS: ("NEW_ORLEANS_METRO_BBOX", "NOLA_DIVISION_BBOXES", "NOLA_DIVISIONS", "NOLA_SUBMARKETS"),
-    CityId.NORFOLK: ("NORFOLK_METRO_BBOX", "NORFOLK_DIVISION_BBOXES", "NORFOLK_DIVISIONS", "NORFOLK_SUBMARKETS"),
-    CityId.DETROIT: ("DETROIT_METRO_BBOX", "DETROIT_DIVISION_BBOXES", "DETROIT_DIVISIONS", "DETROIT_SUBMARKETS"),
-    CityId.AUSTIN: ("AUSTIN_METRO_BBOX", "AUSTIN_DIVISION_BBOXES", "AUSTIN_DIVISIONS", "AUSTIN_SUBMARKETS"),
-    CityId.CINCINNATI: ("CINCINNATI_METRO_BBOX", "CINCINNATI_DIVISION_BBOXES", "CINCINNATI_DIVISIONS", "CINCINNATI_SUBMARKETS"),
-    CityId.BOSTON: ("BOSTON_METRO_BBOX", "BOSTON_DIVISION_BBOXES", "BOSTON_DIVISIONS", "BOSTON_SUBMARKETS"),
-    CityId.BALTIMORE: ("BALTIMORE_METRO_BBOX", "BALTIMORE_DIVISION_BBOXES", "BALTIMORE_DIVISIONS", "BALTIMORE_SUBMARKETS"),
-    CityId.MONTGOMERY: ("MONTGOMERY_METRO_BBOX", "MONTGOMERY_DIVISION_BBOXES", "MONTGOMERY_DIVISIONS", "MONTGOMERY_SUBMARKETS"),
-    CityId.BATON_ROUGE: ("BATON_ROUGE_METRO_BBOX", "BATON_ROUGE_DIVISION_BBOXES", "BATON_ROUGE_DIVISIONS", "BATON_ROUGE_SUBMARKETS"),
-    CityId.DENVER: ("DENVER_METRO_BBOX", "DENVER_DIVISION_BBOXES", "DENVER_DIVISIONS", "DENVER_SUBMARKETS"),
-    CityId.PHILADELPHIA: ("PHILADELPHIA_METRO_BBOX", "PHL_DIVISION_BBOXES", "PHL_DIVISIONS", "PHL_SUBMARKETS"),
-    CityId.WASHINGTON_DC: ("DC_METRO_BBOX", "DC_DIVISION_BBOXES", "DC_DIVISIONS", "DC_SUBMARKETS"),
-    CityId.MINNEAPOLIS: ("MINNEAPOLIS_METRO_BBOX", "MINNEAPOLIS_DIVISION_BBOXES", "MINNEAPOLIS_DIVISIONS", "MINNEAPOLIS_SUBMARKETS"),
-    CityId.SAN_DIEGO: ("SAN_DIEGO_METRO_BBOX", "SAN_DIEGO_DIVISION_BBOXES", "SAN_DIEGO_DIVISIONS", "SAN_DIEGO_SUBMARKETS"),
-    CityId.HOUSTON: ("HOUSTON_METRO_BBOX", "HOUSTON_DIVISION_BBOXES", "HOUSTON_DIVISIONS", "HOUSTON_SUBMARKETS"),
-    CityId.INDIANAPOLIS: ("INDIANAPOLIS_METRO_BBOX", "INDIANAPOLIS_DIVISION_BBOXES", "INDIANAPOLIS_DIVISIONS", "INDIANAPOLIS_SUBMARKETS"),
-    CityId.WICHITA: ("WICHITA_METRO_BBOX", "WICHITA_DIVISION_BBOXES", "WICHITA_DIVISIONS", "WICHITA_SUBMARKETS"),
-    CityId.CHATTANOOGA: ("CHATTANOOGA_METRO_BBOX", "CHATTANOOGA_DIVISION_BBOXES", "CHATTANOOGA_DIVISIONS", "CHATTANOOGA_SUBMARKETS"),
-    CityId.CLEVELAND: ("CLEVELAND_METRO_BBOX", "CLEVELAND_DIVISION_BBOXES", "CLEVELAND_DIVISIONS", "CLEVELAND_SUBMARKETS"),
-    CityId.HARTFORD: ("HARTFORD_METRO_BBOX", "HARTFORD_DIVISION_BBOXES", "HARTFORD_DIVISIONS", "HARTFORD_SUBMARKETS"),
-    CityId.RALEIGH: ("RALEIGH_METRO_BBOX", "RALEIGH_DIVISION_BBOXES", "RALEIGH_DIVISIONS", "RALEIGH_SUBMARKETS"),
-    CityId.SAN_ANTONIO: ("SAN_ANTONIO_METRO_BBOX", "SAN_ANTONIO_DIVISION_BBOXES", "SAN_ANTONIO_DIVISIONS", "SAN_ANTONIO_SUBMARKETS"),
-    CityId.SACRAMENTO: ("SACRAMENTO_METRO_BBOX", "SACRAMENTO_DIVISION_BBOXES", "SACRAMENTO_DIVISIONS", "SACRAMENTO_SUBMARKETS"),
-    CityId.SPOKANE: ("SPOKANE_METRO_BBOX", "SPOKANE_DIVISION_BBOXES", "SPOKANE_DIVISIONS", "SPOKANE_SUBMARKETS"),
-    CityId.DAYTON: ("DAYTON_METRO_BBOX", "DAYTON_DIVISION_BBOXES", "DAYTON_DIVISIONS", "DAYTON_SUBMARKETS"),
-    CityId.TULSA: ("TULSA_METRO_BBOX", "TULSA_DIVISION_BBOXES", "TULSA_DIVISIONS", "TULSA_SUBMARKETS"),
-    CityId.EL_PASO: ("EL_PASO_METRO_BBOX", "EL_PASO_DIVISION_BBOXES", "EL_PASO_DIVISIONS", "EL_PASO_SUBMARKETS"),
-    CityId.DURHAM: ("DURHAM_METRO_BBOX", "DURHAM_DIVISION_BBOXES", "DURHAM_DIVISIONS", "DURHAM_SUBMARKETS"),
-    CityId.DALLAS: ("DALLAS_METRO_BBOX", "DALLAS_DIVISION_BBOXES", "DALLAS_DIVISIONS", "DALLAS_SUBMARKETS"),
-    CityId.LOUISVILLE: ("LOUISVILLE_METRO_BBOX", "LOUISVILLE_DIVISION_BBOXES", "LOUISVILLE_DIVISIONS", "LOUISVILLE_SUBMARKETS"),
-    CityId.PORTLAND: ("PORTLAND_METRO_BBOX", "PORTLAND_DIVISION_BBOXES", "PORTLAND_DIVISIONS", "PORTLAND_SUBMARKETS"),
-    CityId.SAN_JOSE: ("SAN_JOSE_METRO_BBOX", "SAN_JOSE_DIVISION_BBOXES", "SAN_JOSE_DIVISIONS", "SAN_JOSE_SUBMARKETS"),
-    CityId.TAMPA: ("TAMPA_METRO_BBOX", "TAMPA_DIVISION_BBOXES", "TAMPA_DIVISIONS", "TAMPA_SUBMARKETS"),
-    CityId.LAS_VEGAS: ("LAS_VEGAS_METRO_BBOX", "LAS_VEGAS_DIVISION_BBOXES", "LAS_VEGAS_DIVISIONS", "LAS_VEGAS_SUBMARKETS"),
-    CityId.BOISE: ("BOISE_METRO_BBOX", "BOISE_DIVISION_BBOXES", "BOISE_DIVISIONS", "BOISE_SUBMARKETS"),
-    CityId.RENO: ("RENO_METRO_BBOX", "RENO_DIVISION_BBOXES", "RENO_DIVISIONS", "RENO_SUBMARKETS"),
-    CityId.MADISON: ("MADISON_METRO_BBOX", "MADISON_DIVISION_BBOXES", "MADISON_DIVISIONS", "MADISON_SUBMARKETS"),
+# Geometry attribute -> canonical leaf-constant suffix. The export name for a
+# city is derived from the CityId -> cities/<id>.py naming convention (US-429):
+# ``<CITY_ID_UPPER>_<SUFFIX>``. No per-city literal table.
+GEOMETRY_EXPORT_SUFFIXES = {
+    "metro_bbox": "METRO_BBOX",
+    "division_bboxes": "DIVISION_BBOXES",
+    "divisions": "DIVISIONS",
+    "submarkets": "SUBMARKETS",
 }
 
-EXPORT_ATTR_MAP = {
-    0: "metro_bbox",
-    1: "division_bboxes",
-    2: "divisions",
-    3: "submarkets",
-}
+
+def _city_export_modules(cid: CityId) -> list[object]:
+    """Modules carrying the city's registered geometry constants.
+
+    Derived from the ``CityId -> cities/<id>.py`` naming convention. NYC is
+    the one exception: its metro bbox and submarkets live in
+    ``src.spatial.submarkets`` while its divisions live in ``cities/nyc.py``,
+    so both are searched.
+    """
+    if cid is CityId.NYC:
+        import src.spatial.cities.nyc as nyc_module
+        from src.spatial import submarkets as submarkets_pkg
+
+        return [nyc_module, submarkets_pkg]
+    return [importlib.import_module(f"src.spatial.cities.{cid.value}")]
 
 
 def _bbox_contains(outer: dict, inner: dict) -> bool:
@@ -301,15 +277,42 @@ class TestContainment:
 @pytest.mark.interlock
 class TestPackageExportsMatchRegistry:
     def test_city_constants_importable_and_identical(self):
-        for cid, export_names in CITY_EXPORT_NAMES.items():
-            reg = REGISTRY[cid]
-            for idx, export_name in enumerate(export_names):
-                exported = getattr(cities_pkg, export_name, None)
-                assert exported is not None, f"src.spatial.cities does not export {export_name}"
-                attr = EXPORT_ATTR_MAP[idx]
-                assert exported is getattr(reg, attr), (
-                    f"{export_name} is not the object registered as {cid.value}.{attr}"
-                )
+        for cid, reg in REGISTRY.items():
+            for module in _city_export_modules(cid):
+                for attr, suffix in GEOMETRY_EXPORT_SUFFIXES.items():
+                    target = getattr(reg, attr)
+                    bound = [
+                        name
+                        for name, value in vars(module).items()
+                        if value is target
+                    ]
+                    assert bound, (
+                        f"{module.__name__} binds no name to {cid.value}.{attr} — "
+                        f"the leaf does not resolve its registered geometry"
+                    )
+                    if cid is CityId.NYC:
+                        # Identity is covered by
+                        # test_nyc_constants_live_in_submarkets_module; nyc.py
+                        # also bridges non-suffix aliases (NYC_BOROUGH_BBOXES).
+                        continue
+                    canonical = f"{cid.value.upper()}_{suffix}"
+                    assert canonical in bound, (
+                        f"{module.__name__} binds {cid.value}.{attr} only under "
+                        f"{bound}; canonical {canonical} is missing or a copy"
+                    )
+                    assert getattr(cities_pkg, canonical) is target, (
+                        f"src.spatial.cities does not re-export {canonical}"
+                    )
+
+    def test_every_city_id_resolves_to_a_leaf_module(self):
+        for cid in CityId:
+            if cid is CityId.NYC:
+                continue
+            module = _city_export_modules(cid)[0]
+            assert module.__name__ == f"src.spatial.cities.{cid.value}"
+            assert hasattr(module, "REGISTRATION"), (
+                f"cities/{cid.value}.py does not resolve to a registered leaf module"
+            )
 
     def test_nyc_constants_live_in_submarkets_module(self):
         from src.spatial import submarkets as submarkets_pkg
@@ -354,18 +357,35 @@ class TestDashboardWiring:
         assert self.DASHBOARD.exists(), f"{self.DASHBOARD} missing — the map was deleted?"
         return self.DASHBOARD.read_text()
 
-    def test_every_registered_city_has_a_metro_meta_entry(self):
+    def _metro_meta_ids(self, text: str) -> set[str]:
+        """Parse the city ids out of a rendered METRO_META block.
+
+        Same shape the CI/CD pre-flight parser reads
+        (scripts/verify_cicd_preflight.py::_metro_meta_ids). The block is
+        generated from REGISTRY by get_dashboard_html() (US-427), so this is
+        an interface check, not a source-text grep.
+        """
         import re
 
-        src = self._dashboard()
-        missing = [
-            cid.value
-            for cid in REGISTRY
-            if not re.search(rf"(?m)^\s+{re.escape(cid.value)}: \{{ name:", src)
-        ]
+        match = re.search(r"const METRO_META = \{(.*?)\n\s*\};", text, re.DOTALL)
+        if not match:
+            return set()
+        return set(re.findall(r"^\s+(\w+): \{ name:", match.group(1), re.MULTILINE))
+
+    def test_every_registered_city_has_a_metro_meta_entry(self):
+        from src.serving.dashboard import get_dashboard_html
+
+        on_map = self._metro_meta_ids(get_dashboard_html())
+        registered = {cid.value for cid in REGISTRY}
+        missing = sorted(registered - on_map)
         assert not missing, (
             f"registered but not on the map (no METRO_META entry): {missing}. "
-            f"Wire METRO_META in the same spine hold as the REGISTRY entry."
+            f"METRO_META is generated from REGISTRY (US-427) — a missing entry "
+            f"means the dashboard generator is not seeing the registration."
+        )
+        stale = sorted(on_map - registered)
+        assert not stale, (
+            f"on the map but not registered: {stale}. Drop the stale entry."
         )
 
     def test_metro_chips_nav_is_present(self):
@@ -376,7 +396,6 @@ class TestDashboardWiring:
         )
 
     def test_worker_static_copy_is_in_sync_and_carries_every_city(self):
-        import re
 
         from src.serving.dashboard import get_dashboard_html
 
@@ -391,14 +410,11 @@ class TestDashboardWiring:
             f"{self.WORKER_STATIC} is a stale static copy. "
             f"Run python scripts/export_dashboard.py before closing the wave."
         )
-        stale = [
-            cid.value
-            for cid in REGISTRY
-            if not re.search(rf"(?m)^\s+{re.escape(cid.value)}: \{{ name:", rendered)
-        ]
+        stale = sorted(self._metro_meta_ids(rendered) - {cid.value for cid in REGISTRY})
         assert not stale, (
-            f"apps/dashboard/public/index.html lost metro metadata for {stale}. "
-            f"Re-sync it from get_dashboard_html() before closing the wave."
+            f"apps/dashboard/public/index.html carries metro metadata for "
+            f"{stale} without a REGISTRY entry. Re-sync it from "
+            f"get_dashboard_html() before closing the wave."
         )
 
 

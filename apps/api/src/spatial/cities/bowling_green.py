@@ -1,3 +1,16 @@
+GEOCODE_CONTEXT = "Bowling Green, KY"
+
+BOWLING_GREEN_PERMITS_FIELD_MAP = {
+    "job_id": ["PermitNum", "OBJECTID"],
+    "job_type": ["PermitUse"],
+    "issuance_date": ["created_date"],
+    "cost": ["PermitCost"],
+}
+
+FIELD_MAP = {
+    "permits": BOWLING_GREEN_PERMITS_FIELD_MAP,
+}
+
 """Bowling Green / Warren County Metro Submarket Registry and Spatial Layer.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -62,10 +75,6 @@ is padded to that extent.
 
 from typing import Dict
 
-from src.producers.field_maps_bowling_green import (
-    BOWLING_GREEN_PERMITS_FIELD_MAP,
-    GEOCODE_CONTEXT,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 BOWLING_GREEN_CITY_ID: str = "bowling_green"

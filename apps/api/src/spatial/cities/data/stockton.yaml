@@ -1,0 +1,428 @@
+city_id: stockton
+name: Stockton
+state: CA
+center:
+  lat: 37.9577
+  lng: -121.29
+metro_bbox:
+  min_lat: 37.85
+  max_lat: 38.1
+  min_lng: -121.44
+  max_lng: -121.16
+division_bboxes:
+  DOWNTOWN_WATERFRONT:
+    min_lat: 37.944
+    max_lat: 37.97
+    min_lng: -121.31
+    max_lng: -121.278
+  MIDTOWN_MIRACLE_MILE:
+    min_lat: 37.956
+    max_lat: 37.99
+    min_lng: -121.335
+    max_lng: -121.31
+  NORTH_LINCOLN_VILLAGE:
+    min_lat: 37.962
+    max_lat: 38.005
+    min_lng: -121.278
+    max_lng: -121.205
+  WEST_BROOKSIDE:
+    min_lat: 37.95
+    max_lat: 37.97
+    min_lng: -121.368
+    max_lng: -121.335
+  SOUTHWEST_SPANOS:
+    min_lat: 37.9
+    max_lat: 37.95
+    min_lng: -121.368
+    max_lng: -121.305
+  SOUTH_CENTRAL:
+    min_lat: 37.895
+    max_lat: 37.944
+    min_lng: -121.305
+    max_lng: -121.285
+  SOUTHEAST_WESTON:
+    min_lat: 37.895
+    max_lat: 37.955
+    min_lng: -121.285
+    max_lng: -121.205
+submarkets:
+  Downtown Core:
+    name: Downtown Core
+    borough: DOWNTOWN_WATERFRONT
+    lat: 37.9577
+    lng: -121.29
+    zoom: 14.5
+    pitch: 52.0
+    base_lims: 0.84
+    capex: 7800000.0
+    permit_vel: 30.0
+    shift_ratio: 1.48
+    sla: 58.0
+    description: Civic-center and Hunter Square core with the arena-waterfront entertainment
+      district, historic Mariclare and Medico-Dental building reuse, and adaptive-reuse
+      permitting.
+    city_id: stockton
+  Banner Island & Waterfront:
+    name: Banner Island & Waterfront
+    borough: DOWNTOWN_WATERFRONT
+    lat: 37.9535
+    lng: -121.301
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.8
+    capex: 6400000.0
+    permit_vel: 24.0
+    shift_ratio: 1.42
+    sla: 52.0
+    description: Banner Island ballpark district and the Weber Point waterfront promenade
+      with stadium-adjacent hospitality licensing and event-economy turnover.
+    city_id: stockton
+  Miracle Mile:
+    name: Miracle Mile
+    borough: MIDTOWN_MIRACLE_MILE
+    lat: 37.9666
+    lng: -121.319
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.86
+    capex: 7200000.0
+    permit_vel: 28.0
+    shift_ratio: 1.5
+    sla: 62.0
+    description: Pacific Avenue's Miracle Mile with independent restaurants and taprooms,
+      the Fox/Bob Hope theatre block, and the metro's densest on-sale license strip.
+    city_id: stockton
+  University of the Pacific:
+    name: University of the Pacific
+    borough: MIDTOWN_MIRACLE_MILE
+    lat: 37.9802
+    lng: -121.3122
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.82
+    capex: 6800000.0
+    permit_vel: 25.0
+    shift_ratio: 1.46
+    sla: 55.0
+    description: UOP campus and Lincoln Center shopping belt with student-housing
+      turnover, medical-office demand, and steady neighborhood-retail licensing.
+    city_id: stockton
+  Lincoln Village & Park Nine:
+    name: Lincoln Village & Park Nine
+    borough: NORTH_LINCOLN_VILLAGE
+    lat: 37.974
+    lng: -121.2755
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.76
+    capex: 4800000.0
+    permit_vel: 22.0
+    shift_ratio: 1.36
+    sla: 44.0
+    description: Post-war Lincoln Village tracts east of the El Dorado corridor with
+      renovation-led permitting and neighborhood-market license churn.
+    city_id: stockton
+  Eastland Plaza:
+    name: Eastland Plaza
+    borough: NORTH_LINCOLN_VILLAGE
+    lat: 37.965
+    lng: -121.274
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.74
+    capex: 4400000.0
+    permit_vel: 20.0
+    shift_ratio: 1.34
+    sla: 42.0
+    description: Eastland Plaza and East Harding Way retail node with family-market
+      grocers, strip-lot refurbishment, and off-sale license turnover.
+    city_id: stockton
+  Brookside:
+    name: Brookside
+    borough: WEST_BROOKSIDE
+    lat: 37.9505
+    lng: -121.342
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.88
+    capex: 8400000.0
+    permit_vel: 26.0
+    shift_ratio: 1.52
+    sla: 60.0
+    description: Brookside planned community west of I-5 with office-park retrofit,
+      Trinity Parkway retail pads, and high-valuation residential permitting.
+    city_id: stockton
+  West Lane & Country Club:
+    name: West Lane & Country Club
+    borough: WEST_BROOKSIDE
+    lat: 37.962
+    lng: -121.343
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.78
+    capex: 5200000.0
+    permit_vel: 22.0
+    shift_ratio: 1.38
+    sla: 48.0
+    description: Country Club Boulevard commercial spine with the golf-course anchor,
+      westside strip retail, and steady service-business licensing.
+    city_id: stockton
+  Quail Lakes & Heritage:
+    name: Quail Lakes & Heritage
+    borough: SOUTHWEST_SPANOS
+    lat: 37.9455
+    lng: -121.329
+    zoom: 14.0
+    pitch: 44.0
+    base_lims: 0.84
+    capex: 7000000.0
+    permit_vel: 24.0
+    shift_ratio: 1.47
+    sla: 56.0
+    description: Quail Lakes shopping district and the Heritage planned community
+      with pool/roof permitting and family-restaurant licensing.
+    city_id: stockton
+  Spanos Park:
+    name: Spanos Park
+    borough: SOUTHWEST_SPANOS
+    lat: 37.933
+    lng: -121.313
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.86
+    capex: 7600000.0
+    permit_vel: 23.0
+    shift_ratio: 1.49
+    sla: 54.0
+    description: Spanos Park residential-golf community along West Eight Mile Road
+      with new-build tract permitting and clubhouse-adjacent hospitality.
+    city_id: stockton
+  South Stockton & Fairgrounds:
+    name: South Stockton & Fairgrounds
+    borough: SOUTH_CENTRAL
+    lat: 37.937
+    lng: -121.289
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.72
+    capex: 4600000.0
+    permit_vel: 21.0
+    shift_ratio: 1.4
+    sla: 46.0
+    description: San Joaquin County Fairgrounds district and the California Street
+      corridor with community-reinvestment permits and neighborhood-market licensing.
+    city_id: stockton
+  El Dorado & South Central:
+    name: El Dorado & South Central
+    borough: SOUTH_CENTRAL
+    lat: 37.918
+    lng: -121.2965
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.7
+    capex: 4200000.0
+    permit_vel: 19.0
+    shift_ratio: 1.36
+    sla: 40.0
+    description: South El Dorado Street spine with taquerias and markets, Wilson Elementary-area
+      infill, and steady small-operator license turnover.
+    city_id: stockton
+  Weston Ranch:
+    name: Weston Ranch
+    borough: SOUTHEAST_WESTON
+    lat: 37.925
+    lng: -121.282
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.78
+    capex: 5600000.0
+    permit_vel: 23.0
+    shift_ratio: 1.44
+    sla: 43.0
+    description: Master-planned Weston Ranch along Manthey Road with builder-driven
+      new-construction permitting and neighborhood retail pads.
+    city_id: stockton
+  Airport & Arch Road Industrial:
+    name: Airport & Arch Road Industrial
+    borough: SOUTHEAST_WESTON
+    lat: 37.902
+    lng: -121.258
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.68
+    capex: 5000000.0
+    permit_vel: 20.0
+    shift_ratio: 1.32
+    sla: 38.0
+    description: Stockton Metropolitan Airport and Arch Airport industrial belt with
+      logistics-warehouse permits and cannabis-license adjacency to the southeast.
+    city_id: stockton
+divisions:
+  DOWNTOWN_WATERFRONT:
+    name: DOWNTOWN_WATERFRONT
+    center_lat: 37.957
+    center_lng: -121.294
+    zoom: 14.0
+    bbox:
+      min_lat: 37.944
+      max_lat: 37.97
+      min_lng: -121.31
+      max_lng: -121.278
+    submarkets:
+    - Downtown Core
+    - Banner Island & Waterfront
+    city_id: stockton
+  MIDTOWN_MIRACLE_MILE:
+    name: MIDTOWN_MIRACLE_MILE
+    center_lat: 37.973
+    center_lng: -121.322
+    zoom: 14.0
+    bbox:
+      min_lat: 37.956
+      max_lat: 37.99
+      min_lng: -121.335
+      max_lng: -121.31
+    submarkets:
+    - Miracle Mile
+    - University of the Pacific
+    city_id: stockton
+  NORTH_LINCOLN_VILLAGE:
+    name: NORTH_LINCOLN_VILLAGE
+    center_lat: 37.983
+    center_lng: -121.24
+    zoom: 13.0
+    bbox:
+      min_lat: 37.962
+      max_lat: 38.005
+      min_lng: -121.278
+      max_lng: -121.205
+    submarkets:
+    - Lincoln Village & Park Nine
+    - Eastland Plaza
+    city_id: stockton
+  WEST_BROOKSIDE:
+    name: WEST_BROOKSIDE
+    center_lat: 37.96
+    center_lng: -121.351
+    zoom: 13.5
+    bbox:
+      min_lat: 37.95
+      max_lat: 37.97
+      min_lng: -121.368
+      max_lng: -121.335
+    submarkets:
+    - Brookside
+    - West Lane & Country Club
+    city_id: stockton
+  SOUTHWEST_SPANOS:
+    name: SOUTHWEST_SPANOS
+    center_lat: 37.925
+    center_lng: -121.336
+    zoom: 13.0
+    bbox:
+      min_lat: 37.9
+      max_lat: 37.95
+      min_lng: -121.368
+      max_lng: -121.305
+    submarkets:
+    - Quail Lakes & Heritage
+    - Spanos Park
+    city_id: stockton
+  SOUTH_CENTRAL:
+    name: SOUTH_CENTRAL
+    center_lat: 37.92
+    center_lng: -121.3
+    zoom: 13.5
+    bbox:
+      min_lat: 37.895
+      max_lat: 37.944
+      min_lng: -121.305
+      max_lng: -121.285
+    submarkets:
+    - South Stockton & Fairgrounds
+    - El Dorado & South Central
+    city_id: stockton
+  SOUTHEAST_WESTON:
+    name: SOUTHEAST_WESTON
+    center_lat: 37.925
+    center_lng: -121.25
+    zoom: 13.0
+    bbox:
+      min_lat: 37.895
+      max_lat: 37.955
+      min_lng: -121.285
+      max_lng: -121.205
+    submarkets:
+    - Weston Ranch
+    - Airport & Arch Road Industrial
+    city_id: stockton
+datasets:
+  sla:
+    endpoint: https://gisportal.stocktonca.gov/arcgis2/rest/services/OpenCounter/OpenCounterMap/MapServer/7
+    platform: arcgis
+    watermark_col: OriginalIssueDate
+    id_keys:
+    - FileNumber
+    - OBJECTID
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: OriginalIssueDate DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Stockton, CA
+    field_map:
+      license_id:
+      - FileNumber
+      - OBJECTID
+      dba:
+      - PremiseName
+      premises_name:
+      - OwnerName
+      license_type:
+      - LicenseType
+      - LicenseCode
+      status:
+      - Status
+      effective_date:
+      - OriginalIssueDate
+      expiration_date:
+      - ExpirationDate
+      address_street:
+      - PremiseAddress
+      - PremiseAddress2
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: true
+    alarm_exempt_reason: 'current-license snapshot republished by the city GIS team:
+      the watermark is the ABC original issue date, not the republication timestamp,
+      and premise issuance runs ~1/week (61 rows dated 2026); an alarm on issue-date
+      freshness would false-positive on the publication lag'
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: EPSG:2227
+    state_plane_units: ftUS
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- stockton_ca
+- stockton-ca
+- stockton ca
+job_suffix: stockton

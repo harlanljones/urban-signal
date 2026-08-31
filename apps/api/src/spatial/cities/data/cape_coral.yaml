@@ -1,0 +1,356 @@
+city_id: cape_coral
+name: "Cape Coral\u2013Fort Myers"
+state: FL
+center:
+  lat: 26.58
+  lng: -81.92
+metro_bbox:
+  min_lat: 26.4
+  max_lat: 26.8
+  min_lng: -82.15
+  max_lng: -81.7
+division_bboxes:
+  CAPE_CORE_WATERFRONT:
+    min_lat: 26.55
+    max_lat: 26.65
+    min_lng: -82.05
+    max_lng: -81.92
+  CAPE_SW_ISLES:
+    min_lat: 26.52
+    max_lat: 26.6
+    min_lng: -82.1
+    max_lng: -82.0
+  CAPE_NW_GATOR:
+    min_lat: 26.6
+    max_lat: 26.72
+    min_lng: -82.1
+    max_lng: -81.98
+  FORT_MYERS_CORE:
+    min_lat: 26.6
+    max_lat: 26.67
+    min_lng: -81.91
+    max_lng: -81.83
+  NORTH_FORT_MYERS:
+    min_lat: 26.67
+    max_lat: 26.76
+    min_lng: -81.95
+    max_lng: -81.82
+submarkets:
+  Cape Coral Pkwy & Marina:
+    name: Cape Coral Pkwy & Marina
+    borough: CAPE_CORE_WATERFRONT
+    lat: 26.562
+    lng: -81.948
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.86
+    capex: 7200000.0
+    permit_vel: 34.0
+    shift_ratio: 1.42
+    sla: 55.0
+    description: Cape Coral Parkway corridor and yacht club/marina district with steady
+      residential reinvestment.
+    city_id: cape_coral
+  Bimini Basin & Downtown:
+    name: Bimini Basin & Downtown
+    borough: CAPE_CORE_WATERFRONT
+    lat: 26.563
+    lng: -81.956
+    zoom: 15.0
+    pitch: 52.0
+    base_lims: 0.88
+    capex: 7800000.0
+    permit_vel: 36.0
+    shift_ratio: 1.48
+    sla: 58.0
+    description: Downtown Cape Coral and Bimini Basin waterfront infill with mixed-use
+      and hospitality momentum.
+    city_id: cape_coral
+  Pelican Blvd & Mohawk:
+    name: Pelican Blvd & Mohawk
+    borough: CAPE_CORE_WATERFRONT
+    lat: 26.58
+    lng: -81.976
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.8
+    capex: 5600000.0
+    permit_vel: 28.0
+    shift_ratio: 1.35
+    sla: 50.0
+    description: Southwest grid of canals with teardowns and substantial single-family
+      rebuild permits.
+    city_id: cape_coral
+  Southwest Isles & Cape Harbour:
+    name: Southwest Isles & Cape Harbour
+    borough: CAPE_SW_ISLES
+    lat: 26.54
+    lng: -82.026
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.82
+    capex: 6200000.0
+    permit_vel: 30.0
+    shift_ratio: 1.4
+    sla: 54.0
+    description: Cape Harbour and deepwater canal neighborhoods with high-value renovation
+      and pool permits.
+    city_id: cape_coral
+  Surfside & Veterans Pkwy:
+    name: Surfside & Veterans Pkwy
+    borough: CAPE_SW_ISLES
+    lat: 26.575
+    lng: -82.03
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.76
+    capex: 4800000.0
+    permit_vel: 24.0
+    shift_ratio: 1.28
+    sla: 46.0
+    description: Retail and residential mix along Veterans Parkway with steady small-scale
+      permits.
+    city_id: cape_coral
+  Northwest Cape & Burnt Store:
+    name: Northwest Cape & Burnt Store
+    borough: CAPE_NW_GATOR
+    lat: 26.655
+    lng: -82.045
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.7
+    capex: 3800000.0
+    permit_vel: 18.0
+    shift_ratio: 1.18
+    sla: 40.0
+    description: Exurban expansion corridor toward Burnt Store Road with new single-family
+      starts.
+    city_id: cape_coral
+  Downtown Fort Myers River District:
+    name: Downtown Fort Myers River District
+    borough: FORT_MYERS_CORE
+    lat: 26.642
+    lng: -81.871
+    zoom: 15.0
+    pitch: 52.0
+    base_lims: 0.88
+    capex: 8000000.0
+    permit_vel: 35.0
+    shift_ratio: 1.5
+    sla: 60.0
+    description: Historic riverfront core with mid-rise infill and hospitality redevelopment.
+    city_id: cape_coral
+  North Fort Myers & Hancock Bridge:
+    name: North Fort Myers & Hancock Bridge
+    borough: NORTH_FORT_MYERS
+    lat: 26.685
+    lng: -81.89
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.74
+    capex: 4200000.0
+    permit_vel: 20.0
+    shift_ratio: 1.24
+    sla: 44.0
+    description: Commercial strips and older subdivisions north of the river with
+      moderate permit activity.
+    city_id: cape_coral
+divisions:
+  CAPE_CORE_WATERFRONT:
+    name: CAPE_CORE_WATERFRONT
+    center_lat: 26.568
+    center_lng: -81.957
+    zoom: 13.5
+    bbox:
+      min_lat: 26.55
+      max_lat: 26.65
+      min_lng: -82.05
+      max_lng: -81.92
+    submarkets:
+    - Cape Coral Pkwy & Marina
+    - Bimini Basin & Downtown
+    - Pelican Blvd & Mohawk
+    city_id: cape_coral
+  CAPE_SW_ISLES:
+    name: CAPE_SW_ISLES
+    center_lat: 26.555
+    center_lng: -82.026
+    zoom: 13.0
+    bbox:
+      min_lat: 26.52
+      max_lat: 26.6
+      min_lng: -82.1
+      max_lng: -82.0
+    submarkets:
+    - Southwest Isles & Cape Harbour
+    - Surfside & Veterans Pkwy
+    city_id: cape_coral
+  CAPE_NW_GATOR:
+    name: CAPE_NW_GATOR
+    center_lat: 26.665
+    center_lng: -82.03
+    zoom: 12.5
+    bbox:
+      min_lat: 26.6
+      max_lat: 26.72
+      min_lng: -82.1
+      max_lng: -81.98
+    submarkets:
+    - Northwest Cape & Burnt Store
+    city_id: cape_coral
+  FORT_MYERS_CORE:
+    name: FORT_MYERS_CORE
+    center_lat: 26.642
+    center_lng: -81.871
+    zoom: 13.5
+    bbox:
+      min_lat: 26.6
+      max_lat: 26.67
+      min_lng: -81.91
+      max_lng: -81.83
+    submarkets:
+    - Downtown Fort Myers River District
+    city_id: cape_coral
+  NORTH_FORT_MYERS:
+    name: NORTH_FORT_MYERS
+    center_lat: 26.71
+    center_lng: -81.89
+    zoom: 12.5
+    bbox:
+      min_lat: 26.67
+      max_lat: 26.76
+      min_lng: -81.95
+      max_lng: -81.82
+    submarkets:
+    - North Fort Myers & Hancock Bridge
+    city_id: cape_coral
+datasets:
+  permits:
+    endpoint: https://capeims.capecoral.gov/arcgis/rest/services/OpenData/OpenData/MapServer/1
+    platform: arcgis
+    watermark_col: issuedate
+    id_keys:
+    - Permit_Number
+    - objectid
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: issuedate DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Cape Coral, FL
+    field_map:
+      job_id:
+      - Permit_Number
+      issuance_date:
+      - issuedate
+      - applydate
+      - lastchangedon
+      status:
+      - permit_status
+      job_type:
+      - Permit_Type
+      - Work_Class
+      - permit_desc
+      cost:
+      - permitvalue
+      address_street:
+      - Addr1
+      zipcode:
+      - Zip
+      borough:
+      - City
+    ingestion_mode: incremental
+    oid_field: objectid
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: true
+    zip_member: null
+    delimiter: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'FL'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- cape coral
+- fort_myers
+- fort myers
+- cape coral fort myers
+- cape_coral_fort_myers
+- lee_county
+- lee county
+job_suffix: cape_coral

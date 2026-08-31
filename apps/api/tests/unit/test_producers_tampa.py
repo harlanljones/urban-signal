@@ -100,13 +100,13 @@ class TestFeedRegistration:
 
     def test_field_map_is_embedded_and_matches_leaf_module(self):
         spec = get_tampa_dataset(FeedType.PERMITS)
-        assert spec.field_map is FIELD_MAP
+        assert spec.field_map == FIELD_MAP
 
     def test_sla_spec_matches_audited_layer(self):
         spec = get_tampa_dataset(FeedType.SLA)
         assert spec.platform == "arcgis"
         assert spec.watermark_col == "HISTORY_ACT_DT"
-        assert spec.field_map is SLA_FIELD_MAP
+        assert spec.field_map == SLA_FIELD_MAP
 
     @pytest.mark.parametrize("absent_feed", [FeedType.COMPLAINTS_311, FeedType.DEEDS])
     def test_absent_feeds_raise_readable_errors(self, absent_feed):

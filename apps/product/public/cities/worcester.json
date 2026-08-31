@@ -1,0 +1,218 @@
+{
+  "schema_version": 2,
+  "id": "worcester",
+  "name": "Worcester",
+  "state": "MA",
+  "center": {
+    "lat": 42.2626,
+    "lng": -71.8023
+  },
+  "metro_bbox": {
+    "min_lat": 42.22,
+    "max_lat": 42.31,
+    "min_lng": -71.9,
+    "max_lng": -71.76
+  },
+  "divisions": {
+    "DOWNTOWN_CORE": {
+      "name": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 42.26,
+        "lng": -71.801
+      },
+      "bbox": {
+        "min_lat": 42.25,
+        "max_lat": 42.27,
+        "min_lng": -71.812,
+        "max_lng": -71.792
+      },
+      "submarkets": [
+        "Downtown",
+        "Canal District"
+      ]
+    },
+    "EAST_SIDE": {
+      "name": "EAST_SIDE",
+      "center": {
+        "lat": 42.2675,
+        "lng": -71.788
+      },
+      "bbox": {
+        "min_lat": 42.26,
+        "max_lat": 42.276,
+        "min_lng": -71.794,
+        "max_lng": -71.778
+      },
+      "submarkets": [
+        "Shrewsbury Street",
+        "Grafton Hill"
+      ]
+    },
+    "SOUTH_SIDE": {
+      "name": "SOUTH_SIDE",
+      "center": {
+        "lat": 42.25,
+        "lng": -71.8175
+      },
+      "bbox": {
+        "min_lat": 42.244,
+        "max_lat": 42.256,
+        "min_lng": -71.832,
+        "max_lng": -71.802
+      },
+      "submarkets": [
+        "Main South",
+        "Webster Square"
+      ]
+    },
+    "QUINSIGAMOND": {
+      "name": "QUINSIGAMOND",
+      "center": {
+        "lat": 42.24,
+        "lng": -71.777
+      },
+      "bbox": {
+        "min_lat": 42.234,
+        "max_lat": 42.248,
+        "min_lng": -71.788,
+        "max_lng": -71.768
+      },
+      "submarkets": [
+        "Quinsigamond Village"
+      ]
+    },
+    "WEST_SIDE": {
+      "name": "WEST_SIDE",
+      "center": {
+        "lat": 42.272,
+        "lng": -71.84
+      },
+      "bbox": {
+        "min_lat": 42.258,
+        "max_lat": 42.286,
+        "min_lng": -71.862,
+        "max_lng": -71.83
+      },
+      "submarkets": [
+        "Tatnuck"
+      ]
+    },
+    "NORTH_SIDE": {
+      "name": "NORTH_SIDE",
+      "center": {
+        "lat": 42.29,
+        "lng": -71.81
+      },
+      "bbox": {
+        "min_lat": 42.28,
+        "max_lat": 42.3,
+        "min_lng": -71.826,
+        "max_lng": -71.792
+      },
+      "submarkets": [
+        "Greendale"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown": {
+      "name": "Downtown",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 42.2626,
+        "lng": -71.8023
+      },
+      "description": "Civic and office core around Worcester Common and the DCU-tethered Main Street spine with conversion-condo activity and the city's densest commercial pipeline."
+    },
+    "Canal District": {
+      "name": "Canal District",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 42.257,
+        "lng": -71.799
+      },
+      "description": "The Blackstone Canal-era warehouse district around Kelley Square and the PawSox ballpark with loft conversions, restaurant rows, and the city's highest-energy storefront renewal."
+    },
+    "Shrewsbury Street": {
+      "name": "Shrewsbury Street",
+      "division": "EAST_SIDE",
+      "center": {
+        "lat": 42.2689,
+        "lng": -71.789
+      },
+      "description": "Shrewsbury Street's Restaurant Row and the Union Station edge with triple-decker conversions, Belmont Hill spillover, and the metro's most restaurant-led licensing churn."
+    },
+    "Grafton Hill": {
+      "name": "Grafton Hill",
+      "division": "EAST_SIDE",
+      "center": {
+        "lat": 42.266,
+        "lng": -71.787
+      },
+      "description": "Lake Quinsigamond-adjacent east side of Grafton Hill with historic single-family stock, Hamilton Street commercial, and steady duplex-to-condo reinvestment."
+    },
+    "Main South": {
+      "name": "Main South",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 42.2505,
+        "lng": -71.809
+      },
+      "description": "Clark University-anchored Main South corridor with triple-decker rental stock, the Main Street storefront row, and campus-driven renovation flow."
+    },
+    "Webster Square": {
+      "name": "Webster Square",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 42.25,
+        "lng": -71.826
+      },
+      "description": "Webster Square's southwest retail plaza and the Mill Street / Route 122 edge with value-priced multi-family stock and block-by-block reinvestment."
+    },
+    "Quinsigamond Village": {
+      "name": "Quinsigamond Village",
+      "division": "QUINSIGAMOND",
+      "center": {
+        "lat": 42.24,
+        "lng": -71.777
+      },
+      "description": "The historic mill village at the Blackstone River / Lake Quinsigamond confluence with Quinsigamond Avenue commercial and early-stage waterfront reinvestment."
+    },
+    "Tatnuck": {
+      "name": "Tatnuck",
+      "division": "WEST_SIDE",
+      "center": {
+        "lat": 42.272,
+        "lng": -71.84
+      },
+      "description": "The West Side's Tatnuck Square around the Route 122 / Pleasant Street fork with 1920s bungalow stock, stable owner-occupancy, and the metro's most conservation-minded renovation flow."
+    },
+    "Greendale": {
+      "name": "Greendale",
+      "division": "NORTH_SIDE",
+      "center": {
+        "lat": 42.29,
+        "lng": -71.81
+      },
+      "description": "The Greendale / Indian Lake north side with Salisbury Street and West Boylston Street commercial, Burncoat spillover, and value-priced family-housing reinvestment."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "Permit_License_Issued_Date",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "Issued_Date",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/worcester.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

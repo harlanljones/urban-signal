@@ -1,0 +1,520 @@
+city_id: medford
+name: Medford, OR
+state: OR
+center:
+  lat: 42.3266
+  lng: -122.8756
+metro_bbox:
+  min_lat: 42.26
+  max_lat: 42.41
+  min_lng: -122.99
+  max_lng: -122.78
+division_bboxes:
+  DOWNTOWN_MEDFORD:
+    min_lat: 42.32
+    max_lat: 42.336
+    min_lng: -122.884
+    max_lng: -122.866
+  MIDTOWN_MEDFORD_CENTER:
+    min_lat: 42.334
+    max_lat: 42.35
+    min_lng: -122.888
+    max_lng: -122.865
+  EAST_MEDFORD:
+    min_lat: 42.318
+    max_lat: 42.372
+    min_lng: -122.862
+    max_lng: -122.82
+  SOUTH_MEDFORD:
+    min_lat: 42.278
+    max_lat: 42.318
+    min_lng: -122.888
+    max_lng: -122.83
+  NORTH_MEDFORD:
+    min_lat: 42.348
+    max_lat: 42.39
+    min_lng: -122.888
+    max_lng: -122.828
+  RIVERSIDE_BEAR_CREEK:
+    min_lat: 42.302
+    max_lat: 42.338
+    min_lng: -122.868
+    max_lng: -122.845
+  CENTRAL_POINT_EDGE:
+    min_lat: 42.368
+    max_lat: 42.402
+    min_lng: -122.94
+    max_lng: -122.89
+  JACKSONVILLE_EDGE:
+    min_lat: 42.3
+    max_lat: 42.342
+    min_lng: -122.985
+    max_lng: -122.93
+submarkets:
+  Downtown:
+    name: Downtown
+    borough: DOWNTOWN_MEDFORD
+    lat: 42.3266
+    lng: -122.8756
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.86
+    capex: 6400000.0
+    permit_vel: 29.0
+    shift_ratio: 1.46
+    sla: 52.0
+    description: Main Street core with the Medford City Hall, the Rogue Credit Union,
+      and the mixed-use permitting corridor along Riverside Avenue.
+    city_id: medford
+  Medford Center:
+    name: Medford Center
+    borough: MIDTOWN_MEDFORD_CENTER
+    lat: 42.3418
+    lng: -122.8786
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.84
+    capex: 5900000.0
+    permit_vel: 27.0
+    shift_ratio: 1.44
+    sla: 50.0
+    description: Crater Lake Highway midtown corridor with the Medford Center mall,
+      big-box retail, and the city's highest commercial permit velocity.
+    city_id: medford
+  East Medford:
+    name: East Medford
+    borough: EAST_MEDFORD
+    lat: 42.333
+    lng: -122.848
+    zoom: 13.5
+    pitch: 48.0
+    base_lims: 0.82
+    capex: 7200000.0
+    permit_vel: 31.0
+    shift_ratio: 1.48
+    sla: 54.0
+    description: East of I-5 along McAndrews Road with master-planned subdivisions,
+      Blackthorn Drive residential infill, and the Rogue Valley Medical Center adjacency.
+    city_id: medford
+  McAndrews Corridor:
+    name: McAndrews Corridor
+    borough: EAST_MEDFORD
+    lat: 42.343
+    lng: -122.853
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.85
+    capex: 6800000.0
+    permit_vel: 30.0
+    shift_ratio: 1.47
+    sla: 53.0
+    description: E McAndrews Road commercial strip with tenant-improvement remodels,
+      auto dealerships, and the Medford Town Center retail node.
+    city_id: medford
+  South Medford:
+    name: South Medford
+    borough: SOUTH_MEDFORD
+    lat: 42.31
+    lng: -122.87
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.81
+    capex: 5500000.0
+    permit_vel: 24.0
+    shift_ratio: 1.42
+    sla: 48.0
+    description: South Central Avenue corridor with post-war single-family stock,
+      the Stewart Meadows golf community, and steady replacement-permit activity.
+    city_id: medford
+  Stewart Meadows:
+    name: Stewart Meadows
+    borough: SOUTH_MEDFORD
+    lat: 42.294
+    lng: -122.865
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.8
+    capex: 6100000.0
+    permit_vel: 22.0
+    shift_ratio: 1.4
+    sla: 46.0
+    description: Stewart Meadows / Roxy Ann Peak foothills edge with newer residential
+      subdivisions, golf-course views, and the Foothills Christian Church node.
+    city_id: medford
+  North Medford:
+    name: North Medford
+    borough: NORTH_MEDFORD
+    lat: 42.3583
+    lng: -122.8527
+    zoom: 13.5
+    pitch: 48.0
+    base_lims: 0.83
+    capex: 6300000.0
+    permit_vel: 26.0
+    shift_ratio: 1.45
+    sla: 50.0
+    description: North Medford along N Keene Way Drive with CRATER LAKE AVE intersections,
+      residential subdivisions, and the Rogue Valley International Airport edge.
+    city_id: medford
+  Airport Edge:
+    name: Airport Edge
+    borough: NORTH_MEDFORD
+    lat: 42.372
+    lng: -122.858
+    zoom: 13.0
+    pitch: 44.0
+    base_lims: 0.82
+    capex: 5800000.0
+    permit_vel: 24.0
+    shift_ratio: 1.43
+    sla: 48.0
+    description: Biddle Road industrial corridor and Rogue Valley International-Medford
+      Airport perimeter with light-industrial and aviation-support permitting.
+    city_id: medford
+  Riverside:
+    name: Riverside
+    borough: RIVERSIDE_BEAR_CREEK
+    lat: 42.3237
+    lng: -122.8541
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.83
+    capex: 5200000.0
+    permit_vel: 23.0
+    shift_ratio: 1.41
+    sla: 47.0
+    description: Bear Creek greenway corridor with the Riverside Park, Hawthorne Park,
+      and the pre-war bungalow stock along the east-side streamside.
+    city_id: medford
+  Central Point:
+    name: Central Point
+    borough: CENTRAL_POINT_EDGE
+    lat: 42.3759
+    lng: -122.9162
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.84
+    capex: 6000000.0
+    permit_vel: 25.0
+    shift_ratio: 1.44
+    sla: 49.0
+    description: Central Point town center at the junction of I-5 and OR-99 with the
+      Jackson County Expo Park, the North Medford industrial edge, and Crater Rock
+      Museum.
+    city_id: medford
+  Jacksonville:
+    name: Jacksonville
+    borough: JACKSONVILLE_EDGE
+    lat: 42.3134
+    lng: -122.9701
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.85
+    capex: 5500000.0
+    permit_vel: 22.0
+    shift_ratio: 1.43
+    sla: 51.0
+    description: Historic Jacksonville town west of Medford with the Britt Music &
+      Arts Festival, Britta Road wine-tourism, and the Applegate Valley growth edge.
+    city_id: medford
+divisions:
+  DOWNTOWN_MEDFORD:
+    name: DOWNTOWN_MEDFORD
+    center_lat: 42.3266
+    center_lng: -122.8756
+    zoom: 14.0
+    bbox:
+      min_lat: 42.32
+      max_lat: 42.336
+      min_lng: -122.884
+      max_lng: -122.866
+    submarkets:
+    - Downtown
+    city_id: medford
+  MIDTOWN_MEDFORD_CENTER:
+    name: MIDTOWN_MEDFORD_CENTER
+    center_lat: 42.3418
+    center_lng: -122.8786
+    zoom: 13.5
+    bbox:
+      min_lat: 42.334
+      max_lat: 42.35
+      min_lng: -122.888
+      max_lng: -122.865
+    submarkets:
+    - Medford Center
+    city_id: medford
+  EAST_MEDFORD:
+    name: EAST_MEDFORD
+    center_lat: 42.339
+    center_lng: -122.85
+    zoom: 13.0
+    bbox:
+      min_lat: 42.318
+      max_lat: 42.372
+      min_lng: -122.862
+      max_lng: -122.82
+    submarkets:
+    - East Medford
+    - McAndrews Corridor
+    city_id: medford
+  SOUTH_MEDFORD:
+    name: SOUTH_MEDFORD
+    center_lat: 42.3
+    center_lng: -122.87
+    zoom: 13.0
+    bbox:
+      min_lat: 42.278
+      max_lat: 42.318
+      min_lng: -122.888
+      max_lng: -122.83
+    submarkets:
+    - South Medford
+    - Stewart Meadows
+    city_id: medford
+  NORTH_MEDFORD:
+    name: NORTH_MEDFORD
+    center_lat: 42.363
+    center_lng: -122.855
+    zoom: 13.0
+    bbox:
+      min_lat: 42.348
+      max_lat: 42.39
+      min_lng: -122.888
+      max_lng: -122.828
+    submarkets:
+    - North Medford
+    - Airport Edge
+    city_id: medford
+  RIVERSIDE_BEAR_CREEK:
+    name: RIVERSIDE_BEAR_CREEK
+    center_lat: 42.3237
+    center_lng: -122.8541
+    zoom: 13.5
+    bbox:
+      min_lat: 42.302
+      max_lat: 42.338
+      min_lng: -122.868
+      max_lng: -122.845
+    submarkets:
+    - Riverside
+    city_id: medford
+  CENTRAL_POINT_EDGE:
+    name: CENTRAL_POINT_EDGE
+    center_lat: 42.3759
+    center_lng: -122.9162
+    zoom: 12.5
+    bbox:
+      min_lat: 42.368
+      max_lat: 42.402
+      min_lng: -122.94
+      max_lng: -122.89
+    submarkets:
+    - Central Point
+    city_id: medford
+  JACKSONVILLE_EDGE:
+    name: JACKSONVILLE_EDGE
+    center_lat: 42.3134
+    center_lng: -122.9701
+    zoom: 12.5
+    bbox:
+      min_lat: 42.3
+      max_lat: 42.342
+      min_lng: -122.985
+      max_lng: -122.93
+    submarkets:
+    - Jacksonville
+    city_id: medford
+datasets:
+  permits:
+    endpoint: https://maps.medfordmaps.org/arcgis/rest/services/TRAKiTExport/TRAKiTPermits_service/FeatureServer/1
+    platform: arcgis
+    watermark_col: ISSUED
+    id_keys:
+    - PERMIT_NO
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: ISSUED DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: Medford, OR
+    field_map:
+      job_id:
+      - PERMIT_NO
+      - OBJECTID
+      issuance_date:
+      - ISSUED
+      filing_date:
+      - APPLIED
+      status:
+      - STATUS
+      job_type:
+      - PermitType
+      cost:
+      - JOBVALUE
+      address_street:
+      - SITE_ADDR
+      zipcode:
+      - SITE_ZIP
+      bbl:
+      - SITE_APN
+      borough:
+      - SITE_CITY
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  sla:
+    endpoint: https://maps.medfordmaps.org/arcgis/rest/services/MLI2/MLI_TRAKiT_Service/FeatureServer/14
+    platform: arcgis
+    watermark_col: ISSUED
+    id_keys:
+    - LICENSE_NO
+    - RECORDID
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: ISSUED DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Medford, OR
+    field_map:
+      license_id:
+      - LICENSE_NO
+      dba:
+      - COMPANY
+      premises_name:
+      - COMPANY
+      license_type:
+      - LICENSE_TYPE
+      status:
+      - STATUS
+      effective_date:
+      - ISSUED
+      expiration_date:
+      - EXPIRED
+      address_street:
+      - SITE_ADDR
+      zipcode:
+      - SITE_ZIP
+      borough:
+      - SITE_CITY
+      bbl:
+      - SITE_APN
+    ingestion_mode: incremental
+    oid_field: RowNum
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  '311':
+    endpoint: https://maps.medfordmaps.org/arcgis/rest/services/MLI2/MLI_TRAKiT_Service/FeatureServer/12
+    platform: arcgis
+    watermark_col: STARTED
+    id_keys:
+    - CASE_NO
+    - RECORDID
+    topic: raw.municipal.311
+    interval_seconds: 300.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: STARTED DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Medford, OR
+    field_map:
+      incident_id:
+      - CASE_NO
+      complaint_type:
+      - CaseType
+      status:
+      - STATUS
+      created_date:
+      - STARTED
+      closed_date:
+      - CLOSED
+      incident_address:
+      - SITE_ADDR
+      zipcode:
+      - SITE_ZIP
+      borough:
+      - SITE_CITY
+      bbl:
+      - SITE_APN
+    ingestion_mode: incremental
+    oid_field: RECORDID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- medford_or
+- medford-or
+- medford or
+- medford_oregon
+job_suffix: medford

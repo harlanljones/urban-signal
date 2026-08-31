@@ -196,7 +196,7 @@ class TestFeedRegistration:
         assert spec.geocode_context == "Memphis, TN"
         assert spec.oid_field == "ObjectId"
         assert spec.max_record_count == 1000
-        assert spec.field_map is PERMITS_FIELD_MAP
+        assert spec.field_map == PERMITS_FIELD_MAP
 
     def test_311_spec_matches_live_layer(self):
         spec = get_memphis_dataset(FeedType.COMPLAINTS_311)
@@ -211,7 +211,7 @@ class TestFeedRegistration:
         assert spec.geocode_context == "Memphis, TN"
         assert spec.oid_field == "OBJECTID"
         assert spec.max_record_count == 3000
-        assert spec.field_map is COMPLAINTS_311_FIELD_MAP
+        assert spec.field_map == COMPLAINTS_311_FIELD_MAP
 
     @pytest.mark.parametrize("absent_feed", [FeedType.SLA, FeedType.DEEDS, FeedType.STR])
     def test_absent_feeds_raise_readable_errors(self, absent_feed):

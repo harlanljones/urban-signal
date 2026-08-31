@@ -1,0 +1,271 @@
+city_id: tyler
+name: Tyler
+state: TX
+center:
+  lat: 32.3519
+  lng: -95.3006
+metro_bbox:
+  min_lat: 32.25
+  max_lat: 32.45
+  min_lng: -95.45
+  max_lng: -95.15
+division_bboxes:
+  CENTRAL_CORE:
+    min_lat: 32.335
+    max_lat: 32.37
+    min_lng: -95.33
+    max_lng: -95.27
+  WEST_SIDE:
+    min_lat: 32.32
+    max_lat: 32.42
+    min_lng: -95.45
+    max_lng: -95.34
+  EAST_GATE:
+    min_lat: 32.31
+    max_lat: 32.42
+    min_lng: -95.27
+    max_lng: -95.15
+  SOUTH_STRIPS:
+    min_lat: 32.25
+    max_lat: 32.33
+    min_lng: -95.43
+    max_lng: -95.25
+  NORTH_LOOP:
+    min_lat: 32.37
+    max_lat: 32.45
+    min_lng: -95.42
+    max_lng: -95.22
+submarkets:
+  Downtown Tyler:
+    name: Downtown Tyler
+    borough: CENTRAL_CORE
+    lat: 32.3519
+    lng: -95.3006
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.8
+    capex: 5200000.0
+    permit_vel: 26.0
+    shift_ratio: 1.28
+    sla: 52.0
+    description: Courthouse square, arts venues, and mixed commercial infill around
+      downtown core.
+    city_id: tyler
+  Medical District:
+    name: Medical District
+    borough: CENTRAL_CORE
+    lat: 32.345
+    lng: -95.306
+    zoom: 14.0
+    pitch: 42.0
+    base_lims: 0.78
+    capex: 5000000.0
+    permit_vel: 24.0
+    shift_ratio: 1.26
+    sla: 50.0
+    description: Hospital and clinical cluster west of downtown with steady facilities
+      investment.
+    city_id: tyler
+  West Loop 323:
+    name: West Loop 323
+    borough: WEST_SIDE
+    lat: 32.36
+    lng: -95.38
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.74
+    capex: 4400000.0
+    permit_vel: 22.0
+    shift_ratio: 1.22
+    sla: 46.0
+    description: Auto-oriented commercial corridor along Loop 323 with retail pads
+      and services.
+    city_id: tyler
+  University Area:
+    name: University Area
+    borough: EAST_GATE
+    lat: 32.315
+    lng: -95.245
+    zoom: 13.8
+    pitch: 40.0
+    base_lims: 0.72
+    capex: 4300000.0
+    permit_vel: 21.0
+    shift_ratio: 1.2
+    sla: 44.0
+    description: UT Tyler campus and adjacent commercial/medical growth east of Broadway.
+    city_id: tyler
+  Azalea District:
+    name: Azalea District
+    borough: SOUTH_STRIPS
+    lat: 32.32
+    lng: -95.3
+    zoom: 14.0
+    pitch: 38.0
+    base_lims: 0.76
+    capex: 4600000.0
+    permit_vel: 23.0
+    shift_ratio: 1.24
+    sla: 48.0
+    description: Historic residential and garden district with neighborhood-serving
+      retail and renovations.
+    city_id: tyler
+  South Broadway Corridor:
+    name: South Broadway Corridor
+    borough: SOUTH_STRIPS
+    lat: 32.3
+    lng: -95.305
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.7
+    capex: 4200000.0
+    permit_vel: 20.0
+    shift_ratio: 1.18
+    sla: 44.0
+    description: Regional retail spine with highway-oriented pads and steady tenant
+      rollover.
+    city_id: tyler
+  North Loop & Industrial:
+    name: North Loop & Industrial
+    borough: NORTH_LOOP
+    lat: 32.405
+    lng: -95.34
+    zoom: 13.3
+    pitch: 38.0
+    base_lims: 0.68
+    capex: 3800000.0
+    permit_vel: 18.0
+    shift_ratio: 1.16
+    sla: 42.0
+    description: Industrial and logistics belt near Loop 323 with light manufacturing
+      and services.
+    city_id: tyler
+divisions:
+  CENTRAL_CORE:
+    name: CENTRAL_CORE
+    center_lat: 32.352
+    center_lng: -95.3
+    zoom: 13.5
+    bbox:
+      min_lat: 32.335
+      max_lat: 32.37
+      min_lng: -95.33
+      max_lng: -95.27
+    submarkets:
+    - Downtown Tyler
+    - Medical District
+    city_id: tyler
+  WEST_SIDE:
+    name: WEST_SIDE
+    center_lat: 32.365
+    center_lng: -95.395
+    zoom: 13.0
+    bbox:
+      min_lat: 32.32
+      max_lat: 32.42
+      min_lng: -95.45
+      max_lng: -95.34
+    submarkets:
+    - West Loop 323
+    city_id: tyler
+  EAST_GATE:
+    name: EAST_GATE
+    center_lat: 32.36
+    center_lng: -95.22
+    zoom: 13.0
+    bbox:
+      min_lat: 32.31
+      max_lat: 32.42
+      min_lng: -95.27
+      max_lng: -95.15
+    submarkets:
+    - University Area
+    city_id: tyler
+  SOUTH_STRIPS:
+    name: SOUTH_STRIPS
+    center_lat: 32.3
+    center_lng: -95.32
+    zoom: 13.0
+    bbox:
+      min_lat: 32.25
+      max_lat: 32.33
+      min_lng: -95.43
+      max_lng: -95.25
+    submarkets:
+    - Azalea District
+    - South Broadway Corridor
+    city_id: tyler
+  NORTH_LOOP:
+    name: NORTH_LOOP
+    center_lat: 32.41
+    center_lng: -95.33
+    zoom: 12.8
+    bbox:
+      min_lat: 32.37
+      max_lat: 32.45
+      min_lng: -95.42
+      max_lng: -95.22
+    submarkets:
+    - North Loop & Industrial
+    city_id: tyler
+datasets:
+  sla:
+    endpoint: https://data.texas.gov/resource/s7ft-44qi.json?$select=*, 'trec_broker:'
+      || license_type as license_type_ns
+    platform: socrata
+    watermark_col: updated
+    id_keys:
+    - license_number
+    topic: raw.municipal.sla
+    interval_seconds: 3600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: updated DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: county = 'Smith'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - license_number
+      license_type:
+      - license_type_ns
+      effective_date:
+      - original_license_date
+      expiration_date:
+      - license_expiration_date
+      premises_name:
+      - full_name
+      status:
+      - status
+      borough:
+      - county
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- tyler_tx
+- tyler tx
+job_suffix: tyler

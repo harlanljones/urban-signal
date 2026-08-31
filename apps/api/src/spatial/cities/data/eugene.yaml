@@ -1,0 +1,554 @@
+city_id: eugene
+name: Eugene
+state: OR
+center:
+  lat: 44.051
+  lng: -123.092
+metro_bbox:
+  min_lat: 43.96
+  max_lat: 44.14
+  min_lng: -123.3
+  max_lng: -122.96
+division_bboxes:
+  DOWNTOWN:
+    min_lat: 44.044
+    max_lat: 44.058
+    min_lng: -123.1
+    max_lng: -123.08
+  WHITAKER:
+    min_lat: 44.054
+    max_lat: 44.07
+    min_lng: -123.108
+    max_lng: -123.09
+  FRIENDLY:
+    min_lat: 44.02
+    max_lat: 44.045
+    min_lng: -123.12
+    max_lng: -123.07
+  SOUTH_EUGENE:
+    min_lat: 43.99
+    max_lat: 44.025
+    min_lng: -123.12
+    max_lng: -123.055
+  CAL_YOUNG:
+    min_lat: 44.06
+    max_lat: 44.085
+    min_lng: -123.07
+    max_lng: -123.035
+  SANTA_CLARA:
+    min_lat: 44.09
+    max_lat: 44.135
+    min_lng: -123.13
+    max_lng: -123.05
+  BETHEL:
+    min_lat: 44.05
+    max_lat: 44.09
+    min_lng: -123.18
+    max_lng: -123.12
+  CHURCHILL:
+    min_lat: 44.01
+    max_lat: 44.05
+    min_lng: -123.2
+    max_lng: -123.13
+submarkets:
+  Downtown:
+    name: Downtown
+    borough: DOWNTOWN
+    lat: 44.051
+    lng: -123.092
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.85
+    capex: 6200000.0
+    permit_vel: 28.0
+    shift_ratio: 1.45
+    sla: 50.0
+    description: "Eugene's downtown core with the 5th Street Market District, Hult\
+      \ Center, and the Broadway retail corridor \u2014 the metro's primary office\
+      \ and entertainment hub."
+    city_id: eugene
+  Jefferson Westside:
+    name: Jefferson Westside
+    borough: DOWNTOWN
+    lat: 44.053
+    lng: -123.098
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.84
+    capex: 5800000.0
+    permit_vel: 25.0
+    shift_ratio: 1.43
+    sla: 48.0
+    description: West-side downtown residential neighborhood with historic craftsman
+      bungalows, infill apartments, and proximity to the riverfront.
+    city_id: eugene
+  Whiteaker:
+    name: Whiteaker
+    borough: WHITAKER
+    lat: 44.06
+    lng: -123.098
+    zoom: 14.5
+    pitch: 52.0
+    base_lims: 0.86
+    capex: 5900000.0
+    permit_vel: 27.0
+    shift_ratio: 1.48
+    sla: 55.0
+    description: Eugene's historic working-class neighborhood turned arts district
+      with Blair Boulevard restaurant row, breweries, and live-work artist compounds.
+    city_id: eugene
+  Trainsong:
+    name: Trainsong
+    borough: WHITAKER
+    lat: 44.064
+    lng: -123.102
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.8
+    capex: 4800000.0
+    permit_vel: 20.0
+    shift_ratio: 1.38
+    sla: 42.0
+    description: Rail-adjacent industrial-edge neighborhood transitioning with new
+      infill and light-industrial redevelopment.
+    city_id: eugene
+  Friendly:
+    name: Friendly
+    borough: FRIENDLY
+    lat: 44.032
+    lng: -123.098
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.85
+    capex: 5500000.0
+    permit_vel: 24.0
+    shift_ratio: 1.44
+    sla: 50.0
+    description: South-central residential neighborhood around Friendly Street with
+      mature tree canopy, mid-century homes, and steady renovation permits.
+    city_id: eugene
+  South University:
+    name: South University
+    borough: FRIENDLY
+    lat: 44.035
+    lng: -123.078
+    zoom: 14.5
+    pitch: 48.0
+    base_lims: 0.83
+    capex: 5200000.0
+    permit_vel: 23.0
+    shift_ratio: 1.42
+    sla: 46.0
+    description: University of Oregon adjacent student and faculty housing with high
+      turnover, rental conversions, and steady remodel permits.
+    city_id: eugene
+  South Eugene:
+    name: South Eugene
+    borough: SOUTH_EUGENE
+    lat: 44.01
+    lng: -123.09
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.87
+    capex: 6800000.0
+    permit_vel: 26.0
+    shift_ratio: 1.46
+    sla: 52.0
+    description: Upper south hills with premium residential stock, Spencer Butte views,
+      and the highest-valued single-family homes in the metro.
+    city_id: eugene
+  Fairmount:
+    name: Fairmount
+    borough: SOUTH_EUGENE
+    lat: 44.02
+    lng: -123.065
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.84
+    capex: 6100000.0
+    permit_vel: 22.0
+    shift_ratio: 1.41
+    sla: 48.0
+    description: Southeast Eugene foothills neighborhood with University of Oregon
+      family housing, multi-family conversions, and steady renovation permits.
+    city_id: eugene
+  Cal Young:
+    name: Cal Young
+    borough: CAL_YOUNG
+    lat: 44.07
+    lng: -123.052
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.85
+    capex: 6400000.0
+    permit_vel: 25.0
+    shift_ratio: 1.44
+    sla: 50.0
+    description: Northeast Eugene's primary commercial corridor with Coburg Road retail,
+      Olympic Village, and the area's densest suburban multifamily stock.
+    city_id: eugene
+  Harlow:
+    name: Harlow
+    borough: CAL_YOUNG
+    lat: 44.077
+    lng: -123.06
+    zoom: 14.0
+    pitch: 44.0
+    base_lims: 0.82
+    capex: 5300000.0
+    permit_vel: 21.0
+    shift_ratio: 1.39
+    sla: 44.0
+    description: Mid-century suburban neighborhood of ranch homes, duplex infill,
+      and aging-housing-stock renovation permits.
+    city_id: eugene
+  Santa Clara:
+    name: Santa Clara
+    borough: SANTA_CLARA
+    lat: 44.11
+    lng: -123.09
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.81
+    capex: 5600000.0
+    permit_vel: 22.0
+    shift_ratio: 1.4
+    sla: 46.0
+    description: Northern Eugene suburban corridor with River Road commercial strip,
+      new single-family subdivisions, and farm-adjacent residential
+    city_id: eugene
+  Bethel:
+    name: Bethel
+    borough: BETHEL
+    lat: 44.07
+    lng: -123.155
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.82
+    capex: 5100000.0
+    permit_vel: 23.0
+    shift_ratio: 1.41
+    sla: 45.0
+    description: West Eugene's largest suburban neighborhood with Royal Avenue retail,
+      new infrastructure, and the metro's most affordable single-family stock.
+    city_id: eugene
+  West Eugene:
+    name: West Eugene
+    borough: BETHEL
+    lat: 44.07
+    lng: -123.17
+    zoom: 14.0
+    pitch: 44.0
+    base_lims: 0.8
+    capex: 4900000.0
+    permit_vel: 20.0
+    shift_ratio: 1.37
+    sla: 42.0
+    description: Western industrial and residential edge with the West Eugene Enterprise
+      Zone, light-industrial parks, and workforce housing stock.
+    city_id: eugene
+  Churchill:
+    name: Churchill
+    borough: CHURCHILL
+    lat: 44.03
+    lng: -123.165
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.83
+    capex: 5300000.0
+    permit_vel: 22.0
+    shift_ratio: 1.42
+    sla: 47.0
+    description: Southwest Eugene residential area around Churchill High School with
+      mid-century ranch homes, rolling hills, and steady renovation permits.
+    city_id: eugene
+  Amazon:
+    name: Amazon
+    borough: CHURCHILL
+    lat: 44.035
+    lng: -123.15
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.83
+    capex: 5400000.0
+    permit_vel: 23.0
+    shift_ratio: 1.42
+    sla: 47.0
+    description: Amazon Creek corridor residential area with creek-side parks, mixed
+      zoning, and the Amazon Marketplace commercial node.
+    city_id: eugene
+divisions:
+  DOWNTOWN:
+    name: DOWNTOWN
+    center_lat: 44.051
+    center_lng: -123.092
+    zoom: 14.0
+    bbox:
+      min_lat: 44.044
+      max_lat: 44.058
+      min_lng: -123.1
+      max_lng: -123.08
+    submarkets:
+    - Downtown
+    - Jefferson Westside
+    city_id: eugene
+  WHITAKER:
+    name: WHITAKER
+    center_lat: 44.06
+    center_lng: -123.098
+    zoom: 14.0
+    bbox:
+      min_lat: 44.054
+      max_lat: 44.07
+      min_lng: -123.108
+      max_lng: -123.09
+    submarkets:
+    - Whiteaker
+    - Trainsong
+    city_id: eugene
+  FRIENDLY:
+    name: FRIENDLY
+    center_lat: 44.032
+    center_lng: -123.098
+    zoom: 14.0
+    bbox:
+      min_lat: 44.02
+      max_lat: 44.045
+      min_lng: -123.12
+      max_lng: -123.07
+    submarkets:
+    - Friendly
+    - South University
+    city_id: eugene
+  SOUTH_EUGENE:
+    name: SOUTH_EUGENE
+    center_lat: 44.01
+    center_lng: -123.09
+    zoom: 13.5
+    bbox:
+      min_lat: 43.99
+      max_lat: 44.025
+      min_lng: -123.12
+      max_lng: -123.055
+    submarkets:
+    - South Eugene
+    - Fairmount
+    city_id: eugene
+  CAL_YOUNG:
+    name: CAL_YOUNG
+    center_lat: 44.07
+    center_lng: -123.052
+    zoom: 13.5
+    bbox:
+      min_lat: 44.06
+      max_lat: 44.085
+      min_lng: -123.07
+      max_lng: -123.035
+    submarkets:
+    - Cal Young
+    - Harlow
+    city_id: eugene
+  SANTA_CLARA:
+    name: SANTA_CLARA
+    center_lat: 44.11
+    center_lng: -123.09
+    zoom: 13.0
+    bbox:
+      min_lat: 44.09
+      max_lat: 44.135
+      min_lng: -123.13
+      max_lng: -123.05
+    submarkets:
+    - Santa Clara
+    city_id: eugene
+  BETHEL:
+    name: BETHEL
+    center_lat: 44.07
+    center_lng: -123.155
+    zoom: 13.5
+    bbox:
+      min_lat: 44.05
+      max_lat: 44.09
+      min_lng: -123.18
+      max_lng: -123.12
+    submarkets:
+    - Bethel
+    - West Eugene
+    city_id: eugene
+  CHURCHILL:
+    name: CHURCHILL
+    center_lat: 44.03
+    center_lng: -123.165
+    zoom: 13.5
+    bbox:
+      min_lat: 44.01
+      max_lat: 44.05
+      min_lng: -123.2
+      max_lng: -123.13
+    submarkets:
+    - Churchill
+    - Amazon
+    city_id: eugene
+datasets:
+  '311':
+    endpoint: https://services3.arcgis.com/F7NiRLGNbA2hh7gE/arcgis/rest/services/2020_2021CampingWorkOrders/FeatureServer/0
+    platform: arcgis
+    watermark_col: CreatedOn
+    id_keys:
+    - FID
+    - GlobalID
+    topic: raw.municipal.311
+    interval_seconds: 300.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: CreatedOn DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - FID
+      - GlobalID
+      complaint_type:
+      - Title
+      created_date:
+      - CreatedOn
+      status:
+      - StatusText
+    ingestion_mode: incremental
+    oid_field: FID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  sla:
+    endpoint: https://services3.arcgis.com/F7NiRLGNbA2hh7gE/arcgis/rest/services/Food_Service_Establishments_Updated_VIEW_CBE/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - UID
+    - ObjectId
+    - GlobalID
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - UID
+      - GlobalID
+      dba:
+      - Name
+      premises_name:
+      - Name
+      address_street:
+      - MatchAddr
+      status:
+      - Active
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 2000
+    expected_cadence_days: 90
+    alarm_exempt: true
+    alarm_exempt_reason: "Food service establishment license snapshot with no date\
+      \ fields and no source edit metadata (hasStaticData: True, no editingInfo) \u2014\
+      \ freshness is unverifiable at the source; the cross-run id-dedup diff is the\
+      \ open/close signal (Modesto SLA precedent, US-163)"
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  deeds:
+    endpoint: https://services3.arcgis.com/F7NiRLGNbA2hh7gE/arcgis/rest/services/CityLandDeeds/FeatureServer/0
+    platform: arcgis
+    watermark_col: DATE_
+    id_keys:
+    - CITYDEED
+    - OBJECTID_1
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: DATE_ DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - CITYDEED
+      - OBJECTID_1
+      recorded_date:
+      - DATE_
+      doc_type:
+      - ACQDIS
+    ingestion_mode: incremental
+    oid_field: OBJECTID_1
+    max_record_count: 2000
+    expected_cadence_days: 3
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- eugene_or
+- eugene-or
+- eugene or
+job_suffix: eugene

@@ -1,0 +1,342 @@
+city_id: macon_bibb
+name: Macon-Bibb County
+state: GA
+center:
+  lat: 32.8366
+  lng: -83.6324
+metro_bbox:
+  min_lat: 32.67
+  max_lat: 32.93
+  min_lng: -83.85
+  max_lng: -83.45
+division_bboxes:
+  DOWNTOWN_CORE:
+    min_lat: 32.82
+    max_lat: 32.86
+    min_lng: -83.67
+    max_lng: -83.6
+  WEST_MACON:
+    min_lat: 32.79
+    max_lat: 32.87
+    min_lng: -83.85
+    max_lng: -83.68
+  NORTH_MACON:
+    min_lat: 32.87
+    max_lat: 32.93
+    min_lng: -83.78
+    max_lng: -83.58
+  EAST_MACON:
+    min_lat: 32.8
+    max_lat: 32.9
+    min_lng: -83.62
+    max_lng: -83.45
+  SOUTH_BIBB:
+    min_lat: 32.67
+    max_lat: 32.8
+    min_lng: -83.78
+    max_lng: -83.55
+submarkets:
+  Downtown Macon:
+    name: Downtown Macon
+    borough: DOWNTOWN_CORE
+    lat: 32.8366
+    lng: -83.6266
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.82
+    capex: 5200000.0
+    permit_vel: 28.0
+    shift_ratio: 1.26
+    sla: 55.0
+    description: Historic core along Cherry, Poplar, and 2nd Street with adaptive
+      reuse and hospitality momentum.
+    city_id: macon_bibb
+  Riverfront & Amphitheater:
+    name: Riverfront & Amphitheater
+    borough: DOWNTOWN_CORE
+    lat: 32.834
+    lng: -83.621
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.8
+    capex: 4800000.0
+    permit_vel: 26.0
+    shift_ratio: 1.22
+    sla: 52.0
+    description: Ocmulgee riverfront entertainment and open-space anchors at the downtown
+      edge.
+    city_id: macon_bibb
+  Mercer University District:
+    name: Mercer University District
+    borough: DOWNTOWN_CORE
+    lat: 32.8287
+    lng: -83.6513
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.78
+    capex: 4500000.0
+    permit_vel: 24.0
+    shift_ratio: 1.2
+    sla: 50.0
+    description: Campus-adjacent mixed-use and student housing southwest of downtown.
+    city_id: macon_bibb
+  Eisenhower Parkway Corridor:
+    name: Eisenhower Parkway Corridor
+    borough: WEST_MACON
+    lat: 32.806
+    lng: -83.69
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.74
+    capex: 4100000.0
+    permit_vel: 22.0
+    shift_ratio: 1.18
+    sla: 48.0
+    description: Eisenhower retail and commercial corridor including redevelopment
+      around the mall.
+    city_id: macon_bibb
+  I-475 West Industrial:
+    name: I-475 West Industrial
+    borough: WEST_MACON
+    lat: 32.823
+    lng: -83.757
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.72
+    capex: 3800000.0
+    permit_vel: 20.0
+    shift_ratio: 1.16
+    sla: 46.0
+    description: "Industrial and logistics ribbon near I\u2011475 with hospitality\
+      \ and highway services."
+    city_id: macon_bibb
+  North Macon Retail (Bass Rd):
+    name: North Macon Retail (Bass Rd)
+    borough: NORTH_MACON
+    lat: 32.912
+    lng: -83.718
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.76
+    capex: 4300000.0
+    permit_vel: 23.0
+    shift_ratio: 1.2
+    sla: 49.0
+    description: Bass Road / Riverside Drive retail concentration and adjacent residential
+      growth.
+    city_id: macon_bibb
+  Ocmulgee Mounds / East Macon:
+    name: Ocmulgee Mounds / East Macon
+    borough: EAST_MACON
+    lat: 32.8348
+    lng: -83.602
+    zoom: 13.8
+    pitch: 40.0
+    base_lims: 0.7
+    capex: 3500000.0
+    permit_vel: 19.0
+    shift_ratio: 1.14
+    sla: 45.0
+    description: Emery Hwy corridor and Ocmulgee Mounds vicinity east of downtown.
+    city_id: macon_bibb
+  Airport & Industrial South:
+    name: Airport & Industrial South
+    borough: SOUTH_BIBB
+    lat: 32.693
+    lng: -83.649
+    zoom: 13.2
+    pitch: 38.0
+    base_lims: 0.68
+    capex: 3200000.0
+    permit_vel: 18.0
+    shift_ratio: 1.12
+    sla: 44.0
+    description: Middle Georgia Regional Airport area and adjacent industrial parks.
+    city_id: macon_bibb
+divisions:
+  DOWNTOWN_CORE:
+    name: DOWNTOWN_CORE
+    center_lat: 32.838
+    center_lng: -83.628
+    zoom: 13.8
+    bbox:
+      min_lat: 32.82
+      max_lat: 32.86
+      min_lng: -83.67
+      max_lng: -83.6
+    submarkets:
+    - Downtown Macon
+    - Riverfront & Amphitheater
+    - Mercer University District
+    city_id: macon_bibb
+  WEST_MACON:
+    name: WEST_MACON
+    center_lat: 32.83
+    center_lng: -83.735
+    zoom: 13.2
+    bbox:
+      min_lat: 32.79
+      max_lat: 32.87
+      min_lng: -83.85
+      max_lng: -83.68
+    submarkets:
+    - Eisenhower Parkway Corridor
+    - I-475 West Industrial
+    city_id: macon_bibb
+  NORTH_MACON:
+    name: NORTH_MACON
+    center_lat: 32.9
+    center_lng: -83.68
+    zoom: 12.9
+    bbox:
+      min_lat: 32.87
+      max_lat: 32.93
+      min_lng: -83.78
+      max_lng: -83.58
+    submarkets:
+    - North Macon Retail (Bass Rd)
+    city_id: macon_bibb
+  EAST_MACON:
+    name: EAST_MACON
+    center_lat: 32.85
+    center_lng: -83.56
+    zoom: 13.2
+    bbox:
+      min_lat: 32.8
+      max_lat: 32.9
+      min_lng: -83.62
+      max_lng: -83.45
+    submarkets:
+    - Ocmulgee Mounds / East Macon
+    city_id: macon_bibb
+  SOUTH_BIBB:
+    name: SOUTH_BIBB
+    center_lat: 32.735
+    center_lng: -83.66
+    zoom: 12.8
+    bbox:
+      min_lat: 32.67
+      max_lat: 32.8
+      min_lng: -83.78
+      max_lng: -83.55
+    submarkets:
+    - Airport & Industrial South
+    city_id: macon_bibb
+datasets:
+  permits:
+    endpoint: https://services6.arcgis.com/Yx1h0qHJ9wIpQWuU/arcgis/rest/services/Building_Permits_Public/FeatureServer/0
+    platform: arcgis
+    watermark_col: ISSUEDATE
+    id_keys:
+    - OBJECTID0
+    - FOLDERYEAR
+    - FOLDERSEQUENCE
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - OBJECTID0
+      issuance_date:
+      - ISSUEDATE
+      filing_date:
+      - INDATE
+      address_street:
+      - PROPSTREET
+      zipcode:
+      - PROPPOSTAL
+    ingestion_mode: incremental
+    oid_field: OBJECTID0
+    max_record_count: 1000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'GA'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- macon-bibb
+- macon bibb
+- macon
+- macon_ga
+job_suffix: macon_bibb

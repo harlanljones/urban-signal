@@ -904,3 +904,64 @@ Dispatched 6 parallel leaf subagents (TX TREC/TDLR; FL cadastral + Asheville; NO
 | us406-cvc-index | CVC composite index + tests | none (feature store) | 2026-08-30 | completed — 28 tests | feature module + tests |
 
 Yield 9/9. All tickets resolved on Linear with evidence comments + completed state. Changes left uncommitted on the working tree.
+
+## 2026-08-30 — Mid-Atlantic / Northeast onboarding (orchestrator) — Linear US-419
+
+Register Worcester MA (PERMITS + SLA) and wire CT statewide SLA/DEEDS for
+New Haven + Bridgeport (supplement Hartford DEEDS). Probe basis:
+`docs/research/northeast-new-england-expansion-probe-2026-08-30.md`.
+Pre-dispatch re-probe (orchestrator, 2026-08-30): CT SLA `ngch-56tr` and CT
+DEEDS `5mzw-sjtu` live; Worcester Building_Permits + Food_Establishment_Licenses
+FeatureServers live (both Table type, address-only, text M/D/YYYY dates).
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-worcester | `src/spatial/cities/worcester.py` + `field_maps_worcester.py` + `test_producers_worcester.py` | config.py, city_registry.py, cities/__init__.py | 2026-08-30 | completed — 36 tests green, interlock 25/25, ruff clean; 2-feed partial (PERMITS+SLA, both non-spatial Tables, text M/D/YYYY watermark, needs_geocode) | leaf module + field maps + tests + stream log |
+| city-new-haven | `src/spatial/cities/new_haven.py` + `field_maps_new_haven.py` + `test_producers_new_haven.py` | config.py, city_registry.py, cities/__init__.py | 2026-08-30 | completed — 31 tests green, interlock 25/25, ruff clean; SLA+DEEDS via CT statewide Socrata (ngch-56tr / 5mzw-sjtu), serialnumber+listyear composite id, needs_geocode | leaf module + field maps + tests + stream log |
+| city-bridgeport | `src/spatial/cities/bridgeport.py` + `field_maps_bridgeport.py` + `test_producers_bridgeport.py` | config.py, city_registry.py, cities/__init__.py | 2026-08-30 | completed — 30 tests green, interlock 25/25, ruff clean; SLA+DEEDS via CT statewide Socrata, serialnumber+listyear composite id, needs_geocode | leaf module + field maps + tests + stream log |
+
+### 2026-08-30 — Mid-Atlantic / Northeast onboarding — SPINE HOLD (orchestrator, serial)
+
+Applied in one hold after all three leaves landed: config.py (+4 endpoint settings:
+`arcgis_worcester_permits_url`/`arcgis_worcester_sla_url`/`socrata_ct_sla_endpoint`/
+`socrata_ct_deeds_endpoint`); CityId enum (+WORCESTER/NEW_HAVEN/BRIDGEPORT);
+_HANDWRITTEN_ALIASES (+10); _HANDWRITTEN_REGISTRY entries (worcester=PERMITS+SLA,
+new_haven=SLA+DEEDS, bridgeport=SLA+DEEDS); Hartford DEEDS supplement (5mzw-sjtu,
+`where="town = 'Hartford'"`) + Hartford SLA field_map/id_keys corrected to the real
+ngch-56tr columns (prior map referenced nonexistent columns); shared
+deeds_acris_producer loc fallback +`geo_coordinates` so native Points are read
+before address geocoding. METRO_META/index.html regenerated via export_dashboard.py
+(US-427 auto-generates from REGISTRY); product facts re-exported (132 metros).
+Gates: `pytest -m interlock` 25/25; full pre-flight green
+(scripts/verify_cicd_preflight.py); product lint green.
+Yield 3/3 leaf streams. Changes left uncommitted (local git policy); sibling
+streams (peoria/laredo/hpms) were concurrently on the same spine — the hold was
+applied additively on top of their edits (US-429 auto-gather for cities/__init__).
+
+
+### 2026-08-30 — South Central onboarding — city-shreveport (US-267) — REJECT
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-shreveport | none (REJECT) | none | 2026-08-30 | no leaf — all four families Tier 3; City AGOL reference-only, Caddo PW org reference-only, 311 = login-gated QScend, parcels = paid DataScout SaaS, case-index layers carry no date | `docs/research/probe-shreveport.md` + stream log |
+
+Verdict: **Tier 3, no register.** City of Shreveport AGOL
+(`cEsSI6IR59h5UGE4`, 1107 items) and Caddo Parish Public Works
+(`ekpaOXhC7fFWoTJ9`, 16 items) are reference-only. PERMITS = case-index
+layers (no DATE column); 311 = Port City 311 on QScend (login-gated);
+SLA = Oct-2022 liquor snapshot; DEEDS = DataScout paywalled. Re-probe
+trigger: city permit/311 export or anonymous parish parcel/Sales stream.
+
+### 2026-08-30 — South Central REJECT closes (US-346/347)
+
+Two South Central metro REJECT tickets closed (no leaf, no spine edits, no
+code/registry/dashboard changes; local git policy — left uncommitted).
+
+| Ticket | Verdict | Probe doc (stamp) | Final state | Why |
+|---|---|---|---|---|
+| US-346 (Little Rock, AR) | NO REGISTER — all four families Tier 3 | `docs/research/probe-little_rock.md` (2026-08-28) | Done + wontfix | No Socrata (`data.littlerock.gov` is a WordPress redirect); PERMITS = wrong-grain address points (`BPADDLR`/`BPADD`); 311 = Motorola CWI UI-only; DEEDS = PAgis no sales / Pulaski Hub private. SLA : city STR registry `Short_Term_Rentals_(Public_View)/FeatureServer/2` (169 pts, native geocode) is the lone live surface but watermarked **2026-06-08**, **0 approvals in 60d**. Re-probe trigger: ≥1 approval in 60d → Tier-1 SLA companion (Orlando STR precedent). |
+| US-347 (Oklahoma City, OK) | REJECTED — all four families Tier 3 | `docs/research/wave-3-probe-oklahoma-city.md` (2026-08-27) | Done + wontfix | Portal resolved (ArcGIS Hub `open-okc.hub.arcgis.com`, 81 items / 58 datasets) but no permit/311/SLA/deeds on it. PERMITS = Accela ACA UI-only (near-miss Work Zones = rolling occupancy, wrong grain); 311 = CitySourced UI-only (vendor OneView v2 authenticated); SLA = Hotel Motel Tax snapshot, no date field; DEEDS = Land Documents city clerk index, **no sale price/grantee**, newest `IndexType='D'` **2026-06-02**, **0 rows in 30d**. Re-probe triggers: Accela extracts or CitySourced 311 on the Hub, or a county sales FeatureServer (migration in flight through Aug 2026). |
+
+Closing comments added to both tickets via `linear issue comment add` (watermark
+evidence + probe-doc path + re-probe trigger), then `--state Done --add-label
+wontfix`. No leaves built, no re-probe performed (evidence already on disk).

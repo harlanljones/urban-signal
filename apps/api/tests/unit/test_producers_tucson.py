@@ -340,7 +340,7 @@ class TestFeedRegistration:
         assert spec.max_record_count == 2000
         assert spec.needs_geocode is True
         assert spec.geocode_context == TUCSON_GEOCODE_CONTEXT == "Tucson, AZ"
-        assert spec.field_map is SLA_FIELD_MAP
+        assert spec.field_map == SLA_FIELD_MAP
         assert spec.topic  # settings.topic_sla resolves
 
     def test_sla_spec_encodes_slow_cadence_and_alarm_exempt(self):

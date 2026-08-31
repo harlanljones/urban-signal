@@ -1,0 +1,292 @@
+city_id: alexandria
+name: Alexandria
+state: LA
+center:
+  lat: 31.3113
+  lng: -92.4451
+metro_bbox:
+  min_lat: 31.2
+  max_lat: 31.43
+  min_lng: -92.6
+  max_lng: -92.27
+division_bboxes:
+  CENTRAL_CORE:
+    min_lat: 31.29
+    max_lat: 31.34
+    min_lng: -92.48
+    max_lng: -92.42
+  WEST_SIDE:
+    min_lat: 31.28
+    max_lat: 31.35
+    min_lng: -92.6
+    max_lng: -92.5
+  EAST_BANK:
+    min_lat: 31.31
+    max_lat: 31.38
+    min_lng: -92.46
+    max_lng: -92.27
+  SOUTH_STRIPS:
+    min_lat: 31.2
+    max_lat: 31.29
+    min_lng: -92.53
+    max_lng: -92.4
+  NORTH_LOOP:
+    min_lat: 31.35
+    max_lat: 31.43
+    min_lng: -92.55
+    max_lng: -92.38
+submarkets:
+  Downtown Alexandria:
+    name: Downtown Alexandria
+    borough: CENTRAL_CORE
+    lat: 31.312
+    lng: -92.445
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.8
+    capex: 4200000.0
+    permit_vel: 20.0
+    shift_ratio: 1.2
+    sla: 48.0
+    description: Historic core and Red River riverfront with civic anchors and adaptive
+      reuse.
+    city_id: alexandria
+  Red Riverfront:
+    name: Red Riverfront
+    borough: CENTRAL_CORE
+    lat: 31.315
+    lng: -92.44
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.79
+    capex: 3900000.0
+    permit_vel: 19.0
+    shift_ratio: 1.18
+    sla: 46.0
+    description: Riverfront entertainment, hospitality, and mixed-use frontage along
+      the levee.
+    city_id: alexandria
+  Garden District & Jackson St:
+    name: Garden District & Jackson St
+    borough: CENTRAL_CORE
+    lat: 31.301
+    lng: -92.462
+    zoom: 14.0
+    pitch: 42.0
+    base_lims: 0.77
+    capex: 3600000.0
+    permit_vel: 18.0
+    shift_ratio: 1.16
+    sla: 44.0
+    description: Historic neighborhood fabric and Jackson Street corridor small-format
+      reinvestment.
+    city_id: alexandria
+  MacArthur Corridor:
+    name: MacArthur Corridor
+    borough: WEST_SIDE
+    lat: 31.304
+    lng: -92.52
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.74
+    capex: 3300000.0
+    permit_vel: 17.0
+    shift_ratio: 1.14
+    sla: 44.0
+    description: US-165/MacArthur Dr retail, services, and auto-oriented commercial
+      ribbons.
+    city_id: alexandria
+  Pineville Downtown:
+    name: Pineville Downtown
+    borough: EAST_BANK
+    lat: 31.323
+    lng: -92.434
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.73
+    capex: 3200000.0
+    permit_vel: 16.0
+    shift_ratio: 1.12
+    sla: 42.0
+    description: Historic Pineville main street and east-bank civic core across the
+      Red River.
+    city_id: alexandria
+  Kingsville & Coliseum:
+    name: Kingsville & Coliseum
+    borough: SOUTH_STRIPS
+    lat: 31.262
+    lng: -92.476
+    zoom: 13.5
+    pitch: 38.0
+    base_lims: 0.71
+    capex: 3000000.0
+    permit_vel: 15.0
+    shift_ratio: 1.1
+    sla: 42.0
+    description: South Alexandria growth belt near Coliseum Blvd with highway-oriented
+      retail.
+    city_id: alexandria
+  AEX / England Airpark:
+    name: AEX / England Airpark
+    borough: NORTH_LOOP
+    lat: 31.37
+    lng: -92.52
+    zoom: 13.5
+    pitch: 38.0
+    base_lims: 0.7
+    capex: 2900000.0
+    permit_vel: 14.0
+    shift_ratio: 1.08
+    sla: 42.0
+    description: Alexandria International Airport and Airpark logistics/industrial
+      campus.
+    city_id: alexandria
+  Tioga & North Pineville:
+    name: Tioga & North Pineville
+    borough: NORTH_LOOP
+    lat: 31.4
+    lng: -92.43
+    zoom: 13.5
+    pitch: 38.0
+    base_lims: 0.69
+    capex: 2800000.0
+    permit_vel: 14.0
+    shift_ratio: 1.06
+    sla: 42.0
+    description: Northern neighborhoods and commercial nodes spanning US-167 corridor.
+    city_id: alexandria
+divisions:
+  CENTRAL_CORE:
+    name: CENTRAL_CORE
+    center_lat: 31.315
+    center_lng: -92.445
+    zoom: 13.8
+    bbox:
+      min_lat: 31.29
+      max_lat: 31.34
+      min_lng: -92.48
+      max_lng: -92.42
+    submarkets:
+    - Downtown Alexandria
+    - Red Riverfront
+    - Garden District & Jackson St
+    city_id: alexandria
+  WEST_SIDE:
+    name: WEST_SIDE
+    center_lat: 31.315
+    center_lng: -92.55
+    zoom: 13.2
+    bbox:
+      min_lat: 31.28
+      max_lat: 31.35
+      min_lng: -92.6
+      max_lng: -92.5
+    submarkets:
+    - MacArthur Corridor
+    city_id: alexandria
+  SOUTH_STRIPS:
+    name: SOUTH_STRIPS
+    center_lat: 31.245
+    center_lng: -92.465
+    zoom: 13.0
+    bbox:
+      min_lat: 31.2
+      max_lat: 31.29
+      min_lng: -92.53
+      max_lng: -92.4
+    submarkets:
+    - Kingsville & Coliseum
+    city_id: alexandria
+  EAST_BANK:
+    name: EAST_BANK
+    center_lat: 31.345
+    center_lng: -92.38
+    zoom: 13.2
+    bbox:
+      min_lat: 31.31
+      max_lat: 31.38
+      min_lng: -92.46
+      max_lng: -92.27
+    submarkets:
+    - Pineville Downtown
+    city_id: alexandria
+  NORTH_LOOP:
+    name: NORTH_LOOP
+    center_lat: 31.39
+    center_lng: -92.47
+    zoom: 12.8
+    bbox:
+      min_lat: 31.35
+      max_lat: 31.43
+      min_lng: -92.55
+      max_lng: -92.38
+    submarkets:
+    - AEX / England Airpark
+    - Tioga & North Pineville
+    city_id: alexandria
+datasets:
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'LA'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- alexandria_la
+- alexandria la
+- rapides
+- rapides_parish
+- rapides parish
+job_suffix: alexandria

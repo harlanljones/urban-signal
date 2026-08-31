@@ -1,3 +1,95 @@
+PERMITS_FIELD_MAP = {
+    "job_id": ["PERMIT_NO", "OBJECTID"],
+    "issuance_date": ["ISSUED"],
+    "filing_date": ["APPLIED"],
+    "status": ["STATUS"],
+    "job_type": ["PermitType"],
+    "cost": ["JOBVALUE"],
+    "address_street": ["SITE_ADDR"],
+    "zipcode": ["SITE_ZIP"],
+    "bbl": ["SITE_APN"],
+    "borough": ["SITE_CITY"],
+}
+
+SLA_FIELD_MAP = {
+    "license_id": ["LICENSE_NO"],
+    "dba": ["COMPANY"],
+    "premises_name": ["COMPANY"],
+    "license_type": ["LICENSE_TYPE"],
+    "status": ["STATUS"],
+    "effective_date": ["ISSUED"],
+    "expiration_date": ["EXPIRED"],
+    "address_street": ["SITE_ADDR"],
+    "zipcode": ["SITE_ZIP"],
+    "borough": ["SITE_CITY"],
+    "bbl": ["SITE_APN"],
+}
+
+CASE_FIELD_MAP = {
+    "incident_id": ["CASE_NO"],
+    "complaint_type": ["CaseType"],
+    "status": ["STATUS"],
+    "created_date": ["STARTED"],
+    "closed_date": ["CLOSED"],
+    "incident_address": ["SITE_ADDR"],
+    "zipcode": ["SITE_ZIP"],
+    "borough": ["SITE_CITY"],
+    "bbl": ["SITE_APN"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+    "sla": SLA_FIELD_MAP,
+    "311": CASE_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Medford, OR"
+
+DROPPED_PII_COLUMNS = (
+    # Permits (FeatureServer/1)
+    "Taxlots_FEEOWNER",
+    "OWNER_NAME",
+    "APPLICANT_NAME",
+    "CONTRACTOR_NAME",
+    "APPLIED_BY",
+    "APPROVED_BY",
+    "ISSUED_BY",
+    "FINALED_BY",
+    "EXPIRED_BY",
+    "OTHER_BY1",
+    "NOTES",
+    # License2_Main (FeatureServer/14)
+    "EMAIL",
+    "EMERGENCY",
+    "FAX",
+    "PHONE",
+    "PHONE_EXT",
+    "LIAB_CARRIER",
+    "LIAB_NO",
+    "LIAB_ISS",
+    "LIAB_EXP",
+    "WRKR_COMP",
+    "W_COMP_NO",
+    "W_COMP_ISS",
+    "W_COMP_EXP",
+    "TAX_ID",
+    "MAIL_ADDRESS1",
+    "MAIL_ADDRESS2",
+    "MAIL_CITY",
+    "MAIL_STATE",
+    "MAIL_ZIP",
+    # Case_Main (FeatureServer/12)
+    "COMPLAINANT_NAME",
+    "RESIDENT_NAME",
+    "RECEIVED_BY",
+    "STARTED_BY",
+    "CLOSED_BY",
+    "LASTACTION_BY",
+    "FOLLOWUP_BY",
+    "ASSIGNED_TO",
+    "REFERRED_TO",
+)
+
 """Medford, OR spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -35,12 +127,6 @@ has point geometry but is stale (newest real report 2019-03-02) with 2099
 sentinels — not registered; Case_Main supersedes it.
 """
 
-from src.producers.field_maps_medford import (
-    CASE_FIELD_MAP,
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-    SLA_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 MEDFORD_CITY_ID: str = "medford"

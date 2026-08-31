@@ -303,7 +303,7 @@ class TestFeedRegistration:
         assert spec.order_by == "OBJECTID"
         assert spec.oid_field == "OBJECTID"
         assert spec.expected_cadence_days == 1
-        assert spec.field_map is PERMITS_FIELD_MAP
+        assert spec.field_map == PERMITS_FIELD_MAP
 
     def test_sla_spec_declares_trickle_cadence_and_module_filter(self):
         spec = get_spartanburg_dataset(FeedType.SLA)
@@ -319,7 +319,7 @@ class TestFeedRegistration:
         )
         assert spec.order_by == "OBJECTID"
         assert spec.expected_cadence_days == 30
-        assert spec.field_map is SLA_FIELD_MAP
+        assert spec.field_map == SLA_FIELD_MAP
 
     @pytest.mark.parametrize(
         "absent_feed",

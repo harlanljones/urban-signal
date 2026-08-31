@@ -1,0 +1,386 @@
+city_id: salem_or
+name: Salem, OR
+state: OR
+center:
+  lat: 44.9429
+  lng: -123.0351
+metro_bbox:
+  min_lat: 44.84
+  max_lat: 45.01
+  min_lng: -123.13
+  max_lng: -122.93
+division_bboxes:
+  DOWNTOWN:
+    min_lat: 44.93
+    max_lat: 44.955
+    min_lng: -123.045
+    max_lng: -123.028
+  NE_SALEM:
+    min_lat: 44.955
+    max_lat: 45.005
+    min_lng: -123.045
+    max_lng: -122.95
+  SE_MILL_CREEK:
+    min_lat: 44.855
+    max_lat: 44.92
+    min_lng: -123.07
+    max_lng: -122.97
+  WEST_SALEM:
+    min_lat: 44.89
+    max_lat: 44.96
+    min_lng: -123.12
+    max_lng: -123.045
+  SOUTH_SALEM:
+    min_lat: 44.85
+    max_lat: 44.93
+    min_lng: -123.09
+    max_lng: -123.01
+  EAST_LANCASTER:
+    min_lat: 44.88
+    max_lat: 44.965
+    min_lng: -122.978
+    max_lng: -122.93
+submarkets:
+  Downtown Salem:
+    name: Downtown Salem
+    borough: DOWNTOWN
+    lat: 44.9429
+    lng: -123.0351
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.84
+    capex: 7200000.0
+    permit_vel: 31.0
+    shift_ratio: 1.48
+    sla: 58.0
+    description: Liberty and Chemeketa core with the Riverfront Park, the Salem Convention
+      Center, and the downtown retail and office corridor anchored by the Capitol
+      Mall and Willamette University.
+    city_id: salem_or
+  Northgate:
+    name: Northgate
+    borough: NE_SALEM
+    lat: 44.9944
+    lng: -122.9942
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.86
+    capex: 6800000.0
+    permit_vel: 33.0
+    shift_ratio: 1.46
+    sla: 54.0
+    description: Silverton Road and Northgate industrial-commercial corridor with
+      warehousing, auto dealerships, and the city's heaviest commercial permit volume.
+    city_id: salem_or
+  Grant-Highland:
+    name: Grant-Highland
+    borough: NE_SALEM
+    lat: 44.958
+    lng: -123.035
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.85
+    capex: 6400000.0
+    permit_vel: 28.0
+    shift_ratio: 1.44
+    sla: 52.0
+    description: Grant and Highland neighborhoods east of downtown with pre-war housing
+      stock, farmland-residential transition, and the Fairview Cemetery area infill.
+    city_id: salem_or
+  Mill Creek:
+    name: Mill Creek
+    borough: SE_MILL_CREEK
+    lat: 44.8885
+    lng: -123.0557
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.83
+    capex: 5800000.0
+    permit_vel: 26.0
+    shift_ratio: 1.42
+    sla: 50.0
+    description: Southeast Mill Creek corridor along Kuebler Boulevard with ranch-style
+      subdivisions, solar-retrofit permits, and the Pringle Creek greenway.
+    city_id: salem_or
+  Faye Wright:
+    name: Faye Wright
+    borough: SE_MILL_CREEK
+    lat: 44.896
+    lng: -123.02
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.82
+    capex: 5400000.0
+    permit_vel: 24.0
+    shift_ratio: 1.4
+    sla: 48.0
+    description: Delta Highway and South Commercial corridor with apartment complexes,
+      big-box retail, and the Faye Wright neighborhood's steady residential service
+      permits.
+    city_id: salem_or
+  West Salem:
+    name: West Salem
+    borough: WEST_SALEM
+    lat: 44.935
+    lng: -123.065
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.87
+    capex: 7000000.0
+    permit_vel: 30.0
+    shift_ratio: 1.47
+    sla: 56.0
+    description: Edgewater Street and Wallace Marine Park neighborhood west of the
+      Willamette with bridge-access downtown adjacency, river-view renovations, and
+      steady commercial infill.
+    city_id: salem_or
+  South Salem:
+    name: South Salem
+    borough: SOUTH_SALEM
+    lat: 44.876
+    lng: -123.071
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.85
+    capex: 6200000.0
+    permit_vel: 27.0
+    shift_ratio: 1.43
+    sla: 52.0
+    description: Liberty Road South and South Gateway corridor with orchard-retreat-to-subdivision
+      infill, the Minto-Brown Island Park adjacency, and the city's south-edge residential
+      growth.
+    city_id: salem_or
+  Sunnyslope:
+    name: Sunnyslope
+    borough: SOUTH_SALEM
+    lat: 44.905
+    lng: -123.055
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.83
+    capex: 5600000.0
+    permit_vel: 25.0
+    shift_ratio: 1.41
+    sla: 50.0
+    description: Sunnyslope neighborhood south of Bush's Pasture Park with mid-century
+      homes, ranch-style additions, and the Mission Street corridor's steady alterations.
+    city_id: salem_or
+  East Lancaster:
+    name: East Lancaster
+    borough: EAST_LANCASTER
+    lat: 44.942
+    lng: -122.967
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.84
+    capex: 6000000.0
+    permit_vel: 28.0
+    shift_ratio: 1.44
+    sla: 53.0
+    description: Lancaster Drive and I-5 commercial corridor with auto-oriented retail,
+      motel-strip conversions, and the East Salem residential belt's steady apartment-license
+      renewals.
+    city_id: salem_or
+divisions:
+  DOWNTOWN:
+    name: DOWNTOWN
+    center_lat: 44.9429
+    center_lng: -123.0351
+    zoom: 14.0
+    bbox:
+      min_lat: 44.93
+      max_lat: 44.955
+      min_lng: -123.045
+      max_lng: -123.028
+    submarkets:
+    - Downtown Salem
+    city_id: salem_or
+  NE_SALEM:
+    name: NE_SALEM
+    center_lat: 44.978
+    center_lng: -123.002
+    zoom: 13.0
+    bbox:
+      min_lat: 44.955
+      max_lat: 45.005
+      min_lng: -123.045
+      max_lng: -122.95
+    submarkets:
+    - Northgate
+    - Grant-Highland
+    city_id: salem_or
+  SE_MILL_CREEK:
+    name: SE_MILL_CREEK
+    center_lat: 44.89
+    center_lng: -123.04
+    zoom: 13.0
+    bbox:
+      min_lat: 44.855
+      max_lat: 44.92
+      min_lng: -123.07
+      max_lng: -122.97
+    submarkets:
+    - Mill Creek
+    - Faye Wright
+    city_id: salem_or
+  WEST_SALEM:
+    name: WEST_SALEM
+    center_lat: 44.935
+    center_lng: -123.065
+    zoom: 13.5
+    bbox:
+      min_lat: 44.89
+      max_lat: 44.96
+      min_lng: -123.12
+      max_lng: -123.045
+    submarkets:
+    - West Salem
+    city_id: salem_or
+  SOUTH_SALEM:
+    name: SOUTH_SALEM
+    center_lat: 44.89
+    center_lng: -123.06
+    zoom: 13.0
+    bbox:
+      min_lat: 44.85
+      max_lat: 44.93
+      min_lng: -123.09
+      max_lng: -123.01
+    submarkets:
+    - South Salem
+    - Sunnyslope
+    city_id: salem_or
+  EAST_LANCASTER:
+    name: EAST_LANCASTER
+    center_lat: 44.94
+    center_lng: -122.95
+    zoom: 13.0
+    bbox:
+      min_lat: 44.88
+      max_lat: 44.965
+      min_lng: -122.978
+      max_lng: -122.93
+    submarkets:
+    - East Lancaster
+    city_id: salem_or
+datasets:
+  permits:
+    endpoint: https://services.arcgis.com/kIA6yS9KDGqZL7U3/arcgis/rest/services/Structure_Permits/FeatureServer/0
+    platform: arcgis
+    watermark_col: ISSUEDDATE
+    id_keys:
+    - FOLDERNUMBER
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: ISSUEDDATE DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - FOLDERNUMBER
+      issuance_date:
+      - ISSUEDDATE
+      filing_date:
+      - CREATEDDATE
+      status:
+      - STATUS
+      job_type:
+      - SUBDESCRIPTION
+      - MAPDESCRIPTION
+      address_street:
+      - PROPERTYADDRESS
+      borough:
+      - NEIGHBORHOOD
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  sla:
+    endpoint: https://services.arcgis.com/kIA6yS9KDGqZL7U3/arcgis/rest/services/Amanda_MultiFamily_Licenses_Data/FeatureServer/0
+    platform: arcgis
+    watermark_col: INDATE
+    id_keys:
+    - FOLDERNUMBER
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: INDATE DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - FOLDERNUMBER
+      dba:
+      - COMPLEXNAME
+      premises_name:
+      - COMPLEXNAME
+      license_type:
+      - SUBTYPE
+      - SUBDESC
+      status:
+      - STATUSDESC
+      effective_date:
+      - INDATE
+      expiration_date:
+      - EXPIRYDATE
+      address_street:
+      - FOLDERNAME
+      borough:
+      - NEIGHBORHOOD
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- salem_oregon
+- salem oregon
+job_suffix: salem_or

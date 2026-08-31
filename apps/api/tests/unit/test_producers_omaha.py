@@ -219,7 +219,7 @@ class TestFeedRegistration:
         assert spec.oid_field == "OBJECTID"
         assert spec.max_record_count == 2000
         assert spec.order_by == "DATETIMEINIT DESC"
-        assert spec.field_map is COMPLAINTS_311_FIELD_MAP
+        assert spec.field_map == COMPLAINTS_311_FIELD_MAP
 
     @pytest.mark.parametrize(
         "absent_feed",

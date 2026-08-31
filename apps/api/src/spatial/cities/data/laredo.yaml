@@ -1,0 +1,232 @@
+city_id: laredo
+name: Laredo
+state: TX
+center:
+  lat: 27.5306
+  lng: -99.4803
+metro_bbox:
+  min_lat: 27.4
+  max_lat: 27.75
+  min_lng: -99.65
+  max_lng: -99.3
+division_bboxes:
+  LAREDO_CORE:
+    min_lat: 27.42
+    max_lat: 27.58
+    min_lng: -99.6
+    max_lng: -99.38
+  LAREDO_NORTH:
+    min_lat: 27.58
+    max_lat: 27.72
+    min_lng: -99.62
+    max_lng: -99.32
+submarkets:
+  Downtown & San Agustin:
+    name: Downtown & San Agustin
+    borough: LAREDO_CORE
+    lat: 27.5245
+    lng: -99.5075
+    zoom: 14.2
+    pitch: 48.0
+    base_lims: 0.82
+    capex: 6200000.0
+    permit_vel: 34.0
+    shift_ratio: 1.38
+    sla: 55.0
+    description: Historic riverfront core around San Agustin Plaza and the international bridges with rehabilitation and hospitality infill.
+    city_id: laredo
+  Heights & Del Mar:
+    name: Heights & Del Mar
+    borough: LAREDO_CORE
+    lat: 27.545
+    lng: -99.505
+    zoom: 13.8
+    pitch: 46.0
+    base_lims: 0.8
+    capex: 5800000.0
+    permit_vel: 31.0
+    shift_ratio: 1.34
+    sla: 53.0
+    description: Established north-central residential grid and Del Mar retail corridor with steady alteration and addition permits.
+    city_id: laredo
+  Zacate Creek & Washington:
+    name: Zacate Creek & Washington
+    borough: LAREDO_CORE
+    lat: 27.54
+    lng: -99.485
+    zoom: 13.6
+    pitch: 44.0
+    base_lims: 0.79
+    capex: 5400000.0
+    permit_vel: 29.0
+    shift_ratio: 1.32
+    sla: 52.0
+    description: Washington Street corridor and Zacate Creek neighborhoods with infill housing and commercial upgrades.
+    city_id: laredo
+  South Laredo & Santa Rita:
+    name: South Laredo & Santa Rita
+    borough: LAREDO_CORE
+    lat: 27.465
+    lng: -99.49
+    zoom: 13.2
+    pitch: 42.0
+    base_lims: 0.77
+    capex: 5100000.0
+    permit_vel: 27.0
+    shift_ratio: 1.3
+    sla: 51.0
+    description: Southern growth belt toward Santa Rita and the World Trade Bridge with highway-oriented retail and services.
+    city_id: laredo
+  Mines Road Corridor:
+    name: Mines Road Corridor
+    borough: LAREDO_NORTH
+    lat: 27.62
+    lng: -99.56
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.76
+    capex: 5600000.0
+    permit_vel: 30.0
+    shift_ratio: 1.33
+    sla: 52.0
+    description: FM 1472 logistics and industrial spine with warehousing, workforce housing, and utility permits.
+    city_id: laredo
+  North Laredo & Winfield:
+    name: North Laredo & Winfield
+    borough: LAREDO_NORTH
+    lat: 27.65
+    lng: -99.5
+    zoom: 12.8
+    pitch: 38.0
+    base_lims: 0.75
+    capex: 5300000.0
+    permit_vel: 28.0
+    shift_ratio: 1.31
+    sla: 50.0
+    description: Loop 20 / Winfield and Encanto subdivisions with single-family production housing and solar-panel permits.
+    city_id: laredo
+divisions:
+  LAREDO_CORE:
+    name: Laredo Core
+    center_lat: 27.52
+    center_lng: -99.49
+    zoom: 12.4
+    bbox:
+      min_lat: 27.42
+      max_lat: 27.58
+      min_lng: -99.6
+      max_lng: -99.38
+    submarkets:
+    - Downtown & San Agustin
+    - Heights & Del Mar
+    - Zacate Creek & Washington
+    - South Laredo & Santa Rita
+    city_id: laredo
+  LAREDO_NORTH:
+    name: North Laredo
+    center_lat: 27.635
+    center_lng: -99.53
+    zoom: 11.8
+    bbox:
+      min_lat: 27.58
+      max_lat: 27.72
+      min_lng: -99.62
+      max_lng: -99.32
+    submarkets:
+    - Mines Road Corridor
+    - North Laredo & Winfield
+    city_id: laredo
+datasets:
+  permits:
+    endpoint: ckan://data.openlaredo.com/61972510-7b8c-488a-9e88-b73b0112f496
+    platform: ckan
+    watermark_col: PERMIT ISS. DATE
+    id_keys:
+    - APP NBR
+    - APP_NBR
+    - APP YR
+    - APP_YR
+    - _id
+    topic: raw.municipal.permits
+    interval_seconds: 3600.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Laredo, TX
+    field_map:
+      job_id:
+      - APP_NBR
+      - APP_YR
+      - _id
+      issuance_date:
+      - PERMIT_ISS_DATE
+      filing_date:
+      - PERMIT_ISS_DATE
+      status:
+      - PERMIT_STATUS_DESC
+      - PERMIT_STATUS
+      - APP_STAT_DESC
+      - APP_STATUS
+      job_type:
+      - APP_TYPE_DESC
+      - PERMIT_TYPE_DESC
+      - Permit_Group_Type
+      - Permit_Group_Tab
+      cost:
+      - VALUATION
+      - TOTAL_FEE
+      - PERMIT_FEE
+      valuation:
+      - VALUATION
+      total_fee:
+      - TOTAL_FEE
+      address_street:
+      - STREET
+      - STREET_NBR
+      street_number:
+      - STREET_NBR
+      street_name:
+      - STREET
+      description:
+      - APP_DESC
+      - Permit_Group_Type
+      permit_type:
+      - PERMIT_TYPE
+      - APP_TYPE
+      permit_sequence:
+      - PERMIT_SEQUENCE
+      borough:
+      - Permit_Group_Tab
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: 1000
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- laredo
+- laredo_tx
+- laredo-tx
+- laredo tx
+job_suffix: laredo

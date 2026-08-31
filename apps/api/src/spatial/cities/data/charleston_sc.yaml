@@ -1,0 +1,288 @@
+city_id: charleston_sc
+name: Charleston
+state: SC
+center:
+  lat: 32.781
+  lng: -79.931
+metro_bbox:
+  min_lat: 32.6
+  max_lat: 33.02
+  min_lng: -80.3
+  max_lng: -79.6
+division_bboxes:
+  PENINSULA_CORE:
+    min_lat: 32.74
+    max_lat: 32.82
+    min_lng: -79.975
+    max_lng: -79.9
+  MOUNT_PLEASANT:
+    min_lat: 32.77
+    max_lat: 32.9
+    min_lng: -79.9
+    max_lng: -79.75
+  WEST_ASHLEY:
+    min_lat: 32.72
+    max_lat: 32.82
+    min_lng: -80.06
+    max_lng: -79.95
+  NORTH_CHARLESTON:
+    min_lat: 32.84
+    max_lat: 32.98
+    min_lng: -80.05
+    max_lng: -79.9
+  JAMES_ISLAND:
+    min_lat: 32.7
+    max_lat: 32.78
+    min_lng: -79.99
+    max_lng: -79.91
+  DANIEL_CAINHOY:
+    min_lat: 32.84
+    max_lat: 33.0
+    min_lng: -79.93
+    max_lng: -79.7
+submarkets:
+  Historic Peninsula:
+    name: Historic Peninsula
+    borough: PENINSULA_CORE
+    lat: 32.781
+    lng: -79.931
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.86
+    capex: 7800000.0
+    permit_vel: 42.0
+    shift_ratio: 1.38
+    sla: 56.0
+    description: King St, City Market, and waterfront anchors with adaptive reuse
+      and hospitality infill.
+    city_id: charleston_sc
+  Upper King & Cannonborough:
+    name: Upper King & Cannonborough
+    borough: PENINSULA_CORE
+    lat: 32.792
+    lng: -79.942
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.84
+    capex: 7200000.0
+    permit_vel: 38.0
+    shift_ratio: 1.32
+    sla: 54.0
+    description: Mixed-use corridor and medical district spillover north of Calhoun.
+    city_id: charleston_sc
+  Mount Pleasant Waterfront:
+    name: Mount Pleasant Waterfront
+    borough: MOUNT_PLEASANT
+    lat: 32.806
+    lng: -79.875
+    zoom: 13.8
+    pitch: 42.0
+    base_lims: 0.8
+    capex: 6200000.0
+    permit_vel: 30.0
+    shift_ratio: 1.26
+    sla: 50.0
+    description: Waterfront Park, Old Village, and US-17 commercial spine with steady
+      reinvestment.
+    city_id: charleston_sc
+  West Ashley Corridors:
+    name: West Ashley Corridors
+    borough: WEST_ASHLEY
+    lat: 32.782
+    lng: -80.006
+    zoom: 13.6
+    pitch: 40.0
+    base_lims: 0.76
+    capex: 5400000.0
+    permit_vel: 26.0
+    shift_ratio: 1.22
+    sla: 48.0
+    description: Savannah Hwy and Sam Rittenberg Blvd retail/service belts and medical
+      clusters.
+    city_id: charleston_sc
+  Park Circle:
+    name: Park Circle
+    borough: NORTH_CHARLESTON
+    lat: 32.885
+    lng: -79.975
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.74
+    capex: 5000000.0
+    permit_vel: 24.0
+    shift_ratio: 1.2
+    sla: 46.0
+    description: Historic Park Circle district with small-scale infill and hospitality/logistics
+      adjacency.
+    city_id: charleston_sc
+  James Island Folly Rd:
+    name: James Island Folly Rd
+    borough: JAMES_ISLAND
+    lat: 32.742
+    lng: -79.965
+    zoom: 13.8
+    pitch: 40.0
+    base_lims: 0.74
+    capex: 4700000.0
+    permit_vel: 22.0
+    shift_ratio: 1.18
+    sla: 46.0
+    description: Folly Road commercial spine and neighborhood services.
+    city_id: charleston_sc
+  Daniel Island:
+    name: Daniel Island
+    borough: DANIEL_CAINHOY
+    lat: 32.87
+    lng: -79.91
+    zoom: 13.8
+    pitch: 38.0
+    base_lims: 0.72
+    capex: 4600000.0
+    permit_vel: 21.0
+    shift_ratio: 1.16
+    sla: 44.0
+    description: Master-planned mixed-use with logistics adjacency across I-526.
+    city_id: charleston_sc
+divisions:
+  PENINSULA_CORE:
+    name: PENINSULA_CORE
+    center_lat: 32.78
+    center_lng: -79.935
+    zoom: 13.8
+    bbox:
+      min_lat: 32.74
+      max_lat: 32.82
+      min_lng: -79.975
+      max_lng: -79.9
+    submarkets:
+    - Historic Peninsula
+    - Upper King & Cannonborough
+    city_id: charleston_sc
+  MOUNT_PLEASANT:
+    name: MOUNT_PLEASANT
+    center_lat: 32.82
+    center_lng: -79.855
+    zoom: 13.2
+    bbox:
+      min_lat: 32.77
+      max_lat: 32.9
+      min_lng: -79.9
+      max_lng: -79.75
+    submarkets:
+    - Mount Pleasant Waterfront
+    city_id: charleston_sc
+  WEST_ASHLEY:
+    name: WEST_ASHLEY
+    center_lat: 32.775
+    center_lng: -80.0
+    zoom: 13.2
+    bbox:
+      min_lat: 32.72
+      max_lat: 32.82
+      min_lng: -80.06
+      max_lng: -79.95
+    submarkets:
+    - West Ashley Corridors
+    city_id: charleston_sc
+  NORTH_CHARLESTON:
+    name: NORTH_CHARLESTON
+    center_lat: 32.9
+    center_lng: -79.975
+    zoom: 12.8
+    bbox:
+      min_lat: 32.84
+      max_lat: 32.98
+      min_lng: -80.05
+      max_lng: -79.9
+    submarkets:
+    - Park Circle
+    city_id: charleston_sc
+  JAMES_ISLAND:
+    name: JAMES_ISLAND
+    center_lat: 32.745
+    center_lng: -79.965
+    zoom: 13.2
+    bbox:
+      min_lat: 32.7
+      max_lat: 32.78
+      min_lng: -79.99
+      max_lng: -79.91
+    submarkets:
+    - James Island Folly Rd
+    city_id: charleston_sc
+  DANIEL_CAINHOY:
+    name: DANIEL_CAINHOY
+    center_lat: 32.9
+    center_lng: -79.84
+    zoom: 12.8
+    bbox:
+      min_lat: 32.84
+      max_lat: 33.0
+      min_lng: -79.93
+      max_lng: -79.7
+    submarkets:
+    - Daniel Island
+    city_id: charleston_sc
+datasets:
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'SC'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- charleston sc
+- charleston-sc
+job_suffix: charleston_sc

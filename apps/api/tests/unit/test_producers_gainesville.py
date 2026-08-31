@@ -56,7 +56,7 @@ class TestFeedRegistration:
         assert spec.id_keys == ["permit"]
         assert spec.producer_key == "permits"
         # Field map attached for stable parse keys
-        assert spec.field_map is GAINESVILLE_PERMITS_FIELD_MAP
+        assert spec.field_map == GAINESVILLE_PERMITS_FIELD_MAP
 
     def test_field_map_reads_live_columns(self):
         row = {

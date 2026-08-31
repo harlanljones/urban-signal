@@ -1,3 +1,15 @@
+FIELD_MAP = {
+    "job_id": ["PermitID"],
+    "issuance_date": ["DateIssued", "AppliedDate"],
+    "status": ["Status"],
+    "job_type": ["PermitType", "ApplicationType", "BuildingType"],
+    "address_street": ["ADDRESSWITHUNIT"],
+    # Coordinates come from geometry; the layer also carries State-Plane GEOX/GEOY
+    # which we deliberately ignore here.
+}
+
+PSL_FIELD_MAP = FIELD_MAP
+
 """Port St. Lucie Metro Submarket Registry for Urban Signal (US-289).
 
 Leaf-local geometry and camera metadata, plus feed hints for Port St. Lucie, FL.
@@ -171,7 +183,6 @@ PORT_ST_LUCIE_DIVISION_BBOXES_MAP = PORT_ST_LUCIE_DIVISION_BBOXES
 PORT_ST_LUCIE_DIVISIONS_MAP = PORT_ST_LUCIE_DIVISIONS
 
 # Feed registration (leaf-local plain data; the spine copies this into REGISTRY).
-from src.producers.field_maps_port_st_lucie import FIELD_MAP as PSL_FIELD_MAP  # noqa: E402
 
 PSL_PERMITS_ENDPOINT = (
     "https://services1.arcgis.com/YdUP5V6WwzeG8T8r/arcgis/rest/services/Permits/FeatureServer/0"

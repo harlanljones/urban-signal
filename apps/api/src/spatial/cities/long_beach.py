@@ -1,3 +1,49 @@
+SLA_FIELD_MAP = {
+    "license_id": ["LICENSENO"],
+    "dba": ["DBANAME"],
+    "premises_name": ["DBANAME"],
+    "license_type": ["LICCATDESC", "CLASSDESC"],
+    "status": ["LICSTATUS"],
+    "effective_date": ["ISSDTTM"],
+    "expiration_date": ["INACTVDTTM"],
+    "address_street": ["SITELOCATION"],
+    "zipcode": ["ZIP"],
+    "borough": ["COUNCIL_NUMBER"],
+}
+
+CRIME_FIELD_MAP = {
+    "incident_id": ["DR", "OBJECTID"],
+    "offense_type": ["CrimeType", "Category", "Type"],
+    "reported_date": ["ReportedDateTimeDate"],
+    "borough": ["Division"],
+}
+
+FIELD_MAP = {
+    "sla": SLA_FIELD_MAP,
+    "crime": CRIME_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Long Beach, CA"
+
+DROPPED_PII_COLUMNS = ("FULLNAME",)
+
+DROPPED_NONADDRESS_COLUMNS = (
+    "MILESTONE",
+    "MILESTONE_SIMPLE",
+    "BID_NAME",
+    "BID_NAME_1",
+    "BID_NAME_12",
+    "TRACT",
+    "CDBG",
+    "PRINTPRODUCTTYPES",
+    "ReportedDateTime",
+    "Beat",
+    "ReportingDistrict",
+    "DaysOld",
+    "DayOfWeek",
+    "HourOfDay",
+)
+
 """Long Beach, CA spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, division catalog, and
@@ -61,11 +107,6 @@ Live-probe caveats that define this leaf (all probed live 2026-08-28 UTC):
 """
 
 
-from src.producers.field_maps_long_beach import (
-    CRIME_FIELD_MAP,
-    GEOCODE_CONTEXT,
-    SLA_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 LONG_BEACH_CITY_ID: str = "long_beach"

@@ -1,0 +1,221 @@
+city_id: peoria
+name: Peoria
+state: IL
+center:
+  lat: 40.6936
+  lng: -89.589
+metro_bbox:
+  min_lat: 40.45
+  max_lat: 41.05
+  min_lng: -90.05
+  max_lng: -89.35
+division_bboxes:
+  PEORIA_CORE:
+    min_lat: 40.66
+    max_lat: 40.83
+    min_lng: -89.72
+    max_lng: -89.55
+  PEORIA_EAST:
+    min_lat: 40.52
+    max_lat: 40.72
+    min_lng: -89.68
+    max_lng: -89.4
+submarkets:
+  Downtown Peoria:
+    name: Downtown Peoria
+    borough: PEORIA_CORE
+    lat: 40.6936
+    lng: -89.589
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.81
+    capex: 6100000.0
+    permit_vel: 30.0
+    shift_ratio: 1.32
+    sla: 52.0
+    description: Riverfront core around the Warehouse District with mixed-use conversion
+      and medical-campus spillover.
+    city_id: peoria
+  North Peoria:
+    name: North Peoria
+    borough: PEORIA_CORE
+    lat: 40.76
+    lng: -89.6
+    zoom: 12.8
+    pitch: 40.0
+    base_lims: 0.74
+    capex: 4900000.0
+    permit_vel: 26.0
+    shift_ratio: 1.26
+    sla: 47.0
+    description: Northern growth corridor along Knoxville and Sheridan with retail
+      centres and newer subdivisions.
+    city_id: peoria
+  West Bluff:
+    name: West Bluff
+    borough: PEORIA_CORE
+    lat: 40.698
+    lng: -89.618
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.72
+    capex: 4200000.0
+    permit_vel: 24.0
+    shift_ratio: 1.23
+    sla: 45.0
+    description: Historic bluff neighbourhoods west of downtown anchored by Bradley
+      University and steady rehab activity.
+    city_id: peoria
+  Peoria Heights:
+    name: Peoria Heights
+    borough: PEORIA_CORE
+    lat: 40.7472
+    lng: -89.572
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.73
+    capex: 4400000.0
+    permit_vel: 25.0
+    shift_ratio: 1.25
+    sla: 46.0
+    description: Village district above the river bluff with boutique retail along
+      Prospect Road and infill housing.
+    city_id: peoria
+  East Peoria:
+    name: East Peoria
+    borough: PEORIA_EAST
+    lat: 40.6664
+    lng: -89.5801
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.71
+    capex: 4000000.0
+    permit_vel: 23.0
+    shift_ratio: 1.22
+    sla: 44.0
+    description: East-bank commercial strip along IL-8 and the Levee District with
+      riverfront redevelopment.
+    city_id: peoria
+  Morton:
+    name: Morton
+    borough: PEORIA_EAST
+    lat: 40.6114
+    lng: -89.4587
+    zoom: 12.8
+    pitch: 38.0
+    base_lims: 0.69
+    capex: 3700000.0
+    permit_vel: 21.0
+    shift_ratio: 1.19
+    sla: 42.0
+    description: Suburban Tazewell village with distribution employment and consistent
+      single-family construction.
+    city_id: peoria
+  Pekin:
+    name: Pekin
+    borough: PEORIA_EAST
+    lat: 40.5675
+    lng: -89.6407
+    zoom: 12.8
+    pitch: 38.0
+    base_lims: 0.67
+    capex: 3400000.0
+    permit_vel: 20.0
+    shift_ratio: 1.17
+    sla: 41.0
+    description: Tazewell County seat south of the metro with industrial riverfront
+      and established residential stock.
+    city_id: peoria
+divisions:
+  PEORIA_CORE:
+    name: Peoria
+    center_lat: 40.6936
+    center_lng: -89.589
+    zoom: 11.6
+    bbox:
+      min_lat: 40.66
+      max_lat: 40.83
+      min_lng: -89.72
+      max_lng: -89.55
+    submarkets:
+    - Downtown Peoria
+    - North Peoria
+    - West Bluff
+    - Peoria Heights
+    city_id: peoria
+  PEORIA_EAST:
+    name: East Peoria / Tazewell
+    center_lat: 40.6664
+    center_lng: -89.5801
+    zoom: 11.4
+    bbox:
+      min_lat: 40.52
+      max_lat: 40.72
+      min_lng: -89.68
+      max_lng: -89.4
+    submarkets:
+    - East Peoria
+    - Morton
+    - Pekin
+    city_id: peoria
+datasets:
+  deeds:
+    endpoint: https://gis.peoriacounty.gov/arcgis/rest/services/DP/ResidentialSales/MapServer/5
+    platform: arcgis
+    watermark_col: date_of_sale
+    id_keys:
+    - document_number
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year:
+      '2017': https://gis.peoriacounty.gov/arcgis/rest/services/DP/ResidentialSales/MapServer/9
+      '2018': https://gis.peoriacounty.gov/arcgis/rest/services/DP/ResidentialSales/MapServer/8
+      '2019': https://gis.peoriacounty.gov/arcgis/rest/services/DP/ResidentialSales/MapServer/7
+      '2020': https://gis.peoriacounty.gov/arcgis/rest/services/DP/ResidentialSales/MapServer/6
+      '2021': https://gis.peoriacounty.gov/arcgis/rest/services/DP/ResidentialSales/MapServer/11
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - document_number
+      bbl:
+      - Name
+      recorded_date:
+      - date_of_sale
+      doc_type:
+      - PropClass
+      incident_address:
+      - prop_street
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 1000
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- peoria_il
+- peoria il
+job_suffix: peoria

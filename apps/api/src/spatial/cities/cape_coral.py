@@ -1,3 +1,16 @@
+FIELD_MAP = {
+    "job_id": ["Permit_Number"],
+    "issuance_date": ["issuedate", "applydate", "lastchangedon"],
+    "status": ["permit_status"],
+    "job_type": ["Permit_Type", "Work_Class", "permit_desc"],
+    "cost": ["permitvalue"],
+    "address_street": ["Addr1"],
+    "zipcode": ["Zip"],
+    "borough": ["City"],
+}
+
+CAPE_CORAL_FIELD_MAP = FIELD_MAP
+
 """Cape Coral–Fort Myers Metro (FL) — spatial registry and feed leaf.
 
 This leaf declares:
@@ -236,7 +249,6 @@ CAPE_CORAL_DIVISIONS: Dict[str, BoroughMeta] = {
 
 
 # Leaf-local feed registration ------------------------------------------------
-from src.producers.field_maps_cape_coral import FIELD_MAP as CAPE_CORAL_FIELD_MAP  # noqa: E402
 
 # Verified public permits table (address-only; ADR-0004 geocoding in registry).
 CAPE_CORAL_PERMITS_ENDPOINT = "https://capeims.capecoral.gov/arcgis/rest/services/OpenData/OpenData/MapServer/1"

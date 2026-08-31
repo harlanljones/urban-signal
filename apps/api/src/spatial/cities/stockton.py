@@ -1,3 +1,31 @@
+SLA_FIELD_MAP = {
+    "license_id": ["FileNumber", "OBJECTID"],
+    "dba": ["PremiseName"],
+    "premises_name": ["OwnerName"],
+    "license_type": ["LicenseType", "LicenseCode"],
+    "status": ["Status"],
+    "effective_date": ["OriginalIssueDate"],
+    "expiration_date": ["ExpirationDate"],
+    "address_street": ["PremiseAddress", "PremiseAddress2"],
+}
+
+FIELD_MAP = {
+    "sla": SLA_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Stockton, CA"
+
+DROPPED_MAIL_COLUMNS = (
+    "MailAddress",
+    "MailAddress2",
+    "MailCity",
+    "MailState",
+    "MailZipcode",
+    "PremiseZipcode",
+    "PremiseCensusTract",
+    "Shape",
+)
+
 """Stockton, CA spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -56,11 +84,6 @@ Live-probe caveats that define this leaf (probed 2026-08-28, US-230):
 """
 
 
-from src.producers.field_maps_stockton import (
-    DROPPED_MAIL_COLUMNS,
-    GEOCODE_CONTEXT,
-    SLA_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 STOCKTON_CITY_ID: str = "stockton"

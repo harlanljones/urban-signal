@@ -1,0 +1,556 @@
+city_id: tempe
+name: Tempe
+state: AZ
+center:
+  lat: 33.4267
+  lng: -111.9398
+metro_bbox:
+  min_lat: 33.31
+  max_lat: 33.47
+  min_lng: -111.99
+  max_lng: -111.83
+division_bboxes:
+  DOWNTOWN_RIO_SALADO:
+    min_lat: 33.417
+    max_lat: 33.446
+    min_lng: -111.955
+    max_lng: -111.93
+  ASU_CAMPUS_EDGE:
+    min_lat: 33.417
+    max_lat: 33.446
+    min_lng: -111.93
+    max_lng: -111.915
+  ESCALANTE_HISTORIC:
+    min_lat: 33.417
+    max_lat: 33.446
+    min_lng: -111.915
+    max_lng: -111.89
+  PAPAGO_NORTH_TEMPE:
+    min_lat: 33.446
+    max_lat: 33.465
+    min_lng: -111.985
+    max_lng: -111.895
+  DIABLO_DOUBLE_BUTTE:
+    min_lat: 33.393
+    max_lat: 33.446
+    min_lng: -111.985
+    max_lng: -111.955
+  ALAMEDA:
+    min_lat: 33.393
+    max_lat: 33.417
+    min_lng: -111.955
+    max_lng: -111.93
+  MILLS_APACHE:
+    min_lat: 33.393
+    max_lat: 33.417
+    min_lng: -111.93
+    max_lng: -111.888
+  KIWANIS_THE_LAKES:
+    min_lat: 33.355
+    max_lat: 33.393
+    min_lng: -111.985
+    max_lng: -111.855
+  CORONA_SOUTH_TEMPE:
+    min_lat: 33.31
+    max_lat: 33.355
+    min_lng: -111.985
+    max_lng: -111.83
+submarkets:
+  Downtown Mill Avenue:
+    name: Downtown Mill Avenue
+    borough: DOWNTOWN_RIO_SALADO
+    lat: 33.4267
+    lng: -111.9398
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.88
+    capex: 8200000.0
+    permit_vel: 34.0
+    shift_ratio: 1.52
+    sla: 60.0
+    description: Mill Avenue entertainment spine with adaptive-reuse lofts, patio-retail
+      turnover, and the metro's densest evening shift traffic.
+    city_id: tempe
+  Hayden Ferry Lakeside:
+    name: Hayden Ferry Lakeside
+    borough: DOWNTOWN_RIO_SALADO
+    lat: 33.4313
+    lng: -111.9437
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.9
+    capex: 10500000.0
+    permit_vel: 40.0
+    shift_ratio: 1.58
+    sla: 65.0
+    description: Tempe Town Lake south-shore office/residential district with class-A
+      build-outs and the city's highest permit valuations.
+    city_id: tempe
+  ASU Campus & University Drive:
+    name: ASU Campus & University Drive
+    borough: ASU_CAMPUS_EDGE
+    lat: 33.4245
+    lng: -111.9285
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.86
+    capex: 9600000.0
+    permit_vel: 38.0
+    shift_ratio: 1.55
+    sla: 62.0
+    description: Campus-edge student-housing belt with continual renovation permitting,
+      annual tenant turnover, and university-anchored retail.
+    city_id: tempe
+  Escalante Historic District:
+    name: Escalante Historic District
+    borough: ESCALANTE_HISTORIC
+    lat: 33.43
+    lng: -111.908
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.82
+    capex: 5800000.0
+    permit_vel: 24.0
+    shift_ratio: 1.4
+    sla: 50.0
+    description: Historic bungalow district with steady renovation, garage-conversion
+      filings, and infill near the Mesa border.
+    city_id: tempe
+  Papago Park & North Tempe:
+    name: Papago Park & North Tempe
+    borough: PAPAGO_NORTH_TEMPE
+    lat: 33.452
+    lng: -111.935
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.84
+    capex: 7200000.0
+    permit_vel: 28.0
+    shift_ratio: 1.44
+    sla: 54.0
+    description: North-edge recreation and research belt with hotel/office repositioning
+      and riverfront-adjacent multifamily filings.
+    city_id: tempe
+  Diablo Stadium Corridor:
+    name: Diablo Stadium Corridor
+    borough: DIABLO_DOUBLE_BUTTE
+    lat: 33.401
+    lng: -111.9595
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.8
+    capex: 5600000.0
+    permit_vel: 23.0
+    shift_ratio: 1.38
+    sla: 48.0
+    description: West Tempe stadium district with seasonal hospitality churn and spring-training-driven
+      short-term demand.
+    city_id: tempe
+  Alameda Park & Hudson Manor:
+    name: Alameda Park & Hudson Manor
+    borough: ALAMEDA
+    lat: 33.4075
+    lng: -111.937
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.78
+    capex: 4900000.0
+    permit_vel: 22.0
+    shift_ratio: 1.36
+    sla: 47.0
+    description: Mid-century central neighborhoods with starter-home turnover, SES-panel
+      permits, and rental-to-own conversions.
+    city_id: tempe
+  Apache Boulevard Light Rail:
+    name: Apache Boulevard Light Rail
+    borough: MILLS_APACHE
+    lat: 33.4147
+    lng: -111.913
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.83
+    capex: 6800000.0
+    permit_vel: 30.0
+    shift_ratio: 1.46
+    sla: 54.0
+    description: Light-rail spine with transit-oriented multifamily, international-food
+      retail, and corridor infill permitting.
+    city_id: tempe
+  Mills Avenue & Emerald Park:
+    name: Mills Avenue & Emerald Park
+    borough: MILLS_APACHE
+    lat: 33.404
+    lng: -111.922
+    zoom: 14.0
+    pitch: 44.0
+    base_lims: 0.81
+    capex: 6100000.0
+    permit_vel: 26.0
+    shift_ratio: 1.42
+    sla: 51.0
+    description: Mills/Emerald character area with duplex conversions and small-plex
+      new builds feeding steady rental supply.
+    city_id: tempe
+  Kiwanis Park:
+    name: Kiwanis Park
+    borough: KIWANIS_THE_LAKES
+    lat: 33.382
+    lng: -111.8747
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.8
+    capex: 5400000.0
+    permit_vel: 24.0
+    shift_ratio: 1.4
+    sla: 50.0
+    description: Park-anchored east Tempe with townhome infill and roof/HVAC replacement
+      cadence on 1970s-80s stock.
+    city_id: tempe
+  The Lakes:
+    name: The Lakes
+    borough: KIWANIS_THE_LAKES
+    lat: 33.372
+    lng: -111.9445
+    zoom: 14.0
+    pitch: 42.0
+    base_lims: 0.79
+    capex: 5200000.0
+    permit_vel: 22.0
+    shift_ratio: 1.38
+    sla: 49.0
+    description: Lakeside community near Baseline with stable owner-occupancy and
+      water-adjacent amenity premiums.
+    city_id: tempe
+  Corona del Sol:
+    name: Corona del Sol
+    borough: KIWANIS_THE_LAKES
+    lat: 33.3745
+    lng: -111.905
+    zoom: 14.0
+    pitch: 42.0
+    base_lims: 0.82
+    capex: 5700000.0
+    permit_vel: 23.0
+    shift_ratio: 1.41
+    sla: 51.0
+    description: School-district-driven family market with pool permits and kitchen/bath
+      remodel velocity.
+    city_id: tempe
+  South Tempe Rural Corridor:
+    name: South Tempe Rural Corridor
+    borough: CORONA_SOUTH_TEMPE
+    lat: 33.34
+    lng: -111.92
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.76
+    capex: 4600000.0
+    permit_vel: 21.0
+    shift_ratio: 1.34
+    sla: 47.0
+    description: South-edge pockets along the Chandler boundary with no-hoA infill
+      lots and low-rise commercial pads.
+    city_id: tempe
+divisions:
+  DOWNTOWN_RIO_SALADO:
+    name: DOWNTOWN_RIO_SALADO
+    center_lat: 33.427
+    center_lng: -111.94
+    zoom: 14.0
+    bbox:
+      min_lat: 33.417
+      max_lat: 33.446
+      min_lng: -111.955
+      max_lng: -111.93
+    submarkets:
+    - Downtown Mill Avenue
+    - Hayden Ferry Lakeside
+    city_id: tempe
+  ASU_CAMPUS_EDGE:
+    name: ASU_CAMPUS_EDGE
+    center_lat: 33.4245
+    center_lng: -111.9225
+    zoom: 14.0
+    bbox:
+      min_lat: 33.417
+      max_lat: 33.446
+      min_lng: -111.93
+      max_lng: -111.915
+    submarkets:
+    - ASU Campus & University Drive
+    city_id: tempe
+  ESCALANTE_HISTORIC:
+    name: ESCALANTE_HISTORIC
+    center_lat: 33.43
+    center_lng: -111.9025
+    zoom: 14.0
+    bbox:
+      min_lat: 33.417
+      max_lat: 33.446
+      min_lng: -111.915
+      max_lng: -111.89
+    submarkets:
+    - Escalante Historic District
+    city_id: tempe
+  PAPAGO_NORTH_TEMPE:
+    name: PAPAGO_NORTH_TEMPE
+    center_lat: 33.455
+    center_lng: -111.94
+    zoom: 13.5
+    bbox:
+      min_lat: 33.446
+      max_lat: 33.465
+      min_lng: -111.985
+      max_lng: -111.895
+    submarkets:
+    - Papago Park & North Tempe
+    city_id: tempe
+  DIABLO_DOUBLE_BUTTE:
+    name: DIABLO_DOUBLE_BUTTE
+    center_lat: 33.41
+    center_lng: -111.97
+    zoom: 13.5
+    bbox:
+      min_lat: 33.393
+      max_lat: 33.446
+      min_lng: -111.985
+      max_lng: -111.955
+    submarkets:
+    - Diablo Stadium Corridor
+    city_id: tempe
+  ALAMEDA:
+    name: ALAMEDA
+    center_lat: 33.405
+    center_lng: -111.9425
+    zoom: 14.0
+    bbox:
+      min_lat: 33.393
+      max_lat: 33.417
+      min_lng: -111.955
+      max_lng: -111.93
+    submarkets:
+    - Alameda Park & Hudson Manor
+    city_id: tempe
+  MILLS_APACHE:
+    name: MILLS_APACHE
+    center_lat: 33.405
+    center_lng: -111.91
+    zoom: 13.5
+    bbox:
+      min_lat: 33.393
+      max_lat: 33.417
+      min_lng: -111.93
+      max_lng: -111.888
+    submarkets:
+    - Apache Boulevard Light Rail
+    - Mills Avenue & Emerald Park
+    city_id: tempe
+  KIWANIS_THE_LAKES:
+    name: KIWANIS_THE_LAKES
+    center_lat: 33.375
+    center_lng: -111.92
+    zoom: 13.5
+    bbox:
+      min_lat: 33.355
+      max_lat: 33.393
+      min_lng: -111.985
+      max_lng: -111.855
+    submarkets:
+    - Kiwanis Park
+    - The Lakes
+    - Corona del Sol
+    city_id: tempe
+  CORONA_SOUTH_TEMPE:
+    name: CORONA_SOUTH_TEMPE
+    center_lat: 33.3325
+    center_lng: -111.9075
+    zoom: 13.0
+    bbox:
+      min_lat: 33.31
+      max_lat: 33.355
+      min_lng: -111.985
+      max_lng: -111.83
+    submarkets:
+    - South Tempe Rural Corridor
+    city_id: tempe
+datasets:
+  permits:
+    endpoint: https://services.arcgis.com/lQySeXwbBg53XWDi/arcgis/rest/services/building_permits/FeatureServer/0
+    platform: arcgis
+    watermark_col: AppliedDateDtm
+    id_keys:
+    - PermitNum
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: AppliedDateDtm DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Tempe, AZ
+    field_map:
+      job_id:
+      - PermitNum
+      - OBJECTID
+      issuance_date:
+      - IssuedDateDtm
+      - IssuedDate
+      filing_date:
+      - AppliedDateDtm
+      - AppliedDate
+      status:
+      - StatusCurrent
+      job_type:
+      - Type
+      - PermitClass
+      cost:
+      - EstProjectCost
+      address_street:
+      - OriginalAddress1
+      zipcode:
+      - OriginalZip
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  '311':
+    endpoint: https://services.arcgis.com/lQySeXwbBg53XWDi/arcgis/rest/services/code_complaints/FeatureServer/0
+    platform: arcgis
+    watermark_col: CaseOpenDate
+    id_keys:
+    - CaseNo
+    - Id
+    topic: raw.municipal.311
+    interval_seconds: 180.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: CaseOpenDate DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Tempe, AZ
+    field_map:
+      incident_id:
+      - CaseNo
+      - Id
+      created_date:
+      - CaseOpenDate
+      status:
+      - CaseStatus
+      complaint_type:
+      - ViolationType
+      incident_address:
+      - Address
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  crime:
+    endpoint: https://services.arcgis.com/lQySeXwbBg53XWDi/arcgis/rest/services/General_Offenses_(Open_Data)/FeatureServer/0
+    platform: arcgis
+    watermark_col: OccurrenceDatetime
+    id_keys:
+    - PrimaryKey
+    - OBJECTID
+    topic: raw.municipal.crime
+    interval_seconds: 1800.0
+    producer_key: crime
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: OccurrenceDatetime DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - PrimaryKey
+      - OBJECTID
+      offense_type:
+      - OffenseCustom
+      occurred_date:
+      - OccurrenceDatetime
+      borough:
+      - CharacterArea
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: EPSG:2223
+    state_plane_units: ft
+    state_plane_x_col: XCoordinate
+    state_plane_y_col: YCoordinate
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- tempe_az
+- tempe-az
+- tempe, az
+- tempe arizona
+job_suffix: tempe

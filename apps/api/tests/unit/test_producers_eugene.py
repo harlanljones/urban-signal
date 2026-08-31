@@ -604,7 +604,7 @@ class TestEugeneFeedSpec:
         assert spec.interval_seconds == 300.0
         assert spec.ingestion_mode == "incremental"
         assert spec.needs_geocode is False
-        assert spec.field_map is COMPLAINTS_311_FIELD_MAP
+        assert spec.field_map == COMPLAINTS_311_FIELD_MAP
         assert spec.topic == "raw.municipal.311"
 
     def test_sla_spec_matches_live_layer(self):
@@ -617,7 +617,7 @@ class TestEugeneFeedSpec:
         assert spec.max_record_count == 2000
         assert spec.ingestion_mode == "snapshot"
         assert spec.needs_geocode is False
-        assert spec.field_map is SLA_FIELD_MAP
+        assert spec.field_map == SLA_FIELD_MAP
         assert spec.topic == "raw.municipal.sla"
         assert spec.alarm_exempt is True
 
@@ -634,7 +634,7 @@ class TestEugeneFeedSpec:
         assert spec.interval_seconds == 600.0
         assert spec.ingestion_mode == "incremental"
         assert spec.needs_geocode is False
-        assert spec.field_map is DEEDS_FIELD_MAP
+        assert spec.field_map == DEEDS_FIELD_MAP
         assert spec.topic == "raw.municipal.deeds"
 
     def test_registered_feed_set(self):

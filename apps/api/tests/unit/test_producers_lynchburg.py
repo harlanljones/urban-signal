@@ -352,7 +352,7 @@ class TestFeedRegistration:
         assert spec.oid_field == "OBJECTID"
         assert spec.expected_cadence_days == 1
         assert spec.non_spatial is True
-        assert spec.field_map is PERMITS_FIELD_MAP
+        assert spec.field_map == PERMITS_FIELD_MAP
 
     def test_sla_spec_declares_annual_trickle_cadence(self):
         spec = get_lynchburg_dataset(FeedType.SLA)
@@ -366,7 +366,7 @@ class TestFeedRegistration:
         assert spec.order_by == "OBJECTID"
         assert spec.expected_cadence_days == 365
         assert spec.non_spatial is True
-        assert spec.field_map is SLA_FIELD_MAP
+        assert spec.field_map == SLA_FIELD_MAP
 
     def test_deeds_spec_declares_esri_oid_ordering_and_parcel_join(self):
         spec = get_lynchburg_dataset(FeedType.DEEDS)

@@ -1,0 +1,123 @@
+{
+  "schema_version": 2,
+  "id": "laredo",
+  "name": "Laredo",
+  "state": "TX",
+  "center": {
+    "lat": 27.5306,
+    "lng": -99.4803
+  },
+  "metro_bbox": {
+    "min_lat": 27.4,
+    "max_lat": 27.75,
+    "min_lng": -99.65,
+    "max_lng": -99.3
+  },
+  "divisions": {
+    "LAREDO_CORE": {
+      "name": "Laredo Core",
+      "center": {
+        "lat": 27.52,
+        "lng": -99.49
+      },
+      "bbox": {
+        "min_lat": 27.42,
+        "max_lat": 27.58,
+        "min_lng": -99.6,
+        "max_lng": -99.38
+      },
+      "submarkets": [
+        "Downtown & San Agustin",
+        "Heights & Del Mar",
+        "Zacate Creek & Washington",
+        "South Laredo & Santa Rita"
+      ]
+    },
+    "LAREDO_NORTH": {
+      "name": "North Laredo",
+      "center": {
+        "lat": 27.635,
+        "lng": -99.53
+      },
+      "bbox": {
+        "min_lat": 27.58,
+        "max_lat": 27.72,
+        "min_lng": -99.62,
+        "max_lng": -99.32
+      },
+      "submarkets": [
+        "Mines Road Corridor",
+        "North Laredo & Winfield"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown & San Agustin": {
+      "name": "Downtown & San Agustin",
+      "division": "LAREDO_CORE",
+      "center": {
+        "lat": 27.5245,
+        "lng": -99.5075
+      },
+      "description": "Historic riverfront core around San Agustin Plaza and the international bridges with rehabilitation and hospitality infill."
+    },
+    "Heights & Del Mar": {
+      "name": "Heights & Del Mar",
+      "division": "LAREDO_CORE",
+      "center": {
+        "lat": 27.545,
+        "lng": -99.505
+      },
+      "description": "Established north-central residential grid and Del Mar retail corridor with steady alteration and addition permits."
+    },
+    "Zacate Creek & Washington": {
+      "name": "Zacate Creek & Washington",
+      "division": "LAREDO_CORE",
+      "center": {
+        "lat": 27.54,
+        "lng": -99.485
+      },
+      "description": "Washington Street corridor and Zacate Creek neighborhoods with infill housing and commercial upgrades."
+    },
+    "South Laredo & Santa Rita": {
+      "name": "South Laredo & Santa Rita",
+      "division": "LAREDO_CORE",
+      "center": {
+        "lat": 27.465,
+        "lng": -99.49
+      },
+      "description": "Southern growth belt toward Santa Rita and the World Trade Bridge with highway-oriented retail and services."
+    },
+    "Mines Road Corridor": {
+      "name": "Mines Road Corridor",
+      "division": "LAREDO_NORTH",
+      "center": {
+        "lat": 27.62,
+        "lng": -99.56
+      },
+      "description": "FM 1472 logistics and industrial spine with warehousing, workforce housing, and utility permits."
+    },
+    "North Laredo & Winfield": {
+      "name": "North Laredo & Winfield",
+      "division": "LAREDO_NORTH",
+      "center": {
+        "lat": 27.65,
+        "lng": -99.5
+      },
+      "description": "Loop 20 / Winfield and Encanto subdivisions with single-family production housing and solar-panel permits."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "ckan",
+      "watermark_col": "PERMIT ISS. DATE",
+      "interval_seconds": 3600.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/laredo.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

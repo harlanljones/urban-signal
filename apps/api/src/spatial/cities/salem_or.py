@@ -1,3 +1,38 @@
+PERMITS_FIELD_MAP = {
+    "job_id": ["FOLDERNUMBER"],
+    "issuance_date": ["ISSUEDDATE"],
+    "filing_date": ["CREATEDDATE"],
+    "status": ["STATUS"],
+    "job_type": ["SUBDESCRIPTION", "MAPDESCRIPTION"],
+    "address_street": ["PROPERTYADDRESS"],
+    "borough": ["NEIGHBORHOOD"],
+}
+
+SLA_FIELD_MAP = {
+    "license_id": ["FOLDERNUMBER"],
+    "dba": ["COMPLEXNAME"],
+    "premises_name": ["COMPLEXNAME"],
+    "license_type": ["SUBTYPE", "SUBDESC"],
+    "status": ["STATUSDESC"],
+    "effective_date": ["INDATE"],
+    "expiration_date": ["EXPIRYDATE"],
+    "address_street": ["FOLDERNAME"],
+    "borough": ["NEIGHBORHOOD"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+    "sla": SLA_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Salem, OR"
+
+DROPPED_PII_COLUMNS = (
+    "OWNER",
+    "ISSUEUSER",
+    "GlobalID",
+)
+
 """Salem, OR spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -46,11 +81,6 @@ the real door is the City of Salem's ArcGIS Online org at
   development activity. Marion County deeds — no open bulk API identified.
 """
 
-from src.producers.field_maps_salem_or import (
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-    SLA_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 SALEM_CITY_ID: str = "salem_or"

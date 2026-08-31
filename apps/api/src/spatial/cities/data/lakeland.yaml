@@ -1,0 +1,184 @@
+city_id: lakeland
+name: Lakeland
+state: FL
+center:
+  lat: 28.0395
+  lng: -81.9498
+metro_bbox:
+  min_lat: 27.95
+  max_lat: 28.13
+  min_lng: -82.1
+  max_lng: -81.8
+division_bboxes:
+  LAKELAND_CORE:
+    min_lat: 28.0
+    max_lat: 28.08
+    min_lng: -82.01
+    max_lng: -81.9
+submarkets:
+  Downtown Lakeland:
+    name: Downtown Lakeland
+    borough: LAKELAND_CORE
+    lat: 28.041
+    lng: -81.949
+    zoom: 15.0
+    pitch: 48.0
+    base_lims: 0.7
+    capex: 4000000.0
+    permit_vel: 20.0
+    shift_ratio: 1.2
+    sla: 45.0
+    description: Historic downtown core around Munn Park and Lake Mirror with steady
+      renovation permits.
+    city_id: lakeland
+  South Lakeland Strips:
+    name: South Lakeland Strips
+    borough: LAKELAND_CORE
+    lat: 28.015
+    lng: -81.955
+    zoom: 14.0
+    pitch: 44.0
+    base_lims: 0.62
+    capex: 3200000.0
+    permit_vel: 16.0
+    shift_ratio: 1.12
+    sla: 40.0
+    description: Commercial corridors south of downtown with retail renovation and
+      small infill.
+    city_id: lakeland
+  Lakeland Highlands:
+    name: Lakeland Highlands
+    borough: LAKELAND_CORE
+    lat: 28.06
+    lng: -81.93
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.58
+    capex: 2800000.0
+    permit_vel: 14.0
+    shift_ratio: 1.08
+    sla: 38.0
+    description: Residential pockets north/east with scattered teardown-rebuild and
+      additions.
+    city_id: lakeland
+divisions:
+  LAKELAND_CORE:
+    name: LAKELAND_CORE
+    center_lat: 28.041
+    center_lng: -81.949
+    zoom: 13.0
+    bbox:
+      min_lat: 28.0
+      max_lat: 28.08
+      min_lng: -82.01
+      max_lng: -81.9
+    submarkets:
+    - Downtown Lakeland
+    - South Lakeland Strips
+    - Lakeland Highlands
+    city_id: lakeland
+datasets:
+  permits:
+    endpoint: https://gismims.lakelandgov.net/portal/rest/services/Public_CED/Lakeland_CED_Permits/MapServer/0
+    platform: arcgis
+    watermark_col: ISSUEDATE
+    id_keys:
+    - PERMIT_NO
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map: {}
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'FL'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- lakeland_fl
+- lakeland fl
+job_suffix: lakeland

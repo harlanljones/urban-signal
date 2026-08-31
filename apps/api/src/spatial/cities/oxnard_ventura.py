@@ -1,3 +1,54 @@
+SLA_FIELD_MAP = {
+    "license_id": ["ACCTNO"],
+    "dba": ["DBA", "COMPNAME"],
+    "premises_name": ["COMPNAME"],
+    "license_type": ["BUSTYPE", "NAICS_DESC", "NAICS_CODE"],
+    "status": ["STATUSDESC"],
+    "effective_date": ["DATESTART"],
+    "expiration_date": ["DATEEXPIRE"],
+    "address_street": ["ADDRESS"],
+}
+
+COMPLAINTS_311_FIELD_MAP = {
+    "incident_id": ["globalid", "objectid"],
+    "created_date": ["ReportedOn"],
+    "closed_date": ["DateEnded"],
+}
+
+CRIME_FIELD_MAP = {
+    "incident_id": ["EventOffenseKey", "Report_Number"],
+    "offense_type": ["Offense_Type", "Offense_Category"],
+    "occurred_date": ["Incident_Date_Start"],
+    "borough": ["Community_Council"],
+}
+
+FIELD_MAP = {
+    "sla": SLA_FIELD_MAP,
+    "311": COMPLAINTS_311_FIELD_MAP,
+    "crime": CRIME_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Ventura, CA"
+
+DROPPED_NONADDRESS_COLUMNS = (
+    "BADDRX",
+    "BADDRY",
+    "BADDPARCEL",
+    "BUSPHONE",
+    "BUSNOTE",
+    "CONTRACTNO",
+    "GlobalID",
+)
+
+DROPPED_PII_COLUMNS = (
+    "Username",
+    "Creator",
+    "Editor",
+    "ReportedBy",
+    "Monikers",
+    "PhotoNote",
+)
+
 """Oxnard–Ventura, CA spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -78,12 +129,6 @@ ArcGIS Hub hints were dead URLs):
   the companion registration would be 311-only.
 """
 
-from src.producers.field_maps_oxnard_ventura import (
-    COMPLAINTS_311_FIELD_MAP,
-    CRIME_FIELD_MAP,
-    GEOCODE_CONTEXT,
-    SLA_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 OXNARD_VENTURA_CITY_ID: str = "oxnard_ventura"

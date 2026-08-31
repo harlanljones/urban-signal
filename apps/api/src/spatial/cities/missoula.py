@@ -1,3 +1,20 @@
+PERMITS_FIELD_MAP = {
+    "job_id": ["RecordID", "OBJECTID"],
+    "filing_date": ["ApplicationDate"],
+    "status": ["RecordStatus"],
+    "job_type": ["B1_PER_TYPE", "B1_PER_SUB_TYPE"],
+    "description": ["DescriptionOfWork"],
+    "address_street": ["Address", "FullAddress"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Missoula, MT"
+
+DROPPED_PII_COLUMNS = ()
+
 """Missoula, MT spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -49,7 +66,6 @@ Feed rejections (live evidence, same probe):
 """
 
 
-from src.producers.field_maps_missoula import GEOCODE_CONTEXT, PERMITS_FIELD_MAP
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 MISSOULA_CITY_ID: str = "missoula"

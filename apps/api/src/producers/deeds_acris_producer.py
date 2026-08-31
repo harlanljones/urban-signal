@@ -282,6 +282,7 @@ class DeedsACRISProducer:
                     or row.get("georeference")
                     or row.get("shape")
                     or row.get("mappable_latitude_and_longitude")
+                    or row.get("geo_coordinates")
                     or {}
                 )
                 if isinstance(loc, dict):

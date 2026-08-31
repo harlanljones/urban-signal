@@ -1,3 +1,35 @@
+GEOCODE_CONTEXT = "Yakima, WA"
+
+PERMITS_FIELD_MAP = {
+    # OBJECTID is the OID fallback (Henderson/Greenville precedent): live rows
+    # always carry PermitID (it is the id_keys head), but the OID keeps
+    # coordinate-less/dedup edge rows addressable if a permit number is ever
+    # missing client-side.
+    "job_id": ["PermitID", "OBJECTID"],
+    "issuance_date": ["IssuedOnDate"],
+    "filing_date": ["SubmittedOnDate"],
+    "status": ["PermitStatus"],
+    "job_type": ["PermitType"],
+    "address_street": ["SiteStreet"],
+    "zipcode": ["SiteZipCode"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+}
+
+DROPPED_PII_COLUMNS = (
+    # YakBack requestor/assignee block (311 follow-up guard). The permit
+    # layer itself publishes no owner/contractor columns.
+    "name",
+    "email",
+    "phone",
+    "GlobalID",
+    "closedBy",
+    "assignedTo",
+    "updatedBy",
+)
+
 """Yakima, WA spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -47,10 +79,6 @@ ArcGIS Hub + ``gis.yakimawa.gov`` REST):
   feed.
 """
 
-from src.producers.field_maps_yakima import (
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 YAKIMA_CITY_ID: str = "yakima"

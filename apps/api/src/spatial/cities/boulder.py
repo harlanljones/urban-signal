@@ -1,3 +1,34 @@
+PERMITS_FIELD_MAP = {
+    "job_id": ["PermitNum", "PermitID", "ObjectId"],
+    "issuance_date": ["IssuedDate"],
+    "filing_date": ["AppliedDate"],
+    "status": ["StatusCurrent"],
+    "job_type": ["PermitType", "PermitWorkType"],
+    "cost": ["EstProjectCost"],
+    "address_street": ["OriginalAddress"],
+    "zipcode": ["OriginalZip"],
+    "borough": ["OriginalCity"],
+}
+
+SLA_FIELD_MAP = {
+    "license_id": ["LICENSENUMBER"],
+    "dba": ["COMPLEXNAME", "PROFESSIONALLICENSEHOLDERNAME"],
+    "premises_name": ["COMPLEXNAME"],
+    "license_type": ["RENTALTYPE"],
+    "status": ["LICENSESTATUS"],
+    "effective_date": ["APPLIEDDATE"],
+    "expiration_date": ["EXPIRATIONDATE"],
+    "address_street": ["MAINADDRESS"],
+    "borough": ["SUBCOMMUNITY"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+    "sla": SLA_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Boulder, CO"
+
 """Boulder, CO spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -43,11 +74,6 @@ Rejected feeds (evidence in stream log west-boulder.md):
 """
 
 
-from src.producers.field_maps_boulder import (
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-    SLA_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 BOULDER_CITY_ID: str = "boulder"

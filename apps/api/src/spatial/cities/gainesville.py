@@ -1,3 +1,14 @@
+FIELD_MAP = {
+    "job_id": ["permit"],
+    "issuance_date": ["issue"],
+    "address_street": ["address"],
+    "latitude": ["latitude", "location_1.latitude"],
+    "longitude": ["longitude", "location_1.longitude"],
+    "status": ["status"],
+}
+
+GAINESVILLE_PERMITS_FIELD_MAP = FIELD_MAP
+
 """Gainesville, FL Metro Submarket Registry and Spatial Layer for Urban Signal.
 
 Provides neighborhood metadata, camera positioning, division catalog, and geographic
@@ -9,7 +20,6 @@ Feed coverage in this ticket: PERMITS via the verified public Socrata dataset
 
 from typing import Dict
 
-from src.producers.field_maps_gainesville import FIELD_MAP as GAINESVILLE_PERMITS_FIELD_MAP
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 GAINESVILLE_CITY_ID: str = "gainesville"

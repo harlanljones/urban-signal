@@ -1,3 +1,41 @@
+GEOCODE_CONTEXT = "Tallahassee, FL"
+
+PERMITS_FIELD_MAP = {
+    "job_id": ["PermitNum", "OBJECTID"],
+    "job_type": ["PermitTypeMapped", "WorkClassMapped", "WorkClass"],
+    "issuance_date": ["IssuedDate"],
+    "address_street": ["OriginalAddress1"],
+    "bbl": ["PIN"],
+    "borough": ["Jurisdiction", "PermitClassMapped"],
+    "cost": ["EstProjectCost"],
+    "status": ["StatusCurrent", "StatusCurrentMapped"],
+}
+
+COMPLAINTS_311_FIELD_MAP = {
+    "incident_id": ["SERVNO"],
+    "complaint_type": ["PROBDESC", "CATNAME", "DESCRIPT"],
+    "created_date": ["CALLDTTM"],
+    "closed_date": ["RESDTTM"],
+    "incident_address": ["ADDRESS", "LOC"],
+    "borough": ["DISTRICT", "COUNTY", "CATNAME"],
+    "status": ["RESP", "RESCODE"],
+}
+
+DEEDS_FIELD_MAP = {
+    "doc_id": ["SALES_SALEKEY", "OBJECTID"],
+    "bbl": ["SALES_PARID"],
+    "document_amount": ["SALES_PRICE", "SALES_ADJPRICE"],
+    "recorded_date": ["SALES_SALEDT", "SALES_RECORDDT"],
+    "party1_grantor": ["SALES_OLDOWN", "SALES_OLDOWN2"],
+    "party2_grantee": ["SALES_OWN1", "SALES_OWN2"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+    "311": COMPLAINTS_311_FIELD_MAP,
+    "deeds": DEEDS_FIELD_MAP,
+}
+
 """Tallahassee / Leon County Metro Submarket Registry and Spatial Layer.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -51,13 +89,6 @@ a bare ISO string literal 400s (``{"error":{"code":400,...}}``) while the ANSI
 
 from typing import Dict
 
-from src.producers.field_maps_tallahassee import (
-    COMPLAINTS_311_FIELD_MAP,
-    DEEDS_FIELD_MAP,
-    FIELD_MAP,
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 TALLAHASSEE_CITY_ID: str = "tallahassee"

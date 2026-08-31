@@ -549,7 +549,7 @@ class TestFeedRegistration:
         assert spec.where is None
         assert spec.needs_geocode is True
         assert spec.geocode_context == "Scottsdale, AZ"
-        assert spec.field_map is PERMITS_FIELD_MAP
+        assert spec.field_map == PERMITS_FIELD_MAP
         assert spec.topic  # settings.topic_permits resolves
 
     def test_sla_spec_matches_live_layer(self):
@@ -569,7 +569,7 @@ class TestFeedRegistration:
         )
         assert spec.needs_geocode is True
         assert spec.geocode_context == "Scottsdale, AZ"
-        assert spec.field_map is SLA_FIELD_MAP
+        assert spec.field_map == SLA_FIELD_MAP
         assert spec.topic  # settings.topic_sla resolves
 
     def test_endpoints_are_the_probed_mapserver_tables(self):

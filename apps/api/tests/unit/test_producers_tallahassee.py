@@ -434,7 +434,7 @@ class TestFeedRegistration:
         assert spec.order_by == "OBJECTID"
         assert spec.oid_field == "OBJECTID"
         assert spec.expected_cadence_days == 7
-        assert spec.field_map is PERMITS_FIELD_MAP
+        assert spec.field_map == PERMITS_FIELD_MAP
 
     def test_311_spec_declares_where_and_esri_oid(self):
         spec = get_tallahassee_dataset(FeedType.COMPLAINTS_311)
@@ -449,7 +449,7 @@ class TestFeedRegistration:
         assert spec.order_by == "ESRI_OID"
         assert spec.oid_field == "ESRI_OID"
         assert spec.expected_cadence_days == 1
-        assert spec.field_map is COMPLAINTS_311_FIELD_MAP
+        assert spec.field_map == COMPLAINTS_311_FIELD_MAP
 
     def test_deeds_spec_declares_no_parcel_join(self):
         spec = get_tallahassee_dataset(FeedType.DEEDS)
@@ -463,7 +463,7 @@ class TestFeedRegistration:
         assert spec.oid_field == "OBJECTID"
         assert spec.expected_cadence_days == 1
         assert spec.parcel_join == {}
-        assert spec.field_map is DEEDS_FIELD_MAP
+        assert spec.field_map == DEEDS_FIELD_MAP
 
     @pytest.mark.parametrize(
         "absent_feed",

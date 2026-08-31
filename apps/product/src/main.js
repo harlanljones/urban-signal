@@ -333,6 +333,19 @@ async function loadFacts() {
   }
 }
 
+function setupReveal() {
+  const els = $$("[data-reveal]");
+  if (!els.length || matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return;
+  const io = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      entry.target.setAttribute("data-visible", "");
+      io.unobserve(entry.target);
+    }
+  }, { threshold: 0.12 });
+  els.forEach((el) => io.observe(el));
+}
+
 function mountObservatoryControls() {
   const legend = $(".layer-legend");
   if (!legend) return;
@@ -376,6 +389,7 @@ function selectLayer(button) {
 function init() {
   mountObservatoryControls();
   loadFacts();
+  setupReveal();
   const canvas = $("#observatory-canvas");
   const hero = $(".hero");
   const renderer = createObservatory(canvas, {

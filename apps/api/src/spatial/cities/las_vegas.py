@@ -1,3 +1,36 @@
+FIELD_MAP = {
+    # ------------------------------------------------------------------
+    # PERMITS — Clark County Building Permits (ArcGIS table)
+    # ------------------------------------------------------------------
+    "permits": {
+        "job_id": ["APNO", "APBLDGKEY", "ObjectId"],
+        "cost": [
+            "DECLVLTN",
+            "CALCVLTN",
+        ],
+        "job_type": ["WORKTYPE", "APTYPE"],
+        "issuance_date": ["ISSDTTM"],
+        "status": ["BLDGAPPLSTATUS"],
+        "address_street": ["APL_ADDRESS", "ADDR1"],
+        "zipcode": ["ZIP"],
+        "borough": ["CITY", "SUBDIV"],
+        "bbl": ["PRCLID"],
+    },
+    # ------------------------------------------------------------------
+    # DEEDS — Clark County real-property parcel sales / recorded deeds
+    # (ArcGIS table, address-only -> ADR-0004 geocoded at enrichment)
+    # ------------------------------------------------------------------
+    "deeds": {
+        "doc_id": ["DOCNO", "ObjectId"],
+        "bbl": ["PARCEL", "APN"],
+        "document_amount": ["SALEPRICE"],
+        "recorded_date": ["SALEDATE", "DOCDATE"],
+        "borough": ["COMNAME", "WARD"],
+        "address_street": ["ADDRESS1", "ADDRESS2"],
+        "zipcode": ["ZIP", "ZIPCODE"],
+    },
+}
+
 """Las Vegas Metro Submarket Registry and Spatial Layer for Urban Signal.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -20,7 +53,6 @@ never edited.
 
 from typing import Dict
 
-from src.producers.field_maps_las_vegas import FIELD_MAP
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 # Greater Las Vegas / Clark County metro bounding box. Permissive: it must keep

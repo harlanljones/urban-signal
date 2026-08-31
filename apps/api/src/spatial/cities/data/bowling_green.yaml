@@ -1,0 +1,354 @@
+city_id: bowling_green
+name: Bowling Green / Warren County
+state: KY
+center:
+  lat: 36.9892
+  lng: -86.4436
+metro_bbox:
+  min_lat: 36.79
+  max_lat: 37.19
+  min_lng: -86.67
+  max_lng: -86.12
+division_bboxes:
+  DOWNTOWN_UNIVERSITY:
+    min_lat: 36.945
+    max_lat: 37.01
+    min_lng: -86.51
+    max_lng: -86.4
+  EAST_LOOP:
+    min_lat: 36.945
+    max_lat: 37.005
+    min_lng: -86.42
+    max_lng: -86.31
+  SCOTTSVILLE_CORRIDOR:
+    min_lat: 36.83
+    max_lat: 36.945
+    min_lng: -86.45
+    max_lng: -86.35
+  NASHVILLE_SOUTHWEST:
+    min_lat: 36.8
+    max_lat: 36.945
+    min_lng: -86.6
+    max_lng: -86.45
+  CAMPBELL_SOUTH:
+    min_lat: 36.8
+    max_lat: 36.9
+    min_lng: -86.45
+    max_lng: -86.3
+  RUSSELLVILLE_NORTHWEST:
+    min_lat: 36.95
+    max_lat: 37.08
+    min_lng: -86.67
+    max_lng: -86.5
+  EAST_COUNTY_TRANSPARK:
+    min_lat: 36.9
+    max_lat: 37.05
+    min_lng: -86.35
+    max_lng: -86.12
+submarkets:
+  Fountain Square:
+    name: Fountain Square
+    borough: DOWNTOWN_UNIVERSITY
+    lat: 36.99
+    lng: -86.442
+    zoom: 15.0
+    pitch: 42.0
+    base_lims: 0.86
+    capex: 5200000.0
+    permit_vel: 28.0
+    shift_ratio: 1.44
+    sla: 52.0
+    description: Court-square retail and civic core between the Barren River and Center
+      Street, dense with renovation, infill apartments, and restaurant refits.
+    city_id: bowling_green
+  WKU:
+    name: WKU
+    borough: DOWNTOWN_UNIVERSITY
+    lat: 36.9865
+    lng: -86.458
+    zoom: 14.5
+    pitch: 40.0
+    base_lims: 0.83
+    capex: 4800000.0
+    permit_vel: 30.0
+    shift_ratio: 1.4
+    sla: 50.0
+    description: Western Kentucky University campus corridor and its Hilltopper student-housing
+      ring feeding multi-family and street-retail GI on Normal and State Streets.
+    city_id: bowling_green
+  Mt Victor:
+    name: Mt Victor
+    borough: EAST_LOOP
+    lat: 36.978
+    lng: -86.394
+    zoom: 14.0
+    pitch: 36.0
+    base_lims: 0.8
+    capex: 4600000.0
+    permit_vel: 27.0
+    shift_ratio: 1.37
+    sla: 48.0
+    description: Mt Victor Lane and the Loop-side apartment/multifamily corridor east
+      of downtown absorbing the 2025+ large-scale multifamily filings.
+    city_id: bowling_green
+  Lovers Lane:
+    name: Lovers Lane
+    borough: EAST_LOOP
+    lat: 36.96
+    lng: -86.4
+    zoom: 14.0
+    pitch: 34.0
+    base_lims: 0.76
+    capex: 3400000.0
+    permit_vel: 20.0
+    shift_ratio: 1.3
+    sla: 42.0
+    description: Established Lovers Lane subdivisions between the Loop and Us-31W,
+      mixing owner-occupied infill, deck/fence permits, and turn-by-investor resales.
+    city_id: bowling_green
+  Scottsville Rd:
+    name: Scottsville Rd
+    borough: SCOTTSVILLE_CORRIDOR
+    lat: 36.88
+    lng: -86.395
+    zoom: 13.5
+    pitch: 34.0
+    base_lims: 0.72
+    capex: 2900000.0
+    permit_vel: 18.0
+    shift_ratio: 1.27
+    sla: 40.0
+    description: US-231 Scottsville Road retail-and-residential corridor running south-east
+      to the county line, fed by Alvaton/Plano commuter infill.
+    city_id: bowling_green
+  Nashville Rd:
+    name: Nashville Rd
+    borough: NASHVILLE_SOUTHWEST
+    lat: 36.88
+    lng: -86.52
+    zoom: 13.5
+    pitch: 34.0
+    base_lims: 0.7
+    capex: 2700000.0
+    permit_vel: 17.0
+    shift_ratio: 1.25
+    sla: 38.0
+    description: US-31W Nashville Road southwest of the river toward the I-65/I-165
+      interchange, a legacy highway strip with steady retail refit and light industrial.
+    city_id: bowling_green
+  Three Springs Rd:
+    name: Three Springs Rd
+    borough: CAMPBELL_SOUTH
+    lat: 36.86
+    lng: -86.4
+    zoom: 13.0
+    pitch: 32.0
+    base_lims: 0.66
+    capex: 2200000.0
+    permit_vel: 15.0
+    shift_ratio: 1.22
+    sla: 36.0
+    description: Three Springs Road and the Campbell-area south-side neighborhoods,
+      a family-residential ring converting past working land to infill lots.
+    city_id: bowling_green
+  Russellville Rd:
+    name: Russellville Rd
+    borough: RUSSELLVILLE_NORTHWEST
+    lat: 37.02
+    lng: -86.56
+    zoom: 13.5
+    pitch: 33.0
+    base_lims: 0.71
+    capex: 2800000.0
+    permit_vel: 17.0
+    shift_ratio: 1.24
+    sla: 38.0
+    description: Russellville Road northwest toward the county line, pockets of estate
+      infill and minor commercial off the US-68/231 junction.
+    city_id: bowling_green
+  KY Transpark:
+    name: KY Transpark
+    borough: EAST_COUNTY_TRANSPARK
+    lat: 36.98
+    lng: -86.305
+    zoom: 13.0
+    pitch: 32.0
+    base_lims: 0.74
+    capex: 3200000.0
+    permit_vel: 19.0
+    shift_ratio: 1.29
+    sla: 41.0
+    description: Kentucky Transpark industrial/advanced-manufacturing campus on the
+      east edge, drawing warehouse, flex, and build-to-suit filings off the I-65 exits.
+    city_id: bowling_green
+  Bluestem Sheldrake:
+    name: Bluestem Sheldrake
+    borough: EAST_COUNTY_TRANSPARK
+    lat: 36.945
+    lng: -86.27
+    zoom: 13.0
+    pitch: 30.0
+    base_lims: 0.65
+    capex: 2000000.0
+    permit_vel: 14.0
+    shift_ratio: 1.2
+    sla: 34.0
+    description: Far-east Bluestem and Sheldrake district low-density acreage, infill
+      single-family and agricultural-periphery permits seeded by Transpark employment.
+    city_id: bowling_green
+divisions:
+  DOWNTOWN_UNIVERSITY:
+    name: DOWNTOWN_UNIVERSITY
+    center_lat: 36.988
+    center_lng: -86.45
+    zoom: 14.0
+    bbox:
+      min_lat: 36.945
+      max_lat: 37.01
+      min_lng: -86.51
+      max_lng: -86.4
+    submarkets:
+    - Fountain Square
+    - WKU
+    city_id: bowling_green
+  EAST_LOOP:
+    name: EAST_LOOP
+    center_lat: 36.97
+    center_lng: -86.396
+    zoom: 13.5
+    bbox:
+      min_lat: 36.945
+      max_lat: 37.005
+      min_lng: -86.42
+      max_lng: -86.31
+    submarkets:
+    - Mt Victor
+    - Lovers Lane
+    city_id: bowling_green
+  SCOTTSVILLE_CORRIDOR:
+    name: SCOTTSVILLE_CORRIDOR
+    center_lat: 36.89
+    center_lng: -86.4
+    zoom: 13.0
+    bbox:
+      min_lat: 36.83
+      max_lat: 36.945
+      min_lng: -86.45
+      max_lng: -86.35
+    submarkets:
+    - Scottsville Rd
+    city_id: bowling_green
+  NASHVILLE_SOUTHWEST:
+    name: NASHVILLE_SOUTHWEST
+    center_lat: 36.9
+    center_lng: -86.51
+    zoom: 13.0
+    bbox:
+      min_lat: 36.8
+      max_lat: 36.945
+      min_lng: -86.6
+      max_lng: -86.45
+    submarkets:
+    - Nashville Rd
+    city_id: bowling_green
+  CAMPBELL_SOUTH:
+    name: CAMPBELL_SOUTH
+    center_lat: 36.86
+    center_lng: -86.38
+    zoom: 12.5
+    bbox:
+      min_lat: 36.8
+      max_lat: 36.9
+      min_lng: -86.45
+      max_lng: -86.3
+    submarkets:
+    - Three Springs Rd
+    city_id: bowling_green
+  RUSSELLVILLE_NORTHWEST:
+    name: RUSSELLVILLE_NORTHWEST
+    center_lat: 37.01
+    center_lng: -86.58
+    zoom: 13.0
+    bbox:
+      min_lat: 36.95
+      max_lat: 37.08
+      min_lng: -86.67
+      max_lng: -86.5
+    submarkets:
+    - Russellville Rd
+    city_id: bowling_green
+  EAST_COUNTY_TRANSPARK:
+    name: EAST_COUNTY_TRANSPARK
+    center_lat: 36.965
+    center_lng: -86.29
+    zoom: 12.5
+    bbox:
+      min_lat: 36.9
+      max_lat: 37.05
+      min_lng: -86.35
+      max_lng: -86.12
+    submarkets:
+    - KY Transpark
+    - Bluestem Sheldrake
+    city_id: bowling_green
+datasets:
+  permits:
+    endpoint: https://webgis.bgky.org/server/rest/services/CCPC/CCPC_Building_Permits_2010/FeatureServer/5
+    platform: arcgis
+    watermark_col: created_date
+    id_keys:
+    - PermitNum
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 600.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: OBJECTID
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Bowling Green, KY
+    field_map:
+      job_id:
+      - PermitNum
+      - OBJECTID
+      job_type:
+      - PermitUse
+      issuance_date:
+      - created_date
+      cost:
+      - PermitCost
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- bowling green
+- bowling_green_ky
+- bowling green ky
+- bowling-green
+- bgky
+- warren_county_ky
+- warren county ky
+job_suffix: bowling_green

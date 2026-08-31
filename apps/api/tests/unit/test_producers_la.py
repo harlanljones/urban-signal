@@ -35,7 +35,7 @@ class TestLosAngelesRegistration:
 
     @pytest.mark.parametrize(
         "alias",
-        ["los_angeles", "Los Angeles", "LA", "la county", "pasadena", "long beach", "socal"],
+        ["los_angeles", "Los Angeles", "LA", "la county", "pasadena", "glendale", "socal"],
     )
     def test_aliases_resolve(self, alias):
         assert normalize_city(alias) is CityId.LOS_ANGELES

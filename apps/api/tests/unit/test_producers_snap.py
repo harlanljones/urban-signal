@@ -211,8 +211,10 @@ class TestSnapRegistrationShape:
             assert spec.interval_seconds == 1800.0
             assert spec.producer_key == "sla"
             assert spec.needs_geocode is False
-            # DRY: every spec carries the shared field-map object.
-            assert spec.field_map is SNAP_SLA_FIELD_MAP
+            # Each spec carries the shared SNAP map by value (the registry is
+            # derived from the corpus, so spec.field_map == not object-identical
+            # to the snapshot-contract helper anymore US-428).
+            assert spec.field_map == SNAP_SLA_FIELD_MAP
 
     def test_snap_field_map_keys(self):
         assert SNAP_SLA_FIELD_MAP == {
@@ -230,8 +232,8 @@ class TestSnapRegistrationShape:
         from src.producers.field_maps import resolve_field_map
         from src.spatial.city_registry import FeedType
 
-        assert resolve_field_map("columbus", FeedType.SLA) is SNAP_SLA_FIELD_MAP
-        assert resolve_field_map("wichita", FeedType.SLA) is SNAP_SLA_FIELD_MAP
+        assert resolve_field_map("columbus", FeedType.SLA) == SNAP_SLA_FIELD_MAP
+        assert resolve_field_map("wichita", FeedType.SLA) == SNAP_SLA_FIELD_MAP
 
     def test_extended_set_registers_sla_specs(self):
         """The US-364 extension: every remaining SLA-less registered metro
@@ -246,18 +248,35 @@ class TestSnapRegistrationShape:
             assert spec.ingestion_mode == "snapshot"
             assert spec.watermark_col == ""
             assert spec.expected_cadence_days == 14
-            assert spec.field_map is SNAP_SLA_FIELD_MAP
+            assert spec.field_map == SNAP_SLA_FIELD_MAP
             assert spec.needs_geocode is False
 
     def test_every_registered_metro_has_sla(self):
-        """The extension closed the set, then the southeast wave (wave 6)
-        registered three metros whose probes found no SLA-grade feed:
-        savannah (PERMITS+companion), bowling_green (PERMITS) and
-        tallahassee (PERMITS+311+DEEDS). Every other registered metro
-        carries an SLA spec."""
+        """The extension closed the set; later waves registered metros whose
+        probes found no SLA-grade feed, and grand_rapids is geometry-only.
+        Every other registered metro carries an SLA spec."""
         from src.spatial.city_registry import REGISTRY, FeedType, get_dataset
 
-        sla_less = {"savannah", "bowling_green", "tallahassee"}
+        sla_less = {
+            "billings",
+            "bowling_green",
+            "bozeman",
+            "chandler",
+            "grand_rapids",
+            "inland_empire",
+            "madison",
+            "missoula",
+            "nampa",
+            "oakland",
+            "peoria",
+            "santa_fe",
+            "santa_rosa",
+            "savannah",
+            "tallahassee",
+            "tempe",
+            "vancouver_wa",
+            "yakima",
+        }
         for city_id in REGISTRY:
             if city_id.value in sla_less:
                 with pytest.raises(KeyError):

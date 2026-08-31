@@ -1,3 +1,27 @@
+FIELD_MAP = {
+    "job_id": ["RECORD_ID"],
+    "issuance_date": ["LASTUPDATE"],
+    "status": ["PROJECTSTATUS"],
+    "job_type": ["RECORDTYPE", "PROJECTDESCRIPTION", "OCCUPANCYTYPE"],
+    "cost": ["NEWCONSTRUCTIONSF"],
+    "address_street": ["ADDRESS"],
+    "zipcode": ["ZIP"],
+    "borough": ["NEIGHBORHOOD", "COUNCIL"],
+    "proposed_units": ["NBROFUNITS"],
+}
+
+SLA_FIELD_MAP = {
+    "license_id": ["ORD_PERMIT", "APP_NUM"],
+    "license_type": ["ABSALETYPE", "AB_CLASS_PREFIX", "AB_CLASS_SUFFIX"],
+    "premises_name": ["BUS_NAME"],
+    "dba": ["BUS_NAME"],
+    "effective_date": ["HISTORY_ACT_DT"],
+    "expiration_date": ["MTH24_END_DT"],
+    "status": ["HISTORY_ACTION"],
+    "address_street": ["PERMIT_ADDR", "BUS_OWNER_MAIL_ADD"],
+    "zipcode": ["PERMIT_ZIP"],
+}
+
 """Tampa Metro Submarket Registry and Spatial Layer for Urban Signal.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -448,7 +472,6 @@ TPA_DIVISIONS = TAMPA_DIVISIONS
 # ---------------------------------------------------------------------------
 # The field_map data lives in the leaf module field_maps_tampa.py (imported
 # here) so the leaf is self-contained and testable without the spine registry.
-from src.producers.field_maps_tampa import FIELD_MAP, SLA_FIELD_MAP  # noqa: E402
 
 
 TAMPA_PERMITS_ENDPOINT = "https://arcgis.tampagov.net/arcgis/rest/services/Planning/PermitsAll/FeatureServer/0"

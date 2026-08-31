@@ -1,0 +1,398 @@
+city_id: billings
+name: Billings
+state: MT
+center:
+  lat: 45.7833
+  lng: -108.5007
+metro_bbox:
+  min_lat: 45.72
+  max_lat: 45.87
+  min_lng: -108.65
+  max_lng: -108.38
+division_bboxes:
+  DOWNTOWN:
+    min_lat: 45.775
+    max_lat: 45.794
+    min_lng: -108.52
+    max_lng: -108.492
+  MIDTOWN:
+    min_lat: 45.776
+    max_lat: 45.802
+    min_lng: -108.562
+    max_lng: -108.52
+  WEST_END:
+    min_lat: 45.766
+    max_lat: 45.796
+    min_lng: -108.625
+    max_lng: -108.562
+  SOUTH_SIDE:
+    min_lat: 45.742
+    max_lat: 45.776
+    min_lng: -108.555
+    max_lng: -108.505
+  BILLINGS_HEIGHTS:
+    min_lat: 45.802
+    max_lat: 45.845
+    min_lng: -108.545
+    max_lng: -108.44
+  LOCKWOOD:
+    min_lat: 45.79
+    max_lat: 45.818
+    min_lng: -108.44
+    max_lng: -108.39
+submarkets:
+  Downtown:
+    name: Downtown
+    borough: DOWNTOWN
+    lat: 45.7835
+    lng: -108.5045
+    zoom: 14.5
+    pitch: 52.0
+    base_lims: 0.87
+    capex: 6800000.0
+    permit_vel: 27.0
+    shift_ratio: 1.42
+    sla: 51.0
+    description: Montana Avenue / 27th Street CBD core with the courthouse square,
+      historic Skypoint, and the densest commercial permitting corridor in south-central
+      Montana.
+    city_id: billings
+  Midtown:
+    name: Midtown
+    borough: MIDTOWN
+    lat: 45.7875
+    lng: -108.546
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.85
+    capex: 6200000.0
+    permit_vel: 25.0
+    shift_ratio: 1.39
+    sla: 49.0
+    description: Grand Avenue corridor between downtown and the West End with mid-century
+      retail strips, motel conversions, and steady small-bay remodel permits.
+    city_id: billings
+  MetraPark District:
+    name: MetraPark District
+    borough: MIDTOWN
+    lat: 45.7915
+    lng: -108.523
+    zoom: 14.0
+    pitch: 44.0
+    base_lims: 0.84
+    capex: 7500000.0
+    permit_vel: 23.0
+    shift_ratio: 1.44
+    sla: 47.0
+    description: First Interstate Arena at MetraPark and the airport-adjacent event
+      campus with parking-lot infill, hospitality upgrades, and big-box reuse permits.
+    city_id: billings
+  West End:
+    name: West End
+    borough: WEST_END
+    lat: 45.7795
+    lng: -108.59
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.89
+    capex: 8400000.0
+    permit_vel: 31.0
+    shift_ratio: 1.51
+    sla: 55.0
+    description: King Avenue / Grand Avenue growth belt with medical-office expansion
+      (Billings Clinic West), auto-oriented retail redevelopment, and the metro's
+      largest new-construction valuations.
+    city_id: billings
+  Rimrock:
+    name: Rimrock
+    borough: WEST_END
+    lat: 45.7723
+    lng: -108.602
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.86
+    capex: 7200000.0
+    permit_vel: 26.0
+    shift_ratio: 1.46
+    sla: 50.0
+    description: Rimrock Mall and West Park Promenade trade area with enclosed-mall
+      redevelopment, grocery-anchored pads, and the last infill parcels along King
+      Ave.
+    city_id: billings
+  South Side:
+    name: South Side
+    borough: SOUTH_SIDE
+    lat: 45.765
+    lng: -108.535
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.83
+    capex: 5400000.0
+    permit_vel: 21.0
+    shift_ratio: 1.37
+    sla: 46.0
+    description: Historic South Side below I-90 with the South Park greenbelt, brick
+      bungalow stock, and affordable single-family infill along the Midland rail corridor.
+    city_id: billings
+  Southgate:
+    name: Southgate
+    borough: SOUTH_SIDE
+    lat: 45.753
+    lng: -108.522
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.82
+    capex: 5900000.0
+    permit_vel: 22.0
+    shift_ratio: 1.4
+    sla: 45.0
+    description: Southgate Drive corridor at the city's south edge with newer subdivisions,
+      the Southgate Mall trade area, and incremental multifamily infill.
+    city_id: billings
+  Billings Heights:
+    name: Billings Heights
+    borough: BILLINGS_HEIGHTS
+    lat: 45.815
+    lng: -108.482
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.84
+    capex: 6100000.0
+    permit_vel: 24.0
+    shift_ratio: 1.41
+    sla: 48.0
+    description: Main Street north-of-the-river residential plateau with ranch inventory,
+      box-retail nodes, and steady single-family and duplex permitting.
+    city_id: billings
+  Airport District:
+    name: Airport District
+    borough: BILLINGS_HEIGHTS
+    lat: 45.8077
+    lng: -108.5427
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.81
+    capex: 8200000.0
+    permit_vel: 25.0
+    shift_ratio: 1.43
+    sla: 44.0
+    description: Billings Logan International Airport and the surrounding aviation/logistics
+      employment zone with hangar construction, freight expansion, and hotel permitting.
+    city_id: billings
+  Lockwood:
+    name: Lockwood
+    borough: LOCKWOOD
+    lat: 45.802
+    lng: -108.414
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.8
+    capex: 5800000.0
+    permit_vel: 20.0
+    shift_ratio: 1.36
+    sla: 42.0
+    description: Unincorporated Lockwood community east of the city line with I-90-adjacent
+      trade parcels, light-industrial expansion, and affordable-acreage home building.
+    city_id: billings
+divisions:
+  DOWNTOWN:
+    name: DOWNTOWN
+    center_lat: 45.7835
+    center_lng: -108.5045
+    zoom: 14.0
+    bbox:
+      min_lat: 45.775
+      max_lat: 45.794
+      min_lng: -108.52
+      max_lng: -108.492
+    submarkets:
+    - Downtown
+    city_id: billings
+  MIDTOWN:
+    name: MIDTOWN
+    center_lat: 45.7875
+    center_lng: -108.546
+    zoom: 14.0
+    bbox:
+      min_lat: 45.776
+      max_lat: 45.802
+      min_lng: -108.562
+      max_lng: -108.52
+    submarkets:
+    - Midtown
+    - MetraPark District
+    city_id: billings
+  WEST_END:
+    name: WEST_END
+    center_lat: 45.777
+    center_lng: -108.6
+    zoom: 13.5
+    bbox:
+      min_lat: 45.766
+      max_lat: 45.796
+      min_lng: -108.625
+      max_lng: -108.562
+    submarkets:
+    - West End
+    - Rimrock
+    city_id: billings
+  SOUTH_SIDE:
+    name: SOUTH_SIDE
+    center_lat: 45.762
+    center_lng: -108.531
+    zoom: 13.5
+    bbox:
+      min_lat: 45.742
+      max_lat: 45.776
+      min_lng: -108.555
+      max_lng: -108.505
+    submarkets:
+    - South Side
+    - Southgate
+    city_id: billings
+  BILLINGS_HEIGHTS:
+    name: BILLINGS_HEIGHTS
+    center_lat: 45.815
+    center_lng: -108.482
+    zoom: 13.0
+    bbox:
+      min_lat: 45.802
+      max_lat: 45.845
+      min_lng: -108.545
+      max_lng: -108.44
+    submarkets:
+    - Billings Heights
+    - Airport District
+    city_id: billings
+  LOCKWOOD:
+    name: LOCKWOOD
+    center_lat: 45.802
+    center_lng: -108.414
+    zoom: 13.0
+    bbox:
+      min_lat: 45.79
+      max_lat: 45.818
+      min_lng: -108.44
+      max_lng: -108.39
+    submarkets:
+    - Lockwood
+    city_id: billings
+datasets:
+  permits:
+    endpoint: https://billingsgis.com/arcgis_public/rest/services/ArcOnline_Public/BuildingPermits_CodeViolations_EXT/MapServer/0
+    platform: arcgis
+    watermark_col: Issue_Date
+    id_keys:
+    - Building_Permit_Num
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: Issue_Date DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: Billings, MT
+    field_map:
+      job_id:
+      - Building_Permit_Num
+      - OBJECTID
+      issuance_date:
+      - Issue_Date
+      filing_date:
+      - Date_Entered
+      status:
+      - Permit_Status
+      job_type:
+      - Permit_Type
+      address_street:
+      - Property_Address
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  '311':
+    endpoint: https://services6.arcgis.com/rCC3yWJa2mjYtKDP/arcgis/rest/services/Requests_public_00e63199176f44b788fd43684476713d/FeatureServer/0
+    platform: arcgis
+    watermark_col: created_date
+    id_keys:
+    - reqid
+    - OBJECTID
+    topic: raw.municipal.311
+    interval_seconds: 300.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: created_date DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: Billings, MT
+    field_map:
+      incident_id:
+      - reqid
+      - OBJECTID
+      created_date:
+      - created_date
+      closed_date:
+      - resolutiondt
+      status:
+      - status
+      complaint_type:
+      - reqtype
+      incident_address:
+      - locdesc
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- billings_mt
+- billings-mt
+- billings mt
+- billings_montana
+- billings montana
+- by
+job_suffix: billings

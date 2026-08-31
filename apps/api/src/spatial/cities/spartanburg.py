@@ -1,3 +1,26 @@
+GEOCODE_CONTEXT = "Spartanburg, SC"
+
+PERMITS_FIELD_MAP = {
+    "job_id": ["CaseNumber", "OBJECTID"],
+    "job_type": ["WorkClass", "CaseType"],
+    "issuance_date": ["ApplicationDate"],
+}
+
+SLA_FIELD_MAP = {
+    "license_id": ["CaseNumber", "CaseID", "OBJECTID"],
+    "dba": ["ProjectName", "CaseNumber"],
+    "premises_name": ["ProjectName", "CaseNumber"],
+    "license_type": ["CaseType"],
+    "effective_date": ["ApplicationDate"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+    "sla": SLA_FIELD_MAP,
+}
+
+SPARTANBURG_FIELD_MAP = FIELD_MAP
+
 """Spartanburg County Metro Submarket Registry and Spatial Layer for Urban Signal.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -57,11 +80,6 @@ Delivery contract and host quirks (all verified live 2026-08-28):
 
 from typing import Dict
 
-from src.producers.field_maps_spartanburg import (
-    PERMITS_FIELD_MAP,
-    SLA_FIELD_MAP,
-    SPARTANBURG_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 SPARTANBURG_CITY_ID: str = "spartanburg"

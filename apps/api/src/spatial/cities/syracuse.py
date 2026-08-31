@@ -1,3 +1,23 @@
+SYRACUSE_SLA_FIELD_MAP = {
+    "license_id": ["SBL"],
+    "license_type": ["completion_type_name", "NeedsRR"],
+    "effective_date": ["RR_app_received"],
+    "expiration_date": ["valid_until"],
+    "status": ["RRisValid"],
+    "address_street": ["PropertyAddress"],
+    "latitude": ["Latitude"],
+    "longitude": ["Longitude"],
+}
+
+FIELD_MAP = {
+    "sla": SYRACUSE_SLA_FIELD_MAP,
+}
+
+DROPPED_PII_COLUMNS = (
+    "RR_contact_name",
+    "pc_owner",
+)
+
 """Syracuse, NY spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -36,7 +56,6 @@ Live-probe caveats that define this leaf (probed 2026-08-27, US-352):
 
 from typing import Any
 
-from src.producers.field_maps_syracuse import SYRACUSE_SLA_FIELD_MAP
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 SYRACUSE_CITY_ID: str = "syracuse"

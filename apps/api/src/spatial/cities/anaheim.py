@@ -1,3 +1,41 @@
+PERMITS_FIELD_MAP = {
+    # casenumber (BLD2026-…) is the id_keys head; OBJECTID keeps
+    # coordinate-less/dedup edge rows addressable if a case number is
+    # ever missing client-side (Henderson precedent).
+    "job_id": ["casenumber", "OBJECTID"],
+    "issuance_date": ["permitissued"],
+    "filing_date": ["applicationreceived"],
+    "status": ["casestatus"],
+    "job_type": ["typeofwork"],
+    "cost": ["jobvaluation"],
+    "address_street": ["address"],
+}
+
+SLA_FIELD_MAP = {
+    "license_id": ["casenumber", "objectid"],
+    "dba": ["businessname"],
+    "premises_name": ["businessname"],
+    "license_type": ["naicscode"],
+    "status": ["casestatus"],
+    "effective_date": ["applicationdate"],
+    "expiration_date": ["expirationdate"],
+    "address_street": ["address"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+    "sla": SLA_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Anaheim, CA"
+
+DROPPED_PII_COLUMNS = (
+    "ownername",
+    "contractorsname",
+    "contractorsphone",
+    "entityname",
+)
+
 """Anaheim / Orange County spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -69,11 +107,6 @@ Feed rejections (live evidence, same probe):
 """
 
 
-from src.producers.field_maps_anaheim import (
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-    SLA_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 ANAHEIM_CITY_ID: str = "anaheim"

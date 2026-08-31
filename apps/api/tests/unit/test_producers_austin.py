@@ -146,7 +146,7 @@ class TestFeedRegistration:
         assert sla.where == "county = 'Travis'"
         # Namespaced endpoint + shared TABC map (all four TX slices uniform).
         assert sla.endpoint == settings.socrata_tabc_active_endpoint
-        assert sla.field_map is TABC_ACTIVE_FIELD_MAP
+        assert sla.field_map == TABC_ACTIVE_FIELD_MAP
 
     @pytest.mark.parametrize("absent_feed", [FeedType.DEEDS])
     def test_absent_feeds_raise_readable_errors(self, absent_feed):

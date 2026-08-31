@@ -1,3 +1,25 @@
+COMPLAINTS_311_FIELD_MAP = {
+    "incident_id": ["OBJECTID", "REQUESTID"],
+    "complaint_type": ["PROBLEMCODE", "REQCATEGORY"],
+    "created_date": ["DATETIMEINIT"],
+    "closed_date": ["DATETIMECLOSED"],
+    "status": ["STATUS"],
+    "incident_address": ["PROBADDRESS"],
+    "descriptor": ["DESCRIPTION", "DETAILS", "PROBLEMCODE"],
+}
+
+FIELD_MAP = {
+    "311": COMPLAINTS_311_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Omaha, NE"
+
+DROPPED_PII_COLUMNS = (
+    "INITIATEDBY",
+    "SUBMITTO",
+    "CLOSEDBY",
+)
+
 """Omaha / Douglas County spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -30,10 +52,6 @@ Live-probe caveats that define this leaf (2026-08-28 re-stamp, US-358):
 
 from typing import Dict
 
-from src.producers.field_maps_omaha import (
-    COMPLAINTS_311_FIELD_MAP,
-    GEOCODE_CONTEXT,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 OMAHA_CITY_ID: str = "omaha"

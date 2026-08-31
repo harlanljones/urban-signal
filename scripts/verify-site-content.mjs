@@ -14,7 +14,12 @@ const registry = await readFile(new URL("apps/api/src/spatial/city_registry.py",
 const facts = JSON.parse(await readFile(new URL("apps/product/public/facts.json", repo), "utf8"));
 const product = await readFile(new URL("PRODUCT.md", repo), "utf8");
 
-const registryIds = [...registry.matchAll(/^    CityId\.([A-Z_]+): CityRegistration\(/gm)].map((match) => match[1].toLowerCase()).sort();
+// The registry is derived from the CityId enum (US-428): every registered city
+// is a CityId member `UPPER = "value"`. The former source-text
+// `CityId.NAME: CityRegistration(` blocks are gone in favor of the corpus.
+const cityIdMatch = registry.match(/^class CityId\(str, Enum\):\n([\s\S]*?)^class /m);
+const cityIdBlock = cityIdMatch ? cityIdMatch[1] : "";
+const registryIds = [...cityIdBlock.matchAll(/^    ([A-Z][A-Z0-9_]+) = "([a-z0-9_]+)"/gm)].map((match) => match[2]).sort();
 const factIds = facts.metros.map(({ id }) => id).sort();
 if (registryIds.length !== factIds.length || registryIds.some((id, index) => id !== factIds[index])) {
   throw new Error(`Marketing facts differ from registry IDs: registry=${registryIds.join(",")} facts=${factIds.join(",")}`);

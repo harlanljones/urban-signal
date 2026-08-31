@@ -111,6 +111,7 @@ export function renderPage({ route = "", title, description, content, noscript, 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#07110f">
+  <script>if(!matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("js")</script>
   <meta name="description" content="${description}">
   <meta name="author" content="Harlan Jones">
   <meta name="creator" content="Harlan Jones">

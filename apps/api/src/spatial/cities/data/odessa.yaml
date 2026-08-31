@@ -1,0 +1,270 @@
+city_id: odessa
+name: Odessa
+state: TX
+center:
+  lat: 31.845
+  lng: -102.367
+metro_bbox:
+  min_lat: 31.76
+  max_lat: 31.94
+  min_lng: -102.45
+  max_lng: -102.26
+division_bboxes:
+  CENTRAL_CORE:
+    min_lat: 31.83
+    max_lat: 31.88
+    min_lng: -102.39
+    max_lng: -102.34
+  WEST_SIDE:
+    min_lat: 31.82
+    max_lat: 31.88
+    min_lng: -102.45
+    max_lng: -102.39
+  EAST_GATE:
+    min_lat: 31.84
+    max_lat: 31.91
+    min_lng: -102.32
+    max_lng: -102.27
+  SOUTH_STRIPS:
+    min_lat: 31.76
+    max_lat: 31.82
+    min_lng: -102.43
+    max_lng: -102.3
+  NORTH_LOOP:
+    min_lat: 31.88
+    max_lat: 31.94
+    min_lng: -102.43
+    max_lng: -102.3
+submarkets:
+  Downtown Odessa:
+    name: Downtown Odessa
+    borough: CENTRAL_CORE
+    lat: 31.845
+    lng: -102.367
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.8
+    capex: 5200000.0
+    permit_vel: 24.0
+    shift_ratio: 1.22
+    sla: 48.0
+    description: Courthouse, city center, and downtown commercial core with hospitality
+      and civic anchors.
+    city_id: odessa
+  Midtown JBS Parkway:
+    name: Midtown JBS Parkway
+    borough: CENTRAL_CORE
+    lat: 31.86
+    lng: -102.352
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.78
+    capex: 5000000.0
+    permit_vel: 22.0
+    shift_ratio: 1.2
+    sla: 46.0
+    description: JBS Parkway commercial spine connecting downtown with east Odessa
+      retail corridors.
+    city_id: odessa
+  West Loop & Andrews Hwy:
+    name: West Loop & Andrews Hwy
+    borough: WEST_SIDE
+    lat: 31.855
+    lng: -102.41
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.74
+    capex: 4600000.0
+    permit_vel: 20.0
+    shift_ratio: 1.18
+    sla: 44.0
+    description: Highway-oriented services and light industrial corridors west of
+      Loop 338.
+    city_id: odessa
+  I-20 Service Corridor:
+    name: I-20 Service Corridor
+    borough: SOUTH_STRIPS
+    lat: 31.79
+    lng: -102.36
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.72
+    capex: 4300000.0
+    permit_vel: 19.0
+    shift_ratio: 1.16
+    sla: 44.0
+    description: Logistics, equipment yards, and highway services along I-20 south
+      of the core.
+    city_id: odessa
+  UTPB & TX-191:
+    name: UTPB & TX-191
+    borough: EAST_GATE
+    lat: 31.88
+    lng: -102.3
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.73
+    capex: 4400000.0
+    permit_vel: 21.0
+    shift_ratio: 1.19
+    sla: 46.0
+    description: UT Permian Basin campus area and TX-191 retail/office growth corridor.
+    city_id: odessa
+  North Odessa Retail:
+    name: North Odessa Retail
+    borough: NORTH_LOOP
+    lat: 31.905
+    lng: -102.35
+    zoom: 13.5
+    pitch: 38.0
+    base_lims: 0.71
+    capex: 4100000.0
+    permit_vel: 18.0
+    shift_ratio: 1.15
+    sla: 42.0
+    description: 42nd Street retail corridors and surrounding residential belts.
+    city_id: odessa
+  Odessa-Schlemeyer Field:
+    name: Odessa-Schlemeyer Field
+    borough: NORTH_LOOP
+    lat: 31.915
+    lng: -102.405
+    zoom: 13.5
+    pitch: 38.0
+    base_lims: 0.69
+    capex: 3800000.0
+    permit_vel: 17.0
+    shift_ratio: 1.14
+    sla: 42.0
+    description: General-aviation airport vicinity with logistics, hospitality, and
+      industrial services.
+    city_id: odessa
+divisions:
+  CENTRAL_CORE:
+    name: CENTRAL_CORE
+    center_lat: 31.85
+    center_lng: -102.36
+    zoom: 13.8
+    bbox:
+      min_lat: 31.83
+      max_lat: 31.88
+      min_lng: -102.39
+      max_lng: -102.34
+    submarkets:
+    - Downtown Odessa
+    - Midtown JBS Parkway
+    city_id: odessa
+  WEST_SIDE:
+    name: WEST_SIDE
+    center_lat: 31.85
+    center_lng: -102.42
+    zoom: 13.2
+    bbox:
+      min_lat: 31.82
+      max_lat: 31.88
+      min_lng: -102.45
+      max_lng: -102.39
+    submarkets:
+    - West Loop & Andrews Hwy
+    city_id: odessa
+  SOUTH_STRIPS:
+    name: SOUTH_STRIPS
+    center_lat: 31.79
+    center_lng: -102.35
+    zoom: 13.0
+    bbox:
+      min_lat: 31.76
+      max_lat: 31.82
+      min_lng: -102.43
+      max_lng: -102.3
+    submarkets:
+    - I-20 Service Corridor
+    city_id: odessa
+  EAST_GATE:
+    name: EAST_GATE
+    center_lat: 31.875
+    center_lng: -102.295
+    zoom: 13.2
+    bbox:
+      min_lat: 31.84
+      max_lat: 31.91
+      min_lng: -102.32
+      max_lng: -102.27
+    submarkets:
+    - UTPB & TX-191
+    city_id: odessa
+  NORTH_LOOP:
+    name: NORTH_LOOP
+    center_lat: 31.91
+    center_lng: -102.38
+    zoom: 12.8
+    bbox:
+      min_lat: 31.88
+      max_lat: 31.94
+      min_lng: -102.43
+      max_lng: -102.3
+    submarkets:
+    - North Odessa Retail
+    - Odessa-Schlemeyer Field
+    city_id: odessa
+datasets:
+  sla:
+    endpoint: https://data.texas.gov/resource/s7ft-44qi.json?$select=*, 'trec_broker:'
+      || license_type as license_type_ns
+    platform: socrata
+    watermark_col: updated
+    id_keys:
+    - license_number
+    topic: raw.municipal.sla
+    interval_seconds: 3600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: updated DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: county = 'Ector'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - license_number
+      license_type:
+      - license_type_ns
+      effective_date:
+      - original_license_date
+      expiration_date:
+      - license_expiration_date
+      premises_name:
+      - full_name
+      status:
+      - status
+      borough:
+      - county
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- odessa_tx
+- odessa tx
+job_suffix: odessa

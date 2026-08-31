@@ -1,0 +1,435 @@
+city_id: long_beach
+name: Long Beach
+state: CA
+center:
+  lat: 33.7695
+  lng: -118.193
+metro_bbox:
+  min_lat: 33.72
+  max_lat: 33.885
+  min_lng: -118.29
+  max_lng: -118.05
+division_bboxes:
+  DOWNTOWN_SHORELINE:
+    min_lat: 33.755
+    max_lat: 33.785
+    min_lng: -118.205
+    max_lng: -118.185
+  BELMONT_SHORE:
+    min_lat: 33.749
+    max_lat: 33.774
+    min_lng: -118.168
+    max_lng: -118.138
+  NAPLES:
+    min_lat: 33.749
+    max_lat: 33.762
+    min_lng: -118.178
+    max_lng: -118.161
+  CAMBODIA_TOWN:
+    min_lat: 33.775
+    max_lat: 33.79
+    min_lng: -118.185
+    max_lng: -118.168
+  WRIGLEY:
+    min_lat: 33.78
+    max_lat: 33.808
+    min_lng: -118.215
+    max_lng: -118.195
+  BIXBY_KNOLLS:
+    min_lat: 33.805
+    max_lat: 33.835
+    min_lng: -118.21
+    max_lng: -118.175
+  CAL_HEIGHTS:
+    min_lat: 33.805
+    max_lat: 33.83
+    min_lng: -118.175
+    max_lng: -118.145
+  NORTH_LONG_BEACH:
+    min_lat: 33.835
+    max_lat: 33.885
+    min_lng: -118.23
+    max_lng: -118.15
+submarkets:
+  Downtown Shoreline:
+    name: Downtown Shoreline
+    borough: DOWNTOWN_SHORELINE
+    lat: 33.7695
+    lng: -118.193
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.86
+    capex: 7200000.0
+    permit_vel: 31.0
+    shift_ratio: 1.48
+    sla: 54.0
+    description: "Waterfront core with Shoreline Village, the Pike outlets, and the\
+      \ convention-center hotel belt \u2014 the metro's densest mixed-use licensing\
+      \ corridor."
+    city_id: long_beach
+  East Village:
+    name: East Village
+    borough: DOWNTOWN_SHORELINE
+    lat: 33.7735
+    lng: -118.1885
+    zoom: 14.5
+    pitch: 52.0
+    base_lims: 0.84
+    capex: 5900000.0
+    permit_vel: 26.0
+    shift_ratio: 1.43
+    sla: 51.0
+    description: Arts-district edge of downtown with loft conversions, the East Village
+      arts park, and adaptive-reuse storefront licensing along First Street.
+    city_id: long_beach
+  Belmont Shore:
+    name: Belmont Shore
+    borough: BELMONT_SHORE
+    lat: 33.759
+    lng: -118.1525
+    zoom: 14.5
+    pitch: 52.0
+    base_lims: 0.89
+    capex: 7600000.0
+    permit_vel: 27.0
+    shift_ratio: 1.5
+    sla: 57.0
+    description: "Second Street retail spine a block off the bay \u2014 the metro's\
+      \ strongest walkable shopfront corridor with steady restaurant and boutique\
+      \ turnover."
+    city_id: long_beach
+  Belmont Heights:
+    name: Belmont Heights
+    borough: BELMONT_SHORE
+    lat: 33.7625
+    lng: -118.162
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.87
+    capex: 6800000.0
+    permit_vel: 24.0
+    shift_ratio: 1.44
+    sla: 53.0
+    description: Craftsman and Spanish-revival blocks between Broadway and 7th with
+      high-valuation renovation permits and Fourth Street's antique row.
+    city_id: long_beach
+  Naples:
+    name: Naples
+    borough: NAPLES
+    lat: 33.756
+    lng: -118.167
+    zoom: 15.0
+    pitch: 50.0
+    base_lims: 0.91
+    capex: 8400000.0
+    permit_vel: 18.0
+    shift_ratio: 1.38
+    sla: 49.0
+    description: "Treasure Island and the Naples canals \u2014 premium waterfront\
+      \ homes with low velocity but the metro's highest per-permit valuations."
+    city_id: long_beach
+  Cambodia Town:
+    name: Cambodia Town
+    borough: CAMBODIA_TOWN
+    lat: 33.781
+    lng: -118.1745
+    zoom: 14.5
+    pitch: 48.0
+    base_lims: 0.82
+    capex: 4800000.0
+    permit_vel: 22.0
+    shift_ratio: 1.41
+    sla: 46.0
+    description: "Anaheim Street corridor between Junipero and Cherry \u2014 the officially\
+      \ designated Cambodian business district with small-plate restaurant turnover."
+    city_id: long_beach
+  Wrigley:
+    name: Wrigley
+    borough: WRIGLEY
+    lat: 33.792
+    lng: -118.201
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.8
+    capex: 5200000.0
+    permit_vel: 23.0
+    shift_ratio: 1.42
+    sla: 47.0
+    description: Wrigley Village west of Long Beach Boulevard with 1920s bungalow
+      stock, the innovative-starts school campus, and infill permitting along Pacific.
+    city_id: long_beach
+  Bixby Knolls:
+    name: Bixby Knolls
+    borough: BIXBY_KNOLLS
+    lat: 33.8195
+    lng: -118.19
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.86
+    capex: 6400000.0
+    permit_vel: 25.0
+    shift_ratio: 1.45
+    sla: 52.0
+    description: Atlantic Avenue corridor with mid-century retail, the Expo-line-adjacent
+      freight villages, and steady commercial rehabilitation permits.
+    city_id: long_beach
+  California Heights:
+    name: California Heights
+    borough: CAL_HEIGHTS
+    lat: 33.8155
+    lng: -118.156
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.85
+    capex: 6100000.0
+    permit_vel: 24.0
+    shift_ratio: 1.43
+    sla: 50.0
+    description: Historic-district bungalow belt (California Heights/Cal Heights)
+      with the metro's steadiest single-family renovation and duplex-conversion flow.
+    city_id: long_beach
+  North Long Beach:
+    name: North Long Beach
+    borough: NORTH_LONG_BEACH
+    lat: 33.853
+    lng: -118.1935
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.78
+    capex: 5500000.0
+    permit_vel: 26.0
+    shift_ratio: 1.47
+    sla: 45.0
+    description: Uptown corridor around Atlantic and Artesia with the Uptown Renaissance
+      plan, ADU-heavy permitting, and the metro's fastest rent-shift slope.
+    city_id: long_beach
+divisions:
+  DOWNTOWN_SHORELINE:
+    name: DOWNTOWN_SHORELINE
+    center_lat: 33.7695
+    center_lng: -118.193
+    zoom: 14.0
+    bbox:
+      min_lat: 33.755
+      max_lat: 33.785
+      min_lng: -118.205
+      max_lng: -118.185
+    submarkets:
+    - Downtown Shoreline
+    - East Village
+    city_id: long_beach
+  BELMONT_SHORE:
+    name: BELMONT_SHORE
+    center_lat: 33.759
+    center_lng: -118.1525
+    zoom: 14.0
+    bbox:
+      min_lat: 33.749
+      max_lat: 33.774
+      min_lng: -118.168
+      max_lng: -118.138
+    submarkets:
+    - Belmont Shore
+    - Belmont Heights
+    city_id: long_beach
+  NAPLES:
+    name: NAPLES
+    center_lat: 33.756
+    center_lng: -118.167
+    zoom: 15.0
+    bbox:
+      min_lat: 33.749
+      max_lat: 33.762
+      min_lng: -118.178
+      max_lng: -118.161
+    submarkets:
+    - Naples
+    city_id: long_beach
+  CAMBODIA_TOWN:
+    name: CAMBODIA_TOWN
+    center_lat: 33.781
+    center_lng: -118.1745
+    zoom: 14.0
+    bbox:
+      min_lat: 33.775
+      max_lat: 33.79
+      min_lng: -118.185
+      max_lng: -118.168
+    submarkets:
+    - Cambodia Town
+    city_id: long_beach
+  WRIGLEY:
+    name: WRIGLEY
+    center_lat: 33.792
+    center_lng: -118.201
+    zoom: 14.0
+    bbox:
+      min_lat: 33.78
+      max_lat: 33.808
+      min_lng: -118.215
+      max_lng: -118.195
+    submarkets:
+    - Wrigley
+    city_id: long_beach
+  BIXBY_KNOLLS:
+    name: BIXBY_KNOLLS
+    center_lat: 33.8195
+    center_lng: -118.19
+    zoom: 14.0
+    bbox:
+      min_lat: 33.805
+      max_lat: 33.835
+      min_lng: -118.21
+      max_lng: -118.175
+    submarkets:
+    - Bixby Knolls
+    city_id: long_beach
+  CAL_HEIGHTS:
+    name: CAL_HEIGHTS
+    center_lat: 33.8155
+    center_lng: -118.156
+    zoom: 14.0
+    bbox:
+      min_lat: 33.805
+      max_lat: 33.83
+      min_lng: -118.175
+      max_lng: -118.145
+    submarkets:
+    - California Heights
+    city_id: long_beach
+  NORTH_LONG_BEACH:
+    name: NORTH_LONG_BEACH
+    center_lat: 33.853
+    center_lng: -118.1935
+    zoom: 13.5
+    bbox:
+      min_lat: 33.835
+      max_lat: 33.885
+      min_lng: -118.23
+      max_lng: -118.15
+    submarkets:
+    - North Long Beach
+    city_id: long_beach
+datasets:
+  sla:
+    endpoint: https://services6.arcgis.com/yCArG7wGXGyWLqav/arcgis/rest/services/Business_Licenses_Public_View/FeatureServer/0
+    platform: arcgis
+    watermark_col: MILESTONEDATE
+    id_keys:
+    - LICENSENO
+    - OBJECTID
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: MILESTONEDATE DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: OUTSIDECITY='No'
+    needs_geocode: true
+    geocode_context: Long Beach, CA
+    field_map:
+      license_id:
+      - LICENSENO
+      dba:
+      - DBANAME
+      premises_name:
+      - DBANAME
+      license_type:
+      - LICCATDESC
+      - CLASSDESC
+      status:
+      - LICSTATUS
+      effective_date:
+      - ISSDTTM
+      expiration_date:
+      - INACTVDTTM
+      address_street:
+      - SITELOCATION
+      zipcode:
+      - ZIP
+      borough:
+      - COUNCIL_NUMBER
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 3
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  crime:
+    endpoint: https://services6.arcgis.com/yCArG7wGXGyWLqav/arcgis/rest/services/Police_Crime_Mapping/FeatureServer/0
+    platform: arcgis
+    watermark_col: ReportedDateTimeDate
+    id_keys:
+    - DR
+    - OBJECTID
+    topic: raw.municipal.crime
+    interval_seconds: 1800.0
+    producer_key: crime
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: ReportedDateTimeDate DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - DR
+      - OBJECTID
+      offense_type:
+      - CrimeType
+      - Category
+      - Type
+      reported_date:
+      - ReportedDateTimeDate
+      borough:
+      - Division
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- long beach
+- long_beach_ca
+- lb_ca
+- lbc
+job_suffix: long_beach

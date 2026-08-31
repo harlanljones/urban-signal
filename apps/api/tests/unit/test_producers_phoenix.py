@@ -191,7 +191,7 @@ class TestFeedRegistration:
         assert spec.expected_cadence_days == 1
         assert spec.oid_field == "OBJECTID"
         assert spec.max_record_count == 2000
-        assert spec.field_map is PERMITS_FIELD_MAP
+        assert spec.field_map == PERMITS_FIELD_MAP
         assert spec.companion_endpoints["shapephx_issued"] == (
             PHOENIX_SHAPEPHX_PERMITS_ENDPOINT
         )
@@ -215,7 +215,7 @@ class TestFeedRegistration:
         assert spec.expected_cadence_days == 7
         assert spec.oid_field == "OBJECTID"
         assert spec.max_record_count == 2000
-        assert spec.field_map is SLA_FIELD_MAP
+        assert spec.field_map == SLA_FIELD_MAP
 
     @pytest.mark.parametrize(
         "absent_feed",

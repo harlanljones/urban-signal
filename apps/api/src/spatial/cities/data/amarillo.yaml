@@ -1,0 +1,288 @@
+city_id: amarillo
+name: Amarillo
+state: TX
+center:
+  lat: 35.207
+  lng: -101.833
+metro_bbox:
+  min_lat: 35.06
+  max_lat: 35.35
+  min_lng: -102.0
+  max_lng: -101.65
+division_bboxes:
+  CENTRAL_CORE:
+    min_lat: 35.175
+    max_lat: 35.235
+    min_lng: -101.885
+    max_lng: -101.78
+  WEST_SIDE:
+    min_lat: 35.15
+    max_lat: 35.27
+    min_lng: -102.0
+    max_lng: -101.885
+  EAST_GATE:
+    min_lat: 35.16
+    max_lat: 35.26
+    min_lng: -101.78
+    max_lng: -101.65
+  SOUTH_STRIPS:
+    min_lat: 35.08
+    max_lat: 35.19
+    min_lng: -101.96
+    max_lng: -101.78
+  NORTH_LOOP:
+    min_lat: 35.235
+    max_lat: 35.33
+    min_lng: -101.93
+    max_lng: -101.76
+submarkets:
+  Downtown Amarillo:
+    name: Downtown Amarillo
+    borough: CENTRAL_CORE
+    lat: 35.2088
+    lng: -101.8355
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.82
+    capex: 6200000.0
+    permit_vel: 34.0
+    shift_ratio: 1.36
+    sla: 58.0
+    description: Civic Center, Polk Street corridor, and historic Route 66 core with
+      mixed commercial renovation and infill.
+    city_id: amarillo
+  Polk Street District:
+    name: Polk Street District
+    borough: CENTRAL_CORE
+    lat: 35.2105
+    lng: -101.835
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.8
+    capex: 5400000.0
+    permit_vel: 30.0
+    shift_ratio: 1.3
+    sla: 54.0
+    description: Historic main-street blocks with restaurants, nightlife, and adaptive
+      reuse loft conversions.
+    city_id: amarillo
+  Westgate / Soncy:
+    name: Westgate / Soncy
+    borough: WEST_SIDE
+    lat: 35.187
+    lng: -101.938
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.78
+    capex: 5800000.0
+    permit_vel: 28.0
+    shift_ratio: 1.28
+    sla: 52.0
+    description: Regional mall and Soncy Road retail corridor with outparcel medical,
+      hospitality, and steady tenant rollover.
+    city_id: amarillo
+  Medical Center & Wolflin:
+    name: Medical Center & Wolflin
+    borough: WEST_SIDE
+    lat: 35.1805
+    lng: -101.905
+    zoom: 14.0
+    pitch: 42.0
+    base_lims: 0.79
+    capex: 5600000.0
+    permit_vel: 29.0
+    shift_ratio: 1.3
+    sla: 53.0
+    description: BSA / Northwest Texas healthcare cluster and Wolflin residential-adjacent
+      commercial grid.
+    city_id: amarillo
+  Southwest Amarillo:
+    name: Southwest Amarillo
+    borough: SOUTH_STRIPS
+    lat: 35.15
+    lng: -101.9
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.74
+    capex: 4700000.0
+    permit_vel: 26.0
+    shift_ratio: 1.24
+    sla: 48.0
+    description: Southwestern growth belt of newer subdivisions and highway-oriented
+      retail.
+    city_id: amarillo
+  Amarillo College Area:
+    name: Amarillo College Area
+    borough: SOUTH_STRIPS
+    lat: 35.184
+    lng: -101.878
+    zoom: 14.0
+    pitch: 38.0
+    base_lims: 0.76
+    capex: 5000000.0
+    permit_vel: 27.0
+    shift_ratio: 1.26
+    sla: 50.0
+    description: Campus-adjacent district and Wolflin Heights edges with steady renovation
+      and services.
+    city_id: amarillo
+  East Gateway & Airport:
+    name: East Gateway & Airport
+    borough: EAST_GATE
+    lat: 35.22
+    lng: -101.74
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.7
+    capex: 4200000.0
+    permit_vel: 22.0
+    shift_ratio: 1.2
+    sla: 46.0
+    description: Eastern industrial and airport approach corridor along I-40 with
+      logistics and highway services.
+    city_id: amarillo
+  Eastridge & North Heights:
+    name: Eastridge & North Heights
+    borough: NORTH_LOOP
+    lat: 35.255
+    lng: -101.82
+    zoom: 13.5
+    pitch: 38.0
+    base_lims: 0.68
+    capex: 3600000.0
+    permit_vel: 21.0
+    shift_ratio: 1.18
+    sla: 44.0
+    description: Northern residential plateaus and historic neighborhoods with infrastructure-driven
+      service demand.
+    city_id: amarillo
+divisions:
+  CENTRAL_CORE:
+    name: CENTRAL_CORE
+    center_lat: 35.2085
+    center_lng: -101.833
+    zoom: 13.5
+    bbox:
+      min_lat: 35.175
+      max_lat: 35.235
+      min_lng: -101.885
+      max_lng: -101.78
+    submarkets:
+    - Downtown Amarillo
+    - Polk Street District
+    city_id: amarillo
+  WEST_SIDE:
+    name: WEST_SIDE
+    center_lat: 35.185
+    center_lng: -101.925
+    zoom: 13.0
+    bbox:
+      min_lat: 35.15
+      max_lat: 35.27
+      min_lng: -102.0
+      max_lng: -101.885
+    submarkets:
+    - Westgate / Soncy
+    - Medical Center & Wolflin
+    city_id: amarillo
+  SOUTH_STRIPS:
+    name: SOUTH_STRIPS
+    center_lat: 35.15
+    center_lng: -101.9
+    zoom: 13.0
+    bbox:
+      min_lat: 35.08
+      max_lat: 35.19
+      min_lng: -101.96
+      max_lng: -101.78
+    submarkets:
+    - Southwest Amarillo
+    - Amarillo College Area
+    city_id: amarillo
+  EAST_GATE:
+    name: EAST_GATE
+    center_lat: 35.215
+    center_lng: -101.745
+    zoom: 13.0
+    bbox:
+      min_lat: 35.16
+      max_lat: 35.26
+      min_lng: -101.78
+      max_lng: -101.65
+    submarkets:
+    - East Gateway & Airport
+    city_id: amarillo
+  NORTH_LOOP:
+    name: NORTH_LOOP
+    center_lat: 35.27
+    center_lng: -101.835
+    zoom: 12.8
+    bbox:
+      min_lat: 35.235
+      max_lat: 35.33
+      min_lng: -101.93
+      max_lng: -101.76
+    submarkets:
+    - Eastridge & North Heights
+    city_id: amarillo
+datasets:
+  sla:
+    endpoint: https://data.texas.gov/resource/s7ft-44qi.json?$select=*, 'trec_broker:'
+      || license_type as license_type_ns
+    platform: socrata
+    watermark_col: updated
+    id_keys:
+    - license_number
+    topic: raw.municipal.sla
+    interval_seconds: 3600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: updated DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: county = 'Potter'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - license_number
+      license_type:
+      - license_type_ns
+      effective_date:
+      - original_license_date
+      expiration_date:
+      - license_expiration_date
+      premises_name:
+      - full_name
+      status:
+      - status
+      borough:
+      - county
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- amarillo_tx
+- amarillo tx
+job_suffix: amarillo

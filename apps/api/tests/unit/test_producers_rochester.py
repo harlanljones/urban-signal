@@ -283,7 +283,7 @@ class TestFeedRegistration:
         assert spec.non_spatial is False
         assert spec.oid_field == "OBJECTID"
         assert spec.max_record_count == 100000
-        assert spec.field_map is DEEDS_FIELD_MAP
+        assert spec.field_map == DEEDS_FIELD_MAP
 
     def test_deeds_spec_declares_monthly_roll_cadence(self):
         spec = get_rochester_dataset(FeedType.DEEDS)

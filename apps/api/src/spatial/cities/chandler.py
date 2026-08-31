@@ -1,3 +1,37 @@
+PERMITS_FIELD_MAP = {
+    # PERMIT_NBR is the Accela permit number ("UTL26-0884", "BLD26-2139", …)
+    # and the id_keys head; OBJECTID keeps rows addressable if the number is
+    # ever missing client-side (Henderson OID-fallback precedent).
+    "job_id": ["PERMIT_NBR", "OBJECTID"],
+    "filing_date": ["CREATE_DT"],
+    "status": ["PERMIT_STATUS"],
+    "job_type": ["B1_PER_TYPE", "PERMIT_TYPE"],
+    "cost": ["JOB_VALUE"],
+    "address_street": ["FULL_ADDRESS", "FULL_ADDR"],
+    "zipcode": ["ZIP_CODE"],
+    "bbl": ["PARCEL_NBR"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Chandler, AZ"
+
+DROPPED_PII_COLUMNS = (
+    "PRI_CNTCT_BUS_NM",
+    "PRI_CNTCT_FULL_NM",
+    "PRI_CNTCT_PHONE",
+    "PRI_CNTCT_EMAIL",
+    "PRI_CNTRCT_BUS_NM",
+    "PRI_CNTRCT_FULL_NM",
+    "PRI_CNTRCT_PHONE",
+    "PRI_CNTRCT_EMAIL",
+    "OWNER_NM",
+    "OWNER_PHONE",
+    "OWNER_EMAIL",
+)
+
 """Chandler, AZ spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -68,10 +102,6 @@ Live-probe caveats that define this leaf (2026-08-28, US-228):
   boundary envelope: lng[-111.9723,-111.7553] lat[33.2038,33.3613].
 """
 
-from src.producers.field_maps_chandler import (
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 CHANDLER_CITY_ID: str = "chandler"

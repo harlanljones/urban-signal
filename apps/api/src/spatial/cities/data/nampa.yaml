@@ -1,0 +1,309 @@
+city_id: nampa
+name: Nampa, ID
+state: ID
+center:
+  lat: 43.58
+  lng: -116.564
+metro_bbox:
+  min_lat: 43.5
+  max_lat: 43.67
+  min_lng: -116.66
+  max_lng: -116.46
+division_bboxes:
+  DOWNTOWN:
+    min_lat: 43.57
+    max_lat: 43.59
+    min_lng: -116.578
+    max_lng: -116.55
+  UNIVERSITY:
+    min_lat: 43.552
+    max_lat: 43.572
+    min_lng: -116.576
+    max_lng: -116.55
+  WEST_NAMPA:
+    min_lat: 43.58
+    max_lat: 43.61
+    min_lng: -116.64
+    max_lng: -116.585
+  SOUTH_NAMPA:
+    min_lat: 43.54
+    max_lat: 43.57
+    min_lng: -116.59
+    max_lng: -116.54
+  NORTH_NAMPA:
+    min_lat: 43.6
+    max_lat: 43.645
+    min_lng: -116.61
+    max_lng: -116.55
+  EAST_NAMPA:
+    min_lat: 43.55
+    max_lat: 43.6
+    min_lng: -116.55
+    max_lng: -116.49
+submarkets:
+  Downtown Nampa:
+    name: Downtown Nampa
+    borough: DOWNTOWN
+    lat: 43.58
+    lng: -116.564
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.85
+    capex: 5200000.0
+    permit_vel: 22.0
+    shift_ratio: 1.35
+    sla: 48.0
+    description: Downtown Nampa core along 1st/3rd Streets with the Civic Center,
+      the Nampa Public Library, and the downtown business district retail spine.
+    city_id: nampa
+  Old Nampa:
+    name: Old Nampa
+    borough: DOWNTOWN
+    lat: 43.577
+    lng: -116.569
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.83
+    capex: 4800000.0
+    permit_vel: 20.0
+    shift_ratio: 1.33
+    sla: 46.0
+    description: Historic residential neighborhood south of downtown with pre-war
+      bungalow stock, the Old Nampa Neighborhood Association, and steady renovation
+      permits.
+    city_id: nampa
+  College of Western Idaho:
+    name: College of Western Idaho
+    borough: UNIVERSITY
+    lat: 43.562
+    lng: -116.564
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.84
+    capex: 5800000.0
+    permit_vel: 24.0
+    shift_ratio: 1.37
+    sla: 50.0
+    description: University District around the College of Western Idaho Nampa Campus
+      with student-housing turnover, academic infrastructure, and the Nampa Workforce
+      Center.
+    city_id: nampa
+  West Nampa:
+    name: West Nampa
+    borough: WEST_NAMPA
+    lat: 43.595
+    lng: -116.615
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.82
+    capex: 4600000.0
+    permit_vel: 18.0
+    shift_ratio: 1.31
+    sla: 44.0
+    description: Flamingo Avenue and Midland Boulevard corridor with master-planned
+      subdivisions, the West Nampa growth belt, and the Middleton Road edge.
+    city_id: nampa
+  Middleton Road Edge:
+    name: Middleton Road Edge
+    borough: WEST_NAMPA
+    lat: 43.605
+    lng: -116.635
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.81
+    capex: 4400000.0
+    permit_vel: 17.0
+    shift_ratio: 1.3
+    sla: 43.0
+    description: Western approach corridor along Middleton Road with new subdivision
+      build-out and the transition to agricultural land.
+    city_id: nampa
+  South Nampa:
+    name: South Nampa
+    borough: SOUTH_NAMPA
+    lat: 43.555
+    lng: -116.565
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.82
+    capex: 4500000.0
+    permit_vel: 19.0
+    shift_ratio: 1.32
+    sla: 45.0
+    description: South Nampa corridor along 14th Avenue South and Franklin Boulevard
+      with light industrial, utility infrastructure, and water line replacement projects.
+    city_id: nampa
+  North Nampa:
+    name: North Nampa
+    borough: NORTH_NAMPA
+    lat: 43.622
+    lng: -116.58
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.83
+    capex: 5000000.0
+    permit_vel: 21.0
+    shift_ratio: 1.34
+    sla: 47.0
+    description: North Nampa corridor north of Interstate 84 with the Urban Renewal
+      District, Northside Boulevard, and the Garrity Boulevard industrial-commercial
+      spine.
+    city_id: nampa
+  East Nampa:
+    name: East Nampa
+    borough: EAST_NAMPA
+    lat: 43.575
+    lng: -116.52
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.84
+    capex: 5100000.0
+    permit_vel: 20.0
+    shift_ratio: 1.34
+    sla: 46.0
+    description: East Nampa Opportunity Zone corridor along the East Nampa commercial
+      strip with the Nampa Municipal Airport edge and large-lot commercial development.
+    city_id: nampa
+divisions:
+  DOWNTOWN:
+    name: DOWNTOWN
+    center_lat: 43.58
+    center_lng: -116.564
+    zoom: 14.0
+    bbox:
+      min_lat: 43.57
+      max_lat: 43.59
+      min_lng: -116.578
+      max_lng: -116.55
+    submarkets:
+    - Downtown Nampa
+    - Old Nampa
+    city_id: nampa
+  UNIVERSITY:
+    name: UNIVERSITY
+    center_lat: 43.562
+    center_lng: -116.564
+    zoom: 14.0
+    bbox:
+      min_lat: 43.552
+      max_lat: 43.572
+      min_lng: -116.576
+      max_lng: -116.55
+    submarkets:
+    - College of Western Idaho
+    city_id: nampa
+  WEST_NAMPA:
+    name: WEST_NAMPA
+    center_lat: 43.595
+    center_lng: -116.615
+    zoom: 13.0
+    bbox:
+      min_lat: 43.58
+      max_lat: 43.61
+      min_lng: -116.64
+      max_lng: -116.585
+    submarkets:
+    - West Nampa
+    - Middleton Road Edge
+    city_id: nampa
+  SOUTH_NAMPA:
+    name: SOUTH_NAMPA
+    center_lat: 43.555
+    center_lng: -116.565
+    zoom: 13.0
+    bbox:
+      min_lat: 43.54
+      max_lat: 43.57
+      min_lng: -116.59
+      max_lng: -116.54
+    submarkets:
+    - South Nampa
+    city_id: nampa
+  NORTH_NAMPA:
+    name: NORTH_NAMPA
+    center_lat: 43.622
+    center_lng: -116.58
+    zoom: 13.0
+    bbox:
+      min_lat: 43.6
+      max_lat: 43.645
+      min_lng: -116.61
+      max_lng: -116.55
+    submarkets:
+    - North Nampa
+    city_id: nampa
+  EAST_NAMPA:
+    name: EAST_NAMPA
+    center_lat: 43.575
+    center_lng: -116.52
+    zoom: 13.0
+    bbox:
+      min_lat: 43.55
+      max_lat: 43.6
+      min_lng: -116.55
+      max_lng: -116.49
+    submarkets:
+    - East Nampa
+    city_id: nampa
+datasets:
+  permits:
+    endpoint: https://utility.arcgis.com/usrsvcs/servers/7751a4c516434f1d947c67cd78a4d968/rest/services/Public/PublicRoadClosures/FeatureServer/3
+    platform: arcgis
+    watermark_col: CreationDate
+    id_keys:
+    - identifier
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 600.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: CreationDate DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - identifier
+      - OBJECTID
+      issuance_date:
+      - CreationDate
+      status:
+      - Status
+      job_type:
+      - type_
+      - subtype_
+      address_street:
+      - street
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: true
+    alarm_exempt_reason: 'slow cadence: ROW road closure permits layer is small (76
+      rows) and maintained by the GIS team; new closures are infrequent and alarm
+      would false-positive on the slow pace'
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- nampa_id
+- nampa-id
+- nampa id
+job_suffix: nampa

@@ -1,3 +1,36 @@
+ALBUQUERQUE_PERMITS_FIELD_MAP = {
+    "job_id": ["ApplicationPermitNumber", "applicationpermitnumber"],
+    "issuance_date": ["IssueDate", "issuedate"],
+    "job_type": ["TypeofWork", "typeofwork"],
+    "cost": ["PlanCheckValuation", "plancheckvaluation"],
+    "proposed_units": ["NumberOfUnits", "numberofunits"],
+    "status": ["Status", "status"],
+    # ``address_street`` is the composed slot tests / the spine producer fill.
+    # Raw part keys follow so first_mapped still resolves on either spelling.
+    "address_street": [
+        "address_street",
+        "SiteNumber",
+        "sitenumber",
+        "SiteStreet",
+        "sitestreet",
+        "SiteStreetType",
+        "sitestreettype",
+        "SiteStreetDirectional",
+        "sitestreetdirectional",
+    ],
+    "zipcode": ["SiteZip", "sitezip"],
+}
+
+ALBUQUERQUE_GEOCODE_CONTEXT = "Albuquerque, NM"
+
+ALBUQUERQUE_FIELD_MAPS = {
+    "permits": ALBUQUERQUE_PERMITS_FIELD_MAP,
+}
+
+FIELD_MAP = ALBUQUERQUE_FIELD_MAPS
+
+GEOCODE_CONTEXT = ALBUQUERQUE_GEOCODE_CONTEXT
+
 """Albuquerque / Bernalillo County spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -24,13 +57,6 @@ Live-probe caveats that define this leaf (2026-08-27, US-205):
 
 from typing import Any, Dict, List
 
-from src.producers.field_maps_albuquerque import (
-    ALBUQUERQUE_FIELD_MAPS,
-    ALBUQUERQUE_GEOCODE_CONTEXT,
-    ALBUQUERQUE_PERMITS_FIELD_MAP,
-    FIELD_MAP,
-    GEOCODE_CONTEXT,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 ALBUQUERQUE_CITY_ID: str = "albuquerque"

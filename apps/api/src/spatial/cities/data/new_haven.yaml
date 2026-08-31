@@ -1,0 +1,370 @@
+city_id: new_haven
+name: New Haven
+state: CT
+center:
+  lat: 41.3083
+  lng: -72.9279
+metro_bbox:
+  min_lat: 41.27
+  max_lat: 41.35
+  min_lng: -72.99
+  max_lng: -72.86
+division_bboxes:
+  DOWNTOWN:
+    min_lat: 41.29
+    max_lat: 41.32
+    min_lng: -72.94
+    max_lng: -72.9
+  EAST_ROCK:
+    min_lat: 41.315
+    max_lat: 41.337
+    min_lng: -72.925
+    max_lng: -72.89
+  WESTVILLE:
+    min_lat: 41.315
+    max_lat: 41.34
+    min_lng: -72.99
+    max_lng: -72.955
+  FAIR_HAVEN:
+    min_lat: 41.305
+    max_lat: 41.335
+    min_lng: -72.905
+    max_lng: -72.87
+  DIXWELL:
+    min_lat: 41.31
+    max_lat: 41.34
+    min_lng: -72.94
+    max_lng: -72.91
+  THE_HILL:
+    min_lat: 41.28
+    max_lat: 41.3
+    min_lng: -72.965
+    max_lng: -72.925
+submarkets:
+  Downtown:
+    name: Downtown
+    borough: DOWNTOWN
+    lat: 41.3083
+    lng: -72.9279
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.84
+    capex: 7600000.0
+    permit_vel: 34.0
+    shift_ratio: 1.48
+    sla: 56.0
+    description: Civic and commercial core around the historic New Haven Green with
+      the Chapel Street retail spine, arts venues, and office-to-residential conversion.
+    city_id: new_haven
+  Wooster Square:
+    name: Wooster Square
+    borough: DOWNTOWN
+    lat: 41.297
+    lng: -72.912
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.82
+    capex: 6800000.0
+    permit_vel: 28.0
+    shift_ratio: 1.44
+    sla: 54.0
+    description: Historic Italianate rowhouse district around Wooster Square Park
+      with the frank-pepe pizza anchor, Union Station adjacency, and steady residential
+      rehab.
+    city_id: new_haven
+  East Rock:
+    name: East Rock
+    borough: EAST_ROCK
+    lat: 41.327
+    lng: -72.905
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.87
+    capex: 7100000.0
+    permit_vel: 26.0
+    shift_ratio: 1.47
+    sla: 57.0
+    description: Green-bluff neighborhood of late-19th-century houses on the State
+      Street ridge with the Orange Street corridor and strong owner-occupancy.
+    city_id: new_haven
+  Westville:
+    name: Westville
+    borough: WESTVILLE
+    lat: 41.33
+    lng: -72.977
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.83
+    capex: 6400000.0
+    permit_vel: 22.0
+    shift_ratio: 1.42
+    sla: 53.0
+    description: West Rock edge village along Whalley Avenue with the Arts Council
+      hub, tree-lined side streets, and the metro's most stable single-family stock.
+    city_id: new_haven
+  Fair Haven:
+    name: Fair Haven
+    borough: FAIR_HAVEN
+    lat: 41.321
+    lng: -72.894
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.74
+    capex: 4700000.0
+    permit_vel: 27.0
+    shift_ratio: 1.46
+    sla: 47.0
+    description: Quinnipiac River waterfront neighborhood with the Grand Avenue commercial
+      row, immigrant-led storefront vitality, and stabilization-level reinvestment.
+    city_id: new_haven
+  Dixwell:
+    name: Dixwell
+    borough: DIXWELL
+    lat: 41.322
+    lng: -72.934
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.75
+    capex: 5000000.0
+    permit_vel: 25.0
+    shift_ratio: 1.43
+    sla: 49.0
+    description: Historic African American neighborhood on the Dixwell Avenue spine
+      with Winchester Avenue corridor infill and mixed-income redevelopment.
+    city_id: new_haven
+  Newhallville:
+    name: Newhallville
+    borough: DIXWELL
+    lat: 41.331
+    lng: -72.923
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.72
+    capex: 4300000.0
+    permit_vel: 24.0
+    shift_ratio: 1.4
+    sla: 45.0
+    description: North-of-Downtown neighborhood of multi-family and worker housing
+      along Winchester and Shelton Avenues with transit-adjacent redevelopment groundwork.
+    city_id: new_haven
+  The Hill:
+    name: The Hill
+    borough: THE_HILL
+    lat: 41.29
+    lng: -72.946
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.71
+    capex: 4500000.0
+    permit_vel: 23.0
+    shift_ratio: 1.38
+    sla: 44.0
+    description: Southwest neighborhood around Columbus Avenue with the Trowbridge
+      Square district, Long Wharf adjacency, and early-stage corridor reinvestment.
+    city_id: new_haven
+divisions:
+  DOWNTOWN:
+    name: DOWNTOWN
+    center_lat: 41.305
+    center_lng: -72.92
+    zoom: 14.0
+    bbox:
+      min_lat: 41.29
+      max_lat: 41.32
+      min_lng: -72.94
+      max_lng: -72.9
+    submarkets:
+    - Downtown
+    - Wooster Square
+    city_id: new_haven
+  EAST_ROCK:
+    name: EAST_ROCK
+    center_lat: 41.327
+    center_lng: -72.905
+    zoom: 14.0
+    bbox:
+      min_lat: 41.315
+      max_lat: 41.337
+      min_lng: -72.925
+      max_lng: -72.89
+    submarkets:
+    - East Rock
+    city_id: new_haven
+  WESTVILLE:
+    name: WESTVILLE
+    center_lat: 41.33
+    center_lng: -72.977
+    zoom: 13.5
+    bbox:
+      min_lat: 41.315
+      max_lat: 41.34
+      min_lng: -72.99
+      max_lng: -72.955
+    submarkets:
+    - Westville
+    city_id: new_haven
+  FAIR_HAVEN:
+    name: FAIR_HAVEN
+    center_lat: 41.321
+    center_lng: -72.894
+    zoom: 14.0
+    bbox:
+      min_lat: 41.305
+      max_lat: 41.335
+      min_lng: -72.905
+      max_lng: -72.87
+    submarkets:
+    - Fair Haven
+    city_id: new_haven
+  DIXWELL:
+    name: DIXWELL
+    center_lat: 41.326
+    center_lng: -72.929
+    zoom: 14.0
+    bbox:
+      min_lat: 41.31
+      max_lat: 41.34
+      min_lng: -72.94
+      max_lng: -72.91
+    submarkets:
+    - Dixwell
+    - Newhallville
+    city_id: new_haven
+  THE_HILL:
+    name: THE_HILL
+    center_lat: 41.29
+    center_lng: -72.946
+    zoom: 14.0
+    bbox:
+      min_lat: 41.28
+      max_lat: 41.3
+      min_lng: -72.965
+      max_lng: -72.925
+    submarkets:
+    - The Hill
+    city_id: new_haven
+datasets:
+  sla:
+    endpoint: https://data.ct.gov/resource/ngch-56tr.json
+    platform: socrata
+    watermark_col: recordrefreshedon
+    id_keys:
+    - credentialid
+    topic: raw.municipal.sla
+    interval_seconds: 3600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: recordrefreshedon DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: city = 'NEW HAVEN'
+    needs_geocode: true
+    geocode_context: New Haven, CT
+    field_map:
+      license_id:
+      - credentialid
+      - fullcredentialcode
+      license_type:
+      - credential
+      - credentialtype
+      effective_date:
+      - effectivedate
+      - issuedate
+      expiration_date:
+      - expirationdate
+      address_street:
+      - address
+      zipcode:
+      - zip
+      borough:
+      - city
+      premises_name:
+      - businessname
+      - name
+      dba:
+      - businessname
+      - name
+      status:
+      - status
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  deeds:
+    endpoint: https://data.ct.gov/resource/5mzw-sjtu.json
+    platform: socrata
+    watermark_col: daterecorded
+    id_keys:
+    - serialnumber
+    - listyear
+    topic: raw.municipal.deeds
+    interval_seconds: 3600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: daterecorded DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: town = 'New Haven'
+    needs_geocode: true
+    geocode_context: New Haven, CT
+    field_map:
+      doc_id:
+      - serialnumber
+      recorded_date:
+      - daterecorded
+      document_amount:
+      - saleamount
+      address_street:
+      - address
+      borough:
+      - town
+      doc_type:
+      - propertytype
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- new_haven_ct
+- new haven
+job_suffix: new_haven

@@ -1,3 +1,31 @@
+SLA_FIELD_MAP = {
+    "license_id": ["ACC_NUM"],
+    "dba": ["ACC_NAME"],
+    "premises_name": ["ACC_NAME"],
+    "license_type": ["LIC_TYPE", "NAIC_DESC"],
+    "status": ["LIC_STATUS"],
+    "effective_date": ["DT_START"],
+    "address_street": ["FULLADDRESS"],
+    "zipcode": ["ZIP_CODE"],
+}
+
+FIELD_MAP = {
+    "sla": SLA_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Tucson, AZ"
+
+DROPPED_NONADDRESS_COLUMNS = (
+    "STREETNUM",
+    "STREETDIR",
+    "STREETNAM",
+    "STREETSUF",
+    "APT",
+    "ADDRESS",
+    "Shape",
+    "GlobalID",
+)
+
 """Tucson, AZ spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -49,10 +77,6 @@ original probe 2026-08-27):
   evidenced by those 1,021 rows.
 """
 
-from src.producers.field_maps_tucson import (
-    GEOCODE_CONTEXT,
-    SLA_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 TUCSON_CITY_ID: str = "tucson"

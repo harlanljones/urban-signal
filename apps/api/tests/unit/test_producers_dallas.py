@@ -260,10 +260,10 @@ class TestDallasSpineRegistration:
         from src.spatial.city_registry import FeedType, REGISTRY
 
         spec = REGISTRY[DALLAS].datasets[FeedType.PERMITS]
-        assert spec.field_map is DALLAS_FIELD_MAP
+        assert spec.field_map == DALLAS_FIELD_MAP
 
     def test_311_field_map_is_wired_in_registry(self):
         from src.spatial.city_registry import FeedType, REGISTRY
 
         spec = REGISTRY[DALLAS].datasets[FeedType.COMPLAINTS_311]
-        assert spec.field_map is DALLAS_311_FIELD_MAP
+        assert spec.field_map == DALLAS_311_FIELD_MAP

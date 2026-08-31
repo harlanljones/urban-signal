@@ -1,0 +1,420 @@
+city_id: bozeman
+name: Bozeman, MT
+state: MT
+center:
+  lat: 45.677
+  lng: -111.0429
+metro_bbox:
+  min_lat: 45.63
+  max_lat: 45.74
+  min_lng: -111.13
+  max_lng: -110.98
+division_bboxes:
+  DOWNTOWN:
+    min_lat: 45.673
+    max_lat: 45.682
+    min_lng: -111.044
+    max_lng: -111.025
+  MIDTOWN:
+    min_lat: 45.678
+    max_lat: 45.706
+    min_lng: -111.057
+    max_lng: -111.035
+  NORTH_PARK:
+    min_lat: 45.7
+    max_lat: 45.717
+    min_lng: -111.064
+    max_lng: -111.046
+  STORY_MILL:
+    min_lat: 45.684
+    max_lat: 45.69
+    min_lng: -111.032
+    max_lng: -111.024
+  SOUTH_TECH:
+    min_lat: 45.667
+    max_lat: 45.672
+    min_lng: -111.074
+    max_lng: -111.067
+  VALLEY_WEST:
+    min_lat: 45.645
+    max_lat: 45.675
+    min_lng: -111.09
+    max_lng: -111.06
+  BRIDGER_COLLEGE:
+    min_lat: 45.65
+    max_lat: 45.675
+    min_lng: -111.055
+    max_lng: -111.035
+submarkets:
+  Downtown:
+    name: Downtown
+    borough: DOWNTOWN
+    lat: 45.6777
+    lng: -111.0387
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.85
+    capex: 7800000.0
+    permit_vel: 35.0
+    shift_ratio: 1.48
+    sla: 55.0
+    description: Main Street core with the Emerson Center, the Ellen Theatre, and
+      the downtown mixed-use corridor anchored by redevelopment along Main, Willson,
+      and Tracy.
+    city_id: bozeman
+  Bozeman Armory:
+    name: Bozeman Armory
+    borough: DOWNTOWN
+    lat: 45.676
+    lng: -111.041
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.83
+    capex: 7200000.0
+    permit_vel: 32.0
+    shift_ratio: 1.45
+    sla: 53.0
+    description: Armory block south of Main with the historic Armory Hall, gallery
+      district, and craft-beer-anchored infill along the MSU boulevard edge.
+    city_id: bozeman
+  North 7th Avenue:
+    name: North 7th Avenue
+    borough: MIDTOWN
+    lat: 45.69
+    lng: -111.047
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.84
+    capex: 7500000.0
+    permit_vel: 33.0
+    shift_ratio: 1.46
+    sla: 54.0
+    description: North 7th Avenue industrial-to-residential corridor with Midtown
+      Urban Renewal District incentives, warehouse conversions, and the Cannery District
+      redevelopment.
+    city_id: bozeman
+  Bozeman Health:
+    name: Bozeman Health
+    borough: MIDTOWN
+    lat: 45.685
+    lng: -111.045
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.86
+    capex: 8200000.0
+    permit_vel: 36.0
+    shift_ratio: 1.5
+    sla: 57.0
+    description: Bozeman Health Deaconess Hospital anchor corridor with medical-office
+      demand, clinic expansion, and associated multifamily development.
+    city_id: bozeman
+  North Park:
+    name: North Park
+    borough: NORTH_PARK
+    lat: 45.708
+    lng: -111.055
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.82
+    capex: 6900000.0
+    permit_vel: 30.0
+    shift_ratio: 1.43
+    sla: 51.0
+    description: North Park Urban Renewal District at the city's north edge with master-planned
+      residential subdivisions, the North Park business park, and new-build hometracts.
+    city_id: bozeman
+  Story Mill:
+    name: Story Mill
+    borough: STORY_MILL
+    lat: 45.687
+    lng: -111.028
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.83
+    capex: 7100000.0
+    permit_vel: 31.0
+    shift_ratio: 1.44
+    sla: 52.0
+    description: Northeast Neighborhood Urban Renewal District with the Story Mill
+      community garden, Baxter Meadows, and the historic mill-redevelopment corridor
+      along E Story Mill Road.
+    city_id: bozeman
+  South Bozeman Tech:
+    name: South Bozeman Tech
+    borough: SOUTH_TECH
+    lat: 45.6695
+    lng: -111.0705
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.85
+    capex: 8500000.0
+    permit_vel: 34.0
+    shift_ratio: 1.49
+    sla: 56.0
+    description: South Bozeman Technology District west of 19th Avenue with tech-firm
+      campuses, R&D flex space, and the metro's highest commercial-valuation corridor.
+    city_id: bozeman
+  Valley West:
+    name: Valley West
+    borough: VALLEY_WEST
+    lat: 45.661
+    lng: -111.077
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.81
+    capex: 6800000.0
+    permit_vel: 28.0
+    shift_ratio: 1.42
+    sla: 50.0
+    description: Valley West Drive and West Main Street corridor with low-density
+      residential subdivisions, big-box retail, and the West Main auto-oriented commercial
+      strip.
+    city_id: bozeman
+  Bridger College:
+    name: Bridger College
+    borough: BRIDGER_COLLEGE
+    lat: 45.6699
+    lng: -111.0482
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.87
+    capex: 9000000.0
+    permit_vel: 38.0
+    shift_ratio: 1.54
+    sla: 60.0
+    description: Montana State University campus anchor corridor with College Street
+      student housing, university mixed-use development, and the Grant Street innovation
+      belt.
+    city_id: bozeman
+  Baxter/Highland:
+    name: Baxter/Highland
+    borough: BRIDGER_COLLEGE
+    lat: 45.653
+    lng: -111.05
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.8
+    capex: 6500000.0
+    permit_vel: 27.0
+    shift_ratio: 1.4
+    sla: 49.0
+    description: Baxter Lane and Highland Boulevard southern corridor with single-family
+      stock, the Highland Park subdivision, and steady low-valuation alteration permits.
+    city_id: bozeman
+divisions:
+  DOWNTOWN:
+    name: DOWNTOWN
+    center_lat: 45.6777
+    center_lng: -111.0387
+    zoom: 14.0
+    bbox:
+      min_lat: 45.673
+      max_lat: 45.682
+      min_lng: -111.044
+      max_lng: -111.025
+    submarkets:
+    - Downtown
+    - Bozeman Armory
+    city_id: bozeman
+  MIDTOWN:
+    name: MIDTOWN
+    center_lat: 45.69
+    center_lng: -111.047
+    zoom: 13.5
+    bbox:
+      min_lat: 45.678
+      max_lat: 45.706
+      min_lng: -111.057
+      max_lng: -111.035
+    submarkets:
+    - North 7th Avenue
+    - Bozeman Health
+    city_id: bozeman
+  NORTH_PARK:
+    name: NORTH_PARK
+    center_lat: 45.708
+    center_lng: -111.055
+    zoom: 13.0
+    bbox:
+      min_lat: 45.7
+      max_lat: 45.717
+      min_lng: -111.064
+      max_lng: -111.046
+    submarkets:
+    - North Park
+    city_id: bozeman
+  STORY_MILL:
+    name: STORY_MILL
+    center_lat: 45.687
+    center_lng: -111.028
+    zoom: 13.5
+    bbox:
+      min_lat: 45.684
+      max_lat: 45.69
+      min_lng: -111.032
+      max_lng: -111.024
+    submarkets:
+    - Story Mill
+    city_id: bozeman
+  SOUTH_TECH:
+    name: SOUTH_TECH
+    center_lat: 45.6695
+    center_lng: -111.0705
+    zoom: 13.0
+    bbox:
+      min_lat: 45.667
+      max_lat: 45.672
+      min_lng: -111.074
+      max_lng: -111.067
+    submarkets:
+    - South Bozeman Tech
+    city_id: bozeman
+  VALLEY_WEST:
+    name: VALLEY_WEST
+    center_lat: 45.661
+    center_lng: -111.077
+    zoom: 13.0
+    bbox:
+      min_lat: 45.645
+      max_lat: 45.675
+      min_lng: -111.09
+      max_lng: -111.06
+    submarkets:
+    - Valley West
+    city_id: bozeman
+  BRIDGER_COLLEGE:
+    name: BRIDGER_COLLEGE
+    center_lat: 45.6699
+    center_lng: -111.0482
+    zoom: 13.5
+    bbox:
+      min_lat: 45.65
+      max_lat: 45.675
+      min_lng: -111.055
+      max_lng: -111.035
+    submarkets:
+    - Bridger College
+    - Baxter/Highland
+    city_id: bozeman
+datasets:
+  permits:
+    endpoint: https://services3.arcgis.com/f4hk1qcfxRJ0L2BU/arcgis/rest/services/BP_Comm_Dev_Report_Data_view/FeatureServer/0
+    platform: arcgis
+    watermark_col: PERMIT_ISSUE_DATE
+    id_keys:
+    - PERMIT_NUMBER
+    - APPLICATION_NUMBER
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: PERMIT_ISSUE_DATE DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Bozeman, MT
+    field_map:
+      job_id:
+      - PERMIT_NUMBER
+      - APPLICATION_NUMBER
+      - OBJECTID
+      issuance_date:
+      - PERMIT_ISSUE_DATE
+      filing_date:
+      - APPLICATION_DATE
+      status:
+      - PERMIT_STATUS
+      - APPLICATION_STATUS
+      job_type:
+      - PERMIT_TYPE
+      - APPLICATION_TYPE
+      cost:
+      - VALUATION
+      address_street:
+      - LOCATION
+      proposed_units:
+      - New_Dwelling_Units
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 1000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  crime:
+    endpoint: https://gisweb.bozeman.net/hosted/rest/services/BPD_CFS_Public_30_Days/FeatureServer/0
+    platform: arcgis
+    watermark_col: DATE
+    id_keys:
+    - INCIDENT_NUMBER
+    - CASE_NUMBER
+    - OBJECTID
+    topic: raw.municipal.crime
+    interval_seconds: 300.0
+    producer_key: crime
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: DATE DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - INCIDENT_NUMBER
+      - CASE_NUMBER
+      - OBJECTID
+      offense_type:
+      - ALL_CALL_TYPES
+      - PRIMARY_CODE
+      - PRIMARY_DESCRIPTION
+      occurred_date:
+      - DATE
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 20000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- bozeman_mt
+- bozeman-mt
+- bozeman mt
+job_suffix: bozeman

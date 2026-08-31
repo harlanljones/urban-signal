@@ -23,6 +23,38 @@
   pointer-events: none;
 }
 
+/* Hero entrance — the page's authored first moment: the field lights up,
+   then the instruments settle in. Opacity + translate only, on the strong
+   ease-out token. Base state stays visible so a browser without animations
+   never blanks the copy; the keyframes own the hiding. */
+.observatory-canvas {
+  animation: observatory-in 700ms var(--ease-out) both;
+}
+
+.hero .field-label,
+.hero-copy,
+.hero .layer-legend,
+.hero-foot,
+.hero .coordinates {
+  animation: hero-rise 420ms var(--ease-out) both;
+}
+
+.hero .field-label { animation-delay: 140ms; }
+.hero-copy        { animation-delay: 200ms; }
+.hero .layer-legend { animation-delay: 280ms; }
+.hero-foot        { animation-delay: 360ms; }
+.hero .coordinates { animation-delay: 420ms; }
+
+@keyframes observatory-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes hero-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .layer-legend {
   top: 96px;
   gap: 7px;
@@ -38,7 +70,7 @@
   border: 1px solid transparent;
   background: rgba(7, 17, 15, .54);
   text-align: left;
-  transition: border-color .25s ease, background-color .25s ease, transform .35s cubic-bezier(.16, 1, .3, 1);
+  transition: border-color .25s var(--ease-out), background-color .25s var(--ease-out), transform .35s var(--ease-out);
 }
 
 .layer-control:hover {
@@ -198,5 +230,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .readout-status i { animation: none; }
-  .observatory-canvas { opacity: .72; }
+  .observatory-canvas { opacity: .72; animation: none; }
+  .hero .field-label,
+  .hero-copy,
+  .hero .layer-legend,
+  .hero-foot,
+  .hero .coordinates { animation: none; }
 }

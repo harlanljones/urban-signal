@@ -1,0 +1,173 @@
+city_id: beaumont
+name: Beaumont
+state: TX
+center:
+  lat: 30.084
+  lng: -94.101
+metro_bbox:
+  min_lat: 29.9
+  max_lat: 30.2
+  min_lng: -94.3
+  max_lng: -93.85
+division_bboxes:
+  BEAUMONT_CORE:
+    min_lat: 29.95
+    max_lat: 30.18
+    min_lng: -94.25
+    max_lng: -93.9
+submarkets:
+  Downtown Beaumont:
+    name: Downtown Beaumont
+    borough: BEAUMONT_CORE
+    lat: 30.084
+    lng: -94.101
+    zoom: 13.6
+    pitch: 48.0
+    base_lims: 0.84
+    capex: 6800000.0
+    permit_vel: 32.0
+    shift_ratio: 1.42
+    sla: 57.0
+    description: Civic and riverfront core around Crockett Street, Edison Museum,
+      and Downtown arts venues.
+    city_id: beaumont
+  West End:
+    name: West End
+    borough: BEAUMONT_CORE
+    lat: 30.1
+    lng: -94.166
+    zoom: 13.4
+    pitch: 46.0
+    base_lims: 0.83
+    capex: 6400000.0
+    permit_vel: 30.0
+    shift_ratio: 1.4
+    sla: 55.0
+    description: Retail and residential corridor around Dowlen Road and Phelan with
+      steady renovation activity.
+    city_id: beaumont
+  South Park:
+    name: South Park
+    borough: BEAUMONT_CORE
+    lat: 30.041
+    lng: -94.122
+    zoom: 13.4
+    pitch: 46.0
+    base_lims: 0.81
+    capex: 5600000.0
+    permit_vel: 27.0
+    shift_ratio: 1.36
+    sla: 53.0
+    description: Neighborhoods south of US-90 with university-adjacent housing stock
+      and service demand.
+    city_id: beaumont
+  North End:
+    name: North End
+    borough: BEAUMONT_CORE
+    lat: 30.11
+    lng: -94.116
+    zoom: 13.2
+    pitch: 44.0
+    base_lims: 0.82
+    capex: 5900000.0
+    permit_vel: 28.0
+    shift_ratio: 1.38
+    sla: 54.0
+    description: Historic residential grid north of downtown with rehabilitation pressure
+      and code-enforcement load.
+    city_id: beaumont
+  Calder Highlands:
+    name: Calder Highlands
+    borough: BEAUMONT_CORE
+    lat: 30.084
+    lng: -94.148
+    zoom: 13.2
+    pitch: 44.0
+    base_lims: 0.83
+    capex: 6000000.0
+    permit_vel: 29.0
+    shift_ratio: 1.39
+    sla: 54.0
+    description: Calder Avenue corridor and established neighborhoods with infill
+      and alteration permits.
+    city_id: beaumont
+divisions:
+  BEAUMONT_CORE:
+    name: Beaumont Core
+    center_lat: 30.084
+    center_lng: -94.13
+    zoom: 11.8
+    bbox:
+      min_lat: 29.95
+      max_lat: 30.18
+      min_lng: -94.25
+      max_lng: -93.9
+    submarkets:
+    - Downtown Beaumont
+    - West End
+    - South Park
+    - North End
+    - Calder Highlands
+    city_id: beaumont
+datasets:
+  sla:
+    endpoint: https://data.texas.gov/resource/s7ft-44qi.json?$select=*, 'trec_broker:'
+      || license_type as license_type_ns
+    platform: socrata
+    watermark_col: updated
+    id_keys:
+    - license_number
+    topic: raw.municipal.sla
+    interval_seconds: 3600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: updated DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: county = 'Jefferson'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - license_number
+      license_type:
+      - license_type_ns
+      effective_date:
+      - original_license_date
+      expiration_date:
+      - license_expiration_date
+      premises_name:
+      - full_name
+      status:
+      - status
+      borough:
+      - county
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- beaumont_tx
+- beaumont-tx
+- beaumont tx
+job_suffix: beaumont

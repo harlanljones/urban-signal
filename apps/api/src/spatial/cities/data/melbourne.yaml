@@ -1,0 +1,426 @@
+city_id: melbourne
+name: Melbourne / Palm Bay / Titusville
+state: FL
+center:
+  lat: 28.0836
+  lng: -80.6081
+metro_bbox:
+  min_lat: 27.88
+  max_lat: 28.72
+  min_lng: -80.9
+  max_lng: -80.4
+division_bboxes:
+  MELBOURNE_CORE:
+    min_lat: 28.03
+    max_lat: 28.18
+    min_lng: -80.7
+    max_lng: -80.55
+  PALM_BAY_SOUTH:
+    min_lat: 27.9
+    max_lat: 28.05
+    min_lng: -80.75
+    max_lng: -80.58
+  BEACH_BARRIER:
+    min_lat: 28.04
+    max_lat: 28.28
+    min_lng: -80.62
+    max_lng: -80.52
+  VIERA_SUNTREE:
+    min_lat: 28.18
+    max_lat: 28.36
+    min_lng: -80.8
+    max_lng: -80.58
+  TITUSVILLE_NORTH:
+    min_lat: 28.5
+    max_lat: 28.7
+    min_lng: -80.9
+    max_lng: -80.7
+submarkets:
+  Downtown Melbourne:
+    name: Downtown Melbourne
+    borough: MELBOURNE_CORE
+    lat: 28.078
+    lng: -80.608
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.86
+    capex: 7200000.0
+    permit_vel: 30.0
+    shift_ratio: 1.45
+    sla: 60.0
+    description: Historic downtown along New Haven Ave with infill mixed-use and renovation
+      permits.
+    city_id: melbourne
+  Eau Gallie Arts District:
+    name: Eau Gallie Arts District
+    borough: MELBOURNE_CORE
+    lat: 28.128
+    lng: -80.626
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.84
+    capex: 6400000.0
+    permit_vel: 27.0
+    shift_ratio: 1.41
+    sla: 58.0
+    description: "EGAD waterfront arts district with adaptive reuse and small\u2011\
+      format retail licensing."
+    city_id: melbourne
+  West Melbourne Gateway:
+    name: West Melbourne Gateway
+    borough: MELBOURNE_CORE
+    lat: 28.071
+    lng: -80.66
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.78
+    capex: 5200000.0
+    permit_vel: 24.0
+    shift_ratio: 1.34
+    sla: 52.0
+    description: "West Melbourne retail/industrial edge and SR\u2011192 corridor redevelopment."
+    city_id: melbourne
+  Palm Bay Center:
+    name: Palm Bay Center
+    borough: PALM_BAY_SOUTH
+    lat: 28.034
+    lng: -80.62
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.82
+    capex: 6000000.0
+    permit_vel: 26.0
+    shift_ratio: 1.38
+    sla: 56.0
+    description: Palm Bay municipal center and Malabar Road corridor with steady renovation
+      permitting.
+    city_id: melbourne
+  Malabar & South Babcock:
+    name: Malabar & South Babcock
+    borough: PALM_BAY_SOUTH
+    lat: 27.99
+    lng: -80.623
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.74
+    capex: 4200000.0
+    permit_vel: 20.0
+    shift_ratio: 1.28
+    sla: 48.0
+    description: South Palm Bay neighborhoods around Malabar Road and Babcock Street.
+    city_id: melbourne
+  St. Johns Heritage Parkway:
+    name: St. Johns Heritage Parkway
+    borough: PALM_BAY_SOUTH
+    lat: 27.965
+    lng: -80.678
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.7
+    capex: 3800000.0
+    permit_vel: 18.0
+    shift_ratio: 1.24
+    sla: 45.0
+    description: "Exurban growth corridor west of I\u201195 with single\u2011family\
+      \ subdivision activity."
+    city_id: melbourne
+  Indialantic & Indian Harbour:
+    name: Indialantic & Indian Harbour
+    borough: BEACH_BARRIER
+    lat: 28.109
+    lng: -80.577
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.88
+    capex: 9600000.0
+    permit_vel: 34.0
+    shift_ratio: 1.5
+    sla: 64.0
+    description: "Barrier\u2011island beachfront communities with teardowns, additions,\
+      \ and hospitality licensing."
+    city_id: melbourne
+  Satellite Beach:
+    name: Satellite Beach
+    borough: BEACH_BARRIER
+    lat: 28.176
+    lng: -80.593
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.84
+    capex: 7400000.0
+    permit_vel: 28.0
+    shift_ratio: 1.42
+    sla: 58.0
+    description: "Mid\u2011island coastal neighborhoods with renovations and small\
+      \ mixed\u2011use infill."
+    city_id: melbourne
+  Patrick & South Beaches:
+    name: Patrick & South Beaches
+    borough: BEACH_BARRIER
+    lat: 28.07
+    lng: -80.565
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.76
+    capex: 5200000.0
+    permit_vel: 22.0
+    shift_ratio: 1.3
+    sla: 50.0
+    description: "South beaches and Patrick SFB edge; lower\u2011volume, higher\u2011\
+      value residential work."
+    city_id: melbourne
+  Viera Town Center:
+    name: Viera Town Center
+    borough: VIERA_SUNTREE
+    lat: 28.243
+    lng: -80.728
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.82
+    capex: 7800000.0
+    permit_vel: 32.0
+    shift_ratio: 1.4
+    sla: 58.0
+    description: "Planned town\u2011center mixed\u2011use and institutional buildout\
+      \ west of I\u201195."
+    city_id: melbourne
+  Suntree:
+    name: Suntree
+    borough: VIERA_SUNTREE
+    lat: 28.21
+    lng: -80.673
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.78
+    capex: 5600000.0
+    permit_vel: 24.0
+    shift_ratio: 1.32
+    sla: 52.0
+    description: "Established golf\u2011course community with steady renovation permitting."
+    city_id: melbourne
+  Titusville Historic Core:
+    name: Titusville Historic Core
+    borough: TITUSVILLE_NORTH
+    lat: 28.613
+    lng: -80.807
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.8
+    capex: 6200000.0
+    permit_vel: 25.0
+    shift_ratio: 1.36
+    sla: 54.0
+    description: "US\u20111 riverfront historic core with adaptive reuse and small\
+      \ hospitality licensing."
+    city_id: melbourne
+  Mims & Space Coast Gateway:
+    name: Mims & Space Coast Gateway
+    borough: TITUSVILLE_NORTH
+    lat: 28.65
+    lng: -80.84
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.7
+    capex: 4000000.0
+    permit_vel: 18.0
+    shift_ratio: 1.24
+    sla: 46.0
+    description: "Northern gateway communities with industrial and logistics permitting\
+      \ along I\u201195."
+    city_id: melbourne
+divisions:
+  MELBOURNE_CORE:
+    name: MELBOURNE_CORE
+    center_lat: 28.105
+    center_lng: -80.62
+    zoom: 13.5
+    bbox:
+      min_lat: 28.03
+      max_lat: 28.18
+      min_lng: -80.7
+      max_lng: -80.55
+    submarkets:
+    - Downtown Melbourne
+    - Eau Gallie Arts District
+    - West Melbourne Gateway
+    city_id: melbourne
+  PALM_BAY_SOUTH:
+    name: PALM_BAY_SOUTH
+    center_lat: 28.0
+    center_lng: -80.64
+    zoom: 13.0
+    bbox:
+      min_lat: 27.9
+      max_lat: 28.05
+      min_lng: -80.75
+      max_lng: -80.58
+    submarkets:
+    - Palm Bay Center
+    - Malabar & South Babcock
+    - St. Johns Heritage Parkway
+    city_id: melbourne
+  BEACH_BARRIER:
+    name: BEACH_BARRIER
+    center_lat: 28.14
+    center_lng: -80.58
+    zoom: 13.0
+    bbox:
+      min_lat: 28.04
+      max_lat: 28.28
+      min_lng: -80.62
+      max_lng: -80.52
+    submarkets:
+    - Indialantic & Indian Harbour
+    - Satellite Beach
+    - Patrick & South Beaches
+    city_id: melbourne
+  VIERA_SUNTREE:
+    name: VIERA_SUNTREE
+    center_lat: 28.255
+    center_lng: -80.69
+    zoom: 12.8
+    bbox:
+      min_lat: 28.18
+      max_lat: 28.36
+      min_lng: -80.8
+      max_lng: -80.58
+    submarkets:
+    - Viera Town Center
+    - Suntree
+    city_id: melbourne
+  TITUSVILLE_NORTH:
+    name: TITUSVILLE_NORTH
+    center_lat: 28.61
+    center_lng: -80.8
+    zoom: 12.8
+    bbox:
+      min_lat: 28.5
+      max_lat: 28.7
+      min_lng: -80.9
+      max_lng: -80.7
+    submarkets:
+    - Titusville Historic Core
+    - Mims & Space Coast Gateway
+    city_id: melbourne
+datasets:
+  permits:
+    endpoint: https://gis.palmbayflorida.org/arcgis/rest/services/GrowthManagement/BuildingPermits/FeatureServer/0
+    platform: arcgis
+    watermark_col: issueDate
+    id_keys:
+    - ApplicationNumber
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: issueDate DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - ApplicationNumber
+      issuance_date:
+      - issueDate
+      - PermitDate
+      - ApplicationDate
+      status:
+      - PermitStatus
+      job_type:
+      - ApplicationType
+      - PermitType
+      address_street:
+      - ADDRESS
+      cost:
+      - EstimateValuation
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 1000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'FL'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- melbourne_fl
+- melbourne fl
+- palm_bay
+- palm bay
+job_suffix: melbourne

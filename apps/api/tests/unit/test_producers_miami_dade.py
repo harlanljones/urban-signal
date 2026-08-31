@@ -174,7 +174,7 @@ class TestFeedRegistration:
         assert spec.max_record_count == 1000
         assert spec.non_spatial is True
         assert spec.rolling_window_days == 730
-        assert spec.field_map is PERMITS_FIELD_MAP
+        assert spec.field_map == PERMITS_FIELD_MAP
 
     def test_sla_spec_is_snapshot_with_native_coords(self):
         spec = get_miami_dade_dataset(FeedType.SLA)
@@ -184,7 +184,7 @@ class TestFeedRegistration:
         assert spec.ingestion_mode == "snapshot"
         assert spec.oid_field == "OBJECTID"
         assert spec.max_record_count == 16000
-        assert spec.field_map is SLA_FIELD_MAP
+        assert spec.field_map == SLA_FIELD_MAP
         assert spec.companion_endpoints["certificate_of_use"] == MIAMI_DADE_SLA_CERTIFICATE_OF_USE
         assert spec.companion_endpoints["enterprise_twin"] == MIAMI_DADE_SLA_ENTERPRISE_TWIN
 
@@ -203,7 +203,7 @@ class TestFeedRegistration:
         assert spec.where == "PRICE_1 >= 10000"
         assert spec.oid_field == "OBJECTID"
         assert spec.max_record_count == 20000
-        assert spec.field_map is DEEDS_FIELD_MAP
+        assert spec.field_map == DEEDS_FIELD_MAP
 
     @pytest.mark.parametrize("absent_feed", [FeedType.COMPLAINTS_311, FeedType.STR, FeedType.CRIME])
     def test_absent_feeds_raise_readable_errors(self, absent_feed):

@@ -1,3 +1,38 @@
+PERMITS_FIELD_MAP = {
+    "job_id": ["Permit_Number", "OBJECTID"],
+    "issuance_date": ["Issued_Date"],
+    "job_type": ["Permit_Type"],
+    "cost": ["Project_Valuation"],
+    "address_street": ["Permit_Location"],
+}
+
+BUSREG_FIELD_MAP = {
+    "license_id": ["RECNO", "OBJECTID"],
+    "dba": ["DBA", "RECNAME"],
+    "premises_name": ["RECNAME", "DBA"],
+    "license_type": ["BusCat", "BusType"],
+    "status": ["STATUS"],
+    "effective_date": ["LastUpdateDate"],
+    "address_street": ["RecAddress"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+    "sla": BUSREG_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Las Cruces, NM"
+
+DROPPED_PII_COLUMNS = (
+    "Owner_Name",
+    "Contractor_Name",
+    "Contractor_Business_Name",
+    "Email",
+    "Phone",
+    "MailAddress",
+    "ContactName",
+)
+
 """Las Cruces, NM spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -56,11 +91,6 @@ Live-probe evidence (2026-08-28, US-240):
   BuildingPermits layer confirm the six hand-authored divisions below.
 """
 
-from src.producers.field_maps_las_cruces import (
-    BUSREG_FIELD_MAP,
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 LAS_CRUCES_CITY_ID: str = "las_cruces"

@@ -1,3 +1,27 @@
+DEEDS_FIELD_MAP = {
+    "doc_id": ["PRINTKEY", "PARCELID"],
+    "bbl": ["PARCELID"],
+    "doc_type": ["DEED_TYPE"],
+    "document_amount": ["SALE_PRICE"],
+    "recorded_date": ["SALE_DATE"],
+    "address_street": ["SITEADDRESS"],
+    "incident_address": ["SITEADDRESS"],
+    "borough": ["CITY"],
+    "zipcode": ["ZIP5"],
+}
+
+FIELD_MAP = {
+    "deeds": DEEDS_FIELD_MAP,
+}
+
+NON_CANDIDATE_METADATA_COLUMNS = (
+    "VALID",
+    "MultiSale",
+    "PARCEL_SOURCE",
+    "BOOK",
+    "PAGE",
+)
+
 """Rochester Metro Submarket Registry and Spatial Layer for Urban Signal.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -45,10 +69,6 @@ shows 0 new sale rows after a full month, treat the roll as stalled.
 
 from typing import Dict
 
-from src.producers.field_maps_rochester import (
-    DEEDS_FIELD_MAP,
-    FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 ROCHESTER_CITY_ID: str = "rochester"

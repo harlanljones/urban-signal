@@ -1,3 +1,39 @@
+OAKLAND_311_FIELD_MAP = {
+    "incident_id": ["requestid"],
+    "latitude": ["sry"],
+    "longitude": ["srx"],
+    "created_date": ["datetimeinit"],
+    "closed_date": ["datetimeclosed"],
+    "complaint_type": ["reqcategory"],
+    "borough": ["councildistrict"],
+    "incident_address": ["probaddress"],
+    "zipcode": ["zipcode"],
+}
+
+OAKLAND_CRIME_FIELD_MAP = {
+    "incident_id": ["casenumber"],
+    "offense_type": ["crimetype"],
+    "occurred_date": ["datetime"],
+    "borough": ["policebeat"],
+    "address": ["address"],
+}
+
+FIELD_MAP = {
+    "311": OAKLAND_311_FIELD_MAP,
+    "crime": OAKLAND_CRIME_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Oakland, CA"
+
+DROPPED_NONADDRESS_COLUMNS = (
+    "reqaddress",
+    "beat",
+    "status",
+    "source",
+    "referredto",
+    ":@computed_region_w23w_jfhw",
+)
+
 """Oakland, CA spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -54,11 +90,6 @@ Live-probe evidence that defines this leaf (probed 2026-08-28 UTC, US-223):
   chosen genuinely outside (San Francisco, San Jose).
 """
 
-from src.producers.field_maps_oakland import (
-    GEOCODE_CONTEXT,
-    OAKLAND_311_FIELD_MAP,
-    OAKLAND_CRIME_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 OAKLAND_CITY_ID: str = "oakland"

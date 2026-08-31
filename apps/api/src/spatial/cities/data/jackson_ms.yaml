@@ -1,0 +1,299 @@
+city_id: jackson_ms
+name: Jackson
+state: MS
+center:
+  lat: 32.2989
+  lng: -90.1847
+metro_bbox:
+  min_lat: 32.15
+  max_lat: 32.5
+  min_lng: -90.45
+  max_lng: -89.85
+division_bboxes:
+  DOWNTOWN_CORE:
+    min_lat: 32.28
+    max_lat: 32.33
+    min_lng: -90.22
+    max_lng: -90.16
+  NORTH_JACKSON_MADISON:
+    min_lat: 32.34
+    max_lat: 32.5
+    min_lng: -90.35
+    max_lng: -89.95
+  WEST_CLINTON:
+    min_lat: 32.28
+    max_lat: 32.45
+    min_lng: -90.45
+    max_lng: -90.2
+  EAST_FLOWOOD_RANKIN:
+    min_lat: 32.26
+    max_lat: 32.41
+    min_lng: -90.15
+    max_lng: -89.85
+  SOUTH_BELT_BYRAM:
+    min_lat: 32.15
+    max_lat: 32.3
+    min_lng: -90.35
+    max_lng: -90.12
+submarkets:
+  Downtown Jackson:
+    name: Downtown Jackson
+    borough: DOWNTOWN_CORE
+    lat: 32.2989
+    lng: -90.1847
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.82
+    capex: 5200000.0
+    permit_vel: 24.0
+    shift_ratio: 1.28
+    sla: 52.0
+    description: Capitol complex, government, and mixed-use reinvestment core.
+    city_id: jackson_ms
+  Fondren & Belhaven:
+    name: Fondren & Belhaven
+    borough: DOWNTOWN_CORE
+    lat: 32.3235
+    lng: -90.176
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.8
+    capex: 4800000.0
+    permit_vel: 22.0
+    shift_ratio: 1.24
+    sla: 50.0
+    description: Historic neighborhoods north of downtown with medical and cultural
+      anchors.
+    city_id: jackson_ms
+  JSU & West Capitol:
+    name: JSU & West Capitol
+    borough: WEST_CLINTON
+    lat: 32.298
+    lng: -90.21
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.76
+    capex: 4200000.0
+    permit_vel: 20.0
+    shift_ratio: 1.2
+    sla: 48.0
+    description: Jackson State University district and West Capitol corridor reinvestment.
+    city_id: jackson_ms
+  Clinton Main Street:
+    name: Clinton Main Street
+    borough: WEST_CLINTON
+    lat: 32.341
+    lng: -90.328
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.74
+    capex: 4000000.0
+    permit_vel: 18.0
+    shift_ratio: 1.18
+    sla: 46.0
+    description: Historic downtown Clinton and MS College vicinity with corridor infill.
+    city_id: jackson_ms
+  Flowood & Dogwood:
+    name: Flowood & Dogwood
+    borough: EAST_FLOWOOD_RANKIN
+    lat: 32.332
+    lng: -90.067
+    zoom: 13.8
+    pitch: 40.0
+    base_lims: 0.78
+    capex: 4600000.0
+    permit_vel: 21.0
+    shift_ratio: 1.22
+    sla: 48.0
+    description: Lakeland Drive medical/retail spine and Dogwood Festival commercial
+      hub.
+    city_id: jackson_ms
+  Pearl & Airport Corridor:
+    name: Pearl & Airport Corridor
+    borough: EAST_FLOWOOD_RANKIN
+    lat: 32.275
+    lng: -90.08
+    zoom: 13.5
+    pitch: 38.0
+    base_lims: 0.72
+    capex: 3800000.0
+    permit_vel: 19.0
+    shift_ratio: 1.18
+    sla: 46.0
+    description: Pearl retail corridors and JAN airport approaches along MS-475.
+    city_id: jackson_ms
+  Ridgeland & Colony Park:
+    name: Ridgeland & Colony Park
+    borough: NORTH_JACKSON_MADISON
+    lat: 32.42
+    lng: -90.14
+    zoom: 13.8
+    pitch: 40.0
+    base_lims: 0.79
+    capex: 5100000.0
+    permit_vel: 23.0
+    shift_ratio: 1.24
+    sla: 50.0
+    description: I-55 frontage retail/office belts and mixed-use nodes in Ridgeland.
+    city_id: jackson_ms
+  Madison Town Center:
+    name: Madison Town Center
+    borough: NORTH_JACKSON_MADISON
+    lat: 32.462
+    lng: -90.124
+    zoom: 13.8
+    pitch: 40.0
+    base_lims: 0.77
+    capex: 4700000.0
+    permit_vel: 20.0
+    shift_ratio: 1.2
+    sla: 46.0
+    description: Madison center and Highland Colony nodes with steady suburban infill.
+    city_id: jackson_ms
+  Byram & South Jackson:
+    name: Byram & South Jackson
+    borough: SOUTH_BELT_BYRAM
+    lat: 32.196
+    lng: -90.246
+    zoom: 13.5
+    pitch: 38.0
+    base_lims: 0.7
+    capex: 3600000.0
+    permit_vel: 18.0
+    shift_ratio: 1.16
+    sla: 44.0
+    description: South I-55 growth belt with highway-oriented retail and services.
+    city_id: jackson_ms
+divisions:
+  DOWNTOWN_CORE:
+    name: DOWNTOWN_CORE
+    center_lat: 32.305
+    center_lng: -90.185
+    zoom: 13.8
+    bbox:
+      min_lat: 32.28
+      max_lat: 32.33
+      min_lng: -90.22
+      max_lng: -90.16
+    submarkets:
+    - Downtown Jackson
+    - Fondren & Belhaven
+    city_id: jackson_ms
+  NORTH_JACKSON_MADISON:
+    name: NORTH_JACKSON_MADISON
+    center_lat: 32.41
+    center_lng: -90.18
+    zoom: 12.8
+    bbox:
+      min_lat: 32.34
+      max_lat: 32.5
+      min_lng: -90.35
+      max_lng: -89.95
+    submarkets:
+    - Ridgeland & Colony Park
+    - Madison Town Center
+    city_id: jackson_ms
+  WEST_CLINTON:
+    name: WEST_CLINTON
+    center_lat: 32.365
+    center_lng: -90.32
+    zoom: 13.0
+    bbox:
+      min_lat: 32.28
+      max_lat: 32.45
+      min_lng: -90.45
+      max_lng: -90.2
+    submarkets:
+    - JSU & West Capitol
+    - Clinton Main Street
+    city_id: jackson_ms
+  EAST_FLOWOOD_RANKIN:
+    name: EAST_FLOWOOD_RANKIN
+    center_lat: 32.33
+    center_lng: -90.02
+    zoom: 13.0
+    bbox:
+      min_lat: 32.26
+      max_lat: 32.41
+      min_lng: -90.15
+      max_lng: -89.85
+    submarkets:
+    - Flowood & Dogwood
+    - Pearl & Airport Corridor
+    city_id: jackson_ms
+  SOUTH_BELT_BYRAM:
+    name: SOUTH_BELT_BYRAM
+    center_lat: 32.22
+    center_lng: -90.23
+    zoom: 12.8
+    bbox:
+      min_lat: 32.15
+      max_lat: 32.3
+      min_lng: -90.35
+      max_lng: -90.12
+    submarkets:
+    - Byram & South Jackson
+    city_id: jackson_ms
+datasets:
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'MS'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- jackson-ms
+- jackson ms
+job_suffix: jackson_ms

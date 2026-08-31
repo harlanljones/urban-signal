@@ -1,0 +1,181 @@
+city_id: lake_charles
+name: Lake Charles
+state: LA
+center:
+  lat: 30.2266
+  lng: -93.2174
+metro_bbox:
+  min_lat: 30.05
+  max_lat: 30.35
+  min_lng: -93.35
+  max_lng: -93.09
+division_bboxes:
+  LAKE_CHARLES_CORE:
+    min_lat: 30.19
+    max_lat: 30.26
+    min_lng: -93.25
+    max_lng: -93.17
+  PRIEN_LAKE_SOUTH:
+    min_lat: 30.17
+    max_lat: 30.23
+    min_lng: -93.26
+    max_lng: -93.18
+  WESTLAKE_INDUSTRIAL:
+    min_lat: 30.23
+    max_lat: 30.3
+    min_lng: -93.29
+    max_lng: -93.19
+submarkets:
+  Downtown Lake Charles & Lakefront:
+    name: Downtown Lake Charles & Lakefront
+    borough: LAKE_CHARLES_CORE
+    lat: 30.2266
+    lng: -93.2174
+    zoom: 13.8
+    pitch: 44.0
+    base_lims: 0.58
+    capex: 2500000.0
+    permit_vel: 22.0
+    shift_ratio: 1.12
+    sla: 28.0
+    description: Historic downtown and lakeshore activation with civic anchors and
+      hospitality.
+    city_id: lake_charles
+  Prien Lake Retail Corridor:
+    name: Prien Lake Retail Corridor
+    borough: PRIEN_LAKE_SOUTH
+    lat: 30.2005
+    lng: -93.254
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.54
+    capex: 2000000.0
+    permit_vel: 24.0
+    shift_ratio: 1.14
+    sla: 24.0
+    description: Prien Lake Mall and Gauthier Road commercial corridor with steady
+      small-format investment.
+    city_id: lake_charles
+  Westlake & Petrochemical District:
+    name: Westlake & Petrochemical District
+    borough: WESTLAKE_INDUSTRIAL
+    lat: 30.257
+    lng: -93.254
+    zoom: 13.0
+    pitch: 38.0
+    base_lims: 0.5
+    capex: 1800000.0
+    permit_vel: 18.0
+    shift_ratio: 1.08
+    sla: 22.0
+    description: Industrial waterfront and Westlake city area with employment-driven
+      demand signals.
+    city_id: lake_charles
+divisions:
+  LAKE_CHARLES_CORE:
+    name: LAKE_CHARLES_CORE
+    center_lat: 30.226
+    center_lng: -93.215
+    zoom: 12.0
+    bbox:
+      min_lat: 30.19
+      max_lat: 30.26
+      min_lng: -93.25
+      max_lng: -93.17
+    submarkets:
+    - Downtown Lake Charles & Lakefront
+    city_id: lake_charles
+  PRIEN_LAKE_SOUTH:
+    name: PRIEN_LAKE_SOUTH
+    center_lat: 30.202
+    center_lng: -93.242
+    zoom: 12.0
+    bbox:
+      min_lat: 30.17
+      max_lat: 30.23
+      min_lng: -93.26
+      max_lng: -93.18
+    submarkets:
+    - Prien Lake Retail Corridor
+    city_id: lake_charles
+  WESTLAKE_INDUSTRIAL:
+    name: WESTLAKE_INDUSTRIAL
+    center_lat: 30.26
+    center_lng: -93.245
+    zoom: 11.8
+    bbox:
+      min_lat: 30.23
+      max_lat: 30.3
+      min_lng: -93.29
+      max_lng: -93.19
+    submarkets:
+    - Westlake & Petrochemical District
+    city_id: lake_charles
+datasets:
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'LA'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- lake-charles
+- lake charles
+- lake_charles_la
+- lake charles la
+- calcasieu
+- calcasieu_parish
+- calcasieu parish
+job_suffix: lake_charles

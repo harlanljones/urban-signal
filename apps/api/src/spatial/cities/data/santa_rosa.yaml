@@ -1,0 +1,371 @@
+city_id: santa_rosa
+name: Santa Rosa, CA
+state: CA
+center:
+  lat: 38.4405
+  lng: -122.7144
+metro_bbox:
+  min_lat: 38.3
+  max_lat: 38.58
+  min_lng: -122.95
+  max_lng: -122.45
+division_bboxes:
+  DOWNTOWN:
+    min_lat: 38.432
+    max_lat: 38.446
+    min_lng: -122.726
+    max_lng: -122.706
+  NORTHWEST:
+    min_lat: 38.47
+    max_lat: 38.53
+    min_lng: -122.77
+    max_lng: -122.72
+  NORTH_EAST:
+    min_lat: 38.445
+    max_lat: 38.47
+    min_lng: -122.712
+    max_lng: -122.68
+  ROSELAND:
+    min_lat: 38.41
+    max_lat: 38.435
+    min_lng: -122.745
+    max_lng: -122.71
+  SOUTHEAST:
+    min_lat: 38.39
+    max_lat: 38.42
+    min_lng: -122.69
+    max_lng: -122.64
+  EAST:
+    min_lat: 38.44
+    max_lat: 38.47
+    min_lng: -122.66
+    max_lng: -122.61
+submarkets:
+  Downtown:
+    name: Downtown
+    borough: DOWNTOWN
+    lat: 38.4405
+    lng: -122.7144
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.85
+    capex: 6200000.0
+    permit_vel: 28.0
+    shift_ratio: 1.44
+    sla: 52.0
+    description: Old Courthouse Square core with the historic Empire building, Railroad
+      Square adaptive reuse, and the downtown mixed-use permitting corridor.
+    city_id: santa_rosa
+  Railroad Square:
+    name: Railroad Square
+    borough: DOWNTOWN
+    lat: 38.438
+    lng: -122.722
+    zoom: 14.5
+    pitch: 52.0
+    base_lims: 0.83
+    capex: 5800000.0
+    permit_vel: 26.0
+    shift_ratio: 1.42
+    sla: 50.0
+    description: Historic transit-adjacent district with artisan studios, brewery
+      taprooms, and converted warehouse retail.
+    city_id: santa_rosa
+  West End:
+    name: West End
+    borough: DOWNTOWN
+    lat: 38.436
+    lng: -122.718
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.82
+    capex: 5400000.0
+    permit_vel: 24.0
+    shift_ratio: 1.4
+    sla: 49.0
+    description: West Ninth Street corridor with bungalow infill, small-scale commercial
+      rehab, and West End studio conversions.
+    city_id: santa_rosa
+  Northwest Santa Rosa:
+    name: Northwest Santa Rosa
+    borough: NORTHWEST
+    lat: 38.48
+    lng: -122.74
+    zoom: 13.5
+    pitch: 48.0
+    base_lims: 0.8
+    capex: 5200000.0
+    permit_vel: 22.0
+    shift_ratio: 1.38
+    sla: 48.0
+    description: Mendocino Avenue north corridor with post-war residential, Mark West
+      business park, and Airport Boulevard industrial infill.
+    city_id: santa_rosa
+  Larkfield-Wikiup:
+    name: Larkfield-Wikiup
+    borough: NORTHWEST
+    lat: 38.51
+    lng: -122.75
+    zoom: 13.0
+    pitch: 46.0
+    base_lims: 0.78
+    capex: 4800000.0
+    permit_vel: 20.0
+    shift_ratio: 1.36
+    sla: 46.0
+    description: Unincorporated north Sonoma County suburban fringe with ranch-style
+      homes, auto-oriented retail, and steady renovation permits.
+    city_id: santa_rosa
+  North Santa Rosa:
+    name: North Santa Rosa
+    borough: NORTH_EAST
+    lat: 38.46
+    lng: -122.7
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.81
+    capex: 5400000.0
+    permit_vel: 24.0
+    shift_ratio: 1.4
+    sla: 49.0
+    description: Cleveland Avenue and Mendocino Avenue north of downtown with mid-century
+      housing stock, strip retail, and steady alteration permits.
+    city_id: santa_rosa
+  Roseland:
+    name: Roseland
+    borough: ROSELAND
+    lat: 38.431
+    lng: -122.736
+    zoom: 14.0
+    pitch: 50.0
+    base_lims: 0.76
+    capex: 4600000.0
+    permit_vel: 26.0
+    shift_ratio: 1.34
+    sla: 45.0
+    description: Sebastopol Road corridor with immigrant-owned small businesses, Hispanic
+      cultural district, and the Roseland Village mixed-use node.
+    city_id: santa_rosa
+  Southwest Santa Rosa:
+    name: Southwest Santa Rosa
+    borough: ROSELAND
+    lat: 38.42
+    lng: -122.72
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.77
+    capex: 4400000.0
+    permit_vel: 22.0
+    shift_ratio: 1.36
+    sla: 44.0
+    description: West College Avenue corridor with suburban residential, St. Joseph
+      Health campus, and Yulupa Avenue retail pads.
+    city_id: santa_rosa
+  Bennett Valley:
+    name: Bennett Valley
+    borough: SOUTHEAST
+    lat: 38.404
+    lng: -122.657
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.84
+    capex: 6000000.0
+    permit_vel: 26.0
+    shift_ratio: 1.42
+    sla: 51.0
+    description: Bennett Valley Road corridor with golf-course residential, Annadel
+      State Park edge, and the Bennett Valley Village center.
+    city_id: santa_rosa
+  Southeast Santa Rosa:
+    name: Southeast Santa Rosa
+    borough: SOUTHEAST
+    lat: 38.41
+    lng: -122.68
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.8
+    capex: 5200000.0
+    permit_vel: 22.0
+    shift_ratio: 1.38
+    sla: 48.0
+    description: South Avenue corridor with mid-century residential, Oliver's Market
+      area, and Yulupa Boulevard retail.
+    city_id: santa_rosa
+  Rincon Valley:
+    name: Rincon Valley
+    borough: EAST
+    lat: 38.4569
+    lng: -122.6483
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.83
+    capex: 5800000.0
+    permit_vel: 26.0
+    shift_ratio: 1.42
+    sla: 50.0
+    description: Mission Boulevard east corridor with suburban subdivisions, Rincon
+      Valley Library anchor, and steady new-build permit volume.
+    city_id: santa_rosa
+  Fountaingrove:
+    name: Fountaingrove
+    borough: EAST
+    lat: 38.46
+    lng: -122.63
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.86
+    capex: 7400000.0
+    permit_vel: 30.0
+    shift_ratio: 1.48
+    sla: 54.0
+    description: East hills master-planned community with custom homes, winery estate
+      lots, and the Fountaingrove golf course residential belt.
+    city_id: santa_rosa
+divisions:
+  DOWNTOWN:
+    name: DOWNTOWN
+    center_lat: 38.4405
+    center_lng: -122.7144
+    zoom: 14.0
+    bbox:
+      min_lat: 38.432
+      max_lat: 38.446
+      min_lng: -122.726
+      max_lng: -122.706
+    submarkets:
+    - Downtown
+    - Railroad Square
+    - West End
+    city_id: santa_rosa
+  NORTHWEST:
+    name: NORTHWEST
+    center_lat: 38.49
+    center_lng: -122.745
+    zoom: 13.0
+    bbox:
+      min_lat: 38.47
+      max_lat: 38.53
+      min_lng: -122.77
+      max_lng: -122.72
+    submarkets:
+    - Northwest Santa Rosa
+    - Larkfield-Wikiup
+    city_id: santa_rosa
+  NORTH_EAST:
+    name: NORTH_EAST
+    center_lat: 38.456
+    center_lng: -122.696
+    zoom: 13.5
+    bbox:
+      min_lat: 38.445
+      max_lat: 38.47
+      min_lng: -122.712
+      max_lng: -122.68
+    submarkets:
+    - North Santa Rosa
+    city_id: santa_rosa
+  ROSELAND:
+    name: ROSELAND
+    center_lat: 38.425
+    center_lng: -122.73
+    zoom: 13.5
+    bbox:
+      min_lat: 38.41
+      max_lat: 38.435
+      min_lng: -122.745
+      max_lng: -122.71
+    submarkets:
+    - Roseland
+    - Southwest Santa Rosa
+    city_id: santa_rosa
+  SOUTHEAST:
+    name: SOUTHEAST
+    center_lat: 38.405
+    center_lng: -122.665
+    zoom: 13.5
+    bbox:
+      min_lat: 38.39
+      max_lat: 38.42
+      min_lng: -122.69
+      max_lng: -122.64
+    submarkets:
+    - Bennett Valley
+    - Southeast Santa Rosa
+    city_id: santa_rosa
+  EAST:
+    name: EAST
+    center_lat: 38.458
+    center_lng: -122.64
+    zoom: 13.0
+    bbox:
+      min_lat: 38.44
+      max_lat: 38.47
+      min_lng: -122.66
+      max_lng: -122.61
+    submarkets:
+    - Rincon Valley
+    - Fountaingrove
+    city_id: santa_rosa
+datasets:
+  crime:
+    endpoint: https://data.sonomacounty.ca.gov/resource/3rsj-iche.json
+    platform: socrata
+    watermark_col: date_time
+    id_keys:
+    - id
+    - incident_number
+    topic: raw.municipal.crime
+    interval_seconds: 300.0
+    producer_key: crime
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: date_time DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - id
+      - incident_number
+      offense_type:
+      - incident_type
+      occurred_date:
+      - date_time
+      reported_date:
+      - upload
+      borough:
+      - city
+      address:
+      - intersection
+      - location_address
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- santa-rosa
+- santa rosa
+- sr
+- sonoma_county
+job_suffix: santa_rosa

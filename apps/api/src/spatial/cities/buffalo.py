@@ -1,3 +1,28 @@
+SLA_FIELD_MAP = {
+    "license_id": ["licenseno", "uniqkey"],
+    "dba": ["businessname"],
+    "premises_name": ["businessname"],
+    "license_type": ["descript", "code"],
+    "effective_date": ["issdttm"],
+    "expiration_date": ["expdttm"],
+    "status": ["licstatus"],
+    "address_street": ["address"],
+    "borough": ["neighborhood"],
+    "latitude": ["latitude"],
+    "longitude": ["longitude"],
+}
+
+FIELD_MAP = {
+    "sla": SLA_FIELD_MAP,
+}
+
+NEVER_CANDIDATE_COLUMNS = (
+    "gpsx",
+    "gpsy",
+    "licensedttm",
+    "statusdttm",
+)
+
 """Buffalo, NY spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -39,7 +64,6 @@ Live-probe caveats that define this leaf (probed 2026-08-27, re-probed live
 
 from typing import Any
 
-from src.producers.field_maps_buffalo import SLA_FIELD_MAP
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 BUFFALO_CITY_ID: str = "buffalo"

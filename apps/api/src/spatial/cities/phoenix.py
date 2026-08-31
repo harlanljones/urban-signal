@@ -1,3 +1,40 @@
+PERMITS_FIELD_MAP = {
+    "job_id": ["PER_NUM", "PERMIT_NUMBER", "PID", "OBJECTID"],
+    "issuance_date": ["PER_ISSUE_DATE", "PERMIT_ISSUE_DATE"],
+    "filing_date": ["PER_ENT_DATE"],
+    "status": ["PERMIT_STAT", "STATUS"],
+    "job_type": [
+        "PER_TYPE_DESC",
+        "SCOPE_DESC",
+        "PER_TYPE",
+        "PERMIT_TYPE",
+        "PERMIT_NAME",
+    ],
+    "address_street": ["STREET_FULL_NAME", "ADDRESS"],
+}
+
+SLA_FIELD_MAP = {
+    "license_id": ["NAME", "ID", "OBJECTID"],
+    "license_type": ["REGISTRATION_TYPE"],
+    "premises_name": ["POW_NAME", "POW_COMPANY_NAME"],
+    "dba": ["POW_NAME", "POW_COMPANY_NAME"],
+    "effective_date": ["ISSUED_DATE"],
+    "expiration_date": ["EXPIRATION_DATE"],
+    "status": ["STATUS"],
+    "latitude": ["LATITUDE"],
+    "longitude": ["LONGITUDE"],
+    "address_street": ["PROPERTY_ADDRESS"],
+    "zipcode": ["PROPERTY_ZIP"],
+    "borough": ["PROPERTY_CITY_STATE"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+    "sla": SLA_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Phoenix, AZ"
+
 """Phoenix / Maricopa County spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -24,11 +61,6 @@ Live-probe caveats that define this leaf (2026-08-27):
 
 from typing import Dict
 
-from src.producers.field_maps_phoenix import (
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-    SLA_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 PHOENIX_CITY_ID: str = "phoenix"

@@ -1,3 +1,16 @@
+COMPLAINTS_311_FIELD_MAP = {
+    "incident_id": ["globalid", "objectid"],
+    "complaint_type": ["problemtype"],
+    "created_date": ["CreationDate"],
+    "status": ["status"],
+}
+
+FIELD_MAP = {
+    "311": COMPLAINTS_311_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Santa Fe, NM"
+
 """Santa Fe, NM spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -34,10 +47,6 @@ Live-probe 2026-08-28 (``.streams/west-santa_fe.md``):
 """
 
 
-from src.producers.field_maps_santa_fe import (
-    COMPLAINTS_311_FIELD_MAP,
-    GEOCODE_CONTEXT,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 SANTA_FE_CITY_ID: str = "santa_fe"

@@ -1,3 +1,30 @@
+PERMITS_FIELD_MAP = {
+    "job_id": ["Permit_", "FolderRSN", "OBJECTID"],
+    "issuance_date": ["IssueDate"],
+    "filing_date": ["InDate"],
+    "job_type": ["FolderDesc", "FolderGroupDesc", "SubDesc"],
+    "status": ["FolderCondition"],
+    "cost": ["valuation"],
+    "address_street": ["Address"],
+}
+
+SLA_FIELD_MAP = {
+    "license_id": ["License_Number", "TL_License_Number", "OBJECTID"],
+    "dba": ["Business_Name"],
+    "premises_name": ["Business_Owner"],
+    "license_type": ["TaxText", "NAICS_Title", "NAICS_Sector"],
+    "effective_date": ["Start_Date"],
+    "expiration_date": ["End_Date"],
+    "address_street": ["Business_Address", "BusinessAddress_DirSuf"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+    "sla": SLA_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Aurora, CO"
+
 """Aurora / Arapahoe-Adams County spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -33,11 +60,6 @@ Live-probe caveats that define this leaf (2026-08-27, US-326):
 
 from typing import Dict
 
-from src.producers.field_maps_aurora import (
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-    SLA_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 AURORA_CITY_ID: str = "aurora"

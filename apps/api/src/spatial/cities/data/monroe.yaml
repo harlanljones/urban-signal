@@ -1,0 +1,290 @@
+city_id: monroe
+name: Monroe
+state: LA
+center:
+  lat: 32.5093
+  lng: -92.1193
+metro_bbox:
+  min_lat: 32.42
+  max_lat: 32.62
+  min_lng: -92.27
+  max_lng: -91.98
+division_bboxes:
+  CENTRAL_CORE:
+    min_lat: 32.495
+    max_lat: 32.545
+    min_lng: -92.14
+    max_lng: -92.06
+  WEST_BANK:
+    min_lat: 32.49
+    max_lat: 32.57
+    min_lng: -92.23
+    max_lng: -92.12
+  NORTH_LOOP:
+    min_lat: 32.56
+    max_lat: 32.62
+    min_lng: -92.18
+    max_lng: -91.99
+  SOUTH_STRIPS:
+    min_lat: 32.42
+    max_lat: 32.51
+    min_lng: -92.2
+    max_lng: -92.05
+  EAST_GATE:
+    min_lat: 32.495
+    max_lat: 32.59
+    min_lng: -92.08
+    max_lng: -91.98
+submarkets:
+  Downtown Monroe & Riverfront:
+    name: Downtown Monroe & Riverfront
+    borough: CENTRAL_CORE
+    lat: 32.509
+    lng: -92.1185
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.78
+    capex: 3800000.0
+    permit_vel: 18.0
+    shift_ratio: 1.2
+    sla: 44.0
+    description: Historic downtown on the Ouachita River with civic anchors and small-scale
+      adaptive reuse.
+    city_id: monroe
+  ULM / Bayou Desiard:
+    name: ULM / Bayou Desiard
+    borough: CENTRAL_CORE
+    lat: 32.529
+    lng: -92.067
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.76
+    capex: 3600000.0
+    permit_vel: 17.0
+    shift_ratio: 1.18
+    sla: 42.0
+    description: University of Louisiana at Monroe district; campus-adjacent residential
+      and services.
+    city_id: monroe
+  West Monroe / Antique Alley:
+    name: West Monroe / Antique Alley
+    borough: WEST_BANK
+    lat: 32.516
+    lng: -92.145
+    zoom: 14.0
+    pitch: 42.0
+    base_lims: 0.74
+    capex: 3400000.0
+    permit_vel: 16.0
+    shift_ratio: 1.16
+    sla: 42.0
+    description: Antique Alley and West Monroe core across the Ouachita with main-street
+      retail ribbons.
+    city_id: monroe
+  I-20 Retail Corridor (West Monroe):
+    name: I-20 Retail Corridor (West Monroe)
+    borough: WEST_BANK
+    lat: 32.511
+    lng: -92.18
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.72
+    capex: 3200000.0
+    permit_vel: 15.0
+    shift_ratio: 1.14
+    sla: 40.0
+    description: Interstate-oriented commercial and hospitality nodes along I-20 in
+      West Monroe.
+    city_id: monroe
+  Pecanland Mall & Millhaven:
+    name: Pecanland Mall & Millhaven
+    borough: EAST_GATE
+    lat: 32.504
+    lng: -92.062
+    zoom: 13.8
+    pitch: 40.0
+    base_lims: 0.72
+    capex: 3100000.0
+    permit_vel: 15.0
+    shift_ratio: 1.14
+    sla: 40.0
+    description: Regional retail hub around Pecanland Mall and Millhaven corridor
+      east of downtown.
+    city_id: monroe
+  Monroe Regional Airport Vicinity:
+    name: Monroe Regional Airport Vicinity
+    borough: EAST_GATE
+    lat: 32.51
+    lng: -92.037
+    zoom: 13.5
+    pitch: 38.0
+    base_lims: 0.7
+    capex: 3000000.0
+    permit_vel: 14.0
+    shift_ratio: 1.12
+    sla: 38.0
+    description: Airport-adjacent logistics and services east of the core along Central
+      Ave/Millhaven.
+    city_id: monroe
+  Sterlington Road / US-165 North:
+    name: Sterlington Road / US-165 North
+    borough: NORTH_LOOP
+    lat: 32.585
+    lng: -92.077
+    zoom: 13.5
+    pitch: 38.0
+    base_lims: 0.7
+    capex: 3000000.0
+    permit_vel: 14.0
+    shift_ratio: 1.12
+    sla: 38.0
+    description: Growth corridor along US-165 toward Sterlington with medical and
+      neighborhood services.
+    city_id: monroe
+  South Monroe / Richwood:
+    name: South Monroe / Richwood
+    borough: SOUTH_STRIPS
+    lat: 32.445
+    lng: -92.1
+    zoom: 13.3
+    pitch: 38.0
+    base_lims: 0.68
+    capex: 2800000.0
+    permit_vel: 13.0
+    shift_ratio: 1.1
+    sla: 36.0
+    description: Southern belt toward Richwood along US-165 with highway services
+      and residential infill.
+    city_id: monroe
+divisions:
+  CENTRAL_CORE:
+    name: CENTRAL_CORE
+    center_lat: 32.52
+    center_lng: -92.11
+    zoom: 13.6
+    bbox:
+      min_lat: 32.495
+      max_lat: 32.545
+      min_lng: -92.14
+      max_lng: -92.06
+    submarkets:
+    - Downtown Monroe & Riverfront
+    - ULM / Bayou Desiard
+    city_id: monroe
+  WEST_BANK:
+    name: WEST_BANK
+    center_lat: 32.525
+    center_lng: -92.17
+    zoom: 13.2
+    bbox:
+      min_lat: 32.49
+      max_lat: 32.57
+      min_lng: -92.23
+      max_lng: -92.12
+    submarkets:
+    - West Monroe / Antique Alley
+    - I-20 Retail Corridor (West Monroe)
+    city_id: monroe
+  NORTH_LOOP:
+    name: NORTH_LOOP
+    center_lat: 32.59
+    center_lng: -92.085
+    zoom: 12.8
+    bbox:
+      min_lat: 32.56
+      max_lat: 32.62
+      min_lng: -92.18
+      max_lng: -91.99
+    submarkets:
+    - Sterlington Road / US-165 North
+    city_id: monroe
+  SOUTH_STRIPS:
+    name: SOUTH_STRIPS
+    center_lat: 32.465
+    center_lng: -92.12
+    zoom: 13.0
+    bbox:
+      min_lat: 32.42
+      max_lat: 32.51
+      min_lng: -92.2
+      max_lng: -92.05
+    submarkets:
+    - South Monroe / Richwood
+    city_id: monroe
+  EAST_GATE:
+    name: EAST_GATE
+    center_lat: 32.54
+    center_lng: -92.03
+    zoom: 13.2
+    bbox:
+      min_lat: 32.495
+      max_lat: 32.59
+      min_lng: -92.08
+      max_lng: -91.98
+    submarkets:
+    - Pecanland Mall & Millhaven
+    - Monroe Regional Airport Vicinity
+    city_id: monroe
+datasets:
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'LA'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- monroe_la
+- monroe la
+job_suffix: monroe

@@ -1,3 +1,35 @@
+LOUISVILLE_311_FIELD_MAP = {
+    "incident_id": ["service_request_id", "ObjectId"],
+    "latitude": ["latitude"],
+    "longitude": ["longitude"],
+    "complaint_type": ["service_name", "description"],
+    "created_date": ["requested_datetime"],
+    "closed_date": ["closed_date", "updated_datetime"],
+    "incident_address": ["address"],
+    "borough": ["council_district"],
+    "zipcode": ["zip_code"],
+    "status": ["status_description"],
+}
+
+LOUISVILLE_SLA_FIELD_MAP = {
+    "license_id": ["LicenseNumber", "ObjectId"],
+    "latitude": ["Latitude"],
+    "longitude": ["Longitude"],
+    "effective_date": ["IssueDate", "EffectiveDate"],
+    "expiration_date": ["ExpiryDate"],
+    "license_type": ["LicenseType"],
+    "premises_name": ["Licensee"],
+    "dba": ["DBA"],
+    "address_street": ["PremisesStreet", "PremisesCityState"],
+    "status": ["Status"],
+    "borough": ["County", "City"],
+}
+
+FIELD_MAP = {
+    "COMPLAINTS_311": LOUISVILLE_311_FIELD_MAP,
+    "SLA": LOUISVILLE_SLA_FIELD_MAP,
+}
+
 """Louisville Metro Submarket Registry and Spatial Layer for Urban Signal.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -410,10 +442,6 @@ LOU_DIVISIONS = LOUISVILLE_DIVISIONS
 
 # Exact DatasetSpec payloads for the registry spine. Dicts avoid importing
 # city_registry.DatasetSpec while city_registry imports this module.
-from src.producers.field_maps_louisville import (  # noqa: E402
-    LOUISVILLE_311_FIELD_MAP,
-    LOUISVILLE_SLA_FIELD_MAP,
-)
 
 LOUISVILLE_311_SPEC: Dict[str, object] = {
     "endpoint": "settings.arcgis_louisville_311_url",

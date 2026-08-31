@@ -278,7 +278,7 @@ class TestFeedRegistration:
         assert complaints.platform == "csv"
         assert complaints.watermark_col == "datetimeinit"
         assert complaints.endpoint_by_year["2026"] == "2026.csv"
-        assert complaints.field_map is ST_LOUIS_311_FIELD_MAP
+        assert complaints.field_map == ST_LOUIS_311_FIELD_MAP
 
         permits = get_st_louis_dataset(FeedType.PERMITS)
         assert permits.needs_geocode is True

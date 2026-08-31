@@ -1,0 +1,285 @@
+city_id: texarkana
+name: Texarkana
+state: TX
+center:
+  lat: 33.4251
+  lng: -94.0477
+metro_bbox:
+  min_lat: 33.35
+  max_lat: 33.6
+  min_lng: -94.3
+  max_lng: -93.9
+division_bboxes:
+  CENTRAL_CORE:
+    min_lat: 33.41
+    max_lat: 33.45
+    min_lng: -94.08
+    max_lng: -94.02
+  TEXAS_WEST:
+    min_lat: 33.4
+    max_lat: 33.49
+    min_lng: -94.25
+    max_lng: -94.12
+  ARKANSAS_EAST:
+    min_lat: 33.41
+    max_lat: 33.5
+    min_lng: -94.06
+    max_lng: -93.95
+  I30_CORRIDOR:
+    min_lat: 33.45
+    max_lat: 33.52
+    min_lng: -94.2
+    max_lng: -94.05
+  SOUTH_STRIP:
+    min_lat: 33.35
+    max_lat: 33.42
+    min_lng: -94.1
+    max_lng: -94.0
+submarkets:
+  Downtown State Line:
+    name: Downtown State Line
+    borough: CENTRAL_CORE
+    lat: 33.43
+    lng: -94.046
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.8
+    capex: 5200000.0
+    permit_vel: 22.0
+    shift_ratio: 1.2
+    sla: 46.0
+    description: Historic downtown straddling State Line Ave with civic anchors and
+      hospitality infill.
+    city_id: texarkana
+  Texas Blvd & 7th St:
+    name: Texas Blvd & 7th St
+    borough: CENTRAL_CORE
+    lat: 33.424
+    lng: -94.052
+    zoom: 14.8
+    pitch: 45.0
+    base_lims: 0.79
+    capex: 5000000.0
+    permit_vel: 21.0
+    shift_ratio: 1.18
+    sla: 44.0
+    description: West-of-core crossroads with small-format retail and services.
+    city_id: texarkana
+  I-30 at Richmond Rd:
+    name: I-30 at Richmond Rd
+    borough: I30_CORRIDOR
+    lat: 33.476
+    lng: -94.169
+    zoom: 14.2
+    pitch: 42.0
+    base_lims: 0.76
+    capex: 4800000.0
+    permit_vel: 20.0
+    shift_ratio: 1.16
+    sla: 44.0
+    description: Regional retail node and hospitality cluster at Richmond Rd & I-30.
+    city_id: texarkana
+  I-30 at Summerhill:
+    name: I-30 at Summerhill
+    borough: I30_CORRIDOR
+    lat: 33.462
+    lng: -94.074
+    zoom: 14.2
+    pitch: 42.0
+    base_lims: 0.75
+    capex: 4700000.0
+    permit_vel: 19.0
+    shift_ratio: 1.15
+    sla: 44.0
+    description: Interchange commercial cluster with auto-oriented retail and services.
+    city_id: texarkana
+  Wake Village & Nash:
+    name: Wake Village & Nash
+    borough: TEXAS_WEST
+    lat: 33.43
+    lng: -94.17
+    zoom: 13.6
+    pitch: 40.0
+    base_lims: 0.73
+    capex: 4300000.0
+    permit_vel: 18.0
+    shift_ratio: 1.14
+    sla: 42.0
+    description: West-side suburban municipalities with industrial and highway services.
+    city_id: texarkana
+  Broad St & Arkansas Blvd:
+    name: Broad St & Arkansas Blvd
+    borough: ARKANSAS_EAST
+    lat: 33.441
+    lng: -94.033
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.72
+    capex: 4200000.0
+    permit_vel: 18.0
+    shift_ratio: 1.12
+    sla: 42.0
+    description: Arkansas-side commercial corridor and civic services east of State
+      Line Ave.
+    city_id: texarkana
+  East Arkansas Industrial:
+    name: East Arkansas Industrial
+    borough: ARKANSAS_EAST
+    lat: 33.467
+    lng: -93.995
+    zoom: 13.6
+    pitch: 38.0
+    base_lims: 0.7
+    capex: 4000000.0
+    permit_vel: 17.0
+    shift_ratio: 1.1
+    sla: 42.0
+    description: Industrial/logistics clusters along Oats/Arkansas Blvd towards the
+      airport approach.
+    city_id: texarkana
+  South State Line Retail:
+    name: South State Line Retail
+    borough: SOUTH_STRIP
+    lat: 33.399
+    lng: -94.042
+    zoom: 13.8
+    pitch: 38.0
+    base_lims: 0.71
+    capex: 4100000.0
+    permit_vel: 17.0
+    shift_ratio: 1.1
+    sla: 42.0
+    description: Auto-oriented retail and services belt along State Line/US-71/US-82.
+    city_id: texarkana
+divisions:
+  CENTRAL_CORE:
+    name: CENTRAL_CORE
+    center_lat: 33.428
+    center_lng: -94.046
+    zoom: 13.8
+    bbox:
+      min_lat: 33.41
+      max_lat: 33.45
+      min_lng: -94.08
+      max_lng: -94.02
+    submarkets:
+    - Downtown State Line
+    - Texas Blvd & 7th St
+    city_id: texarkana
+  TEXAS_WEST:
+    name: TEXAS_WEST
+    center_lat: 33.435
+    center_lng: -94.185
+    zoom: 13.2
+    bbox:
+      min_lat: 33.4
+      max_lat: 33.49
+      min_lng: -94.25
+      max_lng: -94.12
+    submarkets:
+    - Wake Village & Nash
+    city_id: texarkana
+  ARKANSAS_EAST:
+    name: ARKANSAS_EAST
+    center_lat: 33.455
+    center_lng: -94.015
+    zoom: 13.2
+    bbox:
+      min_lat: 33.41
+      max_lat: 33.5
+      min_lng: -94.06
+      max_lng: -93.95
+    submarkets:
+    - Broad St & Arkansas Blvd
+    - East Arkansas Industrial
+    city_id: texarkana
+  I30_CORRIDOR:
+    name: I30_CORRIDOR
+    center_lat: 33.47
+    center_lng: -94.14
+    zoom: 13.2
+    bbox:
+      min_lat: 33.45
+      max_lat: 33.52
+      min_lng: -94.2
+      max_lng: -94.05
+    submarkets:
+    - I-30 at Richmond Rd
+    - I-30 at Summerhill
+    city_id: texarkana
+  SOUTH_STRIP:
+    name: SOUTH_STRIP
+    center_lat: 33.395
+    center_lng: -94.055
+    zoom: 13.2
+    bbox:
+      min_lat: 33.35
+      max_lat: 33.42
+      min_lng: -94.1
+      max_lng: -94.0
+    submarkets:
+    - South State Line Retail
+    city_id: texarkana
+datasets:
+  sla:
+    endpoint: https://data.texas.gov/resource/s7ft-44qi.json?$select=*, 'trec_broker:'
+      || license_type as license_type_ns
+    platform: socrata
+    watermark_col: updated
+    id_keys:
+    - license_number
+    topic: raw.municipal.sla
+    interval_seconds: 3600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: updated DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: county = 'Bowie'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - license_number
+      license_type:
+      - license_type_ns
+      effective_date:
+      - original_license_date
+      expiration_date:
+      - license_expiration_date
+      premises_name:
+      - full_name
+      status:
+      - status
+      borough:
+      - county
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- texarkana_tx
+- texarkana tx
+- texarkana_ar
+- texarkana ar
+job_suffix: texarkana

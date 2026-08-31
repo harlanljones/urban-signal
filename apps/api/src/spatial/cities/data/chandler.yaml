@@ -1,0 +1,352 @@
+city_id: chandler
+name: Chandler
+state: AZ
+center:
+  lat: 33.306
+  lng: -111.8412
+metro_bbox:
+  min_lat: 33.2
+  max_lat: 33.37
+  min_lng: -111.98
+  max_lng: -111.75
+division_bboxes:
+  WEST_CHANDLER_MARLBOROUGH:
+    min_lat: 33.325
+    max_lat: 33.37
+    min_lng: -111.98
+    max_lng: -111.855
+  PRICE_ROAD_CORRIDOR:
+    min_lat: 33.29
+    max_lat: 33.325
+    min_lng: -111.98
+    max_lng: -111.855
+  DOWNTOWN_HISTORIC_CORE:
+    min_lat: 33.29
+    max_lat: 33.325
+    min_lng: -111.855
+    max_lng: -111.825
+  AIRPORT_EAST_GATEWAY:
+    min_lat: 33.28
+    max_lat: 33.37
+    min_lng: -111.825
+    max_lng: -111.75
+  OCOTILLO_SOUTH_LAKES:
+    min_lat: 33.2
+    max_lat: 33.28
+    min_lng: -111.98
+    max_lng: -111.825
+  SOUTHEAST_SUN_GROVES:
+    min_lat: 33.2
+    max_lat: 33.28
+    min_lng: -111.825
+    max_lng: -111.75
+submarkets:
+  Downtown Historic Core:
+    name: Downtown Historic Core
+    borough: DOWNTOWN_HISTORIC_CORE
+    lat: 33.306
+    lng: -111.8412
+    zoom: 14.5
+    pitch: 52.0
+    base_lims: 0.85
+    capex: 8600000.0
+    permit_vel: 40.0
+    shift_ratio: 1.54
+    sla: 62.0
+    description: Dr. A.J. Chandler park and the ostrich-farm heritage grid around
+      San Marcos and Arizona Avenue, with adaptive reuse, murals-and-patios retail,
+      and steady downtown infill permitting.
+    city_id: chandler
+  Andersen Springs & Chandler Blvd:
+    name: Andersen Springs & Chandler Blvd
+    borough: PRICE_ROAD_CORRIDOR
+    lat: 33.3075
+    lng: -111.8725
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.78
+    capex: 5800000.0
+    permit_vel: 30.0
+    shift_ratio: 1.42
+    sla: 52.0
+    description: Office-park and apartment belt along the Chandler Boulevard frontage
+      with build-to-rent infill, valley-metro commuter demand, and steady TI/tenant-improvement
+      permitting.
+    city_id: chandler
+  Intel Ocotillo Tech Belt:
+    name: Intel Ocotillo Tech Belt
+    borough: PRICE_ROAD_CORRIDOR
+    lat: 33.3163
+    lng: -111.856
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.88
+    capex: 10800000.0
+    permit_vel: 44.0
+    shift_ratio: 1.58
+    sla: 66.0
+    description: Price Road Corridor employment core anchored by the Intel Ocotillo
+      campus and supplier vendors, with the metro's highest-valuation commercial trades
+      and engineering-led permit velocity.
+    city_id: chandler
+  Marlborough Park Estates:
+    name: Marlborough Park Estates
+    borough: WEST_CHANDLER_MARLBOROUGH
+    lat: 33.348
+    lng: -111.8918
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.76
+    capex: 5200000.0
+    permit_vel: 28.0
+    shift_ratio: 1.38
+    sla: 50.0
+    description: North Chandler residential belt around the MARLBOROUGH ESTATES plat
+      (recorded 1973) with pool/deck auxiliary permits, roof-replacement cadence,
+      and Kyrene-school family churn.
+    city_id: chandler
+  West Chandler Kyrene Belt:
+    name: West Chandler Kyrene Belt
+    borough: WEST_CHANDLER_MARLBOROUGH
+    lat: 33.34
+    lng: -111.92
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.74
+    capex: 4800000.0
+    permit_vel: 26.0
+    shift_ratio: 1.36
+    sla: 47.0
+    description: Western edge toward the Kyrene corridor with 1970s-80s tract stock,
+      renovation-led permitting, and the I-10/Pecos logistics commute shed.
+    city_id: chandler
+  Chandler Municipal Airport:
+    name: Chandler Municipal Airport
+    borough: AIRPORT_EAST_GATEWAY
+    lat: 33.2906
+    lng: -111.7968
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.79
+    capex: 6200000.0
+    permit_vel: 32.0
+    shift_ratio: 1.44
+    sla: 54.0
+    description: Reliever-airport industrial district with hangar and flight-school
+      tenancy, airpark-adjacent light industrial trades, and the East Valley logistics
+      gateway.
+    city_id: chandler
+  Ocotillo Lakes:
+    name: Ocotillo Lakes
+    borough: OCOTILLO_SOUTH_LAKES
+    lat: 33.2495
+    lng: -111.8355
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.87
+    capex: 9400000.0
+    permit_vel: 38.0
+    shift_ratio: 1.53
+    sla: 63.0
+    description: Lake-amenity master plan of 58 recorded Ocotillo plats with golf-front
+      custom stock, waterfront renovation, and the city's steadiest high-valuation
+      residential trades.
+    city_id: chandler
+  Fulton Ranch:
+    name: Fulton Ranch
+    borough: OCOTILLO_SOUTH_LAKES
+    lat: 33.2402
+    lng: -111.8506
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.86
+    capex: 9000000.0
+    permit_vel: 36.0
+    shift_ratio: 1.51
+    sla: 61.0
+    description: Master-planned village on the Gila River canal system with estate
+      lots, village-retail pads, and continued build-out permitting at the metro's
+      southwest edge.
+    city_id: chandler
+  Sun Groves:
+    name: Sun Groves
+    borough: SOUTHEAST_SUN_GROVES
+    lat: 33.212
+    lng: -111.764
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.83
+    capex: 7600000.0
+    permit_vel: 34.0
+    shift_ratio: 1.48
+    sla: 58.0
+    description: Southeast-corner subdivision family of twelve recorded parcels with
+      newer-roof stock, Chandler Heights corridor retail pads, and the metro's fastest
+      family-formation churn.
+    city_id: chandler
+  Springfield, Cooper Commons & Circle G:
+    name: Springfield, Cooper Commons & Circle G
+    borough: SOUTHEAST_SUN_GROVES
+    lat: 33.2118
+    lng: -111.7982
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.81
+    capex: 7000000.0
+    permit_vel: 31.0
+    shift_ratio: 1.45
+    sla: 55.0
+    description: Southeast master-planned belt of the SPRINGFIELD, COOPER COMMONS
+      and CIRCLE G AT RIGGS HOMESTEAD RANCH plats with elementary-school build-out,
+      horse-property transition lots, and pool/ patio auxiliary permitting.
+    city_id: chandler
+divisions:
+  WEST_CHANDLER_MARLBOROUGH:
+    name: WEST_CHANDLER_MARLBOROUGH
+    center_lat: 33.347
+    center_lng: -111.9
+    zoom: 12.5
+    bbox:
+      min_lat: 33.325
+      max_lat: 33.37
+      min_lng: -111.98
+      max_lng: -111.855
+    submarkets:
+    - Marlborough Park Estates
+    - West Chandler Kyrene Belt
+    city_id: chandler
+  PRICE_ROAD_CORRIDOR:
+    name: PRICE_ROAD_CORRIDOR
+    center_lat: 33.307
+    center_lng: -111.87
+    zoom: 13.0
+    bbox:
+      min_lat: 33.29
+      max_lat: 33.325
+      min_lng: -111.98
+      max_lng: -111.855
+    submarkets:
+    - Andersen Springs & Chandler Blvd
+    - Intel Ocotillo Tech Belt
+    city_id: chandler
+  DOWNTOWN_HISTORIC_CORE:
+    name: DOWNTOWN_HISTORIC_CORE
+    center_lat: 33.306
+    center_lng: -111.841
+    zoom: 13.5
+    bbox:
+      min_lat: 33.29
+      max_lat: 33.325
+      min_lng: -111.855
+      max_lng: -111.825
+    submarkets:
+    - Downtown Historic Core
+    city_id: chandler
+  AIRPORT_EAST_GATEWAY:
+    name: AIRPORT_EAST_GATEWAY
+    center_lat: 33.29
+    center_lng: -111.795
+    zoom: 12.5
+    bbox:
+      min_lat: 33.28
+      max_lat: 33.37
+      min_lng: -111.825
+      max_lng: -111.75
+    submarkets:
+    - Chandler Municipal Airport
+    city_id: chandler
+  OCOTILLO_SOUTH_LAKES:
+    name: OCOTILLO_SOUTH_LAKES
+    center_lat: 33.245
+    center_lng: -111.845
+    zoom: 12.5
+    bbox:
+      min_lat: 33.2
+      max_lat: 33.28
+      min_lng: -111.98
+      max_lng: -111.825
+    submarkets:
+    - Ocotillo Lakes
+    - Fulton Ranch
+    city_id: chandler
+  SOUTHEAST_SUN_GROVES:
+    name: SOUTHEAST_SUN_GROVES
+    center_lat: 33.212
+    center_lng: -111.785
+    zoom: 12.5
+    bbox:
+      min_lat: 33.2
+      max_lat: 33.28
+      min_lng: -111.825
+      max_lng: -111.75
+    submarkets:
+    - Sun Groves
+    - Springfield, Cooper Commons & Circle G
+    city_id: chandler
+datasets:
+  permits:
+    endpoint: https://gis.chandleraz.gov/portalserver/rest/services/Tolemi/Building_Blocks/MapServer/0
+    platform: arcgis
+    watermark_col: CREATE_DT
+    id_keys:
+    - PERMIT_NBR
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: CREATE_DT DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - PERMIT_NBR
+      - OBJECTID
+      filing_date:
+      - CREATE_DT
+      status:
+      - PERMIT_STATUS
+      job_type:
+      - B1_PER_TYPE
+      - PERMIT_TYPE
+      cost:
+      - JOB_VALUE
+      address_street:
+      - FULL_ADDRESS
+      - FULL_ADDR
+      zipcode:
+      - ZIP_CODE
+      bbl:
+      - PARCEL_NBR
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- chandler_az
+- chandler-az
+- chandler az
+job_suffix: chandler

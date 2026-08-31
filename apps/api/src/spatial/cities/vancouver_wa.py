@@ -1,3 +1,18 @@
+PERMITS_FIELD_MAP = {
+    "job_id": ["CSM_CASENO", "sn", "OBJECTID"],
+    "issuance_date": ["csm_issued_date"],
+    "status": ["CSM_STATUS"],
+    "job_type": ["worktype", "cst_description"],
+    "address_street": ["PRIM_ADDR"],
+    "proposed_units": ["CSM_NO_UNITS"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Vancouver, WA"
+
 """Vancouver, WA spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -51,10 +66,6 @@ Live-probe caveats that define this leaf (2026-08-28, US-233):
   permit coverage (1 row north of 45.70 in the live layer) — not a division.
 """
 
-from src.producers.field_maps_vancouver_wa import (
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 VANCOUVER_WA_CITY_ID: str = "vancouver_wa"

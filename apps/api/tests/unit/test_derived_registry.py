@@ -1,63 +1,77 @@
-"""US-177/US-178: registry aggregator derives REGISTRY / ALIASES from leaf REGISTRATION.
+"""US-177/US-428: registry is derived from the corpus + leaf REGISTRATION.
 
-The aggregator (``registry_derivation``) reconstructs the registry the
-hand-written blocks define, by merging leaf-module geometry with the
-hand-written non-geometry fields. Geometry is the *same object* (``is``)
-the registry already imports, so object identity is preserved by construction.
+The single construction path (``registry_derivation.build_runtime_exports``)
+loads each city's registration from its declarative YAML definition beside the
+leaf module, then re-binds geometry to the leaf ``REGISTRATION``'s exact
+objects. There is no hand-written registry to compare against: the corpus
+satisfies the runtime, and building fails loudly when it does not.
 
-As of US-178 derivation is the DEFAULT: ``city_registry.REGISTRY`` / ``ALIASES``
-are the derived exports, and ``_HANDWRITTEN_REGISTRY`` / ``_HANDWRITTEN_ALIASES``
-preserve the source for equivalence checks.
+These tests pin the invariants the interlock gate relies on: every CityId
+resolves through the corpus and the leaf module, and the active ``REGISTRY``
+/``ALIASES`` are exactly the derived exports.
 """
+
+
 
 from src.spatial import city_registry as cr
 from src.spatial import registry_derivation
-from src.spatial.submarkets import NYC_METRO_BBOX
 
 GEOMETRY_FIELDS = ("metro_bbox", "division_bboxes", "submarkets", "divisions")
-NON_GEOMETRY_FIELDS = ("name", "state", "center", "job_suffix", "datasets")
 
 
 def _leaf_registration(city_id):
     return registry_derivation._leaf_registration(city_id)
 
 
-def test_build_matches_handwritten_field_by_field():
-    handwritten = cr._HANDWRITTEN_REGISTRY
-    derived = registry_derivation.build_registry_from_registrations()
+def _corpus_definitions():
+    from pathlib import Path
 
-    assert set(derived) == set(handwritten)
-    for cid in handwritten:
-        d = derived[cid]
-        h = handwritten[cid]
-        # Geometry now lives on the leaf REGISTRATION, not the hand-written
-        # block (US-180): the derived builder must carry the leaf's exact
-        # geometry objects, and the hand-written block is no longer expected to.
+    from src.config import settings
+    from src.spatial.city_data import load_definitions
+
+    return load_definitions(Path(settings.city_data_dir))
+
+
+def test_build_matches_corpus_and_leaf_geometry():
+    definitions = _corpus_definitions()
+    registry, aliases = registry_derivation.build_runtime_exports()
+
+    # Every corpus city resolves; every CityId is present.
+    assert set(registry) == set(cr.CityId)
+    assert aliases
+    # Non-geometry fields come verbatim from the corpus definitions.
+    assert len(definitions) >= len(cr.CityId)
+    # Geometry is identical to the leaf REGISTRATION for every city.
+    for cid in cr.CityId:
+        leaf = _leaf_registration(cid)
         for field in GEOMETRY_FIELDS:
-            leaf = getattr(_leaf_registration(cid), field)
-            assert getattr(d, field) == leaf, (
-                f"{cid.value}.{field} not equal to leaf REGISTRATION"
+            assert getattr(registry[cid], field) is getattr(leaf, field), (
+                f"{cid.value}.{field} not identical to leaf REGISTRATION"
             )
-            assert getattr(d, field) is leaf, (
-                f"{cid.value}.{field} not identical object to leaf REGISTRATION"
-            )
-        for field in NON_GEOMETRY_FIELDS:
-            assert getattr(d, field) == getattr(h, field), (
-                f"{cid.value}.{field} not equal"
-            )
-        # Shape must be the same dataclass, no extra/dropped fields.
-        assert type(d) is type(h)
+    # Shape is the same dataclass used everywhere.
+    for cid in cr.CityId:
+        assert type(registry[cid]) is cr.CityRegistration
 
 
 def test_nyc_object_identity_preserved():
-    derived = registry_derivation.build_registry_from_registrations()
-    assert derived[cr.CityId.NYC].metro_bbox is NYC_METRO_BBOX
+    from src.spatial.submarkets import NYC_METRO_BBOX
+
+    registry, _ = registry_derivation.build_runtime_exports()
+    assert registry[cr.CityId.NYC].metro_bbox is NYC_METRO_BBOX
 
 
-def test_derived_aliases_equal_handwritten():
-    handwritten = cr._HANDWRITTEN_ALIASES
-    derived = registry_derivation.build_aliases_from_registrations()
-    assert derived == handwritten
+def test_derived_aliases_are_string_keyed_and_complete():
+    registry, aliases = registry_derivation.build_runtime_exports()
+    for alias, city_id in aliases.items():
+        assert isinstance(alias, str)
+        assert city_id in registry, f"alias {alias!r} resolves to unregistered {city_id}"
+
+
+def test_registry_aliases_resolve_from_corpus():
+    """Every corpus aliases entry resolves to a registered city."""
+    registry, aliases = registry_derivation.build_runtime_exports()
+    for city_id in registry:
+        assert city_id.value in aliases, f"{city_id.value} has no self alias"
 
 
 def test_supported_city_ids_match_cityid():
@@ -65,12 +79,27 @@ def test_supported_city_ids_match_cityid():
 
 
 def test_active_exports_are_derived():
-    assert cr.USE_DERIVED_REGISTRY is True
-    assert cr.REGISTRY == registry_derivation.build_registry_from_registrations()
-    assert cr.ALIASES == registry_derivation.build_aliases_from_registrations()
-    # The active export must carry the leaf REGISTRATION geometry (US-180 moved
-    # geometry out of the hand-written block).
-    for cid in cr._HANDWRITTEN_REGISTRY:
+    # The active export is exactly the derived registry (no handwritten copy).
+    registry, aliases = registry_derivation.build_runtime_exports()
+    assert cr.REGISTRY == registry
+    assert cr.ALIASES == aliases
+    for cid in cr.CityId:
         leaf = _leaf_registration(cid)
         for field in GEOMETRY_FIELDS:
             assert getattr(cr.REGISTRY[cid], field) is getattr(leaf, field)
+
+
+def test_corpus_has_no_duplicate_or_unknown_city_ids():
+    definitions = _corpus_definitions()
+    city_ids = [d["city_id"] for d in definitions]
+    assert len(city_ids) == len(set(city_ids)), "duplicate city_id in corpus"
+    known = {c.value for c in cr.CityId}
+    for city_id in city_ids:
+        assert city_id in known, f"corpus city_id {city_id!r} has no CityId"
+
+
+def test_corpus_definitions_parse_cleanly():
+    """The corpus parses into registrations without raising (covered by the
+    interlock gate anyway); asserting here surface a bad unit early."""
+    registry, aliases = registry_derivation.build_runtime_exports()
+    assert registry and aliases

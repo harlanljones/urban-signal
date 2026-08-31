@@ -407,12 +407,13 @@ datasets:
     non_spatial: null
     zip_member: null
   sla:
-    endpoint: https://data.oregon.gov/resource/qad4-bnxp.json
+    endpoint: https://data.oregon.gov/resource/g77e-6bhs.json?$select=*, 'or_ccb:'
+      || license_type as license_type_ns
     platform: socrata
-    watermark_col: date_received
+    watermark_col: ''
     id_keys:
-    - trade_name
-    - address
+    - license_number
+    - related_key
     topic: raw.municipal.sla
     interval_seconds: 600.0
     producer_key: sla
@@ -424,46 +425,25 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: null
+    where: city = 'PORTLAND' AND state = 'OR'
     needs_geocode: true
-    geocode_context: null
+    geocode_context: Portland, OR
     field_map:
       license_id:
       - license_number
-      - trade_name
-      - address
       license_type:
-      - license_type
-      - application_type
-      dba:
-      - dba
-      - trade_name
-      - doing_business_as
-      premises_name:
-      - business_name
-      - licensee_name
-      - trade_name
+      - license_type_ns
       effective_date:
-      - date_received
-      - issue_date
-      - effective_date
+      - orig_regis_date
       expiration_date:
-      - expiration_date
-      status:
-      - application_status
-      - license_status
-      - status
+      - lic_exp_date
+      premises_name:
+      - full_name
       address_street:
       - address
-      - premise_address
-      latitude:
-      - latitude
-      longitude:
-      - longitude
       borough:
-      - district
-      - police_district
-    ingestion_mode: incremental
+      - city
+    ingestion_mode: snapshot
     oid_field: null
     max_record_count: null
     expected_cadence_days: 7

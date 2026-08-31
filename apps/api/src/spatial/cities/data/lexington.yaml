@@ -1,0 +1,344 @@
+city_id: lexington
+name: Lexington / Fayette County
+state: KY
+center:
+  lat: 38.046
+  lng: -84.497
+metro_bbox:
+  min_lat: 37.9
+  max_lat: 38.15
+  min_lng: -84.65
+  max_lng: -84.3
+division_bboxes:
+  DOWNTOWN_UK:
+    min_lat: 38.02
+    max_lat: 38.075
+    min_lng: -84.53
+    max_lng: -84.47
+  NORTHSIDE:
+    min_lat: 38.075
+    max_lat: 38.13
+    min_lng: -84.55
+    max_lng: -84.45
+  SOUTHEAST:
+    min_lat: 37.98
+    max_lat: 38.05
+    min_lng: -84.48
+    max_lng: -84.34
+  SOUTHWEST:
+    min_lat: 37.98
+    max_lat: 38.05
+    min_lng: -84.65
+    max_lng: -84.53
+  EAST_NEW_CIRCLE:
+    min_lat: 38.03
+    max_lat: 38.11
+    min_lng: -84.45
+    max_lng: -84.34
+submarkets:
+  Downtown & Rupp Arena:
+    name: Downtown & Rupp Arena
+    borough: DOWNTOWN_UK
+    lat: 38.047
+    lng: -84.502
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.86
+    capex: 7200000.0
+    permit_vel: 36.0
+    shift_ratio: 1.42
+    sla: 60.0
+    description: Civic core around Rupp Arena and the Convention Center with adaptive
+      reuse and hospitality infill.
+    city_id: lexington
+  University of Kentucky:
+    name: University of Kentucky
+    borough: DOWNTOWN_UK
+    lat: 38.03
+    lng: -84.505
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.84
+    capex: 6500000.0
+    permit_vel: 33.0
+    shift_ratio: 1.38
+    sla: 58.0
+    description: Campus-adjacent mixed-use and student housing along Limestone, Euclid,
+      and Nicholasville corridors.
+    city_id: lexington
+  Chevy Chase & Euclid Ave:
+    name: Chevy Chase & Euclid Ave
+    borough: DOWNTOWN_UK
+    lat: 38.031
+    lng: -84.488
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.82
+    capex: 5800000.0
+    permit_vel: 30.0
+    shift_ratio: 1.34
+    sla: 56.0
+    description: Neighborhood retail corridor east of campus with small-lot infill
+      and renovations.
+    city_id: lexington
+  North Limestone (NoLi):
+    name: North Limestone (NoLi)
+    borough: NORTHSIDE
+    lat: 38.095
+    lng: -84.475
+    zoom: 14.0
+    pitch: 42.0
+    base_lims: 0.78
+    capex: 4800000.0
+    permit_vel: 26.0
+    shift_ratio: 1.28
+    sla: 52.0
+    description: Arts and maker corridor north of downtown with steady small-scale
+      reinvestment.
+    city_id: lexington
+  Meadow Park & Russell Cave:
+    name: Meadow Park & Russell Cave
+    borough: NORTHSIDE
+    lat: 38.11
+    lng: -84.52
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.74
+    capex: 4200000.0
+    permit_vel: 22.0
+    shift_ratio: 1.22
+    sla: 48.0
+    description: Northside neighborhoods along Russell Cave Rd and Loudon Ave.
+    city_id: lexington
+  Hamburg Pavilion:
+    name: Hamburg Pavilion
+    borough: SOUTHEAST
+    lat: 38.03
+    lng: -84.42
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.8
+    capex: 6200000.0
+    permit_vel: 28.0
+    shift_ratio: 1.3
+    sla: 54.0
+    description: I-75 retail and mixed-use node with ongoing pad-site development
+      and hospitality.
+    city_id: lexington
+  Richmond Rd Corridor:
+    name: Richmond Rd Corridor
+    borough: SOUTHEAST
+    lat: 38.005
+    lng: -84.455
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.76
+    capex: 5000000.0
+    permit_vel: 24.0
+    shift_ratio: 1.24
+    sla: 50.0
+    description: Established corridor with renovation-led permits and selective infill.
+    city_id: lexington
+  Beaumont Centre & Harrodsburg:
+    name: Beaumont Centre & Harrodsburg
+    borough: SOUTHWEST
+    lat: 37.995
+    lng: -84.57
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.77
+    capex: 5200000.0
+    permit_vel: 25.0
+    shift_ratio: 1.25
+    sla: 50.0
+    description: Southwest growth belt with office, retail, and multifamily infill.
+    city_id: lexington
+  Nicholasville Rd South:
+    name: Nicholasville Rd South
+    borough: SOUTHWEST
+    lat: 37.99
+    lng: -84.535
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.75
+    capex: 4800000.0
+    permit_vel: 23.0
+    shift_ratio: 1.22
+    sla: 48.0
+    description: Regional commercial spine with redevelopment pressure around major
+      intersections.
+    city_id: lexington
+  Winchester Rd & Industrial:
+    name: Winchester Rd & Industrial
+    borough: EAST_NEW_CIRCLE
+    lat: 38.08
+    lng: -84.41
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.73
+    capex: 4300000.0
+    permit_vel: 21.0
+    shift_ratio: 1.2
+    sla: 46.0
+    description: Industrial and logistics corridor with selective commercial reinvestment.
+    city_id: lexington
+  Andover & Pleasant Ridge:
+    name: Andover & Pleasant Ridge
+    borough: EAST_NEW_CIRCLE
+    lat: 38.065
+    lng: -84.385
+    zoom: 13.5
+    pitch: 38.0
+    base_lims: 0.72
+    capex: 4100000.0
+    permit_vel: 20.0
+    shift_ratio: 1.18
+    sla: 44.0
+    description: East-side neighborhoods with steady residential improvements and
+      services.
+    city_id: lexington
+divisions:
+  DOWNTOWN_UK:
+    name: DOWNTOWN_UK
+    center_lat: 38.042
+    center_lng: -84.5
+    zoom: 13.8
+    bbox:
+      min_lat: 38.02
+      max_lat: 38.075
+      min_lng: -84.53
+      max_lng: -84.47
+    submarkets:
+    - Downtown & Rupp Arena
+    - University of Kentucky
+    - Chevy Chase & Euclid Ave
+    city_id: lexington
+  NORTHSIDE:
+    name: NORTHSIDE
+    center_lat: 38.105
+    center_lng: -84.5
+    zoom: 13.2
+    bbox:
+      min_lat: 38.075
+      max_lat: 38.13
+      min_lng: -84.55
+      max_lng: -84.45
+    submarkets:
+    - North Limestone (NoLi)
+    - Meadow Park & Russell Cave
+    city_id: lexington
+  SOUTHEAST:
+    name: SOUTHEAST
+    center_lat: 38.015
+    center_lng: -84.44
+    zoom: 13.2
+    bbox:
+      min_lat: 37.98
+      max_lat: 38.05
+      min_lng: -84.48
+      max_lng: -84.34
+    submarkets:
+    - Hamburg Pavilion
+    - Richmond Rd Corridor
+    city_id: lexington
+  SOUTHWEST:
+    name: SOUTHWEST
+    center_lat: 38.01
+    center_lng: -84.59
+    zoom: 13.0
+    bbox:
+      min_lat: 37.98
+      max_lat: 38.05
+      min_lng: -84.65
+      max_lng: -84.53
+    submarkets:
+    - Beaumont Centre & Harrodsburg
+    - Nicholasville Rd South
+    city_id: lexington
+  EAST_NEW_CIRCLE:
+    name: EAST_NEW_CIRCLE
+    center_lat: 38.07
+    center_lng: -84.395
+    zoom: 13.2
+    bbox:
+      min_lat: 38.03
+      max_lat: 38.11
+      min_lng: -84.45
+      max_lng: -84.34
+    submarkets:
+    - Winchester Rd & Industrial
+    - Andover & Pleasant Ridge
+    city_id: lexington
+datasets:
+  sla:
+    endpoint: https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/ABC_State_ActiveLicenses/FeatureServer/0
+    platform: arcgis
+    watermark_col: IssueDate
+    id_keys:
+    - LicenseNumber
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: County = 'Fayette'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - LicenseNumber
+      - ObjectId
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      effective_date:
+      - IssueDate
+      - EffectiveDate
+      expiration_date:
+      - ExpiryDate
+      license_type:
+      - LicenseType
+      premises_name:
+      - Licensee
+      dba:
+      - DBA
+      address_street:
+      - PremisesStreet
+      - PremisesCityState
+      status:
+      - Status
+      borough:
+      - County
+      - City
+    ingestion_mode: incremental
+    oid_field: ObjectId
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- lexington_ky
+- lexington ky
+job_suffix: lexington

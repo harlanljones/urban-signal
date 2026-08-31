@@ -1,0 +1,333 @@
+city_id: santa_fe
+name: Santa Fe
+state: NM
+center:
+  lat: 35.6869
+  lng: -105.9372
+metro_bbox:
+  min_lat: 35.6
+  max_lat: 35.75
+  min_lng: -106.05
+  max_lng: -105.85
+division_bboxes:
+  DOWNTOWN_PLAZA:
+    min_lat: 35.678
+    max_lat: 35.695
+    min_lng: -105.948
+    max_lng: -105.925
+  SOUTH_CAPITOL:
+    min_lat: 35.66
+    max_lat: 35.68
+    min_lng: -105.965
+    max_lng: -105.935
+  RAILYARD:
+    min_lat: 35.67
+    max_lat: 35.69
+    min_lng: -105.96
+    max_lng: -105.94
+  EASTSIDE:
+    min_lat: 35.675
+    max_lat: 35.698
+    min_lng: -105.935
+    max_lng: -105.91
+  CERRO_GORDO:
+    min_lat: 35.686
+    max_lat: 35.72
+    min_lng: -105.92
+    max_lng: -105.885
+  SOUTHSIDE:
+    min_lat: 35.62
+    max_lat: 35.665
+    min_lng: -106.03
+    max_lng: -105.96
+submarkets:
+  Downtown Plaza:
+    name: Downtown Plaza
+    borough: DOWNTOWN_PLAZA
+    lat: 35.6869
+    lng: -105.9372
+    zoom: 15.0
+    pitch: 55.0
+    base_lims: 0.85
+    capex: 5800000.0
+    permit_vel: 27.0
+    shift_ratio: 1.44
+    sla: 50.0
+    description: Historic Santa Fe Plaza core with Palace of the Governors, San Miguel
+      Chapel, and the central mixed-use retail/hospitality corridor.
+    city_id: santa_fe
+  Baca Street:
+    name: Baca Street
+    borough: DOWNTOWN_PLAZA
+    lat: 35.6895
+    lng: -105.9305
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.83
+    capex: 5200000.0
+    permit_vel: 22.0
+    shift_ratio: 1.38
+    sla: 46.0
+    description: Baca Street corridor east of the Plaza with Victorian-era cottages,
+      infill townhomes, and steady renovation permit activity.
+    city_id: santa_fe
+  South Capitol:
+    name: South Capitol
+    borough: SOUTH_CAPITOL
+    lat: 35.67
+    lng: -105.95
+    zoom: 14.5
+    pitch: 52.0
+    base_lims: 0.84
+    capex: 5400000.0
+    permit_vel: 24.0
+    shift_ratio: 1.41
+    sla: 48.0
+    description: South Capitol neighborhood with the New Mexico State Capitol, government
+      offices, and the emerging Siler Road creative-zone mixed-use corridor.
+    city_id: santa_fe
+  Siler Road:
+    name: Siler Road
+    borough: SOUTH_CAPITOL
+    lat: 35.665
+    lng: -105.952
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.82
+    capex: 5000000.0
+    permit_vel: 21.0
+    shift_ratio: 1.36
+    sla: 45.0
+    description: Siler Road industrial-artist corridor with warehouse conversions,
+      maker spaces, and light-industrial redevelopment.
+    city_id: santa_fe
+  Railyard:
+    name: Railyard
+    borough: RAILYARD
+    lat: 35.677
+    lng: -105.95
+    zoom: 15.0
+    pitch: 50.0
+    base_lims: 0.86
+    capex: 6100000.0
+    permit_vel: 26.0
+    shift_ratio: 1.45
+    sla: 52.0
+    description: Santa Fe Railyard district with the Farmers Market, railyard parks,
+      gallery spaces, and the Guadalupe Street retail corridor.
+    city_id: santa_fe
+  Eastside:
+    name: Eastside
+    borough: EASTSIDE
+    lat: 35.685
+    lng: -105.925
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.87
+    capex: 6000000.0
+    permit_vel: 25.0
+    shift_ratio: 1.43
+    sla: 51.0
+    description: Eastside including Canyon Road gallery district, Museum Hill, and
+      the historic Acequia Madre neighborhood with high-value adobe renovation permits.
+    city_id: santa_fe
+  Casa Solana:
+    name: Casa Solana
+    borough: EASTSIDE
+    lat: 35.68
+    lng: -105.93
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.81
+    capex: 4800000.0
+    permit_vel: 20.0
+    shift_ratio: 1.35
+    sla: 44.0
+    description: Casa Solana mid-century residential neighborhood with ranch-style
+      homes, lot splits, and steady alteration permits.
+    city_id: santa_fe
+  Cerro Gordo:
+    name: Cerro Gordo
+    borough: CERRO_GORDO
+    lat: 35.7
+    lng: -105.9
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.8
+    capex: 5500000.0
+    permit_vel: 19.0
+    shift_ratio: 1.34
+    sla: 43.0
+    description: Cerro Gordo foothills east of downtown with view-lot estate builds,
+      hillside adobe construction, and National Forest adjacency.
+    city_id: santa_fe
+  Agua Fria:
+    name: Agua Fria
+    borough: CERRO_GORDO
+    lat: 35.708
+    lng: -105.905
+    zoom: 14.0
+    pitch: 44.0
+    base_lims: 0.79
+    capex: 4600000.0
+    permit_vel: 18.0
+    shift_ratio: 1.32
+    sla: 42.0
+    description: Agua Fria Village historic settlement west of the Plaza with agricultural-lot
+      conversions, traditional adobe rehab, and new single-family infill.
+    city_id: santa_fe
+  Southside:
+    name: Southside
+    borough: SOUTHSIDE
+    lat: 35.64
+    lng: -105.985
+    zoom: 13.5
+    pitch: 46.0
+    base_lims: 0.78
+    capex: 6200000.0
+    permit_vel: 23.0
+    shift_ratio: 1.4
+    sla: 47.0
+    description: Southside corridor along Airport Road and Cerrillos Road with master-planned
+      subdivisions, big-box retail, and the metro's highest new-build permit volume.
+    city_id: santa_fe
+divisions:
+  DOWNTOWN_PLAZA:
+    name: DOWNTOWN_PLAZA
+    center_lat: 35.6869
+    center_lng: -105.9372
+    zoom: 14.0
+    bbox:
+      min_lat: 35.678
+      max_lat: 35.695
+      min_lng: -105.948
+      max_lng: -105.925
+    submarkets:
+    - Downtown Plaza
+    - Baca Street
+    city_id: santa_fe
+  SOUTH_CAPITOL:
+    name: SOUTH_CAPITOL
+    center_lat: 35.67
+    center_lng: -105.95
+    zoom: 14.0
+    bbox:
+      min_lat: 35.66
+      max_lat: 35.68
+      min_lng: -105.965
+      max_lng: -105.935
+    submarkets:
+    - South Capitol
+    - Siler Road
+    city_id: santa_fe
+  RAILYARD:
+    name: RAILYARD
+    center_lat: 35.677
+    center_lng: -105.95
+    zoom: 14.0
+    bbox:
+      min_lat: 35.67
+      max_lat: 35.69
+      min_lng: -105.96
+      max_lng: -105.94
+    submarkets:
+    - Railyard
+    city_id: santa_fe
+  EASTSIDE:
+    name: EASTSIDE
+    center_lat: 35.685
+    center_lng: -105.925
+    zoom: 13.5
+    bbox:
+      min_lat: 35.675
+      max_lat: 35.698
+      min_lng: -105.935
+      max_lng: -105.91
+    submarkets:
+    - Eastside
+    - Casa Solana
+    city_id: santa_fe
+  CERRO_GORDO:
+    name: CERRO_GORDO
+    center_lat: 35.7
+    center_lng: -105.9
+    zoom: 13.0
+    bbox:
+      min_lat: 35.686
+      max_lat: 35.72
+      min_lng: -105.92
+      max_lng: -105.885
+    submarkets:
+    - Cerro Gordo
+    - Agua Fria
+    city_id: santa_fe
+  SOUTHSIDE:
+    name: SOUTHSIDE
+    center_lat: 35.64
+    center_lng: -105.985
+    zoom: 13.0
+    bbox:
+      min_lat: 35.62
+      max_lat: 35.665
+      min_lng: -106.03
+      max_lng: -105.96
+    submarkets:
+    - Southside
+    city_id: santa_fe
+datasets:
+  '311':
+    endpoint: https://services7.arcgis.com/p0Gk2nDbPs7KEqSZ/arcgis/rest/services/CRM_Report_A_Problem_New_Public/FeatureServer/0
+    platform: arcgis
+    watermark_col: CreationDate
+    id_keys:
+    - globalid
+    topic: raw.municipal.311
+    interval_seconds: 300.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: CreationDate DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: Santa Fe, NM
+    field_map:
+      incident_id:
+      - globalid
+      - objectid
+      complaint_type:
+      - problemtype
+      created_date:
+      - CreationDate
+      status:
+      - status
+    ingestion_mode: incremental
+    oid_field: objectid
+    max_record_count: 1000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- santa_fe_nm
+- santa-fe-nm
+- santa fe nm
+- santafe
+job_suffix: santa_fe

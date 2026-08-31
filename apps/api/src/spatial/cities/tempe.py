@@ -1,3 +1,61 @@
+PERMITS_FIELD_MAP = {
+    # OBJECTID is the OID fallback (Henderson precedent): PermitNum is the
+    # id_keys head, but the OID keeps coordinate-less/dedup edge rows
+    # addressable if a permit number is ever missing client-side.
+    "job_id": ["PermitNum", "OBJECTID"],
+    # The *Dtm esri dates lead: _flatten_feature ISO-normalizes them to
+    # tz-aware UTC, while the plain string twins ("2026-08-26") parse naive
+    # in the permits producer's datetime chain — keep event datetimes
+    # tz-consistent, string twins remain the fallback.
+    "issuance_date": ["IssuedDateDtm", "IssuedDate"],
+    "filing_date": ["AppliedDateDtm", "AppliedDate"],
+    "status": ["StatusCurrent"],
+    "job_type": ["Type", "PermitClass"],
+    "cost": ["EstProjectCost"],
+    "address_street": ["OriginalAddress1"],
+    "zipcode": ["OriginalZip"],
+    "latitude": ["Latitude"],
+    "longitude": ["Longitude"],
+}
+
+COMPLAINTS_311_FIELD_MAP = {
+    "incident_id": ["CaseNo", "Id"],
+    "created_date": ["CaseOpenDate"],
+    "status": ["CaseStatus"],
+    "complaint_type": ["ViolationType"],
+    "incident_address": ["Address"],
+}
+
+CRIME_FIELD_MAP = {
+    "incident_id": ["PrimaryKey", "OBJECTID"],
+    "offense_type": ["OffenseCustom"],
+    "occurred_date": ["OccurrenceDatetime"],
+    "borough": ["CharacterArea"],
+    "latitude": ["Latitude"],
+    "longitude": ["Longitude"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+    "311": COMPLAINTS_311_FIELD_MAP,
+    "crime": CRIME_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Tempe, AZ"
+
+DROPPED_PII_COLUMNS = (
+    "ContractorCompanyName",
+    "ContractorLicNum",
+    "ContractorPhone",
+    "ContractorAddress1",
+    "ContractorAddress2",
+    "ContractorCity",
+    "ContractorState",
+    "ContractorZip",
+    "ContractorEmail",
+    "ProjectName",
+)
+
 """Tempe, AZ spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -81,12 +139,6 @@ scooped in (small town wedged between Tempe and Phoenix; division resolution
 stays coordinate-based).
 """
 
-from src.producers.field_maps_tempe import (
-    COMPLAINTS_311_FIELD_MAP,
-    CRIME_FIELD_MAP,
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 TEMPE_CITY_ID: str = "tempe"

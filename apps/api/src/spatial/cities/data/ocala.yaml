@@ -1,0 +1,229 @@
+city_id: ocala
+name: Ocala / Marion County
+state: FL
+center:
+  lat: 29.1872
+  lng: -82.1401
+metro_bbox:
+  min_lat: 28.95
+  max_lat: 29.45
+  min_lng: -82.45
+  max_lng: -81.95
+division_bboxes:
+  OCALA_CORE:
+    min_lat: 29.08
+    max_lat: 29.28
+    min_lng: -82.22
+    max_lng: -82.02
+submarkets:
+  Downtown Ocala:
+    name: Downtown Ocala
+    borough: OCALA_CORE
+    lat: 29.1872
+    lng: -82.1401
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.8
+    capex: 5200000.0
+    permit_vel: 28.0
+    shift_ratio: 1.3
+    sla: 50.0
+    description: Historic courthouse square and Magnolia Ave corridor with mixed-use
+      infill and neighborhood services.
+    city_id: ocala
+  West Ocala:
+    name: West Ocala
+    borough: OCALA_CORE
+    lat: 29.185
+    lng: -82.18
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.72
+    capex: 4100000.0
+    permit_vel: 24.0
+    shift_ratio: 1.24
+    sla: 44.0
+    description: "Residential and commercial reinvestment west of US\u2011441 with\
+      \ corridor retail and small\u2011lot rehab."
+    city_id: ocala
+  Silver Springs:
+    name: Silver Springs
+    borough: OCALA_CORE
+    lat: 29.216
+    lng: -82.059
+    zoom: 13.0
+    pitch: 40.0
+    base_lims: 0.74
+    capex: 4300000.0
+    permit_vel: 25.0
+    shift_ratio: 1.26
+    sla: 46.0
+    description: "East\u2011side gateway anchored by Silver Springs State Park and\
+      \ commercial corridors along SR\u201140."
+    city_id: ocala
+  Southeast Ocala:
+    name: Southeast Ocala
+    borough: OCALA_CORE
+    lat: 29.15
+    lng: -82.12
+    zoom: 12.8
+    pitch: 40.0
+    base_lims: 0.71
+    capex: 3900000.0
+    permit_vel: 23.0
+    shift_ratio: 1.22
+    sla: 43.0
+    description: Established neighborhoods and medical/office clusters southeast of
+      downtown with steady renovation.
+    city_id: ocala
+  Northeast Ocala:
+    name: Northeast Ocala
+    borough: OCALA_CORE
+    lat: 29.23
+    lng: -82.12
+    zoom: 12.8
+    pitch: 40.0
+    base_lims: 0.7
+    capex: 3800000.0
+    permit_vel: 22.0
+    shift_ratio: 1.2
+    sla: 42.0
+    description: Northeast residential districts and neighborhood retail along NE
+      36th Ave and Bonnie Heath Blvd.
+    city_id: ocala
+divisions:
+  OCALA_CORE:
+    name: Ocala / Marion County
+    center_lat: 29.1872
+    center_lng: -82.1401
+    zoom: 11.2
+    bbox:
+      min_lat: 29.08
+      max_lat: 29.28
+      min_lng: -82.22
+      max_lng: -82.02
+    submarkets:
+    - Downtown Ocala
+    - West Ocala
+    - Silver Springs
+    - Southeast Ocala
+    - Northeast Ocala
+    city_id: ocala
+datasets:
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'FL'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  permits:
+    endpoint: https://services9.arcgis.com/Gh9awoU677aKree0/arcgis/rest/services/Florida_Statewide_Cadastral/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - OBJECTID
+    - PARCEL_ID
+    topic: raw.municipal.permits
+    interval_seconds: 86400.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: ASMNT_YR = 2025 AND CO_NO = 42
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      job_id:
+      - OBJECTID
+      - PARCEL_ID
+      issuance_date:
+      - EFF_YR_BLT
+      cost:
+      - NCONST_VAL
+      bbl:
+      - PARCEL_ID
+      borough:
+      - CO_NO
+      status:
+      - JV_CHNG
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 365
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- ocala_fl
+- ocala fl
+job_suffix: ocala

@@ -1,0 +1,528 @@
+city_id: oxnard_ventura
+name: "Oxnard\u2013Ventura, CA"
+state: CA
+center:
+  lat: 34.2795
+  lng: -119.297
+metro_bbox:
+  min_lat: 34.23
+  max_lat: 34.356
+  min_lng: -119.345
+  max_lng: -119.128
+division_bboxes:
+  DOWNTOWN_VENTURA:
+    min_lat: 34.272
+    max_lat: 34.283
+    min_lng: -119.3235
+    max_lng: -119.279
+  WESTSIDE_TAYLOR_RANCH:
+    min_lat: 34.2835
+    max_lat: 34.351
+    min_lng: -119.34
+    max_lng: -119.276
+  MIDTOWN_SANJON:
+    min_lat: 34.2625
+    max_lat: 34.283
+    min_lng: -119.2785
+    max_lng: -119.245
+  PIERPONT_HARBOR:
+    min_lat: 34.235
+    max_lat: 34.262
+    min_lng: -119.2755
+    max_lng: -119.252
+  OLIVAS_RIVERBANK:
+    min_lat: 34.235
+    max_lat: 34.252
+    min_lng: -119.2515
+    max_lng: -119.2115
+  COLLEGE_CORRIDOR:
+    min_lat: 34.2525
+    max_lat: 34.299
+    min_lng: -119.2445
+    max_lng: -119.2095
+  EAST_END_SATICOY:
+    min_lat: 34.2435
+    max_lat: 34.305
+    min_lng: -119.206
+    max_lng: -119.1385
+submarkets:
+  Downtown Ventura & Mission:
+    name: Downtown Ventura & Mission
+    borough: DOWNTOWN_VENTURA
+    lat: 34.2795
+    lng: -119.297
+    zoom: 14.5
+    pitch: 52.0
+    base_lims: 0.86
+    capex: 6600000.0
+    permit_vel: 27.0
+    shift_ratio: 1.45
+    sla: 54.0
+    description: Main Street and California Street core around the Mission with adaptive-reuse
+      storefronts, hotel conversions, and the city's densest business-license churn.
+    city_id: oxnard_ventura
+  Westside & Ventura Avenue:
+    name: Westside & Ventura Avenue
+    borough: WESTSIDE_TAYLOR_RANCH
+    lat: 34.299
+    lng: -119.293
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.76
+    capex: 4900000.0
+    permit_vel: 22.0
+    shift_ratio: 1.36
+    sla: 47.0
+    description: Historic Ventura Avenue oil-town corridor with small-business licensing,
+      garage-conversion permitting, and art-city warehouse reuse.
+    city_id: oxnard_ventura
+  Taylor Ranch & Two Trees:
+    name: Taylor Ranch & Two Trees
+    borough: WESTSIDE_TAYLOR_RANCH
+    lat: 34.3
+    lng: -119.31
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.83
+    capex: 6100000.0
+    permit_vel: 19.0
+    shift_ratio: 1.32
+    sla: 44.0
+    description: Hillside subdivision below the Two Trees landmark with view-lot remodels,
+      pool/deck auxiliary permits, and quiet commercial churn.
+    city_id: oxnard_ventura
+  North Avenue:
+    name: North Avenue
+    borough: WESTSIDE_TAYLOR_RANCH
+    lat: 34.325
+    lng: -119.292
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.74
+    capex: 4200000.0
+    permit_vel: 17.0
+    shift_ratio: 1.28
+    sla: 42.0
+    description: North Avenue valley edge with tract-home turnover and school-adjacent
+      renovation permits.
+    city_id: oxnard_ventura
+  Midtown Ventura:
+    name: Midtown Ventura
+    borough: MIDTOWN_SANJON
+    lat: 34.275
+    lng: -119.274
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.82
+    capex: 5700000.0
+    permit_vel: 24.0
+    shift_ratio: 1.4
+    sla: 51.0
+    description: Midtown Main and Telegraph commercial strip with the city's own EconDevAreas
+      tag, medical-office leasing, and steady alteration permitting.
+    city_id: oxnard_ventura
+  Sanjon & Surfers Point:
+    name: Sanjon & Surfers Point
+    borough: MIDTOWN_SANJON
+    lat: 34.2808
+    lng: -119.268
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.8
+    capex: 5300000.0
+    permit_vel: 21.0
+    shift_ratio: 1.38
+    sla: 49.0
+    description: Beach-side midtown strip by Surfers Point with short-stay turnover,
+      coastal-inn licensing, and boardwalk retail.
+    city_id: oxnard_ventura
+  Pierpont Bay:
+    name: Pierpont Bay
+    borough: PIERPONT_HARBOR
+    lat: 34.26
+    lng: -119.27
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.85
+    capex: 6900000.0
+    permit_vel: 20.0
+    shift_ratio: 1.42
+    sla: 52.0
+    description: Oceanfront tract between the dunes and Harbor Boulevard with beach-house
+      remodels and high-valuation coastal permits.
+    city_id: oxnard_ventura
+  Ventura Harbor & Keys:
+    name: Ventura Harbor & Keys
+    borough: PIERPONT_HARBOR
+    lat: 34.2445
+    lng: -119.259
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.87
+    capex: 7400000.0
+    permit_vel: 23.0
+    shift_ratio: 1.47
+    sla: 58.0
+    description: Harbor village, marina, and the canal-front Keys with tourism-led
+      licensing, charter operations, and village retail churn.
+    city_id: oxnard_ventura
+  Olivas & River North Bank:
+    name: Olivas & River North Bank
+    borough: OLIVAS_RIVERBANK
+    lat: 34.245
+    lng: -119.235
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.75
+    capex: 4600000.0
+    permit_vel: 18.0
+    shift_ratio: 1.3
+    sla: 45.0
+    description: Olivas Links and the Santa Clara River north bank with golf/resort
+      adjacency, equestrian parcels, and light commercial turnover.
+    city_id: oxnard_ventura
+  College Area:
+    name: College Area
+    borough: COLLEGE_CORRIDOR
+    lat: 34.279
+    lng: -119.232
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.81
+    capex: 5500000.0
+    permit_vel: 23.0
+    shift_ratio: 1.39
+    sla: 50.0
+    description: College corridor around Pacific View Mall with medical and office
+      leasing, apartment turnover, and retail-pad repositioning.
+    city_id: oxnard_ventura
+  Telegraph & Thille:
+    name: Telegraph & Thille
+    borough: COLLEGE_CORRIDOR
+    lat: 34.262
+    lng: -119.223
+    zoom: 14.0
+    pitch: 44.0
+    base_lims: 0.78
+    capex: 5000000.0
+    permit_vel: 20.0
+    shift_ratio: 1.34
+    sla: 48.0
+    description: Telegraph Road east flats with auto-row licensing, duplex conversions,
+      and infill townhome filings.
+    city_id: oxnard_ventura
+  Wells Corridor:
+    name: Wells Corridor
+    borough: EAST_END_SATICOY
+    lat: 34.29
+    lng: -119.168
+    zoom: 14.0
+    pitch: 44.0
+    base_lims: 0.79
+    capex: 5200000.0
+    permit_vel: 21.0
+    shift_ratio: 1.36
+    sla: 49.0
+    description: Wells Road commercial spine with neighborhood retail, clinic licensing,
+      and steady residential renovation.
+    city_id: oxnard_ventura
+  Serra & Juanamaria:
+    name: Serra & Juanamaria
+    borough: EAST_END_SATICOY
+    lat: 34.272
+    lng: -119.188
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.77
+    capex: 4700000.0
+    permit_vel: 18.0
+    shift_ratio: 1.31
+    sla: 46.0
+    description: Post-war east-end tracts around Serra School with starter-home turnover
+      and garage-conversion permits.
+    city_id: oxnard_ventura
+  Saticoy:
+    name: Saticoy
+    borough: EAST_END_SATICOY
+    lat: 34.278
+    lng: -119.154
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.72
+    capex: 3900000.0
+    permit_vel: 15.0
+    shift_ratio: 1.26
+    sla: 41.0
+    description: Historic Saticoy village at the SOAR edge with ag-service businesses,
+      warehouse reuse, and slow-license churn.
+    city_id: oxnard_ventura
+divisions:
+  DOWNTOWN_VENTURA:
+    name: DOWNTOWN_VENTURA
+    center_lat: 34.2795
+    center_lng: -119.297
+    zoom: 14.0
+    bbox:
+      min_lat: 34.272
+      max_lat: 34.283
+      min_lng: -119.3235
+      max_lng: -119.279
+    submarkets:
+    - Downtown Ventura & Mission
+    city_id: oxnard_ventura
+  WESTSIDE_TAYLOR_RANCH:
+    name: WESTSIDE_TAYLOR_RANCH
+    center_lat: 34.299
+    center_lng: -119.293
+    zoom: 13.0
+    bbox:
+      min_lat: 34.2835
+      max_lat: 34.351
+      min_lng: -119.34
+      max_lng: -119.276
+    submarkets:
+    - Westside & Ventura Avenue
+    - Taylor Ranch & Two Trees
+    - North Avenue
+    city_id: oxnard_ventura
+  MIDTOWN_SANJON:
+    name: MIDTOWN_SANJON
+    center_lat: 34.275
+    center_lng: -119.274
+    zoom: 13.5
+    bbox:
+      min_lat: 34.2625
+      max_lat: 34.283
+      min_lng: -119.2785
+      max_lng: -119.245
+    submarkets:
+    - Midtown Ventura
+    - Sanjon & Surfers Point
+    city_id: oxnard_ventura
+  PIERPONT_HARBOR:
+    name: PIERPONT_HARBOR
+    center_lat: 34.26
+    center_lng: -119.27
+    zoom: 13.5
+    bbox:
+      min_lat: 34.235
+      max_lat: 34.262
+      min_lng: -119.2755
+      max_lng: -119.252
+    submarkets:
+    - Pierpont Bay
+    - Ventura Harbor & Keys
+    city_id: oxnard_ventura
+  OLIVAS_RIVERBANK:
+    name: OLIVAS_RIVERBANK
+    center_lat: 34.245
+    center_lng: -119.235
+    zoom: 13.0
+    bbox:
+      min_lat: 34.235
+      max_lat: 34.252
+      min_lng: -119.2515
+      max_lng: -119.2115
+    submarkets:
+    - Olivas & River North Bank
+    city_id: oxnard_ventura
+  COLLEGE_CORRIDOR:
+    name: COLLEGE_CORRIDOR
+    center_lat: 34.279
+    center_lng: -119.232
+    zoom: 13.0
+    bbox:
+      min_lat: 34.2525
+      max_lat: 34.299
+      min_lng: -119.2445
+      max_lng: -119.2095
+    submarkets:
+    - College Area
+    - Telegraph & Thille
+    city_id: oxnard_ventura
+  EAST_END_SATICOY:
+    name: EAST_END_SATICOY
+    center_lat: 34.29
+    center_lng: -119.168
+    zoom: 12.5
+    bbox:
+      min_lat: 34.2435
+      max_lat: 34.305
+      min_lng: -119.206
+      max_lng: -119.1385
+    submarkets:
+    - Wells Corridor
+    - Serra & Juanamaria
+    - Saticoy
+    city_id: oxnard_ventura
+datasets:
+  sla:
+    endpoint: https://services.arcgis.com/dBVj4EXO3IdRPOqb/arcgis/rest/services/OpenData_PSI_BusinessLicenses/FeatureServer/0
+    platform: arcgis
+    watermark_col: DATEISSUE
+    id_keys:
+    - ACCTNO
+    - GlobalID
+    - OBJECTID
+    topic: raw.municipal.sla
+    interval_seconds: 300.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: DATEISSUE DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Ventura, CA
+    field_map:
+      license_id:
+      - ACCTNO
+      dba:
+      - DBA
+      - COMPNAME
+      premises_name:
+      - COMPNAME
+      license_type:
+      - BUSTYPE
+      - NAICS_DESC
+      - NAICS_CODE
+      status:
+      - STATUSDESC
+      effective_date:
+      - DATESTART
+      expiration_date:
+      - DATEEXPIRE
+      address_street:
+      - ADDRESS
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 16000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  '311':
+    endpoint: https://services.arcgis.com/dBVj4EXO3IdRPOqb/arcgis/rest/services/Graffiti_Responses_Read_Only/FeatureServer/0
+    platform: arcgis
+    watermark_col: ReportedOn
+    id_keys:
+    - globalid
+    - objectid
+    topic: raw.municipal.311
+    interval_seconds: 300.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: ReportedOn DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - globalid
+      - objectid
+      created_date:
+      - ReportedOn
+      closed_date:
+      - DateEnded
+    ingestion_mode: incremental
+    oid_field: objectid
+    max_record_count: 10000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  crime:
+    endpoint: https://services.arcgis.com/dBVj4EXO3IdRPOqb/arcgis/rest/services/OpenData_Police_Crimes/FeatureServer/0
+    platform: arcgis
+    watermark_col: Incident_Date_Start
+    id_keys:
+    - EventOffenseKey
+    - Report_Number
+    - ObjectID
+    topic: raw.municipal.crime
+    interval_seconds: 1800.0
+    producer_key: crime
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: Incident_Date_Start DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - EventOffenseKey
+      - Report_Number
+      offense_type:
+      - Offense_Type
+      - Offense_Category
+      occurred_date:
+      - Incident_Date_Start
+      borough:
+      - Community_Council
+    ingestion_mode: incremental
+    oid_field: ObjectID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- oxnard-ventura
+- oxnard ventura
+- ventura
+- san_buenaventura
+job_suffix: oxnard_ventura

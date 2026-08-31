@@ -1,3 +1,38 @@
+SLA_FIELD_MAP = {
+    "license_id": ["case_number"],
+    "license_type": ["license_type", "license_category"],
+    "premises_name": ["business_name"],
+    "dba": ["business_name", "business_owner_name"],
+    "effective_date": [
+        "last_licensed_issue_date",
+        "received_date",
+        "business_open_date",
+    ],
+    "status": ["license_status"],
+    "address_street": ["business_address"],
+    "borough": ["neighborhood_name", "commissioner_district"],
+}
+
+STR_SLA_FIELD_MAP = {
+    "license_id": ["license_number"],
+    "license_type": ["license_milestone"],
+    "premises_name": ["license_holder_name", "property_owner_name1"],
+    "dba": ["property_owner_name1", "license_holder_name"],
+    "effective_date": ["issued_date", "license_date", "last_action_date"],
+    "expiration_date": ["expire_date", "next_renew_date"],
+    "status": ["license_status", "license_milestone"],
+    "address_street": ["property_address"],
+    "zipcode": ["property_owner_zip"],
+    "borough": ["property_owner_city"],
+}
+
+FIELD_MAP = {
+    "sla": SLA_FIELD_MAP,
+    "sla_str": STR_SLA_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Orlando, FL"
+
 """Orlando Metro Submarket Registry and Spatial Layer for Urban Signal.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -23,12 +58,6 @@ also live+geocoded and is deliberately **out of ticket scope**.
 
 from typing import Dict
 
-from src.producers.field_maps_orlando import (
-    FIELD_MAP,
-    GEOCODE_CONTEXT,
-    SLA_FIELD_MAP,
-    STR_SLA_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 ORLANDO_CITY_ID: str = "orlando"

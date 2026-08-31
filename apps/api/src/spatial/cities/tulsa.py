@@ -1,3 +1,14 @@
+FIELD_MAP = {
+    "incident_id": ["case_id", "OBJECTID"],
+    "created_date": ["case_opened"],
+    "closed_date": ["case_closed"],
+    "status": ["case_status"],
+    "complaint_type": ["case_type", "case_reason", "case_subject"],
+    "incident_address": ["case_external_ref"],
+}
+
+TULSA_311_FIELD_MAP = FIELD_MAP
+
 """Tulsa, Oklahoma spatial registry and geometry.
 
 Tulsa registers as a single-feed, rolling-window city (US-158): only
@@ -15,7 +26,6 @@ edit is a pure copy. ``extra["field_map"]`` wires the per-city spellings from
 
 from typing import Any, Dict
 
-from src.producers.field_maps_tulsa import FIELD_MAP as TULSA_311_FIELD_MAP
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 TULSA_METRO_BBOX: dict[str, float] = {

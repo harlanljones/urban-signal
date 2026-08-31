@@ -283,6 +283,54 @@ a { text-underline-offset: .22em; }
 .agent-links a { display: inline-flex; align-items: center; min-height: 44px; color: var(--lime); text-decoration: underline; }
 .no-script a { text-decoration: underline; }
 
+/* One-time scroll reveal. Gated on html.js so no-JS and reduced-motion users
+   (the head script only sets .js when motion is allowed) always see content —
+   nothing is ever blanked. Transform + opacity only, strong ease-out. */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out);
+}
+
+.js [data-reveal][data-visible] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Precise press & hover feedback — replaces the jump-slops and transition:all.
+   Press feedback (scale) needs no hover gate; hover motion is small and gated
+   to fine pointers so touch doesn't stick a lifted state. */
+@media (hover: hover) and (pointer: fine) {
+  .button:hover,
+  .pipeline-step:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.button {
+  transition: transform 160ms var(--ease-out), background-color 160ms var(--ease-out), color 160ms var(--ease-out);
+}
+.button:active { transform: translateY(0) scale(.97); }
+
+.pipeline-step {
+  transition: border-color .25s var(--ease-out), background-color .25s var(--ease-out), color .25s var(--ease-out), transform .35s var(--ease-out);
+}
+
+.arch-node {
+  transition: border-color .18s var(--ease-out), background-color .18s var(--ease-out), color .18s var(--ease-out);
+}
+
+.chip {
+  transition: border-color .18s var(--ease-out), color .18s var(--ease-out), background-color .18s var(--ease-out);
+}
+
+.matrix-metro { transition: color .18s var(--ease-out); }
+.faq-item summary { transition: color .18s var(--ease-out); }
+.site-links a { transition: color .18s var(--ease-out); }
+
+.faq-item summary::before,
+.city-card summary::before { transition: transform .2s var(--ease-out); }
+
 @media (max-width: 1100px) {
   .hero-copy { width: 52%; }
   .hero h1 { font-size: clamp(4rem, 7vw, 5.25rem); }

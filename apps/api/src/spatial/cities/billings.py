@@ -1,3 +1,41 @@
+PERMITS_FIELD_MAP = {
+    "job_id": ["Building_Permit_Num", "OBJECTID"],
+    "issuance_date": ["Issue_Date"],
+    "filing_date": ["Date_Entered"],
+    "status": ["Permit_Status"],
+    "job_type": ["Permit_Type"],
+    "address_street": ["Property_Address"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+}
+
+BILLINGS_311_FIELD_MAP = {
+    "incident_id": ["reqid", "OBJECTID"],
+    "created_date": ["created_date"],
+    "closed_date": ["resolutiondt"],
+    "status": ["status"],
+    "complaint_type": ["reqtype"],
+    "incident_address": ["locdesc"],
+}
+
+GEOCODE_CONTEXT = "Billings, MT"
+
+DROPPED_PII_COLUMNS = (
+    "Owner",
+    "Owner_Address",
+    "Owner_City",
+    "Owner_State",
+    "Owner_Zip",
+    "Contractor",
+    "Contractor_Num",
+    "Entered_By",
+    "pocfirstname",
+    "poclastname",
+    "created_user",
+)
+
 """Billings, MT spatial registry and geometry (US-234).
 
 Provides neighborhood metadata, investment metrics, division catalog, and
@@ -38,11 +76,6 @@ Not registered:
 """
 
 
-from src.producers.field_maps_billings import (
-    BILLINGS_311_FIELD_MAP,
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 BILLINGS_CITY_ID: str = "billings"

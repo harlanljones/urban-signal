@@ -1,3 +1,49 @@
+PERMITS_FIELD_MAP = {
+    "job_id": ["PermitNumber", "ObjectId"],
+    "issuance_date": ["IssueDate"],
+    "filing_date": ["ApplyDate"],
+    "status": ["PermitStatus"],
+    "job_type": ["PermitType", "WorkClass", "Category"],
+    "cost": ["ValuationTotal"],
+    "address_street": [
+        "ParcelAddressNumber",
+        "ParcelAddressPreDirection",
+        "ParcelAddressStreet",
+        "ParcelAddressStreetType",
+    ],
+    "bbl": ["ParcelNumber"],
+    "zipcode": ["ParcelAddressZip"],
+    "latitude": ["GISY"],
+    "longitude": ["GISX"],
+}
+
+SLA_FIELD_MAP = {
+    "license_id": ["License Number"],
+    "dba": ["DBA", "Entity Name"],
+    "premises_name": ["Entity Name"],
+    "license_type": ["License Type", "License Sub-Type"],
+    "effective_date": ["Original Issue Date"],
+    "expiration_date": ["Expiration Date"],
+    "address_street": ["Business Location"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+    "sla": SLA_FIELD_MAP,
+}
+
+GEOCODE_CONTEXT = "Henderson, NV"
+
+DROPPED_PII_COLUMNS = (
+    "OwnerName",
+    "OwnerAddress",
+    "ProfessionalName",
+    "ProfessionalStateLicNbr",
+    "ProfessionalAddress",
+    "ProfessionalPhone",
+    "Business Phone",
+)
+
 """Henderson, NV spatial registry and geometry.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -37,11 +83,6 @@ original probe 2026-08-27):
 
 from typing import Any
 
-from src.producers.field_maps_henderson import (
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-    SLA_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 HENDERSON_CITY_ID: str = "henderson"

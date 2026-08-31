@@ -1,0 +1,329 @@
+city_id: augusta
+name: Augusta
+state: GA
+center:
+  lat: 33.476
+  lng: -82.01
+metro_bbox:
+  min_lat: 33.25
+  max_lat: 33.65
+  min_lng: -82.2
+  max_lng: -81.85
+division_bboxes:
+  DOWNTOWN_MEDICAL:
+    min_lat: 33.45
+    max_lat: 33.505
+    min_lng: -81.995
+    max_lng: -81.955
+  WEST_AUGUSTA:
+    min_lat: 33.47
+    max_lat: 33.56
+    min_lng: -82.12
+    max_lng: -82.01
+  SOUTH_AUGUSTA:
+    min_lat: 33.3
+    max_lat: 33.43
+    min_lng: -82.11
+    max_lng: -81.97
+  EAST_AUGUSTA:
+    min_lat: 33.45
+    max_lat: 33.54
+    min_lng: -81.95
+    max_lng: -81.89
+submarkets:
+  Downtown & Broad Street:
+    name: Downtown & Broad Street
+    borough: DOWNTOWN_MEDICAL
+    lat: 33.475
+    lng: -81.97
+    zoom: 15.0
+    pitch: 52.0
+    base_lims: 0.86
+    capex: 6500000.0
+    permit_vel: 38.0
+    shift_ratio: 1.45
+    sla: 60.0
+    description: Historic Broad Street corridor and Riverwalk mixed-use spine with
+      steady renovation permits.
+    city_id: augusta
+  Medical District & AU:
+    name: Medical District & AU
+    borough: DOWNTOWN_MEDICAL
+    lat: 33.476
+    lng: -81.962
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.84
+    capex: 7200000.0
+    permit_vel: 35.0
+    shift_ratio: 1.42
+    sla: 58.0
+    description: Augusta University and adjacent medical complex with institutional
+      capital and infill housing.
+    city_id: augusta
+  Summerville & AU Campus:
+    name: Summerville & AU Campus
+    borough: WEST_AUGUSTA
+    lat: 33.486
+    lng: -82.022
+    zoom: 14.5
+    pitch: 48.0
+    base_lims: 0.82
+    capex: 6000000.0
+    permit_vel: 30.0
+    shift_ratio: 1.38
+    sla: 56.0
+    description: Historic Summerville neighborhood around AU Summerville campus; renovation-led
+      permits.
+    city_id: augusta
+  West Augusta Retail Spine:
+    name: West Augusta Retail Spine
+    borough: WEST_AUGUSTA
+    lat: 33.505
+    lng: -82.07
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.76
+    capex: 4800000.0
+    permit_vel: 24.0
+    shift_ratio: 1.3
+    sla: 50.0
+    description: Washington Rd commercial corridor and adjacent residential pockets
+      with steady tenant improvements.
+    city_id: augusta
+  Deans Bridge & Regency:
+    name: Deans Bridge & Regency
+    borough: SOUTH_AUGUSTA
+    lat: 33.39
+    lng: -82.03
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.7
+    capex: 3500000.0
+    permit_vel: 22.0
+    shift_ratio: 1.24
+    sla: 46.0
+    description: South Augusta arterial corridor with small-format commercial rehab
+      and single-family turnover.
+    city_id: augusta
+  Fort Eisenhower Gateway:
+    name: Fort Eisenhower Gateway
+    borough: SOUTH_AUGUSTA
+    lat: 33.405
+    lng: -81.995
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.72
+    capex: 3800000.0
+    permit_vel: 20.0
+    shift_ratio: 1.26
+    sla: 47.0
+    description: Gateway area serving Fort Eisenhower with workforce housing and service
+      permitting.
+    city_id: augusta
+  East Augusta Riverport:
+    name: East Augusta Riverport
+    borough: EAST_AUGUSTA
+    lat: 33.505
+    lng: -81.925
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.74
+    capex: 4200000.0
+    permit_vel: 21.0
+    shift_ratio: 1.28
+    sla: 48.0
+    description: Industrial riverfront and logistics-adjacent redevelopment on the
+      GA side of the Savannah River.
+    city_id: augusta
+  Laney-Walker & Bethlehem:
+    name: Laney-Walker & Bethlehem
+    borough: EAST_AUGUSTA
+    lat: 33.47
+    lng: -81.93
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.8
+    capex: 5200000.0
+    permit_vel: 28.0
+    shift_ratio: 1.34
+    sla: 52.0
+    description: Historic neighborhoods east of downtown with ongoing small-lot infill
+      and rehab.
+    city_id: augusta
+divisions:
+  DOWNTOWN_MEDICAL:
+    name: DOWNTOWN_MEDICAL
+    center_lat: 33.478
+    center_lng: -81.968
+    zoom: 13.5
+    bbox:
+      min_lat: 33.45
+      max_lat: 33.505
+      min_lng: -81.995
+      max_lng: -81.955
+    submarkets:
+    - Downtown & Broad Street
+    - Medical District & AU
+    city_id: augusta
+  WEST_AUGUSTA:
+    name: WEST_AUGUSTA
+    center_lat: 33.508
+    center_lng: -82.05
+    zoom: 13.0
+    bbox:
+      min_lat: 33.47
+      max_lat: 33.56
+      min_lng: -82.12
+      max_lng: -82.01
+    submarkets:
+    - Summerville & AU Campus
+    - West Augusta Retail Spine
+    city_id: augusta
+  SOUTH_AUGUSTA:
+    name: SOUTH_AUGUSTA
+    center_lat: 33.385
+    center_lng: -82.015
+    zoom: 13.0
+    bbox:
+      min_lat: 33.3
+      max_lat: 33.43
+      min_lng: -82.11
+      max_lng: -81.97
+    submarkets:
+    - Deans Bridge & Regency
+    - Fort Eisenhower Gateway
+    city_id: augusta
+  EAST_AUGUSTA:
+    name: EAST_AUGUSTA
+    center_lat: 33.5
+    center_lng: -81.925
+    zoom: 13.0
+    bbox:
+      min_lat: 33.45
+      max_lat: 33.54
+      min_lng: -81.95
+      max_lng: -81.89
+    submarkets:
+    - East Augusta Riverport
+    - Laney-Walker & Bethlehem
+    city_id: augusta
+datasets:
+  permits:
+    endpoint: https://gismap.augustaga.gov/arcgis/rest/services/EnterpriseApps/iasWorld_Permit/MapServer/1
+    platform: arcgis
+    watermark_col: DATE_ISSUE
+    id_keys:
+    - PERMITNUMBER
+    - PERM_NUM
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Augusta, GA
+    field_map:
+      job_id:
+      - PERMITNUMBER
+      - PERM_NUM
+      address_street:
+      - JOBADDRESS
+      issuance_date:
+      - DATE_ISSUE
+      - DATE_ENTERED
+      filing_date:
+      - DATE_ENTERED
+      cost:
+      - WORKCOST
+      status:
+      - PERMIT_STATUS
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 15000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'GA'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- augusta_ga
+- augusta ga
+job_suffix: augusta

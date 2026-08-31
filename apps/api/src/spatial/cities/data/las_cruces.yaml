@@ -1,0 +1,384 @@
+city_id: las_cruces
+name: Las Cruces, NM
+state: NM
+center:
+  lat: 32.312
+  lng: -106.778
+metro_bbox:
+  min_lat: 32.2
+  max_lat: 32.5
+  min_lng: -106.95
+  max_lng: -106.55
+division_bboxes:
+  DOWNTOWN_CORE:
+    min_lat: 32.305
+    max_lat: 32.32
+    min_lng: -106.795
+    max_lng: -106.765
+  MESILLA_VALLEY:
+    min_lat: 32.27
+    max_lat: 32.285
+    min_lng: -106.815
+    max_lng: -106.79
+  EAST_MESA:
+    min_lat: 32.265
+    max_lat: 32.295
+    min_lng: -106.76
+    max_lng: -106.7
+  SONOMA_RANCH:
+    min_lat: 32.34
+    max_lat: 32.365
+    min_lng: -106.75
+    max_lng: -106.7
+  NORTHERN_LC:
+    min_lat: 32.335
+    max_lat: 32.36
+    min_lng: -106.79
+    max_lng: -106.75
+  WEST_MESA:
+    min_lat: 32.29
+    max_lat: 32.32
+    min_lng: -106.9
+    max_lng: -106.8
+submarkets:
+  Downtown Las Cruces:
+    name: Downtown Las Cruces
+    borough: DOWNTOWN_CORE
+    lat: 32.312
+    lng: -106.778
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.82
+    capex: 7200000.0
+    permit_vel: 35.0
+    shift_ratio: 1.48
+    sla: 58.0
+    description: Main Street downtown corridor with the historic Plaza, the Rio Grande
+      Theatre, and mixed-use redevelopment of the commercial core.
+    city_id: las_cruces
+  Las Cruces Plaza:
+    name: Las Cruces Plaza
+    borough: DOWNTOWN_CORE
+    lat: 32.3125
+    lng: -106.771
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.83
+    capex: 6800000.0
+    permit_vel: 32.0
+    shift_ratio: 1.45
+    sla: 55.0
+    description: "Historic Plaza district with the Don\u0303a Ana County Courthouse,\
+      \ the Cathedral of the Immaculate Heart of Mary, and century-old storefront\
+      \ retail."
+    city_id: las_cruces
+  Mesilla Historic District:
+    name: Mesilla Historic District
+    borough: MESILLA_VALLEY
+    lat: 32.2775
+    lng: -106.8
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.8
+    capex: 6400000.0
+    permit_vel: 30.0
+    shift_ratio: 1.43
+    sla: 54.0
+    description: Historic Mesilla town square with adobe architecture, the Basilica
+      of San Albino, and a tourist-oriented arts and dining economy.
+    city_id: las_cruces
+  NMSU Corridor:
+    name: NMSU Corridor
+    borough: EAST_MESA
+    lat: 32.282
+    lng: -106.745
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.84
+    capex: 7600000.0
+    permit_vel: 36.0
+    shift_ratio: 1.5
+    sla: 60.0
+    description: New Mexico State University corridor with student housing, tech-transfer
+      spin-offs, and the Arrowhead Research Park.
+    city_id: las_cruces
+  East Mesa Growth:
+    name: East Mesa Growth
+    borough: EAST_MESA
+    lat: 32.28
+    lng: -106.72
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.81
+    capex: 7000000.0
+    permit_vel: 33.0
+    shift_ratio: 1.46
+    sla: 56.0
+    description: Eastern growth corridor along Lohman Avenue with new subdivisions,
+      strip retail, and the expanding Las Cruces airport edge.
+    city_id: las_cruces
+  Sonoma Ranch:
+    name: Sonoma Ranch
+    borough: SONOMA_RANCH
+    lat: 32.352
+    lng: -106.735
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.86
+    capex: 8400000.0
+    permit_vel: 38.0
+    shift_ratio: 1.52
+    sla: 62.0
+    description: Northwest master-planned community with golf-course residential,
+      Sonoma Ranch Elementary, and the emerging Sonoma Marketplace retail.
+    city_id: las_cruces
+  Telshor/Medical District:
+    name: Telshor/Medical District
+    borough: NORTHERN_LC
+    lat: 32.347
+    lng: -106.77
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.87
+    capex: 9200000.0
+    permit_vel: 40.0
+    shift_ratio: 1.55
+    sla: 64.0
+    description: Telshor Boulevard medical corridor with Memorial Medical Center,
+      MountainView Regional, and the highest concentration of medical office and ancillary
+      services.
+    city_id: las_cruces
+  Las Colinas:
+    name: Las Colinas
+    borough: NORTHERN_LC
+    lat: 32.345
+    lng: -106.765
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.85
+    capex: 7800000.0
+    permit_vel: 36.0
+    shift_ratio: 1.5
+    sla: 60.0
+    description: Northern residential area with Mesilla Valley Hospital, established
+      neighborhoods, and the Foothills Road corridor.
+    city_id: las_cruces
+  West Mesa:
+    name: West Mesa
+    borough: WEST_MESA
+    lat: 32.305
+    lng: -106.85
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.79
+    capex: 6000000.0
+    permit_vel: 28.0
+    shift_ratio: 1.4
+    sla: 50.0
+    description: "West side of the Rio Grande valley with agricultural land, rural\
+      \ residential, and the Do\xF1a Ana County Government Center."
+    city_id: las_cruces
+divisions:
+  DOWNTOWN_CORE:
+    name: DOWNTOWN_CORE
+    center_lat: 32.312
+    center_lng: -106.778
+    zoom: 13.5
+    bbox:
+      min_lat: 32.305
+      max_lat: 32.32
+      min_lng: -106.795
+      max_lng: -106.765
+    submarkets:
+    - Downtown Las Cruces
+    - Las Cruces Plaza
+    city_id: las_cruces
+  MESILLA_VALLEY:
+    name: MESILLA_VALLEY
+    center_lat: 32.2775
+    center_lng: -106.8
+    zoom: 13.5
+    bbox:
+      min_lat: 32.27
+      max_lat: 32.285
+      min_lng: -106.815
+      max_lng: -106.79
+    submarkets:
+    - Mesilla Historic District
+    city_id: las_cruces
+  EAST_MESA:
+    name: EAST_MESA
+    center_lat: 32.282
+    center_lng: -106.745
+    zoom: 13.0
+    bbox:
+      min_lat: 32.265
+      max_lat: 32.295
+      min_lng: -106.76
+      max_lng: -106.7
+    submarkets:
+    - NMSU Corridor
+    - East Mesa Growth
+    city_id: las_cruces
+  SONOMA_RANCH:
+    name: SONOMA_RANCH
+    center_lat: 32.352
+    center_lng: -106.735
+    zoom: 13.0
+    bbox:
+      min_lat: 32.34
+      max_lat: 32.365
+      min_lng: -106.75
+      max_lng: -106.7
+    submarkets:
+    - Sonoma Ranch
+    city_id: las_cruces
+  NORTHERN_LC:
+    name: NORTHERN_LC
+    center_lat: 32.347
+    center_lng: -106.77
+    zoom: 13.0
+    bbox:
+      min_lat: 32.335
+      max_lat: 32.36
+      min_lng: -106.79
+      max_lng: -106.75
+    submarkets:
+    - Telshor/Medical District
+    - Las Colinas
+    city_id: las_cruces
+  WEST_MESA:
+    name: WEST_MESA
+    center_lat: 32.305
+    center_lng: -106.85
+    zoom: 13.0
+    bbox:
+      min_lat: 32.29
+      max_lat: 32.32
+      min_lng: -106.9
+      max_lng: -106.8
+    submarkets:
+    - West Mesa
+    city_id: las_cruces
+datasets:
+  permits:
+    endpoint: https://maps.las-cruces.org/gis/rest/services/Information_Services/MapServer/1
+    platform: arcgis
+    watermark_col: Issued_Date
+    id_keys:
+    - Permit_Number
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: Issued_Date DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: Las Cruces, NM
+    field_map:
+      job_id:
+      - Permit_Number
+      - OBJECTID
+      issuance_date:
+      - Issued_Date
+      job_type:
+      - Permit_Type
+      cost:
+      - Project_Valuation
+      address_street:
+      - Permit_Location
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 1000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  sla:
+    endpoint: https://maps.las-cruces.org/gis/rest/services/Information_Services/MapServer/2
+    platform: arcgis
+    watermark_col: LastUpdateDate
+    id_keys:
+    - RECNO
+    - OBJECTID
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: LastUpdateDate DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: Las Cruces, NM
+    field_map:
+      license_id:
+      - RECNO
+      - OBJECTID
+      dba:
+      - DBA
+      - RECNAME
+      premises_name:
+      - RECNAME
+      - DBA
+      license_type:
+      - BusCat
+      - BusType
+      status:
+      - STATUS
+      effective_date:
+      - LastUpdateDate
+      address_street:
+      - RecAddress
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 1000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- las_cruces_nm
+- las_cruces-nm
+- las_cruces nm
+- las-cruces
+- las cruces
+- lc
+job_suffix: las_cruces

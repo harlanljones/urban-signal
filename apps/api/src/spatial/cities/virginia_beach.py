@@ -1,3 +1,53 @@
+GEOCODE_CONTEXT = "Virginia Beach, VA"
+
+PERMITS_FIELD_MAP = {
+    "job_id": ["PermitNumber", "OBJECTID"],
+    "job_type": ["WorkType", "PermitType"],
+    "issuance_date": ["IssueDate"],
+    "filing_date": ["ApplicationDate"],
+    "address_street": ["StreetAddress"],
+    "bbl": ["GPIN"],
+    "borough": ["City"],
+    "zipcode": ["Zip"],
+}
+
+SLA_FIELD_MAP = {
+    "license_id": ["Trade_Name", "Owner_Name", "Business_Address"],
+    "dba": ["Trade_Name"],
+    "premises_name": ["Owner_Name"],
+    "license_type": ["Business_Classification", "NAICS"],
+    "effective_date": ["Begin_Date"],
+    "address_street": ["Business_Address"],
+    "borough": ["Business_City"],
+    "zipcode": ["Business_ZipCode"],
+}
+
+DEEDS_FIELD_MAP = {
+    "doc_id": ["Document_Number", "OBJECTID"],
+    "bbl": ["GPIN"],
+    "document_amount": ["Sale_Price"],
+    "recorded_date": ["Sales_Date"],
+    "address_street": ["Street_Address"],
+    "incident_address": ["Street_Address"],
+    "borough": ["Neighborhood"],
+    "zipcode": ["Zip_Code"],
+}
+
+FIELD_MAP = {
+    "permits": PERMITS_FIELD_MAP,
+    "sla": SLA_FIELD_MAP,
+    "deeds": DEEDS_FIELD_MAP,
+}
+
+DROPPED_PII_COLUMNS = (
+    "Telephone",
+    "Mailing_Address",
+    "Mailing_City",
+    "Mailing_State",
+    "Mailing_Zip_Code",
+    "Mailing_ZipCode_Ext",
+)
+
 """Virginia Beach Metro Submarket Registry and Spatial Layer for Urban Signal.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -47,13 +97,6 @@ ordering; the declared ``%m/%d/%Y`` typed window is mandatory (ADR 0005).
 
 from typing import Dict
 
-from src.producers.field_maps_virginia_beach import (
-    DEEDS_FIELD_MAP,
-    FIELD_MAP,
-    GEOCODE_CONTEXT,
-    PERMITS_FIELD_MAP,
-    SLA_FIELD_MAP,
-)
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 VIRGINIA_BEACH_CITY_ID: str = "virginia_beach"

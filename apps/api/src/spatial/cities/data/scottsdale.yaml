@@ -1,0 +1,400 @@
+city_id: scottsdale
+name: Scottsdale, AZ
+state: AZ
+center:
+  lat: 33.4942
+  lng: -111.9261
+metro_bbox:
+  min_lat: 33.44
+  max_lat: 33.91
+  min_lng: -112.0
+  max_lng: -111.73
+division_bboxes:
+  OLD_TOWN:
+    min_lat: 33.49
+    max_lat: 33.512
+    min_lng: -111.945
+    max_lng: -111.912
+  SOUTH_SCOTTSDALE:
+    min_lat: 33.44
+    max_lat: 33.49
+    min_lng: -111.965
+    max_lng: -111.88
+  GAINEY_RANCH:
+    min_lat: 33.568
+    max_lat: 33.604
+    min_lng: -111.93
+    max_lng: -111.88
+  AIRPARK:
+    min_lat: 33.604
+    max_lat: 33.638
+    min_lng: -111.96
+    max_lng: -111.89
+  DC_RANCH:
+    min_lat: 33.638
+    max_lat: 33.678
+    min_lng: -111.95
+    max_lng: -111.885
+  NORTH_SCOTTSDALE:
+    min_lat: 33.678
+    max_lat: 33.905
+    min_lng: -111.98
+    max_lng: -111.755
+submarkets:
+  Old Town Scottsdale:
+    name: Old Town Scottsdale
+    borough: OLD_TOWN
+    lat: 33.4926
+    lng: -111.9253
+    zoom: 14.5
+    pitch: 55.0
+    base_lims: 0.88
+    capex: 9800000.0
+    permit_vel: 41.0
+    shift_ratio: 1.56
+    sla: 64.0
+    description: Fifth Avenue and Main Street entertainment core with gallery frontage,
+      hotel conversions, and the entertainment-district patio economy.
+    city_id: scottsdale
+  Arts District:
+    name: Arts District
+    borough: OLD_TOWN
+    lat: 33.4962
+    lng: -111.9341
+    zoom: 14.0
+    pitch: 48.0
+    base_lims: 0.86
+    capex: 8600000.0
+    permit_vel: 37.0
+    shift_ratio: 1.51
+    sla: 61.0
+    description: Gallery row west of Scottsdale Road with museum adjacency, art-walk
+      retail, and boutique office conversions.
+    city_id: scottsdale
+  Los Arcos Corridor:
+    name: Los Arcos Corridor
+    borough: SOUTH_SCOTTSDALE
+    lat: 33.464
+    lng: -111.9255
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.79
+    capex: 6400000.0
+    permit_vel: 31.0
+    shift_ratio: 1.44
+    sla: 55.0
+    description: McDowell and Scottsdale Road retail belt with post-war strip retrofit,
+      infill multifamily, and the Los Arcos redevelopment blocks.
+    city_id: scottsdale
+  SkySong District:
+    name: SkySong District
+    borough: SOUTH_SCOTTSDALE
+    lat: 33.4874
+    lng: -111.9211
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.83
+    capex: 7600000.0
+    permit_vel: 35.0
+    shift_ratio: 1.49
+    sla: 58.0
+    description: ASU SkySong innovation campus corridor with research-office demand,
+      student-adjacent rentals, and steady tenant-improvement permitting.
+    city_id: scottsdale
+  Gainey Village:
+    name: Gainey Village
+    borough: GAINEY_RANCH
+    lat: 33.5864
+    lng: -111.8959
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.87
+    capex: 9200000.0
+    permit_vel: 34.0
+    shift_ratio: 1.52
+    sla: 62.0
+    description: Gainey Ranch corporate and village core with golf-community stock,
+      Class A office along Doubletree, and stable license renewals.
+    city_id: scottsdale
+  Scottsdale Airpark:
+    name: Scottsdale Airpark
+    borough: AIRPARK
+    lat: 33.6229
+    lng: -111.9103
+    zoom: 14.0
+    pitch: 45.0
+    base_lims: 0.89
+    capex: 10400000.0
+    permit_vel: 39.0
+    shift_ratio: 1.55
+    sla: 65.0
+    description: Airport and Loop 101 office corridor with aviation-adjacent industrial,
+      WestWorld event demand, and the metro's densest corporate lease belt.
+    city_id: scottsdale
+  DC Ranch / Market Street:
+    name: DC Ranch / Market Street
+    borough: DC_RANCH
+    lat: 33.6562
+    lng: -111.9168
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.91
+    capex: 11200000.0
+    permit_vel: 36.0
+    shift_ratio: 1.58
+    sla: 67.0
+    description: Master-planned DC Ranch village with Market Street retail, custom-lot
+      rebuilds, and the metro's top household-income band.
+    city_id: scottsdale
+  Cavasson Corridor:
+    name: Cavasson Corridor
+    borough: DC_RANCH
+    lat: 33.6565
+    lng: -111.9087
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.9
+    capex: 10800000.0
+    permit_vel: 38.0
+    shift_ratio: 1.57
+    sla: 66.0
+    description: "Hayden Road corporate corridor anchored by the Cavasson master plan\
+      \ (Scripps/ASU campus) \u2014 evidenced by live tenant-improvement permitting\
+      \ at 18700 N Hayden."
+    city_id: scottsdale
+  Troon:
+    name: Troon
+    borough: NORTH_SCOTTSDALE
+    lat: 33.706
+    lng: -111.909
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.92
+    capex: 11800000.0
+    permit_vel: 33.0
+    shift_ratio: 1.59
+    sla: 68.0
+    description: Golf-community custom-home edge at the McDowell Sonoran Preserve
+      with view-lot rebuilds and luxury remodel demand.
+    city_id: scottsdale
+  Desert Highlands / Happy Valley:
+    name: Desert Highlands / Happy Valley
+    borough: NORTH_SCOTTSDALE
+    lat: 33.6803
+    lng: -111.8612
+    zoom: 13.5
+    pitch: 42.0
+    base_lims: 0.9
+    capex: 10600000.0
+    permit_vel: 32.0
+    shift_ratio: 1.56
+    sla: 66.0
+    description: "Happy Valley Road gate-community belt (Desert Highlands, Troon North\
+      \ edges) \u2014 evidenced by live SFR-CUSTOM and NATIVE PLANT permits at 10040\
+      \ E Happy Valley Rd."
+    city_id: scottsdale
+divisions:
+  OLD_TOWN:
+    name: OLD_TOWN
+    center_lat: 33.493
+    center_lng: -111.9258
+    zoom: 14.0
+    bbox:
+      min_lat: 33.49
+      max_lat: 33.512
+      min_lng: -111.945
+      max_lng: -111.912
+    submarkets:
+    - Old Town Scottsdale
+    - Arts District
+    city_id: scottsdale
+  SOUTH_SCOTTSDALE:
+    name: SOUTH_SCOTTSDALE
+    center_lat: 33.462
+    center_lng: -111.921
+    zoom: 13.5
+    bbox:
+      min_lat: 33.44
+      max_lat: 33.49
+      min_lng: -111.965
+      max_lng: -111.88
+    submarkets:
+    - Los Arcos Corridor
+    - SkySong District
+    city_id: scottsdale
+  GAINEY_RANCH:
+    name: GAINEY_RANCH
+    center_lat: 33.5864
+    center_lng: -111.8959
+    zoom: 13.5
+    bbox:
+      min_lat: 33.568
+      max_lat: 33.604
+      min_lng: -111.93
+      max_lng: -111.88
+    submarkets:
+    - Gainey Village
+    city_id: scottsdale
+  AIRPARK:
+    name: AIRPARK
+    center_lat: 33.6229
+    center_lng: -111.9103
+    zoom: 13.5
+    bbox:
+      min_lat: 33.604
+      max_lat: 33.638
+      min_lng: -111.96
+      max_lng: -111.89
+    submarkets:
+    - Scottsdale Airpark
+    city_id: scottsdale
+  DC_RANCH:
+    name: DC_RANCH
+    center_lat: 33.6562
+    center_lng: -111.9168
+    zoom: 13.5
+    bbox:
+      min_lat: 33.638
+      max_lat: 33.678
+      min_lng: -111.95
+      max_lng: -111.885
+    submarkets:
+    - DC Ranch / Market Street
+    - Cavasson Corridor
+    city_id: scottsdale
+  NORTH_SCOTTSDALE:
+    name: NORTH_SCOTTSDALE
+    center_lat: 33.706
+    center_lng: -111.909
+    zoom: 12.5
+    bbox:
+      min_lat: 33.678
+      max_lat: 33.905
+      min_lng: -111.98
+      max_lng: -111.755
+    submarkets:
+    - Troon
+    - Desert Highlands / Happy Valley
+    city_id: scottsdale
+datasets:
+  permits:
+    endpoint: https://maps.scottsdaleaz.gov/arcgis/rest/services/OpenData_Tabular/MapServer/12
+    platform: arcgis
+    watermark_col: IssueDate
+    id_keys:
+    - PermitNumber
+    - permit_id
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: IssueDate DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: true
+    geocode_context: Scottsdale, AZ
+    field_map:
+      job_id:
+      - PermitNumber
+      - permit_id
+      issuance_date:
+      - IssueDate
+      status:
+      - PermitStatus
+      job_type:
+      - PermitType
+      cost:
+      - Valuation
+      address_street:
+      - Address
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+    ingestion_mode: incremental
+    oid_field: permit_id
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  sla:
+    endpoint: https://maps.scottsdaleaz.gov/arcgis/rest/services/OpenData_Tabular/MapServer/6
+    platform: arcgis
+    watermark_col: BusinessStartDate
+    id_keys:
+    - AcctNum
+    - OBJECTID
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: BusinessStartDate DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: BusinessStartDate <= CURRENT_TIMESTAMP
+    needs_geocode: true
+    geocode_context: Scottsdale, AZ
+    field_map:
+      license_id:
+      - AcctNum
+      dba:
+      - Company
+      premises_name:
+      - Company
+      license_type:
+      - LicType
+      status:
+      - AcctStatus
+      effective_date:
+      - BusinessStartDate
+      address_street:
+      - ServAddrComp
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- scottsdale_az
+- scottsdale-az
+- scottsdale az
+- scottsdale, az
+job_suffix: scottsdale

@@ -1,52 +1,42 @@
-"""Registry derivation aggregator (US-177).
+"""Registry derivation aggregator (US-177 / US-428).
 
-Builds the same structures as the hand-written ``REGISTRY`` / ``ALIASES`` in
-``city_registry`` by *merging*:
+The single construction path for ``REGISTRY`` / ``ALIASES``. Each city's
+registration is loaded once from its declarative YAML definition beside the
+leaf module (``cities/data/<city_id>.yaml``), then geometry is re-bound to the
+leaf ``REGISTRATION``'s exact objects so the interlock identity invariants hold
+by construction.
 
-* geometry (``metro_bbox``, ``division_bboxes``, ``submarkets``,
-  ``divisions``) from each leaf module's ``REGISTRATION`` object, and
-* the non-geometry fields (``name``, ``state``, ``center``,
-  ``job_suffix``, ``datasets``) plus the alias table from the existing
-  hand-written registry (US-177 does NOT move those).
+There is no hand-written registry: the corpus satisfies the runtime. Building
+fails loudly (rather than falling back) when the corpus does not cover every
+``CityId`` or does not correspond to a leaf module — a registration missing its
+definition is a torn write, not a degraded state. Onboarding a city means adding
+``cities/<city_id>.py`` and ``cities/data/<city_id>.yaml`` (plus any endpoints in
+settings); nothing here changes.
 
-Object identity is preserved by construction: each leaf ``REGISTRATION``
-references the exact same constant objects the hand-written registry imports
-(e.g. ``cities.chicago.CHICAGO_METRO_BBOX`` is ``REGISTRY[CityId.CHICAGO].
-metro_bbox``), so geometry fields compare equal with ``is``. NYC is handled
-through ``cities.nyc.REGISTRATION``, which bridges the borough objects from
-``submarkets``.
-
-This module is READ-ONLY toward the 48 leaf modules and ``cities/nyc.py``;
-it never mutates their ``REGISTRATION``. The hand-written registry remains
-the authoritative export unless ``USE_DERIVED_REGISTRY`` is enabled by the
-caller (``city_registry`` switches its own ``REGISTRY``/``ALIASES`` exports
-based on that flag).
+This module is READ-ONLY toward the leaf modules and the corpus; it never
+mutates their ``REGISTRATION`` or their YAML files. NYC resolves to
+``src.spatial.cities.nyc``, whose geometry lives in ``src.spatial.submarkets``.
 """
 
 import importlib
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
-from src.spatial.registration import SpatialRegistration
+from src.spatial import city_data
 
 
 def build_registry_from_data(
     definitions, endpoint_resolver=lambda name: name, *, allow_unknown_city_ids=False
 ):
-    """Build registrations directly from validated declarative definitions.
-
-    This factory is deliberately separate from the legacy fallback below so a
-    caller can validate and promote a data migration in one interlock hold.
-    """
+    """Build registrations directly from validated declarative definitions."""
     from src.spatial import city_registry
-    from src.spatial.city_data import build_registration
 
     return {
         registration.city_id: registration
         for registration in (
-            build_registration(
+            city_data.build_registration(
                 definition,
                 city_id_type=city_registry.CityId,
                 feed_type=city_registry.FeedType,
@@ -59,70 +49,13 @@ def build_registry_from_data(
 
 
 def build_aliases_from_data(
-    definitions: Iterable[dict[str, Any]], *, allow_unknown_city_ids=False
+    definitions: Iterable[Mapping[str, Any]], *, allow_unknown_city_ids=False
 ) -> dict[str, object]:
     from src.spatial import city_registry
-    from src.spatial.city_data import validate_definition
 
-    aliases: dict[str, object] = {}
-    for raw in definitions:
-        definition = validate_definition(raw)
-        try:
-            city_id = city_registry.CityId(definition["city_id"])
-        except (TypeError, ValueError) as exc:
-            if not allow_unknown_city_ids:
-                raise ValueError(f"unknown city_id {definition['city_id']!r}") from exc
-            city_id = definition["city_id"]
-        for alias in [definition["city_id"], *definition.get("aliases", [])]:
-            key = str(alias).strip().lower()
-            if not key:
-                raise ValueError(f"{getattr(city_id, 'value', city_id)} contains an empty alias")
-            previous = aliases.setdefault(key, city_id)
-            if previous != city_id:
-                raise ValueError(
-                    f"alias {key!r} maps to both {getattr(previous, 'value', previous)!r} "
-                    f"and {getattr(city_id, 'value', city_id)!r}"
-                )
-    return aliases
-
-
-def build_runtime_exports(endpoint_resolver=lambda name: name, *, allow_unknown_city_ids=False):
-    from src.config import settings
-    from src.spatial import city_registry
-    from src.spatial.city_data import load_definitions
-
-    try:
-        definitions = load_definitions(
-            Path(settings.city_data_dir), allow_unknown_city_ids=allow_unknown_city_ids
-        )
-        if not definitions:
-            return None
-        registry = build_registry_from_data(
-            definitions,
-            endpoint_resolver,
-            allow_unknown_city_ids=allow_unknown_city_ids,
-        )
-        legacy_ids = set(city_registry._HANDWRITTEN_REGISTRY)
-        if not legacy_ids.issubset(registry):
-            return None
-        canonical = build_registry_from_registrations()
-        for city_id in legacy_ids:
-            source = canonical[city_id]
-            runtime = registry[city_id]
-            registry[city_id] = replace(
-                runtime,
-                metro_bbox=source.metro_bbox,
-                division_bboxes=source.division_bboxes,
-                submarkets=source.submarkets,
-                divisions=source.divisions,
-            )
-        aliases = build_aliases_from_registrations()
-        aliases.update(
-            build_aliases_from_data(definitions, allow_unknown_city_ids=allow_unknown_city_ids)
-        )
-        return registry, aliases
-    except Exception:
-        return None
+    return city_data.aliases_from_definitions(
+        definitions, city_registry.CityId, allow_unknown_city_ids=allow_unknown_city_ids
+    )
 
 
 def _leaf_registration(city_id):
@@ -136,57 +69,65 @@ def _leaf_registration(city_id):
     return module.REGISTRATION
 
 
-def build_registry_from_registrations():
-    """Assemble a ``Dict[CityId, CityRegistration]`` from leaf registrations.
+def load_definitions(*, allow_unknown_city_ids=False) -> list[dict[str, Any]]:
+    """Load the corpus definitions, raising if the directory is missing."""
+    from src.config import settings
 
-    Geometry is taken verbatim from each leaf ``REGISTRATION``; the
-    non-geometry fields are copied from the hand-written registry so that the
-    shape and content match exactly. The hand-written registry is read from
-    ``city_registry._HANDWRITTEN_REGISTRY`` so the result is stable regardless
-    of whether the derived registry is currently the active export.
-    """
-    from src.spatial import city_registry
-
-    handwritten = city_registry._HANDWRITTEN_REGISTRY
-    out: dict[object, object] = {}
-    for city_id, hand in handwritten.items():
-        reg: SpatialRegistration = _leaf_registration(city_id)
-        out[city_id] = city_registry.CityRegistration(
-            city_id=city_id,
-            name=hand.name,
-            state=hand.state,
-            center=hand.center,
-            metro_bbox=reg.metro_bbox,
-            division_bboxes=reg.division_bboxes,
-            submarkets=reg.submarkets,
-            divisions=reg.divisions,
-            job_suffix=hand.job_suffix,
-            datasets=hand.datasets,
+    directory = Path(settings.city_data_dir)
+    if not directory.is_dir():
+        raise ValueError(
+            f"city-data directory {directory} does not exist — run "
+            f"scripts/export_city_data.py to regenerate the corpus"
         )
-    return out
+    definitions = city_data.load_definitions(directory, allow_unknown_city_ids=allow_unknown_city_ids)
+    if not definitions:
+        raise ValueError(
+            f"no city definitions found in {directory} — the corpus was deleted?"
+        )
+    return definitions
 
 
-def build_aliases_from_registrations():
-    """Return the alias table, derived/validated against the registrations.
+def build_runtime_exports(
+    endpoint_resolver=lambda name: name, *, allow_unknown_city_ids=False
+):
+    """Build ``(REGISTRY, ALIASES)`` — the sole registry construction path.
 
-    Aliases live in the hand-written registry (US-177 does not move them);
-    this aggregator re-exposes that table while asserting every alias still
-    resolves to a city that has a registration, so the derived output is
-    guaranteed to equal the hand-written ``ALIASES``.
+    Non-geometry fields come from the corpus definitions; geometry is re-bound
+    to each leaf ``REGISTRATION`` so object identity matches the leaves.
     """
+    from src.config import settings
     from src.spatial import city_registry
 
-    handwritten = city_registry._HANDWRITTEN_ALIASES
-    registrations = city_registry._HANDWRITTEN_REGISTRY
-    derived: dict[str, object] = {}
-    for alias, city_id in handwritten.items():
-        assert city_id in registrations, f"alias {alias!r} -> {city_id!r} has no registration"
-        derived[alias] = city_id
-    return derived
+    definitions = load_definitions(allow_unknown_city_ids=allow_unknown_city_ids)
+    registry = build_registry_from_data(
+        definitions, endpoint_resolver, allow_unknown_city_ids=allow_unknown_city_ids
+    )
+    missing = [
+        cid.value for cid in city_registry.CityId if cid not in registry
+    ]
+    if missing:
+        raise ValueError(
+            f"city definitions missing from the corpus "
+            f"({Path(settings.city_data_dir).resolve()}): {missing}. "
+            f"Every CityId needs a data/<city_id>.yaml beside its leaf module."
+        )
+    for cid in city_registry.CityId:
+        source = _leaf_registration(cid)
+        registry[cid] = replace(
+            registry[cid],
+            metro_bbox=source.metro_bbox,
+            division_bboxes=source.division_bboxes,
+            submarkets=source.submarkets,
+            divisions=source.divisions,
+        )
+    aliases = build_aliases_from_data(
+        definitions, allow_unknown_city_ids=allow_unknown_city_ids
+    )
+    return registry, aliases
 
 
 def derived_supported_cities() -> list[object]:
-    """Yield the same supported-city list as today (derived from ``CityId``)."""
+    """Yield the supported-city list (derived from ``CityId``)."""
     from src.spatial import city_registry
 
     return list(city_registry.CityId)

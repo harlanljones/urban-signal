@@ -849,7 +849,7 @@ class TestBendFeedSpec:
         assert spec.ingestion_mode == "incremental"
         assert spec.needs_geocode is True
         assert spec.geocode_context == "Bend, OR"
-        assert spec.field_map is PERMITS_FIELD_MAP
+        assert spec.field_map == PERMITS_FIELD_MAP
         assert spec.topic == "raw.municipal.permits"
 
     def test_sla_spec_matches_live_layer(self):
@@ -865,7 +865,7 @@ class TestBendFeedSpec:
         assert spec.ingestion_mode == "snapshot"
         assert spec.needs_geocode is True
         assert spec.geocode_context == "Bend, OR"
-        assert spec.field_map is SLA_FIELD_MAP
+        assert spec.field_map == SLA_FIELD_MAP
         assert spec.topic == "raw.municipal.sla"
 
     def test_311_spec_matches_live_layer(self):
@@ -881,7 +881,7 @@ class TestBendFeedSpec:
         assert spec.interval_seconds == 300.0
         assert spec.needs_geocode is True
         assert spec.geocode_context == "Bend, OR"
-        assert spec.field_map is COMPLAINTS_311_FIELD_MAP
+        assert spec.field_map == COMPLAINTS_311_FIELD_MAP
         assert spec.topic == "raw.municipal.311"
 
     def test_crime_spec_matches_live_layer(self):
@@ -897,7 +897,7 @@ class TestBendFeedSpec:
         assert spec.interval_seconds == 300.0
         assert spec.needs_geocode is True
         assert spec.geocode_context == "Bend, OR"
-        assert spec.field_map is CRIME_FIELD_MAP
+        assert spec.field_map == CRIME_FIELD_MAP
         assert spec.topic == "raw.municipal.crime"
 
     def test_registered_feed_set(self):
