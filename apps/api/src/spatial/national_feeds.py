@@ -39,6 +39,7 @@ class NationalFeed(str, Enum):
     DISASTER_DECLARATIONS = "disaster_declarations"
     EV_CHARGING = "ev_charging"
     SBA_LOAN = "sba_loan"
+    BANK_BRANCH = "bank_branch"
 
 
 @dataclass
@@ -181,6 +182,24 @@ NATIONAL_FEEDS: Dict[NationalFeed, NationalFeedSpec] = {
             "cadence; the filename as-of date is the watermark. Addresses are "
             "SBA-truncated to 49 chars — geocode street-first with zip+city "
             "fallback. 504 rows carry project_county for county-join downstream."
+        ),
+    ),
+    NationalFeed.BANK_BRANCH: NationalFeedSpec(
+        feed=NationalFeed.BANK_BRANCH,
+        endpoint="https://api.fdic.gov/banks/locations",
+        platform="rest",
+        topic=settings.topic_bank_branches,
+        producer_key="bank_branch",
+        id_keys=["UNINUM"],
+        watermark_col="RUNDATE",
+        ingestion_mode="snapshot",
+        interval_seconds=86400.0,
+        expected_cadence_days=1,
+        state_dir=settings.fdic_bankfind_state_dir,
+        notes=(
+            "FDIC BankFind full-service brick-and-mortar branches (SERVTYPE=11). "
+            "Openings use ESTYMD; closures are detection-dated from snapshot diff. "
+            "Latest-year SOD DEPSUMBR is attached as annual deposit context."
         ),
     ),
 }

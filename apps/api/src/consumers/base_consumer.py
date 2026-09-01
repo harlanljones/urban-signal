@@ -63,6 +63,7 @@ class BaseKafkaConsumer:
             settings.topic_street_cut: "street_cut_event.avsc",
             settings.topic_enriched_h3: "enriched_h3_feature.avsc",
             settings.topic_catalyst_alerts: "catalyst_alert.avsc",
+            settings.topic_bank_branches: "bank_branch_event.avsc",
         }
         if avro_dir.exists():
             for topic, schema_name in topic_schema_map.items():

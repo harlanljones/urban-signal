@@ -1,0 +1,30 @@
+{
+  "type": "record",
+  "name": "BankBranchEvent",
+  "namespace": "org.urbandev.events",
+  "doc": "FDIC BankFind full-service branch opening or snapshot-detected closure (US-379).",
+  "fields": [
+    {"name":"city_id","type":"string","default":"national"},
+    {"name":"branch_id","type":"string"},
+    {"name":"event_type","type":"string"},
+    {"name":"category","type":"string","default":"full_service"},
+    {"name":"institution_cert","type":["null","string"],"default":null},
+    {"name":"institution_name","type":["null","string"],"default":null},
+    {"name":"address","type":["null","string"],"default":null},
+    {"name":"city","type":["null","string"],"default":null},
+    {"name":"state","type":["null","string"],"default":null},
+    {"name":"zipcode","type":["null","string"],"default":null},
+    {"name":"county","type":["null","string"],"default":null},
+    {"name":"latitude","type":"double"},
+    {"name":"longitude","type":"double"},
+    {"name":"established_date","type":["null","string"],"default":null},
+    {"name":"event_date","type":"string"},
+    {"name":"date_is_detection","type":"boolean","default":false},
+    {"name":"deposits_year","type":["null","int"],"default":null},
+    {"name":"deposits_thousands","type":["null","double"],"default":null},
+    {"name":"h3_res7","type":["null","string"],"default":null},
+    {"name":"h3_res8","type":["null","string"],"default":null},
+    {"name":"h3_res9","type":["null","string"],"default":null},
+    {"name":"ingested_at","type":"string"}
+  ]
+}

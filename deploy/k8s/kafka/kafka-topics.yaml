@@ -61,6 +61,21 @@ spec:
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaTopic
 metadata:
+  name: raw-federal-bank-branches
+  namespace: kafka-streaming
+  labels:
+    strimzi.io/cluster: kafka-cluster
+spec:
+  topicName: raw.federal.bank_branches
+  partitions: 12
+  replicas: 2
+  config:
+    cleanup.policy: compact
+    retention.ms: 2592000000 # 30 Days
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
   name: enriched-spatial-h3
   namespace: kafka-streaming
   labels:

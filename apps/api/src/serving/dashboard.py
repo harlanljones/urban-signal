@@ -1558,6 +1558,14 @@ def get_dashboard_html() -> str:
 __METRO_META__
     };
 
+    // National event sources surfaced by the dashboard's data contract. The
+    // FDIC branch layer is point-native and carries annual SOD deposit context;
+    // keeping the label here makes the source discoverable alongside the
+    // national LOD view without pretending the raw Kafka topic is client data.
+    const NATIONAL_CONTEXT_SOURCES = {
+      bank_branch: { label: 'FDIC BankFind branches', topic: 'raw.federal.bank_branches' },
+    };
+
     const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     let map = null;
