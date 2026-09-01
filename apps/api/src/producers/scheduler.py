@@ -43,6 +43,7 @@ from src.producers.nrel_afdc_client import NrelAfdcClient
 from src.producers.poi_diff_producer import PoiDiffProducer
 from src.producers.sla_licenses_producer import SLALicensesProducer
 from src.producers.sba_loan_producer import SbaLoanProducer
+from src.producers.fdic_bankbranch_producer import FdicBankBranchProducer
 from src.producers.street_cut_permits_producer import StreetCutPermitsProducer
 from src.producers.watermarks import (
     typed_watermark_entry,
@@ -272,6 +273,7 @@ class MunicipalIngestionScheduler:
             "head_start": HeadStartProducer(bootstrap_servers=self.bootstrap_servers),
             # US-378: SBA 7(a)/504 loan approvals — cumulative FOIA snapshot per program.
             "sba_loan": SbaLoanProducer(bootstrap_servers=self.bootstrap_servers),
+            "bank_branch": FdicBankBranchProducer(bootstrap_servers=self.bootstrap_servers),
         }
 
         # Socrata Endpoints & Target Topics mapping derived from city registry
@@ -349,6 +351,7 @@ class MunicipalIngestionScheduler:
                 NationalFeed.POI_CHANGE,
                 NationalFeed.EV_CHARGING,
                 NationalFeed.SBA_LOAN,
+                NationalFeed.BANK_BRANCH,
             )
         }
         for feed in (
@@ -357,6 +360,7 @@ class MunicipalIngestionScheduler:
             NationalFeed.POI_CHANGE,
             NationalFeed.EV_CHARGING,
             NationalFeed.SBA_LOAN,
+            NationalFeed.BANK_BRANCH,
         ):
             spec = NATIONAL_FEEDS[feed]
             job_name = spec.feed.value
@@ -371,6 +375,7 @@ class MunicipalIngestionScheduler:
                 "ingestion_mode": spec.ingestion_mode,
                 "national_feed": spec.feed,
                 "auth_env": spec.auth_env,
+                "state_dir": spec.state_dir,
             }
             self.configs[job_name] = JobConfig(
                 name=job_name,

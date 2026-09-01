@@ -2,7 +2,7 @@
 
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -613,6 +613,46 @@ class SbaLoanEvent(BaseModel):
     def _program_vocab(cls, value: str) -> str:
         if value not in ("504", "7a"):
             raise ValueError(f"program must be one of ('504', '7a'), got {value!r}")
+        return value
+
+
+class BankBranchEvent(BaseModel):
+    """A full-service FDIC-insured branch opened or closed (US-379).
+
+    FDIC publishes openings but not an end date. A missing UNINUM in a
+    completed locations snapshot is consequently a detection-dated close.
+    ``deposits_thousands`` is the latest annual SOD DEPSUMBR value, retained
+    as context rather than treated as an event measure.
+    """
+
+    city_id: str = Field(default="national")
+    branch_id: str = Field(..., description="FDIC UNINUM branch identifier")
+    event_type: str = Field(..., description="opened | closed")
+    category: str = Field(default="full_service", description="SERVTYPE category")
+    institution_cert: Optional[str] = None
+    institution_name: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    zipcode: Optional[str] = None
+    county: Optional[str] = None
+    latitude: float = Field(..., ge=-90.0, le=90.0)
+    longitude: float = Field(..., ge=-180.0, le=180.0)
+    established_date: Optional[datetime] = None
+    event_date: datetime
+    date_is_detection: bool = False
+    deposits_year: Optional[int] = Field(default=None, ge=0)
+    deposits_thousands: Optional[float] = Field(default=None, ge=0.0)
+    h3_res7: Optional[str] = None
+    h3_res8: Optional[str] = None
+    h3_res9: Optional[str] = None
+    ingested_at: datetime = Field(default_factory=_utc_now)
+
+    @field_validator("event_type")
+    @classmethod
+    def _event_type_vocab(cls, value: str) -> str:
+        if value not in ("opened", "closed"):
+            raise ValueError("event_type must be opened or closed")
         return value
 
 

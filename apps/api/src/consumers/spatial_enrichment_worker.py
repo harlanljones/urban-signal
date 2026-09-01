@@ -2,7 +2,7 @@
 
 import logging
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 import pandas as pd
 from src.config import settings
 from src.consumers.base_consumer import BaseKafkaConsumer
@@ -30,6 +30,7 @@ class SpatialEnrichmentWorker:
             settings.topic_sla,
             settings.topic_deeds,
             settings.topic_street_cut,
+            settings.topic_bank_branches,
         ]
         self.consumer = BaseKafkaConsumer(
             group_id=settings.cg_h3_enrichment,

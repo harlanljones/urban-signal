@@ -99,6 +99,15 @@ class Settings(BaseSettings):
         default="raw.sba.loans",
         description="SBA 7(a)/504 loan approvals topic (US-378)",
     )
+    # US-379: full national snapshot state prevents re-emitting every branch.
+    topic_bank_branches: str = Field(
+        default="raw.federal.bank_branches",
+        description="FDIC BankFind branch openings/closures topic (US-379)",
+    )
+    fdic_bankfind_state_dir: str = Field(
+        default="./data/fdic_bankfind_state",
+        description="Directory holding the FDIC branch snapshot state",
+    )
     # US-376: the Head Start daily service-location snapshot.
     # US-376: the Head Start daily service-location snapshot.
     head_start_locations_url: str = Field(
