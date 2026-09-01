@@ -159,6 +159,47 @@ def assign_cell(
     )
 
 
+def assigned_features(
+    cell: str,
+    city_id: str,
+    max_dist_km: float = 25.0,
+) -> dict[str, object] | None:
+    """Return feature-ready ownership metadata for ``cell``.
+
+    This is the public seam for producers that need to synthesize a cell from
+    its nearest submarket.  It intentionally returns plain data (rather than
+    importing the serving router), which keeps coverage usable by snapshot and
+    future vector-tile producers without creating an import cycle.
+    """
+    assignment = assign_cell(cell, city_id, max_dist_km=max_dist_km)
+    if assignment is None:
+        return None
+    meta = submarket_meta(city_id, assignment.submarket)
+    if meta is None:
+        return None
+
+    # Match the feature names used by the live grid endpoint.  Keep source and
+    # distance beside the values so the dashboard can be honest about
+    # interpolated coverage.
+    permit_velocity = meta.permit_vel if meta.permit_vel <= 1.0 else meta.permit_vel / 100.0
+    props: dict[str, object] = {
+        "submarket": meta.name,
+        "borough": meta.borough,
+        "city_id": city_id,
+        "capex_density_decayed": meta.capex,
+        "permit_velocity": permit_velocity,
+        "shift_ratio_311": meta.shift_ratio,
+        "sla_new_filings_90d": int(meta.sla),
+        "lims_score": meta.base_lims * 100.0 if meta.base_lims <= 1.0 else meta.base_lims,
+    }
+    return {
+        "props": props,
+        "source": "measured" if assignment.source == "center" else "k_ring_interpolated",
+        "nearest_submarket": assignment.submarket,
+        "dist_km": assignment.distance_km,
+    }
+
+
 def aggregate_values(
     cells: Iterable[str],
     value_of: Callable[[str], float | None],
@@ -182,6 +223,44 @@ def aggregate_values(
         sums[parent] = sums.get(parent, 0.0) + value
         counts[parent] = counts.get(parent, 0) + 1
     return {parent: sums[parent] / counts[parent] for parent in sums}
+
+
+def aggregate(
+    cells: Iterable[str],
+    to_res: int,
+    values: dict[str, dict[str, float | int | None]] | None = None,
+) -> dict[str, dict[str, float | int]]:
+    """Aggregate feature values and child counts by H3 parent.
+
+    ``values`` is optional so callers that only have cell indexes can still
+    build a useful pyramid inventory.  When supplied, each numeric field is
+    averaged independently, skipping nulls; this is the raw-value-first rule
+    required before percentile normalization.  The result always includes
+    ``count`` and uses deterministic parent ordering.
+    """
+    if to_res >= 9:
+        raise ValueError(f"aggregate only rolls UP to a coarser res, got to_res={to_res}")
+    buckets: dict[str, list[str]] = {}
+    for cell in cells:
+        parent = h3.cell_to_parent(cell, to_res)
+        buckets.setdefault(parent, []).append(cell)
+
+    result: dict[str, dict[str, float | int]] = {}
+    for parent in sorted(buckets):
+        children = buckets[parent]
+        summary: dict[str, float | int] = {"count": len(children)}
+        if values is not None:
+            fields = sorted({key for child in children for key in values.get(child, {})})
+            for field in fields:
+                numeric = [
+                    float(values[child][field])
+                    for child in children
+                    if values.get(child, {}).get(field) is not None
+                ]
+                if numeric:
+                    summary[f"avg_{field}"] = sum(numeric) / len(numeric)
+        result[parent] = summary
+    return result
 
 
 def parent_cells(cell: str, parent_res: int) -> list[str]:
