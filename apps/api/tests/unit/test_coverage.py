@@ -166,6 +166,18 @@ class TestAggregateValues:
         r2 = coverage.aggregate_values(cells, lambda c: 50.0, to_res=8)
         assert r1 == r2
 
+    def test_aggregate_public_seam_averages_raw_values(self):
+        res8 = H3SpatialIndexer.latlng_to_h3(40.7580, -73.9855, resolution=8)
+        children = coverage.parent_cells(res8, 9)
+        values = {
+            child: {"lims": float(index + 1), "delta_6m": None if index == 0 else 10.0}
+            for index, child in enumerate(children)
+        }
+        result = coverage.aggregate(children, to_res=8, values=values)
+        assert result[res8]["count"] == 7
+        assert result[res8]["avg_lims"] == pytest.approx(4.0)
+        assert result[res8]["avg_delta_6m"] == pytest.approx(10.0)
+
 
 class TestParentCells:
     """H3 parent/child helpers."""
@@ -179,6 +191,16 @@ class TestParentCells:
         cell = H3SpatialIndexer.latlng_to_h3(40.7580, -73.9855, resolution=7)
         children = coverage.parent_cells(cell, 8)
         assert len(children) == 7
+
+    def test_assigned_features_is_transport_free(self):
+        reg = REGISTRY[CityId("nyc")]
+        meta = next(iter(reg.submarkets.values()))
+        center = H3SpatialIndexer.latlng_to_h3(meta.lat, meta.lng, resolution=9)
+        result = coverage.assigned_features(center, "nyc")
+        assert result is not None
+        assert result["source"] == "measured"
+        assert result["nearest_submarket"] == meta.name
+        assert result["props"]["lims_score"] == pytest.approx(meta.base_lims * 100)
 
 
 class TestModulePolicy:
