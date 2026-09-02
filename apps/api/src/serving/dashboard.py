@@ -220,6 +220,15 @@ def get_dashboard_html() -> str:
 
     @media (prefers-reduced-motion: reduce) {
       .toast-banner { animation: none; }
+      /* Operate surface motion is restrained by design; under reduced-motion
+         every hover/state transition and the zoom-hint fade go instant. */
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
     }
 
     .pulse-dot.static { background: var(--text-muted); }
@@ -888,8 +897,8 @@ def get_dashboard_html() -> str:
     /* Map orientation readout: scale bar + zoom/coordinate telemetry */
     .map-readout {
       position: absolute;
-      right: 20px;
-      bottom: 20px;
+      right: 64px;
+      bottom: 24px;
       z-index: 50;
       display: flex;
       align-items: flex-end;
@@ -1364,6 +1373,19 @@ def get_dashboard_html() -> str:
         padding: 8px 12px;
       }
       .map-legend-card .legend-bar { margin-bottom: 6px; }
+
+      /* Orientation readout moves to the top-left above the thumb toolbar
+         so the scale bar and telemetry never sit under the mobile toolbar
+         or collide with the legend bar along the bottom edge. */
+      .map-readout {
+        top: max(12px, env(safe-area-inset-top));
+        right: auto;
+        bottom: auto;
+        left: 12px;
+        flex-direction: column-reverse;
+        align-items: flex-start;
+        gap: 6px;
+      }
 
       .inspector-content { padding: 14px; }
       .inspector-empty-state { padding: 40px 18px; }
@@ -2472,10 +2494,12 @@ __METRO_META__
             const subName = props.submarket || (subInfo ? subInfo.name : 'Micro-Block');
             const borough = normalizeBorough(props.borough || (subInfo ? subInfo.meta.borough : ''));
             const bClass = getBoroughClass(borough);
-            const limsVal = Number(props.lims_score || 80.0);
-            const delta6m = Number(props.delta_6m_p50 || 0.12);
+            const limsVal = Number(props.lims_score);
+            const delta6m = Number(props.delta_6m_p50);
             const nationalPct = Number(props.lims_score_national_pct);
             const metroPct = Number(props.lims_score_metro_pct);
+            const limsFinite = Number.isFinite(limsVal);
+            const deltaFinite = Number.isFinite(delta6m);
 
             popup.setLngLat(coords)
               .setHTML(`
@@ -2487,19 +2511,19 @@ __METRO_META__
                   ${props.city_name ? `<div style="color:var(--text-muted); font-size:10px; margin-bottom:3px;">${escapeHtml(props.city_name)}</div>` : ''}
                   <div style="display:flex; justify-content:space-between; gap:8px; margin-top:2px;">
                     <span style="color:var(--text-secondary);">LIMS Score:</span>
-                    <strong style="color: ${limsVal >= 85 ? 'var(--accent-danger)' : 'var(--accent-success)'}">${limsVal.toFixed(1)}</strong>
+                    <strong style="font-family:var(--font-mono); font-variant-numeric:tabular-nums; color:var(--text-main);">${limsFinite ? limsVal.toFixed(1) : '—'}</strong>
                   </div>
                   <div style="display:flex; justify-content:space-between; gap:8px;">
                     <span style="color:var(--text-secondary);">National Pct:</span>
-                    <strong>${Number.isFinite(nationalPct) ? nationalPct.toFixed(0) : '—'}</strong>
+                    <strong style="font-family:var(--font-mono); font-variant-numeric:tabular-nums;">${Number.isFinite(nationalPct) ? nationalPct.toFixed(0) : '—'}</strong>
                   </div>
                   <div style="display:flex; justify-content:space-between; gap:8px;">
                     <span style="color:var(--text-secondary);">Metro Pct:</span>
-                    <strong>${Number.isFinite(metroPct) ? metroPct.toFixed(0) : '—'}</strong>
+                    <strong style="font-family:var(--font-mono); font-variant-numeric:tabular-nums;">${Number.isFinite(metroPct) ? metroPct.toFixed(0) : '—'}</strong>
                   </div>
                   <div style="display:flex; justify-content:space-between; gap:8px;">
                     <span style="color:var(--text-secondary);">6M Return:</span>
-                    <strong style="color: var(--accent-success);">+${(delta6m * 100).toFixed(1)}%</strong>
+                    <strong style="font-family:var(--font-mono); font-variant-numeric:tabular-nums; color: ${deltaFinite && delta6m < 0 ? 'var(--text-muted)' : 'var(--accent-success)'};">${deltaFinite ? `${delta6m < 0 ? '' : '+'}${(delta6m * 100).toFixed(1)}%` : '—'}</strong>
                   </div>
                 </div>
               `)
@@ -2825,7 +2849,7 @@ __METRO_META__
       }
       const ticks = document.getElementById('legend-ticks');
       if (ticks) {
-        const stops = [0, 50, 75, 90].filter((s) => s > 0 && s < 100);
+        const stops = HEX_RAMP.map(([s]) => s).filter((s) => s > 0 && s < 100);
         ticks.replaceChildren(...stops.map((stop) => {
           const span = document.createElement('span');
           span.className = 'legend-tick';
