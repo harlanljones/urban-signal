@@ -988,6 +988,38 @@ class Settings(BaseSettings):
         description="Evansville, IN building commission permits MapServer layer URL (US-425)",
     )
 
+    # Huntsville, AL (on-prem ArcGIS Server 11.5): BuildingPermits MapServer
+    # layer 0 — native point geometry (AL State Plane WKID 102629; outSR=4326
+    # lifts to WGS84), Permit_Issue_DateTime date watermark, PermitID integer
+    # key. US-424 registration.
+    arcgis_huntsville_permits_url: str = Field(
+        default=(
+            "https://maps.huntsvilleal.gov/server/rest/services/"
+            "Licenses/BuildingPermits/MapServer/0"
+        ),
+        description="Huntsville, AL building permits MapServer layer URL (US-424)",
+    )
+
+    # Montgomery, AL (AGOL hosted FeatureServer, services7 org xNUwUjOJqYE54USz):
+    # Construction Permits (All_Permit_viewlayer, IssuedDate date watermark,
+    # PermitNo string id) and 311 Service Requests (on-prem
+    # gis.montgomeryal.gov HostedDatasets Received_311_Service_Request layer,
+    # Create_Date date watermark, Request_ID integer id). US-424 registration.
+    arcgis_montgomery_al_permits_url: str = Field(
+        default=(
+            "https://services7.arcgis.com/xNUwUjOJqYE54USz/arcgis/rest/services/"
+            "All_Permit_viewlayer/FeatureServer/0"
+        ),
+        description="Montgomery, AL construction permits FeatureServer layer URL (US-424)",
+    )
+    arcgis_montgomery_al_311_url: str = Field(
+        default=(
+            "https://gis.montgomeryal.gov/server/rest/services/"
+            "HostedDatasets/Received_311_Service_Request/MapServer/0"
+        ),
+        description="Montgomery, AL received 311 service requests MapServer layer URL (US-424)",
+    )
+
     # Pierce County, WA (ArcGIS): county applications and permits across six
     # departments (Building, Development Engineering, Environmental, Fire,
     # Land Use, Sewer). Point layer in WA State Plane; the client's outSR=4326

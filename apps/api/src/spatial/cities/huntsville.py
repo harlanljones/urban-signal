@@ -35,7 +35,7 @@ HUNTSVILLE_DIVISION_BBOXES: dict[str, dict[str, float]] = {
     # South Huntsville / Whitesburg Dr toward Redstone Arsenal gateways
     "SOUTH_HUNTSVILLE": {"min_lat": 34.54, "max_lat": 34.64, "min_lng": -86.64, "max_lng": -86.50},
     # Northeast / US-72 corridor, airport, and residential growth belts
-    "NORTHEAST": {"min_lat": 34.72, "max_lat": 34.82, "min_lng": -86.44, "max_lng": -86.28},
+    "NORTHEAST": {"min_lat": 34.72, "max_lat": 34.82, "min_lng": -86.50, "max_lng": -86.28},
     # North / Meridianville-Hazel Green residential belts toward Limestone County
     "NORTH_MADISON": {"min_lat": 34.76, "max_lat": 34.82, "min_lng": -86.70, "max_lng": -86.44},
 }

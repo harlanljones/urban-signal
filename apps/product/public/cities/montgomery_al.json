@@ -1,0 +1,183 @@
+{
+  "schema_version": 2,
+  "id": "montgomery_al",
+  "name": "Montgomery, AL",
+  "state": "AL",
+  "center": {
+    "lat": 32.3792,
+    "lng": -86.3077
+  },
+  "metro_bbox": {
+    "min_lat": 32.18,
+    "max_lat": 32.55,
+    "min_lng": -86.52,
+    "max_lng": -86.05
+  },
+  "divisions": {
+    "DOWNTOWN_CORE": {
+      "name": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 32.379,
+        "lng": -86.308
+      },
+      "bbox": {
+        "min_lat": 32.35,
+        "max_lat": 32.41,
+        "min_lng": -86.33,
+        "max_lng": -86.27
+      },
+      "submarkets": [
+        "Downtown Montgomery",
+        "Garden District"
+      ]
+    },
+    "EAST_MONTGOMERY": {
+      "name": "EAST_MONTGOMERY",
+      "center": {
+        "lat": 32.36,
+        "lng": -86.14
+      },
+      "bbox": {
+        "min_lat": 32.34,
+        "max_lat": 32.43,
+        "min_lng": -86.22,
+        "max_lng": -86.05
+      },
+      "submarkets": [
+        "Eastchase",
+        "Pike Road Corridor"
+      ]
+    },
+    "WEST_MONTGOMERY": {
+      "name": "WEST_MONTGOMERY",
+      "center": {
+        "lat": 32.35,
+        "lng": -86.39
+      },
+      "bbox": {
+        "min_lat": 32.28,
+        "max_lat": 32.4,
+        "min_lng": -86.45,
+        "max_lng": -86.33
+      },
+      "submarkets": [
+        "Maxwell / West"
+      ]
+    },
+    "SOUTH_MONTGOMERY": {
+      "name": "SOUTH_MONTGOMERY",
+      "center": {
+        "lat": 32.26,
+        "lng": -86.3
+      },
+      "bbox": {
+        "min_lat": 32.2,
+        "max_lat": 32.32,
+        "min_lng": -86.38,
+        "max_lng": -86.2
+      },
+      "submarkets": [
+        "South Boulevard"
+      ]
+    },
+    "NORTH_MONTGOMERY": {
+      "name": "NORTH_MONTGOMERY",
+      "center": {
+        "lat": 32.47,
+        "lng": -86.23
+      },
+      "bbox": {
+        "min_lat": 32.4,
+        "max_lat": 32.55,
+        "min_lng": -86.36,
+        "max_lng": -86.1
+      },
+      "submarkets": [
+        "North Montgomery"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Montgomery": {
+      "name": "Downtown Montgomery",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 32.3792,
+        "lng": -86.3077
+      },
+      "description": "Capitol complex, historic downtown, and the riverfront mixed-use core."
+    },
+    "Garden District": {
+      "name": "Garden District",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 32.366,
+        "lng": -86.306
+      },
+      "description": "Historic residential district with steady rehabilitation and infill."
+    },
+    "Eastchase": {
+      "name": "Eastchase",
+      "division": "EAST_MONTGOMERY",
+      "center": {
+        "lat": 32.356,
+        "lng": -86.185
+      },
+      "description": "Eastchase retail and mixed-use hub anchoring east Montgomery growth."
+    },
+    "Pike Road Corridor": {
+      "name": "Pike Road Corridor",
+      "division": "EAST_MONTGOMERY",
+      "center": {
+        "lat": 32.37,
+        "lng": -86.1
+      },
+      "description": "Eastern growth corridor toward Pike Road with residential expansion."
+    },
+    "Maxwell / West": {
+      "name": "Maxwell / West",
+      "division": "WEST_MONTGOMERY",
+      "center": {
+        "lat": 32.376,
+        "lng": -86.364
+      },
+      "description": "Maxwell Air Force Base gateway and west Montgomery defense-adjacent belt."
+    },
+    "South Boulevard": {
+      "name": "South Boulevard",
+      "division": "SOUTH_MONTGOMERY",
+      "center": {
+        "lat": 32.295,
+        "lng": -86.29
+      },
+      "description": "South Blvd corridor and south Montgomery residential reinvestment."
+    },
+    "North Montgomery": {
+      "name": "North Montgomery",
+      "division": "NORTH_MONTGOMERY",
+      "center": {
+        "lat": 32.46,
+        "lng": -86.29
+      },
+      "description": "US-231 north corridor residential and commercial belts toward Prattville."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "IssuedDate",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "Create_Date",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/montgomery_al.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

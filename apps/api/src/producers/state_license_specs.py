@@ -40,6 +40,20 @@ returns 403/302 bot-protection, and ``mlcc.michigan.gov`` fails DNS. Per the
 never-fake-endpoints convention (NREL AFDC precedent) these are documented
 as unverified — the specs are exercised by fixture tests only and neither is
 registered or scheduled until a live endpoint is confirmed.
+
+AL/GA state super-feeds (US-424): NOT spec'd — endpoints unverifiable. The
+2026-08-30 southeast/midsouth probe lists Alabama ABC Board and Georgia
+Department of Revenue alcohol & contractor licensing as state-super-feed
+candidates to cover Mobile, AL and Knoxville, TN, but re-probing 2026-08-30
+found NO public REST endpoint for either: ``data.alabama.gov`` and
+``data.georgia.gov`` fail DNS from this host, no AGOL/Socrata feature service
+or SoQL dataset exists for AL ABC licenses or GA DOR alcohol licenses, and
+the only AL ABC layer reachable (Huntsville's
+``Licenses/AlcoholBeverageLicenses/MapServer/0``) is a 971-row,
+Huntsville-area mirror — city-scoped, not a statewide register. Per the
+never-fake-endpoints convention these are documented, not fabricated; SNAP
+retailer SLA (``snap_sla_spec("AL"/"GA")``) remains the live SLA coverage
+until a verifiable state registry endpoint surfaces.
 """
 
 from src.config import settings

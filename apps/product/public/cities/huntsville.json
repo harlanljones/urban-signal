@@ -1,0 +1,213 @@
+{
+  "schema_version": 2,
+  "id": "huntsville",
+  "name": "Huntsville, AL",
+  "state": "AL",
+  "center": {
+    "lat": 34.7301,
+    "lng": -86.5863
+  },
+  "metro_bbox": {
+    "min_lat": 34.42,
+    "max_lat": 34.82,
+    "min_lng": -86.78,
+    "max_lng": -86.28
+  },
+  "divisions": {
+    "CENTRAL_CORE": {
+      "name": "CENTRAL_CORE",
+      "center": {
+        "lat": 34.73,
+        "lng": -86.57
+      },
+      "bbox": {
+        "min_lat": 34.68,
+        "max_lat": 34.78,
+        "min_lng": -86.62,
+        "max_lng": -86.52
+      },
+      "submarkets": [
+        "Downtown Huntsville",
+        "MidCity District",
+        "Governors Drive / Medical"
+      ]
+    },
+    "WEST_HUNTSVILLE": {
+      "name": "WEST_HUNTSVILLE",
+      "center": {
+        "lat": 34.69,
+        "lng": -86.67
+      },
+      "bbox": {
+        "min_lat": 34.64,
+        "max_lat": 34.74,
+        "min_lng": -86.72,
+        "max_lng": -86.62
+      },
+      "submarkets": [
+        "University Drive Corridor",
+        "Research Park / West"
+      ]
+    },
+    "SOUTH_HUNTSVILLE": {
+      "name": "SOUTH_HUNTSVILLE",
+      "center": {
+        "lat": 34.59,
+        "lng": -86.57
+      },
+      "bbox": {
+        "min_lat": 34.54,
+        "max_lat": 34.64,
+        "min_lng": -86.64,
+        "max_lng": -86.5
+      },
+      "submarkets": [
+        "South Huntsville / Whitesburg",
+        "Redstone Gateway / South"
+      ]
+    },
+    "NORTHEAST": {
+      "name": "NORTHEAST",
+      "center": {
+        "lat": 34.76,
+        "lng": -86.4
+      },
+      "bbox": {
+        "min_lat": 34.72,
+        "max_lat": 34.82,
+        "min_lng": -86.5,
+        "max_lng": -86.28
+      },
+      "submarkets": [
+        "US-72 / Airport Corridor",
+        "East Huntsville"
+      ]
+    },
+    "NORTH_MADISON": {
+      "name": "NORTH_MADISON",
+      "center": {
+        "lat": 34.79,
+        "lng": -86.57
+      },
+      "bbox": {
+        "min_lat": 34.76,
+        "max_lat": 34.82,
+        "min_lng": -86.7,
+        "max_lng": -86.44
+      },
+      "submarkets": [
+        "Meridianville / Hazel Green"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Huntsville": {
+      "name": "Downtown Huntsville",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 34.7301,
+        "lng": -86.5863
+      },
+      "description": "Historic downtown core with courthouse, Clinton Row, and the Von Braun Center."
+    },
+    "MidCity District": {
+      "name": "MidCity District",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 34.731,
+        "lng": -86.552
+      },
+      "description": "MidCity mixed-use redevelopment at the old Madison Square Mall site (Memorial Pkwy)."
+    },
+    "Governors Drive / Medical": {
+      "name": "Governors Drive / Medical",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 34.724,
+        "lng": -86.585
+      },
+      "description": "Governors Dr commercial spine between downtown and the hospital district."
+    },
+    "University Drive Corridor": {
+      "name": "University Drive Corridor",
+      "division": "WEST_HUNTSVILLE",
+      "center": {
+        "lat": 34.698,
+        "lng": -86.66
+      },
+      "description": "University Dr retail and multifamily corridor connecting to Research Park."
+    },
+    "Research Park / West": {
+      "name": "Research Park / West",
+      "division": "WEST_HUNTSVILLE",
+      "center": {
+        "lat": 34.668,
+        "lng": -86.66
+      },
+      "description": "Cummings Research Park tech campus and west Huntsville employment core."
+    },
+    "South Huntsville / Whitesburg": {
+      "name": "South Huntsville / Whitesburg",
+      "division": "SOUTH_HUNTSVILLE",
+      "center": {
+        "lat": 34.595,
+        "lng": -86.565
+      },
+      "description": "Whitesburg Dr / Carl T Jones residential and commercial belts south of downtown."
+    },
+    "Redstone Gateway / South": {
+      "name": "Redstone Gateway / South",
+      "division": "SOUTH_HUNTSVILLE",
+      "center": {
+        "lat": 34.575,
+        "lng": -86.565
+      },
+      "description": "Redstone Gateway commercial park and defense-adjacent growth near the Arsenal gates."
+    },
+    "US-72 / Airport Corridor": {
+      "name": "US-72 / Airport Corridor",
+      "division": "NORTHEAST",
+      "center": {
+        "lat": 34.745,
+        "lng": -86.41
+      },
+      "description": "US-72 east commercial corridor and Huntsville International Airport adjacency."
+    },
+    "East Huntsville": {
+      "name": "East Huntsville",
+      "division": "NORTHEAST",
+      "center": {
+        "lat": 34.735,
+        "lng": -86.47
+      },
+      "description": "East Huntsville residential growth belts along the Chapman Mountain approach."
+    },
+    "Meridianville / Hazel Green": {
+      "name": "Meridianville / Hazel Green",
+      "division": "NORTH_MADISON",
+      "center": {
+        "lat": 34.79,
+        "lng": -86.57
+      },
+      "description": "North Madison County bedroom communities and US-231 growth corridors."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "Permit_Issue_DateTime",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/huntsville.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
