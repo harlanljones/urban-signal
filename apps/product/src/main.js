@@ -28,6 +28,40 @@ const sourceUrl = (path) => `${REPOSITORY}/${path.includes(".") ? "blob" : "tree
 let siteFacts = null;
 let showAllCities = false;
 let cityFilters = { feed: -1, platform: "all" };
+let currentViewMode = "cards";
+
+function setCityViewMode(mode) {
+  currentViewMode = mode === "matrix" ? "matrix" : "cards";
+  const isCards = currentViewMode === "cards";
+  const cardsBtn = $("#view-cards-btn");
+  const matrixBtn = $("#view-matrix-btn");
+  const cardsPanel = $("#view-cards-panel");
+  const matrixPanel = $("#view-matrix-panel");
+
+  if (cardsBtn) {
+    cardsBtn.classList.toggle("active", isCards);
+    cardsBtn.setAttribute("aria-selected", String(isCards));
+  }
+  if (matrixBtn) {
+    matrixBtn.classList.toggle("active", !isCards);
+    matrixBtn.setAttribute("aria-selected", String(!isCards));
+  }
+  if (cardsPanel) {
+    cardsPanel.hidden = !isCards;
+    cardsPanel.classList.toggle("active", isCards);
+  }
+  if (matrixPanel) {
+    matrixPanel.hidden = isCards;
+    matrixPanel.classList.toggle("active", !isCards);
+  }
+
+  if (location.pathname.includes("/cities")) {
+    const targetHash = isCards ? "#cards" : "#matrix";
+    if (location.hash !== targetHash && (location.hash === "#matrix" || location.hash === "#cards")) {
+      history.replaceState(null, "", targetHash);
+    }
+  }
+}
 
 function metroMatchesFilters({ feeds, platforms }) {
   if (cityFilters.feed !== -1 && !feeds[cityFilters.feed]) return false;
@@ -47,12 +81,15 @@ function feedSummary(feeds) {
 function renderCities(filter = "") {
   if (!siteFacts) return;
   const query = filter.trim().toLocaleLowerCase();
+  const clearBtn = $("#city-filter-clear");
+  if (clearBtn) clearBtn.hidden = !query;
+
   const matches = siteFacts.metros.filter(({ id, name, state, feeds, platforms }) => {
     const matchesQuery = [id, name, state].some((value) => value.toLocaleLowerCase().includes(query));
     return matchesQuery && metroMatchesFilters({ feeds, platforms });
   });
   const isCompact = matchMedia("(max-width: 600px)").matches;
-  const visible = isCompact && !query && !showAllCities ? matches.slice(0, 5) : matches;
+  const visible = isCompact && !query && !showAllCities ? matches.slice(0, 6) : matches;
   const cityGrid = $("#city-grid");
   const cityCount = $("#city-count");
   const cityToggle = $("#city-toggle");
@@ -61,62 +98,93 @@ function renderCities(filter = "") {
   cityGrid.replaceChildren();
   cityGrid.setAttribute("aria-busy", "false");
   cityCount.textContent = visible.length === matches.length ? `${matches.length} REGISTERED METRO${matches.length === 1 ? "" : "S"}` : `${visible.length} OF ${matches.length} METROS SHOWN`;
-  cityToggle.hidden = !isCompact || Boolean(query) || matches.length <= 5;
+  cityToggle.hidden = !isCompact || Boolean(query) || matches.length <= 6;
   cityToggle.textContent = showAllCities ? "Show fewer metros" : `Show all ${matches.length} registered metros`;
   cityToggle.setAttribute("aria-expanded", String(showAllCities));
 
   if (!matches.length) {
-    const empty = document.createElement("p");
+    const empty = document.createElement("div");
     empty.className = "city-empty";
-    empty.textContent = "No registered metro matches that name or state. Try “CA”, “New York”, or clear the search.";
     empty.setAttribute("role", "status");
+    empty.innerHTML = '<p>No registered metro matches that name or state filter.</p><button type="button" class="chip">Clear all filters</button>';
+    $("button", empty)?.addEventListener("click", () => {
+      const input = $("#city-filter");
+      if (input) input.value = "";
+      cityFilters.feed = -1;
+      cityFilters.platform = "all";
+      refreshCityViews();
+    });
     cityGrid.append(empty);
     return;
   }
 
-  visible.forEach(({ id, name, state, divisions, feeds, platforms, evidence_path: evidencePath }) => {
-    const card = document.createElement("details");
+  visible.forEach(({ id, name, state, divisions, submarket_count: submarkets, feeds, platforms, evidence_path: evidencePath }) => {
+    const card = document.createElement("article");
     card.className = "city-card";
-    const summary = document.createElement("summary");
-    const title = document.createElement("span");
+
+    const head = document.createElement("header");
+    head.className = "city-card-head";
+
+    const title = document.createElement("a");
     title.className = "city-title";
+    title.href = `/cities/${id}/`;
     title.innerHTML = '<span class="city-name"></span><span class="city-state"></span>';
     $(".city-name", title).textContent = name;
     $(".city-state", title).textContent = ` / ${state}`;
+
     const meta = document.createElement("span");
-    meta.className = "city-meta";
-    meta.innerHTML = '<span class="city-divisions"></span><span class="feeds"></span>';
-    $(".city-divisions", meta).textContent = divisions;
-    const feedList = $(".feeds", meta);
+    meta.className = "city-divisions";
+    meta.textContent = submarkets ? `${divisions} · ${submarkets} submarkets` : divisions;
+
+    head.append(title, meta);
+
+    const feedList = document.createElement("div");
+    feedList.className = "feeds";
     const summaryText = feedSummary(feeds);
     feedList.setAttribute("aria-label", `Available: ${summaryText.available}. Limited or missing: ${summaryText.limited}.`);
     feeds.forEach((live, index) => {
       const feed = document.createElement("span");
       feed.className = `feed-token ${live ? "live" : "limited"}`;
       feed.textContent = layers[index];
+      const entry = platforms[index];
+      if (entry) {
+        const intervalFmt = entry.interval_seconds % 60 === 0 ? `${entry.interval_seconds / 60}m` : `${entry.interval_seconds}s`;
+        feed.title = `${layers[index]}: ${entry.platform} (every ${intervalFmt})`;
+      } else {
+        feed.title = `${layers[index]}: not published`;
+      }
       feedList.append(feed);
     });
-    summary.append(title, meta);
 
-    const evidence = document.createElement("div");
-    evidence.className = "city-evidence";
-    const availability = document.createElement("p");
-    availability.innerHTML = `<strong>Available:</strong> ${summaryText.available}<br><strong>Limited or missing:</strong> ${summaryText.limited}`;
-    const link = document.createElement("a");
-    link.href = sourceUrl(evidencePath);
-    link.target = "_blank";
-    link.rel = "noreferrer";
-    link.textContent = "Inspect this metro’s source contract";
-    const twin = document.createElement("a");
-    twin.href = `/cities/${id}/`;
-    twin.textContent = `Open ${name}’s page`;
+    const actions = document.createElement("footer");
+    actions.className = "city-card-actions";
+
+    const pageLink = document.createElement("a");
+    pageLink.className = "city-btn city-btn-primary";
+    pageLink.href = `/cities/${id}/`;
+    pageLink.textContent = "Open page →";
+
+    const mapLink = document.createElement("a");
+    mapLink.className = "city-btn";
+    mapLink.href = `/dashboard?city=${encodeURIComponent(id)}`;
+    mapLink.textContent = "Map ↗";
+
+    const contractLink = document.createElement("a");
+    contractLink.className = "city-btn";
+    contractLink.href = sourceUrl(evidencePath);
+    contractLink.target = "_blank";
+    contractLink.rel = "noreferrer";
+    contractLink.textContent = "Contract ↗";
+
     const twinData = document.createElement("a");
+    twinData.className = "city-btn";
     twinData.href = `/public/cities/${id}.json`;
     twinData.target = "_blank";
     twinData.rel = "noreferrer";
-    twinData.textContent = "Machine-readable coverage";
-    evidence.append(availability, link, twin, twinData);
-    card.append(summary, evidence);
+    twinData.textContent = "JSON ↗";
+
+    actions.append(pageLink, mapLink, contractLink, twinData);
+    card.append(head, feedList, actions);
     cityGrid.append(card);
   });
 }
@@ -319,6 +387,23 @@ async function loadFacts() {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     siteFacts = await response.json();
     $$('[data-metro-count]').forEach((node) => { node.textContent = siteFacts.metros.length; });
+
+    const totalMetrosEl = $("#stat-total-metros");
+    if (totalMetrosEl) totalMetrosEl.textContent = siteFacts.metros.length;
+    const fullCoverageEl = $("#stat-full-coverage");
+    if (fullCoverageEl) fullCoverageEl.textContent = siteFacts.metros.filter((m) => m.feeds.every(Boolean)).length;
+    const platformCountEl = $("#stat-platform-count");
+    if (platformCountEl) {
+      const platforms = new Set(siteFacts.metros.flatMap(({ platforms: pList }) => pList.filter(Boolean).map((p) => p.platform)));
+      platformCountEl.textContent = platforms.size;
+    }
+
+    if (location.hash === "#matrix") {
+      setCityViewMode("matrix");
+    } else {
+      setCityViewMode("cards");
+    }
+
     renderCities($("#city-filter")?.value || "");
     renderPlatformMatrix();
     renderLimitations();
@@ -412,7 +497,28 @@ function init() {
   $$('[data-observatory-layer]').forEach((control) => control.addEventListener("click", () => setObservatoryLayer(Number(control.dataset.observatoryLayer))));
   sync();
 
+  $("#view-cards-btn")?.addEventListener("click", () => setCityViewMode("cards"));
+  $("#view-matrix-btn")?.addEventListener("click", () => setCityViewMode("matrix"));
+  window.addEventListener("hashchange", () => {
+    if (location.hash === "#matrix") setCityViewMode("matrix");
+    else if (location.hash === "#cards") setCityViewMode("cards");
+  });
+  $("#city-filter-clear")?.addEventListener("click", () => {
+    const input = $("#city-filter");
+    if (input) {
+      input.value = "";
+      input.focus();
+    }
+    refreshCityViews();
+  });
+
   $("#city-filter")?.addEventListener("input", (event) => { renderCities(event.target.value); renderCoverageMatrix(); });
+  $("#city-filter")?.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      event.target.value = "";
+      refreshCityViews();
+    }
+  });
   $("#city-toggle")?.addEventListener("click", () => { showAllCities = !showAllCities; renderCities(); });
   matchMedia("(max-width: 600px)").addEventListener("change", () => { showAllCities = false; renderCities($("#city-filter")?.value || ""); });
   $$(".pipeline-step").forEach((button) => button.addEventListener("click", () => { selectLayer(button); button.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "nearest", inline: "center" }); }));
