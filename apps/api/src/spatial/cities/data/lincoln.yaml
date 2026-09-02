@@ -1,0 +1,361 @@
+city_id: lincoln
+name: Lincoln, NE
+state: NE
+center:
+  lat: 40.81
+  lng: -96.69999999999999
+metro_bbox:
+  min_lat: 40.72
+  max_lat: 40.9
+  min_lng: -96.82
+  max_lng: -96.58
+division_bboxes:
+  DOWNTOWN:
+    min_lat: 40.798
+    max_lat: 40.83
+    min_lng: -96.72
+    max_lng: -96.69
+  UNIVERSITY:
+    min_lat: 40.803
+    max_lat: 40.84
+    min_lng: -96.71
+    max_lng: -96.65
+  SOUTH_LINCOLN:
+    min_lat: 40.72
+    max_lat: 40.798
+    min_lng: -96.75
+    max_lng: -96.61
+  EAST_LINCOLN:
+    min_lat: 40.76
+    max_lat: 40.86
+    min_lng: -96.66
+    max_lng: -96.58
+  WEST_LINCOLN:
+    min_lat: 40.78
+    max_lat: 40.88
+    min_lng: -96.82
+    max_lng: -96.72
+  NORTH_LINCOLN:
+    min_lat: 40.83
+    max_lat: 40.9
+    min_lng: -96.78
+    max_lng: -96.66
+submarkets:
+  Downtown Lincoln:
+    name: Downtown Lincoln
+    borough: DOWNTOWN
+    lat: 40.8136
+    lng: -96.7026
+    zoom: 15.0
+    pitch: 50.0
+    base_lims: 0.84
+    capex: 7800000.0
+    permit_vel: 34.0
+    shift_ratio: 1.46
+    sla: 60.0
+    description: Downtown Lincoln civic and office core with the Capitol, the Railyard
+      entertainment district, and active mixed-use and adaptive-reuse permitting.
+    city_id: lincoln
+  Haymarket:
+    name: Haymarket
+    borough: DOWNTOWN
+    lat: 40.812
+    lng: -96.708
+    zoom: 14.5
+    pitch: 48.0
+    base_lims: 0.82
+    capex: 7200000.0
+    permit_vel: 32.0
+    shift_ratio: 1.44
+    sla: 58.0
+    description: Historic Haymarket District with the Pinnacle Bank Arena adjacency,
+      restaurant and retail build-outs, and strong commercial-to-residential conversion.
+    city_id: lincoln
+  University of Nebraska:
+    name: University of Nebraska
+    borough: UNIVERSITY
+    lat: 40.82
+    lng: -96.7
+    zoom: 14.5
+    pitch: 48.0
+    base_lims: 0.8
+    capex: 6400000.0
+    permit_vel: 30.0
+    shift_ratio: 1.42
+    sla: 56.0
+    description: UNL campus corridor with University Place, student housing, institutional
+      permitting, and the Innovation Campus redevelopment.
+    city_id: lincoln
+  College View:
+    name: College View
+    borough: UNIVERSITY
+    lat: 40.81
+    lng: -96.66
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.78
+    capex: 5600000.0
+    permit_vel: 28.0
+    shift_ratio: 1.4
+    sla: 54.0
+    description: College View neighborhood east of the campus with student-oriented
+      housing, small commercial, and steady renovation permits.
+    city_id: lincoln
+  South Lincoln:
+    name: South Lincoln
+    borough: SOUTH_LINCOLN
+    lat: 40.78
+    lng: -96.69
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.82
+    capex: 6800000.0
+    permit_vel: 32.0
+    shift_ratio: 1.44
+    sla: 58.0
+    description: South Lincoln residential corridor with SouthPointe Mall retail,
+      master-planned subdivisions, and the city's strongest new-home permit volume.
+    city_id: lincoln
+  South 48th Street:
+    name: South 48th Street
+    borough: SOUTH_LINCOLN
+    lat: 40.77
+    lng: -96.699
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.8
+    capex: 6000000.0
+    permit_vel: 30.0
+    shift_ratio: 1.42
+    sla: 56.0
+    description: Major south-north commercial corridor with auto dealerships, strip
+      retail, and steady commercial tenant-improvement permitting.
+    city_id: lincoln
+  South 70th Street:
+    name: South 70th Street
+    borough: SOUTH_LINCOLN
+    lat: 40.76
+    lng: -96.624
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.78
+    capex: 5800000.0
+    permit_vel: 28.0
+    shift_ratio: 1.4
+    sla: 54.0
+    description: South 70th Street growth corridor with new subdivisions, big-box
+      retail, and the Wilderness Hills development.
+    city_id: lincoln
+  East Lincoln:
+    name: East Lincoln
+    borough: EAST_LINCOLN
+    lat: 40.82
+    lng: -96.62
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.8
+    capex: 6200000.0
+    permit_vel: 30.0
+    shift_ratio: 1.42
+    sla: 56.0
+    description: East Lincoln residential corridor along 84th and 70th Streets with
+      new subdivisions, schools, and small-strip commercial.
+    city_id: lincoln
+  Havelock:
+    name: Havelock
+    borough: EAST_LINCOLN
+    lat: 40.851
+    lng: -96.63
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.76
+    capex: 5200000.0
+    permit_vel: 26.0
+    shift_ratio: 1.38
+    sla: 52.0
+    description: Historic Havelock neighborhood in northeast Lincoln with older housing
+      stock, small commercial, and the Havelock Main Street district.
+    city_id: lincoln
+  West Lincoln:
+    name: West Lincoln
+    borough: WEST_LINCOLN
+    lat: 40.84
+    lng: -96.76
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.76
+    capex: 5400000.0
+    permit_vel: 26.0
+    shift_ratio: 1.38
+    sla: 52.0
+    description: West Lincoln along Cornhusker Highway with industrial and warehouse
+      permitting, auto-oriented commercial, and the airport adjacency.
+    city_id: lincoln
+  North Lincoln:
+    name: North Lincoln
+    borough: NORTH_LINCOLN
+    lat: 40.86
+    lng: -96.71
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.74
+    capex: 5000000.0
+    permit_vel: 24.0
+    shift_ratio: 1.36
+    sla: 50.0
+    description: North Lincoln gateway corridor with the airpark, ag-industrial, and
+      growing residential subdivision fringe.
+    city_id: lincoln
+divisions:
+  DOWNTOWN:
+    name: DOWNTOWN
+    center_lat: 40.8136
+    center_lng: -96.7026
+    zoom: 14.0
+    bbox:
+      min_lat: 40.798
+      max_lat: 40.83
+      min_lng: -96.72
+      max_lng: -96.69
+    submarkets:
+    - Downtown Lincoln
+    - Haymarket
+    city_id: lincoln
+  UNIVERSITY:
+    name: UNIVERSITY
+    center_lat: 40.816
+    center_lng: -96.685
+    zoom: 14.0
+    bbox:
+      min_lat: 40.803
+      max_lat: 40.84
+      min_lng: -96.71
+      max_lng: -96.65
+    submarkets:
+    - University of Nebraska
+    - College View
+    city_id: lincoln
+  SOUTH_LINCOLN:
+    name: SOUTH_LINCOLN
+    center_lat: 40.77
+    center_lng: -96.695
+    zoom: 13.5
+    bbox:
+      min_lat: 40.72
+      max_lat: 40.798
+      min_lng: -96.75
+      max_lng: -96.61
+    submarkets:
+    - South Lincoln
+    - South 48th Street
+    - South 70th Street
+    city_id: lincoln
+  EAST_LINCOLN:
+    name: EAST_LINCOLN
+    center_lat: 40.83
+    center_lng: -96.62
+    zoom: 13.5
+    bbox:
+      min_lat: 40.76
+      max_lat: 40.86
+      min_lng: -96.66
+      max_lng: -96.58
+    submarkets:
+    - East Lincoln
+    - Havelock
+    city_id: lincoln
+  WEST_LINCOLN:
+    name: WEST_LINCOLN
+    center_lat: 40.84
+    center_lng: -96.76
+    zoom: 13.5
+    bbox:
+      min_lat: 40.78
+      max_lat: 40.88
+      min_lng: -96.82
+      max_lng: -96.72
+    submarkets:
+    - West Lincoln
+    city_id: lincoln
+  NORTH_LINCOLN:
+    name: NORTH_LINCOLN
+    center_lat: 40.86
+    center_lng: -96.72
+    zoom: 13.5
+    bbox:
+      min_lat: 40.83
+      max_lat: 40.9
+      min_lng: -96.78
+      max_lng: -96.66
+    submarkets:
+    - North Lincoln
+    city_id: lincoln
+datasets:
+  permits:
+    endpoint: https://gis.lincoln.ne.gov/public/rest/services/Planning/Residential_New_Construction_Permits/MapServer/4
+    platform: arcgis
+    watermark_col: Issued
+    id_keys:
+    - PermNo
+    - OBJECTID_1
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    expected_cadence_days: 1
+    needs_geocode: false
+    oid_field: OBJECTID_1
+    max_record_count: 2000
+    order_by: Issued DESC
+    field_map:
+      job_id:
+      - PermNo
+      - OBJECTID_1
+      issuance_date:
+      - Issued
+      filing_date:
+      - Applied
+      status:
+      - CurrStatus
+      job_type:
+      - PermType
+      - UseType
+      description:
+      - DescWork
+      address_street:
+      - FullAddress
+      - Address
+      city:
+      - CITY
+      zipcode:
+      - ZIP
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    geocode_context: null
+    ingestion_mode: incremental
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- lincoln_ne
+- lincoln-ne
+- lincoln ne
+job_suffix: lincoln

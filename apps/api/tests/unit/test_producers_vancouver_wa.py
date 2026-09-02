@@ -31,6 +31,7 @@ from src.producers.field_maps_vancouver_wa import (
     FIELD_MAP,
     GEOCODE_CONTEXT,
     PERMITS_FIELD_MAP,
+    SLA_FIELD_MAP,
 )
 from src.schemas.models import JobType
 from src.spatial.cities.vancouver_wa import (
@@ -42,6 +43,7 @@ from src.spatial.cities.vancouver_wa import (
     VANCOUVER_WA_GEOCODE_CONTEXT,
     VANCOUVER_WA_METRO_BBOX,
     VANCOUVER_WA_PERMITS_ENDPOINT,
+    VANCOUVER_WA_SLA_ENDPOINT,
     VANCOUVER_WA_PERMITS_WHERE,
     VANCOUVER_WA_SUBMARKETS,
     get_vancouver_wa_dataset,
@@ -246,7 +248,7 @@ class TestVancouverWaFieldMaps:
         assert PERMITS_FIELD_MAP["proposed_units"] == ["CSM_NO_UNITS"]
 
     def test_field_map_alias_and_geocode_context(self):
-        assert FIELD_MAP == {"permits": PERMITS_FIELD_MAP}
+        assert FIELD_MAP == {"permits": PERMITS_FIELD_MAP, "sla": SLA_FIELD_MAP}
         assert GEOCODE_CONTEXT == "Vancouver, WA"
         assert VANCOUVER_WA_GEOCODE_CONTEXT == "Vancouver, WA"
 
@@ -491,14 +493,28 @@ class TestVancouverWaFeedSpec:
         assert spec.topic == "raw.municipal.permits"
         assert spec.where == "csm_issued_date <= CURRENT_TIMESTAMP"
 
-    def test_registered_feed_set_is_permits_only(self):
-        assert set(VANCOUVER_WA_FEED_SPECS) == {"permits"}
+    def test_registered_feed_set_includes_permits_and_sla(self):
+        assert set(VANCOUVER_WA_FEED_SPECS) == {"permits", "sla"}
 
     def test_unknown_feed_raises_keyerror_naming_available(self):
         with pytest.raises(KeyError) as exc:
-            get_vancouver_wa_dataset("sla")
+            get_vancouver_wa_dataset("deeds")
         assert "vancouver_wa" in str(exc.value)
-        assert "permits" in str(exc.value)
+        assert "permits" in str(exc.value) or "sla" in str(exc.value)
+
+    def test_sla_spec_matches_live_layer(self):
+        spec = get_vancouver_wa_dataset(FeedType.SLA)
+        assert spec.platform == "socrata"
+        assert spec.endpoint == VANCOUVER_WA_SLA_ENDPOINT
+        assert spec.watermark_col == "licenseeffectivedate"
+        assert spec.id_keys == ["contractorlicensenumber", "ubi"]
+        assert spec.expected_cadence_days == 1
+        assert spec.interval_seconds == 3600.0
+        assert spec.ingestion_mode == "incremental"
+        assert spec.needs_geocode is True
+        assert spec.geocode_context == "Vancouver, WA"
+        assert spec.field_map == SLA_FIELD_MAP
+        assert spec.topic == "raw.municipal.sla"
 
     def test_endpoint_is_the_probed_featureserver(self):
         assert "services.arcgis.com" in VANCOUVER_WA_PERMITS_ENDPOINT

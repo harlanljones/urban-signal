@@ -9,15 +9,14 @@ PERMITS_FIELD_MAP = {
 }
 
 SLA_FIELD_MAP = {
-    "license_id": ["FOLDERNUMBER"],
-    "dba": ["COMPLEXNAME"],
-    "premises_name": ["COMPLEXNAME"],
-    "license_type": ["SUBTYPE", "SUBDESC"],
-    "status": ["STATUSDESC"],
-    "effective_date": ["INDATE"],
-    "expiration_date": ["EXPIRYDATE"],
-    "address_street": ["FOLDERNAME"],
-    "borough": ["NEIGHBORHOOD"],
+    "license_id": ["registry_number"],
+    "dba": ["business_name"],
+    "premises_name": ["business_name"],
+    "license_type": ["entity_type"],
+    "effective_date": ["registry_date"],
+    "address_street": ["address"],
+    "city": ["city"],
+    "zipcode": ["zip"],
 }
 
 FIELD_MAP = {
@@ -27,11 +26,7 @@ FIELD_MAP = {
 
 GEOCODE_CONTEXT = "Salem, OR"
 
-DROPPED_PII_COLUMNS = (
-    "OWNER",
-    "ISSUEUSER",
-    "GlobalID",
-)
+DROPPED_PII_COLUMNS = ()
 
 """Salem, OR spatial registry and geometry.
 
@@ -39,46 +34,33 @@ Provides neighborhood metadata, camera positioning, investment metrics,
 division catalog, and geographic bounding boxes for the City of Salem
 (Marion County, OR).
 
-Salem is a TWO-FEED PARTIAL metro like Greenville/Tucson: PERMITS (``Structure_Permits``
+Salem is a TWO-FEED PARTIAL metro: PERMITS (``Structure_Permits``
 at ``services.arcgis.com/kIA6yS9KDGqZL7U3/arcgis/rest/services/Structure_Permits/
 FeatureServer/0``, Tier 1, ~802 rows, native WGS84 point geometry, 100% geometry
-coverage, ``ISSUEDDATE`` watermark, rolling ~1 year window) and SLA (``Amanda
-MultiFamily Licenses`` at the same org, Tier 2, ~1,111 rows, native WGS84 point
-geometry, 100% geometry coverage, ``INDATE`` watermark). 311 (``311events``, 8
-stale demo rows from 2017), deeds (no Marion County open bulk API), and Land_Use_Applications
-(307 rows, no matching FeedType) are Tier 3 and stay unregistered.
+coverage, ``ISSUEDDATE`` watermark, rolling ~1 year window) and SLA (the OR
+Secretary of State Active Businesses registry at ``data.oregon.gov``
+``tckn-sxa6``, Tier 2, ~500k+ active entities, address-only geocoded rows,
+``registry_date`` watermark — US-426 super-feed providing universal OR SLA
+coverage, sliced to Marion County / Salem city). 311 (``311events``, 8 stale
+demo rows from 2017), city-level deeds (no Marion County open bulk API),
+and Land_Use_Applications (307 rows, no matching FeedType) are Tier 3 and
+stay unregistered.
 
 Live-probe caveats that define this leaf (probed 2026-08-28, US-226;
-ticket body pointed to ``salemoregon.opendata.arcgis.com`` which is 404 —
-the real door is the City of Salem's ArcGIS Online org at
-``salem.maps.arcgis.com``, org id ``kIA6yS9KDGqZL7U3``):
+updated 2026-08-30, US-426):
 
-* PERMITS row count is **802 live** (rolling 1-year window: oldest ``ISSUEDDATE``
-  = 2025-09-08, newest = 2026-08-27). ``ISSUEDDATE`` is the daily watermark.
-  ``CREATEDDATE`` is also available as a filing-date candidate. No future-date
-  sentinels (newest is 2026-08-27, yesterday at probe time). ISO date literals
-  work in ``where`` clauses (not an ANSI-date host).
-* SLA row count is **1,111 live**. ``INDATE`` (application in date) is the
-  watermark; newest = 2026-08-26. ``EXPIRYDATE`` carries future-dated 2026-12-31
-  values for all valid licenses — this is a normal annual expiry cycle, not a
-  sentinel problem (the watermark is ``INDATE``, not ``EXPIRYDATE``). No
-  future-date sentinel on the watermark column.
-* Both layers have **100% native geometry coverage** (0 null-geometry rows
-  live-probed), so ``needs_geocode=False``.
-* Store SR is WKID 2913 (NAD83 Oregon State Plane South, feet). ``X``/``Y``
-  (permits) and ``POINT_X``/``POINT_Y`` (licenses) are integer State Plane
-  feet — never mapped as coordinates. Every query requests ``outSR=4326`` and
-  ``ArcGISClient._flatten_feature`` lifts the returned WGS84 geometry to
-  ``latitude``/``longitude``.
-* ``NEIGHBORHOOD`` and ``WARD`` columns are present on both layers. ``NEIGHBORHOOD``
-  maps to the ``borough`` field for source-neighborhood pass-through.
-* SLA cadence: newest INDATE 2026-08-26, oldest INDATE 2025-09-03 (all 1,111
-  rows). The layer is maintained (new INDATE rows appear regularly). Set
-  ``expected_cadence_days=7`` with no alarm exemption — the cadence is
-  typical for a permit-type feed.
-* Land_Use_Applications (307 rows, companion layer) is not registered: no
-  matching FeedType / producer, small size, and the permits feed already covers
-  development activity. Marion County deeds — no open bulk API identified.
+* PERMITS: ``Structure_Permits`` FeatureServer ~802 rows rolling 1-year
+  window, ``ISSUEDDATE`` watermark, 100% native point geometry, WKID 2913
+  store SR, outSR=4326 geometry lift.
+* SLA: OR Active Businesses (``tckn-sxa6``, Socrata ``data.oregon.gov``),
+  address-only rows needing ADR-0004 geocoding with context "Salem, OR",
+  ``registry_date`` watermark, ``where: city = 'SALEM' AND state = 'OR'``.
+  Replaces the previous Amanda_MultiFamily_Licenses_Data SLA (US-226) per
+  the US-426 probe recommendation: Salem is anchored on building permits
+  and supplemented by the OR State SOS super-feed.
+* Land_Use_Applications (307 rows) is not registered: no matching FeedType
+  / producer, and the permits feed already covers development activity.
+  Marion County deeds — no open bulk API identified.
 """
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
@@ -380,8 +362,7 @@ SALEM_PERMITS_ENDPOINT = (
 )
 
 SALEM_SLA_ENDPOINT = (
-    "https://services.arcgis.com/kIA6yS9KDGqZL7U3/arcgis/rest/services/"
-    "Amanda_MultiFamily_Licenses_Data/FeatureServer/0"
+    "https://data.oregon.gov/resource/tckn-sxa6.json"
 )
 
 SALEM_FEED_SPECS: dict[str, dict[str, object]] = {
@@ -413,26 +394,23 @@ SALEM_FEED_SPECS: dict[str, dict[str, object]] = {
     },
     "sla": {
         "endpoint": SALEM_SLA_ENDPOINT,
-        "platform": "arcgis",
-        "watermark_col": "INDATE",
-        "id_keys": ["FOLDERNUMBER"],
+        "platform": "socrata",
+        "watermark_col": "registry_date",
+        "id_keys": ["registry_number", "business_name"],
         "topic_key": "topic_sla",
-        "interval_seconds": 600.0,
+        "interval_seconds": 21600.0,
         "producer_key": "sla",
         "extra": {
-            "expected_cadence_days": 7,
-            "needs_geocode": False,
-            "oid_field": "OBJECTID",
-            "max_record_count": 2000,
-            "order_by": "INDATE DESC",
+            "expected_cadence_days": 1,
+            "needs_geocode": True,
+            "geocode_context": SALEM_GEOCODE_CONTEXT,
+            "order_by": "registry_date DESC",
+            "where": "city = 'SALEM' AND state = 'OR'",
             "scope": (
-                "Amanda MultiFamily Licenses (FeatureServer, ~1,111 rows; "
-                "multifamily rental licenses + short-term rentals; native "
-                "outSR=4326 point geometry; store SR WKID 2913; POINT_X/POINT_Y "
-                "integer State Plane attributes never mapped; INDATE watermark "
-                "(newest 2026-08-26); EXPIRYDATE 2026-12-31 future-dated expiry "
-                "is normal annual cycle, not a sentinel — watermark is INDATE; "
-                "NEIGHBORHOOD + WARD columns; 100% geometry coverage)"
+                "OR SOS Active Businesses registry (tckn-sxa6, data.oregon.gov) "
+                "sliced to Salem OR — US-426 super-feed (OR Active Businesses). "
+                "Address-only rows (address + city + state + zip) geocode via "
+                "ADR-0004 supplement. registry_date ISO-8601 watermark."
             ),
             "field_map": SLA_FIELD_MAP,
         },

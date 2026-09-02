@@ -264,6 +264,7 @@ class TestSnapRegistrationShape:
             "chandler",
             "grand_rapids",
             "inland_empire",
+            "lincoln",
             "madison",
             "missoula",
             "nampa",
@@ -272,9 +273,10 @@ class TestSnapRegistrationShape:
             "santa_fe",
             "santa_rosa",
             "savannah",
+            "sioux_falls",
             "tallahassee",
             "tempe",
-            "vancouver_wa",
+            "topeka",
             "yakima",
         }
         for city_id in REGISTRY:

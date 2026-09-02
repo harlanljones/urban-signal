@@ -1,32 +1,24 @@
-"""Per-city field maps for Salem, OR (US-226), imported by the shared parsers.
+"""Per-city field maps for Salem, OR (US-226; SLA updated US-426).
 
-Salem, OR is a TWO-FEED PARTIAL metro on the City of Salem's ArcGIS Online
-org (``kIA6yS9KDGqZL7U3``): Structure_Permits (FeatureServer/0, Tier 1,
-~802 rows) and Amanda_MultiFamily_Licenses_Data (FeatureServer/0, Tier 2,
-~1,111 rows). Spellings do not match the shared Socrata chains, so the map
-lives here as a leaf rather than growing ``src/producers/field_maps.py``
-(spine).
+Salem, OR is a TWO-FEED PARTIAL metro: Structure_Permits (FeatureServer/0,
+Tier 1, ~802 rows) on the City of Salem's AGOL org
+(``services.arcgis.com/kIA6yS9KDGqZL7U3``) and — since US-426 — the OR
+Secretary of State Active Businesses registry (``tckn-sxa6``,
+``data.oregon.gov``) as the metropolitan SLA slot (US-426 super-feed; see
+docs/research/pnw-rockies-plains-expansion-probe-2026-08-30.md). Spellings
+do not match the shared Socrata chains, so the map lives here as a leaf
+rather than growing ``src/producers/field_maps.py`` (spine).
 
 Coordinate contract (pinned by tests):
 
-* Both feeds — coordinates come from **native point geometry** requested with
+* PERMITS — coordinates come from **native point geometry** requested with
   ``outSR=4326``; ``ArcGISClient._flatten_feature`` lifts them to
   ``latitude``/``longitude`` keys, which the parser's generic chain reads.
   The store SR is WKID 2913 (NAD83 Oregon State Plane South, feet).
-* The ``X``/``Y`` (Structure_Permits) and ``POINT_X``/``POINT_Y``
-  (Amanda licenses) *attributes* are **integer State Plane feet** (values
-  ≈ 7.5e6 / 0.5e6) and are deliberately NOT candidates — mapping them would
-  emit projected feet as degrees.
-* Both layers carry data with 100% native geometry coverage (0 null-geometry
-  rows live-probed 2026-08-28), so ``needs_geocode=False``.
-* CREATEDDATE/ISSUEDDATE (permits) and INDATE (licenses) are
-  ``esriFieldTypeDate`` and arrive as epoch-ms; ``ArcGISClient`` converts
-  them to ISO 8601 UTC on flatten.
-
-PII considerations: OWNER on the Amanda licenses layer is the legal entity
-(company or individual) and is dropped from the map. The DOB permits producer
-dispatches STATUS as provided; the SLA producer dispatches STATUSDESC as
-provided.
+* SLA — the OR Active Businesses Socrata registry is **address-only**
+  (``address``/``city``/``state``/``zip``), so rows geocode via the
+  ADR-0004 supplement with context "Salem, OR" (``needs_geocode=True``).
+  ``registry_date`` is the ISO-8601 watermark.
 """
 
 
@@ -41,15 +33,14 @@ PERMITS_FIELD_MAP: dict[str, list[str]] = {
 }
 
 SLA_FIELD_MAP: dict[str, list[str]] = {
-    "license_id": ["FOLDERNUMBER"],
-    "dba": ["COMPLEXNAME"],
-    "premises_name": ["COMPLEXNAME"],
-    "license_type": ["SUBTYPE", "SUBDESC"],
-    "status": ["STATUSDESC"],
-    "effective_date": ["INDATE"],
-    "expiration_date": ["EXPIRYDATE"],
-    "address_street": ["FOLDERNAME"],
-    "borough": ["NEIGHBORHOOD"],
+    "license_id": ["registry_number"],
+    "dba": ["business_name"],
+    "premises_name": ["business_name"],
+    "license_type": ["entity_type"],
+    "effective_date": ["registry_date"],
+    "address_street": ["address"],
+    "city": ["city"],
+    "zipcode": ["zip"],
 }
 
 FIELD_MAP: dict[str, dict[str, list[str]]] = {
@@ -59,11 +50,7 @@ FIELD_MAP: dict[str, dict[str, list[str]]] = {
 
 GEOCODE_CONTEXT: str = "Salem, OR"
 
-DROPPED_PII_COLUMNS: tuple[str, ...] = (
-    "OWNER",
-    "ISSUEUSER",
-    "GlobalID",
-)
+DROPPED_PII_COLUMNS: tuple[str, ...] = ()
 
 __all__ = [
     "DROPPED_PII_COLUMNS",

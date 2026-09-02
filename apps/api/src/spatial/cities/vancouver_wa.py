@@ -7,8 +7,21 @@ PERMITS_FIELD_MAP = {
     "proposed_units": ["CSM_NO_UNITS"],
 }
 
+SLA_FIELD_MAP = {
+    "license_id": ["contractorlicensenumber"],
+    "license_type": ["license_type_ns"],
+    "effective_date": ["licenseeffectivedate"],
+    "expiration_date": ["licenseexpirationdate"],
+    "premises_name": ["businessname"],
+    "dba": ["businessname"],
+    "address_street": ["address1"],
+    "status": ["contractorlicensestatus"],
+    "borough": ["city"],
+}
+
 FIELD_MAP = {
     "permits": PERMITS_FIELD_MAP,
+    "sla": SLA_FIELD_MAP,
 }
 
 GEOCODE_CONTEXT = "Vancouver, WA"
@@ -26,6 +39,15 @@ Vancouver is a ONE-FEED PARTIAL metro: PERMITS only, from the
 311 lives on a token-gated internal server, no public business-license feed
 exists (WA L&I/LCB state registries are spine companions), and Clark County
 recorder deeds are a web app with no machine-readable feed.
+
+**US-426 super-feed (WA L&I):** the Washington State L&I Construction
+Contractor registry (``data.wa.gov`` ``m8qx-ubtq``) rides here as the
+metropolitan SLA companion — the probe's recommended WA super-feed provides
+a comprehensive contractor footprint across Vancouver, Seattle, Tacoma,
+Spokane, Yakima and the Tri-Cities (sliced to this metro by ``city =
+'VANCOUVER' AND state = 'WA'``). Address-only rows (``address1`` is the
+mailing address; the registry ships no jobsite columns) geocode via the
+ADR-0004 supplement with context "Vancouver, WA".
 
 Live-probe caveats that define this leaf (2026-08-28, US-233):
 
@@ -419,11 +441,16 @@ VANCOUVER_WA_DIVISIONS: dict[str, BoroughMeta] = {
 # Feed specs (leaf-local; the spine copies these into REGISTRY).
 # Probed live 2026-08-28 against the city's AGOL org (CityOfVancouverGISAdmin,
 # services.arcgis.com/oNvpY90qsPDizwkN). Do not register 311 (token-gated
-# internal server), SLA (no public feed), or deeds (Clark Co. web app).
+# internal server) or deeds (Clark Co. web app). SLA is the WA L&I super-feed
+# (US-426, m8qx-ubtq, data.wa.gov).
 # ---------------------------------------------------------------------------
 VANCOUVER_WA_PERMITS_ENDPOINT = (
     "https://services.arcgis.com/oNvpY90qsPDizwkN/arcgis/rest/services/"
     "Permits_and_Code_Enforcement_Data_(public_view)/FeatureServer/0"
+)
+VANCOUVER_WA_SLA_ENDPOINT = (
+    "https://data.wa.gov/resource/m8qx-ubtq.json"
+    "?$select=*, 'wa_li:' || contractorlicensetypecodedesc as license_type_ns"
 )
 
 # Future-dated csm_issued_date rows are sentinels (2 live, max 2049-10-31,
@@ -466,6 +493,29 @@ VANCOUVER_WA_FEED_SPECS: dict[str, dict[str, object]] = {
                 "borough stay undeclared."
             ),
             "field_map": PERMITS_FIELD_MAP,
+        },
+    },
+    "sla": {
+        "endpoint": VANCOUVER_WA_SLA_ENDPOINT,
+        "platform": "socrata",
+        "watermark_col": "licenseeffectivedate",
+        "id_keys": ["contractorlicensenumber", "ubi"],
+        "topic_key": "topic_sla",
+        "interval_seconds": 3600.0,
+        "producer_key": "sla",
+        "extra": {
+            "expected_cadence_days": 1,
+            "needs_geocode": True,
+            "geocode_context": VANCOUVER_WA_GEOCODE_CONTEXT,
+            "order_by": "licenseeffectivedate DESC",
+            "where": "city = 'VANCOUVER' AND state = 'WA'",
+            "scope": (
+                "WA L&I Construction Contractor registry (m8qx-ubtq, data.wa.gov) "
+                "sliced to Vancouver WA — US-426 super-feed. Mailing-address "
+                "(address1) only, no jobsite columns; geocoded via ADR-0004 "
+                "supplement. licenseeffectivedate watermark."
+            ),
+            "field_map": SLA_FIELD_MAP,
         },
     },
 }
@@ -514,6 +564,7 @@ REGISTRATION = SpatialRegistration(
 
 __all__ = [
     "REGISTRATION",
+    "SLA_FIELD_MAP",
     "VANCOUVER_WA_CITY_ID",
     "VANCOUVER_WA_DIVISIONS",
     "VANCOUVER_WA_DIVISION_BBOXES",
@@ -522,6 +573,7 @@ __all__ = [
     "VANCOUVER_WA_METRO_BBOX",
     "VANCOUVER_WA_PERMITS_ENDPOINT",
     "VANCOUVER_WA_PERMITS_WHERE",
+    "VANCOUVER_WA_SLA_ENDPOINT",
     "VANCOUVER_WA_SUBMARKETS",
     "get_vancouver_wa_dataset",
     "is_in_greater_vancouver_wa_metro",

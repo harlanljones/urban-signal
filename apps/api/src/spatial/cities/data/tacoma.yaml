@@ -1,0 +1,457 @@
+city_id: tacoma
+name: Tacoma, WA
+state: WA
+center:
+  lat: 47.230000000000004
+  lng: -122.465
+metro_bbox:
+  min_lat: 47.14
+  max_lat: 47.32
+  min_lng: -122.55
+  max_lng: -122.38
+division_bboxes:
+  DOWNTOWN:
+    min_lat: 47.24
+    max_lat: 47.265
+    min_lng: -122.46
+    max_lng: -122.43
+  NORTH_END:
+    min_lat: 47.26
+    max_lat: 47.31
+    min_lng: -122.505
+    max_lng: -122.43
+  SIXTH_AVENUE:
+    min_lat: 47.238
+    max_lat: 47.262
+    min_lng: -122.51
+    max_lng: -122.46
+  HILLTOP:
+    min_lat: 47.235
+    max_lat: 47.25
+    min_lng: -122.475
+    max_lng: -122.445
+  EASTSIDE:
+    min_lat: 47.24
+    max_lat: 47.262
+    min_lng: -122.432
+    max_lng: -122.395
+  SOUTH_TACOMA:
+    min_lat: 47.15
+    max_lat: 47.24
+    min_lng: -122.54
+    max_lng: -122.42
+submarkets:
+  Downtown Tacoma:
+    name: Downtown Tacoma
+    borough: DOWNTOWN
+    lat: 47.2529
+    lng: -122.4443
+    zoom: 15.0
+    pitch: 50.0
+    base_lims: 0.82
+    capex: 8200000.0
+    permit_vel: 34.0
+    shift_ratio: 1.46
+    sla: 56.0
+    description: Tacoma's civic and office core around Pacific Avenue with the UW
+      Tacoma campus, the Tacoma Dome district, and steady mixed-use and institutional
+      permitting.
+    city_id: tacoma
+  Stadium District:
+    name: Stadium District
+    borough: DOWNTOWN
+    lat: 47.255
+    lng: -122.442
+    zoom: 14.5
+    pitch: 48.0
+    base_lims: 0.8
+    capex: 6800000.0
+    permit_vel: 28.0
+    shift_ratio: 1.42
+    sla: 52.0
+    description: Historic Stadium High neighborhood with early-20th-century homes,
+      the Wright Park corridor, and steady residential renovation permits.
+    city_id: tacoma
+  North End:
+    name: North End
+    borough: NORTH_END
+    lat: 47.268
+    lng: -122.455
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.84
+    capex: 7200000.0
+    permit_vel: 30.0
+    shift_ratio: 1.45
+    sla: 58.0
+    description: Established residential North End with Proctor Street retail, large-lot
+      homes, and consistent high-value remodels.
+    city_id: tacoma
+  Ruston / Point Ruston:
+    name: Ruston / Point Ruston
+    borough: NORTH_END
+    lat: 47.279
+    lng: -122.473
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.86
+    capex: 8400000.0
+    permit_vel: 26.0
+    shift_ratio: 1.48
+    sla: 54.0
+    description: Waterfront mixed-use redevelopment on Commencement Bay with Point
+      Ruston condos, the Ruston Way corridor, and premium residential construction.
+    city_id: tacoma
+  Sixth Avenue:
+    name: Sixth Avenue
+    borough: SIXTH_AVENUE
+    lat: 47.25
+    lng: -122.49
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.78
+    capex: 5600000.0
+    permit_vel: 27.0
+    shift_ratio: 1.38
+    sla: 60.0
+    description: Sixth Avenue commercial corridor with neighborhood retail, restaurants,
+      taverns, and high business-license turnover.
+    city_id: tacoma
+  Hilltop:
+    name: Hilltop
+    borough: HILLTOP
+    lat: 47.245
+    lng: -122.455
+    zoom: 14.5
+    pitch: 48.0
+    base_lims: 0.76
+    capex: 7200000.0
+    permit_vel: 32.0
+    shift_ratio: 1.4
+    sla: 62.0
+    description: Rapidly revitalizing Hilltop corridor along Martin Luther King Jr
+      Way with new mixed-use, the light-rail-adjacent development, and high 311-to-permit
+      activity.
+    city_id: tacoma
+  Lincoln District:
+    name: Lincoln District
+    borough: EASTSIDE
+    lat: 47.255
+    lng: -122.43
+    zoom: 14.5
+    pitch: 48.0
+    base_lims: 0.8
+    capex: 6400000.0
+    permit_vel: 29.0
+    shift_ratio: 1.42
+    sla: 58.0
+    description: Diverse Eastside commercial district along South 38th and the Lincoln
+      Business District with dense small-business licensing.
+    city_id: tacoma
+  Eastside / Salishan:
+    name: Eastside / Salishan
+    borough: EASTSIDE
+    lat: 47.248
+    lng: -122.425
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.74
+    capex: 5200000.0
+    permit_vel: 25.0
+    shift_ratio: 1.36
+    sla: 56.0
+    description: Eastside neighborhoods from Portland Avenue to the Salishan redevelopment
+      with infill housing and community-serving commercial.
+    city_id: tacoma
+  South Tacoma:
+    name: South Tacoma
+    borough: SOUTH_TACOMA
+    lat: 47.211
+    lng: -122.49
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.76
+    capex: 5800000.0
+    permit_vel: 26.0
+    shift_ratio: 1.38
+    sla: 54.0
+    description: South Tacoma's auto-row and light-industrial belt along South Tacoma
+      Way with warehouse conversions and commercial permitting.
+    city_id: tacoma
+  Wapato / South End:
+    name: Wapato / South End
+    borough: SOUTH_TACOMA
+    lat: 47.18
+    lng: -122.46
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.72
+    capex: 4600000.0
+    permit_vel: 22.0
+    shift_ratio: 1.34
+    sla: 50.0
+    description: Southern residential belt around Wapato Lake and the South End with
+      single-family infill and steady service permits.
+    city_id: tacoma
+divisions:
+  DOWNTOWN:
+    name: DOWNTOWN
+    center_lat: 47.2529
+    center_lng: -122.4443
+    zoom: 14.0
+    bbox:
+      min_lat: 47.24
+      max_lat: 47.265
+      min_lng: -122.46
+      max_lng: -122.43
+    submarkets:
+    - Downtown Tacoma
+    - Stadium District
+    city_id: tacoma
+  NORTH_END:
+    name: NORTH_END
+    center_lat: 47.27
+    center_lng: -122.46
+    zoom: 13.5
+    bbox:
+      min_lat: 47.26
+      max_lat: 47.31
+      min_lng: -122.505
+      max_lng: -122.43
+    submarkets:
+    - North End
+    - Ruston / Point Ruston
+    city_id: tacoma
+  SIXTH_AVENUE:
+    name: SIXTH_AVENUE
+    center_lat: 47.25
+    center_lng: -122.49
+    zoom: 13.5
+    bbox:
+      min_lat: 47.238
+      max_lat: 47.262
+      min_lng: -122.51
+      max_lng: -122.46
+    submarkets:
+    - Sixth Avenue
+    city_id: tacoma
+  HILLTOP:
+    name: HILLTOP
+    center_lat: 47.244
+    center_lng: -122.457
+    zoom: 14.0
+    bbox:
+      min_lat: 47.235
+      max_lat: 47.25
+      min_lng: -122.475
+      max_lng: -122.445
+    submarkets:
+    - Hilltop
+    city_id: tacoma
+  EASTSIDE:
+    name: EASTSIDE
+    center_lat: 47.251
+    center_lng: -122.422
+    zoom: 13.5
+    bbox:
+      min_lat: 47.24
+      max_lat: 47.262
+      min_lng: -122.432
+      max_lng: -122.395
+    submarkets:
+    - Lincoln District
+    - Eastside / Salishan
+    city_id: tacoma
+  SOUTH_TACOMA:
+    name: SOUTH_TACOMA
+    center_lat: 47.2
+    center_lng: -122.485
+    zoom: 13.0
+    bbox:
+      min_lat: 47.15
+      max_lat: 47.24
+      min_lng: -122.54
+      max_lng: -122.42
+    submarkets:
+    - South Tacoma
+    - Wapato / South End
+    city_id: tacoma
+datasets:
+  permits:
+    endpoint: https://services3.arcgis.com/SCwJH1pD8WSn5T5y/arcgis/rest/services/accela_permit_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: issued_date
+    id_keys:
+    - permit_number
+    - objectid
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    expected_cadence_days: 1
+    needs_geocode: false
+    oid_field: objectid
+    max_record_count: 2000
+    order_by: issued_date DESC
+    field_map:
+      job_id:
+      - permit_number
+      - objectid
+      issuance_date:
+      - issued_date
+      filing_date:
+      - application_date
+      status:
+      - current_status
+      job_type:
+      - permit_type
+      - permit_subtype
+      description:
+      - description
+      address_street:
+      - address_line_1
+      zipcode:
+      - zip
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    geocode_context: null
+    ingestion_mode: incremental
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  sla:
+    endpoint: https://services3.arcgis.com/SCwJH1pD8WSn5T5y/arcgis/rest/services/Business_Licenses/FeatureServer/0
+    platform: arcgis
+    watermark_col: Business_Open_Date
+    id_keys:
+    - License_Number
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    expected_cadence_days: 7
+    needs_geocode: true
+    geocode_context: Tacoma, WA
+    oid_field: OBJECTID
+    max_record_count: 2000
+    order_by: Business_Open_Date DESC
+    field_map:
+      license_id:
+      - License_Number
+      dba:
+      - Business_Name
+      - Trade_Name
+      premises_name:
+      - Business_Name
+      license_type:
+      - NAICS_Code_Description
+      status:
+      - Map_Status
+      effective_date:
+      - Business_Open_Date
+      address_street:
+      - Site_Street
+      city:
+      - Site_City
+      zipcode:
+      - Site_Zip_Code
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    ingestion_mode: incremental
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  '311':
+    endpoint: https://services3.arcgis.com/SCwJH1pD8WSn5T5y/arcgis/rest/services/SeeClickFix_Requests/FeatureServer/0
+    platform: arcgis
+    watermark_col: created_at
+    id_keys:
+    - id
+    - globalid
+    topic: raw.municipal.311
+    interval_seconds: 300.0
+    producer_key: '311'
+    expected_cadence_days: 1
+    needs_geocode: false
+    oid_field: OBJECTID
+    max_record_count: 2000
+    order_by: created_at DESC
+    field_map:
+      complaint_id:
+      - id
+      - globalid
+      status:
+      - status
+      category:
+      - category
+      filed_date:
+      - created_at
+      address_street:
+      - address
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    geocode_context: null
+    ingestion_mode: incremental
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- tacoma_wa
+- tacoma-wa
+- tacoma wa
+job_suffix: tacoma

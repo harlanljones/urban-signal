@@ -273,17 +273,11 @@ datasets:
     topic: raw.municipal.permits
     interval_seconds: 300.0
     producer_key: permits
-    endpoint_by_year: {}
-    watermark_type: null
-    watermark_format: null
-    watermark_exclude: []
-    order_by: ISSUEDDATE DESC
-    id_col: null
-    select: null
-    fallback_endpoints: []
-    where: null
+    expected_cadence_days: 1
     needs_geocode: false
-    geocode_context: null
+    oid_field: OBJECTID
+    max_record_count: 2000
+    order_by: ISSUEDDATE DESC
     field_map:
       job_id:
       - FOLDERNUMBER
@@ -300,10 +294,16 @@ datasets:
       - PROPERTYADDRESS
       borough:
       - NEIGHBORHOOD
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    geocode_context: null
     ingestion_mode: incremental
-    oid_field: OBJECTID
-    max_record_count: 2000
-    expected_cadence_days: 1
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false
@@ -321,49 +321,47 @@ datasets:
     zip_member: null
     delimiter: null
   sla:
-    endpoint: https://services.arcgis.com/kIA6yS9KDGqZL7U3/arcgis/rest/services/Amanda_MultiFamily_Licenses_Data/FeatureServer/0
-    platform: arcgis
-    watermark_col: INDATE
+    endpoint: https://data.oregon.gov/resource/tckn-sxa6.json
+    platform: socrata
+    watermark_col: registry_date
     id_keys:
-    - FOLDERNUMBER
+    - registry_number
+    - business_name
     topic: raw.municipal.sla
-    interval_seconds: 600.0
+    interval_seconds: 21600.0
     producer_key: sla
+    expected_cadence_days: 1
+    needs_geocode: true
+    geocode_context: Salem, OR
+    order_by: registry_date DESC
+    where: city = 'SALEM' AND state = 'OR'
+    field_map:
+      license_id:
+      - registry_number
+      dba:
+      - business_name
+      premises_name:
+      - business_name
+      license_type:
+      - entity_type
+      effective_date:
+      - registry_date
+      address_street:
+      - address
+      city:
+      - city
+      zipcode:
+      - zip
     endpoint_by_year: {}
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: INDATE DESC
     id_col: null
     select: null
     fallback_endpoints: []
-    where: null
-    needs_geocode: false
-    geocode_context: null
-    field_map:
-      license_id:
-      - FOLDERNUMBER
-      dba:
-      - COMPLEXNAME
-      premises_name:
-      - COMPLEXNAME
-      license_type:
-      - SUBTYPE
-      - SUBDESC
-      status:
-      - STATUSDESC
-      effective_date:
-      - INDATE
-      expiration_date:
-      - EXPIRYDATE
-      address_street:
-      - FOLDERNAME
-      borough:
-      - NEIGHBORHOOD
     ingestion_mode: incremental
-    oid_field: OBJECTID
-    max_record_count: 2000
-    expected_cadence_days: 7
+    oid_field: null
+    max_record_count: null
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false

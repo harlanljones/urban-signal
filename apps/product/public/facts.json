@@ -2155,6 +2155,36 @@
       "evidence_path": "apps/api/src/spatial/cities/lexington.py"
     },
     {
+      "id": "lincoln",
+      "name": "Lincoln, NE",
+      "state": "NE",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 11,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "Issued",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 40.81,
+        "lng": -96.69999999999999
+      },
+      "evidence_path": "apps/api/src/spatial/cities/lincoln.py"
+    },
+    {
       "id": "long_beach",
       "name": "Long Beach",
       "state": "CA",
@@ -3726,9 +3756,9 @@
         },
         null,
         {
-          "platform": "arcgis",
-          "watermark_col": "INDATE",
-          "interval_seconds": 600.0,
+          "platform": "socrata",
+          "watermark_col": "registry_date",
+          "interval_seconds": 21600.0,
           "topic": "raw.municipal.sla"
         },
         null
@@ -4075,6 +4105,36 @@
       "evidence_path": "apps/api/src/spatial/cities/seattle.py"
     },
     {
+      "id": "sioux_falls",
+      "name": "Sioux Falls, SD",
+      "state": "SD",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 9,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "ISSUEDATE",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 43.54,
+        "lng": -96.725
+      },
+      "evidence_path": "apps/api/src/spatial/cities/sioux_falls.py"
+    },
+    {
       "id": "spartanburg",
       "name": "Spartanburg County",
       "state": "SC",
@@ -4248,6 +4308,46 @@
         "lng": -76.1474
       },
       "evidence_path": "apps/api/src/spatial/cities/syracuse.py"
+    },
+    {
+      "id": "tacoma",
+      "name": "Tacoma, WA",
+      "state": "WA",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 10,
+      "feeds": [
+        true,
+        true,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "issued_date",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "created_at",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "Business_Open_Date",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 47.230000000000004,
+        "lng": -122.465
+      },
+      "evidence_path": "apps/api/src/spatial/cities/tacoma.py"
     },
     {
       "id": "tallahassee",
@@ -4425,6 +4525,36 @@
       "evidence_path": "apps/api/src/spatial/cities/toledo.py"
     },
     {
+      "id": "topeka",
+      "name": "Topeka, KS",
+      "state": "KS",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 9,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "date_issued",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 39.04,
+        "lng": -95.69999999999999
+      },
+      "evidence_path": "apps/api/src/spatial/cities/topeka.py"
+    },
+    {
       "id": "tucson",
       "name": "Tucson",
       "state": "AZ",
@@ -4521,7 +4651,7 @@
     },
     {
       "id": "vancouver_wa",
-      "name": "Vancouver",
+      "name": "Vancouver, WA",
       "state": "WA",
       "divisions": "6 divisions",
       "division_count": 6,
@@ -4529,7 +4659,7 @@
       "feeds": [
         true,
         false,
-        false,
+        true,
         false
       ],
       "platforms": [
@@ -4540,7 +4670,12 @@
           "topic": "raw.municipal.permits"
         },
         null,
-        null,
+        {
+          "platform": "socrata",
+          "watermark_col": "licenseeffectivedate",
+          "interval_seconds": 3600.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
       "center": {

@@ -1,0 +1,198 @@
+{
+  "schema_version": 2,
+  "id": "sioux_falls",
+  "name": "Sioux Falls, SD",
+  "state": "SD",
+  "center": {
+    "lat": 43.54,
+    "lng": -96.725
+  },
+  "metro_bbox": {
+    "min_lat": 43.48,
+    "max_lat": 43.6,
+    "min_lng": -96.82,
+    "max_lng": -96.63
+  },
+  "divisions": {
+    "DOWNTOWN": {
+      "name": "DOWNTOWN",
+      "center": {
+        "lat": 43.549,
+        "lng": -96.729
+      },
+      "bbox": {
+        "min_lat": 43.54,
+        "max_lat": 43.56,
+        "min_lng": -96.745,
+        "max_lng": -96.71
+      },
+      "submarkets": [
+        "Downtown Sioux Falls",
+        "Falls Park"
+      ]
+    },
+    "EAST_BANK": {
+      "name": "EAST_BANK",
+      "center": {
+        "lat": 43.53,
+        "lng": -96.71
+      },
+      "bbox": {
+        "min_lat": 43.52,
+        "max_lat": 43.545,
+        "min_lng": -96.735,
+        "max_lng": -96.69
+      },
+      "submarkets": [
+        "East Bank / Arena District",
+        "All Saints / Eastside"
+      ]
+    },
+    "WEST_SIOUX_FALLS": {
+      "name": "WEST_SIOUX_FALLS",
+      "center": {
+        "lat": 43.545,
+        "lng": -96.79
+      },
+      "bbox": {
+        "min_lat": 43.5,
+        "max_lat": 43.59,
+        "min_lng": -96.815,
+        "max_lng": -96.745
+      },
+      "submarkets": [
+        "Western Sioux Falls",
+        "Empire Mall / Southwest"
+      ]
+    },
+    "SOUTH_SIOUX_FALLS": {
+      "name": "SOUTH_SIOUX_FALLS",
+      "center": {
+        "lat": 43.51,
+        "lng": -96.74
+      },
+      "bbox": {
+        "min_lat": 43.48,
+        "max_lat": 43.535,
+        "min_lng": -96.78,
+        "max_lng": -96.69
+      },
+      "submarkets": [
+        "Southern Sioux Falls",
+        "Marion Road / Southeast"
+      ]
+    },
+    "NORTH_SIOUX_FALLS": {
+      "name": "NORTH_SIOUX_FALLS",
+      "center": {
+        "lat": 43.58,
+        "lng": -96.73
+      },
+      "bbox": {
+        "min_lat": 43.56,
+        "max_lat": 43.6,
+        "min_lng": -96.79,
+        "max_lng": -96.64
+      },
+      "submarkets": [
+        "North Sioux Falls"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Sioux Falls": {
+      "name": "Downtown Sioux Falls",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 43.549,
+        "lng": -96.729
+      },
+      "description": "Phillips Avenue retail and office core with the Levitt Shell, the Washington Pavilion, and high-value adaptive-reuse and mixed-use permitting."
+    },
+    "Falls Park": {
+      "name": "Falls Park",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 43.55,
+        "lng": -96.72
+      },
+      "description": "Big Sioux riverfront around Falls Park with hotel and entertainment investment and the Cherapa Place mixed-use corridor."
+    },
+    "East Bank / Arena District": {
+      "name": "East Bank / Arena District",
+      "division": "EAST_BANK",
+      "center": {
+        "lat": 43.535,
+        "lng": -96.716
+      },
+      "description": "East of the river with the Denny Sanford PREMIER Center, the Levitt adjacency, and residential infill and entertainment-adjacent commercial."
+    },
+    "All Saints / Eastside": {
+      "name": "All Saints / Eastside",
+      "division": "EAST_BANK",
+      "center": {
+        "lat": 43.528,
+        "lng": -96.705
+      },
+      "description": "Historic east-side neighborhoods with tree-lined blocks, steady single-family renovation, and the Augustana University adjacency."
+    },
+    "Western Sioux Falls": {
+      "name": "Western Sioux Falls",
+      "division": "WEST_SIOUX_FALLS",
+      "center": {
+        "lat": 43.545,
+        "lng": -96.785
+      },
+      "description": "Western growth corridor with new subdivisions, the Sanford Health western campus expansion, and steady new-build residential permitting."
+    },
+    "Empire Mall / Southwest": {
+      "name": "Empire Mall / Southwest",
+      "division": "WEST_SIOUX_FALLS",
+      "center": {
+        "lat": 43.528,
+        "lng": -96.76
+      },
+      "description": "Empire Mall retail node and the 41st Street commercial strip with tenant-improvement and big-box commercial permitting."
+    },
+    "Southern Sioux Falls": {
+      "name": "Southern Sioux Falls",
+      "division": "SOUTH_SIOUX_FALLS",
+      "center": {
+        "lat": 43.52,
+        "lng": -96.74
+      },
+      "description": "Southside growth area along Minnesota Avenue and Louise Avenue with master-planned subdivisions and strong new-home permit volume."
+    },
+    "Marion Road / Southeast": {
+      "name": "Marion Road / Southeast",
+      "division": "SOUTH_SIOUX_FALLS",
+      "center": {
+        "lat": 43.505,
+        "lng": -96.71
+      },
+      "description": "Southeast residential belt along Marion Road with subdivision infill, schools, and community-serving commercial."
+    },
+    "North Sioux Falls": {
+      "name": "North Sioux Falls",
+      "division": "NORTH_SIOUX_FALLS",
+      "center": {
+        "lat": 43.57,
+        "lng": -96.73
+      },
+      "description": "Northern industrial and gateway corridor with logistics, the airport adjacency, and commercial-industrial permitting."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "ISSUEDATE",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/sioux_falls.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

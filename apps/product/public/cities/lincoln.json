@@ -1,0 +1,233 @@
+{
+  "schema_version": 2,
+  "id": "lincoln",
+  "name": "Lincoln, NE",
+  "state": "NE",
+  "center": {
+    "lat": 40.81,
+    "lng": -96.69999999999999
+  },
+  "metro_bbox": {
+    "min_lat": 40.72,
+    "max_lat": 40.9,
+    "min_lng": -96.82,
+    "max_lng": -96.58
+  },
+  "divisions": {
+    "DOWNTOWN": {
+      "name": "DOWNTOWN",
+      "center": {
+        "lat": 40.8136,
+        "lng": -96.7026
+      },
+      "bbox": {
+        "min_lat": 40.798,
+        "max_lat": 40.83,
+        "min_lng": -96.72,
+        "max_lng": -96.69
+      },
+      "submarkets": [
+        "Downtown Lincoln",
+        "Haymarket"
+      ]
+    },
+    "UNIVERSITY": {
+      "name": "UNIVERSITY",
+      "center": {
+        "lat": 40.816,
+        "lng": -96.685
+      },
+      "bbox": {
+        "min_lat": 40.803,
+        "max_lat": 40.84,
+        "min_lng": -96.71,
+        "max_lng": -96.65
+      },
+      "submarkets": [
+        "University of Nebraska",
+        "College View"
+      ]
+    },
+    "SOUTH_LINCOLN": {
+      "name": "SOUTH_LINCOLN",
+      "center": {
+        "lat": 40.77,
+        "lng": -96.695
+      },
+      "bbox": {
+        "min_lat": 40.72,
+        "max_lat": 40.798,
+        "min_lng": -96.75,
+        "max_lng": -96.61
+      },
+      "submarkets": [
+        "South Lincoln",
+        "South 48th Street",
+        "South 70th Street"
+      ]
+    },
+    "EAST_LINCOLN": {
+      "name": "EAST_LINCOLN",
+      "center": {
+        "lat": 40.83,
+        "lng": -96.62
+      },
+      "bbox": {
+        "min_lat": 40.76,
+        "max_lat": 40.86,
+        "min_lng": -96.66,
+        "max_lng": -96.58
+      },
+      "submarkets": [
+        "East Lincoln",
+        "Havelock"
+      ]
+    },
+    "WEST_LINCOLN": {
+      "name": "WEST_LINCOLN",
+      "center": {
+        "lat": 40.84,
+        "lng": -96.76
+      },
+      "bbox": {
+        "min_lat": 40.78,
+        "max_lat": 40.88,
+        "min_lng": -96.82,
+        "max_lng": -96.72
+      },
+      "submarkets": [
+        "West Lincoln"
+      ]
+    },
+    "NORTH_LINCOLN": {
+      "name": "NORTH_LINCOLN",
+      "center": {
+        "lat": 40.86,
+        "lng": -96.72
+      },
+      "bbox": {
+        "min_lat": 40.83,
+        "max_lat": 40.9,
+        "min_lng": -96.78,
+        "max_lng": -96.66
+      },
+      "submarkets": [
+        "North Lincoln"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Lincoln": {
+      "name": "Downtown Lincoln",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 40.8136,
+        "lng": -96.7026
+      },
+      "description": "Downtown Lincoln civic and office core with the Capitol, the Railyard entertainment district, and active mixed-use and adaptive-reuse permitting."
+    },
+    "Haymarket": {
+      "name": "Haymarket",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 40.812,
+        "lng": -96.708
+      },
+      "description": "Historic Haymarket District with the Pinnacle Bank Arena adjacency, restaurant and retail build-outs, and strong commercial-to-residential conversion."
+    },
+    "University of Nebraska": {
+      "name": "University of Nebraska",
+      "division": "UNIVERSITY",
+      "center": {
+        "lat": 40.82,
+        "lng": -96.7
+      },
+      "description": "UNL campus corridor with University Place, student housing, institutional permitting, and the Innovation Campus redevelopment."
+    },
+    "College View": {
+      "name": "College View",
+      "division": "UNIVERSITY",
+      "center": {
+        "lat": 40.81,
+        "lng": -96.66
+      },
+      "description": "College View neighborhood east of the campus with student-oriented housing, small commercial, and steady renovation permits."
+    },
+    "South Lincoln": {
+      "name": "South Lincoln",
+      "division": "SOUTH_LINCOLN",
+      "center": {
+        "lat": 40.78,
+        "lng": -96.69
+      },
+      "description": "South Lincoln residential corridor with SouthPointe Mall retail, master-planned subdivisions, and the city's strongest new-home permit volume."
+    },
+    "South 48th Street": {
+      "name": "South 48th Street",
+      "division": "SOUTH_LINCOLN",
+      "center": {
+        "lat": 40.77,
+        "lng": -96.699
+      },
+      "description": "Major south-north commercial corridor with auto dealerships, strip retail, and steady commercial tenant-improvement permitting."
+    },
+    "South 70th Street": {
+      "name": "South 70th Street",
+      "division": "SOUTH_LINCOLN",
+      "center": {
+        "lat": 40.76,
+        "lng": -96.624
+      },
+      "description": "South 70th Street growth corridor with new subdivisions, big-box retail, and the Wilderness Hills development."
+    },
+    "East Lincoln": {
+      "name": "East Lincoln",
+      "division": "EAST_LINCOLN",
+      "center": {
+        "lat": 40.82,
+        "lng": -96.62
+      },
+      "description": "East Lincoln residential corridor along 84th and 70th Streets with new subdivisions, schools, and small-strip commercial."
+    },
+    "Havelock": {
+      "name": "Havelock",
+      "division": "EAST_LINCOLN",
+      "center": {
+        "lat": 40.851,
+        "lng": -96.63
+      },
+      "description": "Historic Havelock neighborhood in northeast Lincoln with older housing stock, small commercial, and the Havelock Main Street district."
+    },
+    "West Lincoln": {
+      "name": "West Lincoln",
+      "division": "WEST_LINCOLN",
+      "center": {
+        "lat": 40.84,
+        "lng": -96.76
+      },
+      "description": "West Lincoln along Cornhusker Highway with industrial and warehouse permitting, auto-oriented commercial, and the airport adjacency."
+    },
+    "North Lincoln": {
+      "name": "North Lincoln",
+      "division": "NORTH_LINCOLN",
+      "center": {
+        "lat": 40.86,
+        "lng": -96.71
+      },
+      "description": "North Lincoln gateway corridor with the airpark, ag-industrial, and growing residential subdivision fringe."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "Issued",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/lincoln.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

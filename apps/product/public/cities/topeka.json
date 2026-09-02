@@ -1,0 +1,198 @@
+{
+  "schema_version": 2,
+  "id": "topeka",
+  "name": "Topeka, KS",
+  "state": "KS",
+  "center": {
+    "lat": 39.04,
+    "lng": -95.69999999999999
+  },
+  "metro_bbox": {
+    "min_lat": 38.96,
+    "max_lat": 39.12,
+    "min_lng": -95.82,
+    "max_lng": -95.58
+  },
+  "divisions": {
+    "DOWNTOWN": {
+      "name": "DOWNTOWN",
+      "center": {
+        "lat": 39.0483,
+        "lng": -95.678
+      },
+      "bbox": {
+        "min_lat": 39.035,
+        "max_lat": 39.07,
+        "min_lng": -95.69,
+        "max_lng": -95.66
+      },
+      "submarkets": [
+        "Downtown Topeka",
+        "NOTO Arts District"
+      ]
+    },
+    "CENTRAL": {
+      "name": "CENTRAL",
+      "center": {
+        "lat": 39.035,
+        "lng": -95.7
+      },
+      "bbox": {
+        "min_lat": 39.02,
+        "max_lat": 39.08,
+        "min_lng": -95.72,
+        "max_lng": -95.69
+      },
+      "submarkets": [
+        "Central Topeka",
+        "Chesney Park"
+      ]
+    },
+    "EAST_TOPEKA": {
+      "name": "EAST_TOPEKA",
+      "center": {
+        "lat": 39.04,
+        "lng": -95.62
+      },
+      "bbox": {
+        "min_lat": 39.01,
+        "max_lat": 39.1,
+        "min_lng": -95.64,
+        "max_lng": -95.58
+      },
+      "submarkets": [
+        "East Topeka",
+        "Highland Park"
+      ]
+    },
+    "WEST_TOPEKA": {
+      "name": "WEST_TOPEKA",
+      "center": {
+        "lat": 39.035,
+        "lng": -95.76
+      },
+      "bbox": {
+        "min_lat": 39.0,
+        "max_lat": 39.09,
+        "min_lng": -95.8,
+        "max_lng": -95.72
+      },
+      "submarkets": [
+        "West Topeka",
+        "Huntoon / West 6th"
+      ]
+    },
+    "SOUTH_TOPEKA": {
+      "name": "SOUTH_TOPEKA",
+      "center": {
+        "lat": 38.99,
+        "lng": -95.72
+      },
+      "bbox": {
+        "min_lat": 38.96,
+        "max_lat": 39.02,
+        "min_lng": -95.77,
+        "max_lng": -95.69
+      },
+      "submarkets": [
+        "South Topeka"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Topeka": {
+      "name": "Downtown Topeka",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 39.0483,
+        "lng": -95.678
+      },
+      "description": "Downtown Topeka civic core with the Capitol, the Evergy Plaza, and the Kansas Avenue commercial corridor's steady mixed-use and office permitting."
+    },
+    "NOTO Arts District": {
+      "name": "NOTO Arts District",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 39.055,
+        "lng": -95.679
+      },
+      "description": "North Topeka Arts District with gallery and studio conversions, adaptive-reuse, and the Redbud and First Friday pedestrian traffic."
+    },
+    "Central Topeka": {
+      "name": "Central Topeka",
+      "division": "CENTRAL",
+      "center": {
+        "lat": 39.04,
+        "lng": -95.7
+      },
+      "description": "Central Topeka corridor along 10th and 6th Avenues with older commercial stock, the Washburn University adjacency, and steady commercial renovation."
+    },
+    "Chesney Park": {
+      "name": "Chesney Park",
+      "division": "CENTRAL",
+      "center": {
+        "lat": 39.025,
+        "lng": -95.699
+      },
+      "description": "Established central residential neighborhood with pre-war housing stock, the Gage Park adjacency, and steady renovation permits."
+    },
+    "East Topeka": {
+      "name": "East Topeka",
+      "division": "EAST_TOPEKA",
+      "center": {
+        "lat": 39.05,
+        "lng": -95.62
+      },
+      "description": "East Topeka corridor along Kansas Avenue and 6th Street with older commercial and industrial permitting and the Forbes Field adjacency."
+    },
+    "Highland Park": {
+      "name": "Highland Park",
+      "division": "EAST_TOPEKA",
+      "center": {
+        "lat": 39.02,
+        "lng": -95.61
+      },
+      "description": "Highland Park neighborhood southeast of downtown with post-war single-family and small commercial permitting."
+    },
+    "West Topeka": {
+      "name": "West Topeka",
+      "division": "WEST_TOPEKA",
+      "center": {
+        "lat": 39.04,
+        "lng": -95.76
+      },
+      "description": "West Topeka growth corridor along Wanamaker Road with big-box retail, the West Ridge Mall, and strong commercial tenant-improvement volume."
+    },
+    "Huntoon / West 6th": {
+      "name": "Huntoon / West 6th",
+      "division": "WEST_TOPEKA",
+      "center": {
+        "lat": 39.03,
+        "lng": -95.78
+      },
+      "description": "Huntoon and West 6th corridor with automotive and service commercial, new subdivisions, and residential infill."
+    },
+    "South Topeka": {
+      "name": "South Topeka",
+      "division": "SOUTH_TOPEKA",
+      "center": {
+        "lat": 38.99,
+        "lng": -95.71
+      },
+      "description": "South Topeka residential belt with subdivision expansion, the Topeka High adjacency, and steady single-family permitting."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "date_issued",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/topeka.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

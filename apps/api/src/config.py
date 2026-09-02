@@ -2147,6 +2147,49 @@ class Settings(BaseSettings):
         default="https://services.arcgis.com/kIA6yS9KDGqZL7U3/arcgis/rest/services/Amanda_MultiFamily_Licenses_Data/FeatureServer/0",
         description="Salem OR multi-family enterprise licenses ArcGIS FeatureServer URL (SLA)",
     )
+    arcgis_tacoma_permits_endpoint: str = Field(
+        default="https://services3.arcgis.com/SCwJH1pD8WSn5T5y/arcgis/rest/services/accela_permit_data/FeatureServer/0",
+        description="Tacoma Accela permit data ArcGIS FeatureServer URL",
+    )
+    arcgis_tacoma_sla_endpoint: str = Field(
+        default="https://services3.arcgis.com/SCwJH1pD8WSn5T5y/arcgis/rest/services/Business_Licenses/FeatureServer/0",
+        description="Tacoma business licenses ArcGIS FeatureServer URL (SLA)",
+    )
+    arcgis_tacoma_311_endpoint: str = Field(
+        default="https://services3.arcgis.com/SCwJH1pD8WSn5T5y/arcgis/rest/services/SeeClickFix_Requests/FeatureServer/0",
+        description="Tacoma SeeClickFix 311 service requests ArcGIS FeatureServer URL (311)",
+    )
+    arcgis_sioux_falls_permits_endpoint: str = Field(
+        default="https://gis.siouxfalls.gov/arcgis/rest/services/Data/Community/MapServer/3",
+        description="Sioux Falls building permits ArcGIS MapServer URL",
+    )
+    arcgis_lincoln_permits_endpoint: str = Field(
+        default="https://gis.lincoln.ne.gov/public/rest/services/Planning/Residential_New_Construction_Permits/MapServer/4",
+        description="Lincoln residential new-construction permits ArcGIS MapServer URL (layer 4, previous 3 years)",
+    )
+    arcgis_lincoln_residential_permits_endpoint: str = Field(
+        default="https://gis.lincoln.ne.gov/public/rest/services/Planning/Residential_New_Construction_Permits/MapServer/4",
+        description="Lincoln residential new-construction permits ArcGIS MapServer URL (alias, layer 4)",
+    )
+    arcgis_topeka_permits_endpoint: str = Field(
+        default="https://maps.topeka.gov/arcgis/rest/services/CityworksViews/BuildingPermits/MapServer/0",
+        description="Topeka commercial building permits ArcGIS MapServer URL",
+    )
+    arcgis_topeka_residential_permits_endpoint: str = Field(
+        default="https://maps.topeka.gov/arcgis/rest/services/CityworksViews/BuildingPermits/MapServer/1",
+        description="Topeka residential building permits ArcGIS MapServer URL",
+    )
+    socrata_wa_li_endpoint: str = Field(
+        default=(
+            "https://data.wa.gov/resource/m8qx-ubtq.json"
+            "?$select=*, 'wa_li:' || contractorlicensetypecodedesc as license_type_ns"
+        ),
+        description="WA L&I construction contractor licenses Socrata endpoint (super-feed, US-426)",
+    )
+    socrata_or_active_businesses_endpoint: str = Field(
+        default="https://data.oregon.gov/resource/tckn-sxa6.json",
+        description="OR SOS active businesses registry Socrata endpoint (super-feed, US-426)",
+    )
 
     @field_validator("webhook_alert_urls", mode="before")
     @classmethod

@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "id": "vancouver_wa",
-  "name": "Vancouver",
+  "name": "Vancouver, WA",
   "state": "WA",
   "center": {
     "lat": 45.6282,
@@ -245,7 +245,12 @@
       "topic": "raw.municipal.permits"
     },
     "311": null,
-    "sla": null,
+    "sla": {
+      "platform": "socrata",
+      "watermark_col": "licenseeffectivedate",
+      "interval_seconds": 3600.0,
+      "topic": "raw.municipal.sla"
+    },
     "deeds": null
   },
   "evidence_path": "apps/api/src/spatial/cities/vancouver_wa.py",

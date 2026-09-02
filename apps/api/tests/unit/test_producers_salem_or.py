@@ -1,23 +1,22 @@
-"""Unit tests for the Salem, OR leaf (US-226): spatial module + field
+"""Unit tests for the Salem, OR leaf (US-226 / US-426): spatial module + field
 maps + producer parse wiring.
 
-Salem, OR is a TWO-FEED PARTIAL metro on the City of Salem's ArcGIS Online
-org (``kIA6yS9KDGqZL7U3``): Structure_Permits (FeatureServer/0, Tier 1,
-~802 rows) and Amanda_MultiFamily_Licenses_Data (FeatureServer/0, Tier 2,
-~1,111 rows). 311 is a stale 8-row 2017 demo and deeds are Tier 3 — only
-``permits`` and ``sla`` are registered.
+Salem, OR is a TWO-FEED PARTIAL metro: Structure_Permits (FeatureServer/0,
+Tier 1, ~802 rows) on the City of Salem's AGOL org (``kIA6yS9KDGqZL7U3``)
+and — since US-426 — the OR Secretary of State Active Businesses registry
+(``tckn-sxa6``, ``data.oregon.gov``) as the metropolitan SLA. 311 is a stale
+8-row 2017 demo and deeds are Tier 3 — only ``permits`` and ``sla`` are
+registered.
 
 Tests pass WITHOUT a spine registration (no CityId.SALEM_OR, no REGISTRY
 assertions — ``city_id="salem_or"`` strings only). Spine-stable per the
 wave-5 leaf contract: no division/borough-resolution assertions and no
 geocode-hook call-count assertions (both change when the spine lands).
 
-Fixtures captured byte-verbatim 2026-08-28 from FeatureServer/0 (newest rows
-via ``orderByFields=ISSUEDDATE DESC`` / ``orderByFields=INDATE DESC`` at
-``outSR=4326``). Fixtures are RAW ArcGIS features (attributes + geometry);
-the tests run the real ``ArcGISClient._flatten_feature`` lift — geometry to
-latitude/longitude, epoch-ms to ISO — before parsing, exactly as the live
-producer path does.
+Permits fixtures captured byte-verbatim 2026-08-28 from FeatureServer/0
+(``orderByFields=ISSUEDDATE DESC`` at ``outSR=4326``). SLA fixtures are
+flat Socrata rows from the OR Active Businesses API (``tckn-sxa6``,
+``data.oregon.gov``) captured 2026-08-31.
 """
 
 from unittest.mock import patch
@@ -26,7 +25,6 @@ import pytest
 
 from src.producers.field_maps import first_mapped
 from src.producers.field_maps_salem_or import (
-    DROPPED_PII_COLUMNS,
     FIELD_MAP,
     GEOCODE_CONTEXT,
     PERMITS_FIELD_MAP,
@@ -70,24 +68,6 @@ def _flatten_permits(feature):
     from src.producers.arcgis_client import ArcGISClient
 
     return ArcGISClient()._flatten_feature(feature, {"CREATEDDATE", "ISSUEDDATE"})
-
-
-def _flatten_sla(feature):
-    """Run the real ArcGIS flatten lift over a raw captured SLA feature."""
-    from src.producers.arcgis_client import ArcGISClient
-
-    return ArcGISClient()._flatten_feature(
-        feature,
-        {
-            "INDATE",
-            "EXPIRYDATE",
-            "FINALDATE",
-            "PROGRAMINSPDATE",
-            "INITINSPDATE",
-            "REINSPDATE",
-            "FINALINSPDATE",
-        },
-    )
 
 
 # ---------------------------------------------------------------------------
@@ -185,165 +165,46 @@ WALN_ROW = _flatten_permits(PERMIT_FEATURE_WALN)
 _ISSUEDATE_ISO = "2026-08-27T15:24:25+00:00"
 
 # ---------------------------------------------------------------------------
-# SLA fixtures (byte-verbatim from 2026-08-28 probe, newest by INDATE)
+# SLA fixtures (flat Socrata rows from OR Active Businesses API, 2026-08-31)
 # ---------------------------------------------------------------------------
 
-SLA_FEATURE_MEDICAL = {
-    "attributes": {
-        "OBJECTID": 524172,
-        "SUBTYPE": "Apartment",
-        "FOLDERNUMBER": "26-117246-MF",
-        "FOLDERTYPE": "MF",
-        "FOLDERTYPEDESC": "Multifamily License",
-        "FINALDATE": None,
-        "INDATE": 1787743413000,
-        "STATUS": 300,
-        "STATUSDESC": "Pending",
-        "FOLDERNAME": "716 MEDICAL CENTER DR NE",
-        "FOLDERDESC": "9 BLDGS 120 UNITS\n716-769 MEDICAL CENTER DR NE\n727-745 23RD ST NE",
-        "ISSUEUSER": None,
-        "EXPIRYDATE": 1798675200000,
-        "REFERENCENO": None,
-        "FOLDERGROUP": "Multifamily",
-        "SUBCODE": 30,
-        "SUBDESC": "Apartment",
-        "WORKCODE": None,
-        "WORKDESC": None,
-        "PRIORITY": None,
-        "PROPERTYRSN": 848983,
-        "FOLDERRSN": 1223455,
-        "REVISION": "00",
-        "CENTURY": 20,
-        "YEAR": "26",
-        "SEQUENCE": "117246",
-        "POINT_X": 7553027,
-        "POINT_Y": 474381,
-        "OWNER": "NE SALEM APARTMENTS LP",
-        "COMPLEXNAME": "GUSSIE BELLE COMMONS",
-        "PROGRAMINSPDATE": 1943308800000,
-        "INITINSPDATE": None,
-        "REINSPDATE": None,
-        "FINALINSPDATE": None,
-        "UNITS": 120,
-        "BUILDINGS": 9,
-        "NEIGHBORHOOD": "Northeast Neighbors (NEN)",
-        "WARD": "1",
-        "GlobalID": "1f0599ed-ddab-4de4-994f-7503a13caf63",
-    },
-    "geometry": {
-        "x": -123.00717795777433,
-        "y": 44.94024238056732,
-    },
+SLA_ROW_TALOS = {
+    "registry_number": "262244792",
+    "business_name": "TALOS VENTURES LLC",
+    "entity_type": "DOMESTIC LIMITED LIABILITY COMPANY",
+    "registry_date": "2026-08-31T16:56:42.000",
+    "address": "942 WINDEMERE DR NW",
+    "city": "SALEM",
+    "state": "OR",
+    "zip": "97304",
 }
 
-SLA_FEATURE_ROYALTY = {
-    "attributes": {
-        "OBJECTID": 524338,
-        "SUBTYPE": "Short-term",
-        "FOLDERNUMBER": "26-117237-MF",
-        "FOLDERTYPE": "MF",
-        "FOLDERTYPEDESC": "Multifamily License",
-        "FINALDATE": None,
-        "INDATE": 1787741202000,
-        "STATUS": 300,
-        "STATUSDESC": "Pending",
-        "FOLDERNAME": "946 ROYALTY DR NE",
-        "FOLDERDESC": "Short-Term Rental License",
-        "ISSUEUSER": None,
-        "EXPIRYDATE": None,
-        "REFERENCENO": None,
-        "FOLDERGROUP": "Multifamily",
-        "SUBCODE": 1365,
-        "SUBDESC": "Short-term Rental",
-        "WORKCODE": None,
-        "WORKDESC": None,
-        "PRIORITY": None,
-        "PROPERTYRSN": 9026,
-        "FOLDERRSN": 1223446,
-        "REVISION": "00",
-        "CENTURY": 20,
-        "YEAR": "26",
-        "SEQUENCE": "117237",
-        "POINT_X": 7563514,
-        "POINT_Y": 474775,
-        "OWNER": "ROSEMARY DISIERVI",
-        "COMPLEXNAME": None,
-        "PROGRAMINSPDATE": None,
-        "INITINSPDATE": None,
-        "REINSPDATE": None,
-        "FINALINSPDATE": None,
-        "UNITS": 0,
-        "BUILDINGS": 0,
-        "NEIGHBORHOOD": "East Lancaster Neighborhood Association (ELNA)",
-        "WARD": "6",
-        "GlobalID": "709a05d8-b2b9-4dc8-9215-c55c3eb9d04f",
-    },
-    "geometry": {
-        "x": -122.96674157664741,
-        "y": 44.94220795005418,
-    },
+SLA_ROW_HEART = {
+    "registry_number": "262242598",
+    "business_name": "HEART OF SALEM MARKET PLACE COLLECTIVE",
+    "entity_type": "ASSUMED BUSINESS NAME",
+    "registry_date": "2026-08-31T16:54:58.000",
+    "address": "357 COURT STREET NORTHEAST",
+    "city": "SALEM",
+    "state": "OR",
+    "zip": "97301",
 }
 
-SLA_FEATURE_LIBERTY = {
-    "attributes": {
-        "OBJECTID": 523680,
-        "SUBTYPE": "Apartment",
-        "FOLDERNUMBER": "26-100356-MF",
-        "FOLDERTYPE": "MF",
-        "FOLDERTYPEDESC": "Multifamily License",
-        "FINALDATE": None,
-        "INDATE": 1762162193000,
-        "STATUS": 490,
-        "STATUSDESC": "Valid",
-        "FOLDERNAME": "4804 LIBERTY RD S",
-        "FOLDERDESC": "4804-4892 LIBERTY RD S",
-        "ISSUEUSER": "KHANCOCK",
-        "EXPIRYDATE": 1798675200000,
-        "REFERENCENO": None,
-        "FOLDERGROUP": "Multifamily",
-        "SUBCODE": 30,
-        "SUBDESC": "Apartment",
-        "WORKCODE": None,
-        "WORKDESC": None,
-        "PRIORITY": None,
-        "PROPERTYRSN": 43738,
-        "FOLDERRSN": 1202711,
-        "REVISION": "00",
-        "CENTURY": 20,
-        "YEAR": "26",
-        "SEQUENCE": "100356",
-        "POINT_X": 7538645,
-        "POINT_Y": 455770,
-        "OWNER": "FOXHOLLOW HARRISON APARTMENTS LLC",
-        "COMPLEXNAME": "FOX HOLLOW APARTMENTS",
-        "PROGRAMINSPDATE": 1932768000000,
-        "INITINSPDATE": None,
-        "REINSPDATE": 1764061200000,
-        "FINALINSPDATE": 1773765483000,
-        "UNITS": 180,
-        "BUILDINGS": 22,
-        "NEIGHBORHOOD": "Faye Wright Neighborhood Association",
-        "WARD": "7",
-        "GlobalID": "066a3e76-be5c-4a08-b31c-62907d413fa7",
-    },
-    "geometry": {
-        "x": -123.06041706234647,
-        "y": 44.88798059586505,
-    },
+SLA_ROW_EMPOWER = {
+    "registry_number": "261783394",
+    "business_name": "EMPOWER BROKERAGE, INC.",
+    "entity_type": "FOREIGN BUSINESS CORPORATION",
+    "registry_date": "2026-08-31T14:56:20.000",
+    "address": "780 COMMERCIAL ST SE STE 100",
+    "city": "SALEM",
+    "state": "OR",
+    "zip": "97301",
 }
-
-MEDICAL_ROW = _flatten_sla(SLA_FEATURE_MEDICAL)
-ROYALTY_ROW = _flatten_sla(SLA_FEATURE_ROYALTY)
-LIBERTY_ROW = _flatten_sla(SLA_FEATURE_LIBERTY)
-
-_ININDATE_ISO = "2026-08-26T11:23:33+00:00"
 
 _LIVE_FIXTURE_COORDS = (
     (BLOSSOM_ROW["latitude"], BLOSSOM_ROW["longitude"]),
     (CLARENCE_ROW["latitude"], CLARENCE_ROW["longitude"]),
     (WALN_ROW["latitude"], WALN_ROW["longitude"]),
-    (MEDICAL_ROW["latitude"], MEDICAL_ROW["longitude"]),
-    (ROYALTY_ROW["latitude"], ROYALTY_ROW["longitude"]),
 )
 
 _SUBMARKET_FIELDS = (
@@ -488,17 +349,15 @@ class TestFeedRegistration:
 
     def test_sla_spec_matches_live_layer(self):
         spec = get_salem_dataset(FeedType.SLA)
-        assert spec.platform == "arcgis"
+        assert spec.platform == "socrata"
         assert spec.endpoint == SALEM_SLA_ENDPOINT
-        assert spec.watermark_col == "INDATE"
-        assert spec.id_keys == ["FOLDERNUMBER"]
-        assert spec.oid_field == "OBJECTID"
-        assert spec.max_record_count == 2000
-        assert spec.expected_cadence_days == 7
-        assert spec.order_by == "INDATE DESC"
-        assert spec.interval_seconds == 600.0
+        assert spec.watermark_col == "registry_date"
+        assert spec.id_keys == ["registry_number", "business_name"]
+        assert spec.expected_cadence_days == 1
+        assert spec.order_by == "registry_date DESC"
+        assert spec.interval_seconds == 21600.0
         assert spec.ingestion_mode == "incremental"
-        assert spec.needs_geocode is False
+        assert spec.needs_geocode is True
         assert spec.field_map == SLA_FIELD_MAP
         assert spec.topic == "raw.municipal.sla"
 
@@ -526,15 +385,14 @@ class TestSalemFieldMaps:
         assert PERMITS_FIELD_MAP["borough"] == ["NEIGHBORHOOD"]
 
     def test_sla_map_reads_live_columns(self):
-        assert SLA_FIELD_MAP["license_id"] == ["FOLDERNUMBER"]
-        assert SLA_FIELD_MAP["dba"] == ["COMPLEXNAME"]
-        assert SLA_FIELD_MAP["premises_name"] == ["COMPLEXNAME"]
-        assert SLA_FIELD_MAP["license_type"] == ["SUBTYPE", "SUBDESC"]
-        assert SLA_FIELD_MAP["status"] == ["STATUSDESC"]
-        assert SLA_FIELD_MAP["effective_date"] == ["INDATE"]
-        assert SLA_FIELD_MAP["expiration_date"] == ["EXPIRYDATE"]
-        assert SLA_FIELD_MAP["address_street"] == ["FOLDERNAME"]
-        assert SLA_FIELD_MAP["borough"] == ["NEIGHBORHOOD"]
+        assert SLA_FIELD_MAP["license_id"] == ["registry_number"]
+        assert SLA_FIELD_MAP["dba"] == ["business_name"]
+        assert SLA_FIELD_MAP["premises_name"] == ["business_name"]
+        assert SLA_FIELD_MAP["license_type"] == ["entity_type"]
+        assert SLA_FIELD_MAP["effective_date"] == ["registry_date"]
+        assert SLA_FIELD_MAP["address_street"] == ["address"]
+        assert SLA_FIELD_MAP["city"] == ["city"]
+        assert SLA_FIELD_MAP["zipcode"] == ["zip"]
 
     def test_field_map_alias_and_geocode_context(self):
         assert FIELD_MAP == {"permits": PERMITS_FIELD_MAP, "sla": SLA_FIELD_MAP}
@@ -544,7 +402,8 @@ class TestSalemFieldMaps:
     def test_state_plane_coordinates_are_never_candidates(self):
         """X/Y and POINT_X/POINT_Y are integer State Plane feet (OR South,
         WKID 2913, ≈7.5e6/0.5e6) — mapping them would emit feet as degrees.
-        Coordinates come only from the outSR=4326 geometry lift."""
+        Coordinates come only from the outSR=4326 geometry lift (permits)
+        or the ADR-0004 geocode supplement (SLA super-feed)."""
         assert "latitude" not in PERMITS_FIELD_MAP
         assert "longitude" not in PERMITS_FIELD_MAP
         assert "latitude" not in SLA_FIELD_MAP
@@ -561,11 +420,13 @@ class TestSalemFieldMaps:
         assert mapped
         assert "OWNER" not in mapped
         assert "ISSUEUSER" not in mapped
-        assert {"OWNER", "ISSUEUSER"} <= set(DROPPED_PII_COLUMNS)
 
-    def test_no_zipcode_candidate_in_either_map(self):
+    def test_zipcode_only_declared_for_the_geocoded_sla_feed(self):
+        """The OR Active Businesses super-feed declares a zipcode candidate
+        (its rows carry a state zip); the permits layer has no site-zip
+        column, so permits stays zipcode-free."""
         assert "zipcode" not in PERMITS_FIELD_MAP
-        assert "zipcode" not in SLA_FIELD_MAP
+        assert "zipcode" in SLA_FIELD_MAP
 
     def test_permit_field_map_reads_from_flattened_fixture(self):
         row = BLOSSOM_ROW
@@ -597,36 +458,6 @@ class TestArcgisFlatten:
         assert BLOSSOM_ROW["ISSUEDDATE"] == _ISSUEDATE_ISO
         assert BLOSSOM_ROW["CREATEDDATE"] == "2026-02-13T14:23:54+00:00"
         assert CLARENCE_ROW["ISSUEDDATE"] == "2026-08-27T15:05:13+00:00"
-
-    def test_sla_geometry_lifts_to_wgs84(self):
-        assert MEDICAL_ROW["latitude"] == pytest.approx(44.94024238056732)
-        assert MEDICAL_ROW["longitude"] == pytest.approx(-123.00717795777433)
-        assert LIBERTY_ROW["latitude"] == pytest.approx(44.88798059586505)
-
-    def test_sla_epoch_ms_dates_flatten_to_iso(self):
-        assert MEDICAL_ROW["INDATE"] == _ININDATE_ISO
-        assert MEDICAL_ROW["EXPIRYDATE"] == "2026-12-31T00:00:00+00:00"
-
-    def test_sla_field_map_reads_from_flattened_fixtures(self):
-        assert (
-            first_mapped(ROYALTY_ROW, SLA_FIELD_MAP, "license_id")
-            == "26-117237-MF"
-        )
-        assert first_mapped(ROYALTY_ROW, SLA_FIELD_MAP, "license_type") == "Short-term"
-        assert (
-            first_mapped(ROYALTY_ROW, SLA_FIELD_MAP, "address_street")
-            == "946 ROYALTY DR NE"
-        )
-        assert (
-            first_mapped(ROYALTY_ROW, SLA_FIELD_MAP, "borough")
-            == "East Lancaster Neighborhood Association (ELNA)"
-        )
-
-    def test_sla_complexname_null_means_no_dba(self):
-        """Short-term fixture has COMPLEXNAME=null, so dba and premises_name
-        are None — OWNER is not a map candidate (PII)."""
-        assert first_mapped(ROYALTY_ROW, SLA_FIELD_MAP, "dba") is None
-        assert first_mapped(ROYALTY_ROW, SLA_FIELD_MAP, "premises_name") is None
 
 
 # ---------------------------------------------------------------------------
@@ -736,78 +567,77 @@ class TestSalemPermitParsing:
 
 
 class TestSalemSlaParsing:
-    def test_medical_fixture_parses_all_fields(self, sla, monkeypatch):
+    def test_talos_fixture_parses_all_fields(self, sla, monkeypatch):
         _patch_resolve_sla(monkeypatch)
-        event = sla.parse_socrata_row(MEDICAL_ROW, city_id="salem_or")
+        monkeypatch.setattr(
+            "src.spatial.geocoder.geocode_row_if_declared",
+            lambda city, feed, addr: (44.94, -123.01),
+        )
+        event = sla.parse_socrata_row(SLA_ROW_TALOS, city_id="salem_or")
         assert event is not None
         assert event.city_id == "salem_or"
-        assert event.license_id == "26-117246-MF"
-        assert event.license_type == "Apartment"
-        assert event.premises_name == "GUSSIE BELLE COMMONS"
-        assert event.dba == "GUSSIE BELLE COMMONS"
-        assert event.address == "716 MEDICAL CENTER DR NE"
-        assert event.license_status == "Pending"
+        assert event.license_id == "262244792"
+        assert event.license_type == "DOMESTIC LIMITED LIABILITY COMPANY"
+        assert event.premises_name == "TALOS VENTURES LLC"
+        assert event.dba == "TALOS VENTURES LLC"
+        assert event.address == "942 WINDEMERE DR NW"
+        assert event.license_status == "ACTIVE"
         assert event.effective_date is not None
         assert event.effective_date.year == 2026
         assert event.effective_date.month == 8
-        assert event.effective_date.day == 26
-        assert event.expiration_date is not None
-        assert event.latitude == pytest.approx(44.94024238056732)
-        assert event.longitude == pytest.approx(-123.00717795777433)
-        assert event.source_neighborhood == "Northeast Neighbors (NEN)"
+        assert event.effective_date.day == 31
+        assert event.expiration_date is None
+        assert event.latitude == pytest.approx(44.94)
+        assert event.longitude == pytest.approx(-123.01)
         assert event.h3_res7 is not None
 
-    def test_royalty_fixture_short_term_no_dba(self, sla, monkeypatch):
+    def test_heart_fixture_force_of_business_name(self, sla, monkeypatch):
         _patch_resolve_sla(monkeypatch)
-        event = sla.parse_socrata_row(ROYALTY_ROW, city_id="salem_or")
+        monkeypatch.setattr(
+            "src.spatial.geocoder.geocode_row_if_declared",
+            lambda city, feed, addr: (44.94, -123.01),
+        )
+        event = sla.parse_socrata_row(SLA_ROW_HEART, city_id="salem_or")
         assert event is not None
-        assert event.license_id == "26-117237-MF"
-        assert event.license_type == "Short-term"
-        assert event.address == "946 ROYALTY DR NE"
-        assert event.dba is None  # COMPLEXNAME=null, not in map
-        assert event.premises_name is None
-        assert event.license_status == "Pending"
-        assert event.latitude == pytest.approx(44.94220795005418)
-        assert event.longitude == pytest.approx(-122.96674157664741)
+        assert event.license_id == "262242598"
+        assert event.license_type == "ASSUMED BUSINESS NAME"
+        assert event.address == "357 COURT STREET NORTHEAST"
+        assert event.dba == "HEART OF SALEM MARKET PLACE COLLECTIVE"
+        assert event.premises_name == "HEART OF SALEM MARKET PLACE COLLECTIVE"
+        assert event.license_status == "ACTIVE"
         assert event.effective_date is not None
         assert event.h3_res7 is not None
 
-    def test_liberty_fixture_parses_existing_license(self, sla, monkeypatch):
+    def test_empower_fixture_registry_date_watermark(self, sla, monkeypatch):
         _patch_resolve_sla(monkeypatch)
-        event = sla.parse_socrata_row(LIBERTY_ROW, city_id="salem_or")
+        monkeypatch.setattr(
+            "src.spatial.geocoder.geocode_row_if_declared",
+            lambda city, feed, addr: (44.94, -123.01),
+        )
+        event = sla.parse_socrata_row(SLA_ROW_EMPOWER, city_id="salem_or")
         assert event is not None
-        assert event.license_id == "26-100356-MF"
-        assert event.license_type == "Apartment"
-        assert event.address == "4804 LIBERTY RD S"
-        assert event.dba == "FOX HOLLOW APARTMENTS"
-        assert event.premises_name == "FOX HOLLOW APARTMENTS"
-        assert event.license_status == "Valid"
-        assert event.latitude == pytest.approx(44.88798059586505)
-        assert is_in_salem_metro(event.latitude, event.longitude)
-
-    def test_sla_expiry_date_2026_12_31_is_future_dated(self, sla, monkeypatch):
-        """Valid multifamily licenses carry an EXPIRYDATE of 2026-12-31
-        (annual renewal cycle). Expected — not a sentinel, because the
-        watermark is INDATE (newest 2026-08-26), not EXPIRYDATE."""
-        _patch_resolve_sla(monkeypatch)
-        event = sla.parse_socrata_row(MEDICAL_ROW, city_id="salem_or")
-        assert event is not None
-        assert event.expiration_date is not None
-        assert event.expiration_date.year == 2026
-        assert event.expiration_date.month == 12
-        assert event.expiration_date.day == 31
+        assert event.license_id == "261783394"
+        assert event.license_type == "FOREIGN BUSINESS CORPORATION"
+        assert event.address == "780 COMMERCIAL ST SE STE 100"
+        assert event.effective_date is not None
+        assert event.effective_date.isoformat().startswith("2026-08-31")
+        assert event.h3_res7 is not None
 
     def test_row_without_license_id_is_dropped(self, sla, monkeypatch):
         _patch_resolve_sla(monkeypatch)
-        row = {k: v for k, v in MEDICAL_ROW.items() if k != "FOLDERNUMBER"}
+        row = {k: v for k, v in SLA_ROW_TALOS.items() if k != "registry_number"}
         assert sla.parse_socrata_row(row, city_id="salem_or") is None
 
     def test_city_id_string_is_accepted_verbatim(self, sla, monkeypatch):
         _patch_resolve_sla(monkeypatch)
+        monkeypatch.setattr(
+            "src.spatial.geocoder.geocode_row_if_declared",
+            lambda city, feed, addr: (44.94, -123.01),
+        )
         event = sla.parse_socrata_row(
-            {**MEDICAL_ROW, "FOLDERNUMBER": "99-999999-MF"},
+            {**SLA_ROW_TALOS, "registry_number": "99-999999"},
             city_id="salem_or",
         )
         assert event is not None
         assert event.city_id == "salem_or"
-        assert event.license_id == "99-999999-MF"
+        assert event.license_id == "99-999999"

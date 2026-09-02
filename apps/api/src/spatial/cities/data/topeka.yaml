@@ -1,0 +1,305 @@
+city_id: topeka
+name: Topeka, KS
+state: KS
+center:
+  lat: 39.04
+  lng: -95.69999999999999
+metro_bbox:
+  min_lat: 38.96
+  max_lat: 39.12
+  min_lng: -95.82
+  max_lng: -95.58
+division_bboxes:
+  DOWNTOWN:
+    min_lat: 39.035
+    max_lat: 39.07
+    min_lng: -95.69
+    max_lng: -95.66
+  CENTRAL:
+    min_lat: 39.02
+    max_lat: 39.08
+    min_lng: -95.72
+    max_lng: -95.69
+  EAST_TOPEKA:
+    min_lat: 39.01
+    max_lat: 39.1
+    min_lng: -95.64
+    max_lng: -95.58
+  WEST_TOPEKA:
+    min_lat: 39.0
+    max_lat: 39.09
+    min_lng: -95.8
+    max_lng: -95.72
+  SOUTH_TOPEKA:
+    min_lat: 38.96
+    max_lat: 39.02
+    min_lng: -95.77
+    max_lng: -95.69
+submarkets:
+  Downtown Topeka:
+    name: Downtown Topeka
+    borough: DOWNTOWN
+    lat: 39.0483
+    lng: -95.678
+    zoom: 15.0
+    pitch: 50.0
+    base_lims: 0.82
+    capex: 7200000.0
+    permit_vel: 32.0
+    shift_ratio: 1.44
+    sla: 60.0
+    description: Downtown Topeka civic core with the Capitol, the Evergy Plaza, and
+      the Kansas Avenue commercial corridor's steady mixed-use and office permitting.
+    city_id: topeka
+  NOTO Arts District:
+    name: NOTO Arts District
+    borough: DOWNTOWN
+    lat: 39.055
+    lng: -95.679
+    zoom: 14.5
+    pitch: 48.0
+    base_lims: 0.8
+    capex: 5800000.0
+    permit_vel: 28.0
+    shift_ratio: 1.42
+    sla: 58.0
+    description: North Topeka Arts District with gallery and studio conversions, adaptive-reuse,
+      and the Redbud and First Friday pedestrian traffic.
+    city_id: topeka
+  Central Topeka:
+    name: Central Topeka
+    borough: CENTRAL
+    lat: 39.04
+    lng: -95.7
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.8
+    capex: 6200000.0
+    permit_vel: 30.0
+    shift_ratio: 1.42
+    sla: 56.0
+    description: Central Topeka corridor along 10th and 6th Avenues with older commercial
+      stock, the Washburn University adjacency, and steady commercial renovation.
+    city_id: topeka
+  Chesney Park:
+    name: Chesney Park
+    borough: CENTRAL
+    lat: 39.025
+    lng: -95.699
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.78
+    capex: 5400000.0
+    permit_vel: 26.0
+    shift_ratio: 1.4
+    sla: 54.0
+    description: Established central residential neighborhood with pre-war housing
+      stock, the Gage Park adjacency, and steady renovation permits.
+    city_id: topeka
+  East Topeka:
+    name: East Topeka
+    borough: EAST_TOPEKA
+    lat: 39.05
+    lng: -95.62
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.76
+    capex: 5200000.0
+    permit_vel: 26.0
+    shift_ratio: 1.38
+    sla: 52.0
+    description: East Topeka corridor along Kansas Avenue and 6th Street with older
+      commercial and industrial permitting and the Forbes Field adjacency.
+    city_id: topeka
+  Highland Park:
+    name: Highland Park
+    borough: EAST_TOPEKA
+    lat: 39.02
+    lng: -95.61
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.74
+    capex: 4800000.0
+    permit_vel: 24.0
+    shift_ratio: 1.36
+    sla: 50.0
+    description: Highland Park neighborhood southeast of downtown with post-war single-family
+      and small commercial permitting.
+    city_id: topeka
+  West Topeka:
+    name: West Topeka
+    borough: WEST_TOPEKA
+    lat: 39.04
+    lng: -95.76
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.82
+    capex: 6800000.0
+    permit_vel: 32.0
+    shift_ratio: 1.44
+    sla: 58.0
+    description: West Topeka growth corridor along Wanamaker Road with big-box retail,
+      the West Ridge Mall, and strong commercial tenant-improvement volume.
+    city_id: topeka
+  Huntoon / West 6th:
+    name: Huntoon / West 6th
+    borough: WEST_TOPEKA
+    lat: 39.03
+    lng: -95.78
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.78
+    capex: 5800000.0
+    permit_vel: 28.0
+    shift_ratio: 1.4
+    sla: 54.0
+    description: Huntoon and West 6th corridor with automotive and service commercial,
+      new subdivisions, and residential infill.
+    city_id: topeka
+  South Topeka:
+    name: South Topeka
+    borough: SOUTH_TOPEKA
+    lat: 38.99
+    lng: -95.71
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.76
+    capex: 5400000.0
+    permit_vel: 26.0
+    shift_ratio: 1.38
+    sla: 52.0
+    description: South Topeka residential belt with subdivision expansion, the Topeka
+      High adjacency, and steady single-family permitting.
+    city_id: topeka
+divisions:
+  DOWNTOWN:
+    name: DOWNTOWN
+    center_lat: 39.0483
+    center_lng: -95.678
+    zoom: 14.0
+    bbox:
+      min_lat: 39.035
+      max_lat: 39.07
+      min_lng: -95.69
+      max_lng: -95.66
+    submarkets:
+    - Downtown Topeka
+    - NOTO Arts District
+    city_id: topeka
+  CENTRAL:
+    name: CENTRAL
+    center_lat: 39.035
+    center_lng: -95.7
+    zoom: 14.0
+    bbox:
+      min_lat: 39.02
+      max_lat: 39.08
+      min_lng: -95.72
+      max_lng: -95.69
+    submarkets:
+    - Central Topeka
+    - Chesney Park
+    city_id: topeka
+  EAST_TOPEKA:
+    name: EAST_TOPEKA
+    center_lat: 39.04
+    center_lng: -95.62
+    zoom: 13.5
+    bbox:
+      min_lat: 39.01
+      max_lat: 39.1
+      min_lng: -95.64
+      max_lng: -95.58
+    submarkets:
+    - East Topeka
+    - Highland Park
+    city_id: topeka
+  WEST_TOPEKA:
+    name: WEST_TOPEKA
+    center_lat: 39.035
+    center_lng: -95.76
+    zoom: 13.5
+    bbox:
+      min_lat: 39.0
+      max_lat: 39.09
+      min_lng: -95.8
+      max_lng: -95.72
+    submarkets:
+    - West Topeka
+    - Huntoon / West 6th
+    city_id: topeka
+  SOUTH_TOPEKA:
+    name: SOUTH_TOPEKA
+    center_lat: 38.99
+    center_lng: -95.72
+    zoom: 13.5
+    bbox:
+      min_lat: 38.96
+      max_lat: 39.02
+      min_lng: -95.77
+      max_lng: -95.69
+    submarkets:
+    - South Topeka
+    city_id: topeka
+datasets:
+  permits:
+    endpoint: https://maps.topeka.gov/arcgis/rest/services/CityworksViews/BuildingPermits/MapServer/0
+    platform: arcgis
+    watermark_col: date_issued
+    id_keys:
+    - case_number
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    expected_cadence_days: 1
+    needs_geocode: false
+    oid_field: OBJECTID
+    max_record_count: 2000
+    order_by: date_issued DESC
+    field_map:
+      job_id:
+      - case_number
+      - OBJECTID
+      issuance_date:
+      - date_issued
+      filing_date:
+      - date_entered
+      status:
+      - case_status
+      job_type:
+      - case_type
+      - case_type_desc
+      address_street:
+      - location
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    geocode_context: null
+    ingestion_mode: incremental
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- topeka_ks
+- topeka-ks
+- topeka ks
+job_suffix: topeka

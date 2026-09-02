@@ -1,0 +1,233 @@
+{
+  "schema_version": 2,
+  "id": "tacoma",
+  "name": "Tacoma, WA",
+  "state": "WA",
+  "center": {
+    "lat": 47.230000000000004,
+    "lng": -122.465
+  },
+  "metro_bbox": {
+    "min_lat": 47.14,
+    "max_lat": 47.32,
+    "min_lng": -122.55,
+    "max_lng": -122.38
+  },
+  "divisions": {
+    "DOWNTOWN": {
+      "name": "DOWNTOWN",
+      "center": {
+        "lat": 47.2529,
+        "lng": -122.4443
+      },
+      "bbox": {
+        "min_lat": 47.24,
+        "max_lat": 47.265,
+        "min_lng": -122.46,
+        "max_lng": -122.43
+      },
+      "submarkets": [
+        "Downtown Tacoma",
+        "Stadium District"
+      ]
+    },
+    "NORTH_END": {
+      "name": "NORTH_END",
+      "center": {
+        "lat": 47.27,
+        "lng": -122.46
+      },
+      "bbox": {
+        "min_lat": 47.26,
+        "max_lat": 47.31,
+        "min_lng": -122.505,
+        "max_lng": -122.43
+      },
+      "submarkets": [
+        "North End",
+        "Ruston / Point Ruston"
+      ]
+    },
+    "SIXTH_AVENUE": {
+      "name": "SIXTH_AVENUE",
+      "center": {
+        "lat": 47.25,
+        "lng": -122.49
+      },
+      "bbox": {
+        "min_lat": 47.238,
+        "max_lat": 47.262,
+        "min_lng": -122.51,
+        "max_lng": -122.46
+      },
+      "submarkets": [
+        "Sixth Avenue"
+      ]
+    },
+    "HILLTOP": {
+      "name": "HILLTOP",
+      "center": {
+        "lat": 47.244,
+        "lng": -122.457
+      },
+      "bbox": {
+        "min_lat": 47.235,
+        "max_lat": 47.25,
+        "min_lng": -122.475,
+        "max_lng": -122.445
+      },
+      "submarkets": [
+        "Hilltop"
+      ]
+    },
+    "EASTSIDE": {
+      "name": "EASTSIDE",
+      "center": {
+        "lat": 47.251,
+        "lng": -122.422
+      },
+      "bbox": {
+        "min_lat": 47.24,
+        "max_lat": 47.262,
+        "min_lng": -122.432,
+        "max_lng": -122.395
+      },
+      "submarkets": [
+        "Lincoln District",
+        "Eastside / Salishan"
+      ]
+    },
+    "SOUTH_TACOMA": {
+      "name": "SOUTH_TACOMA",
+      "center": {
+        "lat": 47.2,
+        "lng": -122.485
+      },
+      "bbox": {
+        "min_lat": 47.15,
+        "max_lat": 47.24,
+        "min_lng": -122.54,
+        "max_lng": -122.42
+      },
+      "submarkets": [
+        "South Tacoma",
+        "Wapato / South End"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Tacoma": {
+      "name": "Downtown Tacoma",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 47.2529,
+        "lng": -122.4443
+      },
+      "description": "Tacoma's civic and office core around Pacific Avenue with the UW Tacoma campus, the Tacoma Dome district, and steady mixed-use and institutional permitting."
+    },
+    "Stadium District": {
+      "name": "Stadium District",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 47.255,
+        "lng": -122.442
+      },
+      "description": "Historic Stadium High neighborhood with early-20th-century homes, the Wright Park corridor, and steady residential renovation permits."
+    },
+    "North End": {
+      "name": "North End",
+      "division": "NORTH_END",
+      "center": {
+        "lat": 47.268,
+        "lng": -122.455
+      },
+      "description": "Established residential North End with Proctor Street retail, large-lot homes, and consistent high-value remodels."
+    },
+    "Ruston / Point Ruston": {
+      "name": "Ruston / Point Ruston",
+      "division": "NORTH_END",
+      "center": {
+        "lat": 47.279,
+        "lng": -122.473
+      },
+      "description": "Waterfront mixed-use redevelopment on Commencement Bay with Point Ruston condos, the Ruston Way corridor, and premium residential construction."
+    },
+    "Sixth Avenue": {
+      "name": "Sixth Avenue",
+      "division": "SIXTH_AVENUE",
+      "center": {
+        "lat": 47.25,
+        "lng": -122.49
+      },
+      "description": "Sixth Avenue commercial corridor with neighborhood retail, restaurants, taverns, and high business-license turnover."
+    },
+    "Hilltop": {
+      "name": "Hilltop",
+      "division": "HILLTOP",
+      "center": {
+        "lat": 47.245,
+        "lng": -122.455
+      },
+      "description": "Rapidly revitalizing Hilltop corridor along Martin Luther King Jr Way with new mixed-use, the light-rail-adjacent development, and high 311-to-permit activity."
+    },
+    "Lincoln District": {
+      "name": "Lincoln District",
+      "division": "EASTSIDE",
+      "center": {
+        "lat": 47.255,
+        "lng": -122.43
+      },
+      "description": "Diverse Eastside commercial district along South 38th and the Lincoln Business District with dense small-business licensing."
+    },
+    "Eastside / Salishan": {
+      "name": "Eastside / Salishan",
+      "division": "EASTSIDE",
+      "center": {
+        "lat": 47.248,
+        "lng": -122.425
+      },
+      "description": "Eastside neighborhoods from Portland Avenue to the Salishan redevelopment with infill housing and community-serving commercial."
+    },
+    "South Tacoma": {
+      "name": "South Tacoma",
+      "division": "SOUTH_TACOMA",
+      "center": {
+        "lat": 47.211,
+        "lng": -122.49
+      },
+      "description": "South Tacoma's auto-row and light-industrial belt along South Tacoma Way with warehouse conversions and commercial permitting."
+    },
+    "Wapato / South End": {
+      "name": "Wapato / South End",
+      "division": "SOUTH_TACOMA",
+      "center": {
+        "lat": 47.18,
+        "lng": -122.46
+      },
+      "description": "Southern residential belt around Wapato Lake and the South End with single-family infill and steady service permits."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "issued_date",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "created_at",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "Business_Open_Date",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/tacoma.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

@@ -206,9 +206,9 @@
     },
     "311": null,
     "sla": {
-      "platform": "arcgis",
-      "watermark_col": "INDATE",
-      "interval_seconds": 600.0,
+      "platform": "socrata",
+      "watermark_col": "registry_date",
+      "interval_seconds": 21600.0,
       "topic": "raw.municipal.sla"
     },
     "deeds": null

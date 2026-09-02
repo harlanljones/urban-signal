@@ -1,0 +1,307 @@
+city_id: sioux_falls
+name: Sioux Falls, SD
+state: SD
+center:
+  lat: 43.54
+  lng: -96.725
+metro_bbox:
+  min_lat: 43.48
+  max_lat: 43.6
+  min_lng: -96.82
+  max_lng: -96.63
+division_bboxes:
+  DOWNTOWN:
+    min_lat: 43.54
+    max_lat: 43.56
+    min_lng: -96.745
+    max_lng: -96.71
+  EAST_BANK:
+    min_lat: 43.52
+    max_lat: 43.545
+    min_lng: -96.735
+    max_lng: -96.69
+  WEST_SIOUX_FALLS:
+    min_lat: 43.5
+    max_lat: 43.59
+    min_lng: -96.815
+    max_lng: -96.745
+  SOUTH_SIOUX_FALLS:
+    min_lat: 43.48
+    max_lat: 43.535
+    min_lng: -96.78
+    max_lng: -96.69
+  NORTH_SIOUX_FALLS:
+    min_lat: 43.56
+    max_lat: 43.6
+    min_lng: -96.79
+    max_lng: -96.64
+submarkets:
+  Downtown Sioux Falls:
+    name: Downtown Sioux Falls
+    borough: DOWNTOWN
+    lat: 43.549
+    lng: -96.729
+    zoom: 15.0
+    pitch: 50.0
+    base_lims: 0.84
+    capex: 8200000.0
+    permit_vel: 36.0
+    shift_ratio: 1.48
+    sla: 62.0
+    description: Phillips Avenue retail and office core with the Levitt Shell, the
+      Washington Pavilion, and high-value adaptive-reuse and mixed-use permitting.
+    city_id: sioux_falls
+  Falls Park:
+    name: Falls Park
+    borough: DOWNTOWN
+    lat: 43.55
+    lng: -96.72
+    zoom: 14.5
+    pitch: 48.0
+    base_lims: 0.82
+    capex: 6800000.0
+    permit_vel: 30.0
+    shift_ratio: 1.44
+    sla: 58.0
+    description: Big Sioux riverfront around Falls Park with hotel and entertainment
+      investment and the Cherapa Place mixed-use corridor.
+    city_id: sioux_falls
+  East Bank / Arena District:
+    name: East Bank / Arena District
+    borough: EAST_BANK
+    lat: 43.535
+    lng: -96.716
+    zoom: 14.5
+    pitch: 48.0
+    base_lims: 0.8
+    capex: 7200000.0
+    permit_vel: 32.0
+    shift_ratio: 1.42
+    sla: 56.0
+    description: East of the river with the Denny Sanford PREMIER Center, the Levitt
+      adjacency, and residential infill and entertainment-adjacent commercial.
+    city_id: sioux_falls
+  All Saints / Eastside:
+    name: All Saints / Eastside
+    borough: EAST_BANK
+    lat: 43.528
+    lng: -96.705
+    zoom: 14.0
+    pitch: 46.0
+    base_lims: 0.76
+    capex: 5200000.0
+    permit_vel: 26.0
+    shift_ratio: 1.38
+    sla: 52.0
+    description: Historic east-side neighborhoods with tree-lined blocks, steady single-family
+      renovation, and the Augustana University adjacency.
+    city_id: sioux_falls
+  Western Sioux Falls:
+    name: Western Sioux Falls
+    borough: WEST_SIOUX_FALLS
+    lat: 43.545
+    lng: -96.785
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.8
+    capex: 6400000.0
+    permit_vel: 30.0
+    shift_ratio: 1.42
+    sla: 56.0
+    description: Western growth corridor with new subdivisions, the Sanford Health
+      western campus expansion, and steady new-build residential permitting.
+    city_id: sioux_falls
+  Empire Mall / Southwest:
+    name: Empire Mall / Southwest
+    borough: WEST_SIOUX_FALLS
+    lat: 43.528
+    lng: -96.76
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.78
+    capex: 5800000.0
+    permit_vel: 28.0
+    shift_ratio: 1.4
+    sla: 54.0
+    description: Empire Mall retail node and the 41st Street commercial strip with
+      tenant-improvement and big-box commercial permitting.
+    city_id: sioux_falls
+  Southern Sioux Falls:
+    name: Southern Sioux Falls
+    borough: SOUTH_SIOUX_FALLS
+    lat: 43.52
+    lng: -96.74
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.82
+    capex: 7200000.0
+    permit_vel: 34.0
+    shift_ratio: 1.46
+    sla: 60.0
+    description: Southside growth area along Minnesota Avenue and Louise Avenue with
+      master-planned subdivisions and strong new-home permit volume.
+    city_id: sioux_falls
+  Marion Road / Southeast:
+    name: Marion Road / Southeast
+    borough: SOUTH_SIOUX_FALLS
+    lat: 43.505
+    lng: -96.71
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.76
+    capex: 5400000.0
+    permit_vel: 26.0
+    shift_ratio: 1.38
+    sla: 52.0
+    description: Southeast residential belt along Marion Road with subdivision infill,
+      schools, and community-serving commercial.
+    city_id: sioux_falls
+  North Sioux Falls:
+    name: North Sioux Falls
+    borough: NORTH_SIOUX_FALLS
+    lat: 43.57
+    lng: -96.73
+    zoom: 13.5
+    pitch: 44.0
+    base_lims: 0.74
+    capex: 5000000.0
+    permit_vel: 24.0
+    shift_ratio: 1.36
+    sla: 50.0
+    description: Northern industrial and gateway corridor with logistics, the airport
+      adjacency, and commercial-industrial permitting.
+    city_id: sioux_falls
+divisions:
+  DOWNTOWN:
+    name: DOWNTOWN
+    center_lat: 43.549
+    center_lng: -96.729
+    zoom: 14.0
+    bbox:
+      min_lat: 43.54
+      max_lat: 43.56
+      min_lng: -96.745
+      max_lng: -96.71
+    submarkets:
+    - Downtown Sioux Falls
+    - Falls Park
+    city_id: sioux_falls
+  EAST_BANK:
+    name: EAST_BANK
+    center_lat: 43.53
+    center_lng: -96.71
+    zoom: 14.0
+    bbox:
+      min_lat: 43.52
+      max_lat: 43.545
+      min_lng: -96.735
+      max_lng: -96.69
+    submarkets:
+    - East Bank / Arena District
+    - All Saints / Eastside
+    city_id: sioux_falls
+  WEST_SIOUX_FALLS:
+    name: WEST_SIOUX_FALLS
+    center_lat: 43.545
+    center_lng: -96.79
+    zoom: 13.5
+    bbox:
+      min_lat: 43.5
+      max_lat: 43.59
+      min_lng: -96.815
+      max_lng: -96.745
+    submarkets:
+    - Western Sioux Falls
+    - Empire Mall / Southwest
+    city_id: sioux_falls
+  SOUTH_SIOUX_FALLS:
+    name: SOUTH_SIOUX_FALLS
+    center_lat: 43.51
+    center_lng: -96.74
+    zoom: 13.5
+    bbox:
+      min_lat: 43.48
+      max_lat: 43.535
+      min_lng: -96.78
+      max_lng: -96.69
+    submarkets:
+    - Southern Sioux Falls
+    - Marion Road / Southeast
+    city_id: sioux_falls
+  NORTH_SIOUX_FALLS:
+    name: NORTH_SIOUX_FALLS
+    center_lat: 43.58
+    center_lng: -96.73
+    zoom: 13.5
+    bbox:
+      min_lat: 43.56
+      max_lat: 43.6
+      min_lng: -96.79
+      max_lng: -96.64
+    submarkets:
+    - North Sioux Falls
+    city_id: sioux_falls
+datasets:
+  permits:
+    endpoint: https://gis.siouxfalls.gov/arcgis/rest/services/Data/Community/MapServer/3
+    platform: arcgis
+    watermark_col: ISSUEDATE
+    id_keys:
+    - PERMITNUMBER
+    - OBJECTID
+    topic: raw.municipal.permits
+    interval_seconds: 300.0
+    producer_key: permits
+    expected_cadence_days: 1
+    needs_geocode: false
+    oid_field: OBJECTID
+    max_record_count: 1000
+    order_by: ISSUEDATE DESC
+    field_map:
+      job_id:
+      - PERMITNUMBER
+      - OBJECTID
+      issuance_date:
+      - ISSUEDATE
+      filing_date:
+      - APPLYDATE
+      status:
+      - PERMITSTATUS
+      job_type:
+      - PERMITTYPE
+      - WORKCLASS
+      address_street:
+      - MAINADDRESS
+      proposed_units:
+      - DwellingUnits
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    geocode_context: null
+    ingestion_mode: incremental
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- sioux falls
+- sioux_falls_sd
+- sioux-falls
+job_suffix: sioux_falls

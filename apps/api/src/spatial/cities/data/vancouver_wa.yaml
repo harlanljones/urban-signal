@@ -1,5 +1,5 @@
 city_id: vancouver_wa
-name: Vancouver
+name: Vancouver, WA
 state: WA
 center:
   lat: 45.6282
@@ -337,17 +337,13 @@ datasets:
     topic: raw.municipal.permits
     interval_seconds: 300.0
     producer_key: permits
-    endpoint_by_year: {}
-    watermark_type: null
-    watermark_format: null
-    watermark_exclude: []
-    order_by: csm_issued_date DESC
-    id_col: null
-    select: null
-    fallback_endpoints: []
-    where: csm_issued_date <= CURRENT_TIMESTAMP
+    expected_cadence_days: 1
     needs_geocode: true
     geocode_context: Vancouver, WA
+    oid_field: OBJECTID
+    max_record_count: 2000
+    order_by: csm_issued_date DESC
+    where: csm_issued_date <= CURRENT_TIMESTAMP
     field_map:
       job_id:
       - CSM_CASENO
@@ -364,10 +360,75 @@ datasets:
       - PRIM_ADDR
       proposed_units:
       - CSM_NO_UNITS
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    id_col: null
+    select: null
+    fallback_endpoints: []
     ingestion_mode: incremental
-    oid_field: OBJECTID
-    max_record_count: 2000
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+  sla:
+    endpoint: https://data.wa.gov/resource/m8qx-ubtq.json?$select=*, 'wa_li:' || contractorlicensetypecodedesc
+      as license_type_ns
+    platform: socrata
+    watermark_col: licenseeffectivedate
+    id_keys:
+    - contractorlicensenumber
+    - ubi
+    topic: raw.municipal.sla
+    interval_seconds: 3600.0
+    producer_key: sla
     expected_cadence_days: 1
+    needs_geocode: true
+    geocode_context: Vancouver, WA
+    order_by: licenseeffectivedate DESC
+    where: city = 'VANCOUVER' AND state = 'WA'
+    field_map:
+      license_id:
+      - contractorlicensenumber
+      license_type:
+      - license_type_ns
+      effective_date:
+      - licenseeffectivedate
+      expiration_date:
+      - licenseexpirationdate
+      premises_name:
+      - businessname
+      dba:
+      - businessname
+      address_street:
+      - address1
+      status:
+      - contractorlicensestatus
+      borough:
+      - city
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false
