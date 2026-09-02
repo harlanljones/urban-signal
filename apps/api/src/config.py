@@ -1157,6 +1157,15 @@ class Settings(BaseSettings):
         description="Connecticut Real Estate Sales (2001-2024 GL) Socrata endpoint (statewide)",
     )
 
+    # US-420: California ABC liquor license weekly bulk export (CSV zip).
+    # DailyExport-CSV.zip holds one member (ABC-DailyDataExport.csv) with a
+    # leading preamble line that CSVClient detects and strips. The registries
+    # that ride it declare snapshot ingestion and geocode premise addresses.
+    csv_ca_abc_endpoint: str = Field(
+        default="https://www.abc.ca.gov/wp-content/uploads/DailyExport-CSV.zip",
+        description="California ABC liquor license weekly CSV export zip",
+    )
+
     # Worcester, MA (ArcGIS Hub, US-419). Both layers are non-spatial Tables
     # (address-only) with text M/D/YYYY date columns.
     arcgis_worcester_permits_url: str = Field(

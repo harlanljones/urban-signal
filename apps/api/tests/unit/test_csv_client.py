@@ -6,7 +6,7 @@ import zipfile
 import httpx
 import pytest
 
-from src.producers.csv_client import CSVClient, _read_zip_member
+from src.producers.csv_client import CSVClient, _read_zip_member, _strip_preamble
 
 
 def _zip_bytes(members: dict[str, str]) -> bytes:
@@ -136,3 +136,55 @@ def test_csv_client_reads_pipe_delimited_rows():
     assert batches[0][0]["parcelnumber"] == "20904027B"
     assert batches[0][0]["saleprice"] == "210000"
     assert batches[0][1]["deednumber"] == "000000268"
+
+
+def test_csv_client_strips_single_field_preamble_line():
+    """ABC DailyExport-CSV leads the real header with a one-field metadata line."""
+    payload = (
+        '"Updated Wednesday 2nd of September 2026 03:50:26 AM"\n'
+        '"License Type","File Number","Lic or App","Type Status",'
+        '"Type Orig Iss Date","Expir Date","Primary Name","Prem Addr 1",'
+        '"Prem City","Prem Zip","Prem County","DBA Name"\n'
+        "17,00505492,APP,ACTIVE,18-MAY-2022,30-APR-2027,"
+        "PELOTON IMPORTS LLC,755 SKYWAY CT,NAPA,94558,NAPA,PELOTON IMPORTS LLC\n"
+        "47,00361506,LIC,ACTIVE,01-FEB-1988,30-JUN-2027,"
+        "SAMPLE BAR,100 MAIN ST,SONOMA,95404,SONOMA,SAMPLE BAR\n"
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, text=payload, request=request)
+
+    client = CSVClient(httpx.Client(transport=httpx.MockTransport(handler)))
+    batches = list(
+        client.paginate(
+            "https://www.abc.ca.gov/export.zip",
+            where_clause="prem_county = 'SONOMA'",
+        )
+    )
+    assert len(batches) == 1
+    rows = batches[0]
+    assert [r["file_number"] for r in rows] == ["00361506"]
+    assert rows[0]["license_type"] == "47"
+    assert rows[0]["prem_city"] == "SONOMA"
+
+
+def test_csv_client_where_clause_supports_or():
+    """inland_empire ABC slice covers two counties via an OR clause."""
+    payload = (
+        "File Number,License Type,Prem County\n"
+        "1,41,RIVERSIDE\n"
+        "2,20,SAN BERNARDINO\n"
+        "3,47,SAN DIEGO\n"
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, text=payload, request=request)
+
+    client = CSVClient(httpx.Client(transport=httpx.MockTransport(handler)))
+    batches = list(
+        client.paginate(
+            "https://example.test/abc.csv",
+            where_clause="prem_county = 'RIVERSIDE' OR prem_county = 'SAN BERNARDINO'",
+        )
+    )
+    assert [r["file_number"] for r in batches[0]] == ["1", "2"]

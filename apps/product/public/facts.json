@@ -1834,7 +1834,7 @@
       "feeds": [
         true,
         false,
-        false,
+        true,
         false
       ],
       "platforms": [
@@ -1845,7 +1845,12 @@
           "topic": "raw.municipal.permits"
         },
         null,
-        null,
+        {
+          "platform": "csv",
+          "watermark_col": "",
+          "interval_seconds": 86400.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
       "center": {
@@ -3044,7 +3049,7 @@
       "feeds": [
         false,
         true,
-        false,
+        true,
         false
       ],
       "platforms": [
@@ -3055,7 +3060,12 @@
           "interval_seconds": 180.0,
           "topic": "raw.municipal.311"
         },
-        null,
+        {
+          "platform": "csv",
+          "watermark_col": "",
+          "interval_seconds": 86400.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
       "center": {
@@ -3934,13 +3944,18 @@
       "feeds": [
         false,
         false,
-        false,
+        true,
         false
       ],
       "platforms": [
         null,
         null,
-        null,
+        {
+          "platform": "csv",
+          "watermark_col": "",
+          "interval_seconds": 86400.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
       "center": {

@@ -467,6 +467,68 @@ datasets:
     non_spatial: null
     zip_member: null
     delimiter: null
+  sla:
+    endpoint: https://www.abc.ca.gov/wp-content/uploads/DailyExport-CSV.zip
+    platform: csv
+    watermark_col: ''
+    id_keys:
+    - file_number
+    - license_type
+    topic: raw.municipal.sla
+    interval_seconds: 86400.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: prem_county = 'RIVERSIDE' OR prem_county = 'SAN BERNARDINO'
+    needs_geocode: true
+    geocode_context: Riverside County, CA
+    field_map:
+      license_id:
+      - file_number
+      license_type:
+      - license_type
+      effective_date:
+      - type_orig_iss_date
+      expiration_date:
+      - expir_date
+      premises_name:
+      - primary_name
+      dba:
+      - dba_name
+      address_street:
+      - prem_addr_1
+      status:
+      - type_status
+      borough:
+      - prem_city
+      zipcode:
+      - prem_zip
+    ingestion_mode: snapshot
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: ABC-DailyDataExport.csv
+    delimiter: null
 aliases:
 - inland-empire
 - inland empire

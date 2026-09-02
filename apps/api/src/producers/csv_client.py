@@ -22,7 +22,7 @@ import re
 import zipfile
 from collections.abc import Generator
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import httpx
 
@@ -34,6 +34,25 @@ _NOT_IN = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s+NOT\s+IN\s*\(([^)]*)\)\s*$
 def _normalize_header(name: str) -> str:
     """Normalize municipal CSV headers to the producer field-map convention."""
     return re.sub(r"[^a-z0-9]+", "_", name.strip().lower()).strip("_")
+
+
+def _strip_preamble(text: str, delimiter: str = ",") -> str:
+    """Drop a leading single-field preamble line, if one exists.
+
+    Some CSV publishers (California ABC ``DailyExport-CSV.zip``) lead the real
+    header with a metadata line that csv.DictReader would otherwise mistake for
+    the field names: a one-field row whose next row carries multiple fields.
+    Returning the text unchanged when no preamble is detected keeps every
+    existing feed's parse identical.
+    """
+    reader = csv.reader(io.StringIO(text), delimiter=delimiter)
+    rows: list[list[str]] = [row for row in reader if any(cell.strip() for cell in row)]
+    if len(rows) >= 2 and len(rows[0]) == 1 and len(rows[1]) > 1:
+        buffer = io.StringIO()
+        writer = csv.writer(buffer, delimiter=delimiter, lineterminator="\n")
+        writer.writerows(rows[1:])
+        return buffer.getvalue()
+    return text
 
 
 def _decode_csv_bytes(raw: bytes) -> str:
@@ -90,18 +109,40 @@ def _typed_value(value: Any, fmt: str | None) -> datetime | None:
 
 def _row_matches(
     where_clause: str | None,
-    row: Dict[str, Any],
+    row: dict[str, Any],
     *,
     watermark_col: str | None = None,
     watermark_format: str | None = None,
-    watermark_exclude: List[str] | None = None,
+    watermark_exclude: list[str] | None = None,
 ) -> bool:
-    """Client-side predicate over one parsed row (ANSI/SODA-style clauses)."""
+    """Client-side predicate over one parsed row (ANSI/SODA-style clauses).
+
+    Supports top-level ``OR``: the clause is split on `` OR `` first; a row
+    passes if any branch matches (all AND parts within the branch must match).
+    """
     if not where_clause:
         return True
-    for part in where_clause.split(" AND "):
-        # The scheduler wraps base_where / the job where clause in parentheses
-        # before joining, so a bare predicate arrives as "(valid = 'Y')".
+    clause = where_clause.strip()
+    if len(clause) >= 2 and clause.startswith("(") and clause.endswith(")"):
+        inner = clause[1:-1].strip()
+        if inner.count("(") == inner.count(")"):
+            clause = inner
+    for branch in clause.split(" OR "):
+        if _branch_matches(branch.strip(), row, watermark_col=watermark_col, watermark_format=watermark_format, watermark_exclude=watermark_exclude):
+            return True
+    return False
+
+
+def _branch_matches(
+    branch: str,
+    row: dict[str, Any],
+    *,
+    watermark_col: str | None = None,
+    watermark_format: str | None = None,
+    watermark_exclude: list[str] | None = None,
+) -> bool:
+    """Evaluate one AND-separated clause: every part must match."""
+    for part in branch.split(" AND "):
         part = part.strip()
         if len(part) >= 2 and part.startswith("(") and part.endswith(")"):
             part = part[1:-1].strip()
@@ -156,21 +197,21 @@ def _row_matches(
 class CSVClient:
     """Download-and-filter client for static CSV feeds."""
 
-    def __init__(self, http_client: Optional[httpx.Client] = None):
+    def __init__(self, http_client: httpx.Client | None = None):
         self.http = http_client or httpx.Client(timeout=180.0, follow_redirects=True)
 
     def paginate(
         self,
         endpoint_url: str,
-        where_clause: Optional[str] = None,
+        where_clause: str | None = None,
         order_by: str = "",
         batch_size: int = 1000,
-        max_records: Optional[int] = None,
-        select: Optional[str] = None,
-        id_col: Optional[str] = None,
-        fallback_endpoints: Optional[List[str]] = None,
+        max_records: int | None = None,
+        select: str | None = None,
+        id_col: str | None = None,
+        fallback_endpoints: list[str] | None = None,
         **kwargs: Any,
-    ) -> Generator[List[Dict[str, Any]], None, None]:
+    ) -> Generator[list[dict[str, Any]], None, None]:
         """Download the CSV once and yield batches of filtered rows.
 
         Some ArcGIS Hub items expose both a download route and the underlying
@@ -196,6 +237,7 @@ class CSVClient:
             csv_text = _read_zip_member(response.content, zip_member)
         else:
             csv_text = response.text
+        csv_text = _strip_preamble(csv_text, delimiter=delimiter)
         reader = csv.DictReader(io.StringIO(csv_text), delimiter=delimiter)
         # Municipal CSVs use title case, spaces, and punctuation inconsistently;
         # normalize them so shared field maps apply uniformly.
@@ -208,7 +250,7 @@ class CSVClient:
         watermark_format = kwargs.get("watermark_format")
         watermark_exclude = kwargs.get("watermark_exclude") or []
 
-        rows: List[Dict[str, Any]] = []
+        rows: list[dict[str, Any]] = []
         for row in reader:
             if not _row_matches(
                 where_clause,
@@ -227,7 +269,7 @@ class CSVClient:
             col = _normalize_header(m.group(1)) if m else _normalize_header(order_by)
             typed_sort = col == watermark_col and watermark_format
 
-            def sort_key(row: Dict[str, Any]) -> Any:
+            def sort_key(row: dict[str, Any]) -> Any:
                 if typed_sort:
                     return _typed_value(row.get(col), watermark_format) or datetime.min
                 return str(row.get(col, ""))
@@ -238,7 +280,7 @@ class CSVClient:
                 rows.sort(key=sort_key)
 
         total = 0
-        batch: List[Dict[str, Any]] = []
+        batch: list[dict[str, Any]] = []
         for row in rows:
             batch.append(row)
             total += 1

@@ -260,7 +260,12 @@
       "interval_seconds": 180.0,
       "topic": "raw.municipal.311"
     },
-    "sla": null,
+    "sla": {
+      "platform": "csv",
+      "watermark_col": "",
+      "interval_seconds": 86400.0,
+      "topic": "raw.municipal.sla"
+    },
     "deeds": null
   },
   "evidence_path": "apps/api/src/spatial/cities/oakland.py",

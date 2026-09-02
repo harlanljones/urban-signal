@@ -230,7 +230,12 @@
   "feeds": {
     "permits": null,
     "311": null,
-    "sla": null,
+    "sla": {
+      "platform": "csv",
+      "watermark_col": "",
+      "interval_seconds": 86400.0,
+      "topic": "raw.municipal.sla"
+    },
     "deeds": null
   },
   "evidence_path": "apps/api/src/spatial/cities/santa_rosa.py",
