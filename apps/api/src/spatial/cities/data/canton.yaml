@@ -1,0 +1,210 @@
+city_id: canton
+name: Canton / Stark County
+state: OH
+center:
+  lat: 40.7989
+  lng: -81.3784
+metro_bbox:
+  min_lat: 40.65
+  max_lat: 40.95
+  min_lng: -81.65
+  max_lng: -81.20
+division_bboxes:
+  CANTON_CORE:
+    min_lat: 40.70
+    max_lat: 40.90
+    min_lng: -81.55
+    max_lng: -81.28
+submarkets:
+  Downtown Canton:
+    name: Downtown Canton
+    borough: CANTON_CORE
+    lat: 40.7989
+    lng: -81.3784
+    zoom: 13.4
+    pitch: 46.0
+    base_lims: 0.80
+    capex: 5200000.0
+    permit_vel: 28.0
+    shift_ratio: 1.34
+    sla: 52.0
+    description: Historic civic core anchored by the Pro Football Hall of Fame district and downtown loft reuse.
+    city_id: canton
+  North Canton:
+    name: North Canton
+    borough: CANTON_CORE
+    lat: 40.8759
+    lng: -81.4023
+    zoom: 13.0
+    pitch: 42.0
+    base_lims: 0.79
+    capex: 4700000.0
+    permit_vel: 26.0
+    shift_ratio: 1.32
+    sla: 51.0
+    description: Affluent suburban node with steady single-family permit flow and neighborhood retail corridors.
+    city_id: canton
+  Massillon:
+    name: Massillon
+    borough: CANTON_CORE
+    lat: 40.7967
+    lng: -81.5215
+    zoom: 12.8
+    pitch: 41.0
+    base_lims: 0.73
+    capex: 3600000.0
+    permit_vel: 22.0
+    shift_ratio: 1.27
+    sla: 46.0
+    description: Ohio & Erie Canal town with housing rehabilitation, downtown reinvestment, and industrial reuse.
+    city_id: canton
+  Plain & Jackson Townships:
+    name: Plain & Jackson Townships
+    borough: CANTON_CORE
+    lat: 40.8300
+    lng: -81.3500
+    zoom: 12.6
+    pitch: 40.0
+    base_lims: 0.74
+    capex: 3900000.0
+    permit_vel: 24.0
+    shift_ratio: 1.29
+    sla: 48.0
+    description: Suburban bedroom townships around the Belden Village retail belt with residential infill.
+    city_id: canton
+divisions:
+  CANTON_CORE:
+    name: Canton Core
+    center_lat: 40.7989
+    center_lng: -81.3784
+    zoom: 11.4
+    bbox:
+      min_lat: 40.70
+      max_lat: 40.90
+      min_lng: -81.55
+      max_lng: -81.28
+    submarkets:
+    - Downtown Canton
+    - North Canton
+    - Massillon
+    - Plain & Jackson Townships
+    city_id: canton
+datasets:
+  deeds:
+    endpoint: https://scgisa.starkcountyohio.gov/arcgis/rest/services/Auditor/StarkCountySales/MapServer/0
+    platform: arcgis
+    watermark_col: TRANSFER_DATE
+    id_keys:
+    - PARID
+    - OBJECTID
+    topic: raw.municipal.deeds
+    interval_seconds: 3600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - PARID
+      recorded_date:
+      - TRANSFER_DATE
+      document_amount:
+      - SALE_PRICE
+      party1_grantor:
+      - FORMER_OWNER
+      party2_grantee:
+      - NEW_OWNER
+      doc_type:
+      - INSTR_TYPE_DESC
+      bbl:
+      - PARID
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'OH'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+aliases:
+- canton_oh
+- canton oh
+- stark_county
+- stark county
+job_suffix: canton

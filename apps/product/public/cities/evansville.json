@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "id": "evansville",
+  "name": "Evansville / Vanderburgh County",
+  "state": "IN",
+  "center": {
+    "lat": 37.9716,
+    "lng": -87.5711
+  },
+  "metro_bbox": {
+    "min_lat": 37.8,
+    "max_lat": 38.15,
+    "min_lng": -87.75,
+    "max_lng": -87.35
+  },
+  "divisions": {
+    "EVANSVILLE_CORE": {
+      "name": "Evansville Core",
+      "center": {
+        "lat": 37.9716,
+        "lng": -87.5711
+      },
+      "bbox": {
+        "min_lat": 37.86,
+        "max_lat": 38.1,
+        "min_lng": -87.7,
+        "max_lng": -87.38
+      },
+      "submarkets": [
+        "Downtown Evansville",
+        "East Side",
+        "West Side",
+        "Newburgh & East Corridor"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Evansville": {
+      "name": "Downtown Evansville",
+      "division": "EVANSVILLE_CORE",
+      "center": {
+        "lat": 37.9716,
+        "lng": -87.5711
+      },
+      "description": "Ohio River waterfront civic core with office conversions, riverfront investment, and downtown housing."
+    },
+    "East Side": {
+      "name": "East Side",
+      "division": "EVANSVILLE_CORE",
+      "center": {
+        "lat": 37.97,
+        "lng": -87.52
+      },
+      "description": "East-side residential and commercial belt anchored by Eastland Mall and Green River Road retail."
+    },
+    "West Side": {
+      "name": "West Side",
+      "division": "EVANSVILLE_CORE",
+      "center": {
+        "lat": 37.98,
+        "lng": -87.63
+      },
+      "description": "West-side neighborhoods with housing rehabilitation and industrial-commercial corridor reinvestment."
+    },
+    "Newburgh & East Corridor": {
+      "name": "Newburgh & East Corridor",
+      "division": "EVANSVILLE_CORE",
+      "center": {
+        "lat": 37.92,
+        "lng": -87.4
+      },
+      "description": "River-adjacent growth corridor toward Newburgh with newer subdivisions and regional retail."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "USER_Application_Recv_d",
+      "interval_seconds": 300.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/evansville.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

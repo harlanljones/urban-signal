@@ -28,6 +28,18 @@ would false-alarm the staleness probe with a lexicographic December max.
 Snapshot full pulls whose cross-run id-dedup diff is the churn signal follow
 the KC SLA precedent (US-134); freshness rides Socrata ``rowsUpdatedAt``,
 which the probe reads for every socrata feed.
+
+OH/MI state super-feeds (US-425): NOT spec'd here — leaf specs live in
+``ohio_elicense_specs.py`` and ``michigan_lara_specs.py``. The 2026-08-30
+midwest/rust-belt probe lists DataOhio eLicense ("State of Ohio Licensure -
+Individual" CSV) and Michigan LARA/MLCC license-list CSVs as Tier 2 Batch ETL
+candidates for SLA coverage across Akron, Canton, Youngstown, Lansing, Flint,
+and Ann Arbor, but re-probing 2026-09-02 found NO verifiable public endpoint
+from this host: ``data.ohio.gov`` 404s on every path, ``michigan.gov/lara``
+returns 403/302 bot-protection, and ``mlcc.michigan.gov`` fails DNS. Per the
+never-fake-endpoints convention (NREL AFDC precedent) these are documented
+as unverified — the specs are exercised by fixture tests only and neither is
+registered or scheduled until a live endpoint is confirmed.
 """
 
 from src.config import settings

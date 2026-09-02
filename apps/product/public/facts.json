@@ -790,6 +790,41 @@
       "evidence_path": "apps/api/src/spatial/cities/buffalo.py"
     },
     {
+      "id": "canton",
+      "name": "Canton / Stark County",
+      "state": "OH",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 4,
+      "feeds": [
+        false,
+        false,
+        true,
+        true
+      ],
+      "platforms": [
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "TRANSFER_DATE",
+          "interval_seconds": 3600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 40.7989,
+        "lng": -81.3784
+      },
+      "evidence_path": "apps/api/src/spatial/cities/canton.py"
+    },
+    {
       "id": "cape_coral",
       "name": "Cape Coral–Fort Myers",
       "state": "FL",
@@ -1448,6 +1483,41 @@
         "lng": -123.092
       },
       "evidence_path": "apps/api/src/spatial/cities/eugene.py"
+    },
+    {
+      "id": "evansville",
+      "name": "Evansville / Vanderburgh County",
+      "state": "IN",
+      "divisions": "1 division",
+      "division_count": 1,
+      "submarket_count": 4,
+      "feeds": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "USER_Application_Recv_d",
+          "interval_seconds": 300.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
+      ],
+      "center": {
+        "lat": 37.9716,
+        "lng": -87.5711
+      },
+      "evidence_path": "apps/api/src/spatial/cities/evansville.py"
     },
     {
       "id": "fort_smith",

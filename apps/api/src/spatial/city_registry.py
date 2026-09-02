@@ -156,6 +156,8 @@ class CityId(str, Enum):
     WORCESTER = "worcester"
     NEW_HAVEN = "new_haven"
     BRIDGEPORT = "bridgeport"
+    CANTON = "canton"
+    EVANSVILLE = "evansville"
 
 
 class FeedType(str, Enum):

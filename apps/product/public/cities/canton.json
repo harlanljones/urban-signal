@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "id": "canton",
+  "name": "Canton / Stark County",
+  "state": "OH",
+  "center": {
+    "lat": 40.7989,
+    "lng": -81.3784
+  },
+  "metro_bbox": {
+    "min_lat": 40.65,
+    "max_lat": 40.95,
+    "min_lng": -81.65,
+    "max_lng": -81.2
+  },
+  "divisions": {
+    "CANTON_CORE": {
+      "name": "Canton Core",
+      "center": {
+        "lat": 40.7989,
+        "lng": -81.3784
+      },
+      "bbox": {
+        "min_lat": 40.7,
+        "max_lat": 40.9,
+        "min_lng": -81.55,
+        "max_lng": -81.28
+      },
+      "submarkets": [
+        "Downtown Canton",
+        "North Canton",
+        "Massillon",
+        "Plain & Jackson Townships"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Canton": {
+      "name": "Downtown Canton",
+      "division": "CANTON_CORE",
+      "center": {
+        "lat": 40.7989,
+        "lng": -81.3784
+      },
+      "description": "Historic civic core anchored by the Pro Football Hall of Fame district and downtown loft reuse."
+    },
+    "North Canton": {
+      "name": "North Canton",
+      "division": "CANTON_CORE",
+      "center": {
+        "lat": 40.8759,
+        "lng": -81.4023
+      },
+      "description": "Affluent suburban node with steady single-family permit flow and neighborhood retail corridors."
+    },
+    "Massillon": {
+      "name": "Massillon",
+      "division": "CANTON_CORE",
+      "center": {
+        "lat": 40.7967,
+        "lng": -81.5215
+      },
+      "description": "Ohio & Erie Canal town with housing rehabilitation, downtown reinvestment, and industrial reuse."
+    },
+    "Plain & Jackson Townships": {
+      "name": "Plain & Jackson Townships",
+      "division": "CANTON_CORE",
+      "center": {
+        "lat": 40.83,
+        "lng": -81.35
+      },
+      "description": "Suburban bedroom townships around the Belden Village retail belt with residential infill."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "TRANSFER_DATE",
+      "interval_seconds": 3600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/canton.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

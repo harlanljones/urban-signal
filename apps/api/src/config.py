@@ -964,6 +964,30 @@ class Settings(BaseSettings):
         description="Columbus, GA building permits MapServer layer URL (Residential)",
     )
 
+    # Stark County (Canton, OH) Auditor Property Sales MapServer/0 (US-425):
+    # live-verified 2026-09-02 — 300,909 records, WKID 3857 polygon geometry,
+    # TRANSFER_DATE epoch-ms watermark. scgisa.starkcountyohio.gov on-prem
+    # ArcGIS Server (SCGIS A).
+    arcgis_stark_county_sales_url: str = Field(
+        default=(
+            "https://scgisa.starkcountyohio.gov/arcgis/rest/services/"
+            "Auditor/StarkCountySales/MapServer/0"
+        ),
+        description="Stark County (Canton, OH) Auditor Property Sales layer URL (US-425)",
+    )
+
+    # Evansville, IN building permits MapServer/0 (US-425): live-verified
+    # 2026-09-02 — 154,760 records, WKID 102100 point geometry,
+    # USER_Application_Recv_d epoch-ms watermark. maps.evansvillegis.com
+    # on-prem ArcGIS Server 10.91.
+    arcgis_evansville_permits_url: str = Field(
+        default=(
+            "https://maps.evansvillegis.com/arcgis_server/rest/services/"
+            "BC/BUILDING_COMMISSION_PERMITS/MapServer/0"
+        ),
+        description="Evansville, IN building commission permits MapServer layer URL (US-425)",
+    )
+
     # Pierce County, WA (ArcGIS): county applications and permits across six
     # departments (Building, Development Engineering, Environmental, Fire,
     # Land Use, Sewer). Point layer in WA State Plane; the client's outSR=4326
