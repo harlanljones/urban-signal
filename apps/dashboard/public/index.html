@@ -524,6 +524,15 @@
       position: relative;
       background: var(--bg-base);
       overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+    .map-container::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background: radial-gradient(ellipse 70% 60% at 50% 50%, transparent 35%, rgba(8, 13, 23, 0.65) 100%);
     }
 
     #map {
@@ -2118,10 +2127,10 @@
             // Night-shift tonal treatment: pull the stock Esri dark-gray tiles
             // into the ink canvas so the H3 field reads as the hero, not a
             // screenshot pasted on top of a basemap.
-            'raster-saturation': -0.45,
-            'raster-contrast': 0.12,
-            'raster-brightness-max': 0.82,
-            'raster-opacity': 0.88
+            'raster-saturation': -0.55,
+            'raster-contrast': 0.08,
+            'raster-brightness-max': 0.65,
+            'raster-opacity': 0.70
           }
         },
         {
@@ -2132,9 +2141,9 @@
           maxzoom: 20,
           paint: {
             // Reference labels stay readable but never compete with the hexes.
-            'raster-saturation': -0.3,
-            'raster-brightness-max': 0.75,
-            'raster-opacity': 0.5
+            'raster-saturation': -0.4,
+            'raster-brightness-max': 0.55,
+            'raster-opacity': 0.35
           }
         }
       ]
@@ -2830,9 +2839,9 @@
           'fill-opacity': [
             'interpolate', ['linear'],
             ['coalesce', ['get', 'lims_score_national_pct'], 0],
-            0, 0.42,
-            50, 0.6,
-            92, 0.88
+            0, 0.50,
+            50, 0.70,
+            92, 0.92
           ]
         }
       });
@@ -2863,7 +2872,7 @@
             18
           ],
           'fill-extrusion-base': 0,
-          'fill-extrusion-opacity': 0.88
+          'fill-extrusion-opacity': 0.92
         }
       });
 
@@ -2917,9 +2926,9 @@
       const opacityExpr = [
         'interpolate', ['linear'],
         ['coalesce', ['get', pctProp], 0],
-        0, 0.42,
-        50, 0.6,
-        92, 0.88
+        0, 0.50,
+        50, 0.70,
+        92, 0.92
       ];
       const heightFactor = {
         lims_score: ['*', ['max', 0, ['-', ['coalesce', ['get', pctProp], 50], 40]], 18],
