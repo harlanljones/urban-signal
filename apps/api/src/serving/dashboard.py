@@ -2,6 +2,7 @@
 
 from src.spatial.city_registry import REGISTRY
 
+
 def get_favicon_svg() -> str:
     """Brand favicon: layered-map mark in the dashboard's accent palette."""
     return (
@@ -1605,6 +1606,7 @@ __METRO_META__
     let currentPerspective = '3D';
     let currentMetric = 'lims_score';
     let selectedH3Index = null;
+    let hoveredH3Index = null;
     let catalystAlerts = [];
 
     // ---- All-metros national view state ------------------------------------
@@ -2542,24 +2544,68 @@ __METRO_META__
           }
         };
 
-        map.on('mousemove', 'h3-hex-fill', showPopup);
+        map.on('mousemove', 'h3-hex-fill', (e) => {
+          showPopup(e);
+          if (e.features && e.features.length > 0) {
+            const h3 = e.features[0].properties.h3_index;
+            if (h3 !== hoveredH3Index) {
+              hoveredH3Index = h3;
+              if (map.getLayer('h3-hex-hover')) {
+                map.setFilter('h3-hex-hover', ['==', ['get', 'h3_index'], h3]);
+              }
+            }
+          }
+        });
         map.on('mouseleave', 'h3-hex-fill', () => {
           map.getCanvas().style.cursor = '';
           popup.remove();
+          if (hoveredH3Index) {
+            hoveredH3Index = null;
+            if (map.getLayer('h3-hex-hover')) {
+              map.setFilter('h3-hex-hover', ['==', ['get', 'h3_index'], '']);
+            }
+          }
         });
 
-        map.on('mousemove', 'h3-hex-extrusion', showPopup);
+        map.on('mousemove', 'h3-hex-extrusion', (e) => {
+          showPopup(e);
+          if (e.features && e.features.length > 0) {
+            const h3 = e.features[0].properties.h3_index;
+            if (h3 !== hoveredH3Index) {
+              hoveredH3Index = h3;
+              if (map.getLayer('h3-hex-hover')) {
+                map.setFilter('h3-hex-hover', ['==', ['get', 'h3_index'], h3]);
+              }
+            }
+          }
+        });
         map.on('mouseleave', 'h3-hex-extrusion', () => {
           map.getCanvas().style.cursor = '';
           popup.remove();
+          if (hoveredH3Index) {
+            hoveredH3Index = null;
+            if (map.getLayer('h3-hex-hover')) {
+              map.setFilter('h3-hex-hover', ['==', ['get', 'h3_index'], '']);
+            }
+          }
         });
 
         map.on('click', 'h3-hex-fill', (e) => {
-          if (e.features && e.features.length > 0) handleHexSelection(e.features[0].properties);
+          if (e.features && e.features.length > 0) {
+            if (map.getLayer('h3-hex-hover')) {
+              map.setFilter('h3-hex-hover', ['==', ['get', 'h3_index'], '']);
+            }
+            handleHexSelection(e.features[0].properties);
+          }
         });
 
         map.on('click', 'h3-hex-extrusion', (e) => {
-          if (e.features && e.features.length > 0) handleHexSelection(e.features[0].properties);
+          if (e.features && e.features.length > 0) {
+            if (map.getLayer('h3-hex-hover')) {
+              map.setFilter('h3-hex-hover', ['==', ['get', 'h3_index'], '']);
+            }
+            handleHexSelection(e.features[0].properties);
+          }
         });
       } catch (err) {
         console.error('Map initialization error:', err);
@@ -2728,7 +2774,9 @@ __METRO_META__
       });
 
       // 2D Fill Layer — value-aware opacity so high-percentile cells read as
-      // emphasis instead of every cell sitting at one flat alpha.
+      // emphasis instead of every cell sitting at one flat alpha. Low-value
+      // cells fade into the background, reducing visual noise at dense metro
+      // zoom levels.
       map.addLayer({
         id: 'h3-hex-fill',
         type: 'fill',
@@ -2739,22 +2787,30 @@ __METRO_META__
           'fill-opacity': [
             'interpolate', ['linear'],
             ['coalesce', ['get', 'lims_score_national_pct'], 0],
-            0, 0.50,
-            50, 0.70,
-            92, 0.92
+0, 0.25,
+            40, 0.45,
+            80, 0.7,
+            92, 0.88
           ]
         }
       });
 
-      // 2D Line Outline Layer — zoom-scaled boundary stroke, slate rather
-      // than white, so the dense metro grid never reads as checkerboard noise.
+      // 2D Line Outline Layer — zoom-scaled boundary stroke with opacity
+      // that fades at metro-wide zooms so the dense grid never reads as
+      // checkerboard noise. Only the selected/hovered cell gets a full-opacity
+      // outline; the rest are a faint slate whisper.
       map.addLayer({
         id: 'h3-hex-line',
         type: 'line',
         source: 'h3-grid-source',
         paint: {
-          'line-color': 'rgba(148, 163, 184, 0.2)',
-          'line-width': ['interpolate', ['linear'], ['zoom'], 6, 0.4, 10, 0.8, 14, 1.2]
+          'line-color': [
+            'interpolate', ['linear'], ['zoom'],
+            7, 'rgba(148, 163, 184, 0.04)',
+            10, 'rgba(148, 163, 184, 0.15)',
+            14, 'rgba(148, 163, 184, 0.35)'
+          ],
+          'line-width': ['interpolate', ['linear'], ['zoom'], 7, 0.3, 10, 0.6, 14, 1.0]
         }
       });
 
@@ -2799,6 +2855,19 @@ __METRO_META__
           'line-width': 2.5
         }
       });
+
+      // Hover Highlight — subtle glow on the cell under the cursor so the
+      // grid feels interactive without needing a click. Cleared on mouseleave.
+      map.addLayer({
+        id: 'h3-hex-hover',
+        type: 'line',
+        source: 'h3-grid-source',
+        filter: ['==', ['get', 'h3_index'], ''],
+        paint: {
+          'line-color': 'rgba(56, 189, 248, 0.55)',
+          'line-width': 1.8
+        }
+      });
     }
 
     function updateMetricVisuals() {
@@ -2826,9 +2895,10 @@ __METRO_META__
       const opacityExpr = [
         'interpolate', ['linear'],
         ['coalesce', ['get', pctProp], 0],
-        0, 0.50,
-        50, 0.70,
-        92, 0.92
+0, 0.25,
+        40, 0.45,
+        80, 0.7,
+        92, 0.88
       ];
       const heightFactor = {
         lims_score: ['*', ['max', 0, ['-', ['coalesce', ['get', pctProp], 50], 40]], 18],
