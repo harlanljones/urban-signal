@@ -832,7 +832,7 @@ def get_dashboard_html() -> str:
       height: 6px;
       border-radius: 3px;
       /* Regenerated at runtime from HEX_RAMP (same stops as the map layers). */
-      background: linear-gradient(to right, #1f3a52, #2f6f8f 35%, #5aa9a4 60%, #d9bd63 80%, #f2685c 92%);
+      background: linear-gradient(to right, #0c1628, #1c3c5c 35%, #3a8688 60%, #7ab87a 80%, #c8b84c 92%, #e8a050);
       margin-bottom: 4px;
     }
 
@@ -2040,17 +2040,19 @@ __METRO_META__
       ]
     };
 
-    // Authored percentile ramp (US-431): cool→warm divergence tuned for the
-    // dark canvas. Low = quiet ink-blue (zero evidence), mid = teal, high =
-    // gold, and the reserved coral accent is earned only above the 92nd
-    // percentile (concentrated catalyst). Deliberately NOT a traffic light.
-    // The legend bar + ticks are regenerated from this same constant.
+    // Authored percentile ramp (US-432): cool luminance ramp with a reserved
+    // warm outlier accent, tuned for the dark canvas. Low = quiet ink-blue
+    // (zero evidence, nearly invisible on the dark background), mid = cool teal
+    // (signal building neutrally), high = warm gold (concentrated catalyst).
+    // The amber outlier stop is reserved for the extreme tail (>92nd pctile).
+    // Deliberately no red/coral — no good/bad score, no traffic light.
     const HEX_RAMP = [
-      [0, '#1f3a52'],
-      [35, '#2f6f8f'],
-      [60, '#5aa9a4'],
-      [80, '#d9bd63'],
-      [92, '#f2685c']
+      [0, '#0c1628'],
+      [35, '#1c3c5c'],
+      [60, '#3a8688'],
+      [80, '#7ab87a'],
+      [92, '#c8b84c'],
+      [100, '#e8a050']
     ];
 
     function hexRampExpr(inputExpr) {
