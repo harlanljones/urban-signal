@@ -1587,6 +1587,7 @@
       el_paso: { name: 'El Paso / El Paso County' },
       eugene: { name: 'Eugene' },
       evansville: { name: 'Evansville / Vanderburgh County' },
+      fort_collins: { name: 'Fort Collins, CO' },
       fort_smith: { name: 'Fort Smith' },
       fort_worth: { name: 'Fort Worth / Tarrant County' },
       gainesville: { name: 'Gainesville' },
@@ -2886,16 +2887,10 @@
           'fill-opacity': [
             'interpolate', ['linear'],
             ['coalesce', ['get', 'lims_score_national_pct'], 0],
-<<<<<<< HEAD
-            0, 0.50,
-            50, 0.70,
-            92, 0.92
-=======
-            0, 0.25,
+0, 0.25,
             40, 0.45,
             80, 0.7,
             92, 0.88
->>>>>>> US-433-grid-legibility
           ]
         }
       });
@@ -3000,16 +2995,10 @@
       const opacityExpr = [
         'interpolate', ['linear'],
         ['coalesce', ['get', pctProp], 0],
-<<<<<<< HEAD
-        0, 0.50,
-        50, 0.70,
-        92, 0.92
-=======
-        0, 0.25,
+0, 0.25,
         40, 0.45,
         80, 0.7,
         92, 0.88
->>>>>>> US-433-grid-legibility
       ];
       const heightFactor = {
         lims_score: ['*', ['max', 0, ['-', ['coalesce', ['get', pctProp], 50], 40]], 18],
