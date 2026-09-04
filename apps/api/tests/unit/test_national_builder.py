@@ -1,10 +1,11 @@
-"""Unit tests for the national signal builder (US-382).
+"""Unit tests for the national signal builder (US-382, US-435).
 
 All tests run offline: LODES CSVs are synthesized gz fixtures and the fetcher is
 stubbed to return local paths.
 """
 
 import gzip
+import json
 from pathlib import Path
 
 import h3
@@ -26,13 +27,11 @@ from src.export.national_builder import (
 
 RES = 6
 
-# Fixture block coordinates (Manhattan + one rural point); expected cells are
-# computed with the real h3 library so the test asserts aggregation, not geometry.
 BLOCKS = {
-    "360610001001001": (40.7505, -73.9934),  # two blocks share one res-6 cell (dense)
+    "360610001001001": (40.7505, -73.9934),
     "360610001001002": (40.7507, -73.9936),
-    "360610001001003": (40.8410, -73.9390),  # own cell
-    "301100001001004": (46.8790, -113.9960),  # wac-only rural block
+    "360610001001003": (40.8410, -73.9390),
+    "301100001001004": (46.8790, -113.9960),
 }
 
 
@@ -45,7 +44,7 @@ def _write_gz_csv(path: Path, header: list[str], rows: list[list[str]]) -> None:
 
 
 @pytest.fixture()
-def state_fixtures(tmp_path: Path) -> dict[str, Path]:
+def state_fixtures(tmp_path: Path) -> dict:
     cache = tmp_path / "cache"
     latlng = list(BLOCKS.values())
     _write_gz_csv(
@@ -73,9 +72,9 @@ def state_fixtures(tmp_path: Path) -> dict[str, Path]:
         [row + ["20240101"] for row in rac_rows],
     )
 
-    def fetcher(url: str, cache_dir: Path) -> Path:
+    def fetcher(url: str, cache_dir: Path, sha_list_url: str | None = None) -> Path:
         name = url.rsplit("/", 1)[-1]
-        target = cache_dir / name
+        target = Path(cache_dir) / name
         if not target.exists():
             raise FileNotFoundError(f"fixture fetcher missing {name}")
         return target
@@ -111,26 +110,65 @@ def test_expected_sha_and_hashing(tmp_path: Path):
 
 
 def test_aggregate_state_sums_and_block_counts(state_fixtures):
-    frame = aggregate_state("de", 2023, RES, state_fixtures["cache"], state_fixtures["fetcher"])
+    frame, report = aggregate_state("de", 2023, RES, state_fixtures["cache"], state_fixtures["fetcher"])
     dense_cell = h3.latlng_to_cell(*BLOCKS["360610001001001"], RES)
     row = frame.filter(pl.col("h3_index") == dense_cell)
-    assert row[JOBS_COL][0] == 200  # 120 + 80 in the same cell
+    assert row[JOBS_COL][0] == 200
     assert row["blocks_wac"][0] == 2
     assert row[WORKERS_COL][0] == 60
     assert row["blocks_rac"][0] == 1
     rural_cell = h3.latlng_to_cell(*BLOCKS["301100001001004"], RES)
     rural = frame.filter(pl.col("h3_index") == rural_cell)
     assert rural[JOBS_COL][0] == 5 and rural[WORKERS_COL][0] is None
-    # Cells sum: dense + manhattan-2 + rural = 3 distinct cells
     assert len(frame) == 3
+    assert report["wac_status"] == "ok"
+    assert report["rac_status"] == "ok"
 
 
 def test_aggregate_state_drops_cells_outside_filter(state_fixtures):
     keep = {h3.latlng_to_cell(*BLOCKS["360610001001001"], RES)}
-    frame = aggregate_state(
+    frame, _ = aggregate_state(
         "de", 2023, RES, state_fixtures["cache"], state_fixtures["fetcher"], cell_filter=keep
     )
     assert set(frame["h3_index"].to_list()) == keep
+
+
+def test_aggregate_state_independent_wac_rac(state_fixtures):
+    """A missing RAC file should not discard WAC data (US-435)."""
+
+    def failing_rac_fetcher(url: str, cache_dir: Path, sha_list_url: str | None = None) -> Path:
+        if "_rac_" in url:
+            raise RuntimeError("RAC unavailable")
+        return state_fixtures["fetcher"](url, cache_dir)
+
+    frame, report = aggregate_state(
+        "de", 2023, RES, state_fixtures["cache"], failing_rac_fetcher
+    )
+    assert report["wac_status"] == "ok"
+    assert report["rac_status"] == "no_data"
+    dense_cell = h3.latlng_to_cell(*BLOCKS["360610001001001"], RES)
+    row = frame.filter(pl.col("h3_index") == dense_cell)
+    assert row[JOBS_COL][0] == 200
+    assert row[WORKERS_COL][0] is None
+
+
+def test_aggregate_state_independent_wac_rac_missing_wac(state_fixtures):
+    """A missing WAC file should not discard RAC data (US-435)."""
+
+    def failing_wac_fetcher(url: str, cache_dir: Path, sha_list_url: str | None = None) -> Path:
+        if "_wac_" in url:
+            raise RuntimeError("WAC unavailable")
+        return state_fixtures["fetcher"](url, cache_dir)
+
+    frame, report = aggregate_state(
+        "de", 2023, RES, state_fixtures["cache"], failing_wac_fetcher
+    )
+    assert report["wac_status"] == "no_data"
+    assert report["rac_status"] == "ok"
+    dense_cell = h3.latlng_to_cell(*BLOCKS["360610001001001"], RES)
+    row = frame.filter(pl.col("h3_index") == dense_cell)
+    assert row[JOBS_COL][0] is None
+    assert row[WORKERS_COL][0] == 60
 
 
 def test_attach_ranks_orders_and_preserves_nulls():
@@ -145,7 +183,7 @@ def test_attach_ranks_orders_and_preserves_nulls():
     )
     ranked = _attach_ranks(frame)
     jobs_rank = dict(zip(ranked["h3_index"].to_list(), ranked[RANK_COLS[0]].to_list()))
-    assert jobs_rank["b"] is None  # null stays null, never synthesized
+    assert jobs_rank["b"] is None
     assert jobs_rank["a"] < jobs_rank["d"] < jobs_rank["c"]
     workers_rank = dict(zip(ranked["h3_index"].to_list(), ranked[RANK_COLS[1]].to_list()))
     assert all(v is None for v in workers_rank.values())
@@ -153,25 +191,26 @@ def test_attach_ranks_orders_and_preserves_nulls():
 
 def test_build_national_end_to_end(state_fixtures, tmp_path, monkeypatch):
     monkeypatch.setattr(nb, "LODES_STATES", frozenset({"de"}))
-    # One pyramid cell far from the fixture blocks must stay null (honest no-data).
     empty_cell = h3.latlng_to_cell(20.0, -100.0, RES)
     cells = tuple(sorted(_expected_cells() | {empty_cell}))
     report = build_national(
         out_dir=tmp_path,
-        resolution=RES,
         year=2023,
         states=["de"],
         cache_dir=state_fixtures["cache"],
         fetcher=state_fixtures["fetcher"],
         cells_provider=lambda res: cells,
+        promote=False,
     )
 
-    assert report["cells"] == 4
-    assert report["hexes_with_jobs"] == 2  # dense cell + rural (uptown is RAC-only)
-    assert report["hexes_with_workers"] == 2
-    assert report["total_jobs"] == 205  # 120 + 80 + 5
-    assert report["total_workers"] == 105  # 60 + 45
-    assert report["states"]["de"]["status"] == "ok"
+    assert len(report["artifacts"]) == len(nb.DEFAULT_RESOLUTIONS)
+    res6 = report["artifacts"].get(str(RES))
+    assert res6 is not None
+    assert res6["cells"] == 4
+    assert res6["hexes_with_jobs"] == 2
+    assert res6["hexes_with_workers"] == 2
+    assert res6["total_jobs"] == 205
+    assert res6["total_workers"] == 105
 
     res_dir = tmp_path / "national" / f"res{RES}"
     parquet_files = sorted(res_dir.glob("*.parquet"))
@@ -186,7 +225,6 @@ def test_build_national_end_to_end(state_fixtures, tmp_path, monkeypatch):
     assert row[JOBS_COL][0] == 200
     assert row["res5_parent"][0] == h3.cell_to_parent(dense_cell, 5)
     assert row["res4_parent"][0] == h3.cell_to_parent(dense_cell, 4)
-    # cells with no data are present with null metrics (never zero-filled)
     null_rows = full.filter(pl.col(JOBS_COL).is_null())
     assert sorted(null_rows["h3_index"].to_list()) == sorted([uptown_cell, empty_cell])
     assert null_rows[RANK_COLS[0]].is_null().all()
@@ -195,32 +233,109 @@ def test_build_national_end_to_end(state_fixtures, tmp_path, monkeypatch):
 def test_build_national_reports_no_data_state(state_fixtures, tmp_path, monkeypatch):
     monkeypatch.setattr(nb, "LODES_STATES", frozenset({"de", "zz"}))
 
-    def failing_fetcher(url: str, cache_dir: Path) -> Path:
+    def failing_fetcher(url: str, cache_dir: Path, sha_list_url: str | None = None) -> Path:
         if "_zz_" in url or url.endswith("/zz/zz_xwalk.csv.gz"):
             raise RuntimeError("state unavailable")
         return state_fixtures["fetcher"](url, cache_dir)
 
     report = build_national(
         out_dir=tmp_path,
-        resolution=RES,
         year=2023,
         states=["de", "zz"],
         cache_dir=state_fixtures["cache"],
         fetcher=failing_fetcher,
         cells_provider=lambda res: tuple(sorted(_expected_cells())),
+        promote=False,
     )
-    assert report["states"]["de"]["status"] == "ok"
-    assert report["states"]["zz"]["status"] == "no_data"
-    # The run survives a coverage gap; totals come only from de.
-    assert report["total_jobs"] == 205
+
+    res6 = report["artifacts"].get(str(RES))
+    assert res6 is not None
+    assert res6["total_jobs"] == 205
+
+
+def test_promote_national_writes_pointer(state_fixtures, tmp_path, monkeypatch):
+    """A validated build promotes a pointer carrying identity + provenance (US-435 §23)."""
+    import json
+
+    from src.export.national_builder import promote_national
+
+    monkeypatch.setattr(nb, "LODES_STATES", frozenset({"de"}))
+    cells = tuple(sorted(_expected_cells()))
+    build_national(
+        out_dir=tmp_path,
+        year=2023,
+        resolutions=(RES,),
+        states=["de"],
+        cache_dir=state_fixtures["cache"],
+        fetcher=state_fixtures["fetcher"],
+        cells_provider=lambda res: cells,
+    )
+    pointer = json.loads((tmp_path / "national" / "current.json").read_text())
+    assert pointer["sha256"] == promote_national(tmp_path)["sha256"]
+    assert pointer["artifact_key"].startswith("national/census_lehd_lodes8/2023/")
+    assert pointer["artifact_key"].endswith(pointer["sha256"])
+    assert pointer["builder_revision"] == nb.BUILDER_REVISION
+    assert pointer["lodes_version"] == "v8"
+    assert pointer["resolutions"] == [RES]
+    assert pointer["promoted_at"]
+
+
+def test_promote_national_rejects_empty_build(state_fixtures, tmp_path, monkeypatch):
+    """A build with no data chunks must not replace a valid pointer (US-435 §23)."""
+    from src.export.national_builder import promote_national
+
+    monkeypatch.setattr(nb, "LODES_STATES", frozenset({"de"}))
+    build_national(
+        out_dir=tmp_path,
+        year=2023,
+        resolutions=(RES,),
+        states=["de"],
+        cache_dir=state_fixtures["cache"],
+        fetcher=state_fixtures["fetcher"],
+        cells_provider=lambda res: (),
+        promote=False,
+    )
+    with pytest.raises(ValueError, match="no data chunks"):
+        promote_national(tmp_path)
+    assert not (tmp_path / "national" / "current.json").exists()
+
+
+def test_promote_national_rejects_missing_manifest(tmp_path):
+    from src.export.national_builder import promote_national
+
+    with pytest.raises(ValueError, match="no manifest"):
+        promote_national(tmp_path)
 
 
 def test_build_national_rejects_unknown_states(state_fixtures, tmp_path):
     with pytest.raises(ValueError, match="Unknown LODES state codes"):
         build_national(
             out_dir=tmp_path,
-            resolution=RES,
             states=["xx"],
             cache_dir=state_fixtures["cache"],
             cells_provider=lambda res: (),
         )
+
+
+def test_build_national_manifest_sha256(state_fixtures, tmp_path, monkeypatch):
+    """The aggregate manifest must include a sha256 over all resolution data (US-435)."""
+    monkeypatch.setattr(nb, "LODES_STATES", frozenset({"de"}))
+    cells = tuple(sorted(_expected_cells()))
+    report = build_national(
+        out_dir=tmp_path,
+        year=2023,
+        states=["de"],
+        cache_dir=state_fixtures["cache"],
+        fetcher=state_fixtures["fetcher"],
+        cells_provider=lambda res: cells,
+        promote=False,
+    )
+    assert "sha256" in report
+    assert len(report["sha256"]) == 64
+
+    manifest_path = tmp_path / "national" / "manifest.json"
+    assert manifest_path.exists()
+    loaded = json.loads(manifest_path.read_text())
+    assert loaded["resolutions"] == list(nb.DEFAULT_RESOLUTIONS)
+    assert loaded["checksum_verified"] is True
+    assert loaded["lodes_version"] == "v8"

@@ -56,6 +56,7 @@ def asyncio_run_build(
     cities=None,
     include_legacy_cells: bool = True,
     national_dir: Path | None = None,
+    require_national: bool = False,
 ) -> dict[str, Any]:
     import asyncio
 
@@ -66,6 +67,7 @@ def asyncio_run_build(
             cities=cities,
             include_legacy_cells=include_legacy_cells,
             national_dir=national_dir,
+            require_national=require_national,
         )
     )
 
@@ -278,6 +280,52 @@ def test_national_chunk_over_budget_raises(tmp_path: Path, monkeypatch: pytest.M
     _write_national_fixture(national_dir)
     with pytest.raises(ValueError, match="US-383 budget"):
         asyncio_run_build(tmp_path, cities=["nyc"], national_dir=national_dir)
+
+
+def _write_national_res5_chunk(root: Path) -> None:
+    """Add a one-row res-5 chunk so the fixture covers all required resolutions."""
+    cell = h3.latlng_to_cell(40.7128, -74.006, 5)
+    res5_dir = root / "national" / "res5"
+    res5_dir.mkdir(parents=True, exist_ok=True)
+    _national_fixture_frame(
+        [
+            {
+                "h3_index": cell,
+                "jobs_c000": 5000,
+                "workers_c000": 4200,
+                "jobs_c000_national_pct": 90.0,
+                "workers_c000_national_pct": 88.0,
+                "year": 2023,
+                "signal_source": "census_lehd_lodes8",
+            }
+        ]
+    ).write_parquet(res5_dir / f"{h3.cell_to_parent(cell, 3)}.parquet")
+
+
+def test_require_national_rejects_metro_only(tmp_path: Path):
+    """Production mode must fail, not silently publish metro-only (US-435 §24)."""
+    with pytest.raises(ValueError, match="require-national"):
+        asyncio_run_build(tmp_path, cities=["nyc"], require_national=True)
+
+
+def test_require_national_rejects_incomplete_resolutions(tmp_path: Path):
+    """The base fixture covers res-4 + res-6 only; require mode must reject it."""
+    national_dir = tmp_path / "national-out"
+    _write_national_fixture(national_dir)
+    with pytest.raises(ValueError, match="missing resolutions"):
+        asyncio_run_build(
+            tmp_path, cities=["nyc"], national_dir=national_dir, require_national=True
+        )
+
+
+def test_require_national_accepts_complete_publish(tmp_path: Path):
+    national_dir = tmp_path / "national-out"
+    _write_national_fixture(national_dir)
+    _write_national_res5_chunk(national_dir)
+    manifest = asyncio_run_build(
+        tmp_path, cities=["nyc"], national_dir=national_dir, require_national=True
+    )
+    assert set(manifest["national"]["resolutions"]) >= {"4", "5", "6"}
 
 
 def test_manifest_boot_payload_national_regression(tmp_path: Path):

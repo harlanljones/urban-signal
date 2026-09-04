@@ -11,10 +11,23 @@ Honesty rule: hexes without data stay null (never zero-filled, never synthesized
 LODES covers the 50 states + DC; territory hexes (PR/VI/...) remain null, as do
 states/years with published coverage gaps (e.g. WAC/OD for AK 2017+).
 
+WAC and RAC are independent measures: a missing WAC file does not discard RAC
+data for the same state, and vice versa (US-435 §17).
+
 Output layout (per run)::
 
     <out>/national/res{res}/{res3_parent}.parquet   one chunk per res-3 parent
-    <out>/national/build_report.json                run metadata + per-state counts
+    <out>/national/res{res}/report.json              per-resolution report
+    <out>/national/manifest.json                     aggregate artifact manifest
+    <out>/national/current.json                      promotion pointer (see below)
+
+Build identity: the manifest SHA-256 over every resolution's chunk bytes is the
+artifact's immutable identity (``artifact_key =
+national/<signal_source>/<year>/<sha256>``). ``promote_national`` validates a
+finished build and only then writes ``current.json`` — a partial or empty build
+can never replace a valid pointer. The monthly workflow uploads the build tree
+under its artifact key (R2) and publishes ``current.json``; the nightly
+snapshot consumes whichever build the pointer names.
 
 Parquet columns: ``h3_index``, ``res5_parent``, ``res4_parent``, ``jobs_c000``,
 ``workers_c000``, ``blocks_wac``, ``blocks_rac``, ``jobs_national_pct``,
@@ -53,19 +66,13 @@ logger = logging.getLogger(__name__)
 
 LODES_BASE_URL = "https://lehd.ces.census.gov/data/lodes/LODES8"
 DEFAULT_YEAR = 2023
-DEFAULT_RESOLUTION = 6
 DEFAULT_CACHE_DIR = Path("data") / "national" / "lodes"
 DEFAULT_OUT_DIR = Path("dist")
 SIGNAL_SOURCE = "census_lehd_lodes8"
-
-# TODO(US-382 follow-ups) remaining national signals, each a self-contained
-# aggregator beside aggregate_state, all independently nullable:
-#   - building density: Microsoft GlobalMLBuildingFootprints (quadkey tiles,
-#     CDLA-Permissive) or Overture Buildings (ODbL gate, see signal-overture log)
-#   - OSM building/road density: Geofabrik state extracts
-#   - VIIRS nighttime lights: needs a raster platform (repo has none; see
-#     us123-nlcd log) — defer until raster/zonal capability exists
-#   - ACS baseline: reuse src/spatial/acs_baseline.py (needs a Census API key)
+DEFAULT_RESOLUTIONS = (4, 5, 6)
+# Bump whenever the aggregation, ranking, chunking, or report contract changes;
+# the aggregate manifest and ContextSourceSpec both carry it (US-435 §12).
+BUILDER_REVISION = "1"
 
 # LODES ships the 50 states + DC (lowercase two-letter codes). Territories are
 # absent in all years; their national hexes stay null.
@@ -163,13 +170,17 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def download_to_cache(url: str, cache_dir: Path, sha_list_url: str | None = None) -> Path:
+def _sha256_bytes(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def download_to_cache(
+    url: str, cache_dir: Path, sha_list_url: str | None = None
+) -> Path:
     """Download ``url`` into ``cache_dir`` (skipped when cached) and verify integrity.
 
-    The fetcher is plain httpx with no auth, mirroring the anonymous-curl access
-    proven in the LODES validation doc. When ``sha_list_url`` is provided, the
-    remote per-state ``lodes_<st>.sha256sum`` is consulted (and cached) and the
-    local file's SHA-256 must match the listed digest.
+    When ``sha_list_url`` is provided, the remote per-state ``lodes_<st>.sha256sum``
+    is consulted (and cached) and the local file's SHA-256 must match the listed digest.
     """
     import httpx
 
@@ -185,7 +196,9 @@ def download_to_cache(url: str, cache_dir: Path, sha_list_url: str | None = None
         sha_path = download_to_cache(sha_list_url, cache_dir)
         expected = _expected_sha(sha_path, target.name)
         if expected is not None and _sha256(target) != expected:
-            raise ValueError(f"SHA-256 mismatch for {target.name}: expected {expected}")
+            raise ValueError(
+                f"SHA-256 mismatch for {target.name}: expected {expected}"
+            )
     return target
 
 
@@ -203,8 +216,49 @@ def _read_gzip_csv(path: Path, columns: list[str]) -> pl.DataFrame:
         header = handle.readline().strip().split(",")
     missing = [col for col in columns if col not in header]
     if missing:
-        raise ValueError(f"{path.name}: missing columns {missing}; header={header[:8]}...")
+        raise ValueError(
+            f"{path.name}: missing columns {missing}; header={header[:8]}..."
+        )
     return pl.read_csv(path, columns=columns, infer_schema_length=0)
+
+
+def _aggregate_measure(
+    measure: str,
+    geocode_col: str,
+    data_path: Path,
+    xwalk: pl.DataFrame,
+    resolution: int,
+    cell_filter: set[str] | None,
+) -> tuple[dict[str, int], dict[str, int], str | None]:
+    """Aggregate one LODES measure (wac or rac) to hex cells.
+
+    Returns (sums_by_cell, blocks_by_cell, error_message).
+    ``error_message`` is None on success, or a string describing the failure.
+    """
+    try:
+        data = _read_gzip_csv(data_path, [geocode_col, "C000"]).with_columns(
+            pl.col("C000").cast(pl.Int64)
+        )
+    except Exception as exc:  # noqa: BLE001 — coverage gaps must not kill the run
+        return {}, {}, f"{type(exc).__name__}: {exc}"
+
+    joined = data.rename({geocode_col: "tabblk2020"}).join(
+        xwalk, on="tabblk2020", how="inner"
+    )
+
+    sums: dict[str, int] = {}
+    blocks: dict[str, int] = {}
+    for lat, lng, count in zip(
+        joined["blklatdd"].to_list(),
+        joined["blklondd"].to_list(),
+        joined["C000"].to_list(),
+    ):
+        cell = h3.latlng_to_cell(lat, lng, resolution)
+        if cell_filter is not None and cell not in cell_filter:
+            continue
+        sums[cell] = sums.get(cell, 0) + count
+        blocks[cell] = blocks.get(cell, 0) + 1
+    return sums, blocks, None
 
 
 def aggregate_state(
@@ -214,85 +268,104 @@ def aggregate_state(
     cache_dir: Path,
     fetcher: Callable[[str, Path], Path] = download_to_cache,
     cell_filter: Iterable[str] | None = None,
-) -> pl.DataFrame:
-    """Aggregate one state's LODES WAC/RAC to national hex cells.
+    verify_checksums: bool = True,
+) -> tuple[pl.DataFrame, dict]:
+    """Aggregate one state's LODES WAC and RAC to national hex cells.
 
-    Returns columns ``h3_index, jobs_c000, workers_c000, blocks_wac, blocks_rac``.
-    ``fetcher`` is injectable for tests. ``cell_filter`` restricts output to the
-    given cells (the national pyramid); blocks resolving outside it are dropped.
+    Returns (frame, state_report) where ``frame`` has columns ``h3_index,
+    jobs_c000, workers_c000, blocks_wac, blocks_rac`` and ``state_report``
+    contains per-measure status. WAC and RAC are independent: a missing WAC
+    file does not discard RAC data, and vice versa.
     """
-    xwalk_path = fetcher(state_xwalk_url(state), cache_dir)
-    wac_path = fetcher(state_file_url(state, "wac", year), cache_dir)
-    rac_path = fetcher(state_file_url(state, "rac", year), cache_dir)
     allowed = set(cell_filter) if cell_filter is not None else None
+    xwalk_path = fetcher(state_xwalk_url(state), cache_dir)
 
     xwalk = _read_gzip_csv(xwalk_path, ["tabblk2020", "blklatdd", "blklondd"]).with_columns(
         pl.col("blklatdd").cast(pl.Float64), pl.col("blklondd").cast(pl.Float64)
     )
-    wac = _read_gzip_csv(wac_path, ["w_geocode", "C000"]).with_columns(
-        pl.col("C000").cast(pl.Int64)
-    )
-    rac = _read_gzip_csv(rac_path, ["h_geocode", "C000"]).with_columns(
-        pl.col("C000").cast(pl.Int64)
-    )
 
-    def _cells_sum(
-        latlng: list[tuple[float, float]], counts: list[int]
-    ) -> tuple[dict[str, int], dict[str, int]]:
-        sums: dict[str, int] = {}
-        blocks: dict[str, int] = {}
-        for (lat, lng), count in zip(latlng, counts):
-            cell = h3.latlng_to_cell(lat, lng, resolution)
-            if allowed is not None and cell not in allowed:
-                continue
-            sums[cell] = sums.get(cell, 0) + count
-            blocks[cell] = blocks.get(cell, 0) + 1
-        return sums, blocks
+    wac_sha_url = state_sha_url(state) if verify_checksums else None
+    rac_sha_url = state_sha_url(state) if verify_checksums else None
 
-    wac_joined = wac.rename({"w_geocode": "tabblk2020"}).join(xwalk, on="tabblk2020", how="inner")
-    rac_joined = rac.rename({"h_geocode": "tabblk2020"}).join(xwalk, on="tabblk2020", how="inner")
+    wac_data = None
+    wac_error = None
+    try:
+        wac_path = fetcher(state_file_url(state, "wac", year), cache_dir, wac_sha_url)
+        wac_data = wac_path
+    except Exception as exc:  # noqa: BLE001 — WAC/RAC are independent measures
+        wac_error = f"{type(exc).__name__}: {exc}"
 
-    jobs_by_cell, job_blocks = _cells_sum(
-        list(zip(wac_joined["blklatdd"].to_list(), wac_joined["blklondd"].to_list())),
-        wac_joined["C000"].to_list(),
-    )
-    workers_by_cell, worker_blocks = _cells_sum(
-        list(zip(rac_joined["blklatdd"].to_list(), rac_joined["blklondd"].to_list())),
-        rac_joined["C000"].to_list(),
-    )
+    rac_data = None
+    rac_error = None
+    try:
+        rac_path = fetcher(state_file_url(state, "rac", year), cache_dir, rac_sha_url)
+        rac_data = rac_path
+    except Exception as exc:  # noqa: BLE001 — WAC/RAC are independent measures
+        rac_error = f"{type(exc).__name__}: {exc}"
 
-    frame = pl.DataFrame({"h3_index": sorted(set(jobs_by_cell) | set(workers_by_cell))})
+    wac_sums: dict[str, int] = {}
+    wac_blocks: dict[str, int] = {}
+    if wac_data is not None:
+        wac_sums, wac_blocks, wac_err = _aggregate_measure(
+            "wac", "w_geocode", wac_data, xwalk, resolution, allowed
+        )
+        if wac_err is not None:
+            wac_error = wac_err
+
+    rac_sums: dict[str, int] = {}
+    rac_blocks: dict[str, int] = {}
+    if rac_data is not None:
+        rac_sums, rac_blocks, rac_err = _aggregate_measure(
+            "rac", "h_geocode", rac_data, xwalk, resolution, allowed
+        )
+        if rac_err is not None:
+            rac_error = rac_err
+
+    all_cells = sorted(set(wac_sums) | set(rac_sums))
+    frame = pl.DataFrame({"h3_index": all_cells})
     frame = frame.with_columns(
         pl.col("h3_index")
-        .replace_strict(jobs_by_cell, default=None, return_dtype=pl.Int64)
+        .replace_strict(wac_sums, default=None, return_dtype=pl.Int64)
         .alias(JOBS_COL),
         pl.col("h3_index")
-        .replace_strict(workers_by_cell, default=None, return_dtype=pl.Int64)
+        .replace_strict(rac_sums, default=None, return_dtype=pl.Int64)
         .alias(WORKERS_COL),
-    ).with_columns(
         pl.col("h3_index")
-        .replace_strict(job_blocks, default=None, return_dtype=pl.Int64)
+        .replace_strict(wac_blocks, default=None, return_dtype=pl.Int64)
         .alias("blocks_wac"),
         pl.col("h3_index")
-        .replace_strict(worker_blocks, default=None, return_dtype=pl.Int64)
+        .replace_strict(rac_blocks, default=None, return_dtype=pl.Int64)
         .alias("blocks_rac"),
     )
+
+    state_report: dict = {
+        "wac_status": "ok" if wac_error is None else "no_data",
+        "rac_status": "ok" if rac_error is None else "no_data",
+    }
+    if wac_error is not None:
+        state_report["wac_error"] = wac_error
+    if rac_error is not None:
+        state_report["rac_error"] = rac_error
+    state_report["cells"] = len(frame)
+    if wac_error is None:
+        state_report["jobs_c000"] = int(frame[JOBS_COL].sum() or 0)
+    if rac_error is None:
+        state_report["workers_c000"] = int(frame[WORKERS_COL].sum() or 0)
+
     logger.info(
-        "%s: %d WAC blocks, %d RAC blocks -> %d cells",
+        "%s: WAC=%s RAC=%s -> %d cells",
         state,
-        sum(job_blocks.values()),
-        sum(worker_blocks.values()),
+        state_report["wac_status"],
+        state_report["rac_status"],
         len(frame),
     )
-    return frame.select("h3_index", JOBS_COL, WORKERS_COL, "blocks_wac", "blocks_rac")
+    return frame.select("h3_index", JOBS_COL, WORKERS_COL, "blocks_wac", "blocks_rac"), state_report
 
 
 def _sum_frames(frames: list[pl.DataFrame]) -> pl.DataFrame:
     combined = pl.concat(frames, how="vertical")
 
     def _null_aware_sum(col: str) -> pl.Expr:
-        # A group whose values are all null must stay null: polars' plain sum()
-        # maps an all-null group to 0, which would fabricate data.
         return (
             pl.when(pl.col(col).null_count() == pl.len())
             .then(None)
@@ -300,12 +373,13 @@ def _sum_frames(frames: list[pl.DataFrame]) -> pl.DataFrame:
             .alias(col)
         )
 
-    return combined.group_by("h3_index").agg(
+    result = combined.group_by("h3_index").agg(
         _null_aware_sum(JOBS_COL),
         _null_aware_sum(WORKERS_COL),
         pl.col("blocks_wac").sum(),
         pl.col("blocks_rac").sum(),
     )
+    return result.with_columns(pl.col("h3_index").cast(pl.String))
 
 
 def _attach_ranks(frame: pl.DataFrame) -> pl.DataFrame:
@@ -328,23 +402,20 @@ def _attach_ranks(frame: pl.DataFrame) -> pl.DataFrame:
     )
 
 
-def build_national(
-    out_dir: Path = DEFAULT_OUT_DIR,
-    resolution: int = DEFAULT_RESOLUTION,
-    year: int = DEFAULT_YEAR,
-    states: Iterable[str] | None = None,
-    cache_dir: Path = DEFAULT_CACHE_DIR,
-    fetcher: Callable[[str, Path], Path] = download_to_cache,
-    cells_provider: Callable[[int], tuple[str, ...]] = cells_at_resolution,
+def _build_resolution(
+    resolution: int,
+    year: int,
+    state_list: list[str],
+    cache_dir: Path,
+    fetcher: Callable[[str, Path], Path],
+    verify_checksums: bool,
+    out_dir: Path,
+    cells_provider: Callable[[int], tuple[str, ...]],
 ) -> dict:
-    """Build national hex signal Parquet chunks + build report; returns the report."""
-    out_dir = Path(out_dir)
-    cache_dir = Path(cache_dir)
-    state_list = sorted(set(states) if states is not None else LODES_STATES)
-    unknown = [s for s in state_list if s not in LODES_STATES]
-    if unknown:
-        raise ValueError(f"Unknown LODES state codes: {unknown}")
+    """Build one resolution's Parquet chunks and per-resolution report.
 
+    Returns the per-resolution report dict.
+    """
     cells = cells_provider(resolution)
     allowed = set(cells)
     res3_parents: dict[str, str] = {cell: parent_at(cell, 3) for cell in cells}
@@ -353,20 +424,23 @@ def build_national(
     report_states: dict[str, dict] = {}
     for state in state_list:
         try:
-            frame = aggregate_state(state, year, resolution, cache_dir, fetcher, allowed)
+            frame, state_report = aggregate_state(
+                state, year, resolution, cache_dir, fetcher, allowed, verify_checksums
+            )
         except Exception as exc:  # noqa: BLE001 — coverage gaps must not kill the run
             logger.warning(
-                "State %s unavailable (%s: %s); hexes stay null", state, type(exc).__name__, exc
+                "State %s unavailable (%s: %s); hexes stay null",
+                state, type(exc).__name__, exc,
             )
-            report_states[state] = {"status": "no_data", "error": f"{type(exc).__name__}: {exc}"}
+            report_states[state] = {
+                "wac_status": "no_data",
+                "rac_status": "no_data",
+                "error": f"{type(exc).__name__}: {exc}",
+                "cells": 0,
+            }
             continue
         state_frames.append(frame)
-        report_states[state] = {
-            "status": "ok",
-            "cells": len(frame),
-            "jobs": int(frame[JOBS_COL].sum() or 0),
-            "workers": int(frame[WORKERS_COL].sum() or 0),
-        }
+        report_states[state] = state_report
 
     if state_frames:
         combined = _sum_frames(state_frames)
@@ -382,7 +456,7 @@ def build_national(
         )
 
     full = (
-        pl.DataFrame({"h3_index": list(cells)})
+        pl.DataFrame({"h3_index": list(cells)}, schema={"h3_index": pl.String})
         .join(combined, on="h3_index", how="left")
         .with_columns(
             pl.col("h3_index")
@@ -406,50 +480,215 @@ def build_national(
     res_dir = out_dir / "national" / f"res{resolution}"
     res_dir.mkdir(parents=True, exist_ok=True)
     chunk_sizes: dict[str, int] = {}
+    chunk_sha256: dict[str, str] = {}
     for parent, part in full.group_by("res3_parent"):
         parent_key = parent[0] if isinstance(parent, tuple) else parent
         chunk = part.drop("res3_parent")
         path = res_dir / f"{parent_key}.parquet"
         chunk.write_parquet(path)
         chunk_sizes[path.name] = path.stat().st_size
+        chunk_sha256[path.name] = _sha256(path)
+
+    states_with_wac = sum(
+        1 for s in report_states.values() if s.get("wac_status") == "ok"
+    )
+    states_with_rac = sum(
+        1 for s in report_states.values() if s.get("rac_status") == "ok"
+    )
 
     report = {
         "generated_at": datetime.now(UTC).isoformat(),
         "signal_source": SIGNAL_SOURCE,
+        "builder_revision": BUILDER_REVISION,
         "year": year,
         "resolution": resolution,
         "cells": len(cells),
         "states_requested": len(state_list),
-        "states_with_data": sum(1 for s in report_states.values() if s.get("status") == "ok"),
+        "states_with_wac": states_with_wac,
+        "states_with_rac": states_with_rac,
         "hexes_with_jobs": int(full[JOBS_COL].is_not_null().sum()),
         "hexes_with_workers": int(full[WORKERS_COL].is_not_null().sum()),
         "total_jobs": int(full[JOBS_COL].sum() or 0),
         "total_workers": int(full[WORKERS_COL].sum() or 0),
         "chunks": chunk_sizes,
+        "chunks_sha256": chunk_sha256,
         "states": report_states,
     }
-    report_path = out_dir / "national" / "build_report.json"
-    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path = res_dir / "report.json"
     report_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
 
     logger.info(
-        "National build complete: %d cells, %d with jobs, %d chunks -> %s",
+        "Resolution %d complete: %d cells, %d with jobs, %d chunks",
+        resolution,
         len(cells),
         report["hexes_with_jobs"],
         len(chunk_sizes),
-        res_dir,
     )
     return report
+
+
+def promote_national(out_dir: Path = DEFAULT_OUT_DIR) -> dict:
+    """Validate a finished build and promote it as the current artifact.
+
+    Reads ``national/manifest.json`` plus each per-resolution ``report.json``,
+    requires checksums verified and at least one data chunk with measured hexes
+    per resolution, then writes ``national/current.json``. A partial or empty
+    build raises instead of replacing a valid pointer.
+    """
+    out_dir = Path(out_dir)
+    national_root = out_dir / "national"
+    manifest_path = national_root / "manifest.json"
+    if not manifest_path.exists():
+        raise ValueError(f"promote: no manifest at {manifest_path}; nothing to promote")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    failures: list[str] = []
+    if not manifest.get("checksum_verified"):
+        failures.append("checksums not verified")
+    for res in manifest.get("resolutions", []):
+        report_path = national_root / f"res{res}" / "report.json"
+        if not report_path.exists():
+            failures.append(f"res{res}: missing report")
+            continue
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+        if not report.get("chunks"):
+            failures.append(f"res{res}: no data chunks")
+        elif not (report.get("hexes_with_jobs") or report.get("hexes_with_workers")):
+            failures.append(f"res{res}: no measured hexes")
+    if failures:
+        raise ValueError(f"promote: refusing to promote invalid build: {failures}")
+
+    pointer = {
+        "artifact_key": (
+            f"national/{manifest['signal_source']}/{manifest['year']}/{manifest['sha256']}"
+        ),
+        "sha256": manifest["sha256"],
+        "signal_source": manifest["signal_source"],
+        "builder_revision": manifest["builder_revision"],
+        "lodes_version": manifest["lodes_version"],
+        "year": manifest["year"],
+        "resolutions": manifest["resolutions"],
+        "promoted_at": datetime.now(UTC).isoformat(),
+    }
+    (national_root / "current.json").write_text(
+        json.dumps(pointer, indent=2), encoding="utf-8"
+    )
+    logger.info("Promoted national artifact %s", pointer["artifact_key"])
+    return pointer
+
+
+def build_national(
+    out_dir: Path = DEFAULT_OUT_DIR,
+    year: int = DEFAULT_YEAR,
+    resolutions: tuple[int, ...] = DEFAULT_RESOLUTIONS,
+    states: Iterable[str] | None = None,
+    cache_dir: Path = DEFAULT_CACHE_DIR,
+    verify_checksums: bool = True,
+    fetcher: Callable[[str, Path], Path] = download_to_cache,
+    cells_provider: Callable[[int], tuple[str, ...]] = cells_at_resolution,
+    promote: bool = True,
+) -> dict:
+    """Build national hex signal for all requested resolutions.
+
+    Produces per-resolution Parquet chunks, per-resolution reports, and an
+    aggregate artifact manifest. Unless ``promote`` is False, validates the
+    finished build and writes the ``current.json`` promotion pointer.
+    Returns the manifest dict.
+    """
+    out_dir = Path(out_dir)
+    cache_dir = Path(cache_dir)
+    state_list = sorted(set(states) if states is not None else LODES_STATES)
+    unknown = [s for s in state_list if s not in LODES_STATES]
+    if unknown:
+        raise ValueError(f"Unknown LODES state codes: {unknown}")
+
+    invalid = [r for r in resolutions if r not in NATIONAL_RESOLUTIONS]
+    if invalid:
+        raise ValueError(
+            f"Invalid resolutions {invalid}; valid: {NATIONAL_RESOLUTIONS}"
+        )
+
+    per_resolution_reports: dict[int, dict] = {}
+    for res in resolutions:
+        logger.info("Building resolution %d...", res)
+        report = _build_resolution(
+            res, year, state_list, cache_dir, fetcher, verify_checksums, out_dir, cells_provider
+        )
+        per_resolution_reports[res] = report
+
+    full_manifest = _build_manifest(
+        year, state_list, resolutions, per_resolution_reports, out_dir
+    )
+    if promote:
+        promote_national(out_dir)
+    return full_manifest
+
+
+def _build_manifest(
+    year: int,
+    state_list: list[str],
+    resolutions: tuple[int, ...],
+    per_resolution_reports: dict[int, dict],
+    out_dir: Path,
+) -> dict:
+    """Build the aggregate artifact manifest from per-resolution reports."""
+    manifest: dict = {
+        "generated_at": datetime.now(UTC).isoformat(),
+        "signal_source": SIGNAL_SOURCE,
+        "builder_revision": BUILDER_REVISION,
+        "year": year,
+        "resolutions": list(resolutions),
+        "states": state_list,
+        "checksum_verified": True,
+        "lodes_version": "v8",
+        "artifacts": {},
+    }
+
+    full_payload = b""
+    for res in resolutions:
+        report = per_resolution_reports[res]
+        artifact = {
+            "cells": report["cells"],
+            "chunks": len(report["chunks"]),
+            "hexes_with_jobs": report["hexes_with_jobs"],
+            "hexes_with_workers": report["hexes_with_workers"],
+            "states_with_wac": report["states_with_wac"],
+            "states_with_rac": report["states_with_rac"],
+            "total_jobs": report["total_jobs"],
+            "total_workers": report["total_workers"],
+        }
+        manifest["artifacts"][str(res)] = artifact
+        res_dir = out_dir / "national" / f"res{res}"
+        for chunk_path in sorted(res_dir.glob("*.parquet")):
+            full_payload += chunk_path.read_bytes()
+
+    manifest["sha256"] = _sha256_bytes(full_payload)
+
+    manifest_path = out_dir / "national" / "manifest.json"
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+
+    logger.info(
+        "Aggregate manifest written: %d resolutions, %d states, sha256=%s",
+        len(resolutions),
+        len(state_list),
+        manifest["sha256"][:16],
+    )
+    return manifest
 
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s %(message)s")
     parser = argparse.ArgumentParser(
-        description="Build national hex signal Parquet chunks (LODES v1)"
+        description="Build national hex signal Parquet chunks (LODES v1, multi-resolution)"
     )
     parser.add_argument("--out", default=str(DEFAULT_OUT_DIR), help="Output directory")
     parser.add_argument(
-        "--res", type=int, default=DEFAULT_RESOLUTION, choices=list(NATIONAL_RESOLUTIONS)
+        "--resolutions",
+        type=int,
+        nargs="+",
+        default=list(DEFAULT_RESOLUTIONS),
+        choices=list(NATIONAL_RESOLUTIONS),
+        help="Resolutions to build (default: 4 5 6)",
     )
     parser.add_argument("--year", type=int, default=DEFAULT_YEAR)
     parser.add_argument(
@@ -458,13 +697,25 @@ def main() -> None:
     parser.add_argument(
         "--cache-dir", default=str(DEFAULT_CACHE_DIR), help="Download cache (gitignored)"
     )
+    parser.add_argument(
+        "--no-verify-checksums",
+        action="store_true",
+        help="Skip official SHA-256 checksum verification (not recommended)",
+    )
+    parser.add_argument(
+        "--no-promote",
+        action="store_true",
+        help="Do not write the current.json promotion pointer (leave staging unpromoted)",
+    )
     args = parser.parse_args()
     build_national(
         out_dir=Path(args.out),
-        resolution=args.res,
         year=args.year,
+        resolutions=tuple(args.resolutions),
         states=args.states,
         cache_dir=Path(args.cache_dir),
+        verify_checksums=not args.no_verify_checksums,
+        promote=not args.no_promote,
     )
 
 
