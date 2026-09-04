@@ -1,0 +1,173 @@
+{
+  "schema_version": 2,
+  "id": "fort_collins",
+  "name": "Fort Collins, CO",
+  "state": "CO",
+  "center": {
+    "lat": 40.5853,
+    "lng": -105.0844
+  },
+  "metro_bbox": {
+    "min_lat": 40.47,
+    "max_lat": 40.65,
+    "min_lng": -105.16,
+    "max_lng": -104.98
+  },
+  "divisions": {
+    "DOWNTOWN_OLD_TOWN": {
+      "name": "DOWNTOWN_OLD_TOWN",
+      "center": {
+        "lat": 40.578,
+        "lng": -105.078
+      },
+      "bbox": {
+        "min_lat": 40.47,
+        "max_lat": 40.605,
+        "min_lng": -105.1,
+        "max_lng": -105.055
+      },
+      "submarkets": [
+        "Old Town",
+        "Civic Center"
+      ]
+    },
+    "WEST_FOOTHILLS": {
+      "name": "WEST_FOOTHILLS",
+      "center": {
+        "lat": 40.56,
+        "lng": -105.13
+      },
+      "bbox": {
+        "min_lat": 40.47,
+        "max_lat": 40.605,
+        "min_lng": -105.16,
+        "max_lng": -105.1
+      },
+      "submarkets": [
+        "CSU Campus West",
+        "Foothills West"
+      ]
+    },
+    "EAST_HARMONY": {
+      "name": "EAST_HARMONY",
+      "center": {
+        "lat": 40.535,
+        "lng": -105.015
+      },
+      "bbox": {
+        "min_lat": 40.47,
+        "max_lat": 40.605,
+        "min_lng": -105.055,
+        "max_lng": -104.98
+      },
+      "submarkets": [
+        "Harmony Corridor",
+        "Timberline"
+      ]
+    },
+    "NORTH_FORT_COLLINS": {
+      "name": "NORTH_FORT_COLLINS",
+      "center": {
+        "lat": 40.627,
+        "lng": -105.05
+      },
+      "bbox": {
+        "min_lat": 40.605,
+        "max_lat": 40.65,
+        "min_lng": -105.16,
+        "max_lng": -104.98
+      },
+      "submarkets": [
+        "Old Town North",
+        "Dry Creek"
+      ]
+    }
+  },
+  "submarkets": {
+    "Old Town": {
+      "name": "Old Town",
+      "division": "DOWNTOWN_OLD_TOWN",
+      "center": {
+        "lat": 40.5853,
+        "lng": -105.0772
+      },
+      "description": "Historic Old Town core with adaptive-reuse and mixed-use infill permitting."
+    },
+    "Civic Center": {
+      "name": "Civic Center",
+      "division": "DOWNTOWN_OLD_TOWN",
+      "center": {
+        "lat": 40.567,
+        "lng": -105.079
+      },
+      "description": "Civic Center and CSU-adjacent commercial corridor with steady permit churn."
+    },
+    "CSU Campus West": {
+      "name": "CSU Campus West",
+      "division": "WEST_FOOTHILLS",
+      "center": {
+        "lat": 40.573,
+        "lng": -105.12
+      },
+      "description": "Colorado State University campus-west student housing and rental infill."
+    },
+    "Foothills West": {
+      "name": "Foothills West",
+      "division": "WEST_FOOTHILLS",
+      "center": {
+        "lat": 40.55,
+        "lng": -105.14
+      },
+      "description": "Foothills-facing west edge with low-density residential remodel permitting."
+    },
+    "Harmony Corridor": {
+      "name": "Harmony Corridor",
+      "division": "EAST_HARMONY",
+      "center": {
+        "lat": 40.523,
+        "lng": -105.03
+      },
+      "description": "Harmony Rd tech/office corridor with commercial new-build permitting."
+    },
+    "Timberline": {
+      "name": "Timberline",
+      "division": "EAST_HARMONY",
+      "center": {
+        "lat": 40.55,
+        "lng": -105.0
+      },
+      "description": "East side residential and light-industrial belt along Timberline Rd."
+    },
+    "Old Town North": {
+      "name": "Old Town North",
+      "division": "NORTH_FORT_COLLINS",
+      "center": {
+        "lat": 40.62,
+        "lng": -105.07
+      },
+      "description": "Old Town North master-planned area with new-build residential permitting."
+    },
+    "Dry Creek": {
+      "name": "Dry Creek",
+      "division": "NORTH_FORT_COLLINS",
+      "center": {
+        "lat": 40.635,
+        "lng": -105.03
+      },
+      "description": "North edge Dry Creek growth area with residential build-out."
+    }
+  },
+  "feeds": {
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 3600.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": null,
+    "sla": null,
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/fort_collins.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

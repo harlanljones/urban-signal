@@ -1020,6 +1020,22 @@ class Settings(BaseSettings):
         description="Montgomery, AL received 311 service requests MapServer layer URL (US-424)",
     )
 
+    # Fort Collins, CO (AGOL hosted FeatureServer, services1 org
+    # dLpFH5mwVvxSN4OE): "Current Building Permits" — native point geometry
+    # (WGS84 out of the box), 2,215 rows live-verified 2026-09-03. The item
+    # the research probe cited (e0964db1f10c491a872d5d0e7dbbe13a) resolves to
+    # this URL; its actual schema (PERMITNUM/PERMITTYPE/B1_APPL_STATUS/
+    # ADDRESS) carries NO date column despite the probe's claimed
+    # APPLIED_DATE/ISSUED_DATE fields, so it registers as a snapshot pull
+    # (watermark_col="") rather than incremental. US-421 registration.
+    arcgis_fort_collins_permits_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/dLpFH5mwVvxSN4OE/arcgis/rest/services/"
+            "Building_Permits/FeatureServer/0"
+        ),
+        description="Fort Collins, CO current building permits FeatureServer layer URL (US-421)",
+    )
+
     # Pierce County, WA (ArcGIS): county applications and permits across six
     # departments (Building, Development Engineering, Environmental, Fire,
     # Land Use, Sewer). Point layer in WA State Plane; the client's outSR=4326

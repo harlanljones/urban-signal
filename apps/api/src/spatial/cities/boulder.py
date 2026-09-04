@@ -35,7 +35,19 @@ Provides neighborhood metadata, camera positioning, investment metrics,
 division catalog, and geographic bounding boxes for the City of Boulder, CO
 and its county-fringe context (Boulder County).
 
-Boulder is a TWO-FEED partial metro (live-probed 2026-08-28, US-245):
+Boulder is a TWO-FEED partial metro (live-probed 2026-08-28, US-245).
+PERMITS was already live-registered by US-245 before the US-421 southwest/
+mountain expansion probe re-flagged it as a "Register Now" candidate against
+a different endpoint (``open-data.bouldercolorado.gov/.../
+Construction_Permits/FeatureServer/0``, claimed Tier 1 point geometry).
+That probe endpoint is the ArcGIS Hub mirror of the same Construction_Permits
+table already registered here on the city's own AGOL org
+(services.arcgis.com/ePKBjXrBZ2vEEgWd) — verified non-spatial (a Table, no
+geometry), which is why this leaf's spec correctly carries
+``needs_geocode=True`` rather than the probe's claimed native point
+geometry. No feed changes were needed for US-421; see PR_DESCRIPTION.md.
+
+
 
 * PERMITS — ``Construction_Permits`` FeatureServer/0 on the city's AGOL org
   (services.arcgis.com/ePKBjXrBZ2vEEgWd). A **Table** (non-spatial): no

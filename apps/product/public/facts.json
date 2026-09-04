@@ -1520,6 +1520,36 @@
       "evidence_path": "apps/api/src/spatial/cities/evansville.py"
     },
     {
+      "id": "fort_collins",
+      "name": "Fort Collins, CO",
+      "state": "CO",
+      "divisions": "4 divisions",
+      "division_count": 4,
+      "submarket_count": 8,
+      "feeds": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "platforms": [
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 3600.0,
+          "topic": "raw.municipal.permits"
+        },
+        null,
+        null,
+        null
+      ],
+      "center": {
+        "lat": 40.5853,
+        "lng": -105.0844
+      },
+      "evidence_path": "apps/api/src/spatial/cities/fort_collins.py"
+    },
+    {
       "id": "fort_smith",
       "name": "Fort Smith",
       "state": "AR",
