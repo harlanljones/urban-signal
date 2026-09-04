@@ -471,6 +471,30 @@ def _publish_national_layers(
     return {"generated_at": generated_at, "resolutions": summary_block}
 
 
+def _require_national_block(
+    national_block: dict[str, Any] | None, national_dir: Path | None
+) -> None:
+    """Fail closed when production require-national mode has no valid national input.
+
+    A production release must never silently regress to metro-only coverage:
+    absent input, an empty publish, or a publish missing any of
+    ``NATIONAL_RESOLUTIONS`` raises here, in the build, not at 2 AM in KV.
+    """
+    if national_block is None:
+        raise ValueError(
+            "require-national: no national layers published "
+            f"(national_dir={national_dir}); refusing a metro-only production snapshot"
+        )
+    published = set(national_block.get("resolutions", {}))
+    required = {str(res) for res in NATIONAL_RESOLUTIONS}
+    missing = sorted(required - published)
+    if missing:
+        raise ValueError(
+            f"require-national: national publish is missing resolutions {missing} "
+            f"(published: {sorted(published)}); refusing an incomplete production snapshot"
+        )
+
+
 async def build_snapshot(
     out_dir: Path,
     engine: MultiHorizonInferenceEngine | None = None,
@@ -478,6 +502,7 @@ async def build_snapshot(
     include_legacy_cells: bool = True,
     national_dir: Path | None = None,
     dense_metro: bool = False,
+    require_national: bool = False,
 ) -> dict[str, Any]:
     """Build all snapshot artifacts into out_dir and return the manifest dict.
 
@@ -491,6 +516,10 @@ async def build_snapshot(
     data exists), national hex chunks + ``national/index`` are published and the
     manifest gains a ``national`` summary block; when omitted the snapshot is
     metro-only and the manifest carries no national block.
+
+    ``require_national`` is the production mode (US-435 §24): the build fails
+    instead of silently publishing a metro-only snapshot when the national
+    artifact is absent, corrupt, or missing a required resolution.
 
     ``dense_metro`` switches the res-9 grid from ``router.get_grid_geojson``'s
     k_ring=1 render set to the bounded k_ring=3 coverage seam
@@ -654,6 +683,8 @@ async def build_snapshot(
     national_block: dict[str, Any] | None = None
     if national_dir is not None:
         national_block = _publish_national_layers(out_dir, national_dir, register)
+    if require_national:
+        _require_national_block(national_block, national_dir)
 
     manifest: dict[str, Any] = {
         "generated_at": datetime.now(UTC).isoformat(),
@@ -738,6 +769,14 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--require-national",
+        action="store_true",
+        help=(
+            "Production mode: fail instead of publishing a metro-only or "
+            "resolution-incomplete snapshot when national input is missing"
+        ),
+    )
+    parser.add_argument(
         "--dense-metro",
         action="store_true",
         help="Use bounded k_ring=3 coverage (coverage.metro_cells) for continuous urban hexes",
@@ -750,6 +789,7 @@ def main() -> None:
             include_legacy_cells=not args.skip_legacy_cells,
             national_dir=Path(args.national_dir) if args.national_dir else None,
             dense_metro=args.dense_metro,
+            require_national=args.require_national,
         )
     )
 
