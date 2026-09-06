@@ -2,28 +2,16 @@
 
 import h3
 import pytest
+
 from src.spatial.cities.chicago import (
-    CHICAGO_DIVISION_BBOXES,
-    CHICAGO_DIVISIONS,
-    CHICAGO_METRO_BBOX,
-    CHICAGO_SUBMARKETS,
     is_in_chicago_metro,
 )
 from src.spatial.cities.san_francisco import (
-    SAN_FRANCISCO_DIVISION_BBOXES,
-    SAN_FRANCISCO_DIVISIONS,
-    SAN_FRANCISCO_METRO_BBOX,
-    SAN_FRANCISCO_SUBMARKETS,
-    SF_DIVISION_BBOXES,
-    SF_DIVISIONS,
     SF_METRO_BBOX,
-    SF_SUBMARKETS,
     is_in_san_francisco_metro,
     is_in_sf_metro,
 )
 from src.spatial.geo_utils import (
-    NYC_BOROUGH_BBOXES,
-    NYC_METRO_BBOX,
     get_borough_for_coordinate,
     get_borough_for_h3,
     get_city_for_coordinate,
@@ -32,10 +20,6 @@ from src.spatial.geo_utils import (
     is_in_nyc_metro,
 )
 from src.spatial.submarkets import (
-    NYC_BOROUGHS,
-    NYC_SUBMARKETS,
-    BoroughMeta,
-    DivisionMeta,
     SubmarketMeta,
     find_nearest_submarket,
     get_all_submarkets,
@@ -97,24 +81,37 @@ class TestSubmarketRegistry:
         assert total_div_count == len(chicago_submarkets)
 
     def test_sf_submarket_counts_and_divisions(self):
-        """Verify 35+ total San Francisco submarkets across all 5 divisions."""
+        """Verify 80+ total San Francisco submarkets across all 8 divisions."""
         sf_submarkets = get_all_submarkets("san_francisco")
-        assert len(sf_submarkets) >= 35, f"Expected >= 35 SF submarkets, found {len(sf_submarkets)}"
+        assert len(sf_submarkets) >= 80, f"Expected >= 80 SF submarkets, found {len(sf_submarkets)}"
 
         core = get_submarkets("san_francisco", "SAN_FRANCISCO_CORE")
         east_bay = get_submarkets("san_francisco", "EAST_BAY")
         peninsula = get_submarkets("san_francisco", "PENINSULA")
         silicon_valley = get_submarkets("san_francisco", "SILICON_VALLEY_SOUTH_BAY")
         marin = get_submarkets("san_francisco", "MARIN_NORTH_BAY")
+        wine_country = get_submarkets("san_francisco", "NORTH_BAY_WINE_COUNTRY")
+        solano = get_submarkets("san_francisco", "SOLANO_CORRIDOR")
+        outer_cc = get_submarkets("san_francisco", "OUTER_CONTRA_COSTA")
 
         assert len(core) >= 15, f"Expected >= 15 SF Core submarkets, got {len(core)}"
-        assert len(east_bay) >= 8, f"Expected >= 8 East Bay submarkets, got {len(east_bay)}"
-        assert len(peninsula) >= 5, f"Expected >= 5 Peninsula submarkets, got {len(peninsula)}"
-        assert len(silicon_valley) >= 5, f"Expected >= 5 Silicon Valley submarkets, got {len(silicon_valley)}"
+        assert len(east_bay) >= 15, f"Expected >= 15 East Bay submarkets, got {len(east_bay)}"
+        assert len(peninsula) >= 10, f"Expected >= 10 Peninsula submarkets, got {len(peninsula)}"
+        assert len(silicon_valley) >= 10, f"Expected >= 10 Silicon Valley submarkets, got {len(silicon_valley)}"
         assert len(marin) >= 4, f"Expected >= 4 Marin submarkets, got {len(marin)}"
+        assert len(wine_country) >= 7, f"Expected >= 7 Wine Country submarkets, got {len(wine_country)}"
+        assert len(solano) >= 6, f"Expected >= 6 Solano submarkets, got {len(solano)}"
+        assert len(outer_cc) >= 9, f"Expected >= 9 Outer Contra Costa submarkets, got {len(outer_cc)}"
 
         total_div_count = (
-            len(core) + len(east_bay) + len(peninsula) + len(silicon_valley) + len(marin)
+            len(core)
+            + len(east_bay)
+            + len(peninsula)
+            + len(silicon_valley)
+            + len(marin)
+            + len(wine_country)
+            + len(solano)
+            + len(outer_cc)
         )
         assert total_div_count == len(sf_submarkets)
 
@@ -171,6 +168,9 @@ class TestSubmarketRegistry:
             "PENINSULA",
             "SILICON_VALLEY_SOUTH_BAY",
             "MARIN_NORTH_BAY",
+            "NORTH_BAY_WINE_COUNTRY",
+            "SOLANO_CORRIDOR",
+            "OUTER_CONTRA_COSTA",
         ]
         for name, meta in get_all_submarkets("san_francisco").items():
             assert isinstance(meta, SubmarketMeta)
@@ -271,7 +271,7 @@ class TestSubmarketRegistry:
         assert mission is not None
         assert mission.borough == "SAN_FRANCISCO_CORE"
 
-        rockridge = get_submarket_by_name("ROCKRIDGE")
+        rockridge = get_submarket_by_name("ROCKRIDGE", city_id="san_francisco")
         assert rockridge is not None
         assert rockridge.borough == "EAST_BAY"
 
@@ -325,8 +325,8 @@ class TestSubmarketRegistry:
         sf_meta = catalog["san_francisco"]
         assert sf_meta["city_id"] == "san_francisco"
         assert sf_meta["name"] == "San Francisco Bay Area"
-        assert sf_meta["divisions_count"] == 5
-        assert sf_meta["submarkets_count"] >= 35
+        assert sf_meta["divisions_count"] == 8
+        assert sf_meta["submarkets_count"] >= 80
 
     def test_borough_and_division_catalogs(self):
         """Test NYC, Chicago, and SF division catalogs."""
@@ -375,6 +375,9 @@ class TestSubmarketRegistry:
             "PENINSULA",
             "SILICON_VALLEY_SOUTH_BAY",
             "MARIN_NORTH_BAY",
+            "NORTH_BAY_WINE_COUNTRY",
+            "SOLANO_CORRIDOR",
+            "OUTER_CONTRA_COSTA",
         }
         assert set(sf_catalog.keys()) == expected_sf_divisions
 
@@ -514,7 +517,7 @@ class TestSpatialDistanceAndBoroughs:
         assert get_city_for_coordinate(sample_chicago_coords["loop"]["lat"], sample_chicago_coords["loop"]["lng"]) == "chicago"
         assert get_city_for_coordinate(sample_chicago_coords["fulton_market"]["lat"], sample_chicago_coords["fulton_market"]["lng"]) == "chicago"
         assert get_city_for_coordinate(sample_sf_coords["downtown"]["lat"], sample_sf_coords["downtown"]["lng"]) == "san_francisco"
-        assert get_city_for_coordinate(sample_sf_coords["oakland_downtown"]["lat"], sample_sf_coords["oakland_downtown"]["lng"]) == "san_francisco"
+        assert get_city_for_coordinate(sample_sf_coords["oakland_downtown"]["lat"], sample_sf_coords["oakland_downtown"]["lng"]) == "oakland"
         assert get_city_for_coordinate(sample_sf_coords["palo_alto"]["lat"], sample_sf_coords["palo_alto"]["lng"]) == "san_francisco"
 
         assert get_city_for_coordinate(0.0, 0.0) is None
@@ -578,7 +581,7 @@ class TestSpatialDistanceAndBoroughs:
         # All keys must be namespaced city_id:name
         for k in all_subs:
             assert ":" in k, f"Key {k} is not namespaced"
-            cid, name = k.split(":", 1)
+            cid, _ = k.split(":", 1)
             assert cid in registered_ids
 
         # Chinatown and Financial District exist across cities without collision
@@ -626,14 +629,14 @@ class TestSpatialDistanceAndBoroughs:
         assert wc_sub is not None
         assert wc_sub == "Walnut Creek Downtown"
         assert dist < 1.0
-        assert get_division_for_coordinate(37.9101, -122.0652, city_id="san_francisco") == "EAST_BAY"
+        assert get_division_for_coordinate(37.9101, -122.0652, city_id="san_francisco") == "OUTER_CONTRA_COSTA"
 
         # Concord (37.9780, -122.0311) -> local submarket, NOT Berkeley
         concord_sub, dist = find_nearest_submarket(37.9780, -122.0311, city_id="san_francisco")
         assert concord_sub is not None
         assert concord_sub == "Concord Downtown"
         assert dist < 1.0
-        assert get_division_for_coordinate(37.9780, -122.0311, city_id="san_francisco") == "EAST_BAY"
+        assert get_division_for_coordinate(37.9780, -122.0311, city_id="san_francisco") == "OUTER_CONTRA_COSTA"
 
         # Livermore (37.6819, -121.7680) -> local submarket, NOT San Jose
         livermore_sub, dist = find_nearest_submarket(37.6819, -121.7680, city_id="san_francisco")

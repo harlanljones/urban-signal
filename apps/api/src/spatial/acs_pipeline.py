@@ -9,26 +9,25 @@ This composes:
 
 from __future__ import annotations
 
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import Callable, Iterable, List, Mapping, Optional, Sequence, Tuple
 
 from src.spatial.acs_baseline import BGRow, H3Baseline, aggregate_blockgroup_to_h3
 from src.spatial.acs_client import (
     ACSClient,
-    ENV_API_KEY,
     relative_moe_flags,
     rows_to_bgrows,
     variables_for_features,
 )
 from src.spatial.acs_join import BGToH3Resolver
-from src.spatial.city_registry import CityId, REGISTRY
+from src.spatial.city_registry import REGISTRY, CityId
 
 
 @dataclass
 class ACSPipelineConfig:
     """Configuration for a pilot ACS pull."""
 
-    feature_names: Optional[Sequence[str]] = None
+    feature_names: Sequence[str] | None = None
     h3_resolution: int = 9
 
 
@@ -36,11 +35,11 @@ def ingest_city_from_rows(
     rows: Iterable[Mapping[str, str]],
     bg_to_h3: Callable[[str], str],
     config: ACSPipelineConfig | None = None,
-) -> List[H3Baseline]:
+) -> list[H3Baseline]:
     """Assemble H3 baselines from pre-fetched ACS rows and a BG→H3 resolver."""
     cfg = config or ACSPipelineConfig()
     needed = variables_for_features(cfg.feature_names)
-    bg_rows: List[BGRow] = rows_to_bgrows(rows, needed)
+    bg_rows: list[BGRow] = rows_to_bgrows(rows, needed)
     return aggregate_blockgroup_to_h3(bg_rows, bg_to_h3, cfg.feature_names)
 
 
@@ -48,9 +47,9 @@ def ingest_city_live(
     city: CityId,
     state_fips: str,
     county_fips: Sequence[str],
-    feature_names: Optional[Sequence[str]] = None,
-    api_key: Optional[str] = None,
-) -> List[H3Baseline]:
+    feature_names: Sequence[str] | None = None,
+    api_key: str | None = None,
+) -> list[H3Baseline]:
     """Live end-to-end ingest for one city (ACS pull + BG→H3 + aggregation).
 
     - You must pass a Census API key or set CENSUS_API_KEY in the environment.

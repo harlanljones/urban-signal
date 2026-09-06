@@ -1,0 +1,178 @@
+{
+  "schema_version": 2,
+  "id": "frederick",
+  "name": "Frederick",
+  "state": "MD",
+  "center": {
+    "lat": 39.4143,
+    "lng": -77.4105
+  },
+  "metro_bbox": {
+    "min_lat": 39.35,
+    "max_lat": 39.48,
+    "min_lng": -77.47,
+    "max_lng": -77.37
+  },
+  "divisions": {
+    "DOWNTOWN_HISTORIC": {
+      "name": "DOWNTOWN_HISTORIC",
+      "center": {
+        "lat": 39.41,
+        "lng": -77.411
+      },
+      "bbox": {
+        "min_lat": 39.4,
+        "max_lat": 39.425,
+        "min_lng": -77.425,
+        "max_lng": -77.405
+      },
+      "submarkets": [
+        "Downtown Frederick",
+        "Carroll Creek"
+      ]
+    },
+    "NORTH_MARKET": {
+      "name": "NORTH_MARKET",
+      "center": {
+        "lat": 39.44,
+        "lng": -77.412
+      },
+      "bbox": {
+        "min_lat": 39.425,
+        "max_lat": 39.46,
+        "min_lng": -77.43,
+        "max_lng": -77.4
+      },
+      "submarkets": [
+        "North Market Street",
+        "Golden Mile"
+      ]
+    },
+    "SOUTH_CREEK": {
+      "name": "SOUTH_CREEK",
+      "center": {
+        "lat": 39.385,
+        "lng": -77.415
+      },
+      "bbox": {
+        "min_lat": 39.36,
+        "max_lat": 39.4,
+        "min_lng": -77.43,
+        "max_lng": -77.4
+      },
+      "submarkets": [
+        "South End"
+      ]
+    },
+    "WEST_RIDGE": {
+      "name": "WEST_RIDGE",
+      "center": {
+        "lat": 39.42,
+        "lng": -77.45
+      },
+      "bbox": {
+        "min_lat": 39.39,
+        "max_lat": 39.45,
+        "min_lng": -77.47,
+        "max_lng": -77.43
+      },
+      "submarkets": [
+        "West Side"
+      ]
+    },
+    "EAST_GATE": {
+      "name": "EAST_GATE",
+      "center": {
+        "lat": 39.42,
+        "lng": -77.385
+      },
+      "bbox": {
+        "min_lat": 39.39,
+        "max_lat": 39.45,
+        "min_lng": -77.4,
+        "max_lng": -77.37
+      },
+      "submarkets": [
+        "East Gate"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Frederick": {
+      "name": "Downtown Frederick",
+      "division": "DOWNTOWN_HISTORIC",
+      "center": {
+        "lat": 39.413,
+        "lng": -77.411
+      },
+      "description": "The Carroll Creek / Market Street CBD with office-to-residential conversions, the Frederick anchor projects, and the city's densest mixed-use pipeline."
+    },
+    "Carroll Creek": {
+      "name": "Carroll Creek",
+      "division": "DOWNTOWN_HISTORIC",
+      "center": {
+        "lat": 39.41,
+        "lng": -77.407
+      },
+      "description": "The linear park district southwest of downtown with restored historic rowhouses and steady restoration trades."
+    },
+    "North Market Street": {
+      "name": "North Market Street",
+      "division": "NORTH_MARKET",
+      "center": {
+        "lat": 39.432,
+        "lng": -77.412
+      },
+      "description": "The north-end corridor of boutique retail, mansions cut into apartments, and high-turnover condo stock."
+    },
+    "Golden Mile": {
+      "name": "Golden Mile",
+      "division": "NORTH_MARKET",
+      "center": {
+        "lat": 39.445,
+        "lng": -77.41
+      },
+      "description": "The U.S. 40 commercial strip with auto-row reinvestment and investor renovation flow."
+    },
+    "South End": {
+      "name": "South End",
+      "division": "SOUTH_CREEK",
+      "center": {
+        "lat": 39.385,
+        "lng": -77.415
+      },
+      "description": "The Monocacy-side wards south of downtown with craftsman-bungalow stock and block-by-block reinvestment."
+    },
+    "West Side": {
+      "name": "West Side",
+      "division": "WEST_RIDGE",
+      "center": {
+        "lat": 39.415,
+        "lng": -77.45
+      },
+      "description": "The west-side grid toward the Middletown Valley with solid pre-war housing stock and steady acquisition flow."
+    },
+    "East Gate": {
+      "name": "East Gate",
+      "division": "EAST_GATE",
+      "center": {
+        "lat": 39.415,
+        "lng": -77.385
+      },
+      "description": "The east-side gateway toward the Liberty watershed with the city's lowest sale prices and heaviest vacancy-to-acquisition conversion."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": null,
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SALE_DATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/frederick.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

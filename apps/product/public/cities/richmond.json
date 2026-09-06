@@ -1,0 +1,213 @@
+{
+  "schema_version": 2,
+  "id": "richmond",
+  "name": "Richmond",
+  "state": "VA",
+  "center": {
+    "lat": 37.5407,
+    "lng": -77.436
+  },
+  "metro_bbox": {
+    "min_lat": 37.45,
+    "max_lat": 37.7,
+    "min_lng": -77.65,
+    "max_lng": -77.3
+  },
+  "divisions": {
+    "DOWNTOWN": {
+      "name": "DOWNTOWN",
+      "center": {
+        "lat": 37.544,
+        "lng": -77.4395
+      },
+      "bbox": {
+        "min_lat": 37.52,
+        "max_lat": 37.56,
+        "min_lng": -77.45,
+        "max_lng": -77.43
+      },
+      "submarkets": [
+        "Downtown Richmond",
+        "Jackson Ward"
+      ]
+    },
+    "THE_FAN": {
+      "name": "THE_FAN",
+      "center": {
+        "lat": 37.56,
+        "lng": -77.456
+      },
+      "bbox": {
+        "min_lat": 37.55,
+        "max_lat": 37.58,
+        "min_lng": -77.47,
+        "max_lng": -77.45
+      },
+      "submarkets": [
+        "The Fan",
+        "Museum District"
+      ]
+    },
+    "NORTH_SIDE": {
+      "name": "NORTH_SIDE",
+      "center": {
+        "lat": 37.6025,
+        "lng": -77.445
+      },
+      "bbox": {
+        "min_lat": 37.58,
+        "max_lat": 37.66,
+        "min_lng": -77.47,
+        "max_lng": -77.43
+      },
+      "submarkets": [
+        "Scott's Addition"
+      ]
+    },
+    "SOUTH_SIDE": {
+      "name": "SOUTH_SIDE",
+      "center": {
+        "lat": 37.485,
+        "lng": -77.465
+      },
+      "bbox": {
+        "min_lat": 37.45,
+        "max_lat": 37.56,
+        "min_lng": -77.5,
+        "max_lng": -77.43
+      },
+      "submarkets": [
+        "Carytown",
+        "Manchester"
+      ]
+    },
+    "EAST_END": {
+      "name": "EAST_END",
+      "center": {
+        "lat": 37.55,
+        "lng": -77.365
+      },
+      "bbox": {
+        "min_lat": 37.5,
+        "max_lat": 37.6,
+        "min_lng": -77.43,
+        "max_lng": -77.3
+      },
+      "submarkets": [
+        "Church Hill"
+      ]
+    },
+    "WEST_END": {
+      "name": "WEST_END",
+      "center": {
+        "lat": 37.615,
+        "lng": -77.54
+      },
+      "bbox": {
+        "min_lat": 37.55,
+        "max_lat": 37.68,
+        "min_lng": -77.6,
+        "max_lng": -77.48
+      },
+      "submarkets": [
+        "Westover Hills"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Richmond": {
+      "name": "Downtown Richmond",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 37.541,
+        "lng": -77.437
+      },
+      "description": "The Broad Street CBD and Riverfront with office-to-residential conversions, the downtown arena anchor projects, and the city's densest mixed-use pipeline."
+    },
+    "Jackson Ward": {
+      "name": "Jackson Ward",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 37.547,
+        "lng": -77.442
+      },
+      "description": "The historic Black Wall Street district northwest of downtown with Italianate rowhouses, restoration trades, and a steady hospitality-licensing flow."
+    },
+    "The Fan": {
+      "name": "The Fan",
+      "division": "THE_FAN",
+      "center": {
+        "lat": 37.565,
+        "lng": -77.46
+      },
+      "description": "The diagonal-grid Victorian neighborhood west of downtown with mansion-to-apartment conversions and a high-turnover condo stock."
+    },
+    "Museum District": {
+      "name": "Museum District",
+      "division": "THE_FAN",
+      "center": {
+        "lat": 37.555,
+        "lng": -77.452
+      },
+      "description": "The Boulevard corridor around the VMFA / Science Museum where gallery-space retrofits and rowhouse renewals drive the permit mix."
+    },
+    "Scott's Addition": {
+      "name": "Scott's Addition",
+      "division": "NORTH_SIDE",
+      "center": {
+        "lat": 37.585,
+        "lng": -77.46
+      },
+      "description": "The warehouses-to-breweries and apartment district north of the Fan with the city's highest permit velocity and entertainment licensing."
+    },
+    "Carytown": {
+      "name": "Carytown",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 37.548,
+        "lng": -77.486
+      },
+      "description": "The Cary Street boutique retail spine and surrounding early-20th-century blocks with investor renovation flow and stable rental demand."
+    },
+    "Manchester": {
+      "name": "Manchester",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 37.51,
+        "lng": -77.45
+      },
+      "description": "The south-bank warehouse district across the river from downtown with loft conversions and brewery/industrial adaptive reuse."
+    },
+    "Church Hill": {
+      "name": "Church Hill",
+      "division": "EAST_END",
+      "center": {
+        "lat": 37.53,
+        "lng": -77.41
+      },
+      "description": "The city's oldest neighborhood east of downtown where pre-war housing stock meets the heaviest vacancy-to-acquisition conversion flow."
+    },
+    "Westover Hills": {
+      "name": "Westover Hills",
+      "division": "WEST_END",
+      "center": {
+        "lat": 37.6,
+        "lng": -77.55
+      },
+      "description": "The southwest-river bluff single-family plateau with solid housing stock and steady block-by-block reinvestment."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": null,
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SALE_DATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/richmond.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

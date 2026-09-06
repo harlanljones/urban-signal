@@ -1,0 +1,193 @@
+{
+  "schema_version": 2,
+  "id": "harrisburg",
+  "name": "Harrisburg",
+  "state": "PA",
+  "center": {
+    "lat": 40.2732,
+    "lng": -76.8867
+  },
+  "metro_bbox": {
+    "min_lat": 40.22,
+    "max_lat": 40.32,
+    "min_lng": -76.94,
+    "max_lng": -76.83
+  },
+  "divisions": {
+    "DOWNTOWN_CAPITOL": {
+      "name": "DOWNTOWN_CAPITOL",
+      "center": {
+        "lat": 40.265,
+        "lng": -76.885
+      },
+      "bbox": {
+        "min_lat": 40.255,
+        "max_lat": 40.29,
+        "min_lng": -76.905,
+        "max_lng": -76.875
+      },
+      "submarkets": [
+        "Capitol District"
+      ]
+    },
+    "RIVERFRONT_EAST": {
+      "name": "RIVERFRONT_EAST",
+      "center": {
+        "lat": 40.262,
+        "lng": -76.875
+      },
+      "bbox": {
+        "min_lat": 40.25,
+        "max_lat": 40.285,
+        "min_lng": -76.89,
+        "max_lng": -76.855
+      },
+      "submarkets": [
+        "Riverfront East"
+      ]
+    },
+    "NORTH_SUSQUEHANNA": {
+      "name": "NORTH_SUSQUEHANNA",
+      "center": {
+        "lat": 40.298,
+        "lng": -76.885
+      },
+      "bbox": {
+        "min_lat": 40.29,
+        "max_lat": 40.32,
+        "min_lng": -76.9,
+        "max_lng": -76.86
+      },
+      "submarkets": [
+        "Uptown Harrisburg"
+      ]
+    },
+    "SOUTH_SIDE": {
+      "name": "SOUTH_SIDE",
+      "center": {
+        "lat": 40.235,
+        "lng": -76.88
+      },
+      "bbox": {
+        "min_lat": 40.22,
+        "max_lat": 40.255,
+        "min_lng": -76.9,
+        "max_lng": -76.86
+      },
+      "submarkets": [
+        "South Harrisburg"
+      ]
+    },
+    "EAST_SHORE": {
+      "name": "EAST_SHORE",
+      "center": {
+        "lat": 40.263,
+        "lng": -76.852
+      },
+      "bbox": {
+        "min_lat": 40.24,
+        "max_lat": 40.28,
+        "min_lng": -76.87,
+        "max_lng": -76.835
+      },
+      "submarkets": [
+        "Allison Hill",
+        "Bellevue Park"
+      ]
+    },
+    "WEST_ENOLA": {
+      "name": "WEST_ENOLA",
+      "center": {
+        "lat": 40.258,
+        "lng": -76.925
+      },
+      "bbox": {
+        "min_lat": 40.24,
+        "max_lat": 40.275,
+        "min_lng": -76.938,
+        "max_lng": -76.905
+      },
+      "submarkets": [
+        "West Shore Enola"
+      ]
+    }
+  },
+  "submarkets": {
+    "Capitol District": {
+      "name": "Capitol District",
+      "division": "DOWNTOWN_CAPITOL",
+      "center": {
+        "lat": 40.265,
+        "lng": -76.885
+      },
+      "description": "The State Capitol complex and downtown office core with adaptive-reuse conversions and the densest mixed-use pipeline in the metro."
+    },
+    "Riverfront East": {
+      "name": "Riverfront East",
+      "division": "RIVERFRONT_EAST",
+      "center": {
+        "lat": 40.262,
+        "lng": -76.875
+      },
+      "description": "The Susquehanna riverfront east of downtown with marina-adjacent hospitality licensing and steady townhome reinvestment."
+    },
+    "Uptown Harrisburg": {
+      "name": "Uptown Harrisburg",
+      "division": "NORTH_SUSQUEHANNA",
+      "center": {
+        "lat": 40.298,
+        "lng": -76.885
+      },
+      "description": "The north-central grid above the Capitol with pre-war housing stock and investor renovation flow along the Susquehanna bluff."
+    },
+    "South Harrisburg": {
+      "name": "South Harrisburg",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 40.235,
+        "lng": -76.88
+      },
+      "description": "The South Side ward south of the Capitol with craftsman-bungalow stock, a deep rental register, and block-by-block reinvestment."
+    },
+    "Allison Hill": {
+      "name": "Allison Hill",
+      "division": "EAST_SHORE",
+      "center": {
+        "lat": 40.258,
+        "lng": -76.855
+      },
+      "description": "The East Shore hill neighborhood with the metro's most active block-level acquisition and the heaviest vacancy-to-rehab conversion flow."
+    },
+    "Bellevue Park": {
+      "name": "Bellevue Park",
+      "division": "EAST_SHORE",
+      "center": {
+        "lat": 40.268,
+        "lng": -76.848
+      },
+      "description": "The eastern garden-suburb grid off Paxton Street with solid early-20th-century stock and steady owner-occupier demand."
+    },
+    "West Shore Enola": {
+      "name": "West Shore Enola",
+      "division": "WEST_ENOLA",
+      "center": {
+        "lat": 40.258,
+        "lng": -76.925
+      },
+      "description": "The Cumberland County shore across the river at Enola with commuter-served suburban turnover and rail-adjacent redevelopment."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": null,
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SALE_DATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/harrisburg.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

@@ -1,0 +1,188 @@
+{
+  "schema_version": 2,
+  "id": "albany",
+  "name": "Albany",
+  "state": "NY",
+  "center": {
+    "lat": 42.6526,
+    "lng": -73.7562
+  },
+  "metro_bbox": {
+    "min_lat": 42.62,
+    "max_lat": 42.7,
+    "min_lng": -73.82,
+    "max_lng": -73.71
+  },
+  "divisions": {
+    "DOWNTOWN_HUDSON": {
+      "name": "DOWNTOWN_HUDSON",
+      "center": {
+        "lat": 42.654,
+        "lng": -73.757
+      },
+      "bbox": {
+        "min_lat": 42.645,
+        "max_lat": 42.665,
+        "min_lng": -73.765,
+        "max_lng": -73.75
+      },
+      "submarkets": [
+        "Downtown",
+        "Hudson Park"
+      ]
+    },
+    "PINE_HILLS": {
+      "name": "PINE_HILLS",
+      "center": {
+        "lat": 42.66,
+        "lng": -73.785
+      },
+      "bbox": {
+        "min_lat": 42.65,
+        "max_lat": 42.672,
+        "min_lng": -73.795,
+        "max_lng": -73.77
+      },
+      "submarkets": [
+        "Pine Hills"
+      ]
+    },
+    "WESTERN_WARD": {
+      "name": "WESTERN_WARD",
+      "center": {
+        "lat": 42.64,
+        "lng": -73.79
+      },
+      "bbox": {
+        "min_lat": 42.625,
+        "max_lat": 42.65,
+        "min_lng": -73.8,
+        "max_lng": -73.77
+      },
+      "submarkets": [
+        "Delaware"
+      ]
+    },
+    "EAST_ALBANY": {
+      "name": "EAST_ALBANY",
+      "center": {
+        "lat": 42.647,
+        "lng": -73.738
+      },
+      "bbox": {
+        "min_lat": 42.63,
+        "max_lat": 42.67,
+        "min_lng": -73.755,
+        "max_lng": -73.72
+      },
+      "submarkets": [
+        "Beverwyck",
+        "Buckingham"
+      ]
+    },
+    "NORTH_ALBANY": {
+      "name": "NORTH_ALBANY",
+      "center": {
+        "lat": 42.682,
+        "lng": -73.758
+      },
+      "bbox": {
+        "min_lat": 42.672,
+        "max_lat": 42.698,
+        "min_lng": -73.78,
+        "max_lng": -73.74
+      },
+      "submarkets": [
+        "North Albany",
+        "Arbor Hill"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown": {
+      "name": "Downtown",
+      "division": "DOWNTOWN_HUDSON",
+      "center": {
+        "lat": 42.6526,
+        "lng": -73.7562
+      },
+      "description": "The Empire State Plaza / Broadway CBD with state-office conversions, the downtown hospitality spine, and the city's densest mixed-use pipeline."
+    },
+    "Hudson Park": {
+      "name": "Hudson Park",
+      "division": "DOWNTOWN_HUDSON",
+      "center": {
+        "lat": 42.656,
+        "lng": -73.758
+      },
+      "description": "The Hudson River bluff south of downtown with pre-war apartment houses, Washington Park-adjacent rowhousing, and steady restoration trades."
+    },
+    "Pine Hills": {
+      "name": "Pine Hills",
+      "division": "PINE_HILLS",
+      "center": {
+        "lat": 42.66,
+        "lng": -73.785
+      },
+      "description": "The student-dense grid west of the UAlbany downtown campus with dense rental stock, multifamily conversions, and high-turnover condo product."
+    },
+    "Delaware": {
+      "name": "Delaware",
+      "division": "WESTERN_WARD",
+      "center": {
+        "lat": 42.64,
+        "lng": -73.79
+      },
+      "description": "The Delaware Avenue ward southwest of the plaza with craftsman-bungalow stock, a deep rental register, and block-by-block reinvestment."
+    },
+    "Beverwyck": {
+      "name": "Beverwyck",
+      "division": "EAST_ALBANY",
+      "center": {
+        "lat": 42.65,
+        "lng": -73.74
+      },
+      "description": "The suburban-style south-side grid toward the Bethlehem line with solid mid-century housing stock and investor renovation flow."
+    },
+    "Buckingham": {
+      "name": "Buckingham",
+      "division": "EAST_ALBANY",
+      "center": {
+        "lat": 42.645,
+        "lng": -73.735
+      },
+      "description": "The east-side ward along New Scotland Avenue where the city's lowest sale prices meet the heaviest vacancy-to-acquisition conversion flow."
+    },
+    "North Albany": {
+      "name": "North Albany",
+      "division": "NORTH_ALBANY",
+      "center": {
+        "lat": 42.685,
+        "lng": -73.76
+      },
+      "description": "The former industrial north ward along the Hudson and the rail yards with warehouse-to-loft conversion potential and rebuild work."
+    },
+    "Arbor Hill": {
+      "name": "Arbor Hill",
+      "division": "NORTH_ALBANY",
+      "center": {
+        "lat": 42.68,
+        "lng": -73.755
+      },
+      "description": "The historic north-central neighborhood around Clinton Avenue with Victorian rowhouses, a deep rental register, and renewal-era reinvestment."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": null,
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SALE_DATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/albany.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

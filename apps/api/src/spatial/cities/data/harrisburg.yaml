@@ -1,0 +1,295 @@
+city_id: harrisburg
+name: Harrisburg
+state: PA
+center:
+  lat: 40.2732
+  lng: -76.8867
+metro_bbox:
+  min_lat: 40.22
+  max_lat: 40.32
+  min_lng: -76.94
+  max_lng: -76.83
+division_bboxes:
+  DOWNTOWN_CAPITOL:
+    min_lat: 40.255
+    max_lat: 40.29
+    min_lng: -76.905
+    max_lng: -76.875
+  RIVERFRONT_EAST:
+    min_lat: 40.25
+    max_lat: 40.285
+    min_lng: -76.89
+    max_lng: -76.855
+  NORTH_SUSQUEHANNA:
+    min_lat: 40.29
+    max_lat: 40.32
+    min_lng: -76.9
+    max_lng: -76.86
+  SOUTH_SIDE:
+    min_lat: 40.22
+    max_lat: 40.255
+    min_lng: -76.9
+    max_lng: -76.86
+  EAST_SHORE:
+    min_lat: 40.24
+    max_lat: 40.28
+    min_lng: -76.87
+    max_lng: -76.835
+  WEST_ENOLA:
+    min_lat: 40.24
+    max_lat: 40.275
+    min_lng: -76.938
+    max_lng: -76.905
+submarkets:
+  Capitol District:
+    name: Capitol District
+    borough: DOWNTOWN_CAPITOL
+    lat: 40.265
+    lng: -76.885
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.85
+    capex: 6200000.0
+    permit_vel: 32.0
+    shift_ratio: 1.46
+    sla: 56.0
+    description: The State Capitol complex and downtown office core with adaptive-reuse
+      conversions and the densest mixed-use pipeline in the metro.
+    city_id: harrisburg
+  Riverfront East:
+    name: Riverfront East
+    borough: RIVERFRONT_EAST
+    lat: 40.262
+    lng: -76.875
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.82
+    capex: 4400000.0
+    permit_vel: 26.0
+    shift_ratio: 1.36
+    sla: 48.0
+    description: The Susquehanna riverfront east of downtown with marina-adjacent hospitality
+      licensing and steady townhome reinvestment.
+    city_id: harrisburg
+  Uptown Harrisburg:
+    name: Uptown Harrisburg
+    borough: NORTH_SUSQUEHANNA
+    lat: 40.298
+    lng: -76.885
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.74
+    capex: 3500000.0
+    permit_vel: 22.0
+    shift_ratio: 1.28
+    sla: 42.0
+    description: The north-central grid above the Capitol with pre-war housing stock and
+      investor renovation flow along the Susquehanna bluff.
+    city_id: harrisburg
+  South Harrisburg:
+    name: South Harrisburg
+    borough: SOUTH_SIDE
+    lat: 40.235
+    lng: -76.88
+    zoom: 14.0
+    pitch: 32.0
+    base_lims: 0.7
+    capex: 3100000.0
+    permit_vel: 20.0
+    shift_ratio: 1.24
+    sla: 40.0
+    description: The South Side ward south of the Capitol with craftsman-bungalow stock,
+      a deep rental register, and block-by-block reinvestment.
+    city_id: harrisburg
+  Allison Hill:
+    name: Allison Hill
+    borough: EAST_SHORE
+    lat: 40.258
+    lng: -76.855
+    zoom: 14.0
+    pitch: 32.0
+    base_lims: 0.68
+    capex: 2900000.0
+    permit_vel: 18.0
+    shift_ratio: 1.22
+    sla: 38.0
+    description: The East Shore hill neighborhood with the metro's most active block-level
+      acquisition and the heaviest vacancy-to-rehab conversion flow.
+    city_id: harrisburg
+  Bellevue Park:
+    name: Bellevue Park
+    borough: EAST_SHORE
+    lat: 40.268
+    lng: -76.848
+    zoom: 14.0
+    pitch: 32.0
+    base_lims: 0.72
+    capex: 3300000.0
+    permit_vel: 21.0
+    shift_ratio: 1.26
+    sla: 41.0
+    description: The eastern garden-suburb grid off Paxton Street with solid early-20th-century
+      stock and steady owner-occupier demand.
+    city_id: harrisburg
+  West Shore Enola:
+    name: West Shore Enola
+    borough: WEST_ENOLA
+    lat: 40.258
+    lng: -76.925
+    zoom: 14.0
+    pitch: 32.0
+    base_lims: 0.66
+    capex: 2700000.0
+    permit_vel: 16.0
+    shift_ratio: 1.18
+    sla: 34.0
+    description: The Cumberland County shore across the river at Enola with commuter-served
+      suburban turnover and rail-adjacent redevelopment.
+    city_id: harrisburg
+divisions:
+  DOWNTOWN_CAPITOL:
+    name: DOWNTOWN_CAPITOL
+    center_lat: 40.265
+    center_lng: -76.885
+    zoom: 13.5
+    bbox:
+      min_lat: 40.255
+      max_lat: 40.29
+      min_lng: -76.905
+      max_lng: -76.875
+    submarkets:
+    - Capitol District
+    city_id: harrisburg
+  RIVERFRONT_EAST:
+    name: RIVERFRONT_EAST
+    center_lat: 40.262
+    center_lng: -76.875
+    zoom: 13.5
+    bbox:
+      min_lat: 40.25
+      max_lat: 40.285
+      min_lng: -76.89
+      max_lng: -76.855
+    submarkets:
+    - Riverfront East
+    city_id: harrisburg
+  NORTH_SUSQUEHANNA:
+    name: NORTH_SUSQUEHANNA
+    center_lat: 40.298
+    center_lng: -76.885
+    zoom: 13.0
+    bbox:
+      min_lat: 40.29
+      max_lat: 40.32
+      min_lng: -76.9
+      max_lng: -76.86
+    submarkets:
+    - Uptown Harrisburg
+    city_id: harrisburg
+  SOUTH_SIDE:
+    name: SOUTH_SIDE
+    center_lat: 40.235
+    center_lng: -76.88
+    zoom: 13.0
+    bbox:
+      min_lat: 40.22
+      max_lat: 40.255
+      min_lng: -76.9
+      max_lng: -76.86
+    submarkets:
+    - South Harrisburg
+    city_id: harrisburg
+  EAST_SHORE:
+    name: EAST_SHORE
+    center_lat: 40.263
+    center_lng: -76.852
+    zoom: 13.0
+    bbox:
+      min_lat: 40.24
+      max_lat: 40.28
+      min_lng: -76.87
+      max_lng: -76.835
+    submarkets:
+    - Allison Hill
+    - Bellevue Park
+    city_id: harrisburg
+  WEST_ENOLA:
+    name: WEST_ENOLA
+    center_lat: 40.258
+    center_lng: -76.925
+    zoom: 13.0
+    bbox:
+      min_lat: 40.24
+      max_lat: 40.275
+      min_lng: -76.938
+      max_lng: -76.905
+    submarkets:
+    - West Shore Enola
+    city_id: harrisburg
+datasets:
+  deeds:
+    endpoint: https://harrisburgpa.gov/server/rest/services/open_data/Property_Sales/FeatureServer/0
+    platform: arcgis
+    watermark_col: SALE_DATE
+    id_keys:
+    - PARCELID
+    - PRINTKEY
+    - SALE_DATE
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: text
+    watermark_format: '%m/%d/%Y'
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - PARCELID
+      - PRINTKEY
+      bbl:
+      - PARCELID
+      doc_type:
+      - DEED_TYPE
+      document_amount:
+      - SALE_PRICE
+      recorded_date:
+      - SALE_DATE
+      address_street:
+      - SITEADDRESS
+      incident_address:
+      - SITEADDRESS
+      borough:
+      - CITY
+      zipcode:
+      - ZIP5
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 100000
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: false
+    zip_member: null
+aliases:
+- harrisburg_pa
+- harrisburg-pa
+- harrisburg pa
+job_suffix: harrisburg

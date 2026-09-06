@@ -1,0 +1,313 @@
+city_id: manchester
+name: Manchester
+state: NH
+center:
+  lat: 42.9956
+  lng: -71.4548
+metro_bbox:
+  min_lat: 42.93
+  max_lat: 43.06
+  min_lng: -71.53
+  max_lng: -71.40
+division_bboxes:
+  DOWNTOWN_MILL:
+    min_lat: 42.975
+    max_lat: 43.005
+    min_lng: -71.475
+    max_lng: -71.44
+  WEST_SIDE:
+    min_lat: 42.985
+    max_lat: 43.02
+    min_lng: -71.51
+    max_lng: -71.47
+  NORTH_END:
+    min_lat: 43.0
+    max_lat: 43.055
+    min_lng: -71.49
+    max_lng: -71.44
+  SOUTH_COMMERCIAL:
+    min_lat: 42.935
+    max_lat: 42.975
+    min_lng: -71.47
+    max_lng: -71.42
+  EAST_INDUSTRIAL:
+    min_lat: 42.98
+    max_lat: 43.01
+    min_lng: -71.44
+    max_lng: -71.4
+  QUEENS_CITY:
+    min_lat: 42.94
+    max_lat: 42.985
+    min_lng: -71.5
+    max_lng: -71.46
+submarkets:
+  Center City:
+    name: Center City
+    borough: DOWNTOWN_MILL
+    lat: 42.99
+    lng: -71.462
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.85
+    capex: 6200000.0
+    permit_vel: 32.0
+    shift_ratio: 1.46
+    sla: 56.0
+    description: The Elm Street CBD and Millyard district with office-to-residential
+      conversions, the SNHU/UNH extension anchors, and the city's densest mixed-use
+      pipeline around the Merrimack.
+    city_id: manchester
+  Millyard:
+    name: Millyard
+    borough: DOWNTOWN_MILL
+    lat: 42.988
+    lng: -71.465
+    zoom: 15.0
+    pitch: 42.0
+    base_lims: 0.81
+    capex: 4000000.0
+    permit_vel: 22.0
+    shift_ratio: 1.34
+    sla: 44.0
+    description: The historic Amoskeag Millyard along the river with loft conversions,
+      brewery-retail, and steady restoration trades in the brick-mill stock.
+    city_id: manchester
+  West End:
+    name: West End
+    borough: WEST_SIDE
+    lat: 43.0
+    lng: -71.49
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.83
+    capex: 4900000.0
+    permit_vel: 29.0
+    shift_ratio: 1.41
+    sla: 53.0
+    description: The West Side grid west of the river with pre-war housing stock, the
+      Striar West village mixed-use corridor, and investor renovation flow.
+    city_id: manchester
+  Rimmon Heights:
+    name: Rimmon Heights
+    borough: WEST_SIDE
+    lat: 42.992
+    lng: -71.495
+    zoom: 14.0
+    pitch: 38.0
+    base_lims: 0.79
+    capex: 3700000.0
+    permit_vel: 21.0
+    shift_ratio: 1.3
+    sla: 42.0
+    description: The Rimmon Heights / Notre Dame neighborhood south of Bridge St with
+      dense two-and-three-family stock and block-by-block reinvestment.
+    city_id: manchester
+  North End:
+    name: North End
+    borough: NORTH_END
+    lat: 43.03
+    lng: -71.47
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.72
+    capex: 3300000.0
+    permit_vel: 20.0
+    shift_ratio: 1.25
+    sla: 41.0
+    description: The North End along the Merrimack and the riverfront redevelopment
+      parcels north of downtown with steady infill and hospitality licensing.
+    city_id: manchester
+  South Willow:
+    name: South Willow
+    borough: SOUTH_COMMERCIAL
+    lat: 42.955
+    lng: -71.44
+    zoom: 14.0
+    pitch: 32.0
+    base_lims: 0.7
+    capex: 3100000.0
+    permit_vel: 19.0
+    shift_ratio: 1.23
+    sla: 39.0
+    description: The South Willow Street commercial corridor and Mall of New Hampshire
+      retail district with hotel/hospitality turnover and redevelopment pressure.
+    city_id: manchester
+  Brown Ave:
+    name: Brown Ave
+    borough: EAST_INDUSTRIAL
+    lat: 42.995
+    lng: -71.42
+    zoom: 14.0
+    pitch: 32.0
+    base_lims: 0.68
+    capex: 2900000.0
+    permit_vel: 17.0
+    shift_ratio: 1.2
+    sla: 37.0
+    description: The Brown Avenue / Queen City Avenue east side with light industrial,
+      airport-adjacent parcels, and the city's lowest sale prices meeting conversion
+      flow.
+    city_id: manchester
+  Queen City:
+    name: Queen City
+    borough: QUEENS_CITY
+    lat: 42.96
+    lng: -71.48
+    zoom: 14.0
+    pitch: 33.0
+    base_lims: 0.71
+    capex: 3200000.0
+    permit_vel: 20.0
+    shift_ratio: 1.24
+    sla: 40.0
+    description: The Piscataquog / Queen City Avenue southwest village with
+      craftsman-bungalow stock, a deep rental register, and steady reinvestment.
+    city_id: manchester
+divisions:
+  DOWNTOWN_MILL:
+    name: DOWNTOWN_MILL
+    center_lat: 42.989
+    center_lng: -71.4635
+    zoom: 13.5
+    bbox:
+      min_lat: 42.975
+      max_lat: 43.005
+      min_lng: -71.475
+      max_lng: -71.44
+    submarkets:
+    - Center City
+    - Millyard
+    city_id: manchester
+  WEST_SIDE:
+    name: WEST_SIDE
+    center_lat: 42.996
+    center_lng: -71.4925
+    zoom: 13.5
+    bbox:
+      min_lat: 42.985
+      max_lat: 43.02
+      min_lng: -71.51
+      max_lng: -71.47
+    submarkets:
+    - West End
+    - Rimmon Heights
+    city_id: manchester
+  NORTH_END:
+    name: NORTH_END
+    center_lat: 43.03
+    center_lng: -71.47
+    zoom: 13.0
+    bbox:
+      min_lat: 43.0
+      max_lat: 43.055
+      min_lng: -71.49
+      max_lng: -71.44
+    submarkets:
+    - North End
+    city_id: manchester
+  SOUTH_COMMERCIAL:
+    name: SOUTH_COMMERCIAL
+    center_lat: 42.955
+    center_lng: -71.44
+    zoom: 13.0
+    bbox:
+      min_lat: 42.935
+      max_lat: 42.975
+      min_lng: -71.47
+      max_lng: -71.42
+    submarkets:
+    - South Willow
+    city_id: manchester
+  EAST_INDUSTRIAL:
+    name: EAST_INDUSTRIAL
+    center_lat: 42.995
+    center_lng: -71.42
+    zoom: 13.0
+    bbox:
+      min_lat: 42.98
+      max_lat: 43.01
+      min_lng: -71.44
+      max_lng: -71.4
+    submarkets:
+    - Brown Ave
+    city_id: manchester
+  QUEENS_CITY:
+    name: QUEENS_CITY
+    center_lat: 42.96
+    center_lng: -71.48
+    zoom: 13.0
+    bbox:
+      min_lat: 42.94
+      max_lat: 42.985
+      min_lng: -71.5
+      max_lng: -71.46
+    submarkets:
+    - Queen City
+    city_id: manchester
+datasets:
+  deeds:
+    endpoint: https://services1.arcgis.com/KlG08rx11MkfACQT/arcgis/rest/services/Manchester_NH_Property_Card/FeatureServer/0
+    platform: arcgis
+    watermark_col: SaleDate
+    id_keys:
+    - ParcelID
+    - OBJECTID
+    - SaleDate
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: text
+    watermark_format: '%m/%d/%Y'
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - ParcelID
+      - ParcelId
+      bbl:
+      - ParcelID
+      doc_type:
+      - DeedType
+      document_amount:
+      - SalePrice
+      recorded_date:
+      - SaleDate
+      address_street:
+      - Location
+      incident_address:
+      - Location
+      borough:
+      - City
+      zipcode:
+      - Zip
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 100000
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: false
+    zip_member: null
+aliases:
+- manchester_nh
+- manchester-nh
+- manchester nh
+job_suffix: manchester

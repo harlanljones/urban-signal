@@ -59,6 +59,9 @@
       --division-peninsula: #fbbf24;
       --division-silicon-valley: #c084fc;
       --division-marin: #f43f5e;
+      --division-wine-country: #e879f9;
+      --division-solano: #22d3ee;
+      --division-outer-contra-costa: #fb923c;
       
       --text-main: #f8fafc;
       --text-secondary: #a7b5c9;
@@ -358,6 +361,9 @@
     .borough-btn.active.Peninsula, .borough-btn.active.PENINSULA { color: var(--division-peninsula); }
     .borough-btn.active.SiliconValleySouthBay, .borough-btn.active.SILICON_VALLEY_SOUTH_BAY, .borough-btn.active.SiliconValley { color: var(--division-silicon-valley); }
     .borough-btn.active.MarinNorthBay, .borough-btn.active.MARIN_NORTH_BAY, .borough-btn.active.Marin { color: var(--division-marin); }
+    .borough-btn.active.NorthBayWineCountry, .borough-btn.active.NORTH_BAY_WINE_COUNTRY, .borough-btn.active.WineCountry { color: var(--division-wine-country); }
+    .borough-btn.active.SolanoCorridor, .borough-btn.active.SOLANO_CORRIDOR, .borough-btn.active.Solano { color: var(--division-solano); }
+    .borough-btn.active.OuterContraCosta, .borough-btn.active.OUTER_CONTRA_COSTA, .borough-btn.active.OuterCC { color: var(--division-outer-contra-costa); }
     .borough-btn.active.SeattleCore, .borough-btn.active.SEATTLE_CORE { color: var(--accent-primary); }
     .borough-btn.active.NorthKing, .borough-btn.active.NORTH_KING { color: var(--accent-success); }
     .borough-btn.active.Eastside, .borough-btn.active.EASTSIDE { color: var(--accent-purple); }
@@ -718,6 +724,9 @@
     .borough-tag.Peninsula, .borough-tag.PENINSULA { color: var(--division-peninsula); }
     .borough-tag.SiliconValleySouthBay, .borough-tag.SILICON_VALLEY_SOUTH_BAY, .borough-tag.SiliconValley { color: var(--division-silicon-valley); }
     .borough-tag.MarinNorthBay, .borough-tag.MARIN_NORTH_BAY, .borough-tag.Marin { color: var(--division-marin); }
+    .borough-tag.NorthBayWineCountry, .borough-tag.NORTH_BAY_WINE_COUNTRY, .borough-tag.WineCountry { color: var(--division-wine-country); }
+    .borough-tag.SolanoCorridor, .borough-tag.SOLANO_CORRIDOR, .borough-tag.Solano { color: var(--division-solano); }
+    .borough-tag.OuterContraCosta, .borough-tag.OUTER_CONTRA_COSTA, .borough-tag.OuterCC { color: var(--division-outer-contra-costa); }
     .borough-tag.SeattleCore, .borough-tag.SEATTLE_CORE { color: var(--accent-primary); }
     .borough-tag.NorthKing, .borough-tag.NORTH_KING { color: var(--accent-success); }
     .borough-tag.Eastside, .borough-tag.EASTSIDE { color: var(--accent-purple); }
@@ -1547,8 +1556,10 @@
     // register a city in REGISTRY and it appears here; it cannot fall off.
     const METRO_META = {
       abilene: { name: 'Abilene' },
+      albany: { name: 'Albany' },
       albuquerque: { name: 'Albuquerque / Bernalillo County' },
       alexandria: { name: 'Alexandria' },
+      allentown: { name: 'Allentown' },
       amarillo: { name: 'Amarillo' },
       anaheim: { name: 'Anaheim / Orange County' },
       anchorage: { name: 'Anchorage' },
@@ -1568,10 +1579,12 @@
       bozeman: { name: 'Bozeman, MT' },
       bridgeport: { name: 'Bridgeport' },
       buffalo: { name: 'Buffalo' },
+      burlington: { name: 'Burlington' },
       canton: { name: 'Canton / Stark County' },
       cape_coral: { name: 'Cape Coral–Fort Myers' },
       chandler: { name: 'Chandler' },
       charleston_sc: { name: 'Charleston' },
+      charleston_wv: { name: 'Charleston' },
       charlotte: { name: 'Charlotte' },
       chattanooga: { name: 'Chattanooga / Hamilton County' },
       chicago: { name: 'Chicago' },
@@ -1583,6 +1596,7 @@
       dayton: { name: 'Dayton / Montgomery County' },
       denver: { name: 'Denver' },
       detroit: { name: 'Detroit' },
+      dover: { name: 'Dover' },
       durham: { name: 'Durham / Durham County' },
       el_paso: { name: 'El Paso / El Paso County' },
       eugene: { name: 'Eugene' },
@@ -1590,14 +1604,17 @@
       fort_collins: { name: 'Fort Collins, CO' },
       fort_smith: { name: 'Fort Smith' },
       fort_worth: { name: 'Fort Worth / Tarrant County' },
+      frederick: { name: 'Frederick' },
       gainesville: { name: 'Gainesville' },
       glendale_az: { name: 'Glendale, AZ' },
       grand_rapids: { name: 'Grand Rapids, MI' },
       greenville: { name: 'Greenville' },
+      harrisburg: { name: 'Harrisburg' },
       hartford: { name: 'Hartford' },
       henderson: { name: 'Henderson' },
       honolulu: { name: 'Honolulu / City and County of Honolulu' },
       houston: { name: 'Houston' },
+      huntington_wv: { name: 'Huntington' },
       huntsville: { name: 'Huntsville, AL' },
       indianapolis: { name: 'Indianapolis / Marion County' },
       inland_empire: { name: 'Inland Empire (Riverside County anchor)' },
@@ -1618,6 +1635,7 @@
       lynchburg: { name: 'Lynchburg' },
       macon_bibb: { name: 'Macon-Bibb County' },
       madison: { name: 'Madison' },
+      manchester: { name: 'Manchester' },
       medford: { name: 'Medford, OR' },
       melbourne: { name: 'Melbourne / Palm Bay / Titusville' },
       memphis: { name: 'Memphis / Shelby County' },
@@ -1649,9 +1667,13 @@
       pittsburgh: { name: 'Pittsburgh' },
       port_st_lucie: { name: 'Port St. Lucie' },
       portland: { name: 'Portland / Multnomah County' },
+      portland_maine: { name: 'Portland' },
       prince_georges: { name: 'Prince George\'s County' },
+      providence: { name: 'Providence' },
       raleigh: { name: 'Raleigh / Wake County' },
       reno: { name: 'Reno / Washoe County' },
+      richmond: { name: 'Richmond' },
+      roanoke: { name: 'Roanoke' },
       rochester: { name: 'Rochester' },
       sacramento: { name: 'Sacramento / Sacramento County' },
       salem_or: { name: 'Salem, OR' },
@@ -1685,6 +1707,7 @@
       waco: { name: 'Waco' },
       washington_dc: { name: 'Washington DC' },
       wichita: { name: 'Wichita' },
+      wilmington_de: { name: 'Wilmington' },
       wilmington_nc: { name: 'Wilmington, NC' },
       worcester: { name: 'Worcester' },
       yakima: { name: 'Yakima' },
@@ -2192,6 +2215,9 @@
       if (upper === 'PENINSULA') return 'PENINSULA';
       if (upper === 'SILICONVALLEYSOUTHBAY' || upper === 'SILICONVALLEY' || upper === 'SOUTHBAY') return 'SILICON_VALLEY_SOUTH_BAY';
       if (upper === 'MARINNORTHBAY' || upper === 'MARIN' || upper === 'NORTHBAY') return 'MARIN_NORTH_BAY';
+      if (upper === 'NORTHBAYWINECOUNTRY' || upper === 'WINECOUNTRY' || upper === 'NORTHBAYWINE') return 'NORTH_BAY_WINE_COUNTRY';
+      if (upper === 'SOLANOCORRIDOR' || upper === 'SOLANO') return 'SOLANO_CORRIDOR';
+      if (upper === 'OUTERCONTRACOSTA' || upper === 'CONTRACOSTA' || upper === 'OUTERCC') return 'OUTER_CONTRA_COSTA';
       if (upper === 'SEATTLECORE') return 'SEATTLE_CORE';
       if (upper === 'NORTHKING') return 'NORTH_KING';
       if (upper === 'EASTSIDE') return 'EASTSIDE';

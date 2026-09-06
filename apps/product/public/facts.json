@@ -50,6 +50,36 @@
       "evidence_path": "apps/api/src/spatial/cities/abilene.py"
     },
     {
+      "id": "albany",
+      "name": "Albany",
+      "state": "NY",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 8,
+      "feeds": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "platforms": [
+        null,
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALE_DATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 42.6526,
+        "lng": -73.7562
+      },
+      "evidence_path": "apps/api/src/spatial/cities/albany.py"
+    },
+    {
       "id": "albuquerque",
       "name": "Albuquerque / Bernalillo County",
       "state": "NM",
@@ -113,6 +143,36 @@
         "lng": -92.4451
       },
       "evidence_path": "apps/api/src/spatial/cities/alexandria.py"
+    },
+    {
+      "id": "allentown",
+      "name": "Allentown",
+      "state": "PA",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 8,
+      "feeds": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "platforms": [
+        null,
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALE_DATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 40.6084,
+        "lng": -75.4902
+      },
+      "evidence_path": "apps/api/src/spatial/cities/allentown.py"
     },
     {
       "id": "amarillo",
@@ -790,6 +850,36 @@
       "evidence_path": "apps/api/src/spatial/cities/buffalo.py"
     },
     {
+      "id": "burlington",
+      "name": "Burlington",
+      "state": "VT",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 8,
+      "feeds": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "platforms": [
+        null,
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALE_DATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 44.4759,
+        "lng": -73.2121
+      },
+      "evidence_path": "apps/api/src/spatial/cities/burlington.py"
+    },
+    {
       "id": "canton",
       "name": "Canton / Stark County",
       "state": "OH",
@@ -918,6 +1008,36 @@
         "lng": -79.931
       },
       "evidence_path": "apps/api/src/spatial/cities/charleston_sc.py"
+    },
+    {
+      "id": "charleston_wv",
+      "name": "Charleston",
+      "state": "WV",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 7,
+      "feeds": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "platforms": [
+        null,
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALE_DATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 38.3498,
+        "lng": -81.6326
+      },
+      "evidence_path": "apps/api/src/spatial/cities/charleston_wv.py"
     },
     {
       "id": "charlotte",
@@ -1365,6 +1485,36 @@
       "evidence_path": "apps/api/src/spatial/cities/detroit.py"
     },
     {
+      "id": "dover",
+      "name": "Dover",
+      "state": "DE",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 7,
+      "feeds": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "platforms": [
+        null,
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALEDATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 39.1582,
+        "lng": -75.5244
+      },
+      "evidence_path": "apps/api/src/spatial/cities/dover.py"
+    },
+    {
       "id": "durham",
       "name": "Durham / Durham County",
       "state": "NC",
@@ -1615,6 +1765,36 @@
       "evidence_path": "apps/api/src/spatial/cities/fort_worth.py"
     },
     {
+      "id": "frederick",
+      "name": "Frederick",
+      "state": "MD",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 7,
+      "feeds": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "platforms": [
+        null,
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALE_DATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 39.4143,
+        "lng": -77.4105
+      },
+      "evidence_path": "apps/api/src/spatial/cities/frederick.py"
+    },
+    {
       "id": "gainesville",
       "name": "Gainesville",
       "state": "FL",
@@ -1743,6 +1923,36 @@
         "lng": -82.3992
       },
       "evidence_path": "apps/api/src/spatial/cities/greenville.py"
+    },
+    {
+      "id": "harrisburg",
+      "name": "Harrisburg",
+      "state": "PA",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 7,
+      "feeds": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "platforms": [
+        null,
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALE_DATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 40.2732,
+        "lng": -76.8867
+      },
+      "evidence_path": "apps/api/src/spatial/cities/harrisburg.py"
     },
     {
       "id": "hartford",
@@ -1888,6 +2098,36 @@
         "lng": -95.3698
       },
       "evidence_path": "apps/api/src/spatial/cities/houston.py"
+    },
+    {
+      "id": "huntington_wv",
+      "name": "Huntington",
+      "state": "WV",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 7,
+      "feeds": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "platforms": [
+        null,
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALE_DATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 38.4192,
+        "lng": -82.4454
+      },
+      "evidence_path": "apps/api/src/spatial/cities/huntington_wv.py"
     },
     {
       "id": "huntsville",
@@ -2563,6 +2803,36 @@
         "lng": -89.3844
       },
       "evidence_path": "apps/api/src/spatial/cities/madison.py"
+    },
+    {
+      "id": "manchester",
+      "name": "Manchester",
+      "state": "NH",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 8,
+      "feeds": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "platforms": [
+        null,
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "SaleDate",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 42.9956,
+        "lng": -71.4548
+      },
+      "evidence_path": "apps/api/src/spatial/cities/manchester.py"
     },
     {
       "id": "medford",
@@ -3710,6 +3980,36 @@
       "evidence_path": "apps/api/src/spatial/cities/portland.py"
     },
     {
+      "id": "portland_maine",
+      "name": "Portland",
+      "state": "ME",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 9,
+      "feeds": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "platforms": [
+        null,
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALE_DATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 43.6591,
+        "lng": -70.2568
+      },
+      "evidence_path": "apps/api/src/spatial/cities/portland_maine.py"
+    },
+    {
       "id": "prince_georges",
       "name": "Prince George's County",
       "state": "MD",
@@ -3748,6 +4048,36 @@
         "lng": -76.75
       },
       "evidence_path": "apps/api/src/spatial/cities/prince_georges.py"
+    },
+    {
+      "id": "providence",
+      "name": "Providence",
+      "state": "RI",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 10,
+      "feeds": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "platforms": [
+        null,
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALE_DATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 41.824,
+        "lng": -71.4128
+      },
+      "evidence_path": "apps/api/src/spatial/cities/providence.py"
     },
     {
       "id": "raleigh",
@@ -3828,6 +4158,66 @@
         "lng": -119.8138
       },
       "evidence_path": "apps/api/src/spatial/cities/reno.py"
+    },
+    {
+      "id": "richmond",
+      "name": "Richmond",
+      "state": "VA",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 9,
+      "feeds": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "platforms": [
+        null,
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALE_DATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 37.5407,
+        "lng": -77.436
+      },
+      "evidence_path": "apps/api/src/spatial/cities/richmond.py"
+    },
+    {
+      "id": "roanoke",
+      "name": "Roanoke",
+      "state": "VA",
+      "divisions": "5 divisions",
+      "division_count": 5,
+      "submarket_count": 8,
+      "feeds": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "platforms": [
+        null,
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALE_DATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 37.271,
+        "lng": -79.9414
+      },
+      "evidence_path": "apps/api/src/spatial/cities/roanoke.py"
     },
     {
       "id": "rochester",
@@ -4023,9 +4413,9 @@
       "id": "san_francisco",
       "name": "San Francisco Bay Area",
       "state": "CA",
-      "divisions": "5 divisions",
-      "division_count": 5,
-      "submarket_count": 54,
+      "divisions": "8 divisions",
+      "division_count": 8,
+      "submarket_count": 83,
       "feeds": [
         true,
         true,
@@ -5003,6 +5393,36 @@
         "lng": -97.3301
       },
       "evidence_path": "apps/api/src/spatial/cities/wichita.py"
+    },
+    {
+      "id": "wilmington_de",
+      "name": "Wilmington",
+      "state": "DE",
+      "divisions": "6 divisions",
+      "division_count": 6,
+      "submarket_count": 7,
+      "feeds": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "platforms": [
+        null,
+        null,
+        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALE_DATE",
+          "interval_seconds": 600.0,
+          "topic": "raw.municipal.deeds"
+        }
+      ],
+      "center": {
+        "lat": 39.7447,
+        "lng": -75.5466
+      },
+      "evidence_path": "apps/api/src/spatial/cities/wilmington_de.py"
     },
     {
       "id": "wilmington_nc",

@@ -10,31 +10,46 @@ metro_bbox:
   min_lng: -123.64
   max_lng: -121.2
 division_bboxes:
-  SAN_FRANCISCO_CORE:
+  SAN_FRANCISCO_CORE: &id001
     min_lat: 37.7
     max_lat: 37.835
     min_lng: -122.525
     max_lng: -122.355
-  EAST_BAY:
+  EAST_BAY: &id002
     min_lat: 37.45
     max_lat: 38.05
     min_lng: -122.4
-    max_lng: -121.75
-  PENINSULA:
+    max_lng: -121.65
+  PENINSULA: &id003
     min_lat: 37.42
     max_lat: 37.7
     min_lng: -122.52
-    max_lng: -122.18
-  SILICON_VALLEY_SOUTH_BAY:
-    min_lat: 37.15
-    max_lat: 37.46
-    min_lng: -122.2
-    max_lng: -121.75
-  MARIN_NORTH_BAY:
+    max_lng: -122.15
+  SILICON_VALLEY_SOUTH_BAY: &id004
+    min_lat: 36.95
+    max_lat: 37.48
+    min_lng: -122.22
+    max_lng: -121.5
+  MARIN_NORTH_BAY: &id005
     min_lat: 37.835
-    max_lat: 38.1
+    max_lat: 38.15
     min_lng: -122.65
     max_lng: -122.4
+  NORTH_BAY_WINE_COUNTRY: &id006
+    min_lat: 38.1
+    max_lat: 38.85
+    min_lng: -123.15
+    max_lng: -122.15
+  SOLANO_CORRIDOR: &id007
+    min_lat: 38.03
+    max_lat: 38.55
+    min_lng: -122.35
+    max_lng: -121.65
+  OUTER_CONTRA_COSTA: &id008
+    min_lat: 37.72
+    max_lat: 38.08
+    min_lng: -122.2
+    max_lng: -121.58
 submarkets:
   Downtown:
     name: Downtown
@@ -487,36 +502,6 @@ submarkets:
     description: North Bay / East Bay gateway featuring Macdonald Avenue revitalization,
       Richmond Ferry Terminal, and waterfront industrial reuse.
     city_id: san_francisco
-  Walnut Creek Downtown:
-    name: Walnut Creek Downtown
-    borough: EAST_BAY
-    lat: 37.9101
-    lng: -122.0652
-    zoom: 14.5
-    pitch: 45.0
-    base_lims: 0.88
-    capex: 9200000.0
-    permit_vel: 46.0
-    shift_ratio: 1.45
-    sla: 58.0
-    description: Premier Contra Costa commercial and luxury shopping destination anchored
-      by Broadway Plaza, high-density residential, and BART.
-    city_id: san_francisco
-  Concord Downtown:
-    name: Concord Downtown
-    borough: EAST_BAY
-    lat: 37.978
-    lng: -122.0311
-    zoom: 14.0
-    pitch: 40.0
-    base_lims: 0.81
-    capex: 6700000.0
-    permit_vel: 42.0
-    shift_ratio: 1.34
-    sla: 48.0
-    description: Todos Santos Plaza dining and community core with major BART connectivity
-      and regional transit-oriented infill.
-    city_id: san_francisco
   Pleasanton Downtown:
     name: Pleasanton Downtown
     borough: EAST_BAY
@@ -561,6 +546,21 @@ submarkets:
     sla: 50.0
     description: Eastern Tri-Valley wine country and national laboratory (LLNL) technology
       anchor featuring a vibrant First Street cultural corridor.
+    city_id: san_francisco
+  Union City:
+    name: Union City
+    borough: EAST_BAY
+    lat: 37.5934
+    lng: -122.0438
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.81
+    capex: 6700000.0
+    permit_vel: 42.0
+    shift_ratio: 1.33
+    sla: 46.0
+    description: Station District transit-oriented community centered around Union
+      City BART with diverse retail corridors along Decoto Road.
     city_id: san_francisco
   San Mateo Downtown:
     name: San Mateo Downtown
@@ -666,6 +666,66 @@ submarkets:
     sla: 48.0
     description: YouTube global headquarters campus and San Mateo Avenue commercial
       district adjacent to SFO International Airport.
+    city_id: san_francisco
+  San Carlos:
+    name: San Carlos
+    borough: PENINSULA
+    lat: 37.5072
+    lng: -122.2597
+    zoom: 14.5
+    pitch: 40.0
+    base_lims: 0.88
+    capex: 8800000.0
+    permit_vel: 48.0
+    shift_ratio: 1.44
+    sla: 54.0
+    description: '''City of Good Living'' Laurel Street downtown shopping village
+      and rapidly expanding East Side life sciences and biotech corridor.'
+    city_id: san_francisco
+  Foster City:
+    name: Foster City
+    borough: PENINSULA
+    lat: 37.5585
+    lng: -122.2711
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.9
+    capex: 10200000.0
+    permit_vel: 45.0
+    shift_ratio: 1.48
+    sla: 56.0
+    description: Master-planned lagoon community anchored by Gilead Sciences global
+      headquarters and Metro Center commercial district.
+    city_id: san_francisco
+  Belmont:
+    name: Belmont
+    borough: PENINSULA
+    lat: 37.5208
+    lng: -122.2758
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.85
+    capex: 7600000.0
+    permit_vel: 41.0
+    shift_ratio: 1.38
+    sla: 50.0
+    description: Ralston Avenue village corridor with Caltrain station, Notre Dame
+      de Namur campus, and transit-oriented corridor infill.
+    city_id: san_francisco
+  Half Moon Bay:
+    name: Half Moon Bay
+    borough: PENINSULA
+    lat: 37.4636
+    lng: -122.4286
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.84
+    capex: 7200000.0
+    permit_vel: 32.0
+    shift_ratio: 1.32
+    sla: 46.0
+    description: San Mateo County coastal anchor featuring historic Main Street shops,
+      Ritz-Carlton oceanfront resort, and coastal agriculture.
     city_id: san_francisco
   Palo Alto University Ave:
     name: Palo Alto University Ave
@@ -787,6 +847,51 @@ submarkets:
     description: Major technology innovation corridor along North First Street featuring
       Cisco headquarters, major R&D campuses, and VTA transit.
     city_id: san_francisco
+  Milpitas:
+    name: Milpitas
+    borough: SILICON_VALLEY_SOUTH_BAY
+    lat: 37.4323
+    lng: -121.8996
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.86
+    capex: 8900000.0
+    permit_vel: 51.0
+    shift_ratio: 1.45
+    sla: 52.0
+    description: Silicon Valley manufacturing and hardware anchor featuring Great
+      Mall, Milpitas BART transit center, and major semiconductor campuses.
+    city_id: san_francisco
+  Morgan Hill:
+    name: Morgan Hill
+    borough: SILICON_VALLEY_SOUTH_BAY
+    lat: 37.1305
+    lng: -121.6544
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.83
+    capex: 7100000.0
+    permit_vel: 38.0
+    shift_ratio: 1.34
+    sla: 48.0
+    description: South Santa Clara County gateway featuring vibrant Monterey Road
+      downtown dining, winery trail, and outdoor lifestyle.
+    city_id: san_francisco
+  Gilroy:
+    name: Gilroy
+    borough: SILICON_VALLEY_SOUTH_BAY
+    lat: 37.0058
+    lng: -121.5683
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.79
+    capex: 6300000.0
+    permit_vel: 40.0
+    shift_ratio: 1.3
+    sla: 44.0
+    description: '''Garlic Capital of the World'' historic downtown Monterey Street,
+      major outlet shopping, and future High-Speed Rail corridor hub.'
+    city_id: san_francisco
   Sausalito:
     name: Sausalito
     borough: MARIN_NORTH_BAY
@@ -847,17 +952,358 @@ submarkets:
     description: North Bay retail powerhouse featuring The Village at Corte Madera
       and Town Center shopping centers with marshland preservation.
     city_id: san_francisco
+  Novato Downtown:
+    name: Novato Downtown
+    borough: MARIN_NORTH_BAY
+    lat: 38.1074
+    lng: -122.5697
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.81
+    capex: 6500000.0
+    permit_vel: 35.0
+    shift_ratio: 1.3
+    sla: 46.0
+    description: Grant Avenue historic downtown core with SMART rail station, Buck
+      Institute biomedical research anchor, and Hamilton field reuse.
+    city_id: san_francisco
+  Napa Downtown:
+    name: Napa Downtown
+    borough: NORTH_BAY_WINE_COUNTRY
+    lat: 38.2975
+    lng: -122.2869
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.86
+    capex: 8200000.0
+    permit_vel: 38.0
+    shift_ratio: 1.36
+    sla: 50.0
+    description: World-renowned wine capital urban core along Main and First streets
+      with Oxbow Public Market, luxury hotels, and riverside tasting rooms.
+    city_id: san_francisco
+  Yountville:
+    name: Yountville
+    borough: NORTH_BAY_WINE_COUNTRY
+    lat: 38.4016
+    lng: -122.3608
+    zoom: 14.5
+    pitch: 40.0
+    base_lims: 0.94
+    capex: 12500000.0
+    permit_vel: 30.0
+    shift_ratio: 1.55
+    sla: 65.0
+    description: Culinary epicenter of Napa Valley anchored by The French Laundry,
+      Washington Street luxury boutiques, and premier vineyard estates.
+    city_id: san_francisco
+  St Helena:
+    name: St Helena
+    borough: NORTH_BAY_WINE_COUNTRY
+    lat: 38.5052
+    lng: -122.4704
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.9
+    capex: 9800000.0
+    permit_vel: 28.0
+    shift_ratio: 1.42
+    sla: 55.0
+    description: Historic Napa Valley Main Street corridor with Victorian architecture,
+      elite wine tasting flagships, and Culinary Institute of America.
+    city_id: san_francisco
+  Sonoma Plaza:
+    name: Sonoma Plaza
+    borough: NORTH_BAY_WINE_COUNTRY
+    lat: 38.2919
+    lng: -122.458
+    zoom: 14.5
+    pitch: 40.0
+    base_lims: 0.88
+    capex: 8600000.0
+    permit_vel: 34.0
+    shift_ratio: 1.38
+    sla: 52.0
+    description: Historic 8-acre town plaza surrounded by adobe landmarks, farm-to-table
+      restaurants, artisan bakeries, and Sonoma Valley wineries.
+    city_id: san_francisco
+  Petaluma Downtown:
+    name: Petaluma Downtown
+    borough: NORTH_BAY_WINE_COUNTRY
+    lat: 38.2324
+    lng: -122.6367
+    zoom: 14.5
+    pitch: 40.0
+    base_lims: 0.84
+    capex: 7400000.0
+    permit_vel: 42.0
+    shift_ratio: 1.34
+    sla: 48.0
+    description: Historic Petaluma River waterfront and Victorian iron-front commercial
+      district with thriving craft beverage and foodie scene.
+    city_id: san_francisco
+  Santa Rosa Downtown:
+    name: Santa Rosa Downtown
+    borough: NORTH_BAY_WINE_COUNTRY
+    lat: 38.4404
+    lng: -122.7141
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.82
+    capex: 7800000.0
+    permit_vel: 46.0
+    shift_ratio: 1.35
+    sla: 54.0
+    description: Sonoma County seat and regional economic hub centered around Courthouse
+      Square, SMART rail station, and Railroad Square historic district.
+    city_id: san_francisco
+  Healdsburg:
+    name: Healdsburg
+    borough: NORTH_BAY_WINE_COUNTRY
+    lat: 38.6105
+    lng: -122.8692
+    zoom: 14.5
+    pitch: 40.0
+    base_lims: 0.92
+    capex: 11000000.0
+    permit_vel: 32.0
+    shift_ratio: 1.5
+    sla: 60.0
+    description: Upscale Northern Sonoma plaza surrounded by SingleThread and Michelin-starred
+      dining, boutique hotels, and Russian River Valley access.
+    city_id: san_francisco
+  Vallejo Downtown:
+    name: Vallejo Downtown
+    borough: SOLANO_CORRIDOR
+    lat: 38.1011
+    lng: -122.2578
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.77
+    capex: 5800000.0
+    permit_vel: 40.0
+    shift_ratio: 1.28
+    sla: 44.0
+    description: Historic waterfront urban center along Georgia Street connected to
+      San Francisco via direct SF Bay Ferry service.
+    city_id: san_francisco
+  Mare Island:
+    name: Mare Island
+    borough: SOLANO_CORRIDOR
+    lat: 38.103
+    lng: -122.274
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.79
+    capex: 6500000.0
+    permit_vel: 38.0
+    shift_ratio: 1.3
+    sla: 42.0
+    description: Historic naval shipyard transformation into a modern innovation,
+      film production, manufacturing, and master-planned waterfront community.
+    city_id: san_francisco
+  Benicia:
+    name: Benicia
+    borough: SOLANO_CORRIDOR
+    lat: 38.052
+    lng: -122.158
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.83
+    capex: 6800000.0
+    permit_vel: 35.0
+    shift_ratio: 1.32
+    sla: 46.0
+    description: Picturesque Carquinez Strait historic capital featuring First Street
+      boutique shopping, historic arsenal artists' studios, and waterfront parks.
+    city_id: san_francisco
+  Fairfield Downtown:
+    name: Fairfield Downtown
+    borough: SOLANO_CORRIDOR
+    lat: 38.2494
+    lng: -122.04
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.79
+    capex: 6200000.0
+    permit_vel: 42.0
+    shift_ratio: 1.3
+    sla: 46.0
+    description: Solano County seat anchored by Texas Street civic core, Jelly Belly
+      headquarters, and Travis Air Force Base economic ecosystem.
+    city_id: san_francisco
+  Vacaville Downtown:
+    name: Vacaville Downtown
+    borough: SOLANO_CORRIDOR
+    lat: 38.3566
+    lng: -121.9877
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.81
+    capex: 6600000.0
+    permit_vel: 44.0
+    shift_ratio: 1.33
+    sla: 48.0
+    description: Historic Town Square and Main Street commercial center along the
+      I-80 biotechnology and advanced manufacturing corridor.
+    city_id: san_francisco
+  Dixon:
+    name: Dixon
+    borough: SOLANO_CORRIDOR
+    lat: 38.4455
+    lng: -121.8233
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.76
+    capex: 5200000.0
+    permit_vel: 36.0
+    shift_ratio: 1.25
+    sla: 40.0
+    description: Eastern Solano agricultural and growing logistics hub along I-80
+      with historic downtown First Street charm.
+    city_id: san_francisco
+  Walnut Creek Downtown:
+    name: Walnut Creek Downtown
+    borough: OUTER_CONTRA_COSTA
+    lat: 37.9101
+    lng: -122.0652
+    zoom: 14.5
+    pitch: 45.0
+    base_lims: 0.88
+    capex: 9200000.0
+    permit_vel: 46.0
+    shift_ratio: 1.45
+    sla: 58.0
+    description: Premier Contra Costa commercial and luxury shopping destination anchored
+      by Broadway Plaza, high-density residential, and BART.
+    city_id: san_francisco
+  Concord Downtown:
+    name: Concord Downtown
+    borough: OUTER_CONTRA_COSTA
+    lat: 37.978
+    lng: -122.0311
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.81
+    capex: 6700000.0
+    permit_vel: 42.0
+    shift_ratio: 1.34
+    sla: 48.0
+    description: Todos Santos Plaza dining and community core with major BART connectivity
+      and regional transit-oriented infill.
+    city_id: san_francisco
+  Pleasant Hill:
+    name: Pleasant Hill
+    borough: OUTER_CONTRA_COSTA
+    lat: 37.9477
+    lng: -122.0608
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.83
+    capex: 7000000.0
+    permit_vel: 40.0
+    shift_ratio: 1.35
+    sla: 50.0
+    description: Downtown Crescent Drive lifestyle center and Contra Costa Boulevard
+      retail corridor adjacent to Diablo Valley College.
+    city_id: san_francisco
+  Martinez Downtown:
+    name: Martinez Downtown
+    borough: OUTER_CONTRA_COSTA
+    lat: 38.0194
+    lng: -122.1341
+    zoom: 14.0
+    pitch: 40.0
+    base_lims: 0.8
+    capex: 6100000.0
+    permit_vel: 38.0
+    shift_ratio: 1.3
+    sla: 46.0
+    description: Contra Costa County seat featuring historic Main Street storefronts,
+      Amtrak transit station, and marina recreation.
+    city_id: san_francisco
+  Antioch Downtown:
+    name: Antioch Downtown
+    borough: OUTER_CONTRA_COSTA
+    lat: 38.0175
+    lng: -121.8122
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.77
+    capex: 5600000.0
+    permit_vel: 41.0
+    shift_ratio: 1.28
+    sla: 42.0
+    description: Historic Rivertown commercial corridor along the San Joaquin River
+      with eBART rail extension and waterfront revitalization.
+    city_id: san_francisco
+  Pittsburg Downtown:
+    name: Pittsburg Downtown
+    borough: OUTER_CONTRA_COSTA
+    lat: 38.028
+    lng: -121.8847
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.78
+    capex: 5700000.0
+    permit_vel: 43.0
+    shift_ratio: 1.29
+    sla: 44.0
+    description: Old Town Pittsburg marina district with historic Railroad Avenue
+      retail, waterfront promenade, and eBART connectivity.
+    city_id: san_francisco
+  Brentwood:
+    name: Brentwood
+    borough: OUTER_CONTRA_COSTA
+    lat: 37.9319
+    lng: -121.6961
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.82
+    capex: 6800000.0
+    permit_vel: 45.0
+    shift_ratio: 1.36
+    sla: 48.0
+    description: Fast-growing East Contra Costa agricultural and suburban town center
+      with historic downtown plaza and The Streets of Brentwood retail.
+    city_id: san_francisco
+  San Ramon:
+    name: San Ramon
+    borough: OUTER_CONTRA_COSTA
+    lat: 37.7799
+    lng: -121.978
+    zoom: 14.5
+    pitch: 40.0
+    base_lims: 0.89
+    capex: 9500000.0
+    permit_vel: 47.0
+    shift_ratio: 1.46
+    sla: 56.0
+    description: Bishop Ranch corporate campus anchor and Renzo Piano-designed City
+      Center Bishop Ranch retail and entertainment destination.
+    city_id: san_francisco
+  Danville:
+    name: Danville
+    borough: OUTER_CONTRA_COSTA
+    lat: 37.8216
+    lng: -122.0
+    zoom: 14.5
+    pitch: 40.0
+    base_lims: 0.9
+    capex: 8900000.0
+    permit_vel: 35.0
+    shift_ratio: 1.4
+    sla: 54.0
+    description: Affluent San Ramon Valley historic village centered on Hartz Avenue
+      with high-end boutiques, fine dining, and Iron Horse Trail access.
+    city_id: san_francisco
 divisions:
   SAN_FRANCISCO_CORE:
     name: SAN_FRANCISCO_CORE
     center_lat: 37.7749
     center_lng: -122.4194
     zoom: 12.5
-    bbox:
-      min_lat: 37.7
-      max_lat: 37.835
-      min_lng: -122.525
-      max_lng: -122.355
+    bbox: *id001
     submarkets:
     - Downtown
     - SoMa
@@ -882,11 +1328,7 @@ divisions:
     center_lat: 37.8044
     center_lng: -122.2711
     zoom: 12.0
-    bbox:
-      min_lat: 37.45
-      max_lat: 38.05
-      min_lng: -122.4
-      max_lng: -121.75
+    bbox: *id002
     submarkets:
     - Downtown Oakland
     - Uptown Oakland
@@ -901,22 +1343,17 @@ divisions:
     - Hayward Downtown
     - San Leandro Downtown
     - Richmond CA
-    - Walnut Creek Downtown
-    - Concord Downtown
     - Pleasanton Downtown
     - Dublin Downtown
     - Livermore Downtown
+    - Union City
     city_id: san_francisco
   PENINSULA:
     name: PENINSULA
     center_lat: 37.5485
     center_lng: -122.315
     zoom: 11.5
-    bbox:
-      min_lat: 37.42
-      max_lat: 37.7
-      min_lng: -122.52
-      max_lng: -122.18
+    bbox: *id003
     submarkets:
     - San Mateo Downtown
     - Burlingame Ave
@@ -925,17 +1362,17 @@ divisions:
     - South San Francisco
     - Daly City
     - San Bruno
+    - San Carlos
+    - Foster City
+    - Belmont
+    - Half Moon Bay
     city_id: san_francisco
   SILICON_VALLEY_SOUTH_BAY:
     name: SILICON_VALLEY_SOUTH_BAY
-    center_lat: 37.3688
-    center_lng: -122.0363
-    zoom: 11.5
-    bbox:
-      min_lat: 37.15
-      max_lat: 37.46
-      min_lng: -122.2
-      max_lng: -121.75
+    center_lat: 37.3382
+    center_lng: -121.8863
+    zoom: 11.0
+    bbox: *id004
     submarkets:
     - Palo Alto University Ave
     - Mountain View Castro St
@@ -945,22 +1382,68 @@ divisions:
     - Cupertino
     - Santa Clara
     - North San Jose
+    - Milpitas
+    - Morgan Hill
+    - Gilroy
     city_id: san_francisco
   MARIN_NORTH_BAY:
     name: MARIN_NORTH_BAY
-    center_lat: 37.915
-    center_lng: -122.518
+    center_lat: 37.9735
+    center_lng: -122.5311
     zoom: 11.5
-    bbox:
-      min_lat: 37.835
-      max_lat: 38.1
-      min_lng: -122.65
-      max_lng: -122.4
+    bbox: *id005
     submarkets:
     - Sausalito
     - Mill Valley
     - San Rafael Downtown
     - Corte Madera
+    - Novato Downtown
+    city_id: san_francisco
+  NORTH_BAY_WINE_COUNTRY:
+    name: NORTH_BAY_WINE_COUNTRY
+    center_lat: 38.35
+    center_lng: -122.5
+    zoom: 10.5
+    bbox: *id006
+    submarkets:
+    - Napa Downtown
+    - Yountville
+    - St Helena
+    - Sonoma Plaza
+    - Petaluma Downtown
+    - Santa Rosa Downtown
+    - Healdsburg
+    city_id: san_francisco
+  SOLANO_CORRIDOR:
+    name: SOLANO_CORRIDOR
+    center_lat: 38.25
+    center_lng: -122.05
+    zoom: 11.0
+    bbox: *id007
+    submarkets:
+    - Vallejo Downtown
+    - Mare Island
+    - Benicia
+    - Fairfield Downtown
+    - Vacaville Downtown
+    - Dixon
+    city_id: san_francisco
+  OUTER_CONTRA_COSTA:
+    name: OUTER_CONTRA_COSTA
+    center_lat: 37.95
+    center_lng: -121.95
+    zoom: 11.5
+    bbox: *id008
+    submarkets:
+    - Walnut Creek Downtown
+    - Concord Downtown
+    - Pleasant Hill
+    - Martinez Downtown
+    - Antioch Downtown
+    - Pittsburg Downtown
+    - Brentwood
+    - San Ramon
+    - Danville
     city_id: san_francisco
 datasets:
   permits:
@@ -1118,8 +1601,8 @@ datasets:
     max_record_count: null
     expected_cadence_days: 7
     alarm_exempt: true
-    alarm_exempt_reason: "SUSPECTED STALL \u2014 frozen since 2026-06-26, no replacement\
-      \ (US-164)"
+    alarm_exempt_reason: SUSPECTED STALL — frozen since 2026-06-26, no replacement
+      (US-164)
     annual_rotation: false
     companion_endpoints: {}
     proxy_for: null

@@ -1,0 +1,178 @@
+{
+  "schema_version": 2,
+  "id": "charleston_wv",
+  "name": "Charleston",
+  "state": "WV",
+  "center": {
+    "lat": 38.3498,
+    "lng": -81.6326
+  },
+  "metro_bbox": {
+    "min_lat": 38.32,
+    "max_lat": 38.38,
+    "min_lng": -81.68,
+    "max_lng": -81.58
+  },
+  "divisions": {
+    "DOWNTOWN_KANAWHA": {
+      "name": "DOWNTOWN_KANAWHA",
+      "center": {
+        "lat": 38.3514,
+        "lng": -81.6253
+      },
+      "bbox": {
+        "min_lat": 38.345,
+        "max_lat": 38.365,
+        "min_lng": -81.65,
+        "max_lng": -81.615
+      },
+      "submarkets": [
+        "Downtown Charleston",
+        "Capitol Market"
+      ]
+    },
+    "EAST_END": {
+      "name": "EAST_END",
+      "center": {
+        "lat": 38.3475,
+        "lng": -81.5975
+      },
+      "bbox": {
+        "min_lat": 38.34,
+        "max_lat": 38.36,
+        "min_lng": -81.615,
+        "max_lng": -81.585
+      },
+      "submarkets": [
+        "East End",
+        "Kanawha City"
+      ]
+    },
+    "WEST_SIDE": {
+      "name": "WEST_SIDE",
+      "center": {
+        "lat": 38.355,
+        "lng": -81.665
+      },
+      "bbox": {
+        "min_lat": 38.345,
+        "max_lat": 38.365,
+        "min_lng": -81.68,
+        "max_lng": -81.65
+      },
+      "submarkets": [
+        "West Side"
+      ]
+    },
+    "SOUTH_RIDGE": {
+      "name": "SOUTH_RIDGE",
+      "center": {
+        "lat": 38.3325,
+        "lng": -81.63
+      },
+      "bbox": {
+        "min_lat": 38.32,
+        "max_lat": 38.345,
+        "min_lng": -81.65,
+        "max_lng": -81.61
+      },
+      "submarkets": [
+        "South Hills"
+      ]
+    },
+    "NORTH_PARK": {
+      "name": "NORTH_PARK",
+      "center": {
+        "lat": 38.365,
+        "lng": -81.64
+      },
+      "bbox": {
+        "min_lat": 38.36,
+        "max_lat": 38.38,
+        "min_lng": -81.66,
+        "max_lng": -81.62
+      },
+      "submarkets": [
+        "North Charleston"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Charleston": {
+      "name": "Downtown Charleston",
+      "division": "DOWNTOWN_KANAWHA",
+      "center": {
+        "lat": 38.3498,
+        "lng": -81.6326
+      },
+      "description": "The Capitol Complex / Kanawha Blvd CBD with state-office conversions, the core mixed-use pipeline, and the city's densest reinvestment corridor."
+    },
+    "Capitol Market": {
+      "name": "Capitol Market",
+      "division": "DOWNTOWN_KANAWHA",
+      "center": {
+        "lat": 38.353,
+        "lng": -81.618
+      },
+      "description": "The market-district grid northeast of downtown with food-hall retail, loft conversions, and steady small-business licensing flow."
+    },
+    "East End": {
+      "name": "East End",
+      "division": "EAST_END",
+      "center": {
+        "lat": 38.35,
+        "lng": -81.6
+      },
+      "description": "The historic East End neighborhood east of downtown with restoration trades, the arts-corridor retrofit pipeline, and investor housing stock."
+    },
+    "Kanawha City": {
+      "name": "Kanawha City",
+      "division": "EAST_END",
+      "center": {
+        "lat": 38.345,
+        "lng": -81.595
+      },
+      "description": "The southeast river-front neighborhood along MacCorkle Avenue with solid mid-century housing stock and block-by-block reinvestment."
+    },
+    "West Side": {
+      "name": "West Side",
+      "division": "WEST_SIDE",
+      "center": {
+        "lat": 38.355,
+        "lng": -81.665
+      },
+      "description": "The west-bank grid across the Kanawha River with pre-war housing, the city's lowest sale prices, and heaviest vacancy-to-acquisition flow."
+    },
+    "South Hills": {
+      "name": "South Hills",
+      "division": "SOUTH_RIDGE",
+      "center": {
+        "lat": 38.335,
+        "lng": -81.63
+      },
+      "description": "The south-bank ridge neighborhoods along the Kanawha with commuter-adjacent housing and steady renovation trades."
+    },
+    "North Charleston": {
+      "name": "North Charleston",
+      "division": "NORTH_PARK",
+      "center": {
+        "lat": 38.37,
+        "lng": -81.64
+      },
+      "description": "The north-bank ward toward the I-64 corridor with lighter sale volume and investor acquisition interest at the metro edge."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": null,
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SALE_DATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/charleston_wv.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

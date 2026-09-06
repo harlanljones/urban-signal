@@ -1,0 +1,188 @@
+{
+  "schema_version": 2,
+  "id": "roanoke",
+  "name": "Roanoke",
+  "state": "VA",
+  "center": {
+    "lat": 37.271,
+    "lng": -79.9414
+  },
+  "metro_bbox": {
+    "min_lat": 37.2,
+    "max_lat": 37.34,
+    "min_lng": -80.02,
+    "max_lng": -79.88
+  },
+  "divisions": {
+    "DOWNTOWN_ROANOKE": {
+      "name": "DOWNTOWN_ROANOKE",
+      "center": {
+        "lat": 37.268,
+        "lng": -79.942
+      },
+      "bbox": {
+        "min_lat": 37.25,
+        "max_lat": 37.29,
+        "min_lng": -79.955,
+        "max_lng": -79.92
+      },
+      "submarkets": [
+        "Center City",
+        "Old Southwest"
+      ]
+    },
+    "NORTHWEST_HOLLINS": {
+      "name": "NORTHWEST_HOLLINS",
+      "center": {
+        "lat": 37.315,
+        "lng": -79.97
+      },
+      "bbox": {
+        "min_lat": 37.3,
+        "max_lat": 37.33,
+        "min_lng": -79.99,
+        "max_lng": -79.95
+      },
+      "submarkets": [
+        "Hollins"
+      ]
+    },
+    "SOUTHWEST_MILL_MOUNTAIN": {
+      "name": "SOUTHWEST_MILL_MOUNTAIN",
+      "center": {
+        "lat": 37.24,
+        "lng": -79.952
+      },
+      "bbox": {
+        "min_lat": 37.2,
+        "max_lat": 37.25,
+        "min_lng": -79.98,
+        "max_lng": -79.94
+      },
+      "submarkets": [
+        "Mill Mountain",
+        "Wasena"
+      ]
+    },
+    "NORTHEAST_VINTON": {
+      "name": "NORTHEAST_VINTON",
+      "center": {
+        "lat": 37.28,
+        "lng": -79.9
+      },
+      "bbox": {
+        "min_lat": 37.26,
+        "max_lat": 37.3,
+        "min_lng": -79.91,
+        "max_lng": -79.88
+      },
+      "submarkets": [
+        "Vinton"
+      ]
+    },
+    "WEST_GILES": {
+      "name": "WEST_GILES",
+      "center": {
+        "lat": 37.24,
+        "lng": -79.995
+      },
+      "bbox": {
+        "min_lat": 37.22,
+        "max_lat": 37.28,
+        "min_lng": -80.01,
+        "max_lng": -79.97
+      },
+      "submarkets": [
+        "Salem",
+        "Clearbrook"
+      ]
+    }
+  },
+  "submarkets": {
+    "Center City": {
+      "name": "Center City",
+      "division": "DOWNTOWN_ROANOKE",
+      "center": {
+        "lat": 37.271,
+        "lng": -79.939
+      },
+      "description": "The Campbell Avenue / Market Square CBD with office-to-residential conversions, the Roanoke STAR-adjacent civic projects, and the city's densest mixed-use pipeline."
+    },
+    "Old Southwest": {
+      "name": "Old Southwest",
+      "division": "DOWNTOWN_ROANOKE",
+      "center": {
+        "lat": 37.266,
+        "lng": -79.946
+      },
+      "description": "The turn-of-the-century streetcar suburb of brick rowhouses on the bluff southwest of downtown with steady restoration trades."
+    },
+    "Hollins": {
+      "name": "Hollins",
+      "division": "NORTHWEST_HOLLINS",
+      "center": {
+        "lat": 37.315,
+        "lng": -79.97
+      },
+      "description": "The northwest Roanoke community around Hollins University with seasonal student-housing turnover and steady single-family reinvestment."
+    },
+    "Mill Mountain": {
+      "name": "Mill Mountain",
+      "division": "SOUTHWEST_MILL_MOUNTAIN",
+      "center": {
+        "lat": 37.235,
+        "lng": -79.96
+      },
+      "description": "The south-side district at the base of Mill Mountain with cottage and bungalow stock, park-adjacent hospitality licensing, and hillside rebuild work."
+    },
+    "Wasena": {
+      "name": "Wasena",
+      "division": "SOUTHWEST_MILL_MOUNTAIN",
+      "center": {
+        "lat": 37.245,
+        "lng": -79.945
+      },
+      "description": "The Wasena neighborhood along the Roanoke River greenway with solid pre-war housing stock and investor renovation flow."
+    },
+    "Vinton": {
+      "name": "Vinton",
+      "division": "NORTHEAST_VINTON",
+      "center": {
+        "lat": 37.28,
+        "lng": -79.9
+      },
+      "description": "The town of Vinton east of the Roanoke River with the lowest sale prices in the metro and steady vacancy-to-acquisition conversion flow."
+    },
+    "Salem": {
+      "name": "Salem",
+      "division": "WEST_GILES",
+      "center": {
+        "lat": 37.255,
+        "lng": -79.99
+      },
+      "description": "The city of Salem west of Roanoke with the collegiate and medical-corridor rental register and block-by-block reinvestment."
+    },
+    "Clearbrook": {
+      "name": "Clearbrook",
+      "division": "WEST_GILES",
+      "center": {
+        "lat": 37.225,
+        "lng": -80.0
+      },
+      "description": "The rural-residential fringe southwest of Roanoke with acreage parcels, well-and-septic stock, and the slowest sale cadence in the metro."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": null,
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SALE_DATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/roanoke.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}
