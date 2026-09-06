@@ -77,6 +77,21 @@ def test_ev_job_is_registered_but_disabled_until_verified():
     assert scheduler.configs["ev_charging"].enabled is False
 
 
+def test_nppes_medical_is_registered_and_dispatchable():
+    scheduler = _scheduler()
+    assert "nppes" in scheduler.producers
+    assert "nppes_medical" in scheduler.configs
+    producer = scheduler.producers["nppes"]
+    producer.run_stream = MagicMock(return_value=5)
+    scheduler.configs["nppes_medical"].enabled = True
+
+    result = scheduler.poll_job("nppes_medical", limit=10)
+
+    producer.run_stream.assert_called_once_with(limit=10)
+    assert result["status"] == "SUCCESS"
+    assert result["records_published"] == 5
+
+
 def test_poll_all_runs_enabled_national_jobs():
     scheduler = _scheduler()
     scheduler.configs["nfip_claims"].enabled = True

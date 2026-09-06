@@ -271,6 +271,9 @@ class TestNationalFeeds:
             NationalFeed.NFIP_CLAIMS,
             NationalFeed.DISASTER_DECLARATIONS,
             NationalFeed.EV_CHARGING,
+            NationalFeed.SBA_LOAN,
+            NationalFeed.BANK_BRANCH,
+            NationalFeed.NPPES_MEDICAL,
         }
 
     def test_nfip_uses_v3_and_declarations_stay_on_v2(self):
@@ -313,12 +316,16 @@ class TestNationalFeeds:
     def test_no_national_feed_pretends_to_be_a_city_feed(self):
         # A national file covering 62 metros must not be registered 62 times.
         national_topics = {spec.topic for spec in NATIONAL_FEEDS.values()}
+        shared_topics = {
+            get_national_feed(NationalFeed.DISASTER_DECLARATIONS).topic,
+            get_national_feed(NationalFeed.NPPES_MEDICAL).topic,
+        }
         for cid, reg in REGISTRY.items():
             for feed, spec in reg.datasets.items():
                 if feed is FeedType.GBFS:
                     continue  # GBFS is genuinely one system per metro
                 assert spec.topic not in (
-                    national_topics - {get_national_feed(NationalFeed.DISASTER_DECLARATIONS).topic}
+                    national_topics - shared_topics
                 ), f"{cid.value}/{feed.value} registers a national topic as a city feed"
 
 

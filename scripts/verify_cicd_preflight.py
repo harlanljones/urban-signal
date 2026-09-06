@@ -22,7 +22,7 @@ PRODUCT = REPO / "apps" / "product"
 DASHBOARD_PY = API / "src" / "serving" / "dashboard.py"
 DASHBOARD_HTML = REPO / "apps" / "dashboard" / "public" / "index.html"
 FACTS_JSON = PRODUCT / "public" / "facts.json"
-VENV_PYTHON = API / ".venv" / "bin" / "python"
+VENV_PYTHON = (API / ".venv" / "bin" / "python") if (API / ".venv" / "bin" / "python").exists() else Path(sys.executable)
 
 
 def _run(cmd: list[str], cwd: str | None = None, label: str | None = None) -> None:

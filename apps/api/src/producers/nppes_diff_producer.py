@@ -132,6 +132,7 @@ class NppesDiffProducer:
         spatial_indexer: H3SpatialIndexer | None = None,
         zip_centroids: dict[str, tuple[float, float]] | None = None,
     ):
+        self.socrata = None
         schema_path = Path(__file__).parent.parent / "schemas" / "avro" / "sla_license_event.avsc"
         self.producer = producer or BaseKafkaProducer(
             bootstrap_servers=bootstrap_servers,
@@ -358,3 +359,19 @@ class NppesDiffProducer:
             count += 1
         self.producer.flush()
         return count
+
+    def run_stream(
+        self,
+        payload: bytes | bytearray | io.BufferedIOBase | None = None,
+        state: InMemoryNppesStateStore | None = None,
+        limit: int | None = None,
+        **kwargs: Any,
+    ) -> int:
+        """Run weekly diff processing and emit events."""
+        if payload is None:
+            return 0
+        state = state or InMemoryNppesStateStore()
+        events = self.process_weekly_zip(payload, state, **kwargs)
+        if limit is not None:
+            events = events[:limit]
+        return self.emit(events)

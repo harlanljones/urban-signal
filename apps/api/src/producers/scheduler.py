@@ -36,6 +36,7 @@ from src.producers.ev_charging_producer import EvChargingProducer
 from src.producers.carrier_license_producer import CarrierLicenseProducer
 from src.producers.head_start_producer import HeadStartProducer
 from src.producers.nces_anchor_producer import NcesAnchorProducer
+from src.producers.nppes_diff_producer import NppesDiffProducer
 from src.producers.evictions_producer import EvictionsProducer
 from src.producers.gbfs_producer import GbfsProducer
 from src.producers.nfip_producer import NfipProducer
@@ -274,6 +275,8 @@ class MunicipalIngestionScheduler:
             # US-378: SBA 7(a)/504 loan approvals — cumulative FOIA snapshot per program.
             "sba_loan": SbaLoanProducer(bootstrap_servers=self.bootstrap_servers),
             "bank_branch": FdicBankBranchProducer(bootstrap_servers=self.bootstrap_servers),
+            # US-374: NPPES weekly incremental diffs for medical office churn.
+            "nppes": NppesDiffProducer(bootstrap_servers=self.bootstrap_servers),
         }
 
         # Socrata Endpoints & Target Topics mapping derived from city registry
@@ -352,6 +355,7 @@ class MunicipalIngestionScheduler:
                 NationalFeed.EV_CHARGING,
                 NationalFeed.SBA_LOAN,
                 NationalFeed.BANK_BRANCH,
+                NationalFeed.NPPES_MEDICAL,
             )
         }
         for feed in (
@@ -361,6 +365,7 @@ class MunicipalIngestionScheduler:
             NationalFeed.EV_CHARGING,
             NationalFeed.SBA_LOAN,
             NationalFeed.BANK_BRANCH,
+            NationalFeed.NPPES_MEDICAL,
         ):
             spec = NATIONAL_FEEDS[feed]
             job_name = spec.feed.value
