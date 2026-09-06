@@ -7,12 +7,16 @@ metrics, division catalog, and geographic bounding boxes for the SF Bay Area, CA
 from typing import Dict
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
-# SF Bay Area Metro overall bounding box
+# SF Bay Area Metro overall bounding box: full 9-county envelope (US-436).
+# Rounded outward from the dissolved TIGER/Line boundary in
+# src/spatial/bay_area_boundary.py (BAY_AREA_METRO_BBOX) so every county's land
+# is inside the metro. Must stay == BAY_AREA_METRO_BBOX (see
+# tests/unit/test_bay_area_boundary.py).
 SF_METRO_BBOX: Dict[str, float] = {
-    "min_lat": 37.15,
-    "max_lat": 38.10,
-    "min_lng": -122.65,
-    "max_lng": -121.75,
+    "min_lat": 36.89,
+    "max_lat": 38.87,
+    "min_lng": -123.64,
+    "max_lng": -121.20,
 }
 SAN_FRANCISCO_METRO_BBOX = SF_METRO_BBOX
 
