@@ -14,9 +14,17 @@ from src.producers.nppes_diff_producer import (
 class FakeProducer:
     def __init__(self):
         self.dlq = []
+        self.produced = []
+        self.flushed = False
 
     def route_to_dlq(self, *args):
         self.dlq.append(args)
+
+    def produce(self, topic, key, value):
+        self.produced.append((topic, key, value))
+
+    def flush(self):
+        self.flushed = True
 
 
 def row(**overrides):
@@ -118,3 +126,38 @@ def test_weekly_zip_reader_decodes_csv_member():
         archive.writestr("npidata_20260824-20260830.csv", "NPI,foo\n123,bar\n")
     rows = NppesDiffProducer.read_weekly_zip(payload.getvalue())
     assert rows == [{"NPI": "123", "foo": "bar"}]
+
+
+def test_nppes_diff_producer_has_socrata_attribute():
+    p = producer()
+    assert hasattr(p, "socrata")
+    assert p.socrata is None
+
+
+def test_nppes_diff_producer_run_stream_without_payload_returns_zero():
+    p = producer()
+    assert p.run_stream() == 0
+
+
+def test_nppes_diff_producer_run_stream_with_payload():
+    p = producer()
+    payload = BytesIO()
+    with ZipFile(payload, "w", ZIP_DEFLATED) as archive:
+        archive.writestr(
+            "npidata_20260824-20260830.csv",
+            "NPI,Provider Organization Name (Legal Business Name),Provider Business Practice Location Address First Line,Provider Business Practice Location Address City Name,Provider Business Practice Location Address State Name,Provider Business Practice Location Address Postal Code,Provider Enumeration Date,Healthcare Provider Taxonomy Code_1,Healthcare Provider Primary Taxonomy Switch_1\n"
+            "1234567890,Neighborhood Clinic,100 Main St,New York,NY,10001,01/02/2026,207Q00000X,Y\n",
+        )
+    centroids = {"10001": (40.75, -73.99)}
+    count = p.run_stream(
+        payload=payload.getvalue(),
+        state=InMemoryNppesStateStore(),
+        geocoder=lambda addr: None,
+        zip_centroids=centroids,
+        metro_bboxes={"nyc": {"min_lat": 40.0, "max_lat": 41.0, "min_lng": -75.0, "max_lng": -73.0}},
+    )
+    assert count == 1
+    assert p.producer.flushed is True
+    assert len(p.producer.produced) == 1
+    assert p.producer.produced[0][0] == "raw.municipal.sla"
+    assert p.producer.produced[0][1].startswith("1234567890:")
