@@ -22,13 +22,17 @@ PRODUCT = REPO / "apps" / "product"
 DASHBOARD_PY = API / "src" / "serving" / "dashboard.py"
 DASHBOARD_HTML = REPO / "apps" / "dashboard" / "public" / "index.html"
 FACTS_JSON = PRODUCT / "public" / "facts.json"
-VENV_PYTHON = API / ".venv" / "bin" / "python"
+_venv_python = API / ".venv" / "bin" / "python"
+VENV_PYTHON = _venv_python if _venv_python.is_file() else Path(sys.executable)
 
 
-def _run(cmd: list[str], cwd: str | None = None, label: str | None = None) -> None:
+def _run(cmd: list[str], cwd: str | None = None, label: str | None = None, env: dict[str, str] | None = None) -> None:
     tag = label or cmd[0]
     print(f"\n--- {tag} ", end="", flush=True)
-    result = subprocess.run(cmd, cwd=cwd or str(REPO), capture_output=True, text=True)
+    full_env = {**dict(sys.path and {"PYTHONPATH": str(API)}), **dict(env or {})}
+    import os
+    run_env = {**os.environ, **full_env}
+    result = subprocess.run(cmd, cwd=cwd or str(REPO), capture_output=True, text=True, env=run_env)
     if result.returncode != 0:
         print("FAILED", flush=True)
         print(result.stdout)
@@ -39,7 +43,6 @@ def _run(cmd: list[str], cwd: str | None = None, label: str | None = None) -> No
 
 def _api_python(cmd: list[str]) -> list[str]:
     """Run a Python command through the API virtualenv with PYTHONPATH set."""
-    env = {**dict(PYTHONPATH=str(API))}
     return [str(VENV_PYTHON), *cmd]
 
 
