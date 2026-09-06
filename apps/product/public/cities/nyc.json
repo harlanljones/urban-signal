@@ -757,8 +757,8 @@
     },
     "sla": {
       "platform": "socrata",
-      "watermark_col": "effectivedate",
-      "interval_seconds": 600.0,
+      "watermark_col": "",
+      "interval_seconds": 86400,
       "topic": "raw.municipal.sla"
     },
     "deeds": {

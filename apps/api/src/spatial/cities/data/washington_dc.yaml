@@ -575,58 +575,64 @@ datasets:
     non_spatial: null
     zip_member: null
   sla:
-    endpoint: https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/0
-    platform: arcgis
-    watermark_col: INITIALISSUEDATE
-    id_keys:
-    - CUSTOMERNUMBER
-    - GLOBALID
-    - OBJECTID
-    topic: raw.municipal.sla
-    interval_seconds: 600.0
-    producer_key: sla
-    endpoint_by_year: {}
-    watermark_type: null
-    watermark_format: null
-    watermark_exclude: []
-    order_by: null
-    id_col: null
-    select: null
-    fallback_endpoints: []
-    where: PREMISEINDC = 'Yes'
-    needs_geocode: true
-    geocode_context: Washington, DC
-    field_map:
-      license_id:
-      - CUSTOMERNUMBER
-      license_type:
-      - LICENSETYPE
-      effective_date:
-      - LICENSESTARTDATE
-      expiration_date:
-      - LICENSEENDDATE
-      borough:
-      - WARD
-      address_street:
-      - PREMISEADDRESS
-    ingestion_mode: incremental
-    oid_field: OBJECTID
-    max_record_count: 2000
-    expected_cadence_days: 7
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false
     companion_endpoints: {}
+    delimiter: null
+    endpoint: https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Public_Service_WebMercator/MapServer/33
+    endpoint_by_year: {}
+    expected_cadence_days: 1
+    fallback_endpoints: []
+    field_map:
+      address_street:
+      - ADDRESS
+      dba:
+      - NAME
+      effective_date:
+      - LICENSE_ISSUE_DATE
+      expiration_date:
+      - LICENSE_EXPIRATION_DATE
+      latitude:
+      - LATITUDE
+      license_id:
+      - LICENSE_NUMBER
+      license_type:
+      - LICENSE_TYPE
+      longitude:
+      - LONGITUDE
+      status:
+      - LICENSE_TYPE
+    geocode_context: null
+    id_col: null
+    id_keys:
+    - LICENSE_NUMBER
+    - OBJECTID
+    ingestion_mode: snapshot
+    interval_seconds: 86400
+    max_record_count: 1000
+    needs_geocode: false
+    non_spatial: null
+    oid_field: OBJECTID
+    order_by: null
+    parcel_join: {}
+    platform: arcgis
+    producer_key: sla
     proxy_for: null
     retention_days: null
     rolling_window_days: null
     rollover: null
+    select: null
     state_plane_crs: null
     state_plane_units: null
     state_plane_x_col: null
     state_plane_y_col: null
-    parcel_join: {}
-    non_spatial: null
+    topic: raw.municipal.sla
+    watermark_col: ''
+    watermark_exclude: []
+    watermark_format: null
+    watermark_type: null
+    where: null
     zip_member: null
   deeds:
     endpoint: https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Property_and_Land_WebMercator/FeatureServer/57

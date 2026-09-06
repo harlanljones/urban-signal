@@ -202,61 +202,68 @@ datasets:
     non_spatial: null
     zip_member: null
   sla:
-    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
-    platform: arcgis
-    watermark_col: ''
-    id_keys:
-    - Record_ID
-    - ObjectId
-    topic: raw.municipal.sla
-    interval_seconds: 1800.0
-    producer_key: sla
-    endpoint_by_year: {}
-    watermark_type: null
-    watermark_format: null
-    watermark_exclude: []
-    order_by: null
-    id_col: null
-    select: null
-    fallback_endpoints: []
-    where: State = 'TX'
-    needs_geocode: false
-    geocode_context: null
-    field_map:
-      license_id:
-      - Record_ID
-      license_type:
-      - Store_Type
-      dba:
-      - Store_Name
-      latitude:
-      - Latitude
-      longitude:
-      - Longitude
-      address_street:
-      - Store_Street_Address
-      borough:
-      - City
-      zipcode:
-      - Zip_Code
-    ingestion_mode: snapshot
-    oid_field: ObjectId
-    max_record_count: 1000
-    expected_cadence_days: 14
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false
     companion_endpoints: {}
+    delimiter: null
+    endpoint: https://data.texas.gov/resource/bc5r-88dy.json?$select=*, 'tx_ccl:' || type_of_issuance as license_type_ns, :updated_at
+    endpoint_by_year: {}
+    expected_cadence_days: 1
+    fallback_endpoints: []
+    field_map:
+      address_street:
+      - address_line
+      - location_address
+      borough:
+      - city
+      dba:
+      - operation_name
+      effective_date:
+      - issuance_date
+      latitude:
+      - location_address_geo.latitude
+      license_id:
+      - operation_id
+      license_type:
+      - license_type_ns
+      - type_of_issuance
+      longitude:
+      - location_address_geo.longitude
+      premises_name:
+      - administrator_director_name
+      status:
+      - operation_status
+    geocode_context: TX
+    id_col: null
+    id_keys:
+    - operation_id
+    - operation_number
+    ingestion_mode: incremental
+    interval_seconds: 86400
+    max_record_count: null
+    needs_geocode: true
+    non_spatial: null
+    oid_field: null
+    order_by: :updated_at DESC
+    parcel_join: {}
+    platform: socrata
+    producer_key: sla
     proxy_for: null
     retention_days: null
     rolling_window_days: null
     rollover: null
+    select: null
     state_plane_crs: null
     state_plane_units: null
     state_plane_x_col: null
     state_plane_y_col: null
-    parcel_join: {}
-    non_spatial: null
+    topic: raw.municipal.sla
+    watermark_col: :updated_at
+    watermark_exclude: []
+    watermark_format: null
+    watermark_type: null
+    where: county = 'TARRANT'
     zip_member: null
 aliases:
 - fort worth

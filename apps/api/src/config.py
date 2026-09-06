@@ -609,6 +609,32 @@ class Settings(BaseSettings):
         ),
         description="OR CCB active contractor licenses, namespaced license_type (US-372)",
     )
+    # US-377 state childcare licensing registries.
+    socrata_tx_hhsc_ccl_endpoint: str = Field(
+        default=(
+            "https://data.texas.gov/resource/bc5r-88dy.json"
+            "?$select=*, 'tx_ccl:' || type_of_issuance as license_type_ns, :updated_at"
+        ),
+        description="TX HHSC Child Care Licensing operations (US-377)",
+    )
+    socrata_ny_ocfs_endpoint: str = Field(
+        default=(
+            "https://data.ny.gov/resource/cb42-qumz.json"
+            "?$select=*, 'ny_ocfs:' || program_type as license_type_ns, trim(street_number || ' ' || street_name) as street_address_ns, :updated_at"
+        ),
+        description="NY OCFS child care facilities (US-377)",
+    )
+    socrata_nyc_dohmh_childcare_endpoint: str = Field(
+        default=(
+            "https://data.cityofnewyork.us/resource/gy3q-4tzp.json"
+            "?$select=*, 'nyc_cc:' || facility_type as license_type_ns"
+        ),
+        description="NYC DOHMH child care center inspections/permits (US-377)",
+    )
+    arcgis_dc_child_dev_endpoint: str = Field(
+        default="https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Public_Service_WebMercator/MapServer/33",
+        description="DC Child Development Centers (US-377)",
+    )
     # US-71: APD NIBRS Group A Offenses (Socrata `thrk-bqb6`). Rows carry no
     # lat/lng — only zip_code + census_block_group — so coordinates resolve from
     # the zip_code context via the ADR-0004 geocoder at parse time.

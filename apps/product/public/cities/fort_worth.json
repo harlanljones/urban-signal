@@ -101,9 +101,9 @@
     },
     "311": null,
     "sla": {
-      "platform": "arcgis",
-      "watermark_col": "",
-      "interval_seconds": 1800.0,
+      "platform": "socrata",
+      "watermark_col": ":updated_at",
+      "interval_seconds": 86400,
       "topic": "raw.municipal.sla"
     },
     "deeds": null
