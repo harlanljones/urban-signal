@@ -57,114 +57,88 @@ longitude, borough. Keyed to the FeedType *value* string ("sla") semantics of
 ``field_maps.resolve_field_map``.
 '''
 from typing import Any
-TX_HHSC_CCL_FIELD_MAP: dict[(str, list[str])] = {
-    'license_id': [
-        'operation_id'],
-    'license_type': [
-        'license_type_ns',
-        'type_of_issuance'],
-    'effective_date': [
-        'issuance_date'],
-    'premises_name': [
-        'administrator_director_name'],
-    'dba': [
-        'operation_name'],
-    'address_street': [
-        'address_line',
-        'location_address'],
-    'status': [
-        'operation_status'],
-    'latitude': [
-        'location_address_geo.latitude'],
-    'longitude': [
-        'location_address_geo.longitude'],
-    'borough': [
-        'city'] }
-NY_OCFS_FIELD_MAP: dict[(str, list[str])] = {
-    'license_id': [
-        'facility_id'],
-    'license_type': [
-        'license_type_ns',
-        'program_type'],
-    'effective_date': [
-        'license_issue_date'],
-    'expiration_date': [
-        'license_expiration_date'],
-    'premises_name': [
-        'provider_name'],
-    'dba': [
-        'facility_name'],
-    'address_street': [
-        'street_address_ns',
-        'street_name'],
-    'status': [
-        'facility_status'],
-    'latitude': [
-        'latitude'],
-    'longitude': [
-        'longitude'],
-    'borough': [
-        'county'] }
-NYC_DOHMH_FIELD_MAP: dict[(str, list[str])] = {
-    'license_id': [
-        'dcid'],
-    'license_type': [
-        'license_type_ns',
-        'facility_type'],
-    'dba': [
-        'program_name'],
-    'address_street': [
-        'address'],
-    'latitude': [
-        'latitude'],
-    'longitude': [
-        'longitude'],
-    'borough': [
-        'borough'] }
-DC_CHILD_DEV_FIELD_MAP: dict[(str, list[str])] = {
-    'license_id': [
-        'LICENSE_NUMBER'],
-    'license_type': [
-        'LICENSE_TYPE'],
-    'effective_date': [
-        'LICENSE_ISSUE_DATE'],
-    'expiration_date': [
-        'LICENSE_EXPIRATION_DATE'],
-    'dba': [
-        'NAME'],
-    'address_street': [
-        'ADDRESS'],
-    'status': [
-        'LICENSE_TYPE'],
-    'latitude': [
-        'LATITUDE'],
-    'longitude': [
-        'LONGITUDE'] }
-FIELD_MAPS: dict[(str, dict[(str, list[str])])] = {
+
+TX_HHSC_CCL_FIELD_MAP: dict[str, list[str]] = {
+    'license_id': ['operation_id'],
+    'license_type': ['license_type_ns', 'type_of_issuance'],
+    'effective_date': ['issuance_date'],
+    'premises_name': ['administrator_director_name'],
+    'dba': ['operation_name'],
+    'address_street': ['address_line', 'location_address'],
+    'status': ['operation_status'],
+    'latitude': ['location_address_geo.latitude'],
+    'longitude': ['location_address_geo.longitude'],
+    'borough': ['city'],
+}
+NY_OCFS_FIELD_MAP: dict[str, list[str]] = {
+    'license_id': ['facility_id'],
+    'license_type': ['license_type_ns', 'program_type'],
+    'effective_date': ['license_issue_date'],
+    'expiration_date': ['license_expiration_date'],
+    'premises_name': ['provider_name'],
+    'dba': ['facility_name'],
+    'address_street': ['street_address_ns', 'street_name'],
+    'status': ['facility_status'],
+    'latitude': ['latitude'],
+    'longitude': ['longitude'],
+    'borough': ['county'],
+}
+NYC_DOHMH_FIELD_MAP: dict[str, list[str]] = {
+    'license_id': ['dcid'],
+    'license_type': ['license_type_ns', 'facility_type'],
+    'dba': ['program_name'],
+    'address_street': ['address'],
+    'latitude': ['latitude'],
+    'longitude': ['longitude'],
+    'borough': ['borough'],
+}
+DC_CHILD_DEV_FIELD_MAP: dict[str, list[str]] = {
+    'license_id': ['LICENSE_NUMBER'],
+    'license_type': ['LICENSE_TYPE'],
+    'effective_date': ['LICENSE_ISSUE_DATE'],
+    'expiration_date': ['LICENSE_EXPIRATION_DATE'],
+    'dba': ['NAME'],
+    'address_street': ['ADDRESS'],
+    'status': ['LICENSE_TYPE'],
+    'latitude': ['LATITUDE'],
+    'longitude': ['LONGITUDE'],
+}
+FIELD_MAPS: dict[str, dict[str, list[str]]] = {
     'tx_hhsc_ccl': TX_HHSC_CCL_FIELD_MAP,
     'ny_ocfs': NY_OCFS_FIELD_MAP,
     'nyc_dohmh': NYC_DOHMH_FIELD_MAP,
-    'dc_child_dev': DC_CHILD_DEV_FIELD_MAP }
-STATUS_VOCABULARIES: dict[(str, dict[(str, str)])] = {
+    'dc_child_dev': DC_CHILD_DEV_FIELD_MAP,
+}
+STATUS_VOCABULARIES: dict[str, dict[str, str]] = {
     'tx_hhsc_ccl': {
         'Y': 'ACTIVE',
-        'N': 'INACTIVE' },
+        'N': 'INACTIVE',
+    },
     'ny_ocfs': {
         'License': 'ACTIVE',
         'Registration': 'ACTIVE',
         'Suspended': 'INACTIVE',
         'Pending Revocation': 'INACTIVE',
-        'Pending Revocation and Denial': 'INACTIVE' },
-    'nyc_dohmh': { },
+        'Pending Revocation and Denial': 'INACTIVE',
+    },
+    'nyc_dohmh': {},
     'dc_child_dev': {
         'Full License': 'ACTIVE',
         'Restricted': 'ACTIVE',
-        'Temporary Closure': 'INACTIVE' } }
-TX_TEMPORARILY_CLOSED_STATUS: dict[(str, str)] = {
+        'Temporary Closure': 'INACTIVE',
+    },
+}
+TX_TEMPORARILY_CLOSED_STATUS: dict[str, str] = {
     'YES': 'INACTIVE',
-    'NO': '' }
+    'NO': '',
+}
 
-def normalize_status(registry_key = None, raw_status = None, temporarily_closed = None):
+
+def normalize_status(
+    registry_key: str | None = None,
+    raw_status: str | None = None,
+    temporarily_closed: str | None = None,
+) -> str | None:
     """Map one registry's raw license status onto canonical ACTIVE/INACTIVE.
 
     NYC's active-only registry normalizes anything (including a missing
@@ -174,31 +148,51 @@ def normalize_status(registry_key = None, raw_status = None, temporarily_closed 
     """
     if registry_key == 'nyc_dohmh':
         return 'ACTIVE'
-# WARNING: Decompyle incomplete
+    if registry_key == 'tx_hhsc_ccl' and temporarily_closed:
+        if str(temporarily_closed).strip().upper() == 'YES':
+            return 'INACTIVE'
+    if raw_status is None:
+        return None
+    raw = str(raw_status).strip()
+    if not raw:
+        return None
+    vocab = STATUS_VOCABULARIES.get(registry_key, {})
+    return vocab.get(raw, raw)
 
-EXCLUDED_CARE_TYPES: dict[(str, set[str])] = {
-    'tx_hhsc_ccl': {
-        'Residential Treatment Center'} }
-EXCLUDED_OPERATION_TYPES: dict[(str, set[str])] = {
-    'tx_hhsc_ccl': {
-        'Child Placing Agency'} }
 
-def passes_care_filter(registry_key = None, row = None):
-    '''Keep rows whose care type is a center/home day-care program.
+EXCLUDED_CARE_TYPES: dict[str, set[str]] = {
+    'tx_hhsc_ccl': {
+        'Residential Treatment Center',
+    },
+}
+EXCLUDED_OPERATION_TYPES: dict[str, set[str]] = {
+    'tx_hhsc_ccl': {
+        'Child Placing Agency',
+    },
+}
+
+
+def passes_care_filter(
+    registry_key: str | None = None,
+    row: dict[str, Any] | None = None,
+) -> bool:
+    """Keep rows whose care type is a center/home day-care program.
 
     Only TX declares exclusions today; the other three registries pass every
     row. Missing care_type columns on non-TX registries are not exclusions.
-    '''
+    """
+    if not row:
+        return True
     excluded_care = EXCLUDED_CARE_TYPES.get(registry_key, set())
     if excluded_care:
-        if not row.get('care_type'):
-            row.get('care_type')
-        if str('').strip() in excluded_care:
+        care = row.get('care_type')
+        if care and str(care).strip() in excluded_care:
             return False
     excluded_operation = EXCLUDED_OPERATION_TYPES.get(registry_key, set())
     if excluded_operation:
-        excluded_operation
-        if not row.get('operation_type'):
-            row.get('operation_type')
-    return not (str('').strip() in excluded_operation)
+        operation = row.get('operation_type')
+        if operation and str(operation).strip() in excluded_operation:
+            return False
+    return True
+
 

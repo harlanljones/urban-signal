@@ -20,7 +20,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_santa_rosa import (
+from src.spatial.cities.santa_rosa import (
     CRIME_FIELD_MAP,
     DROPPED_PII_COLUMNS,
     FIELD_MAP,

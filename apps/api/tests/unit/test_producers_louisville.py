@@ -14,7 +14,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_louisville import FIELD_MAP
+from src.spatial.cities.louisville import FIELD_MAP
 from src.spatial.cities.louisville import (
     LOUISVILLE_DIVISION_BBOXES,
     LOUISVILLE_DIVISIONS,

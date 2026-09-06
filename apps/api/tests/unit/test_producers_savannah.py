@@ -36,7 +36,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_savannah import (
+from src.spatial.cities.savannah import (
     FIELD_MAP,
     GEOCODE_CONTEXT,
     PERMITS_FIELD_MAP,

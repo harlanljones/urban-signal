@@ -32,7 +32,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_anchorage import DEEDS_FIELD_MAP, FIELD_MAP
+from src.spatial.cities.anchorage import DEEDS_FIELD_MAP, FIELD_MAP
 from src.spatial.cities.anchorage import (
     ANCHORAGE_CENTER,
     ANCHORAGE_CITY_ID,

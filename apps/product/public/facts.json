@@ -407,8 +407,8 @@
         },
         {
           "platform": "socrata",
-          "watermark_col": "current_issued_date",
-          "interval_seconds": 600.0,
+          "watermark_col": ":updated_at",
+          "interval_seconds": 86400,
           "topic": "raw.municipal.sla"
         },
         null
@@ -837,8 +837,8 @@
         null,
         {
           "platform": "socrata",
-          "watermark_col": "issdttm",
-          "interval_seconds": 600.0,
+          "watermark_col": ":updated_at",
+          "interval_seconds": 86400,
           "topic": "raw.municipal.sla"
         },
         null
@@ -1351,9 +1351,9 @@
           "topic": "raw.municipal.311"
         },
         {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
+          "platform": "socrata",
+          "watermark_col": ":updated_at",
+          "interval_seconds": 86400,
           "topic": "raw.municipal.sla"
         },
         null
@@ -1581,9 +1581,9 @@
           "topic": "raw.municipal.311"
         },
         {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
+          "platform": "socrata",
+          "watermark_col": ":updated_at",
+          "interval_seconds": 86400,
           "topic": "raw.municipal.sla"
         },
         null
@@ -1751,9 +1751,9 @@
         },
         null,
         {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
+          "platform": "socrata",
+          "watermark_col": ":updated_at",
+          "interval_seconds": 86400,
           "topic": "raw.municipal.sla"
         },
         null
@@ -3492,8 +3492,8 @@
         },
         {
           "platform": "socrata",
-          "watermark_col": "effectivedate",
-          "interval_seconds": 600.0,
+          "watermark_col": "",
+          "interval_seconds": 86400,
           "topic": "raw.municipal.sla"
         },
         {
@@ -4236,9 +4236,9 @@
         null,
         null,
         {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
+          "platform": "socrata",
+          "watermark_col": ":updated_at",
+          "interval_seconds": 86400,
           "topic": "raw.municipal.sla"
         },
         {
@@ -4856,9 +4856,9 @@
         null,
         null,
         {
-          "platform": "arcgis",
-          "watermark_col": "RR_app_received",
-          "interval_seconds": 600.0,
+          "platform": "socrata",
+          "watermark_col": ":updated_at",
+          "interval_seconds": 86400,
           "topic": "raw.municipal.sla"
         },
         null
@@ -5342,8 +5342,8 @@
         },
         {
           "platform": "arcgis",
-          "watermark_col": "INITIALISSUEDATE",
-          "interval_seconds": 600.0,
+          "watermark_col": "",
+          "interval_seconds": 86400,
           "topic": "raw.municipal.sla"
         },
         {

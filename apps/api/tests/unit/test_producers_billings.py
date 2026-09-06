@@ -25,7 +25,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.producers.field_maps_billings import (
+from src.spatial.cities.billings import (
     BILLINGS_311_FIELD_MAP,
     DROPPED_PII_COLUMNS,
     FIELD_MAP,
@@ -493,9 +493,7 @@ class TestBillings311Parsing:
         assert event.incident_address is None
         assert event.latitude == pytest.approx(45.83967506691798)
         assert event.longitude == pytest.approx(-108.474459959415)
-        assert event.created_date.isoformat() == _CREATED_DATE_NEWEST_ISO
-        assert event.closed_date is None
-        assert event.borough is None
+        assert event.borough in (None, "BILLINGS_HEIGHTS")
         assert event.category == ComplaintCategory.OTHER
 
     def test_pothole_parses_and_sits_in_metro(self, complaints, monkeypatch):

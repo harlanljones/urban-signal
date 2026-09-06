@@ -38,7 +38,7 @@ import pytest
 
 from src.producers.acquisition import build_where, is_future_watermark
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_long_beach import (
+from src.spatial.cities.long_beach import (
     CRIME_FIELD_MAP,
     DROPPED_NONADDRESS_COLUMNS,
     DROPPED_PII_COLUMNS,

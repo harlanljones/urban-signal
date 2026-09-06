@@ -1222,47 +1222,61 @@ datasets:
     non_spatial: null
     zip_member: null
   sla:
-    endpoint: https://data.ny.gov/resource/9s3h-dpkz.json
-    platform: socrata
-    watermark_col: effectivedate
-    id_keys:
-    - licensepermitid
-    - legacyserialnumber
-    - serial_number
-    - id
-    topic: raw.municipal.sla
-    interval_seconds: 600.0
-    producer_key: sla
-    endpoint_by_year: {}
-    watermark_type: null
-    watermark_format: null
-    watermark_exclude: []
-    order_by: null
-    id_col: null
-    select: null
-    fallback_endpoints: []
-    where: null
-    needs_geocode: false
-    geocode_context: null
-    field_map: {}
-    ingestion_mode: incremental
-    oid_field: null
-    max_record_count: null
-    expected_cadence_days: 7
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false
     companion_endpoints: {}
+    delimiter: null
+    endpoint: https://data.cityofnewyork.us/resource/gy3q-4tzp.json?$select=*, 'nyc_cc:' || facility_type as license_type_ns
+    endpoint_by_year: {}
+    expected_cadence_days: 1
+    fallback_endpoints: []
+    field_map:
+      address_street:
+      - address
+      borough:
+      - borough
+      dba:
+      - program_name
+      latitude:
+      - latitude
+      license_id:
+      - dcid
+      license_type:
+      - license_type_ns
+      - facility_type
+      longitude:
+      - longitude
+    geocode_context: NY
+    id_col: null
+    id_keys:
+    - dcid
+    - permit_number
+    ingestion_mode: snapshot
+    interval_seconds: 86400
+    max_record_count: null
+    needs_geocode: true
+    non_spatial: null
+    oid_field: null
+    order_by: null
+    parcel_join: {}
+    platform: socrata
+    producer_key: sla
     proxy_for: null
     retention_days: null
     rolling_window_days: null
     rollover: null
+    select: null
     state_plane_crs: null
     state_plane_units: null
     state_plane_x_col: null
     state_plane_y_col: null
-    parcel_join: {}
-    non_spatial: null
+    topic: raw.municipal.sla
+    watermark_col: ''
+    watermark_exclude: []
+    watermark_format: null
+    watermark_type: null
+    where: null
     zip_member: null
   deeds:
     endpoint: https://data.cityofnewyork.us/resource/bnx9-e6tj.json

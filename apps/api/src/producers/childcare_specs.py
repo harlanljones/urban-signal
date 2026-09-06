@@ -40,52 +40,58 @@ TX_HHSC_CCL_ENDPOINT = "https://data.texas.gov/resource/bc5r-88dy.json?$select=*
 NY_OCFS_ENDPOINT = "https://data.ny.gov/resource/cb42-qumz.json?$select=*, 'ny_ocfs:' || program_type as license_type_ns, trim(street_number || ' ' || street_name) as street_address_ns, :updated_at"
 NYC_DOHMH_ENDPOINT = "https://data.cityofnewyork.us/resource/gy3q-4tzp.json?$select=*, 'nyc_cc:' || facility_type as license_type_ns"
 DC_CHILD_DEV_ENDPOINT = 'https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Public_Service_WebMercator/MapServer/33'
-TX_CCL_METRO_COUNTIES: dict[(str, str)] = {
+TX_CCL_METRO_COUNTIES: dict[str, str] = {
     'austin': 'TRAVIS',
     'dallas': 'DALLAS',
     'fort_worth': 'TARRANT',
-    'el_paso': 'EL PASO' }
-NY_OCFS_METRO_REGIONS: dict[(str, str)] = {
+    'el_paso': 'EL PASO',
+}
+NY_OCFS_METRO_REGIONS: dict[str, str] = {
     'buffalo': 'BRO',
     'rochester': 'RRO',
-    'syracuse': 'SRO' }
+    'syracuse': 'SRO',
+}
 
-def tx_hhsc_ccl_spec(county = None):
-    '''TX HHSC CCL operations for one county slice (Travis/Dallas/Tarrant/El Paso).'''
+
+def tx_hhsc_ccl_spec(county: str | None = None) -> dict:
+    """TX HHSC CCL operations for one county slice (Travis/Dallas/Tarrant/El Paso)."""
     return {
         'endpoint': TX_HHSC_CCL_ENDPOINT,
         'platform': 'socrata',
         'watermark_col': ':updated_at',
         'id_keys': [
             'operation_id',
-            'operation_number'],
+            'operation_number',
+        ],
         'topic': settings.topic_sla,
         'interval_seconds': 86400,
         'producer_key': 'sla',
         'expected_cadence_days': 1,
         'ingestion_mode': 'incremental',
-        'where': f'''county = \'{county}\'''',
+        'where': f"county = '{county}'",
         'needs_geocode': True,
         'geocode_context': 'TX',
         'order_by': ':updated_at DESC',
-        'field_map': TX_HHSC_CCL_FIELD_MAP }
+        'field_map': TX_HHSC_CCL_FIELD_MAP,
+    }
 
 
-def ny_ocfs_spec(region_code = None):
-    '''NY OCFS facilities, upstate + state context (NYC excluded server-side).
+def ny_ocfs_spec(region_code: str | None = None) -> dict:
+    """NY OCFS facilities, upstate + state context (NYC excluded server-side).
 
     Pass an OCFS regional-office code (BRO/RRO/SRO/ARO/LIRO/YRO) for a
     per-city slice; the default keeps every non-NYC region.
-    '''
+    """
     where = "region_code != 'NYCDOH'"
     if region_code:
-        where += f''' AND region_code = \'{region_code}\''''
+        where += f" AND region_code = '{region_code}'"
     return {
         'endpoint': NY_OCFS_ENDPOINT,
         'platform': 'socrata',
         'watermark_col': ':updated_at',
         'id_keys': [
-            'facility_id'],
+            'facility_id',
+        ],
         'topic': settings.topic_sla,
         'interval_seconds': 86400,
         'producer_key': 'sla',
@@ -95,7 +101,9 @@ def ny_ocfs_spec(region_code = None):
         'needs_geocode': True,
         'geocode_context': 'NY',
         'order_by': ':updated_at DESC',
-        'field_map': NY_OCFS_FIELD_MAP }
+        'field_map': NY_OCFS_FIELD_MAP,
+    }
+
 
 NYC_DOHMH_SPEC: dict = {
     'endpoint': NYC_DOHMH_ENDPOINT,
@@ -103,7 +111,8 @@ NYC_DOHMH_SPEC: dict = {
     'watermark_col': '',
     'id_keys': [
         'dcid',
-        'permit_number'],
+        'permit_number',
+    ],
     'topic': settings.topic_sla,
     'interval_seconds': 86400,
     'producer_key': 'sla',
@@ -111,14 +120,16 @@ NYC_DOHMH_SPEC: dict = {
     'ingestion_mode': 'snapshot',
     'needs_geocode': True,
     'geocode_context': 'NY',
-    'field_map': NYC_DOHMH_FIELD_MAP }
+    'field_map': NYC_DOHMH_FIELD_MAP,
+}
 DC_CHILD_DEV_SPEC: dict = {
     'endpoint': DC_CHILD_DEV_ENDPOINT,
     'platform': 'arcgis',
     'watermark_col': '',
     'id_keys': [
         'LICENSE_NUMBER',
-        'OBJECTID'],
+        'OBJECTID',
+    ],
     'topic': settings.topic_sla,
     'interval_seconds': 86400,
     'producer_key': 'sla',
@@ -127,7 +138,9 @@ DC_CHILD_DEV_SPEC: dict = {
     'oid_field': 'OBJECTID',
     'max_record_count': 1000,
     'needs_geocode': False,
-    'field_map': DC_CHILD_DEV_FIELD_MAP }
-CHILD_CARE_SPECS: dict[(str, dict)] = {
+    'field_map': DC_CHILD_DEV_FIELD_MAP,
+}
+CHILD_CARE_SPECS: dict[str, dict] = {
     'nyc_dohmh': NYC_DOHMH_SPEC,
-    'dc_child_dev': DC_CHILD_DEV_SPEC }
+    'dc_child_dev': DC_CHILD_DEV_SPEC,
+}

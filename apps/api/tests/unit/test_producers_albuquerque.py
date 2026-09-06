@@ -24,7 +24,7 @@ import pytest
 from src.producers.csv_client import CSVClient, _normalize_header, _row_matches
 from src.producers.dob_permits_producer import _parse_datetime
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_albuquerque import FIELD_MAP, GEOCODE_CONTEXT
+from src.spatial.cities.albuquerque import FIELD_MAP, GEOCODE_CONTEXT
 from src.spatial.cities.albuquerque import (
     ALBUQUERQUE_CITY_ID,
     ALBUQUERQUE_DIVISION_BBOXES,

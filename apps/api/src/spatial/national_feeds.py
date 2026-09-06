@@ -40,6 +40,7 @@ class NationalFeed(str, Enum):
     EV_CHARGING = "ev_charging"
     SBA_LOAN = "sba_loan"
     BANK_BRANCH = "bank_branch"
+    NPPES_MEDICAL = "nppes_medical"
 
 
 @dataclass
@@ -200,6 +201,22 @@ NATIONAL_FEEDS: Dict[NationalFeed, NationalFeedSpec] = {
             "FDIC BankFind full-service brick-and-mortar branches (SERVTYPE=11). "
             "Openings use ESTYMD; closures are detection-dated from snapshot diff. "
             "Latest-year SOD DEPSUMBR is attached as annual deposit context."
+        ),
+    ),
+    NationalFeed.NPPES_MEDICAL: NationalFeedSpec(
+        feed=NationalFeed.NPPES_MEDICAL,
+        endpoint="https://download.cms.gov/nppes/NPI_Files.html",
+        platform="csv",
+        topic=settings.topic_sla,
+        producer_key="nppes",
+        id_keys=["NPI"],
+        ingestion_mode="diff",
+        interval_seconds=7 * 86400.0,
+        expected_cadence_days=7,
+        notes=(
+            "NPPES weekly incremental diffs (V.2). Rows are keyed by "
+            "(NPI, normalized practice address) to capture relocations "
+            "as close/open pairs. Emits SLALicenseEvent records to topic_sla."
         ),
     ),
 }

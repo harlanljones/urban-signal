@@ -30,7 +30,7 @@ import pytest
 
 from src.producers.acquisition import build_where, is_future_watermark
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_tucson import (
+from src.spatial.cities.tucson import (
     DROPPED_NONADDRESS_COLUMNS,
     FIELD_MAP,
     GEOCODE_CONTEXT,
