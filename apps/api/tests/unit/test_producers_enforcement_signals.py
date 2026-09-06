@@ -234,7 +234,7 @@ def test_phoenix_registers_deeds_csv():
 
 
 def test_maricopa_field_map_targets():
-    from src.producers.field_maps_maricopa_deeds import MARICOPA_DEEDS_FIELD_MAP
+    from src.spatial.cities.phoenix import MARICOPA_DEEDS_FIELD_MAP
 
     assert MARICOPA_DEEDS_FIELD_MAP["doc_id"] == ["DEEDNUMBER", "PARCELNUMBER"]
     assert MARICOPA_DEEDS_FIELD_MAP["document_amount"] == ["SALEPRICE"]

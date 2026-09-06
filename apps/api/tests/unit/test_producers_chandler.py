@@ -33,7 +33,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_chandler import (
+from src.spatial.cities.chandler import (
     DROPPED_PII_COLUMNS,
     FIELD_MAP,
     GEOCODE_CONTEXT,

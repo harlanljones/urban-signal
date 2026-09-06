@@ -7,7 +7,7 @@ arm's-length helpers must behave correctly.
 
 import pytest
 
-from src.producers import field_maps_asheville_deeds as maps
+from src.producers import asheville_deeds_spec as maps
 from src.producers.asheville_deeds_spec import ASHEVILLE_DEEDS_SPEC
 from src.spatial.city_registry import DatasetSpec
 

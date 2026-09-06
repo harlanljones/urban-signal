@@ -16,7 +16,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_tampa import FIELD_MAP, SLA_FIELD_MAP
+from src.spatial.cities.tampa import FIELD_MAP, SLA_FIELD_MAP
 from src.spatial.cities.tampa import (
     TAMPA_CITY_ID,
     TAMPA_DIVISION_BBOXES,

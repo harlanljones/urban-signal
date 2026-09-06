@@ -32,7 +32,7 @@ import pytest
 
 from src.producers.acquisition import build_where, is_future_watermark
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_scottsdale import (
+from src.spatial.cities.scottsdale import (
     DROPPED_NONADDRESS_COLUMNS,
     DROPPED_PII_COLUMNS,
     FIELD_MAP,

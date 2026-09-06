@@ -25,7 +25,21 @@ from typing import Dict
 
 from src.config import settings
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
-from src.producers.field_maps_austin_tabc import FIELD_MAP as _TABC_FIELD_MAPS
+
+TABC_SLA_FIELD_MAP: dict[str, list[str]] = {
+    "license_id": ["license_id"],
+    "license_type": ["license_type"],
+    "effective_date": ["current_issued_date"],
+    "expiration_date": ["expiration_date"],
+    "premises_name": ["owner"],
+    "dba": ["trade_name"],
+    "address_street": ["address"],
+    "status": ["license_status"],
+}
+
+FIELD_MAP: dict[str, dict[str, list[str]]] = {
+    "sla": TABC_SLA_FIELD_MAP,
+}
 
 # Greater Austin metro bounding box: Travis County plus the Round Rock /
 # Pflugerville growth corridor to the north. Both registered feeds are
@@ -419,7 +433,7 @@ AUSTIN_TABC_SLA_SPEC: Dict[str, object] = {
         "needs_geocode": True,
         "geocode_context": "TX",
         "where": "county = 'Travis'",
-        "field_map": _TABC_FIELD_MAPS["sla"],
+        "field_map": TABC_SLA_FIELD_MAP,
     },
 }
 

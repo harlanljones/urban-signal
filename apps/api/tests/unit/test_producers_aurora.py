@@ -22,7 +22,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_aurora import (
+from src.spatial.cities.aurora import (
     FIELD_MAP,
     GEOCODE_CONTEXT,
     PERMITS_FIELD_MAP,

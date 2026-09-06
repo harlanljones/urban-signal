@@ -47,7 +47,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_bowling_green import (
+from src.spatial.cities.bowling_green import (
     BOWLING_GREEN_PERMITS_FIELD_MAP,
     FIELD_MAP,
     GEOCODE_CONTEXT,

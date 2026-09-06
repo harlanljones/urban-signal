@@ -134,6 +134,8 @@ BOSTON_LICENSING_BOARD_FEED: dict[str, object] = {
     },
 }
 
+FIELD_MAP: dict[str, list[str]] = BOSTON_LICENSING_BOARD_FEED["field_map"]
+
 
 from src.spatial.registration import SpatialRegistration
 

@@ -17,7 +17,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_el_paso import FIELD_MAP
+from src.spatial.cities.el_paso import FIELD_MAP
 from src.spatial.cities.el_paso import (
     EL_PASO_DIVISION_BBOXES,
     EL_PASO_DIVISIONS,

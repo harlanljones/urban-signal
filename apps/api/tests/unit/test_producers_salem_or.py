@@ -24,7 +24,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_salem_or import (
+from src.spatial.cities.salem_or import (
     FIELD_MAP,
     GEOCODE_CONTEXT,
     PERMITS_FIELD_MAP,

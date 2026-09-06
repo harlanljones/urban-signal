@@ -35,6 +35,8 @@ def test_boston_registers_ckan_feeds_and_no_sales_feed():
         FeedType.SLA,
         FeedType.DEEDS,
         FeedType.CRIME,
+        FeedType.INSPECTIONS,
+        FeedType.VIOLATIONS,
     }
     assert REGISTRY[city].datasets[FeedType.PERMITS].platform == "ckan"
     # Licensing Board (04dc653b) fails G5 by construction: gpsx/gpsy are

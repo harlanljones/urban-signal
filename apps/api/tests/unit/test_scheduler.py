@@ -68,25 +68,23 @@ def test_exponential_backoff_tracker():
     assert tracker.current_backoff == 0.0
 
 
+from unittest.mock import MagicMock, patch
+
 @pytest.fixture
 def mock_scheduler():
     mock_dlq = MagicMock()
-    scheduler = MunicipalIngestionScheduler(
-        dlq_producer=mock_dlq,
-        rate_limit_delay_seconds=0.0,
-        dedup_capacity=1000,
-    )
-    # Mock individual producers' Kafka producers to prevent socket calls
-    for p in scheduler.producers.values():
-        p.producer = MagicMock()
-        # The registry now contains ArcGIS, CARTO, CKAN, and CSV feeds in
-        # addition to the original Socrata jobs.  Keep this unit fixture
-        # network-free for every supported platform selected by
-        # _paginating_client_for().
-        for client_name in ("socrata", "arcgis", "carto", "ckan", "csv"):
-            client = getattr(p, client_name, None)
-            if client is not None:
-                client.paginate = MagicMock(return_value=[])
+    with patch("src.producers.base_producer.BaseKafkaProducer"):
+        scheduler = MunicipalIngestionScheduler(
+            dlq_producer=mock_dlq,
+            rate_limit_delay_seconds=0.0,
+            dedup_capacity=1000,
+        )
+        for p in scheduler.producers.values():
+            p.producer = MagicMock()
+            for client_name in ("socrata", "arcgis", "carto", "ckan", "csv"):
+                client = getattr(p, client_name, None)
+                if client is not None:
+                    client.paginate = MagicMock(return_value=[])
     return scheduler
 
 

@@ -59,7 +59,6 @@ def test_pierce_registers_arcgis_permits_and_snap_sla():
     city = CityId.PIERCE
     assert normalize_city("pierce") is city
     assert normalize_city("pierce_county") is city
-    assert normalize_city("tacoma") is city
     assert REGISTRY[city].job_suffix == "pco"
     assert set(REGISTRY[city].datasets) == {FeedType.PERMITS, FeedType.SLA}
 

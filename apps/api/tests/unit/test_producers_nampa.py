@@ -26,7 +26,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.producers.field_maps_nampa import (
+from src.spatial.cities.nampa import (
     DROPPED_PII_COLUMNS,
     FIELD_MAP,
     GEOCODE_CONTEXT,
