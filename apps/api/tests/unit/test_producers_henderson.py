@@ -17,7 +17,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_henderson import (
+from src.spatial.cities.henderson import (
     DROPPED_PII_COLUMNS,
     FIELD_MAP,
     GEOCODE_CONTEXT,

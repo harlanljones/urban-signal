@@ -12,7 +12,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_memphis import (
+from src.spatial.cities.memphis import (
     COMPLAINTS_311_FIELD_MAP,
     DROPPED_PII_COLUMNS,
     FIELD_MAP,

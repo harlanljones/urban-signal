@@ -16,7 +16,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_miami_dade import (
+from src.spatial.cities.miami_dade import (
     DEEDS_FIELD_MAP,
     FIELD_MAP,
     GEOCODE_CONTEXT,

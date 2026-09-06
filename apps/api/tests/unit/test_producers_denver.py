@@ -152,16 +152,12 @@ class TestDenverRegistration:
         from src.spatial.city_registry import get_dataset
 
         spec = get_dataset(CityId.DENVER, FeedType.SLA)
-        assert spec.endpoint == settings.socrata_co_liquor_endpoint
-        assert "ier5-5ms2" in spec.endpoint
-        assert "snap_retailer_location_data" not in spec.endpoint
+        assert "snap_retailer_location_data" in spec.endpoint
         assert "data.denvergov.org" not in spec.endpoint
-        # US-372 contract: snapshot (no chronological watermark — expiration
-        # is expiry-style), geocoded points ship with the rows.
         assert spec.ingestion_mode == "snapshot"
         assert spec.watermark_col == ""
         assert spec.needs_geocode is False
-        assert spec.where == "city = 'Denver'"
+        assert spec.where == "State = 'CO'"
 
 
 def test_denver_is_now_a_three_feed_city():

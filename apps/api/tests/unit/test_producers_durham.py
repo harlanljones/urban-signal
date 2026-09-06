@@ -20,7 +20,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.producers.field_maps_durham import FIELD_MAP as DURHAM_FIELD_MAP
+from src.spatial.cities.durham import FIELD_MAP as DURHAM_FIELD_MAP
 from src.producers.field_maps import first_mapped
 from src.spatial.cities.durham import (
     DURHAM_DEEDS_SPEC,

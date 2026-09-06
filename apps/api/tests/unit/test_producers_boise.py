@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.producers.field_maps_boise import FIELD_MAP as BOISE_PERMITS_FIELD_MAP
+from src.spatial.cities.boise import FIELD_MAP as BOISE_PERMITS_FIELD_MAP
 from src.spatial.cities.boise import (
     BOISE_DIVISION_BBOXES,
     BOISE_DIVISIONS,

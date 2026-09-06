@@ -18,7 +18,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_las_vegas import FIELD_MAP
+from src.spatial.cities.las_vegas import FIELD_MAP
 from src.spatial.cities.las_vegas import (
     LAS_VEGAS_DIVISION_BBOXES,
     LAS_VEGAS_DIVISIONS,

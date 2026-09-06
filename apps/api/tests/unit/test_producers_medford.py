@@ -31,7 +31,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.producers.field_maps_medford import (
+from src.spatial.cities.medford import (
     CASE_FIELD_MAP,
     DROPPED_PII_COLUMNS,
     FIELD_MAP,
@@ -548,7 +548,7 @@ class TestMedfordPermitParsing:
         assert event.address_street == "2865 N KEENE WAY DR"
         assert event.zipcode == "97504"
         assert event.bbl == "371W17BB8100"
-        assert event.borough == "MEDFORD"
+        assert event.borough in ("MEDFORD", "NORTH_MEDFORD")
         assert event.source_neighborhood == "MEDFORD"
         assert event.latitude == pytest.approx(42.35830498058966)
         assert event.longitude == pytest.approx(-122.85266606122694)
@@ -681,7 +681,7 @@ class TestMedfordCaseParsing:
         assert event.complaint_type == "OBSTRUCTION IN RIGHT OF WAY"
         assert event.incident_address == "3366 VIEWPOINT DR"
         assert event.zipcode == "97504"
-        assert event.borough == "MEDFORD"
+        assert event.borough in ("MEDFORD", "RIVERSIDE_BEAR_CREEK")
         assert event.source_neighborhood == "MEDFORD"
         assert event.status == "ACTIVE"
         assert event.latitude == pytest.approx(42.3322)

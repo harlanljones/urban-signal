@@ -32,7 +32,7 @@ import h3
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_oxnard_ventura import (
+from src.spatial.cities.oxnard_ventura import (
     COMPLAINTS_311_FIELD_MAP,
     CRIME_FIELD_MAP,
     DROPPED_NONADDRESS_COLUMNS,
