@@ -436,6 +436,8 @@ SAN_JOSE_FIELD_MAPS: Dict[str, Dict[str, list[str]]] = {
     "311": SAN_JOSE_311_FIELD_MAP,
 }
 
+FIELD_MAP = SAN_JOSE_FIELD_MAPS
+GEOCODE_CONTEXT = "San Jose, CA"
 
 from src.spatial.registration import SpatialRegistration
 

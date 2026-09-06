@@ -25,3 +25,4 @@ This PR completes Linear ticket US-374 by wiring the weekly NPPES (National Plan
 - `pytest apps/api/tests/unit/test_nppes_diff_producer.py apps/api/tests/unit/test_gbfs_and_national_feeds.py apps/api/tests/unit/test_scheduler_national_feeds.py`: 54/54 passed.
 - `pytest -m interlock`: 35/35 passed.
 - `python3 scripts/verify_cicd_preflight.py`: All 6 gates passed (interlock, dashboard ↔ product cross-ref, product facts check, product lint, dashboard export, ruff check).
+

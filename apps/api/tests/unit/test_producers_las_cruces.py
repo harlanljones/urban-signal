@@ -27,7 +27,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_las_cruces import (
+from src.spatial.cities.las_cruces import (
     BUSREG_FIELD_MAP,
     DROPPED_PII_COLUMNS,
     FIELD_MAP,

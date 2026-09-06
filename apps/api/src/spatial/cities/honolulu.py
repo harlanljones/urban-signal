@@ -481,6 +481,10 @@ HONOLULU_FIELD_MAPS: Dict[str, Dict[str, list[str]]] = {
     "311": HONOLULU_311_FIELD_MAP,
 }
 
+FIELD_MAP = HONOLULU_FIELD_MAPS
+GEOCODE_CONTEXT = HONOLULU_GEOCODE_CONTEXT
+
+
 
 from src.spatial.registration import SpatialRegistration
 

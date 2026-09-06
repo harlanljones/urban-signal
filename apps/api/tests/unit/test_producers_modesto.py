@@ -30,7 +30,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_modesto import (
+from src.spatial.cities.modesto import (
     DROPPED_NONADDRESS_COLUMNS,
     FIELD_MAP,
     GEOCODE_CONTEXT,

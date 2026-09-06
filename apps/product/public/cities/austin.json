@@ -282,8 +282,8 @@
     },
     "sla": {
       "platform": "socrata",
-      "watermark_col": "current_issued_date",
-      "interval_seconds": 600.0,
+      "watermark_col": ":updated_at",
+      "interval_seconds": 86400,
       "topic": "raw.municipal.sla"
     },
     "deeds": null

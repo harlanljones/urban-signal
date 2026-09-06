@@ -28,7 +28,7 @@ import h3
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_bozeman import (
+from src.spatial.cities.bozeman import (
     CRIME_FIELD_MAP,
     DROPPED_NONADDRESS_COLUMNS,
     FIELD_MAP,

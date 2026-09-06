@@ -13,7 +13,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.producers.field_maps_boston_licensing import FIELD_MAP
+from src.spatial.cities.boston import FIELD_MAP
 from src.spatial.cities.boston import (
     BOSTON_DIVISION_BBOXES,
     BOSTON_DIVISIONS,

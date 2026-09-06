@@ -35,7 +35,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_inland_empire import (
+from src.spatial.cities.inland_empire import (
     CRIME_FIELD_MAP,
     DROPPED_NOISE_COLUMNS,
     FIELD_MAP,

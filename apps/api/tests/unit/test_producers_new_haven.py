@@ -26,7 +26,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_new_haven import (
+from src.spatial.cities.new_haven import (
     DEEDS_FIELD_MAP,
     DEEDS_NEVER_CANDIDATE_COLUMNS,
     FIELD_MAP,

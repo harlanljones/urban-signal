@@ -20,7 +20,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_buffalo import (
+from src.spatial.cities.buffalo import (
     FIELD_MAP,
     NEVER_CANDIDATE_COLUMNS,
     SLA_FIELD_MAP,

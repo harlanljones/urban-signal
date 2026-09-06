@@ -331,8 +331,8 @@
     },
     "sla": {
       "platform": "arcgis",
-      "watermark_col": "INITIALISSUEDATE",
-      "interval_seconds": 600.0,
+      "watermark_col": "",
+      "interval_seconds": 86400,
       "topic": "raw.municipal.sla"
     },
     "deeds": {

@@ -1,6 +1,6 @@
 """Contract tests for Milwaukee's live US-220 CKAN supplementation leaf."""
 
-from src.producers.field_maps_milwaukee_supplemental import FIELD_MAP
+from src.spatial.cities.milwaukee import MILWAUKEE_SUPPLEMENTAL_FIELD_MAP as FIELD_MAP
 from src.spatial.cities.milwaukee import (
     MILWAUKEE_SUPPLEMENTAL_FEED_SPECS,
     MILWAUKEE_SUPPLEMENTAL_NOT_VIABLE,

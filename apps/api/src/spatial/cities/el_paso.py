@@ -77,6 +77,17 @@ EL_PASO_DIVISIONS: dict[str, BoroughMeta] = {
 }
 
 
+EL_PASO_311_FIELD_MAP: dict[str, list[str]] = {
+    "incident_id": ["id", "request_id", "OBJECTID"],
+    "created_date": ["created_at"],
+    "status": ["status"],
+    "complaint_type": ["request_type", "request_category"],
+    "incident_address": ["address"],
+    "borough": ["district"],
+}
+
+FIELD_MAP: dict[str, list[str]] = EL_PASO_311_FIELD_MAP
+
 from src.spatial.registration import SpatialRegistration
 
 REGISTRATION = SpatialRegistration(
@@ -86,3 +97,4 @@ REGISTRATION = SpatialRegistration(
     divisions=EL_PASO_DIVISIONS,
     contains=is_in_el_paso_metro,
 )
+
