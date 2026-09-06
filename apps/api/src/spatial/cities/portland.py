@@ -337,6 +337,11 @@ PORTLAND_FEED_SPECS: Dict[str, Dict[str, object]] = {
 }
 
 
+FIELD_MAP = {
+    "permits": PORTLAND_PERMITS_FIELD_MAP,
+    "sla": PORTLAND_SLA_FIELD_MAP,
+}
+
 from src.spatial.registration import SpatialRegistration
 
 REGISTRATION = SpatialRegistration(

@@ -19,7 +19,7 @@ import h3
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_omaha import (
+from src.spatial.cities.omaha import (
     COMPLAINTS_311_FIELD_MAP,
     DROPPED_PII_COLUMNS,
     FIELD_MAP,

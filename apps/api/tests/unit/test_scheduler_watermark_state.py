@@ -1,7 +1,7 @@
 """US-106: durable scheduler watermark state (save/load roundtrip, guards)."""
 
 import json
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -11,10 +11,11 @@ from src.producers.scheduler import MunicipalIngestionScheduler
 
 @pytest.fixture(scope="module")
 def scheduler() -> MunicipalIngestionScheduler:
-    sched = MunicipalIngestionScheduler(dlq_producer=MagicMock(), rate_limit_delay_seconds=0.0)
-    for p in sched.producers.values():
-        p.producer = MagicMock()
-    return sched
+    with patch("src.producers.base_producer.BaseKafkaProducer"):
+        sched = MunicipalIngestionScheduler(dlq_producer=MagicMock(), rate_limit_delay_seconds=0.0)
+        for p in sched.producers.values():
+            p.producer = MagicMock()
+        return sched
 
 
 def test_save_then_load_roundtrip(scheduler, tmp_path, monkeypatch):

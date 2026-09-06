@@ -41,6 +41,8 @@ _CENTROIDS_PATH = Path(__file__).resolve().parent / "data" / "calenviroscreen_tr
 
 def _load_centroids() -> dict[str, tuple[float, float]]:
     """Load the tract→centroid lookup from the bundled JSON."""
+    if not _CENTROIDS_PATH.exists():
+        return {}
     with open(_CENTROIDS_PATH, encoding="utf-8") as fh:
         raw: dict[str, list[float]] = json.load(fh)
     return {tract: (lat, lng) for tract, (lat, lng) in raw.items()}

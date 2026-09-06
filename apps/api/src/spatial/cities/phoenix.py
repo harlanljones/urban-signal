@@ -28,6 +28,23 @@ SLA_FIELD_MAP = {
     "borough": ["PROPERTY_CITY_STATE"],
 }
 
+MARICOPA_DEEDS_FIELD_MAP: dict[str, list[str]] = {
+    "doc_id": ["DEEDNUMBER", "PARCELNUMBER"],
+    "bbl": ["PARCELNUMBER"],
+    "doc_type": ["DEEDTYPE"],
+    "document_amount": ["SALEPRICE"],
+    "recorded_date": ["DEEDDATE_MMDDYYYY"],
+    "sale_date": ["SALEDATE_MMYYYY"],
+    "address_street": ["SITUSADDRESS"],
+    "borough": ["SITUSCITY"],
+    "zipcode": ["SITUSZIP"],
+    "party1_grantor": ["GRANTOROWNERNAME"],
+    "party2_grantee": ["GRANTEEOWNERNAME"],
+    "status": ["DEEDSTATUS"],
+}
+
+DEEDS_FIELD_MAP = MARICOPA_DEEDS_FIELD_MAP
+
 FIELD_MAP = {
     "permits": PERMITS_FIELD_MAP,
     "sla": SLA_FIELD_MAP,

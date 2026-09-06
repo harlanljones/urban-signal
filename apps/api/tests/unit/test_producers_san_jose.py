@@ -24,7 +24,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_san_jose import FIELD_MAP, GEOCODE_CONTEXT
+from src.spatial.cities.san_jose import FIELD_MAP, GEOCODE_CONTEXT
 from src.spatial.cities.san_jose import (
     SAN_JOSE_311_FIELD_MAP,
     SAN_JOSE_DIVISION_BBOXES,

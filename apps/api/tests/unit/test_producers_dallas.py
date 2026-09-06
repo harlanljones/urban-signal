@@ -12,7 +12,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_dallas import DALLAS_311_FIELD_MAP, DALLAS_FIELD_MAP, FIELD_MAP
+from src.spatial.cities.dallas import DALLAS_311_FIELD_MAP, DALLAS_FIELD_MAP, FIELD_MAP
 from src.spatial.cities.dallas import (
     DALLAS_DIVISION_BBOXES,
     DALLAS_DIVISIONS,

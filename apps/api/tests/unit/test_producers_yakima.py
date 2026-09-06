@@ -26,7 +26,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_yakima import (
+from src.spatial.cities.yakima import (
     DROPPED_PII_COLUMNS,
     FIELD_MAP,
     GEOCODE_CONTEXT,

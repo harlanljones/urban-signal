@@ -46,7 +46,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_tallahassee import (
+from src.spatial.cities.tallahassee import (
     COMPLAINTS_311_FIELD_MAP,
     DEEDS_FIELD_MAP,
     FIELD_MAP,
