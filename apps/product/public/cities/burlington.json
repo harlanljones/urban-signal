@@ -1,0 +1,203 @@
+{
+  "schema_version": 2,
+  "id": "burlington",
+  "name": "Burlington",
+  "state": "VT",
+  "center": {
+    "lat": 44.4759,
+    "lng": -73.2121
+  },
+  "metro_bbox": {
+    "min_lat": 44.41,
+    "max_lat": 44.55,
+    "min_lng": -73.3,
+    "max_lng": -73.13
+  },
+  "divisions": {
+    "DOWNTOWN": {
+      "name": "DOWNTOWN",
+      "center": {
+        "lat": 44.476,
+        "lng": -73.2121
+      },
+      "bbox": {
+        "min_lat": 44.46,
+        "max_lat": 44.49,
+        "min_lng": -73.225,
+        "max_lng": -73.195
+      },
+      "submarkets": [
+        "Church Street Marketplace",
+        "Waterfront"
+      ]
+    },
+    "SOUTH_END": {
+      "name": "SOUTH_END",
+      "center": {
+        "lat": 44.445,
+        "lng": -73.212
+      },
+      "bbox": {
+        "min_lat": 44.42,
+        "max_lat": 44.46,
+        "min_lng": -73.23,
+        "max_lng": -73.19
+      },
+      "submarkets": [
+        "South End Arts District"
+      ]
+    },
+    "NEW_NORTH_END": {
+      "name": "NEW_NORTH_END",
+      "center": {
+        "lat": 44.495,
+        "lng": -73.2
+      },
+      "bbox": {
+        "min_lat": 44.49,
+        "max_lat": 44.53,
+        "min_lng": -73.22,
+        "max_lng": -73.185
+      },
+      "submarkets": [
+        "University of Vermont"
+      ]
+    },
+    "OLD_NORTH_END": {
+      "name": "OLD_NORTH_END",
+      "center": {
+        "lat": 44.485,
+        "lng": -73.178
+      },
+      "bbox": {
+        "min_lat": 44.47,
+        "max_lat": 44.5,
+        "min_lng": -73.19,
+        "max_lng": -73.16
+      },
+      "submarkets": [
+        "Old North End"
+      ]
+    },
+    "WEST_ROOT": {
+      "name": "WEST_ROOT",
+      "center": {
+        "lat": 44.45,
+        "lng": -73.26
+      },
+      "bbox": {
+        "min_lat": 44.43,
+        "max_lat": 44.47,
+        "min_lng": -73.28,
+        "max_lng": -73.24
+      },
+      "submarkets": [
+        "Riverside"
+      ]
+    },
+    "EAST_HILL": {
+      "name": "EAST_HILL",
+      "center": {
+        "lat": 44.47,
+        "lng": -73.15
+      },
+      "bbox": {
+        "min_lat": 44.45,
+        "max_lat": 44.49,
+        "min_lng": -73.16,
+        "max_lng": -73.14
+      },
+      "submarkets": [
+        "Hill Section",
+        "Prospect Park"
+      ]
+    }
+  },
+  "submarkets": {
+    "Church Street Marketplace": {
+      "name": "Church Street Marketplace",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 44.4766,
+        "lng": -73.2121
+      },
+      "description": "The pedestrian mall CBD with mixed-use conversions, the Burlington anchor retail corridor, and the city's densest downtown pipeline."
+    },
+    "Waterfront": {
+      "name": "Waterfront",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 44.475,
+        "lng": -73.218
+      },
+      "description": "The Lake Champlain waterfront boardwalk and former industrial parcels with hospitality and mixed-use redevelopment flow."
+    },
+    "South End Arts District": {
+      "name": "South End Arts District",
+      "division": "SOUTH_END",
+      "center": {
+        "lat": 44.445,
+        "lng": -73.212
+      },
+      "description": "The Pine Street arts-and-light-industrial district with maker-space conversions and steady studio/loft turnover."
+    },
+    "University of Vermont": {
+      "name": "University of Vermont",
+      "division": "NEW_NORTH_END",
+      "center": {
+        "lat": 44.495,
+        "lng": -73.2
+      },
+      "description": "The UVM / Trinity campus corridor with student-housing conversions, lab retrofits, and high-turnover rental stock."
+    },
+    "Old North End": {
+      "name": "Old North End",
+      "division": "OLD_NORTH_END",
+      "center": {
+        "lat": 44.485,
+        "lng": -73.178
+      },
+      "description": "The dense pre-war neighborhood northwest of downtown with craftsman-bungalow stock and block-by-block reinvestment."
+    },
+    "Riverside": {
+      "name": "Riverside",
+      "division": "WEST_ROOT",
+      "center": {
+        "lat": 44.45,
+        "lng": -73.26
+      },
+      "description": "The Winooski River-adjacent grid west of downtown with solid housing stock and investor renovation flow."
+    },
+    "Hill Section": {
+      "name": "Hill Section",
+      "division": "EAST_HILL",
+      "center": {
+        "lat": 44.47,
+        "lng": -73.15
+      },
+      "description": "The east-slope single-family plateau above the O.N.E. with stable owner-occupied stock and modest teardown-rebuild activity."
+    },
+    "Prospect Park": {
+      "name": "Prospect Park",
+      "division": "EAST_HILL",
+      "center": {
+        "lat": 44.465,
+        "lng": -73.146
+      },
+      "description": "The southeastern hill pocket with views over the lake and steady mid-century home renovation trades."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": null,
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SALE_DATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/burlington.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

@@ -1,0 +1,188 @@
+{
+  "schema_version": 2,
+  "id": "allentown",
+  "name": "Allentown",
+  "state": "PA",
+  "center": {
+    "lat": 40.6084,
+    "lng": -75.4902
+  },
+  "metro_bbox": {
+    "min_lat": 40.45,
+    "max_lat": 40.75,
+    "min_lng": -75.75,
+    "max_lng": -75.15
+  },
+  "divisions": {
+    "DOWNTOWN_ALLENTOWN": {
+      "name": "DOWNTOWN_ALLENTOWN",
+      "center": {
+        "lat": 40.605,
+        "lng": -75.495
+      },
+      "bbox": {
+        "min_lat": 40.585,
+        "max_lat": 40.625,
+        "min_lng": -75.52,
+        "max_lng": -75.47
+      },
+      "submarkets": [
+        "Center City Allentown",
+        "West End Theatre District"
+      ]
+    },
+    "BETHLEHEM": {
+      "name": "BETHLEHEM",
+      "center": {
+        "lat": 40.605,
+        "lng": -75.382
+      },
+      "bbox": {
+        "min_lat": 40.59,
+        "max_lat": 40.625,
+        "min_lng": -75.42,
+        "max_lng": -75.35
+      },
+      "submarkets": [
+        "South Bethlehem",
+        "Downtown Bethlehem"
+      ]
+    },
+    "EASTON": {
+      "name": "EASTON",
+      "center": {
+        "lat": 40.695,
+        "lng": -75.225
+      },
+      "bbox": {
+        "min_lat": 40.66,
+        "max_lat": 40.705,
+        "min_lng": -75.26,
+        "max_lng": -75.21
+      },
+      "submarkets": [
+        "Downtown Easton",
+        "College Hill"
+      ]
+    },
+    "SOUTH_SIDE": {
+      "name": "SOUTH_SIDE",
+      "center": {
+        "lat": 40.562,
+        "lng": -75.495
+      },
+      "bbox": {
+        "min_lat": 40.54,
+        "max_lat": 40.585,
+        "min_lng": -75.53,
+        "max_lng": -75.46
+      },
+      "submarkets": [
+        "South Allentown"
+      ]
+    },
+    "WEST_END": {
+      "name": "WEST_END",
+      "center": {
+        "lat": 40.6,
+        "lng": -75.54
+      },
+      "bbox": {
+        "min_lat": 40.575,
+        "max_lat": 40.62,
+        "min_lng": -75.57,
+        "max_lng": -75.51
+      },
+      "submarkets": [
+        "West End"
+      ]
+    }
+  },
+  "submarkets": {
+    "Center City Allentown": {
+      "name": "Center City Allentown",
+      "division": "DOWNTOWN_ALLENTOWN",
+      "center": {
+        "lat": 40.6005,
+        "lng": -75.49
+      },
+      "description": "The Hamilton Street CBD with office-to-residential conversions, the PPL Center anchor, and the densest mixed-use pipeline in the Lehigh Valley."
+    },
+    "West End Theatre District": {
+      "name": "West End Theatre District",
+      "division": "DOWNTOWN_ALLENTOWN",
+      "center": {
+        "lat": 40.61,
+        "lng": -75.5
+      },
+      "description": "The West End grid around the Nineteenth Street theatre row with pre-war housing stock and steady renovation trades."
+    },
+    "South Bethlehem": {
+      "name": "South Bethlehem",
+      "division": "BETHLEHEM",
+      "center": {
+        "lat": 40.6,
+        "lng": -75.385
+      },
+      "description": "The Lehigh University-adjacent South Side with student-housing conversions, restaurant-row licensing, and industrial-reuse projects."
+    },
+    "Downtown Bethlehem": {
+      "name": "Downtown Bethlehem",
+      "division": "BETHLEHEM",
+      "center": {
+        "lat": 40.621,
+        "lng": -75.379
+      },
+      "description": "The historic Moravian district and Banana Factory arts corridor with boutique retail and hospitality licensing."
+    },
+    "Downtown Easton": {
+      "name": "Downtown Easton",
+      "division": "EASTON",
+      "center": {
+        "lat": 40.69,
+        "lng": -75.211
+      },
+      "description": "The confluence of the Lehigh and Delaware rivers with the Crayola-adjacent retail core and the redeveloped silk-mill district."
+    },
+    "College Hill": {
+      "name": "College Hill",
+      "division": "EASTON",
+      "center": {
+        "lat": 40.7,
+        "lng": -75.24
+      },
+      "description": "The Lafayette College hill neighborhood with solid Victorian stock and investor renovation flow."
+    },
+    "South Allentown": {
+      "name": "South Allentown",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 40.57,
+        "lng": -75.49
+      },
+      "description": "The southward ward along the Lehigh River with craftsman-bungalow stock, a deep rental register, and block-by-block reinvestment."
+    },
+    "West End": {
+      "name": "West End",
+      "division": "WEST_END",
+      "center": {
+        "lat": 40.6,
+        "lng": -75.54
+      },
+      "description": "The west-of-downtown grid toward the Lehigh Valley Hospital campus with pre-war housing and investor renovation flow."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": null,
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SALE_DATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/allentown.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

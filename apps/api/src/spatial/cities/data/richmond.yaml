@@ -1,0 +1,328 @@
+city_id: richmond
+name: Richmond
+state: VA
+center:
+  lat: 37.5407
+  lng: -77.436
+metro_bbox:
+  min_lat: 37.45
+  max_lat: 37.70
+  min_lng: -77.65
+  max_lng: -77.30
+division_bboxes:
+  DOWNTOWN:
+    min_lat: 37.52
+    max_lat: 37.56
+    min_lng: -77.45
+    max_lng: -77.43
+  THE_FAN:
+    min_lat: 37.55
+    max_lat: 37.58
+    min_lng: -77.47
+    max_lng: -77.45
+  NORTH_SIDE:
+    min_lat: 37.58
+    max_lat: 37.66
+    min_lng: -77.47
+    max_lng: -77.43
+  SOUTH_SIDE:
+    min_lat: 37.45
+    max_lat: 37.56
+    min_lng: -77.5
+    max_lng: -77.43
+  EAST_END:
+    min_lat: 37.5
+    max_lat: 37.6
+    min_lng: -77.43
+    max_lng: -77.3
+  WEST_END:
+    min_lat: 37.55
+    max_lat: 37.68
+    min_lng: -77.6
+    max_lng: -77.48
+submarkets:
+  Downtown Richmond:
+    name: Downtown Richmond
+    borough: DOWNTOWN
+    lat: 37.541
+    lng: -77.437
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.86
+    capex: 6500000.0
+    permit_vel: 34.0
+    shift_ratio: 1.48
+    sla: 58.0
+    description: The Broad Street CBD and Riverfront with office-to-residential
+      conversions, the downtown arena anchor projects, and the city's densest
+      mixed-use pipeline.
+    city_id: richmond
+  Jackson Ward:
+    name: Jackson Ward
+    borough: DOWNTOWN
+    lat: 37.547
+    lng: -77.442
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.82
+    capex: 4200000.0
+    permit_vel: 24.0
+    shift_ratio: 1.35
+    sla: 46.0
+    description: The historic Black Wall Street district northwest of downtown
+      with Italianate rowhouses, restoration trades, and a steady hospitality-licensing
+      flow.
+    city_id: richmond
+  The Fan:
+    name: The Fan
+    borough: THE_FAN
+    lat: 37.565
+    lng: -77.46
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.84
+    capex: 5100000.0
+    permit_vel: 30.0
+    shift_ratio: 1.42
+    sla: 54.0
+    description: The diagonal-grid Victorian neighborhood west of downtown with
+      mansion-to-apartment conversions and a high-turnover condo stock.
+    city_id: richmond
+  Museum District:
+    name: Museum District
+    borough: THE_FAN
+    lat: 37.555
+    lng: -77.452
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.83
+    capex: 4800000.0
+    permit_vel: 28.0
+    shift_ratio: 1.4
+    sla: 52.0
+    description: The Boulevard corridor around the VMFA / Science Museum where
+      gallery-space retrofits and rowhouse renewals drive the permit mix.
+    city_id: richmond
+  Scott's Addition:
+    name: Scott's Addition
+    borough: NORTH_SIDE
+    lat: 37.585
+    lng: -77.46
+    zoom: 14.5
+    pitch: 38.0
+    base_lims: 0.8
+    capex: 4600000.0
+    permit_vel: 32.0
+    shift_ratio: 1.38
+    sla: 50.0
+    description: The warehouses-to-breweries and apartment district north of the
+      Fan with the city's highest permit velocity and entertainment licensing.
+    city_id: richmond
+  Carytown:
+    name: Carytown
+    borough: SOUTH_SIDE
+    lat: 37.548
+    lng: -77.486
+    zoom: 15.0
+    pitch: 35.0
+    base_lims: 0.78
+    capex: 3900000.0
+    permit_vel: 26.0
+    shift_ratio: 1.32
+    sla: 48.0
+    description: The Cary Street boutique retail spine and surrounding early-20th-century
+      blocks with investor renovation flow and stable rental demand.
+    city_id: richmond
+  Manchester:
+    name: Manchester
+    borough: SOUTH_SIDE
+    lat: 37.51
+    lng: -77.45
+    zoom: 15.0
+    pitch: 32.0
+    base_lims: 0.7
+    capex: 3100000.0
+    permit_vel: 20.0
+    shift_ratio: 1.24
+    sla: 40.0
+    description: The south-bank warehouse district across the river from downtown
+      with loft conversions and brewery/industrial adaptive reuse.
+    city_id: richmond
+  Church Hill:
+    name: Church Hill
+    borough: EAST_END
+    lat: 37.53
+    lng: -77.41
+    zoom: 14.5
+    pitch: 32.0
+    base_lims: 0.66
+    capex: 2700000.0
+    permit_vel: 16.0
+    shift_ratio: 1.18
+    sla: 34.0
+    description: The city's oldest neighborhood east of downtown where pre-war
+      housing stock meets the heaviest vacancy-to-acquisition conversion flow.
+    city_id: richmond
+  Westover Hills:
+    name: Westover Hills
+    borough: WEST_END
+    lat: 37.6
+    lng: -77.55
+    zoom: 14.0
+    pitch: 32.0
+    base_lims: 0.68
+    capex: 2900000.0
+    permit_vel: 18.0
+    shift_ratio: 1.2
+    sla: 36.0
+    description: The southwest-river bluff single-family plateau with solid housing
+      stock and steady block-by-block reinvestment.
+    city_id: richmond
+divisions:
+  DOWNTOWN:
+    name: DOWNTOWN
+    center_lat: 37.544
+    center_lng: -77.4395
+    zoom: 13.5
+    bbox:
+      min_lat: 37.52
+      max_lat: 37.56
+      min_lng: -77.45
+      max_lng: -77.43
+    submarkets:
+    - Downtown Richmond
+    - Jackson Ward
+    city_id: richmond
+  THE_FAN:
+    name: THE_FAN
+    center_lat: 37.56
+    center_lng: -77.456
+    zoom: 13.5
+    bbox:
+      min_lat: 37.55
+      max_lat: 37.58
+      min_lng: -77.47
+      max_lng: -77.45
+    submarkets:
+    - The Fan
+    - Museum District
+    city_id: richmond
+  NORTH_SIDE:
+    name: NORTH_SIDE
+    center_lat: 37.6025
+    center_lng: -77.445
+    zoom: 13.0
+    bbox:
+      min_lat: 37.58
+      max_lat: 37.66
+      min_lng: -77.47
+      max_lng: -77.43
+    submarkets:
+    - Scott's Addition
+    city_id: richmond
+  SOUTH_SIDE:
+    name: SOUTH_SIDE
+    center_lat: 37.53
+    center_lng: -77.465
+    zoom: 13.0
+    bbox:
+      min_lat: 37.45
+      max_lat: 37.56
+      min_lng: -77.5
+      max_lng: -77.43
+    submarkets:
+    - Carytown
+    - Manchester
+    city_id: richmond
+  EAST_END:
+    name: EAST_END
+    center_lat: 37.55
+    center_lng: -77.365
+    zoom: 13.0
+    bbox:
+      min_lat: 37.5
+      max_lat: 37.6
+      min_lng: -77.43
+      max_lng: -77.3
+    submarkets:
+    - Church Hill
+    city_id: richmond
+  WEST_END:
+    name: WEST_END
+    center_lat: 37.615
+    center_lng: -77.54
+    zoom: 13.0
+    bbox:
+      min_lat: 37.55
+      max_lat: 37.68
+      min_lng: -77.6
+      max_lng: -77.48
+    submarkets:
+    - Westover Hills
+    city_id: richmond
+datasets:
+  deeds:
+    endpoint: https://data.rva.gov/server/rest/services/Property/RealEstateSales/FeatureServer/0
+    platform: arcgis
+    watermark_col: SALE_DATE
+    id_keys:
+    - PARCELID
+    - SALE_DATE
+    - OBJECTID
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: text
+    watermark_format: '%m/%d/%Y'
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - PARCELID
+      bbl:
+      - PARCELID
+      doc_type:
+      - DEED_TYPE
+      document_amount:
+      - SALE_PRICE
+      recorded_date:
+      - SALE_DATE
+      address_street:
+      - SITEADDRESS
+      incident_address:
+      - SITEADDRESS
+      borough:
+      - CITY
+      zipcode:
+      - ZIP5
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 100000
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: false
+    zip_member: null
+aliases:
+- richmond_va
+- richmond-va
+- richmond va
+job_suffix: richmond

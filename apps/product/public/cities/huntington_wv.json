@@ -1,0 +1,178 @@
+{
+  "schema_version": 2,
+  "id": "huntington_wv",
+  "name": "Huntington",
+  "state": "WV",
+  "center": {
+    "lat": 38.4192,
+    "lng": -82.4454
+  },
+  "metro_bbox": {
+    "min_lat": 38.35,
+    "max_lat": 38.49,
+    "min_lng": -82.55,
+    "max_lng": -82.36
+  },
+  "divisions": {
+    "DOWNTOWN_RIVERFRONT": {
+      "name": "DOWNTOWN_RIVERFRONT",
+      "center": {
+        "lat": 38.4165,
+        "lng": -82.445
+      },
+      "bbox": {
+        "min_lat": 38.4,
+        "max_lat": 38.44,
+        "min_lng": -82.46,
+        "max_lng": -82.43
+      },
+      "submarkets": [
+        "Downtown",
+        "Riverfront"
+      ]
+    },
+    "HIGHLAND_PARK": {
+      "name": "HIGHLAND_PARK",
+      "center": {
+        "lat": 38.4515,
+        "lng": -82.4425
+      },
+      "bbox": {
+        "min_lat": 38.44,
+        "max_lat": 38.48,
+        "min_lng": -82.46,
+        "max_lng": -82.42
+      },
+      "submarkets": [
+        "Highland Park",
+        "Ritter Park"
+      ]
+    },
+    "SOUTH_SIDE": {
+      "name": "SOUTH_SIDE",
+      "center": {
+        "lat": 38.375,
+        "lng": -82.47
+      },
+      "bbox": {
+        "min_lat": 38.35,
+        "max_lat": 38.4,
+        "min_lng": -82.5,
+        "max_lng": -82.44
+      },
+      "submarkets": [
+        "Southside"
+      ]
+    },
+    "EAST_HUNTINGTON": {
+      "name": "EAST_HUNTINGTON",
+      "center": {
+        "lat": 38.43,
+        "lng": -82.415
+      },
+      "bbox": {
+        "min_lat": 38.4,
+        "max_lat": 38.46,
+        "min_lng": -82.43,
+        "max_lng": -82.4
+      },
+      "submarkets": [
+        "East End"
+      ]
+    },
+    "WEST_END": {
+      "name": "WEST_END",
+      "center": {
+        "lat": 38.4,
+        "lng": -82.515
+      },
+      "bbox": {
+        "min_lat": 38.37,
+        "max_lat": 38.43,
+        "min_lng": -82.55,
+        "max_lng": -82.48
+      },
+      "submarkets": [
+        "West End"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown": {
+      "name": "Downtown",
+      "division": "DOWNTOWN_RIVERFRONT",
+      "center": {
+        "lat": 38.42,
+        "lng": -82.445
+      },
+      "description": "The 9th Street civic core and Ohio River riverfront with mixed-use conversions, the Marshall University edge, and the city's densest downtown pipeline."
+    },
+    "Riverfront": {
+      "name": "Riverfront",
+      "division": "DOWNTOWN_RIVERFRONT",
+      "center": {
+        "lat": 38.413,
+        "lng": -82.448
+      },
+      "description": "The Harris Riverfront Park and Pullman Square district with hospitality licensing, festival-trade retail, and riverfront redevelopment."
+    },
+    "Highland Park": {
+      "name": "Highland Park",
+      "division": "HIGHLAND_PARK",
+      "center": {
+        "lat": 38.458,
+        "lng": -82.445
+      },
+      "description": "The Hal Greer corridor and historic residential grid around the namesake park with steady renovation trades and student-adjacent rental stock."
+    },
+    "Ritter Park": {
+      "name": "Ritter Park",
+      "division": "HIGHLAND_PARK",
+      "center": {
+        "lat": 38.445,
+        "lng": -82.435
+      },
+      "description": "The Ritter Park / 5th Avenue estate district with high-value pre-war housing stock and investor restoration flow."
+    },
+    "Southside": {
+      "name": "Southside",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 38.375,
+        "lng": -82.47
+      },
+      "description": "The South Side / 29th Street ward across the 4th Avenue viaduct with craftsman-bungalow stock, a deep rental register, and block-by-block reinvestment."
+    },
+    "East End": {
+      "name": "East End",
+      "division": "EAST_HUNTINGTON",
+      "center": {
+        "lat": 38.425,
+        "lng": -82.415
+      },
+      "description": "The east-bank neighborhoods along the 31st Street bridge approach with solid mid-century housing and vacancy-to-acquisition conversion flow."
+    },
+    "West End": {
+      "name": "West End",
+      "division": "WEST_END",
+      "center": {
+        "lat": 38.4,
+        "lng": -82.515
+      },
+      "description": "The West End / Guyandotte fringe along US-60 with the city's lowest sale prices and the heaviest acquisition-conversion flow."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": null,
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SALE_DATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/huntington_wv.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

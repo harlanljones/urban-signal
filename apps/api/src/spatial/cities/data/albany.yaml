@@ -1,0 +1,294 @@
+city_id: albany
+name: Albany
+state: NY
+center:
+  lat: 42.6526
+  lng: -73.7562
+metro_bbox:
+  min_lat: 42.62
+  max_lat: 42.70
+  min_lng: -73.82
+  max_lng: -73.71
+division_bboxes:
+  DOWNTOWN_HUDSON:
+    min_lat: 42.645
+    max_lat: 42.665
+    min_lng: -73.765
+    max_lng: -73.75
+  PINE_HILLS:
+    min_lat: 42.65
+    max_lat: 42.672
+    min_lng: -73.795
+    max_lng: -73.77
+  WESTERN_WARD:
+    min_lat: 42.625
+    max_lat: 42.65
+    min_lng: -73.8
+    max_lng: -73.77
+  EAST_ALBANY:
+    min_lat: 42.63
+    max_lat: 42.67
+    min_lng: -73.755
+    max_lng: -73.72
+  NORTH_ALBANY:
+    min_lat: 42.672
+    max_lat: 42.698
+    min_lng: -73.78
+    max_lng: -73.74
+submarkets:
+  Downtown:
+    name: Downtown
+    borough: DOWNTOWN_HUDSON
+    lat: 42.6526
+    lng: -73.7562
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.85
+    capex: 6200000.0
+    permit_vel: 32.0
+    shift_ratio: 1.45
+    sla: 56.0
+    description: The Empire State Plaza / Broadway CBD with state-office conversions,
+      the downtown hospitality spine, and the city's densest mixed-use pipeline.
+    city_id: albany
+  Hudson Park:
+    name: Hudson Park
+    borough: DOWNTOWN_HUDSON
+    lat: 42.656
+    lng: -73.758
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.81
+    capex: 4000000.0
+    permit_vel: 23.0
+    shift_ratio: 1.33
+    sla: 45.0
+    description: The Hudson River bluff south of downtown with pre-war apartment
+      houses, Washington Park-adjacent rowhousing, and steady restoration trades.
+    city_id: albany
+  Pine Hills:
+    name: Pine Hills
+    borough: PINE_HILLS
+    lat: 42.66
+    lng: -73.785
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.83
+    capex: 4900000.0
+    permit_vel: 29.0
+    shift_ratio: 1.41
+    sla: 53.0
+    description: The student-dense grid west of the UAlbany downtown campus with
+      dense rental stock, multifamily conversions, and high-turnover condo product.
+    city_id: albany
+  Delaware:
+    name: Delaware
+    borough: WESTERN_WARD
+    lat: 42.64
+    lng: -73.79
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.72
+    capex: 3300000.0
+    permit_vel: 21.0
+    shift_ratio: 1.25
+    sla: 41.0
+    description: The Delaware Avenue ward southwest of the plaza with craftsman-bungalow
+      stock, a deep rental register, and block-by-block reinvestment.
+    city_id: albany
+  Beverwyck:
+    name: Beverwyck
+    borough: EAST_ALBANY
+    lat: 42.65
+    lng: -73.74
+    zoom: 14.0
+    pitch: 32.0
+    base_lims: 0.7
+    capex: 3100000.0
+    permit_vel: 19.0
+    shift_ratio: 1.22
+    sla: 39.0
+    description: The suburban-style south-side grid toward the Bethlehem line with
+      solid mid-century housing stock and investor renovation flow.
+    city_id: albany
+  Buckingham:
+    name: Buckingham
+    borough: EAST_ALBANY
+    lat: 42.645
+    lng: -73.735
+    zoom: 14.0
+    pitch: 32.0
+    base_lims: 0.68
+    capex: 2900000.0
+    permit_vel: 17.0
+    shift_ratio: 1.2
+    sla: 37.0
+    description: The east-side ward along New Scotland Avenue where the city's lowest
+      sale prices meet the heaviest vacancy-to-acquisition conversion flow.
+    city_id: albany
+  North Albany:
+    name: North Albany
+    borough: NORTH_ALBANY
+    lat: 42.685
+    lng: -73.76
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.66
+    capex: 2700000.0
+    permit_vel: 16.0
+    shift_ratio: 1.18
+    sla: 34.0
+    description: The former industrial north ward along the Hudson and the rail yards
+      with warehouse-to-loft conversion potential and rebuild work.
+    city_id: albany
+  Arbor Hill:
+    name: Arbor Hill
+    borough: NORTH_ALBANY
+    lat: 42.68
+    lng: -73.755
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.69
+    capex: 3000000.0
+    permit_vel: 18.0
+    shift_ratio: 1.21
+    sla: 38.0
+    description: The historic north-central neighborhood around Clinton Avenue with
+      Victorian rowhouses, a deep rental register, and renewal-era reinvestment.
+    city_id: albany
+divisions:
+  DOWNTOWN_HUDSON:
+    name: DOWNTOWN_HUDSON
+    center_lat: 42.654
+    center_lng: -73.757
+    zoom: 13.5
+    bbox:
+      min_lat: 42.645
+      max_lat: 42.665
+      min_lng: -73.765
+      max_lng: -73.75
+    submarkets:
+    - Downtown
+    - Hudson Park
+    city_id: albany
+  PINE_HILLS:
+    name: PINE_HILLS
+    center_lat: 42.66
+    center_lng: -73.785
+    zoom: 13.5
+    bbox:
+      min_lat: 42.65
+      max_lat: 42.672
+      min_lng: -73.795
+      max_lng: -73.77
+    submarkets:
+    - Pine Hills
+    city_id: albany
+  WESTERN_WARD:
+    name: WESTERN_WARD
+    center_lat: 42.64
+    center_lng: -73.79
+    zoom: 13.0
+    bbox:
+      min_lat: 42.625
+      max_lat: 42.65
+      min_lng: -73.8
+      max_lng: -73.77
+    submarkets:
+    - Delaware
+    city_id: albany
+  EAST_ALBANY:
+    name: EAST_ALBANY
+    center_lat: 42.647
+    center_lng: -73.738
+    zoom: 13.0
+    bbox:
+      min_lat: 42.63
+      max_lat: 42.67
+      min_lng: -73.755
+      max_lng: -73.72
+    submarkets:
+    - Beverwyck
+    - Buckingham
+    city_id: albany
+  NORTH_ALBANY:
+    name: NORTH_ALBANY
+    center_lat: 42.682
+    center_lng: -73.758
+    zoom: 13.0
+    bbox:
+      min_lat: 42.672
+      max_lat: 42.698
+      min_lng: -73.78
+      max_lng: -73.74
+    submarkets:
+    - North Albany
+    - Arbor Hill
+    city_id: albany
+datasets:
+  deeds:
+    endpoint: https://albanyny.gov/server/rest/services/Real_Property/Tax_Parcels/FeatureServer/0
+    platform: arcgis
+    watermark_col: SALE_DATE
+    id_keys:
+    - PARCELID
+    - PRINTKEY
+    - SALE_DATE
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: text
+    watermark_format: '%m/%d/%Y'
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - PARCELID
+      - PRINTKEY
+      bbl:
+      - PARCELID
+      doc_type:
+      - DEED_TYPE
+      document_amount:
+      - SALE_PRICE
+      recorded_date:
+      - SALE_DATE
+      address_street:
+      - SITEADDRESS
+      incident_address:
+      - SITEADDRESS
+      borough:
+      - CITY
+      zipcode:
+      - ZIP5
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 100000
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: false
+    zip_member: null
+aliases:
+- albany_ny
+- albany-ny
+- albany ny
+job_suffix: albany

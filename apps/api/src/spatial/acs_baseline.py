@@ -14,8 +14,8 @@ Medians cannot be summed; they are rolled up as a population-weighted mean of th
 block-group medians (a documented approximation).
 """
 
-from dataclasses import dataclass, field
-from typing import Callable, Dict, List, Optional, Tuple
+from collections.abc import Callable
+from dataclasses import dataclass
 
 Z = 1.645  # 90% confidence multiplier for ACS margins of error
 
@@ -26,18 +26,18 @@ class ACSFeature:
 
     name: str
     estimate_var: str
-    moe_var: Optional[str]
+    moe_var: str | None
     agg: str  # "sum" | "ratio" | "weighted_median_approx"
     # For "ratio": numerator/denominator are the estimate vars of component features.
-    numerator_var: Optional[str] = None
-    denominator_var: Optional[str] = None
-    weight_var: Optional[str] = None  # for weighted_median_approx
+    numerator_var: str | None = None
+    denominator_var: str | None = None
+    weight_var: str | None = None  # for weighted_median_approx
     concept: str = ""
 
 
 # Catalog of proposed neighborhood baseline features (all `acs5`, estimate + MOE).
 # Variable codes verified live against api.census.gov/data/2023/acs/acs5/variables.
-ACS_BASELINE_FEATURES: Dict[str, ACSFeature] = {
+ACS_BASELINE_FEATURES: dict[str, ACSFeature] = {
     "total_population": ACSFeature(
         "total_population", "B01003_001E", "B01003_001M", "sum",
         concept="Total population",
@@ -103,10 +103,10 @@ class BGRow:
     """One block-group observation: variable code -> (estimate, moe)."""
 
     bg_fips12: str
-    values: Dict[str, Tuple[float, float]]  # var -> (estimate, moe)
+    values: dict[str, tuple[float, float]]  # var -> (estimate, moe)
 
 
-def sum_with_moe(estimates: List[float], moes: List[float]) -> Tuple[float, float]:
+def sum_with_moe(estimates: list[float], moes: list[float]) -> tuple[float, float]:
     """Aggregate a sum of independent counts and propagate the 90% MOE.
 
     Census sum formula: MOE_sum = sqrt(Σ MOE_i²). Missing (NaN/None) MOEs are treated
@@ -121,7 +121,7 @@ def sum_with_moe(estimates: List[float], moes: List[float]) -> Tuple[float, floa
 
 def ratio_with_moe(
     num: float, num_moe: float, den: float, den_moe: float
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     """Ratio X/Y with 90% MOE (rho assumed 0). Returns (ratio, moe); moe is 0 if den<=0."""
     if den <= 0:
         return 0.0, 0.0
@@ -137,7 +137,7 @@ def ratio_with_moe(
 
 
 def weighted_median_approx(
-    medians: List[float], weights: List[float]
+    medians: list[float], weights: list[float]
 ) -> float:
     """Population-weighted mean of block-group medians (approximation of the true median).
 
@@ -166,14 +166,14 @@ def block_fips_to_bg(block_fips15: str) -> str:
 @dataclass
 class H3Baseline:
     h3_index: str
-    features: Dict[str, Tuple[float, float]]  # feature name -> (estimate, moe)
+    features: dict[str, tuple[float, float]]  # feature name -> (estimate, moe)
 
 
 def aggregate_blockgroup_to_h3(
-    rows: List[BGRow],
+    rows: list[BGRow],
     bg_to_h3: Callable[[str], str],
-    feature_names: Optional[List[str]] = None,
-) -> List[H3Baseline]:
+    feature_names: list[str] | None = None,
+) -> list[H3Baseline]:
     """Roll block-group rows up to H3 cells following each feature's aggregation rule.
 
     ``bg_to_h3`` maps a 12-digit BG FIPS to an H3 cell string (caller wires
@@ -182,14 +182,14 @@ def aggregate_blockgroup_to_h3(
     population-weighted mean (approximation). Returns one ``H3Baseline`` per occupied cell.
     """
     names = feature_names or list(ACS_BASELINE_FEATURES.keys())
-    cells: Dict[str, List[BGRow]] = {}
+    cells: dict[str, list[BGRow]] = {}
     for row in rows:
         cell = bg_to_h3(row.bg_fips12)
         cells.setdefault(cell, []).append(row)
 
-    out: List[H3Baseline] = []
+    out: list[H3Baseline] = []
     for cell, cell_rows in cells.items():
-        feats: Dict[str, Tuple[float, float]] = {}
+        feats: dict[str, tuple[float, float]] = {}
         for name in names:
             f = ACS_BASELINE_FEATURES[name]
             if f.agg == "sum":

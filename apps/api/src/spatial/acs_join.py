@@ -8,20 +8,23 @@ mean of its member blocks' internal points, then map that point to an H3 cell.
 
 from __future__ import annotations
 
-from collections import defaultdict
-from dataclasses import dataclass
-from pathlib import Path
-from typing import Callable, Dict, Iterable, Tuple
-
 import csv
 import gzip
+import logging
+
+logger = logging.getLogger(__name__)
+from collections import defaultdict
+from collections.abc import Callable, Iterable
+from dataclasses import dataclass
+from pathlib import Path
+
 import h3
 
-from src.export.national_builder import state_xwalk_url, download_to_cache
+from src.export.national_builder import download_to_cache, state_xwalk_url
 from src.spatial.acs_baseline import block_fips_to_bg
 
 
-def _read_xwalk_rows(path: Path) -> Iterable[Tuple[str, float, float]]:
+def _read_xwalk_rows(path: Path) -> Iterable[tuple[str, float, float]]:
     """Yield (tabblk2020, lat, lng) rows from a LODES xwalk (gz or plain CSV)."""
     def _iter(reader):
         header = next(reader)
@@ -36,7 +39,8 @@ def _read_xwalk_rows(path: Path) -> Iterable[Tuple[str, float, float]]:
                 code = row[idx_code]
                 lat = float(row[idx_lat])
                 lng = float(row[idx_lng])
-            except Exception:
+            except (ValueError, IndexError) as exc:
+                logger.debug("skipping malformed row: %s", exc)
                 continue
             yield code, lat, lng
 
@@ -50,9 +54,9 @@ def _read_xwalk_rows(path: Path) -> Iterable[Tuple[str, float, float]]:
             yield from _iter(reader)
 
 
-def _bg_centroids_from_xwalk(path: Path) -> Dict[str, Tuple[float, float]]:
+def _bg_centroids_from_xwalk(path: Path) -> dict[str, tuple[float, float]]:
     """Compute block-group centroids from a LODES xwalk file."""
-    sums: Dict[str, Tuple[float, float, int]] = defaultdict(lambda: (0.0, 0.0, 0))
+    sums: dict[str, tuple[float, float, int]] = defaultdict(lambda: (0.0, 0.0, 0))
     for tabblk, lat, lng in _read_xwalk_rows(path):
         try:
             bg = block_fips_to_bg(tabblk)
@@ -60,7 +64,7 @@ def _bg_centroids_from_xwalk(path: Path) -> Dict[str, Tuple[float, float]]:
             continue
         s_lat, s_lng, n = sums[bg]
         sums[bg] = (s_lat + lat, s_lng + lng, n + 1)
-    centroids: Dict[str, Tuple[float, float]] = {}
+    centroids: dict[str, tuple[float, float]] = {}
     for bg, (s_lat, s_lng, n) in sums.items():
         if n <= 0:
             continue
@@ -77,7 +81,7 @@ class BGToH3Resolver:
 
     def build_for_states(self, states: Iterable[str]) -> Callable[[str], str]:
         """Return a callable `bg_fips12 -> h3_cell` for the given 2-letter states."""
-        mapping: Dict[str, str] = {}
+        mapping: dict[str, str] = {}
         for st in states:
             url = state_xwalk_url(st.lower())
             path = download_to_cache(url, self.cache_dir)
@@ -99,7 +103,7 @@ class BGToH3Resolver:
         paths: Iterable[Path], resolution: int = 9
     ) -> Callable[[str], str]:
         """Build a resolver from local xwalk CSV/CSV.GZ files (tests/fixtures path)."""
-        cents: Dict[str, Tuple[float, float]] = {}
+        cents: dict[str, tuple[float, float]] = {}
         for p in paths:
             cents.update(_bg_centroids_from_xwalk(p))
         mapping = {

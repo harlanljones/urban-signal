@@ -4,7 +4,7 @@ import asyncio
 from unittest.mock import MagicMock
 
 import httpx
-import pytest
+
 from src.serving.app import create_app
 from src.serving.router import get_feature_pipeline, get_inference_engine
 
@@ -216,7 +216,7 @@ def test_submarkets_borough_filter():
     data_m = res_m.json()
     assert data_m["borough"] == "MANHATTAN"
     assert data_m["count"] >= 10
-    for name, meta in data_m["submarkets"].items():
+    for meta in data_m["submarkets"].values():
         assert meta["borough"] == "MANHATTAN"
     assert "SoHo" in data_m["submarkets"]
     assert "Williamsburg" not in data_m["submarkets"]
@@ -227,7 +227,7 @@ def test_submarkets_borough_filter():
     data_bx = res_bx.json()
     assert data_bx["borough"] == "BRONX"
     assert data_bx["count"] >= 5
-    for name, meta in data_bx["submarkets"].items():
+    for meta in data_bx["submarkets"].values():
         assert meta["borough"] == "BRONX"
     assert "Mott Haven" in data_bx["submarkets"]
 
@@ -237,7 +237,7 @@ def test_submarkets_borough_filter():
     data_si = res_si.json()
     assert data_si["borough"] == "STATEN_ISLAND"
     assert data_si["count"] >= 4
-    for name, meta in data_si["submarkets"].items():
+    for meta in data_si["submarkets"].values():
         assert meta["borough"] == "STATEN_ISLAND"
     assert "St. George" in data_si["submarkets"]
 
@@ -398,12 +398,15 @@ def test_spatial_divisions_endpoint():
         assert res.status_code == 200
         data = res.json()
         assert data["city_id"] == "san_francisco"
-        assert data["count"] == 5
+        assert data["count"] == 8
         assert "SAN_FRANCISCO_CORE" in data["divisions"]
         assert "EAST_BAY" in data["divisions"]
         assert "PENINSULA" in data["divisions"]
         assert "SILICON_VALLEY_SOUTH_BAY" in data["divisions"]
         assert "MARIN_NORTH_BAY" in data["divisions"]
+        assert "NORTH_BAY_WINE_COUNTRY" in data["divisions"]
+        assert "SOLANO_CORRIDOR" in data["divisions"]
+        assert "OUTER_CONTRA_COSTA" in data["divisions"]
 
     # NYC
     res_nyc = client.get("/api/v1/spatial/divisions?city_id=nyc")
@@ -445,8 +448,8 @@ def test_dashboard_metrics_endpoint():
         assert res.status_code == 200
         data = res.json()
         assert data["city_id"] == "san_francisco"
-        assert data["submarkets_count"] >= 35
-        assert data["divisions_count"] == 5
+        assert data["submarkets_count"] >= 80
+        assert data["divisions_count"] == 8
         assert data["avg_lims_score"] > 0
         assert data["total_capex"] > 0
         assert len(data["top_momentum_submarkets"]) > 0

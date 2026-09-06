@@ -1,0 +1,308 @@
+city_id: portland_maine
+name: Portland
+state: ME
+center:
+  lat: 43.6591
+  lng: -70.2568
+metro_bbox:
+  min_lat: 43.6
+  max_lat: 43.72
+  min_lng: -70.32
+  max_lng: -70.2
+division_bboxes:
+  DOWNTOWN_PENINSULA:
+    min_lat: 43.64
+    max_lat: 43.67
+    min_lng: -70.265
+    max_lng: -70.245
+  EAST_BAYSIDE:
+    min_lat: 43.66
+    max_lat: 43.675
+    min_lng: -70.26
+    max_lng: -70.245
+  WEST_END:
+    min_lat: 43.65
+    max_lat: 43.675
+    min_lng: -70.275
+    max_lng: -70.255
+  BACK_COVE:
+    min_lat: 43.67
+    max_lat: 43.695
+    min_lng: -70.28
+    max_lng: -70.255
+  SOUTHWEST_HILLS:
+    min_lat: 43.615
+    max_lat: 43.645
+    min_lng: -70.3
+    max_lng: -70.265
+submarkets:
+  Old Port:
+    name: Old Port
+    borough: DOWNTOWN_PENINSULA
+    lat: 43.657
+    lng: -70.2545
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.86
+    capex: 6200000.0
+    permit_vel: 32.0
+    shift_ratio: 1.46
+    sla: 56.0
+    description: The cobblestone waterfront district of boutiques, restaurants, and converted
+      wharf condos at the foot of the Old Port.
+    city_id: portland_maine
+  Arts District:
+    name: Arts District
+    borough: DOWNTOWN_PENINSULA
+    lat: 43.653
+    lng: -70.26
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.83
+    capex: 4800000.0
+    permit_vel: 28.0
+    shift_ratio: 1.4
+    sla: 52.0
+    description: The Congress Street corridor around the Portland Museum of Art and the State
+      Theatre with mixed-use conversion and gallery-retail demand.
+    city_id: portland_maine
+  East Bayside:
+    name: East Bayside
+    borough: EAST_BAYSIDE
+    lat: 43.668
+    lng: -70.255
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.82
+    capex: 4600000.0
+    permit_vel: 30.0
+    shift_ratio: 1.42
+    sla: 50.0
+    description: The rapidly gentrifying grid east of Franklin Arterial with food-hall retail,
+      micro-breweries, and infill residential.
+    city_id: portland_maine
+  Munjoy Hill:
+    name: Munjoy Hill
+    borough: EAST_BAYSIDE
+    lat: 43.671
+    lng: -70.25
+    zoom: 15.0
+    pitch: 38.0
+    base_lims: 0.8
+    capex: 5300000.0
+    permit_vel: 26.0
+    shift_ratio: 1.38
+    sla: 49.0
+    description: The eastern bluff overlooking the bay with dense pre-war housing stock, the
+      Eastern Prom, and steady renovation flow.
+    city_id: portland_maine
+  West End:
+    name: West End
+    borough: WEST_END
+    lat: 43.663
+    lng: -70.265
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.84
+    capex: 5000000.0
+    permit_vel: 24.0
+    shift_ratio: 1.36
+    sla: 51.0
+    description: The Victorian mansion district west of downtown with landmarked rowhouses
+      and high-end restoration trades.
+    city_id: portland_maine
+  Parkside:
+    name: Parkside
+    borough: WEST_END
+    lat: 43.658
+    lng: -70.27
+    zoom: 14.0
+    pitch: 32.0
+    base_lims: 0.72
+    capex: 3300000.0
+    permit_vel: 20.0
+    shift_ratio: 1.24
+    sla: 40.0
+    description: The mixed-income ward around Deering Oaks with craftsman stock, a deep rental
+      register, and block-by-block reinvestment.
+    city_id: portland_maine
+  Back Cove:
+    name: Back Cove
+    borough: BACK_COVE
+    lat: 43.685
+    lng: -70.27
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.74
+    capex: 3800000.0
+    permit_vel: 22.0
+    shift_ratio: 1.28
+    sla: 44.0
+    description: The ring-road residential basin north of downtown with solid double-lot housing
+      and investor renovation flow.
+    city_id: portland_maine
+  Deering:
+    name: Deering
+    borough: SOUTHWEST_HILLS
+    lat: 43.63
+    lng: -70.28
+    zoom: 14.0
+    pitch: 32.0
+    base_lims: 0.7
+    capex: 3100000.0
+    permit_vel: 18.0
+    shift_ratio: 1.22
+    sla: 38.0
+    description: The northern residential neighborhoods along Stevens Avenue with multi-family
+      stock and immigrant-owned commercial corridors.
+    city_id: portland_maine
+  Nasons Corner:
+    name: Nasons Corner
+    borough: SOUTHWEST_HILLS
+    lat: 43.62
+    lng: -70.29
+    zoom: 14.0
+    pitch: 30.0
+    base_lims: 0.66
+    capex: 2700000.0
+    permit_vel: 16.0
+    shift_ratio: 1.18
+    sla: 34.0
+    description: The southwest edge of the city with post-war subdivisions and the lowest sale
+      prices meeting the heaviest acquisition flow.
+    city_id: portland_maine
+divisions:
+  DOWNTOWN_PENINSULA:
+    name: DOWNTOWN_PENINSULA
+    center_lat: 43.655
+    center_lng: -70.255
+    zoom: 13.5
+    bbox:
+      min_lat: 43.64
+      max_lat: 43.67
+      min_lng: -70.265
+      max_lng: -70.245
+    submarkets:
+    - Old Port
+    - Arts District
+    city_id: portland_maine
+  EAST_BAYSIDE:
+    name: EAST_BAYSIDE
+    center_lat: 43.668
+    center_lng: -70.252
+    zoom: 13.5
+    bbox:
+      min_lat: 43.66
+      max_lat: 43.675
+      min_lng: -70.26
+      max_lng: -70.245
+    submarkets:
+    - East Bayside
+    - Munjoy Hill
+    city_id: portland_maine
+  WEST_END:
+    name: WEST_END
+    center_lat: 43.663
+    center_lng: -70.265
+    zoom: 13.5
+    bbox:
+      min_lat: 43.65
+      max_lat: 43.675
+      min_lng: -70.275
+      max_lng: -70.255
+    submarkets:
+    - West End
+    - Parkside
+    city_id: portland_maine
+  BACK_COVE:
+    name: BACK_COVE
+    center_lat: 43.682
+    center_lng: -70.268
+    zoom: 13.0
+    bbox:
+      min_lat: 43.67
+      max_lat: 43.695
+      min_lng: -70.28
+      max_lng: -70.255
+    submarkets:
+    - Back Cove
+    city_id: portland_maine
+  SOUTHWEST_HILLS:
+    name: SOUTHWEST_HILLS
+    center_lat: 43.63
+    center_lng: -70.282
+    zoom: 13.0
+    bbox:
+      min_lat: 43.615
+      max_lat: 43.645
+      min_lng: -70.3
+      max_lng: -70.265
+    submarkets:
+    - Deering
+    - Nasons Corner
+    city_id: portland_maine
+datasets:
+  deeds:
+    endpoint: https://gis.portlandmaine.gov/maps/rest/services/ParcelsWGS84/FeatureServer/0
+    platform: arcgis
+    watermark_col: SALE_DATE
+    id_keys:
+    - PARCELID
+    - OBJECTID
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: text
+    watermark_format: '%m/%d/%Y'
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - PARCELID
+      bbl:
+      - PARCELID
+      doc_type:
+      - DEED_TYPE
+      document_amount:
+      - SALE_PRICE
+      recorded_date:
+      - SALE_DATE
+      address_street:
+      - SITEADDR
+      incident_address:
+      - SITEADDR
+      borough:
+      - CITY
+      zipcode:
+      - ZIP
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 100000
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: false
+    zip_member: null
+aliases:
+- portland_maine_me
+- portland-maine-me
+- portland me
+job_suffix: portland_maine

@@ -1,0 +1,311 @@
+city_id: burlington
+name: Burlington
+state: VT
+center:
+  lat: 44.4759
+  lng: -73.2121
+metro_bbox:
+  min_lat: 44.41
+  max_lat: 44.55
+  min_lng: -73.3
+  max_lng: -73.13
+division_bboxes:
+  DOWNTOWN:
+    min_lat: 44.46
+    max_lat: 44.49
+    min_lng: -73.225
+    max_lng: -73.195
+  SOUTH_END:
+    min_lat: 44.42
+    max_lat: 44.46
+    min_lng: -73.23
+    max_lng: -73.19
+  NEW_NORTH_END:
+    min_lat: 44.49
+    max_lat: 44.53
+    min_lng: -73.22
+    max_lng: -73.185
+  OLD_NORTH_END:
+    min_lat: 44.47
+    max_lat: 44.5
+    min_lng: -73.19
+    max_lng: -73.16
+  WEST_ROOT:
+    min_lat: 44.43
+    max_lat: 44.47
+    min_lng: -73.28
+    max_lng: -73.24
+  EAST_HILL:
+    min_lat: 44.45
+    max_lat: 44.49
+    min_lng: -73.16
+    max_lng: -73.14
+submarkets:
+  Church Street Marketplace:
+    name: Church Street Marketplace
+    borough: DOWNTOWN
+    lat: 44.4766
+    lng: -73.2121
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.85
+    capex: 6200000.0
+    permit_vel: 32.0
+    shift_ratio: 1.46
+    sla: 56.0
+    description: The pedestrian mall CBD with mixed-use conversions, the Burlington
+      anchor retail corridor, and the city's densest downtown pipeline.
+    city_id: burlington
+  Waterfront:
+    name: Waterfront
+    borough: DOWNTOWN
+    lat: 44.475
+    lng: -73.218
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.8
+    capex: 4100000.0
+    permit_vel: 23.0
+    shift_ratio: 1.33
+    sla: 45.0
+    description: The Lake Champlain waterfront boardwalk and former industrial
+      parcels with hospitality and mixed-use redevelopment flow.
+    city_id: burlington
+  South End Arts District:
+    name: South End Arts District
+    borough: SOUTH_END
+    lat: 44.445
+    lng: -73.212
+    zoom: 15.0
+    pitch: 38.0
+    base_lims: 0.72
+    capex: 3300000.0
+    permit_vel: 21.0
+    shift_ratio: 1.25
+    sla: 41.0
+    description: The Pine Street arts-and-light-industrial district with maker-space
+      conversions and steady studio/loft turnover.
+    city_id: burlington
+  University of Vermont:
+    name: University of Vermont
+    borough: NEW_NORTH_END
+    lat: 44.495
+    lng: -73.2
+    zoom: 14.5
+    pitch: 38.0
+    base_lims: 0.78
+    capex: 3900000.0
+    permit_vel: 26.0
+    shift_ratio: 1.31
+    sla: 48.0
+    description: The UVM / Trinity campus corridor with student-housing conversions,
+      lab retrofits, and high-turnover rental stock.
+    city_id: burlington
+  Old North End:
+    name: Old North End
+    borough: OLD_NORTH_END
+    lat: 44.485
+    lng: -73.178
+    zoom: 14.5
+    pitch: 35.0
+    base_lims: 0.68
+    capex: 2900000.0
+    permit_vel: 19.0
+    shift_ratio: 1.22
+    sla: 38.0
+    description: The dense pre-war neighborhood northwest of downtown with craftsman-bungalow
+      stock and block-by-block reinvestment.
+    city_id: burlington
+  Riverside:
+    name: Riverside
+    borough: WEST_ROOT
+    lat: 44.45
+    lng: -73.26
+    zoom: 14.0
+    pitch: 32.0
+    base_lims: 0.64
+    capex: 2600000.0
+    permit_vel: 16.0
+    shift_ratio: 1.18
+    sla: 34.0
+    description: The Winooski River-adjacent grid west of downtown with solid housing
+      stock and investor renovation flow.
+    city_id: burlington
+  Hill Section:
+    name: Hill Section
+    borough: EAST_HILL
+    lat: 44.47
+    lng: -73.15
+    zoom: 14.5
+    pitch: 32.0
+    base_lims: 0.71
+    capex: 3200000.0
+    permit_vel: 20.0
+    shift_ratio: 1.23
+    sla: 40.0
+    description: The east-slope single-family plateau above the O.N.E. with stable
+      owner-occupied stock and modest teardown-rebuild activity.
+    city_id: burlington
+  Prospect Park:
+    name: Prospect Park
+    borough: EAST_HILL
+    lat: 44.465
+    lng: -73.146
+    zoom: 14.5
+    pitch: 32.0
+    base_lims: 0.69
+    capex: 3000000.0
+    permit_vel: 18.0
+    shift_ratio: 1.2
+    sla: 37.0
+    description: The southeastern hill pocket with views over the lake and steady
+      mid-century home renovation trades.
+    city_id: burlington
+divisions:
+  DOWNTOWN:
+    name: DOWNTOWN
+    center_lat: 44.476
+    center_lng: -73.2121
+    zoom: 13.5
+    bbox:
+      min_lat: 44.46
+      max_lat: 44.49
+      min_lng: -73.225
+      max_lng: -73.195
+    submarkets:
+    - Church Street Marketplace
+    - Waterfront
+    city_id: burlington
+  SOUTH_END:
+    name: SOUTH_END
+    center_lat: 44.445
+    center_lng: -73.212
+    zoom: 13.5
+    bbox:
+      min_lat: 44.42
+      max_lat: 44.46
+      min_lng: -73.23
+      max_lng: -73.19
+    submarkets:
+    - South End Arts District
+    city_id: burlington
+  NEW_NORTH_END:
+    name: NEW_NORTH_END
+    center_lat: 44.495
+    center_lng: -73.2
+    zoom: 13.0
+    bbox:
+      min_lat: 44.49
+      max_lat: 44.53
+      min_lng: -73.22
+      max_lng: -73.185
+    submarkets:
+    - University of Vermont
+    city_id: burlington
+  OLD_NORTH_END:
+    name: OLD_NORTH_END
+    center_lat: 44.485
+    center_lng: -73.178
+    zoom: 13.0
+    bbox:
+      min_lat: 44.47
+      max_lat: 44.5
+      min_lng: -73.19
+      max_lng: -73.16
+    submarkets:
+    - Old North End
+    city_id: burlington
+  WEST_ROOT:
+    name: WEST_ROOT
+    center_lat: 44.45
+    center_lng: -73.26
+    zoom: 13.0
+    bbox:
+      min_lat: 44.43
+      max_lat: 44.47
+      min_lng: -73.28
+      max_lng: -73.24
+    submarkets:
+    - Riverside
+    city_id: burlington
+  EAST_HILL:
+    name: EAST_HILL
+    center_lat: 44.47
+    center_lng: -73.15
+    zoom: 13.0
+    bbox:
+      min_lat: 44.45
+      max_lat: 44.49
+      min_lng: -73.16
+      max_lng: -73.14
+    submarkets:
+    - Hill Section
+    - Prospect Park
+    city_id: burlington
+datasets:
+  deeds:
+    endpoint: https://data.burlingtonvt.gov/server/rest/services/Assessment_Parcels/FeatureServer/0
+    platform: arcgis
+    watermark_col: SALE_DATE
+    id_keys:
+    - PARCELID
+    - PRINTKEY
+    - SALE_DATE
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: text
+    watermark_format: '%m/%d/%Y'
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - PARCELID
+      - PRINTKEY
+      bbl:
+      - PARCELID
+      doc_type:
+      - DEED_TYPE
+      document_amount:
+      - SALE_PRICE
+      recorded_date:
+      - SALE_DATE
+      address_street:
+      - SITEADDRESS
+      incident_address:
+      - SITEADDRESS
+      borough:
+      - CITY
+      zipcode:
+      - ZIP5
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 100000
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: false
+    zip_member: null
+aliases:
+- burlington_vt
+- burlington-vt
+- burlington vt
+job_suffix: burlington
