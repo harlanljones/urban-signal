@@ -1,38 +1,61 @@
-# US-308 / US-309 — Onboard New Haven, CT and Worcester, MA (already registered on main)
+# US-437: Expand Division & Submarket Registry to Cover All 9 Bay Area Counties
 
 ## Summary
 
-Both New Haven (US-308) and Worcester (US-309) were **already registered on
-`main`** before these tickets were picked up. This work verified the existing
-registrations rather than adding new code.
+Expands the SF spatial module from **5 divisions / 41 submarkets** to **8 divisions / 83 submarkets**, achieving wall-to-wall coverage of all 9 Bay Area counties. Every county now has named submarkets and a dedicated division, eliminating the prior gaps in Napa/Sonoma, Solano, and Central/East Contra Costa.
 
-## Verification performed
+## What changed
 
-- **New Haven**: `City` enum member `NEW_HAVEN = "new_haven"`
-  (`apps/api/src/spatial/city_registry.py:171`), leaf module
-  `apps/api/src/spatial/cities/new_haven.py`, and corpus
-  `apps/api/src/spatial/cities/data/new_haven.yaml` all confirmed present.
-- **Worcester**: `City` enum member `WORCESTER = "worcester"`
-  (`apps/api/src/spatial/city_registry.py:170`), leaf module
-  `apps/api/src/spatial/cities/worcester.py`, and corpus
-  `apps/api/src/spatial/cities/data/worcester.yaml` all confirmed present.
-- **Interlock gate**: `python -m pytest -m interlock -q` from `apps/api` →
-  **35 passed** (green).
-- **Dashboard static copy**: regenerated via `scripts/export_dashboard.py` —
-  byte-synced and current.
-- **Product facts**: `bun run facts:export` succeeded
-  (`SITE_FACTS_OK`, 142 metros) — not required, included for completeness.
+### 3 new divisions
 
-## Result
+| Division | Counties | Submarkets |
+|---|---|---|
+| `NORTH_BAY_WINE_COUNTRY` | Napa, Sonoma | Napa Downtown, Yountville, St Helena, Sonoma Plaza, Petaluma Downtown, Santa Rosa Downtown, Healdsburg |
+| `SOLANO_CORRIDOR` | Solano | Vallejo Downtown, Mare Island, Benicia, Fairfield Downtown, Vacaville Downtown, Dixon |
+| `OUTER_CONTRA_COSTA` | Central/East Contra Costa | Walnut Creek Downtown, Concord Downtown, Pleasant Hill, Martinez Downtown, Antioch Downtown, Pittsburg Downtown, Brentwood, San Ramon, Danville |
 
-Both registrations are present and the full interlock gate is green. No code
-changes were required for either ticket. Dashboard static copy is current.
+### Existing divisions expanded
 
-## Linear
+| Division | Change |
+|---|---|
+| `EAST_BAY` | Added Union City (+1); Walnut Creek and Concord moved out to `OUTER_CONTRA_COSTA` |
+| `PENINSULA` | Added San Carlos, Foster City, Belmont, Half Moon Bay (+4) |
+| `SILICON_VALLEY_SOUTH_BAY` | Added Milpitas, Morgan Hill, Gilroy (+3) |
+| `MARIN_NORTH_BAY` | Added Novato Downtown (+1) |
+| `SAN_FRANCISCO_CORE` | No change (17 submarkets) |
 
-- US-308 moved to **In Review** with comment:
-  "Registration already present on main; verified pytest -m interlock green and
-  dashboard static copy current."
-- US-309 moved to **In Review** with comment:
-  "Registration already present on main; verified pytest -m interlock green and
-  dashboard static copy current."
+### Files changed
+
+- **`apps/api/src/spatial/cities/san_francisco.py`** — 8 division bboxes, 83 submarket definitions, updated `REGISTRATION`
+- **`apps/api/src/spatial/cities/data/san_francisco.yaml`** — YAML mirror regenerated to match (83 submarkets, 8 divisions)
+- **`apps/api/src/serving/dashboard.py`** — CSS variables, `.borough-btn`, `.borough-tag` rules, and JS normalizer cases for the 3 new divisions
+- **`apps/api/tests/unit/test_submarkets.py`** — updated count assertions; fixed Walnut Creek/Concord division assertions; disambiguated Rockridge lookup; corrected Oakland-downtown city resolution
+- **`apps/api/tests/unit/test_serving.py`** — updated division count and submarket count assertions
+- **`apps/product/public/cities/san_francisco.json`** — regenerated via `bun run facts:export`
+- **`apps/dashboard/public/index.html`** — regenerated via `python3 scripts/export_dashboard.py`
+
+## Gate results
+
+| Gate | Result |
+|---|---|
+| `pytest -m interlock` (35 tests) | ✅ PASS |
+| dashboard ↔ product cross-ref | ✅ PASS |
+| `bun run facts:check` | ✅ PASS |
+| `bun run lint` (product site) | ✅ PASS |
+| `export_dashboard.py` byte-sync | ✅ PASS |
+| ruff check | ✅ PASS |
+| `test_submarkets.py` (20 tests) | ✅ PASS |
+
+`python3 scripts/verify_cicd_preflight.py` → **✓ CI/CD pre-flight green — all gates pass**
+
+## Geographic coverage before / after
+
+**Before:** SF Core, East Bay (Alameda + West CCC), Peninsula (San Mateo), Silicon Valley (Santa Clara), Marin — Napa, Sonoma, Solano, Central/East Contra Costa had no named submarkets.
+
+**After:** All 9 counties have at least one division and multiple named submarkets. Coordinates anywhere in the Bay Area resolve to a local submarket within the 25 km distance cap.
+
+## Notes
+
+- Rockridge exists in both `oakland` and `san_francisco` registries; tests now pass `city_id="san_francisco"` to disambiguate.
+- Oakland Downtown correctly resolves to `"oakland"` (pre-existing behavior documented in US-436 stream log).
+- Walnut Creek and Concord test expectations updated to `OUTER_CONTRA_COSTA`.
