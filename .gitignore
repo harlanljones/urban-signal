@@ -156,3 +156,9 @@ ehthumbs.db
 # Browser MCP session dumps (page snapshots, dataset scrapes)
 .playwright-mcp/
 
+# ==============================================================================
+# Local git worktrees (created via `git worktree add`, never tracked content)
+# ==============================================================================
+/wt/
+/ft/
+
