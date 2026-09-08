@@ -1,119 +1,61 @@
-# US-421: Register Boulder CO and Fort Collins CO permits + wire Texas & Colorado state super-feeds
+# US-437: Expand Division & Submarket Registry to Cover All 9 Bay Area Counties
 
 ## Summary
 
-Implements the four items from the southwest/mountain expansion probe
-(`docs/research/southwest-mountain-expansion-probe-2026-08-30.md`):
+Expands the SF spatial module from **5 divisions / 41 submarkets** to **8 divisions / 83 submarkets**, achieving wall-to-wall coverage of all 9 Bay Area counties. Every county now has named submarkets and a dedicated division, eliminating the prior gaps in Napa/Sonoma, Solano, and Central/East Contra Costa.
 
-1. **Boulder, CO permits** — already live-registered (US-245); verified and
-   documented, no code change needed.
-2. **Fort Collins, CO permits** — new city registration (`fort_collins`),
-   Building Permits feed from the City of Fort Collins ArcGIS Hub.
-3. **Texas state super-feed** — TX TREC (broker/app), TDLR, and TABC specs
-   (already built generically by US-397/US-372) verified to cover the six
-   named metros' counties (Lubbock, Corpus Christi, Laredo, Rio Grande
-   Valley, College Station, Killeen), with a new test suite proving it.
-4. **Colorado DORA super-feed** — new leaf spec module for the statewide
-   occupational and real-estate license registries, city-sliced for
-   Boulder/Fort Collins.
+## What changed
 
-Follows this repo's established "leaf spec, spine wires it" convention for
-state super-feeds (see `tx_trec_specs.py` / `state_license_specs.py`,
-US-397/US-372): the CO DORA specs are copy-pasteable `DatasetSpec` dicts,
-proven against the live producer, but not registered into any
-`CityRegistration` — that remains a separate spine decision, same as every
-other state-super-feed leaf in this repo.
+### 3 new divisions
 
-## Changes
+| Division | Counties | Submarkets |
+|---|---|---|
+| `NORTH_BAY_WINE_COUNTRY` | Napa, Sonoma | Napa Downtown, Yountville, St Helena, Sonoma Plaza, Petaluma Downtown, Santa Rosa Downtown, Healdsburg |
+| `SOLANO_CORRIDOR` | Solano | Vallejo Downtown, Mare Island, Benicia, Fairfield Downtown, Vacaville Downtown, Dixon |
+| `OUTER_CONTRA_COSTA` | Central/East Contra Costa | Walnut Creek Downtown, Concord Downtown, Pleasant Hill, Martinez Downtown, Antioch Downtown, Pittsburg Downtown, Brentwood, San Ramon, Danville |
 
-- `apps/api/src/config.py` — added `arcgis_fort_collins_permits_url` setting.
-- `apps/api/src/spatial/city_registry.py` — added `CityId.FORT_COLLINS`.
-- `apps/api/src/spatial/cities/fort_collins.py` — new leaf module: metro
-  bbox, 4 divisions, 8 submarkets, `REGISTRATION`.
-- `apps/api/src/spatial/cities/data/fort_collins.yaml` — declarative
-  definition wiring the `permits` feed (live-verified endpoint/schema, see
-  Notes) into `REGISTRY`.
-- `apps/api/src/spatial/cities/boulder.py` — docstring note reconciling the
-  US-421 probe's re-flagged Boulder permits endpoint against the already-live
-  US-245 registration (no functional change).
-- `apps/api/src/producers/field_maps_co_dora.py` — new: field maps for CO
-  DORA occupational (`7s5z-vewr`) and real-estate (`4zse-6bnw`) licenses.
-- `apps/api/src/producers/co_dora_specs.py` — new: `co_dora_occupational_spec(city)`
-  and `co_dora_realestate_spec(city)` leaf `DatasetSpec` builders.
-- `apps/api/tests/unit/test_producers_fort_collins.py` — new: spatial
-  geometry + registry wiring tests for Fort Collins.
-- `apps/api/tests/unit/test_co_dora_specs.py` — new: spec-shape and
-  parse-through-producer tests for both CO DORA registries.
-- `apps/api/tests/unit/test_tx_southwest_superfeed_specs.py` — new: proves
-  the existing generic TX TREC/TDLR/TABC spec builders construct correctly
-  for every county behind the six named TX metros.
-- `apps/dashboard/public/index.html` — regenerated via
-  `scripts/export_dashboard.py` (adds the `fort_collins` METRO_META entry).
-  This regeneration also incidentally repairs two pre-existing, unrelated
-  unresolved git-merge-conflict markers (`<<<<<<< HEAD` / `>>>>>>>
-  US-433-grid-legibility`) that had been checked into this generated file
-  out of sync with its `src/serving/dashboard.py` source, plus a stale
-  `PR_DESCRIPTION.md` left over from that same unmerged US-433 branch (this
-  file). The export script is idempotent and rebuilds byte-for-byte from
-  the live `REGISTRY`, so this is a straight resync, not new authored
-  content.
-- `apps/product/public/facts.json` and
-  `apps/product/public/cities/fort_collins.json` — regenerated via
-  `scripts/export_site_facts.py`.
+### Existing divisions expanded
 
-## Testing
+| Division | Change |
+|---|---|
+| `EAST_BAY` | Added Union City (+1); Walnut Creek and Concord moved out to `OUTER_CONTRA_COSTA` |
+| `PENINSULA` | Added San Carlos, Foster City, Belmont, Half Moon Bay (+4) |
+| `SILICON_VALLEY_SOUTH_BAY` | Added Milpitas, Morgan Hill, Gilroy (+3) |
+| `MARIN_NORTH_BAY` | Added Novato Downtown (+1) |
+| `SAN_FRANCISCO_CORE` | No change (17 submarkets) |
 
-- `apps/api/.venv/bin/python -m pytest tests/unit/test_producers_fort_collins.py tests/unit/test_co_dora_specs.py tests/unit/test_tx_southwest_superfeed_specs.py -q` — all pass.
-- `apps/api/.venv/bin/python -m pytest tests/unit -k "registry or fort_collins or boulder or co_dora or tx_southwest or tx_trec or state_license" -q` — all pass (one pre-existing, unrelated failure — `test_get_submarket_by_name_multi_city` (Rockridge ambiguous between Oakland/SF) — reproduces identically on `main`, untouched by this change).
-- `python3 scripts/verify_cicd_preflight.py` (run with `PYTHONPATH=apps/api apps/api/.venv/bin/python`) — **all gates green**: interlock, dashboard↔product cross-ref, facts:check, product lint, dashboard export, ruff check.
-- `scripts/export_site_facts.py --check` — `FACTS_FRESH (142 metros match REGISTRY)`.
+### Files changed
+
+- **`apps/api/src/spatial/cities/san_francisco.py`** — 8 division bboxes, 83 submarket definitions, updated `REGISTRATION`
+- **`apps/api/src/spatial/cities/data/san_francisco.yaml`** — YAML mirror regenerated to match (83 submarkets, 8 divisions)
+- **`apps/api/src/serving/dashboard.py`** — CSS variables, `.borough-btn`, `.borough-tag` rules, and JS normalizer cases for the 3 new divisions
+- **`apps/api/tests/unit/test_submarkets.py`** — updated count assertions; fixed Walnut Creek/Concord division assertions; disambiguated Rockridge lookup; corrected Oakland-downtown city resolution
+- **`apps/api/tests/unit/test_serving.py`** — updated division count and submarket count assertions
+- **`apps/product/public/cities/san_francisco.json`** — regenerated via `bun run facts:export`
+- **`apps/dashboard/public/index.html`** — regenerated via `python3 scripts/export_dashboard.py`
+
+## Gate results
+
+| Gate | Result |
+|---|---|
+| `pytest -m interlock` (35 tests) | ✅ PASS |
+| dashboard ↔ product cross-ref | ✅ PASS |
+| `bun run facts:check` | ✅ PASS |
+| `bun run lint` (product site) | ✅ PASS |
+| `export_dashboard.py` byte-sync | ✅ PASS |
+| ruff check | ✅ PASS |
+| `test_submarkets.py` (20 tests) | ✅ PASS |
+
+`python3 scripts/verify_cicd_preflight.py` → **✓ CI/CD pre-flight green — all gates pass**
+
+## Geographic coverage before / after
+
+**Before:** SF Core, East Bay (Alameda + West CCC), Peninsula (San Mateo), Silicon Valley (Santa Clara), Marin — Napa, Sonoma, Solano, Central/East Contra Costa had no named submarkets.
+
+**After:** All 9 counties have at least one division and multiple named submarkets. Coordinates anywhere in the Bay Area resolve to a local submarket within the 25 km distance cap.
 
 ## Notes
 
-- **Boulder permits is already live.** The probe's cited endpoint
-  (`open-data.bouldercolorado.gov/.../Construction_Permits/FeatureServer/0`)
-  resolves to the ArcGIS Hub mirror of the same `Construction_Permits` table
-  already registered under `boulder.py` (US-245) on the city's own AGOL org
-  (`services.arcgis.com/ePKBjXrBZ2vEEgWd`) — live-verified as a non-spatial
-  **Table** (`needs_geocode=True`), not the probe's claimed native point
-  geometry. No change was needed or made to Boulder's registration.
-- **Fort Collins permits schema does not match the probe.** The probe
-  claimed fields `PERMITNUM, PERMIT_TYPE, SUB_TYPE, STATUS, APPLIED_DATE,
-  ISSUED_DATE, VALUATION, FEES_PAID, CONTRACTOR_NAME, ORIGINAL_ADDRESS,
-  PARCEL_NUMBER` with `ISSUED_DATE` as the watermark. The live FeatureServer
-  behind the cited item id (`e0964db1f10c491a872d5d0e7dbbe13a` ->
-  `services1.arcgis.com/dLpFH5mwVvxSN4OE/.../Building_Permits/FeatureServer/0`,
-  live-verified 2026-09-03) is a 2,215-row "Current Building Permits" table
-  with fields `PERMITNUM, PERMITTYPE, B1_APPL_STATUS, ADDRESS, ...` and
-  **no date column at all** — no `APPLIED_DATE`/`ISSUED_DATE` exists.
-  Geometry IS native WGS84 point (confirmed Tier 1 on that count), so the
-  feed is registered with `needs_geocode=False`, but with
-  `ingestion_mode="snapshot"` (`watermark_col=""`) rather than incremental,
-  following the CO_LIQUOR/OR_CCB snapshot precedent (`state_license_specs.py`).
-- **Colorado DORA dataset ids differ from the ticket.** `7s5z-vewr`
-  (occupational licenses) is correct and live. The ticket's real-estate id
-  `m4y3-x47v` 404s on `data.colorado.gov` (retired/renamed); the live current
-  dataset is **`4zse-6bnw`** ("Licensed Real Estate Professionals in
-  Colorado"), used instead. Neither dataset carries a county column (city
-  only), so specs are city-sliced (`where: city = '<name>'`) rather than
-  county-sliced, matching the CO_LIQUOR/CO_APPROVED precedent already in
-  `state_license_specs.py`. Real-estate `licensefirstissuedate` is
-  `MM/DD/YYYY` text with no server-side chronological ordering (same
-  limitation as OR CCB), so that spec runs in snapshot mode; occupational
-  `licensefirstissuedate` is ISO text and sorts correctly, so it runs
-  incremental.
-- **Texas super-feed "wiring"** follows this repo's existing convention: the
-  county-parameterized spec builders in `tx_trec_specs.py` and
-  `state_license_specs.py` already generalize over any TX county (they were
-  built that way in US-397/US-372), so no new production code was needed —
-  only a test suite proving each builder produces a correct, valid
-  `DatasetSpec` with the right `where` clause for every county behind the
-  six named metros (Lubbock=Lubbock, Corpus Christi=Nueces, Laredo=Webb,
-  RGV=Cameron+Hidalgo, College Station=Brazos, Killeen=Bell).
-- **CO DORA specs are LEAF, not registered**, matching every other
-  state-super-feed leaf module in this repo (`tx_trec_specs.py`,
-  `state_license_specs.py`): they construct valid `DatasetSpec`s and parse
-  correctly through the unmodified `SLALicensesProducer`, but merging them
-  into Boulder's/Fort Collins's `CityRegistration.datasets[FeedType.SLA]` is
-  left as a spine decision, consistent with how every prior state-super-feed
-  ticket in this repo (US-397, US-372, US-424, US-425) has landed.
+- Rockridge exists in both `oakland` and `san_francisco` registries; tests now pass `city_id="san_francisco"` to disambiguate.
+- Oakland Downtown correctly resolves to `"oakland"` (pre-existing behavior documented in US-436 stream log).
+- Walnut Creek and Concord test expectations updated to `OUTER_CONTRA_COSTA`.

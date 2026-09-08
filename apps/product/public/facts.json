@@ -4023,9 +4023,9 @@
       "id": "san_francisco",
       "name": "San Francisco Bay Area",
       "state": "CA",
-      "divisions": "5 divisions",
-      "division_count": 5,
-      "submarket_count": 54,
+      "divisions": "8 divisions",
+      "division_count": 8,
+      "submarket_count": 83,
       "feeds": [
         true,
         true,

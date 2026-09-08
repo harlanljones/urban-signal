@@ -100,6 +100,9 @@ def get_dashboard_html() -> str:
       --division-peninsula: #fbbf24;
       --division-silicon-valley: #c084fc;
       --division-marin: #f43f5e;
+      --division-wine-country: #e879f9;
+      --division-solano: #22d3ee;
+      --division-outer-contra-costa: #fb923c;
       
       --text-main: #f8fafc;
       --text-secondary: #a7b5c9;
@@ -399,6 +402,9 @@ def get_dashboard_html() -> str:
     .borough-btn.active.Peninsula, .borough-btn.active.PENINSULA { color: var(--division-peninsula); }
     .borough-btn.active.SiliconValleySouthBay, .borough-btn.active.SILICON_VALLEY_SOUTH_BAY, .borough-btn.active.SiliconValley { color: var(--division-silicon-valley); }
     .borough-btn.active.MarinNorthBay, .borough-btn.active.MARIN_NORTH_BAY, .borough-btn.active.Marin { color: var(--division-marin); }
+    .borough-btn.active.NorthBayWineCountry, .borough-btn.active.NORTH_BAY_WINE_COUNTRY, .borough-btn.active.WineCountry { color: var(--division-wine-country); }
+    .borough-btn.active.SolanoCorridor, .borough-btn.active.SOLANO_CORRIDOR, .borough-btn.active.Solano { color: var(--division-solano); }
+    .borough-btn.active.OuterContraCosta, .borough-btn.active.OUTER_CONTRA_COSTA, .borough-btn.active.OuterCC { color: var(--division-outer-contra-costa); }
     .borough-btn.active.SeattleCore, .borough-btn.active.SEATTLE_CORE { color: var(--accent-primary); }
     .borough-btn.active.NorthKing, .borough-btn.active.NORTH_KING { color: var(--accent-success); }
     .borough-btn.active.Eastside, .borough-btn.active.EASTSIDE { color: var(--accent-purple); }
@@ -759,6 +765,9 @@ def get_dashboard_html() -> str:
     .borough-tag.Peninsula, .borough-tag.PENINSULA { color: var(--division-peninsula); }
     .borough-tag.SiliconValleySouthBay, .borough-tag.SILICON_VALLEY_SOUTH_BAY, .borough-tag.SiliconValley { color: var(--division-silicon-valley); }
     .borough-tag.MarinNorthBay, .borough-tag.MARIN_NORTH_BAY, .borough-tag.Marin { color: var(--division-marin); }
+    .borough-tag.NorthBayWineCountry, .borough-tag.NORTH_BAY_WINE_COUNTRY, .borough-tag.WineCountry { color: var(--division-wine-country); }
+    .borough-tag.SolanoCorridor, .borough-tag.SOLANO_CORRIDOR, .borough-tag.Solano { color: var(--division-solano); }
+    .borough-tag.OuterContraCosta, .borough-tag.OUTER_CONTRA_COSTA, .borough-tag.OuterCC { color: var(--division-outer-contra-costa); }
     .borough-tag.SeattleCore, .borough-tag.SEATTLE_CORE { color: var(--accent-primary); }
     .borough-tag.NorthKing, .borough-tag.NORTH_KING { color: var(--accent-success); }
     .borough-tag.Eastside, .borough-tag.EASTSIDE { color: var(--accent-purple); }
@@ -2092,6 +2101,9 @@ __METRO_META__
       if (upper === 'PENINSULA') return 'PENINSULA';
       if (upper === 'SILICONVALLEYSOUTHBAY' || upper === 'SILICONVALLEY' || upper === 'SOUTHBAY') return 'SILICON_VALLEY_SOUTH_BAY';
       if (upper === 'MARINNORTHBAY' || upper === 'MARIN' || upper === 'NORTHBAY') return 'MARIN_NORTH_BAY';
+      if (upper === 'NORTHBAYWINECOUNTRY' || upper === 'WINECOUNTRY' || upper === 'NORTHBAYWINE') return 'NORTH_BAY_WINE_COUNTRY';
+      if (upper === 'SOLANOCORRIDOR' || upper === 'SOLANO') return 'SOLANO_CORRIDOR';
+      if (upper === 'OUTERCONTRACOSTA' || upper === 'CONTRACOSTA' || upper === 'OUTERCC') return 'OUTER_CONTRA_COSTA';
       if (upper === 'SEATTLECORE') return 'SEATTLE_CORE';
       if (upper === 'NORTHKING') return 'NORTH_KING';
       if (upper === 'EASTSIDE') return 'EASTSIDE';
