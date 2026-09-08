@@ -4,7 +4,7 @@ Provides comprehensive neighborhood metadata, camera positioning, investment
 metrics, division catalog, and geographic bounding boxes for all 9 Bay Area counties.
 """
 
-from typing import Dict
+
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 # SF Bay Area Metro overall bounding box: full 9-county envelope (US-436).
@@ -12,7 +12,7 @@ from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 # src/spatial/bay_area_boundary.py (BAY_AREA_METRO_BBOX) so every county's land
 # is inside the metro. Must stay == BAY_AREA_METRO_BBOX (see
 # tests/unit/test_bay_area_boundary.py).
-SF_METRO_BBOX: Dict[str, float] = {
+SF_METRO_BBOX: dict[str, float] = {
     "min_lat": 36.89,
     "max_lat": 38.87,
     "min_lng": -123.64,
@@ -21,7 +21,7 @@ SF_METRO_BBOX: Dict[str, float] = {
 SAN_FRANCISCO_METRO_BBOX = SF_METRO_BBOX
 
 # 8 San Francisco Bay Area Division Bounding Boxes covering all 9 counties wall-to-wall (US-437)
-SF_DIVISION_BBOXES: Dict[str, Dict[str, float]] = {
+SF_DIVISION_BBOXES: dict[str, dict[str, float]] = {
     "SAN_FRANCISCO_CORE":       {"min_lat": 37.700, "max_lat": 37.835, "min_lng": -122.525, "max_lng": -122.355},
     "EAST_BAY":                 {"min_lat": 37.450, "max_lat": 38.050, "min_lng": -122.400, "max_lng": -121.650},
     "PENINSULA":                {"min_lat": 37.420, "max_lat": 37.700, "min_lng": -122.520, "max_lng": -122.150},
@@ -49,7 +49,7 @@ is_in_san_francisco_metro = is_in_sf_metro
 # Comprehensive San Francisco Submarket Registry (83 Submarkets Across 8 Divisions)
 # ---------------------------------------------------------------------------
 
-SAN_FRANCISCO_SUBMARKETS: Dict[str, SubmarketMeta] = {
+SAN_FRANCISCO_SUBMARKETS: dict[str, SubmarketMeta] = {
     # =======================================================================
     # SAN_FRANCISCO_CORE (17 Submarkets) - San Francisco County
     # =======================================================================
@@ -1335,7 +1335,7 @@ SF_SUBMARKETS = SAN_FRANCISCO_SUBMARKETS
 # San Francisco Divisions Catalog (8 Divisions)
 # ---------------------------------------------------------------------------
 
-SAN_FRANCISCO_DIVISIONS: Dict[str, BoroughMeta] = {
+SAN_FRANCISCO_DIVISIONS: dict[str, BoroughMeta] = {
     "SAN_FRANCISCO_CORE": BoroughMeta(
         name="SAN_FRANCISCO_CORE",
         center_lat=37.7749,

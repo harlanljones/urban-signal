@@ -1,0 +1,223 @@
+{
+  "schema_version": 2,
+  "id": "providence",
+  "name": "Providence",
+  "state": "RI",
+  "center": {
+    "lat": 41.824,
+    "lng": -71.4128
+  },
+  "metro_bbox": {
+    "min_lat": 41.79,
+    "max_lat": 41.85,
+    "min_lng": -71.45,
+    "max_lng": -71.38
+  },
+  "divisions": {
+    "DOWNTOWN": {
+      "name": "DOWNTOWN",
+      "center": {
+        "lat": 41.827,
+        "lng": -71.414
+      },
+      "bbox": {
+        "min_lat": 41.815,
+        "max_lat": 41.835,
+        "min_lng": -71.425,
+        "max_lng": -71.395
+      },
+      "submarkets": [
+        "Downtown Providence",
+        "Capital Center"
+      ]
+    },
+    "EAST_SIDE": {
+      "name": "EAST_SIDE",
+      "center": {
+        "lat": 41.8365,
+        "lng": -71.3935
+      },
+      "bbox": {
+        "min_lat": 41.82,
+        "max_lat": 41.85,
+        "min_lng": -71.4,
+        "max_lng": -71.385
+      },
+      "submarkets": [
+        "College Hill",
+        "Wayland"
+      ]
+    },
+    "FEDERAL_HILL": {
+      "name": "FEDERAL_HILL",
+      "center": {
+        "lat": 41.8185,
+        "lng": -71.4275
+      },
+      "bbox": {
+        "min_lat": 41.81,
+        "max_lat": 41.83,
+        "min_lng": -71.44,
+        "max_lng": -71.41
+      },
+      "submarkets": [
+        "Federal Hill",
+        "West End"
+      ]
+    },
+    "SOUTH_SIDE": {
+      "name": "SOUTH_SIDE",
+      "center": {
+        "lat": 41.7975,
+        "lng": -71.4175
+      },
+      "bbox": {
+        "min_lat": 41.79,
+        "max_lat": 41.81,
+        "min_lng": -71.44,
+        "max_lng": -71.4
+      },
+      "submarkets": [
+        "Elmwood",
+        "South Providence"
+      ]
+    },
+    "NORTH_SIDE": {
+      "name": "NORTH_SIDE",
+      "center": {
+        "lat": 41.84,
+        "lng": -71.415
+      },
+      "bbox": {
+        "min_lat": 41.83,
+        "max_lat": 41.85,
+        "min_lng": -71.43,
+        "max_lng": -71.4
+      },
+      "submarkets": [
+        "Smith Hill"
+      ]
+    },
+    "OLNEYVILLE": {
+      "name": "OLNEYVILLE",
+      "center": {
+        "lat": 41.82,
+        "lng": -71.435
+      },
+      "bbox": {
+        "min_lat": 41.81,
+        "max_lat": 41.83,
+        "min_lng": -71.45,
+        "max_lng": -71.42
+      },
+      "submarkets": [
+        "Olneyville"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown Providence": {
+      "name": "Downtown Providence",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 41.824,
+        "lng": -71.4128
+      },
+      "description": "The civic and office core around Kennedy Plaza and the riverwalk with conversion-condo activity and the city's densest commercial pipeline."
+    },
+    "Capital Center": {
+      "name": "Capital Center",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 41.83,
+        "lng": -71.415
+      },
+      "description": "The state-house district and I-195 redevelopment lands with loft conversions and the city's highest-energy storefront renewal."
+    },
+    "College Hill": {
+      "name": "College Hill",
+      "division": "EAST_SIDE",
+      "center": {
+        "lat": 41.828,
+        "lng": -71.397
+      },
+      "description": "The Brown/ RISD hilltop with historic single-family stock, Thayer Street commercial, and steady duplex-to-condo reinvestment."
+    },
+    "Wayland": {
+      "name": "Wayland",
+      "division": "EAST_SIDE",
+      "center": {
+        "lat": 41.845,
+        "lng": -71.39
+      },
+      "description": "The East Side's east-of-the-river residential grid with stable owner-occupancy and the metro's most conservation-minded renovation flow."
+    },
+    "Federal Hill": {
+      "name": "Federal Hill",
+      "division": "FEDERAL_HILL",
+      "center": {
+        "lat": 41.822,
+        "lng": -71.425
+      },
+      "description": "The Italianate restaurant-and-housing district on the west flank of downtown with triple-decker rental stock and block-by-block reinvestment."
+    },
+    "West End": {
+      "name": "West End",
+      "division": "FEDERAL_HILL",
+      "center": {
+        "lat": 41.815,
+        "lng": -71.43
+      },
+      "description": "The Broad Street corridor and Dexter Training Ground with value-priced multi-family stock and early-stage commercial renewal."
+    },
+    "Elmwood": {
+      "name": "Elmwood",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 41.8,
+        "lng": -71.42
+      },
+      "description": "The Elmwood Avenue residential spine south of the hospital district with craftsman-bungalow stock and steady investor renovation flow."
+    },
+    "South Providence": {
+      "name": "South Providence",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 41.795,
+        "lng": -71.415
+      },
+      "description": "The Allens Avenue / Washington Park edge with the metro's lowest sale prices and the heaviest vacancy-to-acquisition conversion flow."
+    },
+    "Smith Hill": {
+      "name": "Smith Hill",
+      "division": "NORTH_SIDE",
+      "center": {
+        "lat": 41.84,
+        "lng": -71.415
+      },
+      "description": "The Smith Hill / Wanskuck north side with State House-adjacent rowhouses, the Charles Street commercial strip, and value-priced family-housing reinvestment."
+    },
+    "Olneyville": {
+      "name": "Olneyville",
+      "division": "OLNEYVILLE",
+      "center": {
+        "lat": 41.82,
+        "lng": -71.435
+      },
+      "description": "The Woonasquatucket mill district with mill-to-loft conversions, the Manton Avenue commercial row, and the city's most industrial-leaning reinvestment."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": null,
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SALE_DATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/providence.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

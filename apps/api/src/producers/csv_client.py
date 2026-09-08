@@ -123,10 +123,22 @@ def _row_matches(
     if not where_clause:
         return True
     clause = where_clause.strip()
-    if len(clause) >= 2 and clause.startswith("(") and clause.endswith(")"):
-        inner = clause[1:-1].strip()
-        if inner.count("(") == inner.count(")"):
-            clause = inner
+    while clause.startswith("(") and clause.endswith(")"):
+        depth = 0
+        matched = False
+        for i, ch in enumerate(clause):
+            if ch == "(":
+                depth += 1
+            elif ch == ")":
+                depth -= 1
+                if depth == 0:
+                    if i == len(clause) - 1:
+                        matched = True
+                    break
+        if matched:
+            clause = clause[1:-1].strip()
+        else:
+            break
     for branch in clause.split(" OR "):
         if _branch_matches(branch.strip(), row, watermark_col=watermark_col, watermark_format=watermark_format, watermark_exclude=watermark_exclude):
             return True
@@ -144,8 +156,22 @@ def _branch_matches(
     """Evaluate one AND-separated clause: every part must match."""
     for part in branch.split(" AND "):
         part = part.strip()
-        if len(part) >= 2 and part.startswith("(") and part.endswith(")"):
-            part = part[1:-1].strip()
+        while part.startswith("(") and part.endswith(")"):
+            depth = 0
+            matched = False
+            for i, ch in enumerate(part):
+                if ch == "(":
+                    depth += 1
+                elif ch == ")":
+                    depth -= 1
+                    if depth == 0:
+                        if i == len(part) - 1:
+                            matched = True
+                        break
+            if matched:
+                part = part[1:-1].strip()
+            else:
+                break
         m = _CMP.match(part)
         if m:
             col, op, literal = _normalize_header(m.group(1)), m.group(2), m.group(3)

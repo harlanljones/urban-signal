@@ -2,28 +2,16 @@
 
 import h3
 import pytest
+
 from src.spatial.cities.chicago import (
-    CHICAGO_DIVISION_BBOXES,
-    CHICAGO_DIVISIONS,
-    CHICAGO_METRO_BBOX,
-    CHICAGO_SUBMARKETS,
     is_in_chicago_metro,
 )
 from src.spatial.cities.san_francisco import (
-    SAN_FRANCISCO_DIVISION_BBOXES,
-    SAN_FRANCISCO_DIVISIONS,
-    SAN_FRANCISCO_METRO_BBOX,
-    SAN_FRANCISCO_SUBMARKETS,
-    SF_DIVISION_BBOXES,
-    SF_DIVISIONS,
     SF_METRO_BBOX,
-    SF_SUBMARKETS,
     is_in_san_francisco_metro,
     is_in_sf_metro,
 )
 from src.spatial.geo_utils import (
-    NYC_BOROUGH_BBOXES,
-    NYC_METRO_BBOX,
     get_borough_for_coordinate,
     get_borough_for_h3,
     get_city_for_coordinate,
@@ -32,10 +20,6 @@ from src.spatial.geo_utils import (
     is_in_nyc_metro,
 )
 from src.spatial.submarkets import (
-    NYC_BOROUGHS,
-    NYC_SUBMARKETS,
-    BoroughMeta,
-    DivisionMeta,
     SubmarketMeta,
     find_nearest_submarket,
     get_all_submarkets,
@@ -597,7 +581,7 @@ class TestSpatialDistanceAndBoroughs:
         # All keys must be namespaced city_id:name
         for k in all_subs:
             assert ":" in k, f"Key {k} is not namespaced"
-            cid, name = k.split(":", 1)
+            cid, _ = k.split(":", 1)
             assert cid in registered_ids
 
         # Chinatown and Financial District exist across cities without collision

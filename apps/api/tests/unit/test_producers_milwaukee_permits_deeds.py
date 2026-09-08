@@ -14,7 +14,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.producers.field_maps_milwaukee_permits_deeds import FIELD_MAP
+from src.spatial.cities.milwaukee import FIELD_MAP
 from src.producers.watermarks import typed_watermark_entry, watermark_exclude_clause
 from src.spatial.cities.milwaukee import (
     MILWAUKEE_DEEDS_FIELD_MAP,

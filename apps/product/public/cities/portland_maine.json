@@ -1,0 +1,198 @@
+{
+  "schema_version": 2,
+  "id": "portland_maine",
+  "name": "Portland",
+  "state": "ME",
+  "center": {
+    "lat": 43.6591,
+    "lng": -70.2568
+  },
+  "metro_bbox": {
+    "min_lat": 43.6,
+    "max_lat": 43.72,
+    "min_lng": -70.32,
+    "max_lng": -70.2
+  },
+  "divisions": {
+    "DOWNTOWN_PENINSULA": {
+      "name": "DOWNTOWN_PENINSULA",
+      "center": {
+        "lat": 43.655,
+        "lng": -70.255
+      },
+      "bbox": {
+        "min_lat": 43.64,
+        "max_lat": 43.67,
+        "min_lng": -70.265,
+        "max_lng": -70.245
+      },
+      "submarkets": [
+        "Old Port",
+        "Arts District"
+      ]
+    },
+    "EAST_BAYSIDE": {
+      "name": "EAST_BAYSIDE",
+      "center": {
+        "lat": 43.668,
+        "lng": -70.252
+      },
+      "bbox": {
+        "min_lat": 43.66,
+        "max_lat": 43.675,
+        "min_lng": -70.26,
+        "max_lng": -70.245
+      },
+      "submarkets": [
+        "East Bayside",
+        "Munjoy Hill"
+      ]
+    },
+    "WEST_END": {
+      "name": "WEST_END",
+      "center": {
+        "lat": 43.663,
+        "lng": -70.265
+      },
+      "bbox": {
+        "min_lat": 43.65,
+        "max_lat": 43.675,
+        "min_lng": -70.275,
+        "max_lng": -70.255
+      },
+      "submarkets": [
+        "West End",
+        "Parkside"
+      ]
+    },
+    "BACK_COVE": {
+      "name": "BACK_COVE",
+      "center": {
+        "lat": 43.682,
+        "lng": -70.268
+      },
+      "bbox": {
+        "min_lat": 43.67,
+        "max_lat": 43.695,
+        "min_lng": -70.28,
+        "max_lng": -70.255
+      },
+      "submarkets": [
+        "Back Cove"
+      ]
+    },
+    "SOUTHWEST_HILLS": {
+      "name": "SOUTHWEST_HILLS",
+      "center": {
+        "lat": 43.63,
+        "lng": -70.282
+      },
+      "bbox": {
+        "min_lat": 43.615,
+        "max_lat": 43.645,
+        "min_lng": -70.3,
+        "max_lng": -70.265
+      },
+      "submarkets": [
+        "Deering",
+        "Nasons Corner"
+      ]
+    }
+  },
+  "submarkets": {
+    "Old Port": {
+      "name": "Old Port",
+      "division": "DOWNTOWN_PENINSULA",
+      "center": {
+        "lat": 43.657,
+        "lng": -70.2545
+      },
+      "description": "The cobblestone waterfront district of boutiques, restaurants, and converted wharf condos at the foot of the Old Port."
+    },
+    "Arts District": {
+      "name": "Arts District",
+      "division": "DOWNTOWN_PENINSULA",
+      "center": {
+        "lat": 43.653,
+        "lng": -70.26
+      },
+      "description": "The Congress Street corridor around the Portland Museum of Art and the State Theatre with mixed-use conversion and gallery-retail demand."
+    },
+    "East Bayside": {
+      "name": "East Bayside",
+      "division": "EAST_BAYSIDE",
+      "center": {
+        "lat": 43.668,
+        "lng": -70.255
+      },
+      "description": "The rapidly gentrifying grid east of Franklin Arterial with food-hall retail, micro-breweries, and infill residential."
+    },
+    "Munjoy Hill": {
+      "name": "Munjoy Hill",
+      "division": "EAST_BAYSIDE",
+      "center": {
+        "lat": 43.671,
+        "lng": -70.25
+      },
+      "description": "The eastern bluff overlooking the bay with dense pre-war housing stock, the Eastern Prom, and steady renovation flow."
+    },
+    "West End": {
+      "name": "West End",
+      "division": "WEST_END",
+      "center": {
+        "lat": 43.663,
+        "lng": -70.265
+      },
+      "description": "The Victorian mansion district west of downtown with landmarked rowhouses and high-end restoration trades."
+    },
+    "Parkside": {
+      "name": "Parkside",
+      "division": "WEST_END",
+      "center": {
+        "lat": 43.658,
+        "lng": -70.27
+      },
+      "description": "The mixed-income ward around Deering Oaks with craftsman stock, a deep rental register, and block-by-block reinvestment."
+    },
+    "Back Cove": {
+      "name": "Back Cove",
+      "division": "BACK_COVE",
+      "center": {
+        "lat": 43.685,
+        "lng": -70.27
+      },
+      "description": "The ring-road residential basin north of downtown with solid double-lot housing and investor renovation flow."
+    },
+    "Deering": {
+      "name": "Deering",
+      "division": "SOUTHWEST_HILLS",
+      "center": {
+        "lat": 43.63,
+        "lng": -70.28
+      },
+      "description": "The northern residential neighborhoods along Stevens Avenue with multi-family stock and immigrant-owned commercial corridors."
+    },
+    "Nasons Corner": {
+      "name": "Nasons Corner",
+      "division": "SOUTHWEST_HILLS",
+      "center": {
+        "lat": 43.62,
+        "lng": -70.29
+      },
+      "description": "The southwest edge of the city with post-war subdivisions and the lowest sale prices meeting the heaviest acquisition flow."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": null,
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SALE_DATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/portland_maine.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

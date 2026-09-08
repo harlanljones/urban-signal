@@ -1,0 +1,278 @@
+city_id: frederick
+name: Frederick
+state: MD
+center:
+  lat: 39.4143
+  lng: -77.4105
+metro_bbox:
+  min_lat: 39.35
+  max_lat: 39.48
+  min_lng: -77.47
+  max_lng: -77.37
+division_bboxes:
+  DOWNTOWN_HISTORIC:
+    min_lat: 39.4
+    max_lat: 39.425
+    min_lng: -77.425
+    max_lng: -77.405
+  NORTH_MARKET:
+    min_lat: 39.425
+    max_lat: 39.46
+    min_lng: -77.43
+    max_lng: -77.4
+  SOUTH_CREEK:
+    min_lat: 39.36
+    max_lat: 39.4
+    min_lng: -77.43
+    max_lng: -77.4
+  WEST_RIDGE:
+    min_lat: 39.39
+    max_lat: 39.45
+    min_lng: -77.47
+    max_lng: -77.43
+  EAST_GATE:
+    min_lat: 39.39
+    max_lat: 39.45
+    min_lng: -77.4
+    max_lng: -77.37
+submarkets:
+  Downtown Frederick:
+    name: Downtown Frederick
+    borough: DOWNTOWN_HISTORIC
+    lat: 39.413
+    lng: -77.411
+    zoom: 15.0
+    pitch: 45.0
+    base_lims: 0.86
+    capex: 6200000.0
+    permit_vel: 32.0
+    shift_ratio: 1.46
+    sla: 56.0
+    description: The Carroll Creek / Market Street CBD with office-to-residential
+      conversions, the Frederick anchor projects, and the city's densest mixed-use
+      pipeline.
+    city_id: frederick
+  Carroll Creek:
+    name: Carroll Creek
+    borough: DOWNTOWN_HISTORIC
+    lat: 39.41
+    lng: -77.407
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.82
+    capex: 4100000.0
+    permit_vel: 24.0
+    shift_ratio: 1.34
+    sla: 46.0
+    description: The linear park district southwest of downtown with restored historic
+      rowhouses and steady restoration trades.
+    city_id: frederick
+  North Market Street:
+    name: North Market Street
+    borough: NORTH_MARKET
+    lat: 39.432
+    lng: -77.412
+    zoom: 15.0
+    pitch: 40.0
+    base_lims: 0.84
+    capex: 4900000.0
+    permit_vel: 30.0
+    shift_ratio: 1.42
+    sla: 54.0
+    description: The north-end corridor of boutique retail, mansions cut into apartments,
+      and high-turnover condo stock.
+    city_id: frederick
+  Golden Mile:
+    name: Golden Mile
+    borough: NORTH_MARKET
+    lat: 39.445
+    lng: -77.41
+    zoom: 14.0
+    pitch: 35.0
+    base_lims: 0.78
+    capex: 3600000.0
+    permit_vel: 22.0
+    shift_ratio: 1.28
+    sla: 42.0
+    description: The U.S. 40 commercial strip with auto-row reinvestment and investor
+      renovation flow.
+    city_id: frederick
+  South End:
+    name: South End
+    borough: SOUTH_CREEK
+    lat: 39.385
+    lng: -77.415
+    zoom: 14.0
+    pitch: 32.0
+    base_lims: 0.7
+    capex: 3000000.0
+    permit_vel: 20.0
+    shift_ratio: 1.24
+    sla: 40.0
+    description: The Monocacy-side wards south of downtown with craftsman-bungalow
+      stock and block-by-block reinvestment.
+    city_id: frederick
+  West Side:
+    name: West Side
+    borough: WEST_RIDGE
+    lat: 39.415
+    lng: -77.45
+    zoom: 14.0
+    pitch: 32.0
+    base_lims: 0.74
+    capex: 3300000.0
+    permit_vel: 21.0
+    shift_ratio: 1.26
+    sla: 42.0
+    description: The west-side grid toward the Middletown Valley with solid pre-war
+      housing stock and steady acquisition flow.
+    city_id: frederick
+  East Gate:
+    name: East Gate
+    borough: EAST_GATE
+    lat: 39.415
+    lng: -77.385
+    zoom: 14.0
+    pitch: 32.0
+    base_lims: 0.68
+    capex: 2800000.0
+    permit_vel: 17.0
+    shift_ratio: 1.2
+    sla: 36.0
+    description: The east-side gateway toward the Liberty watershed with the city's
+      lowest sale prices and heaviest vacancy-to-acquisition conversion.
+    city_id: frederick
+divisions:
+  DOWNTOWN_HISTORIC:
+    name: DOWNTOWN_HISTORIC
+    center_lat: 39.41
+    center_lng: -77.411
+    zoom: 13.5
+    bbox:
+      min_lat: 39.4
+      max_lat: 39.425
+      min_lng: -77.425
+      max_lng: -77.405
+    submarkets:
+    - Downtown Frederick
+    - Carroll Creek
+    city_id: frederick
+  NORTH_MARKET:
+    name: NORTH_MARKET
+    center_lat: 39.44
+    center_lng: -77.412
+    zoom: 13.5
+    bbox:
+      min_lat: 39.425
+      max_lat: 39.46
+      min_lng: -77.43
+      max_lng: -77.4
+    submarkets:
+    - North Market Street
+    - Golden Mile
+    city_id: frederick
+  SOUTH_CREEK:
+    name: SOUTH_CREEK
+    center_lat: 39.385
+    center_lng: -77.415
+    zoom: 13.0
+    bbox:
+      min_lat: 39.36
+      max_lat: 39.4
+      min_lng: -77.43
+      max_lng: -77.4
+    submarkets:
+    - South End
+    city_id: frederick
+  WEST_RIDGE:
+    name: WEST_RIDGE
+    center_lat: 39.42
+    center_lng: -77.45
+    zoom: 13.0
+    bbox:
+      min_lat: 39.39
+      max_lat: 39.45
+      min_lng: -77.47
+      max_lng: -77.43
+    submarkets:
+    - West Side
+    city_id: frederick
+  EAST_GATE:
+    name: EAST_GATE
+    center_lat: 39.42
+    center_lng: -77.385
+    zoom: 13.0
+    bbox:
+      min_lat: 39.39
+      max_lat: 39.45
+      min_lng: -77.4
+      max_lng: -77.37
+    submarkets:
+    - East Gate
+    city_id: frederick
+datasets:
+  deeds:
+    endpoint: https://services1.arcgis.com/X3lKekbdaBmNjCHu/ArcGIS/rest/services/Frederick_Parcels/FeatureServer/3
+    platform: arcgis
+    watermark_col: SALE_DATE
+    id_keys:
+    - PARCELID
+    - OBJECTID
+    - SALE_DATE
+    topic: raw.municipal.deeds
+    interval_seconds: 600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: text
+    watermark_format: '%m/%d/%Y'
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - PARCELID
+      bbl:
+      - PARCELID
+      doc_type:
+      - SALE_TYPE
+      document_amount:
+      - SALE_PRICE
+      recorded_date:
+      - SALE_DATE
+      address_street:
+      - SITEADDRESS
+      incident_address:
+      - SITEADDRESS
+      borough:
+      - CITY
+      zipcode:
+      - ZIPCODE
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 100000
+    expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: false
+    zip_member: null
+aliases:
+- frederick_md
+- frederick-md
+- frederick md
+job_suffix: frederick

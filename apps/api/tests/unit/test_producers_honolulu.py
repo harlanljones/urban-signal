@@ -23,7 +23,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_honolulu import FIELD_MAP, GEOCODE_CONTEXT
+from src.spatial.cities.honolulu import FIELD_MAP, GEOCODE_CONTEXT
 from src.spatial.cities.honolulu import (
     HONOLULU_311_FIELD_MAP,
     HONOLULU_DIVISION_BBOXES,

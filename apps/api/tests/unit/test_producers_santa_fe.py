@@ -27,7 +27,7 @@ from src.producers.complaints_311_producer import (
     Complaints311Producer,
 )
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_santa_fe import (
+from src.spatial.cities.santa_fe import (
     COMPLAINTS_311_FIELD_MAP,
     FIELD_MAP,
     GEOCODE_CONTEXT,

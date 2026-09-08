@@ -1,0 +1,193 @@
+{
+  "schema_version": 2,
+  "id": "wilmington_de",
+  "name": "Wilmington",
+  "state": "DE",
+  "center": {
+    "lat": 39.7447,
+    "lng": -75.5466
+  },
+  "metro_bbox": {
+    "min_lat": 39.7,
+    "max_lat": 39.79,
+    "min_lng": -75.62,
+    "max_lng": -75.51
+  },
+  "divisions": {
+    "DOWNTOWN_CORE": {
+      "name": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 39.7455,
+        "lng": -75.549
+      },
+      "bbox": {
+        "min_lat": 39.74,
+        "max_lat": 39.76,
+        "min_lng": -75.56,
+        "max_lng": -75.54
+      },
+      "submarkets": [
+        "Downtown",
+        "Little Italy"
+      ]
+    },
+    "RIVERFRONT": {
+      "name": "RIVERFRONT",
+      "center": {
+        "lat": 39.742,
+        "lng": -75.535
+      },
+      "bbox": {
+        "min_lat": 39.73,
+        "max_lat": 39.75,
+        "min_lng": -75.54,
+        "max_lng": -75.52
+      },
+      "submarkets": [
+        "Riverfront"
+      ]
+    },
+    "WEST_SIDE": {
+      "name": "WEST_SIDE",
+      "center": {
+        "lat": 39.761,
+        "lng": -75.578
+      },
+      "bbox": {
+        "min_lat": 39.75,
+        "max_lat": 39.78,
+        "min_lng": -75.6,
+        "max_lng": -75.56
+      },
+      "submarkets": [
+        "Highlands"
+      ]
+    },
+    "NORTH_SIDE": {
+      "name": "NORTH_SIDE",
+      "center": {
+        "lat": 39.78,
+        "lng": -75.545
+      },
+      "bbox": {
+        "min_lat": 39.77,
+        "max_lat": 39.79,
+        "min_lng": -75.56,
+        "max_lng": -75.52
+      },
+      "submarkets": [
+        "Brandywine"
+      ]
+    },
+    "SOUTH_SIDE": {
+      "name": "SOUTH_SIDE",
+      "center": {
+        "lat": 39.715,
+        "lng": -75.545
+      },
+      "bbox": {
+        "min_lat": 39.7,
+        "max_lat": 39.73,
+        "min_lng": -75.57,
+        "max_lng": -75.53
+      },
+      "submarkets": [
+        "Southbridge"
+      ]
+    },
+    "EAST_SIDE": {
+      "name": "EAST_SIDE",
+      "center": {
+        "lat": 39.758,
+        "lng": -75.523
+      },
+      "bbox": {
+        "min_lat": 39.73,
+        "max_lat": 39.76,
+        "min_lng": -75.53,
+        "max_lng": -75.51
+      },
+      "submarkets": [
+        "Trolley Square"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown": {
+      "name": "Downtown",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 39.7447,
+        "lng": -75.5466
+      },
+      "description": "The Market Street CBD and Rodney Square core with office-to-residential conversions, the Wilmington renaissance pipeline, and the city's densest mixed-use activity."
+    },
+    "Little Italy": {
+      "name": "Little Italy",
+      "division": "DOWNTOWN_CORE",
+      "center": {
+        "lat": 39.747,
+        "lng": -75.553
+      },
+      "description": "The Union Street corridor south of downtown with rowhouse restoration trades, trattoria-row licensing, and steady infill reinvestment."
+    },
+    "Riverfront": {
+      "name": "Riverfront",
+      "division": "RIVERFRONT",
+      "center": {
+        "lat": 39.742,
+        "lng": -75.535
+      },
+      "description": "The Christina Riverfront east of the CBD with the Blue Rocks ballpark, convention-hotel licensing, and the metro's highest-energy waterfront renewal."
+    },
+    "Trolley Square": {
+      "name": "Trolley Square",
+      "division": "EAST_SIDE",
+      "center": {
+        "lat": 39.758,
+        "lng": -75.523
+      },
+      "description": "The 17th Street / Delaware Avenue edge of the East Side with 1920s apartment stock, stable owner-occupancy, and the metro's most conservation-minded renovation flow."
+    },
+    "Highlands": {
+      "name": "Highlands",
+      "division": "WEST_SIDE",
+      "center": {
+        "lat": 39.761,
+        "lng": -75.578
+      },
+      "description": "The West Side's Highlands grid around the Pennsylvania Avenue branch with pre-war single-family stock and block-by-block reinvestment near the city line."
+    },
+    "Brandywine": {
+      "name": "Brandywine",
+      "division": "NORTH_SIDE",
+      "center": {
+        "lat": 39.78,
+        "lng": -75.545
+      },
+      "description": "The Brandywine / 10th Street north side with the hospital-edge commercial spine, Highlands spillover, and value-priced family-housing reinvestment."
+    },
+    "Southbridge": {
+      "name": "Southbridge",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 39.715,
+        "lng": -75.545
+      },
+      "description": "The Christina River / Southbridge village with early-stage waterfront reinvestment, the port-adjacent industrial edge, and the metro's lowest sale prices."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": null,
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SALE_DATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/wilmington_de.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

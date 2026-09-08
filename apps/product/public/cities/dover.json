@@ -1,0 +1,178 @@
+{
+  "schema_version": 2,
+  "id": "dover",
+  "name": "Dover",
+  "state": "DE",
+  "center": {
+    "lat": 39.1582,
+    "lng": -75.5244
+  },
+  "metro_bbox": {
+    "min_lat": 39.1,
+    "max_lat": 39.21,
+    "min_lng": -75.58,
+    "max_lng": -75.46
+  },
+  "divisions": {
+    "DOWNTOWN": {
+      "name": "DOWNTOWN",
+      "center": {
+        "lat": 39.157,
+        "lng": -75.5245
+      },
+      "bbox": {
+        "min_lat": 39.145,
+        "max_lat": 39.172,
+        "min_lng": -75.54,
+        "max_lng": -75.505
+      },
+      "submarkets": [
+        "Dover Downtown",
+        "Loockerman"
+      ]
+    },
+    "EAST_SIDE": {
+      "name": "EAST_SIDE",
+      "center": {
+        "lat": 39.157,
+        "lng": -75.49
+      },
+      "bbox": {
+        "min_lat": 39.145,
+        "max_lat": 39.172,
+        "min_lng": -75.505,
+        "max_lng": -75.47
+      },
+      "submarkets": [
+        "East Dover"
+      ]
+    },
+    "WEST_SIDE": {
+      "name": "WEST_SIDE",
+      "center": {
+        "lat": 39.158,
+        "lng": -75.555
+      },
+      "bbox": {
+        "min_lat": 39.145,
+        "max_lat": 39.172,
+        "min_lng": -75.575,
+        "max_lng": -75.54
+      },
+      "submarkets": [
+        "Silver Lake"
+      ]
+    },
+    "NORTH_DOVER": {
+      "name": "NORTH_DOVER",
+      "center": {
+        "lat": 39.192,
+        "lng": -75.518
+      },
+      "bbox": {
+        "min_lat": 39.172,
+        "max_lat": 39.21,
+        "min_lng": -75.56,
+        "max_lng": -75.49
+      },
+      "submarkets": [
+        "North Dover",
+        "Water Works"
+      ]
+    },
+    "SOUTH_DOVER": {
+      "name": "SOUTH_DOVER",
+      "center": {
+        "lat": 39.122,
+        "lng": -75.525
+      },
+      "bbox": {
+        "min_lat": 39.1,
+        "max_lat": 39.145,
+        "min_lng": -75.56,
+        "max_lng": -75.49
+      },
+      "submarkets": [
+        "South Dover"
+      ]
+    }
+  },
+  "submarkets": {
+    "Dover Downtown": {
+      "name": "Dover Downtown",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 39.1582,
+        "lng": -75.5244
+      },
+      "description": "The capital Green and Loockerman Street CBD with state-office adjacent mixed-use and courthouse-district reinvestment."
+    },
+    "Loockerman": {
+      "name": "Loockerman",
+      "division": "DOWNTOWN",
+      "center": {
+        "lat": 39.156,
+        "lng": -75.525
+      },
+      "description": "The West Loockerman Street corridor west of the Green with pre-war housing stock and steady restoration trades."
+    },
+    "East Dover": {
+      "name": "East Dover",
+      "division": "EAST_SIDE",
+      "center": {
+        "lat": 39.158,
+        "lng": -75.49
+      },
+      "description": "The Route 13 / Bay Road commercial spine east of the Green with auto-row retail and investor multifamily flow."
+    },
+    "Silver Lake": {
+      "name": "Silver Lake",
+      "division": "WEST_SIDE",
+      "center": {
+        "lat": 39.158,
+        "lng": -75.555
+      },
+      "description": "The Silver Lake residential grid northwest of downtown with solid mid-century housing stock and lake-adjacent turnover."
+    },
+    "North Dover": {
+      "name": "North Dover",
+      "division": "NORTH_DOVER",
+      "center": {
+        "lat": 39.19,
+        "lng": -75.525
+      },
+      "description": "The north-side growth wedge along Route 8 with the hospital and Big-box corridor driving the permit mix."
+    },
+    "Water Works": {
+      "name": "Water Works",
+      "division": "NORTH_DOVER",
+      "center": {
+        "lat": 39.195,
+        "lng": -75.51
+      },
+      "description": "The far-north St. Jones watershed edge where the city's lowest sale prices meet the heaviest vacancy-to-acquisition flow."
+    },
+    "South Dover": {
+      "name": "South Dover",
+      "division": "SOUTH_DOVER",
+      "center": {
+        "lat": 39.12,
+        "lng": -75.525
+      },
+      "description": "The south-side residential wards along Route 13 with craftsman-bungalow stock and block-by-block reinvestment."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": null,
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SALEDATE",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/dover.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

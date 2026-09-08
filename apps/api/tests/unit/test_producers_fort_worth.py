@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.producers.field_maps_fort_worth import FIELD_MAP as FORT_WORTH_PERMITS_FIELD_MAP
+from src.spatial.cities.fort_worth import FIELD_MAP as FORT_WORTH_PERMITS_FIELD_MAP
 from src.spatial.cities.fort_worth import (
     FORT_WORTH_DIVISION_BBOXES,
     FORT_WORTH_DIVISIONS,

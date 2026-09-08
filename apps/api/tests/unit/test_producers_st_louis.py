@@ -11,7 +11,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_st_louis import FIELD_MAP, GEOCODE_CONTEXT
+from src.spatial.cities.st_louis import FIELD_MAP, GEOCODE_CONTEXT
 from src.spatial.cities.st_louis import (
     STL_311_ENDPOINT,
     STL_311_SPEC,

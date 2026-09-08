@@ -1,0 +1,203 @@
+{
+  "schema_version": 2,
+  "id": "manchester",
+  "name": "Manchester",
+  "state": "NH",
+  "center": {
+    "lat": 42.9956,
+    "lng": -71.4548
+  },
+  "metro_bbox": {
+    "min_lat": 42.93,
+    "max_lat": 43.06,
+    "min_lng": -71.53,
+    "max_lng": -71.4
+  },
+  "divisions": {
+    "DOWNTOWN_MILL": {
+      "name": "DOWNTOWN_MILL",
+      "center": {
+        "lat": 42.989,
+        "lng": -71.4635
+      },
+      "bbox": {
+        "min_lat": 42.975,
+        "max_lat": 43.005,
+        "min_lng": -71.475,
+        "max_lng": -71.44
+      },
+      "submarkets": [
+        "Center City",
+        "Millyard"
+      ]
+    },
+    "WEST_SIDE": {
+      "name": "WEST_SIDE",
+      "center": {
+        "lat": 42.996,
+        "lng": -71.4925
+      },
+      "bbox": {
+        "min_lat": 42.985,
+        "max_lat": 43.02,
+        "min_lng": -71.51,
+        "max_lng": -71.47
+      },
+      "submarkets": [
+        "West End",
+        "Rimmon Heights"
+      ]
+    },
+    "NORTH_END": {
+      "name": "NORTH_END",
+      "center": {
+        "lat": 43.03,
+        "lng": -71.47
+      },
+      "bbox": {
+        "min_lat": 43.0,
+        "max_lat": 43.055,
+        "min_lng": -71.49,
+        "max_lng": -71.44
+      },
+      "submarkets": [
+        "North End"
+      ]
+    },
+    "SOUTH_COMMERCIAL": {
+      "name": "SOUTH_COMMERCIAL",
+      "center": {
+        "lat": 42.955,
+        "lng": -71.44
+      },
+      "bbox": {
+        "min_lat": 42.935,
+        "max_lat": 42.975,
+        "min_lng": -71.47,
+        "max_lng": -71.42
+      },
+      "submarkets": [
+        "South Willow"
+      ]
+    },
+    "EAST_INDUSTRIAL": {
+      "name": "EAST_INDUSTRIAL",
+      "center": {
+        "lat": 42.995,
+        "lng": -71.42
+      },
+      "bbox": {
+        "min_lat": 42.98,
+        "max_lat": 43.01,
+        "min_lng": -71.44,
+        "max_lng": -71.4
+      },
+      "submarkets": [
+        "Brown Ave"
+      ]
+    },
+    "QUEENS_CITY": {
+      "name": "QUEENS_CITY",
+      "center": {
+        "lat": 42.96,
+        "lng": -71.48
+      },
+      "bbox": {
+        "min_lat": 42.94,
+        "max_lat": 42.985,
+        "min_lng": -71.5,
+        "max_lng": -71.46
+      },
+      "submarkets": [
+        "Queen City"
+      ]
+    }
+  },
+  "submarkets": {
+    "Center City": {
+      "name": "Center City",
+      "division": "DOWNTOWN_MILL",
+      "center": {
+        "lat": 42.99,
+        "lng": -71.462
+      },
+      "description": "The Elm Street CBD and Millyard district: office-to-residential conversions, the SNHU/UNH extension anchors, and the city's densest mixed-use pipeline around the Merrimack."
+    },
+    "Millyard": {
+      "name": "Millyard",
+      "division": "DOWNTOWN_MILL",
+      "center": {
+        "lat": 42.988,
+        "lng": -71.465
+      },
+      "description": "The historic Amoskeag Millyard along the river with loft conversions, brewery-retail, and steady restoration trades in the brick-mill stock."
+    },
+    "West End": {
+      "name": "West End",
+      "division": "WEST_SIDE",
+      "center": {
+        "lat": 43.0,
+        "lng": -71.49
+      },
+      "description": "The West Side grid west of the river with pre-war housing stock, the Striar West village mixed-use corridor, and investor renovation flow."
+    },
+    "Rimmon Heights": {
+      "name": "Rimmon Heights",
+      "division": "WEST_SIDE",
+      "center": {
+        "lat": 42.992,
+        "lng": -71.495
+      },
+      "description": "The Rimmon Heights / Notre Dame neighborhood south of Bridge St with dense two-and-three-family stock and block-by-block reinvestment."
+    },
+    "North End": {
+      "name": "North End",
+      "division": "NORTH_END",
+      "center": {
+        "lat": 43.03,
+        "lng": -71.47
+      },
+      "description": "The North End along the Merrimack and the riverfront redevelopment parcels north of downtown with steady infill and hospitality licensing."
+    },
+    "South Willow": {
+      "name": "South Willow",
+      "division": "SOUTH_COMMERCIAL",
+      "center": {
+        "lat": 42.955,
+        "lng": -71.44
+      },
+      "description": "The South Willow Street commercial corridor and Mall of New Hampshire retail district with hotel/hospitality turnover and redevelopment pressure."
+    },
+    "Brown Ave": {
+      "name": "Brown Ave",
+      "division": "EAST_INDUSTRIAL",
+      "center": {
+        "lat": 42.995,
+        "lng": -71.42
+      },
+      "description": "The Brown Avenue / Queen City Avenue east side with light industrial, airport-adjacent parcels, and the city's lowest sale prices meeting conversion flow."
+    },
+    "Queen City": {
+      "name": "Queen City",
+      "division": "QUEENS_CITY",
+      "center": {
+        "lat": 42.96,
+        "lng": -71.48
+      },
+      "description": "The Piscataquog / Queen City Avenue southwest village with craftsman-bungalow stock, a deep rental register, and steady reinvestment."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": null,
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SaleDate",
+      "interval_seconds": 600.0,
+      "topic": "raw.municipal.deeds"
+    }
+  },
+  "evidence_path": "apps/api/src/spatial/cities/manchester.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

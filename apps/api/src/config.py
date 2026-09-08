@@ -609,6 +609,32 @@ class Settings(BaseSettings):
         ),
         description="OR CCB active contractor licenses, namespaced license_type (US-372)",
     )
+    # US-377 state childcare licensing registries.
+    socrata_tx_hhsc_ccl_endpoint: str = Field(
+        default=(
+            "https://data.texas.gov/resource/bc5r-88dy.json"
+            "?$select=*, 'tx_ccl:' || type_of_issuance as license_type_ns, :updated_at"
+        ),
+        description="TX HHSC Child Care Licensing operations (US-377)",
+    )
+    socrata_ny_ocfs_endpoint: str = Field(
+        default=(
+            "https://data.ny.gov/resource/cb42-qumz.json"
+            "?$select=*, 'ny_ocfs:' || program_type as license_type_ns, trim(street_number || ' ' || street_name) as street_address_ns, :updated_at"
+        ),
+        description="NY OCFS child care facilities (US-377)",
+    )
+    socrata_nyc_dohmh_childcare_endpoint: str = Field(
+        default=(
+            "https://data.cityofnewyork.us/resource/gy3q-4tzp.json"
+            "?$select=*, 'nyc_cc:' || facility_type as license_type_ns"
+        ),
+        description="NYC DOHMH child care center inspections/permits (US-377)",
+    )
+    arcgis_dc_child_dev_endpoint: str = Field(
+        default="https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Public_Service_WebMercator/MapServer/33",
+        description="DC Child Development Centers (US-377)",
+    )
     # US-71: APD NIBRS Group A Offenses (Socrata `thrk-bqb6`). Rows carry no
     # lat/lng — only zip_code + census_block_group — so coordinates resolve from
     # the zip_code context via the ADR-0004 geocoder at parse time.
@@ -1077,16 +1103,6 @@ class Settings(BaseSettings):
         ),
         description="Milwaukee 2025 property-sales CSV endpoint (US-138)",
     )
-    # Milwaukee CKAN crime + 311 datastore resources.
-    ckan_milwaukee_crime_endpoint: str = Field(
-        default="ckan://data.milwaukee.gov/87843297-a6fa-46d4-ba5d-cb342fb2d3bb",
-        description="Milwaukee crime incidents CKAN datastore resource",
-    )
-    ckan_milwaukee_311_endpoint: str = Field(
-        default="ckan://data.milwaukee.gov/bf2b508a-5bfa-49da-8846-d87ffeee020a",
-        description="Milwaukee 311 service requests CKAN datastore resource",
-    )
-
     # Charlotte, NC (ArcGIS): city 311 service requests with native
     # LATITUDE/LONGITUDE + point geometry. Mecklenburg County permits/parcels
     # live on an ArcGIS Hub surface with no quickly-verifiable bulk feed
@@ -1376,11 +1392,6 @@ class Settings(BaseSettings):
         ),
         description="Tulsa Verint 311 cases rolling-window FeatureServer layer URL",
     )
-    # Tulsa crime (ArcGIS `Tulsa_Crime_Time_Display`).
-    arcgis_tulsa_crime_url: str = Field(
-        default="https://services5.arcgis.com/cuQhNeNcUrgLmYGD/arcgis/rest/services/Tulsa_Crime_Time_Display/FeatureServer/0",
-        description="Tulsa crime incidents ArcGIS FeatureServer layer URL",
-    )
 
     # El Paso, TX (US-156): Accela-backed requests are a live 30-day partial
     # view. ArcGISClient requests outSR=4326, transforming native TX state-plane
@@ -1388,11 +1399,6 @@ class Settings(BaseSettings):
     arcgis_el_paso_311_url: str = Field(
         default="https://gis.elpasotexas.gov/accela/rest/services/311/Requests/FeatureServer/0",
         description="El Paso Accela 311 requests FeatureServer layer URL",
-    )
-    # El Paso residential permits (ArcGIS `NewResi2018_19`).
-    arcgis_el_paso_permits_url: str = Field(
-        default="https://services1.arcgis.com/hyTVSIhR7dHyDsJF/arcgis/rest/services/NewResi2018_19/FeatureServer/0",
-        description="El Paso residential permits ArcGIS FeatureServer layer URL",
     )
 
     # Durham, NC (US-154): live point permits and polygon parcel sales.
@@ -1427,11 +1433,6 @@ class Settings(BaseSettings):
         ),
         description="Dallas Building Services approximately 30-day CRM view URL",
     )
-    # Dallas crimes (Socrata `pumt-d92b`).
-    socrata_dallas_crime_endpoint: str = Field(
-        default="https://www.dallasopendata.com/resource/pumt-d92b.json",
-        description="Dallas crimes Socrata endpoint",
-    )
 
     # Louisville, KY (US-148): annual Metro 311 layer plus Kentucky ABC's
     # active-license registry, filtered by the ingestion spec to Jefferson
@@ -1451,19 +1452,6 @@ class Settings(BaseSettings):
         description="Kentucky ABC active licenses FeatureServer layer URL",
     )
     # Louisville crime, active construction permits, and ROW construction
-    # permits (ArcGIS, same org as the 311/ABC layers).
-    arcgis_louisville_crime_url: str = Field(
-        default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/crime_data_2025/FeatureServer",
-        description="Louisville crime incidents ArcGIS FeatureServer layer URL",
-    )
-    arcgis_louisville_permits_url: str = Field(
-        default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/active_construction_permits/FeatureServer",
-        description="Louisville active construction permits ArcGIS FeatureServer layer URL",
-    )
-    arcgis_louisville_street_cut_url: str = Field(
-        default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/Louisville_KY_ROW_Construction_Permits_new/FeatureServer",
-        description="Louisville ROW construction permits ArcGIS FeatureServer layer URL",
-    )
 
     # Portland, OR (US-143): residential permits from Portland Maps and OLCC
     # applications received from Oregon's Socrata portal.
@@ -1506,11 +1494,6 @@ class Settings(BaseSettings):
     arcgis_boise_permits_url: str = Field(
         default="https://services1.arcgis.com/WHM6qC35aMtyAAlN/arcgis/rest/services/PDS_BuildingPermits_HighImpact/FeatureServer/0",
         description="Boise high-impact building permits ArcGIS FeatureServer layer URL",
-    )
-    # Boise Police Department crime incidents (ArcGIS `BPD_Crimes_Public`).
-    arcgis_boise_crime_url: str = Field(
-        default="https://services1.arcgis.com/WHM6qC35aMtyAAlN/arcgis/rest/services/BPD_Crimes_Public/FeatureServer",
-        description="Boise crime incidents ArcGIS FeatureServer layer URL",
     )
 
     # Fort Worth / Tarrant County (US-150): CFW Development Permits Points, a
@@ -1788,15 +1771,6 @@ class Settings(BaseSettings):
     arcgis_tampa_sla_url: str = Field(
         default="https://arcgis.tampagov.net/arcgis/rest/services/Planning/AlcoholBeverage/FeatureServer/0",
         description="Tampa alcohol-beverage partial SLA ArcGIS FeatureServer layer URL",
-    )
-    # Tampa crime (calls for service) and right-of-way permits (ArcGIS).
-    arcgis_tampa_crime_url: str = Field(
-        default="https://arcgis.tampagov.net/arcgis/rest/services/CallsforService/FirePoliceCalls/MapServer/1",
-        description="Tampa calls-for-service ArcGIS MapServer layer URL",
-    )
-    arcgis_tampa_street_cut_url: str = Field(
-        default="https://arcgis.tampagov.net/arcgis/rest/services/Transportation/ROWPermits/FeatureServer/0",
-        description="Tampa right-of-way permits ArcGIS FeatureServer layer URL",
     )
 
     # Cape Coral–Fort Myers, FL (US-285): public permits MapServer table (address-only).
@@ -2296,4 +2270,92 @@ class Settings(BaseSettings):
         return self
 
 
+
+    arcgis_albany_deeds_url: str = Field(
+        default=(
+            "https://albanyny.gov/server/rest/services/Real_Property/"
+            "Tax_Parcels/FeatureServer/0"
+        ),
+        description="Albany NY deeds/sales ArcGIS FeatureServer URL (US-353)",
+    )
+
+    arcgis_providence_deeds_url: str = Field(
+        default="https://providenceri.gov/server/rest/services/OpenData/Parcels/FeatureServer/0",
+        description="Providence, RI deeds/sales ArcGIS FeatureServer URL (US-350)",
+    )
+
+    arcgis_richmond_deeds_url: str = Field(
+        default="https://data.rva.gov/server/rest/services/Property/RealEstateSales/FeatureServer/0",
+        description="Richmond VA deeds/sales ArcGIS FeatureServer URL (US-348)",
+    )
+
+    arcgis_huntington_wv_deeds_url: str = Field(
+        default=(
+            "https://huntingtonwv.gov/server/rest/services/"
+            "Parcels/Deeds/FeatureServer/0"
+        ),
+        description="Huntington WV deeds/sales ArcGIS FeatureServer URL (US-320)",
+    )
+
+    arcgis_charleston_wv_deeds_url: str = Field(
+        default="https://services8.arcgis.com/0zSnoqwLCR3i1Yfw/arcgis/rest/services/Charleston_Parcels/FeatureServer/0",
+        description="Charleston WV deeds/sales ArcGIS FeatureServer URL (US-319)",
+    )
+
+    arcgis_dover_deeds_url: str = Field(
+        default=(
+            "https://gis.delaware.gov/arcgis/rest/services/Dover/Dover_Parcels/"
+            "FeatureServer/0"
+        ),
+        description="Dover DE deeds/sales ArcGIS FeatureServer URL (US-317)",
+    )
+
+    arcgis_burlington_deeds_url: str = Field(
+        default="https://data.burlingtonvt.gov/server/rest/services/Assessment_Parcels/FeatureServer/0",
+        description="Burlington VT deeds/sales ArcGIS FeatureServer URL (US-316)",
+    )
+
+    arcgis_frederick_deeds_url: str = Field(
+        default="https://services1.arcgis.com/X3lKekbdaBmNjCHu/ArcGIS/rest/services/Frederick_Parcels/FeatureServer/3",
+        description="Frederick MD deeds/sales ArcGIS FeatureServer URL (US-315)",
+    )
+
+    arcgis_roanoke_deeds_url: str = Field(
+        default="https://gis.roanokeva.gov/server/rest/services/OpenData/Parcels/FeatureServer/0",
+        description="Roanoke VA deeds/sales ArcGIS FeatureServer URL (US-314)",
+    )
+
+    arcgis_manchester_deeds_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/KlG08rx11MkfACQT/arcgis/rest/services/"
+            "Manchester_NH_Property_Card/FeatureServer/0"
+        ),
+        description="Manchester NH deeds/sales ArcGIS FeatureServer URL (US-313)",
+    )
+
+    arcgis_portland_maine_deeds_url: str = Field(
+        default="https://gis.portlandmaine.gov/maps/rest/services/ParcelsWGS84/FeatureServer/0",
+        description="Portland Maine deeds/sales ArcGIS FeatureServer URL (US-312)",
+    )
+
+    arcgis_harrisburg_deeds_url: str = Field(
+        default="https://harrisburgpa.gov/server/rest/services/open_data/Property_Sales/FeatureServer/0",
+        description="Harrisburg PA deeds/sales ArcGIS FeatureServer URL (US-311)",
+    )
+
+    arcgis_wilmington_de_deeds_url: str = Field(
+        default=(
+            "https://gis.newcastlede.gov/server/rest/services/"
+            "Parcels/Real_Estate_Sales/FeatureServer/0"
+        ),
+        description="Wilmington, DE deeds/sales ArcGIS FeatureServer URL (US-310)",
+    )
+
+    arcgis_allentown_deeds_url: str = Field(
+        default=(
+            "https://gis.allentownpa.gov/server/rest/services/"
+            "Property/Parcels/FeatureServer/0"
+        ),
+        description="Allentown PA deeds/sales ArcGIS FeatureServer URL (US-307)",
+    )
 settings = Settings()

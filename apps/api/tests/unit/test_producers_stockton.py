@@ -28,7 +28,7 @@ from unittest.mock import patch
 import pytest
 
 from src.producers.field_maps import first_mapped
-from src.producers.field_maps_stockton import (
+from src.spatial.cities.stockton import (
     DROPPED_MAIL_COLUMNS,
     FIELD_MAP,
     GEOCODE_CONTEXT,

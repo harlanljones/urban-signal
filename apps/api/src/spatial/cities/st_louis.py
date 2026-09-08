@@ -325,6 +325,10 @@ ST_LOUIS_FIELD_MAPS: Dict[str, Dict[str, list[str]]] = {
     "sla": ST_LOUIS_SLA_FIELD_MAP,
 }
 
+FIELD_MAP = ST_LOUIS_FIELD_MAPS
+GEOCODE_CONTEXT = "St. Louis, MO"
+
+
 
 # ---------------------------------------------------------------------------
 # Feed specs (leaf-local dicts). Spine copies these into REGISTRY.

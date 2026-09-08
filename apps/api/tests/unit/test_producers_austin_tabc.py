@@ -15,8 +15,11 @@ from unittest.mock import patch
 import pytest
 
 import src.producers.field_maps as fm
-from src.producers.field_maps_austin_tabc import FIELD_MAP, TABC_SLA_FIELD_MAP
-from src.spatial.cities.austin import AUSTIN_TABC_SLA_SPEC
+from src.spatial.cities.austin import (
+    AUSTIN_TABC_SLA_SPEC,
+    FIELD_MAP,
+    TABC_SLA_FIELD_MAP,
+)
 
 
 @pytest.fixture(autouse=True)
