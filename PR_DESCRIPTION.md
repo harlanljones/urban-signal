@@ -1,28 +1,38 @@
-# US-374: Build NppesDiffProducer; register NPI registry weekly diffs as medical-office churn
+# US-308 / US-309 — Onboard New Haven, CT and Worcester, MA (already registered on main)
 
 ## Summary
 
-This PR completes Linear ticket US-374 by wiring the weekly NPPES (National Plan and Provider Enumeration System) NPI registry incremental diffs into Urban Signal as national medical-office churn events.
+Both New Haven (US-308) and Worcester (US-309) were **already registered on
+`main`** before these tickets were picked up. This work verified the existing
+registrations rather than adding new code.
 
-### Changes Made
-1. **NPPES Diff Producer (`apps/api/src/producers/nppes_diff_producer.py`)**:
-   - Leaf diff producer filtering for medical/clinical taxonomy codes (excluding DME supplier `33xx` codes) and geocoding metro-filtered deltas.
-   - Added `self.socrata = None` and `run_stream(...)` method to support the scheduler stream polling interface and interlock platform dispatch checks.
-2. **National Feed Registry (`apps/api/src/spatial/national_feeds.py`)**:
-   - Added `NationalFeed.NPPES_MEDICAL = "nppes_medical"` enum member and `NationalFeedSpec` registration producing `SLALicenseEvent` records to `settings.topic_sla` with `producer_key="nppes"`.
-3. **Scheduler Wiring (`apps/api/src/producers/scheduler.py`)**:
-   - Registered `nppes` (`NppesDiffProducer`) in `MunicipalIngestionScheduler.producers`.
-   - Wired `nppes_medical` job in the national feeds loop for scheduled execution.
-4. **Tests & Invariant Gates**:
-   - Added unit test `test_nppes_medical_is_registered_and_dispatchable` in `apps/api/tests/unit/test_scheduler_national_feeds.py`.
-   - Updated `apps/api/tests/unit/test_gbfs_and_national_feeds.py` to assert the updated national feeds set and exempt `settings.topic_sla` shared topic in national-vs-city cross checks.
-   - Added tests in `apps/api/tests/unit/test_nppes_diff_producer.py` covering `socrata` attribute, `run_stream` behavior, and Kafka event emitting.
-   - Fixed `VENV_PYTHON` fallback in `scripts/verify_cicd_preflight.py`.
-   - Added `.streams/us-374.md`.
+## Verification performed
 
-## Verification
+- **New Haven**: `City` enum member `NEW_HAVEN = "new_haven"`
+  (`apps/api/src/spatial/city_registry.py:171`), leaf module
+  `apps/api/src/spatial/cities/new_haven.py`, and corpus
+  `apps/api/src/spatial/cities/data/new_haven.yaml` all confirmed present.
+- **Worcester**: `City` enum member `WORCESTER = "worcester"`
+  (`apps/api/src/spatial/city_registry.py:170`), leaf module
+  `apps/api/src/spatial/cities/worcester.py`, and corpus
+  `apps/api/src/spatial/cities/data/worcester.yaml` all confirmed present.
+- **Interlock gate**: `python -m pytest -m interlock -q` from `apps/api` →
+  **35 passed** (green).
+- **Dashboard static copy**: regenerated via `scripts/export_dashboard.py` —
+  byte-synced and current.
+- **Product facts**: `bun run facts:export` succeeded
+  (`SITE_FACTS_OK`, 142 metros) — not required, included for completeness.
 
-- `pytest apps/api/tests/unit/test_nppes_diff_producer.py apps/api/tests/unit/test_gbfs_and_national_feeds.py apps/api/tests/unit/test_scheduler_national_feeds.py`: 54/54 passed.
-- `pytest -m interlock`: 35/35 passed.
-- `python3 scripts/verify_cicd_preflight.py`: All 6 gates passed (interlock, dashboard ↔ product cross-ref, product facts check, product lint, dashboard export, ruff check).
+## Result
 
+Both registrations are present and the full interlock gate is green. No code
+changes were required for either ticket. Dashboard static copy is current.
+
+## Linear
+
+- US-308 moved to **In Review** with comment:
+  "Registration already present on main; verified pytest -m interlock green and
+  dashboard static copy current."
+- US-309 moved to **In Review** with comment:
+  "Registration already present on main; verified pytest -m interlock green and
+  dashboard static copy current."

@@ -13,7 +13,6 @@ from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 # is inside the metro. Must stay == BAY_AREA_METRO_BBOX (see
 # tests/unit/test_bay_area_boundary.py).
 SF_METRO_BBOX: dict[str, float] = {
-SF_METRO_BBOX: Dict[str, float] = {
     "min_lat": 36.89,
     "max_lat": 38.87,
     "min_lng": -123.64,
