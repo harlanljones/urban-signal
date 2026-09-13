@@ -73,4 +73,31 @@ def test_unknown_source_readable_error():
 
 
 def test_registry_covers_expected_sources():
-    assert set(CONTEXT_SOURCES) == {ContextSourceId.LODES, ContextSourceId.ZBP}
+    assert set(CONTEXT_SOURCES) == {
+        ContextSourceId.LODES,
+        ContextSourceId.ZBP,
+        ContextSourceId.OVERTURE_BUILDINGS,
+        ContextSourceId.OVERTURE_PLACES,
+    }
+
+
+def test_overture_buildings_spec_declares_odbl_share_alike():
+    spec = get_context_source(ContextSourceId.OVERTURE_BUILDINGS)
+    assert spec.implemented is True
+    assert spec.assignment_method == "footprint_centroid"
+    assert spec.supported_resolutions == (9,)
+    assert "ODbL" in spec.attribution
+    assert "OpenStreetMap" in spec.attribution
+    by_name = {m.name: m for m in spec.metrics}
+    assert {"building_count", "total_footprint_area_m2", "avg_height_m", "class_mix", "building_density_weight"} <= set(by_name)
+    assert "share-alike" in spec.notes.lower()
+
+
+def test_overture_places_spec_has_no_share_alike_obligation():
+    spec = get_context_source(ContextSourceId.OVERTURE_PLACES)
+    assert spec.implemented is True
+    assert spec.assignment_method == "point_geometry"
+    assert "CDLA" in spec.attribution
+    by_name = {m.name: m for m in spec.metrics}
+    assert {"poi_density", "poi_category_mix", "commercial_churn"} <= set(by_name)
+    assert "no share-alike" in spec.notes.lower()
