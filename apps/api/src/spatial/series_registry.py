@@ -30,12 +30,23 @@ is one whole-file GET on the publisher's own monthly cadence.
 Credentialed series (HUD, Census) declare their environment variable and fail
 with a readable error when it is unset, rather than silently returning zero
 rows.
+
+**Redfin is not registered here (US-440).** Redfin's ZIP-code market tracker
+publishes eight metrics per row in one gzipped TSV rather than one value
+column per file, which doesn't fit ``SeriesSpec``; it has its own module,
+``src.producers.redfin_client``, that emits the same ``SeriesObservation``
+shape this registry's Zillow specs do. ``zori_zip``/``zhvi_zip`` above are the
+Zillow half of the Redfin/Zillow reconciliation in
+``src.features.market_reconciliation``; the ZIP-to-H3 area-weighted join that
+consumes both lives in ``src.spatial.zip_h3_join``.
 """
 
 from __future__ import annotations
 
-from typing import Dict, List
-
+from src.producers.ntd_spec import (
+    NTD_MEASURES,
+    NTD_MONTHLY_RIDERSHIP_ENDPOINT,
+)
 from src.producers.series_client import (
     LONG_ROWS,
     PROFILE_BULK_CSV,
@@ -46,16 +57,11 @@ from src.producers.series_client import (
     SeriesSpec,
 )
 
-from src.producers.ntd_spec import (
-    NTD_MEASURES,
-    NTD_MONTHLY_RIDERSHIP_ENDPOINT,
-)
-
 ZILLOW_ATTRIBUTION = "Data Provided by Zillow Group"
 
 _ZILLOW_CSV = "https://files.zillowstatic.com/research/public_csvs"
 
-SERIES_REGISTRY: Dict[str, SeriesSpec] = {
+SERIES_REGISTRY: dict[str, SeriesSpec] = {
     # ------------------------------------------------------------------ #
     # Zillow — monthly on the 16th                                        #
     # ------------------------------------------------------------------ #
@@ -213,7 +219,7 @@ SERIES_REGISTRY: Dict[str, SeriesSpec] = {
 }
 
 # Series that need no credential and can therefore run unattended today.
-KEYLESS_SERIES: List[str] = [
+KEYLESS_SERIES: list[str] = [
     sid for sid, spec in SERIES_REGISTRY.items() if spec.auth == "none"
 ]
 
