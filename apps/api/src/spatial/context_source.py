@@ -32,6 +32,8 @@ class ContextSourceId(str, Enum):
 
     LODES = "lodes"
     ZBP = "zbp"
+    OVERTURE_BUILDINGS = "overture_buildings"
+    OVERTURE_PLACES = "overture_places"
 
 
 @dataclass
@@ -71,6 +73,25 @@ LODES_ATTRIBUTION = (
 
 ZBP_ATTRIBUTION = (
     "U.S. Census Bureau, ZIP Code Business Patterns (ZBP), public domain."
+)
+
+# Buildings conflates OpenStreetMap (primary source) with other open/ML-derived
+# footprint datasets and is published under ODbL 1.0 — attribution *and*
+# share-alike on derivative databases (US-443).
+OVERTURE_BUILDINGS_ATTRIBUTION = (
+    "Contains information from the Overture Maps Foundation buildings theme, "
+    "which is made available under the Open Database License (ODbL) 1.0, "
+    "including data \u00a9 OpenStreetMap contributors. Any derived database is "
+    "licensed under ODbL 1.0 (share-alike)."
+)
+
+# Places carries no OpenStreetMap data and is published under a
+# CDLA-Permissive-2.0 / Apache-2.0 / CC0 mix across its contributing sources,
+# with no share-alike obligation (US-443).
+OVERTURE_PLACES_ATTRIBUTION = (
+    "Contains information from the Overture Maps Foundation places theme, "
+    "made available under CDLA-Permissive-2.0, Apache-2.0, and CC0-1.0 across "
+    "its contributing sources."
 )
 
 CONTEXT_SOURCES: dict[ContextSourceId, ContextSourceSpec] = {
@@ -171,6 +192,101 @@ CONTEXT_SOURCES: dict[ContextSourceId, ContextSourceSpec] = {
         requires_checksum=True,
         implemented=False,
         notes="Helpers proven in src.spatial.zbp_signal; no builder yet.",
+    ),
+    ContextSourceId.OVERTURE_BUILDINGS: ContextSourceSpec(
+        source=ContextSourceId.OVERTURE_BUILDINGS,
+        version="release-snapshot",
+        vintage_year=None,
+        attribution=OVERTURE_BUILDINGS_ATTRIBUTION,
+        assignment_method="footprint_centroid",
+        assignment_description=(
+            "Each building footprint's centroid is assigned to the containing "
+            "H3 res-9 cell (polygon-intersection assignment was also "
+            "considered per the ticket, but centroid is O(1) per building and "
+            "never double-counts a footprint split across a hex boundary)."
+        ),
+        supported_resolutions=(9,),
+        metrics=[
+            ContextMetricSpec(
+                name="building_count",
+                description="Total buildings assigned to the hex.",
+                suppression="count",
+            ),
+            ContextMetricSpec(
+                name="total_footprint_area_m2",
+                description="Sum of geodesic building footprint areas in the hex, in m^2.",
+            ),
+            ContextMetricSpec(
+                name="avg_height_m",
+                description="Mean building height where reported; null if no building in the hex reports one.",
+            ),
+            ContextMetricSpec(
+                name="class_mix",
+                description="Fraction residential/commercial/industrial/other, sums to 1.0.",
+            ),
+            ContextMetricSpec(
+                name="building_density_weight",
+                description=(
+                    "Building count normalized so weights across a query batch sum to "
+                    "1.0; the dasymetric mask consumed by the US-438 ACS join (Ticket 3)."
+                ),
+                nullable=False,
+            ),
+        ],
+        suppression_policy=(
+            "Hexes with no buildings are simply absent from the result; no "
+            "zero-filling across the full metro grid is performed here."
+        ),
+        builder_module="src.spatial.overture_pipeline",
+        builder_revision="1",
+        requires_checksum=False,
+        implemented=True,
+        notes=(
+            "ODbL 1.0 share-alike: any derived database built from this source "
+            "must itself be released under ODbL 1.0 with attribution."
+        ),
+    ),
+    ContextSourceId.OVERTURE_PLACES: ContextSourceSpec(
+        source=ContextSourceId.OVERTURE_PLACES,
+        version="release-snapshot",
+        vintage_year=None,
+        attribution=OVERTURE_PLACES_ATTRIBUTION,
+        assignment_method="point_geometry",
+        assignment_description=(
+            "Each place's point geometry is assigned directly to its "
+            "containing H3 res-9 cell."
+        ),
+        supported_resolutions=(9,),
+        metrics=[
+            ContextMetricSpec(
+                name="poi_density",
+                description="Total POI count assigned to the hex.",
+                suppression="count",
+            ),
+            ContextMetricSpec(
+                name="poi_category_mix",
+                description=(
+                    "Fraction restaurants/retail/services/nightlife/healthcare/"
+                    "education/other, sums to 1.0."
+                ),
+            ),
+            ContextMetricSpec(
+                name="commercial_churn",
+                description=(
+                    "Net POI id-set change between two consecutive releases "
+                    "(appearances minus disappearances) per hex."
+                ),
+            ),
+        ],
+        suppression_policy=(
+            "Hexes with no places are simply absent from the result; no "
+            "zero-filling across the full metro grid is performed here."
+        ),
+        builder_module="src.spatial.overture_pipeline",
+        builder_revision="1",
+        requires_checksum=False,
+        implemented=True,
+        notes="No share-alike obligation; contains no OpenStreetMap data.",
     ),
 }
 
