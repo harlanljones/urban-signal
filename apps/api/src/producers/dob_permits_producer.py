@@ -7,8 +7,8 @@ from pathlib import Path
 from typing import Any
 
 from src.config import settings
-from src.producers.arcgis_client import ArcGISClient
 from src.producers.accela_client import AccelaClient
+from src.producers.arcgis_client import ArcGISClient
 from src.producers.base_producer import BaseKafkaProducer
 from src.producers.carto_client import CartoClient
 from src.producers.ckan_client import CkanClient
@@ -394,10 +394,21 @@ class DOBPermitsProducer:
             from src.spatial.geo_utils import get_division_for_coordinate
             resolved_borough = get_division_for_coordinate(lat, lng, city_id=resolved_city) or source_neighborhood
 
+            # US-441: unified cross-jurisdiction permit-type taxonomy, derived
+            # from the raw source string first and the assigned JobType code
+            # as a fallback — every permit resolves to one of six normalized
+            # categories regardless of jurisdiction.
+            from src.features.permit_taxonomy import normalize_permit_type
+
+            normalized_permit_type = normalize_permit_type(
+                raw_type=raw_job_type, job_type=job_type
+            ).value
+
             return PermitEvent(
                 city_id=resolved_city,
                 job_id=job_id,
                 job_type=job_type,
+                normalized_permit_type=normalized_permit_type,
                 borough=resolved_borough,
                 source_neighborhood=source_neighborhood,
                 block=str(row.get("block")) if row.get("block") else None,

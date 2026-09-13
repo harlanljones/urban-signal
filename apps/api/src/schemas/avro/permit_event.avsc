@@ -7,6 +7,7 @@
     { "name": "city_id", "type": "string", "default": "nyc" },
     { "name": "job_id", "type": "string" },
     { "name": "job_type", "type": "string" },
+    { "name": "normalized_permit_type", "type": ["null", "string"], "default": null },
     { "name": "borough", "type": ["null", "string"], "default": null },
     { "name": "source_neighborhood", "type": ["null", "string"], "default": null },
     { "name": "block", "type": ["null", "string"], "default": null },

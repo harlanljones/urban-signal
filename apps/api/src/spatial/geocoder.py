@@ -21,6 +21,7 @@ into confidence-gated coordinates. Design contract, in priority order:
 from __future__ import annotations
 
 import hashlib
+import logging
 import re
 import time
 import typing
@@ -29,10 +30,30 @@ from dataclasses import dataclass
 from typing import Any
 
 import httpx
+from prometheus_client import Counter
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 
+logger = logging.getLogger(__name__)
+
 NORM_VERSION = "v2"
+
+# US-441 AC: "Geocoder cache hit rate logged; new addresses cached
+# deterministically (ADR 0004)". A cache hit is a normalized address whose
+# hash was already frozen (:class:`PostgresGeocodeCache.get` did not return
+# the ``KeyError`` sentinel) — regardless of whether the frozen answer is a
+# point or a definitive miss, since either way no backend call was made.
+GEOCODE_CACHE_HITS = Counter(
+    "geocode_cache_hits_total",
+    "Address geocode lookups answered from the ADR-0004 Postgres cache without a backend call",
+)
+GEOCODE_CACHE_MISSES = Counter(
+    "geocode_cache_misses_total",
+    "Address geocode lookups that were new to the cache and required a backend call",
+)
+# Interval (in total lookups) between hit-rate log lines, so a busy backfill
+# doesn't emit one log line per row.
+_HIT_RATE_LOG_INTERVAL = 100
 
 # Tokens that begin an apartment/unit suffix. v2 removes the designator plus
 # its immediately following value token instead of truncating the whole tail:
@@ -343,6 +364,36 @@ class Geocoder:
         self.cache = cache
         self.backend = backend
         self.confidence_floor = confidence_floor
+        self._cache_hits = 0
+        self._cache_misses = 0
+
+    def cache_hit_rate(self) -> float:
+        """Running hit rate across every lookup this instance has made."""
+        total = self._cache_hits + self._cache_misses
+        return self._cache_hits / total if total else 0.0
+
+    def _record_cache_lookup(self, hit: bool) -> None:
+        """Count one cache lookup and periodically log the running hit rate.
+
+        A hit is a normalized address whose hash was already frozen in the
+        cache (point or definitive miss alike) — no backend call was needed.
+        Logged every ``_HIT_RATE_LOG_INTERVAL`` lookups rather than per-call
+        so a large backfill doesn't flood the log.
+        """
+        if hit:
+            self._cache_hits += 1
+            GEOCODE_CACHE_HITS.inc()
+        else:
+            self._cache_misses += 1
+            GEOCODE_CACHE_MISSES.inc()
+        total = self._cache_hits + self._cache_misses
+        if total % _HIT_RATE_LOG_INTERVAL == 0:
+            logger.info(
+                "geocoder cache hit rate: %.1f%% (%d hits / %d lookups)",
+                self.cache_hit_rate() * 100.0,
+                self._cache_hits,
+                total,
+            )
 
     def geocode(self, address: Any) -> GeoPoint | None:
         """Resolve one address; never raises on provider failure.
@@ -356,7 +407,9 @@ class Geocoder:
         digest = address_hash(normalized)
         cached = self.cache.get(digest)
         if not isinstance(cached, KeyError):
+            self._record_cache_lookup(hit=True)
             return self._gate(cached)
+        self._record_cache_lookup(hit=False)
         try:
             point = self.backend.geocode(normalized)
         except Exception:  # noqa: BLE001  # provider outages must not kill enrichment
@@ -382,14 +435,20 @@ class Geocoder:
             if isinstance(cached, KeyError):
                 pending.append((index, digest, normalized))
             else:
+                self._record_cache_lookup(hit=True)
                 results[index] = self._gate(cached)
         if not pending:
             return results
         batch_backend = getattr(self.backend, "geocode_many", None)
         if batch_backend is None:
+            # self.geocode() records its own cache lookup below, so the
+            # `pending` rows here (already known cache misses from the loop
+            # above) are not double-counted.
             for index, _digest, normalized in pending:
                 results[index] = self.geocode(normalized)
             return results
+        for _index, _digest, _normalized in pending:
+            self._record_cache_lookup(hit=False)
         try:
             answers = batch_backend([(digest, normalized) for _index, digest, normalized in pending])
             self.cache.put_many(
