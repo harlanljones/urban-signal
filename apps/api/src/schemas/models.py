@@ -26,6 +26,15 @@ class PermitEvent(BaseModel):
     city_id: str = Field(default="nyc", description="City identifier")
     job_id: str = Field(..., description="Unique municipal job filing number")
     job_type: JobType = Field(default=JobType.A1, description="Permit type code")
+    normalized_permit_type: Optional[str] = Field(
+        default=None,
+        description=(
+            "Unified cross-jurisdiction permit-type enum value (US-441): "
+            "NEW_CONSTRUCTION, MAJOR_RENOVATION, DEMOLITION, CHANGE_OF_USE, "
+            "MINOR_ALTERATION, or MECHANICAL_ELECTRICAL_PLUMBING. See "
+            "src.features.permit_taxonomy.normalize_permit_type."
+        ),
+    )
     borough: Optional[str] = Field(default=None, description="Borough or division name")
     source_neighborhood: Optional[str] = Field(default=None, description="Raw source municipal neighborhood string")
     block: Optional[str] = Field(default=None, description="Tax lot block")
