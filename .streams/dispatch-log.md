@@ -973,3 +973,18 @@ wontfix`. No leaves built, no re-probe performed (evidence already on disk).
 | us416-maplibre-perf | docs/research/us-416-maplibre-perf.md | none (research) | 2026-08-31 | done | docs/research/us-416-maplibre-perf.md |
 | us417-mvt-pmtiles-cloudflare | docs/research/us-417-mvt-pmtiles-cloudflare.md | none (research) | 2026-08-31 | done | docs/research/us-417-mvt-pmtiles-cloudflare.md |
 | us418-lims-lodes-blend-honesty | docs/research/us-418-lims-lodes-blend-honesty.md | none (research) | 2026-08-31 | done | docs/research/us-418-lims-lodes-blend-honesty.md |
+||||||| parent of 47d3760 (chore(streams): record frontier-sweep round 1 dispatch (US-439..443))
+
+### 2026-09-13 — Frontier Sweep Round 1: Bay Area data layers (orchestrator, Copilot subagents)
+
+Dispatched 5 parallel Copilot worktree sessions (model: claude-sonnet-5, effort: high), one per ticket, no commits — human reviews each worktree's PR_DESCRIPTION.md. Tickets claimed (self-assigned, In Progress) by orchestrator per single-dispatcher policy; workers read Linear only.
+
+| Ticket | Stream | Scope | Expected leaf | Expected spine |
+|---|---|---|---|---|
+| US-439 | us439-lodes | LEHD LODES WAC/RAC → H3 res-9 | new producer/leaf module + tests | city_registry.py (dataset entries), scheduler |
+| US-440 | us440-market | Redfin + Zillow ZIP→H3 area-weighted | new producer/leaf module + tests | city_registry.py, scheduler |
+| US-441 | us441-permits | Multi-jurisdiction permits → H3 | new producer/leaf module + tests | city_registry.py, scheduler, dob_permits_producer.py |
+| US-442 | us442-transit | 511 GTFS stop→H3 k-ring scoring | new producer/leaf module + tests | city_registry.py, scheduler |
+| US-443 | us443-overture | Overture buildings/POI → H3 dasymetric mask | new producer/leaf module + tests | city_registry.py, scheduler |
+
+All five are data-layer streams (no city registration), so TestDashboardWiring/TestSnapshotWiring gates are not implicated; workers still run `pytest -m interlock` from apps/api before finishing any spine edit. Spine conflicts across the 5 worktrees are expected on city_registry.py/scheduler.py — human resolves at merge (orchestrator re-serializes if asked).
