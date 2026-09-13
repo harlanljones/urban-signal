@@ -988,3 +988,7 @@ Dispatched 5 parallel Copilot worktree sessions (model: claude-sonnet-5, effort:
 | US-443 | us443-overture | Overture buildings/POI → H3 dasymetric mask | new producer/leaf module + tests | city_registry.py, scheduler |
 
 All five are data-layer streams (no city registration), so TestDashboardWiring/TestSnapshotWiring gates are not implicated; workers still run `pytest -m interlock` from apps/api before finishing any spine edit. Spine conflicts across the 5 worktrees are expected on city_registry.py/scheduler.py — human resolves at merge (orchestrator re-serializes if asked).
+
+### 2026-09-13 (closeout) — Frontier Sweep Round 1 outcomes
+
+All 5 streams completed leaf-only (US-441 declared one spine edit: dob_permits_producer.py taxonomy wiring). Orchestrator merged origin/main into each branch, re-verified targeted tests + `pytest -m interlock` (green), squash-merged sequentially: #54 US-439, #55 US-442, #56 US-443, #57 US-440, #58 US-441. Dispatch record: #53. All five tickets moved to In Review with summary comments. PR_DESCRIPTION.md files left uncommitted in each worktree; their content landed as PR bodies. Deviations: Herdr unavailable → Copilot worktree sessions (claude-sonnet-5/high) per human instruction; codebase-memory index check skipped (tool unavailable). US-441 partial: county permit sources probed dead — SF/San Jose only; human decision needed on county endpoints. US-444 remains blocked until US-438..443 reach Done. Next unblocked US candidate after closeout: none (US-407 lacks ready-for-agent and self-describes feed-blocked).
