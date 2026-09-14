@@ -992,3 +992,34 @@ All five are data-layer streams (no city registration), so TestDashboardWiring/T
 ### 2026-09-13 (closeout) — Frontier Sweep Round 1 outcomes
 
 All 5 streams completed leaf-only (US-441 declared one spine edit: dob_permits_producer.py taxonomy wiring). Orchestrator merged origin/main into each branch, re-verified targeted tests + `pytest -m interlock` (green), squash-merged sequentially: #54 US-439, #55 US-442, #56 US-443, #57 US-440, #58 US-441. Dispatch record: #53. All five tickets moved to In Review with summary comments. PR_DESCRIPTION.md files left uncommitted in each worktree; their content landed as PR bodies. Deviations: Herdr unavailable → Copilot worktree sessions (claude-sonnet-5/high) per human instruction; codebase-memory index check skipped (tool unavailable). US-441 partial: county permit sources probed dead — SF/San Jose only; human decision needed on county endpoints. US-444 remains blocked until US-438..443 reach Done. Next unblocked US candidate after closeout: none (US-407 lacks ready-for-agent and self-describes feed-blocked).
+
+### 2026-09-14 — West region triage closeout (US-321..333, tracker-only)
+
+The nine West-region onboarding tickets sat in Backlog labeled `needs-triage`
+with triage verdicts already commented on 2026-08-27 but never applied. This
+pass applied them. No code, registry, dashboard, manifest, or spine file was
+touched; `pytest -m interlock` ran green (35 passed) to confirm the
+already-registered members remain map-wired.
+
+| Ticket | Metro | Verdict | Evidence | Final state |
+|---|---|---|---|---|
+| US-321 | Mesa, AZ | wontfix — T3 all four families | `docs/research/probe-mesa.md` | Done + wontfix |
+| US-322 | Salt Lake City, UT | wontfix — T3 all four families | `docs/research/wave-3-probe-salt-lake-city.md` | Done + wontfix |
+| US-323 | Colorado Springs, CO | wontfix — T3 all four families | `docs/research/probe-colorado_springs.md` | Done + wontfix |
+| US-329 | Fresno, CA | wontfix — T3 all four families | `docs/research/probe-fresno.md` | Done + wontfix |
+| US-331 | Bakersfield, CA | wontfix — T3 all four families | `docs/research/probe-bakersfield.md` | Done + wontfix |
+| US-332 | Provo, UT | wontfix — T3 all four families | `docs/research/probe-provo.md` | Done + wontfix |
+| US-324 | Albuquerque, NM | already registered (feeds: permits, sla) | `cities/albuquerque.py`, chip at `index.html:1560` | Done |
+| US-327 | Phoenix, AZ | already registered (feeds: deeds, permits, sla) | `cities/phoenix.py`, chip at `index.html:1665` | Done |
+| US-333 | Honolulu, HI | already registered (feeds: 311, sla) | `cities/honolulu.py`, chip at `index.html:1615` | Done |
+
+Closeout comments cite the probe doc, the re-probe trigger (for rejects), and
+the live registration evidence (for the registered three); feed sets recorded
+on 2026-08-27 were stale — `sla` has landed for Albuquerque/Honolulu and
+`deeds` for Phoenix since. `needs-triage` kept per repo convention (57 of 103
+completed onboarding tickets carry it). Backlog: 30 → 21. Re-probe triggers
+are prose on the probe docs; `scripts/rejection_recheck.py`'s REJECTIONS
+manifest remains wave-2 scoped (South Central rejects US-346/347 are also not
+in it), so wave-3 rejections are not machine-watched — a deliberate gap, not a
+regression.
+

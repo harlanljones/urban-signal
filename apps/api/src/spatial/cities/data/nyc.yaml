@@ -1250,6 +1250,7 @@ datasets:
     geocode_context: NY
     id_col: null
     id_keys:
+    - licensepermitid
     - dcid
     - permit_number
     ingestion_mode: snapshot
