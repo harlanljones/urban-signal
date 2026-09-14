@@ -53,9 +53,10 @@ import io
 import logging
 import os
 import zipfile
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +116,7 @@ def _download(url: str, dest: Path) -> Path:
     return dest
 
 
-def _read_gazetteer(payload: bytes) -> Iterable[Dict[str, str]]:
+def _read_gazetteer(payload: bytes) -> Iterable[dict[str, str]]:
     """Yield rows from a Gazetteer zip.
 
     The files are tab-separated with every line right-padded to a fixed width,
@@ -141,17 +142,17 @@ def _read_gazetteer(payload: bytes) -> Iterable[Dict[str, str]]:
 class GeographyCrosswalk:
     """ZCTA / CBSA -> city_id and H3, loaded once from the Census Gazetteer."""
 
-    def __init__(self, cache_dir: Optional[Path] = None, offline: bool = False):
+    def __init__(self, cache_dir: Path | None = None, offline: bool = False):
         self.cache_dir = Path(cache_dir) if cache_dir else _cache_dir()
         self.offline = offline
-        self._zctas: Optional[Dict[str, GeographyPoint]] = None
-        self._cbsas: Optional[Dict[str, GeographyPoint]] = None
-        self._cbsa_by_name: Optional[Dict[str, str]] = None
-        self._cbsa_by_primary: Optional[Dict[Tuple[str, str], str]] = None
-        self._tracts: Optional[Dict[str, GeographyPoint]] = None
-        self._tract_stems_cache: Optional[Dict[str, List[GeographyPoint]]] = None
-        self._counties: Optional[Dict[str, GeographyPoint]] = None
-        self._city_bboxes: Optional[list[tuple[str, Dict[str, float], float]]] = None
+        self._zctas: dict[str, GeographyPoint] | None = None
+        self._cbsas: dict[str, GeographyPoint] | None = None
+        self._cbsa_by_name: dict[str, str] | None = None
+        self._cbsa_by_primary: dict[tuple[str, str], str] | None = None
+        self._tracts: dict[str, GeographyPoint] | None = None
+        self._tract_stems_cache: dict[str, list[GeographyPoint]] | None = None
+        self._counties: dict[str, GeographyPoint] | None = None
+        self._city_bboxes: list[tuple[str, dict[str, float], float]] | None = None
 
     # ----------------------------------------------------------------- #
     # loading                                                            #
@@ -168,10 +169,10 @@ class GeographyCrosswalk:
         _download(url, path)
         return path.read_bytes()
 
-    def _load_zctas(self) -> Dict[str, GeographyPoint]:
+    def _load_zctas(self) -> dict[str, GeographyPoint]:
         if self._zctas is not None:
             return self._zctas
-        table: Dict[str, GeographyPoint] = {}
+        table: dict[str, GeographyPoint] = {}
         for row in _read_gazetteer(
             self._payload(ZCTA_GAZETTEER_URL, f"{GAZETTEER_YEAR}_Gaz_zcta_national.zip")
         ):
@@ -186,13 +187,13 @@ class GeographyCrosswalk:
         self._zctas = table
         return table
 
-    def _load_cbsas(self) -> Dict[str, GeographyPoint]:
+    def _load_cbsas(self) -> dict[str, GeographyPoint]:
         if self._cbsas is not None:
             return self._cbsas
-        table: Dict[str, GeographyPoint] = {}
-        by_name: Dict[str, str] = {}
-        by_primary: Dict[Tuple[str, str], str] = {}
-        ambiguous: set[Tuple[str, str]] = set()
+        table: dict[str, GeographyPoint] = {}
+        by_name: dict[str, str] = {}
+        by_primary: dict[tuple[str, str], str] = {}
+        ambiguous: set[tuple[str, str]] = set()
         for row in _read_gazetteer(
             self._payload(CBSA_GAZETTEER_URL, f"{GAZETTEER_YEAR}_Gaz_cbsa_national.zip")
         ):
@@ -223,10 +224,10 @@ class GeographyCrosswalk:
         self._cbsa_by_primary = by_primary
         return table
 
-    def _load_tracts(self) -> Dict[str, GeographyPoint]:
+    def _load_tracts(self) -> dict[str, GeographyPoint]:
         if self._tracts is not None:
             return self._tracts
-        table: Dict[str, GeographyPoint] = {}
+        table: dict[str, GeographyPoint] = {}
         for row in _read_gazetteer(
             self._payload(TRACT_GAZETTEER_URL, f"{GAZETTEER_YEAR}_Gaz_tracts_national.zip")
         ):
@@ -241,10 +242,10 @@ class GeographyCrosswalk:
         self._tracts = table
         return table
 
-    def _load_counties(self) -> Dict[str, GeographyPoint]:
+    def _load_counties(self) -> dict[str, GeographyPoint]:
         if self._counties is not None:
             return self._counties
-        table: Dict[str, GeographyPoint] = {}
+        table: dict[str, GeographyPoint] = {}
         for row in _read_gazetteer(
             self._payload(COUNTY_GAZETTEER_URL, f"{GAZETTEER_YEAR}_Gaz_counties_national.zip")
         ):
@@ -261,14 +262,14 @@ class GeographyCrosswalk:
         self._counties = table
         return table
 
-    def county_point(self, fips: Any) -> Optional[GeographyPoint]:
+    def county_point(self, fips: Any) -> GeographyPoint | None:
         """Look up a county centroid from a 5-digit state+county FIPS code."""
         text = "".join(ch for ch in str(fips or "") if ch.isdigit())
         if len(text) < 5:
             return None
         return self._load_counties().get(text[:5])
 
-    def city_for_county_fips(self, fips: Any) -> Optional[str]:
+    def city_for_county_fips(self, fips: Any) -> str | None:
         """Registered city whose metro bbox contains a county's internal point.
 
         Coarser than the ZIP path by construction — a county can span several
@@ -280,7 +281,7 @@ class GeographyCrosswalk:
         point = self.county_point(fips)
         return self.city_for_point(point.latitude, point.longitude) if point else None
 
-    def load(self, tracts: bool = False, counties: bool = False) -> "GeographyCrosswalk":
+    def load(self, tracts: bool = False, counties: bool = False) -> GeographyCrosswalk:
         """Prime both tables (and the on-disk cache). Safe to call repeatedly."""
         self._load_zctas()
         self._load_cbsas()
@@ -293,13 +294,13 @@ class GeographyCrosswalk:
     # ----------------------------------------------------------------- #
     # city resolution                                                    #
     # ----------------------------------------------------------------- #
-    def _bboxes(self) -> list[tuple[str, Dict[str, float], float]]:
+    def _bboxes(self) -> list[tuple[str, dict[str, float], float]]:
         """Registered metro bboxes with their area, smallest-first."""
         if self._city_bboxes is not None:
             return self._city_bboxes
         from src.spatial.city_registry import REGISTRY
 
-        boxes: list[tuple[str, Dict[str, float], float]] = []
+        boxes: list[tuple[str, dict[str, float], float]] = []
         for cid, reg in REGISTRY.items():
             bbox = reg.metro_bbox
             area = (bbox["max_lat"] - bbox["min_lat"]) * (bbox["max_lng"] - bbox["min_lng"])
@@ -308,7 +309,7 @@ class GeographyCrosswalk:
         self._city_bboxes = boxes
         return boxes
 
-    def city_for_point(self, lat: float, lng: float) -> Optional[str]:
+    def city_for_point(self, lat: float, lng: float) -> str | None:
         """Smallest registered metro bbox containing the point, else None.
 
         Smallest-first matters: Prince George's sits inside the DC metro bbox
@@ -324,11 +325,11 @@ class GeographyCrosswalk:
                 return city_id
         return None
 
-    def city_for_zip(self, zcta: str) -> Optional[str]:
+    def city_for_zip(self, zcta: str) -> str | None:
         point = self.zip_point(zcta)
         return self.city_for_point(point.latitude, point.longitude) if point else None
 
-    def city_for_cbsa(self, cbsa_code: str) -> Optional[str]:
+    def city_for_cbsa(self, cbsa_code: str) -> str | None:
         """Resolve a CBSA code to a registered city.
 
         **Not** by centroid containment. A CBSA spans whole counties, so its
@@ -349,7 +350,7 @@ class GeographyCrosswalk:
             return None
         return self._city_for_geography_point(point)
 
-    def _city_for_geography_point(self, point: GeographyPoint) -> Optional[str]:
+    def _city_for_geography_point(self, point: GeographyPoint) -> str | None:
         from src.spatial.city_registry import normalize_city
 
         key = metro_primary_key(point.name)
@@ -362,7 +363,7 @@ class GeographyCrosswalk:
                 return resolved.value
         return self.city_for_point(point.latitude, point.longitude)
 
-    def city_for_metro_name(self, name: str) -> Optional[str]:
+    def city_for_metro_name(self, name: str) -> str | None:
         """Resolve a publisher's metro label to a registered city.
 
         Tries the label's own primary city first, so a metro we register but
@@ -385,11 +386,11 @@ class GeographyCrosswalk:
     # ----------------------------------------------------------------- #
     # lookups                                                            #
     # ----------------------------------------------------------------- #
-    def zip_point(self, zcta: str) -> Optional[GeographyPoint]:
+    def zip_point(self, zcta: str) -> GeographyPoint | None:
         """Look up a ZCTA centroid, tolerating ZIP+4 and unpadded input."""
         return self._load_zctas().get(normalize_zcta(zcta))
 
-    def cbsa_code_for_name(self, name: str) -> Optional[str]:
+    def cbsa_code_for_name(self, name: str) -> str | None:
         """Match a publisher's metro label to a CBSA GEOID.
 
         Zillow writes ``"Houston-The Woodlands-Sugar Land, TX"``; the
@@ -404,17 +405,17 @@ class GeographyCrosswalk:
         key = metro_primary_key(name)
         return self._cbsa_by_primary.get(key) if key else None
 
-    def _tract_stems(self) -> Dict[str, List[GeographyPoint]]:
+    def _tract_stems(self) -> dict[str, list[GeographyPoint]]:
         """Tracts indexed by their 9-character state+county+tract-base prefix."""
         if self._tract_stems_cache is not None:
             return self._tract_stems_cache
-        stems: Dict[str, List[GeographyPoint]] = {}
+        stems: dict[str, list[GeographyPoint]] = {}
         for geoid, point in self._load_tracts().items():
             stems.setdefault(geoid[:9], []).append(point)
         self._tract_stems_cache = stems
         return stems
 
-    def tract_point(self, geoid: Any) -> Optional[GeographyPoint]:
+    def tract_point(self, geoid: Any) -> GeographyPoint | None:
         """Look up a tract centroid from a FEMA ``censusGeoid``.
 
         FEMA publishes a 12-character **block group** id (``482012227001``);
@@ -445,11 +446,11 @@ class GeographyCrosswalk:
             return None
         return sorted(children, key=lambda p: p.geography_id)[0]
 
-    def city_for_tract(self, geoid: Any) -> Optional[str]:
+    def city_for_tract(self, geoid: Any) -> str | None:
         point = self.tract_point(geoid)
         return self.city_for_point(point.latitude, point.longitude) if point else None
 
-    def tract_to_h3(self, geoid: Any, indexer: Any) -> Dict[str, Optional[str]]:
+    def tract_to_h3(self, geoid: Any, indexer: Any) -> dict[str, str | None]:
         """Tract centroid -> H3 hierarchy.
 
         A centroid tag, like ``zip_to_h3``: a tract is much larger than a
@@ -463,7 +464,7 @@ class GeographyCrosswalk:
             return {"h3_res7": None, "h3_res8": None, "h3_res9": None}
         return indexer.get_multi_res_hierarchy(point.latitude, point.longitude)
 
-    def zip_to_h3(self, zcta: str, indexer: Any) -> Dict[str, Optional[str]]:
+    def zip_to_h3(self, zcta: str, indexer: Any) -> dict[str, str | None]:
         """ZCTA centroid -> the multi-resolution H3 hierarchy.
 
         A ZCTA is far larger than a res-9 hexagon, so this is a *centroid*
@@ -512,24 +513,45 @@ def normalize_metro_name(value: Any) -> str:
 # ambiguous as bare aliases: "washington" is also a state, and "miami" is also
 # the Miami, OK micro area (CBSA 33060) — the state half is what makes them
 # safe. Verified against the 2024 Gazetteer 2026-08-28.
-METRO_NAME_OVERRIDES: Dict[Tuple[str, str], str] = {
+METRO_NAME_OVERRIDES: dict[tuple[str, str], str] = {
     ("washington", "dc"): "washington_dc",   # CBSA 47900
     ("miami", "fl"): "miami_dade",           # CBSA 33100 (NOT 33060, Miami OK)
     ("boise city", "id"): "boise",           # CBSA 14260
     ("st. louis", "mo"): "st_louis",         # CBSA 41180
     ("columbus", "ga"): "columbus_ga",       # CBSA 17980; distinct from Columbus, OH
+    ("charleston", "sc"): "charleston_sc",    # CBSA 16700; Charleston SC
+    ("charleston", "wv"): "charleston_wv",   # CBSA 16620; Charleston WV
+    ("huntington", "wv"): "huntington_wv",   # CBSA 26580; Huntington WV
+    ("kansas city", "mo"): "kansas_city",    # CBSA 28140; Kansas City MO
+    ("montgomery", "al"): "montgomery_al",   # CBSA 33860; Montgomery AL
+    ("portland", "me"): "portland_maine",    # CBSA 38860; Portland ME (not OR)
+    ("salem", "or"): "salem_or",             # CBSA 41420; Salem OR (not NH/OH)
+    ("santa fe", "nm"): "santa_fe",           # CBSA 42140; Santa Fe NM
+    ("fort collins", "co"): "fort_collins",  # CBSA 22660; Fort Collins CO
 }
 
-# Registered markets with no CBSA of their own — they are submarkets inside a
-# larger metro's CBSA (Fort Worth and Aurora inside Dallas-Fort Worth and
-# Denver-Aurora; Prince George's inside Washington-Arlington-Alexandria).
-# Metro-level series cannot address them and should not be forced to: they
-# receive coverage through ZIP-level series instead, where centroid
-# containment picks the smaller, more specific bbox.
-CBSA_SUBMARKET_CITIES = frozenset({"fort_worth", "aurora", "prince_georges"})
+# Registered markets `city_for_cbsa` cannot reach — either they have no CBSA
+# of their own (Fort Worth and Aurora inside Dallas-Fort Worth and
+# Denver-Aurora; Prince George's inside Washington-Arlington-Alexandria), or
+# their CBSA centroid falls inside a larger neighbor's registered bbox, so
+# smallest-bbox containment resolves it to that neighbor instead (Oxnard
+# and Inland Empire *do* have their own standalone CBSAs — 37100 and 40140 —
+# but their centroids land inside the LA metro bbox). Either way, metro-level
+# series cannot address them and should not be forced to: they receive
+# coverage through ZIP-level series instead, where centroid containment picks
+# the smaller, more specific bbox.
+CBSA_SUBMARKET_CITIES = frozenset({
+    "fort_worth", "aurora", "prince_georges",          # acknowledged submarkets
+    "anaheim", "chandler", "glendale_az", "long_beach", "oxnard_ventura",
+    "scottsdale", "tempe",                               # Los Angeles–Long Beach–Anaheim / Inland Empire / Phoenix MSA pockets
+    "inland_empire", "nampa", "tacoma", "vancouver_wa", # Portland-Vancouver-WA / Spokane / Inland Empire
+    "oakland",                                            # Northern California counties
+    "frederick", "montgomery",                          # Frederick MD + Montgomery MD: DC MSA submarkets
+    "wilmington_de",                                      # Wilmington DE: Philadelphia CBSA metro division
+})
 
 
-def metro_primary_key(value: Any) -> Optional[Tuple[str, str]]:
+def metro_primary_key(value: Any) -> tuple[str, str] | None:
     """(primary city, first state) for a metro label, or None if unparseable.
 
     ``"Houston-Pasadena-The Woodlands, TX Metro Area"`` and
@@ -548,7 +570,7 @@ def metro_primary_key(value: Any) -> Optional[Tuple[str, str]]:
     return (city, state)
 
 
-_DEFAULT: Optional[GeographyCrosswalk] = None
+_DEFAULT: GeographyCrosswalk | None = None
 
 
 def default_crosswalk() -> GeographyCrosswalk:
