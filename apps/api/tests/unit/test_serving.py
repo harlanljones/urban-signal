@@ -113,7 +113,7 @@ def test_dashboard_endpoint():
     assert response.status_code == 200
     assert "text/html" in response.headers.get("content-type", "")
     assert "Geospatial Intelligence Dashboard" in response.text
-    assert "Real-Time Catalyst Alerts" in response.text
+    assert '<span class="section-title">Catalysts</span>' in response.text
 
 
 def test_predict_single_coordinate():
@@ -552,8 +552,8 @@ def test_dashboard_html_normalizes_cross_metro_metrics():
     html = res.text
 
     assert "lims_score_national_pct" in html
-    assert "National Pct:" in html
-    assert "Metro Pct:" in html
+    assert "National percentile" in html
+    assert "Metro percentile" in html
     # Raw-only ramps are gone from layer paints.
     assert "['get', 'lims_score']" not in html
 
