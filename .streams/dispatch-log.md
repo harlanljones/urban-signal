@@ -1023,3 +1023,9 @@ manifest remains wave-2 scoped (South Central rejects US-346/347 are also not
 in it), so wave-3 rejections are not machine-watched — a deliberate gap, not a
 regression.
 
+
+### 2026-09-23 — Bay Area layers onto the map (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| bay-area-map-wiring | `.streams/bay-area-map-wiring.md` | none | 2026-09-23 | done | `src/export/bay_area_context.py`, snapshot `--context-dir`, dashboard "Bay Area layers" picker, `bay-area-context.yml` |

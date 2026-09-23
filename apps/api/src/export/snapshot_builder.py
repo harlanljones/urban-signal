@@ -50,6 +50,7 @@ from typing import Any
 import h3
 import polars as pl
 
+from src.export.bay_area_context import CONTEXT_METRIC_KEYS, load_context
 from src.serving import router as api_router
 from src.serving.engine import MultiHorizonInferenceEngine
 from src.spatial import coverage
@@ -156,6 +157,74 @@ def _apply_percentile_normalization(grids: dict[str, dict[str, Any]]) -> None:
                 feature["properties"][f"{metric}_metro_pct"] = pct
 
 
+def _apply_context_layers(
+    grids: dict[str, dict[str, Any]], context_values: dict[str, dict[str, float]]
+) -> None:
+    """Copy per-hex context metrics (Bay Area layers) onto matching res-9 features.
+
+    A feature whose cell the context table does not carry gets no context
+    property at all, so the dashboard renders it as "no data" rather than 0.
+    """
+    for grid in grids.values():
+        for feature in grid.get("features", []):
+            props = feature.get("properties", {})
+            metrics = context_values.get(props.get("h3_index"))
+            if metrics:
+                props.update(metrics)
+
+
+def _apply_context_percentiles(
+    grids: dict[str, dict[str, Any]], metric_keys: tuple[str, ...]
+) -> None:
+    """Stamp <metric>_metro_pct / _national_pct for context metrics, nulls excluded.
+
+    Unlike ``NORMALIZED_METRICS`` (present on every feature), a context metric
+    exists only where its layer has coverage, so ranks are computed over the
+    features that carry a value and the rest stay unranked.
+    """
+    for metric in metric_keys:
+        by_city = {
+            city: [f for f in grid.get("features", []) if f["properties"].get(metric) is not None]
+            for city, grid in grids.items()
+        }
+        valued = [feature for feats in by_city.values() for feature in feats]
+        national = _percentile_ranks([float(f["properties"][metric]) for f in valued])
+        for feature, pct in zip(valued, national):
+            feature["properties"][f"{metric}_national_pct"] = pct
+        for feats in by_city.values():
+            metro = _percentile_ranks([float(f["properties"][metric]) for f in feats])
+            for feature, pct in zip(feats, metro):
+                feature["properties"][f"{metric}_metro_pct"] = pct
+
+
+def _context_manifest_block(
+    grids: dict[str, dict[str, Any]], meta: dict[str, Any]
+) -> dict[str, Any]:
+    """Manifest entry telling the dashboard which context metrics it can offer."""
+    metrics = []
+    for spec in meta.get("metrics", []):
+        key = spec["key"]
+        cities = sorted(
+            city
+            for city, grid in grids.items()
+            if any(f["properties"].get(key) is not None for f in grid.get("features", []))
+        )
+        if not cities:
+            continue
+        cells = sum(
+            1
+            for grid in grids.values()
+            for f in grid.get("features", [])
+            if f["properties"].get(key) is not None
+        )
+        metrics.append({**spec, "cities": cities, "cells": cells})
+    return {
+        "generated_at": meta.get("generated_at"),
+        "layers": meta.get("layers", {}),
+        "metrics": metrics,
+    }
+
+
 def _features_bbox(features: list[dict[str, Any]]) -> dict[str, float] | None:
     """Tight bbox over polygon coordinates; None when there are no features."""
     min_lat = min_lng = math.inf
@@ -198,7 +267,7 @@ def _bucket_grid_tiles(
 
 
 def _aggregate_grid_to_res(
-    grid: dict[str, Any], city: str, to_res: int
+    grid: dict[str, Any], city: str, to_res: int, extra_keys: tuple[str, ...] = ()
 ) -> dict[str, Any]:
     """Roll a res-9 grid up to a coarser LOD resolution (US-411).
 
@@ -207,8 +276,11 @@ def _aggregate_grid_to_res(
     ``LOD_AGGREGATE_KEYS`` values plus a parent-boundary polygon and centroid,
     so ``_apply_percentile_normalization`` can rank the aggregate surface
     against itself (each LOD level is its own national rank space).
+
+    Each key averages over the children that carry it, so a sparse
+    ``extra_keys`` context metric is not diluted by children without coverage.
     """
-    aggregate_keys = _lod_aggregate_keys()
+    aggregate_keys = tuple(dict.fromkeys((*_lod_aggregate_keys(), *extra_keys)))
     parents: dict[str, dict[str, Any]] = {}
     for feature in grid.get("features", []):
         props = feature.get("properties", {})
@@ -218,7 +290,7 @@ def _aggregate_grid_to_res(
         parent = h3.cell_to_parent(cell, to_res)
         bucket = parents.setdefault(
             parent,
-            {"h3_index": parent, "resolution": to_res, "_children": 0, "_acc": {}},
+            {"h3_index": parent, "resolution": to_res, "_children": 0, "_acc": {}, "_n": {}},
         )
         bucket["_children"] += 1
         for key in aggregate_keys:
@@ -227,6 +299,7 @@ def _aggregate_grid_to_res(
                 continue
             acc = bucket["_acc"]
             acc[key] = acc.get(key, 0.0) + float(value)
+            bucket["_n"][key] = bucket["_n"].get(key, 0) + 1
 
     features: list[dict[str, Any]] = []
     for parent, bucket in parents.items():
@@ -242,7 +315,7 @@ def _aggregate_grid_to_res(
         }
         for key in aggregate_keys:
             if key in acc:
-                aggregate_props[key] = round(acc[key] / bucket["_children"], 6)
+                aggregate_props[key] = round(acc[key] / bucket["_n"][key], 6)
         centroid = h3.cell_to_latlng(parent)
         aggregate_props["centroid_lat"] = centroid[0]
         aggregate_props["centroid_lng"] = centroid[1]
@@ -503,6 +576,7 @@ async def build_snapshot(
     national_dir: Path | None = None,
     dense_metro: bool = False,
     require_national: bool = False,
+    context_dir: Path | None = None,
 ) -> dict[str, Any]:
     """Build all snapshot artifacts into out_dir and return the manifest dict.
 
@@ -526,6 +600,11 @@ async def build_snapshot(
     (``coverage.metro_cells``, 1.5 km bound) so urban cores are continuous.
     LOD aggregates (res 8/7) are always built regardless; ``dense_metro`` only
     changes the leaf-level density (US-411).
+
+    ``context_dir`` points at a ``src.export.bay_area_context`` output. When it
+    carries a table, its per-hex metrics are joined onto matching grid cells at
+    every LOD level, ranked like the model metrics, and listed in the
+    manifest's ``context_layers`` block; when omitted the grid is unchanged.
     """
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -577,15 +656,28 @@ async def build_snapshot(
         )
         submarkets_by_city[city] = await api_router.list_submarkets(city_id=city, borough=None)
 
+    context = load_context(context_dir) if context_dir is not None else None
+    context_keys: tuple[str, ...] = ()
+    if context is not None:
+        _apply_context_layers(grids, context[0])
+        context_keys = CONTEXT_METRIC_KEYS
+    elif context_dir is not None:
+        logger.warning("No context table at %s; publishing without context layers", context_dir)
+
     # Percentiles must see every exported metro before anything reaches KV.
     # res-9 is its own national rank space (unchanged); each LOD aggregate
     # level is ranked against ITS complete publish (US-415 method A — average
     # raw, then rank per level, never average child percentiles).
     _apply_percentile_normalization(grids)
+    _apply_context_percentiles(grids, context_keys)
     grids_by_res: dict[int, dict[str, dict[str, Any]]] = {DEFAULT_RESOLUTION: grids}
     for res in (8, 7):
-        lod_grids = {city: _aggregate_grid_to_res(grids[city], city, res) for city in cities}
+        lod_grids = {
+            city: _aggregate_grid_to_res(grids[city], city, res, extra_keys=context_keys)
+            for city in cities
+        }
         _apply_percentile_normalization(lod_grids)
+        _apply_context_percentiles(lod_grids, context_keys)
         grids_by_res[res] = lod_grids
 
     cells_requests: list[tuple[str, dict[str, Any]]] = []
@@ -708,6 +800,8 @@ async def build_snapshot(
     }
     if national_block is not None:
         manifest["national"] = national_block
+    if context is not None:
+        manifest["context_layers"] = _context_manifest_block(grids, context[1])
     manifest_size = _write_json(out_dir / "manifest.json", manifest)
     if manifest_size > MAX_MANIFEST_BYTES:
         raise ValueError(
@@ -777,6 +871,14 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--context-dir",
+        default=None,
+        help=(
+            "src.export.bay_area_context output (bay_area_context_res9.parquet + meta); "
+            "omit to publish without the Bay Area context layers"
+        ),
+    )
+    parser.add_argument(
         "--dense-metro",
         action="store_true",
         help="Use bounded k_ring=3 coverage (coverage.metro_cells) for continuous urban hexes",
@@ -790,6 +892,7 @@ def main() -> None:
             national_dir=Path(args.national_dir) if args.national_dir else None,
             dense_metro=args.dense_metro,
             require_national=args.require_national,
+            context_dir=Path(args.context_dir) if args.context_dir else None,
         )
     )
 

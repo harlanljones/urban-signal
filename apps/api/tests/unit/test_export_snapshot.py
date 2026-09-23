@@ -57,6 +57,7 @@ def asyncio_run_build(
     include_legacy_cells: bool = True,
     national_dir: Path | None = None,
     require_national: bool = False,
+    context_dir: Path | None = None,
 ) -> dict[str, Any]:
     import asyncio
 
@@ -68,6 +69,7 @@ def asyncio_run_build(
             include_legacy_cells=include_legacy_cells,
             national_dir=national_dir,
             require_national=require_national,
+            context_dir=context_dir,
         )
     )
 
@@ -641,3 +643,108 @@ def test_dense_grid_features_have_coverage_source(tmp_path: Path):
     sources = {f["properties"].get("coverage_source") for f in grid["features"]}
     assert sources <= {"center", "bounded"}
     assert "bounded" in sources, "dense grid must contain interpolated (bounded) cells"
+
+
+# --------------------------------------------------------------------------- #
+# Bay Area context layers (--context-dir)                                     #
+# --------------------------------------------------------------------------- #
+def _write_context_for_cells(root: Path, cells: list[str]) -> Path:
+    """Context table covering ``cells``: jobs on all, buildings on every other."""
+    from src.export.bay_area_context import BuildConfig, build_context
+
+    jobs = {cell: {"jobs_total": float(100 + i)} for i, cell in enumerate(cells)}
+    buildings = {cell: {"building_count": float(i)} for i, cell in enumerate(cells) if i % 2 == 0}
+    out = root / "context"
+    build_context(
+        out,
+        BuildConfig(cache_dir=root / "cache", env={}),
+        builders={"lodes": lambda _c: jobs, "overture": lambda _c: buildings},
+    )
+    return out
+
+
+def _sf_cells(tmp_path: Path) -> list[str]:
+    asyncio_run_build(tmp_path / "probe", cities=["san_francisco"])
+    grid = json.loads((tmp_path / "probe" / "dist" / "grid" / "san_francisco.json").read_text())
+    return sorted(f["properties"]["h3_index"] for f in grid["features"])
+
+
+def test_context_layers_join_matching_cells_only(tmp_path: Path):
+    sf_cells = _sf_cells(tmp_path)
+    covered = sf_cells[: len(sf_cells) // 2]
+    context_dir = _write_context_for_cells(tmp_path, covered)
+    manifest = asyncio_run_build(
+        tmp_path, cities=["nyc", "san_francisco"], context_dir=context_dir
+    )
+
+    features = _all_grid_features(tmp_path, ["nyc", "san_francisco"])
+    for feature in features["nyc"]:
+        assert "jobs_total" not in feature["properties"]
+        assert "jobs_total_national_pct" not in feature["properties"]
+    sf = {f["properties"]["h3_index"]: f["properties"] for f in features["san_francisco"]}
+    for cell, props in sf.items():
+        if cell in covered:
+            assert props["jobs_total"] == 100 + covered.index(cell)
+            assert 0.0 <= props["jobs_total_metro_pct"] <= 100.0
+        else:
+            assert "jobs_total" not in props
+            assert "jobs_total_metro_pct" not in props
+    # Ranks span only the covered cells, so the extremes hit 0 and 100.
+    pcts = sorted(sf[c]["jobs_total_national_pct"] for c in covered)
+    assert pcts[0] == 0.0 and pcts[-1] == 100.0
+
+    block = manifest["context_layers"]
+    assert [m["key"] for m in block["metrics"]] == ["jobs_total", "building_count"]
+    jobs_meta = block["metrics"][0]
+    assert jobs_meta["cities"] == ["san_francisco"]
+    assert jobs_meta["cells"] == len(covered)
+    assert jobs_meta["label"] == "Jobs (LODES)"
+    assert block["layers"]["overture"]["status"] == "ok"
+    assert "ODbL" in block["layers"]["overture"]["attribution"]
+
+
+def test_context_layers_reach_lod_tiles(tmp_path: Path):
+    sf_cells = _sf_cells(tmp_path)
+    context_dir = _write_context_for_cells(tmp_path, sf_cells)
+    manifest = asyncio_run_build(tmp_path, cities=["san_francisco"], context_dir=context_dir)
+
+    for res in (8, 7):
+        parents = manifest["tile_indexes"][str(res)]
+        features = [
+            f
+            for parent in parents
+            for f in json.loads(
+                (tmp_path / "dist" / "gridtiles_res" / str(res) / f"{parent}.json").read_text()
+            )["features"]
+        ]
+        with_jobs = [f for f in features if "jobs_total" in f["properties"]]
+        assert with_jobs, f"res {res} carries no context metric"
+        for feature in with_jobs:
+            assert "jobs_total_national_pct" in feature["properties"]
+
+
+def test_lod_aggregate_averages_sparse_keys_over_valued_children():
+    from src.export.snapshot_builder import _aggregate_grid_to_res
+
+    parent = h3.latlng_to_cell(37.7793, -122.4193, 8)
+    children = sorted(h3.cell_to_children(parent, 9))[:3]
+    grid = {
+        "features": [
+            {"properties": {"h3_index": children[0], "lims_score": 10.0, "jobs_total": 30.0}},
+            {"properties": {"h3_index": children[1], "lims_score": 20.0, "jobs_total": None}},
+            {"properties": {"h3_index": children[2], "lims_score": 30.0}},
+        ]
+    }
+    lod = _aggregate_grid_to_res(grid, "san_francisco", 8, extra_keys=("jobs_total",))
+    props = lod["features"][0]["properties"]
+    assert props["lims_score"] == 20.0
+    assert props["jobs_total"] == 30.0  # one valued child, not 30 / 3
+
+
+def test_context_dir_without_table_publishes_unchanged(tmp_path: Path):
+    manifest = asyncio_run_build(tmp_path, cities=["nyc"], context_dir=tmp_path / "missing")
+    assert "context_layers" not in manifest
+
+
+def test_no_context_block_by_default(snapshot: dict[str, Any]):
+    assert "context_layers" not in snapshot

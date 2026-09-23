@@ -69,6 +69,7 @@ jobs:
           .venv/bin/ruff check scripts/feed_staleness_probe.py apps/api/src/producers/watermarks.py apps/api/tests/unit/test_feed_staleness_probe.py
           PYTHONPATH=apps/api .venv/bin/python -m pytest -q apps/api/tests/unit/test_feed_staleness_probe.py
           PYTHONPATH=apps/api .venv/bin/python -m pytest -q -m interlock apps/api/tests/unit/test_interlock_gate.py
+          PYTHONPATH=apps/api .venv/bin/python -m pytest -q apps/api/tests/unit/test_bay_area_context.py
 
       - uses: oven-sh/setup-bun@v2
 
@@ -82,6 +83,9 @@ jobs:
     if: always() && github.event_name != 'pull_request' && (needs.validate.result == 'success' || needs.validate.result == 'skipped')
     needs: validate
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read # download the bay-area-context artifact
     steps:
       - uses: actions/checkout@v4
 
@@ -96,10 +100,26 @@ jobs:
           uv venv .venv --python 3.12
           uv pip install -e apps/api
 
+      # Newest weekly Bay Area context table (bay-area-context.yml). Optional:
+      # without it the snapshot publishes unchanged and the dashboard simply
+      # offers no Bay Area layers.
+      - name: Fetch Bay Area context table
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run_id=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow bay-area-context.yml \
+            --branch main --status success --limit 1 --json databaseId --jq '.[0].databaseId')
+          if [ -n "$run_id" ]; then
+            gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name bay-area-context --dir build/context
+          else
+            echo "No successful bay-area-context run yet; publishing without context layers"
+          fi
+
       - name: Build snapshot artifacts
         run: |
           PYTHONPATH=apps/api .venv/bin/python scripts/export_dashboard.py
-          PYTHONPATH=apps/api .venv/bin/python -m src.export.snapshot_builder --out dist
+          PYTHONPATH=apps/api .venv/bin/python -m src.export.snapshot_builder --out dist --context-dir build/context
 
       - uses: actions/upload-artifact@v4
         with:

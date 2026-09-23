@@ -110,6 +110,25 @@ export interface Manifest {
   tile_indexes?: Record<string, Record<string, TileIndexEntry>>;
   lod?: { resolutions: number[]; tile_parent_res: Record<string, number> };
   metro_index?: MetroMeta[];
+  /** Bay Area context layers joined onto grid cells (present only when published). */
+  context_layers?: ContextLayersBlock;
+}
+
+interface ContextLayersBlock {
+  generated_at: string | null;
+  layers: Record<
+    string,
+    { status: string; label: string; attribution: string; ticket: string; reason?: string; hexes?: number }
+  >;
+  metrics: {
+    key: string;
+    label: string;
+    layer: string;
+    unit: string;
+    description: string;
+    cities: string[];
+    cells: number;
+  }[];
 }
 
 interface TileIndexEntry {
@@ -771,7 +790,10 @@ Full H3 (resolution 9) grid with per-cell metrics. Large payload — prefer ETag
 
 ### GET /api/v1/manifest
 Snapshot metadata: supported metros with camera bboxes/centers, the res-5 H3
-grid-tile index (parent -> count/cities/bbox), and publish thresholds.
+grid-tile index (parent -> count/cities/bbox), and publish thresholds. When
+the Bay Area context layers are published, \`context_layers\` lists each
+metric (key, label, unit, covered cities) and each source's attribution; grid
+cells inside coverage carry that metric plus its \`_metro_pct\`/\`_national_pct\`.
 
     ### GET /api/v1/gridtiles?parents=852830bbfffffff,852ab2c3fffffff[&res=7|8|9]
     Viewport tiles for lazy loading: merged GeoJSON for up to 32 H3 parent
