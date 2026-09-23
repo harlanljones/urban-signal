@@ -87,6 +87,8 @@ def get_dashboard_html() -> str:
       --accent-purple-dim: rgba(192, 132, 252, 0.12);
       --accent-emerald: #34d399;
       --accent-amber: #fbbf24;
+      /* Top stop of the map ramp: "high signal" is an opportunity, not an error. */
+      --signal-high: #e8a050;
       --accent-crimson: #f43f5e;
       
       --borough-manhattan: #38bdf8;
@@ -106,7 +108,7 @@ def get_dashboard_html() -> str:
       
       --text-main: #f8fafc;
       --text-secondary: #a7b5c9;
-      --text-muted: #718198;
+      --text-muted: #8190a6;
       
       --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-mono: 'IBM Plex Mono', monospace;
@@ -116,6 +118,26 @@ def get_dashboard_html() -> str:
       --radius-md: 7px;
       --radius-lg: 10px;
       --shadow-dropdown: 0 18px 42px rgba(0, 0, 0, 0.48), 0 4px 12px rgba(0, 0, 0, 0.28);
+      /* Surface overlays and tints (white / slate at fixed alphas). */
+      --overlay-faint: rgba(255, 255, 255, 0.03);
+      --overlay-soft: rgba(255, 255, 255, 0.05);
+      --overlay-medium: rgba(255, 255, 255, 0.1);
+      --overlay-strong: rgba(255, 255, 255, 0.15);
+      --overlay-bold: rgba(255, 255, 255, 0.24);
+      --neutral-tint-soft: rgba(148, 163, 184, 0.07);
+      --neutral-tint: rgba(148, 163, 184, 0.1);
+      --success-edge: rgba(52, 211, 153, 0.24);
+      --no-data-fill: rgba(113, 129, 152, 0.18);
+      --no-data-edge: rgba(113, 129, 152, 0.35);
+      --baseline-hatch: rgba(113, 129, 152, 0.5);
+      --scale-rule-edge: rgba(167, 181, 201, 0.7);
+      --scale-rule-fill: rgba(167, 181, 201, 0.25);
+      --toast-error-bg: rgba(30, 20, 28, 0.95);
+      --toast-error-text: #fecdd3;
+      --toast-warning-bg: rgba(30, 26, 18, 0.95);
+      --toast-warning-text: #fef08a;
+      --toast-success-bg: rgba(18, 30, 24, 0.95);
+      --toast-success-text: #a7f3d0;
     }
 
     * {
@@ -124,6 +146,17 @@ def get_dashboard_html() -> str:
       padding: 0;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Visually hidden, still announced by screen readers. */
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
     ::selection {
@@ -184,25 +217,25 @@ def get_dashboard_html() -> str:
 
     .toast-banner.error {
       border-color: var(--accent-danger);
-      background: rgba(30, 20, 28, 0.95);
-      color: #fecdd3;
+      background: var(--toast-error-bg);
+      color: var(--toast-error-text);
     }
 
     .toast-banner.warning {
       border-color: var(--accent-warning);
-      background: rgba(30, 26, 18, 0.95);
-      color: #fef08a;
+      background: var(--toast-warning-bg);
+      color: var(--toast-warning-text);
     }
 
     .toast-banner.success {
       border-color: var(--accent-success);
-      background: rgba(18, 30, 24, 0.95);
-      color: #a7f3d0;
+      background: var(--toast-success-bg);
+      color: var(--toast-success-text);
     }
 
     .toast-btn {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: var(--overlay-medium);
+      border: 1px solid var(--overlay-bold);
       color: #fff;
       font-size: 11px;
       font-weight: 600;
@@ -214,7 +247,7 @@ def get_dashboard_html() -> str:
     }
 
     .toast-btn:hover {
-      background: rgba(255, 255, 255, 0.2);
+      background: var(--overlay-bold);
     }
 
     @keyframes toastIn {
@@ -255,11 +288,11 @@ def get_dashboard_html() -> str:
       background: transparent;
     }
     ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.14);
+      background: var(--overlay-strong);
       border-radius: 4px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.28);
+      background: var(--overlay-bold);
     }
 
     /* Top Navigation Header */
@@ -304,7 +337,7 @@ def get_dashboard_html() -> str:
     }
 
     .brand-title {
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
       letter-spacing: -0.01em;
       color: var(--text-main);
@@ -315,11 +348,11 @@ def get_dashboard_html() -> str:
     }
 
     .brand-badge {
-      font-size: 10px;
+      font-size: 11px;
       font-family: var(--font-mono);
       font-weight: 500;
       padding: 1px 6px;
-      background: rgba(255, 255, 255, 0.06);
+      background: var(--overlay-soft);
       color: var(--text-secondary);
       border-radius: 4px;
     }
@@ -376,7 +409,7 @@ def get_dashboard_html() -> str:
 
     .borough-btn:hover {
       color: var(--text-main);
-      background: rgba(255, 255, 255, 0.04);
+      background: var(--overlay-soft);
     }
 
     .borough-btn.active {
@@ -396,7 +429,7 @@ def get_dashboard_html() -> str:
     .borough-btn.active.NorthwestSide { color: var(--accent-amber); }
     .borough-btn.active.SouthSide { color: var(--accent-crimson); }
     .borough-btn.active.FarNorthSide { color: var(--accent-purple); }
-    .borough-btn.active.SouthwestSide { color: #38bdf8; }
+    .borough-btn.active.SouthwestSide { color: var(--accent-primary); }
     .borough-btn.active.SanFranciscoCore, .borough-btn.active.SAN_FRANCISCO_CORE, .borough-btn.active.SFCore { color: var(--division-sf-core); }
     .borough-btn.active.EastBay, .borough-btn.active.EAST_BAY { color: var(--division-east-bay); }
     .borough-btn.active.Peninsula, .borough-btn.active.PENINSULA { color: var(--division-peninsula); }
@@ -491,9 +524,10 @@ def get_dashboard_html() -> str:
       color: var(--text-secondary);
       cursor: pointer;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      border-bottom: 1px solid var(--overlay-faint);
       transition: background 0.1s ease;
     }
 
@@ -501,9 +535,24 @@ def get_dashboard_html() -> str:
       border-bottom: none;
     }
 
-    .search-result-item:hover {
-      background: rgba(255, 255, 255, 0.06);
+    .search-result-item:hover,
+    .search-result-item[aria-selected="true"] {
+      background: var(--overlay-soft);
       color: var(--text-main);
+    }
+
+    .search-empty {
+      padding: 10px 12px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .search-result-line {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
     }
 
     .search-result-item .item-sub {
@@ -522,9 +571,16 @@ def get_dashboard_html() -> str:
       color: var(--accent-success);
       padding: 4px 8px;
       background: var(--accent-success-dim);
-      border: 1px solid rgba(52, 211, 153, .24);
+      border: 1px solid var(--success-edge);
       border-radius: var(--radius-sm);
       white-space: nowrap;
+    }
+
+    /* A published snapshot is not a live stream: neutral pill, static dot. */
+    .telemetry-indicator.snapshot {
+      color: var(--text-secondary);
+      background: var(--neutral-tint-soft);
+      border-color: var(--border-subtle);
     }
 
     .pulse-dot {
@@ -565,13 +621,33 @@ def get_dashboard_html() -> str:
       overflow-y: auto;
     }
 
+    /* Desktop: no selection, no inspector; the map takes the width. The
+       inspector's drawer header doubles as its close control here. */
+    @media (min-width: 861px) {
+      body.inspector-empty .sidebar-right { display: none; }
+      .sidebar-right .drawer-grip { display: flex; }
+    }
+
+    /* Tablet: the inspector overlays the map instead of squeezing it. */
+    @media (min-width: 861px) and (max-width: 1024px) {
+      .sidebar-right {
+        position: absolute;
+        top: 0; right: 0; bottom: 0;
+        z-index: 90;
+        box-shadow: var(--shadow-dropdown);
+      }
+      body:not(.inspector-empty) .map-controls-group { right: 316px; }
+      body:not(.inspector-empty) .maplibregl-ctrl-bottom-right { right: 300px; }
+      body:not(.inspector-empty) .map-readout { right: 364px; }
+    }
+
     /* Main Map Viewport */
     .map-container {
       flex: 1;
       position: relative;
       background: var(--bg-base);
       overflow: hidden;
-      border: 1px solid rgba(148, 163, 184, 0.06);
+      border: 1px solid var(--neutral-tint-soft);
     }
     .map-container::after {
       content: '';
@@ -674,11 +750,11 @@ def get_dashboard_html() -> str:
     }
 
     .feed-count-badge {
-      font-size: 10px;
+      font-size: 11px;
       font-family: var(--font-mono);
       font-weight: 600;
-      color: var(--accent-danger);
-      background: var(--accent-danger-dim);
+      color: var(--text-secondary);
+      background: var(--neutral-tint);
       padding: 2px 6px;
       border-radius: 4px;
     }
@@ -694,17 +770,29 @@ def get_dashboard_html() -> str:
     }
 
     .catalyst-item {
-      background: rgba(255, 255, 255, 0.025);
+      display: block;
+      width: 100%;
+      text-align: left;
+      font: inherit;
+      color: inherit;
+      background: var(--overlay-faint);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-sm);
       padding: 11px 12px;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .catalyst-empty {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 24px 0;
     }
 
     .catalyst-item:hover {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: rgba(255, 255, 255, 0.15);
+      background: var(--overlay-soft);
+      border-color: var(--overlay-strong);
     }
 
     .catalyst-item.selected {
@@ -714,9 +802,10 @@ def get_dashboard_html() -> str:
 
     .catalyst-item-top {
       display: flex;
-      align-items: center;
+      align-items: baseline;
       justify-content: space-between;
-      margin-bottom: 4px;
+      gap: 8px;
+      margin-bottom: 6px;
     }
 
     .catalyst-name {
@@ -727,25 +816,39 @@ def get_dashboard_html() -> str:
 
     .catalyst-lims-tag {
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 600;
-      color: var(--accent-danger);
+      color: var(--signal-high);
+      flex-shrink: 0;
     }
 
     .catalyst-item-bottom {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 8px;
       font-size: 11px;
       color: var(--text-secondary);
     }
 
+    .catalyst-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .catalyst-item-bottom .delta-tag {
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
     .borough-tag {
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 500;
       padding: 1px 5px;
       border-radius: 3px;
-      background: rgba(255, 255, 255, 0.04);
+      background: var(--overlay-soft);
       color: var(--text-secondary);
     }
 
@@ -759,7 +862,7 @@ def get_dashboard_html() -> str:
     .borough-tag.NorthwestSide { color: var(--accent-amber); }
     .borough-tag.SouthSide { color: var(--accent-crimson); }
     .borough-tag.FarNorthSide { color: var(--accent-purple); }
-    .borough-tag.SouthwestSide { color: #38bdf8; }
+    .borough-tag.SouthwestSide { color: var(--accent-primary); }
     .borough-tag.SanFranciscoCore, .borough-tag.SAN_FRANCISCO_CORE, .borough-tag.SFCore { color: var(--division-sf-core); }
     .borough-tag.EastBay, .borough-tag.EAST_BAY { color: var(--division-east-bay); }
     .borough-tag.Peninsula, .borough-tag.PENINSULA { color: var(--division-peninsula); }
@@ -782,7 +885,7 @@ def get_dashboard_html() -> str:
     .delta-tag {
       font-family: var(--font-mono);
       font-weight: 600;
-      color: var(--accent-success);
+      color: var(--text-secondary);
     }
 
     /* Floating Map Controls */
@@ -797,8 +900,8 @@ def get_dashboard_html() -> str:
     }
 
     .map-tool-btn {
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-sm);
@@ -814,7 +917,7 @@ def get_dashboard_html() -> str:
     .map-tool-btn:hover {
       background: var(--bg-surface-elevated);
       color: var(--text-main);
-      border-color: rgba(255, 255, 255, 0.15);
+      border-color: var(--overlay-strong);
     }
 
     .map-tool-btn svg {
@@ -865,25 +968,17 @@ def get_dashboard_html() -> str:
       position: absolute;
       top: 0;
       transform: translateX(-50%);
-      font-size: 9px;
+      font-size: 11px;
       font-family: var(--font-mono);
       color: var(--text-muted);
       line-height: 10px;
-    }
-
-    .legend-range-labels {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      font-family: var(--font-mono);
-      color: var(--text-muted);
     }
 
     .legend-note {
       margin-top: 6px;
       padding-top: 6px;
       border-top: 1px solid var(--border-subtle);
-      font-size: 9px;
+      font-size: 11px;
       letter-spacing: 0.02em;
       color: var(--text-muted);
       display: flex;
@@ -905,23 +1000,23 @@ def get_dashboard_html() -> str:
     }
 
     .legend-key-swatch.no-data {
-      background: rgba(113, 129, 152, 0.18);
-      border: 1px solid rgba(113, 129, 152, 0.35);
+      background: var(--no-data-fill);
+      border: 1px solid var(--no-data-edge);
     }
 
     .legend-attribution {
       color: var(--text-muted);
-      font-size: 9px;
+      font-size: 11px;
       line-height: 1.35;
     }
 
     .legend-key-swatch.baseline {
       background: repeating-linear-gradient(
         45deg,
-        rgba(113, 129, 152, 0.5) 0 3px,
+        var(--baseline-hatch) 0 3px,
         transparent 3px 6px
       );
-      border: 1px solid rgba(113, 129, 152, 0.5);
+      border: 1px solid var(--baseline-hatch);
     }
 
     /* Map orientation readout: scale bar + zoom/coordinate telemetry */
@@ -943,7 +1038,7 @@ def get_dashboard_html() -> str:
     }
 
     .map-scale-label {
-      font-size: 10px;
+      font-size: 11px;
       font-family: var(--font-mono);
       font-variant-numeric: tabular-nums;
       color: var(--text-secondary);
@@ -952,13 +1047,13 @@ def get_dashboard_html() -> str:
 
     .map-scale-rule {
       height: 4px;
-      border: 1px solid rgba(167, 181, 201, 0.7);
+      border: 1px solid var(--scale-rule-edge);
       border-top: none;
-      background: rgba(167, 181, 201, 0.25);
+      background: var(--scale-rule-fill);
     }
 
     .map-coords {
-      font-size: 10px;
+      font-size: 11px;
       font-family: var(--font-mono);
       font-variant-numeric: tabular-nums;
       color: var(--text-muted);
@@ -985,7 +1080,7 @@ def get_dashboard_html() -> str:
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.03);
+      background: var(--overlay-faint);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1000,7 +1095,7 @@ def get_dashboard_html() -> str:
     }
 
     .inspector-empty-title {
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
       color: var(--text-main);
       margin-bottom: 4px;
@@ -1033,7 +1128,7 @@ def get_dashboard_html() -> str:
     }
 
     .parcel-name {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
       color: var(--text-main);
       letter-spacing: -0.01em;
@@ -1041,13 +1136,16 @@ def get_dashboard_html() -> str:
 
     .parcel-meta-sub {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      gap: 8px;
+      gap: 2px 8px;
       font-size: 11px;
       font-family: var(--font-mono);
       color: var(--text-muted);
       margin-bottom: 6px;
     }
+
+    .parcel-meta-sub span { white-space: nowrap; }
 
     .parcel-description {
       font-size: 12px;
@@ -1079,7 +1177,7 @@ def get_dashboard_html() -> str:
     }
 
     .score-status-pill {
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.03em;
@@ -1089,7 +1187,15 @@ def get_dashboard_html() -> str:
       font-size: 28px;
       font-weight: 700;
       font-family: var(--font-mono);
+      color: var(--text-main);
     }
+    .score-status-pill { color: var(--text-secondary); }
+    .score-hero-val.catalyst, .score-status-pill.catalyst { color: var(--signal-high); }
+    .score-hero-val.baseline { color: var(--text-secondary); }
+
+    /* Signed deltas: green up, red down; everything else stays neutral. */
+    .delta-pos, .popup-val.delta-pos { color: var(--accent-success); }
+    .delta-neg, .popup-val.delta-neg { color: var(--accent-danger); }
 
     /* Forecast Metrics Grid */
     .forecast-section-title {
@@ -1132,7 +1238,7 @@ def get_dashboard_html() -> str:
     }
 
     .q-lbl {
-      font-size: 10px;
+      font-size: 11px;
       color: var(--text-muted);
     }
 
@@ -1143,9 +1249,12 @@ def get_dashboard_html() -> str:
       color: var(--text-secondary);
     }
 
+    .quantiles-model { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
+    .context-sources { margin-top: 6px; }
+
     .q-box.expected .q-num {
       font-size: 14px;
-      color: var(--accent-success);
+      color: var(--text-main);
     }
 
     .horizon-pairs {
@@ -1168,9 +1277,10 @@ def get_dashboard_html() -> str:
     }
 
     .horizon-mini-val {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
       font-family: var(--font-mono);
+      color: var(--text-main);
     }
 
     /* Chart Block */
@@ -1188,7 +1298,7 @@ def get_dashboard_html() -> str:
     }
 
     .telemetry-table tr {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid var(--overlay-soft);
     }
 
     .telemetry-table tr:last-child {
@@ -1211,6 +1321,31 @@ def get_dashboard_html() -> str:
     }
 
     /* MapLibre Popup Overrides */
+    .popup-card { font-size: 11px; min-width: 190px; line-height: 1.4; }
+    .popup-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .popup-title { color: var(--text-main); font-size: 12px; }
+    .popup-city { color: var(--text-muted); margin-bottom: 3px; }
+    .popup-row { display: flex; justify-content: space-between; gap: 8px; margin-top: 2px; }
+    .popup-lbl { color: var(--text-secondary); }
+    .popup-val { font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--text-main); }
+
+    /* MapLibre's own controls and credit line, restyled for the dark chrome. */
+    .maplibregl-ctrl.maplibregl-ctrl-group {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.32);
+    }
+    .maplibregl-ctrl-group button + button { border-top: 1px solid var(--border-subtle); }
+    .maplibregl-ctrl-group button .maplibregl-ctrl-icon { filter: invert(0.85); }
+    .maplibregl-ctrl-group button:not(:disabled):hover { background-color: var(--overlay-soft); }
+    .maplibregl-ctrl.maplibregl-ctrl-attrib {
+      background: rgba(8, 13, 23, 0.72);
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+    .maplibregl-ctrl-attrib a { color: var(--text-secondary); }
+    .maplibregl-ctrl.maplibregl-ctrl-attrib.maplibregl-compact { background: var(--bg-glass); }
+
     .maplibregl-popup-content {
       background: var(--bg-surface) !important;
       border: 1px solid var(--border-subtle) !important;
@@ -1244,8 +1379,6 @@ def get_dashboard_html() -> str:
     .drawer-grip { display: none; }
 
     body.drawer-left-open .drawer-scrim,
-
-    body.drawer-left-open .drawer-scrim,
     body.drawer-right-open .drawer-scrim,
     body.search-open .drawer-scrim { display: block; }
 
@@ -1276,7 +1409,7 @@ def get_dashboard_html() -> str:
       transition: background 0.15s ease, color 0.15s ease;
     }
     .drawer-close:hover, .drawer-close:focus-visible {
-      background: rgba(255, 255, 255, 0.05);
+      background: var(--overlay-soft);
       color: var(--text-main);
     }
 
@@ -1285,7 +1418,6 @@ def get_dashboard_html() -> str:
       bottom: max(12px, env(safe-area-inset-bottom));
       left: 50%;
       transform: translateX(-50%);
-      display: flex;
       gap: 4px;
       padding: 5px;
       background: var(--bg-glass);
@@ -1307,8 +1439,8 @@ def get_dashboard_html() -> str:
       transition: background 0.15s ease, color 0.15s ease;
     }
     .mt-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
-    .mt-btn span { font-size: 9px; font-weight: 600; letter-spacing: 0.02em; }
-    .mt-btn:hover, .mt-btn:focus-visible { background: rgba(255, 255, 255, 0.06); color: var(--text-main); }
+    .mt-btn span { font-size: 11px; font-weight: 600; letter-spacing: 0.02em; }
+    .mt-btn:hover, .mt-btn:focus-visible { background: var(--overlay-soft); color: var(--text-main); }
     .mt-btn.active { background: var(--accent-primary-dim); color: var(--accent-primary); }
 
     .drawer-scrim {
@@ -1346,9 +1478,9 @@ def get_dashboard_html() -> str:
         gap: 6px;
       }
       .borough-nav::-webkit-scrollbar { display: none; }
-      .borough-btn { padding: 8px 12px; font-size: 12px; flex-shrink: 0; }
+      .borough-btn { padding: 8px 12px; min-height: 40px; font-size: 12px; flex-shrink: 0; }
       .header-actions { flex: 0 0 auto; gap: 8px; }
-      .telemetry-indicator { padding: 5px 7px; font-size: 10px; }
+      .telemetry-indicator { padding: 5px 7px; font-size: 11px; }
       .telemetry-indicator #stream-status-text { display: none; }
 
       /* Workspace: sidebars leave flow as off-canvas drawers */
@@ -1363,8 +1495,9 @@ def get_dashboard_html() -> str:
         box-shadow: var(--shadow-dropdown);
         padding-bottom: env(safe-area-inset-bottom);
       }
-      .sidebar-left { overflow: hidden; }
+      .sidebar-left { left: 0; overflow: hidden; }
       .sidebar-right {
+        right: 0;
         width: min(344px, 92vw);
         transform: translateX(100%);
       }
@@ -1383,11 +1516,19 @@ def get_dashboard_html() -> str:
         padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
         background: var(--bg-surface);
         border-bottom: 1px solid var(--border-subtle);
-        transform: translateY(-130%);
-        transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+        /* Fully off-screen above the header, and hidden, so a stale
+           --header-h can never leave a dead search box over the brand row. */
+        transform: translateY(calc(-100% - var(--header-h, 56px)));
+        visibility: hidden;
+        transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0.26s;
         pointer-events: none;
       }
-      body.search-open .search-wrapper { transform: translateY(0); pointer-events: auto; }
+      body.search-open .search-wrapper {
+        transform: translateY(0);
+        visibility: visible;
+        pointer-events: auto;
+        transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s;
+      }
       .search-input-box { height: 40px; }
       .search-dropdown { top: 50px; max-height: 50vh; }
 
@@ -1398,11 +1539,18 @@ def get_dashboard_html() -> str:
       .map-tool-btn svg { width: 18px; height: 18px; }
       .map-legend-card {
         left: 12px; right: 12px;
-        bottom: calc(76px + env(safe-area-inset-bottom));
+        /* Above the thumb toolbar (56px) and the map credit line (~24px). */
+        bottom: calc(max(12px, env(safe-area-inset-bottom)) + 92px);
         min-width: 0; width: auto;
         padding: 8px 12px;
       }
       .map-legend-card .legend-bar { margin-bottom: 6px; }
+
+      /* Phones pinch to zoom, so drop the +/- buttons; lift the required map
+         credit above the thumb toolbar instead of under it. */
+      .maplibregl-ctrl-bottom-right .maplibregl-ctrl-group { display: none; }
+      .maplibregl-ctrl-bottom-right,
+      .maplibregl-ctrl-bottom-left { bottom: calc(max(12px, env(safe-area-inset-bottom)) + 62px); }
 
       /* Orientation readout moves to the top-left above the thumb toolbar
          so the scale bar and telemetry never sit under the mobile toolbar
@@ -1427,7 +1575,7 @@ def get_dashboard_html() -> str:
     }
   </style>
 </head>
-<body>
+<body class="inspector-empty">
 
   <!-- Toast Notification Container -->
   <div id="status-toast-container" role="status" aria-live="polite"></div>
@@ -1443,7 +1591,7 @@ def get_dashboard_html() -> str:
       </div>
       <div class="brand-title">
         <span>Urban Signal</span>
-        <span class="sr-only" style="display:none;">Geospatial Intelligence Dashboard</span>
+        <span class="sr-only">Geospatial Intelligence Dashboard</span>
         <span class="brand-badge">v2.0</span>
       </div>
     </div>
@@ -1460,7 +1608,7 @@ def get_dashboard_html() -> str:
       <div class="search-wrapper" role="search">
         <div class="search-input-box">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <input type="text" id="global-search-input" placeholder="Search submarket, coords, H3..." autocomplete="off" aria-label="Search submarket or coordinate" oninput="onGlobalSearch(this.value)" onkeydown="if(event.key==='Enter') executeSearch()">
+          <input type="text" id="global-search-input" placeholder="Search submarket, coords, H3..." autocomplete="off" aria-label="Search submarket or coordinate" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="search-dropdown" oninput="onGlobalSearch(this.value)" onkeydown="onSearchKeydown(event)">
         </div>
         <div class="search-dropdown" id="search-dropdown" role="listbox" aria-label="Search suggestions">
           <!-- Populated dynamically via JS -->
@@ -1509,8 +1657,8 @@ def get_dashboard_html() -> str:
         </div>
         <div class="control-row">
           <div class="view-toggle">
-            <button id="btn-3d" class="active" onclick="setPerspective('3D')">3D</button>
-            <button id="btn-2d" onclick="setPerspective('2D')">2D</button>
+            <button id="btn-3d" type="button" class="active" aria-pressed="true" onclick="setPerspective('3D')">3D</button>
+            <button id="btn-2d" type="button" aria-pressed="false" onclick="setPerspective('2D')">2D</button>
           </div>
           <select id="metric-select" class="metric-select-dropdown" onchange="updateMetricVisuals()">
             <option value="lims_score">LIMS Momentum Score</option>
@@ -1522,10 +1670,10 @@ def get_dashboard_html() -> str:
       </div>
 
       <!-- Real-Time Catalyst Feed -->
-      <div class="catalyst-feed-section" title="Real-Time Catalyst Alerts">
+      <div class="catalyst-feed-section">
         <div class="panel-header-row">
-          <span class="section-title">Catalyst Clusters (Real-Time Catalyst Alerts)</span>
-          <span class="feed-count-badge" id="stat-active-catalysts">29 Active</span>
+          <span class="section-title">Catalysts</span>
+          <span class="feed-count-badge" id="stat-active-catalysts"></span>
         </div>
         <div class="catalyst-list-scroll" id="catalyst-feed-list">
           <!-- Populated dynamically via JS -->
@@ -1540,11 +1688,10 @@ def get_dashboard_html() -> str:
 
       <!-- Floating Quick Tools -->
       <div class="map-controls-group">
-        <button class="map-tool-btn" title="Toggle 3D/2D View" onclick="togglePerspective()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 17 22 12"></polyline></svg>
-        </button>
-        <button class="map-tool-btn" title="Reset View (All Metros)" onclick="selectMetro(null)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+        <!-- 3D/2D lives in the sidebar's segmented control, which shows the
+             current mode; one control, not two. -->
+        <button class="map-tool-btn" type="button" title="Reset view (all metros)" aria-label="Reset view to all metros" onclick="selectMetro(null)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
         </button>
       </div>
 
@@ -1554,11 +1701,9 @@ def get_dashboard_html() -> str:
           <span id="legend-metric-title">LIMS Momentum Score</span>
         </div>
         <div class="legend-bar"></div>
+        <!-- One tick row under the bar: the ramp's stops. The 0–100 range is
+             stated in the note below, so no second row of end labels. -->
         <div class="legend-ticks" id="legend-ticks" aria-hidden="true"></div>
-        <div class="legend-range-labels">
-          <span id="legend-min">0</span>
-          <span id="legend-max">100</span>
-        </div>
         <div class="legend-note">
           <span class="legend-key-row">Height &prop; value (3D view) &middot; percentile 0&ndash;100</span>
           <span class="legend-key-row"><span class="legend-key-swatch baseline"></span><span>Registry baseline &mdash; no precomputed snapshot</span></span>
@@ -2178,7 +2323,83 @@ __METRO_META__
     }
 
     function getBoroughClass(b) {
-      return normalizeBorough(b).replace(/[\s\-_/]+/g, '');
+      const n = normalizeBorough(b);
+      // Registry division ids (SAN_FRANCISCO_CORE) keep their underscores so
+      // they match the .borough-tag.<ID> color rules; display names collapse.
+      if (/_/.test(n) && n === n.toUpperCase()) return n;
+      return n.replace(/[\s\-_/]+/g, '');
+    }
+
+    // Human label for a division. normalizeBorough returns registry ids for
+    // most metros (SILICON_VALLEY_SOUTH_BAY); people should read place names.
+    const DIVISION_LABELS = {
+      SAN_FRANCISCO_CORE: 'SF Core',
+      EAST_BAY: 'East Bay',
+      PENINSULA: 'Peninsula',
+      SILICON_VALLEY_SOUTH_BAY: 'Silicon Valley',
+      MARIN_NORTH_BAY: 'Marin / North Bay',
+      NORTH_BAY_WINE_COUNTRY: 'Wine Country',
+      SOLANO_CORRIDOR: 'Solano Corridor',
+      OUTER_CONTRA_COSTA: 'Outer Contra Costa',
+      CBD_FRENCH_QUARTER: 'CBD / French Quarter',
+      BYWATER_MARIGNY: 'Bywater / Marigny',
+      UPTOWN_CARROLLTON: 'Uptown / Carrollton',
+      LAKEVIEW_GENTILLY: 'Lakeview / Gentilly',
+      WEST_BANK_ALGIERS: 'West Bank / Algiers',
+      JEFFERSON_METAIRIE_KENNER: 'Metairie / Kenner',
+      ST_BERNARD_CHALMETTE: 'St. Bernard / Chalmette',
+      GHENT_WESTBURG: 'Ghent / Westburg',
+      CENTRAL_MILITARY_CIRCLE: 'Central / Military Circle',
+      SOUTH_NORFOLK_BERKLEY: 'South Norfolk / Berkley',
+      DOWNTOWN_MIDTOWN_CORKTOWN: 'Downtown / Midtown',
+      EAST_SIDE_JEFFERSON: 'East Side / Jefferson',
+      WEST_SIDE_GRAND_RIVER: 'West Side / Grand River',
+      SOUTHWEST_MEXICANTOWN: 'Southwest / Mexicantown',
+      NORTH_END_HIGHLAND_PARK: 'North End / Highland Park',
+      EAST_ENGLISH_VILLAGE_MORNINGSIDE: 'East English Village',
+    };
+    const DIVISION_WORD_CASE = { LA: 'LA', SF: 'SF', CBD: 'CBD', SGV: 'SGV', DC: 'DC', NW: 'NW', NE: 'NE', SW: 'SW', SE: 'SE' };
+    function divisionLabel(b) {
+      const n = normalizeBorough(b);
+      if (!n) return '';
+      if (DIVISION_LABELS[n]) return DIVISION_LABELS[n];
+      if (/_/.test(n) && n === n.toUpperCase()) {
+        return n.split('_').filter(Boolean).map((w) => DIVISION_WORD_CASE[w]
+          || (w.charAt(0) + w.slice(1).toLowerCase())).join(' ');
+      }
+      return n;
+    }
+
+    // Short metro name for tight UI (catalyst cards): drop regional suffixes.
+    function shortCityName(name) {
+      return String(name || '')
+        .replace(/\s*\(.*\)\s*$/, '')
+        .replace(/ Bay Area$/, ' Bay')
+        .replace(/^San Francisco Bay$/, 'SF Bay')
+        .replace(/^New York City$/, 'NYC');
+    }
+
+    function deltaClass(v) {
+      const n = Number(v);
+      if (v == null || v === '' || !Number.isFinite(n) || n === 0) return '';
+      return n > 0 ? 'delta-pos' : 'delta-neg';
+    }
+
+    // Probability in [0, 1] as a percent; the ends read as bounds, not certainty.
+    function formatProbability(v) {
+      const n = Number(v);
+      if (v == null || v === '' || !Number.isFinite(n)) return '—';
+      const pct = n * 100;
+      if (pct >= 99.5) return '>99%';
+      if (pct <= 0.5) return '<1%';
+      return pct.toFixed(0) + '%';
+    }
+
+    // Signed percent for a fractional delta; '—' when the value is absent.
+    function formatSignedPct(v) {
+      const n = Number(v);
+      if (v == null || v === '' || !Number.isFinite(n)) return '—';
+      return (n > 0 ? '+' : '') + (n * 100).toFixed(1) + '%';
     }
 
     function renderMetroChips() {
@@ -2285,6 +2506,11 @@ __METRO_META__
           if (pillText && stamp && stamp.length >= 16) {
             pillText.textContent = 'Snapshot ' + stamp.slice(11, 16) + ' UTC';
             if (pillDot) pillDot.classList.add('static');
+            const pill = document.getElementById('stream-status-pill');
+            if (pill) {
+              pill.classList.add('snapshot');
+              pill.title = 'Precomputed snapshot published ' + stamp.slice(0, 10) + ' ' + stamp.slice(11, 16) + ' UTC';
+            }
           }
           return true;
         }
@@ -2332,6 +2558,8 @@ __METRO_META__
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
+      const inspector = document.getElementById('inspector-content');
+      if (inspector) INSPECTOR_EMPTY_HTML = inspector.innerHTML;
       wireMobileChrome();
 
       const linked = deepLinkedCity();
@@ -2353,6 +2581,7 @@ __METRO_META__
         if (wrap && !wrap.contains(e.target)) {
           const dd = document.getElementById('search-dropdown');
           if (dd) dd.classList.remove('visible');
+          setSearchExpanded(false);
         }
       });
       const dd = document.getElementById('search-dropdown');
@@ -2366,7 +2595,9 @@ __METRO_META__
       if (feed) {
         feed.addEventListener('click', (e) => {
           const item = e.target.closest('.catalyst-item');
-          if (item && item.dataset.h3) zoomToHex(item.dataset.h3, Number(item.dataset.lat), Number(item.dataset.lng));
+          if (item && item.dataset.h3 && item.dataset.lat !== '' && item.dataset.lng !== '') {
+            zoomToHex(item.dataset.h3, Number(item.dataset.lat), Number(item.dataset.lng));
+          }
         });
       }
     });
@@ -2447,12 +2678,23 @@ __METRO_META__
         btn.addEventListener('click', () => toggleMobilePanel(btn.dataset.drawer));
       });
       document.querySelectorAll('[data-close]').forEach((el) => {
-        el.addEventListener('click', closeMobilePanels);
+        el.addEventListener('click', () => {
+          // Desktop: the inspector's close control ends the selection and
+          // hands its width back to the map. Mobile: it just shuts the drawer.
+          if (!isMobileLayout() && el.closest('.sidebar-right')) clearSelection();
+          else closeMobilePanels();
+        });
       });
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeMobilePanels();
       });
       syncMobileChrome();
+      // The header reflows after load (metro chips render, web fonts swap in),
+      // so track its height continuously instead of measuring once.
+      const header = document.querySelector('header');
+      if (header && 'ResizeObserver' in window) {
+        new ResizeObserver(syncHeaderHeight).observe(header);
+      }
     }
 
     function onGlobalSearch(query) {
@@ -2463,6 +2705,7 @@ __METRO_META__
       if (!q) {
         dd.classList.remove('visible');
         dd.innerHTML = '';
+        setSearchExpanded(false);
         return;
       }
 
@@ -2473,37 +2716,83 @@ __METRO_META__
       }).slice(0, 8);
 
       if (matches.length === 0) {
-        dd.innerHTML = '<div style="padding: 10px 12px; font-size:11px; color:var(--text-muted);">No submarkets found. Press Enter to search as coordinate or H3.</div>';
+        dd.innerHTML = '<div class="search-empty">No submarkets found. Press Enter to search as coordinate or H3.</div>';
         dd.classList.add('visible');
+        setSearchExpanded(false);
         return;
       }
 
-      dd.replaceChildren(...matches.map(([name, meta]) => {
-        const borough = normalizeBorough(meta.borough);
-        const bClass = getBoroughClass(borough);
+      dd.replaceChildren(...matches.map(([name, meta], i) => {
+        const bClass = getBoroughClass(meta.borough);
         const row = document.createElement('div');
         row.className = 'search-result-item';
+        row.id = 'search-opt-' + i;
+        row.setAttribute('role', 'option');
+        row.setAttribute('aria-selected', 'false');
         row.dataset.submarket = name;
-        const left = document.createElement('span');
+        const line = document.createElement('span');
+        line.className = 'search-result-line';
         const strong = document.createElement('strong');
         strong.textContent = name;
-        const tag = document.createElement('span');
-        tag.className = 'borough-tag ' + bClass;
-        tag.style.marginLeft = '4px';
-        tag.textContent = borough;
-        left.append(strong, tag);
         const right = document.createElement('span');
         right.className = 'item-sub';
-        right.textContent = 'LIMS ' + Number(meta.base_lims || 80.0).toFixed(1);
-        row.append(left, right);
+        const lims = Number(meta.base_lims);
+        right.textContent = Number.isFinite(lims) && meta.base_lims != null ? 'LIMS ' + lims.toFixed(1) : '';
+        line.append(strong, right);
+        row.append(line);
+        const label = divisionLabel(meta.borough);
+        if (label) {
+          const tag = document.createElement('span');
+          tag.className = 'borough-tag ' + bClass;
+          tag.textContent = label;
+          row.append(tag);
+        }
         return row;
       }));
+      searchActiveIndex = -1;
       dd.classList.add('visible');
+      setSearchExpanded(true);
+    }
+
+    let searchActiveIndex = -1;
+
+    function setSearchExpanded(open) {
+      const input = document.getElementById('global-search-input');
+      if (!input) return;
+      input.setAttribute('aria-expanded', String(open));
+      if (!open) input.removeAttribute('aria-activedescendant');
+    }
+
+    // Arrow keys walk the suggestion list (listbox/combobox pattern); Enter
+    // picks the highlighted row, or searches the raw text when none is.
+    function onSearchKeydown(event) {
+      const dd = document.getElementById('search-dropdown');
+      const rows = dd ? [...dd.querySelectorAll('.search-result-item')] : [];
+      const input = event.currentTarget;
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        if (!rows.length) return;
+        event.preventDefault();
+        const step = event.key === 'ArrowDown' ? 1 : -1;
+        searchActiveIndex = (searchActiveIndex + step + rows.length) % rows.length;
+        rows.forEach((r, i) => r.setAttribute('aria-selected', String(i === searchActiveIndex)));
+        const active = rows[searchActiveIndex];
+        input.setAttribute('aria-activedescendant', active.id);
+        active.scrollIntoView({ block: 'nearest' });
+      } else if (event.key === 'Enter') {
+        event.preventDefault();
+        const active = rows[searchActiveIndex];
+        if (active && dd.classList.contains('visible')) selectSearchSubmarket(active.dataset.submarket);
+        else executeSearch();
+      } else if (event.key === 'Escape' && dd && dd.classList.contains('visible')) {
+        dd.classList.remove('visible');
+        setSearchExpanded(false);
+      }
     }
 
     function selectSearchSubmarket(name) {
       const dd = document.getElementById('search-dropdown');
       if (dd) dd.classList.remove('visible');
+      setSearchExpanded(false);
       const input = document.getElementById('global-search-input');
       if (input) input.value = name;
       zoomToSubmarket(name);
@@ -2517,6 +2806,7 @@ __METRO_META__
 
       const dd = document.getElementById('search-dropdown');
       if (dd) dd.classList.remove('visible');
+      setSearchExpanded(false);
 
       const foundKey = Object.keys(SUBMARKETS).find(k => k.toLowerCase() === val.toLowerCase());
       if (foundKey) {
@@ -2540,6 +2830,12 @@ __METRO_META__
         });
 
         map.addControl(new maplibregl.NavigationControl({ visualizePitch: true, showCompass: false }), 'bottom-right');
+        // The canvas width changes when the inspector opens or closes, not
+        // only on window resize, so follow the container itself.
+        const mapEl = document.getElementById('map');
+        if (mapEl && 'ResizeObserver' in window) {
+          new ResizeObserver(() => { if (map) map.resize(); }).observe(mapEl);
+        }
 
         map.on('load', () => {
           map.resize();
@@ -2570,45 +2866,32 @@ __METRO_META__
             const coords = e.lngLat;
             const subInfo = getSubmarketInfoByCoords(props.centroid_lat || coords.lat, props.centroid_lng || coords.lng);
             const subName = props.submarket || (subInfo ? subInfo.name : 'Micro-Block');
-            const borough = normalizeBorough(props.borough || (subInfo ? subInfo.meta.borough : ''));
-            const bClass = getBoroughClass(borough);
-            const limsVal = Number(props.lims_score);
-            const delta6m = Number(props.delta_6m_p50);
-            const nationalPct = Number(props.lims_score_national_pct);
-            const metroPct = Number(props.lims_score_metro_pct);
-            const limsFinite = Number.isFinite(limsVal);
-            const deltaFinite = Number.isFinite(delta6m);
+            const rawBorough = props.borough || (subInfo ? subInfo.meta.borough : '');
+            const borough = divisionLabel(rawBorough);
+            const bClass = getBoroughClass(rawBorough);
             const contextMetric = CONTEXT_METRICS[currentMetric];
-            const contextRow = contextMetric ? `
-                  <div style="display:flex; justify-content:space-between; gap:8px;">
-                    <span style="color:var(--text-secondary);">${escapeHtml(contextMetric.label)}:</span>
-                    <strong style="font-family:var(--font-mono); font-variant-numeric:tabular-nums; color:var(--text-main);">${props[currentMetric] == null ? 'No data' : escapeHtml(formatContextValue(currentMetric, props[currentMetric]))}</strong>
-                  </div>` : '';
+            const popupRow = (label, value, cls = '') => `
+                  <div class="popup-row">
+                    <span class="popup-lbl">${escapeHtml(label)}</span>
+                    <strong class="popup-val ${cls}">${value}</strong>
+                  </div>`;
+            const fmtNum = (v, digits) => (v != null && v !== '' && Number.isFinite(Number(v)) ? Number(v).toFixed(digits) : '—');
+            const contextRow = contextMetric
+              ? popupRow(contextMetric.label, props[currentMetric] == null ? 'No data' : escapeHtml(formatContextValue(currentMetric, props[currentMetric])))
+              : '';
 
             popup.setLngLat(coords)
               .setHTML(`
-                <div style="font-size: 11px; min-width: 170px; line-height: 1.4;">
-                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                    <strong style="color: var(--text-main); font-size:12px;">${escapeHtml(subName)}</strong>
-                    <span class="borough-tag ${escapeHtml(bClass)}">${escapeHtml(borough)}</span>
+                <div class="popup-card">
+                  <div class="popup-head">
+                    <strong class="popup-title">${escapeHtml(subName)}</strong>
+                    ${borough ? `<span class="borough-tag ${escapeHtml(bClass)}">${escapeHtml(borough)}</span>` : ''}
                   </div>
-                  ${props.city_name ? `<div style="color:var(--text-muted); font-size:10px; margin-bottom:3px;">${escapeHtml(props.city_name)}</div>` : ''}
-                  <div style="display:flex; justify-content:space-between; gap:8px; margin-top:2px;">
-                    <span style="color:var(--text-secondary);">LIMS Score:</span>
-                    <strong style="font-family:var(--font-mono); font-variant-numeric:tabular-nums; color:var(--text-main);">${limsFinite ? limsVal.toFixed(1) : '—'}</strong>
-                  </div>
-                  <div style="display:flex; justify-content:space-between; gap:8px;">
-                    <span style="color:var(--text-secondary);">National Pct:</span>
-                    <strong style="font-family:var(--font-mono); font-variant-numeric:tabular-nums;">${Number.isFinite(nationalPct) ? nationalPct.toFixed(0) : '—'}</strong>
-                  </div>
-                  <div style="display:flex; justify-content:space-between; gap:8px;">
-                    <span style="color:var(--text-secondary);">Metro Pct:</span>
-                    <strong style="font-family:var(--font-mono); font-variant-numeric:tabular-nums;">${Number.isFinite(metroPct) ? metroPct.toFixed(0) : '—'}</strong>
-                  </div>
-                  <div style="display:flex; justify-content:space-between; gap:8px;">
-                    <span style="color:var(--text-secondary);">6M Return:</span>
-                    <strong style="font-family:var(--font-mono); font-variant-numeric:tabular-nums; color: ${deltaFinite && delta6m < 0 ? 'var(--text-muted)' : 'var(--accent-success)'};">${deltaFinite ? `${delta6m < 0 ? '' : '+'}${(delta6m * 100).toFixed(1)}%` : '—'}</strong>
-                  </div>${contextRow}
+                  ${props.city_name ? `<div class="popup-city">${escapeHtml(props.city_name)}</div>` : ''}
+                  ${popupRow('LIMS score', fmtNum(props.lims_score, 1))}
+                  ${popupRow('National percentile', fmtNum(props.lims_score_national_pct, 0))}
+                  ${popupRow('Metro percentile', fmtNum(props.lims_score_metro_pct, 0))}
+                  ${popupRow('6M return', formatSignedPct(props.delta_6m_p50), deltaClass(props.delta_6m_p50))}${contextRow}
                 </div>
               `)
               .addTo(map);
@@ -2948,8 +3231,6 @@ __METRO_META__
       currentMetric = metricEl.value;
       const pctProp = `${currentMetric}_national_pct`;
       const legendTitle = document.getElementById('legend-metric-title');
-      const legendMin = document.getElementById('legend-min');
-      const legendMax = document.getElementById('legend-max');
 
       const contextMetric = CONTEXT_METRICS[currentMetric];
       const titleSuffix = contextMetric ? ' — Percentile Within Coverage' : ' — National Percentile';
@@ -2966,8 +3247,6 @@ __METRO_META__
         attribution.hidden = !(contextMetric && contextMetric.attribution);
         attribution.textContent = contextMetric && contextMetric.attribution ? 'Source: ' + contextMetric.attribution : '';
       }
-      if (legendMin) legendMin.innerText = '0';
-      if (legendMax) legendMax.innerText = '100';
 
       // One shared percentile color ramp; only extrusion height differs per metric.
       // Context metrics exist only where their layer has coverage: cells
@@ -3042,9 +3321,11 @@ __METRO_META__
         const mPerPx = 156543.03392 * Math.cos((center.lat * Math.PI) / 180) / Math.pow(2, z);
         const maxPx = 90;
         const nice = [25, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000];
-        let meters = nice[nice.length - 1];
+        // Largest nice distance that still fits in maxPx (smallest as floor).
+        let meters = nice[0];
         for (const candidate of nice) {
-          if (candidate / mPerPx <= maxPx) { meters = candidate; break; }
+          if (candidate / mPerPx <= maxPx) meters = candidate;
+          else break;
         }
         const px = Math.round(meters / mPerPx);
         scaleRule.style.width = `${px}px`;
@@ -3055,8 +3336,8 @@ __METRO_META__
       currentPerspective = mode;
       const btn3d = document.getElementById('btn-3d');
       const btn2d = document.getElementById('btn-2d');
-      if (btn3d) btn3d.classList.toggle('active', mode === '3D');
-      if (btn2d) btn2d.classList.toggle('active', mode === '2D');
+      if (btn3d) { btn3d.classList.toggle('active', mode === '3D'); btn3d.setAttribute('aria-pressed', String(mode === '3D')); }
+      if (btn2d) { btn2d.classList.toggle('active', mode === '2D'); btn2d.setAttribute('aria-pressed', String(mode === '2D')); }
 
       if (map) {
         updateLayerVisibilities();
@@ -3081,10 +3362,6 @@ __METRO_META__
       scheduleNationalLoad();
     }
 
-    function togglePerspective() {
-      setPerspective(currentPerspective === '3D' ? '2D' : '3D');
-    }
-
     function zoomToSubmarket(name) {
       if (!name) return;
       const meta = SUBMARKETS[name];
@@ -3093,8 +3370,8 @@ __METRO_META__
       if (map) {
         map.flyTo({
           center: [meta.lng, meta.lat],
-          zoom: meta.zoom || 15.2,
-          pitch: currentPerspective === '3D' ? (meta.pitch || 50) : 0,
+          zoom: Math.min(meta.zoom || FOCUS_ZOOM, FOCUS_ZOOM + 0.5),
+          pitch: currentPerspective === '3D' ? Math.min(meta.pitch || FOCUS_PITCH, FOCUS_PITCH) : 0,
           bearing: -15,
           duration: REDUCED_MOTION ? 0 : 1200
         });
@@ -3156,28 +3433,33 @@ __METRO_META__
 
 
       if (countBadge) {
-        countBadge.innerText = `${filtered.length} Active`;
+        countBadge.innerText = String(filtered.length);
+        countBadge.setAttribute('aria-label', `${filtered.length} catalysts`);
       }
 
       if (filtered.length === 0) {
-        container.innerHTML = `<div style="font-size:11px; color:var(--text-muted); text-align:center; padding:24px 0;">No active catalysts${activeMetroChip ? ` in ${escapeHtml(cityDisplayName(activeMetroChip))}` : ''}</div>`;
+        container.innerHTML = `<div class="catalyst-empty">No catalysts${activeMetroChip ? ` in ${escapeHtml(cityDisplayName(activeMetroChip))}` : ''}</div>`;
         return;
       }
 
       container.replaceChildren(...filtered.map((c) => {
         const subInfo = getSubmarketInfoByCoords(c.centroid_lat, c.centroid_lng);
-        const submarket = c.submarket || (subInfo ? subInfo.name : 'Active Parcel');
-        const borough = normalizeBorough(c.borough || (subInfo ? subInfo.meta.borough : 'Manhattan'));
-        const bClass = getBoroughClass(borough);
-        const lat = c.centroid_lat || (subInfo ? subInfo.meta.lat : 40.72);
-        const lng = c.centroid_lng || (subInfo ? subInfo.meta.lng : -74.00);
+        const submarket = c.submarket || (subInfo ? subInfo.name : 'Unnamed cluster');
+        const rawBorough = c.borough || (subInfo ? subInfo.meta.borough : '');
+        const borough = divisionLabel(rawBorough);
+        const bClass = getBoroughClass(rawBorough);
+        const lat = c.centroid_lat != null ? c.centroid_lat : (subInfo ? subInfo.meta.lat : null);
+        const lng = c.centroid_lng != null ? c.centroid_lng : (subInfo ? subInfo.meta.lng : null);
         const isSelected = selectedH3Index === c.h3_index;
 
-        const item = document.createElement('div');
+        // A real button: focusable, and Enter/Space activate it for free.
+        const item = document.createElement('button');
+        item.type = 'button';
         item.className = 'catalyst-item' + (isSelected ? ' selected' : '');
+        item.setAttribute('aria-pressed', String(isSelected));
         item.dataset.h3 = c.h3_index || '';
-        item.dataset.lat = String(lat);
-        item.dataset.lng = String(lng);
+        item.dataset.lat = lat == null ? '' : String(lat);
+        item.dataset.lng = lng == null ? '' : String(lng);
         const top = document.createElement('div');
         top.className = 'catalyst-item-top';
         const nameEl = document.createElement('span');
@@ -3185,36 +3467,49 @@ __METRO_META__
         nameEl.textContent = submarket;
         const limsEl = document.createElement('span');
         limsEl.className = 'catalyst-lims-tag';
-        limsEl.textContent = Number(c.lims_score || 85.0).toFixed(1);
+        const limsNum = Number(c.lims_score);
+        limsEl.textContent = c.lims_score != null && Number.isFinite(limsNum) ? limsNum.toFixed(1) : '—';
         top.append(nameEl, limsEl);
         const bottom = document.createElement('div');
         bottom.className = 'catalyst-item-bottom';
-        const boroughEl = document.createElement('span');
-        boroughEl.className = 'borough-tag ' + bClass;
-        boroughEl.textContent = borough;
-        bottom.append(boroughEl);
-        if (c.city_name) {
+        const tags = document.createElement('span');
+        tags.className = 'catalyst-tags';
+        if (borough) {
+          const boroughEl = document.createElement('span');
+          boroughEl.className = 'borough-tag ' + bClass;
+          boroughEl.textContent = borough;
+          tags.append(boroughEl);
+        }
+        // The metro is implied once a metro chip scopes the feed.
+        if (c.city_name && !activeMetroChip) {
           const cityEl = document.createElement('span');
           cityEl.className = 'borough-tag';
-          cityEl.textContent = c.city_name;
-          bottom.append(cityEl);
+          cityEl.textContent = shortCityName(c.city_name);
+          cityEl.title = c.city_name;
+          tags.append(cityEl);
         }
         const deltaEl = document.createElement('span');
-        deltaEl.className = 'delta-tag';
-        deltaEl.textContent = '+' + (Number(c.delta_6m_p50 || 0.14) * 100).toFixed(1) + '% 6M';
-        bottom.append(deltaEl);
+        deltaEl.className = 'delta-tag ' + deltaClass(c.delta_6m_p50);
+        deltaEl.textContent = formatSignedPct(c.delta_6m_p50) + ' 6M';
+        bottom.append(tags, deltaEl);
         item.append(top, bottom);
         return item;
       }));
     }
+
+    // Camera for focusing one cell or submarket (catalyst, search, deep
+    // link): neighbourhood scale, so the selection keeps its surroundings and
+    // tall extrusions (up to ~1 km) don't fill the viewport.
+    const FOCUS_ZOOM = 12.9;
+    const FOCUS_PITCH = 40;
 
     function zoomToHex(h3Index, lat, lng) {
       selectedH3Index = h3Index;
       if (map) {
         map.flyTo({
           center: [lng, lat],
-          zoom: 15.6,
-          pitch: currentPerspective === '3D' ? 55 : 0,
+          zoom: FOCUS_ZOOM,
+          pitch: currentPerspective === '3D' ? FOCUS_PITCH : 0,
           bearing: -12,
           duration: REDUCED_MOTION ? 0 : 1100
         });
@@ -3276,9 +3571,28 @@ __METRO_META__
       handleHexSelection(props);
     }
 
+    let INSPECTOR_EMPTY_HTML = null;
+
+    // Desktop keeps the inspector collapsed until something is selected, so
+    // the map gets the width; the body class drives that (CSS, >860px only).
+    function clearSelection() {
+      selectedH3Index = null;
+      if (map) {
+        ['h3-hex-selected', 'h3-hex-selected-fill'].forEach((id) => {
+          if (map.getLayer(id)) map.setFilter(id, ['==', ['get', 'h3_index'], '']);
+        });
+      }
+      const container = document.getElementById('inspector-content');
+      if (container && INSPECTOR_EMPTY_HTML != null) container.innerHTML = INSPECTOR_EMPTY_HTML;
+      if (shapChart) { shapChart.destroy(); shapChart = null; }
+      document.body.classList.add('inspector-empty');
+      renderCatalystFeed();
+    }
+
     function handleHexSelection(props) {
       if (!props) return;
       selectedH3Index = props.h3_index;
+      document.body.classList.remove('inspector-empty');
       // Mobile: the inspector is an off-canvas drawer, so surface it on every
       // selection (map click, catalyst item, or search) — otherwise the user
       // taps a hex and sees nothing change.
@@ -3294,21 +3608,27 @@ __METRO_META__
       if (!container) return;
 
       const baselineOnly = props.__baseline === true;
-      const lims = Number(props.lims_score) || 0;
-      const isCatalyst = !baselineOnly && lims >= 84.0;
-      const p10 = (Number(props.delta_6m_p10 || 0.02) * 100).toFixed(1);
-      const p50 = (Number(props.delta_6m_p50 || 0.12) * 100).toFixed(1);
-      const p90 = (Number(props.delta_6m_p90 || 0.20) * 100).toFixed(1);
-      const spillover = (Number(props.delta_12m_spillover || 0.10) * 100).toFixed(1);
-      const macroProb = (Number(props.prob_18m_macro_outperformance || 0.75) * 100).toFixed(1);
+      const limsRaw = Number(props.lims_score);
+      const limsKnown = props.lims_score != null && Number.isFinite(limsRaw);
+      const lims = limsKnown ? limsRaw : 0;
+      const isCatalyst = !baselineOnly && limsKnown && lims >= 84.0;
+      // Absent model outputs render as '—', never as a plausible-looking default.
+      const deltaCell = (v) => `<span class="${deltaClass(v)}">${formatSignedPct(v)}</span>`;
+      const macroProb = formatProbability(props.prob_18m_macro_outperformance);
 
-      const lat = Number(props.centroid_lat || 40.72);
-      const lng = Number(props.centroid_lng || -74.00);
-      const subInfo = getSubmarketInfoByCoords(lat, lng);
-      const submarketName = props.submarket || (subInfo ? subInfo.name : 'NYC Corridor');
-      const boroughName = normalizeBorough(props.borough || (subInfo ? subInfo.meta.borough : getBoroughNameByCoords(lat, lng)));
-      const description = props.description || (subInfo ? subInfo.meta.description : 'Active spatio-temporal cluster');
-      const bClass = getBoroughClass(boroughName);
+      const latRaw = Number(props.centroid_lat);
+      const lngRaw = Number(props.centroid_lng);
+      const hasCoords = props.centroid_lat != null && props.centroid_lng != null
+        && Number.isFinite(latRaw) && Number.isFinite(lngRaw);
+      const lat = hasCoords ? latRaw : NaN;
+      const lng = hasCoords ? lngRaw : NaN;
+      const subInfo = hasCoords ? getSubmarketInfoByCoords(lat, lng) : null;
+      const submarketName = props.submarket || (subInfo ? subInfo.name : 'Selected cell');
+      const rawBorough = props.borough || (subInfo ? subInfo.meta.borough : (hasCoords ? getBoroughNameByCoords(lat, lng) : ''));
+      const boroughName = divisionLabel(rawBorough);
+      const description = props.description || (subInfo ? subInfo.meta.description : '');
+      const bClass = getBoroughClass(rawBorough);
+      const numOr = (v, fmt) => (v != null && v !== '' && Number.isFinite(Number(v)) ? fmt(Number(v)) : '—');
 
       let shapObj = props.shap_attributions;
       if (typeof shapObj === 'string') {
@@ -3321,26 +3641,25 @@ __METRO_META__
           <div class="parcel-header">
             <div class="parcel-title-row">
               <div class="parcel-name">${esc(submarketName)}</div>
-              <span class="borough-tag ${esc(bClass)}">${esc(boroughName)}</span>
+              ${boroughName ? `<span class="borough-tag ${esc(bClass)}">${esc(boroughName)}</span>` : ''}
             </div>
             <div class="parcel-meta-sub">
-              <span>H3: ${esc(props.h3_index || '')}</span>
-              <span>•</span>
-              <span>${lat.toFixed(4)}, ${lng.toFixed(4)}</span>
-              ${props.city_name ? `<span>•</span><span>${esc(props.city_name)}</span>` : ''}
+              ${props.city_name ? `<span>${esc(props.city_name)}</span><span>•</span>` : ''}
+              ${hasCoords ? `<span>${lat.toFixed(4)}, ${lng.toFixed(4)}</span><span>•</span>` : ''}
+              <span>H3 ${esc(props.h3_index || '—')}</span>
             </div>
-            <div class="parcel-description">${esc(description)}</div>
+            ${description ? `<div class="parcel-description">${esc(description)}</div>` : ''}
           </div>
 
           <div class="score-hero-block">
             <div class="score-hero-left">
               <span class="score-hero-label">${baselineOnly ? 'Registry Baseline Momentum' : 'LIMS Momentum Score'}</span>
-              <span class="score-status-pill" style="color: ${baselineOnly ? 'var(--text-secondary)' : isCatalyst ? 'var(--accent-danger)' : 'var(--accent-success)'}">
-                ${baselineOnly ? '○ Baseline — no model snapshot' : isCatalyst ? '● High Catalyst Alert' : '● Active Signal'}
+              <span class="score-status-pill ${baselineOnly ? 'baseline' : isCatalyst ? 'catalyst' : ''}">
+                ${baselineOnly ? '○ Baseline — no model snapshot' : isCatalyst ? '● Catalyst' : '● Active signal'}
               </span>
             </div>
-            <div class="score-hero-val" style="color: ${baselineOnly ? 'var(--text-secondary)' : isCatalyst ? 'var(--accent-danger)' : 'var(--accent-success)'}">
-              ${baselineOnly && !Number.isFinite(Number(props.lims_score)) ? '—' : lims.toFixed(1)}
+            <div class="score-hero-val ${baselineOnly ? 'baseline' : isCatalyst ? 'catalyst' : ''}">
+              ${limsKnown ? lims.toFixed(1) : '—'}
             </div>
           </div>
           ${
@@ -3378,20 +3697,20 @@ __METRO_META__
             <div class="quantiles-card">
               <div class="quantiles-header">
                 <span>6-Month Forecast Quantiles</span>
-                <span style="font-family:var(--font-mono); font-size:10px; color:var(--text-muted);">LightGBM</span>
+                <span class="quantiles-model">LightGBM</span>
               </div>
               <div class="quantiles-spread-row">
                 <div class="q-box">
                   <span class="q-lbl">Bearish (p10)</span>
-                  <span class="q-num">+${p10}%</span>
+                  <span class="q-num">${formatSignedPct(props.delta_6m_p10)}</span>
                 </div>
                 <div class="q-box expected">
                   <span class="q-lbl">Expected (p50)</span>
-                  <span class="q-num">+${p50}%</span>
+                  <span class="q-num">${deltaCell(props.delta_6m_p50)}</span>
                 </div>
                 <div class="q-box">
                   <span class="q-lbl">Bullish (p90)</span>
-                  <span class="q-num">+${p90}%</span>
+                  <span class="q-num">${formatSignedPct(props.delta_6m_p90)}</span>
                 </div>
               </div>
             </div>
@@ -3399,11 +3718,11 @@ __METRO_META__
             <div class="horizon-pairs">
               <div class="horizon-mini-card">
                 <div class="horizon-mini-lbl">12M Spatial Spillover</div>
-                <div class="horizon-mini-val" style="color: var(--accent-warning);">+${spillover}%</div>
+                <div class="horizon-mini-val">${deltaCell(props.delta_12m_spillover)}</div>
               </div>
               <div class="horizon-mini-card">
-                <div class="horizon-mini-lbl">18M Macro Outperf.</div>
-                <div class="horizon-mini-val" style="color: var(--accent-purple);">${macroProb}%</div>
+                <div class="horizon-mini-lbl">18M Outperformance Probability</div>
+                <div class="horizon-mini-val">${macroProb}</div>
               </div>
             </div>
           </div>
@@ -3415,36 +3734,36 @@ __METRO_META__
             </div>
           </div>
 
-          <div>
-            <div class="forecast-section-title">Leading Telemetry Indicators</div>
-            <table class="telemetry-table">
-              <tr>
-                <td class="lbl">CapEx Density (Decayed)</td>
-                <td class="val">$${Number(props.capex_density_decayed || 550000).toLocaleString()}/km²</td>
-              </tr>
-              <tr>
-                <td class="lbl">DOB Permit Velocity</td>
-                <td class="val">+${(Number(props.permit_velocity || 0.42) * 100).toFixed(1)}%</td>
-              </tr>
-              <tr>
-                <td class="lbl">311 Shift Ratio (QoL/Neglect)</td>
-                <td class="val">${Number(props.shift_ratio_311 || 3.0).toFixed(2)}x</td>
-              </tr>
-              <tr>
-                <td class="lbl">SLA Liquor Filings (90d)</td>
-                <td class="val">${props.sla_new_filings_90d || 4} filings</td>
-              </tr>
-              <tr>
-                <td class="lbl">Inference Latency</td>
-                <td class="val" style="color:var(--accent-primary);">${props.inference_latency_ms || 2.8} ms</td>
-              </tr>
-            </table>
-          </div>`
+          ${leadingIndicatorsHtml(props, numOr)}`
           }${contextInspectorHtml(props)}
         </div>
       `;
 
       renderShapChart(shapObj);
+    }
+
+    // Leading indicators the snapshot actually carries for this cell; rows
+    // with no value are left out rather than padded with defaults.
+    function leadingIndicatorsHtml(props, numOr) {
+      const rows = [
+        ['CapEx Density (Decayed)', props.capex_density_decayed, numOr(props.capex_density_decayed, (n) => '$' + Math.round(n).toLocaleString() + '/km²')],
+        ['Permit Velocity', props.permit_velocity, formatSignedPct(props.permit_velocity)],
+        ['311 Shift Ratio (QoL/Neglect)', props.shift_ratio_311, numOr(props.shift_ratio_311, (n) => n.toFixed(2) + 'x')],
+        ['Liquor License Filings (90d)', props.sla_new_filings_90d, numOr(props.sla_new_filings_90d, (n) => Math.round(n) + ' filings')],
+      ].filter(([, raw, shown]) => raw != null && shown !== '—');
+      const body = rows.length
+        ? `<table class="telemetry-table">${rows.map(([lbl, , shown]) => `
+              <tr>
+                <td class="lbl">${escapeHtml(lbl)}</td>
+                <td class="val">${escapeHtml(shown)}</td>
+              </tr>`).join('')}
+            </table>`
+        : '<div class="shap-empty">No leading indicators published for this cell.</div>';
+      return `
+          <div>
+            <div class="forecast-section-title">Leading Telemetry Indicators</div>
+            ${body}
+          </div>`;
     }
 
     // Every Bay Area context value the selected cell carries, with sources.
@@ -3462,9 +3781,17 @@ __METRO_META__
                 <td class="val">${escapeHtml(formatContextValue(key, props[key]))}</td>
               </tr>`).join('')}
             </table>
-            <div class="legend-attribution" style="margin-top:6px;">${sources.map((s) => escapeHtml(s)).join('<br>')}</div>
+            <div class="legend-attribution context-sources">${sources.map((s) => escapeHtml(s)).join('<br>')}</div>
           </div>`;
     }
+
+    // Canvas text can't read CSS variables, so resolve the tokens once; the
+    // font stacks carry fallbacks so a slow web font never drops to serif.
+    const ROOT_STYLE = getComputedStyle(document.documentElement);
+    const CHART_TEXT_MUTED = ROOT_STYLE.getPropertyValue('--text-muted').trim() || '#8190a6';
+    const CHART_TEXT_SECONDARY = ROOT_STYLE.getPropertyValue('--text-secondary').trim() || '#a7b5c9';
+    const CHART_FONT_MONO = ROOT_STYLE.getPropertyValue('--font-mono').trim() || 'monospace';
+    const CHART_FONT_SANS = ROOT_STYLE.getPropertyValue('--font-sans').trim() || 'sans-serif';
 
     function renderShapChart(shap) {
       const ctx = document.getElementById('shap-chart');
@@ -3515,16 +3842,23 @@ __METRO_META__
             x: {
               grid: { color: 'rgba(255, 255, 255, 0.04)' },
               ticks: {
-                color: '#64748b',
-                font: { family: 'IBM Plex Mono', size: 9 },
+                color: CHART_TEXT_MUTED,
+                font: { family: CHART_FONT_MONO, size: 11 },
                 callback: (v) => `${(v * 100).toFixed(1)}%`
               }
             },
             y: {
               grid: { display: false },
               ticks: {
-                color: '#94a3b8',
-                font: { family: 'IBM Plex Sans', size: 10 }
+                color: CHART_TEXT_SECONDARY,
+                font: { family: CHART_FONT_SANS, size: 11 },
+                // Narrow panels (tablet overlay) can't fit the longest feature
+                // names; shorten them there. The tooltip keeps the full name.
+                callback: function (value) {
+                  const label = String(this.getLabelForValue(value));
+                  const max = this.chart.width < 320 ? 18 : 28;
+                  return label.length > max ? label.slice(0, max - 1) + '…' : label;
+                }
               }
             }
           }
@@ -3561,8 +3895,8 @@ __METRO_META__
         if (map) {
           map.flyTo({
             center: [lng, lat],
-            zoom: 15.5,
-            pitch: currentPerspective === '3D' ? 52 : 0,
+            zoom: FOCUS_ZOOM,
+            pitch: currentPerspective === '3D' ? FOCUS_PITCH : 0,
             bearing: -15,
             duration: REDUCED_MOTION ? 0 : 1100
           });
