@@ -42,9 +42,12 @@ import csv
 import gzip
 import io
 import logging
+import tempfile
 from collections.abc import Iterator
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
+from pathlib import Path
+from typing import TextIO
 
 from src.producers.series_client import SeriesObservation, parse_period, to_float
 from src.spatial.bay_area_zips import is_bay_area_zip, normalize_zip
@@ -109,19 +112,24 @@ class RedfinRow:
     metrics: dict[str, float]
 
 
-def _get_bytes(url: str, timeout_seconds: float) -> bytes:
+def _download_to_file(url: str, dest: Path, timeout_seconds: float) -> None:
+    """Stream ``url`` to ``dest`` in chunks so the multi-GB file never sits in memory."""
     import httpx
 
     try:
-        with httpx.Client(timeout=timeout_seconds, follow_redirects=True) as client:
-            resp = client.get(url)
+        with (
+            httpx.Client(timeout=timeout_seconds, follow_redirects=True) as client,
+            client.stream("GET", url) as resp,
+        ):
             resp.raise_for_status()
-            return resp.content
+            with dest.open("wb") as handle:
+                for chunk in resp.iter_bytes(chunk_size=1 << 20):
+                    handle.write(chunk)
     except Exception as exc:  # httpx.HTTPError and friends
         raise RedfinFetchError(f"{url}: {exc}") from exc
 
 
-def parse_redfin_tsv(text: str) -> Iterator[RedfinRow]:
+def parse_redfin_tsv(text: str | TextIO) -> Iterator[RedfinRow]:
     """Parse the decompressed Redfin ZIP tracker TSV into Bay Area rows.
 
     Filters to Bay Area ZIPs and the "All Residential" aggregate row before
@@ -133,7 +141,8 @@ def parse_redfin_tsv(text: str) -> Iterator[RedfinRow]:
     gracefully around that (US-440 acceptance criteria: "handles ZIPs with
     no data gracefully").
     """
-    reader = csv.DictReader(io.StringIO(text), delimiter="\t")
+    source = io.StringIO(text) if isinstance(text, str) else text
+    reader = csv.DictReader(source, delimiter="\t")
     for row in reader:
         if str(row.get("PROPERTY_TYPE_ID", "")).strip() != ALL_RESIDENTIAL_PROPERTY_TYPE_ID:
             continue
@@ -194,12 +203,15 @@ def fetch_bay_area_zip_tracker(
 
     One whole-file GET (the file is ~1.5 GB compressed as of 2026-09-13;
     ``timeout_seconds`` defaults generously) per Redfin's own publication
-    model — there is no incremental/paged variant of this feed.
+    model — there is no incremental/paged variant of this feed. The download
+    streams to a temporary file and is decompressed line by line, so memory
+    stays flat instead of holding the compressed and decompressed file at once.
     """
-    raw = _get_bytes(url, timeout_seconds)
-    try:
-        text = gzip.decompress(raw).decode("utf-8", errors="replace")
-    except OSError as exc:
-        raise RedfinFetchError(f"{url}: not a valid gzip payload: {exc}") from exc
-    rows = parse_redfin_tsv(text)
-    return redfin_rows_to_observations(rows, vintage=vintage)
+    with tempfile.TemporaryDirectory(prefix="redfin-") as tmp:
+        path = Path(tmp) / "zip_code_market_tracker.tsv000.gz"
+        _download_to_file(url, path, timeout_seconds)
+        try:
+            with gzip.open(path, "rt", encoding="utf-8", errors="replace", newline="") as handle:
+                return redfin_rows_to_observations(parse_redfin_tsv(handle), vintage=vintage)
+        except OSError as exc:
+            raise RedfinFetchError(f"{url}: not a valid gzip payload: {exc}") from exc

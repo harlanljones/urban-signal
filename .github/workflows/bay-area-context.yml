@@ -1,0 +1,60 @@
+name: bay-area-context
+
+# Weekly build of the Bay Area per-hex context table (LODES jobs, 511 transit,
+# SF/San Jose permit momentum, Redfin/Zillow prices, Overture buildings/places).
+# The upstream sources refresh weekly to annually, so this runs on its own
+# cadence instead of inside every publish; batch-push-deploy downloads the
+# newest successful artifact and joins it onto the map (--context-dir).
+# A layer whose source is down or unconfigured (no BAY_511_API_KEY secret) is
+# recorded as skipped/failed in bay_area_context_meta.json; the rest publish.
+
+on:
+  schedule:
+    - cron: "0 9 * * 1" # weekly, Monday 09:00 UTC (before the nightly publish)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bay-area-context
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install project
+        run: |
+          uv venv .venv --python 3.12
+          uv pip install -e apps/api
+
+      - name: Restore download cache (LODES, ZCTA boundaries)
+        uses: actions/cache@v4
+        with:
+          path: .cache/bay_area_context
+          key: bay-area-context-${{ github.run_id }}
+          restore-keys: bay-area-context-
+
+      - name: Build context table
+        env:
+          BAY_511_API_KEY: ${{ secrets.BAY_511_API_KEY }}
+        run: |
+          PYTHONPATH=apps/api .venv/bin/python -m src.export.bay_area_context \
+            --out build/context --cache-dir .cache/bay_area_context
+          cat build/context/bay_area_context_meta.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bay-area-context
+          path: build/context/
+          retention-days: 90

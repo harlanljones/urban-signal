@@ -169,3 +169,34 @@ class TestObservationConversion:
         assert set(INTENSIVE_REDFIN_METRICS) | set(EXTENSIVE_REDFIN_METRICS) == set(
             REDFIN_METRICS
         )
+
+
+class TestStreamedFetch:
+    """``fetch_bay_area_zip_tracker`` streams to disk and parses line by line."""
+
+    def test_fetch_parses_gzip_file_from_disk(self, monkeypatch: pytest.MonkeyPatch):
+        import gzip
+
+        from src.producers import redfin_client
+
+        text = _HEADER + "\n" + "\n".join(_TWELVE_MONTHS) + "\n"
+
+        def fake_download(url, dest, timeout_seconds):
+            dest.write_bytes(gzip.compress(text.encode("utf-8")))
+
+        monkeypatch.setattr(redfin_client, "_download_to_file", fake_download)
+        observations = redfin_client.fetch_bay_area_zip_tracker(vintage="2026-09-13")
+        sale = [o for o in observations if o.series_id == "redfin_median_sale_price_zip"]
+        assert len(sale) == 13
+        assert {o.geography_id for o in sale} == {"94610"}
+
+    def test_fetch_rejects_non_gzip_payload(self, monkeypatch: pytest.MonkeyPatch):
+        from src.producers import redfin_client
+
+        monkeypatch.setattr(
+            redfin_client,
+            "_download_to_file",
+            lambda url, dest, timeout_seconds: dest.write_bytes(b"<html>AccessDenied</html>"),
+        )
+        with pytest.raises(redfin_client.RedfinFetchError, match="not a valid gzip payload"):
+            redfin_client.fetch_bay_area_zip_tracker()

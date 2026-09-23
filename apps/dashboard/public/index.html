@@ -863,6 +863,17 @@
       flex: none;
     }
 
+    .legend-key-swatch.no-data {
+      background: rgba(113, 129, 152, 0.18);
+      border: 1px solid rgba(113, 129, 152, 0.35);
+    }
+
+    .legend-attribution {
+      color: var(--text-muted);
+      font-size: 9px;
+      line-height: 1.35;
+    }
+
     .legend-key-swatch.baseline {
       background: repeating-linear-gradient(
         45deg,
@@ -1510,6 +1521,8 @@
         <div class="legend-note">
           <span class="legend-key-row">Height &prop; value (3D view) &middot; percentile 0&ndash;100</span>
           <span class="legend-key-row"><span class="legend-key-swatch baseline"></span><span>Registry baseline &mdash; no precomputed snapshot</span></span>
+          <span class="legend-key-row" id="legend-no-data" hidden><span class="legend-key-swatch no-data"></span><span>No data &mdash; outside this layer&rsquo;s coverage</span></span>
+          <span class="legend-attribution" id="legend-attribution" hidden></span>
         </div>
       </div>
 
@@ -1728,6 +1741,11 @@
     let shapChart = null;
     let currentPerspective = '3D';
     let currentMetric = 'lims_score';
+    // Bay Area context layers (US-439..443) published by the snapshot's
+    // manifest.context_layers block: key -> {label, layer, unit, attribution}.
+    // Empty when the snapshot carries no context table, so no dead options.
+    let CONTEXT_METRICS = {};
+    const NO_DATA_FILL = 'rgba(113, 129, 152, 0.18)';
     let selectedH3Index = null;
     let hoveredH3Index = null;
     let catalystAlerts = [];
@@ -2335,11 +2353,46 @@
       if (!bounds.isEmpty()) map.fitBounds(bounds, { padding: 40, maxZoom: 8, duration: REDUCED_MOTION ? 0 : 1400 });
     }
 
+    // Adds one "Bay Area layers" optgroup to the metric picker for every
+    // context metric the snapshot actually joined onto grid cells.
+    function populateContextMetrics(block) {
+      CONTEXT_METRICS = {};
+      const select = document.getElementById('metric-select');
+      if (select) select.querySelectorAll('optgroup[data-context]').forEach((g) => g.remove());
+      if (!select || !block || !Array.isArray(block.metrics) || block.metrics.length === 0) return;
+      const layers = block.layers || {};
+      const group = document.createElement('optgroup');
+      group.label = 'Bay Area layers';
+      group.dataset.context = 'true';
+      for (const metric of block.metrics) {
+        const layer = layers[metric.layer] || {};
+        CONTEXT_METRICS[metric.key] = { ...metric, attribution: layer.attribution || '' };
+        const option = document.createElement('option');
+        option.value = metric.key;
+        option.textContent = metric.label;
+        group.appendChild(option);
+      }
+      select.appendChild(group);
+    }
+
+    function formatContextValue(key, value) {
+      const num = Number(value);
+      if (!Number.isFinite(num)) return '—';
+      const unit = (CONTEXT_METRICS[key] || {}).unit;
+      if (unit === 'usd') return '$' + Math.round(num).toLocaleString();
+      if (unit === 'usd_per_month') return '$' + Math.round(num).toLocaleString() + '/mo';
+      if (unit === 'usd_per_km2') return '$' + Math.round(num).toLocaleString() + '/km²';
+      if (unit === 'ratio') return num.toFixed(2) + 'x';
+      if (unit === 'score') return num.toFixed(1);
+      return Math.round(num).toLocaleString();
+    }
+
     async function fetchManifest() {
       try {
         const resp = await fetch('/api/v1/manifest');
         if (resp.ok) {
           snapshotManifest = await resp.json();
+          populateContextMetrics(snapshotManifest && snapshotManifest.context_layers);
           const stamp = snapshotManifest && snapshotManifest.generated_at;
           const pillText = document.getElementById('stream-status-text');
           const pillDot = document.getElementById('stream-pulse-dot');
@@ -2639,6 +2692,12 @@
             const metroPct = Number(props.lims_score_metro_pct);
             const limsFinite = Number.isFinite(limsVal);
             const deltaFinite = Number.isFinite(delta6m);
+            const contextMetric = CONTEXT_METRICS[currentMetric];
+            const contextRow = contextMetric ? `
+                  <div style="display:flex; justify-content:space-between; gap:8px;">
+                    <span style="color:var(--text-secondary);">${escapeHtml(contextMetric.label)}:</span>
+                    <strong style="font-family:var(--font-mono); font-variant-numeric:tabular-nums; color:var(--text-main);">${props[currentMetric] == null ? 'No data' : escapeHtml(formatContextValue(currentMetric, props[currentMetric]))}</strong>
+                  </div>` : '';
 
             popup.setLngLat(coords)
               .setHTML(`
@@ -2663,7 +2722,7 @@
                   <div style="display:flex; justify-content:space-between; gap:8px;">
                     <span style="color:var(--text-secondary);">6M Return:</span>
                     <strong style="font-family:var(--font-mono); font-variant-numeric:tabular-nums; color: ${deltaFinite && delta6m < 0 ? 'var(--text-muted)' : 'var(--accent-success)'};">${deltaFinite ? `${delta6m < 0 ? '' : '+'}${(delta6m * 100).toFixed(1)}%` : '—'}</strong>
-                  </div>
+                  </div>${contextRow}
                 </div>
               `)
               .addTo(map);
@@ -3006,19 +3065,30 @@
       const legendMin = document.getElementById('legend-min');
       const legendMax = document.getElementById('legend-max');
 
-      let titleSuffix = ' — National Percentile';
-      if (legendTitle) legendTitle.innerText = ({
+      const contextMetric = CONTEXT_METRICS[currentMetric];
+      const titleSuffix = contextMetric ? ' — Percentile Within Coverage' : ' — National Percentile';
+      if (legendTitle) legendTitle.innerText = (contextMetric ? contextMetric.label : ({
         lims_score: 'LIMS Momentum Score',
         delta_6m_p50: '6M Expected Return (p50)',
         delta_12m_spillover: '12M Spatial Spillover',
         prob_18m_macro_outperformance: '18M Macro Outperformance'
-      })[currentMetric] + titleSuffix;
+      })[currentMetric]) + titleSuffix;
+      const noDataRow = document.getElementById('legend-no-data');
+      if (noDataRow) noDataRow.hidden = !contextMetric;
+      const attribution = document.getElementById('legend-attribution');
+      if (attribution) {
+        attribution.hidden = !(contextMetric && contextMetric.attribution);
+        attribution.textContent = contextMetric && contextMetric.attribution ? 'Source: ' + contextMetric.attribution : '';
+      }
       if (legendMin) legendMin.innerText = '0';
       if (legendMax) legendMax.innerText = '100';
 
       // One shared percentile color ramp; only extrusion height differs per metric.
-      const colorExpr = hexRampExpr(['get', pctProp]);
-      const opacityExpr = [
+      // Context metrics exist only where their layer has coverage: cells
+      // without a percentile render as flat "no data", never as a low value.
+      const rampExpr = hexRampExpr(['get', pctProp]);
+      const colorExpr = contextMetric ? ['case', ['has', pctProp], rampExpr, NO_DATA_FILL] : rampExpr;
+      const valueOpacity = [
         'interpolate', ['linear'],
         ['coalesce', ['get', pctProp], 0],
 0, 0.25,
@@ -3026,12 +3096,13 @@
         80, 0.7,
         92, 0.88
       ];
+      const opacityExpr = contextMetric ? ['case', ['has', pctProp], valueOpacity, 1] : valueOpacity;
       const heightFactor = {
         lims_score: ['*', ['max', 0, ['-', ['coalesce', ['get', pctProp], 50], 40]], 18],
         delta_6m_p50: ['*', ['max', 0, ['coalesce', ['get', pctProp], 50]], 40],
         delta_12m_spillover: ['*', ['max', 0, ['coalesce', ['get', pctProp], 50]], 45],
         prob_18m_macro_outperformance: ['*', ['max', 0, ['coalesce', ['get', pctProp], 50]], 9]
-      }[currentMetric];
+      }[currentMetric] || ['*', ['coalesce', ['get', pctProp], 0], 12];
 
       if (map.getLayer('h3-hex-fill')) {
         map.setPaintProperty('h3-hex-fill', 'fill-color', colorExpr);
@@ -3483,11 +3554,30 @@
               </tr>
             </table>
           </div>`
-          }
+          }${contextInspectorHtml(props)}
         </div>
       `;
 
       renderShapChart(shapObj);
+    }
+
+    // Every Bay Area context value the selected cell carries, with sources.
+    function contextInspectorHtml(props) {
+      const rows = Object.entries(CONTEXT_METRICS).filter(([key]) => props[key] != null);
+      if (rows.length === 0) return '';
+      const sources = [...new Set(rows.map(([, m]) => m.attribution).filter(Boolean))];
+      return `
+          <div>
+            <div class="forecast-section-title">Bay Area Context</div>
+            <table class="telemetry-table">
+              ${rows.map(([key, m]) => `
+              <tr>
+                <td class="lbl">${escapeHtml(m.label)}</td>
+                <td class="val">${escapeHtml(formatContextValue(key, props[key]))}</td>
+              </tr>`).join('')}
+            </table>
+            <div class="legend-attribution" style="margin-top:6px;">${sources.map((s) => escapeHtml(s)).join('<br>')}</div>
+          </div>`;
     }
 
     function renderShapChart(shap) {
