@@ -40,7 +40,9 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "SAMEORIGIN"
-        response.headers["X-XSS-Protection"] = "1; mode=block"
+        # "0" disables the legacy XSS auditor, which modern browsers removed and
+        # which could itself be abused to leak data; CSP is the real control.
+        response.headers["X-XSS-Protection"] = "0"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = "geolocation=(self), microphone=(), camera=()"
         return response
@@ -66,11 +68,15 @@ def create_app() -> FastAPI:
     # Security Headers Middleware
     app.add_middleware(SecurityHeadersMiddleware)
 
-    # CORS Middleware
+    # CORS Middleware. The API is public and read-only with no cookie or
+    # session auth, so it never needs credentialed cross-origin requests.
+    # allow_credentials=True together with "*" makes Starlette reflect the
+    # caller's Origin with Access-Control-Allow-Credentials: true, which would
+    # let any site make authenticated reads the day auth is added.
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
-        allow_credentials=True,
+        allow_credentials=False,
         allow_methods=["*"],
         allow_headers=["*"],
     )

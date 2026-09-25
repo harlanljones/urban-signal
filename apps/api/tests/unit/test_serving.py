@@ -655,3 +655,28 @@ def test_national_overlay_hands_off_to_metro_at_the_zoom_floor():
     # The old overlapping band is gone.
     assert "const overlayVisible = z < 12;" not in html
     assert "if (z >= 12) return;" not in html
+
+
+def test_predict_batch_rejects_oversized_batch():
+    from src.serving.router import MAX_BATCH_PREDICTIONS
+
+    batch = [{"h3_index": "892a10708b7ffff"}] * (MAX_BATCH_PREDICTIONS + 1)
+    response = client.post("/api/v1/predict/batch", json=batch)
+    assert response.status_code == 413
+
+
+def test_cors_never_allows_credentials():
+    response = client.get("/health", headers={"origin": "https://evil.example", "cookie": "s=1"})
+    assert response.headers.get("access-control-allow-origin") == "*"
+    assert "access-control-allow-credentials" not in response.headers
+
+
+def test_dashboard_cdn_scripts_are_integrity_pinned():
+    import re
+
+    html = client.get("/dashboard").text
+    tags = re.findall(r"<(?:script|link)[^>]+(?:unpkg\.com|cdn\.jsdelivr\.net)[^>]*>", html)
+    assert tags
+    for tag in tags:
+        assert 'integrity="sha384-' in tag, tag
+        assert 'crossorigin="anonymous"' in tag, tag

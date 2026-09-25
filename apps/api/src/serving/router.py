@@ -24,6 +24,10 @@ from src.spatial.submarkets import (
 router = APIRouter()
 indexer = H3SpatialIndexer()
 
+# Each batch item runs feature computation and model inference, so an
+# unbounded list lets one request pin a worker for as long as it likes.
+MAX_BATCH_PREDICTIONS = 100
+
 # Shared singleton instances (injected via app state or lazy init)
 _inference_engine: Optional[MultiHorizonInferenceEngine] = None
 _feature_pipeline: Optional[SpatialFeaturePipeline] = None
@@ -190,6 +194,11 @@ async def predict_batch(
     pipeline: SpatialFeaturePipeline = Depends(get_feature_pipeline),
 ):
     """Batch prediction across multiple spatial coordinates / H3 cells."""
+    if len(requests) > MAX_BATCH_PREDICTIONS:
+        raise HTTPException(
+            status_code=status.HTTP_413_CONTENT_TOO_LARGE,
+            detail=f"Batch too large ({len(requests)} items); max {MAX_BATCH_PREDICTIONS} per request.",
+        )
     responses = []
     for req in requests:
         if req.h3_index:

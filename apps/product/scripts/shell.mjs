@@ -1,3 +1,7 @@
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+
 const NAV = [
   { route: "system", label: "System" },
   { route: "evidence", label: "Evidence" },
@@ -10,6 +14,19 @@ const BRAND_MARK = '<svg viewBox="0 0 32 32"><path d="M16 2v28M2 16h28M7 7l18 18
 const FONTS = "https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap";
 const REPOSITORY = "https://github.com/harlanljones/urban-signal";
 export const SITE_ORIGIN = "https://urban-signal.harlanljones.com";
+
+// Content-hash query strings for the shared stylesheets and entry scripts. The
+// edge worker only marks a /src/ asset immutable when it carries `?v=`, so a
+// deploy that changes a file changes its URL and returning visitors never keep
+// a year-old copy of the CSS or JS next to fresh HTML.
+const SRC_DIR = resolve(import.meta.dirname, "..", "src");
+function versioned(file) {
+  const digest = createHash("sha256").update(readFileSync(resolve(SRC_DIR, file))).digest("hex").slice(0, 10);
+  return `/src/${file}?v=${digest}`;
+}
+const ASSET = Object.fromEntries(
+  ["styles.css", "overdrive.css", "polish.css", "extras.css", "webmcp.js", "main.js"].map((file) => [file, versioned(file)])
+);
 
 const JSON_LD = `  <script type="application/ld+json">
     {
@@ -135,10 +152,10 @@ export function renderPage({ route = "", title, description, content, noscript, 
   <link rel="alternate" type="application/json" href="/facts.json" title="Machine-readable product facts">
   <link rel="alternate" type="application/linkset+json" href="/.well-known/api-catalog" title="API catalog (RFC 9727)">
   <link rel="ai-catalog" href="/.well-known/ai-catalog.json" title="Agentic capability manifest">
-  <link rel="stylesheet" href="/src/styles.css">
-  <link rel="stylesheet" href="/src/overdrive.css">
-  <link rel="stylesheet" href="/src/polish.css">
-  <link rel="stylesheet" href="/src/extras.css">
+  <link rel="stylesheet" href="${ASSET["styles.css"]}">
+  <link rel="stylesheet" href="${ASSET["overdrive.css"]}">
+  <link rel="stylesheet" href="${ASSET["polish.css"]}">
+  <link rel="stylesheet" href="${ASSET["extras.css"]}">
 ${JSON_LD}
 ${pageLd}
 ${extraHead}
@@ -168,8 +185,8 @@ ${content}
   </footer>
 </div>
 <noscript>${noscript || DEFAULT_NOSCRIPT}</noscript>
-<script type="module" src="/src/webmcp.js"></script>
-<script type="module" src="/src/main.js"></script>
+<script type="module" src="${ASSET["webmcp.js"]}"></script>
+<script type="module" src="${ASSET["main.js"]}"></script>
 </body>
 </html>
 `;
