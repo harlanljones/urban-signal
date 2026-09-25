@@ -145,6 +145,13 @@ interface MetroMeta {
 }
 
 const MAX_TILE_PARENTS_PER_REQUEST = 32;
+
+/** Exact third-party script paths the dashboard HTML loads (see its SRI tags). */
+const CDN_SCRIPT_SOURCES = [
+  "https://unpkg.com/maplibre-gl@3.6.2/",
+  "https://unpkg.com/h3-js@4.1.0/",
+  "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/",
+];
 export const H3_PARENT_PATTERN = /^[0-9a-f]{15}$/i;
 
 export interface CatalystEntry {
@@ -230,13 +237,36 @@ function etagMatches(request: Request, etag: string): boolean {
 // batch runs), and each read previously paid a full-body JSON.parse plus a
 // SHA-256 over multi-MB payloads. Cache {value, etag} briefly; TTL matches the
 // manifest cache so post-publish staleness stays bounded by the same bound.
+//
+// The cache is bounded: tile and per-cell keys are effectively unbounded, and an
+// isolate has a 128 MB heap, so an uncapped Map of parsed multi-MB payloads
+// eventually exhausts memory. Map iteration order is insertion order, so
+// re-inserting on hit and evicting from the front gives LRU behaviour.
 type KvCacheEntry = { value: unknown; etag: string; expires: number };
+export const KV_CACHE_MAX_ENTRIES = 256;
 let kvJsonCache = new Map<string, KvCacheEntry>();
+
+function rememberKv(key: string, entry: KvCacheEntry): void {
+  kvJsonCache.delete(key);
+  kvJsonCache.set(key, entry);
+  while (kvJsonCache.size > KV_CACHE_MAX_ENTRIES) {
+    const oldest = kvJsonCache.keys().next().value as string;
+    kvJsonCache.delete(oldest);
+  }
+}
+
+/** Current number of cached KV entries (exposed for tests). */
+export function kvCacheSize(): number {
+  return kvJsonCache.size;
+}
 
 export async function kvJson(env: Env, key: string): Promise<{ value: unknown; etag: string } | null> {
   const now = Date.now();
   const cached = kvJsonCache.get(key);
-  if (cached && now < cached.expires) return cached;
+  if (cached && now < cached.expires) {
+    rememberKv(key, cached);
+    return cached;
+  }
   const raw = await env.SNAPSHOT.get(key);
   if (raw === null) {
     if (cached) return cached;
@@ -247,7 +277,7 @@ export async function kvJson(env: Env, key: string): Promise<{ value: unknown; e
     etag: `"${(await sha256Hex(raw)).slice(0, 32)}"`,
     expires: now + MANIFEST_TTL_MS,
   };
-  kvJsonCache.set(key, entry);
+  rememberKv(key, entry);
   return entry;
 }
 
@@ -1348,18 +1378,26 @@ async function serveSite(request: Request, env: Env, url: URL): Promise<Response
         "content-security-policy",
         [
           "default-src 'self'",
-          "script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net",
-          "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
+          // Pin third-party code to the exact package versions the page loads
+          // (also SRI-hashed in the HTML) instead of trusting every package on
+          // unpkg/jsDelivr.
+          `script-src 'self' 'unsafe-inline' ${CDN_SCRIPT_SOURCES.join(" ")}`,
+          "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com/maplibre-gl@3.6.2/",
           "font-src 'self' https://fonts.gstatic.com",
-          "img-src 'self' data: blob: https://*.arcgisonline.com https://unpkg.com",
+          "img-src 'self' data: blob: https://*.arcgisonline.com",
           "connect-src 'self' https://*.arcgisonline.com",
           "worker-src 'self' blob:",
           "child-src 'self' blob:",
           "frame-ancestors 'self'",
           "base-uri 'self'",
           "form-action 'self'",
+          "object-src 'none'",
+          "upgrade-insecure-requests",
         ].join("; ")
       );
+      headers.set("x-frame-options", "SAMEORIGIN");
+      headers.set("permissions-policy", "camera=(), microphone=(), geolocation=(), payment=()");
+      headers.set("cross-origin-opener-policy", "same-origin");
     }
     headers.set("x-content-type-options", "nosniff");
     if (!headers.has("referrer-policy")) headers.set("referrer-policy", "strict-origin-when-cross-origin");
@@ -1440,12 +1478,15 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
           borough: url.searchParams.get("borough") ?? undefined,
         });
         if ("error" in result) return jsonError(404, result.error);
-        const payload = entry.value as Record<string, unknown>;
-        Object.assign(payload, {
+        // entry.value is the isolate-wide cached object that every later
+        // request reads, so build a fresh payload instead of mutating it: a
+        // borough-filtered request must not shrink the next caller's data.
+        const payload = {
+          ...(entry.value as Record<string, unknown>),
           city_id: result.city_id,
           count: Object.keys(result.submarkets).length,
           submarkets: result.submarkets,
-        });
+        };
         return withHeaders(JSON.stringify(payload), 200, {
           ...baseHeaders,
           etag: entry.etag,

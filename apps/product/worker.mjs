@@ -34,8 +34,8 @@ const DASH_OPENAPI = "https://us-dash.harlanljones.com/openapi.json";
 
 const CORS_HEADERS = {
   "access-control-allow-origin": "*",
-  "access-control-methods": "GET, POST, OPTIONS",
-  "access-control-headers": "content-type, accept, mcp-session-id, mcp-protocol-version",
+  "access-control-allow-methods": "GET, POST, OPTIONS",
+  "access-control-allow-headers": "content-type, accept, mcp-session-id, mcp-protocol-version",
   "access-control-max-age": "86400",
 };
 
@@ -85,37 +85,44 @@ function acceptsMarkdown(acceptHeader) {
     .some((part) => part.trim().toLowerCase().startsWith("text/markdown"));
 }
 
-// Long-lived edge caching. Static, content-addressed assets (scripts, styles,
-// icons) can be cached for a year with background revalidation; everything else
-// (HTML, facts, llms docs) gets a short window so deploys propagate, but still
-// serves instantly from cache and refreshes in the background. This replaces the
-// default `max-age=0, must-revalidate` that forced a conditional round-trip on
-// every single navigation.
+// Long-lived edge caching. Only content-addressed assets, the ones the page
+// shell links with a `?v=<content hash>` query (scripts/shell.mjs), are safe to
+// cache for a year: their URL changes whenever their bytes do. Everything else,
+// including unversioned scripts, styles, icons, HTML, facts and llms docs, gets
+// a short window so deploys propagate, but still serves instantly from cache and
+// refreshes in the background. This replaces the default `max-age=0,
+// must-revalidate` that forced a conditional round-trip on every navigation.
 const IMMUTABLE_ASSET = "public, max-age=31536000, immutable";
 const FRESH_CONTENT = "public, max-age=300, stale-while-revalidate=86400";
 
-function cacheControlFor(pathname, contentType) {
+function cacheControlFor(pathname, search = "") {
   if (pathname.startsWith("/healthz") || pathname === "/mcp") return "no-store";
-  const type = (contentType ?? "").toLowerCase();
-  if (/\.(css|js|mjs|svg|woff2?|ttf|ico|png|jpeg|jpg|webp|avif|gif)(\?|$)/i.test(pathname)) {
+  const versioned = new URLSearchParams(search).has("v");
+  if (versioned && /\.(css|js|mjs|svg|woff2?|ttf|ico|png|jpeg|jpg|webp|avif|gif)$/i.test(pathname)) {
     return IMMUTABLE_ASSET;
   }
-  if (type.includes("text/html")) return FRESH_CONTENT;
-  if (type.includes("application/json") || type.includes("text/markdown") || type.includes("text/plain")) {
-    return FRESH_CONTENT;
-  }
-  if (/\.(json|md|txt)(\?|$)/i.test(pathname)) return FRESH_CONTENT;
   return FRESH_CONTENT;
 }
 
-function decorate(response, { pathname, contentType, tokens, cacheControl } = {}) {
+// Baseline hardening on every decorated response. frame-ancestors (and its
+// legacy X-Frame-Options twin) stops the site being framed for clickjacking.
+const SECURITY_HEADERS = {
+  "x-content-type-options": "nosniff",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "x-frame-options": "SAMEORIGIN",
+  "content-security-policy": "frame-ancestors 'self'; object-src 'none'; base-uri 'self'",
+  "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=()",
+};
+
+function decorate(response, { pathname, search, contentType, tokens, cacheControl } = {}) {
   const headers = new Headers(response.headers);
   if (contentType) headers.set("content-type", contentType);
   headers.set("link", linkHeaderFor(pathname));
   headers.append("vary", "Accept");
   if (tokens !== undefined) headers.set("x-markdown-tokens", String(tokens));
-  const policy = cacheControl ?? cacheControlFor(pathname, response.headers.get("content-type"));
+  const policy = cacheControl ?? cacheControlFor(pathname, search);
   if (policy) headers.set("cache-control", policy);
+  for (const [key, value] of Object.entries(SECURITY_HEADERS)) headers.set(key, value);
   if (pathname.startsWith("/.well-known/") || pathname === "/healthz") {
     for (const [key, value] of Object.entries(CORS_HEADERS)) headers.set(key, value);
   }
@@ -304,7 +311,7 @@ export default {
       asset = new Response(asset.body, { status: asset.status, headers });
     }
 
-    if (asset.ok) return decorate(asset, { pathname, contentType: CONTENT_TYPES[pathname] });
+    if (asset.ok) return decorate(asset, { pathname, search: url.search, contentType: CONTENT_TYPES[pathname] });
     return asset;
   },
 };

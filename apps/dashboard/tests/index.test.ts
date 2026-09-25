@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import worker from "../src/index";
+import worker, { clearSnapshotCaches, kvCacheSize, kvJson, KV_CACHE_MAX_ENTRIES } from "../src/index";
 
 const CITY_IDS = [
   "nyc",
@@ -1119,4 +1119,39 @@ test("MCP predict_cell keeps shap_attributions when include_shap is omitted", as
   const { isError, payload } = await mcpTool(testEnv() as never, "predict_cell", { h3_index: "892a10708b7ffff" });
   expect(isError).toBe(false);
   expect(Array.isArray((payload as { shap_attributions?: unknown }).shap_attributions)).toBe(true);
+});
+
+// ---------------------------------------------------------------------------
+// Edge cache integrity and hardening
+// ---------------------------------------------------------------------------
+
+test("a borough-filtered submarkets request does not shrink the cached payload", async () => {
+  clearSnapshotCaches();
+  const env = testEnv() as never;
+  const filtered = await worker.fetch(new Request(`${ORIGIN}/api/v1/submarkets?city_id=nyc&borough=Brooklyn`), env);
+  expect(((await filtered.json()) as { count: number }).count).toBe(0);
+
+  const full = await worker.fetch(new Request(`${ORIGIN}/api/v1/submarkets?city_id=nyc`), env);
+  const json = (await full.json()) as { count: number; submarkets: Record<string, unknown> };
+  expect(json.count).toBe(1);
+  expect(Object.keys(json.submarkets)).toEqual(["SUB_1"]);
+});
+
+test("the in-isolate KV cache stays bounded", async () => {
+  clearSnapshotCaches();
+  const env = testEnv() as never;
+  for (let i = 0; i < KV_CACHE_MAX_ENTRIES + 50; i += 1) {
+    await kvJson(env, `grid/city_${i}`);
+  }
+  expect(kvCacheSize()).toBe(KV_CACHE_MAX_ENTRIES);
+});
+
+test("dashboard CSP allows only the pinned CDN packages", async () => {
+  const response = await worker.fetch(new Request(`${ORIGIN}/`), testEnv() as never);
+  const csp = response.headers.get("content-security-policy") ?? "";
+  expect(csp).toContain("https://unpkg.com/maplibre-gl@3.6.2/");
+  expect(csp).toContain("object-src 'none'");
+  expect(csp).not.toMatch(/https:\/\/unpkg\.com[ ;]/);
+  expect(csp).not.toMatch(/https:\/\/cdn\.jsdelivr\.net[ ;]/);
+  expect(response.headers.get("x-frame-options")).toBe("SAMEORIGIN");
 });
