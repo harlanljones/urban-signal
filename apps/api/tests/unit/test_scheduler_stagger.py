@@ -30,7 +30,10 @@ def test_all_jobs_due_on_first_tick(scheduler, monkeypatch):
     ran = []
     monkeypatch.setattr(scheduler, "poll_job", lambda job_name, limit=None: ran.append(job_name) or {})
     scheduler.poll_due()
-    assert ran == names  # sorted order, all due at boot (next_due defaults 0.0)
+    # Membership, not order: `poll_due` walks the config mapping, so the run
+    # order is registration order rather than the sorted order `_limit_to_three`
+    # returns. The claim under test is that every enabled job is due at boot.
+    assert sorted(ran) == names
 
 
 def test_only_due_jobs_run(scheduler, monkeypatch):

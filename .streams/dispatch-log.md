@@ -1029,3 +1029,27 @@ regression.
 | Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
 |---|---|---|---|---|---|
 | bay-area-map-wiring | `.streams/bay-area-map-wiring.md` | none | 2026-09-23 | done | `src/export/bay_area_context.py`, snapshot `--context-dir`, dashboard "Bay Area layers" picker, `bay-area-context.yml` |
+
+### 2026-09-25 — US-377 SLA restoration (single stream, with a diagnosis subagent)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| us-377-restore-sla | `.streams/us-377-restore-sla.md` | `city_registry.py`, `sla_licenses_producer.py`, `scheduler.py` | 2026-09-25 | done | `FeedType.CHILDCARE` + `INGESTION_MODES`, `childcare_producer.py`, nine restored `datasets.sla` blocks, `GATES-US-386` G3 closed |
+| failing-test-diagnosis (subagent) | `tests/unit/**` read-mostly, 2 edits | none | 2026-09-25 | done | mapped 11 failures to node IDs from the interrupted run's progress log; fixed 2, reported 9 as src-side |
+
+The originating task was GATES-US-386 G3 ("full suite passes"), which had been
+stuck as `pending` with the note that the run "produced four dots and then made
+no progress". It was a live network call, not a slow machine: the
+`mock_scheduler` fixture stubbed five batch clients by name and the `nfip`
+stream job escaped to the OpenFEMA API. Fixing that unmasked 9 further failures
+that the stall had been hiding, all from US-377 having *replaced* rather than
+accompanied nine cities' `datasets.sla` blocks.
+
+Two things worth keeping from this round:
+
+- The interlock gate rejected the first design (one `sla` producer serving both
+  feeds). `producer_key == feed.value` and one-topic-per-feed are house rules;
+  the fix was a dedicated `ChildcareLicensingProducer`, not a weaker gate.
+- `addopts` now carries `-m 'not live'`, so a command-line `-m interlock` must
+  still override it. Verified: 35 passed, 4954 deselected. A `-m` collision in
+  `addopts` is a way to make a gate pass vacuously, and was worth the check.

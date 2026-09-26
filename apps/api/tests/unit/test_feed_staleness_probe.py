@@ -150,10 +150,23 @@ def test_probe_registry_uses_registered_city_feeds_without_manual_config():
         metadata_fetcher=lambda spec: datetime(2026, 8, 22, tzinfo=UTC),
     )
     assert {result.city_id for result in results} == {"nyc"}
-    # permits, 311, sla, deeds, crime (US-71), evictions (US-93),
-    # energy_benchmark + bike_ped (US-363 §2.7/§2.8), GBFS (US-363 §1.2),
-    # inspections (NYC food-service inspections).
-    assert len(results) == 10
+    # Pinned as a set rather than a count so adding or dropping a feed names
+    # itself in the diff: permits, 311, sla, deeds, crime (US-71), evictions
+    # (US-93), energy_benchmark + bike_ped (US-363 §2.7/§2.8), GBFS
+    # (US-363 §1.2), inspections (NYC food-service), childcare (US-377).
+    assert {result.feed for result in results} == {
+        "permits",
+        "311",
+        "sla",
+        "deeds",
+        "crime",
+        "evictions",
+        "energy_benchmark",
+        "bike_ped",
+        "gbfs",
+        "inspections",
+        "childcare",
+    }
     assert all(not result.stale for result in results)
 
 

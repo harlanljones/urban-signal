@@ -78,6 +78,13 @@ def _parse_datetime(val: Any) -> Optional[datetime]:
 class SLALicensesProducer:
     """Ingests NY SLA, Chicago, and San Francisco business/hospitality license filings and streams to Kafka."""
 
+    # Which registered feed's field map this producer parses with, as a
+    # `FeedType` value. A subclass serving a second feed over the same
+    # classify→geocode→H3 path overrides it (`ChildcareLicensingProducer`).
+    # Held as a string and resolved per call: `city_registry` imports the city
+    # modules, which import producers, so a module-level import here is a cycle.
+    FEED: str = "sla"
+
     def __init__(self, bootstrap_servers: Optional[str] = None):
         schema_path = Path(__file__).parent.parent / "schemas" / "avro" / "sla_license_event.avsc"
         self.producer = BaseKafkaProducer(
@@ -116,8 +123,19 @@ class SLALicensesProducer:
             )
         return client
 
-    def parse_socrata_row(self, row: Dict[str, Any], city_id: Optional[str] = None) -> Optional[SLALicenseEvent]:
-        """Convert raw SLA / business license record to strongly-typed SLALicenseEvent."""
+    def parse_socrata_row(
+        self,
+        row: Dict[str, Any],
+        city_id: Optional[str] = None,
+        feed_type: Optional[str] = None,
+    ) -> Optional[SLALicenseEvent]:
+        """Convert raw SLA / business license record to strongly-typed SLALicenseEvent.
+
+        ``feed_type`` overrides the feed whose registered field map is applied.
+        It defaults to ``self.FEED`` so a subclass serving another feed through
+        this same classify→geocode→H3 path (see ``ChildcareLicensingProducer``)
+        picks up its own map without every call site having to pass it.
+        """
         try:
             # Determine city_id
             from src.spatial.city_registry import CityId, ALIASES, REGISTRY, FeedType, normalize_city, get_dataset
@@ -167,7 +185,9 @@ class SLALicensesProducer:
             from src.producers.field_maps import first_mapped, resolve_field_map
             from src.spatial.geocoder import geocode_row_if_declared
 
-            field_map = resolve_field_map(resolved_city, FeedType.SLA)
+            field_map = resolve_field_map(
+                resolved_city, feed_type or FeedType(self.FEED)
+            )
 
             license_id = str(
                 first_mapped(row, field_map, "license_id")
@@ -389,15 +409,32 @@ class SLALicensesProducer:
             logger.warning("Error parsing SLA row: %s", e)
             return None
 
-    def parse_ckan_row(self, row: Dict[str, Any], city_id: Optional[str] = None) -> Optional[SLALicenseEvent]:
+    def parse_ckan_row(
+        self,
+        row: Dict[str, Any],
+        city_id: Optional[str] = None,
+        feed_type: Optional[str] = None,
+    ) -> Optional[SLALicenseEvent]:
         """CKAN license records are flat JSON dicts like Socrata; reuse the generic parser."""
-        return self.parse_socrata_row(row, city_id=city_id)
+        return self.parse_socrata_row(row, city_id=city_id, feed_type=feed_type)
 
-    def run_stream(self, city_id: str = "nyc", limit: int = 5000, where_clause: Optional[str] = None):
-        """Fetch SLA / license records and stream them into Kafka topic."""
+    def run_stream(
+        self,
+        city_id: str = "nyc",
+        limit: int = 5000,
+        where_clause: Optional[str] = None,
+        feed_type: Optional[str] = None,
+    ):
+        """Fetch SLA / license records and stream them into Kafka topic.
+
+        ``feed_type`` selects which registered feed to stream; it defaults to
+        ``self.FEED`` so ``ChildcareLicensingProducer`` resolves the childcare
+        dataset rather than the business-licensing one.
+        """
         from src.spatial.city_registry import REGISTRY, CityId, FeedType, normalize_city, get_dataset
         cid = normalize_city(city_id) or CityId.NYC
-        spec = get_dataset(cid, FeedType.SLA)
+        feed = feed_type or FeedType(self.FEED)
+        spec = get_dataset(cid, feed)
         endpoint = spec.endpoint
         client = self._client_for(spec.platform)
         from src.producers.acquisition import AcquisitionSpec, build_adapter_request
@@ -405,7 +442,12 @@ class SLALicensesProducer:
         client_kwargs = build_adapter_request(spec.platform, AcquisitionSpec.from_dataset_spec(spec))
         effective_where_clause = where_clause or spec.where
 
-        logger.info("Starting %s SLA / License Ingestion Stream (limit=%d)...", cid.value.upper(), limit)
+        logger.info(
+            "Starting %s %s Ingestion Stream (limit=%d)...",
+            cid.value.upper(),
+            feed.value,
+            limit,
+        )
         records_streamed = 0
 
         for batch in client.paginate(
@@ -417,7 +459,7 @@ class SLALicensesProducer:
         ):
             for row in batch:
                 parse_fn = self.parse_ckan_row if spec.platform == "ckan" else self.parse_socrata_row
-                event = parse_fn(row, city_id=cid.value)
+                event = parse_fn(row, city_id=cid.value, feed_type=feed)
                 if event:
                     key = f"{event.city_id}:{event.license_id}"
                     self.producer.produce(
@@ -428,7 +470,12 @@ class SLALicensesProducer:
                     records_streamed += 1
 
         self.producer.flush()
-        logger.info("%s SLA / License Ingestion completed. Total streamed: %d records.", cid.value.upper(), records_streamed)
+        logger.info(
+            "%s %s Ingestion completed. Total streamed: %d records.",
+            cid.value.upper(),
+            feed.value,
+            records_streamed,
+        )
         return records_streamed
 
 

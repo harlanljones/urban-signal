@@ -1,6 +1,7 @@
 """Pytest fixtures and mock datasets for Urban Predictor pipeline testing."""
 
 from datetime import datetime, timedelta, timezone
+import socket
 import pytest
 from src.schemas.models import (
     Complaint311Event,
@@ -10,6 +11,45 @@ from src.schemas.models import (
     PermitEvent,
     SLALicenseEvent,
 )
+
+
+# Loopback stays reachable: some tests bind a local server, and ASGI/Mock
+# transports never open a socket at all, so they are unaffected.
+_LOCAL_HOSTS = frozenset({"", "localhost", "127.0.0.1", "::1"})
+
+
+@pytest.fixture(autouse=True)
+def _no_outbound_network(request, monkeypatch):
+    """Fail fast when a non-`live` test opens a real outbound socket.
+
+    The full-suite gate (GATES-US-386 G3) used to stall for minutes with no
+    usable signal: `test_scheduler.py::test_poll_all_and_metrics` reached the
+    live OpenFEMA API through a stream job that the fixture's fixed list of
+    batch-client stubs never covered, and the resulting 60s-timeout retry
+    chain looked identical to a slow machine. A multi-minute hang points at
+    nothing, so the escape is converted into an immediate failure that names
+    the test and says how to opt out.
+
+    Mark a test `@pytest.mark.live` when it genuinely probes an external API.
+    Note this only intercepts Python's socket module — librdkafka (confluent-
+    kafka) opens its own sockets in C and is not covered here.
+    """
+    if request.node.get_closest_marker("live"):
+        return
+
+    def _blocked(sock, address, *args, **kwargs):
+        host = address[0] if isinstance(address, tuple) else address
+        if isinstance(host, str) and host in _LOCAL_HOSTS:
+            return _real_connect(sock, address, *args, **kwargs)
+        raise RuntimeError(
+            f"outbound network blocked during {request.node.nodeid}: "
+            f"connect({address!r}). Stub the client under test, or mark the "
+            f"test @pytest.mark.live if the probe is intentional."
+        )
+
+    _real_connect = socket.socket.connect
+    monkeypatch.setattr(socket.socket, "connect", _blocked)
+    monkeypatch.setattr(socket.socket, "connect_ex", _blocked)
 
 
 @pytest.fixture

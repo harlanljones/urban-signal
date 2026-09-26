@@ -251,6 +251,72 @@ divisions:
     city_id: buffalo
 datasets:
   sla:
+    endpoint: https://data.buffalony.gov/resource/4pp3-qkuj.json
+    platform: socrata
+    watermark_col: issdttm
+    id_keys:
+    - uniqkey
+    - licenseno
+    - aplickey
+    topic: raw.municipal.sla
+    interval_seconds: 600.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: issdttm DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: issdttm IS NOT NULL
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - licenseno
+      - uniqkey
+      dba:
+      - businessname
+      premises_name:
+      - businessname
+      license_type:
+      - descript
+      - code
+      effective_date:
+      - issdttm
+      expiration_date:
+      - expdttm
+      status:
+      - licstatus
+      address_street:
+      - address
+      borough:
+      - neighborhood
+      latitude:
+      - latitude
+      longitude:
+      - longitude
+    ingestion_mode: incremental
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+  childcare:
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false
@@ -298,7 +364,7 @@ datasets:
     order_by: :updated_at DESC
     parcel_join: {}
     platform: socrata
-    producer_key: sla
+    producer_key: childcare
     proxy_for: null
     retention_days: null
     rolling_window_days: null

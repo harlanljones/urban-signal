@@ -122,6 +122,7 @@ class TestFeedRegistration:
             FeedType.PERMITS,
             FeedType.COMPLAINTS_311,
             FeedType.SLA,
+            FeedType.CHILDCARE,
             FeedType.VIOLATIONS,
         }
 

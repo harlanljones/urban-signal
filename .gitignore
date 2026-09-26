@@ -85,6 +85,11 @@ datasets/
 !/apps/api/src/spatial/cities/data/*.yaml
 /apps/api/src/spatial/cities/data/_example.yaml
 /apps/api/src/spatial/cities/data/README.md
+# US-420: the CalEnviroScreen tract-centroid lookup is derived from the CES 5.0
+# shapefile and is a required input, not a scratch artifact. Without it the
+# client silently resolves zero tracts (see _load_centroids).
+!/apps/api/src/producers/data/
+!/apps/api/src/producers/data/calenviroscreen_tract_centroids.json
 *.parquet
 *.feather
 *.arrow

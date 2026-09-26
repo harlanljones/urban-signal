@@ -239,11 +239,13 @@ class TestDallasSpineRegistration:
         from src.spatial.city_registry import FeedType, REGISTRY
 
         reg = REGISTRY[DALLAS]
-        # US-364 adds the SNAP SLA slice (national FNS feed, State='TX').
+        # US-364 adds the SNAP SLA slice (national FNS feed, State='TX');
+        # US-377 adds childcare alongside it rather than replacing the SLA feed.
         assert set(reg.datasets) == {
             FeedType.PERMITS,
             FeedType.COMPLAINTS_311,
             FeedType.SLA,
+            FeedType.CHILDCARE,
         }
         spec = reg.datasets[FeedType.PERMITS]
         assert spec.proxy_for == "row_permits"

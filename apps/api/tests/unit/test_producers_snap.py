@@ -253,30 +253,45 @@ class TestSnapRegistrationShape:
 
     def test_every_registered_metro_has_sla(self):
         """The extension closed the set; later waves registered metros whose
-        probes found no SLA-grade feed, and grand_rapids is geometry-only.
+        probes found no SLA-grade feed (the 2026-09-06 mid-Atlantic wave
+        registered deeds-only), and grand_rapids is geometry-only.
         Every other registered metro carries an SLA spec."""
         from src.spatial.city_registry import REGISTRY, FeedType, get_dataset
 
         sla_less = {
+            "albany",
+            "allentown",
             "billings",
             "bowling_green",
             "bozeman",
+            "burlington",
             "chandler",
+            "charleston_wv",
+            "dover",
             "fort_collins",
+            "frederick",
             "grand_rapids",
+            "harrisburg",
+            "huntington_wv",
             "laredo",
             "lincoln",
             "madison",
+            "manchester",
             "missoula",
             "montgomery_al",
             "nampa",
             "peoria",
+            "portland_maine",
+            "providence",
+            "richmond",
+            "roanoke",
             "santa_fe",
             "savannah",
             "sioux_falls",
             "tallahassee",
             "tempe",
             "topeka",
+            "wilmington_de",
             "yakima",
         }
         for city_id in REGISTRY:

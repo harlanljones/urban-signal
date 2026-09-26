@@ -268,9 +268,12 @@ class TestWideCsvParsing:
             list(client.parse_wide_csv(self.spec(), "RegionID,RegionName\n1,10017\n", "v"))
 
     def test_unregistered_geographies_are_dropped(self, client):
+        # Iowa has no registered metro, so 52240 stays unregistered. The
+        # original fixture used Absarokee MT (59001), which was unregistered
+        # when written but now resolves to `billings` and defeated the test.
         csv_text = (
             "RegionID,SizeRank,RegionName,RegionType,StateName,State,City,Metro,CountyName,"
-            "2026-07-31\n1,1,59001,zip,MT,MT,Absarokee,\"Billings, MT\",Stillwater,900\n"
+            "2026-07-31\n1,1,52240,zip,IA,IA,Iowa City,\"Iowa City, IA\",Johnson,900\n"
         )
         assert list(client.parse_wide_csv(self.spec(), csv_text, "v")) == []
 

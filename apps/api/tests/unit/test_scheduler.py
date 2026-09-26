@@ -81,10 +81,27 @@ def mock_scheduler():
         )
         for p in scheduler.producers.values():
             p.producer = MagicMock()
-            for client_name in ("socrata", "arcgis", "carto", "ckan", "csv"):
-                client = getattr(p, client_name, None)
-                if client is not None:
-                    client.paginate = MagicMock(return_value=[])
+            # Stub every paginating client the producer holds rather than a
+            # fixed list of names: stream producers (NFIP/OpenFEMA, GBFS, EV
+            # charging, ...) reach the network through the same `paginate`
+            # seam, and a name tuple silently rots the next time a producer
+            # is registered. `poll_all()` drives stream jobs too, so an
+            # unstubbed client turns a unit test into a live API probe.
+            for attr in dir(p):
+                if attr.startswith("_"):
+                    continue
+                try:
+                    client = getattr(p, attr)
+                except Exception:  # pragma: no cover - defensive: property side effects
+                    continue
+                if hasattr(client, "paginate"):
+                    # Patch the method on the real client rather than swapping
+                    # the object out: tests below read sibling attributes
+                    # (snapshot support, endpoint resolution) off it.
+                    try:
+                        client.paginate = MagicMock(return_value=[])
+                    except AttributeError:  # pragma: no cover - __slots__ clients
+                        setattr(p, attr, MagicMock(**{"paginate.return_value": []}))
     return scheduler
 
 
@@ -372,9 +389,11 @@ class TestYearSliceEndpoints:
     def test_scheduler_metadata_uses_resolver(self, mock_scheduler):
         """Every job's endpoint came through resolve_endpoint (year-sliced
         specs would show their resolved layer)."""
+        from src.spatial.city_registry import INGESTION_MODES
+
         for meta in mock_scheduler.job_metadata.values():
             assert isinstance(meta["endpoint"], str) and meta["endpoint"]
-            assert meta.get("ingestion_mode") in ("incremental", "snapshot")
+            assert meta.get("ingestion_mode") in INGESTION_MODES, meta.get("ingestion_mode")
 
 
 class TestSnapshotMode:

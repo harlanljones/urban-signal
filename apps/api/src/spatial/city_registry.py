@@ -207,6 +207,28 @@ class FeedType(str, Enum):
     # cover every metro at once and live in `national_feeds.py` instead.
     GBFS = "gbfs"
 
+    # US-377 (restored 2026-09-25). Childcare licensing registries are
+    # household-formation proxies like the business-licensing and SNAP feeds
+    # already under SLA, but they are a distinct source with a distinct schema.
+    # US-377 originally registered them by *replacing* each city's SLA dataset,
+    # which silently dropped nine metros' business-licensing and SNAP signals;
+    # this member lets both coexist. Rows still route through
+    # ``sla_licenses_producer`` via ``producer_key: sla``.
+    CHILDCARE = "childcare"
+
+
+# Every ingestion mode a DatasetSpec may declare. Enforced by the interlock
+# gate so a typo or a new mode is caught at registration rather than surfacing
+# as a job that silently polls nothing.
+#   incremental — filter on the declared watermark column
+#   snapshot    — read the table head; no watermark (US-364)
+#   full        — re-read the whole table every run
+#   diff        — compare against the previous run's payload
+#   release_delta — national feeds that diff each vendor release (US-363 POI)
+INGESTION_MODES: frozenset[str] = frozenset(
+    {"incremental", "snapshot", "full", "diff", "release_delta"}
+)
+
 
 @runtime_checkable
 class PaginatingClient(Protocol):

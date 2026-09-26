@@ -40,9 +40,20 @@ _CENTROIDS_PATH = Path(__file__).resolve().parent / "data" / "calenviroscreen_tr
 
 
 def _load_centroids() -> dict[str, tuple[float, float]]:
-    """Load the tract→centroid lookup from the bundled JSON."""
+    """Load the tract→centroid lookup from the bundled JSON.
+
+    The file is derived from the CES 5.0 shapefile (see
+    ``.streams/us420-ca-licenses-ingest.md``) and is tracked in git, so its
+    absence is a broken checkout rather than a normal state. Returning ``{}``
+    here used to make every tract resolve to nothing, which surfaced as an
+    empty feed with no error anywhere.
+    """
     if not _CENTROIDS_PATH.exists():
-        return {}
+        raise FileNotFoundError(
+            f"CalEnviroScreen tract centroids missing at {_CENTROIDS_PATH}. "
+            f"Regenerate from the CES 5.0 shapefile; without it no tract can "
+            f"be crosswalked to H3."
+        )
     with open(_CENTROIDS_PATH, encoding="utf-8") as fh:
         raw: dict[str, list[float]] = json.load(fh)
     return {tract: (lat, lng) for tract, (lat, lng) in raw.items()}

@@ -42,6 +42,7 @@ from src.producers.gbfs_producer import GbfsProducer
 from src.producers.nfip_producer import NfipProducer
 from src.producers.nrel_afdc_client import NrelAfdcClient
 from src.producers.poi_diff_producer import PoiDiffProducer
+from src.producers.childcare_producer import ChildcareLicensingProducer
 from src.producers.sla_licenses_producer import SLALicensesProducer
 from src.producers.sba_loan_producer import SbaLoanProducer
 from src.producers.fdic_bankbranch_producer import FdicBankBranchProducer
@@ -233,6 +234,9 @@ class MunicipalIngestionScheduler:
             "permits": DOBPermitsProducer(bootstrap_servers=self.bootstrap_servers),
             "311": Complaints311Producer(bootstrap_servers=self.bootstrap_servers),
             "sla": SLALicensesProducer(bootstrap_servers=self.bootstrap_servers),
+            # US-377: childcare registries are their own feed with their own
+            # field maps, sharing the SLA producer's event shape and topic.
+            "childcare": ChildcareLicensingProducer(bootstrap_servers=self.bootstrap_servers),
 "deeds": DeedsACRISProducer(bootstrap_servers=self.bootstrap_servers),
             "crime": CrimeIncidentsProducer(bootstrap_servers=self.bootstrap_servers),
             "violations": ViolationsProducer(bootstrap_servers=self.bootstrap_servers),
@@ -307,6 +311,12 @@ class MunicipalIngestionScheduler:
                     "id_keys": ds.id_keys,
                     "city_id": city_id.value,
                     "producer_key": ds.producer_key or feed_type.value,
+                    # Which registered feed this job ingests. Several feed
+                    # types share one producer (childcare and business
+                    # licensing both run through `sla_licenses_producer`), so
+                    # the producer cannot infer this from `producer_key` — it
+                    # selects the field map by feed.
+                    "feed_type": feed_type.value,
                     "platform": ds.platform,
                     "ingestion_mode": ds.ingestion_mode or "incremental",
                     # Platform-specific pagination knobs forwarded verbatim to

@@ -92,11 +92,15 @@ target-version = "py312"
 
 [tool.pytest.ini_options]
 minversion = "8.0"
-addopts = "-ra -q --import-mode=importlib"
+addopts = "-ra -q --import-mode=importlib -m 'not live'"
 testpaths = ["tests"]
 pythonpath = [".", "../.."]
 asyncio_mode = "auto"
 markers = [
     "interlock: fast spine-invariant gate run before releasing the interlock (pytest -m interlock)",
-    "live: live-probe tests that hit external APIs (excluded from normal CI runs)",
+    # `live` probes hit third-party APIs (NOAA, USGS, CalEnviroScreen, ...), so
+    # they are deselected by the `-m 'not live'` default above: a run must not
+    # go red because an upstream had a bad minute. Run them deliberately with
+    # `pytest -m live`, which overrides the default.
+    "live: live-probe tests that hit external APIs (excluded from the default run; enable with `pytest -m live`)",
 ]

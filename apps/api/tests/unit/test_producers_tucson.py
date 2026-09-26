@@ -23,7 +23,7 @@ The host rejects ISO date literals in ``where`` (ANSI ``date '...'`` only
 works and is the sentinel guard.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import patch
 
 import pytest
@@ -374,17 +374,28 @@ class TestFeedRegistration:
 
 
 class TestSentinelGuard:
+    # The fixtures are frozen byte-verbatim rows from the 2026-08-28 probe, so
+    # the "now" the guard is compared against has to be frozen too: the sentinel
+    # is only future-dated relative to a time before 2026-09-12, and against
+    # the wall clock this assertion is a calendar time bomb that expired.
+    PROBE_NOW = datetime(2026, 9, 1, tzinfo=UTC)
+
     def test_live_sentinel_row_is_future_dated_after_flatten(self):
         assert SENTINEL_ROW["DT_START"] == "2026-09-12T00:00:00+00:00"
         parsed = _parse_datetime(SENTINEL_ROW["DT_START"])
         assert parsed is not None
-        assert is_future_watermark(parsed, datetime.now(timezone.utc)) is True
+        assert is_future_watermark(parsed, self.PROBE_NOW) is True
+        # The sentinel must stay ahead of the newest non-future row: it is the
+        # row that would otherwise pin the feed's high watermark.
+        newest = _parse_datetime(TRADER_JOES_ROW["DT_START"])
+        assert newest is not None
+        assert parsed > newest
 
     def test_newest_non_future_fixture_is_not_future_dated(self):
         assert TRADER_JOES_ROW["DT_START"] == "2026-05-29T00:00:00+00:00"
         parsed = _parse_datetime(TRADER_JOES_ROW["DT_START"])
         assert parsed is not None
-        assert is_future_watermark(parsed, datetime.now(timezone.utc)) is False
+        assert is_future_watermark(parsed, self.PROBE_NOW) is False
 
     def test_where_guard_composes_with_the_us111_convention(self):
         spec = get_tucson_dataset(FeedType.SLA)

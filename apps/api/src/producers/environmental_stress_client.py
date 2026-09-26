@@ -24,6 +24,7 @@ import re
 from collections.abc import Generator, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from functools import lru_cache
 from typing import Any
 
 import h3  # needed for areal intersection (USDM)
@@ -42,11 +43,48 @@ AIRNOW_API_KEY_ENV = "AIRNOW_API_KEY"
 
 USDM_CURRENT_URL = "https://droughtmonitor.unl.edu/data/json/usdm_current.json"
 
+STORM_EVENTS_CATALOG_URL = (
+    "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/"
+)
 STORM_EVENTS_TEMPLATE = (
     "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/"
     "StormEvents_details-ftp_v1.0_d{year}_c{created}.csv.gz"
 )
-DEFAULT_STORM_EVENTS_URL = STORM_EVENTS_TEMPLATE.format(year=2026, created=20260819)
+# NCEI rotates the `c<created>` stamp every time it republishes a data year, so
+# a pinned filename 404s within weeks of being written. Resolve the newest
+# published file from the directory index instead of freezing one.
+_STORM_EVENTS_FILE_RE = re.compile(
+    r"StormEvents_details-ftp_v1\.0_d(\d{4})_c(\d{8})\.csv\.gz"
+)
+
+
+@lru_cache(maxsize=1)
+def discover_storm_events_url(timeout: float = 30.0) -> str:
+    """Return the URL of the most recently published Storm Events file.
+
+    Picks the greatest ``(data year, creation stamp)`` pair in NCEI's csvfiles
+    index, so a year republished under a newer stamp wins over the original.
+    """
+    with httpx.Client(timeout=timeout, follow_redirects=True) as client:
+        resp = client.get(STORM_EVENTS_CATALOG_URL)
+        resp.raise_for_status()
+        index = resp.text
+
+    newest = max(
+        (
+            (int(year), int(created))
+            for year, created in _STORM_EVENTS_FILE_RE.findall(index)
+        ),
+        default=None,
+    )
+    if newest is None:
+        raise RuntimeError(
+            f"no StormEvents_details file found in the NCEI index at "
+            f"{STORM_EVENTS_CATALOG_URL}"
+        )
+    year, created = newest
+    return STORM_EVENTS_TEMPLATE.format(year=year, created=created)
+
 
 NWIS_IV_URL = "https://waterservices.usgs.gov/nwis/iv/"
 
@@ -576,11 +614,16 @@ class StormEventsClient:
 
     def fetch(
         self,
-        url: str = DEFAULT_STORM_EVENTS_URL,
+        url: str | None = None,
         max_records: int | None = None,
     ) -> Generator[StormEvent, None, None]:
-        """Download and parse the gzip CSV from the given URL."""
-        with self.http.stream("GET", url) as resp:
+        """Download and parse the gzip CSV from the given URL.
+
+        ``url`` defaults to the newest file NCEI has published, resolved from
+        the directory index rather than pinned, so this does not rot.
+        """
+        target = url or discover_storm_events_url()
+        with self.http.stream("GET", target) as resp:
             resp.raise_for_status()
             raw = resp.read()
             yield from self.parse_csv_bytes(raw, max_records=max_records)

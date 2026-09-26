@@ -20,6 +20,7 @@ from src.producers.scheduler import MunicipalIngestionScheduler
 from src.spatial import cities as cities_pkg
 from src.spatial.city_registry import (
     ALIASES,
+    INGESTION_MODES,
     REGISTRY,
     CityId,
     FeedType,
@@ -50,6 +51,10 @@ FEED_TOPICS = {
     FeedType.ENERGY_BENCHMARK: settings.topic_context_observations,
     FeedType.BIKE_PED: settings.topic_context_observations,
     FeedType.GBFS: settings.topic_station_change,
+    # US-377: childcare registries ride the SLA topic for the same reason the
+    # two context families share one — identical `SLALicenseEvent` shape, told
+    # apart downstream by their registered feed.
+    FeedType.CHILDCARE: settings.topic_sla,
 }
 
 KNOWN_PLATFORMS = {"socrata", "arcgis", "accela", "carto", "ckan", "csv", "excel", "gbfs"}
@@ -206,6 +211,9 @@ class TestCompleteness:
                 assert spec.watermark_col or spec.ingestion_mode == "snapshot", label
                 assert spec.id_keys and all(isinstance(k, str) and k for k in spec.id_keys), label
                 assert spec.interval_seconds > 0, label
+                assert spec.ingestion_mode in INGESTION_MODES, (
+                    f"{label}: unknown ingestion_mode {spec.ingestion_mode!r}"
+                )
                 assert spec.producer_key == feed.value, (
                     f"{label}: producer_key {spec.producer_key!r} != feed {feed.value!r}"
                 )
