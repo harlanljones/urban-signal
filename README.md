@@ -689,6 +689,7 @@ It asserts **closure** (every alias resolves to a registration), **completeness*
 | `docs/agents/spine-manifest.txt` | Files more than one concurrent stream may edit |
 | `docs/expansion-roadmap.md` | Expansion roadmap: 5 → 17 metros (completed) |
 | `docs/expansion-roadmap-wave-2.md` | Wave-2 expansion roadmap (17 → 27 metros and beyond) |
+| `docs/signal-roadmap.md` | Signal roadmap (draft): forward labels, lead-time evidence, and source trails |
 | `docs/replay-lag-verification.md` | Kafka partitioning and 2× replay consumer-lag verification (US-69) |
 | `docs/product/personas.md` | Product persona profiles and user stories |
 | `docs/research/` | Research surveys, candidate city evaluations, watermark audits |
