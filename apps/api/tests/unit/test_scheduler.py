@@ -1,11 +1,12 @@
 """Unit tests for Live Municipal Ingestion Scheduler & Poller."""
 
 import json
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, create_autospec
 
 import pytest
 
 from src.producers.scheduler import (
+    _PAGINATE_KWARGS,
     DeduplicationFilter,
     ExponentialBackoffTracker,
     MunicipalIngestionScheduler,
@@ -431,3 +432,112 @@ class TestSnapshotMode:
                 meta.pop("ingestion_mode", None)
             else:
                 meta["ingestion_mode"] = saved_mode
+
+
+class TestPollJobIngestionContract:
+    """poll_job reaches every job's real client and producer intact.
+
+    The fixture's MagicMock ``paginate`` accepts any kwargs and every producer
+    attribute, which hid two crashes: the blanket kwargs splat raised
+    TypeError on every watermarked socrata/arcgis/ckan/carto job, and the
+    violations/inspections producers had no ``parse_socrata_row``.
+    """
+
+    @staticmethod
+    def _enforce_real_paginate_signatures(scheduler):
+        for producer in scheduler.producers.values():
+            for attr in ("socrata", "arcgis", "carto", "ckan", "csv"):
+                client = getattr(producer, attr, None)
+                if client is None or isinstance(client, MagicMock):
+                    continue
+                real = type(client).paginate.__get__(client)
+                client.paginate = create_autospec(real, return_value=[])
+
+    def test_every_job_polls_through_the_real_paginate_signature(self, mock_scheduler):
+        self._enforce_real_paginate_signatures(mock_scheduler)
+        failures = {}
+        for job_name, meta in mock_scheduler.job_metadata.items():
+            if meta.get("national_feed") or meta.get("platform") not in _PAGINATE_KWARGS:
+                continue
+            result = mock_scheduler.poll_job(job_name, limit=5)
+            if result["status"] != "SUCCESS":
+                failures[job_name] = result["error"]
+        assert not failures, failures
+
+    def test_every_polled_producer_has_the_row_hook(self, mock_scheduler):
+        # Known gap: energy_benchmark / bike_ped fan one row out to several
+        # observation events inside ContextObservationsProducer.run_stream,
+        # which poll_job's one-row-one-event loop cannot carry yet.
+        known_gaps = {"energy_benchmark", "bike_ped"}
+        polled = {
+            meta["producer_key"]
+            for meta in mock_scheduler.job_metadata.values()
+            if meta.get("platform") != "gbfs" and not meta.get("national_feed")
+        }
+        missing = sorted(
+            key
+            for key in polled - known_gaps
+            if not callable(getattr(mock_scheduler.producers[key], "parse_socrata_row", None))
+        )
+        assert not missing, missing
+
+    def test_violations_job_publishes_with_run_stream_keys(self, mock_scheduler):
+        producer = mock_scheduler.producers["violations"]
+        rows = [
+            {"case_id": "C-1", "opened_date": "2026-09-20T08:00:00.000", "latitude": "30.27", "longitude": "-97.74"},
+            {"case_id": "C-2", "opened_date": "2026-09-22T09:30:00.000", "latitude": "30.28", "longitude": "-97.75"},
+        ]
+        producer.socrata.paginate = MagicMock(return_value=[rows])
+
+        result = mock_scheduler.poll_job("violations_austin", limit=100)
+
+        assert result["status"] == "SUCCESS"
+        assert result["records_published"] == 2
+        assert mock_scheduler.dlq_producer.route_to_dlq.call_count == 0
+        keys = [c.kwargs["key"] for c in producer.producer.produce.call_args_list]
+        assert keys == ["austin:C-1", "austin:C-2"]  # same shape as run_stream
+        # ViolationEvent has no issuance/created/effective/recorded date, so
+        # the watermark comes from the raw opened_date column.
+        assert result["high_watermark"] == "2026-09-22T09:30:00"
+
+        producer.socrata.paginate = MagicMock(return_value=[])
+        mock_scheduler.poll_job("violations_austin", limit=100)
+        _, kwargs = producer.socrata.paginate.call_args
+        assert kwargs["where_clause"] == "opened_date > '2026-09-22T09:30:00'"
+
+    def test_inspections_watermark_tracks_the_filter_column(self, mock_scheduler):
+        producer = mock_scheduler.producers["inspections"]
+        rows = [
+            {
+                "licenseno": "L-1",
+                "_id": 1,
+                "status_date": "2026-09-21T14:00:00",
+                # issued years earlier: the watermark must follow status_date,
+                # the column the incremental filter compares.
+                "issdttm": "2019-01-01T00:00:00",
+                "location": "(42.35, -71.06)",
+            },
+        ]
+        producer.ckan.paginate = MagicMock(return_value=[rows])
+
+        result = mock_scheduler.poll_job("inspections_boston", limit=100)
+
+        assert result["records_published"] == 1
+        assert mock_scheduler.dlq_producer.route_to_dlq.call_count == 0
+        assert producer.producer.produce.call_args.kwargs["key"] == "boston:L-1"
+        assert result["high_watermark"] == "2026-09-21T14:00:00"
+
+    def test_raw_column_watermark_skips_future_rows(self, mock_scheduler):
+        """Crime events carry occurred/reported dates, not one of the four
+        watermark attributes; the raw-column fallback keeps the US-111 guard."""
+        producer = mock_scheduler.producers["crime"]
+        rows = [
+            {"id": "1", "case_number": "JJ1", "date": "2028-02-26T00:00:00.000", "latitude": "41.88", "longitude": "-87.63"},
+            {"id": "2", "case_number": "JJ2", "date": "2026-09-20T10:00:00.000", "latitude": "41.88", "longitude": "-87.63"},
+        ]
+        producer.socrata.paginate = MagicMock(return_value=[rows])
+
+        result = mock_scheduler.poll_job("crime_chicago", limit=100)
+
+        assert result["records_published"] == 2
+        assert result["high_watermark"] == "2026-09-20T10:00:00"

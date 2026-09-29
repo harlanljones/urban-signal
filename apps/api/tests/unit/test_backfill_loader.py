@@ -2,6 +2,7 @@
 
 import json
 from datetime import UTC, datetime
+from types import SimpleNamespace
 from unittest.mock import MagicMock
 
 from scripts.backfill_loader import backfill_job, build_query_shape, main, select_jobs
@@ -136,6 +137,38 @@ def test_backfill_job_counts_and_watermark():
     # published through the producer, drops routed to DLQ
     assert pw.producer.produce.call_count == 2
     pw.producer.flush.assert_called_once()
+
+
+def test_backfill_job_raw_column_watermark_and_violation_key():
+    # A violation event carries no issuance/created/effective/recorded date:
+    # the seed watermark comes from the raw watermark column, and the key from
+    # violation_id, matching poll_job and ViolationsProducer.run_stream.
+    fake = _FakeScheduler(
+        {"violations_austin": _meta(watermark_col="opened_date", producer_key="violations", city_id="austin")}
+    )
+    client = MagicMock()
+    client.paginate.return_value = [
+        [
+            {"_id": "C-1", "opened_date": "2026-08-20T10:00:00.000"},
+            {"_id": "C-2", "opened_date": "2026-08-22T11:30:00.000"},
+        ]
+    ]
+    pw = MagicMock()
+    pw.parse_socrata_row.side_effect = lambda row, city_id=None: SimpleNamespace(
+        violation_id=row["_id"], city_id="austin"
+    )
+    fake.clients = {"violations_austin": client}
+    fake.producers["violations"] = pw
+
+    report = backfill_job(
+        fake, "violations_austin",
+        since_dt=None, max_rows=None, page_size=None, batch_delay_seconds=0,
+    )
+
+    assert report["published"] == 2
+    assert report["max_watermark_seen"] == "2026-08-22T11:30:00"
+    keys = [c.kwargs["key"] for c in pw.producer.produce.call_args_list]
+    assert keys == ["austin:C-1", "austin:C-2"]
 
 
 def test_select_jobs_filters_city_and_feed():

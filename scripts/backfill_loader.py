@@ -48,7 +48,7 @@ from src.producers.acquisition import (
     build_where,
 )
 from src.producers.scheduler import MunicipalIngestionScheduler
-from src.producers.watermarks import ANSI_DATE_LITERAL_HOSTS
+from src.producers.watermarks import ANSI_DATE_LITERAL_HOSTS, parse_watermark
 from src.spatial.city_registry import DatasetSpec
 
 logger = logging.getLogger(__name__)
@@ -234,6 +234,8 @@ def backfill_job(
                         or getattr(event, "incident_id", None)
                         or getattr(event, "license_id", None)
                         or getattr(event, "doc_id", None)
+                        or getattr(event, "violation_id", None)
+                        or getattr(event, "inspection_id", None)
                         or rec_id
                     )
                     resolved_city = getattr(event, "city_id", city_id)
@@ -245,8 +247,12 @@ def backfill_job(
                     published += 1
 
                     if spec.watermark_type != "text":
-                        for attr in WM_ATTRS:
-                            wm_val = getattr(event, attr, None)
+                        # Mirrors poll_job: events without a WM_ATTRS date
+                        # fall back to the raw watermark column.
+                        wm_candidates = [getattr(event, attr, None) for attr in WM_ATTRS]
+                        if not any(wm_candidates) and spec.watermark_col:
+                            wm_candidates = [parse_watermark(row.get(spec.watermark_col))]
+                        for wm_val in wm_candidates:
                             if wm_val:
                                 if wm_val.tzinfo is None:
                                     wm_val = wm_val.replace(tzinfo=timezone.utc)

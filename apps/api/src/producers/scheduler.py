@@ -47,7 +47,9 @@ from src.producers.sla_licenses_producer import SLALicensesProducer
 from src.producers.sba_loan_producer import SbaLoanProducer
 from src.producers.fdic_bankbranch_producer import FdicBankBranchProducer
 from src.producers.street_cut_permits_producer import StreetCutPermitsProducer
+from src.producers.acquisition import _ADAPTER_REQUEST_KEYS
 from src.producers.watermarks import (
+    parse_watermark,
     typed_watermark_entry,
     watermark_comparison,
     watermark_exclude_clause,
@@ -55,6 +57,17 @@ from src.producers.watermarks import (
 from src.spatial.national_feeds import NATIONAL_FEEDS, NationalFeed, schedulable_feeds
 
 logger = logging.getLogger(__name__)
+
+# Pagination kwargs each platform client's ``paginate`` accepts beyond the
+# shared endpoint/where/batch/max arguments: the US-185 adapter contract
+# (``acquisition.build_adapter_request``) plus the CSV client's zip/delimiter
+# options, which only the scheduler forwards. The socrata/arcgis/ckan/carto
+# signatures reject the watermark_* keys, so forwarding them raises TypeError
+# before the first request.
+_PAGINATE_KWARGS: dict[str, tuple[str, ...]] = {
+    **_ADAPTER_REQUEST_KEYS,
+    "csv": (*_ADAPTER_REQUEST_KEYS["csv"], "zip_member", "delimiter"),
+}
 
 # Year-slice feed rollover events (US-70): a job switched from one calendar
 # year's layer/resource to the next. Scraped via the serving /metrics mount.
@@ -806,17 +819,7 @@ class MunicipalIngestionScheduler:
         try:
             client_kwargs = {
                 k: meta[k]
-                for k in (
-                    "order_by",
-                    "id_col",
-                    "select",
-                    "fallback_endpoints",
-                    "watermark_col",
-                    "watermark_format",
-                    "watermark_exclude",
-                    "zip_member",
-                    "delimiter",
-                )
+                for k in _PAGINATE_KWARGS.get(meta.get("platform", "socrata"), ())
                 if meta.get(k)
             }
             for batch in self._paginating_client_for(job_name).paginate(
@@ -882,6 +885,8 @@ class MunicipalIngestionScheduler:
                             or getattr(event, "incident_id", None)
                             or getattr(event, "license_id", None)
                             or getattr(event, "doc_id", None)
+                            or getattr(event, "violation_id", None)
+                            or getattr(event, "inspection_id", None)
                             or rec_id
                         )
                         resolved_city = getattr(event, "city_id", city_id)
@@ -906,6 +911,12 @@ class MunicipalIngestionScheduler:
                                 or getattr(event, "effective_date", None)
                                 or getattr(event, "recorded_date", None)
                             )
+                            # Events without one of those attributes (crime,
+                            # violations, inspections, street cuts, evictions)
+                            # advance from the raw watermark column: the same
+                            # column the incremental filter compares against.
+                            if wm_val is None and meta["watermark_col"]:
+                                wm_val = parse_watermark(row.get(meta["watermark_col"]))
                         if wm_val:
                             if _is_future_watermark(wm_val, now_dt):
                                 future_watermarks += 1

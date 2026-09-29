@@ -400,9 +400,9 @@ def test_newest_valid_watermark_drops_future():
 
 
 # --------------------------------------------------------------------------- #
-# 5. Per-platform pagination-key translation matches what adapters receive    #
+# 5. Pagination-key translation: the legacy splat builder                     #
 # --------------------------------------------------------------------------- #
-def test_pagination_kwargs_match_scheduler_for_every_job():
+def test_pagination_kwargs_match_legacy_splat_for_every_job():
     s = _scheduler()
     for job_name, meta in s.job_metadata.items():
         spec = AcquisitionSpec(
@@ -458,8 +458,8 @@ def test_pagination_kwargs_includes_declared_keys_for_csv():
 
 
 def test_pagination_kwargs_uniform_across_platforms():
-    # The scheduler forwards the same dict to every platform today; the engine
-    # reproduces that (the latent per-platform bug is documented, not changed).
+    # The legacy splat is the same dict for every platform. poll_job no longer
+    # forwards it; see test_scheduler.py's real-signature poll test.
     spec = AcquisitionSpec.from_dataset_spec(
         DatasetSpec(
             endpoint="https://x/y.json",
