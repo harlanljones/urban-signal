@@ -1080,6 +1080,26 @@ class Settings(BaseSettings):
         description="Des Moines, IA rental licenses MapServer layer URL (SLA)",
     )
 
+    # Des Moines, IA code enforcement: layer 0 "Code Case" of the same
+    # EXTDynamicCodeCaseRentalLicense MapServer (ArcGIS Server 10.91). Native
+    # point geometry on every row (outSR=4326 lifts the Iowa State Plane South
+    # feet store SR to WGS84), DateOpened date watermark stored at local
+    # midnight, CaseNumber unique string id; 33,061 rows live-verified
+    # 2026-09-29 (newest DateOpened 2026-09-25, 0 future-dated rows).
+    # Registered as FeedType.VIOLATIONS (Austin/Boston precedent); code
+    # enforcement is not 311. Same full-reload service as the rental layer, and
+    # the same ANSI-date-literal host (maps.dsm.city). Description is free text
+    # (14,568 distinct values, with staff initials and names in the notes),
+    # Remark is a free-text column (empty on every row today) and the editor
+    # columns are staff/service accounts: none of them is mapped.
+    arcgis_des_moines_code_cases_url: str = Field(
+        default=(
+            "https://maps.dsm.city/p2/rest/services/External/"
+            "EXTDynamicCodeCaseRentalLicense/MapServer/0"
+        ),
+        description="Des Moines, IA code enforcement cases MapServer layer URL (violations)",
+    )
+
     # Pierce County, WA (ArcGIS): county applications and permits across six
     # departments (Building, Development Engineering, Environmental, Fire,
     # Land Use, Sewer). Point layer in WA State Plane; the client's outSR=4326

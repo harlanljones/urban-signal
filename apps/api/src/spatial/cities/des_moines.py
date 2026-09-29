@@ -2,10 +2,12 @@
 
 Leaf module: geometry only. Feed specs live in the corpus YAML beside this
 leaf (data/des_moines.yaml) and are re-bound to this REGISTRATION by the
-registry derivation (US-429). The one registered feed is the City of Des
-Moines Rental License layer:
+registry derivation (US-429). Two feeds are registered, both layers of one City
+of Des Moines map service: the Rental License layer (SLA)
 https://maps.dsm.city/p2/rest/services/External/EXTDynamicCodeCaseRentalLicense/MapServer/1
-See docs/research/probe-des_moines.md for the row-level probe, the families
+and the Code Case layer (VIOLATIONS, code enforcement)
+https://maps.dsm.city/p2/rest/services/External/EXTDynamicCodeCaseRentalLicense/MapServer/0
+See docs/research/probe-des_moines.md for the row-level probes, the families
 that did not qualify, and the re-probe triggers.
 
 Geographic basis: Des Moines is Iowa's capital and the Polk County seat. The

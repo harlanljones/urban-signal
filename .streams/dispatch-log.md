@@ -1059,7 +1059,7 @@ Two things worth keeping from this round:
 
 | Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
 |---|---|---|---|---|---|
-| city-des-moines | `.streams/city-des-moines.md` | `config.py`, `city_registry.py` | 2026-09-29 | done (registered, `sla` only; PR #66) | `cities/des_moines.py`, `cities/data/des_moines.yaml`, `test_producers_des_moines.py` (39 tests), `docs/research/probe-des_moines.md`, `maps.dsm.city` in `ANSI_DATE_LITERAL_HOSTS`, regenerated dashboard/facts/`cities/des_moines.json`, README/PRODUCT 156 -> 157 |
+| city-des-moines | `.streams/city-des-moines.md` | `config.py`, `city_registry.py` (follow-up: `config.py` only) | 2026-09-29 | done (registered, `sla` in PR #66; follow-up registered `violations`, stacked on PR #67) | `cities/des_moines.py`, `cities/data/des_moines.yaml`, `test_producers_des_moines.py` (39 tests, 60 after the follow-up), `docs/research/probe-des_moines.md`, `maps.dsm.city` in `ANSI_DATE_LITERAL_HOSTS`, regenerated dashboard/facts/`cities/des_moines.json`, README/PRODUCT 156 -> 157; follow-up: `datasets.violations` (Code Case, layer 0) and `arcgis_des_moines_code_cases_url` |
 
 Des Moines was named in the wave-3 extended list but never probed. The probe found
 one feed that qualifies and registered it: the City's Rental License layer
@@ -1104,3 +1104,38 @@ Things worth keeping:
   while the stream ran; neither file was touched here, and no other city's
   registration changed. `docs/signal-roadmap.md` and
   `docs/expansion-roadmap-wave-3.md` were not edited.
+
+**Follow-up, same day and same stream: Code Case registered as `violations`.** The
+`poll_job` / `parse_socrata_row` fix (PR #67) removed the only blocker recorded
+above, so the layer left unregistered in the first pass is now the second Des Moines
+feed. Re-probe 2026-09-29 (26 requests, default curl User-Agent, no WAF response):
+33,061 rows, 33,061 distinct `CaseNumber`, every row a native point inside the metro
+bbox, `DateOpened` newest **2026-09-25** with 0 future-dated rows, 7d **190** / 30d
+**795** / 60d 1,843, longest gap between opened days over the trailing year **5 days**
+(Thanksgiving and Christmas weeks). `DateOpened > date '...'` with `orderByFields=
+DateOpened DESC,OBJECTID DESC` works on `maps.dsm.city`; the ISO string returns error
+400. Registered `arcgis`, watermark `DateOpened`, ids `CaseNumber` then `OBJECTID`,
+interval 1800, `expected_cadence_days: 7` (alarm at 14 days; the reload is not proven
+daily, same as `sla`), field map `violation_id`, `code`, `status`, `status_date`,
+`address` only. `Description` is deliberately not mapped (free text, 14,568 distinct
+values, staff initials and names); `Remark` and the editor columns are never
+mapped. Spine touched: `config.py` (one settings field) only. Gates: `pytest -m
+interlock` 35 passed, the leaf tests 60 passed, `test_scheduler.py` 25 passed,
+`test_producers_enforcement_signals.py` 11 passed, `verify_cicd_preflight.py` green on
+all six gates, `ruff check` clean. G5 on the newest 500 rows: 500/500 parsed, points
+500/500.
+
+Worth keeping from the follow-up:
+
+- **`scripts/backfill_probe.py` cannot probe a `violations` job as shipped**: its
+  `PRODUCERS` table has no `violations` entry (`producer_for` raises `ValueError`), so
+  Austin, Boston and now Des Moines report an error row for that feed. G5 was measured
+  by running the script's own `probe_feed` with the producer injected and curl-captured
+  rows as the transport. The script was not edited (outside the claimed files); adding
+  `violations` and `inspections` to `PRODUCERS` is the follow-up.
+- **The ArcGIS client cannot narrow `outFields`**, so the Code Case free-text and
+  editor columns travel in a raw row and would land in a DLQ payload if a row failed to
+  parse (0 of the newest 500 do). Same platform-wide note as the rental contacts.
+- **Opened-case stream.** `status_date` and the watermark are both `DateOpened`, so a
+  case is published once and later status changes are not re-emitted; `Address` is
+  served with a trailing space that the shared parser keeps.
