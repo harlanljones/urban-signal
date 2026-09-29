@@ -1,0 +1,399 @@
+city_id: des_moines
+name: Des Moines, IA
+state: IA
+center:
+  lat: 41.5887
+  lng: -93.6161
+metro_bbox:
+  min_lat: 41.44
+  max_lat: 41.81
+  min_lng: -93.9
+  max_lng: -93.42
+division_bboxes:
+  CENTRAL_CORE:
+    min_lat: 41.57
+    max_lat: 41.61
+    min_lng: -93.71
+    max_lng: -93.585
+  NORTH_SIDE:
+    min_lat: 41.61
+    max_lat: 41.66
+    min_lng: -93.71
+    max_lng: -93.585
+  SOUTH_SIDE:
+    min_lat: 41.44
+    max_lat: 41.57
+    min_lng: -93.71
+    max_lng: -93.585
+  EAST_SIDE:
+    min_lat: 41.44
+    max_lat: 41.66
+    min_lng: -93.585
+    max_lng: -93.42
+  WEST_SUBURBS:
+    min_lat: 41.44
+    max_lat: 41.66
+    min_lng: -93.9
+    max_lng: -93.71
+  NORTH_SUBURBS:
+    min_lat: 41.66
+    max_lat: 41.81
+    min_lng: -93.9
+    max_lng: -93.42
+submarkets:
+  Downtown / Sherman Hill:
+    name: Downtown / Sherman Hill
+    borough: CENTRAL_CORE
+    lat: 41.5862
+    lng: -93.635
+    zoom: 14.5
+    pitch: 50.0
+    base_lims: 0.75
+    capex: 5000000.0
+    permit_vel: 28.0
+    shift_ratio: 1.3
+    sla: 139.0
+    description: Downtown Des Moines and Sherman Hill, with Woodland Heights, Good
+      Park, Cheatom Park, King Irving and Greenwood Historic.
+    city_id: des_moines
+  East Village / Capitol:
+    name: East Village / Capitol
+    borough: CENTRAL_CORE
+    lat: 41.5937
+    lng: -93.601
+    zoom: 14.5
+    pitch: 48.0
+    base_lims: 0.75
+    capex: 5000000.0
+    permit_vel: 28.0
+    shift_ratio: 1.3
+    sla: 27.0
+    description: Historic East Village, Capitol Park, Capitol East and Martin Luther
+      King Jr. Park.
+    city_id: des_moines
+  Drake / Waveland Park:
+    name: Drake / Waveland Park
+    borough: CENTRAL_CORE
+    lat: 41.602
+    lng: -93.6714
+    zoom: 14.0
+    pitch: 44.0
+    base_lims: 0.75
+    capex: 5000000.0
+    permit_vel: 28.0
+    shift_ratio: 1.3
+    sla: 124.0
+    description: Drake, Waveland Park and North of Grand, out to the Waterbury and
+      Westwood neighborhoods on the west side.
+    city_id: des_moines
+  Beaverdale / Merle Hay:
+    name: Beaverdale / Merle Hay
+    borough: NORTH_SIDE
+    lat: 41.6222
+    lng: -93.6853
+    zoom: 13.8
+    pitch: 42.0
+    base_lims: 0.75
+    capex: 5000000.0
+    permit_vel: 28.0
+    shift_ratio: 1.3
+    sla: 146.0
+    description: Beaverdale, Merle Hay and Lower Beaver on the northwest side.
+    city_id: des_moines
+  Highland Park / Union Park:
+    name: Highland Park / Union Park
+    borough: NORTH_SIDE
+    lat: 41.6225
+    lng: -93.6123
+    zoom: 13.8
+    pitch: 42.0
+    base_lims: 0.75
+    capex: 5000000.0
+    permit_vel: 28.0
+    shift_ratio: 1.3
+    sla: 72.0
+    description: Highland Park/Oak Park, Union Park, River Bend, Chautauqua Park and
+      Mondamin Presidential on the north side.
+    city_id: des_moines
+  Indianola Hills / Grays Lake:
+    name: Indianola Hills / Grays Lake
+    borough: SOUTH_SIDE
+    lat: 41.5624
+    lng: -93.6233
+    zoom: 13.8
+    pitch: 42.0
+    base_lims: 0.75
+    capex: 5000000.0
+    permit_vel: 28.0
+    shift_ratio: 1.3
+    sla: 51.0
+    description: Indianola Hills, Grays Lake and McKinley School/Columbus Park south
+      of downtown.
+    city_id: des_moines
+  South Central / Watrous:
+    name: South Central / Watrous
+    borough: SOUTH_SIDE
+    lat: 41.5392
+    lng: -93.6208
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.75
+    capex: 5000000.0
+    permit_vel: 28.0
+    shift_ratio: 1.3
+    sla: 65.0
+    description: South Central DSM, Watrous Heights, Watrous South and Southwestern
+      Hills on the south side.
+    city_id: des_moines
+  Fairground / Fairmont Park:
+    name: Fairground / Fairmont Park
+    borough: EAST_SIDE
+    lat: 41.607
+    lng: -93.5706
+    zoom: 13.8
+    pitch: 42.0
+    base_lims: 0.75
+    capex: 5000000.0
+    permit_vel: 28.0
+    shift_ratio: 1.3
+    sla: 67.0
+    description: Fairground, Fairmont Park, ACCENT, Sheridan Gardens, Douglas Acres,
+      Grays Woods and Valley High Manor on the east side.
+    city_id: des_moines
+  Easter Lake / River Woods:
+    name: Easter Lake / River Woods
+    borough: EAST_SIDE
+    lat: 41.547
+    lng: -93.5721
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.75
+    capex: 5000000.0
+    permit_vel: 28.0
+    shift_ratio: 1.3
+    sla: 35.0
+    description: Easter Lake Area and River Woods on the southeast side.
+    city_id: des_moines
+  Altoona / Pleasant Hill:
+    name: Altoona / Pleasant Hill
+    borough: EAST_SIDE
+    lat: 41.6263
+    lng: -93.4939
+    zoom: 13.0
+    pitch: 38.0
+    base_lims: 0.75
+    capex: 5000000.0
+    permit_vel: 28.0
+    shift_ratio: 1.3
+    sla: 16.0
+    description: Altoona and Pleasant Hill at the city's eastern edge; Brook Run is
+      the nearest Des Moines neighborhood.
+    city_id: des_moines
+  West Des Moines:
+    name: West Des Moines
+    borough: WEST_SUBURBS
+    lat: 41.5499
+    lng: -93.7814
+    zoom: 13.5
+    pitch: 40.0
+    base_lims: 0.75
+    capex: 5000000.0
+    permit_vel: 28.0
+    shift_ratio: 1.3
+    sla: 0.0
+    description: West Des Moines (Census place 1983910); outside the registered City
+      of Des Moines rental license feed.
+    city_id: des_moines
+  Urbandale / Clive:
+    name: Urbandale / Clive
+    borough: WEST_SUBURBS
+    lat: 41.6244
+    lng: -93.7904
+    zoom: 13.3
+    pitch: 40.0
+    base_lims: 0.75
+    capex: 5000000.0
+    permit_vel: 28.0
+    shift_ratio: 1.3
+    sla: 0.0
+    description: Urbandale and Clive (Census places 1979950 and 1914520); outside
+      the registered City of Des Moines rental license feed.
+    city_id: des_moines
+  Ankeny:
+    name: Ankeny
+    borough: NORTH_SUBURBS
+    lat: 41.7336
+    lng: -93.5994
+    zoom: 13.0
+    pitch: 38.0
+    base_lims: 0.75
+    capex: 5000000.0
+    permit_vel: 28.0
+    shift_ratio: 1.3
+    sla: 0.0
+    description: Ankeny (Census place 1902305); outside the registered City of Des
+      Moines rental license feed.
+    city_id: des_moines
+  Johnston:
+    name: Johnston
+    borough: NORTH_SUBURBS
+    lat: 41.6919
+    lng: -93.7245
+    zoom: 13.0
+    pitch: 38.0
+    base_lims: 0.75
+    capex: 5000000.0
+    permit_vel: 28.0
+    shift_ratio: 1.3
+    sla: 0.0
+    description: Johnston (Census place 1939765); outside the registered City of Des
+      Moines rental license feed.
+    city_id: des_moines
+divisions:
+  CENTRAL_CORE:
+    name: CENTRAL_CORE
+    center_lat: 41.594
+    center_lng: -93.636
+    zoom: 13.2
+    bbox:
+      min_lat: 41.57
+      max_lat: 41.61
+      min_lng: -93.71
+      max_lng: -93.585
+    submarkets:
+    - Downtown / Sherman Hill
+    - East Village / Capitol
+    - Drake / Waveland Park
+    city_id: des_moines
+  NORTH_SIDE:
+    name: NORTH_SIDE
+    center_lat: 41.622
+    center_lng: -93.649
+    zoom: 13.0
+    bbox:
+      min_lat: 41.61
+      max_lat: 41.66
+      min_lng: -93.71
+      max_lng: -93.585
+    submarkets:
+    - Beaverdale / Merle Hay
+    - Highland Park / Union Park
+    city_id: des_moines
+  SOUTH_SIDE:
+    name: SOUTH_SIDE
+    center_lat: 41.551
+    center_lng: -93.622
+    zoom: 13.0
+    bbox:
+      min_lat: 41.44
+      max_lat: 41.57
+      min_lng: -93.71
+      max_lng: -93.585
+    submarkets:
+    - Indianola Hills / Grays Lake
+    - South Central / Watrous
+    city_id: des_moines
+  EAST_SIDE:
+    name: EAST_SIDE
+    center_lat: 41.593
+    center_lng: -93.546
+    zoom: 12.8
+    bbox:
+      min_lat: 41.44
+      max_lat: 41.66
+      min_lng: -93.585
+      max_lng: -93.42
+    submarkets:
+    - Fairground / Fairmont Park
+    - Easter Lake / River Woods
+    - Altoona / Pleasant Hill
+    city_id: des_moines
+  WEST_SUBURBS:
+    name: WEST_SUBURBS
+    center_lat: 41.587
+    center_lng: -93.786
+    zoom: 12.5
+    bbox:
+      min_lat: 41.44
+      max_lat: 41.66
+      min_lng: -93.9
+      max_lng: -93.71
+    submarkets:
+    - West Des Moines
+    - Urbandale / Clive
+    city_id: des_moines
+  NORTH_SUBURBS:
+    name: NORTH_SUBURBS
+    center_lat: 41.713
+    center_lng: -93.662
+    zoom: 12.3
+    bbox:
+      min_lat: 41.66
+      max_lat: 41.81
+      min_lng: -93.9
+      max_lng: -93.42
+    submarkets:
+    - Ankeny
+    - Johnston
+    city_id: des_moines
+datasets:
+  sla:
+    endpoint: https://maps.dsm.city/p2/rest/services/External/EXTDynamicCodeCaseRentalLicense/MapServer/1
+    platform: arcgis
+    watermark_col: IssuedDate
+    id_keys:
+    - LicenseNumber
+    - OBJECTID
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: IssuedDate DESC, OBJECTID DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: ContactType = 'Property Owner'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - LicenseNumber
+      license_type:
+      - ContactType
+      status:
+      - Status
+      effective_date:
+      - IssuedDate
+      expiration_date:
+      - ExpDate
+      address_street:
+      - RentalAddress
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+aliases:
+- des_moines_ia
+- des moines ia
+- des moines
+- dsm
+job_suffix: des_moines

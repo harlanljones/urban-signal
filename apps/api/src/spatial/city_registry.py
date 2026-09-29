@@ -175,6 +175,7 @@ class CityId(str, Enum):
     HUNTSVILLE = "huntsville"
     MONTGOMERY_AL = "montgomery_al"
     FORT_COLLINS = "fort_collins"
+    DES_MOINES = "des_moines"
 
 
 class FeedType(str, Enum):

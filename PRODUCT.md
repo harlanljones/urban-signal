@@ -29,7 +29,7 @@ Visitors evaluate the project through a public product site, a live geospatial d
 
 ## Capabilities and Constraints
 
-- 156 metros are currently registered, generated from the city
+- 157 metros are currently registered, generated from the city
   registry (`apps/api/src/spatial/city_registry.py`). The marketing build
   verifies its machine-readable city projection against that registry
   (`scripts/export_site_facts.py`); the registry remains authoritative and the

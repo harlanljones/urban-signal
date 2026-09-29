@@ -158,6 +158,10 @@ ANSI_DATE_LITERAL_HOSTS = (
     "gis.countyofriverside.us",
     "gis.chandleraz.gov",
     "maps.medfordmaps.org",
+    # Des Moines, IA (ArcGIS Server 10.91): verified live 2026-09-29 —
+    # ``IssuedDate > '2026-09-25T05:00:00'`` returns 400 "Unable to complete
+    # operation" while ``IssuedDate >= date '2026-09-25'`` works.
+    "maps.dsm.city",
 )
 
 
