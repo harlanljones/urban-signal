@@ -18,8 +18,8 @@ SLA_FIELD_MAP = {
     "license_type": ["BusinessType"],
     "effective_date": ["LicenseIssued"],
     "expiration_date": ["LicenseExpires"],
-    "address_street": ["MailAddress1"],
-    "zipcode": ["MailZip"],
+    # MailAddress1 to MailZip are a mailing block, often an owner's or head
+    # office's address out of town: the licence takes its parcel's point.
     "status": ["Status"],
 }
 
@@ -59,8 +59,12 @@ data.cityoflynchburg.opendata.arcgis.com) — so the existing
   EXPIRED/IN REVIEW — registered whole, no server-side status filter.
 * SLA — ``/33`` Business Licenses - Tabular. Watermark ``LicenseIssued``
   (date-typed); annual licenses renew mid-year, so the register is a
-  trickle by nature (7d=1 at re-probe). Native-point ``/2`` Locations
-  layer (``ConcatenatedAddress``, same ``LicenseNumber``) is the T1 path.
+  trickle by nature (7d=1 at re-probe). The only address columns are a
+  mailing block (40% of licences mail outside the city), so a licence takes
+  its parcel's centroid: ``ParcelID`` joins the ``/41`` polygons'
+  ``Parcel_ID`` (2026-09-30: 99 of 100 recent licences), and ``select``
+  leaves the mailing block on the server. The ``/2`` Locations points sit
+  on the same parcels.
 * DEEDS — ``/34`` Transfers - Tabular. Watermark ``SaleDate`` (date-typed,
   same-day live: newest row 2026-08-26, 7d=38). NO address column —
   coordinates come from the spec's ``parcel_join`` (``LRSN`` → the ``/41``
@@ -355,21 +359,29 @@ LYNCHBURG_FEED_SPECS: Dict[str, Dict[str, object]] = {
         "interval_seconds": 600.0,
         "producer_key": "sla",
         "extra": {
-            "needs_geocode": True,
-            "geocode_context": LYNCHBURG_GEOCODE_CONTEXT,
+            "needs_geocode": False,
             "order_by": "OBJECTID",
+            # The mailing block stays on the server.
+            "select": "OBJECTID,LicenseNumber,Company,TradeName,ParcelID,Status,LicenseIssued,LicenseExpires,BusinessType",
             "oid_field": "OBJECTID",
             "max_record_count": 50000,
             "expected_cadence_days": 365,
             "non_spatial": True,
+            "parcel_join": {
+                "parcel_layer": LYNCHBURG_PARCEL_LAYER_ENDPOINT,
+                "join_key": "Parcel_ID",
+                "geometry_source": "centroid",
+                "row_key": "ParcelID",
+            },
             "scope": (
                 "Lynchburg business-license table (annual licenses "
                 "renewing mid-year — trickle cadence is the register's "
                 "nature, not staleness; LicenseExpires runs a year+ "
                 "ahead). Date-typed LicenseIssued watermark; "
                 "LicenseNumber is a zero-padded string kept verbatim. "
-                "Mail-address block is the only tabular address; the "
-                "/2 Locations point layer is the T1 upgrade path."
+                "The only address columns are a mailing block, so a "
+                "licence takes its parcel's centroid (ParcelID -> /41 "
+                "Parcel_ID) and is never geocoded."
             ),
             "field_map": SLA_FIELD_MAP,
         },

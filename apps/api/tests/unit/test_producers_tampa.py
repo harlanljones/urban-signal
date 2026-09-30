@@ -108,6 +108,22 @@ class TestFeedRegistration:
         assert spec.watermark_col == "HISTORY_ACT_DT"
         assert spec.field_map == SLA_FIELD_MAP
 
+    def test_sla_never_reads_the_owners_block(self):
+        """The layer names each permit's owner with a mailing address, phone
+        and email. The premises address is PERMIT_ADDR alone, and the select
+        leaves the owner's columns, staff comments and editors on the server."""
+        spec = get_tampa_dataset(FeedType.SLA)
+        assert SLA_FIELD_MAP["address_street"] == ["PERMIT_ADDR"]
+        selected = spec.select.split(",")
+        for column in (spec.watermark_col, *spec.id_keys):
+            assert column in selected
+        mapped = {col for cols in SLA_FIELD_MAP.values() for col in cols}
+        assert mapped <= set(selected)
+        owner = {"BUS_OWNER_NAME", "BUS_OWNER_NAME2", "BUS_OWNER_MAIL_ADD", "BUS_OWNER_MAIL_CITY",
+                 "BUS_OWNER_MAIL_ST", "BUS_OWNER_MAIL_ZIP", "BUS_OWN_PHONE", "BUS_PHONE", "BUS_OWN_EMAIL",
+                 "PMT_COMMENT", "ENFCMT_COMMENT", "COMMENT_MISC", "CREATEDBY", "LASTEDITOR"}
+        assert not owner & set(selected)
+
     @pytest.mark.parametrize("absent_feed", [FeedType.COMPLAINTS_311, FeedType.DEEDS])
     def test_absent_feeds_raise_readable_errors(self, absent_feed):
         """The unverified 311/DEEDS families stay absent."""
@@ -180,3 +196,20 @@ class TestTampaRowParsing:
 
     def test_permit_live_fixture_is_inside_the_metro_bbox(self, permit_row):
         assert is_in_tampa_metro(float(permit_row["latitude"]), float(permit_row["longitude"]))
+
+    def test_a_permit_without_an_address_publishes_none(self):
+        """48 of 4,096 permits have no PERMIT_ADDR; the owner's mailing
+        address never stands in for it."""
+        with patch("src.producers.sla_licenses_producer.BaseKafkaProducer"):
+            from src.producers.sla_licenses_producer import SLALicensesProducer
+
+            sla = SLALicensesProducer()
+        row = {
+            "ORD_PERMIT": "AB2026-0123", "BUS_NAME": "REDACTED", "HISTORY_ACT_DT": "2026-09-22T00:00:00+00:00",
+            "HISTORY_ACTION": "APPROVED", "PERMIT_ADDR": None, "PERMIT_ZIP": "33602",
+            "BUS_OWNER_MAIL_ADD": "REDACTED", "latitude": 27.948, "longitude": -82.458,
+        }
+        event = sla.parse_socrata_row(row, city_id="tampa")
+        assert event is not None
+        assert event.address is None
+        assert (event.latitude, event.longitude) == pytest.approx((27.948, -82.458))

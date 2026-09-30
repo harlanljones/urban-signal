@@ -515,7 +515,7 @@ datasets:
     watermark_exclude: []
     order_by: null
     id_col: null
-    select: null
+    select: OBJECTID,ORD_PERMIT,APP_NUM,ABSALETYPE,AB_CLASS_PREFIX,AB_CLASS_SUFFIX,BUS_NAME,HISTORY_ACT_DT,MTH24_END_DT,HISTORY_ACTION,PERMIT_ADDR,PERMIT_ZIP
     fallback_endpoints: []
     where: null
     needs_geocode: false
@@ -540,7 +540,6 @@ datasets:
       - HISTORY_ACTION
       address_street:
       - PERMIT_ADDR
-      - BUS_OWNER_MAIL_ADD
       zipcode:
       - PERMIT_ZIP
     ingestion_mode: incremental

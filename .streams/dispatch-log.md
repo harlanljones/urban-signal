@@ -1432,3 +1432,19 @@ Worth keeping:
   SSLs; the old layer keyed `PAR` parcels, the owner polygons key both.
 - **Units live in a relate table.** Condominium units have no polygon of
   their own; DC's `CONDORELATE` names each unit's lot.
+
+### 2026-09-30 — Licences at their premises (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| sla-premises | `.streams/sla-premises.md` | none | 2026-09-30 | done (Lynchburg: 2,037 of 2,210 licences placed on their parcels, no geocoder query; Tampa: same 3,062 published, 12 columns read instead of 94) | Lynchburg `parcel_join`; `select` for both; Tampa without the owner's mailing fallback |
+
+Lynchburg licences take their parcel's centroid instead of a geocoded
+mailing address, and Tampa's never publish or fetch the owner's details.
+
+Worth keeping:
+
+- **An address block named `Mail*` is not the premises.** Check the city and
+  state columns before geocoding one.
+- **A fallback in an address chain can reach a person.** Tampa's second
+  `address_street` candidate was the owner's mailing address.

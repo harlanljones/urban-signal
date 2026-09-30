@@ -18,7 +18,9 @@ SLA_FIELD_MAP = {
     "effective_date": ["HISTORY_ACT_DT"],
     "expiration_date": ["MTH24_END_DT"],
     "status": ["HISTORY_ACTION"],
-    "address_street": ["PERMIT_ADDR", "BUS_OWNER_MAIL_ADD"],
+    # Never BUS_OWNER_MAIL_ADD: a permit without an address would publish
+    # its owner's mailing address as the premises.
+    "address_street": ["PERMIT_ADDR"],
     "zipcode": ["PERMIT_ZIP"],
 }
 
@@ -507,6 +509,12 @@ TAMPA_FEED_SPECS: Dict[str, Dict[str, object]] = {
             "expected_cadence_days": 7,
             "oid_field": "OBJECTID",
             "max_record_count": 2000,
+            # The owner's name, mailing address, phone and email, staff
+            # comments and editor names stay on the server.
+            "select": (
+                "OBJECTID,ORD_PERMIT,APP_NUM,ABSALETYPE,AB_CLASS_PREFIX,AB_CLASS_SUFFIX,"
+                "BUS_NAME,HISTORY_ACT_DT,MTH24_END_DT,HISTORY_ACTION,PERMIT_ADDR,PERMIT_ZIP"
+            ),
             "scope": "Tampa alcohol-beverage sale locations and action history (partial SLA)",
             "field_map": SLA_FIELD_MAP,
         },

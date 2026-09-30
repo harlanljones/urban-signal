@@ -125,7 +125,8 @@ PERMITS_ROW_NEW_SFD = {
 
 # Newest 2026 licenses by LicenseIssued DESC — 1787270400000 / 1787011200000
 # flatten to the fixture ISOs. Newest row 2026-08-21; 7d=1, total=2,182.
-# TradeName is empty on both live rows; the id falls through to Company.
+# TradeName is empty on both live rows; the id falls through to Company. The
+# spec's ``select`` leaves the MailAddress1 to MailZip block on the server.
 SLA_ROW_NEEDLE_NINJA = {
     "OBJECTID": 4609,
     "LicenseNumber": "031386",
@@ -135,13 +136,7 @@ SLA_ROW_NEEDLE_NINJA = {
     "Status": "ACTIVE",
     "LicenseIssued": "2026-08-21T00:00:00+00:00",
     "LicenseExpires": "2027-05-01T00:00:00+00:00",
-    "MailAddress1": "924 MAIN ST",
-    "MailAddress2": "",
-    "MailCity": "LYNCHBURG",
-    "MailState": "VA",
-    "MailZip": "24504-1608",
     "BusinessType": "01 Retail Merchant",
-    "FeeType": "Retail",
 }
 
 SLA_ROW_RIVERFRONT = {
@@ -153,14 +148,11 @@ SLA_ROW_RIVERFRONT = {
     "Status": "ACTIVE",
     "LicenseIssued": "2026-08-18T00:00:00+00:00",
     "LicenseExpires": "2027-05-01T00:00:00+00:00",
-    "MailAddress1": "1312 JEFFERSON ST",
-    "MailAddress2": "",
-    "MailCity": "LYNCHBURG",
-    "MailState": "VA",
-    "MailZip": "24504-1807",
     "BusinessType": "01 Retail Merchant",
-    "FeeType": "",
 }
+
+# The table's mailing block: 40% of licences mail outside the city.
+SLA_MAILING_COLUMNS = ("MailAddress1", "MailAddress2", "MailCity", "MailState", "MailZip")
 
 # Newest transfers by SaleDate DESC — 1787702400000 / 1787616000000 flatten
 # to the fixture ISOs. Newest row 2026-08-26; 7d=38, total=195,460. The
@@ -207,11 +199,11 @@ DEEDS_ROW_SALE = {
 # Mocked ADR-0004 geocodes (address-plausible, inside the metro bbox):
 PERMITS_GEOCODE_ENTERPRISE = (37.3945, -79.1960)   # 2000 ENTERPRISE DR
 PERMITS_GEOCODE_MELINDA = (37.4010, -79.1830)      # 110 MELINDA DR
-SLA_GEOCODE_MAIN_ST = (37.4140, -79.1430)          # 924 MAIN ST
-SLA_GEOCODE_JEFFERSON = (37.4125, -79.1400)        # 1312 JEFFERSON ST
 
-# Parcel-join centroids as the deeds run_stream enrichment would set them
-# (LRSN -> /41 Parcel polygon centroid):
+# Parcel-join centroids as the scheduler's poll sets them (ParcelID -> /41
+# Parcel_ID for licences, LRSN -> /41 for deeds):
+SLA_CENTROID_02449010 = (37.4140, -79.1430)
+SLA_CENTROID_04631003 = (37.4125, -79.1400)
 DEEDS_CENTROID_14196 = (37.4100, -79.1500)
 DEEDS_CENTROID_8921 = (37.4060, -79.1700)
 
@@ -358,11 +350,26 @@ class TestFeedRegistration:
         assert spec.watermark_type is None
         assert spec.id_keys == ["LicenseNumber", "OBJECTID"]
         assert spec.producer_key == "sla"
-        assert spec.needs_geocode is True
         assert spec.order_by == "OBJECTID"
         assert spec.expected_cadence_days == 365
         assert spec.non_spatial is True
         assert spec.field_map == SLA_FIELD_MAP
+
+    def test_sla_joins_its_parcels_and_never_geocodes_the_mailing_block(self):
+        """The table's only address is a mailing block; a licence takes its
+        parcel's centroid instead (ParcelID is the polygons' Parcel_ID)."""
+        spec = get_lynchburg_dataset(FeedType.SLA)
+        assert spec.needs_geocode is False
+        assert spec.geocode_context is None
+        assert spec.parcel_join == {
+            "parcel_layer": LYNCHBURG_PARCEL_LAYER_ENDPOINT,
+            "join_key": "Parcel_ID",
+            "geometry_source": "centroid",
+            "row_key": "ParcelID",
+        }
+        selected = spec.select.split(",")
+        assert "ParcelID" in selected
+        assert not set(SLA_MAILING_COLUMNS) & set(selected)
 
     def test_deeds_spec_declares_esri_oid_ordering_and_parcel_join(self):
         spec = get_lynchburg_dataset(FeedType.DEEDS)
@@ -434,8 +441,12 @@ class TestLynchburgFieldMaps:
         assert first_mapped(row, SLA_FIELD_MAP, "license_type") == "01 Retail Merchant"
         assert first_mapped(row, SLA_FIELD_MAP, "effective_date") == "2026-08-21T00:00:00+00:00"
         assert first_mapped(row, SLA_FIELD_MAP, "expiration_date") == "2027-05-01T00:00:00+00:00"
-        assert first_mapped(row, SLA_FIELD_MAP, "address_street") == "924 MAIN ST"
-        assert first_mapped(row, SLA_FIELD_MAP, "zipcode") == "24504-1608"
+
+    def test_sla_map_reads_no_mailing_column(self):
+        mapped = {col for cols in SLA_FIELD_MAP.values() for col in cols}
+        assert not set(SLA_MAILING_COLUMNS) & mapped
+        assert "address_street" not in SLA_FIELD_MAP
+        assert "zipcode" not in SLA_FIELD_MAP
 
     def test_sla_empty_tradename_falls_through_to_company(self):
         """Live rows carry TradeName="" — falsy candidates must fall through
@@ -606,68 +617,70 @@ class TestLynchburgPermitParsing:
         assert event.job_type == JobType.OT
 
 
+@pytest.fixture
+def no_geocoding(monkeypatch):
+    """Record every query that reaches the geocoder; none should."""
+    queries = []
+
+    class _Geocoder:
+        def geocode(self, query):
+            queries.append(query)
+            return None
+
+    monkeypatch.setattr("src.spatial.geocoder.get_geocoder", lambda: _Geocoder())
+    return queries
+
+
 class TestLynchburgSlaParsing:
-    def test_address_only_license_parses_with_mocked_geocode(self, sla, monkeypatch):
+    def test_joined_license_takes_its_parcel_centroid(self, sla, monkeypatch, no_geocoding):
         _patch_resolve(monkeypatch, "sla")
-        monkeypatch.setattr(
-            "src.spatial.geocoder.geocode_row_if_declared",
-            lambda *args, **kwargs: SLA_GEOCODE_MAIN_ST,
-        )
-        event = sla.parse_socrata_row(SLA_ROW_NEEDLE_NINJA, city_id="lynchburg")
+        lat, lng = SLA_CENTROID_02449010
+        row = {**SLA_ROW_NEEDLE_NINJA, "latitude": lat, "longitude": lng}
+        event = sla.parse_socrata_row(row, city_id="lynchburg")
         assert event is not None
         assert event.city_id == "lynchburg"
         assert event.license_id == "031386"
         assert event.dba == "NEEDLE NINJA LLC"
         assert event.license_type == "01 Retail Merchant"
-        assert event.address == "924 MAIN ST"
-        assert event.latitude == pytest.approx(SLA_GEOCODE_MAIN_ST[0])
-        assert event.longitude == pytest.approx(SLA_GEOCODE_MAIN_ST[1])
-        assert event.h3_res7 == _h3_res7(*SLA_GEOCODE_MAIN_ST)
+        assert event.address is None
+        assert (event.latitude, event.longitude) == pytest.approx(SLA_CENTROID_02449010)
+        assert event.h3_res7 == _h3_res7(*SLA_CENTROID_02449010)
         assert event.h3_res9 is not None
         assert is_in_lynchburg_metro(event.latitude, event.longitude)
+        assert no_geocoding == []
 
-    def test_sla_geocode_sits_inside_metro(self):
-        assert is_in_lynchburg_metro(*SLA_GEOCODE_MAIN_ST)
-        assert is_in_lynchburg_metro(*SLA_GEOCODE_JEFFERSON)
+    def test_sla_centroids_sit_inside_metro(self):
+        assert is_in_lynchburg_metro(*SLA_CENTROID_02449010)
+        assert is_in_lynchburg_metro(*SLA_CENTROID_04631003)
 
-    def test_license_number_keeps_leading_zero(self, sla, monkeypatch):
+    def test_license_number_keeps_leading_zero(self, sla, monkeypatch, no_geocoding):
         """LicenseNumber is a zero-padded 6-digit string; the producer's
         float-normalize branch is scoped to san_diego only, so "031386"
         must survive intact as the id."""
         _patch_resolve(monkeypatch, "sla")
-        monkeypatch.setattr(
-            "src.spatial.geocoder.geocode_row_if_declared",
-            lambda *args, **kwargs: SLA_GEOCODE_JEFFERSON,
-        )
-        event = sla.parse_socrata_row(SLA_ROW_RIVERFRONT, city_id="lynchburg")
+        lat, lng = SLA_CENTROID_04631003
+        event = sla.parse_socrata_row({**SLA_ROW_RIVERFRONT, "latitude": lat, "longitude": lng}, city_id="lynchburg")
         assert event is not None
         assert event.license_id == "031382"
         assert not event.license_id.startswith("31382")
 
-    def test_date_typed_licenseissued_parses_to_effective_date(
-        self, sla, monkeypatch
-    ):
+    def test_date_typed_licenseissued_parses_to_effective_date(self, sla, monkeypatch, no_geocoding):
         _patch_resolve(monkeypatch, "sla")
-        monkeypatch.setattr(
-            "src.spatial.geocoder.geocode_row_if_declared",
-            lambda *args, **kwargs: SLA_GEOCODE_MAIN_ST,
-        )
         event = sla.parse_socrata_row(SLA_ROW_NEEDLE_NINJA, city_id="lynchburg")
         assert event is not None
         assert str(event.effective_date).startswith("2026-08-21")
 
-    def test_geocode_failure_keeps_null_coord_event(self, sla, monkeypatch):
-        """SLA producer tolerance: a row whose geocode fails still emits as a
-        null-lat/lng/null-H3 event (DC precedent) rather than being dropped."""
+    def test_a_license_the_join_missed_is_never_geocoded(self, sla, monkeypatch, no_geocoding):
+        """A licence whose parcel has no polygon still emits, unplaced
+        (null lat/lng/H3); nothing is sent to the geocoder, even from a row
+        that carries the mailing block."""
         _patch_resolve(monkeypatch, "sla")
-        monkeypatch.setattr(
-            "src.spatial.geocoder.geocode_row_if_declared",
-            lambda *args, **kwargs: None,
-        )
-        event = sla.parse_socrata_row(SLA_ROW_NEEDLE_NINJA, city_id="lynchburg")
+        row = {**SLA_ROW_NEEDLE_NINJA, "MailAddress1": "924 MAIN ST", "MailZip": "24504-1608"}
+        event = sla.parse_socrata_row(row, city_id="lynchburg")
         assert event is not None
         assert event.latitude is None and event.longitude is None
         assert event.h3_res7 is None and event.h3_res9 is None
+        assert no_geocoding == []
 
 
 class TestLynchburgDeedsParsing:

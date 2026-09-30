@@ -282,6 +282,36 @@ class TestSaleRows:
         event = producer.producer.produce.call_args.kwargs["payload"]
         assert (event.latitude, event.longitude) == (38.9105, -77.0431)
 
+    def test_a_license_joins_its_parcel_by_the_tables_column_name(self, scheduler, monkeypatch):
+        """Lynchburg's licence table spells the key ParcelID and its parcel
+        polygons Parcel_ID; the licence takes the centroid, never a geocode."""
+        geocoded = []
+
+        class _Geocoder:
+            def geocode(self, query):
+                geocoded.append(query)
+                return None
+
+        monkeypatch.setattr("src.spatial.geocoder.get_geocoder", lambda: _Geocoder())
+        producer = scheduler.producers["sla"]
+        rows = [
+            {"OBJECTID": 4609, "LicenseNumber": "031386", "Company": "NEEDLE NINJA LLC", "TradeName": "",
+             "ParcelID": "02449010", "Status": "ACTIVE", "LicenseIssued": "2026-08-21T00:00:00+00:00",
+             "LicenseExpires": "2027-05-01T00:00:00+00:00", "BusinessType": "01 Retail Merchant"},
+        ]
+        producer.arcgis.paginate = MagicMock(return_value=[rows])
+        producer.arcgis.fetch_centroid_index = MagicMock(return_value={"02449010": (37.414, -79.143)})
+
+        result = scheduler.poll_job("sla_lynchburg", limit=10)
+
+        assert result["records_published"] == 1
+        kwargs = producer.arcgis.fetch_centroid_index.call_args.kwargs
+        assert kwargs["endpoint_url"].endswith("/ODPDynamic/MapServer/41")
+        assert (kwargs["join_key"], kwargs["join_values"]) == ("Parcel_ID", ["02449010"])
+        event = producer.producer.produce.call_args.kwargs["payload"]
+        assert (event.latitude, event.longitude) == (37.414, -79.143)
+        assert geocoded == []
+
     def test_a_workbook_sale_joins_by_its_own_column_name(self, scheduler):
         """Richmond's workbook headers arrive lower-cased (``pin``) while its
         Parcels layer spells the field ``PIN``."""

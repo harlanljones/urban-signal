@@ -19,7 +19,9 @@ rows since their watermark (see "Text-dated polls"). A seventh keeps
 grantor and grantee names out of every `deeds` event (see "Party names in
 deeds"), an eighth places Las Vegas's sales on their parcels (see "Las
 Vegas deeds on their parcels"), and a ninth places DC's on their lots (see
-"DC deeds on their lots").
+"DC deeds on their lots"). A tenth places Lynchburg's licences on their
+parcels and keeps Tampa licence owners' details off the request (see
+"Licences at their premises").
 
 | | Jobs | Repaired here | Left, with reason below |
 |---|---|---|---|
@@ -734,3 +736,49 @@ The same first poll placed 12 before the change. Units `CONDORELATE` does not
 list, and lots with no owner polygon, stay unplaced. Composing the square with
 the table's `REC_LOT` and reading the Record Lots layer (35) would place 63 of
 the 67 listed units rather than 53, but needs a join on two columns.
+
+## Licences at their premises
+
+Two `sla` feeds read an owner's or a mailing address where the premises
+should be:
+
+- **Lynchburg** geocoded each licence from `MailAddress1` and `MailZip`, the
+  table's only address columns. They are a mailing block: of 500 recent
+  licences, 198 (40%) mail to a city other than Lynchburg and 102 (20%)
+  outside Virginia, so those licences were placed at a head office or an
+  owner's address. The table's `ParcelID` is the city parcel polygons'
+  `Parcel_ID` (99 of 100 recent licences matched), and the city's own
+  licence locations layer puts each licence on that same parcel.
+- **Tampa** fell back to `BUS_OWNER_MAIL_ADD`, the owner's mailing address,
+  when a permit had no `PERMIT_ADDR`: 3 of the 48 such permits carried one.
+  The feed also read all 94 of the layer's columns, the owner's name,
+  mailing address, phone and email among them, and six rows that fail to
+  parse (five with no permit number, one with no point) went to the DLQ with
+  them.
+
+The tenth stacked change:
+
+- **Lynchburg joins its parcels.** The spec's `parcel_join` reads each
+  batch's `/41` polygons by `Parcel_ID` (the row's `ParcelID`, through the
+  join's `row_key`), as the city's deeds do, and gives the licence the
+  centroid. The spec no longer declares `needs_geocode`, the field map drops
+  the mailing columns, and a `select` of nine columns leaves them on the
+  server. A licence whose parcel has no polygon stays unplaced.
+- **Tampa reads the premises only.** `address_street` is `PERMIT_ADDR`
+  alone, and a `select` of the twelve columns the feed maps leaves the
+  owner's block, staff comments and editor names on the server. Points still
+  come from the layer's geometry.
+
+### Checked live
+
+On 2026-09-30 each feed was polled twice through `poll_job` from no stored
+watermark, Kafka mocked, the geocoder stubbed to count queries, requests 2
+seconds apart:
+
+| Feed | First poll | Placed | Columns read | Second poll |
+|---|---|---|---|---|
+| Lynchburg `sla` | 2,210 fetched and published, none dead-lettered, 28 requests including the polygon reads | 2,037, all inside the metro box; 162 of the other 173 have no Lynchburg parcel (`ParcelID` reads `*Not City` or `UNKNOWN`) | the nine in the `select` | 1 fetched (the watermark's day), none published |
+| Tampa `sla` | 4,096 fetched, 3,062 published, 6 dead-lettered, as without the `select` | 3,062 from the layer's points | the twelve in the `select`, down from 94 | none fetched |
+
+No query reached the geocoder, and no event carries an address from a
+mailing column.

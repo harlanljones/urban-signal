@@ -253,11 +253,11 @@ datasets:
     watermark_exclude: []
     order_by: OBJECTID
     id_col: null
-    select: null
+    select: OBJECTID,LicenseNumber,Company,TradeName,ParcelID,Status,LicenseIssued,LicenseExpires,BusinessType
     fallback_endpoints: []
     where: null
-    needs_geocode: true
-    geocode_context: Lynchburg, VA
+    needs_geocode: false
+    geocode_context: null
     field_map:
       license_id:
       - LicenseNumber
@@ -274,10 +274,6 @@ datasets:
       - LicenseIssued
       expiration_date:
       - LicenseExpires
-      address_street:
-      - MailAddress1
-      zipcode:
-      - MailZip
       status:
       - Status
     ingestion_mode: incremental
@@ -296,7 +292,11 @@ datasets:
     state_plane_units: null
     state_plane_x_col: null
     state_plane_y_col: null
-    parcel_join: {}
+    parcel_join:
+      parcel_layer: https://mapviewer.lynchburgva.gov/arcgis/rest/services/OpenData/ODPDynamic/MapServer/41
+      join_key: Parcel_ID
+      geometry_source: centroid
+      row_key: ParcelID
     non_spatial: true
     zip_member: null
   deeds:
