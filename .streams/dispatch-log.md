@@ -1557,3 +1557,20 @@ Worth keeping:
 - **Measure a big file's parse before registering it.** `io.StringIO` holds
   four bytes a character, so an 89 MB file cost more than half a gigabyte
   to read.
+
+### 2026-09-30 — Scottsdale 311 (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| scottsdale-311 | `.streams/scottsdale-311.md` | `config.py` (the request table) | 2026-09-30 | done (3,000 closed requests read, 2,838 published, 162 without a point skipped, none dead-lettered, the second poll published none) | `311` spec for Scottsdale; notes in `docs/research/four-family-depth-2026-09-30.md`; regenerated facts |
+
+Scottsdale moves to all four signal families (25 to 26).
+
+Worth keeping:
+
+- **A table that lists closed requests follows the close date.** When a
+  source publishes a row only once it closes, a watermark on the filing date
+  skips every slow request.
+- **A blocked probe is not a blocked feed.** The host that stopped a burst of
+  probe queries answered slow, plain requests an hour later; wait, then ask
+  only for what the spec will send.

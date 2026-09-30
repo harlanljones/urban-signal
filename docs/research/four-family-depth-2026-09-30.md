@@ -26,6 +26,10 @@ Chandler, Glendale and Scottsdale gained a third family from the same layer.
 Bend followed with deeds from Deschutes County's sales table, which makes 23,
 Medford with deeds from Jackson County's sales layer, which makes 24, and
 Tacoma with deeds from Pierce County's weekly sales file, which makes 25.
+Scottsdale followed with `311` from the City's ScottsdaleEZ table, which
+makes 26 (below). Chandler's `311` and Glendale's `permits`, the other two
+families the Maricopa deeds left missing, were probed the same day and have
+no source yet (Not now).
 
 ## Registered
 
@@ -90,6 +94,58 @@ Tacoma with deeds from Pierce County's weekly sales file, which makes 25.
   `State = 'FL'`, the same spec the other six Florida metros use. See the SNAP
   finding below before relying on it.
 
+### Scottsdale, AZ — `311`
+
+- **Source:** the City's ArcGIS Server 10.6,
+  `maps.scottsdaleaz.gov/arcgis/rest/services/OpenData_Tabular/MapServer/28`
+  ("Scottsdale EZ", a standalone table). The City's Hub item `ScottsdaleEZ`
+  is tagged 311 and calls it customer service request data "comparable to
+  311 data of other municipalities". The August probe read only the
+  code-enforcement layers in `OpenData_Events` and recorded no 311 dataset.
+- **Shape:** 240,985 rows on 2026-09-30, every one closed: the City publishes
+  a request once it closes. The columns are `Requests` (the table's object id
+  and the request number), `Workgroup`, `RequestType`, `RequestStatus`,
+  `Address`, `Latitude`, `Longitude`, `CreatedDate` and `ClosedDate`. The
+  City's data dictionary says addresses and points sit at the hundred block
+  and on the street centreline, and no column names the requester. In the
+  newest 1,000 closed rows the largest workgroups are Solid Waste (617),
+  Water Resources (110) and Code Enforcement (87).
+- **Freshness:** the newest request closed late on Saturday 2026-09-26, and
+  nothing newer had arrived by Wednesday afternoon, so the table appears to
+  refresh about once a week; `expected_cadence_days` is 7. 1,088 requests
+  closed in the seven days to the newest and 5,192 in 30 days, about 170 a
+  day.
+- **Watermark:** `ClosedDate`. A request appears only when it closes, often
+  long after it was filed (a median of 16 hours, and a tenth after more than
+  15 days), so a filter on `CreatedDate` would pass over it. The 909 rows
+  without a close date are Transportation requests filed from 2019 to 2023.
+  The host accepts ISO literals (`ClosedDate > '2026-09-26T22:56:27'`) and
+  rejects `CURRENT_DATE - INTERVAL`, which the spec does not use.
+- **Time zone:** the dates are Arizona wall-clock times stamped UTC: filings
+  peak between 08:00 and 15:00 "UTC" and all but stop overnight. The repo
+  stamps Socrata's floating timestamps the same way, and the watermark
+  round-trips because the server compares literals in the same frame.
+- **Location:** 957 of the newest 1,000 rows carry `Latitude`/`Longitude`,
+  all inside the metro box. The other 43 read "Data Not Available" (19 of
+  them from the Police Department). `metro_clip` skips rows without a point
+  before they reach the parser, so the poll sends no filter but the
+  watermark, the query shape the host's permits feed already sends.
+- **Poll:** every six hours, newest first with `Requests` breaking ties,
+  capped at 3,000 rows (three pages), which holds two missed refreshes.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live table, Kafka mocked. The first read 3,000 rows
+  in four requests (the metadata and three pages) and published 2,838, with
+  162 skipped by the clip and none dead-lettered; they closed from 2026-09-08
+  to 2026-09-26 and were filed from 2024-03-07. The second sent
+  `ClosedDate > '2026-09-26T22:56:27'`, read back the boundary row (the
+  server keeps milliseconds), dropped it as a duplicate and published
+  nothing.
+- **Probe conduct:** a probe earlier the same day was blocked by the host's
+  Cloudflare front end on its 18th request (18:28Z) and stopped there. This
+  check waited until 19:22Z, sent one metadata request, five queries and the
+  two polls' five requests, each at least 20 seconds after the host's last
+  response, with the default User-Agent. No request was refused.
+
 ## Not now
 
 | Metro (missing) | Why not | Re-check when |
@@ -103,6 +159,8 @@ Tacoma with deeds from Pierce County's weekly sales file, which makes 25.
 | Phoenix (`311`) | myPHX311 is a Dynamics 365 portal with no public API. The nearest CKAN datasets are police calls (hundred-block only) and property-maintenance cases with no date column. | A 311 package appears on phoenixopendata.com. |
 | Spokane (`311`) | My Spokane 311 is vendor-hosted Salesforce with no API; the City portal serves a JavaScript challenge; the County GIS has no request layer. | A request layer appears on the County GIS. |
 | Virginia Beach (`311`) | VB311 is Salesforce (portal and CRM). No request-level dataset exists in the Hub (0 results for 311), the 366-service AGOL org, the state CKAN harvest, or the on-premises `geo.vbgov.com` server, whose CRM_311 service holds reference layers only. Code-enforcement cases are closed-only, with no case id or coordinates. | A 311 item appears in the Hub or `geo.vbgov.com/.../Business_Systems`. |
+| Chandler (`311`) | Residents report through the PublicStuff app, a vendor CRM with no public API. Neither the City's Enterprise portal (`gis.chandleraz.gov/portalserver`, 128 anonymous services), its ArcGIS Online org (174 feature and map services) nor its Hub carries a request log; `data.chandlerpd.com` is police calls for service. | A request layer appears in the City's org, Hub or portal. |
+| Glendale, AZ (`permits`) | The `Building_Safety` service answers "Token Required"; no anonymous layer among the City's 216 services or its ArcGIS Online org holds permits. The only row-level output is a monthly PDF report from the Hansen system (463 permits in August 2026) that names owners and has no coordinates. | `Building_Safety` opens anonymously or the OpenData folder gains a permits layer. |
 | Eugene (`permits`) | Permits live in the City's in-house eBuild system; the only public export is a form-post report (PDF or Excel) carrying owner and contractor names and no coordinates. Springfield uses Accela Citizen Access. | A permits layer appears in the City AGOL org or DCAT feed. |
 | Prince George's County (`permits`) | The Planning `MomentumPermitLocation` point layer (27,558 rows, native points, clean schema) is one bulk load dated 2026-04-02 whose newest issuance is 2026-03-31, with nothing since; the Socrata successor `245r-4wz8` stopped on 2025-07-28 and `weik-ttee` is a legacy tail of about 1%. | `DATE_LOADED_PPD` moves past 2026-04-02 (the host then needs `ANSI_DATE_LITERAL_HOSTS`). |
 

@@ -214,7 +214,12 @@
       "interval_seconds": 300.0,
       "topic": "raw.municipal.permits"
     },
-    "311": null,
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "ClosedDate",
+      "interval_seconds": 21600.0,
+      "topic": "raw.municipal.311"
+    },
     "sla": {
       "platform": "arcgis",
       "watermark_col": "BusinessStartDate",

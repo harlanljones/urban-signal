@@ -4768,7 +4768,7 @@
       "submarket_count": 10,
       "feeds": [
         true,
-        false,
+        true,
         true,
         true
       ],
@@ -4779,7 +4779,12 @@
           "interval_seconds": 300.0,
           "topic": "raw.municipal.permits"
         },
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "ClosedDate",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "BusinessStartDate",

@@ -2272,6 +2272,12 @@ class Settings(BaseSettings):
         default="https://maps.scottsdaleaz.gov/arcgis/rest/services/OpenData_Tabular/MapServer/6",
         description="Scottsdale business licenses ArcGIS MapServer table URL (SLA)",
     )
+    # ScottsdaleEZ, the city's customer service requests: each request once
+    # it closes, at its hundred block (2026-09-30).
+    scottsdale_311_endpoint: str = Field(
+        default="https://maps.scottsdaleaz.gov/arcgis/rest/services/OpenData_Tabular/MapServer/28",
+        description="Scottsdale EZ closed service requests ArcGIS MapServer table URL (311)",
+    )
     long_beach_sla_endpoint: str = Field(
         default="https://services6.arcgis.com/yCArG7wGXGyWLqav/arcgis/rest/services/Business_Licenses_Public_View/FeatureServer/0",
         description="Long Beach business licenses ArcGIS FeatureServer URL (SLA)",
