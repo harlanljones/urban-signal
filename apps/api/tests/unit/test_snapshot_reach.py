@@ -27,6 +27,10 @@ DEFAULT_CAP = JobConfig.batch_limit
 
 # Rows in the filtered source table, for feeds read in full.
 FULL_READ_ROWS = {
+    # Deschutes County sales on the four township-ranges under Bend's metro
+    # box, dated in the spec's 90-day window, read 2026-09-30 (1,019 of them
+    # fall in the box).
+    ("bend", "deeds"): 1_048,
     ("bend", "sla"): 5_981,
     # Chandler, Glendale, Phoenix, Scottsdale and Tempe deeds (Maricopa
     # Assessor): the deeds dated in each spec's 90-day window inside its

@@ -376,6 +376,9 @@ class MunicipalIngestionScheduler:
                     # sales) takes each row's coordinates from its parcel's
                     # centroid.
                     "parcel_join": dict(ds.parcel_join or {}),
+                    # A county-wide source keeps only the rows placed inside
+                    # the city's metro box (Bend's Deschutes County sales).
+                    "metro_clip": ds.metro_clip,
                 }
                 self.configs[job_name] = JobConfig(
                     name=job_name,
@@ -866,6 +869,36 @@ class MunicipalIngestionScheduler:
             joined.append({**row, "latitude": centroid[0], "longitude": centroid[1]} if centroid else row)
         return joined
 
+    def _metro_clip(self, job_name: str) -> Callable[[dict[str, Any]], bool] | None:
+        """The test a ``metro_clip`` feed's rows pass: placed inside the metro box.
+
+        A row is placed by the columns its field map names for latitude and
+        longitude, else by ``latitude``/``longitude`` (a parcel join's
+        centroid, or the ArcGIS client's). Feeds without the flag get None.
+        """
+        meta = self.job_metadata[job_name]
+        if not meta.get("metro_clip"):
+            return None
+        from src.producers.field_maps import first_mapped, resolve_field_map
+        from src.spatial.city_registry import REGISTRY, CityId, FeedType
+
+        box = REGISTRY[CityId(meta["city_id"])].metro_bbox
+        try:
+            field_map = resolve_field_map(meta["city_id"], FeedType(meta["feed_type"]))
+        except ValueError:
+            field_map = {}
+
+        def inside(row: dict[str, Any]) -> bool:
+            lat = first_mapped(row, field_map, "latitude") or row.get("latitude")
+            lng = first_mapped(row, field_map, "longitude") or row.get("longitude")
+            try:
+                lat, lng = float(lat), float(lng)
+            except (TypeError, ValueError):
+                return False
+            return box["min_lat"] <= lat <= box["max_lat"] and box["min_lng"] <= lng <= box["max_lng"]
+
+        return inside
+
     def poll_job(
         self,
         job_name: str,
@@ -907,6 +940,7 @@ class MunicipalIngestionScheduler:
         records_fetched = 0
         records_published = 0
         duplicates_skipped = 0
+        outside_metro = 0
         new_high_watermark = met.high_watermark
         # US-111 future-watermark guard: advance the high watermark only with
         # values at or before now (mirrors the staleness probe), so one
@@ -951,6 +985,7 @@ class MunicipalIngestionScheduler:
                 for k in _PAGINATE_KWARGS.get(meta.get("platform", "socrata"), ())
                 if meta.get(k)
             }
+            clip = self._metro_clip(job_name)
             for batch in self._paginating_client_for(job_name).paginate(
                 endpoint_url=meta["endpoint"],
                 where_clause=active_where,
@@ -965,6 +1000,9 @@ class MunicipalIngestionScheduler:
 
                 for row in batch:
                     records_fetched += 1
+                    if clip is not None and not clip(row):
+                        outside_metro += 1
+                        continue
                     rec_id = self._extract_record_id(job_name, row)
 
                     # Deduplication check
@@ -1131,6 +1169,8 @@ class MunicipalIngestionScheduler:
                 duplicates_skipped,
                 new_high_watermark,
             )
+            if outside_metro:
+                logger.info("Job '%s': skipped %d rows outside the metro box", job_name, outside_metro)
 
         except Exception as poll_err:
             met.errors_count += 1
@@ -1157,6 +1197,7 @@ class MunicipalIngestionScheduler:
             "records_fetched": records_fetched,
             "records_published": records_published,
             "duplicates_skipped": duplicates_skipped,
+            "outside_metro": outside_metro,
             "high_watermark": met.high_watermark,
             "error": met.last_error,
         }

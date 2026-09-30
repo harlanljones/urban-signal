@@ -56,6 +56,9 @@ class _FakeScheduler:
     def _extract_record_id(self, job_name, row):
         return f"{job_name}:{row.get('permitnumber', row.get('_id', 'x'))}"
 
+    def _metro_clip(self, job_name):
+        return None
+
     def _paginating_client_for(self, job_name):
         return self.clients[job_name]
 
@@ -343,6 +346,32 @@ def test_a_richmond_backfill_finds_the_workbook_and_places_each_sale(scheduler):
     assert (lookup["join_key"], lookup["join_values"]) == ("PIN", ["W0001234005"])
     event = producer.producer.produce.call_args.kwargs["payload"]
     assert (event.latitude, event.longitude) == (37.553, -77.462)
+
+
+def test_a_bend_backfill_keeps_the_sales_its_metro_box_holds(scheduler):
+    """A backfill clips Deschutes County's sales to Bend's box as the poll does."""
+    producer = scheduler.producers["deeds"]
+    rows = [
+        {"OBJECTID": 1, "Taxlot": "181208AB09999", "Book_Page_1": "2026-99999",
+         "Sales_Date_1": "2026-09-15T00:00:00+00:00", "Total_Sales_Price_1": 612000.0,
+         "Reject_Description_1": "CONFIRMED SALE"},
+        {"OBJECTID": 2, "Taxlot": "171229DD09999", "Book_Page_1": "2026-99998",
+         "Sales_Date_1": "2026-09-14T00:00:00+00:00", "Total_Sales_Price_1": 0.0,
+         "Reject_Description_1": "GRANTOR/GRANTEE ARE THE SAME"},
+    ]
+    producer.arcgis.paginate = MagicMock(return_value=[rows])
+    producer.arcgis.fetch_centroid_index = MagicMock(
+        return_value={"181208AB09999": (44.0480, -121.3120), "171229DD09999": (44.1500, -121.3300)}
+    )
+
+    report = backfill_job(
+        scheduler, "deeds_bend", since_dt=None, max_rows=None, page_size=None, batch_delay_seconds=0,
+    )
+
+    assert (report["fetched"], report["published"], report["outside_metro"]) == (2, 1, 1)
+    scheduler.dlq_producer.route_to_dlq.assert_not_called()
+    event = producer.producer.produce.call_args.kwargs["payload"]
+    assert (event.bbl, event.latitude, event.longitude) == ("181208AB09999", 44.0480, -121.3120)
 
 
 def test_backfill_job_counts_and_watermark():

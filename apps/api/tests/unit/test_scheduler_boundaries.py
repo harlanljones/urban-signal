@@ -356,6 +356,91 @@ class TestSaleRows:
             ("13299998", 33.4150, -111.9095),
         ]
 
+    def test_a_bend_poll_keeps_the_sales_its_metro_box_holds(self, scheduler):
+        """Deschutes County's sales table covers the county. Each sale takes
+        its taxlot's centroid, and a poll keeps the ones inside Bend's metro
+        box; a sale outside it, or on a taxlot the join cannot find, is
+        skipped and counted, never dead-lettered."""
+        producer = scheduler.producers["deeds"]
+        rows = [
+            {"OBJECTID": 1, "Taxlot": "181208AB09999", "Book_Page_1": "2026-99999",
+             "Sales_Date_1": "2026-09-15T00:00:00+00:00", "Total_Sales_Price_1": 612000.0,
+             "Reject_Description_1": "CONFIRMED SALE"},
+            {"OBJECTID": 2, "Taxlot": "171229DD09999", "Book_Page_1": "2026-99998",
+             "Sales_Date_1": "2026-09-14T00:00:00+00:00", "Total_Sales_Price_1": 0.0,
+             "Reject_Description_1": "GRANTOR/GRANTEE ARE THE SAME"},
+            {"OBJECTID": 3, "Taxlot": "181211CC09999", "Book_Page_1": "2026-99997",
+             "Sales_Date_1": "2026-09-14T00:00:00+00:00", "Total_Sales_Price_1": 390000.0,
+             "Reject_Description_1": "UNCONFIRMED SALE"},
+        ]
+        producer.arcgis.paginate = MagicMock(return_value=[rows])
+        producer.arcgis.fetch_centroid_index = MagicMock(
+            return_value={"181208AB09999": (44.0480, -121.3120), "171229DD09999": (44.1500, -121.3300)}
+        )
+
+        result = scheduler.poll_job("deeds_bend", limit=10)
+
+        assert (result["records_fetched"], result["records_published"], result["outside_metro"]) == (3, 1, 2)
+        scheduler.dlq_producer.route_to_dlq.assert_not_called()
+        assert _where(producer, "arcgis") == (
+            "((Taxlot LIKE '1711%' OR Taxlot LIKE '1712%' OR Taxlot LIKE '1811%' OR Taxlot LIKE '1812%') "
+            "AND Sales_Date_1 >= CURRENT_DATE - INTERVAL '90' DAY AND Sales_Date_1 <= CURRENT_TIMESTAMP)"
+        )
+        kwargs = producer.arcgis.fetch_centroid_index.call_args.kwargs
+        assert kwargs["endpoint_url"].endswith("/Taxlots/FeatureServer/0")
+        assert (kwargs["join_key"], kwargs["join_values"]) == (
+            "TAXLOT", ["181208AB09999", "171229DD09999", "181211CC09999"]
+        )
+        event = producer.producer.produce.call_args.kwargs["payload"]
+        assert (event.doc_id, event.bbl, event.doc_type) == ("2026-99999", "181208AB09999", "CONFIRMED SALE")
+        assert (event.latitude, event.longitude, event.document_amount) == (44.0480, -121.3120, 612000.0)
+
+    def test_a_sale_the_join_cannot_place_yet_publishes_once_it_can(self, scheduler):
+        """A skipped row is not marked seen, so it publishes on the poll that
+        places it."""
+        producer = scheduler.producers["deeds"]
+        sale = {"OBJECTID": 1, "Taxlot": "181208AB09999", "Book_Page_1": "2026-99999",
+                "Sales_Date_1": "2026-09-15T00:00:00+00:00", "Total_Sales_Price_1": 612000.0,
+                "Reject_Description_1": "CONFIRMED SALE"}
+        producer.arcgis.paginate = MagicMock(return_value=[[sale]])
+
+        producer.arcgis.fetch_centroid_index = MagicMock(return_value={})
+        unplaced = scheduler.poll_job("deeds_bend", limit=10)
+        producer.arcgis.fetch_centroid_index = MagicMock(return_value={"181208AB09999": (44.0480, -121.3120)})
+        placed = scheduler.poll_job("deeds_bend", limit=10)
+
+        assert [(r["records_published"], r["outside_metro"]) for r in (unplaced, placed)] == [(0, 1), (1, 0)]
+
+    def test_a_feed_without_the_clip_publishes_outside_its_box(self, scheduler):
+        """Phoenix's city limits reach north of its metro box along I-17, and
+        its deeds keep those sales."""
+        producer = scheduler.producers["deeds"]
+        rows = [
+            {"OBJECTID": 900003, "APN": "20299999", "DEED_NUMBER": "20269999997",
+             "DEED_DATE": "2026-09-15T00:00:00+00:00", "SALE_PRICE": "610000",
+             "LATITUDE": 33.8800, "LONGITUDE": -112.1600},
+        ]
+        producer.arcgis.paginate = MagicMock(return_value=[rows])
+
+        result = scheduler.poll_job("deeds_phoenix", limit=10)
+
+        assert (result["records_published"], result["outside_metro"]) == (1, 0)
+
+    def test_the_clip_reads_a_rows_mapped_coordinates_first(self, scheduler):
+        """A row is placed where its event will be: by the columns its field
+        map names, else by ``latitude``/``longitude``."""
+        assert scheduler._metro_clip("deeds_hartford") is None
+        scheduler.job_metadata["deeds_tempe"]["metro_clip"] = True
+        inside = scheduler._metro_clip("deeds_tempe")
+
+        in_tempe, north_of_it = (33.4148, -111.9093), (33.6000, -111.7000)
+        assert inside({"LATITUDE": in_tempe[0], "LONGITUDE": in_tempe[1],
+                       "latitude": north_of_it[0], "longitude": north_of_it[1]})
+        assert not inside({"LATITUDE": north_of_it[0], "LONGITUDE": north_of_it[1],
+                           "latitude": in_tempe[0], "longitude": in_tempe[1]})
+        assert inside({"latitude": in_tempe[0], "longitude": in_tempe[1]})
+        assert not inside({"APN": "13299999"})
+
     def test_a_license_joins_its_parcel_by_the_tables_column_name(self, scheduler, monkeypatch):
         """Lynchburg's licence table spells the key ParcelID and its parcel
         polygons Parcel_ID; the licence takes the centroid, never a geocode."""

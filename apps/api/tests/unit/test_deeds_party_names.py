@@ -62,6 +62,8 @@ MARICOPA_OWNER_COLUMNS = {
             (city, MARICOPA_OWNER_COLUMNS)
             for city in (CityId.PHOENIX, CityId.TEMPE, CityId.CHANDLER, CityId.SCOTTSDALE, CityId.GLENDALE_AZ)
         ),
+        # Deschutes County's sales table names both parties of each sale.
+        (CityId.BEND, {"Seller_1", "Buyer_1", "Seller_2", "Buyer_2"}),
     ],
 )
 def test_owner_columns_stay_on_the_server(city, owner_columns):

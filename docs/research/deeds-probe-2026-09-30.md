@@ -6,22 +6,23 @@ property transfers with a date, a price and a way to place it on the map.
 Three registered first. Tempe followed later the same day from the Maricopa
 County Assessor's parcel layer, with Chandler, Glendale and Scottsdale, which
 gain deeds as a third family, and Phoenix, whose deeds move to the same layer.
-Three have a source that needs client work first, two are held and thirteen
-have none.
+Bend followed from Deschutes County's sales table, with a scheduler flag that
+keeps a county-wide source's rows inside the metro box. Two have a source that
+needs client work first, two are held and thirteen have none.
 
 | Verdict | Metros |
 |---|---|
-| Registered here | Nashville, Hartford, Denver; then Tempe (with Chandler, Glendale, Scottsdale and a Phoenix repair) |
-| Source found, needs client work | Bend, Medford, Tacoma |
+| Registered here | Nashville, Hartford, Denver; then Tempe (with Chandler, Glendale, Scottsdale and a Phoenix repair); then Bend |
+| Source found, needs client work | Medford, Tacoma |
 | Held | Minneapolis, San Diego |
 | No source | Austin, Baton Rouge, Billings, Dallas, El Paso, Los Angeles, Louisville, Memphis, Montgomery AL, Sacramento, San Antonio, San Jose, St. Louis |
 
-| Tier (families) | Before | After Denver, Hartford, Nashville | After Maricopa |
-|---|---|---|---|
-| 4 | 18 | 21 | **22** (Tempe) |
-| 3 | 33 | 30 | 32 (Chandler, Glendale, Scottsdale in; Tempe out) |
-| 2 | 72 | 72 | 69 |
-| 1 | 34 | 34 | 34 |
+| Tier (families) | Before | After Denver, Hartford, Nashville | After Maricopa | After Bend |
+|---|---|---|---|---|
+| 4 | 18 | 21 | 22 (Tempe) | **23** (Bend) |
+| 3 | 33 | 30 | 32 (Chandler, Glendale, Scottsdale in; Tempe out) | 31 |
+| 2 | 72 | 72 | 69 | 69 |
+| 1 | 34 | 34 | 34 | 34 |
 
 Phoenix already counted deeds, from a file that dead-lettered every row, so
 its tier does not change.
@@ -134,11 +135,46 @@ requests an owner column or sends an address to the geocoder.
   and Tempe 2,000, each at least 1.5 times its window. Pages hold 1,000 rows,
   so the five take 18 requests a poll, about 72 a day.
 
+### Bend — the county's sales, placed on their taxlots and kept to the box
+
+- **Source:** Deschutes County's `GIS_SALES` table,
+  `services1.arcgis.com/znO8Hz1SuVVohYhZ/.../Taxlots/FeatureServer/8`
+  (109,474 rows, one per taxlot, each holding its two latest sales; `_1` is
+  the newest). Its edit stamp read 2026-09-30 09:33Z, so it reloads
+  overnight (one observation). The feed reads `Sales_Date_1`,
+  `Total_Sales_Price_1`, `Book_Page_1` (the recording's year and number) and
+  `Reject_Description_1`, the assessor's verdict on the sale (unconfirmed,
+  grantor and grantee the same, related parties, new construction,
+  confirmed), which becomes the event's `doc_type` as Hartford's sale code
+  does.
+- **Placement:** the table has no geometry, so each sale takes its taxlot's
+  centroid from the county's taxlot polygons (`Taxlots/FeatureServer/0`),
+  joined `Taxlot` to `TAXLOT`: 2,104 of the 2,105 sales in the window.
+- **Only Bend's sales:** the table has no city column. The account table's
+  `City` is the postal city, which puts 238 of 1,220 "BEND" sales outside
+  the metro box, and its `UGB` column is empty. So the filter keeps the four
+  township-ranges under the box: each of the 50,356 taxlots that touch the
+  box starts with `1711`, `1712`, `1811` or `1812`, and 1,048 of the county's
+  2,105 sales fall on them. A new `metro_clip` flag then skips each row whose
+  placed point lies outside the box, or that the join could not place,
+  before dedup and without dead-lettering it: 29 on 2026-09-30, leaving
+  1,019.
+- **Window:** the sales dated in the 90 days before each poll, up to now. The
+  upper bound keeps out 38 sales in the county dated after today (the earlier
+  probe saw years 2027, 2044 and 4004 among them).
+- **Several taxlots, one sale:** 1,019 rows carry 943 recording numbers. The
+  record id joins `Taxlot`, `Sales_Date_1` and `Book_Page_1`.
+- **Party columns:** `Seller_1`, `Buyer_1`, `Seller_2` and `Buyer_2` stay off
+  the request through `select`.
+- **Freshness:** the newest sale was dated 2026-09-26, and daily counts taper
+  after mid-September. `expected_cadence_days` is 7.
+- **Cap:** 2,500 rows. A poll takes about 20 requests: two pages and the
+  taxlot lookups, which the client batches about 60 to a query.
+
 ## Sources that need client work first
 
 | Metro | Source | What it needs |
 |---|---|---|
-| Bend | Deschutes County `GIS_SALES`, `services1.arcgis.com/znO8Hz1SuVVohYhZ/.../Taxlots/FeatureServer/8`: each taxlot's two most recent sales, refreshed overnight, joined to its polygon (`/0`) on `TAXLOT` (200 of 200). | The table is county-wide with no city column (Bend is 1,220 of 2,105 sales in 90 days), so it needs a city filter through the situs table (`/1`) or a box after the join. |
 | Medford | Jackson County `PropertySales`, `spatial.jacksoncountyor.gov/arcgis/rest/services/Demog/PropertySales/FeatureServer/0`: the latest sale per account with price and document number, two to three days behind; 310 Medford sales in 90 days. | The server sends a malformed `Content-Security-Policy` header that the HTTP client rejects on every request, and it accepts only ANSI date literals. |
 | Tacoma | Pierce County's weekly `sale.zip` (`online.co.pierce.wa.us/datamart/`), every sale since 1997, joined to the county's `Tax_Parcels` layer. | The file is pipe-delimited with no header row, which the CSV client cannot read. It is county-wide, so it needs a box filter, and it runs four to five weeks behind. |
 
@@ -205,10 +241,12 @@ source on 2026-09-30, with Kafka mocked.
 | Glendale, AZ `deeds` | 1,263 | 1,263 | 1,263 | 0 | 2026-07-02 to 2026-09-22 | 521 | 0 new of 1,263 |
 | Scottsdale `deeds` | 2,507 | 2,507 | 2,507 | 0 | 2026-07-02 to 2026-09-22 | 1,032 | 0 new of 2,507 |
 | Phoenix `deeds` | 9,224 | 9,224 | 9,191 | 0 | 2026-07-02 to 2026-09-22 | 3,772 | 0 new of 9,224 |
+| Bend `deeds` | 1,048 | 1,019 (29 outside the box skipped) | 1,019 | 0 | 2026-07-02 to 2026-09-26 | 617 | 0 new of 1,019 |
 
 No poll made a geocoder query or requested an owner column. A first poll of
 the first three took 4 to 8 requests and 10 to 20 seconds; a first poll of
 the Maricopa feeds took 2 to 10, spaced 2 seconds apart, and 5 to 48 seconds.
+Bend's took 22 requests and 62 seconds, spaced 2.2 seconds apart.
 
 ## Probe conduct
 
@@ -230,14 +268,20 @@ the previous response from the host by about 0.3 seconds, because each came
 from a new process that did not share the pacing clock; within a process,
 requests were at least 2 seconds apart.
 
+The Bend follow-up kept one pacing clock across its processes, at least 2.2
+seconds from the end of one response to the next request, and asked for no
+party column. One request with a long taxlot list answered 404; the same
+lookups went again as POST requests in batches of 500.
+
 ## Not covered here
 
 - **A deed on several parcels.** Each parcel's row publishes, but the rows
   share one instrument number, and PostGIS keeps one row per `doc_id`, as it
   does for Las Vegas, Lynchburg and Columbus. In Nashville's sample, 7 of 200
   instruments covered more than one parcel.
-- **The candidates above.** Bend, Medford and Tacoma each need the client
-  change named in their row.
+- **The candidates above.** Medford and Tacoma each need the client change
+  named in their row. Tacoma's county-wide file could use `metro_clip` once
+  the CSV client reads it.
 - **The parcel outlines.** The Maricopa layer returns each parcel's polygon
   with its row, which the feeds do not need since the layer's own coordinates
   place the deed. The scheduler has no per-feed switch for `returnGeometry`.

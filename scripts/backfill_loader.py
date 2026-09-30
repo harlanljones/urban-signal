@@ -220,7 +220,7 @@ def backfill_job(
     platform = meta.get("platform", "socrata")
     city_id = meta["city_id"]
 
-    fetched = published = duplicates = drops = 0
+    fetched = published = duplicates = drops = outside_metro = 0
     max_watermark_seen: str | None = None
     error: str | None = None
     # US-111 future-watermark guard (mirrors the scheduler): a future/sentinel
@@ -238,6 +238,7 @@ def backfill_job(
         producer_wrapper = scheduler.producers[meta["producer_key"]]
         where_clause, client_kwargs = build_query_shape(meta, since_dt)
         effective_page = page_size or PLATFORM_PAGE_SIZE.get(platform, 1000)
+        clip = scheduler._metro_clip(job_name)
         for batch in client.paginate(
             endpoint_url=meta["endpoint"],
             where_clause=where_clause,
@@ -261,6 +262,11 @@ def backfill_job(
 
             for row in batch:
                 fetched += 1
+                # A county-wide source keeps only its metro's rows, as
+                # poll_job does.
+                if clip is not None and not clip(row):
+                    outside_metro += 1
+                    continue
                 rec_id = scheduler._extract_record_id(job_name, row)
 
                 if scheduler.dedup.check_and_add(rec_id):
@@ -348,6 +354,7 @@ def backfill_job(
         "published": published,
         "duplicates": duplicates,
         "parse_drops": drops,
+        "outside_metro": outside_metro,
         "max_watermark_seen": max_watermark_seen,
         "error": error,
     }

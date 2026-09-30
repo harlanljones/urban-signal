@@ -308,6 +308,12 @@ class DatasetSpec:
     # combination: a sale keyed by parcel and instrument, where the parcel
     # repeats on every sale of that parcel.
     composite_id: bool = False
+    # A county-wide source keeps only the rows placed inside the city's
+    # metro box: a poll skips each row whose coordinates (its own, or its
+    # parcel's centroid from ``parcel_join``) are missing or outside, before
+    # dedup, and counts it. Deschutes County's sales table covers the whole
+    # county, and Bend keeps the sales inside its box.
+    metro_clip: bool = False
     # A file renamed with each release is registered by the page that links
     # it: the client reads ``endpoint`` and downloads the newest link whose URL
     # matches this pattern (Richmond's monthly transfers workbook).

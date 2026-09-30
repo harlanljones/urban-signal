@@ -98,6 +98,12 @@ row per parcel with its latest deed, so each feed filters to its own city and
 the 90 days before each poll and reads those whole. Phoenix's leaves the known
 gaps below.
 
+Bend `deeds` (1,048 rows, cap 2,500) joined after them. Deschutes County's
+sales table covers the county, so the feed reads the sales dated in the 90
+days before each poll on the four township-ranges under Bend's metro box,
+places each on its taxlot, and skips the 29 that land outside the box
+(`metro_clip`, `deeds-probe-2026-09-30.md`).
+
 ## Newest-first windows
 
 | Feed | Order | Rows dated in last 30 / 90 days | Window after |

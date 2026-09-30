@@ -1506,3 +1506,20 @@ Worth keeping:
   on it never goes stale.
 - **Bound the window above.** Parcel layers carry future-dated sentinels
   (2044 to 2099 here); `<= CURRENT_TIMESTAMP` keeps them out.
+
+### 2026-09-30 — Bend deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| bend-deeds | `.streams/bend-deeds.md` | `city_registry.py` + `scheduler.py` (`metro_clip`), `config.py` (the sales table, the taxlot layer) | 2026-09-30 | done (1,048 county sales read on Bend's township-ranges, 1,019 placed inside the metro box and published, 29 skipped, none dead-lettered, the second poll published none) | `deeds` spec for Bend; `metro_clip` in poll_job and backfills; notes in `docs/research/deeds-probe-2026-09-30.md`; regenerated facts |
+
+Bend moves to all four signal families (22 to 23).
+
+Worth keeping:
+
+- **A postal city is not the city.** Deschutes County's account table says
+  "BEND" for rural addresses well outside the city; check a city column
+  against the map before filtering on it.
+- **A parcel id can carry its place.** Oregon taxlot ids start with the
+  township and range, so a prefix filter narrows a county table to the ground
+  under a metro box before any join.

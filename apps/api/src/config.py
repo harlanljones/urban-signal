@@ -2142,6 +2142,17 @@ class Settings(BaseSettings):
         default="https://services5.arcgis.com/JisFYcK2mIVg9ueP/arcgis/rest/services/Public_Calls/FeatureServer/0",
         description="Bend public calls for service ArcGIS FeatureServer URL (crime)",
     )
+    # Deschutes County's sales table: each taxlot's two latest sales, no
+    # geometry, county-wide. Bend deeds place each sale on its taxlot polygon
+    # and keep those inside the metro box (2026-09-30).
+    arcgis_bend_deeds_url: str = Field(
+        default="https://services1.arcgis.com/znO8Hz1SuVVohYhZ/arcgis/rest/services/Taxlots/FeatureServer/8",
+        description="Deschutes County GIS_SALES table with each taxlot's latest sales (Bend deeds snapshot)",
+    )
+    arcgis_deschutes_taxlots_url: str = Field(
+        default="https://services1.arcgis.com/znO8Hz1SuVVohYhZ/arcgis/rest/services/Taxlots/FeatureServer/0",
+        description="Deschutes County taxlot polygons that place Bend's sales (parcel join)",
+    )
     arcgis_vancouver_wa_permits_url: str = Field(
         default="https://services.arcgis.com/oNvpY90qsPDizwkN/arcgis/rest/services/Permits_and_Code_Enforcement_Data_(public_view)/FeatureServer/0",
         description="Vancouver WA permits ArcGIS FeatureServer URL",

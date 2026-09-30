@@ -23,6 +23,7 @@ day with deeds from their parcel records, which makes 21
 ([deeds-probe-2026-09-30.md](deeds-probe-2026-09-30.md)). Tempe followed with
 deeds from the Maricopa County Assessor's parcel layer, which makes 22, and
 Chandler, Glendale and Scottsdale gained a third family from the same layer.
+Bend followed with deeds from Deschutes County's sales table, which makes 23.
 
 ## Registered
 
