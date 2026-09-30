@@ -1,4 +1,10 @@
-"""San Antonio / Bexar County, Texas spatial registry and geometry."""
+"""San Antonio / Bexar County, Texas spatial registry and geometry.
+
+Permits (2026-09-30): the CKAN column ``DATE ISSUED`` holds ``YYYY-MM-DD``
+text, so the watermark is text in that format (ADR 0005). An ISO watermark
+compared as text sorted each date below its own midnight, and a poll from a
+whole day skipped that day's rows.
+"""
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 

@@ -230,6 +230,22 @@ ANSI_DATE_LITERAL_HOSTS = (
 )
 
 
+def casts_text_watermark(
+    endpoint: str, watermark_type: str | None, watermark_format: str | None
+) -> bool:
+    """Whether a filter casts a text watermark to a timestamp on both sides.
+
+    San Jose's CKAN permits/311 exports store dates as M/D/YYYY text. A raw
+    string comparison would make `8/9` sort after `8/22`; the filter casts
+    both sides in CKAN's SQL dialect while scheduler state keeps the raw format.
+    """
+    return (
+        endpoint.startswith("ckan://")
+        and watermark_type == "text"
+        and watermark_format == "%m/%d/%Y %I:%M:%S %p"
+    )
+
+
 def watermark_comparison(
     watermark_col: str,
     op: str,
@@ -256,14 +272,7 @@ def watermark_comparison(
     without it DC's 311 filter started four hours late (Eastern) and skipped
     the requests filed in between.
     """
-    # San Jose's CKAN permits/311 exports store dates as M/D/YYYY text. A raw
-    # string comparison would make `8/9` sort after `8/22`; cast both sides in
-    # CKAN's SQL dialect while retaining the raw format in scheduler state.
-    if (
-        endpoint.startswith("ckan://")
-        and watermark_type == "text"
-        and watermark_format == "%m/%d/%Y %I:%M:%S %p"
-    ):
+    if casts_text_watermark(endpoint, watermark_type, watermark_format):
         escaped = value.replace("'", "''")
         pg_format = "MM/DD/YYYY HH12:MI:SS AM"
         return (

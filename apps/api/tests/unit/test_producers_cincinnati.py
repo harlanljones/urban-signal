@@ -47,7 +47,9 @@ def test_cincinnati_registers_four_verified_feeds():
     assert REGISTRY[city].datasets[FeedType.SLA].watermark_col == "entered_date"
     spec = get_dataset(city, FeedType.DEEDS)
     assert spec.platform == "csv"
-    assert spec.watermark_col == "SaleDate"
+    # The sale date is split across MonthSale/DaySale/YearSale: no column to
+    # filter on, so the snapshot names none and a backfill reads the file.
+    assert (spec.watermark_col, spec.ingestion_mode) == ("", "snapshot")
     assert spec.id_keys == ["conveyancenumber", "propertynumber"]
 
 
@@ -57,7 +59,7 @@ def test_cincinnati_registers_four_verified_feeds():
         (FeedType.PERMITS, "uhjb-xac9", "issueddate"),
         (FeedType.COMPLAINTS_311, "gcej-gmiw", "date_time_received"),
         (FeedType.SLA, "ehdi-ajku", "entered_date"),
-        (FeedType.DEEDS, "transfer_dailysales_new.csv", "SaleDate"),
+        (FeedType.DEEDS, "transfer_dailysales_new.csv", ""),
     ],
 )
 def test_cincinnati_specs_pin_researched_sources(feed, endpoint, watermark):

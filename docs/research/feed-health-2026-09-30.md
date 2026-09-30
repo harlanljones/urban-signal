@@ -12,7 +12,9 @@ no sales (see "Mid-Atlantic deeds"). A third fixes the filter an incremental
 poll sends, which a second poll of every affected feed showed was failing on
 32 feeds and reading the wrong rows on others (see "Incremental filters"). A
 fourth reads Richmond's sales from the assessor's monthly workbook (see
-"Richmond's transfers workbook").
+"Richmond's transfers workbook"). A fifth makes a backfill read each feed the
+way its poll does, and repairs three feeds' polls that the check turned up
+(see "Backfills").
 
 | | Jobs | Repaired here | Left, with reason below |
 |---|---|---|---|
@@ -419,11 +421,10 @@ The fourth stacked change reads it without new dependencies:
   request; DC's space-padded `SSL` values now send about 47.
 - **No party names.** `GRANTEE` and `GRANTOR` never leave the client: the
   spec's `select` names only the columns the feed reads.
-- **Not in backfills yet.** `scripts/backfill_loader.py` hands a client only
-  its own `order_by`, not a spec's `select`, `link_pattern`, CSV `zip_member`
-  or parcel join. A Richmond backfill reads the media page as a workbook and
-  fails, and a backfill of an ArcGIS feed whose `select` keeps names on the
-  server reads every column. Left for a later change.
+- **Backfills.** `scripts/backfill_loader.py` handed a client only its own
+  `order_by`, so a Richmond backfill read the media page as a workbook and
+  failed. The fifth change passes the `select`, `link_pattern` and parcel join
+  to backfills too (see "Backfills").
 
 Polled live through `poll_job` on 2026-09-30, Kafka mocked: 6,650 sales
 fetched and published, none dead-lettered, 6,647 placed at a parcel centroid
@@ -432,3 +433,129 @@ inside the metro box (three found no parcel), dated 2025-09-30 to
 poll got a 304 and read nothing. A cold start publishes the whole year once,
 about 22 minutes at the scheduler's 0.2 seconds a row; after that, a new
 workbook brings its month's new sales.
+
+## Backfills
+
+`scripts/backfill_loader.py` loads a feed's history through the scheduler's
+clients, producers, dedup filter and DLQ, but it built each query itself and
+handed the client nothing but an order. The fifth stacked change makes a
+backfill read each feed the way `poll_job` does:
+
+- **The poll's client arguments.** A backfill now hands the client what
+  `poll_job` hands it: a spec's `select`, which keeps owner and party names on
+  the server; Richmond's `link_pattern`; a zipped CSV's member and delimiter;
+  a Carto keyset column; a CSV's fallback endpoints and typed watermark column.
+  A test polls and backfills every job with a mocked client and compares the
+  two. Only the order differs: a window pages newest first on its watermark
+  column.
+- **Parcel joins.** A sales table without geometry takes each parcel's
+  centroid, as `poll_job` places it.
+- **Text-typed windows in the column's format.** A text-typed watermark
+  (ADR 0005) compares as text, and the window started from an ISO literal.
+  Las Vegas `deeds` answered that with a 400; Virginia Beach `permits`
+  (`2026/09/10`) and Henderson `sla` (`08/20/2026`) matched nothing. The
+  window now starts in the column's own format, as a poll's stored watermark
+  does; San Jose's CKAN filter casts both sides to timestamps.
+- **Formats the server can't order are windowed client-side.** Text sorts as
+  dates only when its format is year first. No literal selects a window on
+  `MM/DD/YYYY` or Honolulu's `September 7, 2026 at 1:27 PM`: from
+  `07/02/2026`, Reno and Rochester `deeds` each read 200 sales made on a
+  December 31, from 2018 and from 1990 to 2025, and Worcester `permits` read
+  173 September rows of past years among its 200. A
+  backfill of those six feeds reads the table without the window and keeps
+  the rows inside it; the report's `outside_window` counts the rest. A CSV
+  already compares in the declared format. Such a column is not in date
+  order on the server either, so these feeds and San Jose's keep their
+  spec's order instead of paging newest first.
+- **Snapshots keep their own order.** A backfill of a feed without a
+  watermark column reads it in the spec's order, as the poll does.
+
+### Checked live
+
+On 2026-09-30 the 49 jobs whose backfill query changed were backfilled twice,
+with the old loader and the new, from 90 days back at 200 rows each, Kafka
+mocked, geocoding stubbed to the metro centre, requests 2 seconds apart. The
+feeds whose result changed:
+
+| Feed | Old loader | New loader |
+|---|---|---|
+| St. Louis `311`; Inland Empire, Oakland and Santa Rosa `sla` | read nothing: the zipped CSV's member never reached the client | 198, 186, 159 and 164 published |
+| Richmond `deeds` | failed on the media page | 200 published, all placed at a parcel centroid |
+| Lynchburg and Roanoke `deeds` | fetched party names; none placed | no names; 199 and 186 placed |
+| Burlington, Charleston WV and Providence `deeds` | fetched owner and seller columns | only the `select` columns |
+| Chattanooga `permits` | failed on the primary endpoint's 500 | 200 through its fallback |
+| Philadelphia `permits`, `sla` and `deeds` | 0 published, 0 placed and 0 placed | 199 published, 190 placed and 182 placed |
+| Las Vegas `deeds` | 400 | 200 published |
+| Virginia Beach `permits`, Henderson `sla` | read nothing | 172 and 200 published, inside the window |
+| Boston `sla` | 62 | 65 (rows from the window's first day) |
+| Milwaukee `deeds` | 200 sales from 2025 | none: the file holds only 2025 |
+
+San Jose `311`, read in full with the fixed CKAN client, shows the cast: the
+old loader's text window read 228,536 rows, 142,333 of them before the
+window; the new one reads 86,202, all inside it (44,526 published; the rest
+are `0,0` points the parser drops, as documented).
+
+The six client-windowed feeds were read in full with the new loader, again
+from 90 days back:
+
+| Feed | Rows read | Inside the window | Published | Dated |
+|---|---|---|---|---|
+| Honolulu `311` | 2,186 | 2,186 | 2,126 | 2026-08-31 to 2026-09-29 |
+| Worcester `sla` | 15,776 | 48 | 48 | 2026-07-06 to 2026-09-21 |
+| Virginia Beach `sla` | 42,135 | 606 | 556 | 2026-07-03 to 2026-08-31 |
+| Worcester `permits` | 53,271 | 1,301 | 1,301 | 2026-07-03 to 2026-09-26 |
+| Rochester `deeds` | 64,709 | 373 | 373 | 2026-07-03 to 2026-08-14 |
+| Reno `deeds` | 194,122 | 2,690 | 2,687 | 2026-07-06 to 2026-09-28 |
+
+### Repaired along the way
+
+- **St. Louis `permits`** was registered with `ISSUEDATE` as month-name text
+  (`August, 07 2026 00:00:00`); by 2026-09-30 the export wrote
+  `2026-09-18 00:00:00.0` in every row. The CSV client compares the column in
+  the declared format, and the old one parsed no row, so every poll after the
+  first read nothing. The format is now the export's, and the CSV client also
+  reads a filter literal written as ISO, as a stored watermark is. Polled
+  twice, the second from 2026-09-20, it fetched 95 rows; a backfill publishes
+  199 of 200.
+- **Laredo and San Antonio `permits`** filter on CKAN columns whose names hold
+  spaces and a dot (`PERMIT ISS. DATE`, `DATE ISSUED`). The client passed the
+  unquoted name through, and every filtered poll was a 409 syntax error. It
+  now quotes a name with spaces, in the filter and in the order (an order
+  on `DATE ISSUED` was sent as `"DATE"`). Polled twice,
+  the second from 2026-09-15 and 2026-09-25, they fetched 29 and 200 rows.
+  San Antonio's column is `YYYY-MM-DD` text, now declared so (ADR 0005): an
+  ISO watermark compared as text sorted each date below its own midnight.
+- **Cincinnati `deeds`** named a `SaleDate` column the auditor's file does
+  not have (the sale date is split across three columns), so a backfill
+  windowed on it read nothing. The feed is a snapshot and its poll never
+  filtered on the column; it now names none, and a backfill reads the file:
+  1,131 valid sales, 936 published, one per conveyance (59 sales span
+  several parcels, one of them 104).
+
+### Found, not fixed
+
+- **Polls of the six client-windowed feeds still compare text.** Reno and
+  Rochester `deeds`, Worcester `permits` and `sla`, Virginia Beach `sla` and
+  Honolulu `311` send `column > 'stored value'`, which reads the wrong rows
+  for `MM/DD/YYYY`. Their polls need an object-id cursor or a client-side
+  filter like the backfill's.
+- **Milwaukee `permits`** has not changed since 2026-06-21; its newest permit
+  was issued 2026-06-15.
+- **Cincinnati `deeds` publishes no coordinates.** Its address is split
+  across three columns, and the deeds producer geocodes a single address
+  column (`address_street`), which the feed does not map. A leaf address
+  composer, like the permits producer's, needs a spine edit.
+- **DC `deeds`** places none: condominium lots (`0016    2033`) are not in the
+  Parcel Lots layer the join reads.
+- **Philadelphia `311`**: the newest requests have no coordinates yet, and a
+  row geocoded later is never read again. **Baton Rouge `sla`**: read newest
+  first, as its poll reads it, 5 of 200 rows are placed (143 of the oldest
+  200).
+- **Owner and party names.** 16 `deeds` specs map grantor or grantee
+  columns into their events, Asheville, Miami-Dade, Philadelphia and Phoenix
+  among them, and Virginia Beach `sla` names each premises by its
+  `Owner_Name`. Las Vegas, Reno and DC `deeds` fetch owner-name columns they
+  never map, with no `select` to keep them on the server; a row that fails to
+  parse goes to the DLQ whole, and Phoenix `deeds` dead-letters every row.
+- **`source_mode`.** A backfill does not mark its events as backfilled
+  (ADR 0008, US-115).

@@ -1321,3 +1321,24 @@ Worth keeping:
 - **Check same-state overlaps.** Chandler's and Tempe's boxes share 113 stores,
   which publish under both.
 
+
+### 2026-09-30 — Backfills read each feed the way its poll does (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| backfill-args | `.streams/backfill-args.md` | none | 2026-09-30 | done (49 changed backfills checked live against the old loader; three polls repaired: St. Louis, Laredo and San Antonio `permits`) | `scripts/backfill_loader.py`, CKAN and CSV client fixes |
+
+A backfill hands its client the poll's arguments, places parcel-joined sales,
+starts a text window in the column's format and filters client-side where the
+server cannot order the text.
+
+Worth keeping:
+
+- **Compare the two paths, not the specs.** A test polls and backfills every
+  job with a mocked client and diffs the arguments; that caught the zipped
+  CSVs, the workbook and the `select`s at once.
+- **Check a declared format against today's rows.** St. Louis's export
+  changed its date format after registration, and the CSV client then parsed
+  no row; the first poll still worked, so only a second poll showed it.
+- **Look for the column.** Cincinnati's watermark column never existed in its
+  file; a snapshot poll does not notice, a windowed backfill reads nothing.

@@ -245,7 +245,7 @@ datasets:
   deeds:
     endpoint: https://www.hamiltoncountyauditor.org/download/transfer_dailysales_new.csv
     platform: csv
-    watermark_col: SaleDate
+    watermark_col: ''
     id_keys:
     - conveyancenumber
     - propertynumber

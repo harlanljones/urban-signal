@@ -66,8 +66,11 @@ class NonDatastoreResourceError(ValueError):
 
 
 # A single Socrata-ish predicate: field OP 'value' (double-quoted values also OK).
+# A field may hold spaces and dots, as CKAN column names do (Laredo's
+# ``PERMIT ISS. DATE``); the SQL quotes it. Passed through verbatim, the
+# unquoted name was a syntax error (409) on every filtered poll.
 _TERM_RE = re.compile(
-    r"""^\s*(?P<field>"?[\w]+"?)\s*
+    r"""^\s*(?P<field>"[^"]+"|[^\s()<>=!'"][^()<>=!'"]*?)\s*
         (?P<op>>=|<=|!=|<>|=|>|<)\s*
         (?P<value>'[^']*'|"[^"]*")\s*$""",
     re.VERBOSE,
@@ -81,18 +84,19 @@ def _quote_order_by(order_by: str) -> str:
     ``ORDER BY "issued_date DESC"`` is a 409 ("column does not exist") — the
     direction must stay outside the quotes. Accepts ``col``, ``col DESC``,
     ``col ASC``, and comma-separated combinations; already-quoted columns pass
-    through unchanged.
+    through unchanged. The direction is the last word when it is one, and the
+    column is the rest, spaces included (San Jose's ``Date Created``).
     """
     terms = []
     for term in order_by.split(","):
         term = term.strip()
         if not term:
             continue
-        parts = term.split()
-        col = parts[0]
-        direction = parts[1].upper() if len(parts) > 1 else ""
-        if direction not in ("ASC", "DESC"):
-            direction = ""
+        col, _, last = term.rpartition(" ")
+        if col.strip() and last.upper() in ("ASC", "DESC"):
+            col, direction = col.strip(), last.upper()
+        else:
+            col, direction = term, ""
         if not col.startswith('"'):
             col = f'"{col}"'
         terms.append(f"{col} {direction}".rstrip())

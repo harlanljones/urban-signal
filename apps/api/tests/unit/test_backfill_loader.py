@@ -3,9 +3,20 @@
 import json
 from datetime import UTC, datetime
 from types import SimpleNamespace
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
-from scripts.backfill_loader import backfill_job, build_query_shape, main, select_jobs
+import httpx
+import pytest
+from scripts.backfill_loader import (
+    backfill_job,
+    build_query_shape,
+    client_side_window,
+    main,
+    select_jobs,
+)
+
+from src.producers.csv_client import CSVClient
+from src.producers.scheduler import MunicipalIngestionScheduler
 
 
 def _meta(watermark_col="IssuedDate", platform="socrata", producer_key="permits", **extra):
@@ -146,6 +157,232 @@ def test_build_query_shape_non_dc_arcgis_keeps_iso_and_order():
     where, kwargs = build_query_shape(meta, datetime(2026, 5, 26, tzinfo=UTC))
     assert "ISSUED_DT >= '2026-05-26T00:00:00'" in where
     assert kwargs == {"order_by": "ISSUED_DT DESC"}
+
+
+def test_a_backfill_selects_the_columns_its_poll_selects():
+    # A deeds select keeps grantor and grantee names on the server; without
+    # it a backfill read every column.
+    meta = _meta(
+        watermark_col="SALEDATE",
+        platform="arcgis",
+        endpoint="https://services.example/arcgis/rest/services/Sales/FeatureServer/0",
+        select="PARCELID,SALEDATE,SALEPRICE",
+    )
+    _, kwargs = build_query_shape(meta, datetime(2026, 5, 26, tzinfo=UTC))
+    assert kwargs == {"select": "PARCELID,SALEDATE,SALEPRICE", "order_by": "SALEDATE DESC"}
+
+
+def test_a_snapshot_backfill_keeps_its_own_order():
+    meta = _meta(watermark_col="", platform="arcgis", order_by="SALE_DATE DESC, OBJECTID DESC")
+    _, kwargs = build_query_shape(meta, None)
+    assert kwargs == {"order_by": "SALE_DATE DESC, OBJECTID DESC"}
+
+
+def test_a_text_watermark_window_starts_in_its_own_format():
+    # ADR 0005: the column holds text, so the literal is compared as text.
+    # '20260115' sorts above '2026-05-26T00:00:00', so the ISO window read
+    # every sale from the first of January.
+    meta = _meta(
+        watermark_col="DOCDATE",
+        platform="arcgis",
+        endpoint="https://services.example/arcgis/rest/services/Sales/FeatureServer/0",
+        watermark_type="text",
+        watermark_format="%Y%m%d",
+    )
+    where, kwargs = build_query_shape(meta, datetime(2026, 5, 26, tzinfo=UTC))
+    assert where == "DOCDATE >= '20260526'"
+    assert kwargs == {"order_by": "DOCDATE DESC"}
+
+
+def _text_dated_sales(order_by=None):
+    return _meta(
+        watermark_col="SALE_DATE",
+        platform="arcgis",
+        endpoint="https://services.example/arcgis/rest/services/Sales/FeatureServer/0",
+        watermark_type="text",
+        watermark_format="%m/%d/%Y",
+        **({"order_by": order_by} if order_by else {}),
+    )
+
+
+@pytest.mark.parametrize(
+    ("fmt", "client_side"),
+    [
+        ("%m/%d/%Y", True),
+        ("%B %d, %Y at %I:%M %p", True),
+        ("%Y%m%d", False),
+        ("%Y-%m-%d %H:%M:%S.%f", False),
+        ("%Y/%m/%d", False),
+        ("%Y", False),
+    ],
+)
+def test_only_a_format_the_server_cannot_order_is_windowed_client_side(fmt, client_side):
+    meta = _meta(watermark_col="SALE_DATE", platform="arcgis", watermark_type="text", watermark_format=fmt)
+    assert (client_side_window(meta) == fmt) is client_side
+
+
+def test_text_the_server_can_compare_is_windowed_there():
+    csv = _meta(watermark_col="sale_date", platform="csv", watermark_type="text", watermark_format="%m/%d/%Y")
+    cast = _meta(
+        watermark_col="ISSUEDATE",
+        platform="ckan",
+        endpoint="ckan://data.sanjoseca.gov/045b3678-e923-4002-b696-300955bc6d06",
+        watermark_type="text",
+        watermark_format="%m/%d/%Y %I:%M:%S %p",
+    )
+    untyped = _meta(watermark_col="ISSUEDATE", platform="arcgis", watermark_format="%m/%d/%Y")
+    assert [client_side_window(meta) for meta in (csv, cast, untyped)] == [None, None, None]
+
+
+def test_a_window_the_server_cannot_order_is_kept_client_side():
+    # As text, '12/31/2018' sorts above '07/02/2026': from that literal,
+    # Reno's newest-first read began with sales made on December 31 of 2018
+    # to 2025.
+    meta = _text_dated_sales(order_by="SALE_DATE DESC")
+    where, kwargs = build_query_shape(meta, datetime(2026, 7, 2, tzinfo=UTC))
+    assert where is None
+    assert kwargs == {"order_by": "SALE_DATE DESC"}
+
+    fake = _FakeScheduler({"permits_baltimore": meta})
+    client = MagicMock()
+    client.paginate.return_value = [
+        [
+            {"permitnumber": "old", "SALE_DATE": "10/02/2018"},
+            {"permitnumber": "new", "SALE_DATE": "9/9/2026"},
+            {"permitnumber": "edge", "SALE_DATE": "07/02/2026"},
+            {"permitnumber": "blank", "SALE_DATE": ""},
+        ],
+        [{"permitnumber": "before", "SALE_DATE": "07/01/2026"}],
+    ]
+    pw = MagicMock()
+    pw.parse_socrata_row.side_effect = lambda row, city_id=None: _fake_event(key=row["permitnumber"])
+    _wire(fake, client, pw)
+
+    report = backfill_job(
+        fake, "permits_baltimore",
+        since_dt=datetime(2026, 7, 2, tzinfo=UTC), max_rows=None,
+        page_size=None, batch_delay_seconds=0,
+    )
+
+    published = [call.kwargs["key"] for call in pw.producer.produce.call_args_list]
+    assert published == ["baltimore:new", "baltimore:edge"]
+    assert (report["fetched"], report["outside_window"]) == (2, 3)
+    assert report["max_watermark_seen"] == "9/9/2026"
+    assert client.paginate.call_args.kwargs["where_clause"] is None
+
+
+def test_a_full_load_keeps_every_text_dated_row():
+    meta = _text_dated_sales()
+    fake = _FakeScheduler({"permits_baltimore": meta})
+    client = MagicMock()
+    client.paginate.return_value = [[{"permitnumber": "old", "SALE_DATE": "10/02/2018"}]]
+    pw = MagicMock()
+    pw.parse_socrata_row.side_effect = lambda row, city_id=None: _fake_event(key=row["permitnumber"])
+    _wire(fake, client, pw)
+
+    report = backfill_job(
+        fake, "permits_baltimore", since_dt=None, max_rows=None, page_size=None, batch_delay_seconds=0
+    )
+
+    assert (report["published"], report["outside_window"]) == (1, 0)
+
+
+def test_a_text_dated_csv_backfills_its_window():
+    body = "Sale Date,Parcel\n12/15/2025,A\n10/01/2025,B\n02/03/2026,C\n09/15/2024,D\n"
+    client = CSVClient(httpx.Client(transport=httpx.MockTransport(lambda _: httpx.Response(200, text=body))))
+    meta = _meta(
+        watermark_col="sale_date",
+        platform="csv",
+        endpoint="https://data.example/sales.csv",
+        watermark_type="text",
+        watermark_format="%m/%d/%Y",
+    )
+
+    where, kwargs = build_query_shape(meta, datetime(2025, 11, 1, tzinfo=UTC))
+    rows = [row for batch in client.paginate(endpoint_url=meta["endpoint"], where_clause=where, **kwargs) for row in batch]
+
+    # With the format the CSV client compares and sorts the column as dates;
+    # as text, '02/03/2026' sorts below '11/01/2025' and above '12/15/2025'.
+    assert where == "sale_date >= '11/01/2025'"
+    assert [row["parcel"] for row in rows] == ["C", "A"]
+
+
+def test_san_jose_text_window_casts_both_sides():
+    meta = _meta(
+        watermark_col="ISSUEDATE",
+        platform="ckan",
+        endpoint="ckan://data.sanjoseca.gov/045b3678-e923-4002-b696-300955bc6d06",
+        watermark_type="text",
+        watermark_format="%m/%d/%Y %I:%M:%S %p",
+    )
+    where, kwargs = build_query_shape(meta, datetime(2026, 5, 26, tzinfo=UTC))
+    assert where == (
+        "to_timestamp(\"ISSUEDATE\", 'MM/DD/YYYY HH12:MI:SS AM') >= "
+        "to_timestamp('05/26/2026 12:00:00 AM', 'MM/DD/YYYY HH12:MI:SS AM')"
+    )
+    # The column itself still sorts as text ('9/9/2026' above '9/29/2026'),
+    # so no newest-first order is sent.
+    assert kwargs == {}
+
+
+@pytest.fixture
+def scheduler():
+    with patch("src.producers.base_producer.BaseKafkaProducer"):
+        sched = MunicipalIngestionScheduler(
+            dlq_producer=MagicMock(), rate_limit_delay_seconds=0.0, dedup_capacity=1000
+        )
+    for producer in sched.producers.values():
+        producer.producer = MagicMock()
+    sched.state_file = None
+    return sched
+
+
+def test_every_backfill_hands_its_client_what_the_poll_hands_it(scheduler):
+    """A spec's ``select``, workbook link, zip member, delimiter, keyset column
+    and CSV watermark arguments reach a backfill as they reach ``poll_job``.
+    Only the order differs: a window pages newest-first on its watermark."""
+    shared = {"endpoint_url", "where_clause", "batch_size", "max_records"}
+    checked = 0
+    for job, meta in scheduler.job_metadata.items():
+        if meta.get("platform") == "gbfs" or meta.get("national_feed"):
+            continue
+        client = scheduler._paginating_client_for(job)
+        client.paginate = MagicMock(return_value=[])
+        scheduler.poll_job(job, limit=10)
+        polled = {k: v for k, v in client.paginate.call_args.kwargs.items() if k not in shared}
+
+        _, backfilled = build_query_shape(meta, None)
+        if meta.get("watermark_col"):
+            polled.pop("order_by", None)
+            backfilled.pop("order_by", None)
+        assert backfilled == polled, job
+        checked += 1
+    assert checked > 300
+
+
+def test_a_richmond_backfill_finds_the_workbook_and_places_each_sale(scheduler):
+    producer = scheduler.producers["deeds"]
+    rows = [
+        {"pin": "W0001234005", "transfer_date": "2026-09-22T00:00:00", "consideration": 285000,
+         "deed_book": "ID2026", "deed_page": 21877, "deed_type": "Deed"},
+    ]
+    producer.excel.paginate = MagicMock(return_value=[rows])
+    producer.arcgis.fetch_centroid_index = MagicMock(return_value={"W0001234005": (37.553, -77.462)})
+
+    report = backfill_job(
+        scheduler, "deeds_richmond",
+        since_dt=datetime(2026, 7, 2, tzinfo=UTC), max_rows=None,
+        page_size=None, batch_delay_seconds=0,
+    )
+
+    assert report["published"] == 1
+    kwargs = producer.excel.paginate.call_args.kwargs
+    assert kwargs["link_pattern"] == r"Assessor_Transfers_[0-9-]+\.xlsx$"
+    assert not set(kwargs["select"].split(",")) & {"grantee", "grantor"}
+    lookup = producer.arcgis.fetch_centroid_index.call_args.kwargs
+    assert (lookup["join_key"], lookup["join_values"]) == ("PIN", ["W0001234005"])
+    event = producer.producer.produce.call_args.kwargs["payload"]
+    assert (event.latitude, event.longitude) == (37.553, -77.462)
 
 
 def test_backfill_job_counts_and_watermark():

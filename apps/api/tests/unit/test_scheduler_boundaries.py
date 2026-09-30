@@ -7,8 +7,11 @@ layer that declares a zone reads the stored UTC watermark as local time; and a
 sale keyed by parcel alone collided with the parcel's next sale.
 """
 
+from datetime import datetime
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
+import httpx
 import pytest
 
 from src.producers.scheduler import MunicipalIngestionScheduler
@@ -148,6 +151,36 @@ class TestWatermarkSource:
         result = scheduler.poll_job("permits", limit=10)
 
         assert result["high_watermark"] == "2026-09-28T09:30:00"
+
+    def test_a_csv_with_a_declared_format_reads_past_its_iso_watermark(self, scheduler):
+        """St. Louis's export writes ``2026-09-28 09:30:00.0`` and the spec
+        declares that format, which the CSV client compares the column in,
+        while the watermark it stores is ISO. The literal has to parse too:
+        read only in the declared format it matched no row, and every poll
+        after the first read nothing."""
+        producer = scheduler.producers["permits"]
+        producer.parse_socrata_row = lambda row, city_id=None: SimpleNamespace(
+            job_id=row["address"],
+            city_id="st_louis",
+            issuance_date=datetime.fromisoformat(row["issuedate"]),
+        )
+        export = (
+            "ADDRESS,ISSUEDATE,APPLICATIONDESCRIPTION\n"
+            "100 MARKET ST,2026-09-20 10:00:00.0,Alteration\n"
+            "200 OLIVE ST,2026-09-28 09:30:00.0,New building\n"
+        )
+
+        def serve(text):
+            producer.csv.http = httpx.Client(transport=httpx.MockTransport(lambda _: httpx.Response(200, text=text)))
+
+        serve(export)
+        scheduler.poll_job("permits_stl", limit=100)
+        assert scheduler.metrics["permits_stl"].high_watermark == "2026-09-28T09:30:00"
+
+        serve(export + "300 PINE ST,2026-09-29 12:00:00.0,Alteration\n")
+        result = scheduler.poll_job("permits_stl", limit=100)
+
+        assert (result["records_fetched"], result["records_published"]) == (1, 1)
 
 
 class TestLayerZone:

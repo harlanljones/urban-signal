@@ -162,6 +162,31 @@ def test_parse_where_terms_equality_and_range():
 
 def test_parse_where_terms_passthrough_on_complex_sql():
     assert _parse_where_terms("issued_date IS NOT NULL") is None
+    assert _parse_where_terms("(status = 'Open')") is None
+    assert _parse_where_terms("issued_date NOT IN ('9999-12-31')") is None
+
+
+def test_a_column_name_with_spaces_is_one_field():
+    # Laredo's and San Antonio's permit dates; the filter the scheduler writes
+    # names the column bare.
+    assert _parse_where_terms("PERMIT ISS. DATE >= '2026-09-15T00:00:00'") == [
+        ("PERMIT ISS. DATE", ">=", "2026-09-15T00:00:00")
+    ]
+    assert _parse_where_terms('"DATE ISSUED" >= \'2026-09-15\'') == [("DATE ISSUED", ">=", "2026-09-15")]
+
+
+def test_a_spaced_column_is_quoted_in_the_sql(client, monkeypatch):
+    """Passed through verbatim, the bare name was a syntax error (409) on
+    every filtered poll."""
+    seen = {}
+
+    def fake_request_json(url, params):
+        seen["sql"] = params["sql"]
+        return SQL_WATERMARK_RESULT
+
+    monkeypatch.setattr(client, "_request_json", fake_request_json)
+    client.fetch_records(PERMITS_URI, where_clause="PERMIT ISS. DATE >= '2026-09-15T00:00:00'")
+    assert 'WHERE "PERMIT ISS. DATE" >= \'2026-09-15T00:00:00\'' in seen["sql"]
 
 
 def test_range_clause_routes_to_search_sql(client, monkeypatch):
@@ -209,6 +234,10 @@ def test_quote_order_by_variants():
     )
     assert _quote_order_by('"_id"') == '"_id"'
     assert _quote_order_by("") == '"_id"'
+    # San Jose's 311 column: quoting only "Date" was a 409.
+    assert _quote_order_by("Date Created DESC") == '"Date Created" DESC'
+    assert _quote_order_by('"Date Created" DESC') == '"Date Created" DESC'
+    assert _quote_order_by("PERMIT ISS. DATE") == '"PERMIT ISS. DATE"'
 
 
 def test_equality_clause_uses_search_filters_param(client, monkeypatch):

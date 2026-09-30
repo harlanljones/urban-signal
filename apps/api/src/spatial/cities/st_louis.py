@@ -20,8 +20,11 @@ Live-probe caveats that define this leaf (2026-08-27, US-200):
 * 311 is a D3 zip of year files (``2008.csv``…``2026.csv`` inside one
   ``csb.zip``). ``CSVClient`` accepts ``zip_member='2026.csv'``; the scheduler
   does not yet forward that kwarg (spine).
-* PERMITS ``ISSUEDATE`` is month-name text (``August, 07 2026 00:00:00``),
-  rolling 30-day window, ~20-day publish lag, address-only
+* PERMITS ``ISSUEDATE`` was month-name text (``August, 07 2026 00:00:00``)
+  when registered; by 2026-09-30 the export wrote ``2026-09-18 00:00:00.0``
+  in every row, so the format is that. The CSV client compares the column in
+  the declared format, and the old one parsed no row: every poll after the
+  first read nothing. Rolling 30-day window, ~20-day publish lag, address-only
   (``needs_geocode=True``, ``expected_cadence_days=21``). No permit number —
   composite id is address+issuedate+applicationdescription. Do not register
   frozen ArcGIS Building_Permits (newest 2025-03-05) or trades APIs.
@@ -377,7 +380,7 @@ STL_PERMITS_SPEC: Dict[str, object] = {
         "expected_cadence_days": 21,
         "rolling_window_days": 30,
         "needs_geocode": True,
-        "watermark_format": "%B, %d %Y %H:%M:%S",
+        "watermark_format": "%Y-%m-%d %H:%M:%S.%f",
         "geocode_context": ST_LOUIS_GEOCODE_CONTEXT,
         "field_map": ST_LOUIS_PERMITS_FIELD_MAP,
         "scope": "City of St. Louis building permits, 30-day rolling CF export (address-only)",

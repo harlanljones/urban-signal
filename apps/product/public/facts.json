@@ -1228,7 +1228,7 @@
         },
         {
           "platform": "csv",
-          "watermark_col": "SaleDate",
+          "watermark_col": "",
           "interval_seconds": 1800.0,
           "topic": "raw.municipal.deeds"
         }

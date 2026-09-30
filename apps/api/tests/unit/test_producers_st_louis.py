@@ -60,8 +60,8 @@ _PERMITS_FIXTURE = {
     "address": "2200 GRAVOIS AVE",
     "projecttype": "Commercial",
     "structuretype": "Alteration",
-    "applicationdate": "July, 28 2026 00:00:00",
-    "issuedate": "August, 07 2026 00:00:00",
+    "applicationdate": "2026-07-28 00:00:00.0",
+    "issuedate": "2026-08-07 00:00:00.0",
     "daystoissue": "10",
     "estprojectcost": "125000",
     "applicationdescription": "Interior renovation of existing storefront",
@@ -191,7 +191,7 @@ class TestStLouisFieldMaps:
         row = _PERMITS_FIXTURE
         assert first_mapped(row, ST_LOUIS_PERMITS_FIELD_MAP, "job_id") == "2200 GRAVOIS AVE"
         assert first_mapped(row, ST_LOUIS_PERMITS_FIELD_MAP, "issuance_date") == (
-            "August, 07 2026 00:00:00"
+            "2026-08-07 00:00:00.0"
         )
         assert first_mapped(row, ST_LOUIS_PERMITS_FIELD_MAP, "address_street") == (
             "2200 GRAVOIS AVE"
@@ -261,7 +261,7 @@ class TestFeedRegistration:
         assert extra["needs_geocode"] is True
         assert extra["expected_cadence_days"] == 21
         assert extra["rolling_window_days"] == 30
-        assert extra["watermark_format"] == "%B, %d %Y %H:%M:%S"
+        assert extra["watermark_format"] == "%Y-%m-%d %H:%M:%S.%f"
 
     def test_sla_spec_is_liquor_snapshot(self):
         extra = STL_SLA_SPEC["extra"]
@@ -284,7 +284,7 @@ class TestFeedRegistration:
         assert permits.needs_geocode is True
         assert permits.rolling_window_days == 30
         assert permits.expected_cadence_days == 21
-        assert permits.watermark_format == "%B, %d %Y %H:%M:%S"
+        assert permits.watermark_format == "%Y-%m-%d %H:%M:%S.%f"
 
         sla = get_st_louis_dataset(FeedType.SLA)
         assert sla.ingestion_mode == "snapshot"

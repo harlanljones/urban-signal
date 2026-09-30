@@ -120,6 +120,20 @@ def _typed_value(value: Any, fmt: str | None) -> datetime | None:
         return None
 
 
+def _iso_literal(literal: str) -> datetime | None:
+    """A filter literal written as ISO 8601 rather than in the column's format.
+
+    A feed that declares a format without the ``text`` type keeps its
+    watermark, and starts its backfill window, as ISO (St. Louis permits);
+    parsed only in the column's format, such a literal matched no row, so
+    every poll after the first read nothing.
+    """
+    try:
+        return datetime.fromisoformat(literal).replace(tzinfo=None)
+    except ValueError:
+        return None
+
+
 def _row_matches(
     where_clause: str | None,
     row: dict[str, Any],
@@ -196,7 +210,7 @@ def _branch_matches(
                 if s in (watermark_exclude or []):
                     return False
                 parsed_value = _typed_value(s, watermark_format)
-                parsed_literal = _typed_value(literal, watermark_format)
+                parsed_literal = _typed_value(literal, watermark_format) or _iso_literal(literal)
                 if parsed_value is None or parsed_literal is None:
                     return False
                 left, right = parsed_value, parsed_literal
