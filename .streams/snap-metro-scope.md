@@ -44,5 +44,5 @@ Done. SNAP metros reach 34,686 of 34,686 retailers (were 5,694).
 
 ## Next step
 
-The other 38 snapshot-mode feeds share the same cap; measure each and give the
-ones larger than 1,000 rows a filter or a cap.
+Done in `.streams/snapshot-reach.md`: the other 38 snapshot-mode feeds were
+measured and each now reads in full, reads newest first, or is a listed gap.

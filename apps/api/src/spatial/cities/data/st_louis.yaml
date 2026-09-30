@@ -343,6 +343,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 3000
 aliases:
 - stl
 - saint_louis

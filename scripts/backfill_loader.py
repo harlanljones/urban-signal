@@ -113,27 +113,37 @@ def build_query_shape(
 ) -> tuple[str | None, dict[str, Any]]:
     """Return ``(where_clause, client_kwargs)`` for a backfill pass.
 
-    Snapshot feeds carry no watermark column: no where, no order — the load is
-    a table-head sweep bounded by ``max_records``. Watermarked feeds filter to
+    Every pass keeps the registry's own ``where`` (``base_where``), as
+    ``poll_job`` does: on a shared layer it is what scopes the rows to the
+    metro (a SNAP state and bbox, a county code, a CA ABC county), so a
+    backfill without it would load other places' rows under this city.
+    Snapshot feeds carry no watermark column: no window, no order — the load
+    is a table-head sweep bounded by ``max_records``. Watermarked feeds add
     the window (plus the declared sentinel guard, ADR 0005) and page
     newest-first so a capped run keeps the freshest slice.
 
-    The window predicate and sentinel guard are produced by the
-    ``AcquisitionEngine`` WHERE builder (US-182), keeping the emitted SQL
-    byte-for-byte identical to the prior inline path. The backfill has always
-    ignored ``watermark_type``/``watermark_format`` for the window predicate, so
-    they are suppressed here to preserve that exact shape.
+    The clause comes from the ``AcquisitionEngine`` WHERE builder (US-182).
+    The backfill has always ignored ``watermark_type``/``watermark_format`` for
+    the window predicate, so they are suppressed here to preserve that shape.
     """
+    base_where = meta.get("base_where")
     wm = meta.get("watermark_col")
     if not wm:
-        return None, {}
+        where = build_where(
+            base_where=base_where,
+            watermark_col="",
+            high_watermark=None,
+            endpoint=str(meta.get("endpoint", "")),
+            snapshot=True,
+        )
+        return where, {}
 
     spec = _spec_from_meta(meta)
     high_watermark = (
         since_dt.strftime("%Y-%m-%dT%H:%M:%S") if since_dt is not None else None
     )
     where = build_where(
-        base_where=None,
+        base_where=base_where,
         watermark_col=wm,
         high_watermark=high_watermark,
         endpoint=str(meta.get("endpoint", "")),

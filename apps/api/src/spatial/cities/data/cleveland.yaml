@@ -252,11 +252,11 @@ datasets:
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: last_transfer_date DESC, OBJECTID DESC
     id_col: null
     select: null
     fallback_endpoints: []
-    where: null
+    where: last_transfer_date >= CURRENT_DATE - INTERVAL '180' DAY
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -302,6 +302,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 6000
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis

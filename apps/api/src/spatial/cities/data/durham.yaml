@@ -432,7 +432,7 @@ datasets:
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: PKG_SALE_DATE DESC, OBJECTID_1 DESC
     id_col: null
     select: null
     fallback_endpoints: []

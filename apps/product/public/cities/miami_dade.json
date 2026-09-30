@@ -298,7 +298,7 @@
     "sla": {
       "platform": "arcgis",
       "watermark_col": "BUSSDATE",
-      "interval_seconds": 600.0,
+      "interval_seconds": 1800.0,
       "topic": "raw.municipal.sla"
     },
     "deeds": {

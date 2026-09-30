@@ -455,7 +455,7 @@ datasets:
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: date_account_creation DESC
     id_col: null
     select: null
     fallback_endpoints: []
@@ -502,6 +502,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 4000
 aliases:
 - sandiego
 - san diego

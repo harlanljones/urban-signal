@@ -1185,3 +1185,25 @@ Worth keeping:
   each poll and cap it at `batch_limit` (1,000 by default) in OID or file order, so
   a table larger than the cap is truncated to the same first rows forever. This
   applies to every snapshot feed, not only SNAP; the other 38 are the next check.
+
+### 2026-09-30 — Snapshot feeds reach their rows (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| snapshot-reach | `.streams/snapshot-reach.md` | `scheduler.py` | 2026-09-30 | done (31 of 38 feeds; 7 listed gaps) | `docs/research/snapshot-reach-2026-09-30.md`, `test_snapshot_reach.py`, per-job snapshot seen-sets, backfills keep `where` |
+
+The 38 non-SNAP snapshot feeds were measured live. 33 held more rows than their
+1,000-row cap and read in table order, so each poll saw the same slice. 15 now
+read their whole table (caps up to 16,000 for Inland Empire), 16 read newest
+first by the date they already track (12 of them new or resized), and 7 stay
+listed gaps with their reasons.
+
+Worth keeping:
+
+- **Pick a shape for every snapshot feed.** A snapshot table either fits its cap
+  with half again to spare or is read newest first with a window of 1.5 times
+  its last 90 days of rows. `test_snapshot_reach.py` fails a new snapshot feed
+  until it declares one, with a measured count.
+- **Check the sort on the live server.** Raleigh sorts nulls first under
+  `DESC`, and Cleveland's unbounded sort outlasts the client timeout; both
+  needed a filter that the paging check found.

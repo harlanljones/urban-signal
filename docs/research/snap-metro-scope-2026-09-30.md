@@ -121,5 +121,4 @@ that metro scoping would happen downstream; the cap made it a truncation instead
 ## Not covered here
 
 The same cap applies to every other snapshot-mode feed (38 outside SNAP, GBFS
-aside). Any whose table is larger than its cap has the same blind spot; those
-need their own measurement, and a filter or cap per feed.
+aside). Those are measured and fixed in `snapshot-reach-2026-09-30.md`.

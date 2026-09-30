@@ -166,6 +166,113 @@ def test_snap_jobs_poll_their_own_metro(mock_scheduler):
     assert kwargs["max_records"] == 7000
 
 
+def test_snapshot_windows_poll_newest_first(mock_scheduler):
+    """A newest-first snapshot sends its date order, with a unique tiebreaker
+    for stable paging, and its window's cap, so each poll reads the latest
+    sales instead of the first rows by object id. Cleveland also bounds the
+    server's sort to 180 days."""
+    from src.spatial.city_registry import CityId, FeedType, get_job_name
+
+    paginate = mock_scheduler.producers["deeds"].arcgis.paginate
+    mock_scheduler.poll_job(get_job_name(FeedType.DEEDS, CityId.CLEVELAND))
+    _, kwargs = paginate.call_args
+    assert kwargs["where_clause"] == "(last_transfer_date >= CURRENT_DATE - INTERVAL '180' DAY)"
+    assert kwargs["order_by"] == "last_transfer_date DESC, OBJECTID DESC"
+    assert kwargs["max_records"] == 6000
+
+    paginate = mock_scheduler.producers["deeds"].socrata.paginate
+    mock_scheduler.poll_job(get_job_name(FeedType.DEEDS, CityId.MONTGOMERY))
+    _, kwargs = paginate.call_args
+    assert kwargs["order_by"] == (
+        "sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89 DESC, :id"
+    )
+    assert kwargs["max_records"] == 4000
+
+
+def _stub_snap_parse(scheduler, monkeypatch):
+    """Parse any SNAP-shaped row into a minimal licence event."""
+    from types import SimpleNamespace
+
+    def parse(row, city_id=None):
+        return SimpleNamespace(license_id=str(row["Record_ID"]), city_id=city_id)
+
+    monkeypatch.setattr(scheduler.producers["sla"], "parse_socrata_row", parse)
+
+
+def test_snapshot_ids_survive_other_feeds_churn(mock_scheduler, monkeypatch):
+    """A snapshot job keeps its own seen-set: the shared window (1000 ids in
+    this fixture) filling with other feeds' ids must not make the snapshot's
+    next poll re-emit its unchanged rows as new."""
+    from src.spatial.city_registry import CityId, FeedType, get_job_name
+
+    _stub_snap_parse(mock_scheduler, monkeypatch)
+    job = get_job_name(FeedType.SLA, CityId.TALLAHASSEE)
+    rows = [{"Record_ID": n, "ObjectId": n} for n in (101, 102, 103)]
+    mock_scheduler.producers["sla"].arcgis.paginate.return_value = [rows]
+
+    first = mock_scheduler.poll_job(job)
+    assert first["records_published"] == 3
+    assert mock_scheduler._dedup_for(job, 1000) is not mock_scheduler.dedup
+
+    for n in range(1500):  # incremental feeds' new ids cycle the shared window
+        mock_scheduler.dedup.check_and_add(f"311_nyc:{n}")
+
+    second = mock_scheduler.poll_job(job)
+    assert second["records_published"] == 0
+    assert second["duplicates_skipped"] == 3
+    assert mock_scheduler.get_metrics()["snapshot_dedup_size"] == 3
+
+
+def test_incremental_jobs_share_the_dedup_window(mock_scheduler):
+    assert mock_scheduler._dedup_for("311_cmoh", 5000) is mock_scheduler.dedup
+
+
+def test_snapshot_seen_set_grows_with_an_explicit_limit(mock_scheduler):
+    from src.spatial.city_registry import CityId, FeedType, get_job_name
+
+    job = get_job_name(FeedType.SLA, CityId.HOUSTON)
+    assert mock_scheduler._dedup_for(job, 7000).max_capacity == 14000
+    assert mock_scheduler._dedup_for(job, 20000).max_capacity == 40000
+
+
+def test_snapshot_that_fills_its_cap_warns(mock_scheduler, monkeypatch, caplog):
+    """Rows past a table-order snapshot's cap are never read, so filling the
+    cap is logged; a newest-first snapshot fills it by design."""
+    import logging
+
+    from src.spatial.city_registry import CityId, FeedType, get_job_name
+
+    _stub_snap_parse(mock_scheduler, monkeypatch)
+    rows = [{"Record_ID": n, "ObjectId": n} for n in (1, 2)]
+    mock_scheduler.producers["sla"].arcgis.paginate.return_value = [rows]
+    job = get_job_name(FeedType.SLA, CityId.TALLAHASSEE)
+
+    with caplog.at_level(logging.WARNING, logger="src.producers.scheduler"):
+        mock_scheduler.poll_job(job, limit=2)
+    assert any("stopped at its 2-row cap" in r.getMessage() for r in caplog.records)
+
+    caplog.clear()
+    with caplog.at_level(logging.WARNING, logger="src.producers.scheduler"):
+        mock_scheduler.poll_job(job, limit=5)
+    assert not any("row cap" in r.getMessage() for r in caplog.records)
+
+    for order_by in ("ObjectId DESC", "Record_ID desc, ObjectId DESC"):
+        caplog.clear()
+        mock_scheduler.job_metadata[job]["order_by"] = order_by
+        with caplog.at_level(logging.WARNING, logger="src.producers.scheduler"):
+            mock_scheduler.poll_job(job, limit=2)
+        assert not any("row cap" in r.getMessage() for r in caplog.records), order_by
+
+    # Only a leading DESC term makes a window: a column named *_desc, or a
+    # DESC tiebreaker behind an ascending sort, still reads in table order.
+    for order_by in ("Store_Desc ASC", "Store_Name ASC, ObjectId DESC"):
+        caplog.clear()
+        mock_scheduler.job_metadata[job]["order_by"] = order_by
+        with caplog.at_level(logging.WARNING, logger="src.producers.scheduler"):
+            mock_scheduler.poll_job(job, limit=2)
+        assert any("stopped at its 2-row cap" in r.getMessage() for r in caplog.records), order_by
+
+
 def test_extract_record_id(mock_scheduler):
     permits_id = mock_scheduler._extract_record_id("permits", {"job__": "M123456"})
     assert permits_id == "permits:M123456"

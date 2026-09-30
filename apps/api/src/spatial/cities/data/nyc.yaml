@@ -1322,6 +1322,7 @@ datasets:
     watermark_type: null
     where: null
     zip_member: null
+    batch_limit: 5000
   deeds:
     endpoint: https://data.cityofnewyork.us/resource/bnx9-e6tj.json
     platform: socrata

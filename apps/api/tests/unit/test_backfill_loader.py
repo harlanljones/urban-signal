@@ -77,6 +77,51 @@ def test_build_query_shape_snapshot_feed_has_no_where():
     assert kwargs == {}
 
 
+def test_build_query_shape_snapshot_feed_keeps_the_registry_where():
+    # A snapshot on a shared layer is scoped by its registry filter alone
+    # (here a SNAP state and bbox); dropping it would backfill the national
+    # table under one city.
+    snap_where = (
+        "State = 'FL' AND Latitude BETWEEN 30.29 AND 30.63"
+        " AND Longitude BETWEEN -84.7 AND -84.05"
+    )
+    where, kwargs = build_query_shape(_meta(watermark_col="", base_where=snap_where), None)
+    assert where == f"({snap_where})"
+    assert kwargs == {}
+
+
+def test_build_query_shape_windowed_feed_keeps_the_registry_where():
+    meta = _meta(base_where="prem_county = 'ALAMEDA'", watermark_exclude=["3200-01-01"])
+    where, kwargs = build_query_shape(meta, datetime(2026, 5, 26, tzinfo=UTC))
+    assert where.startswith("(prem_county = 'ALAMEDA') AND IssuedDate >= '2026-05-26")
+    assert "NOT IN" in where
+    assert kwargs == {"order_by": "IssuedDate DESC"}
+
+
+def test_every_registered_filter_survives_into_the_backfill_query():
+    """Backfills scope rows the way poll_job does: every spec's own ``where``
+    is part of the backfill query, windowed or not."""
+    from src.spatial.city_registry import REGISTRY
+
+    checked = 0
+    for city_id, reg in REGISTRY.items():
+        for feed, ds in reg.datasets.items():
+            if not ds.where:
+                continue
+            meta = _meta(
+                watermark_col=ds.watermark_col,
+                platform=ds.platform,
+                endpoint=ds.endpoint,
+                base_where=ds.where,
+                watermark_exclude=ds.watermark_exclude or [],
+            )
+            for since in (None, datetime(2026, 5, 26, tzinfo=UTC)):
+                where, _ = build_query_shape(meta, since)
+                assert where.startswith(f"({ds.where})"), (city_id.value, feed.value)
+            checked += 1
+    assert checked > 54  # the SNAP slices alone are 54
+
+
 def test_build_query_shape_dc_arcgis_uses_date_literal_and_no_order_by():
     # US-109: the DC server (maps2.dcgis.dc.gov) rejects ISO-string date
     # comparisons and the where+orderByFields combination; the loader must

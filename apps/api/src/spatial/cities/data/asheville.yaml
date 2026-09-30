@@ -330,7 +330,7 @@ datasets:
     watermark_type: text
     watermark_format: '%Y%m%d'
     watermark_exclude: []
-    order_by: null
+    order_by: DeedDate DESC, objectid DESC
     id_col: null
     select: null
     fallback_endpoints: []
@@ -375,6 +375,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 4000
     delimiter: null
 aliases:
 - asheville_nc

@@ -14,6 +14,7 @@ import collections
 import json
 import logging
 import os
+import re
 import threading
 import time
 from collections.abc import Callable
@@ -68,6 +69,10 @@ _PAGINATE_KWARGS: dict[str, tuple[str, ...]] = {
     **_ADAPTER_REQUEST_KEYS,
     "csv": (*_ADAPTER_REQUEST_KEYS["csv"], "zip_member", "delimiter"),
 }
+
+# A snapshot whose order starts ``<col> DESC`` reads its newest rows first,
+# so its cap is a window on recent rows rather than a cut through the table.
+_NEWEST_FIRST = re.compile(r"\s*[^\s,]+\s+DESC\b", re.IGNORECASE)
 
 # Year-slice feed rollover events (US-70): a job switched from one calendar
 # year's layer/resource to the next. Scraped via the serving /metrics mount.
@@ -231,6 +236,12 @@ class MunicipalIngestionScheduler:
         self.bootstrap_servers = bootstrap_servers or settings.kafka_bootstrap_servers
         self.rate_limit_delay = rate_limit_delay_seconds
         self.dedup = DeduplicationFilter(max_capacity=dedup_capacity)
+        # A snapshot job re-reads its table every poll and emits only ids it
+        # has not seen, so its seen-set is the feed's state, not an overlap
+        # window. Each snapshot job keeps its own, sized to its cap: in the
+        # shared window above, other feeds' new ids evict a snapshot's ids and
+        # its next poll re-emits unchanged rows as new.
+        self.snapshot_dedup: dict[str, DeduplicationFilter] = {}
         self._stop_event = threading.Event()
         # Injectable calendar clock (US-70): the rollover drill freezes this at
         # Jan 2 to prove the next-year layer is resolved at New Year.
@@ -733,6 +744,18 @@ class MunicipalIngestionScheduler:
         )
         return True
 
+    def _dedup_for(self, job_name: str, fetch_limit: int) -> DeduplicationFilter:
+        """The seen-set a poll checks: the job's own for snapshots, else shared."""
+        if self.job_metadata[job_name].get("ingestion_mode") != "snapshot":
+            return self.dedup
+        capacity = 2 * max(fetch_limit, self.configs[job_name].batch_limit)
+        seen = self.snapshot_dedup.get(job_name)
+        if seen is None:
+            seen = self.snapshot_dedup[job_name] = DeduplicationFilter(max_capacity=capacity)
+        elif seen.max_capacity < capacity:
+            seen.max_capacity = capacity
+        return seen
+
     def poll_job(
         self,
         job_name: str,
@@ -817,6 +840,7 @@ class MunicipalIngestionScheduler:
             stored = typed_watermark_entry(new_high_watermark, fmt=meta.get("watermark_format"))
             new_hw_parsed = stored[1] if stored else None
 
+        dedup = self._dedup_for(job_name, fetch_limit)
         try:
             client_kwargs = {
                 k: meta[k]
@@ -838,7 +862,7 @@ class MunicipalIngestionScheduler:
                     rec_id = self._extract_record_id(job_name, row)
 
                     # Deduplication check
-                    if self.dedup.check_and_add(rec_id):
+                    if dedup.check_and_add(rec_id):
                         duplicates_skipped += 1
                         continue
 
@@ -939,6 +963,20 @@ class MunicipalIngestionScheduler:
                             payload=row,
                             error_msg=str(parse_err),
                         )
+
+            # A snapshot read in table order that fills its cap has rows it
+            # never reads: its source outgrew batch_limit (or its where clause
+            # lost its scope). A newest-first snapshot (order_by ... DESC) is a
+            # window on recent rows by design, so a full page is expected.
+            newest_first = bool(_NEWEST_FIRST.match(str(meta.get("order_by") or "")))
+            if is_snapshot and not newest_first and records_fetched >= fetch_limit:
+                logger.warning(
+                    "Job '%s': snapshot poll stopped at its %d-row cap; rows past "
+                    "it are never read (raise the feed's batch_limit or narrow "
+                    "its where clause)",
+                    job_name,
+                    fetch_limit,
+                )
 
             # Flush producer buffers
             producer_wrapper.producer.flush()
@@ -1079,6 +1117,7 @@ class MunicipalIngestionScheduler:
         """Returns snapshot of live telemetry metrics."""
         return {
             "dedup_cache_size": len(self.dedup),
+            "snapshot_dedup_size": sum(len(seen) for seen in self.snapshot_dedup.values()),
             "jobs": {
                 name: {
                     "total_runs": m.total_runs,

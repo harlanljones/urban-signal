@@ -269,6 +269,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 9000
   crime:
     endpoint: ckan://data.milwaukee.gov/87843297-a6fa-46d4-ba5d-cb342fb2d3bb
     platform: ckan

@@ -283,13 +283,13 @@ datasets:
     - account_id_mdp_field_acctid
     - sales_segment_1_transfer_number_mdp_field_transno1_sdat_field_79
     topic: raw.municipal.deeds
-    interval_seconds: 600.0
+    interval_seconds: 1800.0
     producer_key: deeds
     endpoint_by_year: {}
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89 DESC, :id
     id_col: null
     select: null
     fallback_endpoints: []
@@ -330,6 +330,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 4000
 aliases:
 - baltimore_city
 - baltimore city
