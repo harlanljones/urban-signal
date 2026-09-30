@@ -1486,3 +1486,23 @@ Worth keeping:
   key's shape on both sides before planning a join.
 - **Check a recommended state set's cadence.** Connecticut's OPM sales set is
   published once a year and ended on 2025-09-30.
+
+### 2026-09-30 — Maricopa deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| maricopa-deeds | `.streams/maricopa-deeds.md` | `config.py` (the Assessor parcel layer) | 2026-09-30 | done (5 cities registered from one layer: Phoenix 9,224, Scottsdale 2,507, Chandler 1,573, Glendale 1,263 and Tempe 783 deeds polled live, none dead-lettered, the second polls published none) | `deeds` specs for Tempe, Chandler, Scottsdale and Glendale, Phoenix's moved; notes in `docs/research/deeds-probe-2026-09-30.md`; regenerated facts |
+
+Tempe moves to all four signal families (21 to 22); Chandler, Scottsdale and
+Glendale move from two to three; Phoenix's deeds, which dead-lettered every
+row, now publish.
+
+Worth keeping:
+
+- **One county layer can serve several metros.** The Assessor's parcel layer
+  names each parcel's city, so one spec shape registers every Maricopa city.
+- **Let the server compute the window.** `CURRENT_DATE - INTERVAL '90' DAY`
+  works on hosts that reject ISO date literals, and a snapshot filter built
+  on it never goes stale.
+- **Bound the window above.** Parcel layers carry future-dated sentinels
+  (2044 to 2099 here); `<= CURRENT_TIMESTAMP` keeps them out.

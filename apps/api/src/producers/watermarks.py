@@ -229,6 +229,12 @@ ANSI_DATE_LITERAL_HOSTS = (
     "gis.toledo.oh.gov",
     "gismaps.wichita.gov",
     "gis.nhcgov.com",
+    # Maricopa County Assessor (ArcGIS Server 11.5): verified live 2026-09-30 —
+    # ``DEED_DATE > '2026-09-01T00:00:00'`` returns 400 "Unable to complete
+    # operation" while ``DEED_DATE > timestamp '2026-09-01 00:00:00'`` works.
+    # Its five deeds feeds poll as snapshots; a backfill with a start date
+    # sends the literal.
+    "gis.mcassessor.maricopa.gov",
 )
 
 

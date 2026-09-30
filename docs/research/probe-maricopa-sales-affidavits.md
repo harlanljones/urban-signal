@@ -7,6 +7,11 @@ catalog. This deepens the wave-3 finding
 AGO item). Success criterion for the row-level probe: verify the pipe-delimited
 schema and assess whether `CSVClient` can carry Phoenix deeds.
 
+**Superseded 2026-09-30.** Registered, this file dead-lettered every row.
+Phoenix `deeds` now reads the Maricopa County Assessor's parcel layer, which
+carries each parcel's latest deed with its coordinates, and this file is no
+longer registered ([deeds-probe-2026-09-30.md](deeds-probe-2026-09-30.md)).
+
 ## Source
 
 | | |

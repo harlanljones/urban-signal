@@ -3,31 +3,37 @@
 On 2026-09-30, 22 metros had permits, 311 and licences but no deeds. Two
 probes checked each one live the same day for a public, row-level record of
 property transfers with a date, a price and a way to place it on the map.
-Three register here, four have a source that needs client work first, two
-are held and thirteen have none.
+Three registered first. Tempe followed later the same day from the Maricopa
+County Assessor's parcel layer, with Chandler, Glendale and Scottsdale, which
+gain deeds as a third family, and Phoenix, whose deeds move to the same layer.
+Three have a source that needs client work first, two are held and thirteen
+have none.
 
 | Verdict | Metros |
 |---|---|
-| Registered here | Nashville, Hartford, Denver |
-| Source found, needs client work | Tempe (and a Phoenix repair), Bend, Medford, Tacoma |
+| Registered here | Nashville, Hartford, Denver; then Tempe (with Chandler, Glendale, Scottsdale and a Phoenix repair) |
+| Source found, needs client work | Bend, Medford, Tacoma |
 | Held | Minneapolis, San Diego |
 | No source | Austin, Baton Rouge, Billings, Dallas, El Paso, Los Angeles, Louisville, Memphis, Montgomery AL, Sacramento, San Antonio, San Jose, St. Louis |
 
-| Tier (families) | Before | After |
-|---|---|---|
-| 4 | 18 | **21** (Denver, Hartford, Nashville) |
-| 3 | 33 | 30 |
-| 2 | 72 | 72 |
-| 1 | 34 | 34 |
+| Tier (families) | Before | After Denver, Hartford, Nashville | After Maricopa |
+|---|---|---|---|
+| 4 | 18 | 21 | **22** (Tempe) |
+| 3 | 33 | 30 | 32 (Chandler, Glendale, Scottsdale in; Tempe out) |
+| 2 | 72 | 72 | 69 |
+| 1 | 34 | 34 | 34 |
+
+Phoenix already counted deeds, from a file that dead-lettered every row, so
+its tier does not change.
 
 ## Registered
 
-All three read a parcel-level record of each parcel's most recent transfer,
+All of them read a parcel-level record of each parcel's most recent transfer,
 filtered to transfers dated in the 90 days before each poll, and read that
 window whole every six hours. Their record id joins the parcel, the transfer
 date and the instrument, so a parcel's next sale is new to the snapshot and
 an unchanged row is not re-published. A sale that reaches the source weeks
-after its date is still inside the window when it arrives. None of the three
+after its date is still inside the window when it arrives. None of them
 requests an owner column or sends an address to the geocoder.
 
 ### Nashville — the parcel layer's last transfer
@@ -89,11 +95,49 @@ requests an owner column or sends an address to the geocoder.
   a candidate.
 - **Cap:** 4,000 rows.
 
+### Tempe, Chandler, Glendale, Scottsdale and Phoenix — the Assessor's latest deed
+
+- **Source:** the Maricopa County Assessor's parcel layer,
+  `gis.mcassessor.maricopa.gov/arcgis/rest/services/Parcels/MapServer/0`
+  (ArcGIS Server 11.5), which carries each parcel's latest deed:
+  `DEED_NUMBER`, `DEED_DATE`, `SALE_PRICE` and native `LATITUDE`/`LONGITUDE`.
+  Its `JURISDICTION` column names the city, so each feed reads its own.
+- **Window:** the filter is `JURISDICTION = '<city>' AND DEED_DATE >=
+  CURRENT_DATE - INTERVAL '90' DAY AND DEED_DATE <= CURRENT_TIMESTAMP`, which
+  the server evaluates itself. The upper bound keeps out 173 deeds in the five
+  cities dated 2044 to 2099.
+- **Dates:** the host answers 400 to an ISO date literal
+  (`DEED_DATE > '2026-09-01T00:00:00'`) and accepts
+  `timestamp '2026-09-01 00:00:00'`, so it joins `ANSI_DATE_LITERAL_HOSTS`.
+  A snapshot poll sends no literal; a backfill with a start date does.
+- **Price:** `SALE_PRICE` is text, filled where an affidavit was processed:
+  3,772 of Phoenix's 9,224 deeds and 308 of Tempe's 783. A deed without one
+  publishes with an amount of 0.
+- **Freshness:** on 2026-09-30 the newest deed was dated 2026-09-22, and
+  daily counts fall off after 2026-09-16, so the newest full day trails by
+  about two weeks and the layer loads about weekly (inferred from the
+  counts). `expected_cadence_days` is 14, so the alarm waits 28 days.
+- **Several parcels, one deed:** 783 Tempe rows carry 761 deed numbers, and
+  Phoenix's 9,224 carry 8,417. The record id joins `APN`, `DEED_DATE` and
+  `DEED_NUMBER`, so each parcel's row publishes; PostGIS keeps one row per
+  deed (see "Not covered here").
+- **Owner columns:** `OWNER_NAME`, the `MAIL_*` block and `INCAREOF` stay off
+  the request through `select`.
+- **Phoenix:** its deeds read the Maricopa County Sales Affidavits file until
+  now, a 61 MB zip of 903,301 affidavits that dead-lettered every row
+  (`feed-health-2026-09-30.md`). The file's field map stays in the Phoenix
+  module as a candidate. 33 of Phoenix's 9,224 deeds lie north of its metro
+  box's 33.86° edge, at 33.87 to 33.89° N along I-17, and the layer puts them
+  in Phoenix. They publish at their parcels; widening the box is left out of
+  this change.
+- **Caps:** Phoenix 15,000, Scottsdale 5,000, Chandler 3,000, Glendale 2,500
+  and Tempe 2,000, each at least 1.5 times its window. Pages hold 1,000 rows,
+  so the five take 18 requests a poll, about 72 a day.
+
 ## Sources that need client work first
 
 | Metro | Source | What it needs |
 |---|---|---|
-| Tempe, and Phoenix | Maricopa County Assessor Parcels, `gis.mcassessor.maricopa.gov/arcgis/rest/services/Parcels/MapServer/0`: the latest deed on each parcel (`DEED_NUMBER`, `DEED_DATE`) with native `LATITUDE`/`LONGITUDE`, refreshed about weekly (inferred from daily counts). Tempe (`JURISDICTION = 'TEMPE'`) had 783 deeds in 90 days; `SALE_PRICE` is text and filled on 308 of them. | The host rejects ISO and epoch date literals, so it joins `ANSI_DATE_LITERAL_HOSTS`; pages hold 1,000 rows. The same layer can replace Phoenix's file source, which dead-letters every row today (`feed-health-2026-09-30.md`). |
 | Bend | Deschutes County `GIS_SALES`, `services1.arcgis.com/znO8Hz1SuVVohYhZ/.../Taxlots/FeatureServer/8`: each taxlot's two most recent sales, refreshed overnight, joined to its polygon (`/0`) on `TAXLOT` (200 of 200). | The table is county-wide with no city column (Bend is 1,220 of 2,105 sales in 90 days), so it needs a city filter through the situs table (`/1`) or a box after the join. |
 | Medford | Jackson County `PropertySales`, `spatial.jacksoncountyor.gov/arcgis/rest/services/Demog/PropertySales/FeatureServer/0`: the latest sale per account with price and document number, two to three days behind; 310 Medford sales in 90 days. | The server sends a malformed `Content-Security-Policy` header that the HTTP client rejects on every request, and it accepts only ANSI date literals. |
 | Tacoma | Pierce County's weekly `sale.zip` (`online.co.pierce.wa.us/datamart/`), every sale since 1997, joined to the county's `Tax_Parcels` layer. | The file is pipe-delimited with no header row, which the CSV client cannot read. It is county-wide, so it needs a box filter, and it runs four to five weeks behind. |
@@ -139,6 +183,10 @@ requests an owner column or sends an address to the geocoder.
   (`.streams/west-tempe.md`, `west-bend.md` and `west-medford.md`, and the
   2026-08-30 Pacific Northwest probe for Tacoma) found no source; each has
   one (above).
+- **Phoenix:** `probe-maricopa-sales-affidavits.md` chose the affidavits
+  file, and `wave-3-probe-phoenix.md` read the Assessor's host only through
+  its scale-restricted `MaricopaDynamicQueryService` layers. The `Parcels`
+  service on the same host answers row queries and carries the latest deed.
 - **St. Louis:** the 2026-08-27 note counted 192,504 rows to 2026-02-11; the
   file now holds 94,276 rows ending 2024-11-25.
 
@@ -152,9 +200,15 @@ source on 2026-09-30, with Kafka mocked.
 | Nashville `deeds` | 4,373 | 4,373 | 4,373 | 0 | 2026-07-02 to 2026-09-26 | 2,688 | 0 new of 4,373 |
 | Hartford `deeds` | 353 | 353 | 353 | 0 | 2026-07-06 to 2026-09-22 | 268 | 0 new of 353 |
 | Denver `deeds` | 2,445 | 2,445 | 2,445 | 0 | 2026-07-02 to 2026-09-24 | 2,193 | 0 new of 2,445 |
+| Tempe `deeds` | 783 | 783 | 783 | 0 | 2026-07-02 to 2026-09-22 | 308 | 0 new of 783 |
+| Chandler `deeds` | 1,573 | 1,573 | 1,573 | 0 | 2026-07-02 to 2026-09-17 | 604 | 0 new of 1,573 |
+| Glendale, AZ `deeds` | 1,263 | 1,263 | 1,263 | 0 | 2026-07-02 to 2026-09-22 | 521 | 0 new of 1,263 |
+| Scottsdale `deeds` | 2,507 | 2,507 | 2,507 | 0 | 2026-07-02 to 2026-09-22 | 1,032 | 0 new of 2,507 |
+| Phoenix `deeds` | 9,224 | 9,224 | 9,191 | 0 | 2026-07-02 to 2026-09-22 | 3,772 | 0 new of 9,224 |
 
-No poll made a geocoder query or requested an owner column. A first poll
-took 4 to 8 requests and 10 to 20 seconds.
+No poll made a geocoder query or requested an owner column. A first poll of
+the first three took 4 to 8 requests and 10 to 20 seconds; a first poll of
+the Maricopa feeds took 2 to 10, spaced 2 seconds apart, and 5 to 48 seconds.
 
 ## Probe conduct
 
@@ -170,11 +224,20 @@ next request could follow in under 2 seconds (302 of 418 same-host pairs in
 one probe, about 144 of 200 in the other's early period). Each switched to
 measuring from the end of the response before finishing.
 
+The Maricopa follow-up used the same default User-Agent and asked only for
+counts, statistics and the feeds' own columns. Three of its requests followed
+the previous response from the host by about 0.3 seconds, because each came
+from a new process that did not share the pacing clock; within a process,
+requests were at least 2 seconds apart.
+
 ## Not covered here
 
 - **A deed on several parcels.** Each parcel's row publishes, but the rows
   share one instrument number, and PostGIS keeps one row per `doc_id`, as it
   does for Las Vegas, Lynchburg and Columbus. In Nashville's sample, 7 of 200
   instruments covered more than one parcel.
-- **The candidates above.** Maricopa (Tempe and Phoenix) is next; Bend,
-  Medford and Tacoma each need the client change named in their row.
+- **The candidates above.** Bend, Medford and Tacoma each need the client
+  change named in their row.
+- **The parcel outlines.** The Maricopa layer returns each parcel's polygon
+  with its row, which the feeds do not need since the layer's own coordinates
+  place the deed. The scheduler has no per-feed switch for `returnGeometry`.

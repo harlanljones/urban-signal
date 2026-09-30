@@ -1676,9 +1676,18 @@ class Settings(BaseSettings):
     # ZIP, `Data/Sales_Affidavits.txt` pipe-delimited member). Probe 2026-08-28:
     # 912,806 rows, fresh (item modified 2026-08-03), no Last-Modified header on
     # the download — freshness via AGOL item metadata or alarm_exempt.
+    # Unregistered 2026-09-30: every row dead-lettered, and Phoenix deeds read
+    # the Assessor parcel layer below instead.
     csv_phoenix_deeds_endpoint: str = Field(
         default="https://www.arcgis.com/sharing/rest/content/items/f3484c72a938497286adc4e5de7e9963/data",
         description="Maricopa County Sales Affidavits CSV Collection download URL (US-392)",
+    )
+    # Maricopa County Assessor parcels (ArcGIS Server 11.5): each parcel's
+    # latest deed with native coordinates. Deeds for Phoenix, Tempe, Chandler,
+    # Scottsdale and Glendale filter it by JURISDICTION (2026-09-30).
+    arcgis_maricopa_parcels_url: str = Field(
+        default="https://gis.mcassessor.maricopa.gov/arcgis/rest/services/Parcels/MapServer/0",
+        description="Maricopa County Assessor parcel layer with each parcel's latest deed (deeds snapshot)",
     )
 
     # Aurora, CO (US-326): issued building permits MapServer 44 (full history,

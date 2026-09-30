@@ -326,6 +326,36 @@ class TestSaleRows:
         assert (event.doc_id, event.bbl, event.document_amount) == ("DB-20260930 0099998", "09999000100", 440000.0)
         assert (event.latitude, event.longitude) == (36.1627, -86.7816)
 
+    def test_a_maricopa_deed_poll_reads_its_citys_jurisdiction(self, scheduler):
+        """Five cities read one county parcel layer; each poll asks for its
+        own JURISDICTION's window and places a deed at the parcel's own
+        coordinates. A deed on two parcels publishes once for each."""
+        producer = scheduler.producers["deeds"]
+        rows = [
+            {"OBJECTID": 900001, "APN": "13299999", "DEED_NUMBER": "20269999999",
+             "DEED_DATE": "2026-09-15T00:00:00+00:00", "SALE_PRICE": "485000",
+             "LATITUDE": 33.4148, "LONGITUDE": -111.9093},
+            {"OBJECTID": 900002, "APN": "13299998", "DEED_NUMBER": "20269999999",
+             "DEED_DATE": "2026-09-15T00:00:00+00:00", "SALE_PRICE": "485000",
+             "LATITUDE": 33.4150, "LONGITUDE": -111.9095},
+        ]
+        producer.arcgis.paginate = MagicMock(return_value=[rows])
+        producer.arcgis.fetch_centroid_index = MagicMock()
+
+        result = scheduler.poll_job("deeds_tempe", limit=10)
+
+        assert result["records_published"] == 2
+        assert _where(producer, "arcgis") == (
+            "(JURISDICTION = 'TEMPE' AND DEED_DATE >= CURRENT_DATE - INTERVAL '90' DAY "
+            "AND DEED_DATE <= CURRENT_TIMESTAMP)"
+        )
+        producer.arcgis.fetch_centroid_index.assert_not_called()
+        events = [call.kwargs["payload"] for call in producer.producer.produce.call_args_list]
+        assert [(e.bbl, e.latitude, e.longitude) for e in events] == [
+            ("13299999", 33.4148, -111.9093),
+            ("13299998", 33.4150, -111.9095),
+        ]
+
     def test_a_license_joins_its_parcel_by_the_tables_column_name(self, scheduler, monkeypatch):
         """Lynchburg's licence table spells the key ParcelID and its parcel
         polygons Parcel_ID; the licence takes the centroid, never a geocode."""

@@ -249,18 +249,19 @@ def test_austin_violation_drops_missing_coords():
 # Maricopa County Sales Affidavits (US-392) — pipe-delimited CSV, DEEDS
 # ---------------------------------------------------------------------------
 
-def test_phoenix_registers_deeds_csv():
+def test_phoenix_deeds_moved_to_the_assessor_parcel_layer():
+    """The affidavits file dead-lettered every row. Since 2026-09-30 Phoenix
+    deeds read the Assessor's parcel layer (see test_maricopa_deeds.py); the
+    file's field map stays as a candidate."""
     from src.spatial.city_registry import REGISTRY, CityId, FeedType, get_dataset
 
     reg = REGISTRY[CityId.PHOENIX]
     assert FeedType.DEEDS in reg.datasets
     spec = get_dataset(CityId.PHOENIX, FeedType.DEEDS)
-    assert spec.platform == "csv"
-    assert spec.delimiter == "|"
-    assert spec.zip_member == "Sales_Affidavits.txt"
+    assert spec.platform == "arcgis"
+    assert (spec.zip_member, spec.delimiter) == (None, None)
     assert spec.ingestion_mode == "snapshot"
-    assert spec.watermark_col == ""
-    assert spec.id_keys == ["PARCELNUMBER", "DEEDNUMBER"]
+    assert spec.id_keys == ["APN", "DEED_DATE", "DEED_NUMBER"]
 
 
 def test_maricopa_field_map_targets():

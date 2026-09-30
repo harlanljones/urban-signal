@@ -28,12 +28,17 @@ DEFAULT_CAP = JobConfig.batch_limit
 # Rows in the filtered source table, for feeds read in full.
 FULL_READ_ROWS = {
     ("bend", "sla"): 5_981,
+    # Chandler, Glendale, Phoenix, Scottsdale and Tempe deeds (Maricopa
+    # Assessor): the deeds dated in each spec's 90-day window inside its
+    # JURISDICTION, read 2026-09-30.
+    ("chandler", "deeds"): 1_573,
     ("cincinnati", "deeds"): 1_078,
     # Denver, Hartford and Nashville deeds: the transfers dated in each
     # spec's own 90-day window, read 2026-09-30.
     ("denver", "deeds"): 2_445,
     ("eugene", "sla"): 752,
     ("fort_collins", "permits"): 2_183,
+    ("glendale_az", "deeds"): 1_263,
     ("hartford", "deeds"): 353,
     ("inland_empire", "sla"): 10_585,
     ("milwaukee", "deeds"): 5_685,
@@ -43,14 +48,17 @@ FULL_READ_ROWS = {
     ("nashville", "deeds"): 4_373,
     ("nyc", "childcare"): 2_752,
     ("oakland", "sla"): 5_103,
+    ("phoenix", "deeds"): 9_224,
     ("portland", "sla"): 6_079,
     # Chesterfield County offenses in the metro box over the last 120 days.
     ("richmond", "crime"): 1_249,
     # The transfers since the same day a year before (Excel, 2026-09-23 workbook).
     ("richmond", "deeds"): 6_650,
     ("santa_rosa", "sla"): 4_979,
+    ("scottsdale", "deeds"): 2_507,
     ("st_louis", "sla"): 1_799,
     ("stockton", "sla"): 1_369,
+    ("tempe", "deeds"): 783,
     ("washington_dc", "childcare"): 452,
 }
 
@@ -81,11 +89,6 @@ WINDOW_RECENT_ROWS = {
 
 KNOWN_GAPS = {
     ("kansas_city", "sla"): "28,245 rows and no date to window on (only a text licence year)",
-    ("phoenix", "deeds"): (
-        "the endpoint is a 61 MB zip of a 270 MB pipe-delimited file (903,301 affidavits); "
-        "the spec names no zip member or delimiter, and the CSV client holds the whole "
-        "file and every kept row in memory"
-    ),
     ("boston", "deeds"): (
         "the id is the CKAN package, not a resource (404); the FY2026 resource has "
         "no coordinates and none of the mapped column names"

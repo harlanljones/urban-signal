@@ -32,6 +32,13 @@ def test_no_registered_spec_maps_a_party_name():
     assert mapped == []
 
 
+# The Maricopa Assessor parcel layer, read by five cities.
+MARICOPA_OWNER_COLUMNS = {
+    "OWNER_NAME", "MAIL_ADDR1", "MAIL_ADDR2", "MAIL_CITY", "MAIL_STATE", "MAIL_ZIP", "MAIL_ADDRESS",
+    "MAIL_CNTRY", "INCAREOF",
+}
+
+
 @pytest.mark.parametrize(
     ("city", "owner_columns"),
     [
@@ -50,6 +57,10 @@ def test_no_registered_spec_maps_a_party_name():
                 "Owner3Last", "MailingAddress1", "MailingAddress2", "MailingStreet", "City", "State", "Zip10",
                 "LastGrantor",
             },
+        ),
+        *(
+            (city, MARICOPA_OWNER_COLUMNS)
+            for city in (CityId.PHOENIX, CityId.TEMPE, CityId.CHANDLER, CityId.SCOTTSDALE, CityId.GLENDALE_AZ)
         ),
     ],
 )

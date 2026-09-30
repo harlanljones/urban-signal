@@ -392,6 +392,63 @@ datasets:
     non_spatial: null
     zip_member: null
     delimiter: null
+  deeds:
+    endpoint: https://gis.mcassessor.maricopa.gov/arcgis/rest/services/Parcels/MapServer/0
+    platform: arcgis
+    watermark_col: DEED_DATE
+    id_keys:
+    - APN
+    - DEED_DATE
+    - DEED_NUMBER
+    topic: raw.municipal.deeds
+    interval_seconds: 21600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: DEED_DATE DESC, OBJECTID DESC
+    id_col: null
+    select: OBJECTID,APN,DEED_NUMBER,DEED_DATE,SALE_PRICE,LATITUDE,LONGITUDE
+    fallback_endpoints: []
+    where: JURISDICTION = 'SCOTTSDALE' AND DEED_DATE >= CURRENT_DATE - INTERVAL '90' DAY AND DEED_DATE <= CURRENT_TIMESTAMP
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - DEED_NUMBER
+      - APN
+      recorded_date:
+      - DEED_DATE
+      document_amount:
+      - SALE_PRICE
+      bbl:
+      - APN
+      latitude:
+      - LATITUDE
+      longitude:
+      - LONGITUDE
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    batch_limit: 5000
+    composite_id: true
 aliases:
 - scottsdale_az
 - scottsdale-az

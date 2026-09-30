@@ -167,6 +167,10 @@ CKAN has **zero** license / privilege-tax / business-tax packages.
 County GIS `gis.mcassessor.maricopa.gov` `MaricopaDynamicQueryService` parcels
 are scale-restricted reference layers, not a sales stream.
 
+*2026-09-30: the same host's `Parcels/MapServer/0` answers row queries and
+carries each parcel's latest deed, and Phoenix deeds now read it
+([deeds-probe-2026-09-30.md](deeds-probe-2026-09-30.md)).*
+
 ## Registration contract (`phoenix`)
 
 Partial city. Spine copies these as `DatasetSpec` data; this file is the

@@ -91,6 +91,13 @@ source holds one row per parcel with its last sale, so each feed filters to
 sales dated in the 90 days before each poll and reads those whole
 (`deeds-probe-2026-09-30.md`).
 
+Chandler, Glendale, Phoenix, Scottsdale and Tempe `deeds` (1,573, 1,263,
+9,224, 2,507 and 783 rows; caps 3,000, 2,500, 15,000, 5,000 and 2,000) joined
+later the same day. The Maricopa County Assessor's parcel layer also holds one
+row per parcel with its latest deed, so each feed filters to its own city and
+the 90 days before each poll and reads those whole. Phoenix's leaves the known
+gaps below.
+
 ## Newest-first windows
 
 | Feed | Order | Rows dated in last 30 / 90 days | Window after |
@@ -144,7 +151,6 @@ assessor's four-month posting lag (see the feed-health note).
 | Feed | Rows | Why it is not fixed here |
 |---|---|---|
 | Kansas City `sla` | 28,245 | no date to window on; `valid_license_for` is a text licence year shared by thousands of rows |
-| Phoenix `deeds` (CSV) | 903,301 | the endpoint is a 61 MB zip of a 270 MB pipe-delimited file; the spec names no zip member or delimiter, and the CSV client holds the whole file and every kept row in memory |
 | Boston `deeds` | 184,552 | the configured id is the CKAN package, not a resource (404); the FY2026 resource has no coordinates and none of the mapped column names |
 | Ocala `permits`, Orlando `permits` | 283,399 / 488,959 | the Florida statewide cadastral polygon layer now answers 499 Token Required, and the county codes select Jackson (42) and Levy (48) counties instead of Marion (52) and Orange (58) |
 
@@ -153,8 +159,10 @@ Henderson `sla` was on this list; the feed-repair change
 and made it a window. Reno `deeds` was too, since its only sale date is
 `MM/DD/YYYY` text, which does not sort; a later change there ("Text-dated
 polls") names the dates since its watermark, and it now polls incrementally.
-Phoenix, Boston, Ocala and Orlando need more than a spec edit and are
-described there.
+Phoenix `deeds` was too, as a 61 MB zip of a 270 MB pipe-delimited file
+(903,301 rows) whose spec named no zip member or delimiter; it now reads the
+Assessor's parcel layer (above). Boston, Ocala and Orlando need more than a spec edit and
+are described there.
 
 ## Scheduler and backfill changes
 
