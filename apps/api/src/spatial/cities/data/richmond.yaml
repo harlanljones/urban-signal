@@ -276,7 +276,7 @@ datasets:
     watermark_exclude: []
     order_by: RecordDate DESC, OBJECTID DESC
     id_col: null
-    select: RMSIncidentID,RecordDate,IncidentorOffenseGenCategory,MagisterialDistrictName
+    select: RMSIncidentID,RecordDate,IncidentorOffenseGenCategory,MagisterialDistrictName,OBJECTID
     fallback_endpoints: []
     where: RecordDate >= CURRENT_DATE - INTERVAL '120' DAY AND DimLocationLatitude BETWEEN 37.45 AND 37.7 AND DimLocationLongitude BETWEEN -77.65 AND -77.3
     needs_geocode: false

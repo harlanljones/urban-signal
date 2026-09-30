@@ -53,7 +53,8 @@ def test_only_cleared_signal_feeds_are_registered():
     """Signal-survey feeds are registered only where a verified live feed
     exists. CRIME grew across the signal waves (the four launch metros plus
     boise, boston, las_vegas, louisville, milwaukee, san_jose, tampa, tulsa,
-    and later west/southeast metros). STREET_CUT stays Chicago/Louisville/
+    later west/southeast metros, and Richmond from Chesterfield County's
+    offenses). STREET_CUT stays Chicago/Louisville/
     Tampa (geocodable CDOT/closure feeds); EVICTIONS stays NYC-only;
     STR remains unregistered (US-92 closed not-worth-it)."""
     registered_for = {
@@ -78,6 +79,7 @@ def test_only_cleared_signal_feeds_are_registered():
             CityId.OXNARD_VENTURA,
             CityId.SANTA_ROSA,
             CityId.TEMPE,
+            CityId.RICHMOND,
         },
         FeedType.STREET_CUT: {CityId.CHICAGO, CityId.LOUISVILLE, CityId.TAMPA},
         FeedType.EVICTIONS: {CityId.NYC},

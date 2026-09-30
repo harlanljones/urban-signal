@@ -352,7 +352,10 @@ RICHMOND_FEED_SPECS: dict[str, dict[str, object]] = {
         "extra": {
             "ingestion_mode": "snapshot",
             "order_by": "RecordDate DESC, OBJECTID DESC",
-            "select": "RMSIncidentID,RecordDate,IncidentorOffenseGenCategory,MagisterialDistrictName",
+            "select": (
+                "RMSIncidentID,RecordDate,IncidentorOffenseGenCategory,"
+                "MagisterialDistrictName,OBJECTID"
+            ),
             "where": (
                 "RecordDate >= CURRENT_DATE - INTERVAL '120' DAY"
                 " AND DimLocationLatitude BETWEEN 37.45 AND 37.7"
