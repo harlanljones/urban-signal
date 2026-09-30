@@ -1,4 +1,12 @@
-"""Pierce County, Washington spatial registry and dashboard geometry."""
+"""Pierce County, Washington spatial registry and dashboard geometry.
+
+The county's feeds are registered in ``data/pierce.yaml`` only: PERMITS from
+the county's permit layer, SLA from the SNAP retailers in the metro box, and
+DEEDS (2026-09-30) from the Assessor-Treasurer's weekly sales file, the same
+``sale.zip`` Tacoma reads. Each sale takes its parcel's centroid from the
+county's ``Tax_Parcels`` layer anywhere in the county, and ``metro_clip``
+skips the sales the layer cannot place.
+"""
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 

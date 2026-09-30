@@ -56,6 +56,9 @@ FULL_READ_ROWS = {
     ("nyc", "childcare"): 2_752,
     ("oakland", "sla"): 5_103,
     ("phoenix", "deeds"): 9_224,
+    # The same Pierce County sales as Tacoma's, placed anywhere in the county
+    # (2,317 of them on 2026-09-30).
+    ("pierce", "deeds"): 2_432,
     ("portland", "sla"): 6_079,
     # Chesterfield County offenses in the metro box over the last 120 days.
     ("richmond", "crime"): 1_249,

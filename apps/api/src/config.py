@@ -2325,14 +2325,15 @@ class Settings(BaseSettings):
     # Pierce County's weekly assessor extract: every sale since 1997, a line
     # for each parcel of a sale, pipe-delimited with no header row. Tacoma
     # deeds read the last 90 days and place each sale on its parcel, in the
-    # city's tax code areas only (2026-09-30).
+    # city's tax code areas only (2026-09-30). Pierce County deeds read the
+    # same lines and place them anywhere in the county.
     csv_tacoma_deeds_endpoint: str = Field(
         default="https://online.co.pierce.wa.us/datamart/sale.zip",
-        description="Pierce County Assessor-Treasurer weekly sales extract, zipped sale.txt (Tacoma deeds snapshot)",
+        description="Pierce County Assessor-Treasurer weekly sales extract, zipped sale.txt (Tacoma and Pierce County deeds snapshots)",
     )
     arcgis_pierce_tax_parcels_url: str = Field(
         default="https://services2.arcgis.com/1UvBaQ5y1ubjUPmd/arcgis/rest/services/Tax_Parcels/FeatureServer/0",
-        description="Pierce County tax parcel polygons that place Tacoma's sales (parcel join)",
+        description="Pierce County tax parcel polygons that place Tacoma's and Pierce County's sales (parcel join)",
     )
     arcgis_sioux_falls_permits_endpoint: str = Field(
         default="https://gis.siouxfalls.gov/arcgis/rest/services/Data/Community/MapServer/3",

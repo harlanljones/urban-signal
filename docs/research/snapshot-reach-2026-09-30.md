@@ -115,6 +115,11 @@ in the 90 days before it. The file covers the county, so each sale takes its
 parcel's centroid only in the City of Tacoma's tax code areas, and the clip
 skips the rest: 452 publish (`deeds-probe-2026-09-30.md`).
 
+Pierce County `deeds` (2,432 rows, cap 5,000) reads the same file the same
+way. Its metro is the whole county, so each sale takes its parcel's centroid
+anywhere the county's parcel layer has one, and the clip skips only the 115
+the layer cannot place: 2,317 publish.
+
 ## Newest-first windows
 
 | Feed | Order | Rows dated in last 30 / 90 days | Window after |

@@ -1574,3 +1574,18 @@ Worth keeping:
 - **A blocked probe is not a blocked feed.** The host that stopped a burst of
   probe queries answered slow, plain requests an hour later; wait, then ask
   only for what the spec will send.
+
+### 2026-09-30 — Pierce County deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| pierce-deeds | `.streams/pierce-deeds.md` | `config.py` (descriptions only: the sales file and the parcel layer serve both feeds) | 2026-09-30 | done (2,432 county sales read, 2,317 published, 115 the parcel layer could not place skipped, none dead-lettered, the second poll published none) | `deeds` spec for Pierce County; notes in `docs/research/deeds-probe-2026-09-30.md`; regenerated facts |
+
+Pierce County moves from two signal families to three (three-family tier 28
+to 29).
+
+Worth keeping:
+
+- **A county metro can reuse a city's county-wide source.** When the source
+  already covers the county, the county's feed is the city's without the
+  filter that kept it to the city.

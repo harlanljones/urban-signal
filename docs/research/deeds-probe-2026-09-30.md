@@ -11,7 +11,9 @@ keeps a county-wide source's rows inside the metro box, and Medford from
 Jackson County's sales layer, once the ArcGIS client could read that server's
 responses. Tacoma followed from Pierce County's weekly sales file, once the
 CSV client could read a file with no header row and the parcel join could
-keep to the city's own parcels. Two are held and thirteen have none.
+keep to the city's own parcels. Two are held and thirteen have none. Pierce
+County, which had permits and licences only, then took deeds from Tacoma's
+file across the whole county.
 
 | Verdict | Metros |
 |---|---|
@@ -19,15 +21,16 @@ keep to the city's own parcels. Two are held and thirteen have none.
 | Held | Minneapolis, San Diego |
 | No source | Austin, Baton Rouge, Billings, Dallas, El Paso, Los Angeles, Louisville, Memphis, Montgomery AL, Sacramento, San Antonio, San Jose, St. Louis |
 
-| Tier (families) | Before | After Denver, Hartford, Nashville | After Maricopa | After Bend | After Medford | After Tacoma |
-|---|---|---|---|---|---|---|
-| 4 | 18 | 21 | 22 (Tempe) | 23 (Bend) | 24 (Medford) | **25** (Tacoma) |
-| 3 | 33 | 30 | 32 (Chandler, Glendale, Scottsdale in; Tempe out) | 31 | 30 | 29 |
-| 2 | 72 | 72 | 69 | 69 | 69 | 69 |
-| 1 | 34 | 34 | 34 | 34 | 34 | 34 |
+| Tier (families) | Before | After Denver, Hartford, Nashville | After Maricopa | After Bend | After Medford | After Tacoma | After Pierce County |
+|---|---|---|---|---|---|---|---|
+| 4 | 18 | 21 | 22 (Tempe) | 23 (Bend) | 24 (Medford) | 25 (Tacoma) | **26** (Scottsdale) |
+| 3 | 33 | 30 | 32 (Chandler, Glendale, Scottsdale in; Tempe out) | 31 | 30 | 29 | 29 (Pierce County in; Scottsdale out) |
+| 2 | 72 | 72 | 69 | 69 | 69 | 69 | 68 |
+| 1 | 34 | 34 | 34 | 34 | 34 | 34 | 34 |
 
 Phoenix already counted deeds, from a file that dead-lettered every row, so
-its tier does not change.
+its tier does not change. Scottsdale reached four families between the last
+two columns, with its 311 (`four-family-depth-2026-09-30.md`).
 
 ## Registered
 
@@ -276,6 +279,35 @@ requests an owner column or sends an address to the geocoder.
 - **Cap:** 5,000 rows, twice the county's window. A poll takes one download
   and about 35 requests to the parcel layer: its metadata once, then the
   lookups, about 70 quoted parcel numbers to a query.
+
+### Pierce County — Tacoma's file, the whole county
+
+Pierce County had permits and licences but no 311 or deeds, so it sits two
+families short and outside the 22 above. Its deeds come from the same file.
+
+- **Source:** the `sale.zip` Tacoma reads, read the same way: the lines dated
+  in the 90 days before each poll, the parties dropped as each line is read,
+  the record id joining `ETN` and `Parcel Number`, once a day with a
+  5,000-row cap. One setting declares the file for both feeds.
+- **Placement:** Pierce County's metro is the county. Its box spans it, and
+  its submarkets run from downtown Tacoma to Gig Harbor, Puyallup and Graham.
+  So the parcel join has no `where`: each sale takes its parcel's centroid
+  wherever the `Tax_Parcels` layer has one. On 2026-09-30 the layer placed
+  2,317 of the window's 2,432 lines, all inside the box (latitudes 46.74 to
+  47.40, longitudes -122.84 to -121.53), and `metro_clip` skipped the 115 it
+  could not place, mostly mobile homes and leaseholds.
+- **Overlap with Tacoma:** 688 of the placed sales lie inside Tacoma's box,
+  and the 452 that Tacoma publishes publish under Pierce County as well, as
+  the county's box holds the city. Record ids carry each job's name and each
+  snapshot job keeps its own seen-set, so neither feed skips the other's
+  rows.
+- **What publishes:** 2,317 sales dated 2026-07-02 to 2026-09-11, every one
+  priced, under 2,156 excise tax numbers. Among them are 2,135 statutory
+  warranty deeds, 75 bargain and sale deeds, 38 trustee's deeds after
+  foreclosure, 26 quit claims, 13 special warranty deeds, 10 easements and 6
+  sheriff's deeds.
+- **Cost:** a second download of the 20.8 MB file each day, and about 35
+  requests a poll to the parcel layer, as for Tacoma.
 
 ## Held
 
