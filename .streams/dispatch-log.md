@@ -1613,7 +1613,7 @@ Worth keeping:
 
 | Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
 |---|---|---|---|---|---|
-| charlotte-deeds | `.streams/charlotte-deeds.md` | `config.py` (the county's sales layer) | 2026-09-30 | done (8,925 sale rows read, 8,765 transfers published, 160 repeats of a transfer on a parcel's other property rows skipped, none dead-lettered, the second poll published none) | `deeds` spec for Charlotte; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+| charlotte-deeds | `.streams/charlotte-deeds.md` | `config.py` (the county's sales layer) | 2026-09-30 | done (8,925 sale rows read, 8,765 events published, one per transfer and parcel, 160 repeats of a transfer on a parcel's other property rows skipped, none dead-lettered, the second poll published none) | `deeds` spec for Charlotte; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
 
 Charlotte moves from three signal families to all four (four-family tier 26
 to 27).

@@ -137,18 +137,18 @@ probe and the `311` probe are recorded here as they register.
   page into two columns, so no single column names the deed.
 - **Poll:** every six hours, the whole window as a snapshot (nine pages of
   1,000 rows); the cross-run dedup drops the rows already published.
-- **Live check:** two polls of the registered spec through the real
-  scheduler against the live layer, Kafka mocked. The first read 8,925 rows in
-  ten requests (the metadata and nine pages) and published 8,765 transfers
-  dated 2026-07-02 to 2026-09-22 under 7,183 deeds; the other 160 rows
-  repeated a transfer on another property row of its parcel, and none was
-  dead-lettered. All 8,765 lie inside the metro box, 7,381 of them inside the
-  City's division box, and 5,712 carry a price. By type, 4,612 are warranty
-  deeds, 1,612 special warranty deeds, 901 quit claims, 709 multiple
-  listings, 607 non-warranty deeds, 180 correction deeds, 66 trustee's deeds,
-  30 commissioner's deeds and 48 other types. The second poll read the same
-  8,925 rows in nine requests and published none. Neither poll read a grantor
-  or grantee value or queried a geocoder.
+- **Live check:** two polls of the registered spec through the real scheduler
+  against the live layer, Kafka mocked. The first read 8,925 rows in ten
+  requests (the metadata and nine pages) and published 8,765 events, one per
+  transfer and parcel, dated 2026-07-02 to 2026-09-22 under 7,183 deeds; the
+  other 160 rows repeated a transfer on another property row of its parcel,
+  and none was dead-lettered. All 8,765 lie inside the metro box, 7,381 of
+  them inside the City's division box, and 5,712 carry a price. By type, 4,612
+  are warranty deeds, 1,612 special warranty deeds, 901 quit claims, 709
+  multiple listings, 607 non-warranty deeds, 180 correction deeds, 66
+  trustee's deeds, 30 commissioner's deeds and 48 other types. The second poll
+  read the same 8,925 rows in nine requests and published none. Neither poll
+  read a grantor or grantee value or queried a geocoder.
 
 ## Held
 
