@@ -24,6 +24,7 @@ import math
 import time
 from datetime import datetime, timezone
 from typing import Any, Dict, Generator, List, Optional
+from urllib.parse import quote
 
 import httpx
 
@@ -339,18 +340,13 @@ class ArcGISClient:
                     break
             return index
 
-        # A text key takes quoted literals and a numeric key bare numbers. Keep
-        # each request small enough to stay well below URL/server query limits.
+        # A text key takes quoted literals and a numeric key bare numbers.
         numeric = join_key in self.get_layer_metadata(layer_url).get("numeric_fields", ())
-        for start in range(0, len(values), 100):
-            chunk = values[start : start + 100]
-            if numeric:
-                literals = [lit for lit in map(self._numeric_literal, chunk) if lit is not None]
-                if not literals:
-                    continue
-            else:
-                literals = ["'" + value.replace("'", "''") + "'" for value in chunk]
-            where = f"{join_key} IN ({','.join(literals)})"
+        if numeric:
+            literals = [lit for lit in map(self._numeric_literal, values) if lit is not None]
+        else:
+            literals = ["'" + value.replace("'", "''") + "'" for value in values]
+        for where in self._in_clauses(join_key, literals):
             offset = 0
             while True:
                 fetch_limit = batch_size
@@ -375,6 +371,27 @@ class ArcGISClient:
                 if not exceeded and len(records) < fetch_limit:
                     break
         return index
+
+    # Keep each IN request well below URL limits: Richmond's ArcGIS Online host
+    # answers 404 to a query URL past about 2,000 characters, which 100 quoted
+    # 11-character parcel ids exceed.
+    _IN_MAX_VALUES = 100
+    _IN_MAX_ENCODED = 1_400
+
+    @classmethod
+    def _in_clauses(cls, join_key: str, literals: List[str]) -> Generator[str, None, None]:
+        """``join_key IN (...)`` clauses over ``literals``, each within the limits."""
+        chunk: List[str] = []
+        size = len(quote(f"{join_key} IN ()"))
+        for literal in literals:
+            cost = len(quote(literal)) + 3  # the literal and its encoded comma
+            if chunk and (len(chunk) >= cls._IN_MAX_VALUES or size + cost > cls._IN_MAX_ENCODED):
+                yield f"{join_key} IN ({','.join(chunk)})"
+                chunk, size = [], len(quote(f"{join_key} IN ()"))
+            chunk.append(literal)
+            size += cost
+        if chunk:
+            yield f"{join_key} IN ({','.join(chunk)})"
 
     def _fetch_page(
         self,

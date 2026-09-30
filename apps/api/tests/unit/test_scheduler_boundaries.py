@@ -224,3 +224,26 @@ class TestSaleRows:
         event = producer.producer.produce.call_args.kwargs["payload"]
         assert (event.latitude, event.longitude) == (37.4136, -79.1422)
         assert event.h3_res9 is not None
+
+    def test_a_workbook_sale_joins_by_its_own_column_name(self, scheduler):
+        """Richmond's workbook headers arrive lower-cased (``pin``) while its
+        Parcels layer spells the field ``PIN``."""
+        producer = scheduler.producers["deeds"]
+        rows = [
+            {"pin": "W0001234005", "transfer_date": "2026-09-22T00:00:00", "consideration": 285000,
+             "deed_book": "ID2026", "deed_page": 21877, "deed_type": "Deed"},
+        ]
+        producer.excel.paginate = MagicMock(return_value=[rows])
+        producer.arcgis.fetch_centroid_index = MagicMock(return_value={"W0001234005": (37.553, -77.462)})
+
+        result = scheduler.poll_job("deeds_richmond", limit=10)
+
+        assert result["records_published"] == 1
+        assert producer.excel.paginate.call_args.kwargs["link_pattern"] == r"Assessor_Transfers_[0-9-]+\.xlsx$"
+        kwargs = producer.arcgis.fetch_centroid_index.call_args.kwargs
+        assert (kwargs["join_key"], kwargs["join_values"]) == ("PIN", ["W0001234005"])
+        event = producer.producer.produce.call_args.kwargs["payload"]
+        assert (event.latitude, event.longitude) == (37.553, -77.462)
+        assert scheduler._extract_record_id("deeds_richmond", rows[0]) == (
+            "deeds_richmond:W0001234005|2026-09-22T00:00:00|ID2026|21877"
+        )

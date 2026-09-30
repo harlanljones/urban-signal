@@ -1284,3 +1284,24 @@ Worth keeping:
   collapsed every sale on a date into one id; the second poll caught it.
 - **Read the layer's `dateFieldsTimeReference`.** A declared zone applies to
   every literal, ISO or ANSI, not only to the dates the layer returns.
+
+### 2026-09-30 — Richmond deeds from the assessor's workbook (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| richmond-deeds | `.streams/richmond-deeds.md` | `scheduler.py`, `city_registry.py`, `config.py`, `deeds_acris_producer.py` | 2026-09-30 | done (6,650 sales from the last 365 days published live, 6,647 at a parcel centroid; the next poll got a 304) | `xlsx_reader.py`, `DatasetSpec.link_pattern`, `parcel_join.row_key` |
+
+Richmond's assessor publishes its transfers only as a monthly 72 MB Excel
+workbook under a new name each release. The Excel client now streams `.xlsx`,
+finds the current file from the page that links it, and skips an unchanged
+file with a conditional GET.
+
+Worth keeping:
+
+- **Measure the URL, not the value count.** Richmond's ArcGIS Online host
+  answered 404 to a 2,155-character query; a count limit alone does not bound a
+  text-keyed `IN` list.
+- **Keep names in the client.** A workbook has no `outFields`; the Excel
+  client applies `select` before it hands any row on, so buyer and seller
+  columns never reach the scheduler, an event or the DLQ.
+

@@ -262,50 +262,47 @@ divisions:
     city_id: richmond
 datasets:
   deeds:
-    endpoint: https://data.rva.gov/server/rest/services/Property/RealEstateSales/FeatureServer/0
-    platform: arcgis
-    watermark_col: SALE_DATE
+    endpoint: https://www.rva.gov/media/53946
+    platform: excel
+    watermark_col: transfer_date
     id_keys:
-    - PARCELID
-    - SALE_DATE
-    - OBJECTID
+    - pin
+    - transfer_date
+    - deed_book
+    - deed_page
     topic: raw.municipal.deeds
-    interval_seconds: 600.0
+    interval_seconds: 86400.0
     producer_key: deeds
     endpoint_by_year: {}
-    watermark_type: text
-    watermark_format: '%m/%d/%Y'
+    watermark_type: null
+    watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: transfer_date DESC
     id_col: null
-    select: null
+    select: pin,transfer_date,consideration,deed_book,deed_page,deed_type,parcel_location
     fallback_endpoints: []
-    where: null
+    where: transfer_date >= CURRENT_DATE - INTERVAL '365' DAY
     needs_geocode: false
     geocode_context: null
     field_map:
       doc_id:
-      - PARCELID
+      - pin
       bbl:
-      - PARCELID
+      - pin
       doc_type:
-      - DEED_TYPE
+      - deed_type
       document_amount:
-      - SALE_PRICE
+      - consideration
       recorded_date:
-      - SALE_DATE
+      - transfer_date
       address_street:
-      - SITEADDRESS
+      - parcel_location
       incident_address:
-      - SITEADDRESS
-      borough:
-      - CITY
-      zipcode:
-      - ZIP5
-    ingestion_mode: incremental
-    oid_field: OBJECTID
-    max_record_count: 100000
-    expected_cadence_days: 30
+      - parcel_location
+    ingestion_mode: snapshot
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 45
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false
@@ -318,9 +315,16 @@ datasets:
     state_plane_units: null
     state_plane_x_col: null
     state_plane_y_col: null
-    parcel_join: {}
+    parcel_join:
+      parcel_layer: https://services1.arcgis.com/k3vhq11XkBNeeOfM/arcgis/rest/services/Parcels/FeatureServer/0
+      join_key: PIN
+      row_key: pin
+      geometry_source: centroid
     non_spatial: false
     zip_member: null
+    batch_limit: 12000
+    composite_id: true
+    link_pattern: Assessor_Transfers_[0-9-]+\.xlsx$
 aliases:
 - richmond_va
 - richmond-va

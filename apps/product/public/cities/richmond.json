@@ -202,9 +202,9 @@
     "311": null,
     "sla": null,
     "deeds": {
-      "platform": "arcgis",
-      "watermark_col": "SALE_DATE",
-      "interval_seconds": 600.0,
+      "platform": "excel",
+      "watermark_col": "transfer_date",
+      "interval_seconds": 86400.0,
       "topic": "raw.municipal.deeds"
     }
   },

@@ -57,6 +57,25 @@ def test_a_numeric_join_key_takes_bare_numbers():
     assert client._fetch_page.call_args.kwargs["where_clause"] == "lrsn IN (1116,2204)"
 
 
+def test_long_text_keys_split_below_the_url_limit():
+    """Richmond's ArcGIS Online host answers 404 to a query URL past about
+    2,000 characters: 100 quoted 11-character parcel ids ran to 2,155."""
+    from urllib.parse import quote
+
+    client = ArcGISClient()
+    client.get_layer_metadata = _text_key_metadata
+    client._fetch_page = MagicMock(return_value=([], False))
+    pins = [f"W{n:010d}" for n in range(150)]
+
+    client.fetch_centroid_index("https://example.test/FeatureServer/0", join_key="PIN", join_values=pins)
+
+    wheres = [call.kwargs["where_clause"] for call in client._fetch_page.call_args_list]
+    assert len(wheres) > 2
+    assert all(len(quote(where)) <= 1_400 for where in wheres)
+    sent = [value.strip("'") for where in wheres for value in where[len("PIN IN (") : -1].split(",")]
+    assert sent == pins
+
+
 def test_dc_deed_stream_enriches_cama_row_before_parsing():
     from src.producers.deeds_acris_producer import DeedsACRISProducer
 

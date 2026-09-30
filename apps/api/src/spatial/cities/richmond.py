@@ -1,25 +1,22 @@
 DEEDS_FIELD_MAP = {
-    "doc_id": ["PARCELID"],
-    "bbl": ["PARCELID"],
-    "doc_type": ["DEED_TYPE"],
-    "document_amount": ["SALE_PRICE"],
-    "recorded_date": ["SALE_DATE"],
-    "address_street": ["SITEADDRESS"],
-    "incident_address": ["SITEADDRESS"],
-    "borough": ["CITY"],
-    "zipcode": ["ZIP5"],
+    "doc_id": ["pin"],
+    "bbl": ["pin"],
+    "doc_type": ["deed_type"],
+    "document_amount": ["consideration"],
+    "recorded_date": ["transfer_date"],
+    "address_street": ["parcel_location"],
+    "incident_address": ["parcel_location"],
 }
 
 FIELD_MAP = {
     "deeds": DEEDS_FIELD_MAP,
 }
 
+# Workbook columns a row keeps for its id but no event field reads: the deed
+# book (``ID2026`` for an instrument recorded in 2026) and page.
 NON_CANDIDATE_METADATA_COLUMNS = (
-    "VALID",
-    "MultiSale",
-    "PARCEL_SOURCE",
-    "BOOK",
-    "PAGE",
+    "deed_book",
+    "deed_page",
 )
 
 """Richmond Metro Submarket Registry and Spatial Layer for Urban Signal.
@@ -29,20 +26,18 @@ division catalog, and geographic bounding boxes for the City of Richmond,
 VA (fall-line capital on the James River — boxes chosen to stay clear of the
 sibling Lynchburg/Charlottesville leaf extents).
 
-Feed scope (US-348): Richmond is a DEEDS-led partial metro. The City of
-Richmond open-data portal (data.rva.gov) publishes a real-estate sales /
-tax-parcel layer carrying per-parcel ``SALE_DATE`` / ``SALE_PRICE`` /
-``DEED_TYPE``. The live endpoint was UNREACHABLE from the build network at
-registration time, so the ``arcgis_richmond_deeds_url`` default is a
-documented best-effort FeatureServer path (see PR_DESCRIPTION.md) — the gate
-checks endpoint presence in settings, not liveness. Mirror the Rochester
-leaf: native parcel polygons (outSR=4326 rings -> centroid) supply every
-row's coordinates, so ``needs_geocode`` stays False.
+Feed scope (US-348): Richmond is a DEEDS-led partial metro. The city's
+portal carries no permit, 311 or dated licence feed (probe-richmond.md).
 
-* DEEDS — ``Property/RealEstateSales/FeatureServer/0`` (best-effort).
-  Watermark ``SALE_DATE`` is TEXT ``MM/DD/YYYY``; ADR-0005 typed-text
-  watermark with the declared ``%m/%d/%Y`` format is mandatory. No permit /
-  SLA / 311 open feeds are registered here (out of scope for US-348).
+* DEEDS — the assessor's property transfers workbook, one .xlsx of every
+  recorded transfer, re-released on or about the 15th of each month under a
+  new name (``Assessor_Transfers_2026-09-23.xlsx``). The spec registers the
+  media page that links the current file (``link_pattern``); the Excel client
+  reads it a row at a time, keeps the last 365 days, and answers 304 until a
+  new file appears. The workbook has no coordinates: each sale takes its
+  parcel's centroid from the city's Parcels layer by ``PIN``. Buyer and
+  seller names (``GRANTEE``, ``GRANTOR``) never leave the client: ``select``
+  names only the columns the feed reads.
 """
 
 
@@ -306,44 +301,47 @@ RIC_DIVISIONS = RICHMOND_DIVISIONS
 
 # ---------------------------------------------------------------------------
 # Feed specs (leaf-local; the spine copies these into REGISTRY).
-# US-348: DEEDS-led partial metro. Best-effort ArcGIS endpoint (see
-# PR_DESCRIPTION.md); native parcel polygons supply coordinates so the
-# ADR-0004 geocode hook is NOT declared.
+# US-348: DEEDS-led partial metro, read from the assessor's monthly transfers
+# workbook; the Parcels layer supplies each sale's coordinates.
 # ---------------------------------------------------------------------------
-RICHMOND_DEEDS_ENDPOINT = (
-    "https://data.rva.gov/server/rest/services/Property/RealEstateSales/FeatureServer/0"
+RICHMOND_DEEDS_ENDPOINT = "https://www.rva.gov/media/53946"
+RICHMOND_PARCEL_LAYER = (
+    "https://services1.arcgis.com/k3vhq11XkBNeeOfM/arcgis/rest/services/Parcels/FeatureServer/0"
 )
 
 RICHMOND_FEED_SPECS: dict[str, dict[str, object]] = {
     "deeds": {
         "endpoint": RICHMOND_DEEDS_ENDPOINT,
-        "platform": "arcgis",
-        "watermark_col": "SALE_DATE",
-        "id_keys": ["PARCELID", "SALE_DATE", "OBJECTID"],
+        "platform": "excel",
+        "watermark_col": "transfer_date",
+        "id_keys": ["pin", "transfer_date", "deed_book", "deed_page"],
         "topic_key": "topic_deeds",
-        "interval_seconds": 600.0,
+        "interval_seconds": 86400.0,
         "producer_key": "deeds",
         "extra": {
+            "link_pattern": r"Assessor_Transfers_[0-9-]+\.xlsx$",
+            "composite_id": True,
+            "ingestion_mode": "snapshot",
+            "order_by": "transfer_date DESC",
+            "select": "pin,transfer_date,consideration,deed_book,deed_page,deed_type,parcel_location",
+            "where": "transfer_date >= CURRENT_DATE - INTERVAL '365' DAY",
+            "batch_limit": 12000,
             "needs_geocode": False,
-            "watermark_type": "text",
-            "watermark_format": "%m/%d/%Y",
-            "oid_field": "OBJECTID",
-            "max_record_count": 100000,
-            "expected_cadence_days": 30,
+            "expected_cadence_days": 45,
             "non_spatial": False,
+            "parcel_join": {
+                "parcel_layer": RICHMOND_PARCEL_LAYER,
+                "join_key": "PIN",
+                "row_key": "pin",
+                "geometry_source": "centroid",
+            },
             "scope": (
-                "Richmond VA DEEDS/sales via the City of Richmond real-estate "
-                "sales layer (native parcel polygons, NOT address-only). TEXT "
-                "MM/DD/YYYY watermark sorts lexically — typed comparison "
-                "required (ADR-0005). Best-effort endpoint: the live "
-                "data.rva.gov portal was unreachable from the build network at "
-                "registration (US-348); verify the exact FeatureServer path "
-                "against the published layer before relying on it. $1 quitclaim "
-                "transfers are KEPT at ingest (no per-city where; market-sale "
-                "filtering is analysis-side). No owner-name columns exist; "
-                "party fields stay None. BOOK/PAGE ride id_keys as the "
-                "recorded-deed references; PARCELID/OBJECTID are the parcel "
-                "keys."
+                "Richmond VA DEEDS from the assessor's monthly property "
+                "transfers workbook (439,398 transfers on 2026-09-23, newest "
+                "first). A sale is its parcel, date, deed book and page; the "
+                "last 365 days held about 6,650. $0 and non-market transfers "
+                "are KEPT (the workbook's QUALIFIED column marks market sales; "
+                "filtering is analysis-side)."
             ),
             "field_map": DEEDS_FIELD_MAP,
         },
@@ -404,6 +402,7 @@ __all__ = [
     "RICHMOND_DIVISION_BBOXES",
     "RICHMOND_FEED_SPECS",
     "RICHMOND_METRO_BBOX",
+    "RICHMOND_PARCEL_LAYER",
     "RICHMOND_SUBMARKETS",
     "RIC_DIVISIONS",
     "RIC_DIVISION_BBOXES",

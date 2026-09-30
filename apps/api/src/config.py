@@ -2331,9 +2331,12 @@ class Settings(BaseSettings):
         description="Providence, RI parcels with the assessor's last sale (city-hosted ArcGIS Online layer)",
     )
 
-    arcgis_richmond_deeds_url: str = Field(
-        default="https://data.rva.gov/server/rest/services/Property/RealEstateSales/FeatureServer/0",
-        description="Richmond VA deeds/sales ArcGIS FeatureServer URL (US-348)",
+    excel_richmond_deeds_url: str = Field(
+        default="https://www.rva.gov/media/53946",
+        description=(
+            "Richmond, VA assessor's property transfers: the page linking the "
+            "current monthly .xlsx workbook"
+        ),
     )
 
     arcgis_charleston_wv_deeds_url: str = Field(

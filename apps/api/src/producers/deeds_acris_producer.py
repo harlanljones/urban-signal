@@ -13,6 +13,7 @@ from src.producers.accela_client import AccelaClient
 from src.producers.carto_client import CartoClient
 from src.producers.ckan_client import CkanClient
 from src.producers.csv_client import CSVClient
+from src.producers.excel_client import ExcelClient
 from src.producers.socrata_client import SocrataClient
 from src.schemas.models import DeedEvent
 from src.spatial.h3_indexer import H3SpatialIndexer
@@ -131,6 +132,7 @@ class DeedsACRISProducer:
         self.carto = CartoClient()
         self.ckan = CkanClient()
         self.csv = CSVClient()
+        self.excel = ExcelClient()
         self.spatial_indexer = H3SpatialIndexer()
 
     def _client_for(self, platform: str):
@@ -146,6 +148,7 @@ class DeedsACRISProducer:
             "carto": getattr(self, "carto", None),
             "ckan": getattr(self, "ckan", None),
             "csv": getattr(self, "csv", None),
+            "excel": getattr(self, "excel", None),
         }
         client = clients.get(platform)
         if client is None:

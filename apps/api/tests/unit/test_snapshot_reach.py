@@ -39,6 +39,8 @@ FULL_READ_ROWS = {
     ("nyc", "childcare"): 2_752,
     ("oakland", "sla"): 5_103,
     ("portland", "sla"): 6_079,
+    # The transfers since the same day a year before (Excel, 2026-09-23 workbook).
+    ("richmond", "deeds"): 6_650,
     ("santa_rosa", "sla"): 4_979,
     ("st_louis", "sla"): 1_799,
     ("stockton", "sla"): 1_369,

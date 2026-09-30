@@ -21,7 +21,7 @@ import io
 import re
 import zipfile
 from collections.abc import Generator
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import httpx
@@ -29,6 +29,19 @@ import httpx
 _CMP = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*(>=|<=|>|<|=|!=)\s*'([^']*)'\s*$")
 _IS_NULL = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s+is\s+not\s+null\s*$", re.IGNORECASE)
 _NOT_IN = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s+NOT\s+IN\s*\(([^)]*)\)\s*$", re.IGNORECASE)
+# The rolling window ArcGIS specs send server-side (``CURRENT_DATE - INTERVAL
+# '180' DAY``); a file feed resolves it to a date before filtering rows.
+_RELATIVE_DATE = re.compile(r"CURRENT_DATE\s*-\s*INTERVAL\s*'(\d+)'\s*DAY", re.IGNORECASE)
+
+
+def resolve_relative_dates(where_clause: str | None, today: Any = None) -> str | None:
+    """Replace ``CURRENT_DATE - INTERVAL 'N' DAY`` with that day's quoted ISO date."""
+    if not where_clause:
+        return where_clause
+    day = today or datetime.now(UTC).date()
+    return _RELATIVE_DATE.sub(
+        lambda m: f"'{(day - timedelta(days=int(m.group(1)))).isoformat()}'", where_clause
+    )
 
 
 def _normalize_header(name: str) -> str:
@@ -278,6 +291,7 @@ class CSVClient:
         watermark_col = _normalize_header(kwargs.get("watermark_col") or "") or None
         watermark_format = kwargs.get("watermark_format")
         watermark_exclude = kwargs.get("watermark_exclude") or []
+        where_clause = resolve_relative_dates(where_clause)
 
         rows: list[dict[str, Any]] = []
         for row in reader:

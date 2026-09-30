@@ -121,3 +121,13 @@ point geometry, joined parcel/sales fields: `sale_date`, `sale_price`,
 **Reject Richmond for Wave 3.** All families T3. Watch items: assessor
 permit/sales services (token → anonymous), Business Licenses (if a
 date column and refresh appear). Stamp: 2026-08-28.
+
+## Addendum 2026-09-30: deeds from the assessor's workbook
+
+The assessor also publishes every recorded transfer as a monthly Excel
+workbook, linked from `rva.gov/media/53946` (`Assessor_Transfers_2026-09-23.xlsx`,
+439,398 rows, newest transfer 2026-09-22). It has no geometry, but its `PIN`
+joins the city's `Parcels/FeatureServer/0` layer, so each sale takes its
+parcel's centroid. Richmond `deeds` now reads it
+(`feed-health-2026-09-30.md`, "Richmond's transfers workbook"); the frozen
+`AssessorProValGPINRecTransPublish` table above is not used.

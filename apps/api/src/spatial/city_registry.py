@@ -308,6 +308,10 @@ class DatasetSpec:
     # combination: a sale keyed by parcel and instrument, where the parcel
     # repeats on every sale of that parcel.
     composite_id: bool = False
+    # A file renamed with each release is registered by the page that links
+    # it: the client reads ``endpoint`` and downloads the newest link whose URL
+    # matches this pattern (Richmond's monthly transfers workbook).
+    link_pattern: str | None = None
 
 
 @dataclass

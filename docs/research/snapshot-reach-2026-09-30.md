@@ -71,6 +71,13 @@ day. It was incremental on `GIS_DATETIME`, which each refresh stamps on every
 row at once, so every poll re-read the same first 1,000 rows
 (`feed-health-2026-09-30.md`).
 
+Richmond `deeds` (Excel, 6,650 rows, cap 12,000) joined with the city's
+registration. The assessor's workbook holds every transfer it has recorded
+(439,398 rows), so the feed filters to the 365 days before each poll and
+reads that year whole. A new workbook appears about monthly, and the daily
+poll between releases gets a 304 and reads nothing
+(`feed-health-2026-09-30.md`).
+
 ## Newest-first windows
 
 | Feed | Order | Rows dated in last 30 / 90 days | Window after |

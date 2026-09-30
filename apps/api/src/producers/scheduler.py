@@ -72,7 +72,7 @@ _PAGINATE_KWARGS: dict[str, tuple[str, ...]] = {
     # Accela's public surface is an ArcGIS facade (AccelaClient); a workbook
     # is sorted and column-picked client-side like a CSV.
     "accela": _ADAPTER_REQUEST_KEYS["arcgis"],
-    "excel": ("order_by", "select"),
+    "excel": ("order_by", "select", "link_pattern"),
 }
 
 # A snapshot whose order starts ``<col> DESC`` reads its newest rows first,
@@ -371,6 +371,7 @@ class MunicipalIngestionScheduler:
                     "base_where": ds.where,
                     "zip_member": zip_member,
                     "delimiter": ds.delimiter,
+                    "link_pattern": ds.link_pattern,
                     # A table with no geometry (DC, Lynchburg and Roanoke
                     # sales) takes each row's coordinates from its parcel's
                     # centroid.
@@ -845,11 +846,14 @@ class MunicipalIngestionScheduler:
         meta = self.job_metadata[job_name]
         join = meta["parcel_join"]
         key = join["join_key"]
+        # The row's own name for the key, where it differs from the parcel
+        # layer's (a workbook's headers arrive lower-cased).
+        row_key = join.get("row_key") or key
 
         def unplaced(row: dict[str, Any]) -> bool:
             return row.get("latitude") is None or row.get("longitude") is None
 
-        wanted = [row[key] for row in batch if unplaced(row) and row.get(key) not in (None, "")]
+        wanted = [row[row_key] for row in batch if unplaced(row) and row.get(row_key) not in (None, "")]
         if not wanted:
             return batch
         client = getattr(self.producers[meta["producer_key"]], "arcgis", None) or ArcGISClient()
@@ -858,7 +862,7 @@ class MunicipalIngestionScheduler:
         )
         joined = []
         for row in batch:
-            centroid = centroids.get(ArcGISClient._normalize_join_value(row.get(key))) if unplaced(row) else None
+            centroid = centroids.get(ArcGISClient._normalize_join_value(row.get(row_key))) if unplaced(row) else None
             joined.append({**row, "latitude": centroid[0], "longitude": centroid[1]} if centroid else row)
         return joined
 

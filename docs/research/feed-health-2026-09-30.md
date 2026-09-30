@@ -10,11 +10,13 @@ fallback, and lists the rest with the reason. A second stacked change repairs
 five of the mid-Atlantic `deeds` feeds and retracts seven whose cities publish
 no sales (see "Mid-Atlantic deeds"). A third fixes the filter an incremental
 poll sends, which a second poll of every affected feed showed was failing on
-32 feeds and reading the wrong rows on others (see "Incremental filters").
+32 feeds and reading the wrong rows on others (see "Incremental filters"). A
+fourth reads Richmond's sales from the assessor's monthly workbook (see
+"Richmond's transfers workbook").
 
 | | Jobs | Repaired here | Left, with reason below |
 |---|---|---|---|
-| Failed outright | 36 | 20 (six of them mid-Atlantic `deeds`, Roanoke's in the third change), and eight retracted: Madison `permits` and seven mid-Atlantic `deeds` | 8, one of them mid-Atlantic `deeds` |
+| Failed outright | 36 | 21 (seven of them mid-Atlantic `deeds`: Roanoke's in the third change, Richmond's in the fourth), and eight retracted: Madison `permits` and seven mid-Atlantic `deeds` | 7 |
 | Fetched rows, published none | 16 | 9 (Lynchburg `deeds` in the third change), and Milwaukee `deeds` was fine on a full read | 6 |
 | Fetched nothing | 8 | 5, and Lexington and Seattle `sla` moved to SNAP | 1, Tulsa `311` (an outage) |
 
@@ -194,13 +196,15 @@ inside the metro box, polled live on 2026-09-30):
 | Portland ME | the parcel layers have no sale fields; the one deed-dated layer has seven dated rows, the newest from 2005 | 92 |
 | Wilmington DE | New Castle County's `PropertySales` MapServer could not be checked (its host answers HTTP 472 to this network), and its ArcGIS Online records describe yearly layers for 2013 to 2019 only | 144 |
 
-Richmond stays failing. Roanoke's replacement needed the parcel join in
-`poll_job`, which the third change adds (see "Incremental filters"):
+Two cities needed more than a spec edit. Roanoke's replacement needed the
+parcel join in `poll_job`, which the third change adds (see "Incremental
+filters"), and Richmond's needed a workbook reader, which the fourth adds (see
+"Richmond's transfers workbook"):
 
 | City | Replacement found | Rows | Newest sale | What it needs |
 |---|---|---|---|---|
 | Roanoke | the city's transfer-history table, no geometry | 214,121 dated | 2026-09-28 | done in the third change: each sale sits at its parcel's centroid |
-| Richmond | the assessor's monthly transfers workbook (.xlsx, 72 MB) | 439,398 | 2026-09-22 | a reader for `.xlsx` files and their monthly changing URL |
+| Richmond | the assessor's monthly transfers workbook (.xlsx, 72 MB) | 439,398 | 2026-09-22 | done in the fourth change: the Excel client streams the workbook, keeps a year of sales, and places each at its parcel's centroid |
 
 
 ## Feeds that fetched nothing
@@ -377,3 +381,54 @@ Left as is: a row the dedup skips does not move the watermark, so a layer that
 restamps every row at each refresh keeps re-reading one refresh. Milwaukee
 `sla` was the only such layer in the survey. The Socrata feeds that filter on
 a refresh date (the Connecticut and Texas `sla` feeds) were not part of it.
+
+
+## Richmond's transfers workbook
+
+Richmond's assessor publishes every recorded property transfer, 439,398 rows
+on 2026-09-23, as one Excel workbook re-released each month under a new name
+(`Assessor_Transfers_2026-09-23.xlsx`). The file is 72 MB and its worksheet
+XML 400 MB, so pandas would hold gigabytes, and xlrd no longer opens `.xlsx`.
+The fourth stacked change reads it without new dependencies:
+
+- **A streaming reader.** `xlsx_reader.py` walks the worksheet a row at a time
+  with the standard library's `iterparse` and keeps the shared strings in one
+  buffer: 41 seconds and about 60 MB for the whole file. Date-formatted cells
+  come back as dates (Excel's 1900 and 1904 calendars), and the Excel client
+  hands them on as ISO strings, as the ArcGIS and CSV clients do.
+- **The monthly link.** The spec registers the city's media page
+  (`rva.gov/media/53946`) and a `link_pattern`; each poll reads the page and
+  takes the newest file it links whose name matches.
+- **A 304 between releases.** The client keeps the workbook's `ETag` and
+  `Last-Modified` once a poll has read it in full, so the daily poll asks
+  whether it changed and reads nothing until a new file appears. A poll that
+  stopped short reads the file again next time.
+- **A year of sales.** The feed keeps transfers since the same day a year
+  before (`CURRENT_DATE - INTERVAL '365' DAY`, which the CSV and Excel clients
+  now resolve to a date): 6,650 on 2026-09-30, 1,425 of them in the last 90
+  days, under a cap of 12,000. A sale is its parcel, date, deed book and page,
+  which no two rows in that year share. $0 and non-market transfers are kept,
+  as elsewhere.
+- **Coordinates from the parcel.** The workbook has none, so each sale takes
+  its parcel's centroid from the city's Parcels layer by `PIN`. The row's
+  lower-cased `pin` is named by the join's new `row_key`.
+- **Long parcel lists.** 100 quoted 11-character PINs made a 2,155-character
+  query URL, and Richmond's ArcGIS Online host answers 404 past about 2,000.
+  The client now splits each `IN (...)` list at 1,400 encoded characters as
+  well as 100 values. Numeric keys (Lynchburg, Roanoke) still send 100 a
+  request; DC's space-padded `SSL` values now send about 47.
+- **No party names.** `GRANTEE` and `GRANTOR` never leave the client: the
+  spec's `select` names only the columns the feed reads.
+- **Not in backfills yet.** `scripts/backfill_loader.py` hands a client only
+  its own `order_by`, not a spec's `select`, `link_pattern`, CSV `zip_member`
+  or parcel join. A Richmond backfill reads the media page as a workbook and
+  fails, and a backfill of an ArcGIS feed whose `select` keeps names on the
+  server reads every column. Left for a later change.
+
+Polled live through `poll_job` on 2026-09-30, Kafka mocked: 6,650 sales
+fetched and published, none dead-lettered, 6,647 placed at a parcel centroid
+inside the metro box (three found no parcel), dated 2025-09-30 to
+2026-09-22. The parcel lookups took 100 requests at 2 seconds apart. A second
+poll got a 304 and read nothing. A cold start publishes the whole year once,
+about 22 minutes at the scheduler's 0.2 seconds a row; after that, a new
+workbook brings its month's new sales.
