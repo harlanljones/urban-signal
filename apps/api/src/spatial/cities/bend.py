@@ -64,10 +64,12 @@ Bend is a **FOUR-FEED metro** on the city's ArcGIS Server at
 * CRIME — ``Public_Calls`` (451,275 rows, native point geometry,
   CreateDateTime watermark, newest 2026-08-27T11:43:18).
 
-DEEDS is deliberately **absent**: Deschutes County publishes no bulk
-recorded-deeds/sales endpoint (the county's ArcGIS surface exposes assessor
-parcel layers only, no recorder/sales table). Partial without deeds per the
-US-237 ticket.
+DEEDS come from Deschutes County's ``GIS_SALES`` table
+(``services1.arcgis.com/znO8Hz1SuVVohYhZ/.../Taxlots/FeatureServer/8``),
+registered 2026-09-30 in ``data/bend.yaml`` and not mirrored here: each
+taxlot's latest sales, placed on the taxlot's polygon (``parcel_join``) and
+kept to the metro box (``metro_clip``). The 2026-08-28 probe (US-237) found
+parcel layers only and missed the table.
 
 Live-probe caveats that define this leaf (probed 2026-08-28, US-237):
 
@@ -397,8 +399,8 @@ BEND_DIVISIONS: dict[str, BoroughMeta] = {
 # ---------------------------------------------------------------------------
 # Feed specs (leaf-local; the spine copies these into REGISTRY).
 # Probed 2026-08-28 (US-237). All four feeds are ArcGIS FeatureServers on
-# services5.arcgis.com/JisFYcK2mIVg9ueP. DEEDS unregistered (Deschutes County
-# publishes no bulk recorder/sales API).
+# services5.arcgis.com/JisFYcK2mIVg9ueP. Deeds, from Deschutes County's sales
+# table, are registered in data/bend.yaml only (2026-09-30).
 # ---------------------------------------------------------------------------
 BEND_PERMITS_ENDPOINT = (
     "https://services5.arcgis.com/JisFYcK2mIVg9ueP/arcgis/rest/services/"
