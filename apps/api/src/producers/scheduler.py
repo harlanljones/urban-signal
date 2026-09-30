@@ -858,7 +858,7 @@ class MunicipalIngestionScheduler:
             return batch
         client = getattr(self.producers[meta["producer_key"]], "arcgis", None) or ArcGISClient()
         centroids = client.fetch_centroid_index(
-            endpoint_url=join["parcel_layer"], join_key=key, join_values=wanted
+            endpoint_url=join["parcel_layer"], join_key=key, join_values=wanted, via=join.get("via")
         )
         joined = []
         for row in batch:

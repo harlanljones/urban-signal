@@ -76,6 +76,64 @@ def test_long_text_keys_split_below_the_url_limit():
     assert sent == pins
 
 
+def test_a_value_the_layer_lacks_takes_its_related_parcels_centroid():
+    """DC's Owner Polygons layer holds no condominium unit; CONDORELATE names
+    each unit's lot (MAT_SSL), and the unit takes that lot's centroid."""
+    layer = "https://example.test/FeatureServer/40"
+    table = "https://example.test/FeatureServer/52"
+    pages = {
+        (layer, "SSL IN ('0016    2033','6093    0808','0017    2001')"): [
+            {"SSL": "6093    0808", "latitude": 38.9001, "longitude": -77.0102},
+        ],
+        (table, "SSL IN ('0016    2033','0017    2001')"): [
+            {"SSL": "0016    2033", "MAT_SSL": "0016    0829"},
+            {"SSL": "0016    2033", "MAT_SSL": "0016    0830"},
+        ],
+        (layer, "SSL IN ('0016    0829')"): [
+            {"SSL": "0016    0829", "latitude": 38.9105, "longitude": -77.0431},
+        ],
+    }
+    calls = []
+
+    def fetch_page(endpoint_url, where_clause, order_by, limit, offset, select=None):
+        calls.append((endpoint_url, where_clause, select))
+        return (pages.get((endpoint_url, where_clause), []) if offset == 0 else []), False
+
+    client = ArcGISClient()
+    client.get_layer_metadata = _text_key_metadata
+    client._fetch_page = fetch_page
+
+    index = client.fetch_centroid_index(
+        layer,
+        join_key="SSL",
+        join_values=["0016    2033", "6093    0808", "0017    2001"],
+        via={"table": table, "key": "SSL", "to": "MAT_SSL"},
+    )
+
+    # The unit CONDORELATE does not know stays unplaced; a unit related to
+    # two lots takes the first.
+    assert index == {"6093 0808": (38.9001, -77.0102), "0016 2033": (38.9105, -77.0431)}
+    assert (table, "SSL IN ('0016    2033','0017    2001')", "SSL,MAT_SSL") in calls
+
+
+def test_no_via_table_is_read_when_the_layer_matches_every_value():
+    client = ArcGISClient()
+    client.get_layer_metadata = _text_key_metadata
+    client._fetch_page = MagicMock(
+        return_value=([{"SSL": "6093    0808", "latitude": 38.9001, "longitude": -77.0102}], False)
+    )
+
+    index = client.fetch_centroid_index(
+        "https://example.test/FeatureServer/40",
+        join_key="SSL",
+        join_values=["6093    0808"],
+        via={"table": "https://example.test/FeatureServer/52", "key": "SSL", "to": "MAT_SSL"},
+    )
+
+    assert index == {"6093 0808": (38.9001, -77.0102)}
+    assert client._fetch_page.call_count == 1
+
+
 def test_dc_deed_stream_enriches_cama_row_before_parsing():
     from src.producers.deeds_acris_producer import DeedsACRISProducer
 
@@ -93,6 +151,7 @@ def test_dc_deed_stream_enriches_cama_row_before_parsing():
 
         def fetch_centroid_index(self, **kwargs):
             assert kwargs["join_values"] == ["6093    0808"]
+            assert kwargs["via"]["to"] == "MAT_SSL"
             return {"6093 0808": (38.9001, -77.0102)}
 
     with patch("src.producers.deeds_acris_producer.BaseKafkaProducer"):

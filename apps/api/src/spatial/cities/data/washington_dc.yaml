@@ -737,9 +737,13 @@ datasets:
     state_plane_x_col: null
     state_plane_y_col: null
     parcel_join:
-      parcel_layer: https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Property_and_Land_WebMercator/FeatureServer/33
+      parcel_layer: https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Property_and_Land_WebMercator/FeatureServer/40
       join_key: SSL
       geometry_source: centroid
+      via:
+        table: https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Property_and_Land_WebMercator/FeatureServer/52
+        key: SSL
+        to: MAT_SSL
     non_spatial: null
     zip_member: null
     composite_id: true

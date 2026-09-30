@@ -566,10 +566,18 @@ class TestDcWithProposedFieldMap(DcParsingBase):
 
         extra = get_dataset(CityId.WASHINGTON_DC, FeedType.DEEDS)
         assert extra.non_spatial is not True
+        # Owner Polygons holds the lots; a condominium unit reaches its
+        # building's lot through CONDORELATE. (Parcel Lots, layer 33, holds
+        # only PAR parcels and matched 12 of 4,996 sales.)
         assert extra.parcel_join == {
-            "parcel_layer": f"{DCGIS}/DCGIS_DATA/Property_and_Land_WebMercator/FeatureServer/33",
+            "parcel_layer": f"{DCGIS}/DCGIS_DATA/Property_and_Land_WebMercator/FeatureServer/40",
             "join_key": "SSL",
             "geometry_source": "centroid",
+            "via": {
+                "table": f"{DCGIS}/DCGIS_DATA/Property_and_Land_WebMercator/FeatureServer/52",
+                "key": "SSL",
+                "to": "MAT_SSL",
+            },
         }
 
 

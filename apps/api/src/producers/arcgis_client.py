@@ -279,6 +279,7 @@ class ArcGISClient:
         join_values: Optional[List[Any]] = None,
         batch_size: int = 1000,
         max_records: Optional[int] = None,
+        via: Optional[Dict[str, str]] = None,
     ) -> Dict[str, tuple[float, float]]:
         """Fetch parcel polygons and return a normalized key-to-centroid index.
 
@@ -289,6 +290,12 @@ class ArcGISClient:
         centroid coordinates before this method builds the lookup. Geometry is
         requested through ``returnGeometry``; it is not an attribute field in
         the ``outFields`` selection.
+
+        ``via`` names a table that relates a key the layer does not hold to
+        one it does, as ``{"table": url, "key": ..., "to": ...}``: DC's
+        ``CONDORELATE`` gives a condominium unit's SSL its building's lot
+        (``MAT_SSL``). Each requested value the layer does not match is
+        looked up there and takes its related parcel's centroid.
         """
         layer_url = self._normalize_layer_url(endpoint_url)
         values = list(join_values) if join_values is not None else None
@@ -350,13 +357,7 @@ class ArcGISClient:
                     break
             return index
 
-        # A text key takes quoted literals and a numeric key bare numbers.
-        numeric = join_key in self.get_layer_metadata(layer_url).get("numeric_fields", ())
-        if numeric:
-            literals = [lit for lit in map(self._numeric_literal, values) if lit is not None]
-        else:
-            literals = ["'" + value.replace("'", "''") + "'" for value in values]
-        for where in self._in_clauses(join_key, literals):
+        for where in self._in_clauses(join_key, self._in_literals(layer_url, join_key, values)):
             offset = 0
             while True:
                 fetch_limit = batch_size
@@ -380,6 +381,62 @@ class ArcGISClient:
                     return index
                 if not exceeded and len(records) < fetch_limit:
                     break
+        if via:
+            missing = [value for value in values if self._normalize_join_value(value) not in index]
+            index.update(self._centroids_via(layer_url, join_key, via, missing, batch_size))
+        return index
+
+    def _in_literals(self, layer_url: str, key: str, values: List[str]) -> List[str]:
+        """``values`` as ``IN`` literals: a text key takes quoted literals and
+        a numeric key bare numbers."""
+        if key in self.get_layer_metadata(layer_url).get("numeric_fields", ()):
+            return [lit for lit in map(self._numeric_literal, values) if lit is not None]
+        return ["'" + value.replace("'", "''") + "'" for value in values]
+
+    def _centroids_via(
+        self,
+        layer_url: str,
+        join_key: str,
+        via: Dict[str, str],
+        values: List[str],
+        batch_size: int,
+    ) -> Dict[str, tuple[float, float]]:
+        """Centroids for ``values`` through the keys ``via``'s table relates them to."""
+        if not values:
+            return {}
+        table = self._normalize_layer_url(via["table"])
+        key, to = via["key"], via["to"]
+        related: Dict[str, Any] = {}
+        for where in self._in_clauses(key, self._in_literals(table, key, values)):
+            offset = 0
+            while True:
+                records, exceeded = self._fetch_page(
+                    endpoint_url=table,
+                    where_clause=where,
+                    order_by="",
+                    limit=batch_size,
+                    offset=offset,
+                    select=f"{key},{to}",
+                )
+                if not records:
+                    break
+                for record in records:
+                    source = self._normalize_join_value(record.get(key))
+                    if source and source not in related and record.get(to) not in (None, ""):
+                        related[source] = record[to]
+                offset += len(records)
+                if not exceeded and len(records) < batch_size:
+                    break
+        if not related:
+            return {}
+        targets = self.fetch_centroid_index(
+            layer_url, join_key, join_values=list(related.values()), batch_size=batch_size
+        )
+        index: Dict[str, tuple[float, float]] = {}
+        for source, target in related.items():
+            centroid = targets.get(self._normalize_join_value(target))
+            if centroid:
+                index[source] = centroid
         return index
 
     # Keep each IN request well below URL limits: Richmond's ArcGIS Online host

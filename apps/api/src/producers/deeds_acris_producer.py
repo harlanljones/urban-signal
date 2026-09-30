@@ -472,6 +472,7 @@ class DeedsACRISProducer:
                         endpoint_url=parcel_join["parcel_layer"],
                         join_key=join_key,
                         join_values=join_values,
+                        via=parcel_join.get("via"),
                     )
                 )
             for row in batch:

@@ -258,6 +258,30 @@ class TestSaleRows:
         assert (event.latitude, event.longitude) == (37.4136, -79.1422)
         assert event.h3_res9 is not None
 
+    def test_a_poll_hands_the_join_its_via_table(self, scheduler):
+        """DC's condominium units reach their lot through CONDORELATE."""
+        producer = scheduler.producers["deeds"]
+        rows = [
+            {"SSL": "0016    2033", "SALE_DATE": "2026-09-22T04:00:00+00:00", "SALE_PRICE": 455000,
+             "QUALIFIED": "Q", "ROW_NUMBER": 7, "OBJECTID": 41},
+        ]
+        producer.arcgis.paginate = MagicMock(return_value=[rows])
+        producer.arcgis.fetch_centroid_index = MagicMock(return_value={"0016 2033": (38.9105, -77.0431)})
+
+        result = scheduler.poll_job("deeds_dc", limit=10)
+
+        assert result["records_published"] == 1
+        kwargs = producer.arcgis.fetch_centroid_index.call_args.kwargs
+        assert kwargs["endpoint_url"].endswith("/FeatureServer/40")
+        assert kwargs["via"] == {
+            "table": "https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/"
+            "Property_and_Land_WebMercator/FeatureServer/52",
+            "key": "SSL",
+            "to": "MAT_SSL",
+        }
+        event = producer.producer.produce.call_args.kwargs["payload"]
+        assert (event.latitude, event.longitude) == (38.9105, -77.0431)
+
     def test_a_workbook_sale_joins_by_its_own_column_name(self, scheduler):
         """Richmond's workbook headers arrive lower-cased (``pin``) while its
         Parcels layer spells the field ``PIN``."""
