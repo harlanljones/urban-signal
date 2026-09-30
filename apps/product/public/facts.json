@@ -1092,13 +1092,18 @@
       "division_count": 1,
       "submarket_count": 5,
       "feeds": [
-        false,
+        true,
         true,
         true,
         false
       ],
       "platforms": [
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "issue_date",
+          "interval_seconds": 3600.0,
+          "topic": "raw.municipal.permits"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "RECEIVED_DATE",

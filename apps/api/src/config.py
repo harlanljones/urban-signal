@@ -1161,15 +1161,23 @@ class Settings(BaseSettings):
         description="Milwaukee 2025 property-sales CSV endpoint (US-138)",
     )
     # Charlotte, NC (ArcGIS): city 311 service requests with native
-    # LATITUDE/LONGITUDE + point geometry. Mecklenburg County permits/parcels
-    # live on an ArcGIS Hub surface with no quickly-verifiable bulk feed
-    # (US-88); the registration is 311-only.
+    # LATITUDE/LONGITUDE + point geometry. Building permits come from
+    # Mecklenburg County's own GIS server, which republishes the county's
+    # Accela permits nightly as points, one row per permit and parcel, for
+    # Charlotte and the county's six towns (2026-09-30).
     arcgis_charlotte_311_url: str = Field(
         default=(
             "https://gis.charlottenc.gov/arcgis/rest/services/"
             "ODP/ServiceRequests311/MapServer/0"
         ),
         description="Charlotte ODP 311 service requests layer URL",
+    )
+    arcgis_charlotte_permits_url: str = Field(
+        default=(
+            "https://meckgis.mecklenburgcountync.gov/server/rest/services/"
+            "BuildingPermits_Accela/FeatureServer/0"
+        ),
+        description="Mecklenburg County building permits (Accela) layer URL, Charlotte's permits",
     )
 
     # Houston, TX (ArcGIS, US-140): City of Houston mycity2 HOUSTON311_RECENT_SR_SNOW

@@ -241,6 +241,11 @@ ANSI_DATE_LITERAL_HOSTS = (
     # >= timestamp '2026-09-01 00:00:00'`` works. Medford's deeds poll as a
     # snapshot; a backfill with a start date sends the literal.
     "spatial.jacksoncountyor.gov",
+    # Mecklenburg County, NC: verified live 2026-09-30 — ``issue_date >=
+    # '2026-09-29T00:00:00'`` returns 400 "Unable to complete operation" while
+    # ``issue_date >= timestamp '2026-09-29 00:00:00'`` works. The layer
+    # declares Eastern time and reads literals in it.
+    "meckgis.mecklenburgcountync.gov",
 )
 
 

@@ -1589,3 +1589,22 @@ Worth keeping:
 - **A county metro can reuse a city's county-wide source.** When the source
   already covers the county, the county's feed is the city's without the
   filter that kept it to the city.
+
+### 2026-09-30 — Charlotte permits (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| charlotte-permits | `.streams/charlotte-permits.md` | `config.py` (the county's permits layer) | 2026-09-30 | done (1,000 permit rows read, 997 permits published, 3 further parcels of published permits skipped, none dead-lettered, the second poll published none) | `permits` spec for Charlotte; the county host in `ANSI_DATE_LITERAL_HOSTS`; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Charlotte moves from two signal families to three (three-family tier 29 to
+30).
+
+Worth keeping:
+
+- **Look at the county's server when the city's has nothing.** Charlotte's
+  permits were recorded as absent after the City's server was read and a
+  guessed county path returned 404; the county's server, listed from its
+  root, republishes them nightly.
+- **Check where a server sorts nulls.** A newest-first order put the 4,006
+  unissued permits ahead of every issued one, which a first poll would have
+  read alone.
