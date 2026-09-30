@@ -74,7 +74,6 @@ WINDOW_RECENT_ROWS = {
 
 KNOWN_GAPS = {
     ("kansas_city", "sla"): "28,245 rows and no date to window on (only a text licence year)",
-    ("reno", "deeds"): "194,124 parcels; the sale date is MM/DD/YYYY text, which does not sort",
     ("phoenix", "deeds"): (
         "the endpoint is a 61 MB zip of a 270 MB pipe-delimited file (903,301 affidavits); "
         "the spec names no zip member or delimiter, and the CSV client holds the whole "
