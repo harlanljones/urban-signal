@@ -65,7 +65,7 @@
   "feeds": {
     "permits": {
       "platform": "arcgis",
-      "watermark_col": "ISSUEDATE",
+      "watermark_col": "APPROVED",
       "interval_seconds": 300.0,
       "topic": "raw.municipal.permits"
     },

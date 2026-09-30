@@ -97,6 +97,53 @@ def test_sf_dob_permits_parser():
     assert event_alt.job_type == JobType.A2
 
 
+
+def test_sf_permit_counts_served_as_float_strings():
+    """Since 2026 DataSF serves unit and storey counts as ``"2.0"``; the
+    parser used ``int()`` on them, so three in four permits went to the DLQ."""
+    producer = DOBPermitsProducer(bootstrap_servers="localhost:9092")
+    row = {
+        "permit_number": "201601288200",
+        "permit_type_definition": "additions alterations or repairs",
+        "filed_date": "2016-01-28T09:20:21.000",
+        "issued_date": "2016-01-28T11:26:29.000",
+        "existing_units": "1.0",
+        "proposed_units": "2.0",
+        "number_of_proposed_stories": "3.0",
+        "proposed_stories": "n/a",
+        "location": {"type": "Point", "coordinates": [-122.4755, 37.7819]},
+    }
+
+    event = producer.parse_socrata_row(row, city_id="san_francisco")
+
+    assert event is not None
+    assert event.existing_dwelling_units == 1
+    assert event.proposed_dwelling_units == 2
+    # A count that is not a number is unknown; the permit still publishes.
+    assert event.proposed_stories is None
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [("24", 24), ("0", 0), (0, 0), ("2.0", 2), (3.0, 3), ("1,200", 1200),
+     ("", None), (None, None), ("n/a", None), ("-1", None), ("nan", None)],
+)
+def test_permit_count_coercion(raw, expected):
+    from src.producers.dob_permits_producer import _to_count
+
+    assert _to_count(raw) == expected
+
+
+def test_sf_feeds_use_the_current_datasf_domain():
+    """data.sfgov.org answers 301 to data.sf.gov, and the Socrata client does
+    not follow redirects, so every SF feed failed on every poll."""
+    from src.spatial.city_registry import REGISTRY, CityId
+
+    endpoints = [ds.endpoint for ds in REGISTRY[CityId.SAN_FRANCISCO].datasets.values()]
+    assert not [e for e in endpoints if "data.sfgov.org" in e]
+    assert sum("data.sf.gov/resource/" in e for e in endpoints) == 5
+
+
 def test_sf_311_complaints_parser():
     producer = Complaints311Producer(bootstrap_servers="localhost:9092")
 

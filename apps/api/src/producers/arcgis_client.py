@@ -326,6 +326,14 @@ class ArcGISClient:
         params["orderByFields"] = order_by or meta["oid_field"]
 
         payload = self._request_json(f"{layer_url}/query", params)
+        if "features" not in payload:
+            # A service root (``.../FeatureServer``) answers /query at HTTP 200
+            # with its own description, ``{"layers": [...]}``. Read as an empty
+            # page, that let five feeds report SUCCESS with zero rows.
+            hint = " (a service root: the endpoint needs a layer index)" if "layers" in payload else ""
+            raise RuntimeError(
+                f"ArcGIS query on {layer_url} returned no features{hint}; keys: {sorted(payload)}"
+            )
         features = payload.get("features") or []
         records = [self._flatten_feature(f, meta["date_fields"]) for f in features]
         return records, bool(payload.get("exceededTransferLimit"))

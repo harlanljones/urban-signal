@@ -1,6 +1,7 @@
 """NYC & Chicago DOB / Building Permits and Alterations Ingestion Stream Producer."""
 
 import argparse
+import importlib
 import logging
 from datetime import UTC, datetime
 from pathlib import Path
@@ -70,6 +71,39 @@ def _parse_datetime(val: Any) -> datetime | None:
             except ValueError:
                 pass
     return None
+
+
+def _to_count(val: Any) -> int | None:
+    """Coerce a unit or storey count; portals send ``3``, ``"3"`` or ``"3.0"``.
+
+    A blank, non-numeric or negative cell is an unknown count, not a reason to
+    drop the permit (San Francisco's table began serving ``"2.0"`` in 2026).
+    """
+    if val is None or str(val).strip() == "":
+        return None
+    try:
+        count = int(float(str(val).replace(",", "")))
+    except (ValueError, TypeError, OverflowError):
+        return None
+    return count if count >= 0 else None
+
+
+def _compose_permit_address(city_id: str, row: dict[str, Any]) -> str | None:
+    """The city leaf's ``compose_permit_address(row)``, when it defines one.
+
+    Some permit layers split the site address across columns (house number,
+    direction, street, type). A field map lists alternatives, not parts, so
+    ``first_mapped`` returned the house number alone and the geocoder refused
+    it (Cape Coral published no permits; Henderson dropped its rows without
+    coordinates). A leaf composer joins the parts; its field map then lists
+    ``address_street`` first to read the composed value.
+    """
+    try:
+        leaf = importlib.import_module(f"src.spatial.cities.{city_id}")
+    except ImportError:
+        return None
+    composer = getattr(leaf, "compose_permit_address", None)
+    return composer(row) if composer else None
 
 
 class DOBPermitsProducer:
@@ -163,12 +197,9 @@ class DOBPermitsProducer:
 
             field_map = resolve_field_map(resolved_city, FeedType.PERMITS)
 
-            if resolved_city == "albuquerque":
-                from src.spatial.cities.albuquerque import compose_permit_address
-
-                composed = compose_permit_address(row)
-                if composed:
-                    row = {**row, "address_street": composed}
+            composed = _compose_permit_address(resolved_city, row)
+            if composed:
+                row = {**row, "address_street": composed}
 
             job_id = str(
                 first_mapped(row, field_map, "job_id")
@@ -414,15 +445,15 @@ class DOBPermitsProducer:
                 block=str(row.get("block")) if row.get("block") else None,
                 lot=str(row.get("lot")) if row.get("lot") else None,
                 bbl=str(bbl) if bbl else None,
-                address_street=address_street,
+                address_street=str(address_street) if address_street is not None else None,
                 address_num=address_num,
                 zipcode=zipcode,
                 latitude=lat,
                 longitude=lng,
                 estimated_cost=cost,
-                proposed_dwelling_units=int(proposed_units) if proposed_units else None,
-                existing_dwelling_units=int(existing_units) if existing_units else None,
-                proposed_stories=int(proposed_stories) if proposed_stories else None,
+                proposed_dwelling_units=_to_count(proposed_units),
+                existing_dwelling_units=_to_count(existing_units),
+                proposed_stories=_to_count(proposed_stories),
                 filing_date=filing_dt,
                 issuance_date=issuance_dt,
                 status=(

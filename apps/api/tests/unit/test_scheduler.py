@@ -504,6 +504,28 @@ class TestPlatformRouting:
             mock_scheduler.producers["permits"].arcgis = saved
             mock_scheduler.job_metadata["permits"]["platform"] = "socrata"
 
+    def test_accela_and_excel_jobs_route_to_their_clients(self, mock_scheduler):
+        """Madison (accela, since retracted) and Spokane (excel) permits raised
+        "has no client registered" on every poll: the routing table stopped at
+        csv."""
+        producer = mock_scheduler.producers["permits"]
+        assert mock_scheduler._paginating_client_for("permits_spokane") is producer.excel
+        try:
+            mock_scheduler.job_metadata["permits"]["platform"] = "accela"
+            assert mock_scheduler._paginating_client_for("permits") is producer.accela
+        finally:
+            mock_scheduler.job_metadata["permits"]["platform"] = "socrata"
+
+    def test_excel_poll_sorts_the_workbook_by_issue_date(self, mock_scheduler):
+        """Spokane's workbook is not in date order (22,845 of 48,466 adjacent
+        rows step back in time on 2026-09-30), so a capped incremental read in
+        file order would jump the watermark past a quarter of the rows."""
+        paginate = mock_scheduler.producers["permits"].excel.paginate
+        mock_scheduler.poll_job("permits_spokane", limit=10)
+        _, kwargs = paginate.call_args
+        assert kwargs["order_by"] == "issued_date ASC"
+        assert set(kwargs) == {"endpoint_url", "where_clause", "batch_size", "max_records", "order_by"}
+
 
 class TestYearSliceEndpoints:
     """D3: endpoint_by_year resolves at poll-time metadata build."""
@@ -601,7 +623,7 @@ class TestPollJobIngestionContract:
     @staticmethod
     def _enforce_real_paginate_signatures(scheduler):
         for producer in scheduler.producers.values():
-            for attr in ("socrata", "arcgis", "carto", "ckan", "csv"):
+            for attr in ("socrata", "arcgis", "accela", "carto", "ckan", "csv", "excel"):
                 client = getattr(producer, attr, None)
                 if client is None or isinstance(client, MagicMock):
                     continue
@@ -666,10 +688,10 @@ class TestPollJobIngestionContract:
             {
                 "licenseno": "L-1",
                 "_id": 1,
-                "status_date": "2026-09-21T14:00:00",
-                # issued years earlier: the watermark must follow status_date,
+                "resultdttm": "2026-09-21 14:00:00+00",
+                # issued years earlier: the watermark must follow resultdttm,
                 # the column the incremental filter compares.
-                "issdttm": "2019-01-01T00:00:00",
+                "issdttm": "2019-01-01 00:00:00+00",
                 "location": "(42.35, -71.06)",
             },
         ]
@@ -680,7 +702,9 @@ class TestPollJobIngestionContract:
         assert result["records_published"] == 1
         assert mock_scheduler.dlq_producer.route_to_dlq.call_count == 0
         assert producer.producer.produce.call_args.kwargs["key"] == "boston:L-1"
-        assert result["high_watermark"] == "2026-09-21T14:00:00"
+        # The resource's timestamps are text: the stored watermark keeps the
+        # column's own format so the next `resultdttm > '...'` compares alike.
+        assert result["high_watermark"] == "2026-09-21 14:00:00+00"
 
     def test_raw_column_watermark_skips_future_rows(self, mock_scheduler):
         """Crime events carry occurred/reported dates, not one of the four

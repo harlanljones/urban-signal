@@ -4,7 +4,9 @@ FIELD_MAP = {
     "status": ["permit_status"],
     "job_type": ["Permit_Type", "Work_Class", "permit_desc"],
     "cost": ["permitvalue"],
-    "address_street": ["Addr1"],
+    # ``address_street`` is the composed site address (compose_permit_address);
+    # ``Addr1`` alone is only the house number.
+    "address_street": ["address_street", "Addr1"],
     "zipcode": ["Zip"],
     "borough": ["City"],
 }
@@ -21,7 +23,7 @@ This leaf declares:
 - a leaf-local DatasetSpec accessor for the verified public permits table
 """
 
-from typing import Dict
+from typing import Any
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
@@ -31,7 +33,7 @@ CAPE_CORAL_CITY_ID: str = "cape_coral"
 # Metro bbox — permissive envelope spanning Cape Coral and Fort Myers cores
 # and adjacent North Fort Myers. Chosen to comfortably contain all declared
 # division bboxes and submarket centers.
-CAPE_CORAL_METRO_BBOX: Dict[str, float] = {
+CAPE_CORAL_METRO_BBOX: dict[str, float] = {
     "min_lat": 26.40,
     "max_lat": 26.80,
     "min_lng": -82.15,
@@ -49,9 +51,42 @@ def is_in_cape_coral_metro(lat: float, lng: float) -> bool:
     )
 
 
+def compose_permit_address(row: dict[str, Any]) -> str | None:
+    """Join the permit layer's site-address parts into one geocode query.
+
+    ``Addr1`` holds only the house number; the street is split across
+    ``Predir``, ``Addr2`` (the name), ``Street_Type`` and ``Post_Dir``, and
+    ``Addr3`` is the literal ``Parcel``. Form: ``{Addr1} {Predir} {Addr2}
+    {Street_Type} {Post_Dir}, {City}, {State} {Zip}``; ``City`` is not always
+    Cape Coral (North Fort Myers rows carry their own). Returns ``None``
+    without a street name, so the geocoder is never asked for a bare number.
+    """
+
+    def _part(key: str) -> str:
+        val = row.get(key)
+        return str(val).strip() if val is not None else ""
+
+    if not _part("Addr2"):
+        return None
+    street = " ".join(
+        part
+        for part in (
+            _part("Addr1"),
+            _part("Predir"),
+            _part("Addr2"),
+            _part("Street_Type"),
+            _part("Post_Dir"),
+        )
+        if part
+    )
+    place = f"{_part('City') or 'Cape Coral'}, {_part('State') or 'FL'}"
+    zipcode = _part("Zip")
+    return f"{street}, {place} {zipcode}" if zipcode else f"{street}, {place}"
+
+
 # Division bounding boxes — coarse, disjoint-ish envelopes around key areas.
 # These are hand-authored for stable resolution, not cadastral boundaries.
-CAPE_CORAL_DIVISION_BBOXES: Dict[str, Dict[str, float]] = {
+CAPE_CORAL_DIVISION_BBOXES: dict[str, dict[str, float]] = {
     "CAPE_CORE_WATERFRONT": {"min_lat": 26.55, "max_lat": 26.65, "min_lng": -82.05, "max_lng": -81.92},
     "CAPE_SW_ISLES": {"min_lat": 26.52, "max_lat": 26.60, "min_lng": -82.10, "max_lng": -82.00},
     "CAPE_NW_GATOR": {"min_lat": 26.60, "max_lat": 26.72, "min_lng": -82.10, "max_lng": -81.98},
@@ -60,7 +95,7 @@ CAPE_CORAL_DIVISION_BBOXES: Dict[str, Dict[str, float]] = {
 }
 
 
-CAPE_CORAL_SUBMARKETS: Dict[str, SubmarketMeta] = {
+CAPE_CORAL_SUBMARKETS: dict[str, SubmarketMeta] = {
     # -----------------------------------------------------------------------
     # CAPE_CORE_WATERFRONT (3)
     # -----------------------------------------------------------------------
@@ -199,7 +234,7 @@ CAPE_CORAL_SUBMARKETS: Dict[str, SubmarketMeta] = {
 }
 
 
-CAPE_CORAL_DIVISIONS: Dict[str, BoroughMeta] = {
+CAPE_CORAL_DIVISIONS: dict[str, BoroughMeta] = {
     "CAPE_CORE_WATERFRONT": BoroughMeta(
         name="CAPE_CORE_WATERFRONT",
         center_lat=26.568,
@@ -253,7 +288,7 @@ CAPE_CORAL_DIVISIONS: Dict[str, BoroughMeta] = {
 # Verified public permits table (address-only; ADR-0004 geocoding in registry).
 CAPE_CORAL_PERMITS_ENDPOINT = "https://capeims.capecoral.gov/arcgis/rest/services/OpenData/OpenData/MapServer/1"
 
-CAPE_CORAL_FEED_SPECS: Dict[str, Dict[str, object]] = {
+CAPE_CORAL_FEED_SPECS: dict[str, dict[str, object]] = {
     "permits": {
         "endpoint": CAPE_CORAL_PERMITS_ENDPOINT,
         "platform": "arcgis",
@@ -265,7 +300,15 @@ CAPE_CORAL_FEED_SPECS: Dict[str, Dict[str, object]] = {
         "extra": {
             "expected_cadence_days": 7,
             "order_by": "issuedate DESC",
-            "scope": "Cape Coral–Fort Myers building permits (address-only; geocoding upstream)",
+            # 33 of 64,910 rows carry issue dates past 2026-10-01 (as far out
+            # as the year 2610); newest-first reads would start with them.
+            "where": "issuedate <= CURRENT_TIMESTAMP",
+            "needs_geocode": True,
+            "geocode_context": "Cape Coral, FL",
+            "scope": (
+                "Cape Coral–Fort Myers building permits (address-only; the "
+                "site address is composed from its parts and geocoded)"
+            ),
             "field_map": CAPE_CORAL_FIELD_MAP,
             "non_spatial": True,
         },
@@ -299,7 +342,7 @@ def get_cape_coral_dataset(feed: object) -> object:
 
 
 # Registration object consumed by the derived registry aggregator.
-from src.spatial.registration import SpatialRegistration  # noqa: E402
+from src.spatial.registration import SpatialRegistration
 
 REGISTRATION = SpatialRegistration(
     metro_bbox=CAPE_CORAL_METRO_BBOX,

@@ -631,14 +631,26 @@ datasets:
     needs_geocode: false
     geocode_context: null
     field_map:
-      job_id:
+      permit_id:
       - RECORDID
+      permit_type:
+      - APPTYPE
+      status:
+      - APPLICATIONSTATUS
+      address:
+      - LOCATION
       latitude:
       - LATITUDE
+      - latitude
       longitude:
       - LONGITUDE
+      - longitude
       issued_date:
       - ISSUEDDATE
+      start_date:
+      - STARTDATE
+      end_date:
+      - ENDDATE
     ingestion_mode: incremental
     oid_field: OBJECTID
     max_record_count: 1000

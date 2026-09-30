@@ -535,7 +535,7 @@ datasets:
     non_spatial: null
     zip_member: null
   crime:
-    endpoint: https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/crime_data_2025/FeatureServer
+    endpoint: https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/crime_data_2026/FeatureServer/0
     platform: arcgis
     watermark_col: date_occurred
     id_keys:
@@ -544,11 +544,13 @@ datasets:
     topic: raw.municipal.crime
     interval_seconds: 300.0
     producer_key: crime
-    endpoint_by_year: {}
+    endpoint_by_year:
+      '2025': https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/crime_data_2025/FeatureServer/0
+      '2026': https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/crime_data_2026/FeatureServer/0
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: date_occurred DESC
     id_col: null
     select: null
     fallback_endpoints: []
@@ -573,7 +575,7 @@ datasets:
     expected_cadence_days: 7
     alarm_exempt: false
     alarm_exempt_reason: null
-    annual_rotation: false
+    annual_rotation: true
     companion_endpoints: {}
     proxy_for: null
     retention_days: null
@@ -587,7 +589,7 @@ datasets:
     non_spatial: null
     zip_member: null
   permits:
-    endpoint: https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/active_construction_permits/FeatureServer
+    endpoint: https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/active_construction_permits/FeatureServer/0
     platform: arcgis
     watermark_col: ISSUE_DATE
     id_keys:
@@ -600,7 +602,7 @@ datasets:
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: ISSUE_DATE DESC
     id_col: null
     select: null
     fallback_endpoints: []
@@ -639,7 +641,7 @@ datasets:
     non_spatial: null
     zip_member: null
   street_cut:
-    endpoint: https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/Louisville_KY_ROW_Construction_Permits_new/FeatureServer
+    endpoint: https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/Louisville_KY_ROW_Construction_Permits_new/FeatureServer/0
     platform: arcgis
     watermark_col: FROM_DATE
     id_keys:
@@ -652,7 +654,7 @@ datasets:
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: FROM_DATE DESC
     id_col: null
     select: null
     fallback_endpoints: []
@@ -660,14 +662,24 @@ datasets:
     needs_geocode: false
     geocode_context: null
     field_map:
-      job_id:
+      permit_id:
       - PERMIT_NO
+      work_type:
+      - WORK_TYPE
+      address:
+      - STREET_ADDRESS
       latitude:
       - LATITUDE
+      - latitude
       longitude:
       - LONGITUDE
+      - longitude
       issued_date:
       - FROM_DATE
+      start_date:
+      - FROM_DATE
+      end_date:
+      - TO_DATE
     ingestion_mode: incremental
     oid_field: ObjectId
     max_record_count: 1000

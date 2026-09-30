@@ -483,12 +483,12 @@ datasets:
     non_spatial: null
     zip_member: null
   crime:
-    endpoint: https://services.arcgis.com/jjSk6t82vIntwDbs/arcgis/rest/services/LVMPD_Calls_For_Service_All/FeatureServer
+    endpoint: https://services.arcgis.com/jjSk6t82vIntwDbs/arcgis/rest/services/LVMPD_Calls_For_Service_30_Days/FeatureServer/0
     platform: arcgis
-    watermark_col: incidentdate
+    watermark_col: IncidentDate
     id_keys:
     - OBJECTID
-    - incidentnumber
+    - IncidentNumber
     topic: raw.municipal.crime
     interval_seconds: 300.0
     producer_key: crime
@@ -496,7 +496,7 @@ datasets:
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: IncidentDate DESC
     id_col: null
     select: null
     fallback_endpoints: []
@@ -505,18 +505,18 @@ datasets:
     geocode_context: null
     field_map:
       incident_id:
-      - incidentnumber
+      - IncidentNumber
       - OBJECTID
       offense_type:
-      - incidenttypedescription
+      - IncidentTypeDescription
       occurred_date:
-      - incidentdate
+      - IncidentDate
       latitude:
       - latitude
       longitude:
       - longitude
       address:
-      - location
+      - Address
     ingestion_mode: incremental
     oid_field: OBJECTID
     max_record_count: 1000
@@ -536,6 +536,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 4000
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis

@@ -2052,7 +2052,7 @@
         null,
         {
           "platform": "csv",
-          "watermark_col": "Original Issue Date",
+          "watermark_col": "original_issue_date",
           "interval_seconds": 600.0,
           "topic": "raw.municipal.sla"
         },
@@ -2410,7 +2410,7 @@
       "platforms": [
         {
           "platform": "arcgis",
-          "watermark_col": "ISSUEDATE",
+          "watermark_col": "APPROVED",
           "interval_seconds": 300.0,
           "topic": "raw.municipal.permits"
         },
@@ -2552,8 +2552,8 @@
         null,
         {
           "platform": "arcgis",
-          "watermark_col": "IssueDate",
-          "interval_seconds": 600.0,
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
         null
@@ -2817,20 +2817,20 @@
       "division_count": 1,
       "submarket_count": 5,
       "feeds": [
+        false,
+        false,
         true,
-        false,
-        false,
         false
       ],
       "platforms": [
+        null,
+        null,
         {
-          "platform": "accela",
-          "watermark_col": "IssuedDate",
-          "interval_seconds": 300.0,
-          "topic": "raw.municipal.permits"
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
         },
-        null,
-        null,
         null
       ],
       "center": {
@@ -3071,7 +3071,7 @@
         {
           "platform": "csv",
           "watermark_col": "date_issued",
-          "interval_seconds": 300.0,
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.permits"
         },
         {
@@ -4681,9 +4681,9 @@
           "topic": "raw.municipal.311"
         },
         {
-          "platform": "socrata",
-          "watermark_col": "applicationdate",
-          "interval_seconds": 600.0,
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
         {
@@ -4781,7 +4781,7 @@
         {
           "platform": "excel",
           "watermark_col": "issued_date",
-          "interval_seconds": 300.0,
+          "interval_seconds": 3600.0,
           "topic": "raw.municipal.permits"
         },
         null,

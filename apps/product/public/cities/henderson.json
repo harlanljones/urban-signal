@@ -197,7 +197,7 @@
     "311": null,
     "sla": {
       "platform": "csv",
-      "watermark_col": "Original Issue Date",
+      "watermark_col": "original_issue_date",
       "interval_seconds": 600.0,
       "topic": "raw.municipal.sla"
     },

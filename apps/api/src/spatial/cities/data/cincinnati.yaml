@@ -83,10 +83,7 @@ datasets:
     platform: socrata
     watermark_col: issueddate
     id_keys:
-    - permit_number
-    - permitnumber
-    - pin
-    - id
+    - permitnum
     topic: raw.municipal.permits
     interval_seconds: 300.0
     producer_key: permits
@@ -99,21 +96,28 @@ datasets:
     select: null
     fallback_endpoints: []
     where: null
-    needs_geocode: false
-    geocode_context: null
+    needs_geocode: true
+    geocode_context: Cincinnati, OH
     field_map:
       job_id:
-      - permit_number
-      - permitnumber
-      - pin
+      - permitnum
       issuance_date:
       - issueddate
       filing_date:
       - applieddate
+      job_type:
+      - permittypemapped
+      - workclassmapped
+      status:
+      - statuscurrentmapped
+      cost:
+      - estprojectcostdec
       address_street:
       - originaladdress1
       zipcode:
       - originalzip
+      borough:
+      - neighborhood
     ingestion_mode: incremental
     oid_field: null
     max_record_count: null

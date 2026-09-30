@@ -250,9 +250,7 @@ datasets:
     platform: socrata
     watermark_col: recordrefreshedon
     id_keys:
-    - license_number
-    - credential_number
-    - id
+    - credentialid
     topic: raw.municipal.sla
     interval_seconds: 3600.0
     producer_key: sla
@@ -264,43 +262,35 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: city = 'HARTFORD'
+    where: city = 'HARTFORD' AND credentialtype IN ('LIR', 'LRW', 'LRB', 'LCA', 'LCR', 'LCW', 'LIT', 'LIH', 'LIC', 'LPC', 'LGC', 'LBA', 'LBB', 'LRF', 'LRS', 'LCN', 'LCM', 'LCC', 'LAP', 'LCS', 'LFB', 'LFC', 'LFG', 'LFR', 'LOL', 'LSE', 'LTH', 'LPA', 'LIU', 'LUW', 'LUB', 'LAB', 'LAT', 'LAC', 'LMI', 'LIP', 'LGB', 'LID', 'LWG', 'LRE', 'LMB', 'LMP', 'LBP', 'LML', 'LMS', 'LMA', 'LMC', 'LMW', 'LFW', 'LBF', 'LDF', 'FWBC', 'CGAL', 'LFO')
     needs_geocode: true
     geocode_context: Hartford, CT
     field_map:
       license_id:
-      - license_number
-      - credential_number
-      - id
+      - credentialid
+      - fullcredentialcode
       license_type:
-      - credential_type
-      - credential_name
-      - license_type
+      - credential
+      - credentialtype
       effective_date:
-      - effective_date
-      - issue_date
+      - effectivedate
+      - issuedate
       expiration_date:
-      - expiration_date
-      - expiry_date
+      - expirationdate
       address_street:
       - address
-      - street_address
-      - address_line_1
       zipcode:
       - zip
-      - zipcode
-      - postal_code
       borough:
       - city
       premises_name:
-      - business_name
-      - name
+      - businessname
+      - dba
       dba:
-      - business_name
-      - name
+      - dba
+      - businessname
       status:
       - status
-      - license_status
     ingestion_mode: incremental
     oid_field: null
     max_record_count: null

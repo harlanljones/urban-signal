@@ -79,9 +79,9 @@ divisions:
     city_id: lakeland
 datasets:
   permits:
-    endpoint: https://gismims.lakelandgov.net/portal/rest/services/Public_CED/Lakeland_CED_Permits/MapServer/0
+    endpoint: https://services1.arcgis.com/mcbQY5xNGGGM1vBX/arcgis/rest/services/IMS_Projects_Permits/FeatureServer/6
     platform: arcgis
-    watermark_col: ISSUEDATE
+    watermark_col: APPROVED
     id_keys:
     - PERMIT_NO
     - OBJECTID
@@ -92,17 +92,32 @@ datasets:
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: APPROVED DESC,OBJECTID ASC
     id_col: null
     select: null
     fallback_endpoints: []
-    where: null
+    where: TYPE = 'Permit'
     needs_geocode: false
     geocode_context: null
-    field_map: {}
+    field_map:
+      job_id:
+      - PERMIT_NO
+      issuance_date:
+      - APPROVED
+      - ISSUED
+      filing_date:
+      - APPLIED
+      job_type:
+      - PERMITORPROJECTTYPE
+      cost:
+      - JOBVALUE
+      address_street:
+      - SITE_ADDR
+      zipcode:
+      - SITE_ZIP
     ingestion_mode: incremental
     oid_field: OBJECTID
-    max_record_count: 2000
+    max_record_count: 16000
     expected_cadence_days: 7
     alarm_exempt: false
     alarm_exempt_reason: null

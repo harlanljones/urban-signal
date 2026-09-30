@@ -15,11 +15,13 @@ here — none are registered.
 Live-probe caveats that define this leaf (probed 2026-08-30, US-419):
 
 * SLA watermark is ``recordrefreshedon`` (ISO datetime; newest row on the probe
-  = 2026-08-30). The feed is the broad statewide eLicensing credentials table
-  (2.66M rows statewide; 39,955 for ``city='BRIDGEPORT'``) — rows are
-  credentials (gas dealers, repairers, etc.), not hospitality-only. 0 of 39,955
-  rows have a null watermark, so no ``IS NOT NULL`` guard is required (unlike
-  Buffalo's ``issdttm``). ``credentialid`` is the row identifier.
+  = 2026-08-30). The source is the statewide eLicensing credentials table
+  (2.66M rows statewide; 39,955 for ``city='BRIDGEPORT'``), which holds every
+  credential the state issues, gas dealers and repairers included. Since
+  2026-09-30 the feed also filters ``credentialtype`` to liquor permits
+  (1,401 rows; ``src/producers/ct_liquor_specs.py``). 0 of 39,955 rows have a
+  null watermark, so no ``IS NOT NULL`` guard is required (unlike Buffalo's
+  ``issdttm``). ``credentialid`` is the row identifier.
 * DEEDS watermark is ``daterecorded`` (ISO datetime; newest row on the probe =
   2025-09-30, ``listyear`` 2024 — an annual grand-list publication, so the
   watermark lags ~11 months). 0 of 41,036 rows have a null watermark.
@@ -33,6 +35,7 @@ Live-probe caveats that define this leaf (probed 2026-08-30, US-419):
   the deeds producer's loc fallback (documented in the field-map module).
 """
 
+from src.producers.ct_liquor_specs import CT_LIQUOR_SLA_FIELD_MAP, ct_liquor_where
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 BRIDGEPORT_CITY_ID: str = "bridgeport"
@@ -307,18 +310,9 @@ BRIDGEPORT_DIVISIONS: dict[str, BoroughMeta] = {
 BRIDGEPORT_SLA_ENDPOINT = "https://data.ct.gov/resource/ngch-56tr.json"
 BRIDGEPORT_DEEDS_ENDPOINT = "https://data.ct.gov/resource/5mzw-sjtu.json"
 
-SLA_FIELD_MAP: dict[str, list[str]] = {
-    "license_id": ["credentialid", "fullcredentialcode"],
-    "license_type": ["credential", "credentialtype"],
-    "effective_date": ["effectivedate", "issuedate"],
-    "expiration_date": ["expirationdate"],
-    "address_street": ["address"],
-    "zipcode": ["zip"],
-    "borough": ["city"],
-    "premises_name": ["businessname", "name"],
-    "dba": ["businessname", "name"],
-    "status": ["status"],
-}
+# Shared with Hartford and New Haven: liquor permits only, and never the
+# permittee's own ``name``.
+SLA_FIELD_MAP: dict[str, list[str]] = CT_LIQUOR_SLA_FIELD_MAP
 
 DEEDS_FIELD_MAP: dict[str, list[str]] = {
     "doc_id": ["serialnumber"],
@@ -349,13 +343,13 @@ BRIDGEPORT_FEED_SPECS: dict[str, dict[str, object]] = {
             "expected_cadence_days": 7,
             "needs_geocode": True,
             "geocode_context": "Bridgeport, CT",
-            "where": "city = 'BRIDGEPORT'",
+            "where": ct_liquor_where("BRIDGEPORT"),
             "order_by": "recordrefreshedon DESC",
             "scope": (
                 "Connecticut State Licenses and Credentials (statewide "
-                "eLicensing Socrata feed filtered to city = 'BRIDGEPORT'; "
-                "39,955 rows; broad credential types incl. gas dealers and "
-                "repairers; recordrefreshedon ISO watermark, 0 null rows so no "
+                "eLicensing Socrata feed filtered to city = 'BRIDGEPORT' and "
+                "to liquor permit credential types; 1,401 of 39,955 rows on "
+                "2026-09-30; recordrefreshedon ISO watermark, 0 null rows so no "
                 "IS NOT NULL guard; address-only so needs_geocode=True)"
             ),
             "field_map": SLA_FIELD_MAP,

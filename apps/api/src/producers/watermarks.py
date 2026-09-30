@@ -169,6 +169,18 @@ ANSI_DATE_LITERAL_HOSTS = (
     # re-reads part of a day (the cross-run dedup drops the repeats) but cannot
     # skip rows, because the layer is loaded by one daily extract (~05:00 ET).
     "maps2.columbus.gov",
+    # Augusta, GA (10.91), Dayton, OH (11.4) and Peoria County, IL (11.4):
+    # verified live 2026-09-30 with count queries — ``> '2026-09-22T05:31:07'``
+    # returns 400 "Unable to complete operation" on each, while ``> date
+    # '2026-09-22'`` works. Every first poll passed (no watermark yet); the
+    # second poll failed.
+    "gismap.augustaga.gov",
+    "maps.daytonohio.gov",
+    "gis.peoriacounty.gov",
+    # Tulsa, OK (ArcGIS Server 11.5): verified live 2026-09-30 —
+    # ``case_opened > '2026-08-24T02:53:23'`` returns 400 "Unable to complete
+    # operation" while ``case_opened > date '2026-08-24'`` works.
+    "maps.cityoftulsa.org",
 )
 
 

@@ -63,7 +63,37 @@ def test_boston_registers_violations_and_inspections():
     assert v_spec.platform == "ckan"
     assert v_spec.watermark_col == "status_dttm"
     assert i_spec.platform == "ckan"
-    assert i_spec.watermark_col == "status_date"
+    # status_date is null on 55% of inspections since 2026-08-01, and the
+    # incremental filter never returns a null.
+    assert i_spec.watermark_col == "resultdttm"
+
+
+def test_boston_ckan_feeds_name_resources_not_packages():
+    """Until 2026-09-30 crime, violations and inspections named CKAN package
+    ids, which ``datastore_search`` answers with 404."""
+    assert get_dataset(CityId.BOSTON, FeedType.CRIME).endpoint == (
+        "ckan://data.boston.gov/b973d8cb-eeb2-4e7e-99da-c92938efc9c0"
+    )
+    assert get_dataset(CityId.BOSTON, FeedType.VIOLATIONS).endpoint == (
+        "ckan://data.boston.gov/800a2663-1d6a-46e7-9356-bedb70f5332c"
+    )
+    assert get_dataset(CityId.BOSTON, FeedType.INSPECTIONS).endpoint == (
+        "ckan://data.boston.gov/4582bec6-2b4f-4f9e-bc55-cbaa73117f4c"
+    )
+
+
+def test_boston_ckan_timestamps_keep_their_own_text_format():
+    """The columns are text (``2026-09-27 01:40:00+00``). Stored as ISO, a
+    watermark's ``T`` sorts after the space, so later rows from the
+    watermark's own day compared lower and were never read."""
+    formats = {
+        FeedType.CRIME: "%Y-%m-%d %H:%M:%S+00",
+        FeedType.INSPECTIONS: "%Y-%m-%d %H:%M:%S+00",
+        FeedType.VIOLATIONS: "%Y-%m-%d %H:%M:%S",
+    }
+    for feed, fmt in formats.items():
+        spec = get_dataset(CityId.BOSTON, feed)
+        assert (spec.watermark_type, spec.watermark_format) == ("text", fmt), feed
 
 
 def test_violations_producer_parses_row():

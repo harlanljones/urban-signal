@@ -207,8 +207,8 @@
     "311": null,
     "sla": {
       "platform": "arcgis",
-      "watermark_col": "IssueDate",
-      "interval_seconds": 600.0,
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
       "topic": "raw.municipal.sla"
     },
     "deeds": null

@@ -1447,7 +1447,7 @@ divisions:
     city_id: san_francisco
 datasets:
   permits:
-    endpoint: https://data.sfgov.org/resource/i98e-djp9.json
+    endpoint: https://data.sf.gov/resource/i98e-djp9.json
     platform: socrata
     watermark_col: issued_date
     id_keys:
@@ -1489,7 +1489,7 @@ datasets:
     non_spatial: null
     zip_member: null
   '311':
-    endpoint: https://data.sfgov.org/resource/vw6y-z8j6.json
+    endpoint: https://data.sf.gov/resource/vw6y-z8j6.json
     platform: socrata
     watermark_col: requested_datetime
     id_keys:
@@ -1531,7 +1531,7 @@ datasets:
     non_spatial: null
     zip_member: null
   sla:
-    endpoint: https://data.sfgov.org/resource/g8m3-pdis.json
+    endpoint: https://data.sf.gov/resource/g8m3-pdis.json
     platform: socrata
     watermark_col: location_start_date
     id_keys:
@@ -1573,7 +1573,7 @@ datasets:
     non_spatial: null
     zip_member: null
   deeds:
-    endpoint: https://data.sfgov.org/resource/wv5m-vpq2.json
+    endpoint: https://data.sf.gov/resource/wv5m-vpq2.json
     platform: socrata
     watermark_col: data_loaded_at
     id_keys:
@@ -1617,7 +1617,7 @@ datasets:
     non_spatial: null
     zip_member: null
   crime:
-    endpoint: https://data.sfgov.org/resource/wg3w-h783.json
+    endpoint: https://data.sf.gov/resource/wg3w-h783.json
     platform: socrata
     watermark_col: incident_datetime
     id_keys:

@@ -179,7 +179,7 @@ datasets:
     non_spatial: null
     zip_member: null
   crime:
-    endpoint: https://services1.arcgis.com/WHM6qC35aMtyAAlN/arcgis/rest/services/BPD_Crimes_Public/FeatureServer
+    endpoint: https://services1.arcgis.com/WHM6qC35aMtyAAlN/arcgis/rest/services/BPD_Crimes_Public/FeatureServer/0
     platform: arcgis
     watermark_col: OccurredDateTime
     id_keys:

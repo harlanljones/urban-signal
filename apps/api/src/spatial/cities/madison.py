@@ -1,4 +1,10 @@
-"""Madison, Wisconsin spatial registration and Accela feed contract."""
+"""Madison, Wisconsin spatial registration.
+
+Madison publishes no building permits a poller can read: the Accela Citizen
+Access page registered until 2026-09-30 answers every API call with a redirect
+to an HTML error page, and Accela's Construct API needs a registered App ID.
+The city's only feed is the SNAP retailer ``sla`` fallback (``snap_sla_spec``).
+"""
 
 from src.spatial.registration import SpatialRegistration
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
@@ -75,22 +81,6 @@ MADISON_DIVISIONS: dict[str, BoroughMeta] = {
         submarkets=list(MADISON_SUBMARKETS), city_id="madison",
     ),
 }
-
-# Accela Citizen Access is Madison's authoritative permitting surface. The
-# shared Accela client handles its JSON/REST pagination; keeping the mapping in
-# this leaf lets Grand Rapids reuse the client without sharing Madison fields.
-MADISON_PERMITS_FIELD_MAP: dict[str, list[str]] = {
-    "job_id": ["RecordID", "RecordNumber", "B1_ALT_ID", "permit_number"],
-    "address_street": ["Address", "SITE_ADDRESS", "address"],
-    "issuance_date": ["IssuedDate", "ISSUED_DT", "issued_date"],
-    "filing_date": ["OpenedDate", "CREATE_DT", "created_date"],
-    "job_type": ["RecordType", "PERMIT_TYPE", "permit_type"],
-    "cost": ["TotalJobCost", "JOBVALUE", "estimated_cost"],
-    "latitude": ["Latitude", "latitude"],
-    "longitude": ["Longitude", "longitude"],
-}
-
-MADISON_PERMITS_ENDPOINT = "https://aca-prod.accela.com/MADISON/Cap/CapHome.aspx"
 
 REGISTRATION = SpatialRegistration(
     metro_bbox=MADISON_METRO_BBOX,

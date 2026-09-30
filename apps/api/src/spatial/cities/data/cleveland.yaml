@@ -115,7 +115,7 @@ datasets:
     platform: arcgis
     watermark_col: ISSUE_DATE
     id_keys:
-    - PERMIT_NUMBER
+    - PERMIT_ID
     - OBJECTID
     topic: raw.municipal.permits
     interval_seconds: 300.0
@@ -133,24 +133,21 @@ datasets:
     geocode_context: null
     field_map:
       job_id:
-      - PERMIT_NUMBER
+      - PERMIT_ID
       issuance_date:
       - ISSUE_DATE
       filing_date:
       - FILE_DATE
       job_type:
+      - PERMIT_CATEGORY
       - PERMIT_TYPE
       - PERMIT_SUBTYPE
       cost:
       - JOB_VALUE
       status:
-      - STATUS
-      - PERMIT_STATUS
+      - CURRENT_TASK_STATUS
       address_street:
-      - ADDRESS
-      zipcode:
-      - ZIP
-      - ZIP_CODE
+      - PRIMARY_ADDRESS
       bbl:
       - PARCEL_NUMBER
     ingestion_mode: incremental

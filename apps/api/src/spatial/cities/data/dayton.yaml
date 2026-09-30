@@ -115,6 +115,7 @@ datasets:
     platform: arcgis
     watermark_col: ADDDTTM
     id_keys:
+    - SERVNO
     - RowNumber
     - REFNO
     topic: raw.municipal.311
@@ -124,7 +125,7 @@ datasets:
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: SERVNO ASC
     id_col: null
     select: null
     fallback_endpoints: []
@@ -133,6 +134,7 @@ datasets:
     geocode_context: null
     field_map:
       incident_id:
+      - SERVNO
       - RowNumber
       - REFNO
       created_date:

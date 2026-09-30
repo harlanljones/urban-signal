@@ -425,7 +425,24 @@ datasets:
     where: null
     needs_geocode: false
     geocode_context: null
-    field_map: {}
+    field_map:
+      job_id:
+      - permitnum
+      issuance_date:
+      - issueddate
+      filing_date:
+      - applieddate
+      job_type:
+      - permittypedesc
+      - permittypemapped
+      status:
+      - statuscurrent
+      cost:
+      - estprojectcost
+      address_street:
+      - originaladdress1
+      zipcode:
+      - originalzip
     ingestion_mode: incremental
     oid_field: null
     max_record_count: null
@@ -493,15 +510,14 @@ datasets:
     non_spatial: null
     zip_member: null
   sla:
-    endpoint: https://data.wa.gov/resource/vgcw-qfjm.json
-    platform: socrata
-    watermark_col: applicationdate
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
     id_keys:
-    - license
-    - ubi
-    - id
+    - Record_ID
+    - ObjectId
     topic: raw.municipal.sla
-    interval_seconds: 600.0
+    interval_seconds: 1800.0
     producer_key: sla
     endpoint_by_year: {}
     watermark_type: null
@@ -511,14 +527,30 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: null
+    where: State = 'WA' AND Latitude BETWEEN 47.28 AND 47.78 AND Longitude BETWEEN -122.43 AND -122.0
     needs_geocode: false
     geocode_context: null
-    field_map: {}
-    ingestion_mode: incremental
-    oid_field: null
-    max_record_count: null
-    expected_cadence_days: 7
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false
@@ -534,6 +566,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 2000
   deeds:
     endpoint: https://services.arcgis.com/Ej0PsM5Aw677QF1W/arcgis/rest/services/PARCEL_SALES3YR_AREA_287/FeatureServer/0
     platform: arcgis

@@ -282,6 +282,7 @@ datasets:
       cost:
       - ValuationTotal
       address_street:
+      - address_street
       - ParcelAddressNumber
       - ParcelAddressPreDirection
       - ParcelAddressStreet
@@ -316,9 +317,9 @@ datasets:
   sla:
     endpoint: https://www.arcgis.com/sharing/rest/content/items/2b3fac57210542229afc4bfddd6cd6e8/data
     platform: csv
-    watermark_col: Original Issue Date
+    watermark_col: original_issue_date
     id_keys:
-    - License Number
+    - license_number
     topic: raw.municipal.sla
     interval_seconds: 600.0
     producer_key: sla
@@ -326,7 +327,7 @@ datasets:
     watermark_type: text
     watermark_format: '%m/%d/%Y'
     watermark_exclude: []
-    order_by: null
+    order_by: original_issue_date DESC
     id_col: null
     select: null
     fallback_endpoints: []
@@ -335,21 +336,21 @@ datasets:
     geocode_context: Henderson, NV
     field_map:
       license_id:
-      - License Number
+      - license_number
       dba:
-      - DBA
-      - Entity Name
+      - dba
+      - entity_name
       premises_name:
-      - Entity Name
+      - entity_name
       license_type:
-      - License Type
-      - License Sub-Type
+      - license_type
+      - license_sub_type
       effective_date:
-      - Original Issue Date
+      - original_issue_date
       expiration_date:
-      - Expiration Date
+      - expiration_date
       address_street:
-      - Business Location
+      - business_location
     ingestion_mode: snapshot
     oid_field: null
     max_record_count: null

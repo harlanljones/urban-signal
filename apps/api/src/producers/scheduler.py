@@ -68,6 +68,10 @@ logger = logging.getLogger(__name__)
 _PAGINATE_KWARGS: dict[str, tuple[str, ...]] = {
     **_ADAPTER_REQUEST_KEYS,
     "csv": (*_ADAPTER_REQUEST_KEYS["csv"], "zip_member", "delimiter"),
+    # Accela's public surface is an ArcGIS facade (AccelaClient); a workbook
+    # is sorted and column-picked client-side like a CSV.
+    "accela": _ADAPTER_REQUEST_KEYS["arcgis"],
+    "excel": ("order_by", "select"),
 }
 
 # A snapshot whose order starts ``<col> DESC`` reads its newest rows first,
@@ -635,9 +639,11 @@ class MunicipalIngestionScheduler:
         clients = {
             "socrata": getattr(producer_wrapper, "socrata", None),
             "arcgis": getattr(producer_wrapper, "arcgis", None),
+            "accela": getattr(producer_wrapper, "accela", None),
             "carto": getattr(producer_wrapper, "carto", None),
             "ckan": getattr(producer_wrapper, "ckan", None),
             "csv": getattr(producer_wrapper, "csv", None),
+            "excel": getattr(producer_wrapper, "excel", None),
         }
         platform = meta.get("platform", "socrata")
         client = clients.get(platform)

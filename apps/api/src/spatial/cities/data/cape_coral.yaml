@@ -243,7 +243,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: null
+    where: issuedate <= CURRENT_TIMESTAMP
     needs_geocode: true
     geocode_context: Cape Coral, FL
     field_map:
@@ -262,6 +262,7 @@ datasets:
       cost:
       - permitvalue
       address_street:
+      - address_street
       - Addr1
       zipcode:
       - Zip

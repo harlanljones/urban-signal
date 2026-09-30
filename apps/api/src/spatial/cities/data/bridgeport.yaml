@@ -262,7 +262,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: city = 'BRIDGEPORT'
+    where: city = 'BRIDGEPORT' AND credentialtype IN ('LIR', 'LRW', 'LRB', 'LCA', 'LCR', 'LCW', 'LIT', 'LIH', 'LIC', 'LPC', 'LGC', 'LBA', 'LBB', 'LRF', 'LRS', 'LCN', 'LCM', 'LCC', 'LAP', 'LCS', 'LFB', 'LFC', 'LFG', 'LFR', 'LOL', 'LSE', 'LTH', 'LPA', 'LIU', 'LUW', 'LUB', 'LAB', 'LAT', 'LAC', 'LMI', 'LIP', 'LGB', 'LID', 'LWG', 'LRE', 'LMB', 'LMP', 'LBP', 'LML', 'LMS', 'LMA', 'LMC', 'LMW', 'LFW', 'LBF', 'LDF', 'FWBC', 'CGAL', 'LFO')
     needs_geocode: true
     geocode_context: Bridgeport, CT
     field_map:
@@ -285,10 +285,10 @@ datasets:
       - city
       premises_name:
       - businessname
-      - name
+      - dba
       dba:
+      - dba
       - businessname
-      - name
       status:
       - status
     ingestion_mode: incremental

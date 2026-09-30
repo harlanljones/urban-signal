@@ -85,12 +85,15 @@ whole instead. Milwaukee's source is the city's 2025 arm's-length sales file
 | Anaheim `sla` | `applicationdate DESC` (unchanged) | 38 / 322 | 1,000 (default) |
 | Aurora `sla` | `Issue_Date DESC` (unchanged) | 79 / 238 | 1,000 (default) |
 | Glendale, AZ `sla` | `IssuedOn DESC` (unchanged) | 33 / 518 | 1,000 (default) |
+| Henderson `sla` (CSV) | `original_issue_date DESC` (added with the feed repair) | 140 / 579 | 1,000 (default) |
 | Tucson `sla` | `DT_START DESC` (unchanged) | 2 / 2 | 1,000 (default) |
 
 Every window orders by the column the feed already tracks as its watermark
 (Baton Rouge has none and uses its open date). The Maryland transfer date is
 `YYYY.MM.DD` text and Asheville's `DeedDate` is `YYYYMMDD` text; both sort
-correctly as text. Two windows need a filter:
+correctly as text. Henderson's issue date is `MM/DD/YYYY` text, which does not,
+but the CSV client sorts the declared watermark column as dates. Two windows
+need a filter:
 
 - **Raleigh** sorts null sale dates first, so its window filled with parcels
   that never sold. It now filters `SALE_DATE IS NOT NULL` (358,251 of 438,805
@@ -111,13 +114,14 @@ question about the source, not the window.
 |---|---|---|
 | Kansas City `sla` | 28,245 | no date to window on; `valid_license_for` is a text licence year shared by thousands of rows |
 | Reno `deeds` | 194,124 | the only sale date is `MM/DD/YYYY` text, which does not sort |
-| Henderson `sla` (CSV) | 12,938 | its field map matches none of the file's headers, so no row publishes |
-| Phoenix `deeds` (CSV) | 903,301 | same as Henderson |
-| Boston `deeds` | | the CKAN resource returns 404 |
-| Ocala `permits`, Orlando `permits` | | the Florida statewide cadastral layer now answers 499 Token Required |
+| Phoenix `deeds` (CSV) | 903,301 | the endpoint is a 61 MB zip of a 270 MB pipe-delimited file; the spec names no zip member or delimiter, and the CSV client holds the whole file and every kept row in memory |
+| Boston `deeds` | 184,552 | the configured id is the CKAN package, not a resource (404); the FY2026 resource has no coordinates and none of the mapped column names |
+| Ocala `permits`, Orlando `permits` | 283,399 / 488,959 | the Florida statewide cadastral polygon layer now answers 499 Token Required, and the county codes select Jackson (42) and Levy (48) counties instead of Marion (52) and Orange (58) |
 
-Henderson, Phoenix, Boston, Ocala and Orlando are feed repairs rather than
-cap changes, and are the next change.
+Henderson `sla` was on this list; the feed-repair change
+([feed-health-2026-09-30.md](feed-health-2026-09-30.md)) fixed its field map
+and made it a window. Phoenix, Boston, Ocala and Orlando need more than a spec
+edit and are described there.
 
 ## Scheduler and backfill changes
 
@@ -182,4 +186,5 @@ All live, 2026-09-30, at a spacing of 1.5 to 3 seconds per request.
 - **Feed health.** A one-poll check of all 367 jobs on 2026-09-30 found 36 that
   fail outright (moved or retired endpoints, San Francisco's Socrata redirect,
   four Boston CKAN resources, two platforms with no client) and 16 that fetch
-  rows but publish none. That is the next change.
+  rows but publish none. The repairs are in
+  [feed-health-2026-09-30.md](feed-health-2026-09-30.md).

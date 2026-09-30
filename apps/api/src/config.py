@@ -176,23 +176,23 @@ class Settings(BaseSettings):
 
     # Socrata SODA OpenData APIs (San Francisco & Bay Area)
     socrata_sf_dob_endpoint: str = Field(
-        default="https://data.sfgov.org/resource/i98e-djp9.json",
+        default="https://data.sf.gov/resource/i98e-djp9.json",
         description="SF Building Permits endpoint",
     )
     socrata_sf_311_endpoint: str = Field(
-        default="https://data.sfgov.org/resource/vw6y-z8j6.json",
+        default="https://data.sf.gov/resource/vw6y-z8j6.json",
         description="SF 311 Service Requests endpoint",
     )
     socrata_sf_licenses_endpoint: str = Field(
-        default="https://data.sfgov.org/resource/g8m3-pdis.json",
+        default="https://data.sf.gov/resource/g8m3-pdis.json",
         description="SF Registered Business Locations endpoint",
     )
     socrata_sf_deeds_endpoint: str = Field(
-        default="https://data.sfgov.org/resource/wv5m-vpq2.json",
+        default="https://data.sf.gov/resource/wv5m-vpq2.json",
         description="SF Assessor Historical Secured Property endpoint",
     )
 
-    # Seattle / Puget Sound (Socrata + WA State LCB)
+    # Seattle / Puget Sound (Socrata)
     socrata_seattle_permits_endpoint: str = Field(
         default="https://data.seattle.gov/resource/76t5-zqzr.json",
         description="Seattle SDCI Building Permits endpoint (2005+)",
@@ -200,10 +200,6 @@ class Settings(BaseSettings):
     socrata_seattle_311_endpoint: str = Field(
         default="https://data.seattle.gov/resource/5ngg-rpne.json",
         description="Seattle Customer Service Requests (Find It Fix It) endpoint",
-    )
-    socrata_seattle_licenses_endpoint: str = Field(
-        default="https://data.wa.gov/resource/vgcw-qfjm.json",
-        description="WA State LCB Local Authority Letters - liquor license applications endpoint",
     )
 
     # ArcGIS Feature Services (King County)
@@ -318,7 +314,7 @@ class Settings(BaseSettings):
         description="Chicago crime incidents endpoint",
     )
     socrata_sf_crime_endpoint: str = Field(
-        default="https://data.sfgov.org/resource/wg3w-h783.json",
+        default="https://data.sf.gov/resource/wg3w-h783.json",
         description="SF crime incident reports endpoint",
     )
     socrata_seattle_crime_endpoint: str = Field(
@@ -717,11 +713,13 @@ class Settings(BaseSettings):
             "(gpsx/gpsy State Plane coordinates transformed via EPSG:2249)"
         ),
     )
-    # US-: Boston Crime Incident Reports (CKAN 6220d948-... odata v4). Source
-    # carries Lat/Long directly, so no geocode step required. Mirrors the other
-    # Boston CKAN feeds' `ckan://` scheme.
+    # US-: Boston Crime Incident Reports, the rolling "2023 to Present" resource
+    # (b973d8cb-...). Source carries Lat/Long directly, so no geocode step
+    # required. Mirrors the other Boston CKAN feeds' `ckan://` scheme. Until
+    # 2026-09-30 this named the package id (6220d948-...), which
+    # datastore_search answers with 404.
     ckan_boston_crime_endpoint: str = Field(
-        default="ckan://data.boston.gov/6220d948-eae2-4e4b-8723-2dc8e67722a3",
+        default="ckan://data.boston.gov/b973d8cb-eeb2-4e7e-99da-c92938efc9c0",
         description="Boston Crime Incident Reports CKAN resource",
     )
     # US-209: Boston Property Assessment FY2026 (DEEDS proxy; snapshot). The registry
@@ -732,15 +730,18 @@ class Settings(BaseSettings):
         description="Boston Property Assessment FY2026 CKAN resource (DEEDS proxy; snapshot)",
     )
     # US-209: Boston Building & Property Violations (ISD code enforcement). Direct
-    # lat/long columns; status_dttm watermark; case_no id.
+    # lat/long columns; status_dttm watermark; case_no id. Resource id, not the
+    # package id (705244a6-...) registered until 2026-09-30.
     ckan_boston_violations_endpoint: str = Field(
-        default="ckan://data.boston.gov/705244a6-70a6-4ff8-ab8e-56441aff18e7",
+        default="ckan://data.boston.gov/800a2663-1d6a-46e7-9356-bedb70f5332c",
         description="Boston Building and Property Violations CKAN resource (US-209)",
     )
     # US-209: Boston Food Establishment Inspections. `location` is a "(lat, lng)"
-    # string tuple; licenseno id; resultdttm / status_date watermark.
+    # string tuple; licenseno id; resultdttm watermark (status_date is null on
+    # most rows). Resource id, not the package id (03693648-...) registered
+    # until 2026-09-30.
     ckan_boston_inspections_endpoint: str = Field(
-        default="ckan://data.boston.gov/03693648-2c62-4a2c-a4ec-48de2ee14e18",
+        default="ckan://data.boston.gov/4582bec6-2b4f-4f9e-bc55-cbaa73117f4c",
         description="Boston Food Establishment Inspections CKAN resource (US-209)",
     )
 
@@ -849,9 +850,12 @@ class Settings(BaseSettings):
     # Peoria, IL (US-260). The deeds feed is on **Peoria County's** own ArcGIS
     # server, not the city's — the ArcGIS Hub domain named in the ticket
     # (peoria.opendata.arcgis.com) does not exist. Residential sales are
-    # year-sliced MapServer layers under one service; `endpoint_by_year` in the
-    # registry resolves the current year and the US-70 rollover drill guards New
-    # Year. Point geometry in Web Mercator, lifted to WGS84 via outSR=4326.
+    # year-sliced MapServer layers under one service, and layer 5 is always
+    # "Current Year Sales". The county inserts a layer for the closing year each
+    # January, shifting every older layer's id, so the registry polls layer 5
+    # alone: the year map it carried until 2026-09-30 resolved to a layer that
+    # no longer existed (404). Point geometry in Web Mercator, lifted to WGS84
+    # via outSR=4326.
     arcgis_peoria_deeds_url: str = Field(
         default=(
             "https://gis.peoriacounty.gov/arcgis/rest/services/DP/"
@@ -971,12 +975,6 @@ class Settings(BaseSettings):
             "ServiceRequests/MapServer/1"
         ),
         description="Columbus, OH 311 service requests MapServer layer URL (rolling 3 years)",
-    )
-
-    # Madison, WI (US-356): public Accela permitting surface.
-    accela_madison_permits_endpoint: str = Field(
-        default="https://aca-prod.accela.com/MADISON/Cap/CapHome.aspx",
-        description="Madison Accela Citizen Access building-permit endpoint",
     )
 
     # Columbus, OH (ArcGIS, US-127): Franklin County Auditor sales-dashboard
@@ -1830,10 +1828,14 @@ class Settings(BaseSettings):
         default="https://capeims.capecoral.gov/arcgis/rest/services/OpenData/OpenData/MapServer/1",
         description="Cape Coral–Fort Myers building permits ArcGIS MapServer table URL (address-only)",
     )
-    # Lakeland, FL (US-286): iMS Public CED permits MapServer layer (verified on GeoHub).
+    # Lakeland, FL (US-286): the city's hosted IMS projects-and-permits view on
+    # ArcGIS Online. The on-premises iMS Public CED MapServer it replaced
+    # (gismims.lakelandgov.net) reset every connection in September 2026 while
+    # the city's own site answered; the hosted layer is current (edited
+    # 2026-09-29).
     arcgis_lakeland_permits_url: str = Field(
-        default="https://gismims.lakelandgov.net/portal/rest/services/Public_CED/Lakeland_CED_Permits/MapServer/0",
-        description="Lakeland iMS Public CED permits ArcGIS MapServer layer URL",
+        default="https://services1.arcgis.com/mcbQY5xNGGGM1vBX/arcgis/rest/services/IMS_Projects_Permits/FeatureServer/6",
+        description="Lakeland IMS projects and permits ArcGIS FeatureServer layer URL",
     )
     # Port St. Lucie, FL (US-289): public Building Permits FeatureServer (weekly updates)
     arcgis_port_st_lucie_permits_url: str = Field(
@@ -1892,16 +1894,16 @@ class Settings(BaseSettings):
         description="El Paso residential building permits ArcGIS FeatureServer (frozen 2018-2021 snapshot)",
     )
     arcgis_louisville_crime_url: str = Field(
-        default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/crime_data_2025/FeatureServer",
-        description="Louisville Metro crime ArcGIS FeatureServer (geocoded; no native coords)",
+        default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/crime_data_2026/FeatureServer/0",
+        description="Louisville Metro crime_data_<year> table 0 (geocoded; no native coords; rotates each January)",
     )
     arcgis_louisville_permits_url: str = Field(
-        default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/active_construction_permits/FeatureServer",
-        description="Louisville active construction permits ArcGIS FeatureServer",
+        default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/active_construction_permits/FeatureServer/0",
+        description="Louisville active construction permits ArcGIS FeatureServer layer 0",
     )
     arcgis_louisville_street_cut_url: str = Field(
-        default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/Louisville_KY_ROW_Construction_Permits_new/FeatureServer",
-        description="Louisville ROW construction permits ArcGIS FeatureServer",
+        default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/Louisville_KY_ROW_Construction_Permits_new/FeatureServer/0",
+        description="Louisville ROW construction permits ArcGIS FeatureServer layer 0",
     )
     arcgis_tampa_crime_url: str = Field(
         default="https://arcgis.tampagov.net/arcgis/rest/services/CallsforService/FirePoliceCalls/MapServer/1",
@@ -1912,12 +1914,12 @@ class Settings(BaseSettings):
         description="Tampa ROW permits ArcGIS FeatureServer",
     )
     arcgis_las_vegas_calls_for_service_url: str = Field(
-        default="https://services.arcgis.com/jjSk6t82vIntwDbs/arcgis/rest/services/LVMPD_Calls_For_Service_All/FeatureServer",
-        description="Las Vegas LVMPD Calls For Service ArcGIS FeatureServer",
+        default="https://services.arcgis.com/jjSk6t82vIntwDbs/arcgis/rest/services/LVMPD_Calls_For_Service_30_Days/FeatureServer/0",
+        description="Las Vegas LVMPD Calls For Service - Last 30 Days (daily view; the _All layer froze 2024-02-29)",
     )
     arcgis_boise_crime_url: str = Field(
-        default="https://services1.arcgis.com/WHM6qC35aMtyAAlN/arcgis/rest/services/BPD_Crimes_Public/FeatureServer",
-        description="Boise BPD crimes ArcGIS FeatureServer",
+        default="https://services1.arcgis.com/WHM6qC35aMtyAAlN/arcgis/rest/services/BPD_Crimes_Public/FeatureServer/0",
+        description="Boise BPD crimes ArcGIS FeatureServer layer 0",
     )
     ckan_san_jose_crime_endpoint: str = Field(
         default="ckan://data.sanjoseca.gov/dc0ec99c-0c6b-45fb-b1ec-faf072fe4833",

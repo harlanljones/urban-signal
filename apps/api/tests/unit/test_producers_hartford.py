@@ -6,6 +6,7 @@ from unittest.mock import patch
 
 import pytest
 
+from src.producers.ct_liquor_specs import CT_LIQUOR_SLA_FIELD_MAP, ct_liquor_where
 from src.spatial.cities.hartford import (
     HARTFORD_DIVISION_BBOXES,
     HARTFORD_DIVISIONS,
@@ -41,19 +42,6 @@ HARTFORD_311_FIELD_MAP = {
     "incident_address": ["Match_addr", "Location", "Address"],
     "borough": ["Neighborhood", "Council_District"],
     "zipcode": ["ZIP", "ZipCode", "PostalCode"],
-}
-
-HARTFORD_SLA_FIELD_MAP = {
-    "license_id": ["license_number", "credential_number", "id"],
-    "license_type": ["credential_type", "credential_name", "license_type"],
-    "effective_date": ["effective_date", "issue_date"],
-    "expiration_date": ["expiration_date", "expiry_date"],
-    "address_street": ["address", "street_address", "address_line_1"],
-    "zipcode": ["zip", "zipcode", "postal_code"],
-    "borough": ["city"],
-    "premises_name": ["business_name", "name"],
-    "dba": ["business_name", "name"],
-    "status": ["status", "license_status"],
 }
 
 
@@ -93,8 +81,9 @@ def test_hartford_registers_311_permits_and_sla():
     sla = get_dataset(city, FeedType.SLA)
     assert sla.platform == "socrata"
     assert sla.watermark_col == "recordrefreshedon"
-    assert sla.where == "city = 'HARTFORD'"
-    assert sla.field_map == HARTFORD_SLA_FIELD_MAP
+    assert sla.where == ct_liquor_where("HARTFORD")
+    assert sla.id_keys == ["credentialid"]
+    assert sla.field_map == CT_LIQUOR_SLA_FIELD_MAP
 
 
 @pytest.fixture
@@ -160,23 +149,40 @@ def test_hartford_311_state_plane_geometry_geocodes_match_address(producers):
 
 
 def test_hartford_sla_row_geocodes_address_only_feed(producers):
+    """A live liquor permit row (2026-09-30). The feed registered with
+    ``license_number``/``business_name`` spellings the state table does not
+    have, so every row was dropped for a missing licence id."""
     _, _, sla = producers
     row = {
-        "license_number": "CT-EL-12345",
-        "credential_type": "Food Establishment",
-        "effective_date": "2026-01-15",
-        "expiration_date": "2027-01-15",
-        "business_name": "Hartford Market",
-        "address": "20 MARKET ST",
-        "city": "HARTFORD",
-        "zip": "06103",
+        "credentialid": "2534916",
+        "name": "URBAN LODGE BREWING - PRATT ST LLC",
+        "type": "BUSINESS",
+        "businessname": "URBAN LODGE BREWING - PRATT ST LLC",
+        "dba": "URBAN LODGE BREWING",
+        "fullcredentialcode": "LIR.0021240",
+        "credentialtype": "LIR",
+        "credentialnumber": "21240",
+        "credential": "RESTAURANT LIQUOR",
         "status": "ACTIVE",
+        "statusreason": "CURRENT",
+        "active": "1",
+        "issuedate": "2023-09-28T00:00:00.000",
+        "effectivedate": "2026-09-28T00:00:00.000",
+        "expirationdate": "2027-09-27T00:00:00.000",
+        "address": "88 PRATT ST",
+        "city": "HARTFORD",
+        "state": "CT",
+        "zip": "061031621",
+        "recordrefreshedon": "2026-09-25T00:00:00.000",
     }
     with patch("src.spatial.geocoder.get_geocoder", return_value=_geocoder()):
         event = sla.parse_socrata_row(row, city_id="hartford")
     assert event is not None
-    assert event.license_id == "CT-EL-12345"
-    assert event.license_type == "Food Establishment"
-    assert event.address == "20 MARKET ST"
+    assert event.license_id == "2534916"
+    assert event.license_type == "RESTAURANT LIQUOR"
+    assert event.premises_name == "URBAN LODGE BREWING - PRATT ST LLC"
+    assert event.dba == "URBAN LODGE BREWING"
+    assert event.address == "88 PRATT ST"
+    assert str(event.effective_date).startswith("2026-09-28")
     assert event.latitude == pytest.approx(41.7637)
     assert event.longitude == pytest.approx(-72.6734)

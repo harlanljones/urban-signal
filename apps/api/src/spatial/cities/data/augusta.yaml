@@ -223,7 +223,7 @@ datasets:
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: DATE_ISSUE DESC,PERMITNUMBER ASC,PARID ASC
     id_col: null
     select: null
     fallback_endpoints: []

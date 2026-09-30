@@ -55,6 +55,7 @@ WINDOW_RECENT_ROWS = {
     ("cleveland", "deeds"): 3_509,
     ("durham", "deeds"): 574,
     ("glendale_az", "sla"): 518,
+    ("henderson", "sla"): 579,
     ("miami_dade", "sla"): 2_128,
     ("montgomery", "deeds"): 2_042,
     ("oxnard_ventura", "sla"): 3_839,
@@ -67,11 +68,23 @@ WINDOW_RECENT_ROWS = {
 KNOWN_GAPS = {
     ("kansas_city", "sla"): "28,245 rows and no date to window on (only a text licence year)",
     ("reno", "deeds"): "194,124 parcels; the sale date is MM/DD/YYYY text, which does not sort",
-    ("henderson", "sla"): "the field map matches none of the CSV's headers, so no row publishes",
-    ("phoenix", "deeds"): "the field map matches none of the CSV's headers, so no row publishes",
-    ("boston", "deeds"): "the CKAN resource is gone (404)",
-    ("ocala", "permits"): "the statewide cadastral layer now requires a token (499)",
-    ("orlando", "permits"): "the statewide cadastral layer now requires a token (499)",
+    ("phoenix", "deeds"): (
+        "the endpoint is a 61 MB zip of a 270 MB pipe-delimited file (903,301 affidavits); "
+        "the spec names no zip member or delimiter, and the CSV client holds the whole "
+        "file and every kept row in memory"
+    ),
+    ("boston", "deeds"): (
+        "the id is the CKAN package, not a resource (404); the FY2026 resource has "
+        "no coordinates and none of the mapped column names"
+    ),
+    ("ocala", "permits"): (
+        "the statewide cadastral polygon layer now requires a token (499), and "
+        "CO_NO 42 is Jackson County (FDOR numbers Marion 52)"
+    ),
+    ("orlando", "permits"): (
+        "the statewide cadastral polygon layer now requires a token (499), and "
+        "CO_NO 48 is Levy County (FDOR numbers Orange 58)"
+    ),
 }
 
 

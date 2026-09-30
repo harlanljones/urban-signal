@@ -1,9 +1,11 @@
 """Lexington, KY — Urban Signal spatial registration (metro bbox, divisions, submarkets).
 
-Leaf module: geometry only. Feed specs live in the spine (city_registry). Initial
-registration will land SLA via the Kentucky ABC active-license ArcGIS layer
-filtered to Fayette County; permits remain unregistered pending a verifiable
-public feed on `data.lexingtonky.gov`.
+Leaf module: geometry only. Feed specs live in the spine (city_registry). SLA
+reads the SNAP retailer slice: the Kentucky ABC active-license layer first
+registered here is published by Louisville Metro and holds Jefferson County
+only (no Fayette rows, checked 2026-09-30), and no public Fayette licence layer
+was found. Permits remain unregistered pending a verifiable public feed on
+`data.lexingtonky.gov`.
 """
 
 from typing import Dict

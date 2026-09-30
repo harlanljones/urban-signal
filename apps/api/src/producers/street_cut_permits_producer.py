@@ -106,9 +106,22 @@ class StreetCutPermitsProducer:
         return client
 
     def _chicago_row(self, row: dict[str, Any], city_id: str = "chicago") -> StreetCutEvent | None:
-        """Parse a Chicago CDOT street-closure row (``jdis-5sry``)."""
-        lat_raw = row.get("latitude") or row.get("lat")
-        lng_raw = row.get("longitude") or row.get("lng")
+        """Parse a street-closure row outside NYC.
+
+        Chicago CDOT's columns (``jdis-5sry``) are the defaults; any other
+        city's declared ``field_map`` is consulted first, as the permit parser
+        does. Before 2026-09-30 every row here was stamped ``chicago`` and read
+        only Chicago's column names, so Tampa's rows (``RECORDID``) all dropped.
+        """
+        from src.producers.field_maps import first_mapped, resolve_field_map
+        from src.spatial.city_registry import FeedType, normalize_city
+
+        norm = normalize_city(city_id)
+        resolved_city = norm.value if norm else str(city_id).lower()
+        fmap = resolve_field_map(resolved_city, FeedType.STREET_CUT)
+
+        lat_raw = first_mapped(row, fmap, "latitude") or row.get("latitude") or row.get("lat")
+        lng_raw = first_mapped(row, fmap, "longitude") or row.get("longitude") or row.get("lng")
         if not lat_raw or not lng_raw:
             loc = row.get("location") or {}
             if isinstance(loc, dict) and isinstance(loc.get("coordinates"), list):
@@ -121,13 +134,17 @@ class StreetCutPermitsProducer:
             # point from the composed street address; feeds without the
             # declaration fall through unchanged (dropped below).
             street_fallback = row.get("streetname") or row.get("street")
+            fallback_address = None
             if street_fallback:
                 fallback_address = (
                     f"{row.get('streetnumberfrom', '')} "
                     f"{row.get('direction', '')} {street_fallback} "
                     f"{row.get('suffix', '')}".strip()
                 )
-                point = geocode_row_if_declared(city_id, "street_cut", fallback_address)
+            elif first_mapped(row, fmap, "address"):
+                fallback_address = str(first_mapped(row, fmap, "address"))
+            if fallback_address:
+                point = geocode_row_if_declared(resolved_city, "street_cut", fallback_address)
                 if point is not None:
                     lat, lng = point
         if lat is None or lng is None or (lat == 0.0 and lng == 0.0):
@@ -136,7 +153,8 @@ class StreetCutPermitsProducer:
         h3_res = self.spatial_indexer.get_multi_res_hierarchy(lat, lng)
 
         permit_id = str(
-            row.get("applicationnumber")
+            first_mapped(row, fmap, "permit_id")
+            or row.get("applicationnumber")
             or row.get("uniquekey")
             or row.get("id")
             or ""
@@ -145,7 +163,8 @@ class StreetCutPermitsProducer:
             return None
 
         street_name = (
-            row.get("streetname")
+            first_mapped(row, fmap, "street_name")
+            or row.get("streetname")
             or row.get("street")
             or row.get("location_description")
         )
@@ -155,21 +174,27 @@ class StreetCutPermitsProducer:
                 f"{row.get('streetnumberfrom', '')} "
                 f"{row.get('direction', '')} {street_name} {row.get('suffix', '')}".strip()
             )
+        # Chicago's map lists its address parts, composed above; only a city
+        # without those parts takes its address from the map.
+        address = address or street_name or first_mapped(row, fmap, "address")
+
+        def _text(value: Any) -> str | None:
+            return str(value) if value not in (None, "") else None
 
         return StreetCutEvent(
-            city_id="chicago",
+            city_id=resolved_city,
             permit_id=permit_id,
-            permit_type=str(row.get("applicationtype") or "Unknown"),
-            work_type=row.get("worktypedescription") or row.get("worktype"),
-            status=row.get("applicationstatus") or row.get("currentmilestone"),
-            street_name=street_name,
-            address=address or street_name,
+            permit_type=str(first_mapped(row, fmap, "permit_type") or row.get("applicationtype") or "Unknown"),
+            work_type=_text(first_mapped(row, fmap, "work_type") or row.get("worktypedescription") or row.get("worktype")),
+            status=_text(first_mapped(row, fmap, "status") or row.get("applicationstatus") or row.get("currentmilestone")),
+            street_name=_text(street_name),
+            address=_text(address),
             latitude=lat,
             longitude=lng,
-            issued_date=_parse_datetime(row.get("applicationissueddate")),
-            start_date=_parse_datetime(row.get("applicationstartdate")),
-            end_date=_parse_datetime(row.get("applicationenddate")),
-            fees=_as_float(row.get("totalfees")),
+            issued_date=_parse_datetime(first_mapped(row, fmap, "issued_date") or row.get("applicationissueddate")),
+            start_date=_parse_datetime(first_mapped(row, fmap, "start_date") or row.get("applicationstartdate")),
+            end_date=_parse_datetime(first_mapped(row, fmap, "end_date") or row.get("applicationenddate")),
+            fees=_as_float(first_mapped(row, fmap, "fees") or row.get("totalfees")),
             h3_res7=h3_res["h3_res7"],
             h3_res8=h3_res["h3_res8"],
             h3_res9=h3_res["h3_res9"],

@@ -7,7 +7,7 @@ FIELD_MAP = {
     "issuance_date": ["File_Date", "Status_Date"],
     "filing_date": ["File_Date"],
     "status": ["Current_Status"],
-    "address_street": ["Addr_No", "Street_Name"],
+    "address_street": ["Address", "Street_Name"],
     "zipcode": ["Zip_Code"],
     "bbl": ["B1_LOT", "B1_BLOCK", "B1_TRACT"],
 }

@@ -1207,3 +1207,29 @@ Worth keeping:
 - **Check the sort on the live server.** Raleigh sorts nulls first under
   `DESC`, and Cleveland's unbounded sort outlasts the client timeout; both
   needed a filter that the paging check found.
+
+### 2026-09-30 — Feeds that fail or publish nothing (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| feed-repairs | `.streams/feed-repairs.md` | `config.py`, `scheduler.py`, `dob_permits_producer.py` | 2026-09-30 | done (27 feeds publishing again, Lexington and Seattle `sla` moved to SNAP, Madison `permits` retracted; the rest listed) | `docs/research/feed-health-2026-09-30.md`, `ct_liquor_specs.py`, `test_arcgis_client.py`, `test_ct_liquor_permits.py` |
+
+One poll of every registered job found 36 that failed outright, 8 that fetched
+nothing and 16 that fetched rows but published none. Every repair was re-polled
+live through `poll_job` before it landed. The mid-Atlantic `deeds` wave (14
+cities, none with a live source) is the next stacked change.
+
+Worth keeping:
+
+- **A registered endpoint is not a checked endpoint.** The interlock gate checks
+  a spec's shape. Five ArcGIS feeds sat at a service root, three CKAN feeds
+  named a package instead of a resource, and 14 deeds URLs never answered, all
+  green on the gate. `test_arcgis_client.py` now covers the service-root case;
+  a live one-row check before registration would cover the rest.
+- **Zero rows and SUCCESS is not healthy.** Eight feeds polled SUCCESS with
+  nothing fetched. The ArcGIS client now raises on a page with no
+  `features`, but an empty source (Tulsa `311`) still looks the same as a wrong
+  one to the scheduler.
+- **Read the credential table before filtering it.** State licence tables hold
+  every credential a state issues, most of them held by individuals; a city
+  filter alone publishes people's names as premises (`ct_liquor_specs.py`).

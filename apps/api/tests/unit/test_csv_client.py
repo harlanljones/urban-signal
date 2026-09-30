@@ -188,3 +188,38 @@ def test_csv_client_where_clause_supports_or():
         )
     )
     assert [r["file_number"] for r in batches[0]] == ["1", "2"]
+
+
+@pytest.mark.parametrize("eol", ["\r", "\n", "\r\n"], ids=["cr", "lf", "crlf"])
+def test_csv_client_reads_any_line_ending(eol):
+    """Milwaukee's permits export ends every row with a bare carriage return;
+    parsing it as one line raised "new-line character seen in unquoted field"
+    on every poll."""
+    lines = [
+        '"Date Opened","Address","Record ID","Permit Type","Date Issued"',
+        '"2026-02-03 00:00:00","100 N MAIN ST","COM-ALT-26-00001","Commercial Alteration Permit","2026-06-15 00:00:00"',
+        '"2026-04-23 00:00:00","200 W WELLS ST","RES-ALT-26-00002","Residential Alteration Permit","2026-06-12 00:00:00"',
+        '"2026-05-01 00:00:00","300 E OAK ST","RES-NEW-26-00003","Residential New Construction Permit","2026-06-15 00:00:00"',
+    ]
+    payload = eol.join(lines) + eol
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, text=payload, request=request)
+
+    client = CSVClient(httpx.Client(transport=httpx.MockTransport(handler)))
+    batches = list(
+        client.paginate(
+            "https://example.test/buildingpermits.csv",
+            where_clause="date_issued > '2026-06-13T00:00:00'",
+            order_by="date_issued ASC",
+        )
+    )
+
+    rows = [row for batch in batches for row in batch]
+    assert [row["record_id"] for row in rows] == ["COM-ALT-26-00001", "RES-NEW-26-00003"]
+    assert rows[0]["address"] == "100 N MAIN ST"
+
+
+def test_strip_preamble_reads_bare_carriage_returns():
+    payload = '"Updated 2026-09-29"\r"A","B"\r"1","2"\r'
+    assert _strip_preamble(payload) == "A,B\n1,2\n"

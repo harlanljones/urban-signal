@@ -83,14 +83,14 @@
     }
   },
   "feeds": {
-    "permits": {
-      "platform": "accela",
-      "watermark_col": "IssuedDate",
-      "interval_seconds": 300.0,
-      "topic": "raw.municipal.permits"
-    },
+    "permits": null,
     "311": null,
-    "sla": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
     "deeds": null
   },
   "evidence_path": "apps/api/src/spatial/cities/madison.py",

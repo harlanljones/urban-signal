@@ -45,7 +45,7 @@ def _strip_preamble(text: str, delimiter: str = ",") -> str:
     Returning the text unchanged when no preamble is detected keeps every
     existing feed's parse identical.
     """
-    reader = csv.reader(io.StringIO(text), delimiter=delimiter)
+    reader = csv.reader(io.StringIO(text, newline=""), delimiter=delimiter)
     rows: list[list[str]] = [row for row in reader if any(cell.strip() for cell in row)]
     if len(rows) >= 2 and len(rows[0]) == 1 and len(rows[1]) > 1:
         buffer = io.StringIO()
@@ -264,7 +264,10 @@ class CSVClient:
         else:
             csv_text = response.text
         csv_text = _strip_preamble(csv_text, delimiter=delimiter)
-        reader = csv.DictReader(io.StringIO(csv_text), delimiter=delimiter)
+        # newline="" lets the csv module end rows on \r, \n or \r\n; with
+        # StringIO's default a file using bare \r (Milwaukee's permits export)
+        # is one line with carriage returns inside unquoted fields.
+        reader = csv.DictReader(io.StringIO(csv_text, newline=""), delimiter=delimiter)
         # Municipal CSVs use title case, spaces, and punctuation inconsistently;
         # normalize them so shared field maps apply uniformly.
         if reader.fieldnames:
