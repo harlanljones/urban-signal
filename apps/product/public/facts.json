@@ -1095,7 +1095,7 @@
         true,
         true,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -1116,7 +1116,12 @@
           "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "saledate",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 35.2271,

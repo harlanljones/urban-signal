@@ -14,15 +14,19 @@ and Tulsa), and fifteen have `sla` and `deeds` but neither `permits` nor
 The permits probe for the twelve ran live on 2026-09-30 from 19:32Z to 20:10Z
 (curl default User-Agent, at least 12 seconds between requests to a host, no
 owner or applicant column requested). One metro moves up; one suburb's feed is
-held; ten metros have no permits source. The deeds and `311` probes are
-recorded here as they register.
+held; ten metros have no permits source. The deeds probe ran from 19:32Z to
+20:27Z under the same rules, with no grantor or grantee column requested, for
+nine of the twelve: Houston, Kansas City and Santa Fe were left out because
+Texas, Missouri and New Mexico do not disclose sale prices. Charlotte's deeds
+register first, which gives Charlotte all four families. The rest of the deeds
+probe and the `311` probe are recorded here as they register.
 
-| Tier (families) | Before (with #91) | After |
-|---|---|---|
-| 4 | 26 | 26 |
-| 3 | 29 | **30** (Charlotte) |
-| 2 | 68 | 67 |
-| 1 | 34 | 34 |
+| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds |
+|---|---|---|---|
+| 4 | 26 | 26 | **27** (Charlotte) |
+| 3 | 29 | **30** (Charlotte) | 29 |
+| 2 | 68 | 67 | 67 |
+| 1 | 34 | 34 | 34 |
 
 ## Registered
 
@@ -84,6 +88,67 @@ recorded here as they register.
   unincorporated. The second poll sent `(issue_date IS NOT NULL) AND
   issue_date >= timestamp '2026-09-29 00:00:00'`, read the newest day's 140
   permits again and published none. Neither poll queried a geocoder.
+
+### Charlotte, NC — `deeds`
+
+- **Source:** the same county server's
+  `TaxParcelSales/FeatureServer/0` ("Tax Parcel Sales"), a polygon layer
+  listing the county's recorded transfers on each parcel's outline. The
+  2026-08-25 sweep read the City's parcel layer, which carries no sales, and
+  the county's old REST path (`maps.mecklenburgcountync.gov/agsadaptor`),
+  which answers 404. The probe found the county's current server through an
+  ArcGIS Online search, and `TaxParcelSales` among the 147 services its root
+  lists.
+- **Shape:** 1,598,291 rows on 2026-09-30, one per transfer and property. In
+  the 90-day window, 8,925 rows hold 8,765 distinct transfer and parcel pairs
+  (the rest repeat a pair on another property row of the same parcel) under
+  7,183 deeds; one deed covers 119 parcels. `legalreference` (the deed's book
+  and page) and `transferid` are never empty. 5,806 of the 8,925 rows carry a
+  price; the rest hold zero or nothing. The layer also names the grantor and
+  grantee; the spec's `select` names seven other columns.
+- **Freshness:** a sale date holds the day alone, stored as midnight Eastern.
+  On 2026-09-30 the newest was 2026-09-22 (8 rows, against 99 on 2026-09-21)
+  and none was future-dated. Nothing changed between 19:37Z and 20:14Z, so the
+  ledger runs about eight days behind and is not rebuilt daily.
+  `expected_cadence_days` is 7, so the staleness alarm waits 14 days.
+- **Window:** the server evaluates `saledate >= CURRENT_DATE - INTERVAL '90'
+  DAY AND saledate <= CURRENT_TIMESTAMP`, so a poll sends no date literal (the
+  host, which rejects ISO literals, is already in `ANSI_DATE_LITERAL_HOSTS`
+  for backfills). The window held 8,925 rows on 2026-09-30; over the past year
+  a 90-day window held 8,514 (January to March 2026) to 11,009 (April to June
+  2025), so the cap is 15,000.
+- **Ids and order:** a row is its transfer and parcel (`transferid` with
+  `parcelid`), so a deed covering several parcels publishes an event for each,
+  and a transfer repeated on a parcel's other property rows publishes once.
+  Each event carries the deed's book and page as its document id, so a deed's
+  parcels share a Kafka key. The snapshot reads `saledate DESC, objectid
+  DESC`, which has no ties.
+- **Placement:** each row's outline comes back in WGS84 and the event stands
+  at the centroid of its outer ring; every row in the window lies inside the
+  metro box. The county is the metro, so nothing is clipped and no geocoder is
+  asked.
+- **Mapping:** the book and page (then the transfer id) as the document id,
+  the sale date as the recorded date, the sale price as the amount, the parcel
+  id and the deed type (`deeddescription`: warranty, special warranty, quit
+  claim and so on).
+- **Not chosen:** the same server's `TaxParcel_camadata` parcel layer runs
+  three days fresher but keeps only each parcel's latest sale, holds three
+  future-dated rows (one in the year 9997), and splits the deed's book and
+  page into two columns, so no single column names the deed.
+- **Poll:** every six hours, the whole window as a snapshot (nine pages of
+  1,000 rows); the cross-run dedup drops the rows already published.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live layer, Kafka mocked. The first read 8,925 rows in
+  ten requests (the metadata and nine pages) and published 8,765 transfers
+  dated 2026-07-02 to 2026-09-22 under 7,183 deeds; the other 160 rows
+  repeated a transfer on another property row of its parcel, and none was
+  dead-lettered. All 8,765 lie inside the metro box, 7,381 of them inside the
+  City's division box, and 5,712 carry a price. By type, 4,612 are warranty
+  deeds, 1,612 special warranty deeds, 901 quit claims, 709 multiple
+  listings, 607 non-warranty deeds, 180 correction deeds, 66 trustee's deeds,
+  30 commissioner's deeds and 48 other types. The second poll read the same
+  8,925 rows in nine requests and published none. Neither poll read a grantor
+  or grantee value or queried a geocoder.
 
 ## Held
 

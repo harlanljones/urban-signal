@@ -1164,7 +1164,9 @@ class Settings(BaseSettings):
     # LATITUDE/LONGITUDE + point geometry. Building permits come from
     # Mecklenburg County's own GIS server, which republishes the county's
     # Accela permits nightly as points, one row per permit and parcel, for
-    # Charlotte and the county's six towns (2026-09-30).
+    # Charlotte and the county's six towns (2026-09-30). Deeds come from the
+    # same server's sales ledger, one row per transfer and parcel on the
+    # parcel's polygon.
     arcgis_charlotte_311_url: str = Field(
         default=(
             "https://gis.charlottenc.gov/arcgis/rest/services/"
@@ -1178,6 +1180,13 @@ class Settings(BaseSettings):
             "BuildingPermits_Accela/FeatureServer/0"
         ),
         description="Mecklenburg County building permits (Accela) layer URL, Charlotte's permits",
+    )
+    arcgis_charlotte_deeds_url: str = Field(
+        default=(
+            "https://meckgis.mecklenburgcountync.gov/server/rest/services/"
+            "TaxParcelSales/FeatureServer/0"
+        ),
+        description="Mecklenburg County tax parcel sales layer URL, Charlotte's deeds",
     )
 
     # Houston, TX (ArcGIS, US-140): City of Houston mycity2 HOUSTON311_RECENT_SR_SNOW

@@ -29,7 +29,9 @@ Tacoma with deeds from Pierce County's weekly sales file, which makes 25.
 Scottsdale followed with `311` from the City's ScottsdaleEZ table, which
 makes 26 (below). Chandler's `311` and Glendale's `permits`, the other two
 families the Maricopa deeds left missing, were probed the same day and have
-no source yet (Not now).
+no source yet (Not now). Charlotte followed with permits and deeds from
+Mecklenburg County's GIS server, which makes 27
+([two-family-depth-2026-09-30.md](two-family-depth-2026-09-30.md)).
 
 ## Registered
 

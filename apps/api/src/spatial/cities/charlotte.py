@@ -2,10 +2,12 @@
 
 The metro's feeds are registered in ``data/charlotte.yaml`` only: 311 from the
 City's service requests, SLA from the SNAP retailers in the metro box, and
-PERMITS (2026-09-30) from Mecklenburg County's own GIS server, which rebuilds
-its Accela building permits nightly as points for Charlotte and the county's
-six towns. Earlier probes read the City's server, which holds none.
-Each permit publishes once, at the first of its parcels.
+PERMITS and DEEDS (2026-09-30) from Mecklenburg County's own GIS server. It
+rebuilds the county's Accela building permits nightly as points for Charlotte
+and the county's six towns, and keeps the county's recorded transfers on each
+parcel's polygon. Earlier probes read the City's server, which holds neither.
+Each permit publishes once, at the first of its parcels; each transfer
+publishes once per parcel, at the parcel's centroid.
 """
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta

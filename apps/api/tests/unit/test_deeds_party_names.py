@@ -70,6 +70,8 @@ MARICOPA_OWNER_COLUMNS = {
         # Pierce County's sales file carries both parties on every line; the
         # CSV client drops them from each row as it reads it.
         *((city, {"grantor", "grantee"}) for city in (CityId.TACOMA, CityId.PIERCE)),
+        # Mecklenburg County's sales ledger names both parties of each transfer.
+        (CityId.CHARLOTTE, {"grantor", "grantee"}),
     ],
 )
 def test_owner_columns_stay_on_the_server(city, owner_columns):

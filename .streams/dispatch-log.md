@@ -1608,3 +1608,18 @@ Worth keeping:
 - **Check where a server sorts nulls.** A newest-first order put the 4,006
   unissued permits ahead of every issued one, which a first poll would have
   read alone.
+
+### 2026-09-30 — Charlotte deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| charlotte-deeds | `.streams/charlotte-deeds.md` | `config.py` (the county's sales layer) | 2026-09-30 | done (8,925 sale rows read, 8,765 transfers published, 160 repeats of a transfer on a parcel's other property rows skipped, none dead-lettered, the second poll published none) | `deeds` spec for Charlotte; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Charlotte moves from three signal families to all four (four-family tier 26
+to 27).
+
+Worth keeping:
+
+- **When a county server answers one family, list its other services.** The
+  server that republishes Mecklenburg County's permits also keeps the
+  county's sales ledger, one row per transfer and parcel.

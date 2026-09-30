@@ -42,18 +42,20 @@ def test_charlotte_geometry_is_self_consistent():
     assert {meta.city_id for meta in CHARLOTTE_SUBMARKETS.values()} == {"charlotte"}
 
 
-def test_charlotte_registers_arcgis_permits_311_and_snap_sla():
-    from src.spatial.city_registry import REGISTRY, get_dataset, normalize_city
+def test_charlotte_registers_all_four_families():
+    from src.spatial.city_registry import REGISTRY, normalize_city
 
     city = CityId.CHARLOTTE
     assert normalize_city("charlotte") is city
     assert normalize_city("mecklenburg") is city
     assert REGISTRY[city].job_suffix == "clt"
-    # Permits come from Mecklenburg County's Accela layer (test_charlotte_permits.py).
+    # Permits and deeds come from Mecklenburg County's server
+    # (test_charlotte_permits.py, test_charlotte_deeds.py).
     assert set(REGISTRY[city].datasets) == {
         FeedType.PERMITS,
         FeedType.COMPLAINTS_311,
         FeedType.SLA,
+        FeedType.DEEDS,
     }
 
     s311 = REGISTRY[city].datasets[FeedType.COMPLAINTS_311]
@@ -65,9 +67,6 @@ def test_charlotte_registers_arcgis_permits_311_and_snap_sla():
     assert s311.oid_field == "OBJECTID"
     assert s311.max_record_count == 7500
     assert s311.field_map == CHARLOTTE_FIELD_MAP
-
-    with pytest.raises(KeyError, match="no.*feed"):
-        get_dataset(city, FeedType.DEEDS)
 
 
 CLT_311_ROW = {

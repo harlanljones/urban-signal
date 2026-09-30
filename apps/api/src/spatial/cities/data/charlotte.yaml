@@ -256,6 +256,38 @@ datasets:
     non_spatial: null
     zip_member: null
     batch_limit: 2000
+  deeds:
+    endpoint: https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcelSales/FeatureServer/0
+    platform: arcgis
+    watermark_col: saledate
+    id_keys:
+    - transferid
+    - parcelid
+    topic: raw.municipal.deeds
+    interval_seconds: 21600.0
+    producer_key: deeds
+    order_by: saledate DESC, objectid DESC
+    select: objectid,parcelid,transferid,saleprice,saledate,deeddescription,legalreference
+    where: saledate >= CURRENT_DATE - INTERVAL '90' DAY AND saledate <= CURRENT_TIMESTAMP
+    needs_geocode: false
+    field_map:
+      doc_id:
+      - legalreference
+      - transferid
+      recorded_date:
+      - saledate
+      document_amount:
+      - saleprice
+      bbl:
+      - parcelid
+      doc_type:
+      - deeddescription
+    ingestion_mode: snapshot
+    oid_field: objectid
+    max_record_count: 2000
+    expected_cadence_days: 7
+    batch_limit: 15000
+    composite_id: true
 aliases:
 - charlotte_nc
 - charlotte_mecklenburg

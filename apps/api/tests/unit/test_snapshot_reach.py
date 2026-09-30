@@ -36,6 +36,9 @@ FULL_READ_ROWS = {
     # Assessor): the deeds dated in each spec's 90-day window inside its
     # JURISDICTION, read 2026-09-30.
     ("chandler", "deeds"): 1_573,
+    # Mecklenburg County transfers dated in the spec's 90-day window, newest
+    # 2026-09-22, read 2026-09-30.
+    ("charlotte", "deeds"): 8_925,
     ("cincinnati", "deeds"): 1_078,
     # Denver, Hartford and Nashville deeds: the transfers dated in each
     # spec's own 90-day window, read 2026-09-30.
