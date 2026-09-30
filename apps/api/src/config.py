@@ -2209,6 +2209,13 @@ class Settings(BaseSettings):
         default="https://maps.medfordmaps.org/arcgis/rest/services/MLI2/MLI_TRAKiT_Service/FeatureServer/12",
         description="Medford TRAKiT code enforcement cases ArcGIS FeatureServer URL (311)",
     )
+    # Jackson County's sales layer: each account's latest sale on its taxlot
+    # polygon, county-wide. Medford deeds read the sales whose SiteCity is
+    # MEDFORD, the city itself (2026-09-30).
+    arcgis_medford_deeds_endpoint: str = Field(
+        default="https://spatial.jacksoncountyor.gov/arcgis/rest/services/Demog/PropertySales/FeatureServer/0",
+        description="Jackson County PropertySales ArcGIS FeatureServer URL (Medford deeds snapshot)",
+    )
     arcgis_tempe_permits_endpoint: str = Field(
         default="https://services.arcgis.com/lQySeXwbBg53XWDi/arcgis/rest/services/building_permits/FeatureServer/0",
         description="Tempe building permits ArcGIS FeatureServer URL",

@@ -45,6 +45,9 @@ FULL_READ_ROWS = {
     ("glendale_az", "deeds"): 1_263,
     ("hartford", "deeds"): 353,
     ("inland_empire", "sla"): 10_585,
+    # Jackson County sales whose SiteCity is MEDFORD, dated in the spec's
+    # 90-day window, read 2026-09-30.
+    ("medford", "deeds"): 304,
     ("milwaukee", "deeds"): 5_685,
     ("milwaukee", "sla"): 1_275,
     ("modesto", "sla"): 4_574,

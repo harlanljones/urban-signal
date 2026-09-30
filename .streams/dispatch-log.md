@@ -1523,3 +1523,20 @@ Worth keeping:
 - **A parcel id can carry its place.** Oregon taxlot ids start with the
   township and range, so a prefix filter narrows a county table to the ground
   under a metro box before any join.
+
+### 2026-09-30 — Medford deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| medford-deeds | `.streams/medford-deeds.md` | `config.py` (the sales layer) | 2026-09-30 | done (304 sales in the city read and published, none dead-lettered, the second poll published none) | `deeds` spec for Medford; `src/producers/tolerant_http.py` for hosts whose header lines break HTTP/1.1 syntax; notes in `docs/research/deeds-probe-2026-09-30.md`; regenerated facts |
+
+Medford moves to all four signal families (23 to 24).
+
+Worth keeping:
+
+- **A host httpx cannot read is not a dead host.** When h11 raises "illegal
+  header line", look at the raw headers with curl before ruling the source
+  out; the fix is a listed host in `tolerant_http`, not a new client.
+- **Look for the city in the city column's values.** Jackson County's
+  `SiteCity` says `MEDFORD` inside the city and `MEDFORD/COUNTY` outside it,
+  unlike Deschutes County's postal `City`.

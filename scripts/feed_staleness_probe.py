@@ -27,6 +27,7 @@ if str(API_ROOT) not in sys.path:
 import httpx
 from prometheus_client import Counter, Gauge
 from src.config import settings
+from src.producers import tolerant_http
 from src.producers.acquisition import (
     AcquisitionSpec,
     build_where,
@@ -292,7 +293,7 @@ def probe_registry(
     """Probe all registered feeds without per-feed configuration."""
     now = now or datetime.now(UTC)
     metadata_fetcher = metadata_fetcher or (
-        lambda spec: fetch_source_updated_at(spec, httpx.get)
+        lambda spec: fetch_source_updated_at(spec, tolerant_http.get)
     )
     results: list[ProbeResult] = []
     for city, registration in REGISTRY.items():

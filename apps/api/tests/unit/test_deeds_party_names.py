@@ -64,6 +64,9 @@ MARICOPA_OWNER_COLUMNS = {
         ),
         # Deschutes County's sales table names both parties of each sale.
         (CityId.BEND, {"Seller_1", "Buyer_1", "Seller_2", "Buyer_2"}),
+        # Jackson County's sales layer names both parties and links each
+        # recorded deed.
+        (CityId.MEDFORD, {"Grantor", "Grantee", "DocumentURL"}),
     ],
 )
 def test_owner_columns_stay_on_the_server(city, owner_columns):

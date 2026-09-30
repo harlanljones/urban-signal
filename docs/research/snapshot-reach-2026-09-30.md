@@ -104,6 +104,11 @@ days before each poll on the four township-ranges under Bend's metro box,
 places each on its taxlot, and skips the 29 that land outside the box
 (`metro_clip`, `deeds-probe-2026-09-30.md`).
 
+Medford `deeds` (304 rows, default cap 1,000) reads Jackson County's sales
+layer the same way the Maricopa feeds read theirs: the sales dated in the 90
+days before each poll in the city (`SiteCity = 'MEDFORD'`), whole, each on
+its own taxlot polygon.
+
 ## Newest-first windows
 
 | Feed | Order | Rows dated in last 30 / 90 days | Window after |

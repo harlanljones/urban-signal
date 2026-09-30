@@ -7,22 +7,24 @@ Three registered first. Tempe followed later the same day from the Maricopa
 County Assessor's parcel layer, with Chandler, Glendale and Scottsdale, which
 gain deeds as a third family, and Phoenix, whose deeds move to the same layer.
 Bend followed from Deschutes County's sales table, with a scheduler flag that
-keeps a county-wide source's rows inside the metro box. Two have a source that
-needs client work first, two are held and thirteen have none.
+keeps a county-wide source's rows inside the metro box, and Medford from
+Jackson County's sales layer, once the ArcGIS client could read that server's
+responses. One has a source that needs client work first, two are held and
+thirteen have none.
 
 | Verdict | Metros |
 |---|---|
-| Registered here | Nashville, Hartford, Denver; then Tempe (with Chandler, Glendale, Scottsdale and a Phoenix repair); then Bend |
-| Source found, needs client work | Medford, Tacoma |
+| Registered here | Nashville, Hartford, Denver; then Tempe (with Chandler, Glendale, Scottsdale and a Phoenix repair); then Bend; then Medford |
+| Source found, needs client work | Tacoma |
 | Held | Minneapolis, San Diego |
 | No source | Austin, Baton Rouge, Billings, Dallas, El Paso, Los Angeles, Louisville, Memphis, Montgomery AL, Sacramento, San Antonio, San Jose, St. Louis |
 
-| Tier (families) | Before | After Denver, Hartford, Nashville | After Maricopa | After Bend |
-|---|---|---|---|---|
-| 4 | 18 | 21 | 22 (Tempe) | **23** (Bend) |
-| 3 | 33 | 30 | 32 (Chandler, Glendale, Scottsdale in; Tempe out) | 31 |
-| 2 | 72 | 72 | 69 | 69 |
-| 1 | 34 | 34 | 34 | 34 |
+| Tier (families) | Before | After Denver, Hartford, Nashville | After Maricopa | After Bend | After Medford |
+|---|---|---|---|---|---|
+| 4 | 18 | 21 | 22 (Tempe) | 23 (Bend) | **24** (Medford) |
+| 3 | 33 | 30 | 32 (Chandler, Glendale, Scottsdale in; Tempe out) | 31 | 30 |
+| 2 | 72 | 72 | 69 | 69 | 69 |
+| 1 | 34 | 34 | 34 | 34 | 34 |
 
 Phoenix already counted deeds, from a file that dead-lettered every row, so
 its tier does not change.
@@ -171,11 +173,54 @@ requests an owner column or sends an address to the geocoder.
 - **Cap:** 2,500 rows. A poll takes about 20 requests: two pages and the
   taxlot lookups, which the client batches about 60 to a query.
 
+### Medford — the city's sales on the county's layer
+
+- **Source:** Jackson County's `PropertySales` layer,
+  `spatial.jacksoncountyor.gov/arcgis/rest/services/Demog/PropertySales/FeatureServer/0`
+  (ArcGIS Server 10.91, 60,490 rows), which holds each account's latest sale
+  on the account's taxlot polygon. The feed reads `SalesDate`, `SalesPrice`,
+  `DocumentNumber` (the recording's year and number), `maptaxlot` and
+  `DocumentTypeDescription` (warranty deed, bargain and sale, foreclosure),
+  which becomes the event's `doc_type`.
+- **Only Medford's sales:** `SiteCity` tells the city (`MEDFORD`, 304 sales
+  in 90 days) from the unincorporated land with Medford addresses
+  (`MEDFORD/COUNTY`, 44). The filter keeps `MEDFORD`, the area the city's
+  permits, 311 cases and licences cover. 303 of the 304 lie inside the metro
+  box; one vacant lot sits about 25 metres east of its edge and publishes, as
+  Phoenix's deeds north of its box do.
+- **Placement:** the client takes each polygon's centroid (`outSR=4326`), so
+  there is no join and no geocoder query. One account had no polygon and
+  publishes without coordinates.
+- **Reading the server:** every response carries `Content-Security-Policy :
+  frame-ancestors ...`, with a space before the colon. httpx's parser (h11)
+  rejects the line, and the standard library's reader stops at it and loses
+  the headers after it, `Content-Length` among them. The ArcGIS client now
+  sends requests to the hosts in `TOLERANT_HEADER_HOSTS` through the standard
+  library with a reader that drops that space (`src/producers/tolerant_http.py`)
+  and hands back ordinary httpx responses. The staleness probe's metadata
+  request goes the same way. The county's portal host
+  (`jcportal.jacksoncountyor.gov`) sends the header well formed, but its
+  taxlot layer carries no sales.
+- **Window:** the sales dated in the 90 days before each poll, up to now. The
+  upper bound keeps out 9 county sales dated after today (one reads 2621).
+- **Dates:** the server answers 400 to `SalesDate >= '2026-09-01T00:00:00'`
+  and accepts `timestamp '2026-09-01 00:00:00'`, so it joins
+  `ANSI_DATE_LITERAL_HOSTS`. A snapshot poll sends no literal; a backfill
+  with a start date does.
+- **Several accounts, one sale:** 304 rows carry 291 document numbers. The
+  record id joins `AccountId`, `SalesDate` and `DocumentNumber`.
+- **Party columns:** `Grantor`, `Grantee` and `DocumentURL` (a link to the
+  recorded deed) stay off the request through `select`.
+- **Freshness:** the newest sale was dated 2026-09-25, five days before the
+  probe. `expected_cadence_days` is 7.
+- **Cap:** the default 1,000 rows, more than three times the window. The
+  first poll in a process takes two requests (the layer's metadata, then one
+  page) and each later poll one.
+
 ## Sources that need client work first
 
 | Metro | Source | What it needs |
 |---|---|---|
-| Medford | Jackson County `PropertySales`, `spatial.jacksoncountyor.gov/arcgis/rest/services/Demog/PropertySales/FeatureServer/0`: the latest sale per account with price and document number, two to three days behind; 310 Medford sales in 90 days. | The server sends a malformed `Content-Security-Policy` header that the HTTP client rejects on every request, and it accepts only ANSI date literals. |
 | Tacoma | Pierce County's weekly `sale.zip` (`online.co.pierce.wa.us/datamart/`), every sale since 1997, joined to the county's `Tax_Parcels` layer. | The file is pipe-delimited with no header row, which the CSV client cannot read. It is county-wide, so it needs a box filter, and it runs four to five weeks behind. |
 
 ## Held
@@ -242,11 +287,13 @@ source on 2026-09-30, with Kafka mocked.
 | Scottsdale `deeds` | 2,507 | 2,507 | 2,507 | 0 | 2026-07-02 to 2026-09-22 | 1,032 | 0 new of 2,507 |
 | Phoenix `deeds` | 9,224 | 9,224 | 9,191 | 0 | 2026-07-02 to 2026-09-22 | 3,772 | 0 new of 9,224 |
 | Bend `deeds` | 1,048 | 1,019 (29 outside the box skipped) | 1,019 | 0 | 2026-07-02 to 2026-09-26 | 617 | 0 new of 1,019 |
+| Medford `deeds` | 304 | 304 | 302 (one just east of the box, one without a polygon) | 0 | 2026-07-06 to 2026-09-25 | 304 | 0 new of 304 |
 
 No poll made a geocoder query or requested an owner column. A first poll of
 the first three took 4 to 8 requests and 10 to 20 seconds; a first poll of
 the Maricopa feeds took 2 to 10, spaced 2 seconds apart, and 5 to 48 seconds.
-Bend's took 22 requests and 62 seconds, spaced 2.2 seconds apart.
+Bend's took 22 requests and 62 seconds, spaced 2.2 seconds apart, and
+Medford's 2 requests and 4 seconds.
 
 ## Probe conduct
 
@@ -273,15 +320,20 @@ seconds from the end of one response to the next request, and asked for no
 party column. One request with a long taxlot list answered 404; the same
 lookups went again as POST requests in batches of 500.
 
+The Medford follow-up kept the same clock and asked only for counts,
+statistics and non-personal columns. Until the client could read the county's
+server, it sent its requests with curl and curl's default User-Agent; it also
+searched ArcGIS Online's public catalogue for a copy of the layer on another
+host and found none.
+
 ## Not covered here
 
 - **A deed on several parcels.** Each parcel's row publishes, but the rows
   share one instrument number, and PostGIS keeps one row per `doc_id`, as it
   does for Las Vegas, Lynchburg and Columbus. In Nashville's sample, 7 of 200
   instruments covered more than one parcel.
-- **The candidates above.** Medford and Tacoma each need the client change
-  named in their row. Tacoma's county-wide file could use `metro_clip` once
-  the CSV client reads it.
+- **The candidate above.** Tacoma needs the client change named in its row.
+  Its county-wide file could use `metro_clip` once the CSV client reads it.
 - **The parcel outlines.** The Maricopa layer returns each parcel's polygon
   with its row, which the feeds do not need since the layer's own coordinates
   place the deed. The scheduler has no per-feed switch for `returnGeometry`.

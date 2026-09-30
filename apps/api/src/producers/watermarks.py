@@ -235,6 +235,12 @@ ANSI_DATE_LITERAL_HOSTS = (
     # Its five deeds feeds poll as snapshots; a backfill with a start date
     # sends the literal.
     "gis.mcassessor.maricopa.gov",
+    # Jackson County, OR (ArcGIS Server 10.91): verified live 2026-09-30 —
+    # ``SalesDate >= '2026-09-01T00:00:00'`` and ``SalesDate >= '2026-09-01
+    # 00:00:00'`` return 400 "Unable to complete operation" while ``SalesDate
+    # >= timestamp '2026-09-01 00:00:00'`` works. Medford's deeds poll as a
+    # snapshot; a backfill with a start date sends the literal.
+    "spatial.jacksoncountyor.gov",
 )
 
 

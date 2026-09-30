@@ -119,10 +119,13 @@ Future-date sentinels (Tucson discipline): ``LASTACTION`` on Case_Main
 carries 2026-09-01/02 values on the 2026-08-28 probe. The watermark is
 ``STARTED`` (clean), so no ``where`` guard is needed for the base query.
 
-DEEDS Tier 3: Jackson County recorder has no anonymous bulk API; city layers
-only carry taxlot polygons (no transaction records). Police CADHistory is a
-table without address/coordinate columns (only BEAT_OR_STATION) —
-unregistrable per ADR-0004. The HTE_CodeEnforcement (Police folder) layer
+DEEDS come from Jackson County's ``Demog/PropertySales`` layer on
+``spatial.jacksoncountyor.gov``, registered 2026-09-30 in ``data/medford.yaml``
+and not mirrored here: each account's latest sale on its taxlot polygon, kept
+to ``SiteCity = 'MEDFORD'``. That server sends a header line httpx rejects,
+so the ArcGIS client reaches it through ``src.producers.tolerant_http``.
+Police CADHistory is a table without address/coordinate columns (only
+BEAT_OR_STATION) — unregistrable per ADR-0004. The HTE_CodeEnforcement (Police folder) layer
 has point geometry but is stale (newest real report 2019-03-02) with 2099
 sentinels — not registered; Case_Main supersedes it.
 """

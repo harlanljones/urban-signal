@@ -356,6 +356,39 @@ class TestSaleRows:
             ("13299998", 33.4150, -111.9095),
         ]
 
+    def test_a_medford_poll_reads_the_sales_in_the_city(self, scheduler):
+        """Jackson County's sales layer is county-wide. Medford's poll asks for
+        the city's window and publishes each account's sale where the client
+        placed it, once for each account a sale covers."""
+        producer = scheduler.producers["deeds"]
+        rows = [
+            {"OBJECTID": 900001, "AccountId": 99999999, "maptaxlot": "372W13CD99901",
+             "SalesDate": "2026-09-25T00:00:00+00:00", "SalesPrice": 540000.0,
+             "DocumentNumber": "2026-99999", "DocumentTypeDescription": "WARRANTY DEED",
+             "latitude": 42.3431, "longitude": -122.8601},
+            {"OBJECTID": 900002, "AccountId": 99999998, "maptaxlot": "372W13CD99900",
+             "SalesDate": "2026-09-25T00:00:00+00:00", "SalesPrice": 540000.0,
+             "DocumentNumber": "2026-99999", "DocumentTypeDescription": "WARRANTY DEED",
+             "latitude": 42.3433, "longitude": -122.8603},
+        ]
+        producer.arcgis.paginate = MagicMock(return_value=[rows])
+        producer.arcgis.fetch_centroid_index = MagicMock()
+
+        result = scheduler.poll_job("deeds_medford", limit=10)
+
+        assert (result["records_published"], result["outside_metro"]) == (2, 0)
+        scheduler.dlq_producer.route_to_dlq.assert_not_called()
+        assert _where(producer, "arcgis") == (
+            "(SiteCity = 'MEDFORD' AND SalesDate >= CURRENT_DATE - INTERVAL '90' DAY "
+            "AND SalesDate <= CURRENT_TIMESTAMP)"
+        )
+        producer.arcgis.fetch_centroid_index.assert_not_called()
+        events = [call.kwargs["payload"] for call in producer.producer.produce.call_args_list]
+        assert [(e.doc_id, e.bbl, e.doc_type, e.latitude) for e in events] == [
+            ("2026-99999", "372W13CD99901", "WARRANTY DEED", 42.3431),
+            ("2026-99999", "372W13CD99900", "WARRANTY DEED", 42.3433),
+        ]
+
     def test_a_bend_poll_keeps_the_sales_its_metro_box_holds(self, scheduler):
         """Deschutes County's sales table covers the county. Each sale takes
         its taxlot's centroid, and a poll keeps the ones inside Bend's metro

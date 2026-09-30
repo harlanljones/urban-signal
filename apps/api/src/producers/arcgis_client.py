@@ -28,6 +28,8 @@ from urllib.parse import quote
 
 import httpx
 
+from src.producers.tolerant_http import http_client
+
 # Field types a ``where`` clause compares as numbers. A quoted literal against
 # one of them fails on some servers: Roanoke's parcel layer answers
 # ``lrsn IN ('1116')`` with "Invalid data type for expression".
@@ -117,7 +119,7 @@ class ArcGISClient:
         backoff = 1.0
         for attempt in range(1, self.max_retries + 1):
             try:
-                with httpx.Client(timeout=self.timeout) as client:
+                with http_client(url, timeout=self.timeout) as client:
                     resp = client.post(url, data=params) if long_query else client.get(url, params=params)
                     if resp.status_code == 429:
                         time.sleep(backoff)
