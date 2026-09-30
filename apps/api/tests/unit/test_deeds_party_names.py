@@ -72,6 +72,8 @@ MARICOPA_OWNER_COLUMNS = {
         *((city, {"grantor", "grantee"}) for city in (CityId.TACOMA, CityId.PIERCE)),
         # Mecklenburg County's sales ledger names both parties of each transfer.
         (CityId.CHARLOTTE, {"grantor", "grantee"}),
+        # So does the Lucas County Auditor's sales layer, for each sale.
+        (CityId.TOLEDO, {"GRANTOR", "GRANTEE"}),
     ],
 )
 def test_owner_columns_stay_on_the_server(city, owner_columns):

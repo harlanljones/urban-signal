@@ -421,10 +421,12 @@ class TestLeafFeedSpec:
         assert spec.order_by == "INIT_DATE DESC"
         assert spec.field_map == COMPLAINTS_311_FIELD_MAP
 
-    def test_no_other_feeds_are_registered(self):
+    def test_the_leaf_mirror_carries_only_311(self):
         from src.spatial.cities.toledo import get_toledo_dataset
         from src.spatial.city_registry import FeedType
 
+        # The registry also holds SNAP retailers (sla) and the Auditor's
+        # sales (deeds, test_toledo_deeds.py) from the corpus file.
         for feed in (FeedType.PERMITS, FeedType.SLA, FeedType.DEEDS):
             with pytest.raises(KeyError, match="no.*feed"):
                 get_toledo_dataset(feed)

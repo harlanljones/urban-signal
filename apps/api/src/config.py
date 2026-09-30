@@ -1779,6 +1779,15 @@ class Settings(BaseSettings):
         default="https://gis.toledo.oh.gov/arcgis/rest/services/Public/CityWorks_ServiceRequest_2022/MapServer/0",
         description="Toledo Engage 311 Cityworks ArcGIS MapServer URL",
     )
+    # Toledo deeds (2026-09-30): the Lucas County Auditor's ArcGIS Online
+    # sales layer, one point per recorded sale and parcel across the county.
+    arcgis_toledo_deeds_url: str = Field(
+        default=(
+            "https://services3.arcgis.com/T8dczfwPixv79EgZ/arcgis/rest/services/"
+            "Lucas_County_TaxParcels/FeatureServer/1"
+        ),
+        description="Lucas County Auditor sales layer URL, Toledo's deeds",
+    )
 
     # Buffalo, NY (US-349): restaurant-license SLA (Socrata). Native WGS84
     # latitude/longitude; NULLs-first ordering demands the issdttm IS NOT

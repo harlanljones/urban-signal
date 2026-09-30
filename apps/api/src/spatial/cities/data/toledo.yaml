@@ -517,6 +517,39 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+  deeds:
+    endpoint: https://services3.arcgis.com/T8dczfwPixv79EgZ/arcgis/rest/services/Lucas_County_TaxParcels/FeatureServer/1
+    platform: arcgis
+    watermark_col: RECORDDT
+    id_keys:
+    - SALESID
+    - PARCELID
+    topic: raw.municipal.deeds
+    interval_seconds: 21600.0
+    producer_key: deeds
+    order_by: RECORDDT DESC, OBJECTID DESC
+    select: OBJECTID,PARCELID,RECORDDT,SALEAMNT,SALESID,INSTRTYP
+    where: RECORDDT >= CURRENT_DATE - INTERVAL '90' DAY AND RECORDDT <= CURRENT_TIMESTAMP
+    needs_geocode: false
+    field_map:
+      doc_id:
+      - SALESID
+      - PARCELID
+      recorded_date:
+      - RECORDDT
+      document_amount:
+      - SALEAMNT
+      bbl:
+      - PARCELID
+      doc_type:
+      - INSTRTYP
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    batch_limit: 4000
+    composite_id: true
+    metro_clip: true
 aliases:
 - toledo_oh
 - toledo-oh

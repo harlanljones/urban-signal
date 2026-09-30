@@ -1623,3 +1623,17 @@ Worth keeping:
 - **When a county server answers one family, list its other services.** The
   server that republishes Mecklenburg County's permits also keeps the
   county's sales ledger, one row per transfer and parcel.
+
+### 2026-09-30 — Toledo deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| toledo-deeds | `.streams/toledo-deeds.md` | `config.py` (the Auditor's sales layer) | 2026-09-30 | done (2,296 county sale rows read, 142 outside the metro box skipped, 2,154 events published, one per sale and parcel, none dead-lettered, the second poll published none) | `deeds` spec for Toledo; held and not-now deeds notes for seven metros in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Toledo moves from two signal families to three (three-family tier 29 to 30).
+
+Worth keeping:
+
+- **Search a county office's ArcGIS Online org as well as its server.**
+  Toledo's sales were recorded as absent after the Auditor's own server was
+  read; the Auditor also publishes a hosted sales layer on ArcGIS Online.

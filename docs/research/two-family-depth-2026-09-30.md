@@ -18,15 +18,17 @@ held; ten metros have no permits source. The deeds probe ran from 19:32Z to
 20:27Z under the same rules, with no grantor or grantee column requested, for
 nine of the twelve: Houston, Kansas City and Santa Fe were left out because
 Texas, Missouri and New Mexico do not disclose sale prices. Charlotte's deeds
-register first, which gives Charlotte all four families. The rest of the deeds
-probe and the `311` probe are recorded here as they register.
+register first, which gives Charlotte all four families, and Toledo's follow,
+which gives Toledo a third. Three metros' sources are held and four metros
+have none. The permits and `311` probe of the fifteen is recorded here as it
+registers.
 
-| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds |
-|---|---|---|---|
-| 4 | 26 | 26 | **27** (Charlotte) |
-| 3 | 29 | **30** (Charlotte) | 29 |
-| 2 | 68 | 67 | 67 |
-| 1 | 34 | 34 | 34 |
+| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds |
+|---|---|---|---|---|
+| 4 | 26 | 26 | **27** (Charlotte) | 27 |
+| 3 | 29 | **30** (Charlotte) | 29 | **30** (Toledo) |
+| 2 | 68 | 67 | 67 | 66 |
+| 1 | 34 | 34 | 34 | 34 |
 
 ## Registered
 
@@ -150,10 +152,65 @@ probe and the `311` probe are recorded here as they register.
   read the same 8,925 rows in nine requests and published none. Neither poll
   read a grantor or grantee value or queried a geocoder.
 
+### Toledo, OH — `deeds`
+
+- **Source:** the Lucas County Auditor's ArcGIS Online layer `Lucas_Sales`,
+  `services3.arcgis.com/T8dczfwPixv79EgZ/arcgis/rest/services/Lucas_County_TaxParcels/FeatureServer/1`,
+  which puts each recorded sale of real property in the county at a point.
+  Earlier probes ([probe-toledo.md](probe-toledo.md)) read the Auditor's own
+  GIS server, `lcaudgis.co.lucas.oh.us`, whose public layers carry no sale
+  columns; the hosted layer turned up through an ArcGIS Online search.
+- **Shape:** 60,834 rows on 2026-09-30, recorded from 2020-12-07, one per
+  sale and parcel. In the 90-day window, 2,296 rows hold 2,014 sales; 157
+  sales convey several parcels (one conveys 23), and `SALESID` with
+  `PARCELID` never repeats. Every row carries a price and a point. The layer
+  also names the grantor and grantee; the spec's `select` names six other
+  columns.
+- **Freshness:** the recorded date (`RECORDDT`) holds the day alone, stored
+  as midnight UTC. On 2026-09-30 the newest was Friday 2026-09-25, nothing
+  was future-dated, and the layer had last been edited on Monday 2026-09-28,
+  so it looks rebuilt weekly through the Friday before (inferred from one
+  week). `expected_cadence_days` is 7, so the staleness alarm waits 14 days.
+  The transfer date (`TRANSDT`) runs a median of ten days earlier and is not
+  used.
+- **Window:** the server evaluates `RECORDDT >= CURRENT_DATE - INTERVAL '90'
+  DAY AND RECORDDT <= CURRENT_TIMESTAMP`. The window held 2,296 rows on
+  2026-09-30, and over the past year a 90-day window held 2,154 (October to
+  December 2025) to 2,628 (July to September 2025), so the cap is 4,000.
+- **Ids and order:** a row is its sale and parcel (`SALESID` with
+  `PARCELID`), so a sale conveying several parcels publishes an event for
+  each. Each event carries the sale's number as its document id, so a sale's
+  parcels share a Kafka key. The snapshot reads `RECORDDT DESC, OBJECTID
+  DESC`, which has no ties.
+- **Placement:** each sale is a point, and the layer covers the whole
+  county: 2,154 of the window's 2,296 rows lie inside the metro box, and
+  `metro_clip` skips the 142 that lie outside it, to its west, south and
+  east. No geocoder is asked.
+- **Mapping:** the sale's number (then the parcel) as the document id, the
+  recorded date, the sale amount, the parcel id and the instrument type
+  (`INSTRTYP`: WD warranty deed, SV survivorship deed, FD fiduciary deed, LW
+  limited warranty deed, QC quit claim and so on).
+- **Poll:** every six hours, the whole window as a snapshot (three pages of
+  1,000 rows); the cross-run dedup drops the rows already published.
+- **Live check:** two polls of the registered spec through the real scheduler
+  against the live layer, Kafka mocked. The first read 2,296 rows in four
+  requests (the metadata and three pages), skipped the 142 outside the metro
+  box and published 2,154 events, one per sale and parcel, recorded from
+  2026-07-02 to 2026-09-25 under 1,882 sales, all with a price; none was
+  dead-lettered and no row repeated. 944 lie inside the City's seven
+  neighbourhood boxes. By instrument, 1,447 are warranty deeds, 223
+  survivorship deeds, 184 fiduciary deeds, 119 limited warranty deeds, 102
+  quit claims, 26 sheriff's deeds, 20 `PS`, 16 `CO` and 17 other types. The
+  second poll read the same 2,296 rows in three requests and published none.
+  Neither poll read a grantor or grantee value or queried a geocoder.
+
 ## Held
 
 | Metro (missing) | Source | Why held | Re-check when |
 |---|---|---|---|
+| Dayton (`deeds`) | The Montgomery County Auditor's `TaxParcelSales2025_public` layer (`services8.arcgis.com/O6MENQVX63Jn4008`, points): 24,274 sales from 2023-01-03, edited 2026-07-10, newest sale 2026-06-05, so the 90-day window was empty on 2026-09-30. The previous edition was edited on 2023-12-29. Its recorded date is empty on every row and the deed's book and page are two columns. The City's `DaytonParcel` layer fails every query, and its `Parcels_Join` sales table was loaded once, on 2025-04-06. | The last two editions came two and a half years apart, so a 90-day window would sit empty most of the time. | The Auditor republishes monthly or faster. |
+| Oakland (`deeds`) | The Alameda County Assessor's `Assessor_Office_Ownership_Transfer_List` table (`services5.arcgis.com/ROBnTHSNjoZ2Wm1P`): 187,908 transfers from 2023-04-01 to the 2025-03-31 roll cut-off, edited 2025-07-07, unchanged since the 2026-08-24 check. The county's parcel layer dates each parcel's latest document but carries no price. | Published once a year and 18 months old. | The 2026 edition appears. |
+| Omaha (`deeds`) | Nebraska's statewide parcel layer (`gis.ne.gov`, `StatewideParcelsExternal`) carries each Douglas County parcel's last sale, but it was loaded once, on 2026-01-01, and the newest non-future sale is 2025-12-02, so the 90-day window was empty. The county's own sales search answered 403 (Akamai) and was not asked again; the state's sales file needs a login. | Annual, and the window is empty. | NebraskaMAP loads more often, or the county opens a sales layer. |
 | Kansas City (`permits`) | Overland Park's `Building_Permits` layer (`services1.arcgis.com/YQsWDBr0DjMtoTQo`, a hosted layer last rebuilt on 2026-09-30): 13,824 permits over a rolling window from 2024-01-02, newest 2026-09-29, 429 in 30 days, ISO literals accepted, `CaseNumber` unique; 84% of recent rows carry a point and the rest an address. | It covers one suburb in Kansas, roughly a tenth of the metro's people, while the metro's `311` and licences are Kansas City, Missouri's. Registered as the metro's permits, it would mark Kansas City as covered where the City itself has none. | Kansas City, Missouri publishes current permits, or enough suburbs publish that the metro can take them together. |
 
 ## Not now
@@ -171,8 +228,13 @@ probe and the `311` probe are recorded here as they register.
 | Santa Fe (`permits`) | The City and County ArcGIS Online orgs hold only parking-permit zones, and the permitting system was not identified. | A permits layer appears in either org. |
 | Toledo (`permits`) | `gis.toledo.oh.gov` has no permits layer and ArcGIS Online has none for Toledo or Lucas County. `permits.toledo.oh.gov` answered one request with a 403 (CloudFront "Request blocked") and was not asked again. | A permits layer appears on the City GIS. |
 | Tulsa (`permits`) | The Tulsa County Assessor's `Building_Permit` layer (6,154 rows, no address) ends on 2025-09-18. The City's server answers "Token Required" on every folder checked except `CustomerCare` (its 311). | The Assessor's layer moves past 2025-09-18 or the City opens a permits service. |
+| Honolulu (`deeds`) | No sales on `data.honolulu.gov` (72 datasets), the City's parcel layers, the state's parcel layer or the state's CKAN portal; the City's cadastral tables carry assessed values by tax year and no sale. Sales are searched one parcel or document at a time in qPublic and the Bureau of Conveyances. | A sales or conveyance dataset appears. |
+| Indianapolis (`deeds`) | The City's parcel layers carry owners and assessed values but no sale; `data.indy.gov` (651 datasets) has only tax-sale and surplus reports, and the state's Gateway publishes annual assessment files, not sales disclosures. A statewide sales-disclosure layer on ArcGIS Online is a private compilation that names buyers and sellers and returned no Marion County rows. | The county or state publishes sales disclosures. |
+| Oxnard–Ventura (`deeds`) | Ventura County's parcel layers carry only parcel numbers and coordinates, and no county server or ArcGIS Online item carries sales; California assessors do not publish prices. The Assessor's site answered with a "Request Rejected" page and was not asked again. | A sales or transfer layer appears. |
+| Tulsa (`deeds`) | The Assessor's four ArcGIS Online services hold permits, parcel history, parcel-maintenance records and section shapes, none with a price. Deeds are the County Clerk's, in a paid Tyler recorder search. The Assessor's own ArcGIS Server could not be reached (the egress proxy answered 502 twice). | The Assessor's server can be reached and carries sales. |
 
 A platform client would not unlock these cheaply: Accela Citizen Access
 (Dayton, Indianapolis, Oakland, Omaha) is a search interface with no anonymous
 bulk export, and the Tyler EnerGov portal behind Kansas City's permits has no
-public row API either.
+public row API either. The same holds for deeds: Honolulu's and Tulsa's sit
+behind one-record-at-a-time or paid recorder searches.

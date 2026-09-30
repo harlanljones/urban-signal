@@ -5285,7 +5285,7 @@
         false,
         true,
         true,
-        false
+        true
       ],
       "platforms": [
         null,
@@ -5301,7 +5301,12 @@
           "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "RECORDDT",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 41.6528,

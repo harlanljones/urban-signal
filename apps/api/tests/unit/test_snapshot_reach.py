@@ -75,6 +75,9 @@ FULL_READ_ROWS = {
     # (2026-09-25 extract, read 2026-09-30); 452 of them place in Tacoma.
     ("tacoma", "deeds"): 2_432,
     ("tempe", "deeds"): 783,
+    # Lucas County sales recorded in the spec's 90-day window, county-wide,
+    # newest 2026-09-25, read 2026-09-30; 2,154 of them lie in the metro box.
+    ("toledo", "deeds"): 2_296,
     ("washington_dc", "childcare"): 452,
 }
 
