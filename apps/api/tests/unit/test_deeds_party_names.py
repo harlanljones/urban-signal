@@ -37,6 +37,20 @@ def test_no_registered_spec_maps_a_party_name():
     [
         (CityId.RENO, {"FIRSTNAME", "LASTNAME", "MAILING1", "MAILING2", "MAILCITY", "MAILSTATE", "MAILZIP"}),
         (CityId.WASHINGTON_DC, {"SALE_CURR_OWNER"}),
+        (CityId.NASHVILLE, {"Owner", "OwnAddr1", "OwnAddr2", "OwnAddr3", "OwnCity", "OwnState", "OwnCountry", "OwnZip"}),
+        (
+            CityId.DENVER,
+            {"OWNER_NAME", "OWNER_ADDRESS_LINE1", "OWNER_ADDRESS_LINE2", "OWNER_CITY", "OWNER_STATE", "OWNER_ZIP"},
+        ),
+        # The CAMA table's City, State and Zip10 are the owner's mailing address.
+        (
+            CityId.HARTFORD,
+            {
+                "OwnerFullName", "Owner1FName", "Owner1Last", "Owner2FName", "Owner2Last", "Owner3FName",
+                "Owner3Last", "MailingAddress1", "MailingAddress2", "MailingStreet", "City", "State", "Zip10",
+                "LastGrantor",
+            },
+        ),
     ],
 )
 def test_owner_columns_stay_on_the_server(city, owner_columns):

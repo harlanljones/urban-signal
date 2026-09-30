@@ -282,6 +282,63 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+  deeds:
+    endpoint: https://services2.arcgis.com/HdTo6HJqh92wn4D8/arcgis/rest/services/Parcels_view/FeatureServer/0
+    platform: arcgis
+    watermark_col: OwnDate
+    id_keys:
+    - STANPAR
+    - OwnDate
+    - OwnInstr
+    topic: raw.municipal.deeds
+    interval_seconds: 21600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: OwnDate DESC, OBJECTID DESC
+    id_col: null
+    select: OBJECTID,STANPAR,OwnDate,SalePrice,OwnInstr,Lat,Lon
+    fallback_endpoints: []
+    where: OwnDate >= CURRENT_DATE - INTERVAL '90' DAY AND OwnDate <= CURRENT_TIMESTAMP
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - OwnInstr
+      - STANPAR
+      recorded_date:
+      - OwnDate
+      document_amount:
+      - SalePrice
+      bbl:
+      - STANPAR
+      latitude:
+      - Lat
+      longitude:
+      - Lon
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    batch_limit: 7000
+    composite_id: true
 aliases:
 - nashville_tn
 job_suffix: bna

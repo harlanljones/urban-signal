@@ -1,4 +1,4 @@
-"""Contract tests for Hartford's ArcGIS 311/permits and CT SLA feeds."""
+"""Contract tests for Hartford's ArcGIS 311/permits/deeds and CT SLA feeds."""
 
 from datetime import UTC, datetime
 from types import SimpleNamespace
@@ -44,6 +44,16 @@ HARTFORD_311_FIELD_MAP = {
     "zipcode": ["ZIP", "ZipCode", "PostalCode"],
 }
 
+# The CAMA table's owner, mailing (City, State, Zip10) and grantor columns are
+# never mapped or requested.
+HARTFORD_DEEDS_FIELD_MAP = {
+    "doc_id": ["LegalRef", "ParcelNumber"],
+    "recorded_date": ["LastSaleDate"],
+    "document_amount": ["LastSalePrice"],
+    "bbl": ["ParcelNumber"],
+    "doc_type": ["LastSalecode"],
+}
+
 
 def test_hartford_geometry_is_self_consistent():
     assert is_in_hartford_metro(41.7637, -72.6734)
@@ -84,6 +94,65 @@ def test_hartford_registers_311_permits_and_sla():
     assert sla.where == ct_liquor_where("HARTFORD")
     assert sla.id_keys == ["credentialid"]
     assert sla.field_map == CT_LIQUOR_SLA_FIELD_MAP
+
+
+
+def test_hartford_deeds_read_each_accounts_last_sale_at_its_parcel():
+    """The city's CAMA table holds each account's last sale, live through
+    2026-09-22, and no geometry; its ParcelNumber is the parcel layer's
+    PARCELNUMBER (200 of 200 matched). CT OPM's statewide sales set ends
+    2025-09-30 and the city's own sales table stopped at 2026-01-09."""
+    from src.config import settings
+
+    spec = get_dataset(CityId.HARTFORD, FeedType.DEEDS)
+    assert spec.endpoint == settings.arcgis_hartford_deeds_url
+    assert spec.endpoint.endswith("/HartfordOpenDataTables/FeatureServer/6")
+    assert spec.platform == "arcgis"
+    assert spec.ingestion_mode == "snapshot"
+    assert spec.watermark_col == "LastSaleDate"
+    assert spec.where == (
+        "LastSaleDate >= CURRENT_DATE - INTERVAL '90' DAY AND LastSaleDate <= CURRENT_TIMESTAMP"
+    )
+    assert spec.order_by == "LastSaleDate DESC, OBJECTID DESC"
+    assert spec.id_keys == ["ParcelNumber", "LastSaleDate", "LegalRef"]
+    assert spec.composite_id is True
+    assert spec.select == "OBJECTID,ParcelNumber,LastSaleDate,LastSalePrice,LastSalecode,LegalRef"
+    # 353 sales in the window on 2026-09-30: one page, under the default cap.
+    assert spec.batch_limit is None
+    assert spec.needs_geocode is False
+    assert spec.parcel_join == {
+        "parcel_layer": settings.arcgis_hartford_parcel_layer_url,
+        "join_key": "PARCELNUMBER",
+        "geometry_source": "centroid",
+        "row_key": "ParcelNumber",
+    }
+    assert spec.field_map == HARTFORD_DEEDS_FIELD_MAP
+
+
+def test_hartford_joined_sale_parses_with_its_sale_code():
+    with patch("src.producers.deeds_acris_producer.BaseKafkaProducer"):
+        from src.producers.deeds_acris_producer import DeedsACRISProducer
+
+        deeds = DeedsACRISProducer()
+    row = {
+        "OBJECTID": 90003,
+        "ParcelNumber": "900000001",
+        "LastSaleDate": "2026-09-22T00:00:00+00:00",
+        "LastSalePrice": 310000.0,
+        "LastSalecode": "Valid Sale",
+        "LegalRef": "99999 0001",
+        # The parcel join's centroid.
+        "latitude": 41.7637,
+        "longitude": -72.6851,
+    }
+
+    event = deeds.parse_socrata_row(row, city_id="hartford")
+
+    assert event is not None
+    assert (event.doc_id, event.bbl, event.doc_type) == ("99999 0001", "900000001", "VALID SALE")
+    assert event.document_amount == 310000.0
+    assert event.recorded_date.date().isoformat() == "2026-09-22"
+    assert is_in_hartford_metro(event.latitude, event.longitude)
 
 
 @pytest.fixture

@@ -85,6 +85,12 @@ each poll and reads that whole. An offense is dated by when it happened and
 can be reported up to 118 days later, which a watermark would miss
 (`probe-richmond.md`).
 
+Denver, Hartford and Nashville `deeds` (2,445, 353 and 4,373 rows; caps
+4,000, the default 1,000 and 7,000) joined with their registrations. Each
+source holds one row per parcel with its last sale, so each feed filters to
+sales dated in the 90 days before each poll and reads those whole
+(`deeds-probe-2026-09-30.md`).
+
 ## Newest-first windows
 
 | Feed | Order | Rows dated in last 30 / 90 days | Window after |
@@ -209,7 +215,10 @@ All live, 2026-09-30, at a spacing of 1.5 to 3 seconds per request.
   Raleigh, Asheville, Reno and the three Maryland feeds take their record id
   from the parcel or account, so a parcel that sells again while its id is still
   in the job's seen-set is not re-published. A composite id (parcel plus sale
-  date) would fix it.
+  date) would fix it. Fixed in a later change ("Incremental filters" in
+  [feed-health-2026-09-30.md](feed-health-2026-09-30.md)) by a
+  `composite_id` flag, which the Denver, Hartford and Nashville feeds use
+  too.
 - **Feed health.** A one-poll check of all 367 jobs on 2026-09-30 found 36 that
   fail outright (moved or retired endpoints, San Francisco's Socrata redirect,
   four Boston CKAN resources, two platforms with no client) and 16 that fetch

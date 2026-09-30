@@ -310,6 +310,64 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+  deeds:
+    endpoint: https://utility.arcgis.com/usrsvcs/servers/d595ae995fb049d3ac54919ebf24b1ac/rest/services/HartfordOpenDataTables/FeatureServer/6
+    platform: arcgis
+    watermark_col: LastSaleDate
+    id_keys:
+    - ParcelNumber
+    - LastSaleDate
+    - LegalRef
+    topic: raw.municipal.deeds
+    interval_seconds: 21600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: LastSaleDate DESC, OBJECTID DESC
+    id_col: null
+    select: OBJECTID,ParcelNumber,LastSaleDate,LastSalePrice,LastSalecode,LegalRef
+    fallback_endpoints: []
+    where: LastSaleDate >= CURRENT_DATE - INTERVAL '90' DAY AND LastSaleDate <= CURRENT_TIMESTAMP
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - LegalRef
+      - ParcelNumber
+      recorded_date:
+      - LastSaleDate
+      document_amount:
+      - LastSalePrice
+      bbl:
+      - ParcelNumber
+      doc_type:
+      - LastSalecode
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join:
+      parcel_layer: https://utility.arcgis.com/usrsvcs/servers/6f9809e9fe754a879389ee0dfa1fcec5/rest/services/OpenData_Housing_Development/MapServer/11
+      join_key: PARCELNUMBER
+      geometry_source: centroid
+      row_key: ParcelNumber
+    non_spatial: null
+    zip_member: null
+    composite_id: true
 aliases:
 - hartford_ct
 - hartford ct

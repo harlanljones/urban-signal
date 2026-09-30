@@ -1450,7 +1450,7 @@
         true,
         true,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -1471,7 +1471,12 @@
           "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALE_DATE",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 39.7392,
@@ -2050,7 +2055,7 @@
         true,
         true,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -2071,7 +2076,12 @@
           "interval_seconds": 3600.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "LastSaleDate",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 41.7637,
@@ -3420,7 +3430,7 @@
         true,
         true,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -3441,7 +3451,12 @@
           "interval_seconds": 600.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "OwnDate",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 36.1627,

@@ -18,6 +18,10 @@ where noted). Two metros move up; eleven stay where they are.
 | 1 | 54 | 54 |
 | 0 | 1 | 1 |
 
+Denver, Hartford and Nashville joined the four-family tier later the same
+day with deeds from their parcel records, which makes 21
+([deeds-probe-2026-09-30.md](deeds-probe-2026-09-30.md)).
+
 ## Registered
 
 ### Columbus, OH — `311`

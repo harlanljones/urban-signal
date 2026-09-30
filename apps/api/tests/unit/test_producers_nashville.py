@@ -1,4 +1,5 @@
-"""Contract tests for Nashville, TN (ArcGIS building permits + residential STR licenses)."""
+"""Contract tests for Nashville, TN (ArcGIS building permits, residential STR
+licenses, hubNashville 311, and deeds from the parcel layer's last transfer)."""
 
 from unittest.mock import patch
 
@@ -28,6 +29,16 @@ SLA_FIELD_MAP = {
     "expiration_date": ["Expiration_Date"],
     "license_type": ["Permit_Subtype_Description", "Permit_Type"],
     "status": ["Permit_Status"],
+    "latitude": ["Lat"],
+    "longitude": ["Lon"],
+}
+
+# The parcel layer's owner and mailing columns are never mapped or requested.
+DEEDS_FIELD_MAP = {
+    "doc_id": ["OwnInstr", "STANPAR"],
+    "recorded_date": ["OwnDate"],
+    "document_amount": ["SalePrice"],
+    "bbl": ["STANPAR"],
     "latitude": ["Lat"],
     "longitude": ["Lon"],
 }
@@ -65,14 +76,19 @@ def test_nashville_geometry_is_self_consistent():
     assert {meta.borough for meta in NASHVILLE_SUBMARKETS.values()} == set(NASHVILLE_DIVISIONS)
 
 
-def test_nashville_registers_permits_str_and_311_feeds():
+def test_nashville_registers_all_four_families():
     from src.spatial.city_registry import REGISTRY, normalize_city
 
     city = CityId.NASHVILLE
     assert normalize_city("nashville") is city
     assert normalize_city("nashville_tn") is city
     assert REGISTRY[city].job_suffix == "bna"
-    assert set(REGISTRY[city].datasets) == {FeedType.PERMITS, FeedType.SLA, FeedType.COMPLAINTS_311}
+    assert set(REGISTRY[city].datasets) == {
+        FeedType.PERMITS,
+        FeedType.SLA,
+        FeedType.COMPLAINTS_311,
+        FeedType.DEEDS,
+    }
 
 
 def test_nashville_permit_spec_pins_the_live_schema():
@@ -118,16 +134,33 @@ def test_nashville_311_spec_pins_the_live_schema():
     assert spec.field_map == COMPLAINTS_311_FIELD_MAP
 
 
-def test_nashville_registers_hubnashville_311_and_hard_excludes_deeds():
-    """US-131 re-adjudicated the HJ-119 hubNashville 311 exclusion positive: the
-    Current_Year view now carries 2026 rows, so COMPLAINTS_311 registers.
-    DEEDS stays hard-excluded (no verified sales feed)."""
+def test_nashville_deeds_read_each_parcels_last_transfer():
+    """The Metro parcel layer, refreshed daily, holds each parcel's last
+    transfer: its date, price and instrument, with native Lat/Lon (2026-09-30).
+    Rows arrive up to three weeks after the transfer, so each poll re-reads the
+    transfers of the last 90 days (4,373 on 2026-09-30) and publishes the ones
+    it has not seen; a resale replaces the parcel's row and is a new id."""
+    from src.config import settings
     from src.spatial.city_registry import get_dataset
 
-    spec = get_dataset(CityId.NASHVILLE, FeedType.COMPLAINTS_311)
+    spec = get_dataset(CityId.NASHVILLE, FeedType.DEEDS)
+    assert spec.endpoint == settings.arcgis_nashville_deeds_url
+    assert spec.endpoint.endswith("/Parcels_view/FeatureServer/0")
     assert spec.platform == "arcgis"
-    with pytest.raises(KeyError, match="no.*feed"):
-        get_dataset(CityId.NASHVILLE, FeedType.DEEDS)
+    assert spec.ingestion_mode == "snapshot"
+    assert spec.watermark_col == "OwnDate"
+    assert spec.where == "OwnDate >= CURRENT_DATE - INTERVAL '90' DAY AND OwnDate <= CURRENT_TIMESTAMP"
+    assert spec.order_by == "OwnDate DESC, OBJECTID DESC"
+    # A deed can convey several parcels, and a parcel can sell again.
+    assert spec.id_keys == ["STANPAR", "OwnDate", "OwnInstr"]
+    assert spec.composite_id is True
+    assert spec.select == "OBJECTID,STANPAR,OwnDate,SalePrice,OwnInstr,Lat,Lon"
+    assert spec.batch_limit == 7000
+    assert spec.interval_seconds == 21600.0
+    assert spec.expected_cadence_days == 7
+    assert spec.oid_field == "OBJECTID"
+    assert spec.needs_geocode is False
+    assert spec.field_map == DEEDS_FIELD_MAP
 
 
 def _flatten_feature(attributes: dict, geometry: dict, extra_date_fields: tuple[str, ...] = ()) -> dict:
@@ -400,3 +433,45 @@ class TestNashville311Parsing:
         row.pop("Latitude", None)
         row.pop("Longitude", None)
         assert complaints.parse_socrata_row(row, city_id="nashville") is None
+
+
+class TestNashvilleDeedsParsing:
+    """A synthetic parcel-layer row through the production flattener."""
+
+    ROW = {
+        "OBJECTID": 90001,
+        "STANPAR": "09999000100",
+        "OwnDate": 1789448400000,  # 2026-09-15 05:00 UTC, midnight in Nashville
+        "SalePrice": 425000.0,
+        "OwnInstr": "DB-20260917 0099999",
+        "Lat": 36.1627,
+        "Lon": -86.7816,
+    }
+    GEOMETRY = {"rings": [[[-86.7820, 36.1624], [-86.7812, 36.1624], [-86.7812, 36.1631], [-86.7820, 36.1631], [-86.7820, 36.1624]]]}
+
+    @pytest.fixture
+    def deeds(self):
+        with patch("src.producers.deeds_acris_producer.BaseKafkaProducer"):
+            from src.producers.deeds_acris_producer import DeedsACRISProducer
+
+            return DeedsACRISProducer()
+
+    def _row(self, **changes):
+        return _flatten_feature({**self.ROW, **changes}, self.GEOMETRY, extra_date_fields=("OwnDate",))
+
+    def test_a_transfer_is_a_deed_at_its_parcel(self, deeds):
+        event = deeds.parse_socrata_row(self._row(), city_id="nashville")
+        assert event is not None
+        assert event.doc_id == "DB-20260917 0099999"
+        assert event.bbl == "09999000100"
+        assert event.document_amount == 425000.0
+        assert event.recorded_date.date().isoformat() == "2026-09-15"
+        # The layer's own Lat/Lon, not the polygon centroid the flattener adds.
+        assert (event.latitude, event.longitude) == (36.1627, -86.7816)
+        assert event.h3_res9 is not None
+
+    def test_a_transfer_without_a_price_still_publishes(self, deeds):
+        event = deeds.parse_socrata_row(self._row(SalePrice=0.0, OwnInstr="QC-20260917 0099997"), city_id="nashville")
+        assert event is not None
+        assert event.document_amount == 0.0
+        assert event.doc_type == "DEED"

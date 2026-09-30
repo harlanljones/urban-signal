@@ -29,13 +29,18 @@ DEFAULT_CAP = JobConfig.batch_limit
 FULL_READ_ROWS = {
     ("bend", "sla"): 5_981,
     ("cincinnati", "deeds"): 1_078,
+    # Denver, Hartford and Nashville deeds: the transfers dated in each
+    # spec's own 90-day window, read 2026-09-30.
+    ("denver", "deeds"): 2_445,
     ("eugene", "sla"): 752,
     ("fort_collins", "permits"): 2_183,
+    ("hartford", "deeds"): 353,
     ("inland_empire", "sla"): 10_585,
     ("milwaukee", "deeds"): 5_685,
     ("milwaukee", "sla"): 1_275,
     ("modesto", "sla"): 4_574,
     ("montgomery", "sla"): 1_084,
+    ("nashville", "deeds"): 4_373,
     ("nyc", "childcare"): 2_752,
     ("oakland", "sla"): 5_103,
     ("portland", "sla"): 6_079,

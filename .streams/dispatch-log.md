@@ -1465,3 +1465,24 @@ Worth keeping:
   state only at the line's end.
 - **A normalizer change needs the version bump.** The cache freezes misses,
   so a query that lost its state stays unplaced until its hash changes.
+
+### 2026-09-30 — Deeds from parcel records (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| deeds-wave | `.streams/deeds-wave.md` | `config.py` (three deeds endpoints, Hartford's parcel layer) | 2026-09-30 | done (22 metros probed by two read-only research workers; 3 registered: Nashville 4,373, Hartford 353 and Denver 2,445 sales polled live, all placed in their metro box, the second polls published none) | `docs/research/deeds-probe-2026-09-30.md`; `deeds` specs for Nashville, Hartford and Denver; regenerated facts |
+
+Nashville, Hartford and Denver read each parcel's last sale and move to all
+four signal families (18 to 21). Tempe, Bend, Medford and Tacoma have
+sources that need client work first.
+
+Worth keeping:
+
+- **Look at the parcel layer, not only the catalog.** Nashville's and
+  Denver's parcel layers carry each parcel's last sale; a title search of
+  the Hub found no sales dataset.
+- **A numeric key loses its zeros.** Denver's sales table stores the parcel
+  id as a number, and the parcel layer keys a 13-digit string. Sample the
+  key's shape on both sides before planning a join.
+- **Check a recommended state set's cadence.** Connecticut's OPM sales set is
+  published once a year and ended on 2025-09-30.

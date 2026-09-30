@@ -777,8 +777,8 @@ class Settings(BaseSettings):
         description="Montgomery County MD SDAT real-property deeds snapshot endpoint",
     )
 
-    # Denver (ArcGIS Hub): construction permits and ODC 311 only. Licenses
-    # have no issue date and sales are ungeocoded, so both remain excluded.
+    # Denver (ArcGIS Hub): construction permits, ODC 311, and deeds from the
+    # parcel layer's last sale (2026-09-30). Licenses have no issue date.
     arcgis_denver_permits_url: str = Field(
         default=(
             "https://services1.arcgis.com/zdB7qR0BtYrg0Xpl/arcgis/rest/services/"
@@ -792,6 +792,13 @@ class Settings(BaseSettings):
             "ODC_service_requests_311/FeatureServer/66"
         ),
         description="Denver ODC 311 service requests FeatureServer table",
+    )
+    arcgis_denver_deeds_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/zdB7qR0BtYrg0Xpl/arcgis/rest/services/"
+            "ODC_PROP_PARCELS_A/FeatureServer/245"
+        ),
+        description="Denver parcel polygons with each parcel's last sale (deeds snapshot)",
     )
 
     # Baltimore (ArcGIS): permits, current-year 311, and narrow liquor
@@ -1201,6 +1208,13 @@ class Settings(BaseSettings):
         ),
         description="Nashville hubNashville 311 Service Requests Current Year FeatureServer layer URL",
     )
+    arcgis_nashville_deeds_url: str = Field(
+        default=(
+            "https://services2.arcgis.com/HdTo6HJqh92wn4D8/arcgis/rest/services/"
+            "Parcels_view/FeatureServer/0"
+        ),
+        description="Nashville parcel polygons with each parcel's last transfer (deeds snapshot)",
+    )
 
     # Kansas City, MO (Socrata): 311 Call Center Reported Issues. Corrects the
     # 2026-08-23 rejection (HJ-120); permits/SLA stay unregistered.
@@ -1276,6 +1290,22 @@ class Settings(BaseSettings):
             "Service_Requests_2015_to_Current/FeatureServer/9"
         ),
         description="Hartford current-year 311 FeatureServer layer URL",
+    )
+    arcgis_hartford_deeds_url: str = Field(
+        default=(
+            "https://utility.arcgis.com/usrsvcs/servers/"
+            "d595ae995fb049d3ac54919ebf24b1ac/rest/services/"
+            "HartfordOpenDataTables/FeatureServer/6"
+        ),
+        description="Hartford CAMA property table with each account's last sale (deeds snapshot)",
+    )
+    arcgis_hartford_parcel_layer_url: str = Field(
+        default=(
+            "https://utility.arcgis.com/usrsvcs/servers/"
+            "6f9809e9fe754a879389ee0dfa1fcec5/rest/services/"
+            "OpenData_Housing_Development/MapServer/11"
+        ),
+        description="Hartford parcel polygon layer URL (deeds geometry join on PARCELNUMBER)",
     )
     socrata_hartford_sla_endpoint: str = Field(
         default="https://data.ct.gov/resource/ngch-56tr.json",

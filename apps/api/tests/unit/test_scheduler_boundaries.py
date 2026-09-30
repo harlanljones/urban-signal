@@ -282,6 +282,50 @@ class TestSaleRows:
         event = producer.producer.produce.call_args.kwargs["payload"]
         assert (event.latitude, event.longitude) == (38.9105, -77.0431)
 
+    def test_a_hartford_sale_joins_its_parcel_by_the_tables_parcel_number(self, scheduler):
+        """Hartford's CAMA table has no geometry; its ParcelNumber is the
+        parcel layer's PARCELNUMBER. A snapshot reads its own window only."""
+        producer = scheduler.producers["deeds"]
+        rows = [
+            {"OBJECTID": 90003, "ParcelNumber": "900000001", "LastSaleDate": "2026-09-22T00:00:00+00:00",
+             "LastSalePrice": 310000.0, "LastSalecode": "Valid Sale", "LegalRef": "99999 0001"},
+        ]
+        producer.arcgis.paginate = MagicMock(return_value=[rows])
+        producer.arcgis.fetch_centroid_index = MagicMock(return_value={"900000001": (41.7637, -72.6851)})
+
+        result = scheduler.poll_job("deeds_hartford", limit=10)
+
+        assert result["records_published"] == 1
+        assert _where(producer, "arcgis") == (
+            "(LastSaleDate >= CURRENT_DATE - INTERVAL '90' DAY AND LastSaleDate <= CURRENT_TIMESTAMP)"
+        )
+        kwargs = producer.arcgis.fetch_centroid_index.call_args.kwargs
+        assert kwargs["endpoint_url"].endswith("/OpenData_Housing_Development/MapServer/11")
+        assert (kwargs["join_key"], kwargs["join_values"]) == ("PARCELNUMBER", ["900000001"])
+        event = producer.producer.produce.call_args.kwargs["payload"]
+        assert (event.latitude, event.longitude) == (41.7637, -72.6851)
+
+    def test_a_parcels_next_transfer_is_new_to_its_snapshot(self, scheduler):
+        """Nashville's parcel layer holds each parcel's last transfer. The
+        window re-reads an unchanged row as a duplicate; a resale replaces the
+        parcel's row and publishes."""
+        producer = scheduler.producers["deeds"]
+        sale = {"OBJECTID": 90001, "STANPAR": "09999000100", "OwnDate": "2026-09-15T05:00:00+00:00",
+                "SalePrice": 425000.0, "OwnInstr": "DB-20260917 0099999", "Lat": 36.1627, "Lon": -86.7816}
+        resale = {**sale, "OwnDate": "2026-09-29T05:00:00+00:00", "SalePrice": 440000.0,
+                  "OwnInstr": "DB-20260930 0099998"}
+
+        producer.arcgis.paginate = MagicMock(return_value=[[sale]])
+        first = scheduler.poll_job("deeds_bna", limit=10)
+        again = scheduler.poll_job("deeds_bna", limit=10)
+        producer.arcgis.paginate = MagicMock(return_value=[[resale]])
+        after_resale = scheduler.poll_job("deeds_bna", limit=10)
+
+        assert [r["records_published"] for r in (first, again, after_resale)] == [1, 0, 1]
+        event = producer.producer.produce.call_args.kwargs["payload"]
+        assert (event.doc_id, event.bbl, event.document_amount) == ("DB-20260930 0099998", "09999000100", 440000.0)
+        assert (event.latitude, event.longitude) == (36.1627, -86.7816)
+
     def test_a_license_joins_its_parcel_by_the_tables_column_name(self, scheduler, monkeypatch):
         """Lynchburg's licence table spells the key ParcelID and its parcel
         polygons Parcel_ID; the licence takes the centroid, never a geocode."""
