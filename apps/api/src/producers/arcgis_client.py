@@ -282,6 +282,7 @@ class ArcGISClient:
         batch_size: int = 1000,
         max_records: Optional[int] = None,
         via: Optional[Dict[str, str]] = None,
+        where: Optional[str] = None,
     ) -> Dict[str, tuple[float, float]]:
         """Fetch parcel polygons and return a normalized key-to-centroid index.
 
@@ -298,6 +299,11 @@ class ArcGISClient:
         ``CONDORELATE`` gives a condominium unit's SSL its building's lot
         (``MAT_SSL``). Each requested value the layer does not match is
         looked up there and takes its related parcel's centroid.
+
+        ``where`` limits the parcels that can match, joined to every request
+        with ``AND``: a value whose parcel fails it gets no centroid. Pierce
+        County's parcel layer places Tacoma's sales only in the city's tax
+        code areas.
         """
         layer_url = self._normalize_layer_url(endpoint_url)
         values = list(join_values) if join_values is not None else None
@@ -340,7 +346,7 @@ class ArcGISClient:
                     break
                 records, exceeded = self._fetch_page(
                     endpoint_url=layer_url,
-                    where_clause=None,
+                    where_clause=where,
                     order_by="",
                     limit=fetch_limit,
                     offset=offset,
@@ -359,7 +365,9 @@ class ArcGISClient:
                     break
             return index
 
-        for where in self._in_clauses(join_key, self._in_literals(layer_url, join_key, values)):
+        for clause in self._in_clauses(join_key, self._in_literals(layer_url, join_key, values)):
+            if where:
+                clause = f"({clause}) AND ({where})"
             offset = 0
             while True:
                 fetch_limit = batch_size
@@ -369,7 +377,7 @@ class ArcGISClient:
                     return index
                 records, exceeded = self._fetch_page(
                     endpoint_url=layer_url,
-                    where_clause=where,
+                    where_clause=clause,
                     order_by="",
                     limit=fetch_limit,
                     offset=offset,
@@ -385,7 +393,7 @@ class ArcGISClient:
                     break
         if via:
             missing = [value for value in values if self._normalize_join_value(value) not in index]
-            index.update(self._centroids_via(layer_url, join_key, via, missing, batch_size))
+            index.update(self._centroids_via(layer_url, join_key, via, missing, batch_size, where))
         return index
 
     def _in_literals(self, layer_url: str, key: str, values: List[str]) -> List[str]:
@@ -402,6 +410,7 @@ class ArcGISClient:
         via: Dict[str, str],
         values: List[str],
         batch_size: int,
+        where: Optional[str] = None,
     ) -> Dict[str, tuple[float, float]]:
         """Centroids for ``values`` through the keys ``via``'s table relates them to."""
         if not values:
@@ -409,12 +418,12 @@ class ArcGISClient:
         table = self._normalize_layer_url(via["table"])
         key, to = via["key"], via["to"]
         related: Dict[str, Any] = {}
-        for where in self._in_clauses(key, self._in_literals(table, key, values)):
+        for clause in self._in_clauses(key, self._in_literals(table, key, values)):
             offset = 0
             while True:
                 records, exceeded = self._fetch_page(
                     endpoint_url=table,
-                    where_clause=where,
+                    where_clause=clause,
                     order_by="",
                     limit=batch_size,
                     offset=offset,
@@ -432,7 +441,7 @@ class ArcGISClient:
         if not related:
             return {}
         targets = self.fetch_centroid_index(
-            layer_url, join_key, join_values=list(related.values()), batch_size=batch_size
+            layer_url, join_key, join_values=list(related.values()), batch_size=batch_size, where=where
         )
         index: Dict[str, tuple[float, float]] = {}
         for source, target in related.items():

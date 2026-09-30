@@ -62,13 +62,13 @@ logger = logging.getLogger(__name__)
 
 # Pagination kwargs each platform client's ``paginate`` accepts beyond the
 # shared endpoint/where/batch/max arguments: the US-185 adapter contract
-# (``acquisition.build_adapter_request``) plus the CSV client's zip/delimiter
-# options, which only the scheduler forwards. The socrata/arcgis/ckan/carto
-# signatures reject the watermark_* keys, so forwarding them raises TypeError
-# before the first request.
+# (``acquisition.build_adapter_request``) plus the CSV client's zip,
+# delimiter and header-row options, which only the scheduler forwards. The
+# socrata/arcgis/ckan/carto signatures reject the watermark_* keys, so
+# forwarding them raises TypeError before the first request.
 _PAGINATE_KWARGS: dict[str, tuple[str, ...]] = {
     **_ADAPTER_REQUEST_KEYS,
-    "csv": (*_ADAPTER_REQUEST_KEYS["csv"], "zip_member", "delimiter"),
+    "csv": (*_ADAPTER_REQUEST_KEYS["csv"], "zip_member", "delimiter", "columns"),
     # Accela's public surface is an ArcGIS facade (AccelaClient); a workbook
     # is sorted and column-picked client-side like a CSV.
     "accela": _ADAPTER_REQUEST_KEYS["arcgis"],
@@ -371,6 +371,7 @@ class MunicipalIngestionScheduler:
                     "base_where": ds.where,
                     "zip_member": zip_member,
                     "delimiter": ds.delimiter,
+                    "columns": list(ds.columns or []),
                     "link_pattern": ds.link_pattern,
                     # A table with no geometry (DC, Lynchburg and Roanoke
                     # sales) takes each row's coordinates from its parcel's
@@ -845,6 +846,9 @@ class MunicipalIngestionScheduler:
         Sales tables with no geometry (Lynchburg, Roanoke, DC's CAMA sales)
         name each row's parcel. Only this batch's parcels are read from the
         spec's parcel layer, as the deeds producer's ``run_stream`` does.
+        The join's ``where`` limits the parcels that can place a row: Pierce
+        County's parcels place Tacoma's sales only in the city's tax code
+        areas, and a sale elsewhere in the county stays unplaced.
         """
         meta = self.job_metadata[job_name]
         join = meta["parcel_join"]
@@ -861,7 +865,11 @@ class MunicipalIngestionScheduler:
             return batch
         client = getattr(self.producers[meta["producer_key"]], "arcgis", None) or ArcGISClient()
         centroids = client.fetch_centroid_index(
-            endpoint_url=join["parcel_layer"], join_key=key, join_values=wanted, via=join.get("via")
+            endpoint_url=join["parcel_layer"],
+            join_key=key,
+            join_values=wanted,
+            via=join.get("via"),
+            where=join.get("where"),
         )
         joined = []
         for row in batch:

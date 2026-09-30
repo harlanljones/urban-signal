@@ -109,6 +109,12 @@ layer the same way the Maricopa feeds read theirs: the sales dated in the 90
 days before each poll in the city (`SiteCity = 'MEDFORD'`), whole, each on
 its own taxlot polygon.
 
+Tacoma `deeds` (2,432 rows, cap 5,000) reads Pierce County's weekly sales
+file once a day: one download a poll, filtered in memory to the sales dated
+in the 90 days before it. The file covers the county, so each sale takes its
+parcel's centroid only in the City of Tacoma's tax code areas, and the clip
+skips the rest: 452 publish (`deeds-probe-2026-09-30.md`).
+
 ## Newest-first windows
 
 | Feed | Order | Rows dated in last 30 / 90 days | Window after |

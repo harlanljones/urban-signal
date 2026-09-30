@@ -24,7 +24,8 @@ day with deeds from their parcel records, which makes 21
 deeds from the Maricopa County Assessor's parcel layer, which makes 22, and
 Chandler, Glendale and Scottsdale gained a third family from the same layer.
 Bend followed with deeds from Deschutes County's sales table, which makes 23,
-and Medford with deeds from Jackson County's sales layer, which makes 24.
+Medford with deeds from Jackson County's sales layer, which makes 24, and
+Tacoma with deeds from Pierce County's weekly sales file, which makes 25.
 
 ## Registered
 

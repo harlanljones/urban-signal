@@ -9,22 +9,22 @@ gain deeds as a third family, and Phoenix, whose deeds move to the same layer.
 Bend followed from Deschutes County's sales table, with a scheduler flag that
 keeps a county-wide source's rows inside the metro box, and Medford from
 Jackson County's sales layer, once the ArcGIS client could read that server's
-responses. One has a source that needs client work first, two are held and
-thirteen have none.
+responses. Tacoma followed from Pierce County's weekly sales file, once the
+CSV client could read a file with no header row and the parcel join could
+keep to the city's own parcels. Two are held and thirteen have none.
 
 | Verdict | Metros |
 |---|---|
-| Registered here | Nashville, Hartford, Denver; then Tempe (with Chandler, Glendale, Scottsdale and a Phoenix repair); then Bend; then Medford |
-| Source found, needs client work | Tacoma |
+| Registered here | Nashville, Hartford, Denver; then Tempe (with Chandler, Glendale, Scottsdale and a Phoenix repair); then Bend; then Medford; then Tacoma |
 | Held | Minneapolis, San Diego |
 | No source | Austin, Baton Rouge, Billings, Dallas, El Paso, Los Angeles, Louisville, Memphis, Montgomery AL, Sacramento, San Antonio, San Jose, St. Louis |
 
-| Tier (families) | Before | After Denver, Hartford, Nashville | After Maricopa | After Bend | After Medford |
-|---|---|---|---|---|---|
-| 4 | 18 | 21 | 22 (Tempe) | 23 (Bend) | **24** (Medford) |
-| 3 | 33 | 30 | 32 (Chandler, Glendale, Scottsdale in; Tempe out) | 31 | 30 |
-| 2 | 72 | 72 | 69 | 69 | 69 |
-| 1 | 34 | 34 | 34 | 34 | 34 |
+| Tier (families) | Before | After Denver, Hartford, Nashville | After Maricopa | After Bend | After Medford | After Tacoma |
+|---|---|---|---|---|---|---|
+| 4 | 18 | 21 | 22 (Tempe) | 23 (Bend) | 24 (Medford) | **25** (Tacoma) |
+| 3 | 33 | 30 | 32 (Chandler, Glendale, Scottsdale in; Tempe out) | 31 | 30 | 29 |
+| 2 | 72 | 72 | 69 | 69 | 69 | 69 |
+| 1 | 34 | 34 | 34 | 34 | 34 | 34 |
 
 Phoenix already counted deeds, from a file that dead-lettered every row, so
 its tier does not change.
@@ -217,11 +217,65 @@ requests an owner column or sends an address to the geocoder.
   first poll in a process takes two requests (the layer's metadata, then one
   page) and each later poll one.
 
-## Sources that need client work first
+### Tacoma — the county's sales file, placed on the city's parcels
 
-| Metro | Source | What it needs |
-|---|---|---|
-| Tacoma | Pierce County's weekly `sale.zip` (`online.co.pierce.wa.us/datamart/`), every sale since 1997, joined to the county's `Tax_Parcels` layer. | The file is pipe-delimited with no header row, which the CSV client cannot read. It is county-wide, so it needs a box filter, and it runs four to five weeks behind. |
+- **Source:** the Pierce County Assessor-Treasurer's data mart,
+  `online.co.pierce.wa.us/datamart/sale.zip` (20.8 MB). The county's Data
+  Downloads page says the mart's files are updated weekly; every file in the
+  2026-09-25 build, which this note reads, is stamped 01:00 Pacific that
+  Friday. Its `sale.txt` lists every sale in the county since
+  1997-01-01, a line for each parcel a sale covers (646,457 lines, 89 MB),
+  pipe-delimited with no header row; the Assessor-Treasurer's layout sheet
+  names the 13 columns. Unlike the other sources here it lists every sale,
+  not each parcel's latest, and the feed reads it once a day. It reads
+  `ETN` (the excise tax number the Auditor issues at recording), `Parcel
+  Number`, `Sale Date`, `Sale Price` and `Deed Type` (statutory warranty
+  deed, bargain and sale, trustee's deed), which becomes the event's
+  `doc_type`.
+- **Reading the file:** the CSV client now takes a spec's `columns` for a
+  file with no header row, so the first line is read as a sale. It also
+  splits lines itself instead of through `io.StringIO`, which held four
+  bytes a character: parsing this file peaked at 339 MB instead of 510 MB
+  (tracemalloc), about 15 seconds a poll.
+- **Placement:** each sale takes its parcel's centroid from the county's
+  `Tax_Parcels` layer
+  (`services2.arcgis.com/1UvBaQ5y1ubjUPmd/.../Tax_Parcels/FeatureServer/0`),
+  joined `Parcel Number` to `TaxParcelNumber`: 2,314 of the window's 2,428
+  parcels matched. Most of the rest are mobile homes and leaseholds, which
+  have no parcel polygon of their own.
+- **Only Tacoma's sales:** neither the file nor the layer names a city, but
+  the layer's `Tax_Area_Code` tells it. Of the 75,908 parcels whose label
+  point lies inside the City's limits (`Tacoma_City_Limits` on the City's
+  ArcGIS Online org), 75,859 carry one of seven codes (005, 006, 010, 011,
+  015, 025, 026), 47 carry 0 and two sit on the boundary; the four parcels
+  with those seven codes outside the limits are each within 80 metres of it.
+  The parcel join gains a `where`, so the layer places a sale only on a
+  parcel with one of those codes, and `metro_clip` skips every sale left
+  unplaced. The box alone would have kept 232 sales outside the city, a
+  third of the 688 it holds: 82 on unincorporated land, 77 in Lakewood, 49
+  in University Place, 19 in Fircrest and 5 in Ruston (label points in the
+  county's `Cities_in_Pierce_County` polygons). The clip also skips the
+  city's sales past the box's edges, 20 of 472: 11 to the east, around
+  Northeast Tacoma and the port, and 9 to the west, along the Narrows.
+- **Window:** the sales dated in the 90 days before each poll. No sale in the
+  file is dated after its build, so there is no upper bound.
+- **Several parcels, one sale:** 452 rows carry 440 excise tax numbers. The
+  record id joins `ETN` and `Parcel Number`, the layout's primary key, which
+  no two of the 646,457 lines share.
+- **Party columns:** every line names the grantor and the grantee, and a
+  file cannot leave columns on the server. The spec names them in `columns`
+  and leaves them out of `select`, so the client drops them from each row as
+  it reads it and no row the scheduler handles carries them.
+- **Freshness:** a sale reaches the file four to five weeks after its date.
+  In the 2026-09-25 build, the week to 2026-08-26 holds 219 sales against
+  268 to 370 in earlier weeks, and seven are dated later (the newest
+  2026-09-11). A sale stays in the window for about eight weeks after it
+  arrives. `expected_cadence_days` is 7, the build's cadence: the staleness
+  probe reads the file's `Last-Modified`, since its row check does not open
+  a zip member.
+- **Cap:** 5,000 rows, twice the county's window. A poll takes one download
+  and about 35 requests to the parcel layer: its metadata once, then the
+  lookups, about 70 quoted parcel numbers to a query.
 
 ## Held
 
@@ -288,12 +342,14 @@ source on 2026-09-30, with Kafka mocked.
 | Phoenix `deeds` | 9,224 | 9,224 | 9,191 | 0 | 2026-07-02 to 2026-09-22 | 3,772 | 0 new of 9,224 |
 | Bend `deeds` | 1,048 | 1,019 (29 outside the box skipped) | 1,019 | 0 | 2026-07-02 to 2026-09-26 | 617 | 0 new of 1,019 |
 | Medford `deeds` | 304 | 304 | 302 (one just east of the box, one without a polygon) | 0 | 2026-07-06 to 2026-09-25 | 304 | 0 new of 304 |
+| Tacoma `deeds` | 2,432 | 452 (1,980 unplaced or outside the box skipped) | 452, all inside the city limits | 0 | 2026-07-02 to 2026-08-27 | 452 | 0 new of 452 |
 
 No poll made a geocoder query or requested an owner column. A first poll of
 the first three took 4 to 8 requests and 10 to 20 seconds; a first poll of
 the Maricopa feeds took 2 to 10, spaced 2 seconds apart, and 5 to 48 seconds.
-Bend's took 22 requests and 62 seconds, spaced 2.2 seconds apart, and
-Medford's 2 requests and 4 seconds.
+Bend's took 22 requests and 62 seconds, spaced 2.2 seconds apart,
+Medford's 2 requests and 4 seconds, and Tacoma's one download and 35
+requests to the parcel layer in 111 seconds, spaced the same way.
 
 ## Probe conduct
 
@@ -326,14 +382,23 @@ server, it sent its requests with curl and curl's default User-Agent; it also
 searched ArcGIS Online's public catalogue for a copy of the layer on another
 host and found none.
 
+The Tacoma follow-up kept the same clock. It downloaded `sale.zip` four
+times (twice to measure it, once for each live poll), read the saved copy by
+column position for the non-personal columns, printed or kept no value from
+the grantor and grantee columns, and deleted the copy afterwards. From the
+parcel layer it asked only for `TaxParcelNumber`, `Tax_Area_Code` and the
+label point (`Latitude`, `Longitude`), never the owner's mailing columns:
+its metadata, 34 lookups of the window's parcels and 60 requests for the
+116,698 parcels around the city, before the two live polls (69 requests).
+With the City's limits, the county's city polygons and six catalogue
+searches, it made 177 requests to ArcGIS hosts.
+
 ## Not covered here
 
 - **A deed on several parcels.** Each parcel's row publishes, but the rows
   share one instrument number, and PostGIS keeps one row per `doc_id`, as it
   does for Las Vegas, Lynchburg and Columbus. In Nashville's sample, 7 of 200
   instruments covered more than one parcel.
-- **The candidate above.** Tacoma needs the client change named in its row.
-  Its county-wide file could use `metro_clip` once the CSV client reads it.
 - **The parcel outlines.** The Maricopa layer returns each parcel's polygon
   with its row, which the feeds do not need since the layer's own coordinates
   place the deed. The scheduler has no per-feed switch for `returnGeometry`.

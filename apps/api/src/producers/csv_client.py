@@ -10,8 +10,9 @@ the server-side watermark predicate the scheduler renders (``col > '<hw>'``) is
 evaluated locally against the ISO date strings in the downloaded rows.
 
 Pass ``zip_member='2026.csv'`` to read one named member out of a zip endpoint
-(St. Louis CSB ``csb.zip``). The scheduler does not yet forward that kwarg —
-wiring it is a later spine hold.
+(St. Louis CSB ``csb.zip``), and ``columns`` to name the fields of a file with
+no header row (Pierce County's ``sale.txt``). The scheduler forwards both from
+the spec.
 """
 
 from __future__ import annotations
@@ -20,7 +21,7 @@ import csv
 import io
 import re
 import zipfile
-from collections.abc import Generator
+from collections.abc import Generator, Iterator
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -32,6 +33,19 @@ _NOT_IN = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s+NOT\s+IN\s*\(([^)]*)\)\s*$
 # The rolling window ArcGIS specs send server-side (``CURRENT_DATE - INTERVAL
 # '180' DAY``); a file feed resolves it to a date before filtering rows.
 _RELATIVE_DATE = re.compile(r"CURRENT_DATE\s*-\s*INTERVAL\s*'(\d+)'\s*DAY", re.IGNORECASE)
+# One line with its ending: \r\n, \r or \n, as ``io.StringIO(text, newline="")``
+# splits them, so the csv module ends rows on any of the three (Milwaukee's
+# permits export uses bare \r).
+_LINE = re.compile(r"[^\r\n]*(?:\r\n|\r|\n)|[^\r\n]+")
+
+
+def _lines(text: str) -> Iterator[str]:
+    """The lines of ``text`` without a copy of it.
+
+    StringIO holds four bytes a character: over 350 MB for Pierce County's
+    89 MB sales file, on top of the text itself.
+    """
+    return (match.group(0) for match in _LINE.finditer(text))
 
 
 def resolve_relative_dates(where_clause: str | None, today: Any = None) -> str | None:
@@ -286,15 +300,19 @@ class CSVClient:
 
         zip_member = kwargs.get("zip_member")
         delimiter = kwargs.get("delimiter", ",")
+        columns = kwargs.get("columns")
         if zip_member:
             csv_text = _read_zip_member(response.content, zip_member)
         else:
             csv_text = response.text
-        csv_text = _strip_preamble(csv_text, delimiter=delimiter)
-        # newline="" lets the csv module end rows on \r, \n or \r\n; with
-        # StringIO's default a file using bare \r (Milwaukee's permits export)
-        # is one line with carriage returns inside unquoted fields.
-        reader = csv.DictReader(io.StringIO(csv_text, newline=""), delimiter=delimiter)
+        if columns:
+            # A file with no header row: every line is a row, named by the
+            # spec's columns, and there is no header for a preamble to hide.
+            fieldnames: list[str] | None = list(columns)
+        else:
+            csv_text = _strip_preamble(csv_text, delimiter=delimiter)
+            fieldnames = None
+        reader = csv.DictReader(_lines(csv_text), fieldnames=fieldnames, delimiter=delimiter)
         # Municipal CSVs use title case, spaces, and punctuation inconsistently;
         # normalize them so shared field maps apply uniformly.
         if reader.fieldnames:

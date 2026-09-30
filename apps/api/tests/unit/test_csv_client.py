@@ -223,3 +223,58 @@ def test_csv_client_reads_any_line_ending(eol):
 def test_strip_preamble_reads_bare_carriage_returns():
     payload = '"Updated 2026-09-29"\r"A","B"\r"1","2"\r'
     assert _strip_preamble(payload) == "A,B\n1,2\n"
+
+
+def test_csv_client_names_the_columns_of_a_file_without_a_header_row():
+    """Pierce County's sales file starts with its first sale: the spec names
+    the columns, and select drops the parties from each row as it is read."""
+    payload = _zip_bytes({
+        "sale.txt": (
+            "9999901|1|0000000001|09/11/2026|451000.00|Statutory Warranty Deed|GRANTOR A|GRANTEE B\r\n"
+            "9999902|2|0000000002|02/03/2026|389000.00|Quit Claim Deed|GRANTOR C|GRANTEE D\r\n"
+            "9999903|1|0000000003|09/14/2026|512000.00|Bargain & Sale Deed|GRANTOR E|GRANTEE F\r\n"
+        )
+    })
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, content=payload, request=request)
+
+    client = CSVClient(httpx.Client(transport=httpx.MockTransport(handler)))
+    rows = [
+        row
+        for batch in client.paginate(
+            "https://example.test/sale.zip",
+            where_clause="sale_date >= '2026-09-01'",
+            order_by="sale_date DESC",
+            select="etn,parcel_number,sale_date,sale_price,deed_type",
+            watermark_col="sale_date",
+            watermark_format="%m/%d/%Y",
+            zip_member="sale.txt",
+            delimiter="|",
+            columns=["ETN", "Parcel Count", "Parcel Number", "Sale Date", "Sale Price", "Deed Type", "Grantor",
+                     "Grantee"],
+        )
+        for row in batch
+    ]
+
+    assert [row["etn"] for row in rows] == ["9999903", "9999901"]
+    assert rows[1] == {
+        "etn": "9999901", "parcel_number": "0000000001", "sale_date": "09/11/2026", "sale_price": "451000.00",
+        "deed_type": "Statutory Warranty Deed",
+    }
+
+
+def test_csv_client_keeps_a_quoted_line_break_inside_its_field():
+    payload = 'id,note,issued\r\n1,"two\r\nlines",2026-09-01\r\n2,"bare\rreturn",2026-09-02\r\n'
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, text=payload, request=request)
+
+    client = CSVClient(httpx.Client(transport=httpx.MockTransport(handler)))
+    rows = [row for batch in client.paginate("https://example.test/notes.csv") for row in batch]
+
+    assert [(row["id"], row["note"], row["issued"]) for row in rows] == [
+        ("1", "two\r\nlines", "2026-09-01"),
+        ("2", "bare\rreturn", "2026-09-02"),
+    ]
+

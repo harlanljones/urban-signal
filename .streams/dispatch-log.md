@@ -1540,3 +1540,20 @@ Worth keeping:
 - **Look for the city in the city column's values.** Jackson County's
   `SiteCity` says `MEDFORD` inside the city and `MEDFORD/COUNTY` outside it,
   unlike Deschutes County's postal `City`.
+
+### 2026-09-30 — Tacoma deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| tacoma-deeds | `.streams/tacoma-deeds.md` | `city_registry.py` (`DatasetSpec.columns`), `scheduler.py` (forwards it; the parcel join's `where`), `config.py` (the sales file and the parcel layer) | 2026-09-30 | done (2,432 county sales read, 452 in the city published, none dead-lettered, the second poll published none) | `deeds` spec for Tacoma; header-less files in `CSVClient`; a filter on the parcel join; notes in `docs/research/deeds-probe-2026-09-30.md`; regenerated facts |
+
+Tacoma moves to all four signal families (24 to 25).
+
+Worth keeping:
+
+- **A parcel layer can know the city when the sales do not.** A tax code
+  area belongs to one city or none, so a join filtered to the city's codes
+  keeps a county-wide sales file to the city without a boundary polygon.
+- **Measure a big file's parse before registering it.** `io.StringIO` holds
+  four bytes a character, so an 89 MB file cost more than half a gigabyte
+  to read.

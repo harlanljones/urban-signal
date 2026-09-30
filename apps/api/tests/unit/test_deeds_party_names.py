@@ -67,6 +67,9 @@ MARICOPA_OWNER_COLUMNS = {
         # Jackson County's sales layer names both parties and links each
         # recorded deed.
         (CityId.MEDFORD, {"Grantor", "Grantee", "DocumentURL"}),
+        # Pierce County's sales file carries both parties on every line; the
+        # CSV client drops them from each row as it reads it.
+        (CityId.TACOMA, {"grantor", "grantee"}),
     ],
 )
 def test_owner_columns_stay_on_the_server(city, owner_columns):

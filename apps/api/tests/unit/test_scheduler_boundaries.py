@@ -7,7 +7,9 @@ layer that declares a zone reads the stored UTC watermark as local time; and a
 sale keyed by parcel alone collided with the parcel's next sale.
 """
 
-from datetime import datetime
+import io
+import zipfile
+from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
@@ -388,6 +390,47 @@ class TestSaleRows:
             ("2026-99999", "372W13CD99901", "WARRANTY DEED", 42.3431),
             ("2026-99999", "372W13CD99900", "WARRANTY DEED", 42.3433),
         ]
+
+    def test_a_tacoma_poll_keeps_the_sales_its_parcels_place_in_the_city(self, scheduler):
+        """Pierce County's sales file has no header row and covers the county.
+        A poll reads the lines dated in its window by the spec's columns and
+        asks the parcel layer only for the city's tax code areas: a sale the
+        layer leaves unplaced, or places past the box, is skipped and counted."""
+        today = datetime.now(UTC).date()
+        recent = (today - timedelta(days=5)).strftime("%m/%d/%Y")
+        stale = (today - timedelta(days=200)).strftime("%m/%d/%Y")
+        lines = [
+            f"9999901|1|0000000001|{recent}|451000.00|Statutory Warranty Deed|GRANTOR A|GRANTEE B|1|0||Improved|Residential",
+            f"9999902|1|0000000002|{recent}|389000.00|Statutory Warranty Deed|GRANTOR C|GRANTEE D|1|0||Improved|Residential",
+            f"9999903|1|0000000003|{recent}|512000.00|Quit Claim Deed|GRANTOR E|GRANTEE F|0|0||Improved|Residential",
+            f"9999904|1|0000000004|{stale}|275000.00|Statutory Warranty Deed|GRANTOR G|GRANTEE H|1|0||Improved|Residential",
+        ]
+        archive = io.BytesIO()
+        with zipfile.ZipFile(archive, "w") as zf:
+            zf.writestr("sale.txt", "\r\n".join(lines) + "\r\n")
+        payload = archive.getvalue()
+        producer = scheduler.producers["deeds"]
+        producer.csv.http = httpx.Client(transport=httpx.MockTransport(lambda _: httpx.Response(200, content=payload)))
+        # Downtown, then a city parcel past the box's east edge; the third
+        # parcel is outside the city's tax code areas, so the layer has none.
+        producer.arcgis.fetch_centroid_index = MagicMock(
+            return_value={"0000000001": (47.2529, -122.4443), "0000000002": (47.3000, -122.3600)}
+        )
+
+        result = scheduler.poll_job("deeds_tacoma")
+
+        assert (result["records_fetched"], result["records_published"], result["outside_metro"]) == (3, 1, 2)
+        scheduler.dlq_producer.route_to_dlq.assert_not_called()
+        kwargs = producer.arcgis.fetch_centroid_index.call_args.kwargs
+        assert kwargs["endpoint_url"].endswith("/Tax_Parcels/FeatureServer/0")
+        assert (kwargs["join_key"], kwargs["join_values"]) == (
+            "TaxParcelNumber", ["0000000001", "0000000002", "0000000003"]
+        )
+        assert kwargs["where"] == "Tax_Area_Code IN ('005', '006', '010', '011', '015', '025', '026')"
+        event = producer.producer.produce.call_args.kwargs["payload"]
+        assert (event.doc_id, event.bbl, event.doc_type) == ("9999901", "0000000001", "STATUTORY WARRANTY DEED")
+        assert (event.latitude, event.longitude, event.document_amount) == (47.2529, -122.4443, 451000.0)
+        assert event.recorded_date.date() == today - timedelta(days=5)
 
     def test_a_bend_poll_keeps_the_sales_its_metro_box_holds(self, scheduler):
         """Deschutes County's sales table covers the county. Each sale takes

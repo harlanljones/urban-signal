@@ -65,6 +65,9 @@ FULL_READ_ROWS = {
     ("scottsdale", "deeds"): 2_507,
     ("st_louis", "sla"): 1_799,
     ("stockton", "sla"): 1_369,
+    # Pierce County sales dated in the spec's 90-day window, county-wide
+    # (2026-09-25 extract, read 2026-09-30); 452 of them place in Tacoma.
+    ("tacoma", "deeds"): 2_432,
     ("tempe", "deeds"): 783,
     ("washington_dc", "childcare"): 452,
 }

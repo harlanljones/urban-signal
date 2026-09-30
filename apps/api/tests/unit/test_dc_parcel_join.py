@@ -135,6 +135,46 @@ def test_no_via_table_is_read_when_the_layer_matches_every_value():
     assert client._fetch_page.call_count == 1
 
 
+
+def test_a_joins_filter_goes_with_every_request_to_the_layer():
+    """Pierce County's parcels place Tacoma's sales only in the city's tax
+    code areas. The filter joins each ``IN`` request to the layer, the lookup
+    after a via table included, and a parcel it keeps out gets no centroid."""
+    layer = "https://example.test/FeatureServer/0"
+    table = "https://example.test/FeatureServer/1"
+    where = "Tax_Area_Code IN ('005', '015')"
+    pages = {
+        (layer, f"(TaxParcelNumber IN ('2000000001','2000000002','2000000003')) AND ({where})"): [
+            {"TaxParcelNumber": "2000000001", "latitude": 47.2529, "longitude": -122.4443},
+        ],
+        (table, "TaxParcelNumber IN ('2000000002','2000000003')"): [
+            {"TaxParcelNumber": "2000000002", "Parent": "2000000009"},
+        ],
+        (layer, f"(TaxParcelNumber IN ('2000000009')) AND ({where})"): [
+            {"TaxParcelNumber": "2000000009", "latitude": 47.2600, "longitude": -122.4500},
+        ],
+    }
+    calls = []
+
+    def fetch_page(endpoint_url, where_clause, order_by, limit, offset, select=None):
+        calls.append((endpoint_url, where_clause))
+        return (pages.get((endpoint_url, where_clause), []) if offset == 0 else []), False
+
+    client = ArcGISClient()
+    client.get_layer_metadata = _text_key_metadata
+    client._fetch_page = fetch_page
+
+    index = client.fetch_centroid_index(
+        layer,
+        join_key="TaxParcelNumber",
+        join_values=["2000000001", "2000000002", "2000000003"],
+        via={"table": table, "key": "TaxParcelNumber", "to": "Parent"},
+        where=where,
+    )
+
+    assert index == {"2000000001": (47.2529, -122.4443), "2000000002": (47.26, -122.45)}
+    assert calls == list(pages)
+
 def test_dc_deed_stream_enriches_cama_row_before_parsing():
     from src.producers.deeds_acris_producer import DeedsACRISProducer
 

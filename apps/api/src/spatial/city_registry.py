@@ -298,6 +298,10 @@ class DatasetSpec:
     # CSV feeds are not always comma-delimited (Maricopa sales affidavits are
     # pipe-delimited). Forwarded verbatim to CSVClient.paginate (US-392).
     delimiter: str | None = None
+    # A delimited file with no header row names its columns here, in file
+    # order, and every line is read as a row (Pierce County's sales file,
+    # Tacoma's deeds). Forwarded verbatim to CSVClient.paginate.
+    columns: list[str] = field(default_factory=list)
     # Rows one scheduler poll may fetch; unset keeps JobConfig's default
     # (1000). A newest-first poll never reaches rows past its cap, so a feed
     # whose source lands more than that at once (Columbus 311's daily extract
