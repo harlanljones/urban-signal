@@ -11,7 +11,8 @@ one layer per calendar year on maps2.dcgis.dc.gov and resolve through
   LATITUDE/LONGITUDE columns are null or sentinel junk (39/-77) on every
   sampled row, so the field_map must NOT bridge them.
 * DEEDS publishes ZERO address-like fields, so the producer enriches CAMA
-  rows through the verified SSL → Parcel Lots polygon join before parsing.
+  rows through the SSL → Owner Polygons join before parsing, condominium
+  units through CONDORELATE.
   Unmatched rows still retain nullable lat/lng/H3, preserving the deeds
   precedent while the matched path emits centroid coordinates.
 
@@ -273,7 +274,7 @@ class TestWashingtonDcRegistration:
         """US-74 finding: the CAMA sales layer publishes ZERO address-like
         fields (metadata + 300-newest-row field union, 2026-08-24), so no
         pure-address geocoding contract can be declared. The parcel-key SSL
-        is joined to Parcel Lots before parsing instead."""
+        is joined to Owner Polygons before parsing instead."""
         from src.spatial.city_registry import CityId, FeedType, get_dataset
 
         extra = get_dataset(CityId.WASHINGTON_DC, FeedType.DEEDS)

@@ -1416,3 +1416,19 @@ Worth keeping:
   third of them elsewhere.
 - **Look for a polygon layer with the same row count.** The city publishes
   its parcel polygons beside the table, one for each of its 302,279 rows.
+
+### 2026-09-30 — DC deeds on their lots (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| dc-deeds | `.streams/dc-deeds.md` | `scheduler.py`, `deeds_acris_producer.py` (pass `via` to the join) | 2026-09-30 | done (5,000 sales polled live: 4,374 of 4,996 placed, up from 12; the second poll published none) | Owner Polygons join; `via` hop through `CONDORELATE` |
+
+DC `deeds` joins the Owner Polygons layer, and a condominium unit takes its
+building's lot through `CONDORELATE`.
+
+Worth keeping:
+
+- **Sample the join key's shape on both sides.** Sales carry square-and-lot
+  SSLs; the old layer keyed `PAR` parcels, the owner polygons key both.
+- **Units live in a relate table.** Condominium units have no polygon of
+  their own; DC's `CONDORELATE` names each unit's lot.

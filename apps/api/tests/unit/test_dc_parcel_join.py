@@ -1,4 +1,5 @@
-"""Tests for DC CAMA-to-Parcel Lots centroid enrichment (US-139)."""
+"""Tests for DC CAMA-to-Owner Polygons centroid enrichment (US-139), condominium
+units through CONDORELATE."""
 
 from unittest.mock import MagicMock, patch
 

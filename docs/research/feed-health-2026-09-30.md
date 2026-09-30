@@ -17,8 +17,9 @@ way its poll does, and repairs three feeds' polls that the check turned up
 (see "Backfills"). A sixth makes the polls of six text-dated feeds read the
 rows since their watermark (see "Text-dated polls"). A seventh keeps
 grantor and grantee names out of every `deeds` event (see "Party names in
-deeds"), and an eighth places Las Vegas's sales on their parcels (see "Las
-Vegas deeds on their parcels").
+deeds"), an eighth places Las Vegas's sales on their parcels (see "Las
+Vegas deeds on their parcels"), and a ninth places DC's on their lots (see
+"DC deeds on their lots").
 
 | | Jobs | Repaired here | Left, with reason below |
 |---|---|---|---|
@@ -547,7 +548,8 @@ from 90 days back:
   composer, like the permits producer's, needs a spine edit.
 - **DC `deeds`** places almost none (12 of 4,996 on a live poll): the Parcel
   Lots layer the join reads holds only `PAR` parcels, so a sale's square and
-  lot (`0016    2033`) never matches, condominium or not.
+  lot (`0016    2033`) never matches, condominium or not. The ninth change
+  joins the owner polygons instead (see "DC deeds on their lots").
 - **Philadelphia `311`**: the newest requests have no coordinates yet, and a
   row geocoded later is never read again. **Baton Rouge `sla`**: read newest
   first, as its poll reads it, 5 of 200 rows are placed (143 of the oldest
@@ -658,8 +660,8 @@ grantor or grantee:
 - **28 other ArcGIS and Socrata `deeds` specs** name no `select`, so they
   fetch every column their layer has, owner names included where it has
   them, and a row that fails to parse goes to the DLQ whole.
-- **DC `deeds`** joins the wrong parcel layer (see "Found, not fixed" under
-  "Backfills").
+- **DC `deeds`** joined the wrong parcel layer and placed 12 of 4,996 sales.
+  The ninth change joins the owner polygons instead.
 
 ## Las Vegas deeds on their parcels
 
@@ -695,3 +697,40 @@ No row reached the geocoder, and the columns read were the nine in the
 `select`. A recent sample of 200 sales matched 200 polygons. The 126 parcels
 whose number starts with a zero lose it in the table's numeric column and do
 not match.
+
+## DC deeds on their lots
+
+DC `deeds` reads the assessor's sales table (`PROPERTY SALES (CAMA)`, layer
+57), which has no geometry, and joined each sale's `SSL` (square, suffix and
+lot, such as `0016    2033`) to the Parcel Lots layer (33). That layer holds
+only `PAR` parcels, so 12 of 4,996 sales matched. Of 200 recent sales, 73
+are lots numbered 2000 and above, where condominium units are numbered, and
+no polygon layer holds a unit. The ninth stacked change:
+
+- **Joins the owner polygons.** The Owner Polygons layer (40), keyed by the
+  same `SSL`, matched 126 of the other 127 sales in that sample.
+- **Reaches a unit's lot through `CONDORELATE`.** That table (52) relates a
+  condominium unit's `SSL` to its building's lot (`MAT_SSL`). 67 of the 73
+  units are in it, and the owner polygons hold 53 of their lots. The parcel
+  join gains an optional `via` step: a sale the layer does not match is looked
+  up in the named table and takes its related lot's centroid. The ArcGIS
+  client's `fetch_centroid_index` does the lookup, and `poll_job` and the
+  deeds producer's stream pass the spec's `via` along.
+- **Reads nothing of the owner's.** The join reads `SSL` and the polygon from
+  the layer and `SSL` and `MAT_SSL` from the table; the layer's owner and
+  mailing columns stay on the server.
+
+### Checked live
+
+On 2026-09-30 DC `deeds` was polled twice through `poll_job` from no stored
+watermark, Kafka mocked, requests 2 seconds apart:
+
+| Poll | Fetched | Published | Placed | Requests |
+|---|---|---|---|---|
+| First | 5,000 (sold 2026-05-13 to 2026-09-22) | 4,996, none dead-lettered | 4,374 (88%), 4,373 inside the metro box | 187, including the polygon and table reads |
+| Second | 15 (the watermark's day) | 0 | | 4 |
+
+The same first poll placed 12 before the change. Units `CONDORELATE` does not
+list, and lots with no owner polygon, stay unplaced. Composing the square with
+the table's `REC_LOT` and reading the Record Lots layer (35) would place 63 of
+the 67 listed units rather than 53, but needs a join on two columns.
