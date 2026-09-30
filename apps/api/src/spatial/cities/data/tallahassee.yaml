@@ -438,12 +438,6 @@ datasets:
       recorded_date:
       - SALES_SALEDT
       - SALES_RECORDDT
-      party1_grantor:
-      - SALES_OLDOWN
-      - SALES_OLDOWN2
-      party2_grantee:
-      - SALES_OWN1
-      - SALES_OWN2
     ingestion_mode: incremental
     oid_field: OBJECTID
     max_record_count: null

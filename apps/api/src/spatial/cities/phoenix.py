@@ -38,8 +38,6 @@ MARICOPA_DEEDS_FIELD_MAP: dict[str, list[str]] = {
     "address_street": ["SITUSADDRESS"],
     "borough": ["SITUSCITY"],
     "zipcode": ["SITUSZIP"],
-    "party1_grantor": ["GRANTOROWNERNAME"],
-    "party2_grantee": ["GRANTEEOWNERNAME"],
     "status": ["DEEDSTATUS"],
 }
 

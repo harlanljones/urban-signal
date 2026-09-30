@@ -230,8 +230,6 @@ PHL_FIELD_MAPS = {
         "recorded_date": ["recording_date"],
         "document_amount": ["total_consideration"],
         "bbl": ["opa_account_num"],
-        "party1_grantor": ["grantors"],
-        "party2_grantee": ["grantees"],
         "doc_type": ["document_type"],
     },
 }
@@ -391,7 +389,7 @@ class PhillyParsingBase:
             "zip_code": None,
             "ward": "18",
             "grantors": "MORTGAGE ELECTRONIC REGISTRATION SYSTEMS INC;ROCKET MORTGAGE LLC",
-            "grantees": "ADAMS DAVID J III",
+            "grantees": "REDACTED",
             "cash_consideration": None,
             "other_consideration": None,
             "total_consideration": None,
@@ -577,12 +575,10 @@ class TestPhiladelphiaWithProposedFieldMap(PhillyParsingBase):
         assert ev.document_amount == 0.0
         assert ev.doc_type == "SATISFACTION OF MORTGAGE"
 
-    def test_deed_parties_read_semicolon_joined_grantors_grantees(
-        self, deeds, deed_row
-    ):
+    def test_deed_parties_stay_out_of_the_event(self, deeds, deed_row):
         ev = deeds.parse_socrata_row(deed_row, city_id="philadelphia")
-        assert ev.party1_grantor.startswith("MORTGAGE ELECTRONIC")
-        assert ev.party2_grantee == "ADAMS DAVID J III"
+        assert ev.party1_grantor is None
+        assert ev.party2_grantee is None
 
     def test_deed_full_h3_events_from_select_derived_coordinates(
         self, deeds, deed_row

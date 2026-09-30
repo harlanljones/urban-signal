@@ -622,10 +622,6 @@ datasets:
       - total_consideration
       bbl:
       - opa_account_num
-      party1_grantor:
-      - grantors
-      party2_grantee:
-      - grantees
     ingestion_mode: incremental
     oid_field: null
     max_record_count: null

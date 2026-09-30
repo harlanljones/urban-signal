@@ -241,7 +241,7 @@ COMPLAINT_ROW_RESOLVED = {
 # Newest deeds rows by SALES_SALEDT DESC. SALES_SALEKEY is the per-sale id;
 # SALES_PARID is the space-padded fixed-width parcel id (bbl); the geometry
 # (outSR=4326) WGS84 lat/lng is the latitude/longitude below. NO address column.
-DEEDS_ROW_MONIZ = {
+DEEDS_ROW_SALE = {
     "OBJECTID": 11222,
     "SALES_JUR": "47",
     "SALES_PARID": "110480  C0050",
@@ -256,9 +256,9 @@ DEEDS_ROW_MONIZ = {
     "SALES_INSTRTYP": "CT",
     "SALES_BOOK": "6204",
     "SALES_PAGE": "1030",
-    "SALES_OLDOWN": "MONIZ WAYNE R &",
+    "SALES_OLDOWN": "REDACTED",
     "SALES_OLDOWN2": "MONIZ FRANCES R",
-    "SALES_OWN1": "SANDEEP TYAGI",
+    "SALES_OWN1": "REDACTED",
     "SALES_OWN2": None,
     "SALES_SOURCE": "D",
     "SALES_SALETYPE": "I",
@@ -541,13 +541,13 @@ class TestTallahasseeFieldMaps:
         assert "zipcode" not in COMPLAINTS_311_FIELD_MAP
 
     def test_deeds_map_reads_live_columns(self):
-        row = DEEDS_ROW_MONIZ
+        row = DEEDS_ROW_SALE
         assert first_mapped(row, DEEDS_FIELD_MAP, "doc_id") == 514646
         assert first_mapped(row, DEEDS_FIELD_MAP, "bbl") == "110480  C0050"
         assert first_mapped(row, DEEDS_FIELD_MAP, "document_amount") == 220100.0
         assert first_mapped(row, DEEDS_FIELD_MAP, "recorded_date") == "2026-08-24T00:00:00+00:00"
-        assert first_mapped(row, DEEDS_FIELD_MAP, "party1_grantor") == "MONIZ WAYNE R &"
-        assert first_mapped(row, DEEDS_FIELD_MAP, "party2_grantee") == "SANDEEP TYAGI"
+        assert "party1_grantor" not in DEEDS_FIELD_MAP
+        assert "party2_grantee" not in DEEDS_FIELD_MAP
 
     def test_deeds_map_has_no_address_or_coordinate_candidates(self):
         """The sales layer has no address column and already serves parcel-
@@ -699,18 +699,18 @@ class TestTallahasseeComplaintsParsing:
 class TestTallahasseeDeedsParsing:
     def test_deed_parses_with_geometry_coords(self, deeds, monkeypatch):
         _patch_resolve(monkeypatch, "deeds")
-        event = deeds.parse_socrata_row(DEEDS_ROW_MONIZ, city_id="tallahassee")
+        event = deeds.parse_socrata_row(DEEDS_ROW_SALE, city_id="tallahassee")
         assert event is not None
         assert event.city_id == "tallahassee"
         assert event.doc_id == "514646"
         assert event.bbl == "110480  C0050"
         assert event.document_amount == 220100.0
-        assert event.party1_grantor == "MONIZ WAYNE R &"
-        assert event.party2_grantee == "SANDEEP TYAGI"
-        assert event.latitude == pytest.approx(DEEDS_ROW_MONIZ["latitude"])
-        assert event.longitude == pytest.approx(DEEDS_ROW_MONIZ["longitude"])
+        assert event.party1_grantor is None
+        assert event.party2_grantee is None
+        assert event.latitude == pytest.approx(DEEDS_ROW_SALE["latitude"])
+        assert event.longitude == pytest.approx(DEEDS_ROW_SALE["longitude"])
         assert event.h3_res7 == _h3_res7(
-            DEEDS_ROW_MONIZ["latitude"], DEEDS_ROW_MONIZ["longitude"]
+            DEEDS_ROW_SALE["latitude"], DEEDS_ROW_SALE["longitude"]
         )
         assert event.h3_res8 is not None and event.h3_res9 is not None
         assert is_in_tallahassee_metro(event.latitude, event.longitude)
@@ -735,12 +735,12 @@ class TestTallahasseeDeedsParsing:
         """The sales layer serves native parcel-centroid points — the deed parses
         with coordinates from the geometry and never reaches the geocode hook."""
         _patch_resolve(monkeypatch, "deeds")
-        event = deeds.parse_socrata_row(DEEDS_ROW_MONIZ, city_id="tallahassee")
+        event = deeds.parse_socrata_row(DEEDS_ROW_SALE, city_id="tallahassee")
         assert event is not None
         assert event.latitude is not None and event.longitude is not None
 
     def test_deed_fixture_coordinates_sit_inside_metro(self):
-        for row in (DEEDS_ROW_MONIZ, DEEDS_ROW_NIX_WARRANTY):
+        for row in (DEEDS_ROW_SALE, DEEDS_ROW_NIX_WARRANTY):
             assert is_in_tallahassee_metro(row["latitude"], row["longitude"])
 
 

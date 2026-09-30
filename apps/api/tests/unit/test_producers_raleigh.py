@@ -45,7 +45,6 @@ RALEIGH_DEEDS_FIELD_MAP = {
     "recorded_date": ["SALE_DATE"],
     "document_amount": ["TOTSALPRICE", "SALE_PRICE"],
     "bbl": ["PIN_NUM"],
-    "party2_grantee": ["OWNER_NAME", "OWNERNAME"],
     "doc_type": ["DEED_TYPE", "SALE_TYPE"],
     "borough": ["MUNICIPALITY", "CITY"],
 }
@@ -173,4 +172,4 @@ def test_raleigh_deed_row_parses(producers):
     assert event.bbl == "0794567890"
     assert event.document_amount == 475000.0
     assert event.recorded_date == datetime.fromisoformat("2026-08-10T00:00:00+00:00")
-    assert event.party2_grantee == "RALEIGH HOLDINGS LLC"
+    assert event.party2_grantee is None

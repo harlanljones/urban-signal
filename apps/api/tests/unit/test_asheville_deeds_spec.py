@@ -41,7 +41,7 @@ class TestFieldMap:
     def test_field_map_has_deed_canonical_keys(self):
         expected = {
             "doc_id", "bbl", "document_amount", "recorded_date",
-            "party1_grantor", "party2_grantee", "doc_type", "borough",
+            "doc_type", "borough",
         }
         assert set(maps.ASHEVILLE_DEEDS_FIELD_MAP) == expected
 
@@ -60,9 +60,9 @@ class TestFieldMap:
     def test_doc_type_is_instrument(self):
         assert "Instrument" in maps.ASHEVILLE_DEEDS_FIELD_MAP["doc_type"]
 
-    def test_party_maps_to_owner(self):
-        assert "Owner" in maps.ASHEVILLE_DEEDS_FIELD_MAP["party1_grantor"]
-        assert "Owner" in maps.ASHEVILLE_DEEDS_FIELD_MAP["party2_grantee"]
+    def test_no_party_is_mapped(self):
+        assert "party1_grantor" not in maps.ASHEVILLE_DEEDS_FIELD_MAP
+        assert "party2_grantee" not in maps.ASHEVILLE_DEEDS_FIELD_MAP
 
     def test_borough_is_county(self):
         assert "County" in maps.ASHEVILLE_DEEDS_FIELD_MAP["borough"]

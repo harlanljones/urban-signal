@@ -347,10 +347,6 @@ datasets:
       - Stamps
       recorded_date:
       - DeedDate
-      party1_grantor:
-      - Owner
-      party2_grantee:
-      - Owner
       doc_type:
       - Instrument
       borough:

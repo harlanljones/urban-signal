@@ -69,11 +69,11 @@ DEEDS_ROW_W_47TH_AVE = {
     "Property_Type": "Residential",
     "Class": "Residential",
     "Land_Use": "Residential 1 Family",
-    "Owner_Line_1": "TAUINAOLA TOGIMANU & SERA",
+    "Owner_Line_1": "REDACTED",
     "Owner_Line_2": None,
     "Owner_Line_3": None,
     "Owner_Line_4": "2101 WEST 47TH AVENUE",
-    "Owner_Name": "TAUINAOLA TOGIMANU & SERA",
+    "Owner_Name": "REDACTED",
     "Owner_Address": "2101 WEST 47TH AVENUE",
     "Owner_City": "ANCHORAGE",
     "Owner_State": "AK",
@@ -418,9 +418,6 @@ class TestAnchorageFieldMaps:
         assert first_mapped(row, DEEDS_FIELD_MAP, "bbl") == "01023351000"
         assert first_mapped(row, DEEDS_FIELD_MAP, "recorded_date") == 1787659200000
         assert first_mapped(row, DEEDS_FIELD_MAP, "borough") == "Anchorage"
-        assert first_mapped(row, DEEDS_FIELD_MAP, "party2_grantee") == (
-            "TAUINAOLA TOGIMANU & SERA"
-        )
         assert first_mapped(row, DEEDS_FIELD_MAP, "address_street") == "2101 W 47TH AVE"
         assert first_mapped(row, DEEDS_FIELD_MAP, "zipcode") == "99517"
 
@@ -437,11 +434,11 @@ class TestAnchorageFieldMaps:
         ):
             assert assessed in DEEDS_ROW_W_47TH_AVE  # live, never a candidate
 
-    def test_no_grantor_or_coordinate_candidates(self):
-        # Snapshot grain: the current owner is the GRANTEE (party2); the
-        # seller does not exist on this feed. Coordinates come from the
-        # polygon flatten, never the field map.
+    def test_no_party_or_coordinate_candidates(self):
+        # Owner_Name, the parcel's current owner, is never a candidate.
+        # Coordinates come from the polygon flatten, never the field map.
         assert "party1_grantor" not in DEEDS_FIELD_MAP
+        assert "party2_grantee" not in DEEDS_FIELD_MAP
         assert "latitude" not in DEEDS_FIELD_MAP
         assert "longitude" not in DEEDS_FIELD_MAP
 
@@ -544,18 +541,17 @@ class TestAnchorageDeedsParsing:
         assert event is not None
         assert event.source_neighborhood == "Anchorage"
 
-    def test_grantee_is_current_owner_and_grantor_stays_none(
+    def test_the_current_owner_stays_out_of_the_event(
         self, deeds, monkeypatch
     ):
-        """Snapshot grain: Owner_Name is the last recorded deed's GRANTEE
-        (the buyer side). party1_grantor (the seller) does not exist on this
-        feed; block/lot columns do not either."""
+        """Owner_Name, the parcel's current owner, reaches neither party
+        field; block/lot columns do not exist on this feed."""
         _patch_resolve(monkeypatch, "deeds")
         row = _flatten_feature(DEEDS_ROW_W_47TH_AVE, {"rings": [W_47TH_AVE_RING]})
         event = deeds.parse_socrata_row(row, city_id="anchorage")
         assert event is not None
-        assert event.party2_grantee == "TAUINAOLA TOGIMANU & SERA"
         assert event.party1_grantor is None
+        assert event.party2_grantee is None
         assert event.block is None
         assert event.lot is None
 

@@ -704,7 +704,7 @@ datasets:
     watermark_exclude: []
     order_by: SALE_DATE DESC, OBJECTID DESC
     id_col: null
-    select: null
+    select: SSL,SALE_DATE,SALE_PRICE,QUALIFIED,ROW_NUMBER,OBJECTID
     fallback_endpoints: []
     where: null
     needs_geocode: false

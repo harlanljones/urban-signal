@@ -412,33 +412,13 @@ class DeedsACRISProducer:
                 or row.get("municipality")
                 or row.get("city")
             )
-            party1 = (
-                first_mapped(row, field_map, "party1_grantor")
-                or row.get("owner_name")
-                or row.get("party1_grantor")
-                or row.get("party1_type")
-                or row.get("grantor")
-                or row.get("seller")
-                or row.get("seller_name")
-                or row.get("Sellername")
-                or row.get("OWNERNME1")
-            )
-            party2 = (
-                first_mapped(row, field_map, "party2_grantee")
-                or row.get("buyer")
-                or row.get("buyername")
-                or row.get("buyer_name")
-                or row.get("party2_grantee")
-                or row.get("party2_type")
-                or row.get("grantee")
-                or row.get("OWN1")
-                or row.get("OWN2")
-            )
-
             source_neighborhood = str(borough_val) if borough_val is not None else None
             from src.spatial.geo_utils import get_division_for_coordinate
             resolved_borough = get_division_for_coordinate(lat, lng, city_id=resolved_city) or source_neighborhood
 
+            # No grantor or grantee reaches an event, whatever the row or its
+            # field map holds: sellers and buyers are often private people,
+            # and nothing downstream reads their names.
             return DeedEvent(
                 city_id=resolved_city,
                 doc_id=doc_id,
@@ -450,8 +430,6 @@ class DeedsACRISProducer:
                 lot=lot_val,
                 document_amount=doc_amount,
                 recorded_date=recorded_dt,
-                party1_grantor=party1,
-                party2_grantee=party2,
                 latitude=lat,
                 longitude=lng,
                 h3_res7=h3_res["h3_res7"],

@@ -1382,3 +1382,20 @@ Worth keeping:
   arrives up to 118 days late needs a window, not a watermark.
 - **Run a label fix across every feed.** The simple-assault fix for Richmond
   also moved Boston's and Chicago's simple assaults, which the rule had missed.
+
+### 2026-09-30 — Party names out of deeds events (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| party-names | `.streams/party-names.md` | `deeds_acris_producer.py` | 2026-09-30 | done (Reno and DC `deeds` polled live: no owner column read, no event with a grantor or grantee) | `test_deeds_party_names.py` guard; `select` for Reno and DC `deeds` |
+
+The deeds producer reads no grantor or grantee, and no spec maps one; 16 specs,
+five leaf maps and Asheville's spec module dropped their entries.
+
+Worth keeping:
+
+- **Look past the field map.** The producer's fallback chain read party names
+  from any row that carried a matching column, mapped or not.
+- **Check a join layer's key shape.** DC's Parcel Lots layer keys `PAR`
+  parcels, not the square-and-lot SSLs its sales carry; the join matched 12
+  of 4,996.

@@ -46,8 +46,6 @@ CLEVELAND_DEEDS_FIELD_MAP = {
     "recorded_date": ["last_transfer_date"],
     "document_amount": ["sale_price", "transfer_amount"],
     "bbl": ["parcel_number", "PARCEL_NUMBER", "PARCEL_ID"],
-    "party1_grantor": ["grantor"],
-    "party2_grantee": ["grantee"],
     "doc_type": ["document_type", "deed_type"],
     "borough": ["ward", "neighborhood"],
 }
@@ -200,8 +198,8 @@ def test_cleveland_deed_row_parses(producers):
     assert event.doc_id == "123-45-678"
     assert event.document_amount == 27200.0
     assert event.recorded_date == datetime.fromisoformat("2026-08-21T00:00:00+00:00")
-    assert event.party1_grantor == "DSV SPV3 LLC"
-    assert event.party2_grantee == "3S FUND I LLC"
+    assert event.party1_grantor is None
+    assert event.party2_grantee is None
     assert event.borough == "CLEVELAND_CORE"
 
 

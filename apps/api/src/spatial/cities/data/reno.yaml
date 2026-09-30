@@ -126,7 +126,7 @@ datasets:
     watermark_exclude: []
     order_by: null
     id_col: null
-    select: null
+    select: PIN,SALEDATE,SALEPRICE,CITY,SUBNAME,OBJECTID
     fallback_endpoints: []
     where: null
     needs_geocode: false

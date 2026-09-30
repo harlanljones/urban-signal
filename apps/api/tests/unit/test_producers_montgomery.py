@@ -122,7 +122,7 @@ class TestMontgomerySdatDeeds:
         assert event.doc_id == "160701685528"
         assert event.bbl == "160701685528"
         assert event.document_amount == pytest.approx(11489999.0)
-        assert event.party1_grantor == "FREDERICK ROAD LIMITED PARTNERSHIP"
+        assert event.party1_grantor is None
         assert event.latitude == pytest.approx(38.94571437953814)
         assert event.longitude == pytest.approx(-77.11066435832446)
 

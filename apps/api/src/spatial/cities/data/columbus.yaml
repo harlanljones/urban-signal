@@ -261,11 +261,6 @@ datasets:
       - SALEPRICE
       recorded_date:
       - SALEDATE
-      party1_grantor:
-      - OWNERNME1
-      party2_grantee:
-      - OWN1
-      - OWN2
       incident_address:
       - SITEADDRESS
       zipcode:

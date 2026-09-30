@@ -391,8 +391,8 @@ class TestSeattleDeedParsing:
             "SaleDate": "2023-08-16T00:00:00+00:00",
             "SalePrice": 760000,
             "Property_Type": "Improved",
-            "Sellername": "GLEIBERMAN ZACKARY",
-            "buyername": "PRESTON HEATHER",
+            "Sellername": "REDACTED",
+            "buyername": "REDACTED",
             "latitude": 47.71521,
             "longitude": -122.30314,
         }
@@ -407,8 +407,8 @@ class TestSeattleDeedParsing:
         assert ev.bbl == "9904000063"          # PIN
         assert ev.document_amount == 760000.0  # SalePrice
         assert str(ev.recorded_date).startswith("2023-08-16")
-        assert ev.party1_grantor == "GLEIBERMAN ZACKARY"
-        assert ev.party2_grantee == "PRESTON HEATHER"
+        assert ev.party1_grantor is None
+        assert ev.party2_grantee is None
 
     def test_coordinates_produce_h3_indexes(self, producer, row):
         ev = producer.parse_socrata_row(row, city_id="seattle")

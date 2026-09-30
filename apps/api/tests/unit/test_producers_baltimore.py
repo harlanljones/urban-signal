@@ -142,8 +142,9 @@ class TestBaltimoreSdatDeeds:
         assert event.doc_id == "13113438055A"
         assert event.bbl == "13113438055A"
         assert event.document_amount == pytest.approx(215000.0)
-        assert event.party1_grantor == "BALTIMORE HOLDINGS LLC"
-        assert event.party2_grantee is None  # SDAT records grantor only
+        # SDAT's grantor column stays in the row; no party reaches the event.
+        assert event.party1_grantor is None
+        assert event.party2_grantee is None
         assert event.latitude == pytest.approx(39.311834646402595)
         assert event.longitude == pytest.approx(-76.62346538375218)
 

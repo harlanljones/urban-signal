@@ -203,8 +203,6 @@ datasets:
       bbl:
       - TAX_MAP_NO
       - GISLINK
-      party2_grantee:
-      - OWNERNAME1
       doc_type:
       - SALE1TYPE
       - DEEDTYPE

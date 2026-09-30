@@ -201,8 +201,8 @@ def test_chicago_deeds_parser():
     assert event.borough == "CENTRAL_DOWNTOWN"
     assert event.source_neighborhood == "NORTH CHICAGO"
     assert event.document_amount == 3500000.0
-    assert event.party1_grantor == "WEST LOOP INVESTMENTS LLC"
-    assert event.party2_grantee == "MIDWEST URBAN HOLDINGS LP"
+    assert event.party1_grantor is None
+    assert event.party2_grantee is None
     assert event.latitude == pytest.approx(41.8830)
     assert event.longitude == pytest.approx(-87.6450)
     assert event.h3_res7 is not None

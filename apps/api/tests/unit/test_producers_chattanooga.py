@@ -33,7 +33,6 @@ CHATTANOOGA_DEEDS_FIELD_MAP = {
     "recorded_date": ["SALE1DATE"],
     "document_amount": ["SALE1CONSD"],
     "bbl": ["TAX_MAP_NO", "GISLINK"],
-    "party2_grantee": ["OWNERNAME1"],
     "doc_type": ["SALE1TYPE", "DEEDTYPE", "TYPE"],
     "borough": ["MUNICIPALITY", "CITY"],
 }
@@ -154,7 +153,7 @@ def test_chattanooga_deed_polygon_row_parses(producers):
     assert event.bbl == "999A A 001.00"
     assert event.document_amount == 475000.0
     assert event.recorded_date == datetime.fromisoformat("2026-08-10T00:00:00+00:00")
-    assert event.party2_grantee == "CHATTANOOGA HOLDINGS LLC"
+    assert event.party2_grantee is None
     assert event.borough == "CHATTANOOGA_CORE"
 
 

@@ -118,10 +118,6 @@ datasets:
       - TRANSFER_DATE
       document_amount:
       - SALE_PRICE
-      party1_grantor:
-      - FORMER_OWNER
-      party2_grantee:
-      - NEW_OWNER
       doc_type:
       - INSTR_TYPE_DESC
       bbl:

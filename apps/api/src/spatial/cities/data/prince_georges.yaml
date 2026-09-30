@@ -173,8 +173,6 @@ datasets:
       - sales_segment_1_consideration_mdp_field_considr1_sdat_field_90
       recorded_date:
       - sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89
-      party1_grantor:
-      - sales_segment_1_grantor_name_mdp_field_grntnam1_sdat_field_80
       latitude:
       - mdp_latitude_mdp_field_digycord_converted_to_wgs84
       longitude:

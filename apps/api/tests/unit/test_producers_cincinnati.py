@@ -109,7 +109,7 @@ CINCINNATI_SALE_ROW = {
     "conveyancenumber": "415593",
     "deedtype": "WD",
     "appraisalarea": "ADDYSTON",
-    "previousowner": "DAVIS KRISTEN",
+    "previousowner": "REDACTED",
     "propertynumber": "571-0003-0150-00",
 }
 
@@ -129,8 +129,8 @@ def test_cincinnati_deed_row_parses_via_field_map(deeds):
     assert ev.doc_id == "415593"
     assert ev.bbl == "571-0003-0150-00"
     assert ev.document_amount == 27000.0
-    assert ev.party1_grantor == "DAVIS KRISTEN"
-    assert ev.party2_grantee == "GUTLACHT HOLDINGS LLC"
+    assert ev.party1_grantor is None
+    assert ev.party2_grantee is None
     assert ev.doc_type == "WD"
     assert ev.source_neighborhood == "ADDYSTON"
     assert ev.recorded_date == datetime.fromisoformat("2026-08-13")
@@ -175,9 +175,9 @@ def test_row_matches_strips_wrapping_parentheses():
 CINCINNATI_CSV_SAMPLE = (
     '"ConveyanceNumber","PropertyNumber","SaleAmount","Valid","PreviousOwner",'
     '"OwnerName1","MonthSale","DaySale","YearSale","DeedType","AppraisalArea"\n'
-    '"415593","571-0003-0150-00","27000","Y","DAVIS KRISTEN",'
+    '"415593","571-0003-0150-00","27000","Y","REDACTED",'
     '"GUTLACHT HOLDINGS LLC","8","13","2026","WD","ADDYSTON"\n'
-    '"415594","571-0003-0151-00","27000","N","DAVIS KRISTEN",'
+    '"415594","571-0003-0151-00","27000","N","REDACTED",'
     '"GUTLACHT HOLDINGS LLC","8","13","2026","WD","ADDYSTON"\n'
 )
 

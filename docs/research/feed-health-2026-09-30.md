@@ -15,7 +15,9 @@ fourth reads Richmond's sales from the assessor's monthly workbook (see
 "Richmond's transfers workbook"). A fifth makes a backfill read each feed the
 way its poll does, and repairs three feeds' polls that the check turned up
 (see "Backfills"). A sixth makes the polls of six text-dated feeds read the
-rows since their watermark (see "Text-dated polls").
+rows since their watermark (see "Text-dated polls"). A seventh keeps
+grantor and grantee names out of every `deeds` event (see "Party names in
+deeds").
 
 | | Jobs | Repaired here | Left, with reason below |
 |---|---|---|---|
@@ -542,18 +544,19 @@ from 90 days back:
   across three columns, and the deeds producer geocodes a single address
   column (`address_street`), which the feed does not map. A leaf address
   composer, like the permits producer's, needs a spine edit.
-- **DC `deeds`** places none: condominium lots (`0016    2033`) are not in the
-  Parcel Lots layer the join reads.
+- **DC `deeds`** places almost none (12 of 4,996 on a live poll): the Parcel
+  Lots layer the join reads holds only `PAR` parcels, so a sale's square and
+  lot (`0016    2033`) never matches, condominium or not.
 - **Philadelphia `311`**: the newest requests have no coordinates yet, and a
   row geocoded later is never read again. **Baton Rouge `sla`**: read newest
   first, as its poll reads it, 5 of 200 rows are placed (143 of the oldest
   200).
-- **Owner and party names.** 16 `deeds` specs map grantor or grantee
-  columns into their events, Asheville, Miami-Dade, Philadelphia and Phoenix
-  among them, and Virginia Beach `sla` names each premises by its
-  `Owner_Name`. Las Vegas, Reno and DC `deeds` fetch owner-name columns they
-  never map, with no `select` to keep them on the server; a row that fails to
-  parse goes to the DLQ whole, and Phoenix `deeds` dead-letters every row.
+- **Owner and party names.** 16 `deeds` specs mapped grantor or grantee
+  columns into their events; the seventh change removes them (see "Party
+  names in deeds"). Virginia Beach `sla` names each premises by its
+  `Owner_Name`. Las Vegas `deeds` fetches owner-name columns it never maps,
+  with no `select` to keep them on the server; a row that fails to parse goes
+  to the DLQ whole, and Phoenix `deeds` dead-letters every row.
 - **`source_mode`.** A backfill does not mark its events as backfilled
   (ADR 0008, US-115).
 
@@ -610,3 +613,49 @@ and three pages.
 Rochester's newest sale is dated 2026-08-14 and Virginia Beach's newest
 licence 2026-08-31: both layers are refreshed in batches, so their windows
 run from that date until the next batch lands.
+
+## Party names in deeds
+
+The deeds producer gave every event a grantor and a grantee. It read them
+from a spec's `party1_grantor` and `party2_grantee` field-map entries and,
+when those were empty, from 16 column names a layer might carry (`owner_name`,
+`grantor`, `seller`, `buyer`, `OWN1` and others). Sixteen specs mapped the
+fields: Anchorage, Asheville, Baltimore, Canton, Chattanooga, Cincinnati,
+Cleveland, Columbus, Durham, Miami-Dade, Montgomery, Philadelphia, Phoenix,
+Prince George's, Raleigh and Tallahassee. Sellers and buyers are often private
+people, and nothing downstream reads the names: only the Avro schema and the
+PostGIS sync carry them. The seventh stacked change:
+
+- **Reads no party column.** Both fields stay empty in every event, whatever
+  a row or its field map holds. The schema and the PostGIS columns keep them,
+  so no consumer breaks.
+- **Maps none.** The 16 specs drop the entries, as do the leaf field maps that
+  mirrored them (Anchorage, Miami-Dade, Phoenix, Tallahassee and Asheville's
+  spec module) and Durham's owner-as-grantor mapping. A test fails any
+  registered spec that maps either field.
+- **Reno and DC `deeds` name their columns.** Reno's layer carries each
+  owner's name and mailing address and DC's sales table the current owner;
+  each spec's `select` now lists only the columns it reads.
+- **Fixtures.** Test rows that held people's names now read `REDACTED`.
+
+### Checked live
+
+On 2026-09-30 Reno and DC `deeds` were polled twice through `poll_job` from no
+stored watermark, Kafka mocked, requests 2 seconds apart. No event carried a
+grantor or grantee:
+
+| Feed | First poll | Columns read | Second poll |
+|---|---|---|---|
+| Reno `deeds` | 5,000 fetched, 5,000 published, all placed in the metro box | `PIN`, `SALEDATE`, `SALEPRICE`, `CITY`, `SUBNAME`, `OBJECTID` and the parcel's point | 24 fetched (09/28), 23 published; the first poll had seen one |
+| DC `deeds` | 5,000 fetched, 4,996 published, 12 placed | `SSL`, `SALE_DATE`, `SALE_PRICE`, `QUALIFIED`, `ROW_NUMBER`, `OBJECTID` | 15 fetched, none published |
+
+### Left
+
+- **Las Vegas `deeds`** geocodes `ADDRESS1` and `ADDRESS2`, which hold the
+  owner's mailing address, so a sale lands at its owner's address rather than
+  its parcel. It needs a parcel join and a `select`.
+- **28 other ArcGIS and Socrata `deeds` specs** name no `select`, so they
+  fetch every column their layer has, owner names included where it has
+  them, and a row that fails to parse goes to the DLQ whole.
+- **DC `deeds`** joins the wrong parcel layer (see "Found, not fixed" under
+  "Backfills").

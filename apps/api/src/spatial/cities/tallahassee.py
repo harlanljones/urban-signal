@@ -26,8 +26,6 @@ DEEDS_FIELD_MAP = {
     "bbl": ["SALES_PARID"],
     "document_amount": ["SALES_PRICE", "SALES_ADJPRICE"],
     "recorded_date": ["SALES_SALEDT", "SALES_RECORDDT"],
-    "party1_grantor": ["SALES_OLDOWN", "SALES_OLDOWN2"],
-    "party2_grantee": ["SALES_OWN1", "SALES_OWN2"],
 }
 
 FIELD_MAP = {

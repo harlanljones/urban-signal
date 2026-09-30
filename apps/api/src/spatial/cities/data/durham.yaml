@@ -453,8 +453,6 @@ datasets:
       document_amount:
       - PKG_SALE_PRICE
       - LAND_SALE_PRICE
-      party1_grantor:
-      - PROPERTY_OWNER
       borough:
       - NEIGHBORHOOD
       - CITY

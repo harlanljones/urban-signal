@@ -69,8 +69,6 @@ DENVER_SALES_CANDIDATE_MAP = {
     "recorded_date": ["RECEPTION_DATE"],
     "doc_type": ["INSTRUMENT"],
     "borough": ["NBHD_1_CN"],
-    "party1_grantor": ["GRANTOR"],
-    "party2_grantee": ["GRANTEE"],
 }
 
 # Dirty RECEPTION_DATE values observed live 2026-08-24 (malformed year and
@@ -274,7 +272,7 @@ class TestDenverSalesRowParsing:
             "SALE_MONTHDAY": 811,
             "RECEPTION_DATE": 20260813,
             "SALE_PRICE": 900000,
-            "GRANTOR": "OSTROWSKI,GREGORY R",
+            "GRANTOR": "REDACTED",
             "GRANTEE": "PSJ & ASSOCIATES II LLC",
             "CLASS": "R",
             "D_CLASS_N": "SFR Grade B",
@@ -317,8 +315,8 @@ class TestDenverSalesRowParsing:
             "SALE_MONTHDAY": 1230,
             "RECEPTION_DATE": 20261230,
             "SALE_PRICE": 580000,
-            "GRANTOR": "MASSA,MOLLY M",
-            "GRANTEE": "MEIGS,ANDREW PATRICK",
+            "GRANTOR": "REDACTED",
+            "GRANTEE": "REDACTED",
             "CLASS": "O",
             "D_CLASS": "101",
             "D_CLASS_N": "RESIDENTIAL-CONDOMINIUM",
@@ -326,7 +324,7 @@ class TestDenverSalesRowParsing:
             "NBHD_1_CN": "BALLPARK",
         }
 
-    def test_sane_sale_maps_business_key_parcel_price_and_parties(
+    def test_sane_sale_maps_business_key_parcel_and_price(
         self, deeds, sane_wd_row
     ):
         ev = deeds.parse_socrata_row(sane_wd_row, city_id="denver")
@@ -335,8 +333,8 @@ class TestDenverSalesRowParsing:
         assert ev.bbl == "604322005000"
         assert ev.document_amount == 900000.0
         assert ev.doc_type == "WD"
-        assert ev.party1_grantor == "OSTROWSKI,GREGORY R"
-        assert ev.party2_grantee == "PSJ & ASSOCIATES II LLC"
+        assert ev.party1_grantor is None
+        assert ev.party2_grantee is None
         assert ev.source_neighborhood == "LOWRY"
         assert ev.borough == "LOWRY"
 

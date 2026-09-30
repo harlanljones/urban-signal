@@ -42,8 +42,6 @@ COLUMBUS_DEEDS_FIELD_MAP = {
     "bbl": ["PARCELID"],
     "document_amount": ["Sale_Price", "SALEPRICE"],
     "recorded_date": ["SALEDATE"],
-    "party1_grantor": ["OWNERNME1"],
-    "party2_grantee": ["OWN1", "OWN2"],
     "incident_address": ["SITEADDRESS"],
     "zipcode": ["ZIPCD"],
     "borough": ["MUNINAME", "NHBDNAME"],
@@ -304,8 +302,8 @@ CB_DEED_ROW = {
     "PARCELID": "010-054436",
     "SALEPRICE": 360000,
     "Sale_Price": 360000,
-    "OWNERNME1": "REESE JAMES M",
-    "OWN1": "REESE JAMES M",
+    "OWNERNME1": "REDACTED",
+    "OWN1": "REDACTED",
     "OWN2": "& REESE MICHELLE",
     "Instrument_Number": None,
     "Transfer_Date": None,
@@ -340,8 +338,8 @@ class TestColumbusDeedParsing:
         assert ev.doc_id == "010-054436"
         assert ev.bbl == "010-054436"
         assert ev.document_amount == 360000.0
-        assert ev.party1_grantor == "REESE JAMES M"
-        assert ev.party2_grantee == "REESE JAMES M"
+        assert ev.party1_grantor is None
+        assert ev.party2_grantee is None
         assert ev.recorded_date is not None
         assert (ev.recorded_date.year, ev.recorded_date.month, ev.recorded_date.day) == (
             2025,

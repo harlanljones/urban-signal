@@ -289,7 +289,7 @@ def test_sf_deeds_parser():
     assert event.document_amount == 7850000.0
     assert event.borough == "SAN_FRANCISCO_CORE"
     assert event.source_neighborhood == "Financial District South"
-    assert event.party1_grantor == "HOWARD TOWER HOLDINGS LLC"
+    assert event.party1_grantor is None
     assert event.latitude == pytest.approx(37.7885)
     assert event.longitude == pytest.approx(-122.3980)
     assert event.h3_res7 is not None

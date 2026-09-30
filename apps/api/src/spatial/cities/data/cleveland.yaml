@@ -270,10 +270,6 @@ datasets:
       - parcel_number
       - PARCEL_NUMBER
       - PARCEL_ID
-      party1_grantor:
-      - grantor
-      party2_grantee:
-      - grantee
       doc_type:
       - document_type
       - deed_type

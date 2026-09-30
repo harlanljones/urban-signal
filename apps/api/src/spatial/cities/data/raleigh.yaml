@@ -282,9 +282,6 @@ datasets:
       - SALE_PRICE
       bbl:
       - PIN_NUM
-      party2_grantee:
-      - OWNER_NAME
-      - OWNERNAME
       doc_type:
       - DEED_TYPE
       - SALE_TYPE

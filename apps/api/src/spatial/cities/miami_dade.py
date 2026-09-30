@@ -34,8 +34,6 @@ DEEDS_FIELD_MAP = {
     "bbl": ["FOLIO"],
     "document_amount": ["PRICE_1"],
     "recorded_date": ["DOS_1"],
-    "party1_grantor": ["GRANTOR_1"],
-    "party2_grantee": ["GRANTEE_1"],
     "address_street": ["TRUE_SITE_ADDR"],
     "incident_address": ["TRUE_SITE_ADDR"],
     "zipcode": ["TRUE_SITE_ZIP_CODE"],

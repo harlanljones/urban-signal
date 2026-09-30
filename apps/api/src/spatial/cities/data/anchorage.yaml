@@ -262,8 +262,6 @@ datasets:
       borough:
       - GIS_Site_City
       - Tax_District
-      party2_grantee:
-      - Owner_Name
       bbl:
       - Parcel_ID
       - GIS_ParcelNum11

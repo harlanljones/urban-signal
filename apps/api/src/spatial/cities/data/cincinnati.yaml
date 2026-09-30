@@ -270,11 +270,6 @@ datasets:
       - propertynumber
       document_amount:
       - saleamount
-      party1_grantor:
-      - previousowner
-      party2_grantee:
-      - ownername1
-      - ownername2
       doc_type:
       - deedtype
       incident_address:

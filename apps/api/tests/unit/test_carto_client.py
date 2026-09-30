@@ -86,7 +86,7 @@ RTT_SUMMARY_PAYLOAD = {
             "display_date": "2024-06-26T18:22:03Z",
             "document_date": None,
             "street_address": "1928 S LAMBERT ST",
-            "grantors": "DESIMONE JAMES",
+            "grantors": "REDACTED",
         },
         {
             "cartodb_id": 2,

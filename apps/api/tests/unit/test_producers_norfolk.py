@@ -198,8 +198,8 @@ class TestNorfolkRowParsing:
             "property_street_type": "AV",
             "property_city": "Norfolk",
             "transfer_date": "2026-08-19T00:00:00.000",
-            "grantor": "Scott, Karen F",
-            "grantee": "Alford, Chase & Qunell, Rachael",
+            "grantor": "REDACTED",
+            "grantee": "REDACTED",
             "consideration": "400000",
             "document_number": "260016116",
         }
@@ -252,10 +252,10 @@ class TestNorfolkRowParsing:
         ev = deeds.parse_socrata_row(deed_row, city_id="norfolk")
         assert ev.doc_id == "260016116"
 
-    def test_deed_parties_and_consideration_map(self, deeds, deed_row):
+    def test_deed_consideration_maps_and_parties_stay_out(self, deeds, deed_row):
         ev = deeds.parse_socrata_row(deed_row, city_id="norfolk")
-        assert ev.party1_grantor == "Scott, Karen F"
-        assert ev.party2_grantee == "Alford, Chase & Qunell, Rachael"
+        assert ev.party1_grantor is None
+        assert ev.party2_grantee is None
         assert ev.document_amount == 400000.0
 
     def test_deed_recorded_date_reads_transfer_date(self, deeds, deed_row):
