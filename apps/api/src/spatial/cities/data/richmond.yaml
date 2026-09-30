@@ -261,6 +261,55 @@ divisions:
     - Westover Hills
     city_id: richmond
 datasets:
+  crime:
+    endpoint: https://services3.arcgis.com/TsynfzBSE6sXfoLq/ArcGIS/rest/services/PSDWIncidents_ProdA/FeatureServer/1
+    platform: arcgis
+    watermark_col: RecordDate
+    id_keys:
+    - RMSIncidentID
+    topic: raw.municipal.crime
+    interval_seconds: 21600.0
+    producer_key: crime
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: RecordDate DESC, OBJECTID DESC
+    id_col: null
+    select: RMSIncidentID,RecordDate,IncidentorOffenseGenCategory,MagisterialDistrictName
+    fallback_endpoints: []
+    where: RecordDate >= CURRENT_DATE - INTERVAL '120' DAY AND DimLocationLatitude BETWEEN 37.45 AND 37.7 AND DimLocationLongitude BETWEEN -77.65 AND -77.3
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - RMSIncidentID
+      offense_type:
+      - IncidentorOffenseGenCategory
+      occurred_date:
+      - RecordDate
+      borough:
+      - MagisterialDistrictName
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 3
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: false
+    zip_member: null
+    batch_limit: 2500
   deeds:
     endpoint: https://www.rva.gov/media/53946
     platform: excel

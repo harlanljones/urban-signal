@@ -187,6 +187,13 @@ def test_classify_offense_class():
     assert classify_offense_class("Assault", "Simple Assault") == "PART2"
     assert classify_offense_class("Assault", "Battery") == "PART2"
     assert classify_offense_class("ALL OTHER", "False Pretenses") == "PART2"
+    # Simple assault written the other way round (Chesterfield County, Boston,
+    # Chicago's ASSAULT / SIMPLE) is Part-2 too; felonious assault is not.
+    assert classify_offense_class("Assault-Simple", None) == "PART2"
+    assert classify_offense_class("ASSAULT - SIMPLE", None) == "PART2"
+    assert classify_offense_class("ASSAULT", "SIMPLE") == "PART2"
+    assert classify_offense_class("Assault-Felonious", None) == "PART1"
+    assert classify_offense_class("ASSAULT", "AGGRAVATED - HANDGUN") == "PART1"
 
 
 def test_crime_registration_scope_and_job_names():

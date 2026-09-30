@@ -131,3 +131,42 @@ joins the city's `Parcels/FeatureServer/0` layer, so each sale takes its
 parcel's centroid. Richmond `deeds` now reads it
 (`feed-health-2026-09-30.md`, "Richmond's transfers workbook"); the frozen
 `AssessorProValGPINRecTransPublish` table above is not used.
+
+## Addendum 2026-09-30: crime from Chesterfield County police
+
+The City of Richmond publishes no usable crime data: its CrimeInfo search
+returns no rows, the police department's ArcGIS samples stop in 2021, and the
+Socrata portal holds no crime dataset. Henrico County's police incident
+service is live, but its terms forbid commercial use, so it is held.
+Chesterfield County's police publish every offense on ArcGIS Online
+(`PSDWIncidents_ProdA/FeatureServer/1`, layer `Offenses`; 25,653 rows from
+2024-10-01, refreshed nightly, anonymous). Richmond `crime` now reads it.
+
+- **Coverage.** The metro box holds 1,249 offenses over the 120 days to
+  2026-09-30, all in the county's part south and west of the city
+  (magisterial districts Midlothian 732, Cloverhill 329, Dale 150, Bermuda
+  34). The city's and Henrico's parts of the box have no crime rows.
+- **Rows.** One row per incident: `RMSIncidentID` (agency prefix, report
+  date, sequence) is unique. `RecordDate` is the day the offense happened,
+  date only, and reports arrive late (p50 0 days, p90 9, p95 30, p99 69, max
+  118), so a watermark on it would miss them. The feed is a snapshot of the
+  box's last 120 days, read whole each poll (cap 2,500), and the dedup
+  publishes each incident once.
+- **Location.** The county masks each address to its hundred block but not
+  the point. Over a year, blocks with five or more offenses show 3.8
+  distinct points on average, and 12 of 20 sampled points sit within 30 m of
+  an address point. The spec's `select` leaves the address and the county's
+  own coordinate columns behind, and the crime producer rounds each point to
+  three decimal places (`CRIME_POINT_DECIMALS`), a grid of about 100 m,
+  before it is indexed or published.
+- **Offense types.** `IncidentorOffenseGenCategory`, 28 categories in the
+  box: Larceny 348, Traffic 196, Assault-Simple 190, Fraud / Forgery 148,
+  All Other Incidents 106, Motor Vehicle Theft 56, Vandalism 54, and 21
+  smaller ones. The Part-1/Part-2 rule looked for "SIMPLE ASSAULT" and read
+  `Assault-Simple` as Part 1; it now reads simple assault in either order,
+  which also moves Boston's `ASSAULT - SIMPLE` and Chicago's `ASSAULT` /
+  `SIMPLE` (FBI code 08A) to Part 2.
+
+Live poll 2026-09-30 (Kafka mocked): 1,249 fetched and published, none
+dead-lettered, every point on the grid and inside the box (median shift
+39 m, largest 70 m); the second poll published nothing.

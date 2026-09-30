@@ -8,9 +8,23 @@ DEEDS_FIELD_MAP = {
     "incident_address": ["parcel_location"],
 }
 
+CRIME_FIELD_MAP = {
+    "incident_id": ["RMSIncidentID"],
+    "offense_type": ["IncidentorOffenseGenCategory"],
+    "occurred_date": ["RecordDate"],
+    "borough": ["MagisterialDistrictName"],
+}
+
 FIELD_MAP = {
+    "crime": CRIME_FIELD_MAP,
     "deeds": DEEDS_FIELD_MAP,
 }
+
+# Decimal places an offense's point keeps (the crime producer reads this):
+# three put it on a grid of about 100 m, near the county's own hundred-block
+# masking of the address, where the published point often sits within 30 m
+# of a house.
+CRIME_POINT_DECIMALS = 3
 
 # Workbook columns a row keeps for its id but no event field reads: the deed
 # book (``ID2026`` for an instrument recorded in 2026) and page.
@@ -42,6 +56,15 @@ portal carries no permit, 311 or dated licence feed (probe-richmond.md).
 SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
 stands in for the licence register the metro lacks. The corpus builds it
 with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
+
+CRIME (2026-09-30): Chesterfield County police offenses inside the metro box,
+which covers the county's part south and west of the city. The city
+publishes no crime data, and Henrico's terms forbid commercial use. An
+offense is dated by when it happened and can be reported months later
+(p95 30 days, max 118), so the feed re-reads the last 120 days each poll
+instead of keeping a watermark. Each point is rounded to about 100 m
+(``CRIME_POINT_DECIMALS``); ``select`` leaves the address and the county's
+own coordinates behind.
 """
 
 
@@ -312,8 +335,46 @@ RICHMOND_DEEDS_ENDPOINT = "https://www.rva.gov/media/53946"
 RICHMOND_PARCEL_LAYER = (
     "https://services1.arcgis.com/k3vhq11XkBNeeOfM/arcgis/rest/services/Parcels/FeatureServer/0"
 )
+RICHMOND_CRIME_ENDPOINT = (
+    "https://services3.arcgis.com/TsynfzBSE6sXfoLq/ArcGIS/rest/services/"
+    "PSDWIncidents_ProdA/FeatureServer/1"
+)
 
 RICHMOND_FEED_SPECS: dict[str, dict[str, object]] = {
+    "crime": {
+        "endpoint": RICHMOND_CRIME_ENDPOINT,
+        "platform": "arcgis",
+        "watermark_col": "RecordDate",
+        "id_keys": ["RMSIncidentID"],
+        "topic_key": "topic_crime",
+        "interval_seconds": 21600.0,
+        "producer_key": "crime",
+        "extra": {
+            "ingestion_mode": "snapshot",
+            "order_by": "RecordDate DESC, OBJECTID DESC",
+            "select": "RMSIncidentID,RecordDate,IncidentorOffenseGenCategory,MagisterialDistrictName",
+            "where": (
+                "RecordDate >= CURRENT_DATE - INTERVAL '120' DAY"
+                " AND DimLocationLatitude BETWEEN 37.45 AND 37.7"
+                " AND DimLocationLongitude BETWEEN -77.65 AND -77.3"
+            ),
+            "batch_limit": 2500,
+            "oid_field": "OBJECTID",
+            "max_record_count": 2000,
+            "needs_geocode": False,
+            "expected_cadence_days": 3,
+            "non_spatial": False,
+            "scope": (
+                "Chesterfield County police offenses inside the Richmond metro "
+                "box (1,249 over the 120 days to 2026-09-30), the county's part "
+                "south and west of the city; the city and Henrico have none. "
+                "One row per incident (RMSIncidentID); dated by occurrence and "
+                "re-read over the last 120 days because reports arrive up to "
+                "118 days late. Points are rounded to about 100 m."
+            ),
+            "field_map": CRIME_FIELD_MAP,
+        },
+    },
     "deeds": {
         "endpoint": RICHMOND_DEEDS_ENDPOINT,
         "platform": "excel",
@@ -397,11 +458,14 @@ REGISTRATION = SpatialRegistration(
 )
 
 __all__ = [
+    "CRIME_FIELD_MAP",
+    "CRIME_POINT_DECIMALS",
     "DEEDS_FIELD_MAP",
     "FIELD_MAP",
     "REGISTRATION",
     "RICHMOND_CENTER",
     "RICHMOND_CITY_ID",
+    "RICHMOND_CRIME_ENDPOINT",
     "RICHMOND_DEEDS_ENDPOINT",
     "RICHMOND_DIVISIONS",
     "RICHMOND_DIVISION_BBOXES",

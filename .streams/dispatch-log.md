@@ -1362,3 +1362,23 @@ Worth keeping:
 - **A batch-refreshed layer holds its watermark for weeks.** Rochester's and
   Virginia Beach's newest rows were six and four weeks old, so their windows
   grow until the next batch lands.
+
+### 2026-09-30 — Richmond crime from Chesterfield County offenses (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| richmond-crime | `.streams/richmond-crime.md` | `config.py` | 2026-09-30 | done (1,249 offenses polled live and published on a 100 m grid; the second poll published none) | `CRIME_POINT_DECIMALS` leaf hook in the crime producer; simple assault read in either order |
+
+Richmond `crime` reads Chesterfield County's police offenses inside the metro
+box, re-reading the last 120 days each poll, with each point rounded to three
+decimal places before it is indexed.
+
+Worth keeping:
+
+- **Check a masked address against its point.** The county masks addresses to
+  the hundred block but not the coordinates; comparing distinct points per
+  block showed it.
+- **Look at the lateness before picking a watermark.** An occurrence date that
+  arrives up to 118 days late needs a window, not a watermark.
+- **Run a label fix across every feed.** The simple-assault fix for Richmond
+  also moved Boston's and Chicago's simple assaults, which the rule had missed.

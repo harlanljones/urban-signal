@@ -78,6 +78,13 @@ reads that year whole. A new workbook appears about monthly, and the daily
 poll between releases gets a 304 and reads nothing
 (`feed-health-2026-09-30.md`).
 
+Richmond `crime` (1,249 rows, cap 2,500) joined with its registration.
+Chesterfield County's offenses layer holds every offense since 2024-10-01
+(25,653 rows), so the feed filters to the metro box and the 120 days before
+each poll and reads that whole. An offense is dated by when it happened and
+can be reported up to 118 days later, which a watermark would miss
+(`probe-richmond.md`).
+
 ## Newest-first windows
 
 | Feed | Order | Rows dated in last 30 / 90 days | Window after |

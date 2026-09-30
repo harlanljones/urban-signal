@@ -2339,6 +2339,17 @@ class Settings(BaseSettings):
         ),
     )
 
+    arcgis_richmond_crime_url: str = Field(
+        default=(
+            "https://services3.arcgis.com/TsynfzBSE6sXfoLq/ArcGIS/rest/services/"
+            "PSDWIncidents_ProdA/FeatureServer/1"
+        ),
+        description=(
+            "Chesterfield County, VA police offenses (ArcGIS Online), the crime "
+            "source inside the Richmond metro box"
+        ),
+    )
+
     arcgis_charleston_wv_deeds_url: str = Field(
         default=(
             "https://kanawhacountyassessorgis.com/server/rest/services/"
