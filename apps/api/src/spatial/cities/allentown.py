@@ -309,7 +309,7 @@ ALLENTOWN_FEED_SPECS: dict[str, dict[str, object]] = {
         "endpoint": ALLENTOWN_DEEDS_ENDPOINT,
         "platform": "arcgis",
         "watermark_col": "",
-        "id_keys": ["WARDACCTNO", "PIN"],
+        "id_keys": ["WARDACCTNO", "XINSTNUM"],
         "topic_key": "topic_deeds",
         "interval_seconds": 1800.0,
         "producer_key": "deeds",
@@ -322,6 +322,7 @@ ALLENTOWN_FEED_SPECS: dict[str, dict[str, object]] = {
             "max_record_count": 2000,
             "expected_cadence_days": 45,
             "non_spatial": False,
+            "composite_id": True,
             "scope": (
                 "Allentown PA deeds from the city's Tax Parcels Assessed layer: each parcel's last "
                 "sale (SYEAR + SMON, composed by compose_deed_date), newest first; owner columns "

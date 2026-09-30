@@ -165,43 +165,39 @@ SLA_ROW_RIVERFRONT = {
 # Newest transfers by SaleDate DESC — 1787702400000 / 1787616000000 flatten
 # to the fixture ISOs. Newest row 2026-08-26; 7d=38, total=195,460. The
 # newest instrument (260000257, a $0 will conveyance) is split across two
-# LRSNs — DocumentNo repeats, fixed-width columns arrive space-padded.
-DEEDS_ROW_DAVIS_WILL_X = {
+# LRSNs — DocumentNo repeats, fixed-width columns arrive space-padded. The
+# spec's ``select`` leaves the Seller and Buyer names on the server, so the
+# fixtures carry neither.
+DEEDS_ROW_WILL_X = {
     "LRSN": 8921,
     "SaleDate": "2026-08-26T00:00:00+00:00",
     "SaleAmount": 0.0,
     "DocumentNo": "260000257                       ",
     "DocumentRef": " ",
-    "Seller": "DAVIS, WILLIAM H & NANCY E",
-    "Buyer": "GILLEY, CAROLYN DAVIS, DAVIS, WILLIAM HINTO",
     "SaleType": "        ",
     "TransferType": "X ",
     "ConveyanceForm": "WILL                          ",
     "ESRI_OID": 27,
 }
 
-DEEDS_ROW_DAVIS_WILL_M = {
+DEEDS_ROW_WILL_M = {
     "LRSN": 17439,
     "SaleDate": "2026-08-26T00:00:00+00:00",
     "SaleAmount": 0.0,
     "DocumentNo": "260000257                       ",
     "DocumentRef": " ",
-    "Seller": "DAVIS, WILLIAM H & NANCY E",
-    "Buyer": "GILLEY, CAROLYN DAVIS, WILLIAM HINTON DAVIS JR",
     "SaleType": "        ",
     "TransferType": "M ",
     "ConveyanceForm": "WILL                          ",
     "ESRI_OID": 28,
 }
 
-DEEDS_ROW_SHORT_SWEET = {
+DEEDS_ROW_SALE = {
     "LRSN": 14196,
     "SaleDate": "2026-08-25T00:00:00+00:00",
     "SaleAmount": 180000.0,
     "DocumentNo": "260005545                       ",
     "DocumentRef": " ",
-    "Seller": "SHORT AND SWEET VENTURES VA LLC",
-    "Buyer": "JONES, ELIZABETH F",
     "SaleType": "        ",
     "TransferType": "S ",
     "ConveyanceForm": "DEED                          ",
@@ -375,9 +371,13 @@ class TestFeedRegistration:
         assert spec.watermark_col == "SaleDate"
         assert spec.id_keys == ["LRSN", "DocumentNo"]
         assert spec.producer_key == "deeds"
-        # Layer /34 publishes no objectIdField: OBJECTID ordering 400s.
-        assert spec.order_by == "ESRI_OID"
+        # Layer /34 publishes no objectIdField: OBJECTID ordering 400s, so
+        # ESRI_OID breaks SaleDate ties. Newest first.
+        assert spec.order_by == "SaleDate DESC, ESRI_OID DESC"
         assert spec.oid_field == "ESRI_OID"
+        # A row is its parcel plus its instrument; names stay on the server.
+        assert spec.composite_id is True
+        assert spec.select == "ESRI_OID,LRSN,DocumentNo,SaleDate,SaleAmount"
         # No address column: coordinates via LRSN -> /41 Parcel centroid join.
         assert spec.needs_geocode is True
         assert spec.non_spatial is True
@@ -446,13 +446,11 @@ class TestLynchburgFieldMaps:
         assert first_mapped(row, SLA_FIELD_MAP, "dba") == "RIVERFRONT ENTERTAINMENT FOUNDATION"
 
     def test_deeds_map_reads_live_columns(self):
-        row = DEEDS_ROW_SHORT_SWEET
+        row = DEEDS_ROW_SALE
         assert first_mapped(row, DEEDS_FIELD_MAP, "doc_id") == "260005545                       "
         assert first_mapped(row, DEEDS_FIELD_MAP, "bbl") == 14196
         assert first_mapped(row, DEEDS_FIELD_MAP, "document_amount") == 180000.0
         assert first_mapped(row, DEEDS_FIELD_MAP, "recorded_date") == "2026-08-25T00:00:00+00:00"
-        assert first_mapped(row, DEEDS_FIELD_MAP, "party1_grantor") == "SHORT AND SWEET VENTURES VA LLC"
-        assert first_mapped(row, DEEDS_FIELD_MAP, "party2_grantee") == "JONES, ELIZABETH F"
 
     def test_deeds_map_has_no_address_or_coordinate_candidates(self):
         """The Transfers table carries NO address column — coordinates come
@@ -678,10 +676,10 @@ class TestLynchburgDeedsParsing:
     ):
         """The Transfers table has no address column and "lynchburg" is not
         yet a registered city, so the parse is lossless: fields intact,
-        coordinates/H3 null (the parcel_join enrichment runs at the
-        run_stream layer, post-spine for the scheduler path)."""
+        coordinates/H3 null (the scheduler's poll and run_stream join the
+        parcel centroid before parsing)."""
         _patch_resolve(monkeypatch, "deeds")
-        event = deeds.parse_socrata_row(DEEDS_ROW_SHORT_SWEET, city_id="lynchburg")
+        event = deeds.parse_socrata_row(DEEDS_ROW_SALE, city_id="lynchburg")
         assert event is not None
         assert event.city_id == "lynchburg"
         assert event.latitude is None and event.longitude is None
@@ -689,20 +687,20 @@ class TestLynchburgDeedsParsing:
 
     def test_document_number_strips_fixed_width_padding(self, deeds, monkeypatch):
         _patch_resolve(monkeypatch, "deeds")
-        event = deeds.parse_socrata_row(DEEDS_ROW_DAVIS_WILL_X, city_id="lynchburg")
+        event = deeds.parse_socrata_row(DEEDS_ROW_WILL_X, city_id="lynchburg")
         assert event is not None
         assert event.doc_id == "260000257"
         assert event.doc_id == event.doc_id.strip()
 
     def test_lrsn_maps_to_bbl(self, deeds, monkeypatch):
         _patch_resolve(monkeypatch, "deeds")
-        event = deeds.parse_socrata_row(DEEDS_ROW_SHORT_SWEET, city_id="lynchburg")
+        event = deeds.parse_socrata_row(DEEDS_ROW_SALE, city_id="lynchburg")
         assert event is not None
         assert event.bbl == "14196"
 
     def test_priced_sale_maps_amount_and_iso_recorded_date(self, deeds, monkeypatch):
         _patch_resolve(monkeypatch, "deeds")
-        event = deeds.parse_socrata_row(DEEDS_ROW_SHORT_SWEET, city_id="lynchburg")
+        event = deeds.parse_socrata_row(DEEDS_ROW_SALE, city_id="lynchburg")
         assert event is not None
         assert event.document_amount == 180000.0
         assert str(event.recorded_date).startswith("2026-08-25")
@@ -712,12 +710,12 @@ class TestLynchburgDeedsParsing:
         """$0 non-arms-length conveyances (the will split across LRSN 8921 /
         17439) parse and stay in the register with a 0.0 amount."""
         _patch_resolve(monkeypatch, "deeds")
-        for row in (DEEDS_ROW_DAVIS_WILL_X, DEEDS_ROW_DAVIS_WILL_M):
+        for row in (DEEDS_ROW_WILL_X, DEEDS_ROW_WILL_M):
             event = deeds.parse_socrata_row(row, city_id="lynchburg")
             assert event is not None
             assert event.document_amount == 0.0
             assert str(event.recorded_date).startswith("2026-08-26")
-            assert event.party1_grantor == "DAVIS, WILLIAM H & NANCY E"
+            assert event.party1_grantor is None
 
     def test_parcel_centroid_enrichment_drives_h3_from_fixture_coords(
         self, deeds, monkeypatch
@@ -727,7 +725,7 @@ class TestLynchburgDeedsParsing:
         coordinates and the point lands inside the metro bbox."""
         _patch_resolve(monkeypatch, "deeds")
         row = {
-            **DEEDS_ROW_SHORT_SWEET,
+            **DEEDS_ROW_SALE,
             "latitude": DEEDS_CENTROID_14196[0],
             "longitude": DEEDS_CENTROID_14196[1],
         }
@@ -741,12 +739,14 @@ class TestLynchburgDeedsParsing:
 
     def test_both_newest_batch_rows_parse(self, deeds, monkeypatch):
         _patch_resolve(monkeypatch, "deeds")
-        for row in (DEEDS_ROW_DAVIS_WILL_X, DEEDS_ROW_DAVIS_WILL_M):
+        for row in (DEEDS_ROW_WILL_X, DEEDS_ROW_WILL_M):
             assert deeds.parse_socrata_row(row, city_id="lynchburg") is not None
 
     def test_no_party_or_coordinate_candidates_in_deeds_map(self):
         assert "latitude" not in DEEDS_FIELD_MAP
         assert "longitude" not in DEEDS_FIELD_MAP
+        assert "party1_grantor" not in DEEDS_FIELD_MAP
+        assert "party2_grantee" not in DEEDS_FIELD_MAP
 
 
 class TestGeocodingCaveats:

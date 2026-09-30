@@ -24,7 +24,7 @@ FIELD_MAP = {
         "doc_id": ["DOCNO", "ObjectId"],
         "bbl": ["PARCEL", "APN"],
         "document_amount": ["SALEPRICE"],
-        "recorded_date": ["SALEDATE", "DOCDATE"],
+        "recorded_date": ["DOCDATE", "SALEDATE"],
         "borough": ["COMNAME", "WARD"],
         "address_street": ["ADDRESS1", "ADDRESS2"],
         "zipcode": ["ZIP", "ZIPCODE"],
@@ -465,8 +465,8 @@ LAS_VEGAS_FEED_SPECS: Dict[str, Dict[str, object]] = {
     "deeds": {
         "endpoint": LAS_VEGAS_DEEDS_ENDPOINT,
         "platform": "arcgis",
-        "watermark_col": "SALEDATE",
-        "id_keys": ["PARCEL", "DOCNO", "ObjectId"],
+        "watermark_col": "DOCDATE",
+        "id_keys": ["PARCEL", "DOCNO"],
         "topic_key": "topic_deeds",
         "interval_seconds": 600.0,
         "producer_key": "deeds",
@@ -474,7 +474,14 @@ LAS_VEGAS_FEED_SPECS: Dict[str, Dict[str, object]] = {
             "expected_cadence_days": 7,
             "oid_field": "ObjectId",
             "max_record_count": 2000,
-            "order_by": "SALEDATE DESC",
+            # DOCDATE is the recording day as YYYYMMDD digits (99990909 marks
+            # an unknown day). SALEDATE holds YYYYMM01 digits, too coarse to
+            # poll by, and an ISO comparison on it returns 400.
+            "watermark_type": "text",
+            "watermark_format": "%Y%m%d",
+            "watermark_exclude": ["99990909"],
+            "order_by": "DOCDATE DESC, ObjectId DESC",
+            "composite_id": True,
             "needs_geocode": True,
             "geocode_context": "Las Vegas, NV",
             "scope": "Clark County real-property parcel sales / recorded deeds (address-only ArcGIS table)",

@@ -790,12 +790,15 @@ class TestDesMoinesRegistry:
 
     def test_host_uses_ansi_date_literals(self):
         """`IssuedDate > '2026-09-25T05:00:00'` returns 400 on maps.dsm.city;
-        `date '...'` works, so the host is an ANSI-literal host."""
+        ANSI literals work, so the host takes a `timestamp` literal, read in
+        the layer's Central time."""
         spec = get_dataset(CityId.DES_MOINES, FeedType.SLA)
         assert "maps.dsm.city" in ANSI_DATE_LITERAL_HOSTS
         assert (
-            watermark_comparison(spec.watermark_col, ">", "2026-09-25T05:00:00", spec.endpoint)
-            == "IssuedDate > date '2026-09-25'"
+            watermark_comparison(
+                spec.watermark_col, ">", "2026-09-25T05:00:00", spec.endpoint, time_zone="America/Chicago"
+            )
+            == "IssuedDate > timestamp '2026-09-25 00:00:00'"
         )
 
 
@@ -885,12 +888,15 @@ class TestDesMoinesCodeCaseRegistry:
 
     def test_host_uses_ansi_date_literals(self):
         """`DateOpened > '2026-09-24T05:00:00'` returns error 400 on this layer;
-        `date '...'` works, and `> date '2026-09-25'` excludes the whole day."""
+        ANSI literals work. The column is date-only (local midnight), so the
+        scheduler keeps the boundary day with `>=`."""
         spec = get_dataset(CityId.DES_MOINES, FeedType.VIOLATIONS)
         assert "maps.dsm.city" in ANSI_DATE_LITERAL_HOSTS
         assert (
-            watermark_comparison(spec.watermark_col, ">", "2026-09-25T05:00:00", spec.endpoint)
-            == "DateOpened > date '2026-09-25'"
+            watermark_comparison(
+                spec.watermark_col, ">=", "2026-09-25T05:00:00", spec.endpoint, time_zone="America/Chicago"
+            )
+            == "DateOpened >= timestamp '2026-09-25 00:00:00'"
         )
 
 
@@ -962,8 +968,8 @@ class TestDesMoinesRentalLicenseParsing:
         stored = event.effective_date.strftime("%Y-%m-%dT%H:%M:%S")
         assert stored == "2026-09-25T05:00:00"
         assert (
-            watermark_comparison(spec.watermark_col, ">", stored, spec.endpoint)
-            == "IssuedDate > date '2026-09-25'"
+            watermark_comparison(spec.watermark_col, ">", stored, spec.endpoint, time_zone="America/Chicago")
+            == "IssuedDate > timestamp '2026-09-25 00:00:00'"
         )
 
     def test_2999_expiry_sentinel_parses_to_a_valid_datetime(self, sla):
@@ -1077,8 +1083,8 @@ class TestDesMoinesCodeCaseParsing:
         stored = parse_watermark(record[spec.watermark_col]).strftime("%Y-%m-%dT%H:%M:%S")
         assert stored == "2026-09-25T05:00:00"
         assert (
-            watermark_comparison(spec.watermark_col, ">", stored, spec.endpoint)
-            == "DateOpened > date '2026-09-25'"
+            watermark_comparison(spec.watermark_col, ">", stored, spec.endpoint, time_zone="America/Chicago")
+            == "DateOpened > timestamp '2026-09-25 00:00:00'"
         )
 
     def test_fixture_coordinates_are_contained(self):
@@ -1198,12 +1204,14 @@ class TestDesMoinesSchedulerWiring:
         assert first_call["endpoint_url"] == settings.arcgis_des_moines_rental_licenses_url
         assert first_call["order_by"] == "IssuedDate DESC, OBJECTID DESC"
 
-        # Next poll: incremental filter rendered as an ANSI date literal.
+        # Next poll: an ANSI literal in the layer's Central time. The stored
+        # watermark is local midnight, a date-only value, so `>=` keeps the day.
         sla.arcgis.paginate = MagicMock(return_value=[])
+        sla.arcgis.get_layer_metadata = MagicMock(return_value={"time_zone": "America/Chicago"})
         scheduler.poll_job(self.JOB, limit=100)
         _, second_call = sla.arcgis.paginate.call_args
         assert second_call["where_clause"] == (
-            "(ContactType = 'Property Owner') AND IssuedDate > date '2026-09-25'"
+            "(ContactType = 'Property Owner') AND IssuedDate >= timestamp '2026-09-25 00:00:00'"
         )
 
 
@@ -1261,8 +1269,10 @@ class TestDesMoinesViolationsSchedulerWiring:
         assert first_call["endpoint_url"] == settings.arcgis_des_moines_code_cases_url
         assert first_call["order_by"] == "DateOpened DESC, OBJECTID DESC"
 
-        # Next poll: the incremental filter is an ANSI date literal, not an ISO string.
+        # Next poll: the incremental filter is an ANSI literal in Central time,
+        # not an ISO string, and keeps the date-only boundary day.
         violations.arcgis.paginate = MagicMock(return_value=[])
+        violations.arcgis.get_layer_metadata = MagicMock(return_value={"time_zone": "America/Chicago"})
         scheduler.poll_job(self.JOB, limit=100)
         _, second_call = violations.arcgis.paginate.call_args
-        assert second_call["where_clause"] == "DateOpened > date '2026-09-25'"
+        assert second_call["where_clause"] == "DateOpened >= timestamp '2026-09-25 00:00:00'"

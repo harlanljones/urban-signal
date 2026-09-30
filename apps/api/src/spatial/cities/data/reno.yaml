@@ -116,7 +116,7 @@ datasets:
     watermark_col: SALEDATE
     id_keys:
     - PIN
-    - OBJECTID
+    - SALEDATE
     topic: raw.municipal.deeds
     interval_seconds: 1800.0
     producer_key: deeds
@@ -163,6 +163,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    composite_id: true
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis

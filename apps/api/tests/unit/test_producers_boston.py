@@ -42,7 +42,11 @@ def test_boston_registers_ckan_feeds_and_no_sales_feed():
     # Licensing Board (04dc653b) fails G5 by construction: gpsx/gpsy are
     sla = REGISTRY[city].datasets[FeedType.SLA]
     assert sla.platform == "ckan"
-    assert sla.watermark_col == "expires"
+    # ``expires`` runs years ahead; the filter reads the issue day as text.
+    assert sla.watermark_col == "issued"
+    assert (sla.watermark_type, sla.watermark_format) == ("text", "%Y-%m-%d")
+    assert sla.where == "issued IS NOT NULL"
+    assert sla.order_by == "issued DESC"
     assert sla.id_keys == ["license_num", "_id"]
     assert sla.state_plane_crs == "EPSG:2249"
     assert sla.state_plane_units == "US survey feet"

@@ -370,8 +370,10 @@ def test_text_watermark_guard_and_raw_high_watermark(mock_scheduler):
     result = mock_scheduler.poll_job(job_name, limit=100)
 
     _, kwargs = mock_producer.socrata.paginate.call_args
+    # A date-only format keeps its boundary day (``>=``); the dedup drops
+    # the rows already seen.
     assert kwargs["where_clause"] == (
-        "issuance_date > '20260810' AND issuance_date NOT IN ('ZZZZZZZZ')"
+        "issuance_date >= '20260810' AND issuance_date NOT IN ('ZZZZZZZZ')"
     )
     # Raw declared-format string stored; sentinel dropped; calendar max wins
     # even though 20260801 sorts above it lexically.
@@ -596,13 +598,14 @@ class TestSnapshotMode:
             _, kwargs = producer.socrata.paginate.call_args
             assert not kwargs.get("where_clause")
 
-            # incremental control: same state emits a watermark clause
+            # incremental control: same state emits a watermark clause (a
+            # whole-hour watermark keeps its boundary: a date-only column)
             meta["ingestion_mode"] = "incremental"
             producer.socrata.paginate = MagicMock(return_value=iter([]))
             mock_scheduler.poll_job("sla", limit=10)
             _, kwargs = producer.socrata.paginate.call_args
             wc = kwargs.get("where_clause") or ""
-            assert f"{meta['watermark_col']} > '2020-01-01T00:00:00'" == wc
+            assert f"{meta['watermark_col']} >= '2020-01-01T00:00:00'" == wc
         finally:
             meta["platform"] = saved_platform
             if saved_mode is None:

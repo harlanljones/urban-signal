@@ -277,7 +277,7 @@ CHARLESTON_WV_FEED_SPECS: dict[str, dict[str, object]] = {
         "endpoint": CHARLESTON_WV_DEEDS_ENDPOINT,
         "platform": "arcgis",
         "watermark_col": "Last_Sales_Date",
-        "id_keys": ["PARID", "OBJECTID"],
+        "id_keys": ["PARID", "Last_Sales_Date"],
         "topic_key": "topic_deeds",
         "interval_seconds": 1800.0,
         "producer_key": "deeds",
@@ -296,6 +296,7 @@ CHARLESTON_WV_FEED_SPECS: dict[str, dict[str, object]] = {
             "max_record_count": 2000,
             "expected_cadence_days": 180,
             "non_spatial": False,
+            "composite_id": True,
             "scope": (
                 "Charleston WV deeds from the Kanawha County Assessor parcel layer, tax districts "
                 "09-14, newest sale first; owner columns are never selected."

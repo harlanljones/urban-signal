@@ -254,8 +254,8 @@ datasets:
     platform: arcgis
     watermark_col: SALE_DATE
     id_keys:
-    - OBJECTID
-    - PIN
+    - PIN_NUM
+    - SALE_DATE
     topic: raw.municipal.deeds
     interval_seconds: 1800.0
     producer_key: deeds
@@ -281,8 +281,7 @@ datasets:
       - TOTSALPRICE
       - SALE_PRICE
       bbl:
-      - PIN
-      - PARCELID
+      - PIN_NUM
       party2_grantee:
       - OWNER_NAME
       - OWNERNAME
@@ -312,6 +311,7 @@ datasets:
     non_spatial: null
     zip_member: null
     batch_limit: 5000
+    composite_id: true
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis

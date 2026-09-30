@@ -233,7 +233,7 @@ def test_where_ansi_host_literal():
         high_watermark="2026-01-01T00:00:00",
         endpoint=endpoint,
     )
-    assert got == "GIS_DATETIME > date '2026-01-01'"
+    assert got == "GIS_DATETIME > timestamp '2026-01-01 00:00:00'"
 
 
 def test_where_ckan_text_literal():

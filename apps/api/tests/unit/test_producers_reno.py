@@ -48,7 +48,10 @@ def test_reno_registers_deeds_and_snap_sla():
     assert deeds.platform == "arcgis"
     assert deeds.endpoint.endswith("/OpenData/WashoeDataShare/MapServer/0")
     assert deeds.watermark_col == "SALEDATE"
-    assert deeds.id_keys == ["PIN", "OBJECTID"]
+    # A row is its parcel plus its sale date; a parcel's next sale is a new
+    # row.
+    assert deeds.id_keys == ["PIN", "SALEDATE"]
+    assert deeds.composite_id is True
     assert deeds.field_map == RENO_DEEDS_FIELD_MAP
     assert deeds.watermark_type == "text"
     assert deeds.watermark_format == "%m/%d/%Y"

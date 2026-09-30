@@ -229,50 +229,42 @@ divisions:
     city_id: roanoke
 datasets:
   deeds:
-    endpoint: https://gis.roanokeva.gov/server/rest/services/OpenData/Parcels/FeatureServer/0
+    endpoint: https://maps.roanokeva.gov/server/rest/services/RealEstate/Proval_Transfer_History/FeatureServer/3
     platform: arcgis
-    watermark_col: SALE_DATE
+    watermark_col: pxfer_date
     id_keys:
-    - PARCELID
-    - OBJECTID
+    - DocNum
+    - lrsn
     topic: raw.municipal.deeds
     interval_seconds: 600.0
     producer_key: deeds
     endpoint_by_year: {}
-    watermark_type: text
-    watermark_format: '%m/%d/%Y'
+    watermark_type: null
+    watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: pxfer_date DESC, ID DESC
     id_col: null
-    select: null
+    select: ID,DocNum,lrsn,parcel_id,pxfer_date,consideration,deed_type
     fallback_endpoints: []
-    where: null
+    where: pxfer_date >= date '1900-01-01'
     needs_geocode: false
     geocode_context: null
     field_map:
       doc_id:
-      - PARCELID
-      - PRINTKEY
+      - DocNum
+      - ID
       bbl:
-      - PARCELID
+      - parcel_id
       doc_type:
-      - DEED_TYPE
+      - deed_type
       document_amount:
-      - SALE_PRICE
+      - consideration
       recorded_date:
-      - SALE_DATE
-      address_street:
-      - SITEADDRESS
-      incident_address:
-      - SITEADDRESS
-      borough:
-      - CITY
-      zipcode:
-      - ZIP5
+      - pxfer_date
     ingestion_mode: incremental
-    oid_field: OBJECTID
-    max_record_count: 100000
-    expected_cadence_days: 30
+    oid_field: ID
+    max_record_count: 2000
+    expected_cadence_days: 7
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false
@@ -285,9 +277,13 @@ datasets:
     state_plane_units: null
     state_plane_x_col: null
     state_plane_y_col: null
-    parcel_join: {}
+    parcel_join:
+      parcel_layer: https://maps.roanokeva.gov/server/rest/services/Hosted/City_Parcels/FeatureServer/0
+      join_key: lrsn
+      geometry_source: centroid
     non_spatial: false
     zip_member: null
+    composite_id: true
 aliases:
 - roanoke_va
 - roanoke-va

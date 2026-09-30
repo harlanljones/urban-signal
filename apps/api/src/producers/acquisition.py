@@ -237,8 +237,10 @@ def build_where(
     """Build the incremental/backfill WHERE clause for a polling pass.
 
     Faithful reimplementation of the clause assembly in
-    ``MunicipalIngestionScheduler.poll_job`` (plus the ``">="`` op the backfill
-    loader uses).  Composition, in order:
+    ``MunicipalIngestionScheduler.poll_job``. The comparison op is the
+    caller's: the scheduler picks ``>`` or ``>=`` per poll
+    (``_watermark_predicate``) and the backfill loader uses ``">="``.
+    Composition, in order:
 
     1. ``(base_where)`` when a registry ``where`` filter is declared.
     2. ``(override_where)`` when a runtime override is supplied.

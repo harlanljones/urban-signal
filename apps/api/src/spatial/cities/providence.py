@@ -332,7 +332,7 @@ PROVIDENCE_FEED_SPECS: dict[str, dict[str, object]] = {
         "endpoint": PROVIDENCE_DEEDS_ENDPOINT,
         "platform": "arcgis",
         "watermark_col": "SaleDate",
-        "id_keys": ["PROPID", "PIN", "OBJECTID"],
+        "id_keys": ["PROPID", "SaleDate"],
         "topic_key": "topic_deeds",
         "interval_seconds": 1800.0,
         "producer_key": "deeds",
@@ -348,6 +348,7 @@ PROVIDENCE_FEED_SPECS: dict[str, dict[str, object]] = {
             "expected_cadence_days": 30,
             "non_spatial": False,
             "batch_limit": 1500,
+            "composite_id": True,
             "scope": (
                 "Providence RI deeds from the city's Parcels with CAMA layer: each parcel's last "
                 "sale, newest first; owner columns are never selected."

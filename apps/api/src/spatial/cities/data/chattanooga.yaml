@@ -175,8 +175,8 @@ datasets:
     platform: arcgis
     watermark_col: SALE1DATE
     id_keys:
-    - PIN
-    - OBJECTID
+    - GISLINK
+    - SALE1DATE
     topic: raw.municipal.deeds
     interval_seconds: 1800.0
     producer_key: deeds
@@ -201,8 +201,8 @@ datasets:
       document_amount:
       - SALE1CONSD
       bbl:
-      - PIN
-      - PARCELID
+      - TAX_MAP_NO
+      - GISLINK
       party2_grantee:
       - OWNERNAME1
       doc_type:
@@ -232,6 +232,7 @@ datasets:
     non_spatial: null
     zip_member: null
     batch_limit: 3000
+    composite_id: true
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis

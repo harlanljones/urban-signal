@@ -168,13 +168,15 @@ def test_columbus_311_spec_pins_the_rolling_three_year_layer():
     assert spec.field_map == COLUMBUS_311_FIELD_MAP
 
 
-def test_columbus_311_watermark_renders_as_an_ansi_date_literal():
+def test_columbus_311_watermark_renders_as_an_eastern_ansi_literal():
     # Verified live 2026-09-30: the server answers an ISO string in `where`
-    # with a 400 and accepts only an ANSI date literal.
+    # with a 400, accepts ANSI literals, and reads them in the layer's
+    # Eastern time.
     assert "maps2.columbus.gov" in ANSI_DATE_LITERAL_HOSTS
     assert watermark_comparison(
-        "REPORTED_DATE", ">", "2026-09-29T08:57:53", settings.arcgis_columbus_311_url
-    ) == "REPORTED_DATE > date '2026-09-29'"
+        "REPORTED_DATE", ">", "2026-09-29T08:57:53", settings.arcgis_columbus_311_url,
+        time_zone="America/New_York",
+    ) == "REPORTED_DATE > timestamp '2026-09-29 04:57:53'"
 
 
 CB_PERMIT_ROW = {
@@ -672,16 +674,16 @@ class TestColumbus311SchedulerWiring:
         assert first_call["endpoint_url"] == settings.arcgis_columbus_311_url
         assert first_call["order_by"] == "REPORTED_DATE DESC, OBJECTID DESC"
 
-        # Next poll: the watermark's date as an ANSI literal (Eastern midnight
-        # on the server), so the re-read part of the day dedups instead of
-        # publishing twice.
+        # Next poll: the watermark as an ANSI literal in the layer's Eastern
+        # time. A row the server sends again dedups instead of publishing twice.
         complaints.arcgis.paginate = MagicMock(
             return_value=[[_flatten_sr(_SR_ABANDONED_VEHICLE)]]
         )
+        complaints.arcgis.get_layer_metadata = MagicMock(return_value={"time_zone": "America/New_York"})
         second = scheduler.poll_job(self.JOB, limit=100)
         _, second_call = complaints.arcgis.paginate.call_args
         assert second_call["where_clause"] == (
-            f"{self.BASE_WHERE} AND REPORTED_DATE > date '2026-09-29'"
+            f"{self.BASE_WHERE} AND REPORTED_DATE > timestamp '2026-09-29 04:57:53'"
         )
         assert second["records_published"] == 0
         assert second["duplicates_skipped"] == 1

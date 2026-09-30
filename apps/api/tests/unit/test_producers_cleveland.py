@@ -98,7 +98,10 @@ def test_cleveland_registers_three_verified_feeds_and_snap_sla():
     deeds = get_dataset(city, FeedType.DEEDS)
     assert deeds.platform == "arcgis"
     assert deeds.watermark_col == "last_transfer_date"
-    assert deeds.id_keys == ["PARCEL_ID", "OBJECTID"]
+    # A row is its parcel plus its transfer date; a parcel's next sale is a
+    # new row.
+    assert deeds.id_keys == ["PARCEL_ID", "last_transfer_date"]
+    assert deeds.composite_id is True
     assert deeds.field_map == CLEVELAND_DEEDS_FIELD_MAP
 
 

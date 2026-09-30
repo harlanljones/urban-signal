@@ -124,11 +124,11 @@ datasets:
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: REQUESTEDDATETIME DESC, OBJECTID DESC
     id_col: null
     select: null
     fallback_endpoints: []
-    where: null
+    where: REQUESTEDDATETIME IS NOT NULL
     needs_geocode: false
     geocode_context: null
     field_map:

@@ -216,7 +216,7 @@ datasets:
     watermark_col: Last_Sales_Date
     id_keys:
     - PARID
-    - OBJECTID
+    - Last_Sales_Date
     topic: raw.municipal.deeds
     interval_seconds: 1800.0
     producer_key: deeds
@@ -264,6 +264,7 @@ datasets:
     parcel_join: {}
     non_spatial: false
     zip_member: null
+    composite_id: true
 aliases:
 - charleston_wv_wv
 - charleston-wv-wv

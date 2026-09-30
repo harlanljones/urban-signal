@@ -16,13 +16,66 @@ Two things differ from Socrata and are handled here rather than by callers:
 
 Date fields come back as epoch **milliseconds**; we convert them to ISO 8601 UTC
 strings using the layer's own field metadata, which is fetched once and cached.
+A layer whose ``dateFieldsTimeReference`` names a zone reads ``where`` literals
+in that zone, so the metadata also carries it (``time_zone``).
 """
 
+import math
 import time
 from datetime import datetime, timezone
 from typing import Any, Dict, Generator, List, Optional
 
 import httpx
+
+# Field types a ``where`` clause compares as numbers. A quoted literal against
+# one of them fails on some servers: Roanoke's parcel layer answers
+# ``lrsn IN ('1116')`` with "Invalid data type for expression".
+_NUMERIC_FIELD_TYPES = frozenset(
+    {
+        "esriFieldTypeOID",
+        "esriFieldTypeSmallInteger",
+        "esriFieldTypeInteger",
+        "esriFieldTypeBigInteger",
+        "esriFieldTypeSingle",
+        "esriFieldTypeDouble",
+    }
+)
+
+# Servers older than 11.x name a layer's zone in Windows terms only; each reads
+# with daylight saving or without it, as the reference says.
+_WINDOWS_TIME_ZONES = {
+    "Eastern Standard Time": ("America/New_York", "Etc/GMT+5"),
+    "Central Standard Time": ("America/Chicago", "Etc/GMT+6"),
+    "Mountain Standard Time": ("America/Denver", "Etc/GMT+7"),
+    "US Mountain Standard Time": ("America/Phoenix", "America/Phoenix"),
+    "Pacific Standard Time": ("America/Los_Angeles", "Etc/GMT+8"),
+    "Alaskan Standard Time": ("America/Anchorage", "Etc/GMT+9"),
+    "Hawaiian Standard Time": ("Pacific/Honolulu", "Pacific/Honolulu"),
+}
+_UTC_ZONE_NAMES = frozenset(
+    {"UTC", "Etc/UTC", "Coordinated Universal Time", "GMT", "Etc/GMT", "Greenwich Standard Time"}
+)
+
+
+def layer_time_zone(reference: Any) -> str | None:
+    """The IANA zone a layer's ``dateFieldsTimeReference`` reads literals in.
+
+    None means UTC: no reference, or a UTC one. DC's 311 layer declares
+    ``America/New_York`` and reads ``date '2026-09-29'`` as 04:00 UTC.
+    """
+    if not isinstance(reference, dict):
+        return None
+    zone = reference.get("timeZoneIANA")
+    if not zone:
+        name = reference.get("timeZone")
+        zones = _WINDOWS_TIME_ZONES.get(name)
+        if zones is None:
+            zone = name
+        else:
+            zone = zones[0] if reference.get("respectsDaylightSaving", True) else zones[1]
+    if not zone or zone in _UTC_ZONE_NAMES:
+        return None
+    return zone
 
 
 class ArcGISClient:
@@ -37,7 +90,8 @@ class ArcGISClient:
         self.timeout = timeout_seconds
         self.max_retries = max_retries
         self.return_geometry = return_geometry
-        # layer_url -> {"date_fields": set[str], "oid_field": str, "max_record_count": int}
+        # layer_url -> {"date_fields": set[str], "numeric_fields": set[str],
+        #               "oid_field": str, "max_record_count": int, "time_zone": str | None}
         self._layer_meta: Dict[str, Dict[str, Any]] = {}
 
     # ------------------------------------------------------------------ helpers
@@ -81,7 +135,7 @@ class ArcGISClient:
         return {}
 
     def get_layer_metadata(self, endpoint_url: str) -> Dict[str, Any]:
-        """Fetch and cache a layer's date fields, OID field, and server page cap."""
+        """Fetch and cache a layer's field types, OID field, page cap and time zone."""
         layer_url = self._normalize_layer_url(endpoint_url)
         if layer_url in self._layer_meta:
             return self._layer_meta[layer_url]
@@ -92,8 +146,12 @@ class ArcGISClient:
             "date_fields": {
                 f["name"] for f in fields if f.get("type") == "esriFieldTypeDate"
             },
+            "numeric_fields": {
+                f["name"] for f in fields if f.get("type") in _NUMERIC_FIELD_TYPES
+            },
             "oid_field": payload.get("objectIdField") or "OBJECTID",
             "max_record_count": int(payload.get("maxRecordCount") or 1000),
+            "time_zone": layer_time_zone(payload.get("dateFieldsTimeReference")),
         }
         self._layer_meta[layer_url] = meta
         return meta
@@ -187,7 +245,21 @@ class ArcGISClient:
     @staticmethod
     def _normalize_join_value(value: Any) -> str:
         """Normalize a parcel join key without changing its meaningful digits."""
+        if isinstance(value, float) and value.is_integer():
+            # A Double key column reads 1116.0 where an Integer one reads 1116.
+            value = int(value)
         return " ".join(str(value or "").split()).upper()
+
+    @staticmethod
+    def _numeric_literal(value: Any) -> str | None:
+        """A value as an unquoted number for a numeric ``IN``, or None if it is not one."""
+        try:
+            number = float(str(value).strip())
+        except (TypeError, ValueError):
+            return None
+        if not math.isfinite(number):
+            return None
+        return str(int(number)) if number.is_integer() else repr(number)
 
     def fetch_centroid_index(
         self,
@@ -267,12 +339,18 @@ class ArcGISClient:
                     break
             return index
 
-        # ArcGIS accepts a text-field IN clause. Keep each request small enough
-        # to stay well below URL/server query limits.
+        # A text key takes quoted literals and a numeric key bare numbers. Keep
+        # each request small enough to stay well below URL/server query limits.
+        numeric = join_key in self.get_layer_metadata(layer_url).get("numeric_fields", ())
         for start in range(0, len(values), 100):
             chunk = values[start : start + 100]
-            escaped = ["'" + value.replace("'", "''") + "'" for value in chunk]
-            where = f"{join_key} IN ({','.join(escaped)})"
+            if numeric:
+                literals = [lit for lit in map(self._numeric_literal, chunk) if lit is not None]
+                if not literals:
+                    continue
+            else:
+                literals = ["'" + value.replace("'", "''") + "'" for value in chunk]
+            where = f"{join_key} IN ({','.join(literals)})"
             offset = 0
             while True:
                 fetch_limit = batch_size

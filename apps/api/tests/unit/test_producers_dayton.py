@@ -114,7 +114,7 @@ def test_dayton_incident_id_is_the_service_request_number(producer):
     assert event.incident_id == "2107815"
 
 
-def test_dayton_augusta_and_peoria_hosts_take_date_literals():
+def test_dayton_augusta_and_peoria_hosts_take_ansi_literals():
     """ArcGIS Server 10.91 and 11.4 on these hosts answer an ISO string
     comparison with 400 "Unable to complete operation" (verified 2026-09-30)."""
     from src.producers.watermarks import watermark_comparison
@@ -125,4 +125,4 @@ def test_dayton_augusta_and_peoria_hosts_take_date_literals():
         "https://gis.peoriacounty.gov/arcgis/rest/services/DP/ResidentialSales/MapServer/5",
     ):
         clause = watermark_comparison("ADDDTTM", ">", "2026-09-22T05:31:07", endpoint=endpoint)
-        assert clause == "ADDDTTM > date '2026-09-22'", endpoint
+        assert clause == "ADDDTTM > timestamp '2026-09-22 05:31:07'", endpoint

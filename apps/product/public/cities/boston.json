@@ -152,7 +152,7 @@
     },
     "sla": {
       "platform": "ckan",
-      "watermark_col": "expires",
+      "watermark_col": "issued",
       "interval_seconds": 600.0,
       "topic": "raw.municipal.sla"
     },

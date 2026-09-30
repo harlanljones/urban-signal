@@ -272,6 +272,7 @@ datasets:
     parcel_join: {}
     non_spatial: false
     zip_member: null
+    composite_id: true
 aliases:
 - frederick_md
 - frederick-md

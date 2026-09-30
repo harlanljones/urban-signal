@@ -393,7 +393,10 @@ BOWLING_GREEN_FEED_SPECS: Dict[str, Dict[str, object]] = {
         "extra": {
             "needs_geocode": True,
             "geocode_context": BOWLING_GREEN_GEOCODE_CONTEXT,
-            "order_by": "OBJECTID",
+            # Rows with no created_date read first in OID order and never
+            # move the watermark, so they are left out and the newest read first.
+            "where": "created_date IS NOT NULL",
+            "order_by": "created_date DESC, OBJECTID DESC",
             "oid_field": "OBJECTID",
             "max_record_count": 2000,
             "expected_cadence_days": 1,

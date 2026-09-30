@@ -271,6 +271,7 @@ datasets:
     non_spatial: null
     zip_member: null
     batch_limit: 4000
+    composite_id: true
 aliases:
 - montgomery_county
 - montgomery county

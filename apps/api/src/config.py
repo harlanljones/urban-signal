@@ -2358,8 +2358,11 @@ class Settings(BaseSettings):
     )
 
     arcgis_roanoke_deeds_url: str = Field(
-        default="https://gis.roanokeva.gov/server/rest/services/OpenData/Parcels/FeatureServer/0",
-        description="Roanoke VA deeds/sales ArcGIS FeatureServer URL (US-314)",
+        default=(
+            "https://maps.roanokeva.gov/server/rest/services/RealEstate/"
+            "Proval_Transfer_History/FeatureServer/3"
+        ),
+        description="Roanoke VA property transfer history table (city ArcGIS Server; no geometry, joined to parcels)",
     )
 
     arcgis_allentown_deeds_url: str = Field(

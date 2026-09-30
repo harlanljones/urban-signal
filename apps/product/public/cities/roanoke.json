@@ -178,7 +178,7 @@
     "sla": null,
     "deeds": {
       "platform": "arcgis",
-      "watermark_col": "SALE_DATE",
+      "watermark_col": "pxfer_date",
       "interval_seconds": 600.0,
       "topic": "raw.municipal.deeds"
     }

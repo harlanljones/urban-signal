@@ -283,8 +283,7 @@ datasets:
     watermark_col: SaleDate
     id_keys:
     - PROPID
-    - PIN
-    - OBJECTID
+    - SaleDate
     topic: raw.municipal.deeds
     interval_seconds: 1800.0
     producer_key: deeds
@@ -338,6 +337,7 @@ datasets:
     non_spatial: false
     zip_member: null
     batch_limit: 1500
+    composite_id: true
 aliases:
 - providence_ri
 - providence-ri

@@ -6,6 +6,7 @@ from src.producers.watermarks import (
     newest_watermark,
     sort_watermarks,
     typed_watermark_entry,
+    watermark_comparison,
     watermark_exclude_clause,
 )
 
@@ -83,3 +84,53 @@ def test_exclude_clause_quotes_and_skips_empty():
     )
     assert watermark_exclude_clause("col", ["O'BRIEN", ""]) == "col NOT IN ('O''BRIEN')"
     assert watermark_exclude_clause("col", []) is None
+
+
+_CHARLOTTE = "https://gis.charlottenc.gov/arcgis/rest/services/ODP/ServiceRequests311/MapServer/0"
+_DC_311 = "https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/ServiceRequests/FeatureServer/21"
+_GREENVILLE = "https://citygis.greenvillesc.gov/arcgis/rest/services/Permits/MapServer/0"
+
+
+def test_a_literal_only_host_takes_an_exact_timestamp():
+    """A ``date`` literal compared whole days: every poll re-read the day, and
+    a day with more rows than the cap never let the watermark leave it."""
+    assert watermark_comparison("RECEIVED_DATE", ">", "2026-09-29T18:23:07", _CHARLOTTE) == (
+        "RECEIVED_DATE > timestamp '2026-09-29 18:23:07'"
+    )
+
+
+def test_a_layer_zone_renders_the_watermark_as_local_time():
+    """DC's 311 layer reads literals as Eastern time: 01:30 UTC is 21:30 the
+    evening before, where the UTC day's ``date`` literal started at 04:00 UTC
+    and skipped the requests filed in between."""
+    assert watermark_comparison(
+        "ADDDATE", ">", "2026-09-30T01:30:00", _DC_311, time_zone="America/New_York"
+    ) == "ADDDATE > timestamp '2026-09-29 21:30:00'"
+    # Standard time: five hours behind.
+    assert watermark_comparison(
+        "ADDDATE", ">", "2026-01-15T01:30:00", _DC_311, time_zone="America/New_York"
+    ) == "ADDDATE > timestamp '2026-01-14 20:30:00'"
+
+
+def test_an_iso_host_with_a_zone_takes_a_local_iso_string():
+    """Greenville takes ISO strings but reads them as Eastern time, so a
+    date-only row stored at local midnight (04:00 UTC) matches only 00:00."""
+    assert watermark_comparison(
+        "NewIssueDate", ">=", "2026-09-25T04:00:00", _GREENVILLE, time_zone="America/New_York"
+    ) == "NewIssueDate >= '2026-09-25T00:00:00'"
+    # Without a zone the stored string passes through untouched.
+    assert watermark_comparison("NewIssueDate", ">=", "2026-09-25T04:00:00", _GREENVILLE) == (
+        "NewIssueDate >= '2026-09-25T04:00:00'"
+    )
+
+
+def test_text_watermarks_and_unknown_zones_keep_the_stored_value(caplog):
+    assert watermark_comparison(
+        "DOCDATE", ">=", "20260916", _GREENVILLE,
+        watermark_type="text", watermark_format="%Y%m%d", time_zone="America/Los_Angeles",
+    ) == "DOCDATE >= '20260916'"
+    with caplog.at_level("WARNING"):
+        got = watermark_comparison("col", ">", "2026-09-29T18:23:07", _GREENVILLE, time_zone="Mars/Olympus")
+    assert got == "col > '2026-09-29T18:23:07'"
+    assert "Mars/Olympus" in caplog.text
+

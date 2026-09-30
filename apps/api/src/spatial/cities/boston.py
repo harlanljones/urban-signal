@@ -116,7 +116,9 @@ BOSTON_LICENSING_BOARD_FEED: dict[str, object] = {
     "platform": "ckan",
     "dataset_id": "04dc653b-1789-4374-9669-b07df7233344",
     "feed_type": "sla",
-    "watermark_col": "expires",
+    # ``expires`` runs years ahead of today, so the watermark filters on
+    # ``issued`` (YYYY-MM-DD text).
+    "watermark_col": "issued",
     "state_plane_crs": "EPSG:2249",
     "state_plane_units": "US survey feet",
     "state_plane_x_col": "gpsx",

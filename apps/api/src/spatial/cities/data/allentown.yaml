@@ -233,7 +233,7 @@ datasets:
     watermark_col: ''
     id_keys:
     - WARDACCTNO
-    - PIN
+    - XINSTNUM
     topic: raw.municipal.deeds
     interval_seconds: 1800.0
     producer_key: deeds
@@ -281,6 +281,7 @@ datasets:
     parcel_join: {}
     non_spatial: false
     zip_member: null
+    composite_id: true
 aliases:
 - allentown_pa
 - allentown-pa

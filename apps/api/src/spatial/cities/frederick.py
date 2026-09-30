@@ -290,6 +290,7 @@ FREDERICK_FEED_SPECS: dict[str, dict[str, object]] = {
             "ingestion_mode": "snapshot",
             "expected_cadence_days": 30,
             "non_spatial": False,
+            "composite_id": True,
             "scope": (
                 "Frederick MD deeds from the SDAT real property assessments (Frederick "
                 "County view, gx8c-a963), FREDERICK postal city, newest sale first. "

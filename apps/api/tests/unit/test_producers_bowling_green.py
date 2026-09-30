@@ -288,7 +288,10 @@ class TestFeedRegistration:
         assert spec.producer_key == "permits"
         assert spec.needs_geocode is True
         assert spec.geocode_context == "Bowling Green, KY"
-        assert spec.order_by == "OBJECTID"
+        # Rows with no created_date never move the watermark: left out, and
+        # the newest read first.
+        assert spec.where == "created_date IS NOT NULL"
+        assert spec.order_by == "created_date DESC, OBJECTID DESC"
         assert spec.oid_field == "OBJECTID"
         assert spec.max_record_count == 2000
         assert spec.expected_cadence_days == 1

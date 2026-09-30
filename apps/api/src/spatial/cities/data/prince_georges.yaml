@@ -199,6 +199,7 @@ datasets:
     non_spatial: null
     zip_member: null
     batch_limit: 2000
+    composite_id: true
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis

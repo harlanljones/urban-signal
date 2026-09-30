@@ -303,7 +303,7 @@ datasets:
   sla:
     endpoint: ckan://data.boston.gov/04dc653b-1789-4374-9669-b07df7233344
     platform: ckan
-    watermark_col: expires
+    watermark_col: issued
     id_keys:
     - license_num
     - _id
@@ -311,14 +311,14 @@ datasets:
     interval_seconds: 600.0
     producer_key: sla
     endpoint_by_year: {}
-    watermark_type: null
-    watermark_format: null
+    watermark_type: text
+    watermark_format: '%Y-%m-%d'
     watermark_exclude: []
-    order_by: null
+    order_by: issued DESC
     id_col: null
     select: null
     fallback_endpoints: []
-    where: null
+    where: issued IS NOT NULL
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -489,6 +489,7 @@ datasets:
     alarm_exempt_reason: null
     annual_rotation: false
     companion_endpoints: {}
+    composite_id: true
     delimiter: null
     endpoint: ckan://data.boston.gov/4582bec6-2b4f-4f9e-bc55-cbaa73117f4c
     endpoint_by_year: {}
@@ -531,7 +532,7 @@ datasets:
     id_col: null
     id_keys:
     - licenseno
-    - _id
+    - resultdttm
     ingestion_mode: incremental
     interval_seconds: 600.0
     max_record_count: null

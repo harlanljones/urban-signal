@@ -694,9 +694,7 @@ datasets:
     watermark_col: SALE_DATE
     id_keys:
     - SSL
-    - ROW_NUMBER
-    - OBJECTID
-    - id
+    - SALE_DATE
     topic: raw.municipal.deeds
     interval_seconds: 600.0
     producer_key: deeds
@@ -704,7 +702,7 @@ datasets:
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: SALE_DATE DESC, OBJECTID DESC
     id_col: null
     select: null
     fallback_endpoints: []
@@ -744,6 +742,7 @@ datasets:
       geometry_source: centroid
     non_spatial: null
     zip_member: null
+    composite_id: true
   gbfs:
     endpoint: https://gbfs.capitalbikeshare.com/gbfs/gbfs.json
     platform: gbfs

@@ -122,17 +122,17 @@ def test_every_registered_filter_survives_into_the_backfill_query():
     assert checked > 54  # the SNAP slices alone are 54
 
 
-def test_build_query_shape_dc_arcgis_uses_date_literal_and_no_order_by():
+def test_build_query_shape_dc_arcgis_uses_an_ansi_literal_and_no_order_by():
     # US-109: the DC server (maps2.dcgis.dc.gov) rejects ISO-string date
     # comparisons and the where+orderByFields combination; the loader must
-    # emit an ANSI date literal and page by OID.
+    # emit an ANSI literal and page by OID.
     meta = _meta(
         watermark_col="ISSUE_DATE",
         platform="arcgis",
         endpoint="https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer/18",
     )
     where, kwargs = build_query_shape(meta, datetime(2026, 5, 26, tzinfo=UTC))
-    assert "ISSUE_DATE >= date '2026-05-26'" in where
+    assert "ISSUE_DATE >= timestamp '2026-05-26 00:00:00'" in where
     assert "2026-05-26T" not in where
     assert kwargs == {}
 

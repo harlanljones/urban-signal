@@ -33,6 +33,7 @@ FULL_READ_ROWS = {
     ("fort_collins", "permits"): 2_183,
     ("inland_empire", "sla"): 10_585,
     ("milwaukee", "deeds"): 5_685,
+    ("milwaukee", "sla"): 1_275,
     ("modesto", "sla"): 4_574,
     ("montgomery", "sla"): 1_084,
     ("nyc", "childcare"): 2_752,

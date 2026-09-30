@@ -303,6 +303,11 @@ class DatasetSpec:
     # whose source lands more than that at once (Columbus 311's daily extract
     # tops 1,000 rows on a third of weekdays) declares a higher cap.
     batch_limit: int | None = None
+    # A poll names each row by its first id key with a value; later keys are
+    # fallbacks. True joins every key instead, for rows unique only as a
+    # combination: a sale keyed by parcel and instrument, where the parcel
+    # repeats on every sale of that parcel.
+    composite_id: bool = False
 
 
 @dataclass

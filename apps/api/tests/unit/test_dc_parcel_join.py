@@ -5,8 +5,13 @@ from unittest.mock import MagicMock, patch
 from src.producers.arcgis_client import ArcGISClient
 
 
+def _text_key_metadata(url):
+    return {"date_fields": set(), "numeric_fields": set(), "oid_field": "OBJECTID", "max_record_count": 1000}
+
+
 def test_arcgis_client_builds_normalized_centroid_index_for_requested_keys():
     client = ArcGISClient()
+    client.get_layer_metadata = _text_key_metadata
     client._fetch_page = MagicMock(
         return_value=(
             [
@@ -31,6 +36,25 @@ def test_arcgis_client_builds_normalized_centroid_index_for_requested_keys():
     kwargs = client._fetch_page.call_args.kwargs
     assert kwargs["where_clause"] == "SSL IN ('6093 0808','NO-GEOMETRY')"
     assert kwargs["select"] == "SSL"
+
+
+def test_a_numeric_join_key_takes_bare_numbers():
+    """Roanoke's parcel layer answers ``lrsn IN ('1116')`` with "Invalid data
+    type for expression", and Lynchburg's Double LRSN reads back as 1116.0."""
+    client = ArcGISClient()
+    client.get_layer_metadata = lambda url: {**_text_key_metadata(url), "numeric_fields": {"lrsn"}}
+    client._fetch_page = MagicMock(
+        return_value=([{"lrsn": 1116.0, "latitude": 37.27, "longitude": -79.94}], False)
+    )
+
+    index = client.fetch_centroid_index(
+        "https://example.test/FeatureServer/0",
+        join_key="lrsn",
+        join_values=[1116, "1116", 2204.0, "not-a-number"],
+    )
+
+    assert index == {"1116": (37.27, -79.94)}
+    assert client._fetch_page.call_args.kwargs["where_clause"] == "lrsn IN (1116,2204)"
 
 
 def test_dc_deed_stream_enriches_cama_row_before_parsing():

@@ -32,7 +32,7 @@ CHATTANOOGA_DEEDS_FIELD_MAP = {
     "doc_id": ["PIN", "PARCELID", "OBJECTID"],
     "recorded_date": ["SALE1DATE"],
     "document_amount": ["SALE1CONSD"],
-    "bbl": ["PIN", "PARCELID"],
+    "bbl": ["TAX_MAP_NO", "GISLINK"],
     "party2_grantee": ["OWNERNAME1"],
     "doc_type": ["SALE1TYPE", "DEEDTYPE", "TYPE"],
     "borough": ["MUNICIPALITY", "CITY"],
@@ -77,7 +77,10 @@ def test_chattanooga_registers_permits_deeds_and_snap_sla():
     deeds = get_dataset(city, FeedType.DEEDS)
     assert deeds.platform == "arcgis"
     assert deeds.watermark_col == "SALE1DATE"
-    assert deeds.id_keys == ["PIN", "OBJECTID"]
+    # GISLINK is the parcel (PARCEL repeats across map groups); a parcel's
+    # next sale is a new row.
+    assert deeds.id_keys == ["GISLINK", "SALE1DATE"]
+    assert deeds.composite_id is True
     assert deeds.ingestion_mode == "snapshot"
     assert deeds.field_map == CHATTANOOGA_DEEDS_FIELD_MAP
 
@@ -99,12 +102,12 @@ PERMIT_ROW = {
 
 DEED_ROW = {
     "OBJECTID": 42,
-    "PIN": "123456789",
+    "GISLINK": "033999A A 00100",
+    "TAX_MAP_NO": "999A A 001.00",
     "SALE1DATE": "2026-08-10T00:00:00+00:00",
     "SALE1CONSD": 475000,
     "SALE1TYPE": "WD",
     "OWNERNAME1": "CHATTANOOGA HOLDINGS LLC",
-    "MUNICIPALITY": "CHATTANOOGA",
     "latitude": 35.0456,
     "longitude": -85.3097,
 }
@@ -147,7 +150,8 @@ def test_chattanooga_deed_polygon_row_parses(producers):
         event = deeds.parse_socrata_row(dict(DEED_ROW), city_id="chattanooga")
     assert event is not None
     assert event.city_id == "chattanooga"
-    assert event.doc_id == "123456789"
+    assert event.doc_id == "42"
+    assert event.bbl == "999A A 001.00"
     assert event.document_amount == 475000.0
     assert event.recorded_date == datetime.fromisoformat("2026-08-10T00:00:00+00:00")
     assert event.party2_grantee == "CHATTANOOGA HOLDINGS LLC"

@@ -241,7 +241,7 @@ datasets:
     watermark_col: last_transfer_date
     id_keys:
     - PARCEL_ID
-    - OBJECTID
+    - last_transfer_date
     topic: raw.municipal.deeds
     interval_seconds: 1800.0
     producer_key: deeds
@@ -300,6 +300,7 @@ datasets:
     non_spatial: null
     zip_member: null
     batch_limit: 6000
+    composite_id: true
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis

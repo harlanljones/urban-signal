@@ -28,8 +28,6 @@ DEEDS_FIELD_MAP = {
     "bbl": ["LRSN"],
     "document_amount": ["SaleAmount"],
     "recorded_date": ["SaleDate"],
-    "party1_grantor": ["Seller"],
-    "party2_grantee": ["Buyer"],
 }
 
 FIELD_MAP = {
@@ -66,8 +64,11 @@ data.cityoflynchburg.opendata.arcgis.com) — so the existing
 * DEEDS — ``/34`` Transfers - Tabular. Watermark ``SaleDate`` (date-typed,
   same-day live: newest row 2026-08-26, 7d=38). NO address column —
   coordinates come from the spec's ``parcel_join`` (``LRSN`` → the ``/41``
-  Parcel polygons, centroid source) applied by the deeds ``run_stream``
-  enrichment step (DC precedent); ADR 0004 is the lossless fallback.
+  Parcel polygons, centroid source), which each scheduled poll and the deeds
+  ``run_stream`` apply (DC precedent); ADR 0004 is the lossless fallback.
+  ``/41`` stores ``LRSN`` as a Double, so the join's ``IN`` is numeric. A
+  row is ``LRSN`` plus ``DocumentNo`` (``composite_id``), and ``select``
+  leaves the Seller and Buyer names on the server (2026-09-30).
 * COMPLAINTS_311 — absent. The 51-layer service has no citizen-request
   layer; TRAKiT Violation Cases is code enforcement (``ZON26-…``), a
   different family. Do not register.
@@ -385,12 +386,18 @@ LYNCHBURG_FEED_SPECS: Dict[str, Dict[str, object]] = {
             "needs_geocode": True,
             "geocode_context": LYNCHBURG_GEOCODE_CONTEXT,
             # Layer /34 publishes NO objectIdField — its OID column is
-            # ESRI_OID and orderByFields=OBJECTID returns error 400.
-            "order_by": "ESRI_OID",
+            # ESRI_OID and orderByFields=OBJECTID returns error 400. Newest
+            # first, so a first poll starts at today instead of 1990.
+            "order_by": "SaleDate DESC, ESRI_OID DESC",
+            # Seller and Buyer name people; they stay on the server.
+            "select": "ESRI_OID,LRSN,DocumentNo,SaleDate,SaleAmount",
             "oid_field": "ESRI_OID",
             "max_record_count": 50000,
             "expected_cadence_days": 1,
             "non_spatial": True,
+            # DocumentNo repeats across the parcels of one instrument and
+            # LRSN across a parcel's sales: a row is the pair.
+            "composite_id": True,
             "parcel_join": {
                 "parcel_layer": LYNCHBURG_PARCEL_LAYER_ENDPOINT,
                 "join_key": "LRSN",
@@ -403,10 +410,11 @@ LYNCHBURG_FEED_SPECS: Dict[str, Dict[str, object]] = {
                 "address column: coordinates arrive via the LRSN -> "
                 "/41 Parcel polygon centroid join (parcel_join, DC "
                 "precedent) with ADR-0004 as the lossless fallback. "
-                "Layer publishes no objectIdField — ESRI_OID ordering "
-                "is mandatory. SaleAmount 0 non-arms-length transfers "
-                "(wills, family conveyances) are kept; DocumentNo "
-                "repeats across LRSN splits of one instrument."
+                "Layer publishes no objectIdField — ESRI_OID is the "
+                "tiebreak after SaleDate. SaleAmount 0 non-arms-length "
+                "transfers (wills, family conveyances) are kept; "
+                "DocumentNo repeats across LRSN splits of one "
+                "instrument, so a row is named by both."
             ),
             "field_map": DEEDS_FIELD_MAP,
         },

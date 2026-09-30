@@ -672,7 +672,7 @@
         },
         {
           "platform": "ckan",
-          "watermark_col": "expires",
+          "watermark_col": "issued",
           "interval_seconds": 600.0,
           "topic": "raw.municipal.sla"
         },
@@ -2523,7 +2523,7 @@
         },
         {
           "platform": "arcgis",
-          "watermark_col": "SALEDATE",
+          "watermark_col": "DOCDATE",
           "interval_seconds": 600.0,
           "topic": "raw.municipal.deeds"
         }
@@ -3083,7 +3083,7 @@
         {
           "platform": "arcgis",
           "watermark_col": "GIS_DATETIME",
-          "interval_seconds": 600.0,
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
         {
@@ -4243,7 +4243,7 @@
         null,
         {
           "platform": "arcgis",
-          "watermark_col": "SALE_DATE",
+          "watermark_col": "pxfer_date",
           "interval_seconds": 600.0,
           "topic": "raw.municipal.deeds"
         }

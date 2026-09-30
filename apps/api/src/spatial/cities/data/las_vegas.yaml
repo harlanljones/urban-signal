@@ -423,19 +423,19 @@ datasets:
   deeds:
     endpoint: https://services1.arcgis.com/F1v0ufATbBQScMtY/ArcGIS/rest/services/parcels/FeatureServer/0
     platform: arcgis
-    watermark_col: SALEDATE
+    watermark_col: DOCDATE
     id_keys:
     - PARCEL
     - DOCNO
-    - ObjectId
     topic: raw.municipal.deeds
     interval_seconds: 600.0
     producer_key: deeds
     endpoint_by_year: {}
-    watermark_type: null
-    watermark_format: null
-    watermark_exclude: []
-    order_by: SALEDATE DESC
+    watermark_type: text
+    watermark_format: '%Y%m%d'
+    watermark_exclude:
+    - '99990909'
+    order_by: DOCDATE DESC, ObjectId DESC
     id_col: null
     select: null
     fallback_endpoints: []
@@ -452,8 +452,8 @@ datasets:
       document_amount:
       - SALEPRICE
       recorded_date:
-      - SALEDATE
       - DOCDATE
+      - SALEDATE
       borough:
       - COMNAME
       - WARD
@@ -482,6 +482,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    composite_id: true
   crime:
     endpoint: https://services.arcgis.com/jjSk6t82vIntwDbs/arcgis/rest/services/LVMPD_Calls_For_Service_30_Days/FeatureServer/0
     platform: arcgis

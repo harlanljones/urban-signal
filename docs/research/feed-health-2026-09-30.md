@@ -8,12 +8,14 @@ client fix can reach, retracts one feed that has no public source, moves two
 licence feeds whose source holds no rows for their city to the SNAP retailer
 fallback, and lists the rest with the reason. A second stacked change repairs
 five of the mid-Atlantic `deeds` feeds and retracts seven whose cities publish
-no sales (see "Mid-Atlantic deeds").
+no sales (see "Mid-Atlantic deeds"). A third fixes the filter an incremental
+poll sends, which a second poll of every affected feed showed was failing on
+32 feeds and reading the wrong rows on others (see "Incremental filters").
 
 | | Jobs | Repaired here | Left, with reason below |
 |---|---|---|---|
-| Failed outright | 36 | 19 (five of them mid-Atlantic `deeds`), and eight retracted: Madison `permits` and seven mid-Atlantic `deeds` | 9, two of them mid-Atlantic `deeds` |
-| Fetched rows, published none | 16 | 8, and Milwaukee `deeds` was fine on a full read | 7 |
+| Failed outright | 36 | 20 (six of them mid-Atlantic `deeds`, Roanoke's in the third change), and eight retracted: Madison `permits` and seven mid-Atlantic `deeds` | 8, one of them mid-Atlantic `deeds` |
+| Fetched rows, published none | 16 | 9 (Lynchburg `deeds` in the third change), and Milwaukee `deeds` was fine on a full read | 6 |
 | Fetched nothing | 8 | 5, and Lexington and Seattle `sla` moved to SNAP | 1, Tulsa `311` (an outage) |
 
 Three feeds that did publish were repaired too: New Haven and Bridgeport `sla`
@@ -128,7 +130,6 @@ do too.
 | Phoenix `deeds` (CSV) | the endpoint is a 61 MB zip of a 270 MB pipe-delimited file (903,301 affidavits); the spec names no zip member or delimiter | a streaming zip reader in the CSV client, which today holds the whole file and every kept row in memory |
 | Boston `deeds` | the id is the CKAN package; the FY2026 assessment resource (`ee73430d-...`, 184,552 rows) has none of the mapped column names and no coordinates, and a new resource appears every fiscal year | a field map on the uppercase columns, coordinates from a join to the SAM address points on `GIS_ID` (the CKAN client has no join) or geocoding, and `endpoint_by_year` |
 | Ocala `permits`, Orlando `permits` | the Florida statewide cadastral polygon layer now answers 499 Token Required; its centroid twin is anonymous. The specs' county codes select Jackson (42) and Levy (48) counties: FDOR numbers Marion 52 and Orange 58 | the centroid layer, corrected county codes (and the 01-67 county map behind them), and an object-id band in the filter, since un-banded Orange queries time out. Orlando also has a real permit feed, Socrata `ryhf-m453`, whose recent rows need geocoding |
-| Lynchburg `deeds` | the sales table has no coordinates and declares a `parcel_join`, but only the standalone producer applies it, not `poll_job`; its id is the parcel, so a parcel's earlier sales collapse (250 of 300 rows) | the parcel join in `poll_job`, and the document number as the id |
 | Bend `crime` | the layer now answers 499 Token Required; the public replacement lists each offense's exact address, where the old feed gave block ranges | a decision on publishing exact offense addresses; left failing |
 | Lincoln `permits`, Sioux Falls `permits` | each city's permit service fails every query, even a bare count: Lincoln with 400 "Unable to complete operation", Sioux Falls with 500 and a stopped Java web application behind the service | a restart on the city's side; no other public permit source was found for either |
 | El Paso `311` | Cloudflare answers 403 to this network | a check from the production network |
@@ -193,11 +194,12 @@ inside the metro box, polled live on 2026-09-30):
 | Portland ME | the parcel layers have no sale fields; the one deed-dated layer has seven dated rows, the newest from 2005 | 92 |
 | Wilmington DE | New Castle County's `PropertySales` MapServer could not be checked (its host answers HTTP 472 to this network), and its ArcGIS Online records describe yearly layers for 2013 to 2019 only | 144 |
 
-Two stay failing:
+Richmond stays failing. Roanoke's replacement needed the parcel join in
+`poll_job`, which the third change adds (see "Incremental filters"):
 
 | City | Replacement found | Rows | Newest sale | What it needs |
 |---|---|---|---|---|
-| Roanoke | the city's transfer-history table, no geometry | 214,121 dated | 2026-09-28 | the parcel join in `poll_job`, as Lynchburg |
+| Roanoke | the city's transfer-history table, no geometry | 214,121 dated | 2026-09-28 | done in the third change: each sale sits at its parcel's centroid |
 | Richmond | the assessor's monthly transfers workbook (.xlsx, 72 MB) | 439,398 | 2026-09-22 | a reader for `.xlsx` files and their monthly changing URL |
 
 
@@ -256,8 +258,9 @@ Henderson, Norfolk and San Diego `permits`) were not re-checked one by one.
 
 ## Found along the way
 
-These cut across many feeds and need scheduler changes, so they are the next
-change rather than part of this one.
+These cut across many feeds and need scheduler changes, so they were left to
+the next change. The third change fixes the first, second and fourth (see
+"Incremental filters"); the rest stand.
 
 - **The watermark advances from the event's date, not the filter's column.**
   `poll_job` stores the newest `issuance_date`, `created_date`,
@@ -266,27 +269,111 @@ change rather than part of this one.
   next filter compares the column against the wrong date. The Connecticut
   `sla` feeds filter on the refresh date but store the permit's effective date,
   which runs into the future: a live poll logged `ignoring future watermark
-  2026-11-06`.
+  2026-11-06`. Fixed in the third change.
 - **Record ids take the first id key that has a value, not all of them.**
   Boston inspections list `licenseno` then `_id`; a licence number repeats on
   every row of an inspection and on every later inspection, so a first poll of
   1,000 rows published 17. Lynchburg deeds, the parcel-keyed deeds in the
   snapshot-reach note, and St. Louis permits (special-cased in the scheduler)
-  have the same shape.
+  have the same shape. Fixed in the third change by a `composite_id` flag;
+  St. Louis keeps its special case.
 - **170 of 274 incremental feeds are not ordered by their watermark column.**
   A capped poll then reads the first rows by object id newer than the
   watermark, and the watermark jumps to the newest date among them, so rows
   dated in between that sit past the cap are never read. It bites on a cold
-  start or after an outage longer than one cap's worth of rows.
+  start or after an outage longer than one cap's worth of rows. The third
+  change reorders Canton `deeds`, whose second poll showed the jump; the rest
+  stand.
 - **Date-only watermarks lose the boundary day.** A feed whose dates carry no
   time stores `2026-09-28T00:00:00`, and `>` then skips rows published later
   with that same date. From `2026-09-01T00:00:00`, Baton Rouge fetched 632 of
-  the 671 permits issued since 1 September.
+  the 671 permits issued since 1 September. Fixed in the third change.
 - **ArcGIS polls read every column a spec does not name.** The ArcGIS client
   ignored `select` until the mid-Atlantic deeds change, which sends it as
   `outFields`. Only those four feeds declare one so far, so owner, applicant
   and contractor names still ride along with other feeds' rows and are kept in
   the DLQ payload of any row that fails to parse.
-- **`maps.cityofmadison.com` refuses ISO date strings** like the three hosts
-  above. No feed polls it today; a future Madison spec should add the host to
+- **`maps.cityofmadison.com` refuses ISO date strings** too. No feed polls it
+  today; a future Madison spec should add the host to
   `ANSI_DATE_LITERAL_HOSTS`.
+
+## Incremental filters
+
+The census polled each job once, from no watermark, so it never sent an
+incremental filter. The third stacked change polled every incremental ArcGIS
+feed a second time, from the watermark its first poll stored, and fixed what
+that showed.
+
+- **32 feeds failed every poll after their first.** Their hosts answer an ISO
+  date string with a 400 ("Unable to complete operation"), and 28 of the hosts
+  were not in `ANSI_DATE_LITERAL_HOSTS`: Aurora, Billings, Boulder, Bozeman,
+  Canton, Cape Coral, Columbus GA, Durham, Evansville, Fort Worth, Glendale AZ,
+  Hartford (permits), Houston, Huntsville, Indianapolis, Las Cruces, Melbourne,
+  Memphis, Montgomery AL, Nampa, Omaha, Phoenix (two hosts), Portland, Tampa,
+  Toledo, Wichita and Wilmington NC. They join the list.
+- **ANSI literals compared whole days.** The literal was `date 'YYYY-MM-DD'`,
+  which re-read the watermark's day on every poll and never let a day with
+  more rows than the cap go. It is now `timestamp 'YYYY-MM-DD HH:MM:SS'`,
+  exact to the second; every incremental ANSI host answered it on 2026-09-30.
+- **Layers read literals in their own time zone.** A layer whose
+  `dateFieldsTimeReference` names a zone reads every literal, ISO or ANSI, as
+  local time there, while the scheduler stores UTC. 25 incremental feeds
+  declare one, DC's four among them. Under the date
+  literal, a DC watermark between 8 PM and midnight Eastern, whose UTC date is
+  already the next day, sent that next day, and the requests filed before
+  midnight were skipped; an exact literal without the zone would start four
+  hours late. The client now reads the zone from the layer's metadata, which it
+  already fetched for paging, and the literal is written in local time.
+  Greenville and Baltimore `sla` take ISO strings but read them as local, so
+  they get local ISO strings.
+- **Date-only watermarks keep their day.** A watermark on a whole hour is taken
+  as a date: the filter keeps the boundary with `>=`, and the dedup drops the
+  rows already seen. From `2026-08-18T00:00:00`, Tallahassee `permits` found a
+  permit applied for that same day that its first poll had not seen. A
+  timestamp keeps a strict `>`.
+- **A boundary that fills the cap is stepped past.** When a poll fills its cap
+  without moving the watermark, the next poll steps past the boundary (`>` on a
+  date, `>=` the next second on a timestamp) until the watermark moves, and
+  logs it. A newest-first read never steps past, since a newer row would have
+  come first.
+- **The watermark follows the filter column.** It is the newest value of the
+  column the filter compares; the event's own date stands in only when that
+  column is empty.
+- **Sales keep one id each.** A `composite_id` flag joins every id key into the
+  record id, where the first key with a value used to win. 18 `deeds` feeds
+  key a sale by parcel and date, document, or book and page, and Boston
+  `inspections` by licence and result time.
+- **Parcel joins run in `poll_job`.** Lynchburg's and Roanoke's sales tables
+  have no geometry and declare a `parcel_join`, which only the standalone
+  producer applied. `poll_job` now looks up each batch's parcel centroids, with
+  numeric keys sent as numbers. Roanoke moves to the city's transfer-history
+  table; Lynchburg's feed reads newest first and names only the columns it
+  maps, so buyer and seller names stay on the server.
+
+### Checked live
+
+On 2026-09-30, 78 feeds were polled twice through `poll_job` at 200 rows,
+Kafka mocked: every incremental ArcGIS feed on an ANSI host or with a declared
+zone, Baltimore `sla`, Greenville `permits`, Boston `sla` and `inspections`,
+and every `deeds` feed whose id changed. 77 succeeded on both polls
+(Tallahassee `permits` on a second try, after one query came back without
+features); Sioux Falls `permits` fails every query (above). Lynchburg and Roanoke published 199
+and 200 of their newest 200 sales. The second polls' duplicates had three
+sources: the boundary day re-read under `>=`; source rows that repeat an id
+within one poll (one Medford permit spans 174 taxlot rows); and a timestamp's
+fraction of a second, which the JSON drops, so the watermark row came back
+once more.
+
+The survey also caught four feeds this change repairs:
+
+| Feed | What the second poll showed | Fix | After |
+|---|---|---|---|
+| Chattanooga `deeds` | the new composite key named a `PIN` column the layer does not have, so every sale on a date shared one id: 16 of 200 published | key on `GISLINK` and the sale date; `bbl`, which named the same missing column, reads `TAX_MAP_NO` | 191 of 200 (9 rows repeat a parcel's sale) |
+| Raleigh `deeds` | the same, with Wake County's `PIN_NUM`: 9 of 200 | key and `bbl` on `PIN_NUM` | 200 of 200 |
+| Canton `deeds` | keyed by parcel alone, so a parcel's next sale was a duplicate, and read in object-id order, which does not follow the transfer date: the second poll jumped from 2026-07-31 to 2026-09-29 | key by parcel and instrument number, read newest first | the newest 200 rows hold 114 sales; a sale's row can repeat up to six times |
+| Milwaukee `sla` | each refresh stamps one `GIS_DATETIME` on all 1,275 rows, and the server holds it finer than the JSON returns (`> 01:23:59` matches every row, `>= 01:24:00` none), so every poll re-read the same first 1,000 rows | read the whole layer as a snapshot every 30 minutes, cap 2,000 | 1,274 of 1,275 (one row has no coordinates) |
+
+Left as is: a row the dedup skips does not move the watermark, so a layer that
+restamps every row at each refresh keeps re-reading one refresh. Milwaukee
+`sla` was the only such layer in the survey. The Socrata feeds that filter on
+a refresh date (the Connecticut and Texas `sla` feeds) were not part of it.

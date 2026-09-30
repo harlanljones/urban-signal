@@ -422,7 +422,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: null
+    where: PER_ISSUE_DATE IS NOT NULL
     needs_geocode: false
     geocode_context: null
     field_map:

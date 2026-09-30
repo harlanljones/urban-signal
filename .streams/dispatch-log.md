@@ -1259,3 +1259,28 @@ Worth keeping:
   seller and buyer names next to the sale. ArcGIS specs now name their columns in
   `select`, which the client sends as `outFields`, so those names never reach a
   row, an event or the DLQ.
+
+### 2026-09-30 — Incremental filters repaired (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| scheduler-semantics | `.streams/scheduler-semantics.md` | `scheduler.py`, `city_registry.py`, `config.py` | 2026-09-30 | done (32 feeds whose later polls failed now poll; zone-aware exact literals; date boundaries kept; composite sale ids; Lynchburg and Roanoke deeds publish through the parcel join) | `test_scheduler_boundaries.py`, `layer_time_zone`, `DatasetSpec.composite_id` |
+
+Every incremental ArcGIS feed was polled twice through `poll_job` on
+2026-09-30. On 32 feeds the second poll failed, because their hosts reject ISO
+date strings; 25 feeds declare a local zone that the stored UTC watermark was
+read in; date-only watermarks skipped the rest of their day; and sale feeds
+keyed by parcel alone dropped a parcel's next sale. 77 of the 78 feeds polled
+now succeed on both polls; Sioux Falls `permits` fails every query at the
+source.
+
+Worth keeping:
+
+- **Poll twice.** A single poll from no watermark never sends the incremental
+  filter, so a census of first polls cannot see the failures that start on the
+  second.
+- **Check a new id key against the layer's field list.** Chattanooga's and
+  Raleigh's composite keys first named a `PIN` column neither layer has, which
+  collapsed every sale on a date into one id; the second poll caught it.
+- **Read the layer's `dateFieldsTimeReference`.** A declared zone applies to
+  every literal, ISO or ANSI, not only to the dates the layer returns.

@@ -143,6 +143,8 @@ def test_same_year_poll_keeps_watermark_baseline(scheduler):
     scheduler._today_provider = lambda: date(2026, 6, 1)
     producer = scheduler.producers[meta["producer_key"]]
     producer.arcgis.paginate = MagicMock(return_value=iter([]))
+    # The watermark filter reads the layer's zone from its metadata.
+    producer.arcgis.get_layer_metadata = MagicMock(return_value={})
 
     scheduler.poll_job("311_dc", limit=10)
 

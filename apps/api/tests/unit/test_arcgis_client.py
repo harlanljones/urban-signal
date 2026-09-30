@@ -10,7 +10,7 @@ import re
 
 import pytest
 
-from src.producers.arcgis_client import ArcGISClient
+from src.producers.arcgis_client import ArcGISClient, layer_time_zone
 from src.spatial.city_registry import REGISTRY
 
 _LAYER = "https://example.test/arcgis/rest/services/Crimes/FeatureServer/0"
@@ -99,3 +99,41 @@ def test_every_arcgis_select_names_the_columns_a_poll_reads():
             if needed - selected - {""}:
                 gaps.append((city_id.value, feed.value, sorted(needed - selected - {""})))
     assert not gaps, gaps
+
+
+def test_layer_time_zone_reads_the_date_fields_reference():
+    """A layer reads ``where`` literals in the zone its reference names."""
+    assert layer_time_zone(
+        {"timeZone": "Eastern Standard Time", "timeZoneIANA": "America/New_York", "respectsDaylightSaving": True}
+    ) == "America/New_York"
+    # Servers before 11.x give only a Windows name (Des Moines, Durham).
+    assert layer_time_zone({"timeZone": "Central Standard Time", "respectsDaylightSaving": True}) == "America/Chicago"
+    assert layer_time_zone({"timeZone": "Central Standard Time", "respectsDaylightSaving": False}) == "Etc/GMT+6"
+    assert layer_time_zone({"timeZone": "US Mountain Standard Time"}) == "America/Phoenix"
+    assert layer_time_zone({"timeZoneIANA": "Etc/GMT+7"}) == "Etc/GMT+7"
+    for utc in (None, {}, {"timeZone": "UTC"}, {"timeZoneIANA": "Etc/UTC"}):
+        assert layer_time_zone(utc) is None
+
+
+def test_layer_metadata_carries_the_time_zone_and_numeric_fields(monkeypatch):
+    client = ArcGISClient()
+    monkeypatch.setattr(
+        client,
+        "_request_json",
+        lambda url, params: {
+            "fields": [
+                {"name": "ADDDATE", "type": "esriFieldTypeDate"},
+                {"name": "LRSN", "type": "esriFieldTypeDouble"},
+                {"name": "SSL", "type": "esriFieldTypeString"},
+            ],
+            "objectIdField": "OBJECTID",
+            "maxRecordCount": 1000,
+            "dateFieldsTimeReference": {"timeZone": "Eastern Standard Time", "timeZoneIANA": "America/New_York"},
+        },
+    )
+
+    meta = client.get_layer_metadata(_LAYER)
+
+    assert meta["time_zone"] == "America/New_York"
+    assert meta["date_fields"] == {"ADDDATE"}
+    assert meta["numeric_fields"] == {"LRSN"}

@@ -306,11 +306,11 @@ datasets:
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: OBJECTID
+    order_by: created_date DESC, OBJECTID DESC
     id_col: null
     select: null
     fallback_endpoints: []
-    where: null
+    where: created_date IS NOT NULL
     needs_geocode: true
     geocode_context: Bowling Green, KY
     field_map:

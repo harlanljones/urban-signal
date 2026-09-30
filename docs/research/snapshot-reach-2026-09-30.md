@@ -66,6 +66,11 @@ whole instead. Milwaukee's source is the city's 2025 arm's-length sales file
 (`expected_cadence_days: 365`); reading it whole publishes all of 2025, and a
 2026 file needs a new endpoint.
 
+Milwaukee `sla` (1,275 rows, cap 2,000) joined the full reads later the same
+day. It was incremental on `GIS_DATETIME`, which each refresh stamps on every
+row at once, so every poll re-read the same first 1,000 rows
+(`feed-health-2026-09-30.md`).
+
 ## Newest-first windows
 
 | Feed | Order | Rows dated in last 30 / 90 days | Window after |

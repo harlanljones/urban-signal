@@ -2,10 +2,14 @@
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Iterable
 from datetime import UTC, date, datetime
 from functools import cmp_to_key
 from typing import Any
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
+logger = logging.getLogger(__name__)
 
 _TEXT_FORMATS = (
     "%m/%d/%Y",
@@ -141,10 +145,11 @@ def watermark_exclude_clause(column: str, exclude: Iterable[str]) -> str | None:
 
 
 # ArcGIS servers that reject ISO-string date comparisons in ``where`` and only
-# accept ANSI ``date 'YYYY-MM-DD'`` literals for date columns. US-109 (DC) /
+# accept ANSI ``date``/``timestamp`` literals for date columns. US-109 (DC) /
 # US-87 (Milwaukee) / US-88 (Charlotte): verified live — ``col >= '2026-08-
 # 01T00:00:00'`` returns 400 "Unable to complete operation" while
-# ``col >= date '2026-08-01'`` works.
+# ``col >= date '2026-08-01'`` works. Every incremental feed on these hosts
+# also answers ``col > timestamp '2026-09-24 12:00:00'`` (verified 2026-09-30).
 ANSI_DATE_LITERAL_HOSTS = (
     "maps2.dcgis.dc.gov",
     "milwaukeemaps.milwaukee.gov",
@@ -164,10 +169,8 @@ ANSI_DATE_LITERAL_HOSTS = (
     "maps.dsm.city",
     # Columbus, OH (ArcGIS Server 11.5): verified live 2026-09-30 —
     # ``REPORTED_DATE > '2026-09-22T00:00:00'`` returns 400 "Unable to complete
-    # operation" while ``REPORTED_DATE > date '2026-09-22'`` works. The server
-    # reads the literal as Eastern midnight. Truncating the watermark to a date
-    # re-reads part of a day (the cross-run dedup drops the repeats) but cannot
-    # skip rows, because the layer is loaded by one daily extract (~05:00 ET).
+    # operation" while ``REPORTED_DATE > date '2026-09-22'`` works. The layer
+    # declares Eastern time and reads literals in it.
     "maps2.columbus.gov",
     # Augusta, GA (10.91), Dayton, OH (11.4) and Peoria County, IL (11.4):
     # verified live 2026-09-30 with count queries — ``> '2026-09-22T05:31:07'``
@@ -186,6 +189,44 @@ ANSI_DATE_LITERAL_HOSTS = (
     # operation" while ``Last_Sales_Date >= date '2026-09-01'`` works. Charleston
     # WV deeds poll as a snapshot today, so this only matters if they go incremental.
     "kanawhacountyassessorgis.com",
+    # Roanoke, VA (ArcGIS Server): verified live 2026-09-30 —
+    # ``pxfer_date > '2026-09-01T00:00:00'`` and ``pxfer_date >= '2026-09-01'``
+    # return 400 "Unable to complete operation" while ``pxfer_date >= date
+    # '2026-09-01'`` works.
+    "maps.roanokeva.gov",
+    # Verified live 2026-09-30 with a count query on every incremental ArcGIS
+    # feed: ``col > '2026-09-24T12:00:00'`` returns 400 on each of these while
+    # ``col > timestamp '2026-09-24 12:00:00'`` answers. Each feed's first poll
+    # passed (no watermark yet) and every later poll failed. A shared ArcGIS
+    # proxy is matched by its server id, since its other servers take ISO.
+    "ags.auroragov.org",
+    "billingsgis.com",
+    "gis.bouldercolorado.gov",
+    "gisweb.bozeman.net",
+    "scgisa.starkcountyohio.gov",
+    "capeims.capecoral.gov",
+    "ccggisprod.columbusga.org",
+    "webgis2.durhamnc.gov",
+    "maps.evansvillegis.com",
+    "mapit.fortworthtexas.gov",
+    "gismaps.glendaleaz.com",
+    "utility.arcgis.com/usrsvcs/servers/d595ae995fb049d3ac54919ebf24b1ac",
+    "mycity2.houstontx.gov",
+    "maps.huntsvilleal.gov",
+    "gis.indy.gov",
+    "maps.las-cruces.org",
+    "gis.palmbayflorida.org",
+    "311.memphistn.gov",
+    "gis.montgomeryal.gov",
+    "utility.arcgis.com/usrsvcs/servers/7751a4c516434f1d947c67cd78a4d968",
+    "dcgis.org/server",
+    "maps.phoenix.gov",
+    "mapportal.phoenix.gov",
+    "www.portlandmaps.com",
+    "arcgis.tampagov.net",
+    "gis.toledo.oh.gov",
+    "gismaps.wichita.gov",
+    "gis.nhcgov.com",
 )
 
 
@@ -197,14 +238,23 @@ def watermark_comparison(
     *,
     watermark_type: str | None = None,
     watermark_format: str | None = None,
+    time_zone: str | None = None,
 ) -> str:
     """Render a ``col OP <value>`` predicate with a server-appropriate literal.
 
     Most registered servers accept the ISO 8601 string the scheduler stores;
-    the ANSI-literal hosts above reject it, so for those the value is
-    truncated to its date component and wrapped in an ANSI ``date '...'``
-    literal. Shared by the scheduler's incremental filter and the backfill
-    loader's windowed filter so both stay query-shape compatible.
+    the ANSI-literal hosts above reject it, so for those the value becomes an
+    ANSI ``timestamp '...'`` literal, exact to the second. (A ``date``
+    literal compared whole days: it re-read the watermark's day on every
+    poll, and a day holding more rows than the batch cap never let the
+    watermark leave it.) Shared by the scheduler's incremental filter and the
+    backfill loader's windowed filter so both stay query-shape compatible.
+
+    The stored value is UTC, but an ArcGIS layer whose
+    ``dateFieldsTimeReference`` names a zone reads every literal, ISO or
+    ANSI, as local time there. ``time_zone`` renders the value in that zone;
+    without it DC's 311 filter started four hours late (Eastern) and skipped
+    the requests filed in between.
     """
     # San Jose's CKAN permits/311 exports store dates as M/D/YYYY text. A raw
     # string comparison would make `8/9` sort after `8/22`; cast both sides in
@@ -220,6 +270,16 @@ def watermark_comparison(
             f'to_timestamp("{watermark_col}", \'{pg_format}\') {op} '
             f"to_timestamp('{escaped}', '{pg_format}')"
         )
+    parsed = parse_watermark(value) if watermark_type != "text" else None
+    if parsed is not None and time_zone:
+        try:
+            parsed = parsed.astimezone(ZoneInfo(time_zone))
+        except (ZoneInfoNotFoundError, ValueError):
+            logger.warning("Unknown time zone %r; comparing %s in UTC", time_zone, watermark_col)
     if any(host in endpoint for host in ANSI_DATE_LITERAL_HOSTS):
-        return f"{watermark_col} {op} date '{value[:10]}'"
+        if parsed is None:
+            return f"{watermark_col} {op} date '{value[:10]}'"
+        return f"{watermark_col} {op} timestamp '{parsed:%Y-%m-%d %H:%M:%S}'"
+    if parsed is not None and time_zone:
+        return f"{watermark_col} {op} '{parsed:%Y-%m-%dT%H:%M:%S}'"
     return f"{watermark_col} {op} '{value}'"
