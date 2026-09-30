@@ -31,6 +31,10 @@ Feeds (probed 2026-09-30):
   does not exist. Lehigh County's ``ATestParcel`` layer carries the same
   fields county-wide, about a month staler, if the city layer disappears.
 * PERMITS / SLA / 311 — not registered.
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
 """
 
 
@@ -338,8 +342,9 @@ def get_allentown_dataset(feed: object) -> object:
     """Leaf-local mirror of ``city_registry.get_dataset``.
 
     Returns the spec for a registered Allentown feed, or raises ``KeyError``
-    naming the city and available feeds when the feed is absent (permits/SLA/
-    311 are not registered for Allentown).
+    naming the city and available feeds when the feed is absent (permits and
+    311 are not registered for Allentown). SLA is the corpus's shared SNAP
+    slice, which this mirror does not carry.
     """
     from src.config import settings
     from src.spatial.city_registry import DatasetSpec

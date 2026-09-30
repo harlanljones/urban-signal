@@ -32,6 +32,10 @@ Feeds (probed 2026-09-30):
   ``Charleston_Parcels`` layer registered until 2026-09-30 is Charleston,
   South Carolina.
 * PERMITS / SLA / 311 — none published. Tier 3.
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
 """
 
 
@@ -311,8 +315,9 @@ def get_charleston_wv_dataset(feed: object) -> object:
     """Leaf-local mirror of ``city_registry.get_dataset``.
 
     Returns the spec for a registered Charleston WV feed, or raises ``KeyError``
-    naming the city and available feeds when the feed is absent (permits/SLA/
-    311 are not yet registered for Charleston WV).
+    naming the city and available feeds when the feed is absent (permits and
+    311 are not yet registered for Charleston WV). SLA is the corpus's
+    shared SNAP slice, which this mirror does not carry.
     """
     from src.config import settings
     from src.spatial.city_registry import DatasetSpec

@@ -34,6 +34,10 @@ Feeds (probed 2026-09-30):
   ``data.burlingtonvt.gov`` URL registered until 2026-09-30 is the city's
   ArcGIS Hub domain, which serves no REST services (HTTP 404).
 * PERMITS / SLA / COMPLAINTS_311 — absent. Tier 3.
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
 """
 
 
@@ -335,8 +339,9 @@ def get_burlington_dataset(feed: object) -> object:
     """Leaf-local mirror of ``city_registry.get_dataset``.
 
     Returns the spec for a registered Burlington feed, or raises ``KeyError``
-    naming the city and available feeds when the feed is absent (permits/SLA/311
-    are absent from the open-data portal at definition time).
+    naming the city and available feeds when the feed is absent (permits and 311
+    are absent from the open-data portal at definition time). SLA is the
+    corpus's shared SNAP slice, which this mirror does not carry.
     """
     from src.config import settings
     from src.spatial.city_registry import DatasetSpec

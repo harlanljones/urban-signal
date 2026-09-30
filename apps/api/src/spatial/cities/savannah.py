@@ -69,6 +69,10 @@ IssuedDate_DATE 2026-08-20 (26-07908-BR / 26-06373-BR / 26-08047-BR), total 1933
 7d 0, 60d 294. COM newest IssuedDate_DATE 2026-08-21 (26-00953-BC), total 666,
 7d 1, 60d 61. Native point coordinates observed on every sampled row, including
 null-issued In Review rows.
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
 """
 
 from typing import Dict
@@ -403,9 +407,10 @@ def get_savannah_dataset(feed: object) -> object:
     """Leaf-local mirror of ``city_registry.get_dataset``.
 
     Returns the spec for a registered Savannah feed, or raises ``KeyError``
-    naming the city and available feeds when the feed is absent (311 / SLA /
-    deeds are all NOT-viable for Savannah — no municipal CRM extract, no
-    license register, no grantor-bearing assessor sales source).
+    naming the city and available feeds when the feed is absent (311 and
+    deeds are NOT-viable for Savannah — no municipal CRM extract, no
+    grantor-bearing assessor sales source). SLA is the corpus's shared SNAP
+    slice (there is no licence register), which this mirror does not carry.
     """
     from src.config import settings
     from src.spatial.city_registry import DatasetSpec

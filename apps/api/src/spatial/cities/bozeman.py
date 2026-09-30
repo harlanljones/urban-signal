@@ -69,6 +69,10 @@ Live-probe caveats that define this leaf (probed 2026-08-28, US-236):
 * 7 divisions based on the city's 5 official Tax Increment District / Urban
   Renewal Districts (TIF/URD) plus the Valley West and Bridger/College
   corridors (real neighborhoods named in city planning documents).
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
 """
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta

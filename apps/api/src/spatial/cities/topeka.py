@@ -46,6 +46,10 @@ Live-probe caveats that define this leaf (2026-08-30, US-426):
 * No neighborhood/district column exists on the layer, so no ``borough``
   field-map candidate is declared: division resolution comes from coordinates
   at ingest.
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
 """
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta

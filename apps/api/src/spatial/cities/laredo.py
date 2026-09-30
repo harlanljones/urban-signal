@@ -9,6 +9,10 @@ Center: Santa Maria & Matamoros vicinity (27.5306, -99.4803). Bboxes are
 hand-authored to tightly contain the urbanized Webb County core while keeping
 divisions as strict subsets of the metro envelope, consistent with the
 south-central wave-4 leaf pattern (Beaumont / Waco / Amarillo).
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``.
 """
 
 

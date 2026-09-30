@@ -84,13 +84,20 @@ SNAP_METRO_RETAILERS = {
     "albany": ("NY", 133),
     "albuquerque": ("NM", 412),
     "alexandria": ("LA", 85),
+    "allentown": ("PA", 449),
     "anchorage": ("AK", 111),
     "asheville": ("NC", 175),
     "augusta": ("GA", 305),
+    "billings": ("MT", 85),
     "boise": ("ID", 231),
+    "bowling_green": ("KY", 135),
+    "bozeman": ("MT", 28),
+    "burlington": ("VT", 84),
     "canton": ("OH", 248),
     "cape_coral": ("FL", 429),
+    "chandler": ("AZ", 277),
     "charleston_sc": ("SC", 433),
+    "charleston_wv": ("WV", 42),
     "charlotte": ("NC", 1036),
     "chattanooga": ("TN", 386),
     "cleveland": ("OH", 948),
@@ -103,9 +110,12 @@ SNAP_METRO_RETAILERS = {
     "durham": ("NC", 208),
     "el_paso": ("TX", 600),
     "evansville": ("IN", 188),
+    "fort_collins": ("CO", 102),
     "fort_smith": ("AR", 114),
     "fort_worth": ("TX", 1806),
+    "frederick": ("MD", 84),
     "gainesville": ("FL", 149),
+    "grand_rapids": ("MI", 664),
     "greenville": ("SC", 219),
     "harrisburg": ("PA", 144),
     "honolulu": ("HI", 505),
@@ -117,34 +127,49 @@ SNAP_METRO_RETAILERS = {
     "jonesboro": ("AR", 88),
     "lake_charles": ("LA", 148),
     "lakeland": ("FL", 210),
+    "laredo": ("TX", 199),
     "las_vegas": ("NV", 1317),
     "lexington": ("KY", 254),
+    "lincoln": ("NE", 173),
     "macon_bibb": ("GA", 209),
     "madison": ("WI", 303),
     "manchester": ("NH", 124),
     "melbourne": ("FL", 422),
     "memphis": ("TN", 825),
+    "missoula": ("MT", 57),
     "monroe": ("LA", 129),
+    "montgomery_al": ("AL", 303),
+    "nampa": ("ID", 73),
     "ocala": ("FL", 310),
     "omaha": ("NE", 387),
+    "peoria": ("IL", 297),
     "pierce": ("WA", 896),
     "pittsburgh": ("PA", 526),
     "port_st_lucie": ("FL", 177),
     "portland_maine": ("ME", 92),
     "prince_georges": ("MD", 1078),
+    "providence": ("RI", 172),
     "raleigh": ("NC", 1466),
     "reno": ("NV", 316),
+    "richmond": ("VA", 566),
+    "roanoke": ("VA", 163),
     "rochester": ("NY", 400),
     "sacramento": ("CA", 1965),
     "san_antonio": ("TX", 1536),
     "san_jose": ("CA", 755),
+    "santa_fe": ("NM", 64),
+    "savannah": ("GA", 277),
     "seattle": ("WA", 1103),
+    "sioux_falls": ("SD", 162),
     "tallahassee": ("FL", 242),
+    "tempe": ("AZ", 361),
     "toledo": ("OH", 439),
+    "topeka": ("KS", 111),
     "tulsa": ("OK", 670),
     "wichita": ("KS", 378),
     "wilmington_de": ("DE", 144),
     "wilmington_nc": ("NC", 262),
+    "yakima": ("WA", 118),
 }
 
 
@@ -351,47 +376,15 @@ class TestSnapRegistrationShape:
             assert spec.needs_geocode is False
 
     def test_every_registered_metro_has_sla(self):
-        """The extension closed the set; later waves registered metros whose
-        probes found no SLA-grade feed (the 2026-09-06 mid-Atlantic wave
-        registered deeds-only; seven of those moved to SNAP on 2026-09-30 when
-        their deeds were retracted), and grand_rapids is geometry-only.
-        Every other registered metro carries an SLA spec."""
+        """The extension closed the set, and later waves registered metros whose
+        probes found no SLA-grade feed. On 2026-09-30 the 25 left without one
+        (the mid-Atlantic wave's deeds-only cities among them, and Grand
+        Rapids, until then geometry-only) took their SNAP slice too, so every
+        registered metro now carries an SLA spec."""
         from src.spatial.city_registry import REGISTRY, FeedType, get_dataset
 
-        sla_less = {
-            "allentown",
-            "billings",
-            "bowling_green",
-            "bozeman",
-            "burlington",
-            "chandler",
-            "charleston_wv",
-            "fort_collins",
-            "frederick",
-            "grand_rapids",
-            "laredo",
-            "lincoln",
-            "missoula",
-            "montgomery_al",
-            "nampa",
-            "peoria",
-            "providence",
-            "richmond",
-            "roanoke",
-            "santa_fe",
-            "savannah",
-            "sioux_falls",
-            "tempe",
-            "topeka",
-            "yakima",
-        }
         for city_id in REGISTRY:
-            if city_id.value in sla_less:
-                with pytest.raises(KeyError):
-                    get_dataset(city_id, FeedType.SLA)
-                continue
-            spec = get_dataset(city_id, FeedType.SLA)
-            assert spec is not None, city_id
+            assert get_dataset(city_id, FeedType.SLA) is not None, city_id
 
 
 def _snap_specs():

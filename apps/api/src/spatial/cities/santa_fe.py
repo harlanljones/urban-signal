@@ -44,6 +44,10 @@ Live-probe 2026-08-28 (``.streams/west-santa_fe.md``):
   (Greenville BusinessLicenses precedent); no building-permit or SLA feature
   layer exists in the org; Santa Fe County org (``OrtlXpzQGtgBGqsz``, 88 items)
   has no deeds/sales/assessor feeds.
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
 """
 
 

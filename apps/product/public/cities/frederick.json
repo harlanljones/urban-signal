@@ -165,7 +165,12 @@
   "feeds": {
     "permits": null,
     "311": null,
-    "sla": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
     "deeds": {
       "platform": "socrata",
       "watermark_col": "sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89",

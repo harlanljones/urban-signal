@@ -12,6 +12,10 @@ Cache la Poudre River, home to Colorado State University. Downtown/Old Town
 is at roughly (40.585, -105.077). The metro bbox mirrors the live AGOL
 FeatureServer item extent ([-105.145, 40.481] to [-104.990, 40.638]) plus a
 small buffer.
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``.
 """
 
 from src.spatial.registration import SpatialRegistration

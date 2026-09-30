@@ -38,6 +38,10 @@ portal carries no permit, 311 or dated licence feed (probe-richmond.md).
   parcel's centroid from the city's Parcels layer by ``PIN``. Buyer and
   seller names (``GRANTEE``, ``GRANTOR``) never leave the client: ``select``
   names only the columns the feed reads.
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
 """
 
 
@@ -353,8 +357,9 @@ def get_richmond_dataset(feed: object) -> object:
     """Leaf-local mirror of ``city_registry.get_dataset``.
 
     Returns the spec for a registered Richmond feed, or raises ``KeyError``
-    naming the city and available feeds when the feed is absent (permits/SLA/
-    311 are not registered for US-348).
+    naming the city and available feeds when the feed is absent (permits and
+    311 are not registered). SLA is the corpus's shared SNAP slice, which
+    this mirror does not carry.
     """
     from src.config import settings
     from src.spatial.city_registry import DatasetSpec

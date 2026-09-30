@@ -1,4 +1,9 @@
-"""Peoria, Illinois spatial registry and geometry (US-260)."""
+"""Peoria, Illinois spatial registry and geometry (US-260).
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``.
+"""
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 

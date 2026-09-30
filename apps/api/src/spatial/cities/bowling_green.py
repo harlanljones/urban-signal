@@ -71,6 +71,10 @@ Implementation re-probe (2026-08-28, live): newest ``created_date``
 2633 Mt Victor Lane, OBJECTID 113479), 7d=22, 60d=386, total=29,691. Feed
 extent (outSR=4326): lat 36.795-37.179, lng -86.661--86.125 — the metro box
 is padded to that extent.
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
 """
 
 from typing import Dict
@@ -423,7 +427,8 @@ def get_bowling_green_dataset(feed: object) -> object:
 
     Returns the spec for a registered Bowling Green feed, or raises
     ``KeyError`` naming the city and available feeds when the feed is absent
-    (311 / SLA / deeds have no viable live feed here).
+    (311 and deeds have no viable live feed here). SLA is the corpus's shared
+    SNAP slice, which this mirror does not carry.
     """
     from src.config import settings
     from src.spatial.city_registry import DatasetSpec

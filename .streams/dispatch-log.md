@@ -1305,3 +1305,19 @@ Worth keeping:
   client applies `select` before it hands any row on, so buyer and seller
   columns never reach the scheduler, an event or the DLQ.
 
+### 2026-09-30 — SNAP stores for the last 25 SLA-less metros (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| snap-wave | `.streams/snap-wave.md` | none | 2026-09-30 | done (25 metros poll their SNAP slice; each live poll published its full count, 5,046 stores in all, none dead-lettered) | `sla` blocks in 25 corpus files |
+
+Every registered metro now has an `sla` family. The blocks are the shared
+`snap_sla_spec` output, checked by `TestSnapMetroScope`.
+
+Worth keeping:
+
+- **Count before you cap.** A metro whose stores reach two thirds of the
+  default 1,000 needs a declared cap; none of these did.
+- **Check same-state overlaps.** Chandler's and Tempe's boxes share 113 stores,
+  which publish under both.
+

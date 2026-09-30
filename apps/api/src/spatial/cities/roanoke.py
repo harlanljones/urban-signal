@@ -45,6 +45,10 @@ Feeds (probed 2026-09-30):
   ArcGIS Server behind it (the host redirects to a vendor viewer), and the
   ``Hosted/Proval_Transfer_History_Copy`` table stopped at 2025-10-27.
 * PERMITS / SLA / COMPLAINTS_311 — not registered.
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
 """
 
 
@@ -334,8 +338,9 @@ def get_roanoke_dataset(feed: object) -> object:
     """Leaf-local mirror of ``city_registry.get_dataset``.
 
     Returns the spec for a registered Roanoke feed, or raises ``KeyError``
-    naming the city and available feeds when the feed is absent (permits/SLA/
-    311 are not registered on this ticket).
+    naming the city and available feeds when the feed is absent (permits and
+    311 are not registered on this ticket). SLA is the corpus's shared SNAP
+    slice, which this mirror does not carry.
     """
     from src.config import settings
     from src.spatial.city_registry import DatasetSpec

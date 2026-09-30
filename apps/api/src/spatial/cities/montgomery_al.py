@@ -11,6 +11,10 @@ County, on the Alabama River. Downtown sits around (32.3792, -86.3077).
 The metro bbox covers the city proper plus the Montgomery County urbanized
 area (Pike Road, Prattville-adjacent east, and the Maxwell Air Force Base
 southwest gateway).
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``.
 """
 
 from src.spatial.registration import SpatialRegistration

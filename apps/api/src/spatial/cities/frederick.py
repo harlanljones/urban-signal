@@ -34,6 +34,10 @@ Feeds (probed 2026-09-30):
   ``Frederick_Parcels`` layer registered until 2026-09-30 never existed.
 * PERMITS / SLA / 311 — absent from the public Frederick open-data surface;
   Tier 3, not registered.
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
 """
 
 

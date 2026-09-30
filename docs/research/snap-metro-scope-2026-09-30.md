@@ -118,6 +118,56 @@ that metro scoping would happen downstream; the cap made it a truncation instead
 | Wichita | KS | 2,054 | 378 | 182 | 0 | 1,000 (default) |
 | Wilmington, NC | NC | 8,908 | 262 | 32 | 0 | 1,000 (default) |
 
+## Metros added later
+
+Ten metros took a SNAP slice after the table above: Lexington, Madison and
+Seattle in the feed-repair change, and seven mid-Atlantic cities whose deeds
+feeds were retracted (`feed-health-2026-09-30.md`). Later on 2026-09-30 the 25
+registered metros still without an `sla` feed took theirs, so every
+registered metro now has one. They were counted as above, and each was polled
+once through `poll_job` (real scheduler and ArcGIS client, Kafka mocked):
+every poll fetched and published exactly its count, all inside the metro box,
+with none dead-lettered. None needs a cap; Grand Rapids holds the most, 664,
+and half again is 996.
+
+| Metro | State | Statewide | In metro bbox | In bbox, other state | Cap |
+|---|---|---|---|---|---|
+| Allentown | PA | 9,569 | 449 | 16 | 1,000 (default) |
+| Billings | MT | 756 | 85 | 0 | 1,000 (default) |
+| Bowling Green / Warren County | KY | 4,436 | 135 | 0 | 1,000 (default) |
+| Bozeman | MT | 756 | 28 | 0 | 1,000 (default) |
+| Burlington | VT | 622 | 84 | 0 | 1,000 (default) |
+| Chandler | AZ | 4,688 | 277 | 0 | 1,000 (default) |
+| Charleston, WV | WV | 1,985 | 42 | 0 | 1,000 (default) |
+| Fort Collins | CO | 3,134 | 102 | 0 | 1,000 (default) |
+| Frederick | MD | 3,732 | 84 | 0 | 1,000 (default) |
+| Grand Rapids | MI | 9,472 | 664 | 0 | 1,000 (default) |
+| Laredo | TX | 20,490 | 199 | 0 | 1,000 (default) |
+| Lincoln | NE | 1,394 | 173 | 0 | 1,000 (default) |
+| Missoula | MT | 756 | 57 | 0 | 1,000 (default) |
+| Montgomery, AL | AL | 4,815 | 303 | 0 | 1,000 (default) |
+| Nampa | ID | 1,078 | 73 | 0 | 1,000 (default) |
+| Peoria | IL | 9,025 | 297 | 0 | 1,000 (default) |
+| Providence | RI | 892 | 172 | 0 | 1,000 (default) |
+| Richmond | VA | 6,061 | 566 | 0 | 1,000 (default) |
+| Roanoke | VA | 6,061 | 163 | 0 | 1,000 (default) |
+| Santa Fe | NM | 1,621 | 64 | 0 | 1,000 (default) |
+| Savannah / Chatham County | GA | 9,164 | 277 | 0 | 1,000 (default) |
+| Sioux Falls | SD | 775 | 162 | 0 | 1,000 (default) |
+| Tempe | AZ | 4,688 | 361 | 0 | 1,000 (default) |
+| Topeka | KS | 2,054 | 111 | 0 | 1,000 (default) |
+| Yakima | WA | 4,827 | 118 | 0 | 1,000 (default) |
+
+- **Chandler and Tempe overlap.** Their boxes share a band from 33.31 to
+  33.37 N, and the 113 Arizona stores inside it publish under both metros, as
+  the two cities' other feeds already can. None of the other 23 new boxes
+  overlaps another SNAP metro's box in the same state.
+- **Grand Rapids** was registered with geometry only; SNAP is its first feed.
+- SNAP stands in for a licence register, which none of these metros
+  publishes: each city leaf keeps its probe notes, and the feed mirrors in
+  the leaves do not carry the SNAP spec, which the corpus builds with
+  `snap_sla_spec`.
+
 ## Not covered here
 
 The same cap applies to every other snapshot-mode feed (38 outside SNAP, GBFS

@@ -60,6 +60,10 @@ Live-probe caveats that define this leaf (probed 2026-08-28):
 * The layer is **small and active** (76 rows, maintained by the GIS team).
   ``expected_cadence_days=7`` with ``alarm_exempt=True`` to avoid false
   positives on the slow issuance pace of road closures.
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
 """
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta

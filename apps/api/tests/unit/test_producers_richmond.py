@@ -41,7 +41,7 @@ def test_richmond_geometry_is_self_consistent():
 
 
 def test_richmond_reads_deeds_from_the_newest_transfers_workbook():
-    assert set(REGISTRY[CityId.RICHMOND].datasets) == {FeedType.DEEDS}
+    assert set(REGISTRY[CityId.RICHMOND].datasets) == {FeedType.DEEDS, FeedType.SLA}
     deeds = get_dataset(CityId.RICHMOND, FeedType.DEEDS)
     assert deeds.platform == "excel"
     assert deeds.endpoint == RICHMOND_DEEDS_ENDPOINT
