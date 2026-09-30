@@ -288,7 +288,6 @@ class TestSnapRegistrationShape:
             "santa_fe",
             "savannah",
             "sioux_falls",
-            "tallahassee",
             "tempe",
             "topeka",
             "wilmington_de",

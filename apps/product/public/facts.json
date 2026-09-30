@@ -1258,7 +1258,7 @@
       "submarket_count": 5,
       "feeds": [
         true,
-        false,
+        true,
         true,
         true
       ],
@@ -1269,7 +1269,12 @@
           "interval_seconds": 300.0,
           "topic": "raw.municipal.permits"
         },
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "REPORTED_DATE",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "",
@@ -4949,7 +4954,7 @@
       "feeds": [
         true,
         true,
-        false,
+        true,
         true
       ],
       "platforms": [
@@ -4965,7 +4970,12 @@
           "interval_seconds": 600.0,
           "topic": "raw.municipal.311"
         },
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "SALES_SALEDT",

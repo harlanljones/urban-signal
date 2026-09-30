@@ -354,6 +354,7 @@ class MunicipalIngestionScheduler:
                 self.configs[job_name] = JobConfig(
                     name=job_name,
                     interval_seconds=ds.interval_seconds,
+                    batch_limit=ds.batch_limit or JobConfig.batch_limit,
                     # GBFS is wired as an explicit stream job below, but keep
                     # it opt-in until its per-city endpoint has been verified
                     # by the scheduler runtime. This also preserves the

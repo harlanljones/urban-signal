@@ -1139,3 +1139,30 @@ Worth keeping from the follow-up:
 - **Opened-case stream.** `status_date` and the watermark are both `DateOpened`, so a
   case is published once and later status changes are not re-emitted; `Address` is
   served with a trailing space that the shared parser keeps.
+
+### 2026-09-30 — Four-family depth pass (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| depth-four-family | `.streams/depth-four-family.md` | `config.py`, `city_registry.py`, `scheduler.py` | 2026-09-29 | done (2 of 13 metros moved to four families) | `docs/research/four-family-depth-2026-09-30.md`, Columbus `datasets.'311'` + `arcgis_columbus_311_url`, Tallahassee `datasets.sla` (SNAP), `DatasetSpec.batch_limit`, `maps2.columbus.gov` in `ANSI_DATE_LITERAL_HOSTS`, regenerated facts |
+
+Thirteen of the 32 metros one family short were probed live by three read-only
+research workers. Columbus gains `311` from a City layer the open-data Hub does not
+list (`maps2.columbus.gov` ServiceRequests MapServer/1); Tallahassee gains `sla` from
+the statewide SNAP fallback after local sources came up empty and the state alcohol
+extract geocoded 88%. The other eleven stay, each with a re-check trigger in the
+research doc. Four-family metros go from 16 to 18.
+
+Worth keeping:
+
+- **Daily-extract feeds can outrun the poll cap.** Columbus loads its 311 layer once a
+  day; the filtered extract passed 1,000 rows on 22 of 64 weekdays in 90 days, and a
+  newest-first poll capped at 1,000 never reaches the oldest rows. `DatasetSpec` now
+  takes an opt-in `batch_limit` (the scheduler's per-poll cap); Columbus 311 sets 5,000.
+- **SNAP licences are a statewide sample (pre-existing, 54 metros).** Each SNAP job
+  filters by state only and snapshots at most 1,000 rows ordered by `ObjectId`, so it
+  sees the same 1,000 retailers every poll: 19 of Tallahassee's 242. Fix is a bbox in
+  each SNAP `where` plus `batch_limit` where needed; not done here.
+- **Geocoder drops context.** `FL` is a unit token in `normalize_address` (drops the
+  state and the ZIP after it) and a `#` unit cuts everything after it, including the
+  appended `geocode_context`. Affects address-only feeds; needs a `NORM_VERSION` bump.

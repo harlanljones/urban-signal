@@ -162,6 +162,13 @@ ANSI_DATE_LITERAL_HOSTS = (
     # ``IssuedDate > '2026-09-25T05:00:00'`` returns 400 "Unable to complete
     # operation" while ``IssuedDate >= date '2026-09-25'`` works.
     "maps.dsm.city",
+    # Columbus, OH (ArcGIS Server 11.5): verified live 2026-09-30 —
+    # ``REPORTED_DATE > '2026-09-22T00:00:00'`` returns 400 "Unable to complete
+    # operation" while ``REPORTED_DATE > date '2026-09-22'`` works. The server
+    # reads the literal as Eastern midnight. Truncating the watermark to a date
+    # re-reads part of a day (the cross-run dedup drops the repeats) but cannot
+    # skip rows, because the layer is loaded by one daily extract (~05:00 ET).
+    "maps2.columbus.gov",
 )
 
 

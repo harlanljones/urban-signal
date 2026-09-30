@@ -1,9 +1,14 @@
-"""Contract tests for Columbus, OH (ArcGIS building permits + deeds)."""
+"""Contract tests for Columbus, OH (ArcGIS building permits, 311 and deeds)."""
 
-from unittest.mock import patch
+from datetime import UTC, datetime
+from unittest.mock import MagicMock, patch
 
 import pytest
 
+from src.config import settings
+from src.producers.scheduler import MunicipalIngestionScheduler
+from src.producers.watermarks import ANSI_DATE_LITERAL_HOSTS, watermark_comparison
+from src.schemas.models import Complaint311Event
 from src.spatial.cities.columbus import (
     COLUMBUS_DIVISION_BBOXES,
     COLUMBUS_DIVISIONS,
@@ -44,6 +49,23 @@ COLUMBUS_DEEDS_FIELD_MAP = {
     "borough": ["MUNINAME", "NHBDNAME"],
 }
 
+# DatasetSpec.field_map for the City's "All Service Requests - Last 3 Years"
+# layer. DATAHUB_ID is the request key (unique across all 920,928 rows on
+# 2026-09-29); CASE_ID is not, because one CRM case can spawn up to eight
+# requests. closed_date stays unmapped: STATUS_DATE is the last status change
+# for every status, not a close time.
+COLUMBUS_311_FIELD_MAP = {
+    "incident_id": ["DATAHUB_ID"],
+    "latitude": ["LATITUDE"],
+    "longitude": ["LONGITUDE"],
+    "created_date": ["REPORTED_DATE"],
+    "status": ["STATUS"],
+    "complaint_type": ["REQUEST_TYPE", "REQUEST_SUBCATEGORY", "REQUEST_CATEGORY"],
+    "incident_address": ["STREET"],
+    "zipcode": ["ZIPCODE", "ZIP"],
+    "borough": ["COLUMBUSCOMMUNITY", "COUNCILDISTRICT"],
+}
+
 
 def test_columbus_geometry_is_self_consistent():
     assert is_in_columbus_metro(39.9612, -83.0007)
@@ -60,16 +82,18 @@ def test_columbus_geometry_is_self_consistent():
     assert {meta.city_id for meta in COLUMBUS_SUBMARKETS.values()} == {"columbus"}
 
 
-def test_columbus_registers_arcgis_permits_and_deeds():
-    from src.spatial.city_registry import REGISTRY, get_dataset, normalize_city
+def test_columbus_registers_all_four_feed_families():
+    from src.spatial.city_registry import REGISTRY, normalize_city
 
     city = CityId.COLUMBUS
     assert normalize_city("columbus") is city
     assert normalize_city("columbus_oh") is city
     assert REGISTRY[city].job_suffix == "cmoh"
-    # US-364 adds the SNAP SLA slice (national FNS feed, State='OH').
+    # US-364 adds the SNAP SLA slice (national FNS feed, State='OH'); the
+    # 2026-09-30 depth pass adds the City's 311 layer.
     assert set(REGISTRY[city].datasets) == {
         FeedType.PERMITS,
+        FeedType.COMPLAINTS_311,
         FeedType.DEEDS,
         FeedType.SLA,
     }
@@ -88,9 +112,6 @@ def test_columbus_registers_arcgis_permits_and_deeds():
     assert permits.oid_field == "OBJECTID"
     assert permits.max_record_count == 2000
     assert permits.field_map == COLUMBUS_FIELD_MAP
-
-    with pytest.raises(KeyError, match="no.*feed"):
-        get_dataset(city, FeedType.COMPLAINTS_311)
 
 
 def test_columbus_deeds_spec_pins_arcgis_annual_snapshot():
@@ -112,6 +133,48 @@ def test_columbus_deeds_spec_pins_arcgis_annual_snapshot():
     assert spec.oid_field == "OBJECTID"
     assert spec.max_record_count == 2000
     assert spec.field_map == COLUMBUS_DEEDS_FIELD_MAP
+
+
+def test_columbus_311_spec_pins_the_rolling_three_year_layer():
+    from src.spatial.city_registry import get_dataset
+
+    spec = get_dataset(CityId.COLUMBUS, FeedType.COMPLAINTS_311)
+    assert spec.endpoint == settings.arcgis_columbus_311_url
+    assert spec.endpoint == (
+        "https://maps2.columbus.gov/arcgis/rest/services/Applications/"
+        "ServiceRequests/MapServer/1"
+    )
+    assert spec.platform == "arcgis"
+    assert spec.watermark_col == "REPORTED_DATE"
+    assert spec.id_keys == ["DATAHUB_ID", "OBJECTID"]
+    assert spec.topic == "raw.municipal.311"
+    assert spec.producer_key == "311"
+    assert spec.ingestion_mode == "incremental"
+    assert not spec.needs_geocode
+    # Newest first, so a poll after the daily extract lands on the new rows.
+    assert spec.order_by == "REPORTED_DATE DESC, OBJECTID DESC"
+    # "City Staff Requests" are call-centre notes, not service locations, and
+    # the quarter of the layer without a point cannot be indexed.
+    assert spec.where == "LATITUDE IS NOT NULL AND REQUEST_CATEGORY <> 'City Staff Requests'"
+    # One extract a day, so three quiet days mean the extract stopped.
+    assert spec.expected_cadence_days == 3
+    assert spec.rolling_window_days == 1095
+    assert spec.oid_field == "OBJECTID"
+    assert spec.max_record_count == 2000
+    # The daily extract tops 1,000 filtered rows on a third of weekdays (peak
+    # 1,227 in the 90 days to 2026-09-28); a newest-first poll capped at the
+    # default would never reach the morning's oldest rows.
+    assert spec.batch_limit == 5000
+    assert spec.field_map == COLUMBUS_311_FIELD_MAP
+
+
+def test_columbus_311_watermark_renders_as_an_ansi_date_literal():
+    # Verified live 2026-09-30: the server answers an ISO string in `where`
+    # with a 400 and accepts only an ANSI date literal.
+    assert "maps2.columbus.gov" in ANSI_DATE_LITERAL_HOSTS
+    assert watermark_comparison(
+        "REPORTED_DATE", ">", "2026-09-29T08:57:53", settings.arcgis_columbus_311_url
+    ) == "REPORTED_DATE > date '2026-09-29'"
 
 
 CB_PERMIT_ROW = {
@@ -313,3 +376,314 @@ class TestColumbusDeedParsing:
         assert ev is not None
         assert ev.doc_id == "010-054436"
         assert ev.h3_res7 is None
+
+
+# ======================================================================
+# 311 service requests (maps2.columbus.gov ServiceRequests/MapServer/1)
+# ======================================================================
+
+# The layer's date fields; ArcGISClient re-encodes them from epoch ms to ISO
+# 8601 UTC. The server stores them in Eastern time and serves UTC epochs.
+_SR_DATE_FIELDS = {"STATUS_DATE", "REPORTED_DATE", "REQUEST_MODIFIED", "SLA_1", "SLA_2"}
+
+
+def _service_request(
+    *,
+    datahub_id,
+    object_id,
+    case_id,
+    status,
+    status_ms,
+    reported_ms,
+    category,
+    request_type,
+    street,
+    zip_code,
+    community,
+    district,
+    lat,
+    lng,
+    point,
+):
+    """One raw feature as the layer serves it (attributes trimmed to the
+    columns the spec reads plus their neighbours; values verbatim)."""
+    return {
+        "attributes": {
+            "OBJECTID": object_id,
+            "STATUS": status,
+            "STATUS_DATE": status_ms,
+            "DATAHUB_ID": datahub_id,
+            "CASE_ID": case_id,
+            "REPORTED_DATE": reported_ms,
+            "REQUEST_CATEGORY": category,
+            "REQUEST_SUBCATEGORY": category,
+            "REQUEST_TYPE": request_type,
+            "STREET": street,
+            "CITY": "Columbus",
+            "ZIP": zip_code,
+            "COLUMBUSCOMMUNITY": community,
+            "COUNCILDISTRICT": district,
+            "ZIPCODE": zip_code,
+            "LATITUDE": lat,
+            "LONGITUDE": lng,
+            "SLA_1": None,
+            "SLA_2": None,
+        },
+        "geometry": {"x": point[0], "y": point[1]},
+    }
+
+
+# Five live rows captured 2026-09-30 from the extract loaded at ~05:00 ET on
+# 2026-09-29 (orderByFields=REPORTED_DATE DESC, outSR=4326). The layer carries
+# no requester name, contact or free text.
+_SR_ABANDONED_VEHICLE = _service_request(
+    datahub_id=3050458,
+    object_id=11135271,
+    case_id="CAS-3176453-Z7V5V1",
+    status="Received",
+    status_ms=None,
+    reported_ms=1790672273000,  # 2026-09-29T08:57:53Z, the newest row
+    category="Public Safety and Traffic Enforcement Issues",
+    request_type="Abandoned Vehicle On Street/R.O.W.",
+    street="2630 SAVILLE ROW",
+    zip_code="43224",
+    community="Northeast",
+    district="District 5",
+    lat=40.0544305096,
+    lng=-82.9463160038,
+    point=(-82.9463160041976, 40.05443050996114),
+)
+_SR_STREET_LIGHT = _service_request(
+    datahub_id=3050428,
+    object_id=11137595,
+    case_id="CAS-3176423-S2N4S8",
+    status="In Progress",
+    status_ms=1790647393000,  # last status change, not a close time
+    reported_ms=1790643982000,
+    category="Streets, Sidewalks, Street Lighting, Sign and Signal Issues",
+    request_type="Repair Of Street Lighting",
+    street="3716 KELLEN DR",
+    zip_code="43230",
+    community="Northland",
+    district="District 5",
+    lat=40.0721257677,
+    lng=-82.9139762088,
+    point=(-82.91397620857005, 40.07212576750038),
+)
+_SR_ALLEY_MATERIALS = _service_request(
+    datahub_id=3050427,
+    object_id=11137631,
+    case_id="CAS-3176421-G2N2S6",
+    status="Received",
+    status_ms=None,
+    reported_ms=1790642820000,
+    category="Trash, Recycling, Yard Waste and Illegal Dumping Issues",
+    request_type="Illegal Materials in the Alley",
+    street="1288 MANCHESTER AVE",
+    zip_code="43211",
+    community="North Linden",
+    district="District 4",
+    lat=40.02246,
+    lng=-82.9771425,
+    point=(-82.97714250023307, 40.02246000041479),
+)
+_SR_WATER_LINE_BREAK = _service_request(
+    datahub_id=3050391,
+    object_id=11135821,
+    case_id="CAS-3176379-Q2D1M4",
+    status="Received",
+    status_ms=None,
+    reported_ms=1790637635000,
+    category="Water, Drinking Water, Storm Water, Flooding, Sewer Issues",
+    request_type="Water Line Break",
+    street="4825 WINTERSET DR",
+    zip_code="43220",
+    community="Northwest",
+    district="District 3",
+    lat=40.056435,
+    lng=-83.057805,
+    point=(-83.0578049998324, 40.05643500042103),
+)
+_SR_CLOSED_ABANDONED_VEHICLE = _service_request(
+    datahub_id=3050105,
+    object_id=11135131,
+    case_id="CAS-3176083-V8S3D3",
+    status="Closed",
+    status_ms=1790643812000,
+    reported_ms=1790626271000,
+    category="Public Safety and Traffic Enforcement Issues",
+    request_type="Abandoned Vehicle On Street/R.O.W.",
+    street="5587 MILLWHEEL CT",
+    zip_code="43026",
+    community="Far West",
+    district="District 2",
+    lat=40.004118,
+    lng=-83.157795,
+    point=(-83.15779500034826, 40.004118000084965),
+)
+# In the server's order: newest REPORTED_DATE first.
+_SR_FIXTURES = [
+    _SR_ABANDONED_VEHICLE,
+    _SR_STREET_LIGHT,
+    _SR_ALLEY_MATERIALS,
+    _SR_WATER_LINE_BREAK,
+    _SR_CLOSED_ABANDONED_VEHICLE,
+]
+
+
+def _flatten_sr(feature):
+    """Flatten a 311 fixture exactly as the production ArcGIS client does."""
+    from src.producers.arcgis_client import ArcGISClient
+
+    return ArcGISClient()._flatten_feature(feature, date_fields=_SR_DATE_FIELDS)
+
+
+class TestColumbus311Parsing:
+    """The registered field map resolves through the shared 311 producer."""
+
+    @pytest.fixture
+    def complaints(self):
+        with patch("src.producers.complaints_311_producer.BaseKafkaProducer"):
+            from src.producers.complaints_311_producer import Complaints311Producer
+
+            yield Complaints311Producer()
+
+    def test_every_captured_row_parses_inside_the_metro(self, complaints):
+        for feature in _SR_FIXTURES:
+            event = complaints.parse_socrata_row(_flatten_sr(feature), city_id="columbus")
+            assert event is not None, feature["attributes"]["DATAHUB_ID"]
+            assert event.city_id == "columbus"
+            assert event.incident_id == str(feature["attributes"]["DATAHUB_ID"])
+            assert is_in_columbus_metro(event.latitude, event.longitude)
+            assert event.h3_res7 is not None
+
+    def test_newest_row_maps_every_declared_field(self, complaints):
+        event = complaints.parse_socrata_row(
+            _flatten_sr(_SR_ABANDONED_VEHICLE), city_id="columbus"
+        )
+        assert event is not None
+        assert event.incident_id == "3050458"  # DATAHUB_ID, never CASE_ID
+        assert event.complaint_type == "Abandoned Vehicle On Street/R.O.W."
+        assert event.status == "Received"
+        assert event.incident_address == "2630 SAVILLE ROW"
+        assert event.zipcode == "43224"
+        assert event.source_neighborhood == "Northeast"
+        assert event.created_date == datetime(2026, 9, 29, 8, 57, 53, tzinfo=UTC)
+        assert event.latitude == pytest.approx(40.0544305096)
+        assert event.longitude == pytest.approx(-82.9463160038)
+        assert event.closed_date is None
+
+    def test_status_date_is_never_read_as_a_close_time(self, complaints):
+        in_progress = complaints.parse_socrata_row(
+            _flatten_sr(_SR_STREET_LIGHT), city_id="columbus"
+        )
+        closed = complaints.parse_socrata_row(
+            _flatten_sr(_SR_CLOSED_ABANDONED_VEHICLE), city_id="columbus"
+        )
+        assert in_progress.status == "In Progress"
+        assert closed.status == "Closed"
+        assert in_progress.closed_date is None
+        assert closed.closed_date is None
+
+    def test_complaint_type_falls_back_to_the_category(self, complaints):
+        record = _flatten_sr(_SR_WATER_LINE_BREAK)
+        record["REQUEST_TYPE"] = None
+        event = complaints.parse_socrata_row(record, city_id="columbus")
+        assert event.complaint_type == (
+            "Water, Drinking Water, Storm Water, Flooding, Sewer Issues"
+        )
+
+    def test_row_without_a_point_is_dropped_not_geocoded(self, complaints):
+        # The spec filters these server-side; the parser must not guess.
+        feature = {
+            "attributes": {**_SR_ALLEY_MATERIALS["attributes"], "LATITUDE": None, "LONGITUDE": None},
+            "geometry": None,
+        }
+        assert complaints.parse_socrata_row(_flatten_sr(feature), city_id="columbus") is None
+
+
+_NOW = datetime(2026, 9, 30, 3, 15, tzinfo=UTC)
+
+
+class _FrozenDatetime(datetime):
+    @classmethod
+    def now(cls, tz=None):
+        return _NOW if tz is None else _NOW.astimezone(tz)
+
+
+@pytest.fixture
+def scheduler():
+    with patch("src.producers.base_producer.BaseKafkaProducer"):
+        sched = MunicipalIngestionScheduler(
+            dlq_producer=MagicMock(),
+            rate_limit_delay_seconds=0.0,
+            dedup_capacity=1000,
+        )
+    wrapper = sched.producers["311"]
+    wrapper.producer = MagicMock()
+    wrapper.arcgis.paginate = MagicMock(return_value=[])
+    return sched
+
+
+class TestColumbus311SchedulerWiring:
+    JOB = "311_cmoh"
+    BASE_WHERE = "(LATITUDE IS NOT NULL AND REQUEST_CATEGORY <> 'City Staff Requests')"
+
+    def test_job_is_registered_from_the_spec(self, scheduler):
+        meta = scheduler.job_metadata[self.JOB]
+        assert meta["platform"] == "arcgis"
+        assert meta["producer_key"] == "311"
+        assert meta["topic"] == "raw.municipal.311"
+        assert meta["watermark_col"] == "REPORTED_DATE"
+        assert meta["city_id"] == "columbus"
+        assert meta["endpoint"] == settings.arcgis_columbus_311_url
+        assert scheduler.configs[self.JOB].batch_limit == 5000
+        assert scheduler._extract_record_id(self.JOB, _flatten_sr(_SR_ABANDONED_VEHICLE)) == (
+            "311_cmoh:3050458"
+        )
+
+    def test_poll_publishes_by_request_id_and_watermarks_the_newest_report(
+        self, scheduler, monkeypatch
+    ):
+        monkeypatch.setattr("src.producers.scheduler.datetime", _FrozenDatetime)
+        complaints = scheduler.producers["311"]
+        complaints.arcgis.paginate = MagicMock(
+            return_value=[[_flatten_sr(feature) for feature in _SR_FIXTURES]]
+        )
+
+        result = scheduler.poll_job(self.JOB, limit=100)
+
+        assert result["status"] == "SUCCESS"
+        assert result["records_fetched"] == len(_SR_FIXTURES)
+        assert result["records_published"] == len(_SR_FIXTURES)
+        assert result["duplicates_skipped"] == 0
+        assert scheduler.dlq_producer.route_to_dlq.call_count == 0
+
+        produced = complaints.producer.produce.call_args_list
+        assert [c.kwargs["key"] for c in produced] == [
+            f"columbus:{f['attributes']['DATAHUB_ID']}" for f in _SR_FIXTURES
+        ]
+        assert {c.kwargs["topic"] for c in produced} == {"raw.municipal.311"}
+        assert all(isinstance(c.kwargs["payload"], Complaint311Event) for c in produced)
+        assert result["high_watermark"] == "2026-09-29T08:57:53"
+
+        _, first_call = complaints.arcgis.paginate.call_args
+        assert first_call["where_clause"] == self.BASE_WHERE
+        assert first_call["endpoint_url"] == settings.arcgis_columbus_311_url
+        assert first_call["order_by"] == "REPORTED_DATE DESC, OBJECTID DESC"
+
+        # Next poll: the watermark's date as an ANSI literal (Eastern midnight
+        # on the server), so the re-read part of the day dedups instead of
+        # publishing twice.
+        complaints.arcgis.paginate = MagicMock(
+            return_value=[[_flatten_sr(_SR_ABANDONED_VEHICLE)]]
+        )
+        second = scheduler.poll_job(self.JOB, limit=100)
+        _, second_call = complaints.arcgis.paginate.call_args
+        assert second_call["where_clause"] == (
+            f"{self.BASE_WHERE} AND REPORTED_DATE > date '2026-09-29'"
+        )
+        assert second["records_published"] == 0
+        assert second["duplicates_skipped"] == 1
+        assert second["high_watermark"] == "2026-09-29T08:57:53"
+

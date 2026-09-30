@@ -220,7 +220,12 @@
       "interval_seconds": 600.0,
       "topic": "raw.municipal.311"
     },
-    "sla": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
     "deeds": {
       "platform": "arcgis",
       "watermark_col": "SALES_SALEDT",

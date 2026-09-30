@@ -164,6 +164,70 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+  '311':
+    endpoint: https://maps2.columbus.gov/arcgis/rest/services/Applications/ServiceRequests/MapServer/1
+    platform: arcgis
+    watermark_col: REPORTED_DATE
+    id_keys:
+    - DATAHUB_ID
+    - OBJECTID
+    topic: raw.municipal.311
+    interval_seconds: 1800.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: REPORTED_DATE DESC, OBJECTID DESC
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: LATITUDE IS NOT NULL AND REQUEST_CATEGORY <> 'City Staff Requests'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - DATAHUB_ID
+      latitude:
+      - LATITUDE
+      longitude:
+      - LONGITUDE
+      created_date:
+      - REPORTED_DATE
+      status:
+      - STATUS
+      complaint_type:
+      - REQUEST_TYPE
+      - REQUEST_SUBCATEGORY
+      - REQUEST_CATEGORY
+      incident_address:
+      - STREET
+      zipcode:
+      - ZIPCODE
+      - ZIP
+      borough:
+      - COLUMBUSCOMMUNITY
+      - COUNCILDISTRICT
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 3
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: 1095
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    batch_limit: 5000
   deeds:
     endpoint: https://services1.arcgis.com/7r2Wl09a1Apy459r/arcgis/rest/services/FCAO_Sales_Dashboard_Last_Years_Sales_Points/FeatureServer/0
     platform: arcgis

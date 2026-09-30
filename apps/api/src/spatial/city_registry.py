@@ -298,6 +298,11 @@ class DatasetSpec:
     # CSV feeds are not always comma-delimited (Maricopa sales affidavits are
     # pipe-delimited). Forwarded verbatim to CSVClient.paginate (US-392).
     delimiter: str | None = None
+    # Rows one scheduler poll may fetch; unset keeps JobConfig's default
+    # (1000). A newest-first poll never reaches rows past its cap, so a feed
+    # whose source lands more than that at once (Columbus 311's daily extract
+    # tops 1,000 rows on a third of weekdays) declares a higher cap.
+    batch_limit: int | None = None
 
 
 @dataclass

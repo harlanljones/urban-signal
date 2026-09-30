@@ -190,3 +190,12 @@ Leaf complete. Tests green. No spine edits. Report back to orchestrator.
 Orchestrator applies the spine delta serially (after the west-coast hold
 lands), then `pytest -m interlock` + full suite + `export_dashboard`
 byte-sync.
+
+## Follow-up 2026-09-30 — `sla` (four-family depth pass)
+
+Registered `datasets.sla` as the statewide SNAP slice (`State = 'FL'`, the exact
+block the other Florida metros carry); the leaf mirror `get_tallahassee_dataset`
+returns `snap_sla_spec("FL")` for SLA, and the SNAP suite no longer lists
+Tallahassee as SLA-less. Local licence sources re-probed and still absent; the
+DBPR alcohol extract was held at 88% geocode coverage. See
+`docs/research/four-family-depth-2026-09-30.md`.

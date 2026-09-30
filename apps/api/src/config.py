@@ -959,6 +959,20 @@ class Settings(BaseSettings):
         description="Columbus Building Permits FeatureServer layer URL",
     )
 
+    # Columbus, OH (ArcGIS Server 11.5): "All Service Requests - Last 3 Years",
+    # the layer behind the City's 311 map app. A rolling three-year window
+    # refreshed by one daily extract (~05:00 ET). The server rejects ISO date
+    # strings in `where` (400), hence its ANSI_DATE_LITERAL_HOSTS entry. The
+    # spec excludes the "City Staff Requests" category (call-centre notes) and
+    # rows without a point.
+    arcgis_columbus_311_url: str = Field(
+        default=(
+            "https://maps2.columbus.gov/arcgis/rest/services/Applications/"
+            "ServiceRequests/MapServer/1"
+        ),
+        description="Columbus, OH 311 service requests MapServer layer URL (rolling 3 years)",
+    )
+
     # Madison, WI (US-356): public Accela permitting surface.
     accela_madison_permits_endpoint: str = Field(
         default="https://aca-prod.accela.com/MADISON/Cap/CapHome.aspx",

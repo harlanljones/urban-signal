@@ -10,8 +10,9 @@ rolling 3-year sales set (``/LCPA_Last3YearsSales_D_WM/MapServer/0``). All
 three are native points with ``needs_geocode=False`; geometry (requested
 ``outSR=4326``) supplies WGS84 lat/lng, so the projected attribute coordinate
 columns are never mapped (permits ``Latitude``/``Longitude`` are Web Mercator
-meters; 311 ``GPSX``/``GPSY`` are FL State Plane North feet). No SLA — no BTR
-dataset in the org.
+meters; 311 ``GPSX``/``GPSY`` are FL State Plane North feet). SLA is the
+shared statewide SNAP slice (``snap_sla_spec("FL")``): the City issues no
+business licences and no local licence dataset exists (2026-09-30 depth pass).
 
 Host/ordering contract (verified live 2026-08-28): no layer publishes an
 ``objectIdField``. Permits/Deeds carry ``OBJECTID`` (ordering OK); the 311
@@ -413,8 +414,18 @@ class TestTallahasseeSpatial:
 
 
 class TestFeedRegistration:
-    def test_exactly_three_feed_types_are_registered(self):
+    def test_three_local_feeds_are_mirrored(self):
         assert set(TALLAHASSEE_FEED_SPECS) == {"permits", "311", "deeds"}
+
+    def test_sla_is_the_shared_florida_snap_slice(self):
+        from src.spatial.city_registry import CityId, get_dataset, snap_sla_spec
+
+        spec = get_tallahassee_dataset(FeedType.SLA)
+        assert spec == snap_sla_spec("FL")
+        assert spec.where == "State = 'FL'"
+        assert spec.ingestion_mode == "snapshot"
+        # The leaf mirror and the corpus-derived registry agree.
+        assert get_dataset(CityId.TALLAHASSEE, FeedType.SLA) == spec
 
     def test_all_endpoints_share_the_web_adaptor_base(self):
         base = "https://intervector.leoncountyfl.gov/intervector/rest/services/MapServices"
@@ -467,10 +478,10 @@ class TestFeedRegistration:
 
     @pytest.mark.parametrize(
         "absent_feed",
-        [FeedType.SLA, FeedType.CRIME, FeedType.STR],
+        [FeedType.CRIME, FeedType.STR],
     )
     def test_absent_feeds_raise_readable_errors(self, absent_feed):
-        with pytest.raises(KeyError, match=r"'tallahassee'.*available"):
+        with pytest.raises(KeyError, match=r"'tallahassee'.*available.*sla"):
             get_tallahassee_dataset(absent_feed)
 
     def test_field_map_export_keys(self):

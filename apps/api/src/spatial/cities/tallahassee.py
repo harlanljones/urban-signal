@@ -46,7 +46,7 @@ registration — neither Gadsden to the west, Wakulla to the south, nor
 Jefferson to the east is claimed).
 
 Feed scope (probed and re-probed live 2026-08-28,
-docs/research/se-probe-tallahassee.md). All three feeds are native-space
+docs/research/se-probe-tallahassee.md). The three local feeds are native-space
 point layers on ONE joint City/County ArcGIS Server 10.81 —
 ``intervector.leoncountyfl.gov``, web-adaptor base
 ``/intervector/rest/services/MapServices/`` — so the existing ``ArcGISClient``
@@ -71,8 +71,14 @@ covers the city with no fifth client:
   point — NO address column and NO ``parcel_join`` needed (the layer already
   serves parcel-centroid geometry). ``needs_geocode=False``; OID field
   ``OBJECTID``. Cadence ~1. id ``SALES_SALEKEY``.
-* SLA — absent. No Local Business Tax Receipt dataset anywhere in the org.
-  Do not register.
+* SLA — the statewide USDA SNAP retailer layer sliced to ``State = 'FL'``
+  (``snap_sla_spec("FL")``), the fallback the other Florida metros use. No
+  local licence dataset exists: the City stopped issuing business licences in
+  2016, and neither the org nor the Leon County Tax Collector publishes one
+  (re-probed 2026-09-30). The state's DBPR alcoholic-beverage licence extract
+  covers Leon County (687 licences) but is address-only and geocoded 105 of
+  120 sampled rows (88%), under the 95% floor for geocoded feeds, so it stays
+  a candidate (docs/research/four-family-depth-2026-09-30.md).
 
 OID/ordering contract (verified live 2026-08-28): no layer publishes an
 ``objectIdField``. Permits/Deeds carry `OBJECTID` (ordering OK); the 311 layer
@@ -490,15 +496,17 @@ def get_tallahassee_dataset(feed: object) -> object:
     """Leaf-local mirror of ``city_registry.get_dataset``.
 
     Returns the spec for a registered Tallahassee feed, or raises ``KeyError``
-    naming the city and available feeds when the feed is absent (SLA has no
-    BTR dataset in the org).
+    naming the city and available feeds when the feed is absent. SLA resolves
+    to the shared statewide SNAP spec (no local licence dataset exists).
     """
     from src.config import settings
-    from src.spatial.city_registry import DatasetSpec
+    from src.spatial.city_registry import DatasetSpec, snap_sla_spec
 
     feed_name = getattr(feed, "value", str(feed))
+    if feed_name == "sla":
+        return snap_sla_spec("FL")
     if feed_name not in TALLAHASSEE_FEED_SPECS:
-        available = ", ".join(sorted(TALLAHASSEE_FEED_SPECS))
+        available = ", ".join(sorted([*TALLAHASSEE_FEED_SPECS, "sla"]))
         raise KeyError(
             f"'{TALLAHASSEE_CITY_ID}' has no '{feed_name}' feed; available: {available}"
         )

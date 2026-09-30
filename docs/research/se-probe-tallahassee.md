@@ -116,3 +116,15 @@ submarket pinned to a real Sales-2026 row's geometry + `SALES_PARID`:
 - `apps/api/src/spatial/cities/tallahassee.py`
 - `apps/api/src/producers/field_maps_tallahassee.py`
 - `apps/api/tests/unit/test_producers_tallahassee.py`
+
+## Addendum 2026-09-30 — licences (SLA)
+
+The SLA row above still holds for local sources: the City stopped requiring
+business licences in 2016 and no City, County or Tax Collector licence dataset
+exists. Tallahassee now registers `sla` as the statewide USDA SNAP slice
+(`snap_sla_spec("FL")`), the fallback the other Florida metros use, which makes
+it a four-family metro. Florida DBPR's alcoholic-beverage licence extract covers
+Leon County (687 licences) but geocoded 105 of 120 sampled addresses (88%), under
+the 95% floor, so it stays a candidate. Evidence, the SNAP coverage caveat and
+two geocoder defects found on the way are in
+`docs/research/four-family-depth-2026-09-30.md`.

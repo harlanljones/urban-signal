@@ -118,6 +118,30 @@ def test_job_configuration(mock_scheduler):
         mock_scheduler.configure_job("invalid_job", interval_seconds=10.0)
 
 
+def test_spec_batch_limit_sets_the_per_poll_cap(mock_scheduler):
+    """A feed whose source lands more rows at once than the default cap
+    declares its own ``batch_limit``; every other feed keeps 1000."""
+    from src.spatial.city_registry import REGISTRY, get_job_name
+
+    for city_id, reg in REGISTRY.items():
+        for feed_type, ds in reg.datasets.items():
+            cfg = mock_scheduler.configs[get_job_name(feed_type, city_id)]
+            assert cfg.batch_limit == (ds.batch_limit or 1000), cfg.name
+
+    # Columbus 311's daily extract tops 1,000 rows on heavy weekdays.
+    job = "311_cmoh"
+    assert mock_scheduler.configs[job].batch_limit == 5000
+    paginate = mock_scheduler.producers["311"].arcgis.paginate
+    mock_scheduler.poll_job(job)
+    _, kwargs = paginate.call_args
+    assert kwargs["max_records"] == 5000
+    assert kwargs["batch_size"] == 1000
+    # An explicit per-call limit still wins over the declared cap.
+    mock_scheduler.poll_job(job, limit=10)
+    _, kwargs = paginate.call_args
+    assert kwargs["max_records"] == 10
+
+
 def test_extract_record_id(mock_scheduler):
     permits_id = mock_scheduler._extract_record_id("permits", {"job__": "M123456"})
     assert permits_id == "permits:M123456"
