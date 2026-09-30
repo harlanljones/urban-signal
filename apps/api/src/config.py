@@ -2044,6 +2044,15 @@ class Settings(BaseSettings):
         default="https://gis.buncombecounty.org/arcgis/rest/services/opendata/FeatureServer/1",
         description="Buncombe County NC Property roll layer (Asheville DEEDS supplement)",
     )
+    # Asheville, NC permits (2026-09-30): the City's Accela permits view on its
+    # own ArcGIS Server, one row per permit, nearly all with a point.
+    arcgis_asheville_permits_url: str = Field(
+        default=(
+            "https://gis.ashevillenc.gov/server/rest/services/"
+            "Permits/AccelaPermitsView/MapServer/2"
+        ),
+        description="City of Asheville Accela permits view layer URL (Asheville PERMITS)",
+    )
 
     # US-404: MARTA station entrances/exits (Atlanta) — Socrata, weekly.
     socrata_marta_endpoint: str = Field(

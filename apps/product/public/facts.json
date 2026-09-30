@@ -287,13 +287,18 @@
       "division_count": 6,
       "submarket_count": 9,
       "feeds": [
-        false,
+        true,
         false,
         true,
         true
       ],
       "platforms": [
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "date_opened",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.permits"
+        },
         null,
         {
           "platform": "arcgis",

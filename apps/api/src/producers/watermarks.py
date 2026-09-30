@@ -246,6 +246,12 @@ ANSI_DATE_LITERAL_HOSTS = (
     # ``issue_date >= timestamp '2026-09-29 00:00:00'`` works. The layer
     # declares Eastern time and reads literals in it.
     "meckgis.mecklenburgcountync.gov",
+    # Asheville, NC: verified live 2026-09-30 — ``date_opened >=
+    # '2026-09-28T00:00:00'`` returns 400 "Unable to complete operation" while
+    # ``date_opened >= timestamp '2026-09-28 00:00:00'`` works. The layer
+    # declares Eastern time and reads literals in it: ``>= timestamp
+    # '2026-09-29 02:00:00'`` leaves out that day's rows, stored at 04:00Z.
+    "gis.ashevillenc.gov",
 )
 
 

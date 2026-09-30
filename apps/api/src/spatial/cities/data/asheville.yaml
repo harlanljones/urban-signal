@@ -258,6 +258,43 @@ divisions:
     - South Asheville & Arden
     city_id: asheville
 datasets:
+  permits:
+    endpoint: https://gis.ashevillenc.gov/server/rest/services/Permits/AccelaPermitsView/MapServer/2
+    platform: arcgis
+    watermark_col: date_opened
+    id_keys:
+    - record_id
+    topic: raw.municipal.permits
+    interval_seconds: 21600.0
+    producer_key: permits
+    order_by: date_opened DESC, objectid DESC
+    select: objectid,record_id,date_opened,record_type,record_type_subtype,record_status,address,apn
+    where: date_opened >= CURRENT_DATE - INTERVAL '90' DAY AND date_opened <= CURRENT_TIMESTAMP AND record_type_type
+      NOT IN ('Right of Way', 'Event-Temporary Use', 'Outdoor Vendor', 'Over The Counter') AND record_type_subtype
+      NOT IN ('Home Occupation', 'Occupational')
+    needs_geocode: false
+    field_map:
+      job_id:
+      - record_id
+      issuance_date:
+      - date_opened
+      filing_date:
+      - date_opened
+      job_type:
+      - record_type_subtype
+      - record_type
+      status:
+      - record_status
+      address_street:
+      - address
+      bbl:
+      - apn
+    ingestion_mode: snapshot
+    oid_field: objectid
+    max_record_count: 2000
+    expected_cadence_days: 3
+    batch_limit: 1500
+    metro_clip: true
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis

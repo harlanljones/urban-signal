@@ -1637,3 +1637,21 @@ Worth keeping:
 - **Search a county office's ArcGIS Online org as well as its server.**
   Toledo's sales were recorded as absent after the Auditor's own server was
   read; the Auditor also publishes a hosted sales layer on ArcGIS Online.
+
+### 2026-09-30 — Asheville permits (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| asheville-permits | `.streams/asheville-permits.md` | `config.py` (the City's permits layer), `producers/watermarks.py` (ANSI literals) | 2026-09-30 | done (697 permits read from the 90-day window, 7 without a point skipped, 690 published, none dead-lettered, the second poll published none) | `permits` spec for Asheville; held and not-now permits and `311` notes for seven metros in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Asheville moves from two signal families to three (three-family tier 30 to
+31).
+
+Worth keeping:
+
+- **Walk a city's ArcGIS Server as well as its Hub.** Asheville's permits
+  were recorded as absent after the City's Hub was read; the City's own
+  server publishes them in a folder the Hub does not list.
+- **Look at the seconds of a date-only column before trusting a watermark on
+  it.** One row stored a second after midnight is enough to make the next
+  filter strict and pass over that day's later rows.

@@ -20,15 +20,23 @@ nine of the twelve: Houston, Kansas City and Santa Fe were left out because
 Texas, Missouri and New Mexico do not disclose sale prices. Charlotte's deeds
 register first, which gives Charlotte all four families, and Toledo's follow,
 which gives Toledo a third. Three metros' sources are held and four metros
-have none. The permits and `311` probe of the fifteen is recorded here as it
-registers.
+have none.
 
-| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds |
-|---|---|---|---|---|
-| 4 | 26 | 26 | **27** (Charlotte) | 27 |
-| 3 | 29 | **30** (Charlotte) | 29 | **30** (Toledo) |
-| 2 | 68 | 67 | 67 | 66 |
-| 1 | 34 | 34 | 34 | 34 |
+The permits and `311` probe of the fifteen ran in two batches. The seven
+southern and western metros (Anchorage, Asheville, Charleston WV, Peoria,
+Reno, Richmond and Roanoke) were probed live on 2026-09-30 from 20:07Z to
+20:50Z (curl default User-Agent, at least ten seconds between requests to a
+host, no applicant, contact or free-text column requested). Asheville's
+permits register, which gives Asheville a third family; three narrow feeds
+are held, and nothing usable turned up for the other ten gaps. The eight
+north-eastern metros' results are recorded here as their feeds register.
+
+| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds (#94) | With Asheville's permits |
+|---|---|---|---|---|---|
+| 4 | 26 | 26 | **27** (Charlotte) | 27 | 27 |
+| 3 | 29 | **30** (Charlotte) | 29 | **30** (Toledo) | **31** (Asheville) |
+| 2 | 68 | 67 | 67 | 66 | 65 |
+| 1 | 34 | 34 | 34 | 34 | 34 |
 
 ## Registered
 
@@ -204,6 +212,69 @@ registers.
   second poll read the same 2,296 rows in three requests and published none.
   Neither poll read a grantor or grantee value or queried a geocoder.
 
+### Asheville, NC — `permits`
+
+- **Source:** the City of Asheville's Accela permits view,
+  `gis.ashevillenc.gov/server/rest/services/Permits/AccelaPermitsView/MapServer/2`,
+  which puts each permit at a point. The 2026-08-28 pass
+  (`.streams/city-asheville.md`) looked only at the City's ArcGIS Hub, which
+  does not list it; the probe found it by walking the City server's folders.
+- **Shape:** 66,072 rows on 2026-09-30, opened from 2014-01-02, one per
+  permit: `record_id` (like `26-07120`) never repeats. The layer also carries
+  each record's name, description, notes and comments, a licence number and a
+  business name; the spec's `select` names eight other columns. Three rows
+  carry a job value, none from the past year, so events carry no cost.
+- **Freshness:** `date_opened` holds the day alone, stored as midnight
+  Eastern (04:00Z in summer), though 18 of the 690 permits published in the
+  live check carry it a second later. Late on Wednesday afternoon
+  (2026-09-30) the newest permit was Tuesday's, and none is opened at
+  weekends, so the layer looks refreshed overnight through the day before
+  (inferred from one day). `expected_cadence_days` is 3, so the staleness
+  alarm waits six days. The layer has no issue date, so both dates on an
+  event are the day the permit was opened, and its status (`record_status`)
+  says whether it has been issued.
+- **A window, not a watermark:** a watermark on `date_opened` lands on
+  04:00:01Z whenever one of the newest day's permits carries the extra
+  second. The next poll's filter (`date_opened > timestamp '2026-09-29
+  00:00:01'`) would then pass over any permit of that day that reached the
+  layer later. So the server evaluates a 90-day window instead, and the
+  cross-run dedup drops the permits already published. The host rejects ISO
+  date literals, so it joins `ANSI_DATE_LITERAL_HOSTS` for a backfill's
+  window; it reads timestamp literals in Eastern time.
+- **Window:** `date_opened >= CURRENT_DATE - INTERVAL '90' DAY AND
+  date_opened <= CURRENT_TIMESTAMP`, less right-of-way, temporary-event,
+  outdoor-vendor and over-the-counter records and the home-occupation and
+  occupational subtypes. The window held 697 permits on 2026-09-30, of the
+  842 opened in those 90 days, and over the past year a 90-day window held
+  727 (June to August 2026) to 1,047 (August to October 2025), so the cap is
+  1,500.
+- **Ids and order:** the permit number keys each event. The snapshot reads
+  `date_opened DESC, objectid DESC`, which has no ties.
+- **Placement:** each permit is a point (stored in State Plane feet; the
+  client asks for WGS84). Seven of the window's 697 permits have no point,
+  and `metro_clip` skips them, as it skips Scottsdale's unplaced requests;
+  every other permit lies inside the metro box. No geocoder is asked.
+- **Mapping:** the permit number, the opened date (as both the filing and
+  the issue date), the subtype as the job type (then the record type), the
+  status, the site address and the parcel number (`apn`). Subtypes name new
+  buildings and demolitions, which map to new construction and demolition;
+  the rest (`Existing Building`, `Accessory Structure`, `Trade`, `Site Work`
+  and so on) map to minor alterations.
+- **Poll:** every six hours, the whole window as a snapshot, in one page.
+- **Live check:** first, the probe's incremental draft of the spec. Its
+  first poll read the newest 1,000 permits, published 985 and left the
+  watermark at `2026-09-29T04:00:01`, so its second poll asked for
+  `date_opened > timestamp '2026-09-29 00:00:01'`. Then two polls of the
+  registered spec through the real scheduler against the live layer, Kafka
+  mocked. The first read 697 permits in two requests (the metadata and one
+  page), skipped the 7 without a point and published 690, opened from
+  2026-07-02 to 2026-09-29; none was dead-lettered and no permit repeated.
+  63 are new buildings, 35 demolitions and 592 other work. By status, 312
+  are issued, 109 wait on the applicant, 106 are in plan check, 50 are
+  finaled, 40 are `CC Issued`, 17 newly received, 17 reissued, 14 revoked
+  and 25 in other states. The second poll read the same 697 permits in one
+  request and published none. Neither poll queried a geocoder.
+
 ## Held
 
 | Metro (missing) | Source | Why held | Re-check when |
@@ -211,12 +282,17 @@ registers.
 | Dayton (`deeds`) | The Montgomery County Auditor's `TaxParcelSales2025_public` layer (`services8.arcgis.com/O6MENQVX63Jn4008`, points): 24,274 sales from 2023-01-03, edited 2026-07-10, newest sale 2026-06-05, so the 90-day window was empty on 2026-09-30. The previous edition was edited on 2023-12-29. Its recorded date is empty on every row and the deed's book and page are two columns. The City's `DaytonParcel` layer fails every query, and its `Parcels_Join` sales table was loaded once, on 2025-04-06. | The last two editions came two and a half years apart, so a 90-day window would sit empty most of the time. | The Auditor republishes monthly or faster. |
 | Oakland (`deeds`) | The Alameda County Assessor's `Assessor_Office_Ownership_Transfer_List` table (`services5.arcgis.com/ROBnTHSNjoZ2Wm1P`): 187,908 transfers from 2023-04-01 to the 2025-03-31 roll cut-off, edited 2025-07-07, unchanged since the 2026-08-24 check. The county's parcel layer dates each parcel's latest document but carries no price. | Published once a year and 18 months old. | The 2026 edition appears. |
 | Omaha (`deeds`) | Nebraska's statewide parcel layer (`gis.ne.gov`, `StatewideParcelsExternal`) carries each Douglas County parcel's last sale, but it was loaded once, on 2026-01-01, and the newest non-future sale is 2025-12-02, so the 90-day window was empty. The county's own sales search answered 403 (Akamai) and was not asked again; the state's sales file needs a login. | Annual, and the window is empty. | NebraskaMAP loads more often, or the county opens a sales layer. |
+| Anchorage (`311`) | The Anchorage Police Department's `APD_CampReports` layer (`services2.arcgis.com/Ce3DhLRthdwbHlfF`, points, edited 2026-09-30): 3,139 camp reports completed since 2026-01-01, 1,334 in 90 days, each with its own `CAMPID`. Its public report layer (3,739 rows) has no stable id. | Reports of camps and trash alone, from the police, not a service-request stream. Registered as the metro's `311`, they would mark Anchorage as covered where the Municipality publishes no requests. | The Municipality publishes its service requests. |
+| Reno (`311`) | The Washoe County Sheriff's Office graffiti, dumping and abandoned-vehicle tracker (`AGOL_WCSO_Graffiti_Dumping_AbandonedVehicles4/FeatureServer/4`): 13,957 reports since 2013-08-15, 135 in 90 days (71 graffiti, 55 abandoned vehicles, 5 dumping, 4 encampments) across Reno, Sparks and unincorporated Washoe; ISO literals accepted. | Three issue types from the sheriff, about one and a half a day. Registered as the metro's `311`, they would mark Reno as covered where the City's own request system publishes nothing (its Reno Direct folder needs a token). | Reno Direct publishes its requests. |
+| Roanoke (`permits`) | The City's `ROWPermitsPublic` layer (`maps.roanokeva.gov`, Transportation): 9,125 permits applied for since 2003, 146 in 90 days; water lines, utility poles, sewers, gas lines and hydrants. | Right-of-way utility and excavation permits, not building permits. Registered as the metro's permits, they would mark Roanoke as covered where the City publishes no building permits (its TRAKiT layers hold reference data, and its weekly permit PDFs stop in October 2022). | The City publishes building permits. |
 | Kansas City (`permits`) | Overland Park's `Building_Permits` layer (`services1.arcgis.com/YQsWDBr0DjMtoTQo`, a hosted layer last rebuilt on 2026-09-30): 13,824 permits over a rolling window from 2024-01-02, newest 2026-09-29, 429 in 30 days, ISO literals accepted, `CaseNumber` unique; 84% of recent rows carry a point and the rest an address. | It covers one suburb in Kansas, roughly a tenth of the metro's people, while the metro's `311` and licences are Kansas City, Missouri's. Registered as the metro's permits, it would mark Kansas City as covered where the City itself has none. | Kansas City, Missouri publishes current permits, or enough suburbs publish that the metro can take them together. |
 
 ## Not now
 
 | Metro (missing) | Why not | Re-check when |
 |---|---|---|
+| Anchorage (`permits`) | The Municipality's permit activity reports are monthly PDFs, and its SmartGov hosted layers hold address points and parcels only; the one permits layer a title search of its ArcGIS Online org found (marijuana, 211 rows) stops on 2023-04-24. | A permits layer or extract appears. |
+| Charleston, WV (`permits`, `311`) | The City GIS folders for the Building Commission and for QAlert (CWV311) need a token, and permits are PDFs and paper forms. The Kanawha County Assessor's server holds parcels, imagery and addresses only. | Either folder opens. |
 | Dayton (`permits`) | The City's GIS holds only the code-complaint layer in its two Accela services and no permits in its Hansen, building-services, planning or viewer services. Permits live in Accela Citizen Access (`DAYTON`). | A permits layer appears on the City GIS. |
 | Honolulu (`permits`) | `data.honolulu.gov` `4vab-c87q` (432,021 rows) is an archive titled "through June 30, 2025" whose newest issue date is 2025-07-01. Nothing in the 72-dataset catalog or ArcGIS Online succeeds it. | A successor dataset appears. |
 | Houston (`permits`) | The City's CKAN (99 datasets) publishes a monthly summary workbook, and its single- and multi-family extracts in ArcGIS Online end in 2024 (edited 2025-05-19). The permit web maps point at an unpublished `Permit_Viewer` (404). `cohegis.houstontx.gov` could not be reached (the egress proxy answered 502 twice). | A permits layer appears on the City GIS. |
@@ -225,9 +301,14 @@ registers.
 | Oakland (`permits`) | No permits dataset among the 313 on `data.oaklandca.gov`, or on the Alameda County and Berkeley portals. Permits live in Accela Citizen Access (`OAKLAND`). | A permits dataset appears. |
 | Omaha (`permits`) | Permits live in Accela Citizen Access (`OMAHA`). Douglas County's `Planning Wreck Permits` (demolitions only) stops on 2024-02-23, and MAPA's regional permits layer (51,978 rows) holds only new buildings over $25,000 and demolitions, updated yearly (newest 2025-12-31). | A permits layer appears on `dcgis.org`. |
 | Oxnard–Ventura (`permits`) | Oxnard's Socrata `vmzx-48vx` stopped on 2024-12-03 and the domain now redirects to an OpenGov budget site with no row API. Ventura County's permitting service covers mining, oil and communication facilities only, and the City of Ventura publishes none. | A permits layer appears in either City's ArcGIS Online org. |
+| Peoria (`permits`, `311`) | The City GIS (`gis.peoriagov.org`) holds reference layers only, its EnerGov map display among them, and no permit or request table; permits live in Tyler EnerGov, and Peoria Cares (`311`) runs on SeeClickFix. Peoria County's server holds parcels, sales and zoning. | A permits or requests layer appears on the City GIS. |
+| Reno (`permits`) | Reno, Sparks and Washoe County permit through one Accela system (ONE Regional Licensing and Permitting) with no public layer. The City's `Permits_Issued` layer (463 rows) stops in September 2022, and the Washoe County Assessor's permit layers stop in 2019. | A permits layer or extract appears. |
+| Richmond (`permits`, `311`) | The City's residential construction layer still needs a token (499, checked again on 2026-09-30) and the commercial one answers 400. For requests, the Socrata portal holds only a SeeClickFix sample from 2014 and 2015, and RVA311 publishes no extract. | The construction layers open or RVA311 publishes an extract. |
 | Santa Fe (`permits`) | The City and County ArcGIS Online orgs hold only parking-permit zones, and the permitting system was not identified. | A permits layer appears in either org. |
 | Toledo (`permits`) | `gis.toledo.oh.gov` has no permits layer and ArcGIS Online has none for Toledo or Lucas County. `permits.toledo.oh.gov` answered one request with a 403 (CloudFront "Request blocked") and was not asked again. | A permits layer appears on the City GIS. |
 | Tulsa (`permits`) | The Tulsa County Assessor's `Building_Permit` layer (6,154 rows, no address) ends on 2025-09-18. The City's server answers "Token Required" on every folder checked except `CustomerCare` (its 311). | The Assessor's layer moves past 2025-09-18 or the City opens a permits service. |
+| Asheville (`311`) | The Asheville App runs on SeeClickFix, whose public API returns reporters and descriptions with no way to leave them out. The City server's old requests view is stopped ("MapServer not started"), and its Accela services view is code enforcement that stops in December 2018. | The City publishes a requests layer. |
+| Roanoke (`311`) | The City's QAlert layer (`QAlertIncidentsProd`) has the columns a `311` feed needs but returned no rows on 2026-08-28 or 2026-09-30. | The layer returns rows. |
 | Honolulu (`deeds`) | No sales on `data.honolulu.gov` (72 datasets), the City's parcel layers, the state's parcel layer or the state's CKAN portal; the City's cadastral tables carry assessed values by tax year and no sale. Sales are searched one parcel or document at a time in qPublic and the Bureau of Conveyances. | A sales or conveyance dataset appears. |
 | Indianapolis (`deeds`) | The City's parcel layers carry owners and assessed values but no sale; `data.indy.gov` (651 datasets) has only tax-sale and surplus reports, and the state's Gateway publishes annual assessment files, not sales disclosures. A statewide sales-disclosure layer on ArcGIS Online is a private compilation that names buyers and sellers and returned no Marion County rows. | The county or state publishes sales disclosures. |
 | Oxnard–Ventura (`deeds`) | Ventura County's parcel layers carry only parcel numbers and coordinates, and no county server or ArcGIS Online item carries sales; California assessors do not publish prices. The Assessor's site answered with a "Request Rejected" page and was not asked again. | A sales or transfer layer appears. |
@@ -236,5 +317,6 @@ registers.
 A platform client would not unlock these cheaply: Accela Citizen Access
 (Dayton, Indianapolis, Oakland, Omaha) is a search interface with no anonymous
 bulk export, and the Tyler EnerGov portal behind Kansas City's permits has no
-public row API either. The same holds for deeds: Honolulu's and Tulsa's sit
-behind one-record-at-a-time or paid recorder searches.
+public row API either. Peoria's permits sit in Tyler EnerGov too, and
+Reno's in the region's Accela. The same holds for deeds: Honolulu's and
+Tulsa's sit behind one-record-at-a-time or paid recorder searches.

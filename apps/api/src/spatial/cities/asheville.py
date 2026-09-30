@@ -1,8 +1,18 @@
 """Asheville, NC — Urban Signal spatial registration (metro bbox, divisions, submarkets).
 
-Leaf module: geometry first. Feed specs live in the spine (city_registry) and
-start with SNAP Retailers (NC slice) unless and until a verifiable public
-permits/311/deeds endpoint is proven on the City's ArcGIS Hub.
+Leaf module: geometry first. The corpus (``data/asheville.yaml``) registers
+three feeds:
+
+- SLA: SNAP retailers (NC slice).
+- DEEDS: the Buncombe County property roll.
+- PERMITS (2026-09-30): the City's Accela permits view on its own ArcGIS
+  Server (``gis.ashevillenc.gov``), which the City's ArcGIS Hub does not list.
+  A snapshot of the permits opened in the last 90 days, since ``date_opened``
+  sometimes carries a stray second that would push a watermark past the rest
+  of its day. See ``docs/research/two-family-depth-2026-09-30.md``.
+
+``311`` stays unregistered: the Asheville App runs on SeeClickFix, and the
+City server's old requests view is stopped.
 """
 
 from typing import Dict
