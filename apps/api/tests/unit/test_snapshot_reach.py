@@ -27,6 +27,9 @@ DEFAULT_CAP = JobConfig.batch_limit
 
 # Rows in the filtered source table, for feeds read in full.
 FULL_READ_ROWS = {
+    # City of Allentown building permits issued in the spec's 90-day window,
+    # newest 2026-09-29, read 2026-09-30.
+    ("allentown", "permits"): 819,
     # City of Asheville permits opened in the spec's 90-day window, less the
     # right-of-way, event, vendor, over-the-counter and home-business
     # records, newest 2026-09-29, read 2026-09-30; 7 carry no point.

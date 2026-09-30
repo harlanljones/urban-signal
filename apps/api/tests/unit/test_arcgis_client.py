@@ -6,6 +6,7 @@ three Louisville feeds) were registered at a service root and reported SUCCESS
 with zero rows until 2026-09-30.
 """
 
+import importlib
 import re
 from urllib.parse import parse_qs
 
@@ -85,7 +86,8 @@ def test_select_is_sent_as_out_fields(monkeypatch):
 def test_every_arcgis_select_names_the_columns_a_poll_reads():
     """``select`` becomes ``outFields``, and a column left out of it arrives
     missing: the field map, id keys, watermark, object id and sort columns must
-    all be selected."""
+    all be selected. A city's ``compose_permit_address`` writes a permit's
+    ``address_street`` from selected parts, so that key is not a column."""
     gaps = []
     for city_id, registration in REGISTRY.items():
         for feed, spec in registration.datasets.items():
@@ -97,6 +99,9 @@ def test_every_arcgis_select_names_the_columns_a_poll_reads():
                 for columns in spec.field_map.values()
                 for column in (columns if isinstance(columns, list) else [columns])
             }
+            leaf = importlib.import_module(f"src.spatial.cities.{city_id.value}")
+            if feed.value == "permits" and hasattr(leaf, "compose_permit_address"):
+                needed.discard("address_street")
             needed |= set(spec.id_keys) | {spec.watermark_col, spec.oid_field or ""}
             needed |= {term.split()[0] for term in (spec.order_by or "").split(",") if term.strip()}
             if needed - selected - {""}:

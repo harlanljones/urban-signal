@@ -2497,4 +2497,13 @@ class Settings(BaseSettings):
         ),
         description="Allentown PA assessed tax parcels with sale year, month and price (city-hosted)",
     )
+    # Allentown permits (2026-09-30): the City's EnerGov building permits view
+    # on ArcGIS Online, one point per permit issued since January 2025.
+    arcgis_allentown_permits_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/WUqVDRuvIiIiH2Pl/arcgis/rest/services/"
+            "EnerGov_Building_Permits_Current/FeatureServer/0"
+        ),
+        description="Allentown PA EnerGov building permits view URL (city-hosted)",
+    )
 settings = Settings()

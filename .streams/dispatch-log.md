@@ -1655,3 +1655,18 @@ Worth keeping:
 - **Look at the seconds of a date-only column before trusting a watermark on
   it.** One row stored a second after midnight is enough to make the next
   filter strict and pass over that day's later rows.
+
+### 2026-09-30 — Allentown permits (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| allentown-permits | `.streams/allentown-permits.md` | `config.py` (the City's permits layer) | 2026-09-30 | done (819 permits read from the 90-day window, 819 published, none dead-lettered, the second poll published none) | `permits` spec and address joiner for Allentown; held and not-now permits notes for seven metros in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Allentown moves from two signal families to three (three-family tier 31 to
+32).
+
+Worth keeping:
+
+- **Search the org that already serves a registered feed.** Allentown's
+  permits sit in the same ArcGIS Online org as its deeds layer, and a keyword
+  search of that org found them after two passes had recorded none.

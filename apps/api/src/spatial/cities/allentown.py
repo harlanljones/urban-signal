@@ -30,7 +30,14 @@ Feeds (probed 2026-09-30):
   coordinates. The ``gis.allentownpa.gov`` host registered until 2026-09-30
   does not exist. Lehigh County's ``ATestParcel`` layer carries the same
   fields county-wide, about a month staler, if the city layer disappears.
-* PERMITS / SLA / 311 — not registered.
+* PERMITS (2026-09-30) — the city's EnerGov building permits view on the
+  same ArcGIS Online org (``EnerGov_Building_Permits_Current``), one point
+  per permit issued since January 2025. Read as a snapshot of the permits
+  issued in the last 90 days: a handful of rows carry a time of day on
+  ``ISSUEDATE``, which would push a watermark past the rest of its day. The
+  site address is split across five columns, which
+  ``compose_permit_address`` below joins.
+* 311 — not registered.
 
 SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
 stands in for the licence register the metro lacks. The corpus builds it
@@ -299,6 +306,35 @@ def compose_deed_date(row: dict[str, Any]) -> str | None:
     return f"{year:04d}-{month:02d}-01"
 
 
+def compose_permit_address(row: dict[str, Any]) -> str | None:
+    """The permit's site address, joined from the EnerGov layer's parts.
+
+    ``ADDRESSLINE1`` holds only the house number; the street is split across
+    ``PREDIRECTION``, ``ADDRESSLINE2`` (the name), ``STREETTYPE`` and
+    ``POSTDIRECTION``. ``DOBPermitsProducer`` calls this for every Allentown
+    permit row. Every row carries a point, so the address is never geocoded.
+    Returns None without a street name.
+    """
+
+    def _part(key: str) -> str:
+        val = row.get(key)
+        return str(val).strip() if val is not None else ""
+
+    if not _part("ADDRESSLINE2"):
+        return None
+    return " ".join(
+        part
+        for part in (
+            _part("ADDRESSLINE1"),
+            _part("PREDIRECTION"),
+            _part("ADDRESSLINE2"),
+            _part("STREETTYPE"),
+            _part("POSTDIRECTION"),
+        )
+        if part
+    )
+
+
 # ---------------------------------------------------------------------------
 # Feed specs (leaf-local; the spine copies these into REGISTRY).
 # Allentown deeds: the city's Tax Parcels Assessed layer (sale year + month).
@@ -342,9 +378,9 @@ def get_allentown_dataset(feed: object) -> object:
     """Leaf-local mirror of ``city_registry.get_dataset``.
 
     Returns the spec for a registered Allentown feed, or raises ``KeyError``
-    naming the city and available feeds when the feed is absent (permits and
-    311 are not registered for Allentown). SLA is the corpus's shared SNAP
-    slice, which this mirror does not carry.
+    naming the city and available feeds when the feed is absent (311 is not
+    registered for Allentown). The corpus registers PERMITS and SLA (the
+    shared SNAP slice) itself; this mirror carries deeds only.
     """
     from src.config import settings
     from src.spatial.city_registry import DatasetSpec
