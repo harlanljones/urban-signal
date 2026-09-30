@@ -660,7 +660,7 @@ grantor or grantee:
   them, and a row that fails to parse goes to the DLQ whole.
 - **DC `deeds`** joins the wrong parcel layer (see "Found, not fixed" under
   "Backfills").
-\n
+
 ## Las Vegas deeds on their parcels
 
 Las Vegas `deeds` reads the city's `parcels` table (302,279 parcels, each
