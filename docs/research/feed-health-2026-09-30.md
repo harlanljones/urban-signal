@@ -17,7 +17,8 @@ way its poll does, and repairs three feeds' polls that the check turned up
 (see "Backfills"). A sixth makes the polls of six text-dated feeds read the
 rows since their watermark (see "Text-dated polls"). A seventh keeps
 grantor and grantee names out of every `deeds` event (see "Party names in
-deeds").
+deeds"), and an eighth places Las Vegas's sales on their parcels (see "Las
+Vegas deeds on their parcels").
 
 | | Jobs | Repaired here | Left, with reason below |
 |---|---|---|---|
@@ -651,11 +652,46 @@ grantor or grantee:
 
 ### Left
 
-- **Las Vegas `deeds`** geocodes `ADDRESS1` and `ADDRESS2`, which hold the
-  owner's mailing address, so a sale lands at its owner's address rather than
-  its parcel. It needs a parcel join and a `select`.
+- **Las Vegas `deeds`** geocoded `ADDRESS1` and `ADDRESS2`, which hold the
+  owner's mailing address, so a sale landed at its owner's address rather than
+  its parcel. The eighth change joins its parcels instead.
 - **28 other ArcGIS and Socrata `deeds` specs** name no `select`, so they
   fetch every column their layer has, owner names included where it has
   them, and a row that fails to parse goes to the DLQ whole.
 - **DC `deeds`** joins the wrong parcel layer (see "Found, not fixed" under
   "Backfills").
+\n
+## Las Vegas deeds on their parcels
+
+Las Vegas `deeds` reads the city's `parcels` table (302,279 parcels, each
+with its latest recorded deed), which has no geometry. The spec geocoded
+`ADDRESS1` and `ADDRESS2`, but those columns, with `OWNER` and `ZIPCODE`,
+are the owner's mailing block, not the parcel's address. Of the 2,000 sales
+recorded since 2026-08-01, 632 (32%) have a mailing ZIP that differs from the
+parcel's `ZIP`, and 257 a mailing address outside Nevada, so at least a third
+of sales were placed where their owner receives mail, and the owner's address
+was sent to the geocoder. The eighth stacked change:
+
+- **Joins the parcels.** The city's `CLV_PARCELS_POLY` layer holds a polygon
+  for each of the table's 302,279 parcels. The spec's `parcel_join` reads
+  each batch's polygons by `PARCEL` and gives each sale its parcel's
+  centroid, as DC's does, and the spec no longer declares `needs_geocode`.
+- **Reads nothing of the owner's.** The field map drops the mailing columns
+  (and `APN`, which the table does not have), and a `select` leaves `OWNER`,
+  `NAMETAG`, `ADDRESS1` to `ADDRESS5` and `ZIPCODE` on the server.
+
+### Checked live
+
+On 2026-09-30 Las Vegas `deeds` was polled twice through `poll_job` from no
+stored watermark, Kafka mocked, the geocoder stubbed to count calls, requests
+2 seconds apart:
+
+| Poll | Fetched | Published | Placed | Requests |
+|---|---|---|---|---|
+| First | 5,000 (recorded 2026-07-14 to 2026-09-16) | 5,000 | 5,000, all inside the metro box | 82, including the polygon reads |
+| Second | 67 (the watermark's day) | 0 | | 2 |
+
+No row reached the geocoder, and the columns read were the nine in the
+`select`. A recent sample of 200 sales matched 200 polygons. The 126 parcels
+whose number starts with a zero lose it in the table's numeric column and do
+not match.

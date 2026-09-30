@@ -437,18 +437,17 @@ datasets:
     - '99990909'
     order_by: DOCDATE DESC, ObjectId DESC
     id_col: null
-    select: null
+    select: PARCEL,DOCNO,DOCDATE,SALEDATE,SALEPRICE,COMNAME,WARD,ZIP,ObjectId
     fallback_endpoints: []
     where: null
-    needs_geocode: true
-    geocode_context: Las Vegas, NV
+    needs_geocode: false
+    geocode_context: null
     field_map:
       doc_id:
       - DOCNO
       - ObjectId
       bbl:
       - PARCEL
-      - APN
       document_amount:
       - SALEPRICE
       recorded_date:
@@ -457,12 +456,8 @@ datasets:
       borough:
       - COMNAME
       - WARD
-      address_street:
-      - ADDRESS1
-      - ADDRESS2
       zipcode:
       - ZIP
-      - ZIPCODE
     ingestion_mode: incremental
     oid_field: ObjectId
     max_record_count: 2000
@@ -479,7 +474,10 @@ datasets:
     state_plane_units: null
     state_plane_x_col: null
     state_plane_y_col: null
-    parcel_join: {}
+    parcel_join:
+      parcel_layer: https://services1.arcgis.com/F1v0ufATbBQScMtY/ArcGIS/rest/services/CLV_PARCELS_POLY/FeatureServer/7
+      join_key: PARCEL
+      geometry_source: centroid
     non_spatial: null
     zip_member: null
     composite_id: true

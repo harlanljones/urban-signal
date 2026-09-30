@@ -1399,3 +1399,20 @@ Worth keeping:
 - **Check a join layer's key shape.** DC's Parcel Lots layer keys `PAR`
   parcels, not the square-and-lot SSLs its sales carry; the join matched 12
   of 4,996.
+
+### 2026-09-30 — Las Vegas deeds on their parcels (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| lv-deeds | `.streams/lv-deeds.md` | none | 2026-09-30 | done (5,000 sales polled live, all placed on their parcels inside the metro box; no geocoder call; the second poll published none) | parcel join to `CLV_PARCELS_POLY`; a `select` without the owner block |
+
+Las Vegas `deeds` takes each sale's point from its parcel's polygon instead
+of geocoding the owner's mailing address.
+
+Worth keeping:
+
+- **Read a table's address columns before geocoding them.** `ADDRESS1` to
+  `ADDRESS5` follow `OWNER`; comparing their ZIP with the parcel's showed a
+  third of them elsewhere.
+- **Look for a polygon layer with the same row count.** The city publishes
+  its parcel polygons beside the table, one for each of its 302,279 rows.
