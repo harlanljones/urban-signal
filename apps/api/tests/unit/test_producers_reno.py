@@ -55,6 +55,9 @@ def test_reno_registers_deeds_and_snap_sla():
     assert deeds.field_map == RENO_DEEDS_FIELD_MAP
     assert deeds.watermark_type == "text"
     assert deeds.watermark_format == "%m/%d/%Y"
+    # The poll names the dates since its watermark (text_date_window). As a
+    # snapshot it re-read the same first 1,000 of 194,122 sales every poll.
+    assert deeds.ingestion_mode == "incremental"
 
     for feed in (FeedType.PERMITS, FeedType.COMPLAINTS_311):
         with pytest.raises(KeyError, match="no.*feed"):

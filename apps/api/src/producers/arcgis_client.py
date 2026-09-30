@@ -102,13 +102,23 @@ class ArcGISClient:
         """Strip a trailing ``/query`` so callers may pass either form."""
         return endpoint_url.rstrip("/").removesuffix("/query")
 
+    # ArcGIS Online and other IIS-fronted servers answer 404 to a GET whose
+    # URL passes about 2,000 characters; Esri's own clients send such a query
+    # as a POST, which every query operation accepts.
+    _MAX_GET_URL = 2_000
+
     def _request_json(self, url: str, params: Dict[str, Any]) -> Dict[str, Any]:
-        """GET a JSON payload with exponential backoff, raising on ArcGIS error bodies."""
+        """GET a JSON payload with exponential backoff, raising on ArcGIS error bodies.
+
+        A query too long for a GET URL (a text watermark's list of dates) is
+        POSTed as a form instead.
+        """
+        long_query = len(str(httpx.URL(url, params=params))) > self._MAX_GET_URL
         backoff = 1.0
         for attempt in range(1, self.max_retries + 1):
             try:
                 with httpx.Client(timeout=self.timeout) as client:
-                    resp = client.get(url, params=params)
+                    resp = client.post(url, data=params) if long_query else client.get(url, params=params)
                     if resp.status_code == 429:
                         time.sleep(backoff)
                         backoff *= 2.0

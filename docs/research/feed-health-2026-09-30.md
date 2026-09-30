@@ -14,7 +14,8 @@ poll sends, which a second poll of every affected feed showed was failing on
 fourth reads Richmond's sales from the assessor's monthly workbook (see
 "Richmond's transfers workbook"). A fifth makes a backfill read each feed the
 way its poll does, and repairs three feeds' polls that the check turned up
-(see "Backfills").
+(see "Backfills"). A sixth makes the polls of six text-dated feeds read the
+rows since their watermark (see "Text-dated polls").
 
 | | Jobs | Repaired here | Left, with reason below |
 |---|---|---|---|
@@ -466,7 +467,8 @@ backfill read each feed the way `poll_job` does:
   the rows inside it; the report's `outside_window` counts the rest. A CSV
   already compares in the declared format. Such a column is not in date
   order on the server either, so these feeds and San Jose's keep their
-  spec's order instead of paging newest first.
+  spec's order instead of paging newest first. The sixth change sends these
+  windows to the server as dates (see "Text-dated polls").
 - **Snapshots keep their own order.** A backfill of a feed without a
   watermark column reads it in the spec's order, as the poll does.
 
@@ -534,11 +536,6 @@ from 90 days back:
 
 ### Found, not fixed
 
-- **Polls of the six client-windowed feeds still compare text.** Reno and
-  Rochester `deeds`, Worcester `permits` and `sla`, Virginia Beach `sla` and
-  Honolulu `311` send `column > 'stored value'`, which reads the wrong rows
-  for `MM/DD/YYYY`. Their polls need an object-id cursor or a client-side
-  filter like the backfill's.
 - **Milwaukee `permits`** has not changed since 2026-06-21; its newest permit
   was issued 2026-06-15.
 - **Cincinnati `deeds` publishes no coordinates.** Its address is split
@@ -559,3 +556,57 @@ from 90 days back:
   parse goes to the DLQ whole, and Phoenix `deeds` dead-letters every row.
 - **`source_mode`.** A backfill does not mark its events as backfilled
   (ADR 0008, US-115).
+
+## Text-dated polls
+
+Six feeds keep their date as text in a format that is not year first: Reno
+and Rochester `deeds`, Virginia Beach and Worcester `sla` and Worcester
+`permits` write `MM/DD/YYYY` (Worcester without zero padding), and Honolulu
+`311` writes `September 29, 2026 at 10:17 PM`. As text,
+`SALEDATE > '09/21/2026'` reads September 22 to December 31 of every past
+year, and Worcester's `9/9/2026` sorts above `9/30/2026`, so each poll read
+old rows and could fill its cap before it reached new ones. Reno `deeds` was a
+snapshot for this reason, and each poll re-read the same first 1,000 of its
+194,122 sales. The sixth stacked change:
+
+- **Names the dates.** An ArcGIS or Socrata filter on such a column lists
+  each day from the watermark's to today, written padded and unpadded, with
+  whole months and years as `LIKE` patterns:
+  `SALEDATE IN ('09/28/2026', '9/28/2026', ...) OR SALEDATE LIKE '10/%/2026'`.
+  A time of day matches any text, so Honolulu reads
+  `date_created LIKE 'September 29, 2026 at %'` and the dedup drops the rows
+  of that day it has seen. A CSV already compares in the declared format and
+  San Jose's CKAN filter casts both sides, so neither changes, and a
+  year-first format still compares as text.
+- **Posts a long query.** ArcGIS Online answers 404 to a GET past about 2,000
+  characters (a list of 85 dates measured 2,272; 70 measured 1,898 and
+  passed), and a window that spans two part-months lists up to 120 dates. The
+  ArcGIS client now sends a query that long as a form POST, as Esri's own
+  clients do.
+- **Reno `deeds` polls incrementally.**
+- **Backfills use the same window** instead of reading these feeds whole and
+  filtering client-side.
+
+### Checked live
+
+On 2026-09-30 each feed was polled twice through `poll_job` from a set
+watermark, Kafka mocked, requests 2 seconds apart. Every row read was dated
+inside the window, and each second poll read only the new watermark's day,
+whose rows the dedup dropped:
+
+| Feed | Watermark | First poll | Second poll |
+|---|---|---|---|
+| Reno `deeds` | `09/21/2026` | 211 rows dated 09/21 to 09/28, 211 published | 24 rows (09/28), none published |
+| Rochester `deeds` | `08/03/2026` | 55 rows, 08/03 to 08/14, 55 published | 1 row, none published |
+| Virginia Beach `sla` | `08/03/2026` | 296 rows, 08/03 to 08/31, 273 published | 9 rows, none published |
+| Worcester `permits` | `8/2/2026` | 931 rows, 8/2 to 9/26, 931 published | 1 row, none published |
+| Worcester `sla` | `8/20/2026` | 13 rows, 8/20 to 9/21, 13 published | 1 row, none published |
+| Honolulu `311` | `September 26, 2026 at 3:15 PM` | 298 rows, September 26 to 29, 292 published | 85 rows (September 29), none published |
+
+A 58-day window (116 dates) went as a POST to Worcester `permits` on ArcGIS
+Online and to Reno's MapServer, which returned 834 and 2,013 rows over one
+and three pages.
+
+Rochester's newest sale is dated 2026-08-14 and Virginia Beach's newest
+licence 2026-08-31: both layers are refreshed in batches, so their windows
+run from that date until the next batch lands.

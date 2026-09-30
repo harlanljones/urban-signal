@@ -15,10 +15,9 @@ Design notes:
   reading; ``--full`` loads complete history.
 * Snapshot feeds (no watermark column) load their table head, in the spec's
   own order, under ``--max-rows-per-feed``.
-* A text-typed watermark whose format the server cannot order (``MM/DD/YYYY``
-  on ArcGIS) is read without a window and filtered client-side; the report's
-  ``outside_window`` counts the rows read and left out. A cap then counts rows
-  read in the spec's own order.
+* A text-typed watermark whose format does not sort (``MM/DD/YYYY``) is
+  windowed by its dates, as ``poll_job`` windows it, and read in the spec's
+  own order, so a cap counts rows in that order rather than newest first.
 * The per-feed report's ``max_watermark_seen`` is the seed value for the
   durable watermark store (US-106).
 
@@ -34,7 +33,6 @@ import argparse
 import json
 import logging
 import os
-import re
 import sys
 import time
 from collections.abc import Iterable
@@ -55,8 +53,8 @@ from src.producers.acquisition import (
 from src.producers.scheduler import _PAGINATE_KWARGS, MunicipalIngestionScheduler
 from src.producers.watermarks import (
     ANSI_DATE_LITERAL_HOSTS,
-    casts_text_watermark,
     parse_watermark,
+    text_sorts_as_dates,
 )
 from src.spatial.city_registry import DatasetSpec
 
@@ -72,12 +70,6 @@ PLATFORM_PAGE_SIZE = {
 }
 
 WM_ATTRS = ("issuance_date", "created_date", "effective_date", "recorded_date")
-
-# A date format whose text sorts as its dates do: year first, then month, day
-# and time, each zero-padded.
-_YEAR_FIRST = re.compile(
-    r"^%Y(?:[^%]*%m(?:[^%]*%d(?:[^%]*%H(?:[^%]*%M(?:[^%]*%S(?:[^%]*%f)?)?)?)?)?)?[^%]*$"
-)
 
 
 def _spec_from_meta(meta: dict[str, Any]) -> AcquisitionSpec:
@@ -145,8 +137,8 @@ def build_query_shape(
     A text-typed column (ADR 0005) compares as the text its format writes, so
     its window starts in that format, as ``poll_job``'s stored watermark does:
     an ISO literal read every ``YYYYMMDD`` date from the first of January. A
-    format the server cannot order is windowed client-side instead
-    (``client_side_window``).
+    format that does not sort gets the window's dates instead
+    (``text_date_window``).
     """
     base_where = meta.get("base_where")
     wm = meta.get("watermark_col")
@@ -167,11 +159,8 @@ def build_query_shape(
 
     spec = _spec_from_meta(meta)
     text_format = meta.get("watermark_format") if meta.get("watermark_type") == "text" else None
-    client_window = client_side_window(meta)
     high_watermark = (
-        since_dt.strftime(text_format or "%Y-%m-%dT%H:%M:%S")
-        if since_dt is not None and not client_window
-        else None
+        since_dt.strftime(text_format or "%Y-%m-%dT%H:%M:%S") if since_dt is not None else None
     )
     where = build_where(
         base_where=base_where,
@@ -202,39 +191,7 @@ def _sorts_as_dates(meta: dict[str, Any]) -> bool:
     fmt = meta.get("watermark_format")
     if meta.get("watermark_type") != "text" or not fmt or meta.get("platform") == "csv":
         return True
-    return bool(_YEAR_FIRST.match(fmt))
-
-
-def client_side_window(meta: dict[str, Any]) -> str | None:
-    """The declared format, when a text column's window cannot be sent.
-
-    A column that does not sort as dates does not compare as them either:
-    from ``07/02/2026``, Reno's sales read every December 31 from 2018 to
-    2025. San Jose's CKAN filter casts both sides to timestamps
-    (``casts_text_watermark``); for the rest (``MM/DD/YYYY`` on ArcGIS,
-    Honolulu's ``September 7, 2026 at 1:27 PM``) the backfill reads the feed
-    without the window and keeps the rows inside it.
-    """
-    if not meta.get("watermark_col") or _sorts_as_dates(meta):
-        return None
-    if casts_text_watermark(
-        str(meta.get("endpoint", "")), meta.get("watermark_type"), meta.get("watermark_format")
-    ):
-        return None
-    return meta.get("watermark_format")
-
-
-def _in_window(value: Any, fmt: str, since_dt: datetime) -> bool:
-    """Whether a text watermark falls on or after the window's start.
-
-    The column holds a local time with no zone, so the start's clock time is
-    compared as it is. A value that does not parse is outside.
-    """
-    try:
-        parsed = datetime.strptime(str(value).strip(), fmt)  # noqa: DTZ007
-    except (TypeError, ValueError):
-        return False
-    return parsed >= since_dt.replace(tzinfo=None)
+    return text_sorts_as_dates(fmt)
 
 
 def _is_ansi_date_literal_server(meta: dict[str, Any]) -> bool:
@@ -263,7 +220,7 @@ def backfill_job(
     platform = meta.get("platform", "socrata")
     city_id = meta["city_id"]
 
-    fetched = published = duplicates = drops = outside_window = 0
+    fetched = published = duplicates = drops = 0
     max_watermark_seen: str | None = None
     error: str | None = None
     # US-111 future-watermark guard (mirrors the scheduler): a future/sentinel
@@ -280,7 +237,6 @@ def backfill_job(
         client = scheduler._paginating_client_for(job_name)
         producer_wrapper = scheduler.producers[meta["producer_key"]]
         where_clause, client_kwargs = build_query_shape(meta, since_dt)
-        window_format = client_side_window(meta) if since_dt is not None else None
         effective_page = page_size or PLATFORM_PAGE_SIZE.get(platform, 1000)
         for batch in client.paginate(
             endpoint_url=meta["endpoint"],
@@ -289,13 +245,6 @@ def backfill_job(
             max_records=max_rows,
             **client_kwargs,
         ):
-            if window_format:
-                kept = [
-                    row for row in batch
-                    if _in_window(row.get(meta["watermark_col"]), window_format, since_dt)
-                ]
-                outside_window += len(batch) - len(kept)
-                batch = kept
             # A sales table without geometry takes each parcel's centroid, as
             # poll_job places it.
             if meta.get("parcel_join") and batch:
@@ -399,7 +348,6 @@ def backfill_job(
         "published": published,
         "duplicates": duplicates,
         "parse_drops": drops,
-        "outside_window": outside_window,
         "max_watermark_seen": max_watermark_seen,
         "error": error,
     }

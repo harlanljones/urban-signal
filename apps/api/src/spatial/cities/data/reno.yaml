@@ -144,7 +144,7 @@ datasets:
       borough:
       - CITY
       - SUBNAME
-    ingestion_mode: snapshot
+    ingestion_mode: incremental
     oid_field: OBJECTID
     max_record_count: 2000
     expected_cadence_days: 7

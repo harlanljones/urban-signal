@@ -1342,3 +1342,23 @@ Worth keeping:
   no row; the first poll still worked, so only a second poll showed it.
 - **Look for the column.** Cincinnati's watermark column never existed in its
   file; a snapshot poll does not notice, a windowed backfill reads nothing.
+
+### 2026-09-30 — Text-dated polls read the rows since their watermark (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| text-windows | `.streams/text-windows.md` | none | 2026-09-30 | done (six feeds polled twice live from a set watermark; every row read inside the window) | `text_date_window` in `producers/watermarks.py`, ArcGIS POST for long queries, Reno `deeds` incremental |
+
+A filter on a text date that does not sort (`MM/DD/YYYY`, Honolulu's long
+dates) names the days since the watermark, with whole months and years as
+`LIKE` patterns, instead of comparing text. Backfills use the same window.
+
+Worth keeping:
+
+- **Measure padding before writing a pattern.** Reno writes `09/05/2026` and
+  Worcester `9/5/2026` under the same declared format; the window writes both.
+- **ArcGIS Online caps a GET near 2,000 characters.** A longer query is a 404
+  that looks like a missing layer; send it as a POST.
+- **A batch-refreshed layer holds its watermark for weeks.** Rochester's and
+  Virginia Beach's newest rows were six and four weeks old, so their windows
+  grow until the next batch lands.

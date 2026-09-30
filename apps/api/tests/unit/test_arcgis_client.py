@@ -7,9 +7,12 @@ with zero rows until 2026-09-30.
 """
 
 import re
+from urllib.parse import parse_qs
 
+import httpx
 import pytest
 
+from src.producers import arcgis_client
 from src.producers.arcgis_client import ArcGISClient, layer_time_zone
 from src.spatial.city_registry import REGISTRY
 
@@ -137,3 +140,28 @@ def test_layer_metadata_carries_the_time_zone_and_numeric_fields(monkeypatch):
     assert meta["time_zone"] == "America/New_York"
     assert meta["date_fields"] == {"ADDDATE"}
     assert meta["numeric_fields"] == {"LRSN"}
+
+
+def test_a_query_too_long_for_a_url_is_posted(monkeypatch):
+    """ArcGIS Online answers 404 to a GET past about 2,000 characters, which a
+    text watermark's list of dates can pass; the query goes as a form POST."""
+    seen = []
+
+    def answer(request):
+        form = parse_qs(request.content.decode()) if request.method == "POST" else {}
+        seen.append((request.method, form.get("where", [request.url.params.get("where")])[0]))
+        return httpx.Response(200, json={"features": []})
+
+    real_client = httpx.Client
+    monkeypatch.setattr(
+        arcgis_client.httpx, "Client",
+        lambda **kw: real_client(transport=httpx.MockTransport(answer), **kw),
+    )
+    dates = ", ".join(f"'{month:02d}/{day:02d}/2026'" for month in (5, 6, 7, 8) for day in range(1, 31))
+    long_where = f"SALEDATE IN ({dates})"
+    client = ArcGISClient()
+
+    client._request_json(f"{_LAYER}/query", {"where": "1=1", "f": "json"})
+    client._request_json(f"{_LAYER}/query", {"where": long_where, "resultOffset": 0, "f": "json"})
+
+    assert seen == [("GET", "1=1"), ("POST", long_where)]

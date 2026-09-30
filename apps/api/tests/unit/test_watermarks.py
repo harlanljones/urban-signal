@@ -1,10 +1,14 @@
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
+
+import pytest
 
 from src.producers.watermarks import (
     compare_watermarks,
     newest_typed_watermark,
     newest_watermark,
     sort_watermarks,
+    text_date_window,
+    text_sorts_as_dates,
     typed_watermark_entry,
     watermark_comparison,
     watermark_exclude_clause,
@@ -134,3 +138,102 @@ def test_text_watermarks_and_unknown_zones_keep_the_stored_value(caplog):
     assert got == "col > '2026-09-29T18:23:07'"
     assert "Mars/Olympus" in caplog.text
 
+
+
+_RENO = "https://gisweb.washoecounty.gov/arcgis/rest/services/OpenData/WashoeDataShare/MapServer/0"
+_HONOLULU = "https://data.honolulu.gov/resource/jdy7-ftwe.json"
+
+
+@pytest.mark.parametrize(
+    ("fmt", "sorts"),
+    [
+        ("%Y%m%d", True),
+        ("%Y-%m-%d %H:%M:%S.%f", True),
+        ("%Y/%m/%d", True),
+        ("%Y", True),
+        ("%m/%d/%Y", False),
+        ("%B %d, %Y at %I:%M %p", False),
+        (None, False),
+    ],
+)
+def test_only_a_year_first_format_sorts_as_dates(fmt, sorts):
+    assert text_sorts_as_dates(fmt) is sorts
+
+
+def test_a_text_window_names_each_day_to_today():
+    """As text, ``SALEDATE > '09/21/2026'`` read September 22 to December 31
+    of every past year. The window names the days, padded and unpadded."""
+    assert text_date_window("SALEDATE", ">=", "09/28/2026", "%m/%d/%Y", today=date(2026, 9, 30)) == (
+        "SALEDATE IN ('09/28/2026', '9/28/2026', '09/29/2026', '9/29/2026', '09/30/2026', '9/30/2026')"
+    )
+    # A strict boundary on a date-only column starts the next day.
+    assert text_date_window("SALEDATE", ">", "09/28/2026", "%m/%d/%Y", today=date(2026, 9, 30)) == (
+        "SALEDATE IN ('09/29/2026', '9/29/2026', '09/30/2026', '9/30/2026')"
+    )
+    # Worcester writes 9/9/2026, which sorted above 9/30/2026.
+    assert text_date_window("D", ">=", "9/9/2026", "%m/%d/%Y", today=date(2026, 9, 10)) == (
+        "D IN ('09/09/2026', '9/9/2026', '09/10/2026', '9/10/2026')"
+    )
+    # Into a new month, both months' days are named; October's are written
+    # the same padded and unpadded from the 10th.
+    got = text_date_window("D", ">=", "9/29/2026", "%m/%d/%Y", today=date(2026, 10, 10))
+    assert got.startswith("D IN ('09/29/2026', '9/29/2026', '09/30/2026', '9/30/2026', '10/01/2026', '10/1/2026'")
+    assert got.endswith("'10/09/2026', '10/9/2026', '10/10/2026')")
+
+
+def test_a_long_text_window_takes_whole_months_and_years():
+    got = text_date_window("SALEDATE", ">=", "12/30/2023", "%m/%d/%Y", today=date(2026, 2, 1))
+    assert got == (
+        "(SALEDATE IN ('12/30/2023', '12/31/2023', '02/01/2026', '2/1/2026')"
+        " OR SALEDATE LIKE '%/2024' OR SALEDATE LIKE '%/2025'"
+        " OR SALEDATE LIKE '01/%/2026' OR SALEDATE LIKE '1/%/2026')"
+    )
+
+
+def test_a_time_of_day_matches_any_text():
+    """Honolulu writes ``September 29, 2026 at 10:17 PM``: the watermark's
+    own day is read whole, and the dedup drops the rows already seen."""
+    got = text_date_window(
+        "date_created", ">", "September 29, 2026 at 10:17 PM", "%B %d, %Y at %I:%M %p",
+        today=date(2026, 10, 1),
+    )
+    assert got == (
+        "(date_created LIKE 'September 29, 2026 at %' OR date_created LIKE 'September 30, 2026 at %'"
+        " OR date_created LIKE 'October 01, 2026 at %' OR date_created LIKE 'October 1, 2026 at %')"
+    )
+
+
+@pytest.mark.parametrize(
+    ("value", "fmt"),
+    [
+        ("not a date", "%m/%d/%Y"),
+        ("09/2026", "%m/%Y"),
+        ("2026_09_28", "%Y_%m_%d"),
+        ("09/28/2026 +0000", "%m/%d/%Y %z%j"),
+    ],
+)
+def test_a_value_or_format_it_cannot_name_gives_no_window(value, fmt):
+    assert text_date_window("D", ">=", value, fmt, today=date(2026, 9, 30)) is None
+
+
+def test_the_server_gets_the_dates_where_text_would_not_sort():
+    kw = {"watermark_type": "text", "watermark_format": "%m/%d/%Y", "today": date(2026, 9, 29)}
+    assert watermark_comparison("SALEDATE", ">=", "09/28/2026", _RENO, **kw) == (
+        "SALEDATE IN ('09/28/2026', '9/28/2026', '09/29/2026', '9/29/2026')"
+    )
+    assert watermark_comparison(
+        "date_created", ">=", "September 29, 2026 at 12:00 AM", _HONOLULU,
+        watermark_type="text", watermark_format="%B %d, %Y at %I:%M %p", today=date(2026, 9, 29),
+    ) == "date_created LIKE 'September 29, 2026 at %'"
+    # A CSV client compares the column as dates itself; San Jose's CKAN
+    # filter casts both sides; a year-first format sorts as text.
+    assert watermark_comparison("sale_date", ">=", "09/28/2026", "https://data.example/sales.csv", **kw) == (
+        "sale_date >= '09/28/2026'"
+    )
+    assert watermark_comparison(
+        "ISSUEDATE", ">", "9/28/2026 1:00:00 PM", "ckan://data.sanjoseca.gov/x",
+        watermark_type="text", watermark_format="%m/%d/%Y %I:%M:%S %p",
+    ).startswith('to_timestamp("ISSUEDATE"')
+    assert watermark_comparison(
+        "DOCDATE", ">", "20260928", _RENO, watermark_type="text", watermark_format="%Y%m%d"
+    ) == "DOCDATE > '20260928'"

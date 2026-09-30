@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import calendar
 import logging
+import re
 from collections.abc import Iterable
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from functools import cmp_to_key
 from typing import Any
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -246,6 +248,160 @@ def casts_text_watermark(
     )
 
 
+# A date format whose text sorts as its dates do: year first, then month, day
+# and time, each zero-padded.
+_YEAR_FIRST = re.compile(
+    r"^%Y(?:[^%]*%m(?:[^%]*%d(?:[^%]*%H(?:[^%]*%M(?:[^%]*%S(?:[^%]*%f)?)?)?)?)?)?[^%]*$"
+)
+
+
+def text_sorts_as_dates(watermark_format: str | None) -> bool:
+    """Whether text written in ``watermark_format`` sorts in date order.
+
+    Only a year-first format does (``%Y%m%d``, ``%Y-%m-%d %H:%M:%S``). As
+    text, ``12/31/2018`` sorts above ``07/02/2026``.
+    """
+    return bool(watermark_format and _YEAR_FIRST.match(watermark_format))
+
+
+# Date parts a text window names; a time of day or a zone matches anything.
+_DATE_DIRECTIVES = frozenset("YymBbdAa")
+_TIME_DIRECTIVES = frozenset("HIMSfpzZ")
+
+
+def _format_tokens(fmt: str) -> list[tuple[bool, str]] | None:
+    """Split a strptime format into ``(is_directive, text)`` tokens.
+
+    None when the format cannot be named day by day: it lacks a year, a month
+    or a day, uses another directive, or has a literal ``%`` or ``_`` (LIKE
+    wildcards).
+    """
+    tokens: list[tuple[bool, str]] = []
+    pos = 0
+    for match in re.finditer(r"%(.)", fmt):
+        if match.start() > pos:
+            tokens.append((False, fmt[pos : match.start()]))
+        tokens.append((True, match.group(1)))
+        pos = match.end()
+    if pos < len(fmt):
+        tokens.append((False, fmt[pos:]))
+    directives = {text for is_directive, text in tokens if is_directive}
+    literals = "".join(text for is_directive, text in tokens if not is_directive)
+    if (
+        not directives <= _DATE_DIRECTIVES | _TIME_DIRECTIVES
+        or not directives & {"Y", "y"}
+        or not directives & {"m", "B", "b"}
+        or "d" not in directives
+        or "%" in literals
+        or "_" in literals
+    ):
+        return None
+    return tokens
+
+
+def _date_cover(start: date, end: date) -> list[tuple[str, date]]:
+    """Whole years, whole months and single days that cover ``start..end``."""
+    units: list[tuple[str, date]] = []
+    day = start
+    while day <= end:
+        month_end = day.replace(day=calendar.monthrange(day.year, day.month)[1])
+        if (day.month, day.day) == (1, 1) and date(day.year, 12, 31) <= end:
+            units.append(("year", day))
+            day = date(day.year + 1, 1, 1)
+        elif day.day == 1 and month_end <= end:
+            units.append(("month", day))
+            day = month_end + timedelta(days=1)
+        else:
+            units.append(("day", day))
+            day += timedelta(days=1)
+    return units
+
+
+def _render_unit(tokens: list[tuple[bool, str]], unit: str, day: date, padded: bool) -> str:
+    """One unit of a cover as the column writes it, ``%`` where any text goes."""
+    parts = []
+    for is_directive, text in tokens:
+        if not is_directive:
+            parts.append(text.replace("'", "''"))
+        elif text == "Y":
+            parts.append(f"{day.year:04d}")
+        elif text == "y":
+            parts.append(f"{day.year % 100:02d}")
+        elif text == "m" and unit != "year":
+            parts.append(f"{day.month:02d}" if padded else str(day.month))
+        elif text in "Bb" and unit != "year":
+            parts.append(day.strftime(f"%{text}"))
+        elif text == "d" and unit == "day":
+            parts.append(f"{day.day:02d}" if padded else str(day.day))
+        elif text in "Aa" and unit == "day":
+            parts.append(day.strftime(f"%{text}"))
+        else:
+            parts.append("%")
+    # Wildcards joined only by punctuation are one wildcard: ``%:% %`` is ``%``.
+    return re.sub(r"%(?:[^0-9A-Za-z%]*%)+", "%", "".join(parts))
+
+
+def text_date_window(
+    watermark_col: str,
+    op: str,
+    value: str,
+    watermark_format: str,
+    *,
+    today: date | None = None,
+) -> str | None:
+    """Name the dates from a text watermark's day to today, as the column writes them.
+
+    A format that is not year first does not compare as text: from
+    ``09/28/2026``, ``SALEDATE > '09/28/2026'`` read September 29 to December
+    31 of every past year, and Worcester's unpadded ``9/9/2026`` sorted above
+    ``9/30/2026``. The window lists each day instead, from the watermark's
+    (the next day for ``>`` on a date-only column) to today in UTC, with
+    whole months and years as ``LIKE`` patterns:
+    ``SALEDATE IN ('09/28/2026', '9/28/2026', ...) OR SALEDATE LIKE
+    '10/%/2026'``. Each day is written padded and unpadded, since strptime
+    reads both. A time of day matches any text (Honolulu's ``September 29,
+    2026 at %``), so rows earlier on the watermark's day are read again and
+    the dedup drops them. None when the format or value cannot be read.
+    """
+    tokens = _format_tokens(watermark_format)
+    if tokens is None or op not in (">", ">="):
+        return None
+    entry = typed_watermark_entry(value, fmt=watermark_format) or typed_watermark_entry(value)
+    if entry is None:
+        return None
+    start = entry[1].date()
+    if op == ">" and not any(is_directive and text in _TIME_DIRECTIVES for is_directive, text in tokens):
+        start += timedelta(days=1)
+    end = max(today or datetime.now(UTC).date(), start)
+    exact: list[str] = []
+    patterns: list[str] = []
+    for unit, day in _date_cover(start, end):
+        for padded in (True, False):
+            text = _render_unit(tokens, unit, day, padded)
+            bucket = patterns if "%" in text else exact
+            if text not in bucket:
+                bucket.append(text)
+    terms = []
+    if exact:
+        listed = ", ".join(f"'{text}'" for text in exact)
+        terms.append(f"{watermark_col} IN ({listed})")
+    terms.extend(f"{watermark_col} LIKE '{pattern}'" for pattern in patterns)
+    return terms[0] if len(terms) == 1 else f"({' OR '.join(terms)})"
+
+
+# An ArcGIS layer or a Socrata resource: servers that evaluate ``where``.
+_SERVER_FILTERED = re.compile(r"/rest/services/.+/(?:FeatureServer|MapServer)/\d+/?$|/resource/[^/]+\.json$")
+
+
+def _server_reads_where(endpoint: str) -> bool:
+    """Whether the server evaluates ``where`` (an ArcGIS layer, a Socrata resource).
+
+    The CSV and workbook clients evaluate it themselves, comparing a text
+    column as dates in its declared format.
+    """
+    return bool(_SERVER_FILTERED.search(endpoint))
+
+
 def watermark_comparison(
     watermark_col: str,
     op: str,
@@ -255,6 +411,7 @@ def watermark_comparison(
     watermark_type: str | None = None,
     watermark_format: str | None = None,
     time_zone: str | None = None,
+    today: date | None = None,
 ) -> str:
     """Render a ``col OP <value>`` predicate with a server-appropriate literal.
 
@@ -271,6 +428,10 @@ def watermark_comparison(
     ANSI, as local time there. ``time_zone`` renders the value in that zone;
     without it DC's 311 filter started four hours late (Eastern) and skipped
     the requests filed in between.
+
+    A text column whose format is not year first cannot be compared as text,
+    so an ArcGIS or Socrata server gets the dates themselves
+    (``text_date_window``).
     """
     if casts_text_watermark(endpoint, watermark_type, watermark_format):
         escaped = value.replace("'", "''")
@@ -279,6 +440,15 @@ def watermark_comparison(
             f'to_timestamp("{watermark_col}", \'{pg_format}\') {op} '
             f"to_timestamp('{escaped}', '{pg_format}')"
         )
+    if (
+        watermark_type == "text"
+        and watermark_format
+        and not text_sorts_as_dates(watermark_format)
+        and _server_reads_where(endpoint)
+    ):
+        window = text_date_window(watermark_col, op, value, watermark_format, today=today)
+        if window is not None:
+            return window
     parsed = parse_watermark(value) if watermark_type != "text" else None
     if parsed is not None and time_zone:
         try:

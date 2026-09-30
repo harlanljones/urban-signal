@@ -131,15 +131,17 @@ assessor's four-month posting lag (see the feed-health note).
 | Feed | Rows | Why it is not fixed here |
 |---|---|---|
 | Kansas City `sla` | 28,245 | no date to window on; `valid_license_for` is a text licence year shared by thousands of rows |
-| Reno `deeds` | 194,124 | the only sale date is `MM/DD/YYYY` text, which does not sort |
 | Phoenix `deeds` (CSV) | 903,301 | the endpoint is a 61 MB zip of a 270 MB pipe-delimited file; the spec names no zip member or delimiter, and the CSV client holds the whole file and every kept row in memory |
 | Boston `deeds` | 184,552 | the configured id is the CKAN package, not a resource (404); the FY2026 resource has no coordinates and none of the mapped column names |
 | Ocala `permits`, Orlando `permits` | 283,399 / 488,959 | the Florida statewide cadastral polygon layer now answers 499 Token Required, and the county codes select Jackson (42) and Levy (48) counties instead of Marion (52) and Orange (58) |
 
 Henderson `sla` was on this list; the feed-repair change
 ([feed-health-2026-09-30.md](feed-health-2026-09-30.md)) fixed its field map
-and made it a window. Phoenix, Boston, Ocala and Orlando need more than a spec
-edit and are described there.
+and made it a window. Reno `deeds` was too, since its only sale date is
+`MM/DD/YYYY` text, which does not sort; a later change there ("Text-dated
+polls") names the dates since its watermark, and it now polls incrementally.
+Phoenix, Boston, Ocala and Orlando need more than a spec edit and are
+described there.
 
 ## Scheduler and backfill changes
 

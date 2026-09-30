@@ -10,7 +10,6 @@ import pytest
 from scripts.backfill_loader import (
     backfill_job,
     build_query_shape,
-    client_side_window,
     main,
     select_jobs,
 )
@@ -205,70 +204,30 @@ def _text_dated_sales(order_by=None):
     )
 
 
-@pytest.mark.parametrize(
-    ("fmt", "client_side"),
-    [
-        ("%m/%d/%Y", True),
-        ("%B %d, %Y at %I:%M %p", True),
-        ("%Y%m%d", False),
-        ("%Y-%m-%d %H:%M:%S.%f", False),
-        ("%Y/%m/%d", False),
-        ("%Y", False),
-    ],
-)
-def test_only_a_format_the_server_cannot_order_is_windowed_client_side(fmt, client_side):
-    meta = _meta(watermark_col="SALE_DATE", platform="arcgis", watermark_type="text", watermark_format=fmt)
-    assert (client_side_window(meta) == fmt) is client_side
-
-
-def test_text_the_server_can_compare_is_windowed_there():
-    csv = _meta(watermark_col="sale_date", platform="csv", watermark_type="text", watermark_format="%m/%d/%Y")
-    cast = _meta(
-        watermark_col="ISSUEDATE",
-        platform="ckan",
-        endpoint="ckan://data.sanjoseca.gov/045b3678-e923-4002-b696-300955bc6d06",
+def test_text_the_server_can_compare_keeps_its_comparison():
+    csv = _meta(
+        watermark_col="sale_date",
+        platform="csv",
+        endpoint="https://data.example/sales.csv",
         watermark_type="text",
-        watermark_format="%m/%d/%Y %I:%M:%S %p",
+        watermark_format="%m/%d/%Y",
     )
     untyped = _meta(watermark_col="ISSUEDATE", platform="arcgis", watermark_format="%m/%d/%Y")
-    assert [client_side_window(meta) for meta in (csv, cast, untyped)] == [None, None, None]
+    since = datetime(2026, 7, 2, tzinfo=UTC)
+    assert build_query_shape(csv, since)[0] == "sale_date >= '07/02/2026'"
+    assert build_query_shape(untyped, since)[0] == "ISSUEDATE >= '2026-07-02T00:00:00'"
 
 
-def test_a_window_the_server_cannot_order_is_kept_client_side():
+def test_a_window_on_text_that_does_not_sort_names_its_dates():
     # As text, '12/31/2018' sorts above '07/02/2026': from that literal,
     # Reno's newest-first read began with sales made on December 31 of 2018
-    # to 2025.
+    # to 2025. The window names July's days from the 2nd, then whole months.
     meta = _text_dated_sales(order_by="SALE_DATE DESC")
     where, kwargs = build_query_shape(meta, datetime(2026, 7, 2, tzinfo=UTC))
-    assert where is None
+    assert where.startswith("(SALE_DATE IN ('07/02/2026', '7/2/2026', '07/03/2026', '7/3/2026'")
+    assert "SALE_DATE LIKE '08/%/2026' OR SALE_DATE LIKE '8/%/2026'" in where
+    # The column has no newest-first order, so the spec's own stands.
     assert kwargs == {"order_by": "SALE_DATE DESC"}
-
-    fake = _FakeScheduler({"permits_baltimore": meta})
-    client = MagicMock()
-    client.paginate.return_value = [
-        [
-            {"permitnumber": "old", "SALE_DATE": "10/02/2018"},
-            {"permitnumber": "new", "SALE_DATE": "9/9/2026"},
-            {"permitnumber": "edge", "SALE_DATE": "07/02/2026"},
-            {"permitnumber": "blank", "SALE_DATE": ""},
-        ],
-        [{"permitnumber": "before", "SALE_DATE": "07/01/2026"}],
-    ]
-    pw = MagicMock()
-    pw.parse_socrata_row.side_effect = lambda row, city_id=None: _fake_event(key=row["permitnumber"])
-    _wire(fake, client, pw)
-
-    report = backfill_job(
-        fake, "permits_baltimore",
-        since_dt=datetime(2026, 7, 2, tzinfo=UTC), max_rows=None,
-        page_size=None, batch_delay_seconds=0,
-    )
-
-    published = [call.kwargs["key"] for call in pw.producer.produce.call_args_list]
-    assert published == ["baltimore:new", "baltimore:edge"]
-    assert (report["fetched"], report["outside_window"]) == (2, 3)
-    assert report["max_watermark_seen"] == "9/9/2026"
-    assert client.paginate.call_args.kwargs["where_clause"] is None
 
 
 def test_a_full_load_keeps_every_text_dated_row():
@@ -284,7 +243,8 @@ def test_a_full_load_keeps_every_text_dated_row():
         fake, "permits_baltimore", since_dt=None, max_rows=None, page_size=None, batch_delay_seconds=0
     )
 
-    assert (report["published"], report["outside_window"]) == (1, 0)
+    assert report["published"] == 1
+    assert client.paginate.call_args.kwargs["where_clause"] is None
 
 
 def test_a_text_dated_csv_backfills_its_window():
