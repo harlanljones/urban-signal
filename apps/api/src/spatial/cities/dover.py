@@ -1,25 +1,3 @@
-DEEDS_FIELD_MAP = {
-    "doc_id": ["PARCELID"],
-    "bbl": ["PARCELID"],
-    "doc_type": ["DEED_TYPE"],
-    "document_amount": ["SALEPRICE"],
-    "recorded_date": ["SALEDATE"],
-    "address_street": ["ADDRESS"],
-    "incident_address": ["ADDRESS"],
-    "borough": ["CITY"],
-    "zipcode": ["ZIP"],
-}
-
-FIELD_MAP = {
-    "deeds": DEEDS_FIELD_MAP,
-}
-
-NON_CANDIDATE_METADATA_COLUMNS = (
-    "VALID",
-    "MultiSale",
-    "PARCEL_SOURCE",
-)
-
 """Dover Metro Submarket Registry and Spatial Layer for Urban Signal.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -27,14 +5,12 @@ division catalog, and geographic bounding boxes for the City of Dover, DE
 (Kent County seat and state capital — deliberately scoped to the Dover
 municipal extent, not the broader Kent County parcel layer).
 
-Feed scope (probed 2026-09-06, best-effort): Dover is a DEEDS-led partial
-metro. The city's open-data GIS publishes a municipal parcel layer carrying
-per-parcel SALEPRICE/SALEDATE/DEED_TYPE; the closest ACRIS-shape feed this
-project has in the Delmarva region. The endpoint is a best-effort ArcGIS
-FeatureServer URL (US-317) — the interlock gate does not assert endpoint
-liveness, and the feed is typed against the municipal open-data GIS. Native
-parcel polygons supply every row's coordinates, so ``needs_geocode`` stays
-False. PERMITS/SLA/311 are absent from the Dover open-data portal; Tier 3.
+Feeds: SLA reads the SNAP retailer slice (``snap_sla_spec``, Delaware stores
+inside the metro box). The DEEDS feed registered until 2026-09-30 named a host
+(gis.delaware.gov) that does not exist, and no public sale source exists: Kent
+County's parcel layer carries a deed book and page reference but no sale date
+or price, its sales history sits in the per-parcel PRIDE site, and Delaware
+publishes no statewide sales dataset. Permits and 311 remain unregistered.
 """
 
 
@@ -248,79 +224,6 @@ DOV_DIVISION_BBOXES = DOVER_DIVISION_BBOXES
 DOV_SUBMARKETS = DOVER_SUBMARKETS
 DOV_DIVISIONS = DOVER_DIVISIONS
 
-# ---------------------------------------------------------------------------
-# Feed specs (leaf-local; the spine copies these into REGISTRY).
-# Best-effort Dover municipal deeds/sales FeatureServer (US-317); endpoint
-# liveness is not asserted by the gate.
-# ---------------------------------------------------------------------------
-DOVER_DEEDS_ENDPOINT = (
-    "https://gis.delaware.gov/arcgis/rest/services/Dover/Dover_Parcels/"
-    "FeatureServer/0"
-)
-
-DOVER_FEED_SPECS: dict[str, dict[str, object]] = {
-    "deeds": {
-        "endpoint": DOVER_DEEDS_ENDPOINT,
-        "platform": "arcgis",
-        "watermark_col": "SALEDATE",
-        "id_keys": ["PARCELID", "SALEDATE"],
-        "topic_key": "topic_deeds",
-        "interval_seconds": 600.0,
-        "producer_key": "deeds",
-        "extra": {
-            "needs_geocode": False,
-            "watermark_type": "text",
-            "watermark_format": "%m/%d/%Y",
-            "oid_field": "OBJECTID",
-            "max_record_count": 100000,
-            "expected_cadence_days": 30,
-            "non_spatial": False,
-            "scope": (
-                "Dover DE deeds/sales via the municipal open-data parcel layer "
-                "(Kent County extract; native parcel polygons, NOT address-only). "
-                "Best-effort FeatureServer endpoint (US-317) — liveness not "
-                "asserted by the gate. SALEDATE TEXT MM/DD/YYYY watermark sorts "
-                "lexically — typed comparison required (ADR-0005). No owner-name "
-                "columns exist; party fields stay None. PARCELID is the parcel "
-                "key; DEED_TYPE distinguishes arm's-length vs quitclaim transfers."
-            ),
-            "field_map": DEEDS_FIELD_MAP,
-        },
-    },
-}
-
-
-def get_dover_dataset(feed: object) -> object:
-    """Leaf-local mirror of ``city_registry.get_dataset``.
-
-    Returns the spec for a registered Dover feed, or raises ``KeyError`` naming
-    the city and available feeds when the feed is absent (permits/SLA/311 are
-    absent from the Dover open-data portal).
-    """
-    from src.config import settings
-    from src.spatial.city_registry import DatasetSpec
-
-    feed_name = getattr(feed, "value", str(feed))
-    if feed_name not in DOVER_FEED_SPECS:
-        available = ", ".join(sorted(DOVER_FEED_SPECS))
-        raise KeyError(
-            f"'{DOVER_CITY_ID}' has no '{feed_name}' feed; available: {available}"
-        )
-    payload = DOVER_FEED_SPECS[feed_name]
-    extra_kwargs = {
-        k: v for k, v in payload.get("extra", {}).items() if k != "scope"
-    }
-    return DatasetSpec(
-        endpoint=payload["endpoint"],
-        platform=payload["platform"],
-        watermark_col=payload["watermark_col"],
-        id_keys=payload["id_keys"],
-        topic=getattr(settings, payload["topic_key"]),
-        interval_seconds=payload["interval_seconds"],
-        producer_key=payload["producer_key"],
-        **extra_kwargs,
-    )
-
 
 from src.spatial.registration import SpatialRegistration
 
@@ -333,21 +236,16 @@ REGISTRATION = SpatialRegistration(
 )
 
 __all__ = [
-    "DEEDS_FIELD_MAP",
     "DOVER_CENTER",
     "DOVER_CITY_ID",
-    "DOVER_DEEDS_ENDPOINT",
     "DOVER_DIVISIONS",
     "DOVER_DIVISION_BBOXES",
-    "DOVER_FEED_SPECS",
     "DOVER_METRO_BBOX",
     "DOVER_SUBMARKETS",
     "DOV_DIVISIONS",
     "DOV_DIVISION_BBOXES",
     "DOV_SUBMARKETS",
-    "FIELD_MAP",
     "REGISTRATION",
-    "get_dover_dataset",
     "is_in_dover",
     "is_in_dover_metro",
 ]

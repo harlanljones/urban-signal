@@ -345,8 +345,14 @@ class ArcGISClient:
         order_by: str = "",
         batch_size: int = 1000,
         max_records: Optional[int] = None,
+        select: Optional[str] = None,
     ) -> Generator[List[Dict[str, Any]], None, None]:
-        """Paginate an ArcGIS layer, yielding batches of flattened records."""
+        """Paginate an ArcGIS layer, yielding batches of flattened records.
+
+        ``select`` is a comma-separated field list sent as ``outFields``, so a
+        layer's owner and buyer columns can stay on the server; without it
+        every column is read.
+        """
         offset = 0
         total_fetched = 0
 
@@ -363,6 +369,7 @@ class ArcGISClient:
                 order_by=order_by,
                 limit=fetch_limit,
                 offset=offset,
+                select=select,
             )
 
             if not records:

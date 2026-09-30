@@ -2323,19 +2323,12 @@ class Settings(BaseSettings):
                 )
         return self
 
-
-
-    arcgis_albany_deeds_url: str = Field(
-        default=(
-            "https://albanyny.gov/server/rest/services/Real_Property/"
-            "Tax_Parcels/FeatureServer/0"
-        ),
-        description="Albany NY deeds/sales ArcGIS FeatureServer URL (US-353)",
-    )
-
     arcgis_providence_deeds_url: str = Field(
-        default="https://providenceri.gov/server/rest/services/OpenData/Parcels/FeatureServer/0",
-        description="Providence, RI deeds/sales ArcGIS FeatureServer URL (US-350)",
+        default=(
+            "https://services6.arcgis.com/wv9mHoqblhTsnqdG/arcgis/rest/services/"
+            "Parcel_Zoning_FL/FeatureServer/0"
+        ),
+        description="Providence, RI parcels with the assessor's last sale (city-hosted ArcGIS Online layer)",
     )
 
     arcgis_richmond_deeds_url: str = Field(
@@ -2343,35 +2336,25 @@ class Settings(BaseSettings):
         description="Richmond VA deeds/sales ArcGIS FeatureServer URL (US-348)",
     )
 
-    arcgis_huntington_wv_deeds_url: str = Field(
-        default=(
-            "https://huntingtonwv.gov/server/rest/services/"
-            "Parcels/Deeds/FeatureServer/0"
-        ),
-        description="Huntington WV deeds/sales ArcGIS FeatureServer URL (US-320)",
-    )
-
     arcgis_charleston_wv_deeds_url: str = Field(
-        default="https://services8.arcgis.com/0zSnoqwLCR3i1Yfw/arcgis/rest/services/Charleston_Parcels/FeatureServer/0",
-        description="Charleston WV deeds/sales ArcGIS FeatureServer URL (US-319)",
-    )
-
-    arcgis_dover_deeds_url: str = Field(
         default=(
-            "https://gis.delaware.gov/arcgis/rest/services/Dover/Dover_Parcels/"
-            "FeatureServer/0"
+            "https://kanawhacountyassessorgis.com/server/rest/services/"
+            "Parcel_Line_Layer/MapServer/1"
         ),
-        description="Dover DE deeds/sales ArcGIS FeatureServer URL (US-317)",
+        description="Kanawha County Assessor tax parcels with the last sale (Charleston, WV)",
     )
 
     arcgis_burlington_deeds_url: str = Field(
-        default="https://data.burlingtonvt.gov/server/rest/services/Assessment_Parcels/FeatureServer/0",
-        description="Burlington VT deeds/sales ArcGIS FeatureServer URL (US-316)",
+        default=(
+            "https://services1.arcgis.com/BkFxaEFNwHqX3tAw/arcgis/rest/services/"
+            "FS_VCGI_OPENDATA_Cadastral_PTTR_point_WM_v1_view/FeatureServer/0"
+        ),
+        description="Vermont property-transfer returns (VCGI), filtered to Burlington's town code",
     )
 
-    arcgis_frederick_deeds_url: str = Field(
-        default="https://services1.arcgis.com/X3lKekbdaBmNjCHu/ArcGIS/rest/services/Frederick_Parcels/FeatureServer/3",
-        description="Frederick MD deeds/sales ArcGIS FeatureServer URL (US-315)",
+    socrata_frederick_deeds_endpoint: str = Field(
+        default="https://opendata.maryland.gov/resource/gx8c-a963.json",
+        description="Maryland SDAT real property assessments, Frederick County view (last sale per account)",
     )
 
     arcgis_roanoke_deeds_url: str = Field(
@@ -2379,37 +2362,11 @@ class Settings(BaseSettings):
         description="Roanoke VA deeds/sales ArcGIS FeatureServer URL (US-314)",
     )
 
-    arcgis_manchester_deeds_url: str = Field(
-        default=(
-            "https://services1.arcgis.com/KlG08rx11MkfACQT/arcgis/rest/services/"
-            "Manchester_NH_Property_Card/FeatureServer/0"
-        ),
-        description="Manchester NH deeds/sales ArcGIS FeatureServer URL (US-313)",
-    )
-
-    arcgis_portland_maine_deeds_url: str = Field(
-        default="https://gis.portlandmaine.gov/maps/rest/services/ParcelsWGS84/FeatureServer/0",
-        description="Portland Maine deeds/sales ArcGIS FeatureServer URL (US-312)",
-    )
-
-    arcgis_harrisburg_deeds_url: str = Field(
-        default="https://harrisburgpa.gov/server/rest/services/open_data/Property_Sales/FeatureServer/0",
-        description="Harrisburg PA deeds/sales ArcGIS FeatureServer URL (US-311)",
-    )
-
-    arcgis_wilmington_de_deeds_url: str = Field(
-        default=(
-            "https://gis.newcastlede.gov/server/rest/services/"
-            "Parcels/Real_Estate_Sales/FeatureServer/0"
-        ),
-        description="Wilmington, DE deeds/sales ArcGIS FeatureServer URL (US-310)",
-    )
-
     arcgis_allentown_deeds_url: str = Field(
         default=(
-            "https://gis.allentownpa.gov/server/rest/services/"
-            "Property/Parcels/FeatureServer/0"
+            "https://services1.arcgis.com/WUqVDRuvIiIiH2Pl/arcgis/rest/services/"
+            "Tax_Parcels_Assessed_2022/FeatureServer/0"
         ),
-        description="Allentown PA deeds/sales ArcGIS FeatureServer URL (US-307)",
+        description="Allentown PA assessed tax parcels with sale year, month and price (city-hosted)",
     )
 settings = Settings()

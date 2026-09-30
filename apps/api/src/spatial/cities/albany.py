@@ -1,27 +1,3 @@
-DEEDS_FIELD_MAP = {
-    "doc_id": ["PARCELID", "PRINTKEY"],
-    "bbl": ["PARCELID"],
-    "doc_type": ["DEED_TYPE"],
-    "document_amount": ["SALE_PRICE"],
-    "recorded_date": ["SALE_DATE"],
-    "address_street": ["SITEADDRESS"],
-    "incident_address": ["SITEADDRESS"],
-    "borough": ["CITY"],
-    "zipcode": ["ZIP5"],
-}
-
-FIELD_MAP = {
-    "deeds": DEEDS_FIELD_MAP,
-}
-
-NON_CANDIDATE_METADATA_COLUMNS = (
-    "VALID",
-    "MultiSale",
-    "PARCEL_SOURCE",
-    "BOOK",
-    "PAGE",
-)
-
 """Albany Metro Submarket Registry and Spatial Layer for Urban Signal.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -29,23 +5,13 @@ division catalog, and geographic bounding boxes for the City of Albany,
 NY (Capital District seat on the Hudson — deliberately not overlapping the
 sibling Rochester/Syracuse leaf boxes).
 
-Feed scope (best-effort registration, 2026-09-02): Albany County's Real
-Property parcels are published through the city/county ArcGIS catalog. The
-DEEDS-led partial metro below carries the closest ACRIS-shape parcel/sales
-feed. The endpoint is a BEST-EFFORT URL (see PR_DESCRIPTION); the interlock
-gate does not probe endpoint liveness, so this registration lands the
-geometry, submarkets, and producer-key wiring ahead of a verified live probe.
-
-* DEEDS — ``Real_Property/Tax_Parcels/FeatureServer/0``. Watermark
-  ``SALE_DATE`` is assumed TEXT ``MM/DD/YYYY``; if a live probe shows a
-  different format, the declared ``watermark_format`` must follow. Native
-  parcel polygons supply every row's coordinates, so ``needs_geocode`` stays
-  False. ``producer_key='deeds'`` rides the shared ``deeds_acris_producer``.
-* PERMITS / SLA / COMPLAINTS_311 — absent from the local catalog at probe
-  time. Tier 3 — do not register until a live endpoint is confirmed.
-
-Re-probe within 72 h of any spine change; replace the assumed endpoint with
-the verified FeatureServer URL once the city's open-data portal resolves it.
+Feeds: SLA reads the SNAP retailer slice (``snap_sla_spec``, New York stores
+inside the metro box). The DEEDS feed registered until 2026-09-30 pointed at an
+ArcGIS Server albanyny.gov never ran, and no public sale source exists: the
+city, county and state parcel layers and data.ny.gov stop at deed book and
+page, and New York's RP-5217 sales sit behind the ORPTS Sales Web search.
+Re-probe if ORPTS publishes those sales as a dataset. Permits and 311 remain
+unregistered.
 """
 
 
@@ -289,80 +255,6 @@ ALB_DIVISION_BBOXES = ALBANY_DIVISION_BBOXES
 ALB_SUBMARKETS = ALBANY_SUBMARKETS
 ALB_DIVISIONS = ALBANY_DIVISIONS
 
-# ---------------------------------------------------------------------------
-# Feed specs (leaf-local; the spine copies these into REGISTRY).
-# ---------------------------------------------------------------------------
-ALBANY_DEEDS_ENDPOINT = (
-    "https://albanyny.gov/server/rest/services/Real_Property/"
-    "Tax_Parcels/FeatureServer/0"
-)
-
-ALBANY_FEED_SPECS: dict[str, dict[str, object]] = {
-    "deeds": {
-        "endpoint": ALBANY_DEEDS_ENDPOINT,
-        "platform": "arcgis",
-        "watermark_col": "SALE_DATE",
-        "id_keys": ["PARCELID", "PRINTKEY", "SALE_DATE"],
-        "topic_key": "topic_deeds",
-        "interval_seconds": 600.0,
-        "producer_key": "deeds",
-        "extra": {
-            "needs_geocode": False,
-            "watermark_type": "text",
-            "watermark_format": "%m/%d/%Y",
-            "oid_field": "OBJECTID",
-            "max_record_count": 100000,
-            "expected_cadence_days": 30,
-            "non_spatial": False,
-            "scope": (
-                "Albany DEEDS/sales via the city/county Real Property parcels "
-                "layer (best-effort endpoint; assumed TEXT MM/DD/YYYY SALE_DATE "
-                "watermark, native parcel polygons, NO address-only). ENDPOINT "
-                "IS A BEST-EFFORT ASSUMPTION (US-353): the city's open-data "
-                "portal must be re-probed to confirm the live FeatureServer URL "
-                "and watermark format before production ingest. $1 quitclaim "
-                "transfers are KEPT at ingest (no per-city where; market-sale "
-                "filtering is analysis-side). No owner-name columns assumed; "
-                "party fields stay None. Re-probe within 72h of any spine or "
-                "schedule change and replace the assumed endpoint."
-            ),
-            "field_map": DEEDS_FIELD_MAP,
-        },
-    },
-}
-
-
-def get_albany_dataset(feed: object) -> object:
-    """Leaf-local mirror of ``city_registry.get_dataset``.
-
-    Returns the spec for a registered Albany feed, or raises ``KeyError``
-    naming the city and available feeds when the feed is absent (permits/SLA/
-    311 are absent from the local catalog at probe time).
-    """
-    from src.config import settings
-    from src.spatial.city_registry import DatasetSpec
-
-    feed_name = getattr(feed, "value", str(feed))
-    if feed_name not in ALBANY_FEED_SPECS:
-        available = ", ".join(sorted(ALBANY_FEED_SPECS))
-        raise KeyError(
-            f"'{ALBANY_CITY_ID}' has no '{feed_name}' feed; available: {available}"
-        )
-    payload = ALBANY_FEED_SPECS[feed_name]
-    extra_kwargs = {
-        k: v for k, v in payload.get("extra", {}).items() if k != "scope"
-    }
-    return DatasetSpec(
-        endpoint=payload["endpoint"],
-        platform=payload["platform"],
-        watermark_col=payload["watermark_col"],
-        id_keys=payload["id_keys"],
-        topic=getattr(settings, payload["topic_key"]),
-        interval_seconds=payload["interval_seconds"],
-        producer_key=payload["producer_key"],
-        **extra_kwargs,
-    )
-
 
 from src.spatial.registration import SpatialRegistration
 
@@ -377,19 +269,14 @@ REGISTRATION = SpatialRegistration(
 __all__ = [
     "ALBANY_CENTER",
     "ALBANY_CITY_ID",
-    "ALBANY_DEEDS_ENDPOINT",
     "ALBANY_DIVISIONS",
     "ALBANY_DIVISION_BBOXES",
-    "ALBANY_FEED_SPECS",
     "ALBANY_METRO_BBOX",
     "ALBANY_SUBMARKETS",
     "ALB_DIVISIONS",
     "ALB_DIVISION_BBOXES",
     "ALB_SUBMARKETS",
-    "DEEDS_FIELD_MAP",
-    "FIELD_MAP",
     "REGISTRATION",
-    "get_albany_dataset",
     "is_in_albany",
     "is_in_albany_metro",
 ]

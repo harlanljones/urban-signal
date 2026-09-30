@@ -1,27 +1,3 @@
-DEEDS_FIELD_MAP = {
-    "doc_id": ["PARCELID", "PRINTKEY"],
-    "bbl": ["PARCELID"],
-    "doc_type": ["DEED_TYPE"],
-    "document_amount": ["SALE_PRICE"],
-    "recorded_date": ["SALE_DATE"],
-    "address_street": ["SITEADDRESS"],
-    "incident_address": ["SITEADDRESS"],
-    "borough": ["CITY"],
-    "zipcode": ["ZIP5"],
-}
-
-FIELD_MAP = {
-    "deeds": DEEDS_FIELD_MAP,
-}
-
-NON_CANDIDATE_METADATA_COLUMNS = (
-    "VALID",
-    "MultiSale",
-    "PARCEL_SOURCE",
-    "BOOK",
-    "PAGE",
-)
-
 """Harrisburg Metro Submarket Registry and Spatial Layer for Urban Signal.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -30,17 +6,13 @@ PA (the state capital, on the Susquehanna River in Dauphin County — the
 sibling Lancaster/York leaf boxes sit east/southeast and must stay clear of
 this box).
 
-Feed scope (US-311, registered 2026-09 without a live municipal probe;
-endpoint is a documented best-effort ArcGIS FeatureServer URL per the
-onboarding SOP — liveness is unverified). Harrisburg is a DEEDS-led partial
-metro: the city's open-data property/sales layer is expected to carry
-per-parcel ``SALE_DATE``/``SALE_PRICE``/``BOOK``/``PAGE``/``DEED_TYPE`` in the
-ADR-0005 text-watermark shape. Re-probe once a live layer is confirmed.
-
-* DEEDS — ``open_data/Property_Sales/FeatureServer/0``. Text ``SALE_DATE`` is
-  the watermark (``%m/%d/%Y``); ``needs_geocode=False`` pending a confirmed
-  native-parcel geometry probe. Producer key ``deeds`` resolves uniquely via
-  ``job_suffix="harrisburg"``.
+Feeds: SLA reads the SNAP retailer slice (``snap_sla_spec``, Pennsylvania
+stores inside the metro box). The DEEDS feed registered until 2026-09-30 named
+a service the city website never hosted, and no public sale source exists: the
+city's tax-parcel snapshots carry a purchase date frozen at 2022-12-30 and no
+price, Dauphin County's open tables carry only a recorder document number, and
+the county's sales search has no export or API. Permits and 311 remain
+unregistered.
 """
 
 
@@ -284,80 +256,6 @@ HBG_DIVISION_BBOXES = HARRISBURG_DIVISION_BBOXES
 HBG_SUBMARKETS = HARRISBURG_SUBMARKETS
 HBG_DIVISIONS = HARRISBURG_DIVISIONS
 
-# ---------------------------------------------------------------------------
-# Feed specs (leaf-local; the spine copies these into REGISTRY).
-# Best-effort endpoint (US-311): no live municipal open-data probe was
-# performed; validate the FeatureServer layer before production ingest.
-# ---------------------------------------------------------------------------
-HARRISBURG_DEEDS_ENDPOINT = (
-    "https://harrisburgpa.gov/server/rest/services/"
-    "open_data/Property_Sales/FeatureServer/0"
-)
-
-HARRISBURG_FEED_SPECS: dict[str, dict[str, object]] = {
-    "deeds": {
-        "endpoint": HARRISBURG_DEEDS_ENDPOINT,
-        "platform": "arcgis",
-        "watermark_col": "SALE_DATE",
-        "id_keys": ["PARCELID", "PRINTKEY", "SALE_DATE"],
-        "topic_key": "topic_deeds",
-        "interval_seconds": 600.0,
-        "producer_key": "deeds",
-        "extra": {
-            "needs_geocode": False,
-            "watermark_type": "text",
-            "watermark_format": "%m/%d/%Y",
-            "oid_field": "OBJECTID",
-            "max_record_count": 100000,
-            "expected_cadence_days": 30,
-            "non_spatial": False,
-            "scope": (
-                "Harrisburg DEEDS/sales via the city open-data Property_Sales "
-                "layer (best-effort endpoint — live layer unverified at "
-                "registration; re-probe before production ingest). TEXT "
-                "MM/DD/YYYY watermark sorts lexically — typed comparison "
-                "required (ADR-0005). $1 quitclaim transfers KEPT at ingest "
-                "(no per-city where). No owner-name columns expected; party "
-                "fields stay None. BOOK/PAGE ride id_keys as recorded-deed "
-                "references; PARCELID/PRINTKEY are the parcel keys."
-            ),
-            "field_map": DEEDS_FIELD_MAP,
-        },
-    },
-}
-
-
-def get_harrisburg_dataset(feed: object) -> object:
-    """Leaf-local mirror of ``city_registry.get_dataset``.
-
-    Returns the spec for a registered Harrisburg feed, or raises ``KeyError``
-    naming the city and available feeds when the feed is absent (permits/SLA/
-    311 are absent at registration).
-    """
-    from src.config import settings
-    from src.spatial.city_registry import DatasetSpec
-
-    feed_name = getattr(feed, "value", str(feed))
-    if feed_name not in HARRISBURG_FEED_SPECS:
-        available = ", ".join(sorted(HARRISBURG_FEED_SPECS))
-        raise KeyError(
-            f"'{HARRISBURG_CITY_ID}' has no '{feed_name}' feed; available: {available}"
-        )
-    payload = HARRISBURG_FEED_SPECS[feed_name]
-    extra_kwargs = {
-        k: v for k, v in payload.get("extra", {}).items() if k != "scope"
-    }
-    return DatasetSpec(
-        endpoint=payload["endpoint"],
-        platform=payload["platform"],
-        watermark_col=payload["watermark_col"],
-        id_keys=payload["id_keys"],
-        topic=getattr(settings, payload["topic_key"]),
-        interval_seconds=payload["interval_seconds"],
-        producer_key=payload["producer_key"],
-        **extra_kwargs,
-    )
-
 
 from src.spatial.registration import SpatialRegistration
 
@@ -370,21 +268,16 @@ REGISTRATION = SpatialRegistration(
 )
 
 __all__ = [
-    "DEEDS_FIELD_MAP",
-    "FIELD_MAP",
     "HARRISBURG_CENTER",
     "HARRISBURG_CITY_ID",
-    "HARRISBURG_DEEDS_ENDPOINT",
     "HARRISBURG_DIVISIONS",
     "HARRISBURG_DIVISION_BBOXES",
-    "HARRISBURG_FEED_SPECS",
     "HARRISBURG_METRO_BBOX",
     "HARRISBURG_SUBMARKETS",
     "HBG_DIVISIONS",
     "HBG_DIVISION_BBOXES",
     "HBG_SUBMARKETS",
     "REGISTRATION",
-    "get_harrisburg_dataset",
     "is_in_harrisburg",
     "is_in_harrisburg_metro",
 ]

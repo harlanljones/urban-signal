@@ -1,26 +1,18 @@
 DEEDS_FIELD_MAP = {
-    "doc_id": ["PARCELID", "PRINTKEY"],
-    "bbl": ["PARCELID"],
-    "doc_type": ["DEED_TYPE"],
-    "document_amount": ["SALE_PRICE"],
-    "recorded_date": ["SALE_DATE"],
-    "address_street": ["SITEADDRESS"],
-    "incident_address": ["SITEADDRESS"],
-    "borough": ["CITY"],
-    "zipcode": ["ZIP5"],
+    "doc_id": ["returnID"],
+    "bbl": ["span"],
+    "document_amount": ["ValPdOrTrn"],
+    "recorded_date": ["closeDate"],
+    "address_street": ["propLocStr"],
+    "incident_address": ["propLocStr"],
+    "borough": ["propLocCty"],
+    "latitude": ["Latitude"],
+    "longitude": ["Longitude"],
 }
 
 FIELD_MAP = {
     "deeds": DEEDS_FIELD_MAP,
 }
-
-NON_CANDIDATE_METADATA_COLUMNS = (
-    "VALID",
-    "MultiSale",
-    "PARCEL_SOURCE",
-    "BOOK",
-    "PAGE",
-)
 
 """Burlington Metro Submarket Registry and Spatial Layer for Urban Signal.
 
@@ -29,22 +21,19 @@ division catalog, and geographic bounding boxes for the City of Burlington,
 VT (Chittenden County seat on Lake Champlain — deliberately not overlapping
 the sibling Montpelier/Plattsburgh leaf boxes).
 
-Feed scope (best-effort definition 2026-09-03; see PR_DESCRIPTION assumption):
-Burlington publishes an open-data parcel/sales layer on its municipal ArcGIS
-Portal. The DEEDS feed mirrors Rochester's ArcGIS shape — a tax-parcel
-FeatureServer carrying per-parcel SALE_DATE/SALE_PRICE — with native parcel
-polygons supplying every row's coordinates, so ``needs_geocode`` stays False.
-The endpoint in ``arcgis_burlington_deeds_url`` is a documented best-effort
-URL pending a live probe of the Burlington open-data portal; the gate does not
-check endpoint liveness.
+Feeds (probed 2026-09-30):
 
-Implementation notes:
-* DEEDS — ``Assessment_Parcels/FeatureServer/0`` (best-effort). Producer key
-  ``deeds``, topic ``raw.municipal.deeds``, ``oid_field='OBJECTID'``,
-  ``ingestion_mode='incremental'``.
-* PERMITS — absent from the open-data portal at definition time. Tier 3.
-* SLA/licenses — absent. Tier 3.
-* COMPLAINTS_311 — absent. Tier 3.
+* DEEDS — the state's Vermont Property Transfers layer (VCGI geocodes the
+  Department of Taxes property-transfer returns filed since 2019 and updates
+  it weekly), filtered to Burlington's town code ``114``. One row per return,
+  read incrementally on ``postedDate``: about 30% of returns post more than a
+  month after closing, so a ``closeDate`` cursor would skip them.
+  ``closeDate`` is the recorded date and ``ValPdOrTrn`` the amount. Seller and
+  buyer names are never selected. The layer's own ``Latitude``/``Longitude``
+  supply coordinates. The city's parcel layers carry no sale fields, and the
+  ``data.burlingtonvt.gov`` URL registered until 2026-09-30 is the city's
+  ArcGIS Hub domain, which serves no REST services (HTTP 404).
+* PERMITS / SLA / COMPLAINTS_311 — absent. Tier 3.
 """
 
 
@@ -305,46 +294,36 @@ BTV_DIVISIONS = BURLINGTON_DIVISIONS
 
 # ---------------------------------------------------------------------------
 # Feed specs (leaf-local; the spine copies these into REGISTRY).
-# Best-effort Burlington open-data parcel/sales layer (endpoint documented in
-# arcgis_burlington_deeds_url). Mirrors Rochester's ArcGIS shape: native parcel
-# polygons supply coordinates (needs_geocode False), incremental ingestion with
-# a TEXT watermark.
+# Burlington deeds: VCGI Vermont Property Transfers, town code 114.
 # ---------------------------------------------------------------------------
 BURLINGTON_DEEDS_ENDPOINT = (
-    "https://data.burlingtonvt.gov/server/rest/services/"
-    "Assessment_Parcels/FeatureServer/0"
+    "https://services1.arcgis.com/BkFxaEFNwHqX3tAw/arcgis/rest/services/"
+    "FS_VCGI_OPENDATA_Cadastral_PTTR_point_WM_v1_view/FeatureServer/0"
 )
 
 BURLINGTON_FEED_SPECS: dict[str, dict[str, object]] = {
     "deeds": {
         "endpoint": BURLINGTON_DEEDS_ENDPOINT,
         "platform": "arcgis",
-        "watermark_col": "SALE_DATE",
-        "id_keys": ["PARCELID", "PRINTKEY", "SALE_DATE"],
+        "watermark_col": "postedDate",
+        "id_keys": ["returnID"],
         "topic_key": "topic_deeds",
-        "interval_seconds": 600.0,
+        "interval_seconds": 1800.0,
         "producer_key": "deeds",
         "extra": {
-            "needs_geocode": False,
-            "watermark_type": "text",
-            "watermark_format": "%m/%d/%Y",
+            "order_by": "postedDate DESC, returnID DESC",
+            "select": (
+                "OBJECTID,returnID,span,townCode,postedDate,closeDate,ValPdOrTrn,propLocStr,"
+                "propLocCty,Latitude,Longitude"
+            ),
+            "where": "townCode = '114'",
             "oid_field": "OBJECTID",
-            "max_record_count": 100000,
-            "expected_cadence_days": 30,
+            "max_record_count": 2000,
+            "expected_cadence_days": 14,
             "non_spatial": False,
             "scope": (
-                "Burlington VT DEEDS/sales via the municipal open-data tax "
-                "parcel layer (best-effort endpoint pending a live probe of "
-                "the Burlington open-data portal; the interlock gate does not "
-                "check endpoint liveness). Native parcel polygons (outSR=4326 "
-                "rings -> centroid) supply every row's coordinates, so the "
-                "ADR-0004 geocode hook is NOT declared. TEXT MM/DD/YYYY "
-                "watermark sorts lexically — typed comparison required "
-                "(ADR-0005). $1 quitclaim transfers are KEPT at ingest (no "
-                "per-city where; market-sale filtering is analysis-side). "
-                "PARCELID/PRINTKEY are the parcel keys; BOOK/PAGE ride id_keys "
-                "as recorded-deed references. No owner-name columns exist; "
-                "party fields stay None."
+                "Burlington VT deeds from the VCGI Vermont Property Transfers layer, townCode 114, "
+                "incremental on postedDate; party names are never selected."
             ),
             "field_map": DEEDS_FIELD_MAP,
         },

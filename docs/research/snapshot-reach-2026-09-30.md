@@ -87,13 +87,18 @@ whole instead. Milwaukee's source is the city's 2025 arm's-length sales file
 | Glendale, AZ `sla` | `IssuedOn DESC` (unchanged) | 33 / 518 | 1,000 (default) |
 | Henderson `sla` (CSV) | `original_issue_date DESC` (added with the feed repair) | 140 / 579 | 1,000 (default) |
 | Tucson `sla` | `DT_START DESC` (unchanged) | 2 / 2 | 1,000 (default) |
+| Frederick `deeds` (added 2026-09-30, mid-Atlantic deeds) | transfer date `DESC, :id` | 0 / 270 | 1,000 (default) |
+| Providence `deeds` (same) | `SaleDate DESC, OBJECTID DESC` | 37 / 791 | 1,500 |
+| Allentown `deeds` (same) | `SYEAR DESC, SMON DESC, OBJECTID DESC` | 2 / 304 | 1,000 (default) |
+| Charleston WV `deeds` (same) | `Last_Sales_Date DESC, OBJECTID DESC` | 0 / 3 | 1,000 (default) |
 
 Every window orders by the column the feed already tracks as its watermark
-(Baton Rouge has none and uses its open date). The Maryland transfer date is
-`YYYY.MM.DD` text and Asheville's `DeedDate` is `YYYYMMDD` text; both sort
-correctly as text. Henderson's issue date is `MM/DD/YYYY` text, which does not,
-but the CSV client sorts the declared watermark column as dates. Two windows
-need a filter:
+(Baton Rouge has none and uses its open date; Allentown has none and sorts by
+sale year and month). The Maryland transfer date is `YYYY.MM.DD` text and
+Asheville's `DeedDate` is `YYYYMMDD` text; both sort correctly as text.
+Henderson's issue date is `MM/DD/YYYY` text, which does not, but the CSV
+client sorts the declared watermark column as dates. Two windows need a
+filter:
 
 - **Raleigh** sorts null sale dates first, so its window filled with parcels
   that never sold. It now filters `SALE_DATE IS NOT NULL` (358,251 of 438,805
@@ -106,7 +111,8 @@ need a filter:
   deeds now reads 180 days, since the backfill keeps each feed's filter.
 
 Tucson's layer holds only two rows dated in the last 90 days, which is a
-question about the source, not the window.
+question about the source, not the window. Charleston WV's three are the
+assessor's four-month posting lag (see the feed-health note).
 
 ## Known gaps
 

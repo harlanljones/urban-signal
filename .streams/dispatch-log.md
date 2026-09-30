@@ -1233,3 +1233,29 @@ Worth keeping:
 - **Read the credential table before filtering it.** State licence tables hold
   every credential a state issues, most of them held by individuals; a city
   filter alone publishes people's names as premises (`ct_liquor_specs.py`).
+
+### 2026-09-30 — Mid-Atlantic deeds repaired or retracted (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| midatlantic-deeds | `.streams/midatlantic-deeds.md` | `config.py`, `deeds_acris_producer.py` | 2026-09-30 | done (5 deeds feeds publishing, 7 retracted with SNAP `sla` instead, Roanoke and Richmond left failing) | `test_midatlantic_deeds.py`, ArcGIS `select` as `outFields`, the leaf `compose_deed_date` hook |
+
+The 14 mid-Atlantic `deeds` feeds registered on 2026-09-06 had never pointed at a
+live source. Frederick, Providence, Burlington, Allentown and Charleston WV now
+read published last-sale or transfer layers, each polled live through `poll_job`
+at its production cap (992 to 1,496 rows published per poll). Albany, Dover,
+Harrisburg, Huntington, Manchester, Portland ME and Wilmington DE publish no sale
+dates or prices anywhere public; their `deeds` feeds are retracted and each polls
+the SNAP retailer slice for its metro box (59 to 144 stores).
+
+Worth keeping:
+
+- **Look past the city's own portal.** Three of the five replacements are not
+  city data: Maryland's statewide assessment table, Vermont's property-transfer
+  returns, and a county assessor's ArcGIS server that the earlier probe missed.
+  The earlier probes checked the city's portal or the county's parcel layer and
+  stopped there.
+- **Keep party columns on the server.** Parcel and transfer layers carry owner,
+  seller and buyer names next to the sale. ArcGIS specs now name their columns in
+  `select`, which the client sends as `outFields`, so those names never reach a
+  row, an event or the DLQ.

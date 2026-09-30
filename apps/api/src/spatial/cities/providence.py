@@ -1,26 +1,17 @@
 DEEDS_FIELD_MAP = {
-    "doc_id": ["PARCELID"],
-    "bbl": ["PARCELID"],
-    "doc_type": ["DEED_TYPE"],
-    "document_amount": ["SALE_PRICE"],
-    "recorded_date": ["SALE_DATE"],
-    "address_street": ["SITEADDRESS"],
-    "incident_address": ["SITEADDRESS"],
-    "borough": ["CITY"],
-    "zipcode": ["ZIP5"],
+    "doc_id": ["PROPID", "PIN"],
+    "bbl": ["PROPID", "PIN"],
+    "document_amount": ["SalePrice"],
+    "recorded_date": ["SaleDate"],
+    "address_street": ["ParcAddress"],
+    "incident_address": ["ParcAddress"],
+    "borough": ["MuniName"],
+    "zipcode": ["ZipCode"],
 }
 
 FIELD_MAP = {
     "deeds": DEEDS_FIELD_MAP,
 }
-
-NON_CANDIDATE_METADATA_COLUMNS = (
-    "VALID",
-    "MultiSale",
-    "PARCEL_SOURCE",
-    "BOOK",
-    "PAGE",
-)
 
 """Providence, RI Metro Submarket Registry and Spatial Layer for Urban Signal.
 
@@ -28,20 +19,19 @@ Provides neighborhood metadata, camera positioning, investment metrics,
 division catalog, and geographic bounding boxes for the City of Providence,
 RI (the state capital, at the head of Narragansett Bay).
 
-Feed scope (US-350): Providence is a DEEDS-led partial metro. The City of
-Providence open-data portal publishes a parcels / sales layer carrying per-parcel
-SALE_DATE / SALE_PRICE / DEED_TYPE. Until a live probe confirms the exact
-resource, the registration points at a best-effort municipal FeatureServer URL
-(see ``arcgis_providence_deeds_url`` in settings) and is documented as such in
-PR_DESCRIPTION.md. The feed mirrors Rochester's ArcGIS shape:
+Feeds (probed 2026-09-30):
 
-* DEEDS — municipal parcels FeatureServer (``/FeatureServer/0``). Watermark
-  ``SALE_DATE`` is TEXT ``MM/DD/YYYY``; the ADR-0005 text-watermark typed
-  comparison is mandatory. Native parcel polygons (``outSR=4326``) supply each
-  row's coordinates, so ``needs_geocode`` stays False — no ADR-0004 hook.
-* PERMITS / SLA / COMPLAINTS_311 — absent from the scope of this ticket (US-350
-  is DEEDS-only); do not register them until a dedicated ticket clears the feed
-  family gate.
+* DEEDS — the city's hosted "Parcels with CAMA" layer behind the public
+  Providence Parcels and Zoning Map (``Parcel_Zoning_FL/FeatureServer/0`` on
+  ArcGIS Online, refreshed about monthly). Each parcel carries its last sale:
+  ``SaleDate`` is text ``YYYY-MM-DD HH:MM:SS.fff`` (ADR 0005) and
+  ``SalePrice`` is text, ``'0'`` when no arm's-length price was recorded. It is
+  read as a snapshot, newest sale first, selecting only non-owner columns. The
+  layer has no deed-type field (``LastDocRef`` says how the owner holds title),
+  so ``doc_type`` falls back to the producer default. Parcel polygons supply
+  coordinates. The ``providenceri.gov`` URL registered until 2026-09-30 sits
+  behind a JavaScript challenge, and no ArcGIS service was found there.
+* PERMITS / SLA / COMPLAINTS_311 — not registered.
 """
 
 
@@ -330,40 +320,37 @@ PROV_DIVISIONS = PROVIDENCE_DIVISIONS
 
 # ---------------------------------------------------------------------------
 # Feed specs (leaf-local; the spine copies these into REGISTRY).
-# Providence is DEEDS-only for US-350: the municipal parcels FeatureServer
-# carries SALE_DATE / SALE_PRICE / DEED_TYPE. Native parcel polygons supply
-# coordinates, so needs_geocode stays False.
+# Providence deeds: the city's Parcels with CAMA layer (last sale per parcel).
 # ---------------------------------------------------------------------------
 PROVIDENCE_DEEDS_ENDPOINT = (
-    "https://providenceri.gov/server/rest/services/OpenData/Parcels/FeatureServer/0"
+    "https://services6.arcgis.com/wv9mHoqblhTsnqdG/arcgis/rest/services/Parcel_Zoning_FL/"
+    "FeatureServer/0"
 )
 
 PROVIDENCE_FEED_SPECS: dict[str, dict[str, object]] = {
     "deeds": {
         "endpoint": PROVIDENCE_DEEDS_ENDPOINT,
         "platform": "arcgis",
-        "watermark_col": "SALE_DATE",
-        "id_keys": ["PARCELID", "OBJECTID"],
+        "watermark_col": "SaleDate",
+        "id_keys": ["PROPID", "PIN", "OBJECTID"],
         "topic_key": "topic_deeds",
-        "interval_seconds": 600.0,
+        "interval_seconds": 1800.0,
         "producer_key": "deeds",
         "extra": {
-            "needs_geocode": False,
             "watermark_type": "text",
-            "watermark_format": "%m/%d/%Y",
+            "watermark_format": "%Y-%m-%d %H:%M:%S.%f",
+            "order_by": "SaleDate DESC, OBJECTID DESC",
+            "select": "OBJECTID,PROPID,PIN,SaleDate,SalePrice,ParcAddress,MuniName,ZipCode",
+            "where": "SaleDate IS NOT NULL AND SaleDate <> ''",
+            "ingestion_mode": "snapshot",
             "oid_field": "OBJECTID",
-            "max_record_count": 100000,
+            "max_record_count": 2000,
             "expected_cadence_days": 30,
             "non_spatial": False,
-            "ingestion_mode": "incremental",
+            "batch_limit": 1500,
             "scope": (
-                "Providence, RI DEEDS/sales via the municipal parcels "
-                "FeatureServer (best-effort endpoint — not live-verified at "
-                "registration; see PR_DESCRIPTION.md). TEXT MM/DD/YYYY "
-                "watermark sorts lexically — typed comparison required "
-                "(ADR-0005). Native parcel polygons (outSR=4326) supply each "
-                "row's coordinates, so the ADR-0004 geocode hook is NOT "
-                "declared. PERMITS/SLA/311 are out of scope for US-350."
+                "Providence RI deeds from the city's Parcels with CAMA layer: each parcel's last "
+                "sale, newest first; owner columns are never selected."
             ),
             "field_map": DEEDS_FIELD_MAP,
         },

@@ -244,51 +244,48 @@ divisions:
     city_id: burlington
 datasets:
   deeds:
-    endpoint: https://data.burlingtonvt.gov/server/rest/services/Assessment_Parcels/FeatureServer/0
+    endpoint: https://services1.arcgis.com/BkFxaEFNwHqX3tAw/arcgis/rest/services/FS_VCGI_OPENDATA_Cadastral_PTTR_point_WM_v1_view/FeatureServer/0
     platform: arcgis
-    watermark_col: SALE_DATE
+    watermark_col: postedDate
     id_keys:
-    - PARCELID
-    - PRINTKEY
-    - SALE_DATE
+    - returnID
     topic: raw.municipal.deeds
-    interval_seconds: 600.0
+    interval_seconds: 1800.0
     producer_key: deeds
     endpoint_by_year: {}
-    watermark_type: text
-    watermark_format: '%m/%d/%Y'
+    watermark_type: null
+    watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: postedDate DESC, returnID DESC
     id_col: null
-    select: null
+    select: OBJECTID,returnID,span,townCode,postedDate,closeDate,ValPdOrTrn,propLocStr,propLocCty,Latitude,Longitude
     fallback_endpoints: []
-    where: null
+    where: townCode = '114'
     needs_geocode: false
     geocode_context: null
     field_map:
       doc_id:
-      - PARCELID
-      - PRINTKEY
+      - returnID
       bbl:
-      - PARCELID
-      doc_type:
-      - DEED_TYPE
+      - span
       document_amount:
-      - SALE_PRICE
+      - ValPdOrTrn
       recorded_date:
-      - SALE_DATE
+      - closeDate
       address_street:
-      - SITEADDRESS
+      - propLocStr
       incident_address:
-      - SITEADDRESS
+      - propLocStr
       borough:
-      - CITY
-      zipcode:
-      - ZIP5
+      - propLocCty
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
     ingestion_mode: incremental
     oid_field: OBJECTID
-    max_record_count: 100000
-    expected_cadence_days: 30
+    max_record_count: 2000
+    expected_cadence_days: 14
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false

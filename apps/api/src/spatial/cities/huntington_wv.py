@@ -1,27 +1,3 @@
-DEEDS_FIELD_MAP = {
-    "doc_id": ["PARCELID"],
-    "bbl": ["PARCELID"],
-    "doc_type": ["DEED_TYPE"],
-    "document_amount": ["SALE_PRICE"],
-    "recorded_date": ["SALE_DATE"],
-    "address_street": ["SITEADDRESS"],
-    "incident_address": ["SITEADDRESS"],
-    "borough": ["CITY"],
-    "zipcode": ["ZIP5"],
-}
-
-FIELD_MAP = {
-    "deeds": DEEDS_FIELD_MAP,
-}
-
-NON_CANDIDATE_METADATA_COLUMNS = (
-    "VALID",
-    "MultiSale",
-    "PARCEL_SOURCE",
-    "BOOK",
-    "PAGE",
-)
-
 """Huntington, WV Metro Submarket Registry and Spatial Layer for Urban Signal.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -29,25 +5,13 @@ division catalog, and geographic bounding boxes for the City of Huntington,
 WV (Cabell County seat on the Ohio River — deliberately not overlapping the
 sibling Charleston/Huntington-corridor leaf boxes).
 
-Feed scope: Huntington is a DEEDS-led partial metro. The city's municipal
-open-data parcel/sales layer (Cabell County Assessor extract surfaced through
-the City of Huntington ArcGIS server) carries per-parcel SALE_DATE / SALE_PRICE
-/ DEED_TYPE — the closest ACRIS-shape feed in this corridor. The feed is an
-ArcGIS polygon service served by the existing ``ArcGISClient``:
-
-* DEEDS — ``Parcels/Deeds/FeatureServer/0``. Watermark ``SALE_DATE`` is TEXT
-  ``MM/DD/YYYY``; ADR-0005 text-watermark with the declared ``%m/%d/%Y`` format
-  is mandatory. Native parcel polygons (``outSR=4326`` rings -> centroid) supply
-  every row's coordinates, so ``needs_geocode`` stays False — no ADR-0004 hook.
-* PERMITS — absent on the City Hub at probe time. Tier 3.
-* SLA/licenses — absent on the City Hub at probe time. Tier 3.
-* COMPLAINTS_311 — absent on the City Hub at probe time. Tier 3.
-
-NOTE ON ENDPOINT (US-320): the ``arcgis_huntington_wv_deeds_url`` default is a
-best-effort placeholder (``https://huntingtonwv.gov/server/rest/services/...``).
-The endpoint was not confirmed live during onboarding; it must be verified
-against the City's open-data portal before the feed is scheduled. The gate does
-not check endpoint liveness.
+Feeds: SLA reads the SNAP retailer slice (``snap_sla_spec``, West Virginia
+stores inside the metro box). The DEEDS feed registered until 2026-09-30 named
+a service huntingtonwv.gov never hosted, and no public sale source exists:
+Cabell County's parcel layer and the WV GIS Technical Center parcel tables
+carry deed book and page but no sale date or price (Kanawha County, which feeds
+Charleston, is the exception in this corridor). Permits and 311 remain
+unregistered.
 """
 
 
@@ -275,83 +239,6 @@ HNT_DIVISION_BBOXES = HUNTINGTON_WV_DIVISION_BBOXES
 HNT_SUBMARKETS = HUNTINGTON_WV_SUBMARKETS
 HNT_DIVISIONS = HUNTINGTON_WV_DIVISIONS
 
-# ---------------------------------------------------------------------------
-# Feed specs (leaf-local; the spine copies these into REGISTRY).
-# ---------------------------------------------------------------------------
-HUNTINGTON_WV_DEEDS_ENDPOINT = (
-    "https://huntingtonwv.gov/server/rest/services/"
-    "Parcels/Deeds/FeatureServer/0"
-)
-
-HUNTINGTON_WV_FEED_SPECS: dict[str, dict[str, object]] = {
-    "deeds": {
-        "endpoint": HUNTINGTON_WV_DEEDS_ENDPOINT,
-        "platform": "arcgis",
-        "watermark_col": "SALE_DATE",
-        "id_keys": ["PARCELID", "SALE_DATE"],
-        "topic_key": "topic_deeds",
-        "interval_seconds": 600.0,
-        "producer_key": "deeds",
-        "extra": {
-            # Native parcel polygons (outSR=4326 rings -> centroid) supply
-            # every row's coordinates; the ADR-0004 geocode hook is NOT
-            # declared. SITEADDRESS/ZIP5 expected complete on sampled sale rows.
-            "needs_geocode": False,
-            "watermark_type": "text",
-            "watermark_format": "%m/%d/%Y",
-            "oid_field": "OBJECTID",
-            "max_record_count": 100000,
-            "expected_cadence_days": 30,
-            "non_spatial": False,
-            "scope": (
-                "Huntington WV DEEDS/sales via the City municipal open-data "
-                "parcel/sales ArcGIS layer (Cabell County Assessor extract). "
-                "TEXT MM/DD/YYYY watermark sorts lexically — typed comparison "
-                "required (ADR-0005). ENDPOINT UNVERIFIED (US-320): the "
-                "arcgis_huntington_wv_deeds_url default is a best-effort "
-                "placeholder and must be confirmed against the City open-data "
-                "portal before scheduling. $1 quitclaim transfers are KEPT at "
-                "ingest (no per-city where). No owner-name columns exist; party "
-                "fields stay None. PARCELID is the parcel key; SALE_DATE is the "
-                "watermark."
-            ),
-            "field_map": DEEDS_FIELD_MAP,
-        },
-    },
-}
-
-
-def get_huntington_wv_dataset(feed: object) -> object:
-    """Leaf-local mirror of ``city_registry.get_dataset``.
-
-    Returns the spec for a registered Huntington feed, or raises ``KeyError``
-    naming the city and available feeds when the feed is absent (permits/SLA/
-    311 are absent from the City Hub at probe time).
-    """
-    from src.config import settings
-    from src.spatial.city_registry import DatasetSpec
-
-    feed_name = getattr(feed, "value", str(feed))
-    if feed_name not in HUNTINGTON_WV_FEED_SPECS:
-        available = ", ".join(sorted(HUNTINGTON_WV_FEED_SPECS))
-        raise KeyError(
-            f"'{HUNTINGTON_WV_CITY_ID}' has no '{feed_name}' feed; available: {available}"
-        )
-    payload = HUNTINGTON_WV_FEED_SPECS[feed_name]
-    extra_kwargs = {
-        k: v for k, v in payload.get("extra", {}).items() if k != "scope"
-    }
-    return DatasetSpec(
-        endpoint=payload["endpoint"],
-        platform=payload["platform"],
-        watermark_col=payload["watermark_col"],
-        id_keys=payload["id_keys"],
-        topic=getattr(settings, payload["topic_key"]),
-        interval_seconds=payload["interval_seconds"],
-        producer_key=payload["producer_key"],
-        **extra_kwargs,
-    )
-
 
 from src.spatial.registration import SpatialRegistration
 
@@ -364,21 +251,16 @@ REGISTRATION = SpatialRegistration(
 )
 
 __all__ = [
-    "DEEDS_FIELD_MAP",
-    "FIELD_MAP",
     "HNT_DIVISIONS",
     "HNT_DIVISION_BBOXES",
     "HNT_SUBMARKETS",
     "HUNTINGTON_WV_CENTER",
     "HUNTINGTON_WV_CITY_ID",
-    "HUNTINGTON_WV_DEEDS_ENDPOINT",
     "HUNTINGTON_WV_DIVISIONS",
     "HUNTINGTON_WV_DIVISION_BBOXES",
-    "HUNTINGTON_WV_FEED_SPECS",
     "HUNTINGTON_WV_METRO_BBOX",
     "HUNTINGTON_WV_SUBMARKETS",
     "REGISTRATION",
-    "get_huntington_wv_dataset",
     "is_in_huntington_wv",
     "is_in_huntington_wv_metro",
 ]

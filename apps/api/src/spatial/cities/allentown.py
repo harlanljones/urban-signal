@@ -1,26 +1,15 @@
 DEEDS_FIELD_MAP = {
-    "doc_id": ["PARCELID", "PRINTKEY"],
-    "bbl": ["PARCELID"],
-    "doc_type": ["DEED_TYPE"],
-    "document_amount": ["SALE_PRICE"],
-    "recorded_date": ["SALE_DATE"],
-    "address_street": ["SITEADDRESS"],
-    "incident_address": ["SITEADDRESS"],
-    "borough": ["CITY"],
-    "zipcode": ["ZIP5"],
+    "doc_id": ["XINSTNUM", "WARDACCTNO"],
+    "bbl": ["PIN"],
+    "document_amount": ["SPRICE"],
+    "address_street": ["PROPERTYADDR"],
+    "incident_address": ["PROPERTYADDR"],
+    "zipcode": ["ZIP"],
 }
 
 FIELD_MAP = {
     "deeds": DEEDS_FIELD_MAP,
 }
-
-NON_CANDIDATE_METADATA_COLUMNS = (
-    "VALID",
-    "MultiSale",
-    "PARCEL_SOURCE",
-    "BOOK",
-    "PAGE",
-)
 
 """Allentown Metro Submarket Registry and Spatial Layer for Urban Signal.
 
@@ -30,17 +19,22 @@ Easton (Lehigh Valley) metro, PA. Allentown is the Lehigh County seat on the
 Lehigh River; Bethlehem (Northampton County) and Easton (Northampton County
 seat) anchor the eastern end of the valley.
 
-Feed scope: Allentown is a DEEDS-led partial metro. A best-effort Lehigh
-Valley parcels/sales ArcGIS FeatureServer endpoint is registered
-(``arcgis_allentown_deeds_url``); the layer id was not verified live at
-implementation and must be confirmed before the job is enabled. The feed
-mirrors the Rochester DEEDS shape: native parcel polygons supply coordinates,
-so ``needs_geocode`` stays False; ``SALE_DATE`` is the watermark column.
+Feeds (probed 2026-09-30):
 
-PERMITS / SLA / 311 are not wired in this registration — verify the relevant
-municipal open-data layers before adding them. Tier 3 (not registered).
+* DEEDS — the city's "Tax Parcels Assessed" layer on ArcGIS Online (service
+  ``Tax_Parcels_Assessed_2022``, overwritten in place about monthly). Each
+  parcel carries its last sale as a year (``SYEAR``) and a month (``SMON``)
+  with no day, so ``compose_deed_date`` below stamps the first of the month.
+  It is read as a snapshot, newest sale first, selecting only non-owner
+  columns; an ``SPRICE`` of 1 is a nominal transfer. Parcel polygons supply
+  coordinates. The ``gis.allentownpa.gov`` host registered until 2026-09-30
+  does not exist. Lehigh County's ``ATestParcel`` layer carries the same
+  fields county-wide, about a month staler, if the city layer disappears.
+* PERMITS / SLA / 311 — not registered.
 """
 
+
+from typing import Any
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
@@ -281,40 +275,57 @@ ALL_CITY_DIVISION_BBOXES = ALLENTOWN_DIVISION_BBOXES
 ALL_CITY_SUBMARKETS = ALLENTOWN_SUBMARKETS
 ALL_CITY_DIVISIONS = ALLENTOWN_DIVISIONS
 
+
+def _to_int(value: Any) -> int | None:
+    try:
+        return int(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+
+
+def compose_deed_date(row: dict[str, Any]) -> str | None:
+    """The first of the sale month, from ``SYEAR`` and ``SMON`` (the layer has no day).
+
+    ``DeedsACRISProducer`` calls this when ``recorded_date`` is unmapped;
+    returns None for a missing year or a month outside 1-12.
+    """
+    year, month = _to_int(row.get("SYEAR")), _to_int(row.get("SMON"))
+    if year is None or month is None or not (1 <= month <= 12 and year >= 1900):
+        return None
+    return f"{year:04d}-{month:02d}-01"
+
+
 # ---------------------------------------------------------------------------
 # Feed specs (leaf-local; the spine copies these into REGISTRY).
+# Allentown deeds: the city's Tax Parcels Assessed layer (sale year + month).
 # ---------------------------------------------------------------------------
 ALLENTOWN_DEEDS_ENDPOINT = (
-    "https://gis.allentownpa.gov/server/rest/services/"
-    "Property/Parcels/FeatureServer/0"
+    "https://services1.arcgis.com/WUqVDRuvIiIiH2Pl/arcgis/rest/services/Tax_Parcels_Assessed_2022/"
+    "FeatureServer/0"
 )
 
 ALLENTOWN_FEED_SPECS: dict[str, dict[str, object]] = {
     "deeds": {
         "endpoint": ALLENTOWN_DEEDS_ENDPOINT,
         "platform": "arcgis",
-        "watermark_col": "SALE_DATE",
-        "id_keys": ["PARCELID", "PRINTKEY", "SALE_DATE"],
+        "watermark_col": "",
+        "id_keys": ["WARDACCTNO", "PIN"],
         "topic_key": "topic_deeds",
-        "interval_seconds": 600.0,
+        "interval_seconds": 1800.0,
         "producer_key": "deeds",
         "extra": {
-            "needs_geocode": False,
-            "watermark_type": "text",
-            "watermark_format": "%m/%d/%Y",
+            "order_by": "SYEAR DESC, SMON DESC, OBJECTID DESC",
+            "select": "OBJECTID,WARDACCTNO,PIN,PARNUM,XINSTNUM,SYEAR,SMON,SPRICE,PROPERTYADDR,ZIP",
+            "where": "SYEAR >= 1900 AND SMON <> '00' AND SMON <> ''",
+            "ingestion_mode": "snapshot",
             "oid_field": "OBJECTID",
-            "max_record_count": 100000,
-            "expected_cadence_days": 30,
+            "max_record_count": 2000,
+            "expected_cadence_days": 45,
             "non_spatial": False,
             "scope": (
-                "Allentown (Lehigh Valley) DEEDS/sales via a best-effort Lehigh "
-                "Valley parcels ArcGIS FeatureServer. Native parcel polygons "
-                "(outSR=4326) supply coordinates, so the ADR-0004 geocode hook "
-                "is NOT declared. TEXT MM/DD/YYYY watermark requires typed "
-                "comparison (ADR-0005). The layer id was unverified at "
-                "implementation — confirm before enabling the job. "
-                "PARCELID/PRINTKEY are the parcel keys; SALE_DATE is the "
-                "watermark; SALE_PRICE/DEED_TYPE ride the row."
+                "Allentown PA deeds from the city's Tax Parcels Assessed layer: each parcel's last "
+                "sale (SYEAR + SMON, composed by compose_deed_date), newest first; owner columns "
+                "are never selected."
             ),
             "field_map": DEEDS_FIELD_MAP,
         },

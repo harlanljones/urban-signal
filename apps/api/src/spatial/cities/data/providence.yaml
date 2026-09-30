@@ -278,48 +278,49 @@ divisions:
     city_id: providence
 datasets:
   deeds:
-    endpoint: https://providenceri.gov/server/rest/services/OpenData/Parcels/FeatureServer/0
+    endpoint: https://services6.arcgis.com/wv9mHoqblhTsnqdG/arcgis/rest/services/Parcel_Zoning_FL/FeatureServer/0
     platform: arcgis
-    watermark_col: SALE_DATE
+    watermark_col: SaleDate
     id_keys:
-    - PARCELID
+    - PROPID
+    - PIN
     - OBJECTID
     topic: raw.municipal.deeds
-    interval_seconds: 600.0
+    interval_seconds: 1800.0
     producer_key: deeds
     endpoint_by_year: {}
     watermark_type: text
-    watermark_format: '%m/%d/%Y'
+    watermark_format: '%Y-%m-%d %H:%M:%S.%f'
     watermark_exclude: []
-    order_by: null
+    order_by: SaleDate DESC, OBJECTID DESC
     id_col: null
-    select: null
+    select: OBJECTID,PROPID,PIN,SaleDate,SalePrice,ParcAddress,MuniName,ZipCode
     fallback_endpoints: []
-    where: null
+    where: SaleDate IS NOT NULL AND SaleDate <> ''
     needs_geocode: false
     geocode_context: null
     field_map:
       doc_id:
-      - PARCELID
+      - PROPID
+      - PIN
       bbl:
-      - PARCELID
-      doc_type:
-      - DEED_TYPE
+      - PROPID
+      - PIN
       document_amount:
-      - SALE_PRICE
+      - SalePrice
       recorded_date:
-      - SALE_DATE
+      - SaleDate
       address_street:
-      - SITEADDRESS
+      - ParcAddress
       incident_address:
-      - SITEADDRESS
+      - ParcAddress
       borough:
-      - CITY
+      - MuniName
       zipcode:
-      - ZIP5
-    ingestion_mode: incremental
+      - ZipCode
+    ingestion_mode: snapshot
     oid_field: OBJECTID
-    max_record_count: 100000
+    max_record_count: 2000
     expected_cadence_days: 30
     alarm_exempt: false
     alarm_exempt_reason: null
@@ -336,6 +337,7 @@ datasets:
     parcel_join: {}
     non_spatial: false
     zip_member: null
+    batch_limit: 1500
 aliases:
 - providence_ri
 - providence-ri

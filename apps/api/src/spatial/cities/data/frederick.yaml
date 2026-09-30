@@ -212,49 +212,50 @@ divisions:
     city_id: frederick
 datasets:
   deeds:
-    endpoint: https://services1.arcgis.com/X3lKekbdaBmNjCHu/ArcGIS/rest/services/Frederick_Parcels/FeatureServer/3
-    platform: arcgis
-    watermark_col: SALE_DATE
+    endpoint: https://opendata.maryland.gov/resource/gx8c-a963.json
+    platform: socrata
+    watermark_col: sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89
     id_keys:
-    - PARCELID
-    - OBJECTID
-    - SALE_DATE
+    - account_id_mdp_field_acctid
+    - sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89
     topic: raw.municipal.deeds
-    interval_seconds: 600.0
+    interval_seconds: 1800.0
     producer_key: deeds
     endpoint_by_year: {}
-    watermark_type: text
-    watermark_format: '%m/%d/%Y'
+    watermark_type: null
+    watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89 DESC, :id
     id_col: null
     select: null
     fallback_endpoints: []
-    where: null
+    where: mdp_street_address_city_mdp_field_city = 'FREDERICK'
     needs_geocode: false
     geocode_context: null
     field_map:
       doc_id:
-      - PARCELID
+      - account_id_mdp_field_acctid
       bbl:
-      - PARCELID
-      doc_type:
-      - SALE_TYPE
+      - account_id_mdp_field_acctid
       document_amount:
-      - SALE_PRICE
+      - sales_segment_1_consideration_mdp_field_considr1_sdat_field_90
       recorded_date:
-      - SALE_DATE
+      - sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89
       address_street:
-      - SITEADDRESS
+      - mdp_street_address_mdp_field_address
       incident_address:
-      - SITEADDRESS
+      - mdp_street_address_mdp_field_address
       borough:
-      - CITY
+      - mdp_street_address_city_mdp_field_city
       zipcode:
-      - ZIPCODE
-    ingestion_mode: incremental
-    oid_field: OBJECTID
-    max_record_count: 100000
+      - mdp_street_address_zip_code_mdp_field_zipcode
+      latitude:
+      - mdp_latitude_mdp_field_digycord_converted_to_wgs84
+      longitude:
+      - mdp_longitude_mdp_field_digxcord_converted_to_wgs84
+    ingestion_mode: snapshot
+    oid_field: null
+    max_record_count: null
     expected_cadence_days: 30
     alarm_exempt: false
     alarm_exempt_reason: null

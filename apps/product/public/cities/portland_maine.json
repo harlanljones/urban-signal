@@ -185,13 +185,13 @@
   "feeds": {
     "permits": null,
     "311": null,
-    "sla": null,
-    "deeds": {
+    "sla": {
       "platform": "arcgis",
-      "watermark_col": "SALE_DATE",
-      "interval_seconds": 600.0,
-      "topic": "raw.municipal.deeds"
-    }
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
   },
   "evidence_path": "apps/api/src/spatial/cities/portland_maine.py",
   "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"

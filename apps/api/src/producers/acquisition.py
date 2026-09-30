@@ -415,16 +415,17 @@ def newest_valid_watermark(
 # positional contract (``endpoint_url``, ``where_clause``, ``batch_size``,
 # ``max_records``).  ``where`` is intentionally absent: callers forward it as
 # the explicit ``where_clause`` argument, never a splatted kwarg.  CARTO takes
-# ``id_col``/``select``; CSV additionally swallows the watermark_* kwargs via
-# ``**kwargs`` (and ``fallback_endpoints``); the other three accept only
-# ``order_by``.  US-185: this is the adapter-facing contract that replaces the
+# ``id_col``/``select``; ArcGIS takes ``select`` as ``outFields``; CSV
+# additionally swallows the watermark_* kwargs via ``**kwargs`` (and
+# ``fallback_endpoints``); Socrata and CKAN accept only ``order_by``.
+# US-185: this is the adapter-facing contract that replaces the
 # prior 7-key truthy splat, which forwarded ``watermark_col`` /
 # ``watermark_format`` / ``watermark_exclude`` (and ``id_col``/``select`` for
 # non-CARTO platforms) to signatures that reject them — the latent
 # ``TypeError`` crash reported against US-183's scheduler.
 _ADAPTER_REQUEST_KEYS: Dict[str, Tuple[str, ...]] = {
     "socrata": ("order_by",),
-    "arcgis": ("order_by",),
+    "arcgis": ("order_by", "select"),
     "carto": ("order_by", "id_col", "select"),
     "ckan": ("order_by",),
     "csv": (

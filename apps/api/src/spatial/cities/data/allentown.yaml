@@ -228,51 +228,44 @@ divisions:
     city_id: allentown
 datasets:
   deeds:
-    endpoint: https://gis.allentownpa.gov/server/rest/services/Property/Parcels/FeatureServer/0
+    endpoint: https://services1.arcgis.com/WUqVDRuvIiIiH2Pl/arcgis/rest/services/Tax_Parcels_Assessed_2022/FeatureServer/0
     platform: arcgis
-    watermark_col: SALE_DATE
+    watermark_col: ''
     id_keys:
-    - PARCELID
-    - PRINTKEY
-    - SALE_DATE
+    - WARDACCTNO
+    - PIN
     topic: raw.municipal.deeds
-    interval_seconds: 600.0
+    interval_seconds: 1800.0
     producer_key: deeds
     endpoint_by_year: {}
-    watermark_type: text
-    watermark_format: '%m/%d/%Y'
+    watermark_type: null
+    watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: SYEAR DESC, SMON DESC, OBJECTID DESC
     id_col: null
-    select: null
+    select: OBJECTID,WARDACCTNO,PIN,PARNUM,XINSTNUM,SYEAR,SMON,SPRICE,PROPERTYADDR,ZIP
     fallback_endpoints: []
-    where: null
+    where: SYEAR >= 1900 AND SMON <> '00' AND SMON <> ''
     needs_geocode: false
     geocode_context: null
     field_map:
       doc_id:
-      - PARCELID
-      - PRINTKEY
+      - XINSTNUM
+      - WARDACCTNO
       bbl:
-      - PARCELID
-      doc_type:
-      - DEED_TYPE
+      - PIN
       document_amount:
-      - SALE_PRICE
-      recorded_date:
-      - SALE_DATE
+      - SPRICE
       address_street:
-      - SITEADDRESS
+      - PROPERTYADDR
       incident_address:
-      - SITEADDRESS
-      borough:
-      - CITY
+      - PROPERTYADDR
       zipcode:
-      - ZIP5
-    ingestion_mode: incremental
+      - ZIP
+    ingestion_mode: snapshot
     oid_field: OBJECTID
-    max_record_count: 100000
-    expected_cadence_days: 30
+    max_record_count: 2000
+    expected_cadence_days: 45
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false

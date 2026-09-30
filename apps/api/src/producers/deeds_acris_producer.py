@@ -1,8 +1,9 @@
-"""NYC ACRIS, Cook County/Chicago, San Francisco, Denver, Cincinnati, Columbus, Pittsburgh & MD SDAT (Baltimore/Montgomery/Prince George's) Deeds Ingestion Stream Producer."""
+"""NYC ACRIS, Cook County/Chicago, San Francisco, Denver, Cincinnati, Columbus, Pittsburgh & MD SDAT (Baltimore/Montgomery/Prince George's/Frederick) Deeds Ingestion Stream Producer."""
 
 import argparse
+import importlib
 import logging
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
 from src.config import settings
@@ -68,33 +69,20 @@ def _parse_datetime(val: Any, spec: Any = None) -> Optional[datetime]:
     return None
 
 
-def _to_int(val: Any) -> int | None:
-    """Coerce a CSV cell into an int, tolerating float-like and blank values."""
-    if val is None or str(val).strip() == "":
-        return None
-    try:
-        return int(float(str(val)))
-    except (ValueError, TypeError):
-        return None
+def _compose_deed_date(city_id: str, row: dict[str, Any]) -> str | None:
+    """The city leaf's ``compose_deed_date(row)``, when it defines one.
 
-
-def _compose_hamilton_sale_date(row: dict[str, Any]) -> str | None:
-    """Compose ``YYYY-MM-DD`` from Hamilton County's split sale-date columns.
-
-    The Auditor CSV ships ``MonthSale``/``DaySale``/``YearSale`` as separate
-    integer cells with no single sale-date column (US-126). Returns ``None``
-    so the production chain falls through to its existing date handling when
-    any of the three is missing or unparseable.
+    Some sources split the sale date across columns: Hamilton County's auditor
+    CSV (year, month and day; US-126) and Allentown's parcel layer (year and
+    month). The leaf joins the parts into ``YYYY-MM-DD`` and returns ``None``
+    when one is missing or bad, so the generic date chain runs as before.
     """
-    year = _to_int(row.get("yearsale"))
-    month = _to_int(row.get("monthsale"))
-    day = _to_int(row.get("daysale"))
-    if not (year and month and day and 1900 <= year <= 2100):
-        return None
     try:
-        return date(year, month, day).strftime("%Y-%m-%d")
-    except ValueError:
+        leaf = importlib.import_module(f"src.spatial.cities.{city_id}")
+    except ImportError:
         return None
+    composer = getattr(leaf, "compose_deed_date", None)
+    return composer(row) if composer else None
 
 
 def _parse_wkt_point(value: Any) -> tuple[float | None, float | None]:
@@ -211,14 +199,16 @@ class DeedsACRISProducer:
                 resolved_city = "pittsburgh"
             elif "account_id_mdp_field_acctid" in row:
                 # MD SDAT real-property assessment snapshot (US-128) shared by
-                # Baltimore/Montgomery/Prince George's. All three counties carry
-                # the identical schema; autodetect distinguishes them by the
-                # county_name column (defaulting to baltimore when absent).
+                # Baltimore/Montgomery/Prince George's/Frederick. Every county
+                # carries the identical schema; autodetect distinguishes them by
+                # the county_name column (defaulting to baltimore when absent).
                 county = str(row.get("county_name_mdp_field_cntyname", "")).lower()
                 if "montgomery" in county:
                     resolved_city = "montgomery"
                 elif "prince" in county or "george" in county:
                     resolved_city = "prince_georges"
+                elif "frederick" in county:
+                    resolved_city = "frederick"
                 else:
                     resolved_city = "baltimore"
             else:
@@ -368,11 +358,10 @@ class DeedsACRISProducer:
             )
 
             recorded_str = first_mapped(row, field_map, "recorded_date")
-            if not recorded_str and resolved_city == "cincinnati":
-                # US-126: Hamilton County Auditor splits the sale date across
-                # three int columns (YearSale/MonthSale/DaySale) with no single
-                # sale-date column, so compose it before the generic chains.
-                recorded_str = _compose_hamilton_sale_date(row)
+            if not recorded_str:
+                # A sale date split across columns (Cincinnati, Allentown) is
+                # composed by the city leaf before the generic chains.
+                recorded_str = _compose_deed_date(resolved_city, row)
             recorded_str = recorded_str or (
                 row.get("recording_date")
                 or row.get("transfer_date")

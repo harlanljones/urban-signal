@@ -6,11 +6,13 @@ Kafka mocked. 36 jobs failed outright, 8 fetched nothing, and 16 fetched rows
 but published none. This change repairs the ones a spec, endpoint or small
 client fix can reach, retracts one feed that has no public source, moves two
 licence feeds whose source holds no rows for their city to the SNAP retailer
-fallback, and lists the rest with the reason.
+fallback, and lists the rest with the reason. A second stacked change repairs
+five of the mid-Atlantic `deeds` feeds and retracts seven whose cities publish
+no sales (see "Mid-Atlantic deeds").
 
 | | Jobs | Repaired here | Left, with reason below |
 |---|---|---|---|
-| Failed outright | 36 | 14, and Madison `permits` retracted | 21, 14 of them mid-Atlantic `deeds` |
+| Failed outright | 36 | 19 (five of them mid-Atlantic `deeds`), and eight retracted: Madison `permits` and seven mid-Atlantic `deeds` | 9, two of them mid-Atlantic `deeds` |
 | Fetched rows, published none | 16 | 8, and Milwaukee `deeds` was fine on a full read | 7 |
 | Fetched nothing | 8 | 5, and Lexington and Seattle `sla` moved to SNAP | 1, Tulsa `311` (an outage) |
 
@@ -132,10 +134,10 @@ do too.
 | El Paso `311` | Cloudflare answers 403 to this network | a check from the production network |
 | Chicago, NYC, Seattle `energy_benchmark`; NYC, Seattle `bike_ped` | the context-observation producer has no per-row hook: an energy row fans out into several metrics and counter rows fold into one observation per sensor-day, so `poll_job` dead-letters every row | a batch hook in `poll_job`, or running these through the producer's own stream |
 
-### Mid-Atlantic deeds: the next stacked change
+## Mid-Atlantic deeds
 
 The 14 cities of the 2026-09-06 mid-Atlantic wave were registered with only a
-`deeds` feed, and all 14 fail. None of the registered URLs ever pointed at a
+`deeds` feed, and all 14 failed. None of the registered URLs ever pointed at a
 live sales source: three hosts have no DNS (Allentown, Dover, Wilmington DE);
 seven paths sit on city websites with no ArcGIS Server behind them (Albany,
 Burlington, Harrisburg, Huntington, Providence, Richmond, Roanoke); two name
@@ -144,22 +146,59 @@ Manchester); and two point at the wrong place (Charleston WV at a Charleston,
 SC service; Portland ME at a layer id the service does not have). The
 interlock gate checks a spec's shape, not whether its endpoint answers.
 
-| City | Replacement | Rows | Newest sale |
-|---|---|---|---|
-| Frederick | Maryland SDAT assessments (Socrata `gx8c-a963`), city filter | 56,256 | 2026-08-06 |
-| Providence | the city's parcel layer with its assessor's last sale | 35,421 with a sale date | 2026-09-20 |
-| Burlington | Vermont's property-transfer returns (VCGI), town 114 | 6,788 | posted 2026-09-18 |
-| Allentown | the city's assessed parcels, sale year and month | 34,234 with a sale month | 2026-09 |
-| Charleston WV | Kanawha County Assessor parcels, county-wide | 88,853 with a sale date | complete to 2026-05 |
-| Roanoke | the city's transfer-history table, no geometry | 214,121 dated | 2026-09-28 |
-| Richmond | the assessor's monthly transfers workbook (.xlsx, 72 MB) | 439,398 | 2026-09-22 |
+The second stacked change repairs five and retracts seven. Each repaired feed
+was polled live through `poll_job` on 2026-09-30 at its production cap:
 
-Roanoke needs the parcel join in `poll_job` (as Lynchburg does), and Richmond
-needs a reader for `.xlsx` files and their monthly changing URL. Albany, Dover,
-Harrisburg, Huntington, Manchester, Portland ME and Wilmington DE publish no
-sale dates or prices anywhere public: their county and state parcel layers
-carry deed book and page only, and the sales searches that exist are
-interactive sites.
+| City | Source and filter | Mode | Rows | Newest sale | Published |
+|---|---|---|---|---|---|
+| Frederick | Maryland SDAT assessments, Frederick County view (Socrata `gx8c-a963`); postal city FREDERICK | snapshot, newest first | 56,256 | 2026-08-06 | 1,000 of 1,000 |
+| Providence | the city's Parcels with CAMA layer (`Parcel_Zoning_FL`); rows with a sale date | snapshot, 1,500 newest | 35,421 | 2026-09-20 | 1,496 of 1,500 (4 parcels drawn as two polygons) |
+| Burlington | Vermont Property Transfers (VCGI); town code 114 | incremental on `postedDate` | 6,788 | posted 2026-09-18 | 1,000 of 1,000, and 26 from a 2026-09-10 watermark |
+| Allentown | the city's Tax Parcels Assessed layer; rows with a sale year and month | snapshot, newest first | 34,234 | 2026-09 | 1,000 of 1,000 |
+| Charleston WV | Kanawha County Assessor parcels (`Parcel_Line_Layer/MapServer/1`); tax districts 09 to 14 | snapshot, newest first | 23,171 | complete to 2026-05 | 992 of 1,000 (8 parcels drawn as two polygons) |
+
+- **No party names.** No feed maps an owner, grantor or buyer column. The four
+  ArcGIS feeds list their columns in `select`, which the ArcGIS client now
+  sends as `outFields`, so those columns stay on the server. Frederick's SDAT
+  view hides owner names but still carries the grantor's; it is read and never
+  mapped.
+- **Allentown** records a sale's year and month but not its day. The leaf's
+  `compose_deed_date` stamps the first of the month: the deeds producer calls a
+  leaf composer when `recorded_date` is unmapped, and Cincinnati's split sale
+  date moved onto the same hook.
+- **Burlington** polls on the date a return was posted, because about 30% of
+  returns post more than a month after closing and a closing-date cursor would
+  skip them. The recorded date is still the closing date.
+- **Charleston WV.** The assessor posts sales about four months late (80 sales
+  county-wide from June to September 2026, against about 500 a month before),
+  so the feed expects a new sale every 180 days. The layer has no city column;
+  districts 09 to 14 hold about 94% of the parcels inside the metro box. The
+  host rejects ISO date literals, so it joins `ANSI_DATE_LITERAL_HOSTS` in case
+  the feed goes incremental.
+- **Providence** has one sale dated 2026-10-08, a typo at the source. It is
+  published as dated; the scheduler already refuses a future date as a
+  watermark.
+
+Seven cities publish no sale date or price anywhere public, so their `deeds`
+feed is retracted and each gets the SNAP retailer `sla` slice instead (stores
+inside the metro box, polled live on 2026-09-30):
+
+| City | Why there is no source | SNAP stores published |
+|---|---|---|
+| Albany | city, county and state parcel layers stop at deed book and page; New York's RP-5217 sales sit behind the ORPTS Sales Web search | 133 |
+| Dover | Kent County's parcel layer has a deed book and page reference only; its sales history is in the per-parcel PRIDE site | 67 |
+| Harrisburg | the city's parcel snapshots carry a purchase date frozen at 2022-12-30 and no price; Dauphin County's sales search has no export | 144 |
+| Huntington | Cabell County's parcel layer and the state parcel tables carry deed book and page only | 59 |
+| Manchester | the assessor publishes through a per-property Vision site; the state's PA-34 sales go to municipalities only | 124 |
+| Portland ME | the parcel layers have no sale fields; the one deed-dated layer has seven dated rows, the newest from 2005 | 92 |
+| Wilmington DE | New Castle County's `PropertySales` MapServer could not be checked (its host answers HTTP 472 to this network), and its ArcGIS Online records describe yearly layers for 2013 to 2019 only | 144 |
+
+Two stay failing:
+
+| City | Replacement found | Rows | Newest sale | What it needs |
+|---|---|---|---|---|
+| Roanoke | the city's transfer-history table, no geometry | 214,121 dated | 2026-09-28 | the parcel join in `poll_job`, as Lynchburg |
+| Richmond | the assessor's monthly transfers workbook (.xlsx, 72 MB) | 439,398 | 2026-09-22 | a reader for `.xlsx` files and their monthly changing URL |
 
 
 ## Feeds that fetched nothing
@@ -243,9 +282,11 @@ change rather than part of this one.
   time stores `2026-09-28T00:00:00`, and `>` then skips rows published later
   with that same date. From `2026-09-01T00:00:00`, Baton Rouge fetched 632 of
   the 671 permits issued since 1 September.
-- **ArcGIS polls read every column.** The ArcGIS client ignores `select`, so
-  owner, applicant and contractor names ride along with each row and are kept
-  in the DLQ payload of any row that fails to parse.
+- **ArcGIS polls read every column a spec does not name.** The ArcGIS client
+  ignored `select` until the mid-Atlantic deeds change, which sends it as
+  `outFields`. Only those four feeds declare one so far, so owner, applicant
+  and contractor names still ride along with other feeds' rows and are kept in
+  the DLQ payload of any row that fails to parse.
 - **`maps.cityofmadison.com` refuses ISO date strings** like the three hosts
   above. No feed polls it today; a future Madison spec should add the host to
   `ANSI_DATE_LITERAL_HOSTS`.

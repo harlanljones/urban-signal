@@ -181,6 +181,11 @@ ANSI_DATE_LITERAL_HOSTS = (
     # ``case_opened > '2026-08-24T02:53:23'`` returns 400 "Unable to complete
     # operation" while ``case_opened > date '2026-08-24'`` works.
     "maps.cityoftulsa.org",
+    # Kanawha County Assessor, WV (SQL Server backed): verified live 2026-09-30 —
+    # ``Last_Sales_Date >= '2026-09-01'`` returns 400 "Unable to complete
+    # operation" while ``Last_Sales_Date >= date '2026-09-01'`` works. Charleston
+    # WV deeds poll as a snapshot today, so this only matters if they go incremental.
+    "kanawhacountyassessorgis.com",
 )
 
 

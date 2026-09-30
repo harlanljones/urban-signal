@@ -81,6 +81,7 @@ SNAP_EXTENDED_METROS = [
 # spec declares more), so each cap must clear its metro's count with room to
 # grow. docs/research/snap-metro-scope-2026-09-30.md has the statewide counts.
 SNAP_METRO_RETAILERS = {
+    "albany": ("NY", 133),
     "albuquerque": ("NM", 412),
     "alexandria": ("LA", 85),
     "anchorage": ("AK", 111),
@@ -98,6 +99,7 @@ SNAP_METRO_RETAILERS = {
     "dallas": ("TX", 1970),
     "dayton": ("OH", 774),
     "denver": ("CO", 1202),
+    "dover": ("DE", 67),
     "durham": ("NC", 208),
     "el_paso": ("TX", 600),
     "evansville": ("IN", 188),
@@ -105,8 +107,10 @@ SNAP_METRO_RETAILERS = {
     "fort_worth": ("TX", 1806),
     "gainesville": ("FL", 149),
     "greenville": ("SC", 219),
+    "harrisburg": ("PA", 144),
     "honolulu": ("HI", 505),
     "houston": ("TX", 4205),
+    "huntington_wv": ("WV", 59),
     "huntsville": ("AL", 261),
     "indianapolis": ("IN", 946),
     "jackson_ms": ("MS", 316),
@@ -117,6 +121,7 @@ SNAP_METRO_RETAILERS = {
     "lexington": ("KY", 254),
     "macon_bibb": ("GA", 209),
     "madison": ("WI", 303),
+    "manchester": ("NH", 124),
     "melbourne": ("FL", 422),
     "memphis": ("TN", 825),
     "monroe": ("LA", 129),
@@ -125,6 +130,7 @@ SNAP_METRO_RETAILERS = {
     "pierce": ("WA", 896),
     "pittsburgh": ("PA", 526),
     "port_st_lucie": ("FL", 177),
+    "portland_maine": ("ME", 92),
     "prince_georges": ("MD", 1078),
     "raleigh": ("NC", 1466),
     "reno": ("NV", 316),
@@ -137,6 +143,7 @@ SNAP_METRO_RETAILERS = {
     "toledo": ("OH", 439),
     "tulsa": ("OK", 670),
     "wichita": ("KS", 378),
+    "wilmington_de": ("DE", 144),
     "wilmington_nc": ("NC", 262),
 }
 
@@ -346,12 +353,12 @@ class TestSnapRegistrationShape:
     def test_every_registered_metro_has_sla(self):
         """The extension closed the set; later waves registered metros whose
         probes found no SLA-grade feed (the 2026-09-06 mid-Atlantic wave
-        registered deeds-only), and grand_rapids is geometry-only.
+        registered deeds-only; seven of those moved to SNAP on 2026-09-30 when
+        their deeds were retracted), and grand_rapids is geometry-only.
         Every other registered metro carries an SLA spec."""
         from src.spatial.city_registry import REGISTRY, FeedType, get_dataset
 
         sla_less = {
-            "albany",
             "allentown",
             "billings",
             "bowling_green",
@@ -359,20 +366,15 @@ class TestSnapRegistrationShape:
             "burlington",
             "chandler",
             "charleston_wv",
-            "dover",
             "fort_collins",
             "frederick",
             "grand_rapids",
-            "harrisburg",
-            "huntington_wv",
             "laredo",
             "lincoln",
-            "manchester",
             "missoula",
             "montgomery_al",
             "nampa",
             "peoria",
-            "portland_maine",
             "providence",
             "richmond",
             "roanoke",
@@ -381,7 +383,6 @@ class TestSnapRegistrationShape:
             "sioux_falls",
             "tempe",
             "topeka",
-            "wilmington_de",
             "yakima",
         }
         for city_id in REGISTRY:

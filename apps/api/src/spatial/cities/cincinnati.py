@@ -1,8 +1,38 @@
 """Cincinnati, Ohio spatial registry and dashboard geometry."""
 
-from typing import Dict
+from datetime import date
+from typing import Any, Dict
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
+
+
+def _to_int(val: Any) -> int | None:
+    """Coerce a CSV cell into an int, tolerating float-like and blank values."""
+    if val is None or str(val).strip() == "":
+        return None
+    try:
+        return int(float(str(val)))
+    except (ValueError, TypeError):
+        return None
+
+
+def compose_deed_date(row: dict[str, Any]) -> str | None:
+    """Compose ``YYYY-MM-DD`` from Hamilton County's split sale-date columns.
+
+    The Auditor CSV ships ``MonthSale``/``DaySale``/``YearSale`` as separate
+    integer cells with no single sale-date column (US-126). Returns ``None``
+    so the production chain falls through to its existing date handling when
+    any of the three is missing or unparseable.
+    """
+    year = _to_int(row.get("yearsale"))
+    month = _to_int(row.get("monthsale"))
+    day = _to_int(row.get("daysale"))
+    if not (year and month and day and 1900 <= year <= 2100):
+        return None
+    try:
+        return date(year, month, day).strftime("%Y-%m-%d")
+    except ValueError:
+        return None
 
 
 CINCINNATI_METRO_BBOX: Dict[str, float] = {

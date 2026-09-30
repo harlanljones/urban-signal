@@ -62,3 +62,40 @@ def test_every_registered_arcgis_endpoint_names_a_layer():
                 if url and "/rest/services/" in url and not _LAYER_INDEX.search(url)
             ]
     assert not missing, missing
+
+
+def test_select_is_sent_as_out_fields(monkeypatch):
+    client = _client_answering(monkeypatch, {"features": []})
+    sent = []
+
+    def answer(url, params):
+        sent.append(params["outFields"])
+        return {"features": []}
+
+    monkeypatch.setattr(client, "_request_json", answer)
+    list(client.paginate(endpoint_url=_LAYER, max_records=10, select="OBJECTID,SaleDate"))
+    list(client.paginate(endpoint_url=_LAYER, max_records=10))
+
+    assert sent == ["OBJECTID,SaleDate", "*"]
+
+
+def test_every_arcgis_select_names_the_columns_a_poll_reads():
+    """``select`` becomes ``outFields``, and a column left out of it arrives
+    missing: the field map, id keys, watermark, object id and sort columns must
+    all be selected."""
+    gaps = []
+    for city_id, registration in REGISTRY.items():
+        for feed, spec in registration.datasets.items():
+            if spec.platform != "arcgis" or not spec.select:
+                continue
+            selected = {column.strip() for column in spec.select.split(",")}
+            needed = {
+                column
+                for columns in spec.field_map.values()
+                for column in (columns if isinstance(columns, list) else [columns])
+            }
+            needed |= set(spec.id_keys) | {spec.watermark_col, spec.oid_field or ""}
+            needed |= {term.split()[0] for term in (spec.order_by or "").split(",") if term.strip()}
+            if needed - selected - {""}:
+                gaps.append((city_id.value, feed.value, sorted(needed - selected - {""})))
+    assert not gaps, gaps
