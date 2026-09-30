@@ -195,15 +195,11 @@ class TestGeocodingCaveats:
         assert _STATE_RE.search("2219 AMHERST AVE".upper()) is None
 
     def test_unit_designator_normalization_preserves_city(self):
-        # SUITE B is dropped in place. ``FL`` is also in the geocoder's unit
-        # token set (FLOOR), so the state abbreviation is stripped from
-        # Florida addresses during normalize — a live-window caveat. Raw
-        # BTR strings still match ``_STATE_RE``, so geocode_context is NOT
-        # appended even though the normalized query has lost ``FL``.
+        # SUITE B is dropped in place. ``FL`` is also a floor designator, but
+        # at the end of the line it is the state and stays (v3; v2 stripped
+        # it, so BTR addresses reached the geocoder without their state).
         norm = normalize_address("5438 INTERNATIONAL DR SUITE B, ORLANDO, FL")
-        assert "SUITE" not in norm
-        assert "ORLANDO" in norm
-        assert "FL" not in norm
+        assert norm == "5438 INTERNATIONAL DR ORLANDO FL"
 
 
 @pytest.fixture

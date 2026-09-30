@@ -21,7 +21,9 @@ deeds"), an eighth places Las Vegas's sales on their parcels (see "Las
 Vegas deeds on their parcels"), and a ninth places DC's on their lots (see
 "DC deeds on their lots"). A tenth places Lynchburg's licences on their
 parcels and keeps Tampa licence owners' details off the request (see
-"Licences at their premises").
+"Licences at their premises"). An eleventh keeps each address's state, and
+its city, in the query the geocoder receives (see "Addresses keep their
+place").
 
 | | Jobs | Repaired here | Left, with reason below |
 |---|---|---|---|
@@ -782,3 +784,90 @@ seconds apart:
 
 No query reached the geocoder, and no event carries an address from a
 mailing column.
+
+## Addresses keep their place
+
+Feeds that declare `needs_geocode` send each row's address line to the
+geocoder with the feed's `geocode_context` ("Tampa, FL") appended. Three
+defects cost many of those queries their state, and some their city:
+
+- **`FL` read as a floor.** `FL` is a unit designator, so
+  `normalize_address` dropped it with the token after it:
+  `..., CAPE CORAL, FL 33904` reached the geocoder as `... CAPE CORAL`.
+  Every Florida query lost its state, and its ZIP when one followed
+  (first noted in `four-family-depth-2026-09-30.md`).
+- **Everything after `#` cut.** A `#` unit took the rest of the line with
+  it, the appended context included: `7000 BUSINESS CENTER DR #2, SAVANNAH,
+  GA` became `7000 BUSINESS CENTER DR`.
+- **Street words read as states.** The context was skipped whenever any
+  two-letter word in the line spelled a state code, so lines with `NE` (a
+  quadrant), `CT` (Court), `WY` (Way), `DE`, `LA` or `MT` went out as the
+  bare street line.
+
+The Census geocoder, the deployment's default backend, finds nothing for a
+street line with no state or ZIP (checked with the Census Bureau's own
+address), and the cache keeps that miss for good.
+
+The eleventh stacked change (normalization `v3`):
+
+- **A `#` drops only its value** ("#4", "# 4B"), and a designator never
+  takes the word after a comma ("APT, NORFOLK").
+- **`FL` is Florida** where it ends the line, precedes a ZIP code or stands
+  between commas; elsewhere it is a floor, dropped with its ordinal ("2ND
+  FL"). A trailing country (", USA") and a ZIP+4 extension drop too.
+- **A line names its place only at its end:** a state after a comma or
+  before a ZIP code, a ZIP code after a comma, or the context's own words.
+  Otherwise the context is appended, whatever two-letter words the street
+  has.
+- **`NORM_VERSION` is `v3`,** so the cache asks every address once more
+  rather than reuse the misses v2 froze for these queries.
+
+### Checked live
+
+On 2026-09-30 each of the 88 feeds that declare geocoding was polled once
+through `poll_job` (400 rows, Kafka mocked, requests 2 seconds apart per
+host) with the geocoder stubbed to record each query and send nothing. 55
+feeds sent 16,918 queries; the other 33 had coordinates on every row polled,
+or failed to fetch (Bend `crime` wants a token, and Medford `sla` returned a
+server error). A query counts as keeping its place when its normalized form
+still ends with the state it should carry: the context's, or its own line's.
+
+| Feed | Queries | Without their state under v2 | Why |
+|---|---|---|---|
+| Cape Coral `permits` | 400 | 400 | `FL` (399) |
+| Miami-Dade `permits` | 400 | 400 | `FL` (330), street words (70) |
+| Orlando `sla` | 388 | 388 | `FL` (383), `#` (5) |
+| Vancouver WA `sla` | 400 | 284 | street words, mostly the `NE` quadrant |
+| Salem `sla` | 227 | 95 | street words (92), `#` (3) |
+| Hartford `permits` | 364 | 74 | `#` (70), street words (4) |
+| Portland `sla` | 289 | 70 | street words (63), `#` (7) |
+| Tacoma `sla` | 400 | 52 | street words (48), `#` (4) |
+| Las Vegas `permits` | 400 | 48 | street words (33), `#` (15) |
+| San Jose `crime` | 388 | 45 | street words |
+| 32 other feeds | 10,205 | 470 | |
+| 13 feeds | 3,057 | none | |
+| All 55 | 16,918 | 2,326 (14%) | `FL` 1,112, street words 987, `#` 222, other 5 |
+
+Under v3 all 16,918 keep their state. Ten queries from each of three
+licence feeds then went to the Census geocoder in both forms, 2 seconds
+apart:
+
+| Feed, ten queries | Matched as v2 sent them | Matched as v3 sends them |
+|---|---|---|
+| Orlando `sla` | 7 | 9 |
+| Glendale AZ `sla`, lines with `#` | 1 | 10 |
+| Vancouver WA `sla`, lines with `NE`, `CT` or `WY` | 0 | 9 |
+
+Every match fell inside its metro's box.
+
+The NPPES diff keys each practice by its normalized address, so v3 changes
+most of its keys: a ZIP+4 now ends at its ZIP, and Florida addresses keep
+their state. A state store kept across this change would read each changed
+key as a move. The scheduler's NPPES job reads no weekly file yet and keeps
+no state.
+
+Not changed here: a feed whose context names a state alone sends a street
+and a state. Austin `sla` and `childcare` (context "TX") sent 795 such
+queries, and the Census geocoder can match them to a street elsewhere in the
+state (`4080 LEMON ST TX` matched `4080 DE LEON ST, HOUSTON`). Their rows
+carry a city and ZIP code that the specs could send instead.

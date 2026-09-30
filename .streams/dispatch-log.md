@@ -1448,3 +1448,20 @@ Worth keeping:
   state columns before geocoding one.
 - **A fallback in an address chain can reach a person.** Tampa's second
   `address_street` candidate was the owner's mailing address.
+
+### 2026-09-30 — Addresses keep their place (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| geocode-context | `.streams/geocode-context.md` | none | 2026-09-30 | done (2,326 of 16,918 live geocoder queries from 55 feeds had lost their state under v2; none under v3; Census matched 28 of 30 sampled licence queries as v3 sends them, 8 as v2 sent them) | normalization `v3`; `compose_geocode_query` |
+
+Geocoder queries keep the city and state after a unit, a floor or a street
+word that spells a state code.
+
+Worth keeping:
+
+- **Two letters are not a state.** `CT`, `NE`, `WY`, `LA`, `DE` and `MT` are
+  street words far more often than states inside an address line; read a
+  state only at the line's end.
+- **A normalizer change needs the version bump.** The cache freezes misses,
+  so a query that lost its state stays unplaced until its hash changes.

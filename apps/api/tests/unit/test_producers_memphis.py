@@ -275,13 +275,17 @@ class TestMemphisFieldMaps:
 
 
 class TestGeocodingCaveats:
-    def test_court_suffix_false_positives_connecticut(self):
-        # Live permit streets often end in CT (Court). ``_STATE_RE`` treats
-        # that token as Connecticut, so ADR-0004 will NOT append
-        # geocode_context. Native WGS84 covers ~95% of rows; the 5% geocode
-        # gap is the only path that sees this. Do not concatenate City/State
-        # onto address_street (Honolulu Hawaii-word precedent).
-        assert _STATE_RE.search("2218 OXFORD SQUARE CT".upper()) is not None
+    def test_court_suffix_still_gets_the_context(self):
+        # Live permit streets often end in CT (Court). The geocoder used to
+        # take that token for Connecticut and skip geocode_context; a state
+        # now counts only after a comma or before a ZIP code (v3). Do not
+        # concatenate City/State onto address_street (Honolulu Hawaii-word
+        # precedent).
+        from src.spatial.geocoder import compose_geocode_query
+
+        assert compose_geocode_query("2218 OXFORD SQUARE CT", "Memphis, TN") == (
+            "2218 OXFORD SQUARE CT, Memphis, TN"
+        )
         assert _STATE_RE.search("2218 OXFORD SQUARE COURT, MEMPHIS, TN".upper()) is not None
 
     def test_311_street_has_no_state_token(self):

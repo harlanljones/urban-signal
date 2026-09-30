@@ -36,7 +36,10 @@ from sqlalchemy.engine import Engine
 
 logger = logging.getLogger(__name__)
 
-NORM_VERSION = "v2"
+# v3 stops a '#' unit, an "FL" or a street word such as "CT" from costing a
+# query its city and state. The cache froze v2's misses for those queries;
+# the new version asks them again.
+NORM_VERSION = "v3"
 
 # US-441 AC: "Geocoder cache hit rate logged; new addresses cached
 # deterministically (ADR 0004)". A cache hit is a normalized address whose
@@ -61,16 +64,38 @@ _HIT_RATE_LOG_INTERVAL = 100
 # Washington, DC"), where tail-truncation amputated the city context and
 # turned resolvable addresses into misses (US-74 finding).
 _UNIT_TOKENS = {"APT", "APARTMENT", "UNIT", "STE", "SUITE", "BLDG", "BUILDING", "FL", "FLOOR", "RM", "ROOM"}
-_PUNCT_RE = re.compile(r"[^A-Z0-9 ]+")
-_WS_RE = re.compile(r"\s+")
-# A query that already names a state must not receive a context suffix —
-# appending one corrupts legitimate out-of-jurisdiction premises addresses
-# (US-74 finding: ~24% of DC license premises sit in MD/VA).
-_STATE_RE = re.compile(
-    r"\b(?:AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|"
-    r"MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|"
-    r"WV|WI|WY|DC)\b"
+# v3 folds every punctuation mark but '#' and ',': '#' marks a unit value and
+# a comma ends the street line, and both must survive to the unit scan so
+# neither a unit nor a designator with no value takes the city after it.
+_FOLD_RE = re.compile(r"[^A-Z0-9#, ]+")
+_WORD_RE = re.compile(r"[^A-Z0-9 ]+")
+_ZIP_RE = re.compile(r"\d{5}")
+_ORDINAL_RE = re.compile(r"\d+(?:ST|ND|RD|TH)")
+# A trailing country adds nothing for a US geocoder and would hide the state
+# before it from the context check ("..., DC, 20001, USA").
+_COUNTRY_RE = re.compile(r"(?:,\s*(?:USA|US|UNITED STATES(?: OF AMERICA)?)|\s+USA)\s*$")
+# A ZIP+4 keeps its ZIP: folding would split "33602-1234" into two numbers.
+_ZIP4_RE = re.compile(r"\b(\d{5})-?\d{4}$")
+_STATE_CODES = (
+    "AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|"
+    "MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|"
+    "WV|WI|WY|DC"
 )
+_STATE_RE = re.compile(rf"\b(?:{_STATE_CODES})\b")
+# A query that already names its place must not receive a context suffix —
+# appending one corrupts legitimate out-of-jurisdiction premises addresses
+# (US-74 finding: ~24% of DC license premises sit in MD/VA). v3 reads a place
+# only at the end of the line: a state after a comma or before a ZIP code, or
+# a ZIP code after a comma. Anywhere else a two-letter code is usually a street
+# word (CT for Court, NE for a quadrant, WY for Way, LA, DE and MT in names),
+# and taking it for a state sent the bare street line to the geocoder.
+_NAMED_PLACE_RE = re.compile(
+    rf"(?:,\s*(?:{_STATE_CODES})|\b(?:{_STATE_CODES})\s+\d{{5}}(?:-?\d{{4}})?|,\s*\d{{5}}(?:-\d{{4}})?)$"
+)
+
+
+def _without_country(upper: str) -> str:
+    return _COUNTRY_RE.sub("", upper.strip().rstrip(",")).strip()
 
 
 def normalize_address(address: Any) -> str:
@@ -80,25 +105,64 @@ def normalize_address(address: Any) -> str:
     designator + value pairs removed in place. Same input always yields the
     same output; the output is version-stamped when hashed (see
     :func:`address_hash`).
+
+    v3 keeps the place that follows a unit: a ``#`` drops only its value
+    ("#4", "# 4B"), a designator never takes the word after a comma, and
+    ``FL`` is Florida where it ends the line, precedes a ZIP code or stands
+    between commas (a floor elsewhere, with its ordinal: "2ND FL"). A
+    trailing country and a ZIP+4 extension drop.
     """
     if not address:
         return ""
-    # '#' always begins a unit suffix on US address lines, and it would not
-    # survive punctuation folding as a recognizable token — split it first.
-    upper = str(address).upper().split("#", 1)[0]
-    cleaned = _PUNCT_RE.sub(" ", upper)
-    cleaned = _WS_RE.sub(" ", cleaned).strip()
-    tokens = cleaned.split(" ") if cleaned else []
+    upper = _ZIP4_RE.sub(r"\1", _without_country(str(address).upper()))
+    # Glue each '#' to its value so the pair drops as one token.
+    upper = re.sub(r"#\s*", " #", upper)
+    tokens = _FOLD_RE.sub(" ", upper).replace(",", " , ").split()
     kept: list[str] = []
     index = 0
     while index < len(tokens):
         token = tokens[index]
-        if index > 0 and token in _UNIT_TOKENS:
+        following = tokens[index + 1] if index + 1 < len(tokens) else None
+        if token.startswith("#"):
+            index += 1
+            continue
+        if token in _UNIT_TOKENS and any(word != "," for word in kept):
+            if token == "FL" and (
+                following is None
+                or _ZIP_RE.fullmatch(following)
+                or (following == "," and kept[-1] == ",")
+            ):
+                kept.append(token)  # Florida, not a floor
+                index += 1
+                continue
+            if following is None or following == ",":
+                # A designator with no value drops alone, "2ND FL" as a pair.
+                if token in ("FL", "FLOOR") and _ORDINAL_RE.fullmatch(kept[-1]):
+                    kept.pop()
+                index += 1
+                continue
             index += 2  # drop the designator and its value token
             continue
         kept.append(token)
         index += 1
-    return " ".join(kept)
+    return " ".join(word for word in kept if word != ",")
+
+
+def compose_geocode_query(address: str, context: str | None) -> str:
+    """The query sent for one address line and its feed's ``geocode_context``.
+
+    The context is appended unless the line already names its place: it ends
+    with the context's own words, or with a state or ZIP code in the places
+    ``_NAMED_PLACE_RE`` accepts.
+    """
+    query = address.strip()
+    if not context:
+        return query
+    bare = _without_country(query.upper())
+    context_words = _WORD_RE.sub(" ", context.upper()).split()
+    if _WORD_RE.sub(" ", bare).split()[-len(context_words):] == context_words or _NAMED_PLACE_RE.search(bare):
+        return query
+    return f"{query}, {context}"
 
 
 def address_hash(normalized: str) -> str:
@@ -514,11 +578,7 @@ def geocode_row_if_declared(
             return None
         if not isinstance(address, str) or len(address.strip()) < 6:
             return None
-        query = address.strip()
-        suffix = spec.geocode_context
-        if suffix and suffix.upper() not in query.upper() and not _STATE_RE.search(query.upper()):
-            query = f"{query}, {suffix}"
-        point = get_geocoder().geocode(query)
+        point = get_geocoder().geocode(compose_geocode_query(address, spec.geocode_context))
         return (point.lat, point.lon) if point else None
     except Exception:  # noqa: BLE001  # geocoding must never kill parsing
         return None

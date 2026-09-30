@@ -143,3 +143,7 @@ apply after `geocode_row_if_declared` appends a feed's `geocode_context`:
 Either fix changes what `normalize_address` returns for some inputs, so it
 needs a `NORM_VERSION` bump (the geocode cache is keyed on it). Not changed
 here.
+
+Fixed in a later change ("Addresses keep their place" in
+`feed-health-2026-09-30.md`): normalization `v3` keeps `FL` as the state
+where it ends a line or precedes a ZIP code, and a `#` drops only its value.

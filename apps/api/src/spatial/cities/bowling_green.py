@@ -58,9 +58,10 @@ Host quirks (documented here; ``watermarks.py`` / ``geocoder.py`` NOT edited):
   is a true date, so no ADR-0005 text-watermark declaration is needed.
   Note in spine delta.
 * ``_STATE_RE`` false positive: street names such as "MT VICTOR LANE" carry a
-  ``M T`` token that ``_STATE_RE`` matches as the MT state token, so an
-  address context append is skipped for a Mt Victor geocode fallback. That
-  path is never taken here (native coords), documented only.
+  ``M T`` token that ``_STATE_RE`` matches as the MT state token, which
+  skipped the address context append for a Mt Victor geocode fallback until
+  geocoder v3 (a state now counts only after a comma or before a ZIP code).
+  That path is never taken here (native coords), documented only.
 
 OID/ordering contract: layer 5 publishes ``OBJECTID`` as its ``objectIdField``
 and honors ``orderByFields=OBJECTID``. ``maxRecordCount`` is 2000 (verified

@@ -475,13 +475,17 @@ class TestBowlingGreenPermitParsing:
 
 
 class TestGeocodingCaveats:
-    def test_mt_victor_is_state_re_false_positive(self):
-        """'MT' in 'MT VICTOR LANE' is matched as the MT state token by
-        _STATE_RE, so an address context append would be skipped for a Mt
-        Victor geocode fallback (host quirk, documented only — native coords
-        mean the fallback is never taken)."""
-        assert _STATE_RE.search("MT VICTOR LANE") is not None
+    def test_mt_victor_still_gets_the_context(self):
+        """'MT' in 'MT VICTOR LANE' spells the MT state code, which used to
+        skip the context append for a Mt Victor geocode fallback; a state now
+        counts only after a comma or before a ZIP code (v3). Native coords
+        mean the fallback is never taken here."""
+        from src.spatial.geocoder import compose_geocode_query
+
         assert _STATE_RE.search("MT VICTOR LANE").group(0) == "MT"
+        assert compose_geocode_query("2633 MT VICTOR LANE", "Bowling Green, KY") == (
+            "2633 MT VICTOR LANE, Bowling Green, KY"
+        )
 
     def test_non_mt_streets_have_no_state_token(self):
         assert _STATE_RE.search("2040 BARBERRY COURT") is None

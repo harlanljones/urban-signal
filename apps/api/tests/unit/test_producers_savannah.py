@@ -481,9 +481,8 @@ class TestGeocodingCaveats:
     def test_context_with_ga_is_a_state_token(self):
         assert _STATE_RE.search("131 KING ST, SAVANNAH, GA".upper()) is not None
 
-    def test_unit_designator_truncates_after_hash(self):
-        """normalize_address splits on '#' (a unit suffix) and drops the tail,
-        including the appended city context — the query is rebuilt losslessly by
-        the geocode hook. This matches the shared geocoder design (US-74)."""
+    def test_hash_unit_keeps_the_city_context(self):
+        """normalize_address drops a '#' unit's value and keeps the appended
+        city context after it (v3; v2 cut the whole tail, context included)."""
         norm = normalize_address("7000 BUSINESS CENTER DR #2, SAVANNAH, GA")
-        assert norm == "7000 BUSINESS CENTER DR"
+        assert norm == "7000 BUSINESS CENTER DR SAVANNAH GA"

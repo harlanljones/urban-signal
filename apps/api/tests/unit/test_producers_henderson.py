@@ -497,28 +497,23 @@ class TestHendersonSlaParsing:
         """The composed geocode query for an SLA row is
         '{Business Location}, Henderson, NV' — pinned here so the spine's
         REGISTRY copy carries the same geocode_context."""
-        from src.spatial.geocoder import _STATE_RE
+        from src.spatial.geocoder import compose_geocode_query
 
         spec = get_henderson_dataset(FeedType.SLA)
+        assert compose_geocode_query("871 Coronado Center Dr", spec.geocode_context) == (
+            "871 Coronado Center Dr, Henderson, NV"
+        )
 
-        def compose(query: str) -> str:
-            suffix = spec.geocode_context
-            if suffix and suffix.upper() not in query.upper() and not _STATE_RE.search(query.upper()):
-                query = f"{query}, {suffix}"
-            return query
+    def test_sla_court_suffix_keeps_the_context(self):
+        """'Ct' (Court) spells a state code, and the geocoder used to take it
+        for one, so Court-suffixed streets geocoded on the bare street line.
+        A state now counts only after a comma or before a ZIP code (v3)."""
+        from src.spatial.geocoder import compose_geocode_query
 
-        assert compose("871 Coronado Center Dr") == "871 Coronado Center Dr, Henderson, NV"
-
-    def test_sla_court_suffix_trips_the_state_detector(self):
-        """Live quirk pinned: _STATE_RE matches two-letter codes with word
-        boundaries, and 'Ct' (Court) IS a state code — so Court-suffixed
-        streets skip the 'Henderson, NV' suffix and geocode on the bare
-        street line. Documented here so a future geocoder fix is deliberate;
-        the spec's geocode_context itself is unchanged."""
-        from src.spatial.geocoder import _STATE_RE
-
-        assert _STATE_RE.search("296 DAVIS HILL CT") is not None
-        assert _STATE_RE.search("871 CORONADO CENTER DR") is None
+        spec = get_henderson_dataset(FeedType.SLA)
+        assert compose_geocode_query("296 DAVIS HILL CT", spec.geocode_context) == (
+            "296 DAVIS HILL CT, Henderson, NV"
+        )
 
 
 class TestLeafFeedSpecContract:
