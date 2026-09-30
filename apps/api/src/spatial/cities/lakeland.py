@@ -5,7 +5,8 @@ Leaf-only module (US-286). Declares:
 - submarket metadata
 - a verified ArcGIS permits feed spec (iMS Public CED)
 
-SLA falls back to statewide SNAP (declared in the spine via snap_sla_spec('FL')).
+SLA falls back to SNAP, Florida inside the metro bbox (declared in the spine;
+``snap_sla_spec`` builds it).
 """
 
 from typing import Dict

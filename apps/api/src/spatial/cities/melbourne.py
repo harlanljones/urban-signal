@@ -323,7 +323,7 @@ MLB_DIVISIONS = MELBOURNE_DIVISIONS
 # City of Palm Bay (Brevard County) Building Permits, ArcGIS FeatureServer layer 0:
 # https://gis.palmbayflorida.org/arcgis/rest/services/GrowthManagement/BuildingPermits/FeatureServer/0
 # Watermark: issueDate; OID field: OBJECTID; max_record_count: 1000
-# SLA fallback: USDA SNAP Retailers (state = 'FL') via snap_sla_spec("FL")
+# SLA fallback: USDA SNAP Retailers, Florida inside the metro bbox (snap_sla_spec)
 
 from src.spatial.registration import SpatialRegistration
 

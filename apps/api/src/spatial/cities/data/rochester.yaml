@@ -323,7 +323,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'NY'
+    where: State = 'NY' AND Latitude BETWEEN 43.1 AND 43.27 AND Longitude BETWEEN -77.71 AND -77.53
     needs_geocode: false
     geocode_context: null
     field_map:

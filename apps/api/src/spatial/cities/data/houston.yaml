@@ -207,7 +207,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'TX'
+    where: State = 'TX' AND Latitude BETWEEN 29.2 AND 30.3 AND Longitude BETWEEN -95.9 AND -94.8
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -246,6 +246,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 7000
 aliases:
 - houston_tx
 - houston-tx

@@ -52,8 +52,9 @@ the only AL ABC layer reachable (Huntsville's
 ``Licenses/AlcoholBeverageLicenses/MapServer/0``) is a 971-row,
 Huntsville-area mirror — city-scoped, not a statewide register. Per the
 never-fake-endpoints convention these are documented, not fabricated; SNAP
-retailer SLA (``snap_sla_spec("AL"/"GA")``) remains the live SLA coverage
-until a verifiable state registry endpoint surfaces.
+retailer SLA (``snap_sla_spec``, the AL/GA slice inside each metro bbox)
+remains the live SLA coverage until a verifiable state registry endpoint
+surfaces.
 """
 
 from src.config import settings

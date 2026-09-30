@@ -169,7 +169,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'IN'
+    where: State = 'IN' AND Latitude BETWEEN 37.8 AND 38.15 AND Longitude BETWEEN -87.75 AND -87.35
     needs_geocode: false
     geocode_context: null
     field_map:

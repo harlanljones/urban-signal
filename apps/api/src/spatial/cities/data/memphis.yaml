@@ -485,7 +485,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'TN'
+    where: State = 'TN' AND Latitude BETWEEN 34.99 AND 35.28 AND Longitude BETWEEN -90.13 AND -89.68
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -524,6 +524,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 2000
 aliases:
 - memphis_tn
 - memphis tn

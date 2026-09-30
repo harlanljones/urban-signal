@@ -253,7 +253,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'MS'
+    where: State = 'MS' AND Latitude BETWEEN 32.15 AND 32.5 AND Longitude BETWEEN -90.45 AND -89.85
     needs_geocode: false
     geocode_context: null
     field_map:

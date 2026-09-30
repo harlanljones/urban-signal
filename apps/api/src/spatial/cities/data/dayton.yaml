@@ -190,7 +190,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'OH'
+    where: State = 'OH' AND Latitude BETWEEN 39.55 AND 40.05 AND Longitude BETWEEN -84.65 AND -83.65
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -229,6 +229,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 2000
 aliases:
 - dayton_oh
 - dayton oh

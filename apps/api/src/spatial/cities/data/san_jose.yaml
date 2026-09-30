@@ -564,7 +564,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'CA'
+    where: State = 'CA' AND Latitude BETWEEN 37.15 AND 37.45 AND Longitude BETWEEN -122.06 AND -121.55
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -603,6 +603,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 2000
 aliases:
 - san-jose
 - san jose

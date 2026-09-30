@@ -71,8 +71,9 @@ covers the city with no fifth client:
   point — NO address column and NO ``parcel_join`` needed (the layer already
   serves parcel-centroid geometry). ``needs_geocode=False``; OID field
   ``OBJECTID``. Cadence ~1. id ``SALES_SALEKEY``.
-* SLA — the statewide USDA SNAP retailer layer sliced to ``State = 'FL'``
-  (``snap_sla_spec("FL")``), the fallback the other Florida metros use. No
+* SLA — the national USDA SNAP retailer layer sliced to Florida inside the
+  metro bbox (``snap_sla_spec("FL", TALLAHASSEE_METRO_BBOX)``, 242 retailers on
+  2026-09-30), the fallback the other Florida metros use. No
   local licence dataset exists: the City stopped issuing business licences in
   2016, and neither the org nor the Leon County Tax Collector publishes one
   (re-probed 2026-09-30). The state's DBPR alcoholic-beverage licence extract
@@ -497,14 +498,15 @@ def get_tallahassee_dataset(feed: object) -> object:
 
     Returns the spec for a registered Tallahassee feed, or raises ``KeyError``
     naming the city and available feeds when the feed is absent. SLA resolves
-    to the shared statewide SNAP spec (no local licence dataset exists).
+    to the shared SNAP spec for Florida inside the metro bbox (no local licence
+    dataset exists).
     """
     from src.config import settings
     from src.spatial.city_registry import DatasetSpec, snap_sla_spec
 
     feed_name = getattr(feed, "value", str(feed))
     if feed_name == "sla":
-        return snap_sla_spec("FL")
+        return snap_sla_spec("FL", TALLAHASSEE_METRO_BBOX)
     if feed_name not in TALLAHASSEE_FEED_SPECS:
         available = ", ".join(sorted([*TALLAHASSEE_FEED_SPECS, "sla"]))
         raise KeyError(

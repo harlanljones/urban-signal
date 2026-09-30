@@ -329,7 +329,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'NC'
+    where: State = 'NC' AND Latitude BETWEEN 35.4 AND 36.15 AND Longitude BETWEEN -79.5 AND -78.0
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -368,6 +368,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 3000
 aliases:
 - raleigh_nc
 - raleigh nc

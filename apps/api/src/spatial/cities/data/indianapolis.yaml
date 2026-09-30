@@ -191,7 +191,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'IN'
+    where: State = 'IN' AND Latitude BETWEEN 39.6 AND 39.95 AND Longitude BETWEEN -86.38 AND -85.9
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -230,6 +230,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 2000
 aliases:
 - indianapolis_in
 - indianapolis in

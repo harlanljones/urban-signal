@@ -157,7 +157,12 @@ class TestDenverRegistration:
         assert spec.ingestion_mode == "snapshot"
         assert spec.watermark_col == ""
         assert spec.needs_geocode is False
-        assert spec.where == "State = 'CO'"
+        assert spec.where == (
+            "State = 'CO' AND Latitude BETWEEN 39.55 AND 39.95"
+            " AND Longitude BETWEEN -105.2 AND -104.5"
+        )
+        # 1,202 retailers in the bbox on 2026-09-30: more than the default cap.
+        assert spec.batch_limit == 2000
 
 
 def test_denver_is_now_a_three_feed_city():

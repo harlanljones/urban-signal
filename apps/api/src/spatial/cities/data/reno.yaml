@@ -181,7 +181,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'NV'
+    where: State = 'NV' AND Latitude BETWEEN 39.3 AND 40.0 AND Longitude BETWEEN -120.2 AND -119.4
     needs_geocode: false
     geocode_context: null
     field_map:

@@ -1166,3 +1166,22 @@ Worth keeping:
 - **Geocoder drops context.** `FL` is a unit token in `normalize_address` (drops the
   state and the ZIP after it) and a `#` unit cuts everything after it, including the
   appended `geocode_context`. Affects address-only feeds; needs a `NORM_VERSION` bump.
+
+### 2026-09-30 — SNAP licences scoped to each metro (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| snap-metro-scope | `.streams/snap-metro-scope.md` | `city_registry.py` | 2026-09-30 | done (54 metros) | `docs/research/snap-metro-scope-2026-09-30.md`, `snap_sla_where`, bbox `where` in 54 SNAP blocks, `batch_limit` on 18 |
+
+Each SNAP `sla` spec now reads its state inside its metro bbox instead of the whole
+state, and the 18 metros whose bbox holds 667 or more retailers declare a higher
+cap (up to 7,000 for Houston). Across the 54 metros that takes the retailers each
+metro actually receives from 5,694 of 34,686 to all of them, and ends the 47,656
+out-of-metro rows a round of polls used to publish under metro city ids.
+
+Worth keeping:
+
+- **A snapshot is only as complete as its cap.** Snapshot feeds re-read the table
+  each poll and cap it at `batch_limit` (1,000 by default) in OID or file order, so
+  a table larger than the cap is truncated to the same first rows forever. This
+  applies to every snapshot feed, not only SNAP; the other 38 are the next check.

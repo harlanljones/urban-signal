@@ -11,7 +11,8 @@ three are native points with ``needs_geocode=False`; geometry (requested
 ``outSR=4326``) supplies WGS84 lat/lng, so the projected attribute coordinate
 columns are never mapped (permits ``Latitude``/``Longitude`` are Web Mercator
 meters; 311 ``GPSX``/``GPSY`` are FL State Plane North feet). SLA is the
-shared statewide SNAP slice (``snap_sla_spec("FL")``): the City issues no
+shared SNAP layer sliced to Florida inside the metro bbox
+(``snap_sla_spec("FL", TALLAHASSEE_METRO_BBOX)``): the City issues no
 business licences and no local licence dataset exists (2026-09-30 depth pass).
 
 Host/ordering contract (verified live 2026-08-28): no layer publishes an
@@ -421,8 +422,14 @@ class TestFeedRegistration:
         from src.spatial.city_registry import CityId, get_dataset, snap_sla_spec
 
         spec = get_tallahassee_dataset(FeedType.SLA)
-        assert spec == snap_sla_spec("FL")
-        assert spec.where == "State = 'FL'"
+        assert spec == snap_sla_spec("FL", TALLAHASSEE_METRO_BBOX)
+        # Florida inside the metro bbox: 242 retailers on 2026-09-30, under
+        # the default 1,000-row cap.
+        assert spec.where == (
+            "State = 'FL' AND Latitude BETWEEN 30.29 AND 30.63"
+            " AND Longitude BETWEEN -84.7 AND -84.05"
+        )
+        assert spec.batch_limit is None
         assert spec.ingestion_mode == "snapshot"
         # The leaf mirror and the corpus-derived registry agree.
         assert get_dataset(CityId.TALLAHASSEE, FeedType.SLA) == spec

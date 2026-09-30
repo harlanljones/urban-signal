@@ -2,9 +2,10 @@
 
 Fort Smith registers initially as a SNAP-as-SLA-only metro (US-275) — no
 public municipal permits API was verified at claim time (CityView portal is
-present; no open ArcGIS/Socrata/CKAN endpoint found). The spine will wire
-`snap_sla_spec("AR")` for the SLA slice; permits/311/deeds remain unregistered
-and `get_dataset()` will raise readable errors for them.
+present; no open ArcGIS/Socrata/CKAN endpoint found). The spine wires the
+Arkansas SNAP slice inside the metro bbox (`snap_sla_spec`) for SLA;
+permits/311/deeds remain unregistered and `get_dataset()` will raise
+readable errors for them.
 
 This leaf defines the metro/division bboxes and submarket catalog so the
 interlock containment gate passes and the dashboard snapshot/grid layers can

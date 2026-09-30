@@ -163,7 +163,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'OH'
+    where: State = 'OH' AND Latitude BETWEEN 40.65 AND 40.95 AND Longitude BETWEEN -81.65 AND -81.2
     needs_geocode: false
     geocode_context: null
     field_map:

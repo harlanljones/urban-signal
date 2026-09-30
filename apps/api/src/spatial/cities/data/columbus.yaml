@@ -310,7 +310,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'OH'
+    where: State = 'OH' AND Latitude BETWEEN 39.75 AND 40.2 AND Longitude BETWEEN -83.3 AND -82.7
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -349,6 +349,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 2000
 aliases:
 - columbus_oh
 job_suffix: cmoh

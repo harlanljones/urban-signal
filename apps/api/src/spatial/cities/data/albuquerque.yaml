@@ -493,7 +493,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'NM'
+    where: State = 'NM' AND Latitude BETWEEN 34.94 AND 35.22 AND Longitude BETWEEN -106.85 AND -106.47
     needs_geocode: false
     geocode_context: null
     field_map:

@@ -179,7 +179,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'NC'
+    where: State = 'NC' AND Latitude BETWEEN 34.98 AND 35.55 AND Longitude BETWEEN -81.1 AND -80.45
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -218,6 +218,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 2000
 aliases:
 - charlotte_nc
 - charlotte_mecklenburg

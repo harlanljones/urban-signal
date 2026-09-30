@@ -554,7 +554,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'NV'
+    where: State = 'NV' AND Latitude BETWEEN 35.9 AND 36.34 AND Longitude BETWEEN -115.5 AND -114.9
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -593,6 +593,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 2000
 aliases:
 - las-vegas
 - las vegas

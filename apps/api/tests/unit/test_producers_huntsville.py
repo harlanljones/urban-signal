@@ -3,9 +3,10 @@
 Huntsville registers with live-verified ArcGIS BuildingPermits feed
 (maps.huntsvilleal.gov Licenses/BuildingPermits/MapServer/0, 18.4k rows,
 Permit_Issue_DateTime date watermark, US-424 re-probe 2026-08-30) plus the
-USDA SNAP Retailer SLA slice for AL (snap_sla_spec("AL")). This test focuses
-on the spatial registration contract: metro bbox sanity, division
-containment, and submarket placement inside their declared division bbox.
+USDA SNAP Retailer SLA slice for AL inside the metro bbox (snap_sla_spec).
+This test focuses on the spatial registration contract: metro bbox sanity,
+division containment, and submarket placement inside their declared
+division bbox.
 """
 
 from src.spatial.cities.huntsville import (

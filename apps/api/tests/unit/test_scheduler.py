@@ -142,6 +142,30 @@ def test_spec_batch_limit_sets_the_per_poll_cap(mock_scheduler):
     assert kwargs["max_records"] == 10
 
 
+def test_snap_jobs_poll_their_own_metro(mock_scheduler):
+    """A SNAP licence job asks the national layer for its state inside its
+    metro bbox and reads enough rows to cover it (Houston's bbox holds 4,205
+    retailers), rather than the state's first 1,000 by ObjectId."""
+    from src.spatial.city_registry import CityId, FeedType, get_job_name
+
+    paginate = mock_scheduler.producers["sla"].arcgis.paginate
+    mock_scheduler.poll_job(get_job_name(FeedType.SLA, CityId.TALLAHASSEE))
+    _, kwargs = paginate.call_args
+    assert kwargs["where_clause"] == (
+        "(State = 'FL' AND Latitude BETWEEN 30.29 AND 30.63"
+        " AND Longitude BETWEEN -84.7 AND -84.05)"
+    )
+    assert kwargs["max_records"] == 1000
+
+    mock_scheduler.poll_job(get_job_name(FeedType.SLA, CityId.HOUSTON))
+    _, kwargs = paginate.call_args
+    assert kwargs["where_clause"] == (
+        "(State = 'TX' AND Latitude BETWEEN 29.2 AND 30.3"
+        " AND Longitude BETWEEN -95.9 AND -94.8)"
+    )
+    assert kwargs["max_records"] == 7000
+
+
 def test_extract_record_id(mock_scheduler):
     permits_id = mock_scheduler._extract_record_id("permits", {"job__": "M123456"})
     assert permits_id == "permits:M123456"

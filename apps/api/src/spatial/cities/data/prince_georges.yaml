@@ -216,7 +216,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'MD'
+    where: State = 'MD' AND Latitude BETWEEN 38.55 AND 39.22 AND Longitude BETWEEN -77.12 AND -76.62
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -255,6 +255,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 2000
 aliases:
 - prince georges
 - prince_georges_county

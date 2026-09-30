@@ -47,4 +47,4 @@ Done. Tier counts 16 / 32 / 54 / 54 / 1 -> 18 / 30 / 54 / 54 / 1.
 ## Next step
 
 Scope the 54 SNAP specs to their metro bboxes (with `batch_limit` where a bbox
-holds more than 1,000 retailers).
+holds more than 1,000 retailers). Done in `snap-metro-scope` (2026-09-30).

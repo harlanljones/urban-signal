@@ -233,7 +233,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'CO'
+    where: State = 'CO' AND Latitude BETWEEN 39.55 AND 39.95 AND Longitude BETWEEN -105.2 AND -104.5
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -272,6 +272,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 2000
 aliases:
 - denver_co
 - denver-co

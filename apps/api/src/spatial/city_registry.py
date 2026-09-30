@@ -332,9 +332,11 @@ def normalize_city(city_id: str | None) -> CityId | None:
 # US-364: USDA FNS SNAP Retailer Locator, registered as FeedType.SLA — the
 # food-retail authorization slice (say so in feature names). One national
 # FeatureServer covers every metro, so the registration is a single shared
-# spec parameterized by a State where-clause (state-level coarseness is
-# accepted for v1: rows outside the metro bbox still index global H3 cells —
-# H3SpatialIndexer has no bbox gate — and metro scoping stays downstream).
+# spec parameterized by the metro's state and bbox. The v1 slice (2026-08-27)
+# filtered by state only and left metro scoping downstream, but a snapshot
+# poll reads at most its batch_limit rows, so every metro in a state received
+# the same first 1,000 retailers; the bbox term (2026-09-30) makes each poll
+# the metro's own retailers.
 #
 # Verified live 2026-08-27: fields are Record_ID / Store_Name /
 # Store_Street_Address / Additonal_Address (sic) / City / State / Zip_Code /
@@ -358,8 +360,33 @@ SNAP_SLA_FIELD_MAP: dict[str, list[str]] = {
 }
 
 
-def snap_sla_spec(state: str) -> DatasetSpec:
-    """Build the SNAP SLA DatasetSpec for one metro's state slice."""
+def snap_sla_where(state: str, bbox: dict[str, float]) -> str:
+    """The SNAP layer filter for one metro: its state, narrowed to its bbox.
+
+    The state alone is not enough. A snapshot poll takes at most the job's
+    ``batch_limit`` rows ordered by ``ObjectId``, so a statewide filter hands
+    every metro in the state the same first rows (Tallahassee received 19 of
+    its 242 retailers among 1,000 from across Florida). The state term stays so
+    a bbox that crosses a state line keeps to the metro's own state.
+    """
+    return (
+        f"State = '{state}'"
+        f" AND Latitude BETWEEN {bbox['min_lat']!r} AND {bbox['max_lat']!r}"
+        f" AND Longitude BETWEEN {bbox['min_lng']!r} AND {bbox['max_lng']!r}"
+    )
+
+
+def snap_sla_spec(
+    state: str,
+    bbox: dict[str, float],
+    batch_limit: int | None = None,
+) -> DatasetSpec:
+    """Build the SNAP SLA DatasetSpec for one metro's slice of its state.
+
+    ``batch_limit`` must clear the retailers inside the bbox with room to grow,
+    or the snapshot never sees the rest; metros holding more than two thirds of
+    the default 1,000 set one.
+    """
     return DatasetSpec(
         endpoint=settings.arcgis_snap_retailers_url,
         platform="arcgis",
@@ -372,7 +399,8 @@ def snap_sla_spec(state: str) -> DatasetSpec:
         ingestion_mode="snapshot",
         oid_field="ObjectId",
         max_record_count=1000,
-        where=f"State = '{state}'",
+        where=snap_sla_where(state, bbox),
+        batch_limit=batch_limit,
         field_map=SNAP_SLA_FIELD_MAP,
     )
 

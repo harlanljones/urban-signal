@@ -249,7 +249,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'TN'
+    where: State = 'TN' AND Latitude BETWEEN 34.98 AND 35.45 AND Longitude BETWEEN -85.5 AND -84.95
     needs_geocode: false
     geocode_context: null
     field_map:

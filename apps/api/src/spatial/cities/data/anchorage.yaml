@@ -308,7 +308,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'AK'
+    where: State = 'AK' AND Latitude BETWEEN 60.8 AND 61.5 AND Longitude BETWEEN -150.25 AND -148.95
     needs_geocode: false
     geocode_context: null
     field_map:

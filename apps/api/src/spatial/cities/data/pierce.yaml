@@ -208,7 +208,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'WA'
+    where: State = 'WA' AND Latitude BETWEEN 46.73 AND 47.42 AND Longitude BETWEEN -122.85 AND -121.46
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -247,6 +247,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 2000
 aliases:
 - pierce_county
 - pierce-county

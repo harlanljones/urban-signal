@@ -120,6 +120,10 @@ Tallahassee). The fix is to add each metro's bbox to its SNAP `where`
 clause and to set `batch_limit` for any metro whose bbox holds more than 1,000
 retailers. It touches 54 corpus files, so it belongs in its own change.
 
+Fixed in that change (`snap-metro-scope-2026-09-30.md`): every SNAP spec now
+reads its state inside its metro bbox, and 18 metros declare a higher cap. The
+54 metros go from 5,694 of their 34,686 retailers to all of them.
+
 ### Geocoder normalization drops context (address-only feeds)
 
 Both defects are in `normalize_address` (`apps/api/src/spatial/geocoder.py`) and

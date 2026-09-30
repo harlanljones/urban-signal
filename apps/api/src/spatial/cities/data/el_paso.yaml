@@ -233,7 +233,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'TX'
+    where: State = 'TX' AND Latitude BETWEEN 31.55 AND 32.2 AND Longitude BETWEEN -107.2 AND -106.0
     needs_geocode: false
     geocode_context: null
     field_map:

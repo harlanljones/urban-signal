@@ -320,7 +320,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'OH'
+    where: State = 'OH' AND Latitude BETWEEN 41.3 AND 41.65 AND Longitude BETWEEN -81.95 AND -81.5
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -359,6 +359,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 2000
 aliases:
 - cleveland_oh
 - cleveland oh
