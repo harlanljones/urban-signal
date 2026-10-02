@@ -18,7 +18,10 @@ PERMITS_FIELD_MAP = {
     "job_id": ["Permit__"],
     "issuance_date": ["Date_Issued"],
     "filing_date": ["Date_Entered"],
+    "job_type": ["Permit_Type_Description"],
     "cost": ["Const_Cost"],
+    "address_street": ["Address"],
+    "zipcode": ["ZIP"],
     "latitude": ["Lat"],
     "longitude": ["Lon"],
 }
@@ -103,6 +106,8 @@ def test_nashville_permit_spec_pins_the_live_schema():
     assert spec.oid_field == "ObjectId"
     assert spec.max_record_count == 1000
     assert spec.field_map == PERMITS_FIELD_MAP
+    # The contact and the free-text purpose stay on the server.
+    assert not {"Contact", "Purpose"} & set(spec.select.split(","))
 
 
 def test_nashville_str_spec_pins_the_live_schema():
@@ -281,15 +286,24 @@ class TestNashvillePermitParsing:
         row = _flatten_feature(attrs, PERMITS_GEOMETRY)
         assert permits.parse_socrata_row(row, city_id="nashville") is None
 
-    def test_unmapped_type_description_defaults_to_major_a1(self, permits):
-        """The shared classifier never matches Metro Nashville's free-text
-        Permit_Type_Description, so rows take the parser's literal ``"A1"``
-        default and land on JobType.A1."""
+    def test_type_description_names_the_work(self, permits):
+        """Permit_Type_Description ("Building Residential - New") is the
+        work class; unmapped, every permit took the parser's ``"A1"``."""
         from src.schemas.models import JobType
 
         event = permits.parse_socrata_row(self._row(), city_id="nashville")
-        assert event.job_type is JobType.A1
+        assert event.job_type is JobType.OT
+        # The issued-permits layer has no status column.
         assert event.status == "ISSUED"
+        attrs = {**PERMITS_ROW, "Permit_Type_Description": "Building Residential - New"}
+        event = permits.parse_socrata_row(_flatten_feature(attrs, PERMITS_GEOMETRY), city_id="nashville")
+        assert event.job_type is JobType.NB
+        assert event.normalized_permit_type == "NEW_CONSTRUCTION"
+
+    def test_site_address_and_zip_come_from_the_row(self, permits):
+        event = permits.parse_socrata_row(self._row(), city_id="nashville")
+        assert event.address_street == "607 W DUE WEST AVE"
+        assert event.zipcode == "37115"
 
 
 class TestNashvilleMixedCaseCoordinateContract:

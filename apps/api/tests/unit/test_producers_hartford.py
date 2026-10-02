@@ -22,15 +22,17 @@ from src.spatial.city_registry import (
     resolve_endpoint,
 )
 
+# The layer's own columns (2026-10-02).
 HARTFORD_PERMITS_FIELD_MAP = {
     "job_id": ["RECORD_ID"],
     "issuance_date": ["DateIssued"],
-    "job_type": ["PermitType", "PERMIT_TYPE", "WorkDescription"],
-    "cost": ["EstimatedCost", "COST", "ProjectCost"],
-    "status": ["Status", "STATUS"],
+    "filing_date": ["DATE_OPENED"],
+    "job_type": ["B1_APP_TYPE_ALIAS", "RECORD_TYPE_TYPE"],
+    "cost": ["Total_Construction_Cost"],
+    "status": ["RECORD_STATUS"],
     "address_street": ["PROPERTY_ADDRESS", "Location"],
-    "zipcode": ["ZIP", "ZipCode", "POSTAL_CODE"],
-    "bbl": ["PARCEL_ID", "ParcelID"],
+    "zipcode": ["PROPERTY_ZIP"],
+    "bbl": ["PARCEL_ID"],
 }
 
 HARTFORD_311_FIELD_MAP = {
@@ -80,6 +82,10 @@ def test_hartford_registers_311_permits_and_sla():
     assert permits.id_keys == ["RECORD_ID", "OBJECTID"]
     assert permits.field_map == HARTFORD_PERMITS_FIELD_MAP
     assert permits.needs_geocode is True
+    # Fee records and amendments are not permits of their own.
+    assert permits.where == "RECORD_TYPE_TYPE NOT IN ('Miscellaneous Fees', 'Amendment')"
+    # The assignee and the free-text description stay on the server.
+    assert not {"ASSIGNED_TO", "DESCRIPTION"} & set(permits.select.split(","))
 
     complaints = get_dataset(city, FeedType.COMPLAINTS_311)
     assert complaints.platform == "arcgis"
@@ -180,9 +186,12 @@ def test_hartford_permit_row_geocodes_address_only_feed(producers):
         "RECORD_ID": "RES-ALT-26-000445",
         "PROPERTY_ADDRESS": "165 CAPITOL AVE",
         "DateIssued": "2026-08-24T00:00:00+00:00",
-        "PermitType": "Building Alteration",
-        "EstimatedCost": "125000",
-        "Status": "Issued",
+        "DATE_OPENED": "2026-08-03T00:00:00+00:00",
+        "B1_APP_TYPE_ALIAS": "Commercial Alteration Permit",
+        "RECORD_TYPE_TYPE": "Commercial",
+        "Total_Construction_Cost": 125000,
+        "RECORD_STATUS": "Issued",
+        "PROPERTY_ZIP": "06106",
         "PARCEL_ID": "HFD-001",
     }
     with patch("src.spatial.geocoder.get_geocoder", return_value=_geocoder()):
@@ -194,6 +203,11 @@ def test_hartford_permit_row_geocodes_address_only_feed(producers):
     assert event.latitude == pytest.approx(41.7637)
     assert event.longitude == pytest.approx(-72.6734)
     assert event.issuance_date == datetime.fromisoformat("2026-08-24T00:00:00+00:00")
+    assert event.filing_date == datetime.fromisoformat("2026-08-03T00:00:00+00:00")
+    assert event.estimated_cost == 125000.0
+    assert event.status == "Issued"
+    assert event.zipcode == "06106"
+    assert event.job_type == "A2"
 
 
 def test_hartford_311_state_plane_geometry_geocodes_match_address(producers):

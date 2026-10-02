@@ -20,6 +20,8 @@ from src.producers.ckan_client import (
     NonDatastoreResourceError,
     _parse_where_terms,
     _quote_order_by,
+    _split_and,
+    _translate_where,
 )
 
 PERMITS_URI = "ckan://data.boston.gov/6ddcd912-32a0-43df-9908-63574f8c7e77"
@@ -162,8 +164,29 @@ def test_parse_where_terms_equality_and_range():
 
 def test_parse_where_terms_passthrough_on_complex_sql():
     assert _parse_where_terms("issued_date IS NOT NULL") is None
-    assert _parse_where_terms("(status = 'Open')") is None
+    assert _parse_where_terms("(issued_date IS NOT NULL) AND status = 'Open'") is None
     assert _parse_where_terms("issued_date NOT IN ('9999-12-31')") is None
+
+
+def test_parse_where_terms_unwraps_the_schedulers_parentheses():
+    # The scheduler wraps a spec's own filter in parentheses before joining
+    # the watermark term; a simple filter still reads as simple terms.
+    assert _parse_where_terms("(status = 'Open')") == [("status", "=", "Open")]
+    assert _parse_where_terms("(status = 'Open' AND kind = 'A') AND issued_date > '2026-08-20'") == [
+        ("status", "=", "Open"),
+        ("kind", "=", "A"),
+        ("issued_date", ">", "2026-08-20"),
+    ]
+
+
+def test_and_inside_a_quoted_value_does_not_split_the_clause():
+    assert _parse_where_terms("group = 'NEZ and Pave/Parking'") == [("group", "=", "NEZ and Pave/Parking")]
+    assert _split_and("\"Permit Group Type\" NOT IN ('Vendor', 'NEZ and Pave/Parking') AND x = '1'") == [
+        "\"Permit Group Type\" NOT IN ('Vendor', 'NEZ and Pave/Parking')",
+        "x = '1'",
+    ]
+    # A column whose name merely contains AND is not a conjunction.
+    assert _split_and("BRAND_AND_MODEL = 'x' AND LAND = 'y'") == ["BRAND_AND_MODEL = 'x'", "LAND = 'y'"]
 
 
 def test_a_column_name_with_spaces_is_one_field():
@@ -187,6 +210,88 @@ def test_a_spaced_column_is_quoted_in_the_sql(client, monkeypatch):
     monkeypatch.setattr(client, "_request_json", fake_request_json)
     client.fetch_records(PERMITS_URI, where_clause="PERMIT ISS. DATE >= '2026-09-15T00:00:00'")
     assert 'WHERE "PERMIT ISS. DATE" >= \'2026-09-15T00:00:00\'' in seen["sql"]
+
+
+def test_a_rich_filter_keeps_its_sql_and_the_watermark_term_is_quoted(client, monkeypatch):
+    """Laredo's permits filter, as the scheduler joins it to the watermark.
+    Sent verbatim, the bare dotted column was a 409 on every filtered poll."""
+    seen = {}
+
+    def fake_request_json(url, params):
+        seen["url"] = url
+        seen["sql"] = params["sql"]
+        return SQL_WATERMARK_RESULT
+
+    monkeypatch.setattr(client, "_request_json", fake_request_json)
+    client.fetch_records(
+        PERMITS_URI,
+        where_clause=(
+            "(\"Permit Group Type\" NOT IN ('Vendor', 'NEZ and Pave/Parking')) "
+            "AND PERMIT ISS. DATE >= '2026-09-02T00:00:00'"
+        ),
+    )
+    assert "/datastore_search_sql" in seen["url"]
+    assert seen["sql"].startswith('SELECT * FROM "6ddcd912-32a0-43df-9908-63574f8c7e77" WHERE ')
+    assert (
+        "WHERE (\"Permit Group Type\" NOT IN ('Vendor', 'NEZ and Pave/Parking')) "
+        "AND \"PERMIT ISS. DATE\" >= '2026-09-02T00:00:00' ORDER BY"
+    ) in seen["sql"]
+
+
+def test_translate_where_quotes_simple_terms_only():
+    # Boston's licences: the spec's own IS NOT NULL passes through.
+    assert _translate_where("(issued IS NOT NULL) AND issued > '2026-09-01 00:00:00'") == (
+        "(issued IS NOT NULL) AND \"issued\" > '2026-09-01 00:00:00'"
+    )
+    assert _translate_where("(a IS NULL AND b = '1') AND c >= '2'") == '(a IS NULL AND "b" = \'1\') AND "c" >= \'2\''
+    # BETWEEN's own AND survives the split and rejoin.
+    assert _translate_where("d BETWEEN '2026-01-01' AND '2026-02-01'") == "d BETWEEN '2026-01-01' AND '2026-02-01'"
+    # A compound condition is not a spaced column name.
+    assert _translate_where("x IS NULL OR y = '1'") == "x IS NULL OR y = '1'"
+
+
+def test_select_names_the_sql_columns(client, monkeypatch):
+    seen = {}
+
+    def fake_request_json(url, params):
+        seen["sql"] = params["sql"]
+        return SQL_WATERMARK_RESULT
+
+    monkeypatch.setattr(client, "_request_json", fake_request_json)
+    client.fetch_records(
+        PERMITS_URI,
+        where_clause="PERMIT ISS. DATE >= '2026-09-15T00:00:00'",
+        select="_id, APP YR,PERMIT ISS. DATE,\"STREET\"",
+    )
+    assert seen["sql"].startswith(
+        'SELECT "_id", "APP YR", "PERMIT ISS. DATE", "STREET" FROM "6ddcd912-32a0-43df-9908-63574f8c7e77" WHERE'
+    )
+
+
+def test_select_on_the_filters_path_is_the_fields_param(client, monkeypatch):
+    seen = {}
+
+    def fake_request_json(url, params):
+        seen["url"] = url
+        seen["params"] = params
+        return SEARCH_PAGE_1
+
+    monkeypatch.setattr(client, "_request_json", fake_request_json)
+    client.fetch_records(PERMITS_URI, where_clause="status = 'Open'", select="_id,permitnumber, issued_date")
+    assert seen["url"].endswith("/datastore_search")
+    assert seen["params"]["fields"] == "_id,permitnumber,issued_date"
+
+
+def test_paginate_forwards_select(client, monkeypatch):
+    seen = []
+
+    def fake_fetch_records(**kwargs):
+        seen.append(kwargs)
+        return []
+
+    monkeypatch.setattr(client, "fetch_records", fake_fetch_records)
+    list(client.paginate(PERMITS_URI, where_clause="x > '1'", select="_id,x"))
+    assert seen[0]["select"] == "_id,x"
 
 
 def test_range_clause_routes_to_search_sql(client, monkeypatch):

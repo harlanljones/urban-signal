@@ -185,7 +185,7 @@
   "feeds": {
     "permits": {
       "platform": "arcgis",
-      "watermark_col": "date_issued",
+      "watermark_col": "Date_Issued",
       "interval_seconds": 300.0,
       "topic": "raw.municipal.permits"
     },

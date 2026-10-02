@@ -126,7 +126,7 @@ datasets:
     watermark_exclude: []
     order_by: null
     id_col: null
-    select: null
+    select: ObjectId,Permit__,Date_Issued,Date_Entered,Permit_Type_Description,Const_Cost,Address,ZIP,Lat,Lon
     fallback_endpoints: []
     where: null
     needs_geocode: false
@@ -138,8 +138,14 @@ datasets:
       - Date_Issued
       filing_date:
       - Date_Entered
+      job_type:
+      - Permit_Type_Description
       cost:
       - Const_Cost
+      address_street:
+      - Address
+      zipcode:
+      - ZIP
       latitude:
       - Lat
       longitude:

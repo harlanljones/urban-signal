@@ -106,7 +106,7 @@ datasets:
     watermark_exclude: []
     order_by: null
     id_col: null
-    select: null
+    select: OBJECTID,USER_Permit_Number,USER_Application_Recv_d,USER_Project_Activity,USER_App_Status,USER_User_Status,USER_Estimated_Cost,USER_Location,USER_Location_Desc,USER_Parcel_ID
     fallback_endpoints: []
     where: null
     needs_geocode: false
@@ -118,6 +118,8 @@ datasets:
       - USER_Application_Recv_d
       filing_date:
       - USER_Application_Recv_d
+      job_type:
+      - USER_Project_Activity
       cost:
       - USER_Estimated_Cost
       status:
@@ -128,10 +130,6 @@ datasets:
       - USER_Location_Desc
       bbl:
       - USER_Parcel_ID
-      premises_name:
-      - USER_Business
-      description:
-      - USER_Project_Activity
     ingestion_mode: incremental
     oid_field: OBJECTID
     max_record_count: 2000

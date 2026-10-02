@@ -1,6 +1,6 @@
 """Contract tests for Chattanooga's CSV permits and ArcGIS parcel feeds."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 from unittest.mock import patch
 
 import httpx
@@ -16,16 +16,15 @@ from src.spatial.cities.chattanooga import (
 )
 from src.spatial.city_registry import CityId, FeedType
 
+# The export's own columns (2026-10-02); it carries no valuation or parcel.
 CHATTANOOGA_PERMITS_FIELD_MAP = {
     "job_id": ["permitnum"],
     "issuance_date": ["issueddate"],
     "filing_date": ["applieddate"],
     "job_type": ["permitclass"],
-    "cost": ["estprojectcostdec"],
-    "status": ["status"],
-    "address_street": ["address"],
-    "zipcode": ["zipcode", "zip"],
-    "bbl": ["pin"],
+    "status": ["statuscurrent"],
+    "address_street": ["originaladdress1"],
+    "zipcode": ["originalzip"],
 }
 
 CHATTANOOGA_DEEDS_FIELD_MAP = {
@@ -72,6 +71,18 @@ def test_chattanooga_registers_permits_deeds_and_snap_sla():
     assert permits.id_keys == ["permitnum"]
     assert permits.fallback_endpoints
     assert permits.field_map == CHATTANOOGA_PERMITS_FIELD_MAP
+    # Dates read "2026-10-01 00:00:00 UTC"; the text sorts as dates.
+    assert permits.watermark_type == "text"
+    assert permits.watermark_format == "%Y-%m-%d %H:%M:%S UTC"
+    # Street cuts and meter changes are not building permits.
+    assert "'Street Cut Permit'" in permits.where
+    assert permits.where.startswith("permitclass NOT IN (")
+    # Contractors and descriptions stay in the file.
+    selected = set(permits.select.split(","))
+    assert not selected & {
+        "contractoraddress1", "contractorcompanyname", "contractorphone", "contractorlicnum", "description",
+    }
+    assert set(CHATTANOOGA_PERMITS_FIELD_MAP["address_street"]) <= selected
 
     deeds = get_dataset(city, FeedType.DEEDS)
     assert deeds.platform == "arcgis"
@@ -89,14 +100,14 @@ def test_chattanooga_registers_permits_deeds_and_snap_sla():
 
 PERMIT_ROW = {
     "permitnum": "2026-00123",
-    "applieddate": "2026-08-23",
-    "issueddate": "2026-08-24",
+    "applieddate": "2026-08-23 00:00:00 UTC",
+    "issueddate": "2026-08-24 00:00:00 UTC",
     "permitclass": "NEW CONSTRUCTION",
-    "estprojectcostdec": "1250000",
-    "status": "ISSUED",
+    "statuscurrent": "Issued",
+    "originaladdress1": "100 MARKET ST",
+    "originalzip": "37402",
     "latitude": "35.0456",
     "longitude": "-85.3097",
-    "pin": "123456789",
 }
 
 DEED_ROW = {
@@ -134,8 +145,11 @@ def test_chattanooga_permit_row_parses(producers):
     assert event is not None
     assert event.city_id == "chattanooga"
     assert event.job_id == "2026-00123"
-    assert event.estimated_cost == 1250000.0
-    assert event.issuance_date == datetime.fromisoformat("2026-08-24")
+    assert event.issuance_date == datetime(2026, 8, 24, tzinfo=UTC)
+    assert event.filing_date == datetime(2026, 8, 23, tzinfo=UTC)
+    assert event.status == "Issued"
+    assert event.address_street == "100 MARKET ST"
+    assert event.zipcode == "37402"
     assert event.latitude == pytest.approx(35.0456)
     assert event.borough == "CHATTANOOGA_CORE"
 

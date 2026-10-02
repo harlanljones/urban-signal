@@ -120,15 +120,15 @@ datasets:
     interval_seconds: 300.0
     producer_key: permits
     endpoint_by_year: {}
-    watermark_type: null
-    watermark_format: null
+    watermark_type: text
+    watermark_format: '%Y-%m-%d %H:%M:%S UTC'
     watermark_exclude: []
     order_by: issueddate DESC
     id_col: null
-    select: null
+    select: permitnum,issueddate,applieddate,permitclass,statuscurrent,originaladdress1,originalzip,latitude,longitude
     fallback_endpoints:
     - https://www.arcgis.com/sharing/rest/content/items/9937e99e93de467eae5f592061c2672c/data
-    where: null
+    where: permitclass NOT IN ('Utility Street Cut Permit', 'Street Cut Permit', 'City Employee Only Utility Street Cut', 'Meter Inspection / Tenant Change Application')
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -140,17 +140,12 @@ datasets:
       - applieddate
       job_type:
       - permitclass
-      cost:
-      - estprojectcostdec
       status:
-      - status
+      - statuscurrent
       address_street:
-      - address
+      - originaladdress1
       zipcode:
-      - zipcode
-      - zip
-      bbl:
-      - pin
+      - originalzip
     ingestion_mode: incremental
     oid_field: null
     max_record_count: null

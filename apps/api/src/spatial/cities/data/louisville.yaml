@@ -604,7 +604,7 @@ datasets:
     watermark_exclude: []
     order_by: ISSUE_DATE DESC
     id_col: null
-    select: null
+    select: ObjectId,PERMIT_NUMBER,ISSUE_DATE,PERMIT_TYPE,WORK_TYPE,PERMIT_STATUS,PROJECT_COSTS,ADDRESS,ZIPCODE,LATITUDE,LONGITUDE
     fallback_endpoints: []
     where: null
     needs_geocode: false
@@ -612,15 +612,23 @@ datasets:
     field_map:
       job_id:
       - PERMIT_NUMBER
+      issuance_date:
+      - ISSUE_DATE
+      job_type:
+      - PERMIT_TYPE
+      - WORK_TYPE
+      status:
+      - PERMIT_STATUS
       cost:
       - PROJECT_COSTS
-      - PERMIT_FEE
+      address_street:
+      - ADDRESS
+      zipcode:
+      - ZIPCODE
       latitude:
       - LATITUDE
       longitude:
       - LONGITUDE
-      issued_date:
-      - ISSUE_DATE
     ingestion_mode: incremental
     oid_field: ObjectId
     max_record_count: 1000

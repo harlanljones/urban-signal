@@ -1,10 +1,11 @@
 PERMITS_FIELD_MAP = {
-    "job_id": ["case_number", "OBJECTID"],
-    "issuance_date": ["date_issued"],
-    "filing_date": ["date_entered"],
-    "status": ["case_status"],
-    "job_type": ["case_type", "case_type_desc"],
-    "address_street": ["location"],
+    "job_id": ["Permit_Number", "OBJECTID"],
+    "issuance_date": ["Date_Issued"],
+    "filing_date": ["Date_Entered"],
+    "status": ["Permit_Status"],
+    # Permit_Name reads "Residential Building Permit", "Electrical Permit".
+    "job_type": ["Permit_Name", "Permit_Type"],
+    "address_street": ["Address_1"],
 }
 
 FIELD_MAP = {
@@ -36,13 +37,17 @@ Live-probe caveats that define this leaf (2026-08-30, US-426):
   ``CityworksViews/BuildingPermits/MapServer/0`` (4,180 rows live). A
   companion ``Residential Building Permit`` layer (MapServer/1, 7,052 rows)
   is NOT registered separately (ADR-0007) — the commercial layer is the
-  primary permit stream. ``date_issued`` is the watermark (epoch ms);
-  ``date_entered`` is the filing date.
+  primary permit stream.
 * Native point geometry (``outSR=4326`` lifts to WGS84), so
   ``needs_geocode=False``.
-* ``case_number`` is the unique permit id; ``case_status`` is the status;
-  ``case_type`` + ``case_type_desc`` split the work class; ``location`` is
-  the street address.
+* The layer renamed its columns since (2026-10-02: 816 rows, issued
+  2024-03-28 to 2026-09-04). ``Date_Issued`` is the watermark and
+  ``Date_Entered`` the filing date, both text written ``9/4/2026``, so the
+  poll names the days since its watermark (``text_date_window``).
+  ``Permit_Number`` is the permit; a permit spanning several parcels has a
+  row per parcel (57 such rows), and the id keeps one. ``Permit_Name``
+  ("Commercial Electrical", "Commercial Building New") is the work class,
+  ``Permit_Status`` the status and ``Address_1`` the street address.
 * No neighborhood/district column exists on the layer, so no ``borough``
   field-map candidate is declared: division resolution comes from coordinates
   at ingest.
@@ -347,8 +352,8 @@ TOPEKA_FEED_SPECS: dict[str, dict[str, object]] = {
     "permits": {
         "endpoint": TOPEKA_PERMITS_ENDPOINT,
         "platform": "arcgis",
-        "watermark_col": "date_issued",
-        "id_keys": ["case_number", "OBJECTID"],
+        "watermark_col": "Date_Issued",
+        "id_keys": ["Permit_Number", "OBJECTID"],
         "topic_key": "topic_permits",
         "interval_seconds": 300.0,
         "producer_key": "permits",
@@ -357,10 +362,17 @@ TOPEKA_FEED_SPECS: dict[str, dict[str, object]] = {
             "needs_geocode": False,
             "oid_field": "OBJECTID",
             "max_record_count": 2000,
-            "order_by": "date_issued DESC",
+            # Date_Issued is text ("9/4/2026"): sorted, it reads as text.
+            "watermark_type": "text",
+            "watermark_format": "%m/%d/%Y",
+            "order_by": "OBJECTID DESC",
+            "select": (
+                "OBJECTID,Permit_Number,Date_Issued,Date_Entered,Permit_Name,"
+                "Permit_Type,Permit_Status,Address_1"
+            ),
             "scope": (
                 "Commercial Building Permit (MapServer/0, 4,180 rows; "
-                "native point geometry; date_issued watermark; companion "
+                "native point geometry; Date_Issued watermark; companion "
                 "Residential Building Permit layer MapServer/1 with 7,052 "
                 "rows not registered — ADR-0007)"
             ),

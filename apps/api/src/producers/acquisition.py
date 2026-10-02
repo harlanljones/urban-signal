@@ -419,7 +419,7 @@ def newest_valid_watermark(
 # the explicit ``where_clause`` argument, never a splatted kwarg.  CARTO takes
 # ``id_col``/``select``; ArcGIS takes ``select`` as ``outFields`` and Socrata
 # as ``$select``; CSV additionally swallows the watermark_* kwargs via
-# ``**kwargs`` (and ``fallback_endpoints``); CKAN accepts only ``order_by``.
+# ``**kwargs`` (and ``fallback_endpoints``); CKAN takes ``order_by``/``select``.
 # US-185: this is the adapter-facing contract that replaces the
 # prior 7-key truthy splat, which forwarded ``watermark_col`` /
 # ``watermark_format`` / ``watermark_exclude`` (and ``id_col``/``select`` for
@@ -429,7 +429,7 @@ _ADAPTER_REQUEST_KEYS: Dict[str, Tuple[str, ...]] = {
     "socrata": ("order_by", "select"),
     "arcgis": ("order_by", "select"),
     "carto": ("order_by", "id_col", "select"),
-    "ckan": ("order_by",),
+    "ckan": ("order_by", "select"),
     "csv": (
         "order_by",
         "id_col",

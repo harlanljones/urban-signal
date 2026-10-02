@@ -225,7 +225,7 @@ datasets:
     watermark_exclude: []
     order_by: DATE_ISSUE DESC,PERMITNUMBER ASC,PARID ASC
     id_col: null
-    select: null
+    select: PERMITNUMBER,PERM_NUM,PERMYEAR,PARID,PERMCODE,PERM_TYPE,PERMIT_STATUS,DATE_ISSUE,DATE_ENTERED,JOBADDRESS,WORKCOST
     fallback_endpoints: []
     where: null
     needs_geocode: true
@@ -241,12 +241,15 @@ datasets:
       - DATE_ENTERED
       filing_date:
       - DATE_ENTERED
+      job_type:
+      - PERM_TYPE
+      - PERMCODE
       cost:
       - WORKCOST
       status:
       - PERMIT_STATUS
     ingestion_mode: incremental
-    oid_field: OBJECTID
+    oid_field: PERMITNUMBER
     max_record_count: 15000
     expected_cadence_days: 7
     alarm_exempt: false

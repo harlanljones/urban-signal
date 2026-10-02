@@ -53,6 +53,9 @@ def _parse_datetime(val: Any) -> datetime | None:
         return val if val.tzinfo else val.replace(tzinfo=UTC)
     if isinstance(val, str):
         val_clean = val.replace("Z", "+00:00").strip()
+        # Chattanooga's permits export writes "2026-10-01 00:00:00 UTC".
+        if val_clean.endswith(" UTC"):
+            val_clean = val_clean[: -len(" UTC")] + "+00:00"
         try:
             return datetime.fromisoformat(val_clean)
         except ValueError:
@@ -67,6 +70,8 @@ def _parse_datetime(val: Any) -> datetime | None:
             "%B, %d %Y %H:%M:%S",
             # MyGov's report workbooks (Abilene's permits).
             "%m/%d/%Y at %I:%M %p",
+            # Virginia Beach's permits table keeps its dates as text.
+            "%Y/%m/%d",
         ):
             try:
                 return datetime.strptime(val.strip(), fmt).replace(tzinfo=UTC)

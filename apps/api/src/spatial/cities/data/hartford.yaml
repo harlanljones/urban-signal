@@ -126,9 +126,9 @@ datasets:
     watermark_exclude: []
     order_by: null
     id_col: null
-    select: null
+    select: OBJECTID,RECORD_ID,DateIssued,DATE_OPENED,B1_APP_TYPE_ALIAS,RECORD_TYPE_TYPE,RECORD_STATUS,Total_Construction_Cost,PROPERTY_ADDRESS,Location,PROPERTY_ZIP,PARCEL_ID
     fallback_endpoints: []
-    where: null
+    where: RECORD_TYPE_TYPE NOT IN ('Miscellaneous Fees', 'Amendment')
     needs_geocode: true
     geocode_context: Hartford, CT
     field_map:
@@ -136,27 +136,22 @@ datasets:
       - RECORD_ID
       issuance_date:
       - DateIssued
+      filing_date:
+      - DATE_OPENED
       job_type:
-      - PermitType
-      - PERMIT_TYPE
-      - WorkDescription
+      - B1_APP_TYPE_ALIAS
+      - RECORD_TYPE_TYPE
       cost:
-      - EstimatedCost
-      - COST
-      - ProjectCost
+      - Total_Construction_Cost
       status:
-      - Status
-      - STATUS
+      - RECORD_STATUS
       address_street:
       - PROPERTY_ADDRESS
       - Location
       zipcode:
-      - ZIP
-      - ZipCode
-      - POSTAL_CODE
+      - PROPERTY_ZIP
       bbl:
       - PARCEL_ID
-      - ParcelID
     ingestion_mode: incremental
     oid_field: OBJECTID
     max_record_count: 2000

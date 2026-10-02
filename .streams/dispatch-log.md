@@ -1968,3 +1968,21 @@ Worth keeping:
 | Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
 |---|---|---|---|---|---|
 | ansi-backfill-order | `.streams/ansi-backfill-order.md` | none | 2026-10-02 | done (Augusta permits backfill: 40 of 40 rows published in a capped live run, refused before; 60 of 62 ordered jobs on date-literal hosts answer the new shape, the other 2 fail the same way in the old one) | `build_query_shape` keeps the spec's order on date-literal hosts |
+
+### 2026-10-02 — Permits feeds map the columns their sources publish (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| permit-fields | `.streams/permit-fields.md` | `dob_permits_producer.py` (`_parse_datetime` reads `... UTC` and `YYYY/MM/DD`) | 2026-10-02 | done (11 feeds; in two live polls each, the events missing a mapped issue date, type, status or address fell from all of them to what the source leaves empty; Laredo publishes 1,000 of 1,000 rows, 429 before) | per-feed `select`, filters and field maps; CKAN filters with rich SQL; dotted column names in field maps |
+
+Worth keeping:
+
+- **Count the fields an event fills, not just the rows it publishes.** All
+  eleven feeds polled cleanly and published; their maps named columns the
+  sources do not have, so their events carried no dates, types or addresses.
+- **Check a date column's type before ordering by it.** Topeka's
+  `Date_Issued` is text (`9/4/2026`): its statistics put September 4 above
+  every October date.
+- **Key on what is unique.** Laredo's application number is shared by a
+  house and its trade permits; keyed on it, 571 of 1,000 rows were dropped
+  as duplicates without an error.

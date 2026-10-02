@@ -26,8 +26,10 @@ So the client parses each ``<field> OP '<value>'`` term (OP ∈ =, !=, >, >=, <,
   with a quoted WHERE fragment (verified live: ``WHERE issued_date > '...'
   ORDER BY "_id" LIMIT n OFFSET m`` succeeds on Boston permits).
 
-Anything unparseable is passed through to ``datastore_search_sql`` verbatim so
-operators can hand-write richer SQL if needed.
+Anything else goes to ``datastore_search_sql``: the clause is split on its
+top-level ANDs (quotes and parentheses respected), simple terms get their
+columns quoted, and the rest passes through verbatim so operators can
+hand-write richer SQL (Laredo's ``"Permit Group Type" NOT IN (...)``).
 
 **Paging & termination.** ``datastore_search`` pages via ``limit``/``offset``
 and reports the row count in ``result.total`` — used to stop exactly at
@@ -103,22 +105,115 @@ def _quote_order_by(order_by: str) -> str:
     return ", ".join(terms) if terms else '"_id"'
 
 
+def _word_char(text: str, i: int) -> bool:
+    return 0 <= i < len(text) and (text[i].isalnum() or text[i] == "_")
+
+
+def _split_and(clause: str) -> List[str]:
+    """Split a clause on its top-level ``AND``s, never inside a quoted value
+    or parentheses (Laredo's filter names the group 'NEZ and Pave/Parking')."""
+    parts: List[str] = []
+    depth, quote, start, i = 0, None, 0, 0
+    while i < len(clause):
+        ch = clause[i]
+        if quote:
+            if ch == quote:
+                quote = None
+        elif ch in "'\"":
+            quote = ch
+        elif ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+        elif depth == 0 and clause[i:i + 3].upper() == "AND" and not _word_char(clause, i - 1) and not _word_char(
+            clause, i + 3
+        ):
+            parts.append(clause[start:i])
+            start = i = i + 3
+            continue
+        i += 1
+    parts.append(clause[start:])
+    return [p.strip() for p in parts if p.strip()]
+
+
+def _strip_parens(part: str) -> str:
+    """Drop parentheses that wrap a whole part, as the scheduler wraps a spec's
+    own filter: ``(a = '1')`` -> ``a = '1'``; ``(a) AND (b)`` stays."""
+    while part.startswith("(") and part.endswith(")"):
+        depth, quote = 0, None
+        for i, ch in enumerate(part):
+            if quote:
+                quote = None if ch == quote else quote
+            elif ch in "'\"":
+                quote = ch
+            elif ch == "(":
+                depth += 1
+            elif ch == ")":
+                depth -= 1
+                if depth == 0 and i < len(part) - 1:
+                    return part
+        part = part[1:-1].strip()
+    return part
+
+
+# A bare "field" holding one of these words is a compound condition
+# (``x IS NULL OR y = '1'``), not a column name with spaces.
+_SQL_WORD_RE = re.compile(r"\b(?:OR|IS|NOT|IN|LIKE|ILIKE|BETWEEN|NULL)\b", re.IGNORECASE)
+
+
+def _match_term(part: str) -> Optional[Tuple[str, str, str]]:
+    m = _TERM_RE.match(part)
+    if not m:
+        return None
+    field = m.group("field")
+    if not field.startswith('"') and _SQL_WORD_RE.search(field):
+        return None
+    op = "!=" if m.group("op") == "<>" else m.group("op")
+    return field.strip('"'), op, m.group("value")[1:-1]
+
+
 def _parse_where_terms(where_clause: str) -> Optional[List[Tuple[str, str, str]]]:
     """Split an AND-combined where clause into ``(field, op, value)`` terms.
 
     Returns None when any part does not fit the simple grammar — callers then
-    pass the clause through to ``datastore_search_sql`` verbatim.
+    send the clause to ``datastore_search_sql`` through ``_translate_where``.
     """
-    parts = [p.strip() for p in re.split(r"\bAND\b", where_clause, flags=re.IGNORECASE) if p.strip()]
     terms = []
-    for part in parts:
-        m = _TERM_RE.match(part)
-        if not m:
+    for part in _split_and(where_clause):
+        inner = _strip_parens(part)
+        sub = _split_and(inner)
+        if len(sub) > 1:
+            nested = _parse_where_terms(inner)
+            if nested is None:
+                return None
+            terms.extend(nested)
+            continue
+        term = _match_term(inner)
+        if term is None:
             return None
-        value = m.group("value")[1:-1]
-        op = "!=" if m.group("op") == "<>" else m.group("op")
-        terms.append((m.group("field").strip('"'), op, value))
+        terms.append(term)
     return terms
+
+
+def _translate_where(where_clause: str) -> str:
+    """A clause the simple grammar does not cover, for ``datastore_search_sql``:
+    its simple terms get their columns quoted (a CKAN column name can hold
+    spaces and dots) and the rest passes through verbatim. A spec's own filter
+    (Laredo's ``"Permit Group Type" NOT IN (...)``) joined to the scheduler's
+    watermark term ``PERMIT ISS. DATE >= '...'`` needs both."""
+    out = []
+    for part in _split_and(where_clause):
+        inner = _strip_parens(part)
+        if len(_split_and(inner)) > 1:
+            out.append(f"({_translate_where(inner)})")
+            continue
+        term = _match_term(inner)
+        if term is None:
+            out.append(part)
+        else:
+            field, op, value = term
+            out.append(f'"{field}" {op} \'{value}\'')
+    return " AND ".join(out)
 
 
 class CkanClient:
@@ -239,8 +334,13 @@ class CkanClient:
         order_by: str = "_id",
         limit: int = 1000,
         offset: int = 0,
+        select: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
-        """Fetch a single page of records, choosing search vs search_sql by clause shape."""
+        """Fetch a single page of records, choosing search vs search_sql by clause shape.
+
+        ``select`` names the columns to return, comma-separated (a spec's
+        ``select``); the default is every column.
+        """
         action_base, resource_id, _uri_params = self.parse_endpoint(endpoint_url)
         if order_by == ":id":
             order_by = "_id"
@@ -250,11 +350,13 @@ class CkanClient:
             terms is None
             or any(op not in ("=",) for _, op, _ in terms)
         )
+        columns = [c.strip() for c in select.split(",") if c.strip()] if select else []
 
         if use_sql:
-            sql = f'SELECT * FROM "{resource_id}"'
+            cols = ", ".join(c if c.startswith('"') or c == "*" else f'"{c}"' for c in columns) or "*"
+            sql = f'SELECT {cols} FROM "{resource_id}"'
             if terms is None:
-                sql += f" WHERE {where_clause}"
+                sql += f" WHERE {_translate_where(where_clause)}"
             elif terms:
                 conds = [
                     f'"{field}" {"!=" if op == "!=" else op} \'{value}\''
@@ -275,6 +377,8 @@ class CkanClient:
             params["sort"] = order_by
         if terms:
             params["filters"] = json.dumps({f: v for f, _, v in terms})
+        if columns:
+            params["fields"] = ",".join(c.strip('"') for c in columns)
         payload = self._request_json(f"{action_base}/datastore_search", params)
         return list(payload["result"]["records"])
 
@@ -297,6 +401,7 @@ class CkanClient:
         order_by: str = "_id",
         batch_size: int = 1000,
         max_records: Optional[int] = None,
+        select: Optional[str] = None,
     ) -> Generator[List[Dict[str, Any]], None, None]:
         """Yield batches of records, terminating on exhaustion or max_records.
 
@@ -323,6 +428,7 @@ class CkanClient:
                 order_by=order_by,
                 limit=fetch_limit,
                 offset=offset,
+                select=select,
             )
 
             if not records:

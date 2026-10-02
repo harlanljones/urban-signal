@@ -246,25 +246,20 @@ __all__ = [
 ]
 
 PERMITS_FIELD_MAP: dict[str, list[str]] = {
-    # APP NBR (numeric) + APP YR composite key; _id is the CKAN row OID fallback.
-    "job_id": ["APP_NBR", "APP_YR", "_id"],
-    # Watermark column is timestamp; maps to both issuance and filing.
-    "issuance_date": ["PERMIT_ISS_DATE"],
-    "filing_date": ["PERMIT_ISS_DATE"],
-    "status": ["PERMIT_STATUS_DESC", "PERMIT_STATUS", "APP_STAT_DESC", "APP_STATUS"],
-    "job_type": ["APP_TYPE_DESC", "PERMIT_TYPE_DESC", "Permit_Group_Type", "Permit_Group_Tab"],
-    "cost": ["VALUATION", "TOTAL_FEE", "PERMIT_FEE"],
-    "valuation": ["VALUATION"],
-    "total_fee": ["TOTAL_FEE"],
-    # Split address — first_mapped picks the first truthy; the producer
-    # concatenates STREET NBR + STREET when both present.
-    "address_street": ["STREET", "STREET_NBR"],
-    "street_number": ["STREET_NBR"],
-    "street_name": ["STREET"],
-    "description": ["APP_DESC", "Permit_Group_Type"],
-    "permit_type": ["PERMIT_TYPE", "APP_TYPE"],
-    "permit_sequence": ["PERMIT_SEQUENCE"],
-    "borough": ["Permit_Group_Tab"],
+    # CKAN's row id: the only column unique per row. An application number
+    # carries several permits (a house and its electrical, plumbing and
+    # mechanical permits share APP NBR and PERMIT SEQUENCE), so the spec's
+    # composite id joins APP YR, APP NBR, PERMIT SEQUENCE and PERMIT TYPE.
+    "job_id": ["_id"],
+    # The datastore keeps no application date, only the issue date.
+    "issuance_date": ["PERMIT ISS. DATE"],
+    "status": ["PERMIT STATUS DESC", "APP STAT DESC"],
+    # The permit's group names its trade ("Electrical", "Plumbing",
+    # "Mechanical", "Demolition"); the type description is the fallback.
+    "job_type": ["Permit Group Type", "PERMIT TYPE DESC", "APP TYPE DESC"],
+    "cost": ["VALUATION"],
+    # ``compose_permit_address`` joins STREET NBR and STREET.
+    "address_street": ["address_street", "STREET"],
 }
 
 FIELD_MAP: dict[str, dict[str, list[str]]] = {
@@ -278,23 +273,15 @@ DROPPED_PII_COLUMNS: tuple[str, ...] = (
 )
 
 
-def normalize_laredo_row(row: dict) -> dict:
-    """Normalize a raw CKAN datastore row so its keys match PERMITS_FIELD_MAP.
+def compose_permit_address(row: dict) -> str | None:
+    """The permit's site address, joined from the datastore's parts.
 
-    CKAN field ids contain dots and spaces (e.g. "PERMIT ISS. DATE"). The
-    spine ``first_mapped`` treats dots as nesting, so the leaf normalizes
-    by replacing dots/spaces with "_" and upper-casing to the map's
-    sanitized keys. Both the original and normalized keys are kept so
-    existing callers that pass raw rows keep working after the spine patch.
+    ``STREET NBR`` holds the house number and ``STREET`` the street, both
+    padded with spaces. ``DOBPermitsProducer`` calls this for every Laredo
+    permit row and geocodes the result. Returns None without a street.
     """
-    out: dict = dict(row)
-    for k, v in list(row.items()):
-        sanitized = k.replace(".", "").replace(" ", "_").replace("-", "_")
-        while "__" in sanitized:
-            sanitized = sanitized.replace("__", "_")
-        sanitized = sanitized.strip("_")
-        if sanitized != k:
-            out[sanitized] = v
-            out[sanitized.upper()] = v
-    return out
-
+    street = " ".join(str(row.get("STREET") or "").split())
+    if not street:
+        return None
+    number = str(row.get("STREET NBR") or "").strip()
+    return f"{number} {street}" if number else street

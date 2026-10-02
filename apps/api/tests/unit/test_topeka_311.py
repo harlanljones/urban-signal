@@ -8,6 +8,7 @@ rejects ISO date strings, so its path takes ANSI literals. The poll reads
 only each request's id, problem code, department, status and dates.
 """
 
+from datetime import date
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -79,11 +80,21 @@ def test_the_311_view_takes_ansi_literals_and_the_permits_view_keeps_iso():
     assert watermark_comparison(
         "datetimeinit", ">", "2026-10-01T13:38:18", spec.endpoint, time_zone="Etc/UTC"
     ) == "datetimeinit > timestamp '2026-10-01 13:38:18'"
-    # The permits view on the same host answers 400 to an ANSI literal on
-    # ``date_issued``.
+    # The permits view on the same host answers 400 to an ANSI literal.
     assert watermark_comparison(
-        "date_issued", ">", "2026-10-01T13:38:18", permits.endpoint
-    ) == "date_issued > '2026-10-01T13:38:18'"
+        "Date_Issued", ">", "2026-10-01T13:38:18", permits.endpoint
+    ) == "Date_Issued > '2026-10-01T13:38:18'"
+    # Its dates are text ("9/4/2026"), so its poll names the days since the
+    # watermark rather than comparing text.
+    assert watermark_comparison(
+        permits.watermark_col,
+        ">=",
+        "9/30/2026",
+        permits.endpoint,
+        watermark_type=permits.watermark_type,
+        watermark_format=permits.watermark_format,
+        today=date(2026, 10, 2),
+    ) == "Date_Issued IN ('09/30/2026', '9/30/2026', '10/01/2026', '10/1/2026', '10/02/2026', '10/2/2026')"
 
 
 def test_the_request_names_its_columns_and_leaves_free_text_out():

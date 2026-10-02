@@ -245,9 +245,9 @@ datasets:
   permits:
     endpoint: https://maps.topeka.gov/arcgis/rest/services/CityworksViews/BuildingPermits/MapServer/0
     platform: arcgis
-    watermark_col: date_issued
+    watermark_col: Date_Issued
     id_keys:
-    - case_number
+    - Permit_Number
     - OBJECTID
     topic: raw.municipal.permits
     interval_seconds: 300.0
@@ -256,28 +256,28 @@ datasets:
     needs_geocode: false
     oid_field: OBJECTID
     max_record_count: 2000
-    order_by: date_issued DESC
+    order_by: OBJECTID DESC
     field_map:
       job_id:
-      - case_number
+      - Permit_Number
       - OBJECTID
       issuance_date:
-      - date_issued
+      - Date_Issued
       filing_date:
-      - date_entered
+      - Date_Entered
       status:
-      - case_status
+      - Permit_Status
       job_type:
-      - case_type
-      - case_type_desc
+      - Permit_Name
+      - Permit_Type
       address_street:
-      - location
+      - Address_1
     endpoint_by_year: {}
-    watermark_type: null
-    watermark_format: null
+    watermark_type: text
+    watermark_format: '%m/%d/%Y'
     watermark_exclude: []
     id_col: null
-    select: null
+    select: OBJECTID,Permit_Number,Date_Issued,Date_Entered,Permit_Name,Permit_Type,Permit_Status,Address_1
     fallback_endpoints: []
     where: null
     geocode_context: null

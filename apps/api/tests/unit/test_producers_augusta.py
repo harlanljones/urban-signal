@@ -36,7 +36,8 @@ def test_augusta_registry_carries_permits_311_and_sla_specs():
     assert permits.platform == "arcgis"
     assert permits.producer_key == "permits"
     assert permits.needs_geocode is True
-    assert permits.oid_field == "OBJECTID"
+    # The iasWorld permits table has no object id; the permit number keys its rows.
+    assert permits.oid_field == "PERMITNUMBER"
     assert "PERMITNUMBER" in permits.id_keys
 
     # Unregistered feeds raise readable errors
