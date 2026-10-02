@@ -155,7 +155,7 @@ datasets:
     watermark_exclude: []
     order_by: null
     id_col: null
-    select: _id,APP YR,APP NBR,PERMIT SEQUENCE,PERMIT TYPE,PERMIT TYPE DESC,APP TYPE DESC,Permit Group Type,PERMIT STATUS DESC,APP STAT DESC,PERMIT ISS. DATE,VALUATION,STREET NBR,STREET
+    select: _id,APP YR,APP NBR,PERMIT SEQUENCE,PERMIT TYPE,PERMIT TYPE DESC,APP TYPE DESC,Permit Group Type,Permit Group Tab,PERMIT STATUS DESC,APP STAT DESC,PERMIT ISS. DATE,VALUATION,STREET NBR,STREET
     fallback_endpoints: []
     where: '"Permit Group Type" NOT IN (''Vendor'', ''Internal use'', ''Business'', ''Fire Dept'', ''Right-of-Way/Utility'', ''NEZ and Pave/Parking'')'
     needs_geocode: true

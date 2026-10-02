@@ -1986,3 +1986,19 @@ Worth keeping:
 - **Key on what is unique.** Laredo's application number is shared by a
   house and its trade permits; keyed on it, 571 of 1,000 rows were dropped
   as duplicates without an error.
+
+### 2026-10-02 — Permit types read from two columns (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| permit-types | `.streams/permit-types.md` | `dob_permits_producer.py` (asks the city leaf for `compose_permit_type` before the field map) | 2026-10-02 | done (replayed on each source's own vocabulary: Laredo's new buildings 0 → 1,814 of 12,036 permits in a year, Philadelphia's 0 → 766 of 34,937 in 2026, Chattanooga's 0 → 49 of 708; Augusta's trade permits 9 → 492 of 1,000. Live, new construction 0 → 74 of Chattanooga's 998 and 0 → 186 of Laredo's 999) | `building_permit_type` in the shared taxonomy; `compose_permit_type` in the Chattanooga, Philadelphia, Laredo and Augusta leaves |
+
+Worth keeping:
+
+- **A type can need two columns.** A field map lists alternatives, not
+  parts: where a source names the class in one column and the work in
+  another ("Residential Building Permit" and "New Construction"), the city
+  leaf composes them, as it composes an address.
+- **Join a work type only where the class leaves it open.** Philadelphia's
+  fire-suppression permits for a new building also say "New Construction";
+  read with their class, every one would have counted as a new building.

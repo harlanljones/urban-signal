@@ -638,3 +638,52 @@ class TestProducerWiring:
     def test_client_for_dispatches_carto_platform(self):
         for producer in self._producers():
             assert producer._client_for("carto") is producer.carto
+
+
+class TestPhiladelphiaPermitTypes(PhillyParsingBase):
+    """A building permit's type of work says whether it builds something new
+    (533 new houses among 2026's 34,937 permits to 2026-10-02); the other
+    permits name what they are in their description."""
+
+    @pytest.fixture(autouse=True)
+    def _registered_map(self, monkeypatch):
+        import src.producers.field_maps as fm
+
+        permits_map = get_dataset(CityId.PHILADELPHIA, FeedType.PERMITS).field_map
+        monkeypatch.setattr(
+            fm,
+            "resolve_field_map",
+            lambda city_value, feed: permits_map if feed == FeedType.PERMITS else {},
+        )
+
+    @pytest.mark.parametrize(
+        ("description", "work", "job_type", "normalized"),
+        [
+            ("Residential Building Permit", "New Construction", "NB", "NEW_CONSTRUCTION"),
+            ("Commercial Building Permit", "New Construction (Shell Only)", "NB", "NEW_CONSTRUCTION"),
+            ("Residential Building Permit", "Addition and/or Alteration", "A2", "MAJOR_RENOVATION"),
+            # A zoning approval and a sprinkler system for a new building are
+            # not new buildings themselves.
+            ("Zoning Permit", "New construction, addition, GFA change", "OT", "MINOR_ALTERATION"),
+            ("Fire Suppression Permit", "New Construction", "OT", "MINOR_ALTERATION"),
+            ("Plumbing Permit", "New Construction or Additions", "A2", "MECHANICAL_ELECTRICAL_PLUMBING"),
+            # An EZ permit's interior wall "Demo." is not a demolition.
+            ("General Permit Minor", "EZ Interior Non-Load-Bearing Wall Demo.", "OT", "MINOR_ALTERATION"),
+        ],
+    )
+    def test_job_type(self, permits, description, work, job_type, normalized):
+        row = {
+            "cartodb_id": 1,
+            "permitnumber": "BP-2026-000001",
+            "permitissuedate": "2026-09-30T12:00:00Z",
+            "permitdescription": description,
+            "typeofwork": work,
+            "status": "Issued",
+            "address": "1400 JOHN F KENNEDY BLVD",
+            "zip": "19102",
+            "latitude": 39.9526,
+            "longitude": -75.1652,
+        }
+        event = permits.parse_socrata_row(row, city_id="philadelphia")
+        assert event is not None
+        assert (event.job_type.value, event.normalized_permit_type) == (job_type, normalized)

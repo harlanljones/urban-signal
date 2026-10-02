@@ -154,6 +154,42 @@ def test_chattanooga_permit_row_parses(producers):
     assert event.borough == "CHATTANOOGA_CORE"
 
 
+@pytest.mark.parametrize(
+    ("permit_class", "permit_type", "job_type", "normalized"),
+    [
+        ("Residential Building Permit", "New Construction", "NB", "NEW_CONSTRUCTION"),
+        ("Residential Building Permit", "New Addition", "A2", "MAJOR_RENOVATION"),
+        ("Residential Building Permit", "Pool", "OT", "MINOR_ALTERATION"),
+        ("Electrical Permit", "Residential", "A2", "MECHANICAL_ELECTRICAL_PLUMBING"),
+        ("Commercial Building Permit", None, "OT", "MINOR_ALTERATION"),
+    ],
+)
+def test_chattanooga_building_permits_read_their_work_type(producers, permit_class, permit_type, job_type, normalized):
+    """A new house is a "Residential Building Permit" whose type is "New
+    Construction" (49 of the newest 1,000 rows on 2026-10-02); read alone,
+    the class counted it as minor work."""
+    from src.spatial.cities.chattanooga import compose_permit_type
+
+    permits, _ = producers
+    row = {**PERMIT_ROW, "permitclass": permit_class, "permittype": permit_type}
+    with patch(
+        "src.producers.field_maps.resolve_field_map",
+        return_value=CHATTANOOGA_PERMITS_FIELD_MAP,
+    ):
+        event = permits.parse_socrata_row(row, city_id="chattanooga")
+    assert event is not None
+    assert (event.job_type.value, event.normalized_permit_type) == (job_type, normalized)
+    if permit_class != "Residential Building Permit":
+        assert compose_permit_type(row) is None
+
+
+def test_chattanooga_selects_the_permit_type():
+    from src.spatial.city_registry import get_dataset
+
+    spec = get_dataset(CityId.CHATTANOOGA, FeedType.PERMITS)
+    assert {"permitclass", "permittype"} <= set(spec.select.split(","))
+
+
 def test_chattanooga_deed_polygon_row_parses(producers):
     _, deeds = producers
     with patch(

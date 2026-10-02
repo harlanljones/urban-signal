@@ -38,6 +38,7 @@ from src.spatial.cities.laredo import (
     PERMITS_FIELD_MAP,
     REGISTRATION,
     compose_permit_address,
+    compose_permit_type,
     is_in_greater_laredo_metro,
     is_in_laredo_metro,
 )
@@ -331,6 +332,40 @@ class TestLaredoAddress:
         assert compose_permit_address({}) is None
 
 
+def _laredo_permit(group: str, tab: str, kind: str) -> dict:
+    """A fixture row with another group, report tab and kind, padded the way
+    the datastore pads ``PERMIT TYPE DESC``."""
+    return {**_PERMIT_SECRETARIA, "Permit Group Type": group, "Permit Group Tab": tab, "PERMIT TYPE DESC": f"{kind:<30}"}
+
+
+class TestLaredoPermitType:
+    """The group names a trade or a class; a year of permits (2025-10-01 to
+    2026-10-02, 17,925 rows) shows which groups need the kind as well."""
+
+    def test_new_homes_and_commercial_buildings_read_as_new_construction(self):
+        row = _laredo_permit("Residential", "New Construction", "SINGLE FAMILY DETACHED")
+        assert compose_permit_type(row) == "New construction: SINGLE FAMILY DETACHED"
+        row = _laredo_permit("Commercial Construction", "New Construction", "OFFICES, BANKS")
+        assert compose_permit_type(row) == "New construction: OFFICES, BANKS"
+
+    def test_a_mobile_home_installation_is_not_a_new_building(self):
+        for kind in ("INSTALLATION PERMIT", "INSTALLATION PERMIT/MH-PENALTY"):
+            assert compose_permit_type(_laredo_permit("Residential", "New Construction", kind)) is None
+
+    def test_an_alteration_names_its_kind(self):
+        # The group's own name says "Conversions", which read every reroof
+        # and fence as a change of use.
+        row = _laredo_permit("Additions, Alterations, and Conversions", "New Construction", "RES REROOF")
+        assert compose_permit_type(row) == "Alteration: RES REROOF"
+
+    def test_an_other_permit_is_its_kind(self):
+        assert compose_permit_type(_laredo_permit("Other", "Other Permits", "SIGN PERMIT")) == "SIGN PERMIT"
+
+    def test_trade_permits_read_their_group(self):
+        assert compose_permit_type(_PERMIT_SECRETARIA) is None
+        assert compose_permit_type({}) is None
+
+
 class TestLaredoRegisteredSpec:
     @pytest.fixture
     def spec(self):
@@ -358,6 +393,8 @@ class TestLaredoRegisteredSpec:
             for column in candidates:
                 assert column == "address_street" or column in selected
         assert {"STREET NBR", "STREET"} <= set(selected)
+        # compose_permit_type reads the group's report tab.
+        assert "Permit Group Tab" in selected
 
 
 class TestLaredoPermitParsing:
@@ -392,6 +429,33 @@ class TestLaredoPermitParsing:
         # An electrical permit is a trade permit.
         assert event.job_type is JobType.A2
         assert event.normalized_permit_type == NormalizedPermitType.MECHANICAL_ELECTRICAL_PLUMBING.value
+
+    @pytest.mark.parametrize(
+        ("group", "tab", "kind", "job_type", "normalized"),
+        [
+            ("Residential", "New Construction", "SINGLE FAMILY DETACHED", "NB", "NEW_CONSTRUCTION"),
+            ("Commercial Construction", "New Construction", "5 OR MORE FAMILY BLDG", "NB", "NEW_CONSTRUCTION"),
+            ("Residential", "New Construction", "INSTALLATION PERMIT", "OT", "MINOR_ALTERATION"),
+            ("Additions, Alterations, and Conversions", "New Construction", "RES REROOF", "A2", "MINOR_ALTERATION"),
+            (
+                "Additions, Alterations, and Conversions",
+                "New Construction",
+                "RES REMODEL 1001 - 2000 SQFT",
+                "A2",
+                "MAJOR_RENOVATION",
+            ),
+            ("Other", "Other Permits", "SIGN PERMIT", "SG", "MINOR_ALTERATION"),
+            ("Plumbing", "Other Permits", "PL-RESIDENTIAL", "A2", "MECHANICAL_ELECTRICAL_PLUMBING"),
+        ],
+    )
+    def test_job_type_reads_group_tab_and_kind(self, permits, group, tab, kind, job_type, normalized):
+        with (
+            patch("src.producers.field_maps.resolve_field_map", return_value=PERMITS_FIELD_MAP),
+            patch("src.spatial.geocoder.geocode_row_if_declared", return_value=(27.570, -99.485)),
+        ):
+            event = permits.parse_socrata_row(_laredo_permit(group, tab, kind), city_id="laredo")
+        assert event is not None
+        assert (event.job_type.value, event.normalized_permit_type) == (job_type, normalized)
 
 
 # ======================================================================

@@ -113,6 +113,24 @@ def _compose_permit_address(city_id: str, row: dict[str, Any]) -> str | None:
     return composer(row) if composer else None
 
 
+def _compose_permit_type(city_id: str, row: dict[str, Any]) -> str | None:
+    """The city leaf's ``compose_permit_type(row)``, when it defines one.
+
+    Some sources name a permit's class in one column and its work in another:
+    Chattanooga's "Residential Building Permit" with its "New Construction"
+    type, or Augusta's "Repair" under an electrical code. A field map lists
+    alternatives, not parts, so a new house read as its class alone and
+    counted as minor work. A leaf composer joins the columns its source
+    needs; the field map reads the type when it returns None.
+    """
+    try:
+        leaf = importlib.import_module(f"src.spatial.cities.{city_id}")
+    except ImportError:
+        return None
+    composer = getattr(leaf, "compose_permit_type", None)
+    return composer(row) if composer else None
+
+
 class DOBPermitsProducer:
     """Ingests NYC, Chicago, and San Francisco building permit filings and streams to Kafka."""
 
@@ -285,7 +303,8 @@ class DOBPermitsProducer:
 
             # Job Type
             raw_job_type = (
-                first_mapped(row, field_map, "job_type")
+                _compose_permit_type(resolved_city, row)
+                or first_mapped(row, field_map, "job_type")
                 or row.get("permit_type_definition")
                 or row.get("permit_type")
                 or row.get("job_type")

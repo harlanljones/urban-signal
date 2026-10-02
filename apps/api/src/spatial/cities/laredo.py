@@ -256,6 +256,7 @@ PERMITS_FIELD_MAP: dict[str, list[str]] = {
     "status": ["PERMIT STATUS DESC", "APP STAT DESC"],
     # The permit's group names its trade ("Electrical", "Plumbing",
     # "Mechanical", "Demolition"); the type description is the fallback.
+    # ``compose_permit_type`` reads the kind where the group needs it.
     "job_type": ["Permit Group Type", "PERMIT TYPE DESC", "APP TYPE DESC"],
     "cost": ["VALUATION"],
     # ``compose_permit_address`` joins STREET NBR and STREET.
@@ -285,3 +286,37 @@ def compose_permit_address(row: dict) -> str | None:
         return None
     number = str(row.get("STREET NBR") or "").strip()
     return f"{number} {street}" if number else street
+
+
+# Groups whose permits under the "New Construction" tab are new buildings: the
+# Census Bureau's categories for new homes ("SINGLE FAMILY DETACHED", "2 FAMILY
+# BLDG DUPLEX") and new commercial buildings ("OFFICES, BANKS", "5 OR MORE
+# FAMILY BLDG"). The tab alone does not say so: the additions, alterations and
+# conversions group sits under it too.
+_NEW_BUILDING_GROUPS: frozenset[str] = frozenset({"Residential", "Commercial Construction"})
+
+
+def compose_permit_type(row: dict) -> str | None:
+    """The permit's type, read from its group, report tab and kind.
+
+    ``Permit Group Type`` names a trade ("Electrical") or a class, and the
+    field map reads it alone for most permits. Three groups need the kind
+    (``PERMIT TYPE DESC``) too. A residential or commercial construction permit
+    under the "New Construction" tab is a new building, except a mobile home's
+    installation permit. An addition, alteration or conversion is an
+    alteration of the kind it names ("RES REROOF", "RES PORCH, CARPORT &
+    ADDITION"), not a change of use. An "Other" permit is its kind ("SIGN
+    PERMIT"). ``DOBPermitsProducer`` calls this for every Laredo permit row.
+    """
+    group = " ".join(str(row.get("Permit Group Type") or "").split())
+    tab = " ".join(str(row.get("Permit Group Tab") or "").split())
+    kind = " ".join(str(row.get("PERMIT TYPE DESC") or "").split())
+    if group in _NEW_BUILDING_GROUPS and tab == "New Construction":
+        if kind.upper().startswith("INSTALLATION PERMIT"):
+            return None
+        return f"New construction: {kind}" if kind else "New construction"
+    if group == "Additions, Alterations, and Conversions" and kind:
+        return f"Alteration: {kind}"
+    if group == "Other" and kind:
+        return kind
+    return None

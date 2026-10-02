@@ -6,6 +6,7 @@ import pytest
 
 from src.features.permit_taxonomy import (
     NormalizedPermitType,
+    building_permit_type,
     is_trade_permit,
     names_new_building,
     normalize_permit_type,
@@ -91,6 +92,7 @@ class TestNewBuildingsNamedOtherWays:
             "ProdHome",  # Las Vegas's production homes
             "Model",  # Las Vegas
             "Residential Model Permit",  # Tucson
+            "New - 2 Family Residential",  # Augusta
         ],
     )
     def test_reads_as_new_construction(self, raw):
@@ -143,6 +145,38 @@ class TestTradePermits:
         # Orlando names the trade after "New".
         assert not is_trade_permit("New Plumbing")
         assert normalize_permit_type("New Plumbing") == MEP
+
+
+class TestBuildingPermitType:
+    """Chattanooga and Philadelphia name a permit's class in one column and
+    its work in another."""
+
+    def test_a_building_permit_reads_with_its_work(self):
+        joined = building_permit_type("Residential Building Permit", "New Construction")
+        assert joined == "Residential Building Permit: New Construction"
+        assert normalize_permit_type(joined) == NEW
+        altered = building_permit_type("Commercial Building Permit", "Addition and/or Alteration")
+        assert normalize_permit_type(altered) == MAJOR
+
+    def test_spacing_collapses(self):
+        joined = building_permit_type(" Residential Building Permit ", "Accessory  Structure")
+        assert joined == "Residential Building Permit: Accessory Structure"
+
+    @pytest.mark.parametrize(
+        ("permit_class", "work"),
+        [
+            # Philadelphia: a zoning approval and a fire-suppression permit
+            # for a new building are not new buildings themselves.
+            ("Zoning Permit", "New construction, addition, GFA change"),
+            ("Fire Suppression Permit", "New Construction"),
+            ("Electrical Permit", "Residential"),  # Chattanooga
+            ("Residential Building Permit", None),
+            ("Residential Building Permit", "  "),
+            (None, "New Construction"),
+        ],
+    )
+    def test_other_permits_keep_their_class(self, permit_class, work):
+        assert building_permit_type(permit_class, work) is None
 
 
 class TestPermitsProducerJobType:

@@ -26,6 +26,12 @@ Permit" (Tucson). :func:`names_new_building` reads those, and
 :func:`is_trade_permit` keeps a trade's permit for a new building (Texarkana's
 "Plumbing Permit -New construction & major remodels") a trade permit. The
 shared producer applies both to the job type code as well.
+
+Some sources name a permit's class in one column and its work in another, so
+a new house is a "Residential Building Permit" whose work type is "New
+Construction" (Chattanooga, Philadelphia). :func:`building_permit_type` joins
+the two for a building permit, and a city leaf's ``compose_permit_type``
+hands the joined name to the producer.
 """
 
 from __future__ import annotations
@@ -120,7 +126,7 @@ _TRADE_FIRST = re.compile(r"^\W*(PLUMBING|ELECTRICAL|ELECTRIC|MECHANICAL|HVAC)\b
 # What the surveyed vocabularies call a new building or its use.
 _BUILDING = (
     r"(CONSTRUCTION|CONST|BUILDINGS?|BLDGS?|BLD|DWELLINGS?|RESIDENCES?|RESIDENTIAL"
-    r"|SINGLE[\s-]*FAMILY|(1|ONE)\s*(&|AND)\s*(2|TWO)[\s-]*FAMILY|TWO[\s-]*FAMILY"
+    r"|SINGLE[\s-]*FAMILY|(1|ONE)\s*(&|AND)\s*(2|TWO)[\s-]*FAMILY|(TWO|THREE|FOUR|[234])[\s-]*FAMILY"
     r"|MULTI[\s-]*(FAMILY|UNIT)|MULTIFAMILY|DUPLEX(ES)?|TOWN\s*HOUSES?|TOWN\s*HOMES?"
     r"|APARTMENTS?|COMMERCIAL|HOMES?|HOUSES?|SFR|SFD)"
 )
@@ -161,6 +167,28 @@ def names_new_building(raw_type: Any) -> bool:
     if is_trade_permit(text) or _NOT_A_BUILDING.search(text) or _EXISTING_BUILDING.search(text):
         return False
     return bool(_NEW_BUILDING.search(text) or _PLANNED_HOME.search(text))
+
+
+# A building permit's class, as against a trade's, a site's or a zoning one.
+_BUILDING_PERMIT = re.compile(r"\bBUILDING\b")
+
+
+def building_permit_type(permit_class: Any, work: Any) -> str | None:
+    """A building permit's class read with the work it does ("Residential
+    Building Permit: New Construction"), or None.
+
+    Only a building permit's work type says whether it builds something new.
+    Other permits name what they are in their class, and their work type would
+    mislead: Philadelphia's fire-suppression permits for a new building carry
+    "New Construction" and its zoning approvals "New construction, addition,
+    GFA change". So a class that does not name a building permit, or a missing
+    work type, gives None and the field map reads the class alone.
+    """
+    text = " ".join(str(permit_class or "").split())
+    detail = " ".join(str(work or "").split())
+    if not detail or not _BUILDING_PERMIT.search(text.upper()):
+        return None
+    return f"{text}: {detail}"
 
 
 # Fallback when no raw-string keyword matches: the existing NYC/Chicago-style

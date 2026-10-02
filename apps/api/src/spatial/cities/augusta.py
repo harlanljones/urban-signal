@@ -240,6 +240,27 @@ AUGUSTA_DIVISIONS: Dict[str, BoroughMeta] = {
 GREATER_AUGUSTA_METRO_BBOX = AUGUSTA_METRO_BBOX
 AUGUSTA_CENTER = {"lat": 33.476, "lng": -82.010}
 
+# PERMCODE names the trade that PERM_TYPE leaves out: a "Repair" is electrical
+# under PREL, plumbing under PRPL and mechanical under PRMH, where the HVAC
+# "Change Out"s fall.
+_TRADE_BY_PERMCODE: dict[str, str] = {"PREL": "Electrical", "PRMH": "Mechanical", "PRPL": "Plumbing"}
+
+
+def compose_permit_type(row: dict) -> str | None:
+    """A trade permit's type with its trade first ("Electrical: Service
+    Change"), so it reads as a trade's permit.
+
+    ``DOBPermitsProducer`` calls this for every Augusta permit row. For
+    building, demolition, pool and mobile-home permits it returns None, and
+    the field map reads ``PERM_TYPE`` alone.
+    """
+    trade = _TRADE_BY_PERMCODE.get(str(row.get("PERMCODE") or "").strip().upper())
+    if not trade:
+        return None
+    kind = " ".join(str(row.get("PERM_TYPE") or "").split())
+    return f"{trade}: {kind}" if kind else trade
+
+
 # Leaf-local spatial registration object (the spine references these dicts).
 REGISTRATION = SpatialRegistration(
     metro_bbox=AUGUSTA_METRO_BBOX,

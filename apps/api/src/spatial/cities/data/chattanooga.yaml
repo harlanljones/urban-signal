@@ -125,7 +125,7 @@ datasets:
     watermark_exclude: []
     order_by: issueddate DESC
     id_col: null
-    select: permitnum,issueddate,applieddate,permitclass,statuscurrent,originaladdress1,originalzip,latitude,longitude
+    select: permitnum,issueddate,applieddate,permitclass,permittype,statuscurrent,originaladdress1,originalzip,latitude,longitude
     fallback_endpoints:
     - https://www.arcgis.com/sharing/rest/content/items/9937e99e93de467eae5f592061c2672c/data
     where: permitclass NOT IN ('Utility Street Cut Permit', 'Street Cut Permit', 'City Employee Only Utility Street Cut', 'Meter Inspection / Tenant Change Application')
