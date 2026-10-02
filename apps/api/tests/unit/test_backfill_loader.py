@@ -137,8 +137,8 @@ def test_every_registered_filter_survives_into_the_backfill_query():
 
 def test_build_query_shape_dc_arcgis_uses_an_ansi_literal_and_no_order_by():
     # US-109: the DC server (maps2.dcgis.dc.gov) rejects ISO-string date
-    # comparisons and the where+orderByFields combination; the loader must
-    # emit an ANSI literal and page by OID.
+    # comparisons; the loader emits an ANSI literal and, as the spec names no
+    # order, pages by OID as poll_job does.
     meta = _meta(
         watermark_col="ISSUE_DATE",
         platform="arcgis",
@@ -148,6 +148,22 @@ def test_build_query_shape_dc_arcgis_uses_an_ansi_literal_and_no_order_by():
     assert "ISSUE_DATE >= timestamp '2026-05-26 00:00:00'" in where
     assert "2026-05-26T" not in where
     assert kwargs == {}
+
+
+def test_a_date_literal_server_keeps_the_specs_own_order():
+    # Augusta's permits table has no object-id field: with the order dropped,
+    # the page was ordered by an OBJECTID it lacks and refused ("Invalid or
+    # missing input parameters"); poll_job sends the spec's order.
+    order = "DATE_ISSUE DESC,PERMITNUMBER ASC,PARID ASC"
+    meta = _meta(
+        watermark_col="DATE_ISSUE",
+        platform="arcgis",
+        endpoint="https://gismap.augustaga.gov/arcgis/rest/services/EnterpriseApps/iasWorld_Permit/MapServer/1",
+        order_by=order,
+    )
+    where, kwargs = build_query_shape(meta, datetime(2026, 9, 21, tzinfo=UTC))
+    assert where == "DATE_ISSUE >= timestamp '2026-09-21 00:00:00'"
+    assert kwargs == {"order_by": order}
 
 
 def test_build_query_shape_non_dc_arcgis_keeps_iso_and_order():

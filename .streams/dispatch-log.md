@@ -1961,3 +1961,10 @@ Worth keeping:
   "New Single Family Residence" as a minor alteration in 15 metros; the
   survey of 98 feeds' type names showed every spelling, and each rule was
   checked against all of them before it landed.
+
+
+### 2026-10-02 — Backfills on date-literal servers keep the spec's order (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| ansi-backfill-order | `.streams/ansi-backfill-order.md` | none | 2026-10-02 | done (Augusta permits backfill: 40 of 40 rows published in a capped live run, refused before; 60 of 62 ordered jobs on date-literal hosts answer the new shape, the other 2 fail the same way in the old one) | `build_query_shape` keeps the spec's order on date-literal hosts |

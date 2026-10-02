@@ -131,7 +131,9 @@ def build_query_shape(
     Snapshot feeds carry no watermark column: no window, and the spec's own
     order — the load is a table-head sweep bounded by ``max_records``.
     Watermarked feeds add the window (plus the declared sentinel guard, ADR
-    0005) and page newest-first so a capped run keeps the freshest slice.
+    0005) and page newest-first so a capped run keeps the freshest slice,
+    except on a server that reads only date literals, which keeps the
+    spec's own order as ``poll_job`` does.
 
     The clause comes from the ``AcquisitionEngine`` WHERE builder (US-182).
     A text-typed column (ADR 0005) compares as the text its format writes, so
@@ -173,9 +175,10 @@ def build_query_shape(
         watermark_format=text_format,
     )
 
-    if _is_ansi_date_literal_server(meta):
-        client_kwargs.pop("order_by", None)
-    elif _sorts_as_dates(meta):
+    # A server that reads only date literals keeps the spec's own order, as
+    # poll_job sends it: Augusta's permits table has no object-id field, so
+    # a page ordered by none was refused.
+    if not _is_ansi_date_literal_server(meta) and _sorts_as_dates(meta):
         client_kwargs["order_by"] = f"{wm} DESC"
     # Otherwise the column has no newest-first order; the spec's own stands.
     return where, client_kwargs
@@ -198,10 +201,11 @@ def _is_ansi_date_literal_server(meta: dict[str, Any]) -> bool:
     """Whether the feed's server rejects ISO-string date comparisons.
 
     The DC (``maps2.dcgis.dc.gov``) and Milwaukee (``milwaukeemaps.
-    milwaukee.gov``) ArcGIS servers reject ISO-string date comparisons in
-    ``where`` AND the ``where + orderByFields`` combination (US-109 / US-87).
-    Their working shape is ``where <col> >= date 'YYYY-MM-DD'`` with no
-    orderByFields (OID paging) — the shape ``watermark_comparison`` emits.
+    milwaukee.gov``) ArcGIS servers were the first found (US-109 / US-87);
+    ``ANSI_DATE_LITERAL_HOSTS`` lists every one since. Their working shape is
+    the one ``poll_job`` sends: a ``date`` or ``timestamp`` literal
+    (``watermark_comparison``) and the spec's own order, which pages by
+    object id when the spec names none.
     """
     return any(host in str(meta.get("endpoint", "")) for host in ANSI_DATE_LITERAL_HOSTS)
 
