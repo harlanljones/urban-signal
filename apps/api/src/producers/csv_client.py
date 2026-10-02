@@ -214,6 +214,22 @@ def _read_zip_member(payload: bytes, member: str) -> str:
     return "".join(_zip_member_lines(payload, member))
 
 
+def _body_lines(response: httpx.Response) -> Iterator[str]:
+    """The lines of a downloaded CSV as ``_lines(response.text)`` gives them,
+    decoded as they are read.
+
+    The encoding and the replacement of bytes it cannot decode are httpx's
+    own. ``response.text`` holds the whole body again as text, twice while
+    httpx joins it: Larimer County's 101 MB sales file read that way added
+    385 MB to the peak.
+    """
+    # newline="" ends lines on \r\n, \r or \n and keeps the endings, as
+    # ``_lines`` does.
+    return io.TextIOWrapper(
+        io.BytesIO(response.content), encoding=response.encoding or "utf-8", errors="replace", newline=""
+    )
+
+
 def _typed_value(value: Any, fmt: str | None) -> datetime | None:
     if not value or not fmt:
         return None
@@ -393,7 +409,7 @@ class CSVClient:
         if zip_member:
             lines = _zip_member_lines(response.content, zip_member)
         else:
-            lines = _lines(response.text)
+            lines = _body_lines(response)
         if columns:
             # A file with no header row: every line is a row, named by the
             # spec's columns, and there is no header for a preamble to hide.

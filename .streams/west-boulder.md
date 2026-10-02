@@ -57,6 +57,12 @@ the stream log.
   with no watermark).
 - 2026-08-28 — Leaf files built: boulder.py, field_maps_boulder.py,
   test_producers_boulder.py. 45 boulder tests pass, 24 interlock pass, ruff clean.
+- 2026-10-02 — Deeds registered from the Boulder County Assessor's daily
+  `Sales.csv` (752,371 rows, no party columns): the sales dated in the 90
+  days before each poll, closed at today against eight rows dated as far as
+  2057, each placed through `PARCELS/PARCELS_OWNER/MapServer/0` on
+  `AccountNo` and clipped to the metro box (715 published on the first live
+  poll). See `.streams/western-deeds.md`.
 
 ## Current step
 

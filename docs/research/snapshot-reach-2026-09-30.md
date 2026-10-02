@@ -171,6 +171,24 @@ parcel's centroid from the City's parcel layer, the clip skips the 1,579
 outside the box, and 1,885 publish. The cap holds the 5,272 sales in reach
 of the 90 days from 2025-02-17, the busiest window since October 2024.
 
+Vancouver `deeds` (1,637 rows, cap 6,000) joined the same day. Clark
+County's taxlots hold one row per taxlot with its latest sale, so the feed
+reads the sales dated in the 90 days before each poll county-wide, whole,
+newest first, each at its polygon's centroid, every six hours; the clip
+skips the 524 outside the metro box, and 1,113 publish. The cap holds the
+4,221 sales of the 90 days from 2026-04-01.
+
+Boulder `deeds` (1,806 rows, cap 6,000), Fort Collins `deeds` (2,597 rows,
+cap 6,000) and Salem `deeds` (1,544 rows, cap 5,000) read their county
+assessors' sales files once a day, as Tacoma reads Pierce County's: one
+download a poll, decoded and filtered a line at a time to the sales dated in
+the 90 days before it, each sale at its parcel's centroid from the county's
+parcel layer. The clips skip 1,091, 1,554 and 733 outside the metro boxes,
+and 715, 1,043 and 666 publish (Salem's file repeats a sale on a line per
+situs and code area; 145 lines in the box repeat one). The caps hold the
+4,334 sales of the 90 days from 2025-02-24, the 4,337 from 2025-03-31 and the
+3,092 from 2026-04-20, each the busiest window in the years checked.
+
 ## Newest-first windows
 
 | Feed | Order | Rows dated in last 30 / 90 days | Window after |

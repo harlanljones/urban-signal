@@ -119,12 +119,23 @@ streaming read.
 Lakeland's sales followed the same day, once the CSV client read a zip member
 as a stream instead of whole, which gives Lakeland a third family.
 
-| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds (#94) | With Asheville's permits (#95) | With Allentown's permits (#96) | With Allentown's and New Haven's `311` (#97) | With Lincoln's `311` (#98) | With Albuquerque's and Topeka's `311` (#99) | With Yakima's `311` and deeds (#100) | With Cape Coral's `311` and deeds (#101) | With the wrong-place permits retracted (#102) | With Augusta's `311` and Wilmington's deeds (#103) | With Tampa's, Gainesville's and Ocala's deeds (#104) | With Lakeland's deeds |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 4 | 26 | 26 | **27** (Charlotte) | 27 | 27 | 27 | **28** (Allentown) | 28 | 28 | **29** (Yakima) | **30** (Cape Coral) | 30 | 30 | 30 | 30 |
-| 3 | 29 | **30** (Charlotte) | 29 | **30** (Toledo) | **31** (Asheville) | **32** (Allentown) | 32 (New Haven in, Allentown up) | **33** (Lincoln) | **35** (Albuquerque, Topeka) | 35 | 35 | 35 | **37** (Augusta, Wilmington NC) | **39** (Tampa, Gainesville) | **40** (Lakeland) |
-| 2 | 68 | 67 | 67 | 66 | 65 | 64 | 63 | 62 | 60 | 59 | 58 | 56 | 54 | 53 (Ocala in, Tampa and Gainesville up) | 52 |
-| 1 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | **36** (Ocala, Macon-Bibb) | 36 | 35 | 35 |
+The western sales followed the same day. Vancouver's, Boulder's, Fort
+Collins's and Salem's register, which gives each a third family: Clark
+County's taxlots carry each parcel's latest sale, and the Boulder, Larimer
+and Marion County assessors publish their sales as files that the polls
+place on each county's parcel layer. Larimer's file is 101 MB, so the CSV
+client now decodes a plain download as it reads it, and Larimer's parcel
+layer pages only by the object-id field it types, which the ArcGIS client
+now finds. Aurora's are held: Arapahoe County's parcels, which cover most of
+the city, carry sales about eight weeks after their date, and Adams County's
+daily table covers only the city's Adams side.
+
+| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds (#94) | With Asheville's permits (#95) | With Allentown's permits (#96) | With Allentown's and New Haven's `311` (#97) | With Lincoln's `311` (#98) | With Albuquerque's and Topeka's `311` (#99) | With Yakima's `311` and deeds (#100) | With Cape Coral's `311` and deeds (#101) | With the wrong-place permits retracted (#102) | With Augusta's `311` and Wilmington's deeds (#103) | With Tampa's, Gainesville's and Ocala's deeds (#104) | With Lakeland's deeds (#105) | With the western deeds |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 4 | 26 | 26 | **27** (Charlotte) | 27 | 27 | 27 | **28** (Allentown) | 28 | 28 | **29** (Yakima) | **30** (Cape Coral) | 30 | 30 | 30 | 30 | 30 |
+| 3 | 29 | **30** (Charlotte) | 29 | **30** (Toledo) | **31** (Asheville) | **32** (Allentown) | 32 (New Haven in, Allentown up) | **33** (Lincoln) | **35** (Albuquerque, Topeka) | 35 | 35 | 35 | **37** (Augusta, Wilmington NC) | **39** (Tampa, Gainesville) | **40** (Lakeland) | **44** (Vancouver WA, Boulder, Fort Collins, Salem) |
+| 2 | 68 | 67 | 67 | 66 | 65 | 64 | 63 | 62 | 60 | 59 | 58 | 56 | 54 | 53 (Ocala in, Tampa and Gainesville up) | 52 | 48 |
+| 1 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | **36** (Ocala, Macon-Bibb) | 36 | 35 | 35 | 35 |
 
 ## Registered
 
@@ -1153,6 +1164,189 @@ as a stream instead of whole, which gives Lakeland a third family.
   published the same 1,885. No event carried a party name, and no poll
   queried a geocoder.
 
+### Vancouver, WA — `deeds`
+
+- **Source:** Clark County's hosted taxlots,
+  `services2.arcgis.com/ylxwjFBdCPBzP16d/arcgis/rest/services/TaxlotsforPublicUse/FeatureServer/0`
+  ("Taxlots for Public Use"): 196,272 polygons, each with its latest sale's
+  date, price and excise number. It carries the same rows and values as the
+  County's own `ClarkView_Public/TaxlotsPublic` MapServer on
+  `gis.clark.wa.gov`, whose portal item is titled "delete by 10122026". The
+  2026-08-28 probe rejected Vancouver's deeds as a recorder web app; it had
+  not noticed the sale columns on the taxlots.
+- **Window:** the taxlots whose sale is dated in the 90 days before each
+  poll, closed at the request's time: 1,637 county-wide on 2026-10-02,
+  newest 2026-09-11, none in the future. Sales reach the layer four to eight
+  weeks after their date: 1,218 in July, 518 in August and 8 in September,
+  against 1,280 to 1,560 a month from March to June. Part of the dates carry
+  a time of day, so the window runs on the server rather than on a watermark.
+- **Reach:** the layer keeps only each taxlot's latest sale, so an older
+  window loses the taxlots sold again since. The 90 days from 2026-04-01 held
+  4,221, the most of the windows checked, so the cap is 6,000: three pages
+  of 2,000.
+- **Rows:** a row is its taxlot and sale date; a later sale of the taxlot
+  changes the date and publishes anew. A sale over several taxlots shares its
+  excise number, which is the event's id where it has one (39 of the 1,637
+  have none and take the taxlot's). The layer carries no deed type, so each
+  sale publishes as a DEED. 1,072 of the 1,637 carry a price.
+- **Freshness:** the layer's publish stamp was 2026-09-27 and the newest sale
+  21 days old. `expected_cadence_days` is 21, so the staleness alarm waits
+  42 days.
+- **Personal data:** `select` names six columns. The owner's id, the tax
+  bill, the situs address and the legal description stay on the server.
+- **Placement:** the client reduces each polygon to its centroid, and the
+  spec clips to the metro box: a third of the county's sales lie north and
+  east of it. No geocoder is asked.
+- **Poll:** every six hours, newest first.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live layer, Kafka mocked. The first read 1,637 rows
+  in three requests and published 1,113 sales dated 2026-07-06 to
+  2026-09-04. It skipped 524 outside the box and dead-lettered none. The
+  second read the same 1,637 and published nothing. No event carried a party
+  name, and neither poll queried a geocoder.
+
+### Boulder, CO — `deeds`
+
+- **Source:** the Boulder County Assessor's "All Sales" file,
+  `assessor.boco.solutions/ASR_PublicDataFiles/Sales.csv` (50 MB, listed on
+  the Assessor's data-download page, which says the files are refreshed at
+  4 a.m. daily). Every sale in the county by account: 752,371 rows on
+  2026-10-02, in seven columns, none naming a party. The 2026-08-28 probe
+  rejected the County's `PropSearch_SALES` table, which holds the same
+  sales, for its future-dated rows and its dates the server would not
+  filter.
+- **Window:** the sales dated in the 90 days before each poll, closed at
+  today: 1,806 county-wide on 2026-10-02. Eight rows are dated in the future,
+  as far as 2057, and the bound keeps them out. The newest past sale was
+  dated 2026-09-28, and the dates run dense to 2026-09-18: sales reach the
+  file two to four weeks after their date.
+- **Reach:** the busiest 90 days since October 2024, from 2025-02-24, held
+  4,334, so the cap is 6,000.
+- **Rows:** a row is its deed number and account. A deed over several
+  accounts repeats its number, but the pair repeats for none. The deed type
+  is the Assessor's code (`SW`, `WD`, `QD`, `BN`, `SJ`, `WJ` lead).
+- **Freshness:** `expected_cadence_days` is 14, so the staleness alarm waits
+  28 days.
+- **Personal data:** the file names no party. The parcel join asks the
+  County's parcel layer for `AccountNo` alone; its owner and mailing columns
+  stay on the server.
+- **Placement:** each sale takes its account's parcel centroid from
+  `maps.bouldercounty.org/arcgis/rest/services/PARCELS/PARCELS_OWNER/MapServer/0`
+  (140,985 polygons), joined on `strap`, which is the account number: the
+  probe matched 1,605 of the window's 1,611 accounts, where three hosted
+  parcel layers matched 24 to 29%. The spec clips to the metro box, which
+  leaves out Longmont, Lafayette and the mountain towns. No geocoder is
+  asked.
+- **Poll:** once a day: one download, decoded and filtered a line at a time,
+  the window sorted newest first in memory, then the join.
+- **Live check:** two polls of the registered spec through the real
+  scheduler, Kafka mocked. The first downloaded the file once, read 1,806
+  sales, asked the parcel layer for its metadata and 22 lists of accounts,
+  and published 715 sales dated 2026-07-05 to 2026-09-18. It skipped 1,091
+  outside the box, 5 of them on accounts the layer does not hold, and
+  dead-lettered none. The second read the same 1,806 and published nothing.
+  Neither poll queried a geocoder.
+
+### Fort Collins, CO — `deeds`
+
+- **Source:** the Larimer County Assessor's public sales table,
+  `storage.googleapis.com/lc-public/asr/assessor-public-sales.csv` (101 MB,
+  listed on the Assessor's public data portal), rebuilt overnight: every sale
+  in the county by account, 661,961 rows. Two of its eleven columns name the
+  grantor and grantee.
+- **Window:** the sales dated in the 90 days before each poll, closed at
+  today: 2,597 county-wide on 2026-10-02, none in the future. The newest was
+  dated 2026-09-08, 24 days earlier: 1,458 sales were dated in July, 1,190 in
+  August and 97 in September. A fifth of the dates carry a time of day, so a
+  sale dated today with a time waits for the next day's window.
+- **Reach:** the busiest 90 days since October 2024, from 2025-03-31, held
+  4,337, so the cap is 6,000.
+- **Rows:** a row is its reception number and account. A deed over several
+  accounts repeats its reception number, but the pair repeats for none. The
+  deed type is the Assessor's description (special warranty deeds, quit
+  claims and warranty deeds lead).
+- **Freshness:** `expected_cadence_days` is 21, so the staleness alarm waits
+  42 days.
+- **Personal data:** `select` names seven of the eleven columns: the grantor
+  and grantee are parsed with each line and dropped before it is kept, and
+  no spec maps them. The parcel join asks the County's layer for `SCHEDNUM`
+  alone; its owner names and mailing addresses stay on the server.
+- **Placement:** each sale takes its account's parcel centroid from the
+  County's "Tax Parcels" layer,
+  `maps1.larimer.org/arcgis/rest/services/MapServices/Parcels/MapServer/3`
+  (181,269 polygons), joined on the schedule number: the account without its
+  letter, one parcel each. Condominium units share a parcel number, so a
+  join on it would fetch every unit's polygon for each sale. The spec clips
+  to the metro box. No geocoder is asked.
+- **Poll:** once a day: one download, decoded and filtered a line at a time,
+  the window sorted newest first in memory, then the join.
+- **CSV client:** a plain download is now decoded as it is read, in the
+  encoding `response.text` would have used and with the same replacement of
+  undecodable bytes, and handed to the parser a line at a time. Read as
+  `response.text`, Larimer's file added 385 MB to a read's peak memory: the
+  text again, twice while httpx joined it. Decoded as it is read, 1 MB. The
+  lines and the rows come out the same.
+- **ArcGIS client:** Larimer's parcel layer names no object-id field, and its
+  object ids are `OBJECTID_1`. The client ordered each page by `OBJECTID`, and
+  the server answered 400 to the first. It now takes the field the layer
+  types as its object id when it names none.
+- **Live check:** two polls of the registered spec through the real
+  scheduler, Kafka mocked. Before the ArcGIS fix both dead-lettered on that
+  400. After it, the first downloaded the file once, read 2,597 sales, asked
+  the parcel layer for its metadata and 30 lists of schedule numbers, and
+  published 1,043 sales dated 2026-07-06 to 2026-09-07. It skipped 1,554
+  outside the box, 11 of them on accounts the layer does not hold, and
+  dead-lettered none. The second read the same 2,597 and published nothing.
+  No event carried a party name, and neither poll queried a geocoder.
+
+### Salem, OR — `deeds`
+
+- **Source:** the Marion County Assessor's sales file for the year,
+  `apps.co.marion.or.us/AO/PropertySalesData/2026SalesData.csv` (3.4 MB,
+  listed on the Assessor's data center page, which says it is updated weekly
+  by an automated process; it was rewritten at 06:00 UTC on 2026-10-02): 6,481
+  lines, one per sale, account and situs. The last four of its 42 columns
+  name the grantor and grantee and give their addresses.
+- **Window:** the lines dated in the 90 days before each poll, closed at
+  today: 1,544 on 2026-10-02. Three sales are dated in November and December
+  2026, and the bound keeps them out. The newest past sale was dated
+  2026-09-27, and the dates run dense to 2026-09-18: sales reach the file
+  about two weeks after their date.
+- **Reach:** the busiest 90 days since January 2025, from 2026-04-20, held
+  3,092 (June 2026 alone held 1,719), so the cap is 5,000.
+- **Rows:** a row is its sale and account. A sale repeats on a line for each
+  situs and code area of an account: 342 of the 1,544 lines repeated a sale
+  and an account, and publish once. The deed type is the file's description;
+  a blank one publishes as a DEED.
+- **Year files:** the spec maps 2026 and 2027 to their files and turns to
+  the new one on 1 January. While the 2027 file is missing, the poll falls
+  back to the 2026 file; once it exists, sales of late December 2026 posted
+  after the turn are not read.
+- **Freshness:** `expected_cadence_days` is 14, so the staleness alarm waits
+  28 days.
+- **Personal data:** `select` names six of the 42 columns. The grantor and
+  grantee names and addresses and the situs address are parsed with each
+  line and dropped before it is kept, and no spec maps them. The parcel join
+  asks the Assessor's layer for `TAXLOT` alone.
+- **Placement:** each sale takes its taxlot's centroid from the Assessor's
+  `Parcels` layer
+  (`services3.arcgis.com/SXXjryU22GsO8OEC/arcgis/rest/services/Parcels/FeatureServer/0`,
+  115,385 polygons), joined on `map_taxlot`. The layer is an extract last
+  edited on 2025-09-15, so taxlots created since then do not place: the probe
+  matched 1,044 of the window's 1,111 taxlots. The spec clips to the metro
+  box. West Salem lies in Polk County, which the file does not cover, and
+  Polk's GIS answered HTTP 500 to the probe twice. No geocoder is asked.
+- **Poll:** once a day: one download, decoded and filtered a line at a time,
+  the window sorted newest first in memory, then the join.
+- **Live check:** two polls of the registered spec through the real
+  scheduler, Kafka mocked. The first downloaded the 2026 file once, read
+  1,544 lines, asked the parcel layer for its metadata and 20 lists of
+  taxlots, and published 666 sales dated 2026-07-06 to 2026-09-27. It
+  skipped 733 lines outside the box, 77 of them on taxlots the layer does not
+  hold, and 145 repeated lines inside it, and dead-lettered none. The second
+  read the same 1,544 and published nothing. No event carried a party name,
+  and neither poll queried a geocoder.
+
 ## Retracted
 
 | Metro (feed) | What it read | Why retracted | Re-check when |
@@ -1182,6 +1376,7 @@ as a stream instead of whole, which gives Lakeland a third family.
 | Greenville (`deeds`) | The City's parcel layer (`citygis.greenvillesc.gov`, `GeneralData/GeneralData_WebMercator/MapServer/2`, 90,470 parcels) carries each parcel's latest deed date, price, and book and page: 1,188 sales in the 90 days to 2026-10-02, 897 of them inside the metro box. Its three sibling services publish the same table. | The newest sale was dated 2026-08-28, none fell in the last 30 days, and the layer has no edit stamp. | A newer sale appears. |
 | Spartanburg (`deeds`) | Spartanburg County's `GIS/CAMA_Parcels` layer (`maps.spartanburgcounty.org`, 182,863 polygons): sale dates (2,072 in the 90 days to 2026-10-02, entered about six weeks late), deed book and page and the instrument number. | No row in the layer has a price, and no column names the document type. | A price or document type appears. |
 | Savannah (`deeds`) | The Chatham County Board of Assessors' parcels (`pub.sagis.org`, `Savannah/PropertyValue/MapServer/13`, 127,033 rows) carry each parcel's sale price, year, month and day, and book and page. | An annual roll: every dated row was updated on 2026-06-22, and the newest 2026 sale is dated 2026-01-21. | The roll is updated more often. |
+| Aurora (`deeds`) | Arapahoe County's `OpenDataService` parcel layer (`gis.arapahoegov.com`, 233,721 polygons) carries each parcel's latest sale: 1,232 in the 90 days to 2026-10-02, 1,026 of them inside the metro box, newest 2026-09-23. The Assessor posts sales about eight weeks after their date: 1,341 in July, 56 in August and 35 in September, against 1,500 to 1,700 a month in the spring. Its weekly transfer file runs as far behind and sits behind a click-through agreement. Adams County's `Property_Sales` table (`services3.arcgis.com/4PNQOtAivErR7nbT`) is loaded each business day, newest 2026-09-30, and joins to the County's parcels, but 18% of its sales lie in the metro box. No Douglas County source turned up. | A spec reads one source. Arapahoe's layer alone would report Aurora's sales two months after the fact and miss its Adams and Douglas sides; Adams's table alone covers only the city's northern part. | Arapahoe posts sales within a few weeks of their date, or a feed can read two counties. |
 | Macon-Bibb (`deeds`) | The County's hosted CAMA layers (org `zPFLSOZ5HzUzzTQb`) carry each parcel's sale date and price. | Annual digests: the two 2025 layers' newest sales are dated 2024-12-06 and 2026-02-05. | A current digest or a sales layer appears. |
 
 ## Not now

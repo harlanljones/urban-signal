@@ -161,6 +161,30 @@ def test_a_host_that_reads_local_time_lends_its_layers_a_zone(monkeypatch):
     assert client.get_layer_metadata(_LAYER)["time_zone"] is None
 
 
+def test_a_layer_that_does_not_name_its_object_id_field_pages_by_the_one_it_types(monkeypatch):
+    """Larimer County's parcel layer omits ``objectIdField`` and calls its
+    object-id field OBJECTID_1; a page ordered by OBJECTID answers 400."""
+    client = ArcGISClient()
+    orders = []
+
+    def answer(url, params):
+        if not url.endswith("/query"):
+            return {"fields": [
+                {"name": "OBJECTID_1", "type": "esriFieldTypeOID"},
+                {"name": "SCHEDNUM", "type": "esriFieldTypeString"},
+            ]}
+        orders.append(params["orderByFields"])
+        return {"features": [{"attributes": {"OBJECTID_1": 1, "SCHEDNUM": "0999002"}}]}
+
+    monkeypatch.setattr(client, "_request_json", answer)
+
+    assert [row["SCHEDNUM"] for batch in client.paginate(_LAYER) for row in batch] == ["0999002"]
+    assert orders == ["OBJECTID_1"]
+    # A layer that types none still pages by OBJECTID.
+    monkeypatch.setattr(client, "_request_json", lambda url, params: {"fields": []})
+    assert client.get_layer_metadata(_ROOT + "/1")["oid_field"] == "OBJECTID"
+
+
 def test_a_server_that_cannot_page_is_asked_once(monkeypatch):
     """Augusta's server ignores ``resultOffset`` and flags every short page as
     truncated, so a second request would read the first page again."""

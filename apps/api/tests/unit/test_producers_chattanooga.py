@@ -160,6 +160,9 @@ def test_chattanooga_deed_polygon_row_parses(producers):
 class _Response:
     def __init__(self, text: str, status_code: int):
         self.text = text
+        # The CSV client reads the downloaded bytes in the response's encoding.
+        self.content = text.encode()
+        self.encoding = "utf-8"
         self.status_code = status_code
 
     def raise_for_status(self):

@@ -39,6 +39,11 @@ FULL_READ_ROWS = {
     # fall in the box).
     ("bend", "deeds"): 1_048,
     ("bend", "sla"): 5_981,
+    # Boulder County sales dated in the spec's 90-day window, county-wide
+    # (the file rebuilt 2026-10-02, newest 2026-09-28), read 2026-10-02; 715
+    # of them place inside the metro box. The 90 days from 2025-02-24 held
+    # 4,334.
+    ("boulder", "deeds"): 1_806,
     # Lee County parcels whose latest sale is dated in the spec's 90-day
     # window, county-wide, newest 2026-09-25, read 2026-10-02; 4,409 lie in
     # the metro box. March to May 2026 held 11,253.
@@ -55,6 +60,10 @@ FULL_READ_ROWS = {
     # spec's own 90-day window, read 2026-09-30.
     ("denver", "deeds"): 2_445,
     ("eugene", "sla"): 752,
+    # Larimer County sales dated in the spec's 90-day window, county-wide,
+    # newest 2026-09-08, read 2026-10-02; 1,043 of them place inside the
+    # metro box. The 90 days from 2025-03-31 held 4,337.
+    ("fort_collins", "deeds"): 2_597,
     ("fort_collins", "permits"): 2_183,
     # Alachua County sales dated in the spec's 90-day window, county-wide
     # (the extract rebuilt 2026-10-02, newest 2026-09-30); 1,556 of them place
@@ -91,6 +100,10 @@ FULL_READ_ROWS = {
     ("richmond", "crime"): 1_249,
     # The transfers since the same day a year before (Excel, 2026-09-23 workbook).
     ("richmond", "deeds"): 6_650,
+    # Marion County (Oregon) sale lines dated in the spec's 90-day window,
+    # county-wide, read 2026-10-02; 811 of them place inside the metro box,
+    # 666 sales once each. The 90 days from 2026-04-20 held 3,092.
+    ("salem_or", "deeds"): 1_544,
     ("santa_rosa", "sla"): 4_979,
     ("scottsdale", "deeds"): 2_507,
     ("st_louis", "sla"): 1_799,
@@ -103,6 +116,10 @@ FULL_READ_ROWS = {
     # lie in the metro box. May to July 2026 held 6,441.
     ("tampa", "deeds"): 3_886,
     ("tempe", "deeds"): 783,
+    # Clark County taxlots whose latest sale is dated in the spec's 90-day
+    # window, county-wide, newest 2026-09-11, read 2026-10-02; 1,113 lie in
+    # the metro box. The 90 days from 2026-04-01 held 4,221.
+    ("vancouver_wa", "deeds"): 1_637,
     # Lucas County sales recorded in the spec's 90-day window, county-wide,
     # newest 2026-09-25, read 2026-09-30; 2,154 of them lie in the metro box.
     ("toledo", "deeds"): 2_296,

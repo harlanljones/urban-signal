@@ -2636,4 +2636,28 @@ class Settings(BaseSettings):
         default="https://www.polkflpa.gov/FTPPage/downloader.ashx?filename=ftp_sales.zip&dir=%5CAppraisalData%5C",
         description="Polk County Property Appraiser nightly sales extract, zipped ftp_sales.txt (Lakeland deeds snapshot)",
     )
+    # Vancouver WA deeds (2026-10-02): Clark County's taxlots, each with its
+    # latest sale (the hosted copy that replaces the County's own MapServer).
+    arcgis_vancouver_wa_deeds_url: str = Field(
+        default="https://services2.arcgis.com/ylxwjFBdCPBzP16d/arcgis/rest/services/TaxlotsforPublicUse/FeatureServer/0",
+        description="Clark County WA Taxlots for Public Use, each taxlot with its latest sale (Vancouver WA deeds snapshot)",
+    )
+    # Boulder deeds (2026-10-02): the Boulder County Assessor's daily sales
+    # file, every sale by account, with no party columns.
+    csv_boulder_deeds_endpoint: str = Field(
+        default="https://assessor.boco.solutions/ASR_PublicDataFiles/Sales.csv",
+        description="Boulder County Assessor daily sales file, Sales.csv (Boulder deeds snapshot)",
+    )
+    # Fort Collins deeds (2026-10-02): the Larimer County Assessor's public
+    # sales table.
+    csv_fort_collins_deeds_endpoint: str = Field(
+        default="https://storage.googleapis.com/lc-public/asr/assessor-public-sales.csv",
+        description="Larimer County Assessor public sales table, assessor-public-sales.csv (Fort Collins deeds snapshot)",
+    )
+    # Salem OR deeds (2026-10-02): the Marion County Assessor's sales file for
+    # the year, rebuilt by an automated process.
+    csv_salem_or_deeds_endpoint: str = Field(
+        default="https://apps.co.marion.or.us/AO/PropertySalesData/2026SalesData.csv",
+        description="Marion County Assessor 2026 sales file, 2026SalesData.csv (Salem OR deeds snapshot)",
+    )
 settings = Settings()

@@ -44,7 +44,7 @@ Secretary of State Active Businesses registry at ``data.oregon.gov``
 coverage, sliced to Marion County / Salem city). 311 (``311events``, 8 stale
 demo rows from 2017), city-level deeds (no Marion County open bulk API),
 and Land_Use_Applications (307 rows, no matching FeedType) are Tier 3 and
-stay unregistered.
+stay unregistered. (Deeds superseded 2026-10-02: see DEEDS below.)
 
 Live-probe caveats that define this leaf (probed 2026-08-28, US-226;
 updated 2026-08-30, US-426):
@@ -61,6 +61,21 @@ updated 2026-08-30, US-426):
 * Land_Use_Applications (307 rows) is not registered: no matching FeedType
   / producer, and the permits feed already covers development activity.
   Marion County deeds — no open bulk API identified.
+
+DEEDS (2026-10-02): the Marion County Assessor's sales file for the year
+(``apps.co.marion.or.us/AO/PropertySalesData/2026SalesData.csv``), rebuilt by
+an automated process, a line per sale, account and situs. The poll downloads
+it once a day and reads the lines dated in the 90 days before it, closed at
+today because three sales are dated in November and December (1,544 on
+2026-10-02; the 90 days from 2026-04-20 held 3,092) under a 5,000-row cap.
+Each sale takes its taxlot's centroid from the Assessor's ``Parcels`` layer
+(an extract last edited 2025-09-15), joined on ``map_taxlot``, and the 666
+placed inside the box publish; a sale repeated on several situs or code-area
+lines of one account publishes once. On 1 January the poll turns to the new
+year's file, and reads the old one while the new one is missing; sales of
+late December posted after the turn are not read. The grantor and grantee
+names and addresses and the situs are never selected. Polk County's side of
+the river (West Salem) is not in the file.
 """
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta

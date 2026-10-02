@@ -188,7 +188,11 @@ class ArcGISClient:
                 for f in fields
                 if (f.get("domain") or {}).get("type") == "codedValue"
             },
-            "oid_field": payload.get("objectIdField") or "OBJECTID",
+            # A layer that does not name its object-id field still types it:
+            # Larimer County's parcels call theirs OBJECTID_1, and a page
+            # ordered by OBJECTID there answers 400.
+            "oid_field": payload.get("objectIdField")
+            or next((f["name"] for f in fields if f.get("type") == "esriFieldTypeOID"), "OBJECTID"),
             "max_record_count": int(payload.get("maxRecordCount") or 1000),
             "time_zone": layer_time_zone(payload.get("dateFieldsTimeReference"))
             or LITERAL_TIME_ZONE_BY_HOST.get(urlsplit(layer_url).hostname or ""),

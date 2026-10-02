@@ -1832,3 +1832,20 @@ Worth keeping:
   county's sales that no parcel in the box could place, and the join's
   requests fall from 166 to 66.
 
+### 2026-10-02 — Western deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| western-deeds | `.streams/western-deeds.md` | `config.py` (the four sources) | 2026-10-02 | done (Vancouver 1,637 read, 1,113 published; Boulder 1,806 and 715; Fort Collins 2,597 and 1,043; Salem 1,544 and 666; each second poll published none); Aurora held | `deeds` specs for Vancouver WA, Boulder, Fort Collins and Salem; the CSV client's streamed plain read; the ArcGIS client's object-id fallback; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Vancouver, Boulder, Fort Collins and Salem move from two signal families to
+three (three-family tier 40 to 44, two-family tier 52 to 48).
+
+Worth keeping:
+
+- **Read the parcel layer's columns before calling a county's deeds
+  missing.** Clark County's taxlots carried each parcel's latest sale all
+  along; the 2026-08-28 check looked for a recorder feed and missed them.
+- **A layer's object-id field is whatever it types as one.** Larimer's
+  parcels name none and call theirs `OBJECTID_1`; paging by `OBJECTID` failed
+  every join until the client asked the field types.

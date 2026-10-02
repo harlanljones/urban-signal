@@ -378,6 +378,47 @@ datasets:
     non_spatial: null
     zip_member: null
     delimiter: null
+  deeds:
+    endpoint: https://apps.co.marion.or.us/AO/PropertySalesData/2026SalesData.csv
+    platform: csv
+    watermark_col: sale_date
+    id_keys:
+    - sale_id
+    - account_number
+    topic: raw.municipal.deeds
+    interval_seconds: 86400.0
+    producer_key: deeds
+    endpoint_by_year:
+      '2026': https://apps.co.marion.or.us/AO/PropertySalesData/2026SalesData.csv
+      '2027': https://apps.co.marion.or.us/AO/PropertySalesData/2027SalesData.csv
+    watermark_format: '%m/%d/%Y'
+    order_by: sale_date DESC
+    select: sale_id,account_number,map_taxlot,sale_date,sale_price,deed_type_code_description
+    fallback_endpoints:
+    - https://apps.co.marion.or.us/AO/PropertySalesData/2026SalesData.csv
+    where: sale_date >= CURRENT_DATE - INTERVAL '90' DAY AND sale_date <= CURRENT_DATE
+    needs_geocode: false
+    field_map:
+      doc_id:
+      - sale_id
+      recorded_date:
+      - sale_date
+      document_amount:
+      - sale_price
+      bbl:
+      - map_taxlot
+      doc_type:
+      - deed_type_code_description
+    ingestion_mode: snapshot
+    expected_cadence_days: 14
+    parcel_join:
+      parcel_layer: https://services3.arcgis.com/SXXjryU22GsO8OEC/arcgis/rest/services/Parcels/FeatureServer/0
+      join_key: TAXLOT
+      geometry_source: centroid
+      row_key: map_taxlot
+    batch_limit: 5000
+    composite_id: true
+    metro_clip: true
 aliases:
 - salem_oregon
 - salem oregon

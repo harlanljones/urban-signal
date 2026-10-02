@@ -75,7 +75,8 @@ Rejected feeds (evidence in stream log west-boulder.md):
   item was last modified 2024-09-03, and date-range where clauses return 400;
   the county's PropSearch_SALES table (752,488 rows, non-spatial) has
   future-date sentinels on SaleDate (top rows 2057/2027), null dates, and the
-  same non-queryable date-range limitation.
+  same non-queryable date-range limitation. (Superseded 2026-10-02: the
+  Assessor's daily file of the same table; see DEEDS below.)
 * SLA — Active_Business_Licenses (13,656 rows) is stale (newest
   License_Effective_Date 2019-09-09) and carries only City/State/Zip with no
   street address; Licensed_Contractors (3,077 rows) is a current snapshot
@@ -83,6 +84,18 @@ Rejected feeds (evidence in stream log west-boulder.md):
 * CRIME — Boulder_PD_Calls_For_Service (365,854 rows, point geometry) is
   verified live but out of scope for this leaf (ticket prefers
   permits/311/SLA/deeds).
+
+DEEDS (2026-10-02): the Boulder County Assessor's daily ``Sales.csv``
+(``assessor.boco.solutions/ASR_PublicDataFiles``, rebuilt at 4 a.m.), every
+sale in the county by account in seven columns, none naming a party: 752,371
+rows, 50 MB. The poll downloads it once a day and reads the sales dated in
+the 90 days before it, closed at today because eight rows are dated as far
+ahead as 2057 (1,806 on 2026-10-02; the 90 days from 2025-02-24 held 4,334)
+under a 6,000-row cap. Each sale takes its account's parcel centroid from the
+County's ``PARCELS/PARCELS_OWNER`` layer, joined on ``strap``, and the 715
+placed inside the box publish. Rows key on deed number and account. The join
+asks the layer for ``AccountNo`` alone; its owner and mailing columns stay on
+the server.
 """
 
 

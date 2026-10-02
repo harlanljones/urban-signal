@@ -38,7 +38,8 @@ Vancouver is a ONE-FEED PARTIAL metro: PERMITS only, from the
 ``services.arcgis.com/oNvpY90qsPDizwkN``). 311, SLA, and DEEDS stay Tier 3:
 311 lives on a token-gated internal server, no public business-license feed
 exists (WA L&I/LCB state registries are spine companions), and Clark County
-recorder deeds are a web app with no machine-readable feed.
+recorder deeds are a web app with no machine-readable feed. (The County's
+taxlots carry each parcel's latest sale, though: see DEEDS below.)
 
 **US-426 super-feed (WA L&I):** the Washington State L&I Construction
 Contractor registry (``data.wa.gov`` ``m8qx-ubtq``) rides here as the
@@ -86,6 +87,17 @@ Live-probe caveats that define this leaf (2026-08-28, US-233):
   divisions/submarkets catalogued here.
 * Felida (ticket suggestion) is unincorporated north of the city and has no
   permit coverage (1 row north of 45.70 in the live layer) — not a division.
+
+DEEDS (2026-10-02): Clark County's taxlots (``TaxlotsforPublicUse`` on the
+County's AGOL org, ``services2.arcgis.com/ylxwjFBdCPBzP16d``), 196,272
+polygons, each with its latest sale's date, price and excise number. The
+hosted layer replaces the County's own ``TaxlotsPublic`` MapServer, whose
+portal item is marked for deletion on 2026-10-12. The poll reads the taxlots
+whose sale falls in the 90 days before it (1,637 on 2026-10-02; the 90 days
+from 2026-04-01 held 4,221) under a 6,000-row cap every six hours, places
+each on its polygon's centroid and keeps the 1,113 inside the metro box. Rows
+key on the taxlot and its sale date. The layer has no deed type, so each sale
+publishes as a DEED; the owner's id and the tax bill are never selected.
 """
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta

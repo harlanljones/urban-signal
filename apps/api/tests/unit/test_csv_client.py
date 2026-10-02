@@ -11,6 +11,7 @@ import pytest
 from src.producers import csv_client
 from src.producers.csv_client import (
     CSVClient,
+    _body_lines,
     _decode_csv_bytes,
     _lines,
     _read_zip_member,
@@ -418,3 +419,71 @@ def test_a_zip_member_with_a_title_line_streams_without_it():
         {"file_number": "1", "prem_county": "POLK\r\nCOUNTY"},
         {"file_number": "2", "prem_county": "LAKE"},
     ]
+
+
+def _body_client(body: bytes) -> CSVClient:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, content=body, headers={"content-type": "text/csv"}, request=request)
+
+    return CSVClient(httpx.Client(transport=httpx.MockTransport(handler)))
+
+
+def test_a_plain_body_is_read_without_its_text(monkeypatch):
+    """Larimer County's sales file is 101 MB, and its text held whole added
+    385 MB to the peak: the client decodes the body as its rows are read."""
+    body = "PARCELNO,SALEDATE,SALEPRICE\r\n" + "".join(
+        f"{n:010d},2026-09-{n % 28 + 1:02d} 00:00:00,{n}00\r\n" for n in range(2000)
+    )
+
+    def whole(self):
+        raise AssertionError("the body was read as text")
+
+    monkeypatch.setattr(httpx.Response, "text", property(whole))
+
+    rows = [
+        row
+        for batch in _body_client(body.encode()).paginate(
+            "https://example.test/assessor-public-sales.csv",
+            where_clause="saledate >= '2026-09-27'",
+            order_by="saledate DESC",
+            watermark_col="saledate",
+            watermark_format="%Y-%m-%d %H:%M:%S",
+        )
+        for row in batch
+    ]
+
+    # Days 27 and 28 of each of the 71 whole 28-row cycles.
+    assert len(rows) == 142
+    assert {row["saledate"] for row in rows} == {"2026-09-27 00:00:00", "2026-09-28 00:00:00"}
+
+
+@pytest.mark.parametrize(
+    ("raw", "content_type"),
+    [
+        ("Parcel,Street\n1,Zoë Ct\n".encode(), "text/csv"),
+        ("﻿Parcel,Street\n1,Zoë Ct\n".encode(), "text/csv"),
+        ("Parcel,Street\n1,Zoë Ct\n".encode("cp1252"), "text/csv; charset=windows-1252"),
+        ("Parcel,Street\n1,Zoë Ct\n".encode("cp1252"), "application/octet-stream"),
+        (b"Parcel,Street\n1,Zo\xc3", "text/csv"),
+        (("Parcel,Street\n" + "".join(f"{n},{'€' * (1000 + 37 * n)}\n" for n in range(40))).encode(), "text/csv"),
+    ],
+    ids=["utf-8", "utf-8-bom", "declared-cp1252", "undeclared-cp1252", "cut-short", "split-characters"],
+)
+def test_a_plain_body_decodes_as_its_text_did(raw, content_type):
+    """The body decodes as httpx decodes its text: in the declared charset,
+    else UTF-8, with httpx's replacement characters, wherever the reader's
+    pieces split a character."""
+    response = httpx.Response(200, content=raw, headers={"content-type": content_type})
+
+    assert list(_body_lines(response)) == list(_lines(response.text))
+
+
+def test_a_plain_body_splits_lines_as_its_text_did():
+    """Every ending (\\r\\n, bare \\r, \\n) ends a line, as it does in the
+    downloaded text, including a \\r\\n split between the reader's pieces."""
+    text = "x" * 8191 + "\r\n" + "".join(
+        f"{n},{'x' * (n % 97)}{ending}" for n, ending in zip(range(6000), cycle(["\r\n", "\r", "\n"]))
+    )
+    response = httpx.Response(200, content=text.encode())
+
+    assert list(_body_lines(response)) == list(_lines(text))
