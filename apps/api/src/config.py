@@ -1367,6 +1367,16 @@ class Settings(BaseSettings):
         ),
         description="Worcester food establishment licenses FeatureServer table URL",
     )
+    # Worcester 311 (2026-10-02): the City's Customer Service Request System
+    # work orders from 2021, a table with no geometry whose coordinates are
+    # Massachusetts State Plane feet; the scheduler converts them.
+    arcgis_worcester_311_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/j8dqo2DJE7mVUBU1/arcgis/rest/services/"
+            "CsrsWorkOrders_TEST/FeatureServer/0"
+        ),
+        description="Worcester CSRS work orders FeatureServer table URL (311)",
+    )
 
     # Raleigh, NC / Wake County (ArcGIS, US-151): native point permits and
     # 311 plus polygon parcel sales for the deeds signal.

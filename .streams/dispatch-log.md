@@ -1906,3 +1906,22 @@ Worth keeping:
   which held 1,275 when read whole 25 minutes later; the shortfall showed
   only against the week's count.
 
+
+### 2026-10-02 — Worcester `311`, through State Plane placement (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| worcester-311 | `.streams/worcester-311.md` | `config.py` (the source), `scheduler.py` (places rows from declared State Plane columns) | 2026-10-02 | done (10,000 read, converted and published; the second poll read the newest day's 200 again and published none) | the scheduler's State Plane step, used by backfills too; a `311` spec for Worcester; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Worcester moves from two signal families to three (three-family tier 44 to
+45, two-family tier 56 to 55).
+
+Worth keeping:
+
+- **Ask which requests are residents'.** A tenth of Worcester's requests are
+  utility mark-outs that arrive through SeeClickFix like any resident's
+  report; grouping the types by source and division showed them.
+- **Run a new placement step against every spec that already declares its
+  inputs.** Four specs named State Plane columns before the scheduler read them;
+  one live poll each showed which rows the step would change (only Boston's,
+  to the same points).

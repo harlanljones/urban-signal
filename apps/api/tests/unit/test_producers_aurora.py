@@ -419,8 +419,8 @@ class TestStatePlaneCRS:
     """EPSG:2232 (NAD83 Colorado South ftUS) → EPSG:4326, live-verified.
 
     The declared transform reproduces each row's outSR=4326 geometry to
-    ~1m, so the spine can wire a Boston-style fallback for null-geometry
-    rows without a new transform path.
+    ~1m, and the scheduler places null-geometry rows with it before the
+    producer reads them (2026-10-02, ``test_scheduler_state_plane.py``).
     """
 
     @pytest.mark.parametrize(
@@ -522,8 +522,9 @@ class TestAuroraPermitParsing:
     def test_state_plane_only_permit_row_is_dropped_not_geocoded(
         self, permits, monkeypatch
     ):
-        """Null-geometry rows (≈5.1% PropX nulls aside) have no coordinate
-        path under needs_geocode=False — they must drop, never emit feet."""
+        """A row that reaches the producer with no point (needs_geocode=False)
+        drops, never emitting feet. A poll places null-geometry rows from
+        PropX/PropY first, so only a row without them gets here."""
         _patch_resolve(monkeypatch, "permits")
         event = permits.parse_socrata_row(
             PERMITS_STATE_PLANE_ONLY, city_id="aurora"
@@ -584,8 +585,9 @@ class TestAuroraSlaParsing:
     def test_state_plane_only_sla_row_emits_null_coords_never_feet(
         self, sla, monkeypatch
     ):
-        """Snapshot grain: null-geometry license rows keep flowing as
-        null-coordinate events; X/Y feet must never become coordinates."""
+        """Snapshot grain: a license row that reaches the producer with no
+        point flows as a null-coordinate event; X/Y feet must never become
+        coordinates. A poll places null-geometry rows from X/Y first."""
         _patch_resolve(monkeypatch, "sla")
         event = sla.parse_socrata_row(SLA_STATE_PLANE_ONLY, city_id="aurora")
         assert event is not None

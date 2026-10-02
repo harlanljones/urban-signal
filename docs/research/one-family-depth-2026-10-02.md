@@ -63,12 +63,18 @@ latitude and longitude. Tucson's deeds register from Pima County's sales
 files, which gives Tucson three families, and Long Beach's `311` from the
 City's request export, which gives it two.
 
-| Tier (families) | Before (with #106) | With the Texas and southern feeds (#107) | With the north-eastern and western feeds (#108) | With two held sources |
-|---|---|---|---|---|
-| 4 | 30 | 30 | **31** (Lincoln) | 31 |
-| 3 | 44 | 44 | 43 | **44** (Tucson) |
-| 2 | 48 | **54** (Midland, Longview, Charleston SC, Odessa, Waco, Lexington) | **56** (Manchester, Tucson) | **56** (Long Beach in, Tucson up) |
-| 1 | 35 | 29 | 27 | 26 |
+A hold from the two-family pass came off next: Worcester's work orders, a
+table whose points are two columns of Massachusetts State Plane feet, which
+the scheduler now converts for any spec that declares them. That gives
+Worcester a third family; the registration is written up with the
+two-family pass ([two-family-depth-2026-09-30.md](two-family-depth-2026-09-30.md)).
+
+| Tier (families) | Before (with #106) | With the Texas and southern feeds (#107) | With the north-eastern and western feeds (#108) | With two held sources (#109) | With Worcester's `311` |
+|---|---|---|---|---|---|
+| 4 | 30 | 30 | **31** (Lincoln) | 31 | 31 |
+| 3 | 44 | 44 | 43 | **44** (Tucson) | **45** (Worcester) |
+| 2 | 48 | **54** (Midland, Longview, Charleston SC, Odessa, Waco, Lexington) | **56** (Manchester, Tucson) | **56** (Long Beach in, Tucson up) | 55 |
+| 1 | 35 | 29 | 27 | 26 | 26 |
 
 ## Registered
 

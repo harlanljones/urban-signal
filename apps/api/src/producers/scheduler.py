@@ -44,7 +44,7 @@ from src.producers.nfip_producer import NfipProducer
 from src.producers.nrel_afdc_client import NrelAfdcClient
 from src.producers.poi_diff_producer import PoiDiffProducer
 from src.producers.childcare_producer import ChildcareLicensingProducer
-from src.producers.sla_licenses_producer import SLALicensesProducer
+from src.producers.sla_licenses_producer import SLALicensesProducer, _transform_state_plane
 from src.producers.sba_loan_producer import SbaLoanProducer
 from src.producers.fdic_bankbranch_producer import FdicBankBranchProducer
 from src.producers.street_cut_permits_producer import StreetCutPermitsProducer
@@ -377,6 +377,15 @@ class MunicipalIngestionScheduler:
                     "point_col": ds.point_col,
                     "link_pattern": ds.link_pattern,
                     "decode_domains": ds.decode_domains,
+                    # A table whose rows hold projected coordinates instead
+                    # of geometry (Worcester's work orders, in Massachusetts
+                    # State Plane feet) places each row from the declared
+                    # columns.
+                    "state_plane": (
+                        {"crs": ds.state_plane_crs, "x_col": ds.state_plane_x_col, "y_col": ds.state_plane_y_col}
+                        if ds.state_plane_crs and ds.state_plane_x_col and ds.state_plane_y_col
+                        else {}
+                    ),
                     # A table with no geometry (DC, Lynchburg and Roanoke
                     # sales) takes each row's coordinates from its parcel's
                     # centroid.
@@ -844,6 +853,26 @@ class MunicipalIngestionScheduler:
         zone = get_metadata(meta["endpoint"]).get("time_zone")
         return zone if isinstance(zone, str) else None
 
+    def _place_state_plane_rows(self, job_name: str, batch: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Give rows without coordinates the point their State Plane columns hold.
+
+        A spec can declare a projected CRS and the columns that hold each
+        row's x and y (``state_plane_*``): Worcester's work orders are a table
+        with no geometry whose coordinates are Massachusetts State Plane feet.
+        Each row the client left unplaced is converted to latitude and
+        longitude. A row whose columns are empty or do not convert stays
+        unplaced, and a row the client placed keeps its point.
+        """
+        plane = self.job_metadata[job_name]["state_plane"]
+        placed = []
+        for row in batch:
+            if row.get("latitude") is None or row.get("longitude") is None:
+                point = _transform_state_plane(row, plane["crs"], plane["x_col"], plane["y_col"])
+                if point is not None:
+                    row = {**row, "latitude": point[1], "longitude": point[0]}
+            placed.append(row)
+        return placed
+
     def _join_parcel_centroids(self, job_name: str, batch: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Give rows without coordinates their parcel's centroid (``parcel_join``).
 
@@ -885,8 +914,9 @@ class MunicipalIngestionScheduler:
         """The test a ``metro_clip`` feed's rows pass: placed inside the metro box.
 
         A row is placed by the columns its field map names for latitude and
-        longitude, else by ``latitude``/``longitude`` (a parcel join's
-        centroid, or the ArcGIS client's). Feeds without the flag get None.
+        longitude, else by ``latitude``/``longitude`` (the ArcGIS client's, a
+        parcel join's centroid, or its State Plane columns' point). Feeds
+        without the flag get None.
         """
         meta = self.job_metadata[job_name]
         if not meta.get("metro_clip"):
@@ -1007,6 +1037,8 @@ class MunicipalIngestionScheduler:
             ):
                 if self._stop_event.is_set():
                     break
+                if meta.get("state_plane"):
+                    batch = self._place_state_plane_rows(job_name, batch)
                 if meta.get("parcel_join"):
                     batch = self._join_parcel_centroids(job_name, batch)
 

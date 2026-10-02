@@ -8,8 +8,15 @@ Worcester is a TWO-FEED PARTIAL metro on the city's ArcGIS Hub
 (``opendata.worcesterma.gov``, AGOL org
 ``services1.arcgis.com/j8dqo2DJE7mVUBU1``): PERMITS (Building Permits) and
 SLA (Food Establishment Licenses). Both are **non-spatial Tables** (address-
-only) with **text M/D/YYYY date columns** (no zero-padding). COMPLAINTS_311
-and DEEDS are absent from the Hub (no open extract) and stay unregistered.
+only) with **text M/D/YYYY date columns** (no zero-padding). DEEDS has no
+current source: MassGIS loads the City's assessor roll once a year.
+
+COMPLAINTS_311 is registered in the spine corpus, not this leaf (2026-10-02):
+the City's Customer Service Request System work orders
+(``CsrsWorkOrders_TEST/FeatureServer/0``), a Table whose rows carry their
+points as Massachusetts State Plane feet (EPSG:2249) in ``X_Coordinate`` and
+``Y_coordinate``. The spec declares those columns and the scheduler converts
+them, so nothing is geocoded.
 
 Live-probe caveats that define this leaf (probed live 2026-08-30, US-419):
 
@@ -323,10 +330,10 @@ WORCESTER_DIVISIONS: dict[str, BoroughMeta] = {
 
 # ---------------------------------------------------------------------------
 # Feed specs (leaf-local; the spine copies these into REGISTRY).
-# Probed live 2026-08-30 (US-419). Register PERMITS and SLA only — both are
+# Probed live 2026-08-30 (US-419). This leaf carries PERMITS and SLA — both
 # non-spatial address-only Tables with text M/D/YYYY watermarks. Do not
-# register the sibling Business_Certificates layer (out of scope) or any
-# absent 311/deeds extract.
+# register the sibling Business_Certificates layer (out of scope). The 311
+# work orders are a spine feed (see the module docstring).
 # ---------------------------------------------------------------------------
 WORCESTER_PERMITS_ENDPOINT = (
     "https://services1.arcgis.com/j8dqo2DJE7mVUBU1/arcgis/rest/services/"
@@ -437,9 +444,9 @@ WORCESTER_FEED_SPECS: dict[str, dict[str, object]] = {
 def get_worcester_dataset(feed: object) -> object:
     """Leaf-local mirror of ``city_registry.get_dataset``.
 
-    Returns the spec for a registered Worcester feed, or raises ``KeyError``
-    naming the city and available feeds when the feed is absent (311/deeds
-    are absent from the Hub).
+    Returns the spec for a feed this leaf carries, or raises ``KeyError``
+    naming the city and available feeds when the leaf does not carry it (the
+    311 work orders are a spine feed; deeds have no source).
     """
     from src.config import settings
     from src.spatial.city_registry import DatasetSpec

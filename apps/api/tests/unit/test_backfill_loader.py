@@ -391,6 +391,28 @@ def test_a_bend_backfill_keeps_the_sales_its_metro_box_holds(scheduler):
     assert (event.bbl, event.latitude, event.longitude) == ("181208AB09999", 44.0480, -121.3120)
 
 
+def test_a_worcester_backfill_places_each_request_from_its_state_plane_columns(scheduler):
+    """A backfill converts a table's State Plane coordinates as the poll does."""
+    producer = scheduler.producers["311"]
+    rows = [
+        {"ObjectId": 382001, "Service_Request_ID": 9900001, "Date_Logged": "2026-09-30", "Request_Type": "Pothole",
+         "Division": "DPW&P Streets", "Status": "Open", "Closed_Date": None,
+         "X_Coordinate": 574340.05, "Y_coordinate": 2920859.95},
+    ]
+    producer.arcgis.paginate = MagicMock(return_value=[rows])
+    producer.arcgis.get_layer_metadata = MagicMock(return_value={"time_zone": None})
+
+    report = backfill_job(
+        scheduler, "311_worcester", since_dt=datetime(2026, 9, 1, tzinfo=UTC), max_rows=None,
+        page_size=None, batch_delay_seconds=0,
+    )
+
+    assert report["published"] == 1
+    scheduler.dlq_producer.route_to_dlq.assert_not_called()
+    event = producer.producer.produce.call_args.kwargs["payload"]
+    assert (round(event.latitude, 5), round(event.longitude, 5)) == (42.26259, -71.80229)
+
+
 def test_backfill_job_counts_and_watermark():
     fake = _FakeScheduler({"permits_baltimore": _meta()})
     client = MagicMock()

@@ -246,8 +246,10 @@ def backfill_job(
             max_records=max_rows,
             **client_kwargs,
         ):
-            # A sales table without geometry takes each parcel's centroid, as
-            # poll_job places it.
+            # A table without geometry takes each row's point from its State
+            # Plane columns, or its parcel's centroid, as poll_job places it.
+            if meta.get("state_plane") and batch:
+                batch = scheduler._place_state_plane_rows(job_name, batch)
             if meta.get("parcel_join") and batch:
                 batch = scheduler._join_parcel_centroids(job_name, batch)
 

@@ -130,6 +130,13 @@ now finds. Aurora's are held: Arapahoe County's parcels, which cover most of
 the city, carry sales about eight weeks after their date, and Adams County's
 daily table covers only the city's Adams side.
 
+Worcester's work orders followed on 2026-10-02, which gives Worcester a third
+family. Their table has no geometry, and each row's point is two columns of
+Massachusetts State Plane feet; a spec can now declare such columns and their
+coordinate system, and the scheduler converts each row's point before the
+producer reads it. The tier counts from here on are in the one-family pass's
+table ([one-family-depth-2026-10-02.md](one-family-depth-2026-10-02.md)).
+
 | Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds (#94) | With Asheville's permits (#95) | With Allentown's permits (#96) | With Allentown's and New Haven's `311` (#97) | With Lincoln's `311` (#98) | With Albuquerque's and Topeka's `311` (#99) | With Yakima's `311` and deeds (#100) | With Cape Coral's `311` and deeds (#101) | With the wrong-place permits retracted (#102) | With Augusta's `311` and Wilmington's deeds (#103) | With Tampa's, Gainesville's and Ocala's deeds (#104) | With Lakeland's deeds (#105) | With the western deeds |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 4 | 26 | 26 | **27** (Charlotte) | 27 | 27 | 27 | **28** (Allentown) | 28 | 28 | **29** (Yakima) | **30** (Cape Coral) | 30 | 30 | 30 | 30 | 30 |
@@ -1347,6 +1354,80 @@ daily table covers only the city's Adams side.
   read the same 1,544 and published nothing. No event carried a party name,
   and neither poll queried a geocoder.
 
+### Worcester, MA — `311`
+
+- **Source:** the City's Customer Service Request System work orders, "CSRS
+  Work Orders 2021 to Present" on the City's ArcGIS Online org, a hosted
+  table:
+  `services1.arcgis.com/j8dqo2DJE7mVUBU1/arcgis/rest/services/CsrsWorkOrders_TEST/FeatureServer/0`.
+  The item says the table is updated weekly; it was last rebuilt at 10:30Z
+  on 2026-10-02, with requests logged through 2026-09-30. Its licence lets
+  the data be distributed freely.
+- **Shape:** one row per request since 2021-01-01: 382,882 on 2026-10-02,
+  15,926 logged in the 90 days before, each with its own id. 60% came by
+  phone and 35% through SeeClickFix. The columns are the request id, the
+  day and time logged, the street and cross street, the type (143 in the 90
+  days), priority, status, source, the division it went to, whether and
+  when it closed, and the point.
+- **Point:** the table has no geometry. `X_Coordinate` and `Y_coordinate`
+  are NAD83 Massachusetts Mainland State Plane, US survey feet (EPSG:2249):
+  the probe's 398 newest rows converted to points from 42.227° to 42.335° N
+  and 71.878° to 71.753° W, inside the city. The spec declares the
+  coordinate system and the two columns (`state_plane_*`), and the
+  scheduler converts each row's point before the producer reads it; a
+  backfill does the same. Streets carry no house numbers, so nothing is
+  geocoded.
+- **Filter:** `X_Coordinate IS NOT NULL AND Y_coordinate IS NOT NULL AND
+  Request_Type <> 'Water Mains / Street Light Mark Outs'`. 15 of the 15,926
+  requests had no coordinates. 1,502 asked Water Engineering to mark out its
+  mains and street light cables ahead of an excavation, 1,123 of them
+  through SeeClickFix: contractors' notices, which Augusta's spec leaves out
+  as utility-locate tickets. The other 14,414 are read. Requests from the
+  City's own task forces and inspectors stay in: they report conditions in
+  the street, from bulk items in the public way to street lights out.
+- **Watermark:** `Date_Logged`, a date-only column the table writes as
+  `2026-09-30`. A whole day keeps its boundary with `>=`, so each poll reads
+  the newest day again and the dedup drops what it published. The table
+  takes the scheduler's ISO literal on that column.
+- **Reach:** the busiest 16 days of the year to 2026-09-30, from 2026-01-20,
+  logged 6,660 requests besides mark-outs (the busiest day, 2026-01-27, 1,237
+  of every kind). A poll reads newest first and stops at its cap, so the cap
+  is 10,000, enough for a weekly update after a missed one. A first poll
+  reads the newest 10,000, about nine weeks.
+- **Freshness:** `expected_cadence_days` is 7, so the staleness alarm waits
+  14 days.
+- **Personal data:** the table holds no requester, contact or description
+  columns. `select` names nine columns and leaves the street, cross street,
+  source, priority and time of day on the server.
+- **Placement:** each request's converted point. The spec does not clip:
+  907 of the first poll's 10,000 lay at the city's north, east and south
+  edges, past the metro box, and are kept, as Worcester's permits and
+  licences keep theirs.
+- **Poll:** every six hours, newest first by `Date_Logged DESC, ObjectId
+  DESC`, in pages of 1,000.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live table, Kafka mocked, from 18:20Z on
+  2026-10-02. The first took a metadata request and ten pages, read 10,000
+  requests logged from 2026-07-30 to 2026-09-30, converted every point and
+  published all 10,000, with none dead-lettered. By type, 999 are the
+  public works task force's bulk items in the public way, 784 parking
+  enforcement, 574 the inspections task force, 539 trash bags not collected
+  and 446 trash on private property; 5,965 are closed, 1,495 accepted and
+  987 open, and 6,998 carry a closing day. The watermark stopped at
+  2026-09-30, and the second poll, one request, sent `Date_Logged >=
+  '2026-09-30T00:00:00'`, read that day's 200 requests again and published
+  nothing. No poll queried a geocoder.
+- **Other specs with State Plane columns:** four declared them already.
+  Boston's licences carry no other coordinates, and the licence producer
+  converted them itself with the same function, so their points do not
+  change: a live poll converted 992 of 1,000 (8 have none). Aurora's permits
+  and licences and Tempe's crime reports carry the columns beside their
+  geometry, so only a row without geometry is converted, and Tempe's
+  producer still reads a row's own latitude and longitude columns first.
+  Such an Aurora row used to be dead-lettered (permits) or published without
+  a point (licences). None of the newest 1,000 rows of each of the three
+  feeds lacked geometry on 2026-10-02.
+
 ## Retracted
 
 | Metro (feed) | What it read | Why retracted | Re-check when |
@@ -1370,7 +1451,6 @@ daily table covers only the city's Adams side.
 | Rochester (`311`) | The City's `311_Case_Data` layer (`services2.arcgis.com/yoz1ZtATTCokO9nU`): 51,721 cases filed from 2021-01-02 to 2022-02-07, data last edited on 2022-12-12, with no successor in the org. | Frozen since 2022. | A current requests layer appears. |
 | Kansas City (`permits`) | Overland Park's `Building_Permits` layer (`services1.arcgis.com/YQsWDBr0DjMtoTQo`, a hosted layer last rebuilt on 2026-09-30): 13,824 permits over a rolling window from 2024-01-02, newest 2026-09-29, 429 in 30 days, ISO literals accepted, `CaseNumber` unique; 84% of recent rows carry a point and the rest an address. | It covers one suburb in Kansas, roughly a tenth of the metro's people, while the metro's `311` and licences are Kansas City, Missouri's. Registered as the metro's permits, it would mark Kansas City as covered where the City itself has none. | Kansas City, Missouri publishes current permits, or enough suburbs publish that the metro can take them together. |
 | Missoula (`311`) | The City's "Report Drainage Issue" Survey123 layer (`services.arcgis.com/HfwHS0BxZBQ1E5DY/.../Illicit_Discharge/FeatureServer/0`): 329 reports since 2022-04-30, 34 in 90 days, each with a point and an arrival stamp. | One issue type, about twelve reports a month with bursts of what look like staff tests, on a layer the public can edit. Registered as the metro's `311`, it would mark Missoula as covered where the City publishes no request stream. | The City publishes its requests. |
-| Worcester (`311`) | The City's CSRS work orders (`services1.arcgis.com/j8dqo2DJE7mVUBU1/.../CsrsWorkOrders_TEST/FeatureServer/0`, its "2021 to Present" dataset, refreshed weekly): 382,664 requests with unique ids, 15,708 logged in 90 days, a third of them through SeeClickFix. | The table has no geometry. Its coordinates are Massachusetts State Plane feet, which the `311` producer cannot convert yet (the licence producer does for Boston), its streets carry no house numbers, and its dates are whole days, refreshed a week at a time. | The `311` producer converts State Plane coordinates. |
 | Worcester (`deeds`) | MassGIS's statewide parcels for Worcester (`TOWN_ID = 348`) carry each parcel's last sale: 47,703 parcels, the newest sale on 2026-04-17. | An annual assessor roll: no sale in the 90 days to 2026-10-02. | MassGIS loads Worcester more often. |
 | Augusta (`deeds`) | The County's "All Sales" point layer (`gismap.augustaga.gov`, `Map_LayersTS/MapServer/404`, 111,717 rows) and its base `sales` table: sale key, date, price and parcel. The table is live (122 rows added between 06:56Z and 09:03Z on 2026-10-02, 114 of them dated April to June), and its newest sale was dated 2026-06-24. | Sales are keyed three to five months after they close, so the 90-day window was empty. | The newest sale comes within about a month of the poll. |
 | Greenville (`deeds`) | The City's parcel layer (`citygis.greenvillesc.gov`, `GeneralData/GeneralData_WebMercator/MapServer/2`, 90,470 parcels) carries each parcel's latest deed date, price, and book and page: 1,188 sales in the 90 days to 2026-10-02, 897 of them inside the metro box. Its three sibling services publish the same table. | The newest sale was dated 2026-08-28, none fell in the last 30 days, and the layer has no edit stamp. | A newer sale appears. |
