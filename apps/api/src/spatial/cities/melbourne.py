@@ -5,7 +5,11 @@ geographic bounding boxes for the south‑central Brevard County metro anchored
 by Melbourne and Palm Bay, with Titusville at the north end and the barrier‑
 island beach communities east of the Indian River Lagoon.
 
-Fit: High (US-296). ArcGIS public permits verified via Brevard GIS Hub.
+Registered in US-296 with the City of Palm Bay's building permits layer
+(``gis.palmbayflorida.org``, ``GrowthManagement/BuildingPermits``). Its newest
+permit was issued on 2022-05-31, so the permits feed was retired on
+2026-10-02; no current permits source has been found for Brevard County.
+Licences come from the USDA's SNAP retailers in Florida inside the metro box.
 """
 
 from typing import Dict
@@ -320,9 +324,8 @@ MLB_DIVISIONS = MELBOURNE_DIVISIONS
 
 
 # Leaf-local feed notes (for parity with other city modules):
-# City of Palm Bay (Brevard County) Building Permits, ArcGIS FeatureServer layer 0:
-# https://gis.palmbayflorida.org/arcgis/rest/services/GrowthManagement/BuildingPermits/FeatureServer/0
-# Watermark: issueDate; OID field: OBJECTID; max_record_count: 1000
+# Permits: none registered. Palm Bay's layer (150,427 permits, 2004-01-12 to
+# 2022-05-31) stopped in May 2022; retired 2026-10-02.
 # SLA fallback: USDA SNAP Retailers, Florida inside the metro bbox (snap_sla_spec)
 
 from src.spatial.registration import SpatialRegistration

@@ -1,4 +1,13 @@
-"""El Paso, Texas spatial registry and geometry."""
+"""El Paso, Texas spatial registry and geometry.
+
+Permits: none registered. The City's hosted ``NewResi2018_19`` layer, the
+permits feed until 2026-10-02, holds nothing issued after 2021-07-30, and its
+siblings on ArcGIS Online nothing after 2022-01-31. The City's current
+new-construction layers (``Planning/NewResidential`` and
+``Planning/NewCommercial``, created 2026-02-17) are on ``gis.elpasotexas.gov``,
+which answered the 2026-10-02 probes with Cloudflare's 403, so their rows are
+unmeasured.
+"""
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 

@@ -83,12 +83,7 @@
     }
   },
   "feeds": {
-    "permits": {
-      "platform": "arcgis",
-      "watermark_col": "Issued_Dat",
-      "interval_seconds": 300.0,
-      "topic": "raw.municipal.permits"
-    },
+    "permits": null,
     "311": {
       "platform": "arcgis",
       "watermark_col": "created_at",

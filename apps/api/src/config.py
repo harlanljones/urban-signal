@@ -1649,12 +1649,6 @@ class Settings(BaseSettings):
         description="Alachua County building permits layer for the Gainesville FL metro (county-hosted)",
     )
 
-    # Melbourne / Palm Bay / Titusville (Brevard County, FL) — US-296
-    arcgis_brevard_permits_url: str = Field(
-        default="https://gis.palmbayflorida.org/arcgis/rest/services/GrowthManagement/BuildingPermits/FeatureServer/0",
-        description="Palm Bay (Brevard County) Building Permits ArcGIS FeatureServer layer URL",
-    )
-
     # Miami-Dade County (US-199): ArcGIS Hub permits table + LBT SLA snapshot
     # + PaGis last-sale points. No 311. Companions are metadata-only.
     arcgis_miami_dade_permits_url: str = Field(
@@ -1971,10 +1965,6 @@ class Settings(BaseSettings):
     arcgis_augusta_permits_url: str = Field(
         default="https://gismap.augustaga.gov/arcgis/rest/services/EnterpriseApps/iasWorld_Permit/MapServer/1",
         description="Augusta CityView permits ArcGIS MapServer table URL (address-only, geocoded)",
-    )
-    arcgis_el_paso_permits_url: str = Field(
-        default="https://services1.arcgis.com/hyTVSIhR7dHyDsJF/arcgis/rest/services/NewResi2018_19/FeatureServer/0",
-        description="El Paso residential building permits ArcGIS FeatureServer (frozen 2018-2021 snapshot)",
     )
     arcgis_louisville_crime_url: str = Field(
         default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/crime_data_2026/FeatureServer/0",

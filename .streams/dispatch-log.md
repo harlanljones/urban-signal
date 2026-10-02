@@ -2014,3 +2014,16 @@ Worth keeping:
 - **Check whose permits a county layer holds.** Three quarters of the
   County's permits fall in the metro box, but only 33 of 2,441 inside the
   City: a box test alone would have read it as the City's feed.
+
+### 2026-10-02 — El Paso and Melbourne permits retired (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| retire-frozen-permits | `.streams/retire-frozen-permits.md` | `config.py` (both sources' settings go) | 2026-10-02 | done (El Paso's newest permit 2021-07-30, Melbourne's 2022-05-31; both specs removed, both metros stay registered) | El Paso's and Melbourne's `permits` specs removed; notes in both city modules; regenerated facts |
+
+Worth keeping:
+
+- **Count a family only while its source is live.** Melbourne's feed
+  passed every poll and gate with nothing issued since 2022, and El Paso's
+  spec called itself a frozen snapshot (alarm-exempt) yet counted as permits
+  coverage. Read the newest issue date before counting a feed.
