@@ -5,7 +5,8 @@ ever pointed at a live source. Five now read a published last-sale or transfer
 layer. Albany, Dover, Harrisburg, Huntington, Manchester, Portland (Maine) and
 Wilmington (Delaware) have no public sale source, so their deeds feed is
 retracted and their ``sla`` reads the SNAP retailer slice. Roanoke and Richmond
-are unchanged (``docs/research/feed-health-2026-09-30.md``).
+are unchanged (``docs/research/feed-health-2026-09-30.md``). Manchester's deeds
+came back on 2026-10-02 from the City's own parcels (``test_manchester_deeds.py``).
 
 Fixture rows keep each source's real column names and value formats; the ids,
 addresses and prices in them are made up.
@@ -43,7 +44,6 @@ RETRACTED = {
     "dover": "DE",
     "harrisburg": "PA",
     "huntington_wv": "WV",
-    "manchester": "NH",
     "portland_maine": "ME",
     "wilmington_de": "DE",
 }
@@ -98,6 +98,17 @@ def test_retracted_city_polls_only_its_snap_slice(city, state):
     assert set(registration.datasets) == {FeedType.SLA}
     assert registration.datasets[FeedType.SLA] == snap_sla_spec(state, registration.metro_bbox)
     assert not hasattr(settings, f"arcgis_{city}_deeds_url")
+
+
+def test_manchesters_deeds_read_the_citys_parcels_beside_its_snap_slice():
+    # The wave's Manchester deeds named an ArcGIS Online service that does not
+    # exist; the City's own parcel layer, found on 2026-10-02, carries each
+    # parcel's latest sale.
+    registration = REGISTRY[CityId.MANCHESTER]
+    assert set(registration.datasets) == {FeedType.SLA, FeedType.DEEDS}
+    assert registration.datasets[FeedType.SLA] == snap_sla_spec("NH", registration.metro_bbox)
+    assert _deeds("manchester").endpoint == settings.arcgis_manchester_deeds_url
+    assert settings.arcgis_manchester_deeds_url.startswith("https://ags.manchesternh.gov/")
 
 
 class TestAllentownSaleDate:

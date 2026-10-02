@@ -13,9 +13,14 @@ The other 34 were probed live on 2026-10-02 in four groups (curl default
 User-Agent, at least 2.2 seconds between requests to a host on a clock the
 groups shared, no owner, applicant, reporter, contact or free-text column
 requested). Workbooks that carried such columns were read only by their other
-headers and deleted. Three hosts refused a first request and were not asked
-again: ARCountyData and the City of Fort Smith's website answered 403, and
-Fort Smith's GIS portal reset the connection.
+headers and deleted. Hosts that refused a request were not asked again:
+ARCountyData, the City of Fort Smith's website, the Cities of Harrisburg's
+and Wilmington's websites and West Des Moines's answered 403, New Castle
+County's GIS answered 472, Fort Smith's GIS portal reset the connection, the
+City of Dover's website returned an error page, and Buffalo's open data
+portal refused the permits dataset's rows (403). New York's sales search and
+the City of Portland, Maine's website failed certificate checks and were not
+queried.
 
 The nine Texas metros (Abilene, Amarillo, Beaumont, Longview, Midland, Odessa,
 Texarkana, Tyler and Waco) ran from 14:14Z to 15:27Z. Texas does not disclose
@@ -32,14 +37,31 @@ a second family. Charleston County's sales are held on the County's terms and
 the City's missed-collection requests as one kind of request; the other gaps
 have no public source.
 
-The north-eastern and western groups follow with their registrations.
+The eight north-eastern metros (Albany, Buffalo, Syracuse, Harrisburg,
+Manchester NH, Portland ME, Dover and Wilmington DE) ran from 14:13Z to
+15:50Z. Manchester's deeds register, from the City's own parcels, which the
+August probe missed. Buffalo's holes-in-road work orders are held as one kind
+of request, Manchester's public works tickets because resident intake stopped
+on 2026-09-02, and Buffalo's 2026-27 roll because its deed dates are empty.
+New York's county and state layers carry deed book and page only, and the
+other gaps sit in vendor systems (SeeClickFix, EnerGov, Camino, TRAKiT,
+Infor) with no public rows.
 
-| Tier (families) | Before (with #106) | With these feeds |
-|---|---|---|
-| 4 | 30 | 30 |
-| 3 | 44 | 44 |
-| 2 | 48 | **54** (Midland, Longview, Charleston SC, Odessa, Waco, Lexington) |
-| 1 | 35 | 29 |
+The western group (Des Moines, Grand Rapids, Madison, Long Beach, Modesto,
+Santa Rosa, Stockton and Tucson, with Lincoln's missing deeds) ran from 14:16Z
+to 15:30Z. Lincoln's deeds register from the Assessor's sales of the last 12
+months, which gives Lincoln all four families, and Tucson's permits register
+from a layer the August probe did not find. Pima County's yearly sales files,
+Long Beach's requests, Polk County's sales and Sonoma County's parcel sales
+are held; the other gaps have no public source, and Stanislaus and San
+Joaquin counties publish no sale prices.
+
+| Tier (families) | Before (with #106) | With the Texas and southern feeds (#107) | With the north-eastern and western feeds |
+|---|---|---|---|
+| 4 | 30 | 30 | **31** (Lincoln) |
+| 3 | 44 | 44 | 43 |
+| 2 | 48 | **54** (Midland, Longview, Charleston SC, Odessa, Waco, Lexington) | **56** (Manchester, Tucson) |
+| 1 | 35 | 29 | 27 |
 
 ## Registered
 
@@ -301,6 +323,144 @@ The north-eastern and western groups follow with their registrations.
   CreatedDate > '2026-10-02T14:58:11'`, found nothing newer and published
   nothing. Neither poll queried a geocoder.
 
+### Lincoln, NE — `deeds`
+
+- **Source:** the Lancaster County Assessor's property sales on the
+  City-County GIS server:
+  `gis.lincoln.ne.gov/public/rest/services/Assessor/PropertySales/FeatureServer/0`,
+  "Property Sales - Points (last 12 months)", "provided by the Assessor's
+  office"; layer 1 holds the same sales as parcel polygons. The 2026-08-30
+  probe found no public bulk sales feed, and the "Lancaster County Property
+  Sales" items on the City's open data hub stop at 2018.
+- **Shape:** 3,980 sales on 2026-10-02, recorded from 2025-10-03 to
+  2026-09-28, each at its point with its instrument number and type, parcel
+  number, price and sale and recording dates (midnight UTC). Every sale
+  carries a price; 960 of the 986 in the 90 days are residential.
+- **Window:** the sales recorded in the 90 days before each poll, closed at
+  the request's time: 986 rows on 2026-10-02 (875 by sale date). The server
+  rejects ISO date literals and evaluates the relative window.
+- **Reach:** the 90 days from 2026-04-19 held 1,371, the most in the layer's
+  12 months (recordings ran from 199 in October 2025 to 514 in June 2026), so
+  the cap is 2,500, read in pages of 1,000.
+- **Ids:** the instrument number keys each event; two sales in the window
+  were listed twice, parcel, price and day alike.
+- **Freshness:** sales arrive on weekdays, four to seven days after they are
+  recorded; the newest, recorded 2026-09-28, was unchanged between 14:18Z and
+  15:14Z on 2026-10-02. `expected_cadence_days` is 7.
+- **Personal data:** `select` names six columns; the layer's display name,
+  the grantor, the grantee, the appraiser and the photo link stay on the
+  server.
+- **Mapping:** the instrument number, the recording date, the price, the
+  parcel number and the instrument type (`WDEED`, `TRDEED`, `DEED`, `PRDEED`)
+  as the document type.
+- **Placement:** each sale at its point. The layer covers Lancaster County,
+  and the clip keeps the metro box: 807 of the 986. No geocoder is asked.
+- **Poll:** every six hours, the whole window as a snapshot, newest first by
+  `RecordedDate DESC, OBJECTID DESC`.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live layer at 16:23Z, Kafka mocked. The first read
+  986 rows in two requests and published 805 sales recorded from 2026-07-06
+  to 2026-09-28 (750 `WDEED`, 51 `TRDEED`, 3 `DEED` and 1 `PRDEED`), every
+  one with a price; it skipped 179 outside the box and the 2 repeated
+  listings, and dead-lettered none. The second read the same rows in one
+  request and published nothing. Neither poll queried a geocoder.
+
+### Manchester, NH — `deeds`
+
+- **Source:** the City's parcels on its own ArcGIS Server:
+  `ags.manchesternh.gov/agsgis7/rest/services/Community/Parcels/MapServer/0`,
+  33,997 polygons, each with its latest sale. The registration retracted on
+  2026-09-30 named an ArcGIS Online org that does not exist, and the August
+  probe found no sale source; the City's Hub is private.
+- **Shape:** every row carries the same as-of stamp (03:59Z on 2026-10-02):
+  the layer is rebuilt daily. Each sale has its book and page (`9986/1668`),
+  price and land use, and its date as unpadded `M/D/YYYY` text. 172 of the 521
+  sales in the 90 days carry a price of zero or none.
+- **Window:** as text the dates do not compare, but the server casts them, so
+  the spec reads the parcels whose cast sale date falls in the 90 days before
+  each poll, closed at today: 521 rows on 2026-10-02. The 58 parcels the City
+  keeps off its internet maps (`Suppress_Internet_Access = 'Yes'`) stay out;
+  none had a sale in the window. A watermark on the sale date would pass over
+  the sales the assessor posts late, so the poll rereads the window and the
+  cross-run dedup drops the sales already published.
+- **Reach:** the 90 days from 2026-05-04 held 735, the most found, so the
+  default cap of 1,000 holds the window.
+- **Ids:** a row is its parcel, sale date and book and page, since one deed
+  can convey several parcels (478 books and pages among the 496 published
+  sales); 3 rows inside the box repeated all three.
+- **Freshness:** the newest sale, dated 2026-09-17, was 15 days old on
+  2026-10-02, and September's 54 sales against 207 to 285 in each of the
+  three months before show the assessor posting sales two to four weeks after
+  they close. `expected_cadence_days` is 21, so the alarm waits six weeks.
+- **Personal data:** `select` names six columns; owners and their mailing
+  addresses stay on the server.
+- **Mapping:** the book and page (the parcel number where there is none), the
+  sale date as the recorded date, the price, the parcel number and the land
+  use (`Single Fam`, `Condo`, `Two Family`) as the document type.
+- **Placement:** each parcel's centroid. The layer covers the city, and the
+  clip skips the 22 parcels south or east of the box. No geocoder is asked.
+- **Poll:** every six hours, the whole window as a snapshot, paged by object
+  id.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live layer at 16:32Z, Kafka mocked. The first read
+  521 rows in two requests and published 496 sales dated from 2026-07-05 to
+  2026-09-17 (283 single-family, 91 condominium and 45 two-family), 332 of
+  them with a price; it skipped 22 outside the box and 3 repeated rows, and
+  dead-lettered none. The second read the same rows in one request and
+  published nothing. Neither poll queried a geocoder.
+
+### Tucson, AZ — `permits`
+
+- **Source:** the City's EnerGov residential building permits on its own
+  ArcGIS Server:
+  `gis.tucsonaz.gov/public/rest/services/PublicMaps/PermitsCode/MapServer/85`
+  (`PDSD_ResidentialBldg`). The August probes found only the
+  `PDSD_PERMITS_ALL` archive, which stops on 2022-10-20; the City's ArcGIS
+  Online items for the `PermitsCode` layers were modified on 2026-09-03.
+- **Shape:** 20,003 rows on 2026-10-02, the oldest issued in 1997, each at
+  its point with its number, parcel, status, type, work class, census code,
+  value, square footage and dates; 1,693 have not been issued. The commercial
+  layer beside it (`/81`) held 315 permits in the 90 days, and the
+  multi-family layer (`/84`) stopped on 2025-03-14.
+- **Window:** the permits issued in the 90 days before each poll, closed at
+  the request's time: 1,290 rows on 2026-10-02. Trade, solar, pool and fence
+  permits stay in with the building work. The issue date is midnight UTC on
+  1,257 of them and carries a time of day on 33, so the window runs on the
+  server and the cross-run dedup drops the permits already published.
+- **Reach:** the 90 days from 2025-08-17 held 1,329, the most in the two
+  years before, so the cap is 2,500, read in pages of 1,000.
+- **Ids:** the permit number keys each event; none repeated in the window.
+- **Freshness:** 4 permits issued on 2026-10-02 were in the layer by 14:41Z
+  that day, so it refreshes at least daily. `expected_cadence_days` is 3.
+- **Personal data:** `select` names ten columns; the project name, the
+  free-text description and the portal links stay on the server.
+- **Mapping:** the permit number, the issue and application dates, the work
+  class and then the type as the job type, the status, the value (zero on
+  most trade permits), the site address and the parcel number. Model permits
+  (homes built from a plan the City approved once: 141 in the window,
+  averaging 2,331 square feet and $288,769) and new dwellings (29) are the
+  new homes, but the job type codes read neither as new construction; new
+  dwellings do read so in the normalized type. Additions and alterations
+  read as alterations and demolitions as their own class; the rest falls to
+  the catch-all class.
+- **Placement:** each permit at its own point. About a fifth lie in the
+  City's southern and south-eastern annexations, south of 32.15° N or east of
+  110.78° W, outside the metro box, and the clip skips them; widening the box
+  would change the metro's grid tiles and is left for its own change. No
+  geocoder is asked.
+- **Poll:** every six hours, the whole window as a snapshot, newest first by
+  `ISSUEDATE DESC, OBJECTID DESC`.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live layer at 16:23Z, Kafka mocked. The first read
+  1,290 rows in three requests and published 1,016 permits issued from
+  2026-07-06 to 2026-10-02; it skipped 274 outside the box and dead-lettered
+  none. 182 read as alterations, 14 as demolitions and 820 in the catch-all
+  class; by normalized type, 26 are new construction, 182 major renovations
+  and 150 mechanical, electrical or plumbing work. By status, 584 are issued,
+  385 in inspections and 36 with inspections complete. The second read the
+  same rows in two requests and published nothing. Neither poll queried a
+  geocoder.
+
 ## Held
 
 | Metro (missing) | Source | Why held | Re-check when |
@@ -311,6 +471,13 @@ The north-eastern and western groups follow with their registrations.
 | Beaumont (`permits`) | The City's Cityworks server publishes the new residential and commercial permits still open, for its "Construction and SUP Map" (`cityworks.beaumonttexas.gov/CityworksNAD/gis/1/1/rest/services/qe/FeatureServer/8` and `/7`): 80 and 37 rows on 2026-10-02, 20 and 9 issued in 90 days, with times of day; a permit leaves when it closes, and the server rejects relative dates. | New construction only, and only while open. Registered as the metro's permits, they would mark Beaumont as covered while missing its trade, roofing and remodelling permits. | The City publishes all its permits. |
 | Texarkana (`permits`) | MyGov's daily "Permits Issued in the last month" workbook for the Texas city (`public.mygov.us/tx_texarkana`, report 370): 289 permits started in about a month, each with its number and address, 170 of them issued (2026-09-01 to 2026-10-02). Its dates are text (`MM/DD/YYYY`) and it has no coordinates; the five-year workbook beside it (14,142 rows) has no permit number and lists health inspections, restaurant permits, zoning and street cuts among its types. | The Excel client compares text dates as strings and drops the spec's date format, so it can neither window nor order the workbook, and nothing in the workbook separates building permits from the rest. | The Excel client reads text dates as dates. |
 | Abilene (`permits`) | MyGov's "TCADBuildingPermitsWithProjInfo" workbook for the City (`public.mygov.us/tx_abilene`, report 371): 652 permits, each with its number and coordinates, all issued in August 2026. It is generated once a month (last on 2026-09-28), each file replaces the last, and its times read "MM/DD/YYYY at H:MM AM". The City's other permit reports are PDFs, and its GIS server reset the connection twice. | Monthly and a month behind, and the permits producer cannot read its dates. | MyGov publishes a daily permits workbook, or a monthly feed is accepted and the producer reads the format. |
+| Tucson (`deeds`) | Pima County Assessor's yearly "Affidavit of Sales" files (`www.asr.pima.gov/Downloads/Data/sales/2026//SALE2026.ZIP`), rebuilt nightly, 15 columns with no names or addresses. The 2026 file held 14,165 sales recorded from 2026-01-02 to 2026-09-25, 4,257 in the 90 days to 2026-10-02, unique by sequence number and parcel; a join to Pima's parcel centroids placed 4,256 of them, 1,719 inside the metro box. The files are keyed by the year of sale, so a sale closed in one year and recorded in the next sits in the earlier file (the 2025 file holds 813 sales recorded in January 2026, 438 in February and 651 in March). | The CSV client reads one fixed file, and the scheduler's year map names zip members, not URLs: a spec would need its URL and member changed each January and would miss the previous year's late recordings through March. | The CSV client reads a year-templated URL with the previous year's file beside it. |
+| Long Beach (`311`) | The City's "Go Long Beach" requests on its OpenDataSoft portal (`data.longbeach.gov`, `service-requests`): 353,242 since 2020-09-21, about 200 a day, refreshed about hourly. The CSV export takes a filter and named columns (19,090 in 90 days, case numbers unique, no requester columns), but each request's point is one quoted `lat, lon` column. | The CSV client and the 311 producer cannot split a composite point, the server cannot split it for them, and the rows carry no address to place them by. | The CSV client splits a `lat, lon` column, or an OpenDataSoft client is built. |
+| Buffalo (`311`) | The City's Salesforce CRM mirrors public works' holes-in-road work orders to ArcGIS Online for its pothole tracker (`services8.arcgis.com/BMPgiPHUrkqJdtki`, `SF_Work_Order_Holes_In_Road_(view)/FeatureServer/1`): 5,420 since 2024-08-26, 873 in 90 days, unique work order numbers, each at its point. | One kind of request: potholes, cave-ins and other holes. Registered as the metro's `311`, it would mark Buffalo as covered while the CRM's other requests stay unpublished. | The City publishes its CRM requests as one layer with ids. |
+| Manchester, NH (`311`) | Public works' Maximo tickets on the City's server (`DPW/SRPOINTS/FeatureServer`): 4,025 open and 60,847 closed, each at its point, from missed pickups to potholes, cave-ins and tree pruning, internal and resident tickets mixed; the dates are text. | Resident ticket intake stopped: the newest report was filed on 2026-09-02, 30 days before, though work orders still arrive. Residents now report through "Manchester NH Connect", a SeeClickFix app. | Tickets arrive again, or SeeClickFix publishes a view for the City. |
+| Buffalo (`deeds`) | The City's 2026-27 assessment roll (`gis.buffalony.gov/server/rest/services/Tax/Parcels_20262027/FeatureServer/0`, 93,453 parcels) carries a sale price on 75,983 parcels, with deed book and page. | The deed date is empty on every row; the 2025-26 layer rejects queries on it, and Erie County's parcels carry no price. | The roll's deed dates load. |
+| Des Moines (`deeds`) | Polk County Assessor's yearly residential sales file (`www.assess.co.polk.ia.us`, `info/web/exports/res/sales/polk/2026.csv`): 5,667 sales from 2026-01-01 to 2026-07-28 across the metro's cities, unique by book and page, all priced, placed only by site address. | The newest sale was 66 days old and the file was built on 2026-08-18; the 2025 file was rebuilt the same day and the 2024 file last on 2025-12-31, so rebuilds are irregular. The Auditor's parcel table, which carries the latest deed date without a price, sits on a host closed to these probes. | The file is rebuilt monthly or faster. |
+| Santa Rosa (`deeds`) | Sonoma County's "Parcels Public" layer (`socogis.sonomacounty.ca.gov`, `CRAPublic/ParcelsPublic/FeatureServer/0`, 189,239 parcels) carries each parcel's latest sale: recording date, document number and price. | The Assessor posts sales about 145 days late: 23 were recorded in the 90 days to 2026-10-02, against 291 to 550 a month through April 2026, and the layer is complete only through 2026-05-11. | Posting catches up, or a window of about nine months is accepted. |
 
 ## Not now
 
@@ -333,3 +500,19 @@ The north-eastern and western groups follow with their registrations.
 | Lake Charles (`permits`, `311`) | Permits live in MGO Connect, and the City posts monthly permit reports as PDFs (newest July 2026); the parish GIS holds reference layers. The "ONE LC Action Line" runs on SeeClickFix. Louisiana does not disclose sale prices. | A permits layer appears or SeeClickFix publishes a view for the City. |
 | Lexington (`permits`, `deeds`) | Permits live in Accela Citizen Access; LFUCG's ArcGIS Online org holds right-of-way permits and annual summaries, and its Hub finds no permits dataset. The Fayette County PVA publishes its sales as weekly PDF reports, and LFUCG's parcel layers carry no sale fields. | A permits layer appears, or the PVA publishes its sales as a table. |
 | Monroe (`permits`, `311`) | Permits live in MGO Connect; the City's "Permitted Projects" layer is a one-off export of 203 permits from 2025-08-01 to 2026-03-13, last edited on 2026-03-18. Requests run on SeeClickFix. Louisiana does not disclose sale prices. | A current permits layer appears or SeeClickFix publishes a view for the City. |
+| Albany (`permits`, `311`, `deeds`) | The City's ArcGIS Online org (231 items) holds reference layers and a 2023 parcels layer made for EnerGov, which likely runs its permits; its Hub answers 401. Requests go through SeeClickFix, whose public org holds no Albany view. Albany County's 2026 parcels, the state's tax parcels and the annual roll on `data.ny.gov` carry deed book and page only; New York's sales search is interactive, and its certificate did not verify here. | A permits layer, a SeeClickFix view or a sales table appears. |
+| Buffalo (`permits`) | The open data portal still refuses the permits dataset's rows (403, as on 2026-08-27), and the City's GIS server holds Infor/Hansen base layers only. | The dataset's rows open, or a permits layer appears. |
+| Syracuse (`permits`, `311`, `deeds`) | Permit applications moved to Camino, and the City's ArcGIS export of permits stops on 2025-08-16; requests moved to SeeClickFix, and the SYRCityline export stops on 2025-02-27. The City's 2025 parcel map has no sale fields, and no Onondaga County sales layer turned up. | Camino or SeeClickFix publishes rows, or a sales table appears. |
+| Harrisburg (`permits`, `311`, `deeds`) | The City's website answered with a Cloudflare challenge (403) and was not asked again. The City's ArcGIS org holds street-cut and parking permits, a static workbook from 2025 and a Tyler tile service; the only request form is a Survey123 layer last edited in 2023. The City's parcel snapshot carries a purchase date with a 99/99/1999 sentinel and no price, and Dauphin County's tables carry document numbers only. | A permits or requests layer appears, or a sales table. |
+| Manchester, NH (`permits`) | Permits run on CentralSquare TRAKiT, whose map service holds address, place and parcel points only, and the City's permit page links PDF forms. | A permits layer appears. |
+| Portland, ME (`permits`, `311`, `deeds`) | The City's GIS server holds EnerGov base layers, capital projects and a static demolitions list. Requests run on SeeClickFix; the City's website failed its certificate check and was not queried. Parcel layers carry no price, and the Cumberland County registry is interactive only. | A permits layer or a SeeClickFix view appears, or a sales table. |
+| Dover (`permits`, `311`, `deeds`) | The City's permits layer covers 2018 alone, and the state's permits layer is annual, its newest year 2024. Kent County's permits layer is current to 2026-09-04 but covers the County's own jurisdiction: 5 of its 139 permits of 2026 lie inside the City. The road-problem layer needs a token, the request forms are write-only, and Kent County's parcels carry deed references only. The City's website returned an error page and was not asked again. | The City publishes its permits or requests, or Kent County its sales. |
+| Wilmington, DE (`permits`, `311`, `deeds`) | The City's website answered with an Akamai "Access Denied" (403) and New Castle County's GIS with "Request Blocked" (472), and neither was asked again. The City's ArcGIS org and Hub hold no permit or request layers, and its copy of the County's parcels has no sale fields. | The County's sales layer can be read, or the City publishes permits or requests. |
+| Des Moines (`permits`, `311`) | Permits live in Tyler EnerGov's self-service portal, which answers an anonymous JSON search that no client here reads, and requests run on CitySourced and Tyler Portico with no public rows. West Des Moines's permit reports page answered with Akamai "Access Denied" (403). The City's Hub (62 datasets) holds neither. | An EnerGov client is built, or a permits or requests layer appears. |
+| Grand Rapids (`permits`, `311`, `deeds`) | Permits live in BS&A Online and Accela, with no rows on the City's server, whose CRM services are spatial-join helpers without requests. Kent County's parcels carry no sale fields and its Hub is private. Ottawa County's arm's-length sales are current (706 in 90 days) but reach only the lakeshore townships at the box's west edge: 126 of the 706 lie inside it. | Kent County publishes its sales, or a permits or requests layer appears. |
+| Madison (`permits`, `311`, `deeds`) | Unchanged since the 2026-09-30 probe: permits sit in Accela's interface, requests go through a web form, the City's owner-change date is empty, and Wisconsin's transfer returns sit in a session-only app. | A permits, requests or sales layer appears. |
+| Long Beach (`permits`, `deeds`) | The City's open data portal lists 15 datasets, none of them permits or sales, and its ArcGIS org holds an annual housing report and 61 development projects. Los Angeles County's sales layer stopped on 2024-06-05. | A permits layer or a current sales source appears. |
+| Modesto (`permits`, `311`, `deeds`) | The City's ArcGIS org (68 services) holds 2021 dashboards and reference layers; its TrakIT folder answered 403 to the August probe and its GIS host refuses the default User-Agent, so neither was asked. Requests run on PublicStuff, whose API returns requester fields with no way to leave them out. Stanislaus County publishes no sale prices. | A permits layer appears, or a request source without requester fields. |
+| Santa Rosa (`permits`, `311`) | The City's permit layers are post-fire rebuild records last updated in 2020 and 2024, and Sonoma County's permit datasets cover unincorporated parcels and stop on 2025-05-30. Requests run on Accela's request management with no public rows. | A permits or requests layer appears. |
+| Stockton (`permits`, `311`, `deeds`) | The City's Socrata permits stop on 2022-06-30 and its public works requests on 2024-03-26; "Ask Stockton" now runs on GOGov, and the GIS server's Accela folder needs a token. San Joaquin County's parcels carry no sale fields. | Current permits or requests appear. |
+| Tucson (`311`) | Requests run on SeeClickFix (the City's app is SeeClickFix's), and SeeClickFix's public org holds no Tucson view; the City's Hub finds none. | SeeClickFix publishes a view for the City. |

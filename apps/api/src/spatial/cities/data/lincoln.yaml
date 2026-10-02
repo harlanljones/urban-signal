@@ -439,6 +439,36 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+  deeds:
+    endpoint: https://gis.lincoln.ne.gov/public/rest/services/Assessor/PropertySales/FeatureServer/0
+    platform: arcgis
+    watermark_col: RecordedDate
+    id_keys:
+    - InstNum
+    topic: raw.municipal.deeds
+    interval_seconds: 21600.0
+    producer_key: deeds
+    order_by: RecordedDate DESC, OBJECTID DESC
+    select: OBJECTID,InstNum,PID,InstType,SalePrice,RecordedDate
+    where: RecordedDate >= CURRENT_DATE - INTERVAL '90' DAY AND RecordedDate <= CURRENT_TIMESTAMP
+    needs_geocode: false
+    field_map:
+      doc_id:
+      - InstNum
+      recorded_date:
+      - RecordedDate
+      document_amount:
+      - SalePrice
+      bbl:
+      - PID
+      doc_type:
+      - InstType
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 4000
+    expected_cadence_days: 7
+    batch_limit: 2500
+    metro_clip: true
 aliases:
 - lincoln_ne
 - lincoln-ne

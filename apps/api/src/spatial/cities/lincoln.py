@@ -31,7 +31,7 @@ on the city's public ArcGIS server. The 2026-08-30 probe left 311, SLA and
 DEEDS at Tier 3: it found only a request form for 311, the SLA is
 supplemented by the Nebraska SOS corporate registry, and deeds are recorded
 through the Lancaster County Register of Deeds with no public bulk sales
-feed. The SLA and 311 notes below record what has registered since.
+feed. The SLA, 311 and DEEDS notes below record what has registered since.
 
 Live-probe caveats that define this leaf (2026-08-30, US-426):
 
@@ -65,6 +65,18 @@ SeeClickFix's request ``id`` and filtered to public requests; the address,
 assignee, photo and page links and the editing accounts are never selected.
 Requests just south of the metro box are kept. The corpus registers this
 feed; the feed mirror below carries PERMITS only.
+
+DEEDS (2026-10-02): the Lancaster County Assessor's property sales of the
+last 12 months on the City-County GIS server (``Assessor/PropertySales/
+FeatureServer/0``, 3,980 points on 2026-10-02), each with its instrument
+number, parcel, price and recording date. The poll reads the sales recorded
+in the 90 days before it (986 county-wide on 2026-10-02) and keeps the ones
+inside the metro box; sales reach the layer four to seven days after they
+are recorded. Keyed on the instrument number, which repeats only where the
+layer lists a sale twice. The buyer, the seller, the layer's display name,
+the appraiser and the photo link are never selected. The County's sales
+items on the open data hub stop at 2018. The corpus registers this feed; the
+feed mirror below carries PERMITS only.
 """
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
@@ -387,7 +399,8 @@ LINCOLN_DIVISIONS: dict[str, BoroughMeta] = {
 # Probed 2026-08-30 (US-426). Do not register the Lincoln 311 request form
 # (311 reads SeeClickFix's public view, which the corpus registers), the
 # Lincoln SOS or NE state-level feeds, or Lancaster County Register of Deeds
-# (no bulk sales API).
+# (no bulk sales API; deeds read the Assessor's sales layer, which the corpus
+# registers).
 # ---------------------------------------------------------------------------
 LINCOLN_PERMITS_ENDPOINT = (
     "https://gis.lincoln.ne.gov/public/rest/services/Planning/"

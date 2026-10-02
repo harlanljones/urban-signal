@@ -202,6 +202,17 @@ repeated permit numbers are dropped. The caps hold the 3,786 applications of
 the 90 days from 2025-04-10, the 1,136 permits from 2024-10-12 and the 2,445
 from 2025-07-09, the busiest windows found.
 
+Lincoln `deeds` (986 rows, cap 2,500), Manchester `deeds` (521 rows, default
+cap) and Tucson `permits` (1,290 rows, cap 2,500) joined on 2026-10-02
+(`one-family-depth-2026-10-02.md`). Lincoln reads the Lancaster County sales
+recorded in the 90 days before each poll, newest first; Manchester the City's
+parcels whose latest sale, cast from text, falls in them, paged by object id;
+and Tucson the City's residential permits issued in them, newest first. The
+clips skip 179, 22 and 274 rows outside the metro boxes, and 805, 496 and
+1,016 publish once the repeated rows are dropped. The caps hold the 1,371
+sales of the 90 days from 2026-04-19, the 735 from 2026-05-04 and the 1,329
+permits from 2025-08-17, the busiest windows found.
+
 ## Newest-first windows
 
 | Feed | Order | Rows dated in last 30 / 90 days | Window after |

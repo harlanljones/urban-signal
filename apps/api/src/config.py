@@ -2699,4 +2699,22 @@ class Settings(BaseSettings):
         default="https://services1.arcgis.com/Mg7DLdfYcSWIaDnu/arcgis/rest/services/CitizenRequests_public/FeatureServer/0",
         description="Lexington KY LexCall citizen requests layer URL, rolling 30 days (LFUCG ArcGIS Online)",
     )
+    # Lincoln deeds (2026-10-02): the Lancaster County Assessor's sales of
+    # the last 12 months, one point per sale, on the City-County GIS server.
+    arcgis_lincoln_deeds_url: str = Field(
+        default="https://gis.lincoln.ne.gov/public/rest/services/Assessor/PropertySales/FeatureServer/0",
+        description="Lancaster County Assessor property sales layer URL, last 12 months (Lincoln NE deeds snapshot)",
+    )
+    # Manchester NH deeds (2026-10-02): the City's parcels, each with its
+    # latest sale, refreshed daily on the City GIS server.
+    arcgis_manchester_deeds_url: str = Field(
+        default="https://ags.manchesternh.gov/agsgis7/rest/services/Community/Parcels/MapServer/0",
+        description="City of Manchester NH parcels layer URL, latest sale per parcel (Manchester deeds snapshot)",
+    )
+    # Tucson permits (2026-10-02): the City's residential building permits
+    # from EnerGov, one point per permit, on the City GIS server.
+    arcgis_tucson_permits_url: str = Field(
+        default="https://gis.tucsonaz.gov/public/rest/services/PublicMaps/PermitsCode/MapServer/85",
+        description="City of Tucson residential building permits layer URL (City GIS)",
+    )
 settings = Settings()

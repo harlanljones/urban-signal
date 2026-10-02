@@ -77,6 +77,10 @@ FULL_READ_ROWS = {
     ("glendale_az", "deeds"): 1_263,
     ("hartford", "deeds"): 353,
     ("inland_empire", "sla"): 10_585,
+    # Lancaster County sales recorded in the spec's 90-day window,
+    # county-wide, newest 2026-09-28, read 2026-10-02; 807 of them lie in the
+    # metro box. The 90 days from 2026-04-19 held 1,371.
+    ("lincoln", "deeds"): 986,
     # Polk County sales on parcels numbered 23 to 25, dated in the spec's
     # 90-day window, read 2026-10-02 (the extract rebuilt that night, newest
     # 2026-09-24); 1,885 of them place inside the metro box. The 90 days from
@@ -87,6 +91,10 @@ FULL_READ_ROWS = {
     # reviews, newest 2026-10-01, read 2026-10-02. The 90 days from 2024-10-12
     # held 1,136.
     ("longview", "permits"): 1_027,
+    # City of Manchester parcels whose latest sale falls in the spec's
+    # 90-day cast window, newest 2026-09-17, read 2026-10-02; 499 of them lie
+    # in the metro box. The 90 days from 2026-05-04 held 735.
+    ("manchester", "deeds"): 521,
     # Jackson County sales whose SiteCity is MEDFORD, dated in the spec's
     # 90-day window, read 2026-09-30.
     ("medford", "deeds"): 304,
@@ -130,6 +138,10 @@ FULL_READ_ROWS = {
     # lie in the metro box. May to July 2026 held 6,441.
     ("tampa", "deeds"): 3_886,
     ("tempe", "deeds"): 783,
+    # City of Tucson residential building permits issued in the spec's
+    # 90-day window, newest 2026-10-02, read 2026-10-02; 1,016 of them lie in
+    # the metro box. The 90 days from 2025-08-17 held 1,329.
+    ("tucson", "permits"): 1_290,
     # Clark County taxlots whose latest sale is dated in the spec's 90-day
     # window, county-wide, newest 2026-09-11, read 2026-10-02; 1,113 lie in
     # the metro box. The 90 days from 2026-04-01 held 4,221.

@@ -207,6 +207,10 @@ inside the metro box, polled live on 2026-09-30):
 | Portland ME | the parcel layers have no sale fields; the one deed-dated layer has seven dated rows, the newest from 2005 | 92 |
 | Wilmington DE | New Castle County's `PropertySales` MapServer could not be checked (its host answers HTTP 472 to this network), and its ArcGIS Online records describe yearly layers for 2013 to 2019 only | 144 |
 
+Manchester's deeds came back on 2026-10-02: the City's own parcel layer
+(`ags.manchesternh.gov`) carries each parcel's latest sale
+([one-family-depth-2026-10-02.md](one-family-depth-2026-10-02.md)).
+
 Two cities needed more than a spec edit. Roanoke's replacement needed the
 parcel join in `poll_job`, which the third change adds (see "Incremental
 filters"), and Richmond's needed a workbook reader, which the fourth adds (see

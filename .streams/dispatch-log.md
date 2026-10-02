@@ -1867,3 +1867,22 @@ Worth keeping:
 - **A table can repeat its subject by design.** Longview's permits repeat
   once per review period; one `PERIOD_NUMBER` condition, found by counting
   distinct permit numbers in a page, makes it one row per permit.
+
+### 2026-10-02 — North-eastern and western one-family feeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| northeast-west-feeds | `.streams/northeast-west-feeds.md` | `config.py` (the three sources) | 2026-10-02 | done (Lincoln deeds 986 read, 805 published; Manchester deeds 521 and 496; Tucson permits 1,290 and 1,016; each second poll published none); Tucson deeds, Long Beach, Buffalo and Manchester `311`, and Buffalo, Des Moines and Santa Rosa deeds held | `deeds` specs for Lincoln and Manchester NH; a `permits` spec for Tucson; notes in `docs/research/one-family-depth-2026-10-02.md`; regenerated facts |
+
+Lincoln moves to all four signal families (four-family tier 30 to 31), and
+Manchester and Tucson from one family to two (two-family tier 54 to 56,
+one-family tier 29 to 27).
+
+Worth keeping:
+
+- **Look for a suppression flag before reading a parcel layer.** Manchester's
+  parcels carry `Suppress_Internet_Access`; the 58 flagged parcels stay out
+  of the window even though none sold in it.
+- **Count work classes with their values.** Tucson's "model permits" read as
+  nothing in particular until their average value ($288,769) and size (2,331
+  square feet) showed them to be new homes.

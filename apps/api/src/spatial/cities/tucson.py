@@ -75,6 +75,22 @@ original probe 2026-08-27):
   12,424; ORO VALLEY 1,021; MARANA 672; SOUTH TUCSON 249); metro bbox
   containment gates ingestion, and the Oro Valley edge division is
   evidenced by those 1,021 rows.
+
+PERMITS (2026-10-02): the City's EnerGov residential building permits on its
+own server (``PublicMaps/PermitsCode/MapServer/85``), which the August probes
+did not find: 20,003 points, the oldest issued in 1997, refreshed daily, each
+with its number, parcel, status, type, work class, value and dates. The poll
+reads the permits issued in the 90 days before it (1,290 on 2026-10-02), a
+window on the server since the issue date carries a time of day on a few
+rows. Model permits (homes built from a plan the City approved once, 141 in
+that window) and new dwellings (29) are the new homes; the job type codes
+read neither as new construction, though new dwellings do in the normalized
+type. The commercial layer (81, 315 permits in the window) is not
+registered, and the multi-family layer (84) stopped on 2025-03-14. About a
+fifth of the permits lie in the City's southern and south-eastern
+annexations, outside the metro box, and are clipped. The project name and
+the free-text description are never selected. The corpus registers this
+feed; the feed mirror below carries SLA only.
 """
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
@@ -334,7 +350,8 @@ TUCSON_DIVISIONS: dict[str, BoroughMeta] = {
 # ---------------------------------------------------------------------------
 # Feed specs (leaf-local; the spine copies these into REGISTRY).
 # Probed 2026-08-27, re-probed 2026-08-28. Do not register the frozen
-# PDSD_PERMITS_ALL archive, 311, deeds, or sibling MapServer layers.
+# PDSD_PERMITS_ALL archive (permits read PermitsCode/MapServer/85, which the
+# corpus registers), 311, deeds, or sibling MapServer layers.
 # ---------------------------------------------------------------------------
 TUCSON_SLA_ENDPOINT = (
     "https://gis.tucsonaz.gov/arcgis/rest/services/"

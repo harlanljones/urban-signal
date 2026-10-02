@@ -8,10 +8,23 @@ Boston/Worcester leaf boxes).
 
 Feeds: SLA reads the SNAP retailer slice (``snap_sla_spec``, New Hampshire
 stores inside the metro box). The DEEDS feed registered until 2026-09-30 named
-an ArcGIS Online organisation that does not exist, and no public sale source
-exists: the assessor publishes through a per-property Vision site, NH GRANIT
-parcels carry no sale fields, and the state's PA-34 sales go to municipalities
-only. Permits and 311 remain unregistered.
+an ArcGIS Online organisation that does not exist; the probe that retracted it
+found the assessor's per-property Vision site, NH GRANIT parcels without sale
+fields and the state's PA-34 sales going to municipalities only. Permits
+(CentralSquare TRAKiT, no permit rows on the City's server) and 311
+(SeeClickFix; the DPW ticket layer's resident intake stopped after
+2026-09-02) remain unregistered.
+
+DEEDS (2026-10-02): the City's own GIS server publishes its parcels
+(``Community/Parcels/MapServer/0``, 33,997 polygons, refreshed daily), each
+with its latest sale: book and page, price, and the sale date as unpadded
+``M/D/YYYY`` text. The server casts the text, so the poll reads the sales of
+the 90 days before each poll (521 on 2026-10-02) and drops the ones it has
+already published; a watermark on the sale date would skip the sales the
+assessor posts two to four weeks after they close. A row is its parcel, sale
+date and book and page, since one deed can convey several parcels. Owners and
+their mailing addresses are never selected, and the 58 parcels the City keeps
+off its internet maps stay out of the window. The corpus registers this feed.
 """
 
 
