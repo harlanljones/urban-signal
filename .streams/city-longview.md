@@ -23,6 +23,8 @@ Register CityId.longview (Longview, TX) as a new Urban Signal metro. Deliver a v
 
 - 2026-08-28 07:10 UTC — No verifiable municipal permits API identified pre-commit; register SLA (SNAP Retailers, TX slice) only via `snap_sla_spec("TX")`. Expand with permits in a follow-up once a public endpoint is proven.
 
+- 2026-10-02 — Permits registered from the City's Cityworks dashboard layer (`cloud.longviewtexas.gov`, `Building_Permit_Dashboard/MapServer/2`), one row per permit (stream `texas-south-feeds`, `docs/research/one-family-depth-2026-10-02.md`). `311` runs on CitySourced with no current layer.
+
 ## Current step
 
 Leaf complete: `longview.py` geometry and containment tests authored.

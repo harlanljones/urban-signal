@@ -1067,13 +1067,18 @@
       "division_count": 6,
       "submarket_count": 7,
       "feeds": [
-        false,
+        true,
         false,
         true,
         false
       ],
       "platforms": [
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "ISSUE_DATE",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.permits"
+        },
         null,
         {
           "platform": "arcgis",
@@ -2688,13 +2693,18 @@
       "submarket_count": 11,
       "feeds": [
         false,
-        false,
+        true,
         true,
         false
       ],
       "platforms": [
         null,
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "CreatedDate",
+          "interval_seconds": 900.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "",
@@ -2787,13 +2797,18 @@
       "division_count": 5,
       "submarket_count": 7,
       "feeds": [
-        false,
+        true,
         false,
         true,
         false
       ],
       "platforms": [
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "DATE_ISSUED",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.permits"
+        },
         null,
         {
           "platform": "socrata",
@@ -3187,13 +3202,18 @@
       "division_count": 5,
       "submarket_count": 9,
       "feeds": [
-        false,
+        true,
         false,
         true,
         false
       ],
       "platforms": [
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "ApplyDate",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.permits"
+        },
         null,
         {
           "platform": "socrata",
@@ -3803,13 +3823,18 @@
       "submarket_count": 7,
       "feeds": [
         false,
-        false,
+        true,
         true,
         false
       ],
       "platforms": [
         null,
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "created_at",
+          "interval_seconds": 900.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "socrata",
           "watermark_col": "updated",
@@ -5608,13 +5633,18 @@
       "submarket_count": 8,
       "feeds": [
         false,
-        false,
+        true,
         true,
         false
       ],
       "platforms": [
         null,
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "DateCreated",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "socrata",
           "watermark_col": "updated",

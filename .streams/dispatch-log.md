@@ -1849,3 +1849,21 @@ Worth keeping:
 - **A layer's object-id field is whatever it types as one.** Larimer's
   parcels name none and call theirs `OBJECTID_1`; paging by `OBJECTID` failed
   every join until the client asked the field types.
+
+### 2026-10-02 — Texas and southern one-family feeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| texas-south-feeds | `.streams/texas-south-feeds.md` | `config.py` (the six sources) | 2026-10-02 | done (Midland permits 2,622 read, 2,606 published; Longview 1,027 and 1,002; Charleston SC 2,363 and 2,310; Odessa `311` 1,000 and 863; Waco 1,000 and 1,000; Lexington 1,000 and 1,000; each second poll published none); Charleston deeds and `311`, and Tyler, Beaumont, Texarkana and Abilene permits held | `permits` specs for Midland, Longview and Charleston SC; `311` specs for Odessa, Waco and Lexington; notes in `docs/research/one-family-depth-2026-10-02.md`; regenerated facts |
+
+Midland, Longview, Charleston SC, Odessa, Waco and Lexington move from one
+signal family to two (two-family tier 48 to 54, one-family tier 35 to 29).
+
+Worth keeping:
+
+- **Count a layer's rows by month before trusting its dates.** Midland's
+  issue dates looked current but had stopped following the permits; the
+  monthly counts against applications showed it in one request.
+- **A table can repeat its subject by design.** Longview's permits repeat
+  once per review period; one `PERIOD_NUMBER` condition, found by counting
+  distinct permit numbers in a page, makes it one row per permit.

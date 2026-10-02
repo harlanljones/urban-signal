@@ -2,7 +2,18 @@
 
 Leaf module: geometry only. Feed specs live in the spine (city_registry) and
 are currently limited to SNAP Retailers (TX slice) pending a verifiable public
-city permits endpoint (data.texas.gov probe TBD per US-272).
+city permits endpoint (data.texas.gov probe TBD per US-272). (Permits still
+unregistered 2026-10-02: they live in Tyler EnerGov, whose GIS layers are
+empty.)
+
+311 (2026-10-02): the City's MyWaco requests (CitySourced), synced nightly at
+about 03:00 UTC to a hosted layer on the City's ArcGIS Online org
+(``MyWacoRequests/FeatureServer/6``): one point per request since December
+2021, 22,861 on 2026-10-02. 59% of recent requests are marked private, so the
+spec reads ``IsPrivate = 0`` only, newer than its watermark on
+``DateCreated``, every six hours. The author, assignee, customer and creator
+names and the description, address, device and image columns are never
+requested.
 """
 
 from typing import Dict

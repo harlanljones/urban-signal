@@ -189,6 +189,19 @@ situs and code area; 145 lines in the box repeat one). The caps hold the
 4,334 sales of the 90 days from 2025-02-24, the 4,337 from 2025-03-31 and the
 3,092 from 2026-04-20, each the busiest window in the years checked.
 
+Midland `permits` (2,622 rows, cap 5,000), Longview `permits` (1,027 rows,
+cap 2,500) and Charleston SC `permits` (2,363 rows, cap 5,000) joined on
+2026-10-02 (`one-family-depth-2026-10-02.md`). Each reads its city's permit
+layer whole, newest first, every six hours, without the kinds of permit that
+are not building work: Midland the applications made in the 90 days before
+each poll, since its issue dates stopped following the permits, and Longview
+and Charleston the permits issued in them, Longview's at one row per permit
+of the several its review periods give. Each permit sits at its own point;
+the clips skip 12, 25 and 52, and 2,606, 1,002 and 2,310 publish once the
+repeated permit numbers are dropped. The caps hold the 3,786 applications of
+the 90 days from 2025-04-10, the 1,136 permits from 2024-10-12 and the 2,445
+from 2025-07-09, the busiest windows found.
+
 ## Newest-first windows
 
 | Feed | Order | Rows dated in last 30 / 90 days | Window after |

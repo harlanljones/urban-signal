@@ -52,6 +52,11 @@ FULL_READ_ROWS = {
     # Assessor): the deeds dated in each spec's 90-day window inside its
     # JURISDICTION, read 2026-09-30.
     ("chandler", "deeds"): 1_573,
+    # City of Charleston permits issued in the spec's 90-day window, less the
+    # permits that are not building work, newest 2026-09-30, read 2026-10-02;
+    # 52 carry no point. The busiest 90 days the layer holds, from 2025-07-09,
+    # held 2,445.
+    ("charleston_sc", "permits"): 2_363,
     # Mecklenburg County transfers dated in the spec's 90-day window, newest
     # 2026-09-22, read 2026-09-30.
     ("charlotte", "deeds"): 8_925,
@@ -77,9 +82,18 @@ FULL_READ_ROWS = {
     # 2026-09-24); 1,885 of them place inside the metro box. The 90 days from
     # 2025-02-17 held 5,272.
     ("lakeland", "deeds"): 3_464,
+    # City of Longview permits issued in the spec's 90-day window, first
+    # review period only, less contractor registrations, right-of-way work and
+    # reviews, newest 2026-10-01, read 2026-10-02. The 90 days from 2024-10-12
+    # held 1,136.
+    ("longview", "permits"): 1_027,
     # Jackson County sales whose SiteCity is MEDFORD, dated in the spec's
     # 90-day window, read 2026-09-30.
     ("medford", "deeds"): 304,
+    # City of Midland permit applications made in the spec's 90-day window,
+    # less the names that are not building work, newest 2026-10-01, read
+    # 2026-10-02; 10 carry no point. The 90 days from 2025-04-10 held 3,786.
+    ("midland", "permits"): 2_622,
     ("milwaukee", "deeds"): 5_685,
     ("milwaukee", "sla"): 1_275,
     ("modesto", "sla"): 4_574,

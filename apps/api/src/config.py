@@ -2660,4 +2660,43 @@ class Settings(BaseSettings):
         default="https://apps.co.marion.or.us/AO/PropertySalesData/2026SalesData.csv",
         description="Marion County Assessor 2026 sales file, 2026SalesData.csv (Salem OR deeds snapshot)",
     )
+    # Midland permits (2026-10-02): the City's EnerGov permits as points on
+    # ArcGIS Online, one per application since 2000, reloaded daily.
+    arcgis_midland_permits_url: str = Field(
+        default="https://services.arcgis.com/0H6bQdxd9223gQB5/arcgis/rest/services/Permits/FeatureServer/0",
+        description="Midland TX permits layer URL, one point per application (City-hosted)",
+    )
+    # Longview permits (2026-10-02): the City's Cityworks permits behind its
+    # building permit dashboard, on the City GIS server.
+    arcgis_longview_permits_url: str = Field(
+        default="https://cloud.longviewtexas.gov/arcgis/rest/services/AGOL/Building_Permit_Dashboard/MapServer/2",
+        description="Longview TX building permit dashboard layer URL (City GIS)",
+    )
+    # Charleston SC permits (2026-10-02): the City's active permits, a rolling
+    # 18 months, on the City GIS server.
+    arcgis_charleston_sc_permits_url: str = Field(
+        default="https://gis.charleston-sc.gov/arcgis2/rest/services/External/Applications/MapServer/20",
+        description="City of Charleston SC active permits layer URL (City GIS)",
+    )
+    # Odessa 311 (2026-10-02): the City's SeeClickFix requests, published to
+    # the City's ArcGIS Online org since June 2025.
+    arcgis_odessa_311_url: str = Field(
+        default=(
+            "https://utility.arcgis.com/usrsvcs/servers/d29bb427c9bc497fae24cbd89f5b8b6d/rest/services/"
+            "ServiceRequests_OdessaTX/FeatureServer/0"
+        ),
+        description="Odessa TX SeeClickFix service requests layer URL (City ArcGIS Online)",
+    )
+    # Waco 311 (2026-10-02): the City's MyWaco requests, synced nightly to the
+    # City's ArcGIS Online org.
+    arcgis_waco_311_url: str = Field(
+        default="https://services2.arcgis.com/oUXiR7ziAPAzGw6X/arcgis/rest/services/MyWacoRequests/FeatureServer/6",
+        description="Waco TX MyWaco service requests layer URL (City ArcGIS Online)",
+    )
+    # Lexington 311 (2026-10-02): LFUCG's LexCall requests, a rolling 30
+    # days on its ArcGIS Online org.
+    arcgis_lexington_311_url: str = Field(
+        default="https://services1.arcgis.com/Mg7DLdfYcSWIaDnu/arcgis/rest/services/CitizenRequests_public/FeatureServer/0",
+        description="Lexington KY LexCall citizen requests layer URL, rolling 30 days (LFUCG ArcGIS Online)",
+    )
 settings = Settings()

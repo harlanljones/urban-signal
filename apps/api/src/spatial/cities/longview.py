@@ -3,6 +3,20 @@
 Leaf module: geometry only. Feed specs live in the spine (city_registry) and
 are initially limited to SNAP Retailers (TX slice) pending a verifiable public
 city permits endpoint (per US-276). Do not fake endpoints.
+(Superseded 2026-10-02: see PERMITS below.)
+
+PERMITS (2026-10-02): the City's Cityworks permits behind its building permit
+dashboard, on its own ArcGIS Server
+(``cloud.longviewtexas.gov/arcgis/rest/services/AGOL/Building_Permit_Dashboard/MapServer/2``).
+The layer holds a row per permit and review period, so the spec keeps
+``PERIOD_NUMBER <= 1``, one row per permit, and reads the permits issued in
+the 90 days before each poll. Contractor registrations (placed at the
+contractor's own address, often outside Longview), right-of-way work and the
+pre-submittal, plan and site reviews are left out. The permit types are codes
+(``PLUMBPMT#``, ``RESBLDG#``), so the job type comes from the project type
+where one is set, and most permits fall to the catch-all class. The
+applicant, work description, case name and project detail columns are never
+requested.
 """
 
 from typing import Dict

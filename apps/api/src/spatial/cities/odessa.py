@@ -2,7 +2,17 @@
 
 Leaf module: geometry only. Feed specs live in the spine (city_registry) and
 are initially limited to SNAP Retailers (TX slice) pending a verifiable public
-city permits endpoint (US-280).
+city permits endpoint (US-280). (Permits still unregistered 2026-10-02: they
+live in MGO Connect, which has no public data API.)
+
+311 (2026-10-02): the City's SeeClickFix requests ("Team Odessa"), which
+SeeClickFix publishes to the City's ArcGIS Online org through a federated
+server proxy (``utility.arcgis.com/usrsvcs/servers/...``): one point per
+request since June 2025, 5,366 on 2026-10-02. Odessa reads the public
+requests (``private = '0'``) newer than its watermark on ``created_at``. Of the
+1,000 newest public requests, 137 lie in north Odessa beyond the metro box
+(latitude above 31.94) and are clipped. The reporter's name and email, the
+summary, description, address and assignee columns are never requested.
 """
 
 from typing import Dict

@@ -23,6 +23,8 @@ Register CityId.odessa (Odessa, TX) as a new Urban Signal metro in the South Cen
 
 - 2026-08-28 — Initial registration will use SNAP SLA (TX) only unless a verifiable Odessa municipal permits API is found during leaf work (no faked endpoints).
 
+- 2026-10-02 — `311` registered from the City's SeeClickFix requests layer on ArcGIS Online (stream `texas-south-feeds`, `docs/research/one-family-depth-2026-10-02.md`). Permits live in MGO Connect, which has no public data API.
+
 ## Current step
 
 Scaffolding leaf module `odessa.py` and Odessa containment/unit tests based on the Waco pattern.
