@@ -147,6 +147,62 @@ def test_layer_metadata_carries_the_time_zone_and_numeric_fields(monkeypatch):
     assert meta["numeric_fields"] == {"LRSN"}
 
 
+_AUGUSTA = "https://augcw.augustaga.gov/CityworksForms/gis/2/5799/rest/services/cw/FeatureServer/1"
+
+
+def test_a_host_that_reads_local_time_lends_its_layers_a_zone(monkeypatch):
+    """Augusta's Cityworks server reads a zone-less literal as Eastern time
+    and its layer declares no ``dateFieldsTimeReference``."""
+    client = ArcGISClient()
+    monkeypatch.setattr(client, "_request_json", lambda url, params: {"fields": [], "objectIdField": "REQUESTID"})
+
+    assert client.get_layer_metadata(_AUGUSTA)["time_zone"] == "America/New_York"
+    # Elsewhere a layer without a reference is read in UTC.
+    assert client.get_layer_metadata(_LAYER)["time_zone"] is None
+
+
+def test_a_server_that_cannot_page_is_asked_once(monkeypatch):
+    """Augusta's server ignores ``resultOffset`` and flags every short page as
+    truncated, so a second request would read the first page again."""
+    client = ArcGISClient()
+    offsets = []
+
+    def answer(url, params):
+        if not url.endswith("/query"):
+            return {"fields": [], "advancedQueryCapabilities": {"supportsPagination": False}}
+        offsets.append(params["resultOffset"])
+        return {"features": [{"attributes": {"REQUESTID": 2}}, {"attributes": {"REQUESTID": 1}}],
+                "exceededTransferLimit": True}
+
+    monkeypatch.setattr(client, "_request_json", answer)
+
+    pages = list(client.paginate(endpoint_url=_AUGUSTA, batch_size=1000, max_records=1000))
+
+    assert [[row["REQUESTID"] for row in page] for page in pages] == [[2, 1]]
+    assert offsets == [0]
+
+
+def test_a_server_that_pages_reads_on_past_a_truncated_page(monkeypatch):
+    client = ArcGISClient()
+    offsets = []
+    pages = {0: ([{"attributes": {"OBJECTID": 3}}, {"attributes": {"OBJECTID": 2}}], True),
+             2: ([{"attributes": {"OBJECTID": 1}}], False)}
+
+    def answer(url, params):
+        if not url.endswith("/query"):
+            return {"fields": [], "advancedQueryCapabilities": {"supportsPagination": True}}
+        offsets.append(params["resultOffset"])
+        features, exceeded = pages[params["resultOffset"]]
+        return {"features": features, "exceededTransferLimit": exceeded}
+
+    monkeypatch.setattr(client, "_request_json", answer)
+
+    pages_read = list(client.paginate(endpoint_url=_LAYER, batch_size=1000, max_records=1000))
+
+    assert [[row["OBJECTID"] for row in page] for page in pages_read] == [[3, 2], [1]]
+    assert offsets == [0, 2]
+
+
 def test_layer_metadata_names_each_coded_value(monkeypatch):
     """A Survey123 form stores its choices as codes and names them only in the
     layer's coded-value domains, as Allentown's 311 requests do."""

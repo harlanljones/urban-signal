@@ -16,6 +16,8 @@ Findings:
 - ArcGIS Hub: `geohub-augustagis.opendata.arcgis.com` (Open Augusta).
 - Verified public permits table: `https://gismap.augustaga.gov/arcgis/rest/services/EnterpriseApps/iasWorld_Permit/MapServer/1` (CityView_Permit, non-spatial ArcGIS table). Address-only with `JOBADDRESS`, `DATE_ISSUE`, `PERMITNUMBER`, `PERMIT_STATUS`, `WORKCOST`. Registered as PERMITS with ADR-0004 geocoding and a minimal field_map; `oid_field="OBJECTID"`; cadence 7d.
 - 311: Open311 exists (`augusta2-production.spotmobile.net/open311`) but requires an API key — not registered.
+- 2026-10-02 — 311 registered from the open requests Cityworks publishes (`augcw.augustaga.gov`); the Open311 endpoint
+  still needs a key. See `.streams/augusta-311-wilmington-deeds.md`.
 - SLA: Registered SNAP GA slice via `snap_sla_spec("GA")`.
 
 ## Dashboard wiring (city-registration rule)

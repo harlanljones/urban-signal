@@ -90,6 +90,10 @@ FULL_READ_ROWS = {
     # newest 2026-09-25, read 2026-09-30; 2,154 of them lie in the metro box.
     ("toledo", "deeds"): 2_296,
     ("washington_dc", "childcare"): 452,
+    # New Hanover County parcel points whose latest sale falls in the spec's
+    # 90-day cast window, newest 2026-09-23, read 2026-10-02, all in the
+    # metro box. April to June 2026 held 2,898.
+    ("wilmington_nc", "deeds"): 2_401,
     # Yakima County Assessor parcel rows whose sale falls in the spec's
     # 90-day cast window, county-wide, newest 2026-09-23, read 2026-10-02;
     # 208 of those sales lie in the metro box. April to June held 594.

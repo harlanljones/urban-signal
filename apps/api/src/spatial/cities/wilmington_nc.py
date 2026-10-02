@@ -3,6 +3,18 @@
 Leaf module: geometry only (metro bbox, divisions, submarkets, containment).
 Feed specs live in the spine registry. Verified public permits feed exists on
 the New Hanover County ArcGIS server and will be registered in REGISTRY.
+
+DEEDS (2026-10-02): New Hanover County's parcels as points on the County GIS
+server that serves the permits (``Layers/PropertyPoints4326``, 115,880
+points), each with its latest sale: date and price as text, the instrument
+(``WD`` for a warranty deed) and the municipality. The server casts the text
+dates, so the poll reads the sales dated in the 90 days before it (2,401 on
+2026-10-02, all inside the metro box; April to June 2026 held 2,898) under a
+4,500-row cap. A deed can convey several parcels, so rows key on parcel and
+sale date. The layer carries no refresh stamp; on 2026-10-02 its newest sale
+was nine days old and three reads over the night found it unchanged, so the
+cadence is 30 days. The owner, the owner's mailing address and the legal
+description are never selected.
 """
 
 from typing import Dict, List

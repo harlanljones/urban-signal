@@ -2592,4 +2592,23 @@ class Settings(BaseSettings):
         ),
         description="Lee County FL parcels layer URL with latest sales (Lee County GIS)",
     )
+    # Augusta 311 (2026-10-02): the open requests in the City's Cityworks,
+    # one point per request, as Cityworks publishes them.
+    arcgis_augusta_311_url: str = Field(
+        default=(
+            "https://augcw.augustaga.gov/CityworksForms/gis/2/5799/rest/services/"
+            "cw/FeatureServer/1"
+        ),
+        description="Augusta GA open Cityworks service requests layer URL (City Cityworks)",
+    )
+    # Wilmington NC deeds (2026-10-02): New Hanover County's parcels, one
+    # point each with its latest sale, on the County GIS server that also
+    # serves Wilmington's permits.
+    arcgis_wilmington_nc_deeds_url: str = Field(
+        default=(
+            "https://gis.nhcgov.com/server/rest/services/Layers/"
+            "PropertyPoints4326/MapServer/0"
+        ),
+        description="New Hanover County NC parcel points URL with latest sales (County GIS)",
+    )
 settings = Settings()

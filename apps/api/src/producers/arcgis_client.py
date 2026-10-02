@@ -9,7 +9,8 @@ Two things differ from Socrata and are handled here rather than by callers:
 * **Paging.** ArcGIS pages with ``resultOffset``/``resultRecordCount`` and reports
   more-pages-available via ``exceededTransferLimit`` rather than by a short page.
   Layers cap a page at ``maxRecordCount`` (1000 for King County parcel sales), so a
-  larger ``batch_size`` is silently truncated server-side.
+  larger ``batch_size`` is silently truncated server-side. A layer whose
+  ``advancedQueryCapabilities`` say it cannot page is read one page per call.
 * **Records.** A feature is ``{"attributes": {...}, "geometry": {...}}``. We flatten
   to the attributes dict so downstream row parsers see a Socrata-shaped record, and
   lift point geometry to ``latitude``/``longitude`` keys when present.
@@ -17,14 +18,16 @@ Two things differ from Socrata and are handled here rather than by callers:
 Date fields come back as epoch **milliseconds**; we convert them to ISO 8601 UTC
 strings using the layer's own field metadata, which is fetched once and cached.
 A layer whose ``dateFieldsTimeReference`` names a zone reads ``where`` literals
-in that zone, so the metadata also carries it (``time_zone``).
+in that zone, so the metadata also carries it (``time_zone``). A server that
+reads literals in local time without naming a zone (Augusta's Cityworks) lends
+its layers a zone by host (``LITERAL_TIME_ZONE_BY_HOST``).
 """
 
 import math
 import time
 from datetime import datetime, timezone
 from typing import Any, Dict, Generator, List, Optional
-from urllib.parse import quote
+from urllib.parse import quote, urlsplit
 
 import httpx
 
@@ -81,6 +84,16 @@ def layer_time_zone(reference: Any) -> str | None:
     return zone
 
 
+# Servers that read a zone-less date literal as local time without declaring
+# ``dateFieldsTimeReference``. Augusta's Cityworks layer stores UTC instants,
+# yet on 2026-10-02 ``DateTimeInit > '2026-10-01T20:04:15'`` matched 7 of the
+# 20 requests created after 20:04:15 UTC; the same instant written in Eastern
+# time, or with a ``Z``, matched all 20.
+LITERAL_TIME_ZONE_BY_HOST: dict[str, str] = {
+    "augcw.augustaga.gov": "America/New_York",
+}
+
+
 class ArcGISClient:
     """Robust client for ArcGIS REST FeatureServer / MapServer layer endpoints."""
 
@@ -95,7 +108,8 @@ class ArcGISClient:
         self.return_geometry = return_geometry
         # layer_url -> {"date_fields": set[str], "numeric_fields": set[str],
         #               "coded_values": dict[str, dict[str, str]], "oid_field": str,
-        #               "max_record_count": int, "time_zone": str | None}
+        #               "max_record_count": int, "time_zone": str | None,
+        #               "paginates": bool}
         self._layer_meta: Dict[str, Dict[str, Any]] = {}
 
     # ------------------------------------------------------------------ helpers
@@ -176,7 +190,12 @@ class ArcGISClient:
             },
             "oid_field": payload.get("objectIdField") or "OBJECTID",
             "max_record_count": int(payload.get("maxRecordCount") or 1000),
-            "time_zone": layer_time_zone(payload.get("dateFieldsTimeReference")),
+            "time_zone": layer_time_zone(payload.get("dateFieldsTimeReference"))
+            or LITERAL_TIME_ZONE_BY_HOST.get(urlsplit(layer_url).hostname or ""),
+            # A server that says it cannot page ignores ``resultOffset``, so a
+            # second request returns the first page again (Augusta's 311).
+            "paginates": (payload.get("advancedQueryCapabilities") or {}).get("supportsPagination")
+            is not False,
         }
         self._layer_meta[layer_url] = meta
         return meta
@@ -585,4 +604,9 @@ class ArcGISClient:
             # Unlike Socrata, a short page is not proof of exhaustion: the server
             # caps pages at maxRecordCount and flags the truncation instead.
             if not exceeded and len(records) < fetch_limit:
+                break
+            # A server that cannot page answers every offset with the first
+            # page, and Augusta's flags every short page as truncated, so a
+            # poll there is one request.
+            if not self.get_layer_metadata(endpoint_url).get("paginates", True):
                 break

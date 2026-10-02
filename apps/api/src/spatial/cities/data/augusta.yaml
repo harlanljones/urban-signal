@@ -265,6 +265,37 @@ datasets:
     non_spatial: null
     zip_member: null
     delimiter: null
+  '311':
+    endpoint: https://augcw.augustaga.gov/CityworksForms/gis/2/5799/rest/services/cw/FeatureServer/1
+    platform: arcgis
+    watermark_col: DateTimeInit
+    id_keys:
+    - REQUESTID
+    topic: raw.municipal.311
+    interval_seconds: 1800.0
+    producer_key: '311'
+    order_by: DateTimeInit DESC, REQUESTID DESC
+    select: REQUESTID,ProblemCode,Status,DateTimeInit,DateTimeClosed,ProbDistrict
+    where: ProblemCode NOT LIKE 'LOCATE UTILITIES%' AND ProblemCode <> 'Subpoenas' AND ProblemCode NOT LIKE 'C&M%'
+    needs_geocode: false
+    field_map:
+      incident_id:
+      - REQUESTID
+      created_date:
+      - DateTimeInit
+      closed_date:
+      - DateTimeClosed
+      complaint_type:
+      - ProblemCode
+      status:
+      - Status
+      borough:
+      - ProbDistrict
+    ingestion_mode: incremental
+    oid_field: REQUESTID
+    max_record_count: 30000
+    expected_cadence_days: 1
+    metro_clip: true
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis

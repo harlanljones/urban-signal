@@ -24,13 +24,13 @@ def test_augusta_geometry_is_self_consistent():
     assert {meta.city_id for meta in AUGUSTA_SUBMARKETS.values()} == {"augusta"}
 
 
-def test_augusta_registry_carries_permits_and_sla_specs():
+def test_augusta_registry_carries_permits_311_and_sla_specs():
     from src.spatial.city_registry import REGISTRY, get_dataset, normalize_city
 
     city = CityId.AUGUSTA
     assert normalize_city("augusta") is city
     assert normalize_city("augusta_ga") is city
-    assert set(REGISTRY[city].datasets) == {FeedType.PERMITS, FeedType.SLA}
+    assert set(REGISTRY[city].datasets) == {FeedType.PERMITS, FeedType.COMPLAINTS_311, FeedType.SLA}
 
     permits = REGISTRY[city].datasets[FeedType.PERMITS]
     assert permits.platform == "arcgis"
@@ -40,7 +40,7 @@ def test_augusta_registry_carries_permits_and_sla_specs():
     assert "PERMITNUMBER" in permits.id_keys
 
     # Unregistered feeds raise readable errors
-    for feed in (FeedType.COMPLAINTS_311, FeedType.DEEDS):
+    for feed in (FeedType.DEEDS,):
         try:
             get_dataset(city, feed)
             assert False, "get_dataset should raise for unregistered feeds"

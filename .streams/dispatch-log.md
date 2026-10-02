@@ -1775,3 +1775,21 @@ Worth keeping:
 - **A city's own address points can place what the geocoder cannot.** The
   Census geocoder missed whole new subdivisions in Orlando; the City's
   address layer placed 95% of permits by exact address.
+
+### 2026-10-02 — Augusta 311 and Wilmington deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| augusta-311-wilmington-deeds | `.streams/augusta-311-wilmington-deeds.md` | `config.py` (the request layer and the parcel points) | 2026-10-02 | done (Augusta 311: one query a poll, 630 read, 628 published, 2 clipped; the second poll sent an Eastern watermark and published none; Wilmington deeds: 2,401 read, 2,401 published; the second poll published none) | `311` spec for Augusta and `deeds` spec for Wilmington, NC; the ArcGIS client's host zones and paging stop; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Augusta and Wilmington, NC move from two signal families to three (three-family
+tier 35 to 37, two-family tier 56 to 54).
+
+Worth keeping:
+
+- **Read a layer's paging support before trusting its truncation flag.**
+  Augusta's Cityworks server ignores `resultOffset` and flags every short
+  page, so the client asked for the same rows again until its cap.
+- **Test a host's literals against a known instant.** A zone-less literal one
+  server reads as UTC another reads as local time; counting the rows past one
+  request's timestamp in each form settles it in a handful of queries.

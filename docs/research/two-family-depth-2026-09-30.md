@@ -100,12 +100,22 @@ Macon-Bibb's registered permits layer drawing every polygon in St.
 Catharines, Ontario, so those permits are retracted too. Ocala and
 Macon-Bibb keep their SNAP retailers and drop to one family.
 
-| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds (#94) | With Asheville's permits (#95) | With Allentown's permits (#96) | With Allentown's and New Haven's `311` (#97) | With Lincoln's `311` (#98) | With Albuquerque's and Topeka's `311` (#99) | With Yakima's `311` and deeds (#100) | With Cape Coral's `311` and deeds (#101) | With the wrong-place permits retracted |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 4 | 26 | 26 | **27** (Charlotte) | 27 | 27 | 27 | **28** (Allentown) | 28 | 28 | **29** (Yakima) | **30** (Cape Coral) | 30 |
-| 3 | 29 | **30** (Charlotte) | 29 | **30** (Toledo) | **31** (Asheville) | **32** (Allentown) | 32 (New Haven in, Allentown up) | **33** (Lincoln) | **35** (Albuquerque, Topeka) | 35 | 35 | 35 |
-| 2 | 68 | 67 | 67 | 66 | 65 | 64 | 63 | 62 | 60 | 59 | 58 | 56 |
-| 1 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | **36** (Ocala, Macon-Bibb) |
+The nine south-eastern metros (Augusta, Bowling Green, Columbus GA,
+Greenville, Huntsville, Macon-Bibb, Savannah, Spartanburg and Wilmington NC)
+ran from 05:00Z to 06:52Z under the same rules, with two sales layers read
+again at about 09:00Z. Augusta's `311`, the open requests Cityworks
+publishes, and Wilmington's deeds, New Hanover County's parcel points with
+their latest sales, register, which gives each a third family. Augusta's own
+sales are keyed months late, Greenville's had not moved in five weeks,
+Spartanburg's carry no price, and Savannah's and Macon-Bibb's are annual
+rolls, so those five are held; the other gaps have no source.
+
+| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds (#94) | With Asheville's permits (#95) | With Allentown's permits (#96) | With Allentown's and New Haven's `311` (#97) | With Lincoln's `311` (#98) | With Albuquerque's and Topeka's `311` (#99) | With Yakima's `311` and deeds (#100) | With Cape Coral's `311` and deeds (#101) | With the wrong-place permits retracted (#102) | With Augusta's `311` and Wilmington's deeds |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 4 | 26 | 26 | **27** (Charlotte) | 27 | 27 | 27 | **28** (Allentown) | 28 | 28 | **29** (Yakima) | **30** (Cape Coral) | 30 | 30 |
+| 3 | 29 | **30** (Charlotte) | 29 | **30** (Toledo) | **31** (Asheville) | **32** (Allentown) | 32 (New Haven in, Allentown up) | **33** (Lincoln) | **35** (Albuquerque, Topeka) | 35 | 35 | 35 | **37** (Augusta, Wilmington NC) |
+| 2 | 68 | 67 | 67 | 66 | 65 | 64 | 63 | 62 | 60 | 59 | 58 | 56 | 54 |
+| 1 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | **36** (Ocala, Macon-Bibb) | 36 |
 
 ## Registered
 
@@ -844,6 +854,96 @@ Macon-Bibb keep their SNAP retailers and drop to one family.
   again with four requests to the address layer, and published nothing. No
   event carried a name.
 
+### Augusta, GA — `311`
+
+- **Source:** the City's open service requests as Cityworks publishes them,
+  listed in the City's ArcGIS Online org as "All Open SRs":
+  `augcw.augustaga.gov/CityworksForms/gis/2/5799/rest/services/cw/FeatureServer/1`.
+- **Shape:** one point per request since 2016-10-01: 12,471 open on
+  2026-10-02 and none closed. A request leaves the layer when it closes, so
+  no closure reaches the feed; statuses change in place until then. 2,855
+  were created in the 90 days to 2026-10-02, 99% of them inside the metro
+  box.
+- **Filter:** `ProblemCode NOT LIKE 'LOCATE UTILITIES%' AND ProblemCode <>
+  'Subpoenas' AND ProblemCode NOT LIKE 'C&M%'` leaves out the utility-locate
+  tickets from excavators (about 820 of those 2,855), the subpoena queue (51)
+  and the crews' daily start entries (30), and keeps 1,948.
+- **Server:** it ignores `resultOffset`, takes the first `resultRecordCount`
+  rows in the requested order before it applies the `where`, and flags every
+  short page as truncated, though its metadata says it cannot page. The
+  client read the flag as more to come and asked for the next page, which
+  the server answered with the same rows, until its cap: a four-row poll
+  would have taken 250 requests. The client now stops after one page on a
+  layer that says it cannot page, so each poll is one request for the
+  newest 1,000 rows of every kind (23 days on 2026-10-02), filtered on the
+  server.
+- **Watermark and zone:** `DateTimeInit`, true UTC instants. The server
+  reads a zone-less literal as Eastern time and declares no zone: on
+  2026-10-02 `DateTimeInit > '2026-10-01T20:04:15'` matched 7 of the 20
+  requests created after 20:04:15 UTC, and the same instant written in
+  Eastern time, or with a `Z`, matched all 20. The scheduler stores the
+  watermark without a zone, so the client now lends the host's layers
+  Eastern time (`LITERAL_TIME_ZONE_BY_HOST`), as a layer that declares its
+  zone already gets.
+- **Personal data:** the free text (details, comments and resolution), the
+  staff who opened, closed or cancelled a request, and the problem address
+  stay on the server; `select` names six columns. The server always adds
+  `Description`, a one-to-one label of the problem code, and its own
+  state-plane coordinates; the producer reads neither.
+- **Placement:** each request's own point, which the server reprojects. The
+  spec clips to the metro box. No geocoder is asked.
+- **Poll:** every 30 minutes, newest first by `DateTimeInit DESC, REQUESTID
+  DESC`.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live layer, Kafka mocked, after one metadata
+  request. The first poll took one query, read 630 requests created from
+  2026-09-08 to 2026-10-02 and published 628; the clip skipped 2, one of
+  them more than 300 km south of the box, and none was dead-lettered. By
+  type, 62 are mosquito complaints, 42 water leaks, 38 right-of-way
+  complaints, 26 abandoned vehicles, 24 ditch complaints, 22 sinkholes and 22
+  traffic signal faults; 386 are `INITIATE`, 104 `ASSIGNED` and 90
+  `QAQCCOMPLETE`. The watermark stopped at 08:38:02Z, and the second poll,
+  one query again, sent `DateTimeInit > '2026-10-02T04:38:02'`, read the
+  newest request again (its time runs past the second) and published
+  nothing. Without the zone it would have sent 08:38:02, which the server
+  reads four hours late. No poll queried a geocoder.
+
+### Wilmington, NC — `deeds`
+
+- **Source:** New Hanover County's parcels as points on the County GIS server
+  that serves Wilmington's permits:
+  `gis.nhcgov.com/server/rest/services/Layers/PropertyPoints4326/MapServer/0`
+  (ArcGIS Server 11.5, 115,880 points), each with its latest sale: date,
+  price, instrument, deed book and page, and the municipality.
+- **Window:** the sales dated in the 90 days before each poll: 2,401 on
+  2026-10-02, dated 2026-07-05 to 2026-09-23. Dates and prices are text
+  (`2026-09-11 00:00:00`); the server casts the dates, so the window is the
+  `CAST(SALE_DATE AS DATE)` filter Yakima's deeds use, and its upper bound
+  leaves out two sales dated 2029 and 3025. April to June 2026 held 2,898,
+  so the cap is 4,500.
+- **Rows:** one per parcel. A deed can convey several parcels, and its book
+  and page repeat across them, so a row is its parcel and sale date. 1,349
+  of the 2,401 carry a price. By instrument, 1,422 are `WD` (warranty
+  deeds), 231 `QC`, 193 `SW`, 151 `OB`, 100 `EA` and 69 `NW`.
+- **Freshness:** the layer carries no refresh stamp. On 2026-10-02 the
+  newest sale was nine days old, its day held 16 sales against 35 to 41 on
+  full days, and three reads over the County's night (05:33Z, 06:00Z and
+  09:02Z) found the layer unchanged, so it is loaded less often than weekly.
+  `expected_cadence_days` is 30, so the staleness alarm waits 60 days.
+- **Personal data:** the owner, the owner's mailing address and the legal
+  description stay on the server; `select` names six columns, and the layer
+  is never read without it.
+- **Placement:** each parcel's own point. All 2,401 lie inside the metro box,
+  so the spec does not clip. No geocoder is asked.
+- **Poll:** every six hours, newest first by `SALE_DATE DESC, OBJECTID DESC`.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live layer, Kafka mocked. The first read 2,401 rows
+  with the metadata and three pages and published all 2,401; by municipality
+  code, 1,046 are `FD`, 1,024 `WM`, 183 `CB`, 72 `KB`, 56 `WB` and 20 `BD`.
+  None was dead-lettered. The second read the same 2,401 and published
+  nothing. No event carried a party name, and neither poll queried a
+  geocoder.
+
 ## Retracted
 
 | Metro (feed) | What it read | Why retracted | Re-check when |
@@ -869,6 +969,11 @@ Macon-Bibb keep their SNAP retailers and drop to one family.
 | Missoula (`311`) | The City's "Report Drainage Issue" Survey123 layer (`services.arcgis.com/HfwHS0BxZBQ1E5DY/.../Illicit_Discharge/FeatureServer/0`): 329 reports since 2022-04-30, 34 in 90 days, each with a point and an arrival stamp. | One issue type, about twelve reports a month with bursts of what look like staff tests, on a layer the public can edit. Registered as the metro's `311`, it would mark Missoula as covered where the City publishes no request stream. | The City publishes its requests. |
 | Worcester (`311`) | The City's CSRS work orders (`services1.arcgis.com/j8dqo2DJE7mVUBU1/.../CsrsWorkOrders_TEST/FeatureServer/0`, its "2021 to Present" dataset, refreshed weekly): 382,664 requests with unique ids, 15,708 logged in 90 days, a third of them through SeeClickFix. | The table has no geometry. Its coordinates are Massachusetts State Plane feet, which the `311` producer cannot convert yet (the licence producer does for Boston), its streets carry no house numbers, and its dates are whole days, refreshed a week at a time. | The `311` producer converts State Plane coordinates. |
 | Worcester (`deeds`) | MassGIS's statewide parcels for Worcester (`TOWN_ID = 348`) carry each parcel's last sale: 47,703 parcels, the newest sale on 2026-04-17. | An annual assessor roll: no sale in the 90 days to 2026-10-02. | MassGIS loads Worcester more often. |
+| Augusta (`deeds`) | The County's "All Sales" point layer (`gismap.augustaga.gov`, `Map_LayersTS/MapServer/404`, 111,717 rows) and its base `sales` table: sale key, date, price and parcel. The table is live (122 rows added between 06:56Z and 09:03Z on 2026-10-02, 114 of them dated April to June), and its newest sale was dated 2026-06-24. | Sales are keyed three to five months after they close, so the 90-day window was empty. | The newest sale comes within about a month of the poll. |
+| Greenville (`deeds`) | The City's parcel layer (`citygis.greenvillesc.gov`, `GeneralData/GeneralData_WebMercator/MapServer/2`, 90,470 parcels) carries each parcel's latest deed date, price, and book and page: 1,188 sales in the 90 days to 2026-10-02, 897 of them inside the metro box. Its three sibling services publish the same table. | The newest sale was dated 2026-08-28, none fell in the last 30 days, and the layer has no edit stamp. | A newer sale appears. |
+| Spartanburg (`deeds`) | Spartanburg County's `GIS/CAMA_Parcels` layer (`maps.spartanburgcounty.org`, 182,863 polygons): sale dates (2,072 in the 90 days to 2026-10-02, entered about six weeks late), deed book and page and the instrument number. | No row in the layer has a price, and no column names the document type. | A price or document type appears. |
+| Savannah (`deeds`) | The Chatham County Board of Assessors' parcels (`pub.sagis.org`, `Savannah/PropertyValue/MapServer/13`, 127,033 rows) carry each parcel's sale price, year, month and day, and book and page. | An annual roll: every dated row was updated on 2026-06-22, and the newest 2026 sale is dated 2026-01-21. | The roll is updated more often. |
+| Macon-Bibb (`deeds`) | The County's hosted CAMA layers (org `zPFLSOZ5HzUzzTQb`) carry each parcel's sale date and price. | Annual digests: the two 2025 layers' newest sales are dated 2024-12-06 and 2026-02-05. | A current digest or a sales layer appears. |
 
 ## Not now
 
@@ -914,6 +1019,14 @@ Macon-Bibb keep their SNAP retailers and drop to one family.
 | Indianapolis (`deeds`) | The City's parcel layers carry owners and assessed values but no sale; `data.indy.gov` (651 datasets) has only tax-sale and surplus reports, and the state's Gateway publishes annual assessment files, not sales disclosures. A statewide sales-disclosure layer on ArcGIS Online is a private compilation that names buyers and sellers and returned no Marion County rows. | The county or state publishes sales disclosures. |
 | Oxnard–Ventura (`deeds`) | Ventura County's parcel layers carry only parcel numbers and coordinates, and no county server or ArcGIS Online item carries sales; California assessors do not publish prices. The Assessor's site answered with a "Request Rejected" page and was not asked again. | A sales or transfer layer appears. |
 | Tulsa (`deeds`) | The Assessor's four ArcGIS Online services hold permits, parcel history, parcel-maintenance records and section shapes, none with a price. Deeds are the County Clerk's, in a paid Tyler recorder search. The Assessor's own ArcGIS Server could not be reached (the egress proxy answered 502 twice). | The Assessor's server can be reached and carries sales. |
+| Bowling Green (`311`, `deeds`) | City requests go through an in-house request form behind a login, and the code-case layer stopped on 2023-01-31. Warren County's parcel layer has prices and deed book and page but no sale date. | A requests layer or a dated sales column appears. |
+| Columbus, GA (`311`, `deeds`) | Requests run on QAlert, whose folder on the City GIS holds reference layers only, and the City's 311 service is an address registry. The tax assessors' parcel layer has deed book and page but no sale date or price. | A requests or sales layer appears. |
+| Greenville (`311`) | The City's request dashboards read hosts on its internal network, and its public "Greenville Cares" form layer refuses queries. | A requests layer opens. |
+| Huntsville (`311`, `deeds`) | Requests run on Comcate, with no public rows, and the City's ArcGIS Online org holds no request or sales layer. The City's parcel layers carry values but no sale, and no Madison County GIS host resolved. | A requests or sales layer appears. |
+| Macon-Bibb (`311`) | Requests run on SeeClickFix. The County's org holds exports last modified in April 2024 or earlier and one live debris layer on SeeClickFix's geoservice, which answered 503 at 05:33Z and 06:39Z. | SeeClickFix publishes a readable view for the County. |
+| Savannah (`311`) | The City's OneView 311 services hold district polygons, the County's QAlert folder reference layers, and the open Cityworks work orders cover trees only. | A requests layer appears. |
+| Spartanburg (`311`) | The County's EnerGov layer holds code enforcement, not requests, and neither the County's site nor ArcGIS Online shows a request platform. | A requests layer appears. |
+| Wilmington, NC (`311`) | New Hanover County's 311 portal runs on Salesforce, and its two public web maps hold reference layers only; the City's GIS holds no request layer. | Either publishes its requests. |
 
 A platform client would not unlock these cheaply: Accela Citizen Access
 (Dayton, Indianapolis, Oakland, Omaha) is a search interface with no anonymous
@@ -923,7 +1036,7 @@ too, and Reno's in the region's Accela; OpenGov's ViewPoint Cloud, which holds
 New Haven's, Providence's and the City of Frederick's, was not probed. The
 same holds for deeds: Honolulu's and Tulsa's sit behind one-record-at-a-time
 or paid recorder searches. For `311`, SeeClickFix is the shared platform
-(Bridgeport, Canton, Frederick County, Peoria, Sioux Falls, Wichita and
+(Bridgeport, Canton, Frederick County, Macon-Bibb, Peoria, Sioux Falls, Wichita and
 probably Evansville, and behind Burlington's frozen export), and its public
 API returns reporters and descriptions with no way to leave them out. The
 cheaper route is the one New Haven's and Lincoln's feeds take: SeeClickFix

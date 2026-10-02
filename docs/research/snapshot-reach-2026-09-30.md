@@ -134,6 +134,12 @@ first, each at the parcel's own coordinates; the clip skips the 2,356 outside
 the metro box, and 4,409 publish. The cap holds the 11,253 sales of March to
 May 2026, the busiest window of the year so far.
 
+Wilmington `deeds` (2,401 rows, cap 4,500) joined the same day. New Hanover
+County's parcel points hold one row per parcel with its latest sale, dated in
+text, so the server casts the dates and the feed reads the 90 days before
+each poll, whole, newest first, each sale at its parcel's point; every one
+lies in the metro box. The cap holds the 2,898 sales of April to June 2026.
+
 ## Newest-first windows
 
 | Feed | Order | Rows dated in last 30 / 90 days | Window after |

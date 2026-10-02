@@ -6,6 +6,23 @@ the Augusta metropolitan area (Richmond County focus).
 This leaf declares only spatial structures; feed registrations live in the spine
 registry. The registry will register a verified permits dataset (ArcGIS table,
 address-geocoded) and a SNAP SLA state slice for Georgia.
+
+311 (2026-10-02): the City's open service requests as Cityworks publishes
+them (``augcw.augustaga.gov``, "All Open SRs"): one point per request, 12,471
+open on 2026-10-02, 2,855 of them created in the 90 days before. A request
+leaves the layer when it closes, so no closure reaches the feed. The poll
+leaves out the utility-locate tickets (about 29% of those 90 days), the
+subpoena queue and the crews' daily start entries, and reads each request's
+id, problem code, status, dates and district; the free text, the
+staff names and the problem address stay on the server. The server ignores
+``resultOffset``, takes the first ``resultRecordCount`` rows in the requested
+order before it applies the ``where``, and flags every short page as
+truncated, so each poll is one request for the newest 1,000 rows (23 days on
+2026-10-02). It reads a zone-less date literal as Eastern time without
+declaring a zone, and the client lends the layer the host's zone.
+
+Deeds are not registered: the County's sales table is keyed three to five
+months after a sale, so a 90-day window is empty.
 """
 
 from typing import Dict
