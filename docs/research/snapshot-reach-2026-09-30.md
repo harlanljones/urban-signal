@@ -162,6 +162,15 @@ whole, newest first, each sale at its parcel's point; the clip skips the
 1,107 outside the metro box, and 6,365 publish. The cap holds April to June
 2026's 9,946 sales with a partial month on top.
 
+Lakeland `deeds` (3,464 rows, cap 8,000) reads the Polk County Property
+Appraiser's nightly extract once a day, as Gainesville reads Alachua's: one
+download a poll, `ftp_sales.txt` streamed out of the zip and filtered as it
+is read to the sales dated in the 90 days before it on parcels numbered 23
+to 25, the only numbers that reach the metro box; each sale takes its
+parcel's centroid from the City's parcel layer, the clip skips the 1,579
+outside the box, and 1,885 publish. The cap holds the 5,272 sales in reach
+of the 90 days from 2025-02-17, the busiest window since October 2024.
+
 ## Newest-first windows
 
 | Feed | Order | Rows dated in last 30 / 90 days | Window after |

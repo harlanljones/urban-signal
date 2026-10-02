@@ -116,12 +116,15 @@ a second. Lakeland's are held: Polk County's nightly sales file unpacks to
 518 MB, and the CSV client reads a zip member whole, so the feed waits for a
 streaming read.
 
-| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds (#94) | With Asheville's permits (#95) | With Allentown's permits (#96) | With Allentown's and New Haven's `311` (#97) | With Lincoln's `311` (#98) | With Albuquerque's and Topeka's `311` (#99) | With Yakima's `311` and deeds (#100) | With Cape Coral's `311` and deeds (#101) | With the wrong-place permits retracted (#102) | With Augusta's `311` and Wilmington's deeds (#103) | With Tampa's, Gainesville's and Ocala's deeds |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 4 | 26 | 26 | **27** (Charlotte) | 27 | 27 | 27 | **28** (Allentown) | 28 | 28 | **29** (Yakima) | **30** (Cape Coral) | 30 | 30 | 30 |
-| 3 | 29 | **30** (Charlotte) | 29 | **30** (Toledo) | **31** (Asheville) | **32** (Allentown) | 32 (New Haven in, Allentown up) | **33** (Lincoln) | **35** (Albuquerque, Topeka) | 35 | 35 | 35 | **37** (Augusta, Wilmington NC) | **39** (Tampa, Gainesville) |
-| 2 | 68 | 67 | 67 | 66 | 65 | 64 | 63 | 62 | 60 | 59 | 58 | 56 | 54 | 53 (Ocala in, Tampa and Gainesville up) |
-| 1 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | **36** (Ocala, Macon-Bibb) | 36 | 35 |
+Lakeland's sales followed the same day, once the CSV client read a zip member
+as a stream instead of whole, which gives Lakeland a third family.
+
+| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds (#94) | With Asheville's permits (#95) | With Allentown's permits (#96) | With Allentown's and New Haven's `311` (#97) | With Lincoln's `311` (#98) | With Albuquerque's and Topeka's `311` (#99) | With Yakima's `311` and deeds (#100) | With Cape Coral's `311` and deeds (#101) | With the wrong-place permits retracted (#102) | With Augusta's `311` and Wilmington's deeds (#103) | With Tampa's, Gainesville's and Ocala's deeds (#104) | With Lakeland's deeds |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 4 | 26 | 26 | **27** (Charlotte) | 27 | 27 | 27 | **28** (Allentown) | 28 | 28 | **29** (Yakima) | **30** (Cape Coral) | 30 | 30 | 30 | 30 |
+| 3 | 29 | **30** (Charlotte) | 29 | **30** (Toledo) | **31** (Asheville) | **32** (Allentown) | 32 (New Haven in, Allentown up) | **33** (Lincoln) | **35** (Albuquerque, Topeka) | 35 | 35 | 35 | **37** (Augusta, Wilmington NC) | **39** (Tampa, Gainesville) | **40** (Lakeland) |
+| 2 | 68 | 67 | 67 | 66 | 65 | 64 | 63 | 62 | 60 | 59 | 58 | 56 | 54 | 53 (Ocala in, Tampa and Gainesville up) | 52 |
+| 1 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | **36** (Ocala, Macon-Bibb) | 36 | 35 | 35 |
 
 ## Registered
 
@@ -1087,6 +1090,69 @@ streaming read.
   same 7,472 rows and published nothing. No event carried a party name, and
   neither poll queried a geocoder.
 
+### Lakeland, FL — `deeds`
+
+- **Source:** the Polk County Property Appraiser's nightly extract,
+  `www.polkflpa.gov/FTPPage/downloader.ashx?filename=ftp_sales.zip&dir=%5CAppraisalData%5C`
+  (55 MB, listed on the Property Appraiser's bulk-data page). Its one member,
+  `FTP_CAMA/ftp_sales.txt`, was rebuilt at 04:02 on 2026-10-02: every
+  recorded sale in the county, 3,034,532 lines and 518 MB unpacked, one per
+  parcel and sale, comma-separated and quoted with a header. Two of its
+  fifteen columns name the grantor and grantee.
+- **Window:** the sales dated in the 90 days before each poll, closed at
+  today: 8,450 county-wide on 2026-10-02, dated 2026-07-04 to 2026-09-24,
+  none in the future. Sales arrive one to several weeks after their date:
+  the weeks of 2026-09-07 and 2026-09-14 held about 400 each, against 800 to
+  1,000 a week in July and August.
+- **Reach:** the filter first keeps the parcels numbered from `23` to `25`.
+  A Polk parcel number starts with its range and township (`2328…` lies west
+  of `2428…`, and `2429…` south of it), and on 2026-10-02 each of the 89,769
+  parcels of the City's layer touching the metro box started `23`, `24` or
+  `25`; the layer's 11,315 others lie north-west and east of the box. The
+  parcel test runs before the date's, so the other rows skip the date parse,
+  and the window holds 3,464 rows instead of 8,450: the join asks the City's
+  server 66 times a poll instead of 166, and publishes the same 1,885 sales.
+  The busiest 90 days in reach since October 2024, from 2025-02-17, held
+  5,272, so the cap is 8,000.
+- **Rows:** a row is its parcel, date, book and page: 222 lines of the 8,450
+  share a parcel and a date with another, and a deed's book and page repeat
+  across its parcels, but the four together repeat for none. The deed type is
+  the extract's description; county-wide, 5,285 are warranty deeds, 1,235
+  quit claims, 887 life estates and 490 miscellaneous documents. 968 lines
+  carry no price and 4,897 one of $10,000 or more.
+- **Freshness:** the bulk files share one nightly build, and the newest sale
+  was eight days old. `expected_cadence_days` is 14, so the staleness alarm
+  waits 28 days.
+- **Personal data:** `select` names six of the fifteen columns: the grantor
+  and grantee are parsed with each line and dropped before it is kept, and
+  no spec maps them. The parcel join asks the City's layer for `PARCELID`
+  alone.
+- **Placement:** each sale takes its parcel's centroid from the City's
+  parcel layer (`arcgis.lakelandgov.net/maps/rest/services/LandBase/Parcels/MapServer/10`,
+  177,779 polygons over the city and the country around it), joined on
+  `parcel_id` in lists of at most 51 (the client's URL limit for 18-digit
+  quoted ids). The spec clips to the metro box. No geocoder is asked.
+- **Poll:** once a day: one download, the member decompressed and filtered
+  as it is read, the window sorted newest first in memory, then the join.
+- **CSV client:** a zip member is now read as a stream: decompressed and
+  decoded a megabyte at a time, in the encoding the whole member would have
+  chosen (UTF-8, else cp1252, else UTF-8 with replacement characters, found
+  in a first pass over the member), and handed to the parser a line at a
+  time. Read whole, Polk's member added 1,041 MB to a read's peak memory;
+  streamed, 6 MB. The title-line check reads the stream's first two rows and
+  passes the rest on untouched, and the archive closes once its lines are
+  read.
+- **Live check:** two polls of the registered spec through the real
+  scheduler, Kafka mocked. The first downloaded the extract once, read 3,464
+  sales, asked the City's layer for its metadata and 66 lists of parcels,
+  and published 1,885 sales dated 2026-07-06 to 2026-09-23, 592 of them in
+  the `LAKELAND_CORE` division. It skipped 1,579 outside the box, 100 of
+  them on parcels the layer does not hold, and dead-lettered none. The
+  second read the same 3,464 and published nothing. An earlier pair of
+  polls without the parcel filter read 8,450 rows, sent 166 lists and
+  published the same 1,885. No event carried a party name, and no poll
+  queried a geocoder.
+
 ## Retracted
 
 | Metro (feed) | What it read | Why retracted | Re-check when |
@@ -1117,7 +1183,6 @@ streaming read.
 | Spartanburg (`deeds`) | Spartanburg County's `GIS/CAMA_Parcels` layer (`maps.spartanburgcounty.org`, 182,863 polygons): sale dates (2,072 in the 90 days to 2026-10-02, entered about six weeks late), deed book and page and the instrument number. | No row in the layer has a price, and no column names the document type. | A price or document type appears. |
 | Savannah (`deeds`) | The Chatham County Board of Assessors' parcels (`pub.sagis.org`, `Savannah/PropertyValue/MapServer/13`, 127,033 rows) carry each parcel's sale price, year, month and day, and book and page. | An annual roll: every dated row was updated on 2026-06-22, and the newest 2026 sale is dated 2026-01-21. | The roll is updated more often. |
 | Macon-Bibb (`deeds`) | The County's hosted CAMA layers (org `zPFLSOZ5HzUzzTQb`) carry each parcel's sale date and price. | Annual digests: the two 2025 layers' newest sales are dated 2024-12-06 and 2026-02-05. | A current digest or a sales layer appears. |
-| Lakeland (`deeds`) | The Polk County Property Appraiser's nightly extract (`www.polkflpa.gov`, `ftp_sales.zip`, 55 MB): every recorded sale in the county by parcel, 8,284 dated in the 90 days to 2026-10-02 with dates, prices, book and page and the instrument type. The City's `LandBase/Parcels` layer (`arcgis.lakelandgov.net`, `MapServer/10`) places 43% of them, nearly every sale in the townships around Lakeland, and about 1,840 fall in the metro box. | The member unpacks to 518 MB, which the CSV client reads into memory whole, about a gigabyte at peak, once a day. | The CSV client streams a zip member. |
 
 ## Not now
 

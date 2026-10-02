@@ -63,6 +63,11 @@ FULL_READ_ROWS = {
     ("glendale_az", "deeds"): 1_263,
     ("hartford", "deeds"): 353,
     ("inland_empire", "sla"): 10_585,
+    # Polk County sales on parcels numbered 23 to 25, dated in the spec's
+    # 90-day window, read 2026-10-02 (the extract rebuilt that night, newest
+    # 2026-09-24); 1,885 of them place inside the metro box. The 90 days from
+    # 2025-02-17 held 5,272.
+    ("lakeland", "deeds"): 3_464,
     # Jackson County sales whose SiteCity is MEDFORD, dated in the spec's
     # 90-day window, read 2026-09-30.
     ("medford", "deeds"): 304,

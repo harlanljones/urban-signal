@@ -17,13 +17,14 @@ the spec.
 
 from __future__ import annotations
 
+import codecs
 import csv
 import io
 import re
 import zipfile
 from collections.abc import Generator, Iterable, Iterator
 from datetime import UTC, datetime, timedelta
-from itertools import islice
+from itertools import chain, islice
 from typing import Any
 
 import httpx
@@ -74,25 +75,52 @@ def _nonblank_rows(lines: Iterable[str], delimiter: str) -> Iterator[list[str]]:
     return (row for row in csv.reader(lines, delimiter=delimiter) if any(cell.strip() for cell in row))
 
 
-def _strip_preamble(text: str, delimiter: str = ",") -> str:
-    """Drop a leading single-field preamble line, if one exists.
+def _rows_as_lines(rows: Iterable[list[str]], delimiter: str) -> Iterator[str]:
+    """Each row written back as CSV, one physical line at a time."""
+    buffer = io.StringIO()
+    writer = csv.writer(buffer, delimiter=delimiter, lineterminator="\n")
+    for row in rows:
+        buffer.seek(0)
+        buffer.truncate()
+        writer.writerow(row)
+        yield from _lines(buffer.getvalue())
+
+
+def _without_preamble(lines: Iterator[str], delimiter: str = ",") -> tuple[Iterator[str], bool]:
+    """``lines`` without a leading single-field preamble line, and whether one
+    was dropped.
 
     Some CSV publishers (California ABC ``DailyExport-CSV.zip``) lead the real
     header with a metadata line that csv.DictReader would otherwise mistake for
     the field names: a one-field row whose next row carries multiple fields.
-    Returning the text unchanged when no preamble is detected keeps every
-    existing feed's parse identical.
+    Only the first two rows decide, so a file without one streams on
+    untouched; parsing every row of Alachua County's 510,000 sales into lists
+    took more memory than the file itself.
     """
-    # Only the first two rows decide: parsing every row of Alachua County's
-    # 510,000 sales into lists took more memory than the file itself.
-    rows = list(islice(_nonblank_rows(_lines(text), delimiter), 2))
-    if len(rows) == 2 and len(rows[0]) == 1 and len(rows[1]) > 1:
-        rows = list(_nonblank_rows(io.StringIO(text, newline=""), delimiter))
-        buffer = io.StringIO()
-        writer = csv.writer(buffer, delimiter=delimiter, lineterminator="\n")
-        writer.writerows(rows[1:])
-        return buffer.getvalue()
-    return text
+    read: list[str] = []
+    deciding = True
+
+    def recorded() -> Iterator[str]:
+        for line in lines:
+            if deciding:
+                read.append(line)
+            yield line
+
+    rows = _nonblank_rows(recorded(), delimiter)
+    head = list(islice(rows, 2))
+    deciding = False
+    if len(head) == 2 and len(head[0]) == 1 and len(head[1]) > 1:
+        # The rest of the file is written back without its blank rows, as
+        # the whole text was before files were streamed.
+        return _rows_as_lines(chain(head[1:], rows), delimiter), True
+    return chain(read, lines), False
+
+
+def _strip_preamble(text: str, delimiter: str = ",") -> str:
+    """``text`` without a leading single-field preamble line, if one exists;
+    returned unchanged when there is none."""
+    lines, stripped = _without_preamble(_lines(text), delimiter)
+    return "".join(lines) if stripped else text
 
 
 def _decode_csv_bytes(raw: bytes) -> str:
@@ -105,11 +133,56 @@ def _decode_csv_bytes(raw: bytes) -> str:
     return raw.decode("utf-8", errors="replace")
 
 
-def _read_zip_member(payload: bytes, member: str) -> str:
-    """Extract one named CSV member from a zip (St. Louis CSB ``csb.zip`` / ``{year}.csv``).
+# How much of a zip member to decompress at a time.
+_CHUNK = 1 << 20
+
+
+def _member_name(archive: zipfile.ZipFile, name: str) -> str:
+    """The archive's own name for ``name``: the exact name, else the first
+    member with the same basename."""
+    names = archive.namelist()
+    if name in names:
+        return name
+    wanted = name.rsplit("/", 1)[-1].lower()
+    for candidate in names:
+        if candidate.rsplit("/", 1)[-1].lower() == wanted and not candidate.endswith("/"):
+            return candidate
+    raise FileNotFoundError(f"zip member {name!r} not in archive; members={names}")
+
+
+def _member_encoding(archive: zipfile.ZipFile, name: str) -> tuple[str, str]:
+    """The encoding ``_decode_csv_bytes`` would choose for a member, and its
+    error handler, found in one pass over the decompressed bytes without
+    holding them: UTF-8 when every byte decodes, else cp1252, else UTF-8 with
+    replacement characters."""
+    decoders = {"utf-8": codecs.getincrementaldecoder("utf-8")(), "cp1252": codecs.getincrementaldecoder("cp1252")()}
+    with archive.open(name) as raw:
+        while decoders and (chunk := raw.read(_CHUNK)):
+            for encoding, decoder in list(decoders.items()):
+                try:
+                    decoder.decode(chunk)
+                except UnicodeDecodeError:
+                    del decoders[encoding]
+    for encoding, decoder in list(decoders.items()):
+        try:
+            decoder.decode(b"", final=True)
+        except UnicodeDecodeError:
+            del decoders[encoding]
+    if "utf-8" in decoders:
+        return "utf-8-sig", "strict"
+    if "cp1252" in decoders:
+        return "cp1252", "strict"
+    return "utf-8", "replace"
+
+
+def _zip_member_lines(payload: bytes, member: str) -> Iterator[str]:
+    """The lines of one named CSV member of a zip (St. Louis CSB ``csb.zip`` /
+    ``{year}.csv``), decompressed and decoded as they are read.
 
     ``member`` is a filename such as ``2026.csv``. A basename match is accepted
-    when the archive nests the year file under a folder.
+    when the archive nests the year file under a folder. Polk County's sales
+    member unpacks to 518 MB: read whole and then decoded, it took twice that
+    on top of the download.
     """
     name = str(member).strip()
     if not name or name.lower() in {"true", "1", "yes"}:
@@ -120,22 +193,25 @@ def _read_zip_member(payload: bytes, member: str) -> str:
         archive = zipfile.ZipFile(io.BytesIO(payload))
     except zipfile.BadZipFile as exc:
         raise ValueError("CSV endpoint declared zip_member but the body is not a zip") from exc
-    with archive:
-        names = archive.namelist()
-        chosen = name if name in names else None
-        if chosen is None:
-            wanted = name.rsplit("/", 1)[-1].lower()
-            matches = [
-                n
-                for n in names
-                if n.rsplit("/", 1)[-1].lower() == wanted and not n.endswith("/")
-            ]
-            if not matches:
-                raise FileNotFoundError(
-                    f"zip member {name!r} not in archive; members={names}"
-                )
-            chosen = matches[0]
-        return _decode_csv_bytes(archive.read(chosen))
+    try:
+        chosen = _member_name(archive, name)
+        encoding, errors = _member_encoding(archive, chosen)
+    except BaseException:
+        archive.close()
+        raise
+    return _member_lines(archive, chosen, encoding, errors)
+
+
+def _member_lines(archive: zipfile.ZipFile, name: str, encoding: str, errors: str) -> Iterator[str]:
+    with archive, archive.open(name) as raw:
+        # newline="" ends lines on \r\n, \r or \n and keeps the endings, as
+        # ``_lines`` does.
+        yield from io.TextIOWrapper(raw, encoding=encoding, errors=errors, newline="")
+
+
+def _read_zip_member(payload: bytes, member: str) -> str:
+    """The text of one named CSV member of a zip; see ``_zip_member_lines``."""
+    return "".join(_zip_member_lines(payload, member))
 
 
 def _typed_value(value: Any, fmt: str | None) -> datetime | None:
@@ -315,17 +391,17 @@ class CSVClient:
         delimiter = kwargs.get("delimiter", ",")
         columns = kwargs.get("columns")
         if zip_member:
-            csv_text = _read_zip_member(response.content, zip_member)
+            lines = _zip_member_lines(response.content, zip_member)
         else:
-            csv_text = response.text
+            lines = _lines(response.text)
         if columns:
             # A file with no header row: every line is a row, named by the
             # spec's columns, and there is no header for a preamble to hide.
             fieldnames: list[str] | None = list(columns)
         else:
-            csv_text = _strip_preamble(csv_text, delimiter=delimiter)
+            lines, _ = _without_preamble(lines, delimiter=delimiter)
             fieldnames = None
-        reader = csv.DictReader(_lines(csv_text), fieldnames=fieldnames, delimiter=delimiter)
+        reader = csv.DictReader(lines, fieldnames=fieldnames, delimiter=delimiter)
         # Municipal CSVs use title case, spaces, and punctuation inconsistently;
         # normalize them so shared field maps apply uniformly.
         if reader.fieldnames:

@@ -3,6 +3,7 @@
 import io
 import zipfile
 from datetime import date
+from itertools import cycle
 
 import httpx
 import pytest
@@ -10,13 +11,16 @@ import pytest
 from src.producers import csv_client
 from src.producers.csv_client import (
     CSVClient,
+    _decode_csv_bytes,
+    _lines,
     _read_zip_member,
     _strip_preamble,
+    _zip_member_lines,
     resolve_relative_dates,
 )
 
 
-def _zip_bytes(members: dict[str, str]) -> bytes:
+def _zip_bytes(members: dict[str, str | bytes]) -> bytes:
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w") as archive:
         for name, text in members.items():
@@ -313,3 +317,104 @@ def test_csv_client_keeps_a_quoted_line_break_inside_its_field():
         ("2", "bare\rreturn", "2026-09-02"),
     ]
 
+
+def _zip_client(payload: bytes) -> CSVClient:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, content=payload, request=request)
+
+    return CSVClient(httpx.Client(transport=httpx.MockTransport(handler)))
+
+
+def test_a_zip_member_is_read_as_its_rows_are(monkeypatch):
+    """Polk County's sales member unpacks to 518 MB: the client decompresses
+    and decodes it as the rows are read instead of holding it whole, and
+    closes the archive once they are."""
+    payload = _zip_bytes({
+        "ftp_sales.txt": "PARCEL_ID,SALEDT,PRICE\r\n"
+        + "".join(f"{n:018d},09/{n % 28 + 1:02d}/2026,{n}00\r\n" for n in range(2000))
+    })
+
+    def whole(*args, **kwargs):
+        raise AssertionError("the member was read whole")
+
+    monkeypatch.setattr(zipfile.ZipFile, "read", whole)
+    monkeypatch.setattr(csv_client, "_decode_csv_bytes", whole)
+    archives = []
+
+    class Recorded(zipfile.ZipFile):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            archives.append(self)
+
+    monkeypatch.setattr(zipfile, "ZipFile", Recorded)
+
+    rows = [
+        row
+        for batch in _zip_client(payload).paginate(
+            "https://example.test/ftp_sales.zip",
+            where_clause="saledt >= '2026-09-27'",
+            order_by="saledt DESC",
+            watermark_col="saledt",
+            watermark_format="%m/%d/%Y",
+            zip_member="ftp_sales.txt",
+        )
+        for row in batch
+    ]
+
+    # Days 27 and 28 of each of the 71 whole 28-row cycles.
+    assert len(rows) == 142
+    assert {row["saledt"] for row in rows} == {"09/27/2026", "09/28/2026"}
+    assert len(archives) == 1
+    assert archives[0].fp is None
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        "Parcel,Street\n1,Zoë Ct\n".encode(),
+        "\ufeffParcel,Street\n1,Zoë Ct\n".encode(),
+        "Parcel,Street\n1,Zoë Ct\n".encode("cp1252"),
+        b"Parcel,Street\n1,Zo\x81\xff Ct\n",
+        b"Parcel,Street\n1,Zo\xc3",
+    ],
+    ids=["utf-8", "utf-8-bom", "cp1252", "neither", "cut-short"],
+)
+def test_a_zip_member_decodes_as_its_whole_bytes_did(raw, monkeypatch):
+    """The member is decoded a piece at a time, in the encoding its whole
+    bytes chose: UTF-8 (without a byte-order mark) when every byte decodes,
+    else cp1252, else UTF-8 with replacement characters. One-byte pieces
+    split every multibyte character."""
+    monkeypatch.setattr(csv_client, "_CHUNK", 1)
+    assert _read_zip_member(_zip_bytes({"sales.txt": raw}), "sales.txt") == _decode_csv_bytes(raw)
+
+
+def test_a_zip_member_splits_lines_as_text_does():
+    """Every ending (\\r\\n, bare \\r, \\n) ends a line, as it does for a
+    downloaded text, wherever the reader's buffer boundaries fall."""
+    text = "".join(
+        f"{n},{'x' * (n % 97)}{ending}" for n, ending in zip(range(6000), cycle(["\r\n", "\r", "\n"]))
+    )
+
+    lines = list(_zip_member_lines(_zip_bytes({"sale.txt": text}), "sale.txt"))
+
+    assert lines == list(_lines(text))
+
+
+def test_a_zip_member_with_a_title_line_streams_without_it():
+    payload = _zip_bytes({
+        "export.csv": (
+            '"Updated Friday 2nd of October 2026 05:35:00 AM"\r\n'
+            '"File Number","Prem County"\r\n'
+            '1,"POLK\r\nCOUNTY"\r\n'
+            "\r\n"
+            "2,LAKE\r\n"
+        )
+    })
+
+    rows = [row for batch in _zip_client(payload).paginate("https://example.test/export.zip", zip_member="export.csv")
+            for row in batch]
+
+    assert rows == [
+        {"file_number": "1", "prem_county": "POLK\r\nCOUNTY"},
+        {"file_number": "2", "prem_county": "LAKE"},
+    ]

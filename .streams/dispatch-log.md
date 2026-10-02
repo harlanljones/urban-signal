@@ -1812,3 +1812,23 @@ Worth keeping:
 - **Measure a file client on the real file.** Parsing every row of
   Alachua's 510,529-line sales file to find a title line took eleven times the
   memory the read itself needs.
+
+### 2026-10-02 — Lakeland deeds and a streaming CSV read (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| lakeland-deeds | `.streams/lakeland-deeds.md` | `config.py` (the source) | 2026-10-02 | done (3,464 read, 1,885 published; the second poll published none) | Lakeland's `deeds` spec; the CSV client's streaming zip read; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Lakeland moves from two signal families to three (three-family tier 39 to 40,
+two-family tier 53 to 52).
+
+Worth keeping:
+
+- **Stream a file a client cannot hold twice.** Read whole and then decoded,
+  Polk's 518 MB sales member took over a gigabyte; streamed, the same read
+  takes 6 MB, and the encoding still matches what the whole bytes chose.
+- **Ask a parcel number where it is before joining it.** Polk's numbers start
+  with range and township, so one string comparison drops the 59% of the
+  county's sales that no parcel in the box could place, and the join's
+  requests fall from 166 to 66.
+

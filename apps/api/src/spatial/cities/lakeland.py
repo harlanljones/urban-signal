@@ -7,6 +7,18 @@ Leaf-only module (US-286). Declares:
 
 SLA falls back to SNAP, Florida inside the metro bbox (declared in the spine;
 ``snap_sla_spec`` builds it).
+
+DEEDS (2026-10-02): the Polk County Property Appraiser's nightly extract
+(``ftp_sales.zip``), whose ``ftp_sales.txt`` lists every recorded sale in the
+county by parcel: 3,034,532 lines, 518 MB unpacked, which the CSV client
+streams out of the zip. The poll downloads it once a day and reads the sales
+dated in the 90 days before it on parcels numbered 23 to 25, the only
+numbers among the City's parcels inside the metro box (3,464 on 2026-10-02;
+the 90 days from 2025-02-17 held 5,272) under an 8,000-row cap. Each sale
+takes its parcel's centroid from the City's ``LandBase/Parcels`` layer,
+joined on ``parcel_id``, and the 1,885 placed inside the box publish. Rows
+key on parcel, date, book and page. The grantor and grantee columns are
+never selected, and the join asks the City's layer for ``PARCELID`` alone.
 """
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta

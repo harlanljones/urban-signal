@@ -2630,4 +2630,10 @@ class Settings(BaseSettings):
         default="https://gis.ocalafl.org/arcgis/rest/services/Public/Parcels/FeatureServer/0",
         description="Marion County parcels with latest sale year and month (City of Ocala GIS)",
     )
+    # Lakeland deeds (2026-10-02): the Polk County Property Appraiser's
+    # nightly sales extract, every recorded sale in the county by parcel.
+    csv_lakeland_deeds_endpoint: str = Field(
+        default="https://www.polkflpa.gov/FTPPage/downloader.ashx?filename=ftp_sales.zip&dir=%5CAppraisalData%5C",
+        description="Polk County Property Appraiser nightly sales extract, zipped ftp_sales.txt (Lakeland deeds snapshot)",
+    )
 settings = Settings()
