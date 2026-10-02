@@ -252,6 +252,12 @@ ANSI_DATE_LITERAL_HOSTS = (
     # declares Eastern time and reads literals in it: ``>= timestamp
     # '2026-09-29 02:00:00'`` leaves out that day's rows, stored at 04:00Z.
     "gis.ashevillenc.gov",
+    # Topeka, KS 311 view (ArcGIS Server 11.5): verified live 2026-10-02 —
+    # ``datetimeinit > '2026-09-25T00:00:00'`` returns 400 "Unable to complete
+    # operation" while ``datetimeinit > timestamp '2026-09-25 00:00:00'``
+    # works. Matched by its path: the host's permits view reads ISO strings
+    # and answers 400 to ``date_issued > timestamp '2026-09-01 00:00:00'``.
+    "maps.topeka.gov/arcgis/rest/services/CityworksViews/SCF_E311_Requests",
 )
 
 

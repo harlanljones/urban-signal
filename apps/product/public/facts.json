@@ -88,7 +88,7 @@
       "submarket_count": 18,
       "feeds": [
         true,
-        false,
+        true,
         true,
         false
       ],
@@ -99,7 +99,12 @@
           "interval_seconds": 1800.0,
           "topic": "raw.municipal.permits"
         },
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "CREATEDTIME",
+          "interval_seconds": 900.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "",
@@ -5348,7 +5353,7 @@
       "submarket_count": 9,
       "feeds": [
         true,
-        false,
+        true,
         true,
         false
       ],
@@ -5359,7 +5364,12 @@
           "interval_seconds": 300.0,
           "topic": "raw.municipal.permits"
         },
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "datetimeinit",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "",

@@ -1705,3 +1705,21 @@ Worth keeping:
 - **Prefer an arrival stamp to a filing time when a view keeps one.** A
   layer's editor-tracking `CreationDate` follows its object ids, so a poll on
   it passes over no late arrival.
+
+### 2026-10-02 — Albuquerque and Topeka 311 (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| albuquerque-topeka-311 | `.streams/albuquerque-topeka-311.md` | `config.py` (the two request layers) | 2026-10-02 | done (Albuquerque: 1,897 rows read, 73 repeats dropped, 1,824 published; Topeka: 1,000 read and published; none dead-lettered, and each second poll published none) | `311` specs for Albuquerque and Topeka; Topeka's request view in `ANSI_DATE_LITERAL_HOSTS`; held and not-now notes for the interior metros in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Albuquerque and Topeka move from two signal families to three (three-family
+tier 33 to 35).
+
+Worth keeping:
+
+- **Bound a slow layer by date before calling it unqueryable.** Albuquerque's
+  CRM layer looked dead to unbounded queries in August; a one-day window
+  answers in seconds.
+- **A row query can fail silently where a count fails loudly.** On
+  Albuquerque's layer, a window holding an unreadable row returns no rows and
+  no error; only a count over it reports the failure.

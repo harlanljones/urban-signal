@@ -21,14 +21,14 @@ Provides neighborhood metadata, camera positioning, investment metrics,
 division catalog, and geographic bounding boxes for the City of Topeka
 (Shawnee County, KS).
 
-Topeka is a ONE-FEED PARTIAL metro: PERMITS only, from the CityworksViews
-hosted service ``BuildingPermits/MapServer/0`` (Commercial Building Permit)
-on the City of Topeka's ArcGIS server (``maps.topeka.gov``). 311 / SLA /
-DEEDS stay Tier 3: Topeka operates through a Cityworks UI for 311, business
+Topeka's PERMITS come from the CityworksViews hosted service
+``BuildingPermits/MapServer/0`` (Commercial Building Permit) on the City of
+Topeka's ArcGIS server (``maps.topeka.gov``). The 2026-08-30 probe left 311,
+SLA and DEEDS at Tier 3: it found 311 only as a Cityworks UI, business
 licensing is handled by the Shawnee County clerks, and Kansas is a statutory
 non-disclosure state (K.S.A. 79-1437e) — Real Estate Sales Validation
-Questionnaires are confidential, so no deed-sales feed exists (probe
-2026-08-30).
+Questionnaires are confidential, so no deed-sales feed exists. The SLA and
+311 notes below record what has registered since.
 
 Live-probe caveats that define this leaf (2026-08-30, US-426):
 
@@ -50,6 +50,18 @@ Live-probe caveats that define this leaf (2026-08-30, US-426):
 SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
 stands in for the licence register the metro lacks. The corpus builds it
 with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
+
+311 (2026-10-02): the same CityworksViews folder serves
+``SCF_E311_Requests``, the City's 311 requests as Cityworks holds them, one
+point per request since 2013: 8,825 in the year to 2026-10-02, about 24 a
+day, with no day missing. The poll follows ``datetimeinit``, which follows
+the view's object ids without exception over that year, keys events on
+``requestid``, and names its columns, so each request's description,
+details, address, initiator and Cityworks link stay on the server. The view
+rejects ISO date strings, so its path, not the host, is listed in
+``ANSI_DATE_LITERAL_HOSTS``: the permits view on the same host reads ISO
+strings. The corpus registers this feed; the feed mirror below carries
+PERMITS only.
 """
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
@@ -322,9 +334,9 @@ TOPEKA_DIVISIONS: dict[str, BoroughMeta] = {
 # ---------------------------------------------------------------------------
 # Feed specs (leaf-local; the spine copies these into REGISTRY).
 # Probed 2026-08-30 (US-426). Do not register the residential building-permit
-# layer (MapServer/1, 7,052 rows — ADR-0007 one-endpoint-per-feedtype), the
-# Cityworks 311 UI, or any Shawnee County deed feed (K.S.A. 79-1437e
-# non-disclosure).
+# layer (MapServer/1, 7,052 rows — ADR-0007 one-endpoint-per-feedtype) or any
+# Shawnee County deed feed (K.S.A. 79-1437e non-disclosure). 311 reads the
+# CityworksViews request view, which the corpus registers.
 # ---------------------------------------------------------------------------
 TOPEKA_PERMITS_ENDPOINT = (
     "https://maps.topeka.gov/arcgis/rest/services/CityworksViews/"

@@ -2534,4 +2534,22 @@ class Settings(BaseSettings):
         ),
         description="Lincoln NE SeeClickFix public requests view URL (SeeClickFix-hosted)",
     )
+    # Albuquerque 311 (2026-10-02): the City's ABQ311 CRM requests, one point
+    # per request joined to its parcels, on the City GIS server.
+    arcgis_albuquerque_311_url: str = Field(
+        default=(
+            "https://coageo.cabq.gov/cabqgeo/rest/services/"
+            "CRM_Service_Requests_MIL1/MapServer/0"
+        ),
+        description="Albuquerque NM ABQ311 service requests layer URL (City GIS)",
+    )
+    # Topeka 311 (2026-10-02): the City's requests as Cityworks holds them, in
+    # the CityworksViews folder that also serves Topeka's permits.
+    arcgis_topeka_311_url: str = Field(
+        default=(
+            "https://maps.topeka.gov/arcgis/rest/services/CityworksViews/"
+            "SCF_E311_Requests/FeatureServer/0"
+        ),
+        description="Topeka KS Cityworks service requests view URL (City GIS)",
+    )
 settings = Settings()

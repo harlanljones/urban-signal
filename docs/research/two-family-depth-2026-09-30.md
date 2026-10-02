@@ -54,12 +54,24 @@ Tampa, Chapel Hill beside Durham, Fort Lauderdale beside Miami-Dade), and
 places with no registered metro (Birmingham, Provo, Tuscaloosa, Clayton
 County, Hilton Head Island, Jupiter and Moses Lake).
 
-| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds (#94) | With Asheville's permits (#95) | With Allentown's permits (#96) | With Allentown's and New Haven's `311` (#97) | With Lincoln's `311` |
-|---|---|---|---|---|---|---|---|---|
-| 4 | 26 | 26 | **27** (Charlotte) | 27 | 27 | 27 | **28** (Allentown) | 28 |
-| 3 | 29 | **30** (Charlotte) | 29 | **30** (Toledo) | **31** (Asheville) | **32** (Allentown) | 32 (New Haven in, Allentown up) | **33** (Lincoln) |
-| 2 | 68 | 67 | 67 | 66 | 65 | 64 | 63 | 62 |
-| 1 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 |
+The 40 two-family metros with `permits` and `sla` were probed for `311` and
+deeds on 2026-10-02 in four groups. The thirteen interior metros
+(Albuquerque, Boise, Bozeman, Evansville, Fort Worth, Laredo, Las Cruces,
+Missoula, Nampa, Sioux Falls, Topeka, Wichita and Worcester) ran live from
+05:15Z to 06:14Z (curl default User-Agent, at least 2.2 seconds between
+requests to a host on a clock shared with the other groups, no personal or
+free-text column requested). Deeds were left out in New Mexico, Texas,
+Montana, Idaho and Kansas, which do not disclose sale prices. Albuquerque's
+and Topeka's `311` register, which gives each a third family; Missoula's
+drainage reports and Worcester's work orders and parcel sales are held, and
+the other gaps have no source.
+
+| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds (#94) | With Asheville's permits (#95) | With Allentown's permits (#96) | With Allentown's and New Haven's `311` (#97) | With Lincoln's `311` (#98) | With Albuquerque's and Topeka's `311` |
+|---|---|---|---|---|---|---|---|---|---|
+| 4 | 26 | 26 | **27** (Charlotte) | 27 | 27 | 27 | **28** (Allentown) | 28 | 28 |
+| 3 | 29 | **30** (Charlotte) | 29 | **30** (Toledo) | **31** (Asheville) | **32** (Allentown) | 32 (New Haven in, Allentown up) | **33** (Lincoln) | **35** (Albuquerque, Topeka) |
+| 2 | 68 | 67 | 67 | 66 | 65 | 64 | 63 | 62 | 60 |
+| 1 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 |
 
 ## Registered
 
@@ -489,6 +501,99 @@ County, Hilton Head Island, Jupiter and Moses Lake).
   CreationDate > '2026-10-02T02:46:02'`, read the newest request again and
   published nothing. Neither poll queried a geocoder.
 
+### Albuquerque, NM — `311`
+
+- **Source:** the City's ABQ311 requests, joined to assessor parcels, on the
+  City GIS server:
+  `coageo.cabq.gov/cabqgeo/rest/services/CRM_Service_Requests_MIL1/MapServer/0`
+  (ArcGIS Server 10.81; the FeatureServer twin needs a token). The
+  2026-08-27 probe saw its queries time out. Those were unbounded queries,
+  which still do not answer within 60 seconds; a query bounded by date
+  answers in two to four.
+- **Shape:** one row per request and parcel: 288,000 rows in the year to
+  2026-10-02, about 790 a day. A request joined to several parcels repeats
+  with the same `CRM_ID`: the 1,887 rows filed in the day to 06:13Z on
+  2026-10-02 held 1,814 requests, one of them on 43 rows and two on 12.
+  Events are keyed on `CRM_ID`, so the poll publishes each request once.
+- **Window:** the spec reads at most the last day, `CREATEDTIME >=
+  CURRENT_TIMESTAMP - INTERVAL '1' DAY`. The server's clock runs on local
+  time, so the day is about 30 hours. `CREATEDTIME` holds real times in UTC
+  and follows `CRM_ID` without exception among those 1,814 requests, and the
+  server takes ISO literals, so the incremental filter needs no ANSI entry.
+- **An unreadable row:** one request filed between 18:02:27Z and 18:02:48Z
+  on 2026-09-30 cannot be read. A count over any window that holds it fails
+  ("Failed to execute query."), and a row query over such a window returns
+  no rows at all, with or without geometry: the 47 rows filed from 17:30Z up
+  to it come back on their own, and none once the window runs past it.
+  Quarterly counts over the rest of the year to 2026-10-02 all succeed, so
+  it is the only such row in that year. A poll whose window held a row like
+  it would read nothing until that row was more than a day old, and would
+  then catch up on the day since.
+- **Personal data:** the address, subject, description, notes, staff
+  accounts, councillor's name and zoning inspector stay on the server;
+  `select` names six columns.
+- **Placement:** every request is a point. 1,823 of the 1,824 requests the
+  first live poll published lie inside the metro box, and one lies just
+  east of it; the spec does not clip. No geocoder is asked.
+- **Poll:** every 15 minutes, newest first by `CREATEDTIME DESC, CRM_ID
+  DESC`, with a 3,000-row cap so that a first poll reads the whole day
+  (1,897 rows on 2026-10-02).
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live layer, Kafka mocked. The first read 1,897 rows
+  with the metadata and two pages and published 1,824 requests filed from
+  00:30Z on 2026-10-01 to 06:13Z on 2026-10-02; the dedup dropped 73
+  repeats, and none was dead-lettered. 1,491 are closed, 243 new, 89 pending
+  and one updated. By type, 1,054 are missed trash pickups, 192 large-item
+  pickups, 163 trash or recycling carts, 39 animal-welfare dispatches, 32
+  commercial solid-waste requests and 31 solid-waste questions. The second
+  poll sent `(CREATEDTIME >= CURRENT_TIMESTAMP - INTERVAL '1' DAY) AND
+  CREATEDTIME > '2026-10-02T06:13:00'` and read nothing; a count of the
+  requests filed after 06:13:00Z returned 0 two minutes later. Neither poll
+  queried a geocoder.
+
+### Topeka, KS — `311`
+
+- **Source:** the `CityworksViews` folder on the City's ArcGIS server, which
+  serves Topeka's permits, also serves the City's 311 requests as Cityworks
+  holds them:
+  `maps.topeka.gov/arcgis/rest/services/CityworksViews/SCF_E311_Requests/FeatureServer/0`
+  (ArcGIS Server 11.5). The 2026-08-30 probe found 311 only as a Cityworks
+  UI.
+- **Shape:** 65,189 requests since 2013-09-10 on 2026-10-02, one point
+  each; the 8,825 filed in the year to 2026-10-02 carry 8,825 `requestid`s.
+  Half of the 2,925 filed in the 90 days to 2026-10-02 went to the code
+  department (nuisance complaints and abandoned vehicles), the rest to
+  streets, forestry, police, traffic, engineering and storm water. The view
+  holds Cityworks service requests, whichever department takes them, so the
+  spec keeps them all.
+- **Personal data:** each request's description, details, address,
+  initiator, assignee and Cityworks link stay on the server; `select` names
+  eight columns.
+- **Freshness:** about 24 requests a day: 8,825 in the year to 2026-10-02,
+  from 396 in November 2025 to 1,296 in June 2026, with no day missing. The
+  longest quiet spell was 0.89 days, so `expected_cadence_days` is 1.
+- **Watermark:** `datetimeinit`, which holds real times in UTC (the layer
+  declares UTC) and follows the view's object ids and request ids without
+  exception over that year. The view answers 400 to an ISO literal
+  (`datetimeinit > '2026-09-25T00:00:00'`) and takes `timestamp '...'`, so
+  its path joins `ANSI_DATE_LITERAL_HOSTS`. The host cannot: the permits
+  view there takes ISO strings and answers 400 to `date_issued > timestamp
+  '2026-09-01 00:00:00'`.
+- **Placement:** all 2,925 requests filed in the 90 days to 2026-10-02 lie
+  inside the metro box, and the spec does not clip. No geocoder is asked.
+- **Poll:** every 30 minutes, newest first by `datetimeinit DESC, ObjectId
+  DESC`, under the default cap of 1,000 rows, which reached back to
+  2026-08-26 on the first poll.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live layer, Kafka mocked. The first read and
+  published 1,000 requests filed from 2026-08-26 to 2026-10-02 with the
+  metadata and one page; none was dead-lettered. By problem code, 367 are
+  nuisance complaints, 109 abandoned vehicles, 86 potholes, 79 tree limbs or
+  brush, 35 police parking issues and 27 homeless encampments; 631 are
+  closed, 319 open and 28 in progress. The second poll sent `datetimeinit >
+  timestamp '2026-10-02 00:03:53'`, read the newest request again and
+  published nothing. Neither poll queried a geocoder.
+
 ## Held
 
 | Metro (missing) | Source | Why held | Re-check when |
@@ -504,6 +609,9 @@ County, Hilton Head Island, Jupiter and Moses Lake).
 | Burlington (`311`) | The City's `SeeClickFix` export (`services1.arcgis.com/1bO0c7PxQdsGidPK`, points): 53,597 requests, the newest filed on 2026-04-26, the layer last edited on 2026-04-27. Its filing date is text ("4/26/2026 6:48 PM"). SeeClickFix itself is still the City's live system. | Frozen for five months, like the City's permits export. | The export moves past 2026-04-26. |
 | Rochester (`311`) | The City's `311_Case_Data` layer (`services2.arcgis.com/yoz1ZtATTCokO9nU`): 51,721 cases filed from 2021-01-02 to 2022-02-07, data last edited on 2022-12-12, with no successor in the org. | Frozen since 2022. | A current requests layer appears. |
 | Kansas City (`permits`) | Overland Park's `Building_Permits` layer (`services1.arcgis.com/YQsWDBr0DjMtoTQo`, a hosted layer last rebuilt on 2026-09-30): 13,824 permits over a rolling window from 2024-01-02, newest 2026-09-29, 429 in 30 days, ISO literals accepted, `CaseNumber` unique; 84% of recent rows carry a point and the rest an address. | It covers one suburb in Kansas, roughly a tenth of the metro's people, while the metro's `311` and licences are Kansas City, Missouri's. Registered as the metro's permits, it would mark Kansas City as covered where the City itself has none. | Kansas City, Missouri publishes current permits, or enough suburbs publish that the metro can take them together. |
+| Missoula (`311`) | The City's "Report Drainage Issue" Survey123 layer (`services.arcgis.com/HfwHS0BxZBQ1E5DY/.../Illicit_Discharge/FeatureServer/0`): 329 reports since 2022-04-30, 34 in 90 days, each with a point and an arrival stamp. | One issue type, about twelve reports a month with bursts of what look like staff tests, on a layer the public can edit. Registered as the metro's `311`, it would mark Missoula as covered where the City publishes no request stream. | The City publishes its requests. |
+| Worcester (`311`) | The City's CSRS work orders (`services1.arcgis.com/j8dqo2DJE7mVUBU1/.../CsrsWorkOrders_TEST/FeatureServer/0`, its "2021 to Present" dataset, refreshed weekly): 382,664 requests with unique ids, 15,708 logged in 90 days, a third of them through SeeClickFix. | The table has no geometry. Its coordinates are Massachusetts State Plane feet, which the `311` producer cannot convert yet (the licence producer does for Boston), its streets carry no house numbers, and its dates are whole days, refreshed a week at a time. | The `311` producer converts State Plane coordinates. |
+| Worcester (`deeds`) | MassGIS's statewide parcels for Worcester (`TOWN_ID = 348`) carry each parcel's last sale: 47,703 parcels, the newest sale on 2026-04-17. | An annual assessor roll: no sale in the 90 days to 2026-10-02. | MassGIS loads Worcester more often. |
 
 ## Not now
 
@@ -536,6 +644,15 @@ County, Hilton Head Island, Jupiter and Moses Lake).
 | Frederick (`311`) | Frederick County's "FCG FixIT!" runs on SeeClickFix (since 2022) with no published layer, the City's "Report a Problem" is a web form, and Maryland's Socrata portal has no requests dataset. | SeeClickFix publishes a view for the county or City. |
 | Providence (`311`) | PVD311 is a Power Apps portal with no public rows; the Socrata portal and the City's ArcGIS Online org (963 items) hold no requests, and SeeClickFix's Open311 feed for the City stopped in September 2021 when last checked (2026-08-27). | PVD311 publishes an extract. |
 | Roanoke (`311`) | The City's QAlert layer (`QAlertIncidentsProd`) has the columns a `311` feed needs but returned no rows on 2026-08-28 or 2026-09-30. | The layer returns rows. |
+| Boise (`311`) | Requests go through departmental web forms with no published rows; the City's ArcGIS Online org (69 matching items) and Hub (88 datasets) hold inventories and police calls. | A requests layer appears. |
+| Bozeman (`311`) | The City's ArcGIS Online org holds a daily-counts table (last edited 2025-01-22) and a 2019 pothole inventory; its Cityworks folder needs a token. | Cityworks requests are published. |
+| Fort Worth (`311`) | MyFW runs on a vendor CRM with no public rows; `data.fortworthtexas.gov` holds ten datasets, none of them requests, and the City's `mapit` server holds code violations, crime and permits. | A requests dataset appears. |
+| Laredo (`311`) | The CKAN portal's newest request slice (fiscal 2023–24, 37,468 rows) stops on 2024-06-26 and carries no location; only the 2014–2018 slice has coordinates. | A current slice with locations appears. |
+| Las Cruces (`311`) | Requests run on Tyler Portico with no row API; the City's ArcGIS server holds permits, business registrations and code enforcement, and its ArcGIS Online org and Hub hold no request layer. | A requests layer appears. |
+| Nampa (`311`) | Requests and code complaints go through a CivicPlus web form; the City's public map service holds 45 static layers. | A requests layer appears. |
+| Wichita (`311`) | The City's app runs on SeeClickFix, and neither its ArcGIS server nor its ArcGIS Online org holds a request layer; its facility work orders are internal and the service is stopped. | SeeClickFix publishes a view for the City. |
+| Sioux Falls (`311`, `deeds`) | Requests go through SeeClickFix, and the City's VUEWorks work orders are unpublished; the City GIS has pothole totals, code cases and police calls. South Dakota does not disclose sale prices: the City's parcel layer carries no sale, and the county GIS answered 403 and was not asked again. | SeeClickFix publishes a view for the City. |
+| Evansville (`311`, `deeds`) | Requests reportedly run on SeeClickFix (not confirmed on a City page), and the City's ArcGIS Online org and Hub hold no request layer. The City-County GIS server answered "Could not access any server machines" four times from 05:46Z to 06:12Z, so its assessor sales layers, named in older web maps, could not be checked; the registered permits there fail with it. | The GIS server answers again. |
 | Honolulu (`deeds`) | No sales on `data.honolulu.gov` (72 datasets), the City's parcel layers, the state's parcel layer or the state's CKAN portal; the City's cadastral tables carry assessed values by tax year and no sale. Sales are searched one parcel or document at a time in qPublic and the Bureau of Conveyances. | A sales or conveyance dataset appears. |
 | Indianapolis (`deeds`) | The City's parcel layers carry owners and assessed values but no sale; `data.indy.gov` (651 datasets) has only tax-sale and surplus reports, and the state's Gateway publishes annual assessment files, not sales disclosures. A statewide sales-disclosure layer on ArcGIS Online is a private compilation that names buyers and sellers and returned no Marion County rows. | The county or state publishes sales disclosures. |
 | Oxnard–Ventura (`deeds`) | Ventura County's parcel layers carry only parcel numbers and coordinates, and no county server or ArcGIS Online item carries sales; California assessors do not publish prices. The Assessor's site answered with a "Request Rejected" page and was not asked again. | A sales or transfer layer appears. |
@@ -545,12 +662,13 @@ A platform client would not unlock these cheaply: Accela Citizen Access
 (Dayton, Indianapolis, Oakland, Omaha) is a search interface with no anonymous
 bulk export, and the Tyler EnerGov portal behind Kansas City's permits has no
 public row API either. Peoria's and Bridgeport's permits sit in Tyler EnerGov
-too, and Reno's in the region's Accela; OpenGov's ViewPoint Cloud, which
-holds New Haven's, Providence's and the City of Frederick's, was not probed. The same holds for deeds: Honolulu's and
-Tulsa's sit behind one-record-at-a-time or paid recorder searches. For
-`311`, SeeClickFix is the shared platform (Bridgeport, Canton, Frederick
-County and Peoria, and behind Burlington's frozen export), and its public API
-returns reporters and descriptions with no way to leave them out. The cheaper
-route is the one New Haven's and Lincoln's feeds take: SeeClickFix
+too, and Reno's in the region's Accela; OpenGov's ViewPoint Cloud, which holds
+New Haven's, Providence's and the City of Frederick's, was not probed. The
+same holds for deeds: Honolulu's and Tulsa's sit behind one-record-at-a-time
+or paid recorder searches. For `311`, SeeClickFix is the shared platform
+(Bridgeport, Canton, Frederick County, Peoria, Sioux Falls, Wichita and
+probably Evansville, and behind Burlington's frozen export), and its public
+API returns reporters and descriptions with no way to leave them out. The
+cheaper route is the one New Haven's and Lincoln's feeds take: SeeClickFix
 publishes public ArcGIS views of some clients' requests in its own ArcGIS
 Online org, which the existing ArcGIS client reads.

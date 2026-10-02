@@ -475,6 +475,37 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+  '311':
+    endpoint: https://coageo.cabq.gov/cabqgeo/rest/services/CRM_Service_Requests_MIL1/MapServer/0
+    platform: arcgis
+    watermark_col: CREATEDTIME
+    id_keys:
+    - CRM_ID
+    topic: raw.municipal.311
+    interval_seconds: 900.0
+    producer_key: '311'
+    order_by: CREATEDTIME DESC, CRM_ID DESC
+    select: CRM_ID,STATUSID,CREATEDTIME,CLOSEDTIME,QUICK_CODE,ZIP_CODE
+    where: CREATEDTIME >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+    needs_geocode: false
+    field_map:
+      incident_id:
+      - CRM_ID
+      created_date:
+      - CREATEDTIME
+      closed_date:
+      - CLOSEDTIME
+      complaint_type:
+      - QUICK_CODE
+      status:
+      - STATUSID
+      zipcode:
+      - ZIP_CODE
+    ingestion_mode: incremental
+    oid_field: CRM_ID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    batch_limit: 3000
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis
