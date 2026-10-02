@@ -134,19 +134,17 @@ class TestTucsonPermitParsing:
         assert (round(event.latitude, 4), round(event.longitude, 4)) == (32.2501, -110.9102)
         assert (event.job_type.value, event.normalized_permit_type) == ("A2", "MAJOR_RENOVATION")
 
-    def test_a_new_dwelling_reads_as_new_construction_in_the_normalized_type(self, permits):
+    def test_a_new_dwelling_is_a_new_building(self, permits):
         event = permits.parse_socrata_row(
             _permit(NUMBER="TC-RES-0926-99002", WORKCLASS="New Dwelling Permit", VALUE=244600.0), city_id="tucson"
         )
 
         assert event is not None
-        # The job type codes know no "new dwelling"; the normalized type does.
-        assert (event.job_type.value, event.normalized_permit_type) == ("OT", "NEW_CONSTRUCTION")
+        assert (event.job_type.value, event.normalized_permit_type) == ("NB", "NEW_CONSTRUCTION")
 
-    def test_a_model_permit_takes_the_catch_all_type(self, permits):
+    def test_a_model_permit_is_a_new_building(self, permits):
         # A home built from a plan the City approved once (141 in the window
-        # on 2026-10-02, averaging 2,331 square feet): neither type reads the
-        # name as new construction.
+        # on 2026-10-02, averaging 2,331 square feet).
         event = permits.parse_socrata_row(
             _permit(NUMBER="TC-RES-0926-99003", TYPE="Model Building Permit", WORKCLASS="Residential Model Permit",
                     VALUE=288800.0),
@@ -154,7 +152,7 @@ class TestTucsonPermitParsing:
         )
 
         assert event is not None
-        assert (event.job_type.value, event.normalized_permit_type) == ("OT", "MINOR_ALTERATION")
+        assert (event.job_type.value, event.normalized_permit_type) == ("NB", "NEW_CONSTRUCTION")
 
 
 class TestTucsonPoll:

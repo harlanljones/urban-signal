@@ -172,6 +172,18 @@ def test_the_permits_producer_reads_mygov_times(scheduler):
     assert (event.job_id, event.status, event.zipcode, event.estimated_cost) == ("26-990001", "complete", "79601", 12500.0)
 
 
+def test_a_new_house_is_new_construction(scheduler):
+    # 114 of August's 636 permits were new single-family homes and townhouses.
+    row = dict(zip(COLUMNS, ("26-990003", "New Single Family Residence", "active", "08/03/2026 at 9:11 AM",
+                             "08/24/2026 at 8:35 AM", "0", "100 EXAMPLE ST", "79601", "-99.7331, 32.4487")))
+    row.update(latitude=32.4487, longitude=-99.7331)
+
+    event = scheduler.producers["permits"].parse_socrata_row(row, city_id="abilene")
+
+    assert event is not None
+    assert (event.job_type.value, event.normalized_permit_type) == ("NB", "NEW_CONSTRUCTION")
+
+
 class TestAbilenePoll:
     def test_a_month_publishes_once_and_the_next_workbook_follows(self, scheduler):
         september = [

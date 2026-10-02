@@ -571,7 +571,8 @@ class TestInlandEmpirePermitParsing:
         job_type candidates; finer classification (CASE_DESCR carries 'NEW
         SINGLE- FAMILY DWELLING' etc.) is analytics-side. The OAPT code is
         not among the producer's recognized codes, so it lands on OT
-        honestly."""
+        honestly; a work class that names a new building is read by the
+        shared producer, not the leaf."""
         _patch_resolve(monkeypatch, "permits")
         event = permits.parse_socrata_row(
             _flatten_permits(PERMITS_FEATURE_1), city_id="inland_empire"
@@ -582,7 +583,7 @@ class TestInlandEmpirePermitParsing:
         record["CASE_WORK_CLASS"] = "BLD01 - NEW COMMERCIAL BUILDING"
         event = permits.parse_socrata_row(record, city_id="inland_empire")
         assert event is not None
-        assert event.job_type == JobType.OT
+        assert event.job_type == JobType.NB
 
 
 class TestInlandEmpireCrimeParsing:

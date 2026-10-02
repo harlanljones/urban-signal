@@ -1947,3 +1947,17 @@ Worth keeping:
 - **Count the classes a new feed publishes.** Texarkana's trade permits
   name "new construction" in their titles and Abilene's new homes do not;
   only the job-type counts of the live poll showed either.
+
+
+### 2026-10-02 — Permit types: new homes and trade permits (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| permit-taxonomy | `.streams/permit-taxonomy.md` | `dob_permits_producer.py` (trade permits leave `NB`; new homes named another way leave `OT`) | 2026-10-02 | done (1,480 of 93,511 surveyed rows in 15 metros change class; no other row changes) | `names_new_building` and `is_trade_permit` in the shared taxonomy; whole-word `NB` |
+
+Worth keeping:
+
+- **Survey the vocabulary before writing a rule.** The old keywords read
+  "New Single Family Residence" as a minor alteration in 15 metros; the
+  survey of 98 feeds' type names showed every spelling, and each rule was
+  checked against all of them before it landed.

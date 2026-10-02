@@ -225,6 +225,14 @@ class TestTexarkanaPermitParsing:
         assert geocoder.queries == ["100 Example St., Texarkana, TX"]
         assert event.latitude == pytest.approx(33.4252)
 
+    def test_a_trade_permit_for_new_construction_is_a_trade_permit(self, scheduler, geocoder):
+        # 56 of the 201 permits on 2026-10-02 were plumbing, electrical and
+        # HVAC permits whose titles name the new construction they serve.
+        event = scheduler.producers["permits"].parse_socrata_row(self._row(SEPTEMBER[2]), city_id="texarkana")
+
+        assert event is not None
+        assert (event.job_type.value, event.normalized_permit_type) == ("A2", "MECHANICAL_ELECTRICAL_PLUMBING")
+
     def test_a_permit_in_review_has_no_issue_date(self, scheduler, geocoder):
         event = scheduler.producers["permits"].parse_socrata_row(self._row(SEPTEMBER[1]), city_id="texarkana")
 

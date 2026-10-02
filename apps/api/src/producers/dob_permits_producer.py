@@ -321,6 +321,17 @@ class DOBPermitsProducer:
                     job_type = JobType(raw_job_type)
                 except ValueError:
                     job_type = JobType.OT
+            # A trade's permit for a new building is still a trade permit
+            # (Texarkana's "Plumbing Permit -New construction & major
+            # remodels"), and a new home named some other way is a new
+            # building (Abilene's "New Single Family Residence", Las Vegas's
+            # "ProdHome"); see src/features/permit_taxonomy.py.
+            from src.features.permit_taxonomy import is_trade_permit, names_new_building
+
+            if job_type is JobType.NB and is_trade_permit(raw_job_type):
+                job_type = JobType.A2
+            elif job_type is JobType.OT and names_new_building(raw_job_type):
+                job_type = JobType.NB
 
             # Cost
             cost_raw = (
