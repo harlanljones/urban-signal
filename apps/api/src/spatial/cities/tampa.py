@@ -34,9 +34,20 @@ Tampa registers as a PARTIAL city like Austin/Los Angeles. Live ArcGIS
 verification found a full permits layer and an alcohol-beverage action-history
 layer that supports a partial SLA signal. Both are point feeds with date
 watermarks; the permits watermark is an edit stamp rather than an issuance date.
-311 remains token-gated and no usable deeds feed was found, so those families
-are deliberately absent; ``get_tampa_dataset()`` raises a readable error for
-them, exactly like the shared ``get_dataset()`` contract.
+311 remains token-gated, so that family is deliberately absent.
+``get_tampa_dataset()`` covers the feeds authored here and raises a readable
+error for 311 and deeds, exactly like the shared ``get_dataset()`` contract.
+
+DEEDS (2026-10-02, registered in the corpus, ``data/tampa.yaml``): the City's
+GIS server publishes the Hillsborough County Property Appraiser's parcels
+(``Parcels/TaxParcel``, 531,613 polygons), each with its latest sale's date
+and price. The poll reads the parcels whose sale falls in the 90 days before
+it (3,886 on 2026-10-02; May to July 2026 held 6,441) under a 10,000-row cap,
+places each on its polygon's centroid and keeps the 2,468 inside the metro
+box. Rows key on folio and sale date. The layer carries no refresh stamp; on
+2026-10-02 its newest sale was 14 days old, so the cadence is 30 days. The
+owner, the mailing address, the trade name and the legal description are
+never selected.
 """
 
 from typing import Dict

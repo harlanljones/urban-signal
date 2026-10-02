@@ -16,6 +16,17 @@ bounding boxes for the City of Gainesville, FL (Alachua County seat).
 
 Feed coverage in this ticket: PERMITS via the verified public Socrata dataset
 `p798-x3nx` on `data.cityofgainesville.org` (native latitude/longitude + point field).
+
+DEEDS (2026-10-02): the Alachua County Property Appraiser's nightly extract
+(``ACPA_CAMAData.zip``), whose ``Sales.txt`` lists every recorded sale in the
+county by parcel, tab-delimited and without party names. The poll downloads
+it once a day and reads the sales dated in the 90 days before it (2,486 on
+2026-10-02; the 90 days to 2025-08-26 held 3,484) under a 6,000-row cap. Each
+sale takes its parcel's centroid from the Property Appraiser's
+``PublicParcel`` layer, joined on ``prop_id``, and the 1,556 placed inside
+the metro box publish. Rows key on parcel, date, book and page, since a
+parcel can change hands twice in a day. Only ``Sales.txt`` is read, and the
+join asks the parcel layer for ``Prop_ID`` alone.
 """
 
 from typing import Dict

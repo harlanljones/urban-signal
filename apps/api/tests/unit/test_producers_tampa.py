@@ -1,7 +1,9 @@
 """Unit tests for the Tampa registration and its producer wiring.
 
-Tampa registers full permits plus a partial alcohol-beverage SLA feed. 311 /
-DEEDS remain absent because the live audit found no usable public feed.
+Tampa registers full permits plus a partial alcohol-beverage SLA feed. 311
+remains absent: the City's request layer needs a token. Deeds (the City's copy
+of the County parcels, 2026-10-02) are registered from the corpus, not from
+this leaf's mirror, so the mirror still raises for them.
 
 These tests are SELF-CONTAINED: they import the leaf module's
 ``TAMPA_FEED_SPECS`` / ``get_tampa_dataset`` directly and never touch
@@ -126,7 +128,7 @@ class TestFeedRegistration:
 
     @pytest.mark.parametrize("absent_feed", [FeedType.COMPLAINTS_311, FeedType.DEEDS])
     def test_absent_feeds_raise_readable_errors(self, absent_feed):
-        """The unverified 311/DEEDS families stay absent."""
+        """The leaf mirror carries neither 311 nor deeds."""
         with pytest.raises(KeyError, match=r"'tampa'.*available"):
             get_tampa_dataset(absent_feed)
 

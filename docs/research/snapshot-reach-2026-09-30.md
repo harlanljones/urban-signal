@@ -140,6 +140,28 @@ text, so the server casts the dates and the feed reads the 90 days before
 each poll, whole, newest first, each sale at its parcel's point; every one
 lies in the metro box. The cap holds the 2,898 sales of April to June 2026.
 
+Tampa `deeds` (3,886 rows, cap 10,000) joined the same day. The City's copy
+of Hillsborough County's parcels holds one row per parcel with its latest
+sale, so the feed reads the sales dated in the 90 days before each poll
+county-wide, whole, newest first, each at its polygon's centroid; the clip
+skips the 1,418 outside the metro box, and 2,468 publish. The cap holds the
+6,441 sales of May to July 2026.
+
+Gainesville `deeds` (2,486 rows, cap 6,000) reads the Alachua County
+Property Appraiser's nightly extract once a day, as Tacoma reads Pierce
+County's file: one download a poll, `Sales.txt` filtered in memory to the
+sales dated in the 90 days before it, each sale at its parcel's centroid;
+the clip skips the 930 outside the metro box, and 1,556 publish. The cap
+holds the 3,484 sales of the 90 days to 2025-08-26, the busiest window in
+two years.
+
+Ocala `deeds` (7,472 rows, cap 15,000) reads Marion County's parcels on the
+City's server, each with its latest sale's year and month: the server
+computes the current month and the three before it, and the feed reads them
+whole, newest first, each sale at its parcel's point; the clip skips the
+1,107 outside the metro box, and 6,365 publish. The cap holds April to June
+2026's 9,946 sales with a partial month on top.
+
 ## Newest-first windows
 
 | Feed | Order | Rows dated in last 30 / 90 days | Window after |

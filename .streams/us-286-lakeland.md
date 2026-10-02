@@ -22,6 +22,7 @@ Onboard Lakeland, FL as a new Urban Signal metro with a verified ArcGIS permits 
 ## Decisions
 
 - 2026-08-28 — Use iMS Public CED MapServer as the permits feed endpoint. SLA via SNAP (FL).
+- 2026-10-02 — Deeds held: the Polk County Property Appraiser's nightly sales file (`ftp_sales.zip`) is registrable with the City's `LandBase/Parcels` layer for placement, but its member unpacks to 518 MB, which the CSV client reads whole. See `.streams/florida-deeds.md`.
 
 ## Current step
 

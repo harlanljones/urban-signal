@@ -1793,3 +1793,22 @@ Worth keeping:
 - **Test a host's literals against a known instant.** A zone-less literal one
   server reads as UTC another reads as local time; counting the rows past one
   request's timestamp in each form settles it in a handful of queries.
+
+### 2026-10-02 — Tampa, Gainesville and Ocala deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| florida-deeds | `.streams/florida-deeds.md` | `config.py` (the three sources), `deeds_acris_producer.py` (padded deed types) | 2026-10-02 | done (Tampa: 3,886 read, 2,468 published; Gainesville: 2,486 read, 1,556 published; Ocala: 7,472 read, 6,365 published; each second poll published none; Lakeland held for a streaming CSV read) | `deeds` specs for Tampa, Gainesville and Ocala; Ocala's `compose_deed_date`; the CSV client's bare `CURRENT_DATE` and two-row title check; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Tampa and Gainesville move from two signal families to three and Ocala from
+one to two (three-family tier 37 to 39, two-family tier 54 to 53, one-family
+tier 36 to 35).
+
+Worth keeping:
+
+- **Count the rows a poll would key as one another.** Ocala's first live
+  poll reported seven duplicates inside a single read: polygons without a
+  parcel number whose sales shared a placeholder book and page.
+- **Measure a file client on the real file.** Parsing every row of
+  Alachua's 510,529-line sales file to find a title line took eleven times the
+  memory the read itself needs.

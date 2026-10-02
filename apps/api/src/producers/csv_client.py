@@ -21,8 +21,9 @@ import csv
 import io
 import re
 import zipfile
-from collections.abc import Generator, Iterator
+from collections.abc import Generator, Iterable, Iterator
 from datetime import UTC, datetime, timedelta
+from itertools import islice
 from typing import Any
 
 import httpx
@@ -33,6 +34,9 @@ _NOT_IN = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s+NOT\s+IN\s*\(([^)]*)\)\s*$
 # The rolling window ArcGIS specs send server-side (``CURRENT_DATE - INTERVAL
 # '180' DAY``); a file feed resolves it to a date before filtering rows.
 _RELATIVE_DATE = re.compile(r"CURRENT_DATE\s*-\s*INTERVAL\s*'(\d+)'\s*DAY", re.IGNORECASE)
+# ``CURRENT_DATE`` alone bounds a window above, so a sale keyed in the future
+# (Alachua's Sales.txt holds one dated 2079) stays out of it.
+_CURRENT_DATE = re.compile(r"\bCURRENT_DATE\b", re.IGNORECASE)
 # One line with its ending: \r\n, \r or \n, as ``io.StringIO(text, newline="")``
 # splits them, so the csv module ends rows on any of the three (Milwaukee's
 # permits export uses bare \r).
@@ -49,18 +53,25 @@ def _lines(text: str) -> Iterator[str]:
 
 
 def resolve_relative_dates(where_clause: str | None, today: Any = None) -> str | None:
-    """Replace ``CURRENT_DATE - INTERVAL 'N' DAY`` with that day's quoted ISO date."""
+    """Replace ``CURRENT_DATE - INTERVAL 'N' DAY`` with that day's quoted ISO
+    date, and ``CURRENT_DATE`` alone with today's."""
     if not where_clause:
         return where_clause
     day = today or datetime.now(UTC).date()
-    return _RELATIVE_DATE.sub(
+    clause = _RELATIVE_DATE.sub(
         lambda m: f"'{(day - timedelta(days=int(m.group(1)))).isoformat()}'", where_clause
     )
+    return _CURRENT_DATE.sub(f"'{day.isoformat()}'", clause)
 
 
 def _normalize_header(name: str) -> str:
     """Normalize municipal CSV headers to the producer field-map convention."""
     return re.sub(r"[^a-z0-9]+", "_", name.strip().lower()).strip("_")
+
+
+def _nonblank_rows(lines: Iterable[str], delimiter: str) -> Iterator[list[str]]:
+    """The parsed rows of ``lines`` that hold at least one non-blank cell."""
+    return (row for row in csv.reader(lines, delimiter=delimiter) if any(cell.strip() for cell in row))
 
 
 def _strip_preamble(text: str, delimiter: str = ",") -> str:
@@ -72,9 +83,11 @@ def _strip_preamble(text: str, delimiter: str = ",") -> str:
     Returning the text unchanged when no preamble is detected keeps every
     existing feed's parse identical.
     """
-    reader = csv.reader(io.StringIO(text, newline=""), delimiter=delimiter)
-    rows: list[list[str]] = [row for row in reader if any(cell.strip() for cell in row)]
-    if len(rows) >= 2 and len(rows[0]) == 1 and len(rows[1]) > 1:
+    # Only the first two rows decide: parsing every row of Alachua County's
+    # 510,000 sales into lists took more memory than the file itself.
+    rows = list(islice(_nonblank_rows(_lines(text), delimiter), 2))
+    if len(rows) == 2 and len(rows[0]) == 1 and len(rows[1]) > 1:
+        rows = list(_nonblank_rows(io.StringIO(text, newline=""), delimiter))
         buffer = io.StringIO()
         writer = csv.writer(buffer, delimiter=delimiter, lineterminator="\n")
         writer.writerows(rows[1:])

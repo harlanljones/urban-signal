@@ -168,6 +168,40 @@ datasets:
     non_spatial: null
     zip_member: null
     delimiter: null
+  deeds:
+    endpoint: https://gis.ocalafl.org/arcgis/rest/services/Public/Parcels/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - parcel
+    - bk1
+    - pg1
+    topic: raw.municipal.deeds
+    interval_seconds: 21600.0
+    producer_key: deeds
+    order_by: yr1 DESC, mo1 DESC, OBJECTID DESC
+    select: OBJECTID,parcel,yr1,mo1,pr_1,bk1,pg1,INSIDE_X,INSIDE_Y
+    where: parcel <> '' AND yr1 * 12 + mo1 >= EXTRACT(YEAR FROM CURRENT_DATE) * 12 + EXTRACT(MONTH FROM CURRENT_DATE) - 3 AND yr1 * 12 + mo1 <= EXTRACT(YEAR FROM CURRENT_DATE) * 12 + EXTRACT(MONTH FROM CURRENT_DATE)
+    needs_geocode: false
+    field_map:
+      doc_id:
+      - parcel
+      - OBJECTID
+      document_amount:
+      - pr_1
+      bbl:
+      - parcel
+      latitude:
+      - INSIDE_Y
+      longitude:
+      - INSIDE_X
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 250000
+    expected_cadence_days: 45
+    batch_limit: 15000
+    composite_id: true
+    metro_clip: true
 aliases:
 - ocala_fl
 - ocala fl

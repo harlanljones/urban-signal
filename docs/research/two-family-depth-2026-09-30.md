@@ -110,12 +110,18 @@ sales are keyed months late, Greenville's had not moved in five weeks,
 Spartanburg's carry no price, and Savannah's and Macon-Bibb's are annual
 rolls, so those five are held; the other gaps have no source.
 
-| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds (#94) | With Asheville's permits (#95) | With Allentown's permits (#96) | With Allentown's and New Haven's `311` (#97) | With Lincoln's `311` (#98) | With Albuquerque's and Topeka's `311` (#99) | With Yakima's `311` and deeds (#100) | With Cape Coral's `311` and deeds (#101) | With the wrong-place permits retracted (#102) | With Augusta's `311` and Wilmington's deeds |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 4 | 26 | 26 | **27** (Charlotte) | 27 | 27 | 27 | **28** (Allentown) | 28 | 28 | **29** (Yakima) | **30** (Cape Coral) | 30 | 30 |
-| 3 | 29 | **30** (Charlotte) | 29 | **30** (Toledo) | **31** (Asheville) | **32** (Allentown) | 32 (New Haven in, Allentown up) | **33** (Lincoln) | **35** (Albuquerque, Topeka) | 35 | 35 | 35 | **37** (Augusta, Wilmington NC) |
-| 2 | 68 | 67 | 67 | 66 | 65 | 64 | 63 | 62 | 60 | 59 | 58 | 56 | 54 |
-| 1 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | **36** (Ocala, Macon-Bibb) | 36 |
+The Florida sales followed later on 2026-10-02. Tampa's, Gainesville's and
+Ocala's register, which gives Tampa and Gainesville a third family and Ocala
+a second. Lakeland's are held: Polk County's nightly sales file unpacks to
+518 MB, and the CSV client reads a zip member whole, so the feed waits for a
+streaming read.
+
+| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds (#94) | With Asheville's permits (#95) | With Allentown's permits (#96) | With Allentown's and New Haven's `311` (#97) | With Lincoln's `311` (#98) | With Albuquerque's and Topeka's `311` (#99) | With Yakima's `311` and deeds (#100) | With Cape Coral's `311` and deeds (#101) | With the wrong-place permits retracted (#102) | With Augusta's `311` and Wilmington's deeds (#103) | With Tampa's, Gainesville's and Ocala's deeds |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 4 | 26 | 26 | **27** (Charlotte) | 27 | 27 | 27 | **28** (Allentown) | 28 | 28 | **29** (Yakima) | **30** (Cape Coral) | 30 | 30 | 30 |
+| 3 | 29 | **30** (Charlotte) | 29 | **30** (Toledo) | **31** (Asheville) | **32** (Allentown) | 32 (New Haven in, Allentown up) | **33** (Lincoln) | **35** (Albuquerque, Topeka) | 35 | 35 | 35 | **37** (Augusta, Wilmington NC) | **39** (Tampa, Gainesville) |
+| 2 | 68 | 67 | 67 | 66 | 65 | 64 | 63 | 62 | 60 | 59 | 58 | 56 | 54 | 53 (Ocala in, Tampa and Gainesville up) |
+| 1 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | **36** (Ocala, Macon-Bibb) | 36 | 35 |
 
 ## Registered
 
@@ -944,6 +950,143 @@ rolls, so those five are held; the other gaps have no source.
   nothing. No event carried a party name, and neither poll queried a
   geocoder.
 
+### Tampa, FL — `deeds`
+
+- **Source:** the City of Tampa's copy of the Hillsborough County Property
+  Appraiser's parcels, on the server that serves Tampa's permits and
+  licences:
+  `arcgis.tampagov.net/arcgis/rest/services/Parcels/TaxParcel/FeatureServer/0`
+  (531,613 polygons, the whole county), each with its latest sale's date and
+  price. The Property Appraiser's own ArcGIS Online layer holds the same
+  parcels, but its newest sale was a week older (2026-09-11 against
+  2026-09-18).
+- **Window:** the parcels whose sale falls in the 90 days before each poll,
+  county-wide: 3,886 on 2026-10-02, dated 2026-07-06 to 2026-09-18. Every
+  date is midnight UTC. Sales reach the layer three to four weeks after
+  their date (the week to 2026-09-06 held 237 against 400 to 530 in the
+  full weeks before it, and the two weeks after it 8), and the window
+  re-reads them when they do. May to July 2026 held 6,441, so the cap is
+  10,000.
+- **Rows:** one per parcel, keyed on folio and sale date, so a parcel that
+  sells again publishes again. Every sale in the window has a price, and
+  3,882 of the 3,886 are $10,000 or more, so the layer appears to carry each
+  parcel's latest qualified sale (inferred: it names no qualification code).
+- **Freshness:** the layer carries no edit stamp. On 2026-10-02 its newest
+  sale was 14 days old, and two reads 50 minutes apart found it unchanged.
+  `expected_cadence_days` is 30, so the staleness alarm waits 60 days.
+- **Personal data:** the owner, the mailing address, the trade name and the
+  legal description stay on the server; `select` names four columns.
+- **Placement:** each polygon's centroid, which the client computes. The spec
+  clips to the metro box, which leaves out Plant City, Lithia, Wimauma,
+  Ruskin and Sun City Center. No geocoder is asked.
+- **Poll:** every six hours, newest first by `S_DATE DESC, OBJECTID DESC`;
+  the object id orders a day's sales, which a date alone left free to
+  repeat across pages.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live layer, Kafka mocked. The first read 3,886 rows
+  with the metadata and four pages and published 2,468 sales dated
+  2026-07-06 to 2026-09-08; by division, 635 are in `BRANDON_EAST`, 620 in
+  `CARROLLWOOD_NORTH`, 514 in `TAMPA_HEIGHTS_SEMINOLE`, 267 in
+  `SOUTH_TAMPA_PALMA`, 168 in `DOWNTOWN_CHANNEL`, 157 in
+  `WESTSHORE_INTERNATIONAL` and 107 in `HYDE_PARK_BAYSHORE`. It skipped
+  1,418 outside the box and dead-lettered none. The second read the same
+  3,886 rows in four pages and published nothing. No event carried a party
+  name, and neither poll queried a geocoder.
+
+### Gainesville, FL — `deeds`
+
+- **Source:** the Alachua County Property Appraiser's nightly extract,
+  `s3.amazonaws.com/acpa.cama/ACPA_CAMAData.zip` (73 MB, linked from the
+  Property Appraiser's map site), rebuilt at 07:27 GMT on 2026-10-01 and
+  again the next night. Of its thirteen members the feed reads only
+  `Sales.txt` (59 MB unpacked): every recorded sale in the county, 510,529
+  lines, one per parcel and sale, tab-delimited with a header and no party
+  names.
+- **Window:** the sales dated in the 90 days before each poll, county-wide:
+  2,486 on 2026-10-02, dated 2026-07-04 to 2026-09-30. Dates are whole days,
+  and sales arrive one to two weeks after their date. The upper bound keeps
+  out one sale keyed for 2079-08-24. The busiest 90 days of the last two
+  years, to 2025-08-26, held 3,484, so the cap is 6,000.
+- **Rows:** a row is its parcel, date, book and page: 125 lines of the 2,486
+  share a parcel and a date with another, and the file's line number
+  renumbers a parcel's sales whenever it sells again. 2,090 carry a price
+  above zero and 1,242 one of $10,000 or more. By deed type, 1,176 are `WD`
+  (warranty deeds), 391 `MS`, 320 `SD`, 190 `QD`, 144 `DD` and 88 `OD`.
+- **Freshness:** the extract's members share one build minute, and two
+  nightly builds were seen in a row. `expected_cadence_days` is 7, since
+  sales arrive a week or two late, so the staleness alarm waits 14 days.
+- **Personal data:** `Sales.txt` holds no names, and `select` names seven of
+  its eleven columns. The owner and legal-description members are never
+  read, and the parcel join asks the parcel layer for `Prop_ID` alone,
+  never its owner or mailing columns.
+- **Placement:** each sale takes its parcel's centroid from the Property
+  Appraiser's `PublicParcel` layer
+  (`services.arcgis.com/cNo3jpluyt69V8Ek/arcgis/rest/services/PublicParcel/FeatureServer/0`),
+  joined on `prop_id` in lists of at most 100. The spec clips to the metro
+  box, which leaves out Newberry, High Springs, Alachua, Archer and
+  Hawthorne. No geocoder is asked.
+- **Poll:** once a day: one download, `Sales.txt` filtered and sorted newest
+  first in memory, then the join.
+- **CSV client:** a bare `CURRENT_DATE` now resolves to today, so a window
+  can close at today; before, the client ignored it and the 2079 sale came
+  through. And the client now decides whether a file opens with a one-cell
+  title line from its first two rows instead of parsing all of them: on
+  Alachua's file that parse added 572 MB to the poll's peak memory, and the
+  whole read now adds 52 MB.
+- **Deed types:** the extract pads its codes (`WD` and eight spaces), so the
+  deeds producer now strips a mapped deed type.
+- **Live check:** two polls of the registered spec through the real
+  scheduler, Kafka mocked. The first downloaded the extract once, read 2,486
+  sales, asked the parcel layer for the metadata and 25 lists of parcels,
+  and published 1,556 sales dated 2026-07-06 to 2026-09-30: by division, 662
+  in `NORTHWEST`, 459 in `SOUTHWEST_SOUTHEAST`, 308 in `DOWNTOWN_UF` and 127
+  in `NORTHEAST`. It skipped 930
+  outside the box, 10 of them on parcels the layer does not hold, and
+  dead-lettered none. The second read the same 2,486 and published nothing.
+  No event carried a party name, and neither poll queried a geocoder.
+
+### Ocala, FL — `deeds`
+
+- **Source:** the Marion County Property Appraiser's parcels on the City of
+  Ocala's GIS server:
+  `gis.ocalafl.org/arcgis/rest/services/Public/Parcels/FeatureServer/0`
+  (ArcGIS Server 11.3, 290,085 polygons, "updated weekly from data provided
+  by the Property Appraiser's office"), each with its latest sale: a year
+  (`yr1`) and month (`mo1`) with no day, the official-records book and page,
+  a price and the parcel's own point. The Property Appraiser's yearly sales
+  files are dated by month too, carry no coordinates and name the owner, so
+  the layer is the simpler read.
+- **Window:** the server computes it from `yr1 * 12 + mo1`: the current month
+  and the three before it, so on 2026-10-02 July to October, 7,472 sales.
+  September, the month just ended, held about a third of a full month, since
+  sales land two to three weeks late. The upper bound leaves out a sale
+  keyed for November. April to June 2026 held 9,946, so the cap is 15,000.
+- **Rows:** one per parcel, keyed on parcel, book and page. 51 polygons carry
+  a sale but no parcel number, some sharing a book and page (`DETH` and
+  `REGS`, `UNRE` and `INST`); they would publish under no parcel and key as
+  one another, so the filter leaves them out. Every sale published has a
+  price: 3,510 of the 6,365 are $10,000 or more, and 2,750 are $100 or
+  less.
+- **Dates:** `compose_deed_date` in the leaf dates each sale the first of
+  its month, as Allentown's leaf does for its monthly sales.
+- **Freshness:** the layer carries no edit stamp. A sale lands dated up to a
+  month back, so `expected_cadence_days` is 45 and the staleness alarm waits
+  90 days.
+- **Personal data:** the owner's name and the mailing address stay on the
+  server; `select` names nine columns.
+- **Placement:** each parcel's own point. The spec clips to the metro box,
+  which leaves out the far east and west of the county. No geocoder is
+  asked.
+- **Poll:** every six hours, newest first by `yr1 DESC, mo1 DESC, OBJECTID
+  DESC`.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live layer, Kafka mocked. The first read 7,472 rows
+  with the metadata and eight pages and published 6,365 sales dated
+  2026-07-01 to 2026-10-01, 6,138 of them in the `OCALA_CORE` division. It
+  skipped 1,107 outside the box and dead-lettered none. The second read the
+  same 7,472 rows and published nothing. No event carried a party name, and
+  neither poll queried a geocoder.
+
 ## Retracted
 
 | Metro (feed) | What it read | Why retracted | Re-check when |
@@ -974,6 +1117,7 @@ rolls, so those five are held; the other gaps have no source.
 | Spartanburg (`deeds`) | Spartanburg County's `GIS/CAMA_Parcels` layer (`maps.spartanburgcounty.org`, 182,863 polygons): sale dates (2,072 in the 90 days to 2026-10-02, entered about six weeks late), deed book and page and the instrument number. | No row in the layer has a price, and no column names the document type. | A price or document type appears. |
 | Savannah (`deeds`) | The Chatham County Board of Assessors' parcels (`pub.sagis.org`, `Savannah/PropertyValue/MapServer/13`, 127,033 rows) carry each parcel's sale price, year, month and day, and book and page. | An annual roll: every dated row was updated on 2026-06-22, and the newest 2026 sale is dated 2026-01-21. | The roll is updated more often. |
 | Macon-Bibb (`deeds`) | The County's hosted CAMA layers (org `zPFLSOZ5HzUzzTQb`) carry each parcel's sale date and price. | Annual digests: the two 2025 layers' newest sales are dated 2024-12-06 and 2026-02-05. | A current digest or a sales layer appears. |
+| Lakeland (`deeds`) | The Polk County Property Appraiser's nightly extract (`www.polkflpa.gov`, `ftp_sales.zip`, 55 MB): every recorded sale in the county by parcel, 8,284 dated in the 90 days to 2026-10-02 with dates, prices, book and page and the instrument type. The City's `LandBase/Parcels` layer (`arcgis.lakelandgov.net`, `MapServer/10`) places 43% of them, nearly every sale in the townships around Lakeland, and about 1,840 fall in the metro box. | The member unpacks to 518 MB, which the CSV client reads into memory whole, about a gigabyte at peak, once a day. | The CSV client streams a zip member. |
 
 ## Not now
 

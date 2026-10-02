@@ -669,6 +669,37 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+  deeds:
+    endpoint: https://arcgis.tampagov.net/arcgis/rest/services/Parcels/TaxParcel/FeatureServer/0
+    platform: arcgis
+    watermark_col: S_DATE
+    id_keys:
+    - FOLIO
+    - S_DATE
+    topic: raw.municipal.deeds
+    interval_seconds: 21600.0
+    producer_key: deeds
+    order_by: S_DATE DESC, OBJECTID DESC
+    select: OBJECTID,FOLIO,S_DATE,AMT
+    where: S_DATE >= CURRENT_DATE - INTERVAL '90' DAY AND S_DATE <= CURRENT_TIMESTAMP
+    needs_geocode: false
+    field_map:
+      doc_id:
+      - FOLIO
+      - OBJECTID
+      recorded_date:
+      - S_DATE
+      document_amount:
+      - AMT
+      bbl:
+      - FOLIO
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 6000
+    expected_cadence_days: 30
+    batch_limit: 10000
+    composite_id: true
+    metro_clip: true
 aliases:
 - tampa_fl
 - tampa fl

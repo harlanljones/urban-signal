@@ -23,6 +23,7 @@ Register Gainesville, FL as a new Urban Signal metro (`CityId.gainesville`) with
 - 2026-08-28 — 311 dataset exists (`78uv-94ar`) but reflects a migration note and appears stale post-2021; not registering 311 in this ticket. PERMITS only.
 - 2026-08-28 — CityId is free (`gainesville`); proceed with that id. Aliases: `gainesville`, `gainesville_fl`, `gainesville fl`.
 - 2026-08-28 — Field map: `job_id` ← `permit`, `issuance_date` ← `issue`, `address_street` ← `address`, `latitude`/`longitude` ← direct or `location_1.{latitude,longitude}`; `status` if present.
+- 2026-10-02 — Deeds registered from the Alachua County Property Appraiser's nightly extract (`Sales.txt`), placed through the Property Appraiser's parcel layer. The `311` dataset is still frozen at 2023-07-12. See `.streams/florida-deeds.md`.
 
 ## Current step
 

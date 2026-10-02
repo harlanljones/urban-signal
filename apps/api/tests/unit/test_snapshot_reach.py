@@ -56,6 +56,10 @@ FULL_READ_ROWS = {
     ("denver", "deeds"): 2_445,
     ("eugene", "sla"): 752,
     ("fort_collins", "permits"): 2_183,
+    # Alachua County sales dated in the spec's 90-day window, county-wide
+    # (the extract rebuilt 2026-10-02, newest 2026-09-30); 1,556 of them place
+    # inside the metro box. The 90 days to 2025-08-26 held 3,484.
+    ("gainesville", "deeds"): 2_486,
     ("glendale_az", "deeds"): 1_263,
     ("hartford", "deeds"): 353,
     ("inland_empire", "sla"): 10_585,
@@ -69,6 +73,10 @@ FULL_READ_ROWS = {
     ("nashville", "deeds"): 4_373,
     ("nyc", "childcare"): 2_752,
     ("oakland", "sla"): 5_103,
+    # Marion County parcels whose latest sale falls in the current month or
+    # the three before it, county-wide, read 2026-10-02; 6,365 lie in the
+    # metro box. April to June 2026 held 9,946.
+    ("ocala", "deeds"): 7_472,
     ("phoenix", "deeds"): 9_224,
     # The same Pierce County sales as Tacoma's, placed anywhere in the county
     # (2,317 of them on 2026-09-30).
@@ -85,6 +93,10 @@ FULL_READ_ROWS = {
     # Pierce County sales dated in the spec's 90-day window, county-wide
     # (2026-09-25 extract, read 2026-09-30); 452 of them place in Tacoma.
     ("tacoma", "deeds"): 2_432,
+    # Hillsborough County parcels whose latest sale falls in the spec's
+    # 90-day window, county-wide, newest 2026-09-18, read 2026-10-02; 2,468
+    # lie in the metro box. May to July 2026 held 6,441.
+    ("tampa", "deeds"): 3_886,
     ("tempe", "deeds"): 783,
     # Lucas County sales recorded in the spec's 90-day window, county-wide,
     # newest 2026-09-25, read 2026-09-30; 2,154 of them lie in the metro box.

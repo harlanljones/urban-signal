@@ -30,11 +30,18 @@ def test_no_feed_reads_the_statewide_parcel_layer():
     assert readers == []
 
 
-@pytest.mark.parametrize("city", [CityId.OCALA, CityId.MACON_BIBB])
-def test_retracted_metros_register_no_permits_and_keep_their_retailers(city):
+@pytest.mark.parametrize(
+    ("city", "registered"),
+    [
+        # Ocala's deeds come from the County's parcels on the City's server.
+        (CityId.OCALA, {FeedType.SLA, FeedType.DEEDS}),
+        (CityId.MACON_BIBB, {FeedType.SLA}),
+    ],
+)
+def test_retracted_metros_register_no_permits_and_keep_their_retailers(city, registered):
     feeds = REGISTRY[city].datasets
     assert FeedType.PERMITS not in feeds
-    assert set(feeds) == {FeedType.SLA}
+    assert set(feeds) == registered
     assert feeds[FeedType.SLA].endpoint == settings.arcgis_snap_retailers_url
 
 

@@ -318,7 +318,8 @@ class DeedsACRISProducer:
             if lat is not None and lng is not None:
                 h3_res = self.spatial_indexer.get_multi_res_hierarchy(lat, lng)
 
-            doc_type = (
+            # Fixed-width extracts pad their codes (Alachua's ``WD        ``).
+            doc_type = str(
                 first_mapped(row, field_map, "doc_type")
                 or row.get("property_class_code_definition")
                 or row.get("doc_type")
@@ -327,7 +328,7 @@ class DeedsACRISProducer:
                 or row.get("deed_type")
                 or row.get("Property_Type")
                 or "DEED"
-            ).upper()
+            ).strip().upper() or "DEED"
 
             def _parse_val(val: Any) -> float:
                 if not val:

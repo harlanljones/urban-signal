@@ -2611,4 +2611,23 @@ class Settings(BaseSettings):
         ),
         description="New Hanover County NC parcel points URL with latest sales (County GIS)",
     )
+    # Tampa deeds (2026-10-02): the City's copy of the Hillsborough County
+    # Property Appraiser's parcels, each with its latest sale.
+    arcgis_tampa_deeds_url: str = Field(
+        default="https://arcgis.tampagov.net/arcgis/rest/services/Parcels/TaxParcel/FeatureServer/0",
+        description="City of Tampa copy of the Hillsborough County parcels with latest sales (City GIS)",
+    )
+    # Gainesville deeds (2026-10-02): the Alachua County Property Appraiser's
+    # nightly extract, whose Sales.txt lists every recorded sale by parcel.
+    csv_gainesville_deeds_endpoint: str = Field(
+        default="https://s3.amazonaws.com/acpa.cama/ACPA_CAMAData.zip",
+        description="Alachua County Property Appraiser nightly CAMA extract, zipped Sales.txt (Gainesville deeds snapshot)",
+    )
+    # Ocala deeds (2026-10-02): the Marion County Property Appraiser's parcels
+    # on the City of Ocala's GIS server, each with its latest sale's year and
+    # month.
+    arcgis_ocala_deeds_url: str = Field(
+        default="https://gis.ocalafl.org/arcgis/rest/services/Public/Parcels/FeatureServer/0",
+        description="Marion County parcels with latest sale year and month (City of Ocala GIS)",
+    )
 settings = Settings()

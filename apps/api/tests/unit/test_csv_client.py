@@ -2,11 +2,18 @@
 
 import io
 import zipfile
+from datetime import date
 
 import httpx
 import pytest
 
-from src.producers.csv_client import CSVClient, _read_zip_member, _strip_preamble
+from src.producers import csv_client
+from src.producers.csv_client import (
+    CSVClient,
+    _read_zip_member,
+    _strip_preamble,
+    resolve_relative_dates,
+)
 
 
 def _zip_bytes(members: dict[str, str]) -> bytes:
@@ -223,6 +230,34 @@ def test_csv_client_reads_any_line_ending(eol):
 def test_strip_preamble_reads_bare_carriage_returns():
     payload = '"Updated 2026-09-29"\r"A","B"\r"1","2"\r'
     assert _strip_preamble(payload) == "A,B\n1,2\n"
+
+
+def test_strip_preamble_parses_only_the_rows_that_decide(monkeypatch):
+    """A file with a header comes back untouched after two rows: parsing all
+    510,000 lines of Alachua County's sales took more memory than the text."""
+    lines_read = []
+    real_lines = csv_client._lines
+
+    def counting(text):
+        for line in real_lines(text):
+            lines_read.append(line)
+            yield line
+
+    monkeypatch.setattr(csv_client, "_lines", counting)
+    text = "Parcel\tSale_Date\r\n" + "".join(f"{n:05d}\t2026-09-28\r\n" for n in range(1000))
+
+    assert _strip_preamble(text, delimiter="\t") is text
+    assert len(lines_read) == 2
+
+
+def test_a_window_closes_at_today():
+    """``CURRENT_DATE`` alone resolves too: Alachua County's sales list holds
+    one sale keyed for 2079, which only an upper bound keeps out."""
+    today = date(2026, 10, 2)
+    assert resolve_relative_dates(
+        "sale_date >= CURRENT_DATE - INTERVAL '90' DAY AND sale_date <= CURRENT_DATE", today
+    ) == "sale_date >= '2026-07-04' AND sale_date <= '2026-10-02'"
+    assert resolve_relative_dates("d <= current_date", today) == "d <= '2026-10-02'"
 
 
 def test_csv_client_names_the_columns_of_a_file_without_a_header_row():
