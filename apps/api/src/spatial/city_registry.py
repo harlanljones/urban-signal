@@ -305,8 +305,11 @@ class DatasetSpec:
     # A file that writes each row's point as one ``lat, lon`` column (the
     # CSV export of an OpenDataSoft geo point, Long Beach's requests) names
     # it here, and CSVClient.paginate adds the row's ``latitude`` and
-    # ``longitude``.
+    # ``longitude``. The Excel client does the same for a workbook.
     point_col: str | None = None
+    # True when that column writes ``lon, lat`` instead (MyGov's workbooks,
+    # Abilene's permits).
+    point_lon_first: bool = False
     # Rows one scheduler poll may fetch; unset keeps JobConfig's default
     # (1000). A newest-first poll never reaches rows past its cap, so a feed
     # whose source lands more than that at once (Columbus 311's daily extract

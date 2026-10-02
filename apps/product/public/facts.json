@@ -27,13 +27,18 @@
       "division_count": 5,
       "submarket_count": 8,
       "feeds": [
-        false,
+        true,
         false,
         true,
         false
       ],
       "platforms": [
-        null,
+        {
+          "platform": "excel",
+          "watermark_col": "permit_issued_date_time",
+          "interval_seconds": 86400.0,
+          "topic": "raw.municipal.permits"
+        },
         null,
         {
           "platform": "socrata",
@@ -5362,13 +5367,18 @@
       "division_count": 5,
       "submarket_count": 8,
       "feeds": [
-        false,
+        true,
         false,
         true,
         false
       ],
       "platforms": [
-        null,
+        {
+          "platform": "excel",
+          "watermark_col": "date_started",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.permits"
+        },
         null,
         {
           "platform": "socrata",

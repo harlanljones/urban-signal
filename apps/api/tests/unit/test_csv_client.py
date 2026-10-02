@@ -16,6 +16,7 @@ from src.producers.csv_client import (
     _decode_csv_bytes,
     _lines,
     _read_zip_member,
+    _row_matches,
     _split_point,
     _strip_preamble,
     _zip_member_lines,
@@ -652,6 +653,30 @@ def test_a_file_served_as_html_is_still_read(monkeypatch):
 )
 def test_a_point_value_splits_into_latitude_and_longitude(value, point):
     assert _split_point(value) == point
+
+
+def test_a_lon_lat_value_splits_the_other_way():
+    """MyGov's workbooks write each point as ``lon, lat`` (Abilene's permits)."""
+    assert _split_point("-99.765896481724, 32.367721393634", lon_first=True) == {
+        "latitude": 32.367721393634, "longitude": -99.765896481724,
+    }
+    assert _split_point("32.3677, -99.7659", lon_first=True) == {}
+
+
+def test_a_not_in_list_reads_each_quoted_value_whole():
+    """A quoted value can hold parentheses or commas (Abilene's ``'Certificate
+    of Occupancy Permit (C)'``). Read only to the first parenthesis, such a
+    list matched nothing, so every row passed."""
+    types = ["Roof Permit (R)", "Certificate of Occupancy Permit (C)", "Sign, Pole", "Owner's Permit", "Itinerant Business"]
+    where = "type NOT IN ('Certificate of Occupancy Permit (C)', 'Sign, Pole', 'Owner''s Permit')"
+
+    assert [t for t in types if _row_matches(where, {"type": t})] == ["Roof Permit (R)", "Itinerant Business"]
+    # Wrapped as the scheduler wraps a spec's filter, beside its watermark.
+    wrapped = f"({where}) AND issued >= '2026-09-01'"
+    assert _row_matches(wrapped, {"type": "Roof Permit (R)", "issued": "2026-09-02"}) is True
+    assert _row_matches(wrapped, {"type": "Sign, Pole", "issued": "2026-09-02"}) is False
+    # An unquoted list is split on its commas.
+    assert [code for code in ("1", "3") if _row_matches("code NOT IN (1, 2)", {"code": code})] == ["3"]
 
 
 def test_a_point_column_gives_each_row_its_latitude_and_longitude():

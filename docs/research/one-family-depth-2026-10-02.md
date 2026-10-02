@@ -69,12 +69,21 @@ the scheduler now converts for any spec that declares them. That gives
 Worcester a third family; the registration is written up with the
 two-family pass ([two-family-depth-2026-09-30.md](two-family-depth-2026-09-30.md)).
 
-| Tier (families) | Before (with #106) | With the Texas and southern feeds (#107) | With the north-eastern and western feeds (#108) | With two held sources (#109) | With Worcester's `311` |
-|---|---|---|---|---|---|
-| 4 | 30 | 30 | **31** (Lincoln) | 31 | 31 |
-| 3 | 44 | 44 | 43 | **44** (Tucson) | **45** (Worcester) |
-| 2 | 48 | **54** (Midland, Longview, Charleston SC, Odessa, Waco, Lexington) | **56** (Manchester, Tucson) | **56** (Long Beach in, Tucson up) | 55 |
-| 1 | 35 | 29 | 27 | 26 | 26 |
+Two of the Texas holds came off last, through changes to the Excel client: it
+now compares and orders a workbook's text dates as dates in the spec's
+format, gives each row its latitude and longitude from a column written
+`lon, lat`, and reads each quoted value of a `NOT IN` list whole (the CSV
+client too), and the permits producer reads MyGov's `MM/DD/YYYY at H:MM AM`
+times. Texarkana's permits register from the Texas city's monthly workbook,
+geocoded by address, and Abilene's from the City's monthly workbook, a month
+behind. That gives each a second family.
+
+| Tier (families) | Before (with #106) | With the Texas and southern feeds (#107) | With the north-eastern and western feeds (#108) | With two held sources (#109) | With Worcester's `311` (#110) | With Texarkana's and Abilene's permits |
+|---|---|---|---|---|---|---|
+| 4 | 30 | 30 | **31** (Lincoln) | 31 | 31 | 31 |
+| 3 | 44 | 44 | 43 | **44** (Tucson) | **45** (Worcester) | 45 |
+| 2 | 48 | **54** (Midland, Longview, Charleston SC, Odessa, Waco, Lexington) | **56** (Manchester, Tucson) | **56** (Long Beach in, Tucson up) | 55 | **57** (Texarkana, Abilene) |
+| 1 | 35 | 29 | 27 | 26 | 26 | 24 |
 
 ## Registered
 
@@ -582,6 +591,130 @@ two-family pass ([two-family-depth-2026-09-30.md](two-family-depth-2026-09-30.md
   under the default cap of 1,000 published only the newest 1,000 of the
   week, which is why the spec declares 2,000.
 
+### Texarkana, TX — `permits`
+
+- **Source:** MyGov's "Permits Issued in the last month" workbook for the
+  Texas city (`public.mygov.us/tx_texarkana/downloadReport?moduleName=pi&id=370`).
+  MyGov sends no ETag, dates the workbook's Last-Modified header at the
+  moment of download, and answers a conditional request with the whole file.
+- **Shape:** despite its name, the permits started in the previous calendar
+  month, whatever their status, rebuilt each morning with their current
+  statuses: on 2026-10-02, 289 permits started from 2026-09-01 to
+  2026-09-30, 170 of them issued. Eleven columns: the title, description,
+  project address, status, collaborators, start date, issue date, occupancy
+  certificate date, valuation, square footage and permit number. The dates
+  are `MM/DD/YYYY` text and there are no coordinates.
+- **Filter:** thirty-one titles the City used in the year to 2026-10-02
+  that are not permits to build are left out by name: health, sanitation and
+  pool inspections, mobile vendors, occupancy certificates, zoning,
+  variances, platting, plan reviews, floodplain applications, street cuts,
+  rights of way, special events, banners, tents, seasonal permits, courtesy
+  inspections and stop-work notices. They took 88 of September's 289, among
+  them 28 health inspections, 19 occupancy certificates and 9 street cuts.
+  Trade, roofing, driveway, sign, demolition and temporary power permits
+  stay in with the building work.
+- **Window:** each poll reads the whole workbook, newest start first, and
+  keeps the permits started on or after the newest day it published; the
+  client compares the text dates as dates in the spec's format. The
+  workbook's permits change only when a month ends, so a permit is published
+  once, when its month's workbook first appears, up to a month after it
+  started, with the status and issue date it had then: 54 of the 201 kept
+  from September's workbook had no issue date.
+- **Reach:** a month held 289 permits, so the default cap of 1,000 holds
+  one.
+- **Ids:** the permit number keys each event; each of the 289 had its own.
+- **Freshness:** the newest start date is at most a month old until the
+  next month's workbook replaces it, so `expected_cadence_days` is 35.
+- **Personal data:** `select` names seven of the eleven columns. MyGov
+  offers no column choice, so the workbook arrives whole, and the client
+  drops the free-text description and the collaborators (people and firms)
+  before any row is parsed or dead-lettered.
+- **Mapping:** the permit number, the issue date, the start date as the
+  filing date, the title as the job type, the status, the valuation
+  (non-zero on 7 of the 201) and the project address. Plumbing, electrical
+  and HVAC permits for "new construction and major remodels" (56 of the
+  201) read as new construction because their titles say so; a permit
+  taxonomy change follows.
+- **Placement:** each project address goes to the geocoder with
+  ", Texarkana, TX" appended. Rows are placed as they are parsed, after the
+  metro clip, so the clip, which drops unplaced rows, stays off; a permit
+  whose address the geocoder cannot place is dead-lettered.
+- **Poll:** every six hours, newest first by `date_started DESC`,
+  incremental on `date_started`. The dates are whole days, so each poll
+  reads the newest day again and the dedup drops what it published.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live workbook from 19:27Z to 19:32Z, Kafka mocked,
+  with the production geocoder over the Census one-line backend (an
+  in-memory cache standing in for Postgres). The first downloaded the
+  workbook once (30,340 bytes), kept 201 permits, asked the Census geocoder
+  about 112 distinct addresses and published 190 permits started from
+  2026-09-01 to 2026-09-30, 140 of them issued (to 2026-10-02). It
+  dead-lettered the 11 whose addresses the geocoder could not place, and
+  none lay outside the box. By status, 80 are in review, 60 issued, 40
+  archived and 10 requested; by job type, 63 read as new construction, 62
+  as alterations, 18 as signs, 13 as demolitions and 34 in the catch-all
+  class. The second downloaded the workbook again, re-read the six permits
+  started on 2026-09-30 and published nothing.
+
+### Abilene, TX — `permits`
+
+- **Source:** MyGov's "TCADBuildingPermitsWithProjInfo" workbook for the
+  City (`public.mygov.us/tx_abilene/downloadReport?moduleName=pi&id=371`),
+  served as Texarkana's is. The City's other permit reports are PDFs.
+- **Shape:** generated once a month, around the 28th (last on 2026-09-28),
+  with the building permits issued in the previous calendar month; each
+  file replaces the last. On 2026-10-02 it held 652 permits, all issued in
+  August 2026, each with its number, template, status, start and issue
+  times written `MM/DD/YYYY at H:MM AM`, valuation, address, ZIP code and
+  point, one `lng, lat` column. Its 71 columns also carry square footage,
+  parcel, zoning and school fields, and the people a permit was issued to
+  and by.
+- **Filter:** occupancy certificates and itinerant businesses are left out
+  (16 of August's 652); trade, roofing, irrigation, sign, pool and
+  demolition permits stay in with the building work. The occupancy
+  template's parenthesis (`Certificate of Occupancy Permit (C)`) kept the
+  CSV and Excel clients from recognising the `NOT IN` list, so the filter
+  let every row through; the clients now read each quoted value whole,
+  commas and parentheses included.
+- **Window:** each poll reads the whole workbook, newest issue time first,
+  and keeps the permits issued after the newest time it published; the
+  client compares the text times as times in the spec's format, and the
+  permits producer now reads that format.
+- **Reach:** August's 636 building permits held 152 roofs. A newest-first
+  poll that fills its cap never reads the month's older permits, and the
+  workbook is read whole either way, so the cap is 2,500, room for a month
+  of storm repairs.
+- **Ids:** the permit number keys each event; each of the 652 had its own.
+- **Freshness:** the newest permit was 32 days old on 2026-10-02 and will
+  be about 58 days old when the next workbook comes, as Richmond's monthly
+  transfers are, so `expected_cadence_days` is 45.
+- **Personal data:** `select` names nine of the 71 columns; who a permit was
+  issued to and by, who created and manages it, its contacts, description
+  and account number are dropped in the client before any row is parsed or
+  dead-lettered.
+- **Mapping:** the permit number, the issue and start times, the template
+  as the job type, the status, the valuation, the address and the ZIP code.
+  New single-family homes and townhouses (114 in August) read as minor
+  alterations, since the classifiers look for "new construction" or "new
+  building" and not "new single family"; the permit taxonomy change that
+  follows covers them.
+- **Placement:** each permit at its own point. 35 of August's points lay in
+  Houston, Flagstaff or western Colorado and 3 permits had none, so the
+  metro clip is on and skips them. No geocoder is asked.
+- **Poll:** daily, newest first by `permit_issued_date_time DESC`,
+  incremental on it. The times carry minutes, so each poll keeps only later
+  ones.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live workbook at 19:26Z, Kafka mocked. The first
+  downloaded the workbook once (191,560 bytes), kept 636 permits and
+  published 598 issued from 2026-08-03 to 2026-08-31, 575 with a ZIP code
+  and 41 with a valuation; it skipped 38 outside the box (3 without a
+  point) and dead-lettered none. By status, 321 are active, 248 complete, 27
+  on hold and 2 cancelled; by normalized type, 336 are minor alterations,
+  237 mechanical, electrical or plumbing work, 13 major renovations, 6
+  demolitions and 6 new construction. The second downloaded the workbook
+  again and published nothing.
+
 ## Held
 
 | Metro (missing) | Source | Why held | Re-check when |
@@ -590,8 +723,6 @@ two-family pass ([two-family-depth-2026-09-30.md](two-family-depth-2026-09-30.md
 | Charleston, SC (`311`) | The City GIS's `MissedCollectionSixMonths` layer (`External/Applications/MapServer/96`): 1,500 missed garbage and trash collections over a rolling six months, 852 in 90 days, each with its own reference number and point; its closing date is text. The City's monthly request sheets on ArcGIS Online are uploaded by hand under a new service name each month, carry no request id, and stop with August's, which holds garbage requests only. | One kind of request, from solid waste. Registered as the metro's `311`, it would mark Charleston as covered where the City publishes no request stream. | The City publishes its service requests as one layer with ids. |
 | Tyler (`permits`) | The City's `Permit_Data_With_XY` layer (`services5.arcgis.com/RmXXW3PwBZGOxlSe`): 29,994 permits issued from 2023-01-02, about 540 a month, the newest on 2026-07-24, though the item was modified on 2026-09-29: a monthly export for the City's permits dashboard. `Active_Construction_Sites` in the same org is current (113 issued in 90 days, newest 2026-09-25) but holds only new construction, shells and grading still open, 1,047 sites that leave the layer when they close. | The export ran 70 days behind on 2026-10-02, and the active sites are a slice of the permits. | The export moves past 2026-07-24 and keeps pace. |
 | Beaumont (`permits`) | The City's Cityworks server publishes the new residential and commercial permits still open, for its "Construction and SUP Map" (`cityworks.beaumonttexas.gov/CityworksNAD/gis/1/1/rest/services/qe/FeatureServer/8` and `/7`): 80 and 37 rows on 2026-10-02, 20 and 9 issued in 90 days, with times of day; a permit leaves when it closes, and the server rejects relative dates. | New construction only, and only while open. Registered as the metro's permits, they would mark Beaumont as covered while missing its trade, roofing and remodelling permits. | The City publishes all its permits. |
-| Texarkana (`permits`) | MyGov's daily "Permits Issued in the last month" workbook for the Texas city (`public.mygov.us/tx_texarkana`, report 370): 289 permits started in about a month, each with its number and address, 170 of them issued (2026-09-01 to 2026-10-02). Its dates are text (`MM/DD/YYYY`) and it has no coordinates; the five-year workbook beside it (14,142 rows) has no permit number and lists health inspections, restaurant permits, zoning and street cuts among its types. | The Excel client compares text dates as strings and drops the spec's date format, so it can neither window nor order the workbook, and nothing in the workbook separates building permits from the rest. | The Excel client reads text dates as dates. |
-| Abilene (`permits`) | MyGov's "TCADBuildingPermitsWithProjInfo" workbook for the City (`public.mygov.us/tx_abilene`, report 371): 652 permits, each with its number and coordinates, all issued in August 2026. It is generated once a month (last on 2026-09-28), each file replaces the last, and its times read "MM/DD/YYYY at H:MM AM". The City's other permit reports are PDFs, and its GIS server reset the connection twice. | Monthly and a month behind, and the permits producer cannot read its dates. | MyGov publishes a daily permits workbook, or a monthly feed is accepted and the producer reads the format. |
 | Buffalo (`311`) | The City's Salesforce CRM mirrors public works' holes-in-road work orders to ArcGIS Online for its pothole tracker (`services8.arcgis.com/BMPgiPHUrkqJdtki`, `SF_Work_Order_Holes_In_Road_(view)/FeatureServer/1`): 5,420 since 2024-08-26, 873 in 90 days, unique work order numbers, each at its point. | One kind of request: potholes, cave-ins and other holes. Registered as the metro's `311`, it would mark Buffalo as covered while the CRM's other requests stay unpublished. | The City publishes its CRM requests as one layer with ids. |
 | Manchester, NH (`311`) | Public works' Maximo tickets on the City's server (`DPW/SRPOINTS/FeatureServer`): 4,025 open and 60,847 closed, each at its point, from missed pickups to potholes, cave-ins and tree pruning, internal and resident tickets mixed; the dates are text. | Resident ticket intake stopped: the newest report was filed on 2026-09-02, 30 days before, though work orders still arrive. Residents now report through "Manchester NH Connect", a SeeClickFix app. | Tickets arrive again, or SeeClickFix publishes a view for the City. |
 | Buffalo (`deeds`) | The City's 2026-27 assessment roll (`gis.buffalony.gov/server/rest/services/Tax/Parcels_20262027/FeatureServer/0`, 93,453 parcels) carries a sale price on 75,983 parcels, with deed book and page. | The deed date is empty on every row; the 2025-26 layer rejects queries on it, and Erie County's parcels carry no price. | The roll's deed dates load. |

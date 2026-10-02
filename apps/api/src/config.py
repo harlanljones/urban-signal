@@ -2745,4 +2745,18 @@ class Settings(BaseSettings):
         default="https://www.asr.pima.gov/Downloads/Data/sales/{year}//SALE{year}.ZIP",
         description="Pima County Assessor affidavit of sales file per sale year, SALE{year}.ZIP (Tucson deeds snapshot)",
     )
+    # Texarkana TX permits (2026-10-02): MyGov's workbook of the permits
+    # started in the previous calendar month, rebuilt each morning with their
+    # statuses; text dates and no coordinates.
+    excel_texarkana_permits_url: str = Field(
+        default="https://public.mygov.us/tx_texarkana/downloadReport?moduleName=pi&id=370",
+        description="Texarkana TX MyGov 'Permits Issued in the last month' workbook (previous calendar month's permits)",
+    )
+    # Abilene permits (2026-10-02): MyGov's workbook of the building permits
+    # issued in the previous calendar month, built once a month around the
+    # 28th; each point one "lng, lat" column.
+    excel_abilene_permits_url: str = Field(
+        default="https://public.mygov.us/tx_abilene/downloadReport?moduleName=pi&id=371",
+        description="Abilene TX MyGov 'TCADBuildingPermitsWithProjInfo' workbook (previous calendar month's building permits)",
+    )
 settings = Settings()

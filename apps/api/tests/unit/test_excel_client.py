@@ -1,5 +1,6 @@
 """ExcelClient on .xlsx workbooks: the monthly link, the rolling window, the
-columns that leave the client, and the 304 that skips an unchanged file."""
+columns that leave the client, the 304 that skips an unchanged file, and
+MyGov's text dates and ``lon, lat`` points."""
 
 import io
 import zipfile
@@ -160,3 +161,64 @@ def test_relative_dates_resolve_to_a_quoted_day():
         "d >= '2026-09-23' AND x = 'A'"
     )
     assert resolve_relative_dates(None) is None
+
+
+MYGOV = "https://public.example.test/tx_example/downloadReport?moduleName=pi&id=371"
+
+
+def _cell(ref: str, text: str) -> str:
+    return f'<c r="{ref}" t="inlineStr"><is><t>{text}</t></is></c>' if text else ""
+
+
+def _report() -> bytes:
+    """Four synthetic permits as a MyGov report writes them: dates as text and
+    each point as one ``lon, lat`` column."""
+    header = "".join(
+        _cell(f"{col}1", name)
+        for col, name in zip("ABCD", ("Permit Number", "Template Name", "Permit Issued Date Time", "Coordinates"))
+    )
+    permits = (
+        ("26-990001", "Roof Permit (R)", "12/30/2026 at 4:31 PM", "-99.7331, 32.4487"),
+        ("27-990002", "Certificate of Occupancy Permit (C)", "01/04/2027 at 9:10 AM", "-99.7400, 32.4500"),
+        ("27-990003", "New Single Family Residence", "01/05/2027 at 8:35 AM", ""),
+        ("26-990004", "Building Permit - Plumbing Permit", "09/30/2026 at 10:01 AM", "-99.7000, 32.4000"),
+    )
+    rows = "".join(
+        f'<row r="{n}">' + "".join(_cell(f"{col}{n}", value) for col, value in zip("ABCD", permit)) + "</row>"
+        for n, permit in enumerate(permits, start=2)
+    )
+    return _workbook(f'<row r="1">{header}</row>' + rows)
+
+
+def _report_rows(**kwargs) -> list[dict]:
+    client = ExcelClient(httpx.Client(transport=httpx.MockTransport(lambda request: httpx.Response(200, content=_report()))))
+    return [row for batch in client.paginate(MYGOV, **kwargs) for row in batch]
+
+
+def test_text_dates_are_compared_and_sorted_as_dates():
+    # As text, "01/05/2027" sorts below "12/30/2026": January's permits
+    # failed the filter and sorted last.
+    rows = _report_rows(
+        where_clause="permit_issued_date_time >= '12/30/2026 at 4:31 PM'",
+        order_by="permit_issued_date_time DESC",
+        watermark_col="permit_issued_date_time",
+        watermark_format="%m/%d/%Y at %I:%M %p",
+    )
+
+    assert [row["permit_number"] for row in rows] == ["27-990003", "27-990002", "26-990001"]
+
+
+def test_a_type_list_holding_parentheses_leaves_those_types_out():
+    rows = _report_rows(where_clause="template_name NOT IN ('Certificate of Occupancy Permit (C)', 'Itinerant Business')")
+
+    assert [row["permit_number"] for row in rows] == ["26-990001", "27-990003", "26-990004"]
+
+
+def test_a_lon_lat_column_places_each_row():
+    rows = _report_rows(select="permit_number,coordinates", point_col="Coordinates", point_lon_first=True)
+
+    assert (rows[0]["latitude"], rows[0]["longitude"]) == (32.4487, -99.7331)
+    # A permit without a point stays unplaced.
+    assert "latitude" not in rows[2] and "longitude" not in rows[2]
+    assert set(rows[0]) == {"permit_number", "coordinates", "latitude", "longitude"}
+

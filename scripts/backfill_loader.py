@@ -185,11 +185,11 @@ def _sorts_as_dates(meta: dict[str, Any]) -> bool:
     """Whether the watermark column, ordered where it is read, is in date order.
 
     A text-typed column (ADR 0005) sorts as text, which is date order only
-    when its format is year first. A CSV sorts in the declared format
-    client-side.
+    when its format is year first. A CSV or a workbook sorts in the declared
+    format client-side.
     """
     fmt = meta.get("watermark_format")
-    if meta.get("watermark_type") != "text" or not fmt or meta.get("platform") == "csv":
+    if meta.get("watermark_type") != "text" or not fmt or meta.get("platform") in ("csv", "excel"):
         return True
     return text_sorts_as_dates(fmt)
 

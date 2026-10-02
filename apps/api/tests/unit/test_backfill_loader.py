@@ -287,6 +287,25 @@ def test_a_text_dated_csv_backfills_its_window():
     assert [row["parcel"] for row in rows] == ["C", "A"]
 
 
+def test_a_text_dated_workbook_backfills_newest_first():
+    # The Excel client compares and sorts the column in its format, as the
+    # CSV client does, so a MyGov workbook's window reads newest first.
+    meta = _meta(
+        watermark_col="date_started",
+        platform="excel",
+        endpoint="https://reports.example/downloadReport?moduleName=pi&id=370",
+        watermark_type="text",
+        watermark_format="%m/%d/%Y",
+        order_by="permit_number ASC",
+    )
+
+    where, kwargs = build_query_shape(meta, datetime(2026, 9, 1, tzinfo=UTC))
+
+    assert where == "date_started >= '09/01/2026'"
+    assert kwargs["order_by"] == "date_started DESC"
+    assert (kwargs["watermark_col"], kwargs["watermark_format"]) == ("date_started", "%m/%d/%Y")
+
+
 def test_san_jose_text_window_casts_both_sides():
     meta = _meta(
         watermark_col="ISSUEDATE",

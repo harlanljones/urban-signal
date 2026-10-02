@@ -65,6 +65,8 @@ def _parse_datetime(val: Any) -> datetime | None:
             "%m/%d/%Y %I:%M:%S %p",
             "%Y-%m-%dT%H:%M:%S",
             "%B, %d %Y %H:%M:%S",
+            # MyGov's report workbooks (Abilene's permits).
+            "%m/%d/%Y at %I:%M %p",
         ):
             try:
                 return datetime.strptime(val.strip(), fmt).replace(tzinfo=UTC)

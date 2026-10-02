@@ -70,11 +70,21 @@ logger = logging.getLogger(__name__)
 _PAGINATE_KWARGS: dict[str, tuple[str, ...]] = {
     **_ADAPTER_REQUEST_KEYS,
     "arcgis": (*_ADAPTER_REQUEST_KEYS["arcgis"], "decode_domains"),
-    "csv": (*_ADAPTER_REQUEST_KEYS["csv"], "zip_member", "delimiter", "columns", "point_col"),
+    "csv": (*_ADAPTER_REQUEST_KEYS["csv"], "zip_member", "delimiter", "columns", "point_col", "point_lon_first"),
     # Accela's public surface is an ArcGIS facade (AccelaClient); a workbook
-    # is sorted and column-picked client-side like a CSV.
+    # is filtered, sorted and column-picked client-side like a CSV, its text
+    # dates compared as dates (MyGov's report workbooks).
     "accela": _ADAPTER_REQUEST_KEYS["arcgis"],
-    "excel": ("order_by", "select", "link_pattern"),
+    "excel": (
+        "order_by",
+        "select",
+        "link_pattern",
+        "watermark_col",
+        "watermark_format",
+        "watermark_exclude",
+        "point_col",
+        "point_lon_first",
+    ),
 }
 
 # A snapshot whose order starts ``<col> DESC`` reads its newest rows first,
@@ -375,6 +385,7 @@ class MunicipalIngestionScheduler:
                     "delimiter": ds.delimiter,
                     "columns": list(ds.columns or []),
                     "point_col": ds.point_col,
+                    "point_lon_first": ds.point_lon_first,
                     "link_pattern": ds.link_pattern,
                     "decode_domains": ds.decode_domains,
                     # A table whose rows hold projected coordinates instead

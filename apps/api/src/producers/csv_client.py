@@ -24,7 +24,8 @@ site, as the site's own page with a 200; either passes it over, and any
 other failure to download either file fails the read. A ``point_col`` names
 a column that holds each row's point as one ``lat, lon`` value (the CSV
 export of an OpenDataSoft geo point, Long Beach's requests); the client adds
-its ``latitude`` and ``longitude``.
+its ``latitude`` and ``longitude``. ``point_lon_first`` reads the column as
+``lon, lat`` instead, as MyGov's workbooks write it.
 """
 
 from __future__ import annotations
@@ -43,7 +44,10 @@ import httpx
 
 _CMP = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*(>=|<=|>|<|=|!=)\s*'([^']*)'\s*$")
 _IS_NULL = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s+is\s+not\s+null\s*$", re.IGNORECASE)
-_NOT_IN = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s+NOT\s+IN\s*\(([^)]*)\)\s*$", re.IGNORECASE)
+# The list runs to the last parenthesis: a quoted value can hold one
+# (Abilene's ``'Certificate of Occupancy Permit (C)'``).
+_NOT_IN = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s+NOT\s+IN\s*\((.*)\)\s*$", re.IGNORECASE)
+_QUOTED = re.compile(r"'((?:[^']|'')*)'")
 # The rolling window ArcGIS specs send server-side (``CURRENT_DATE - INTERVAL
 # '180' DAY``); a file feed resolves it to a date before filtering rows.
 _RELATIVE_DATE = re.compile(r"CURRENT_DATE\s*-\s*INTERVAL\s*'(\d+)'\s*DAY", re.IGNORECASE)
@@ -106,13 +110,16 @@ def _is_web_page(response: httpx.Response) -> bool:
     return content_type.startswith("text/html") and response.content.lstrip(b"\xef\xbb\xbf \t\r\n")[:1] == b"<"
 
 
-def _split_point(value: Any) -> dict[str, float]:
-    """``latitude`` and ``longitude`` from one ``lat, lon`` value; nothing
-    when it is blank, malformed or off the globe."""
+def _split_point(value: Any, lon_first: bool = False) -> dict[str, float]:
+    """``latitude`` and ``longitude`` from one ``lat, lon`` value, or ``lon,
+    lat`` with ``lon_first``; nothing when it is blank, malformed or off the
+    globe."""
     try:
         lat, lng = (float(part) for part in str(value).split(","))
     except (TypeError, ValueError):
         return {}
+    if lon_first:
+        lat, lng = lng, lat
     if not (-90 <= lat <= 90 and -180 <= lng <= 180):
         return {}
     return {"latitude": lat, "longitude": lng}
@@ -301,6 +308,16 @@ def _iso_literal(literal: str) -> datetime | None:
         return None
 
 
+def _listed_values(items: str) -> set[str]:
+    """The values of an ``IN`` list: each quoted value whole, commas and
+    parentheses included, with ``''`` read as a quote; an unquoted list split
+    on its commas."""
+    quoted = _QUOTED.findall(items)
+    if quoted:
+        return {value.replace("''", "'").strip() for value in quoted}
+    return {item.strip() for item in items.split(",")}
+
+
 def _row_matches(
     where_clause: str | None,
     row: dict[str, Any],
@@ -408,8 +425,7 @@ def _branch_matches(
             m3 = _NOT_IN.match(part)
             if m3:
                 col = _normalize_header(m3.group(1))
-                excluded = {item.strip().strip("'") for item in m3.group(2).split(",")}
-                if str(row.get(col, "")).strip() in excluded:
+                if str(row.get(col, "")).strip() in _listed_values(m3.group(2)):
                     return False
     return True
 
@@ -447,6 +463,7 @@ class CSVClient:
             [_normalize_header(c) for c in select.split(",") if c.strip()] if select else None
         )
         point_col = _normalize_header(kwargs.get("point_col") or "") or None
+        point_lon_first = bool(kwargs.get("point_lon_first"))
         watermark_col = _normalize_header(kwargs.get("watermark_col") or "") or None
         watermark_format = kwargs.get("watermark_format")
         watermark_exclude = kwargs.get("watermark_exclude") or []
@@ -483,7 +500,7 @@ class CSVClient:
                 if selected_cols:
                     row = {k: row[k] for k in selected_cols if k in row}
                 if point_col:
-                    row.update(_split_point(row.get(point_col)))
+                    row.update(_split_point(row.get(point_col), point_lon_first))
                 rows.append(row)
 
         if order_by:

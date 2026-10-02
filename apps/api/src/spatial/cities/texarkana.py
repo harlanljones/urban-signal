@@ -3,6 +3,22 @@
 Leaf module: geometry only. Feed specs live in the spine (city_registry) and
 are currently limited to SNAP Retailers (TX slice) pending verifiable public
 municipal permits endpoints for both sides of the bi-state metro (US-282).
+(Superseded 2026-10-02: see PERMITS below.)
+
+PERMITS (2026-10-02): the Texas city's MyGov "Permits Issued in the last
+month" workbook (``public.mygov.us/tx_texarkana``, report 370), rebuilt each
+morning with the permits started in the previous calendar month (289 for
+September on 2026-10-02) and their current statuses. Each row has its permit
+number, title, status, start and issue dates as ``MM/DD/YYYY`` text,
+valuation and street address, and no coordinates, so each address is
+geocoded with ", Texarkana, TX" appended. A permit is read once, when its
+month's workbook first appears, so permits reach the stream up to a month
+after they start, and those still in review carry no issue date. Thirty-one
+titles that are not building work (health and pool inspections, mobile
+vendors, occupancy, zoning, platting, plan reviews, street cuts, rights of
+way, events, banners, tents and notices) are left out: 88 of September's
+289. The Arkansas city publishes no permits. The workbook's description and
+collaborators columns are never requested.
 """
 
 from typing import Dict

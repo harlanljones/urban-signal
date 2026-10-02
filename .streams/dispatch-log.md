@@ -1925,3 +1925,25 @@ Worth keeping:
   inputs.** Four specs named State Plane columns before the scheduler read them;
   one live poll each showed which rows the step would change (only Boston's,
   to the same points).
+
+
+### 2026-10-02 — Texarkana and Abilene permits, through MyGov workbooks (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| mygov-permits | `.streams/mygov-permits.md` | `config.py` (the sources), `city_registry.py` (`point_lon_first`), `scheduler.py` (passes the Excel client its watermark and point settings), `dob_permits_producer.py` (MyGov's times) | 2026-10-02 | done (Texarkana: 190 published, 11 unplaceable addresses dead-lettered, second poll none; Abilene: 598 published, 38 clipped, second poll none) | the Excel client's typed text dates and lon-lat points; whole quoted `NOT IN` values; `permits` specs for Texarkana and Abilene; notes in `docs/research/one-family-depth-2026-10-02.md`; regenerated facts |
+
+Texarkana and Abilene move from one signal family to two (two-family tier
+55 to 57, one-family tier 26 to 24).
+
+Worth keeping:
+
+- **Read a report's window before its name.** Texarkana's "Permits Issued
+  in the last month" lists the permits started in the previous calendar
+  month, whatever their status; the start dates, not the title, showed it.
+- **Test a filter with the values it will meet.** Abilene's occupancy
+  template holds a parenthesis, which kept the clients from recognising the
+  `NOT IN` list, so the filter passed every row without an error.
+- **Count the classes a new feed publishes.** Texarkana's trade permits
+  name "new construction" in their titles and Abilene's new homes do not;
+  only the job-type counts of the live poll showed either.
