@@ -2717,4 +2717,22 @@ class Settings(BaseSettings):
         default="https://gis.tucsonaz.gov/public/rest/services/PublicMaps/PermitsCode/MapServer/85",
         description="City of Tucson residential building permits layer URL (City GIS)",
     )
+    # Long Beach 311 (2026-10-02): the City's Go Long Beach requests of the
+    # last seven days, exported as CSV by its OpenDataSoft portal, the point
+    # one "lat, lon" column.
+    csv_long_beach_311_endpoint: str = Field(
+        default=(
+            "https://data.longbeach.gov/api/explore/v2.1/catalog/datasets/service-requests/exports/csv"
+            "?select=casenumber,type,status,createddate,closeddate,zipcode_c,geolocation"
+            "&where=createddate%20%3E%3D%20now(days%3D-7)&delimiter=%2C&use_labels=false"
+        ),
+        description="Long Beach Go Long Beach service requests, last 7 days, OpenDataSoft CSV export (311)",
+    )
+    # Tucson deeds (2026-10-02): the Pima County Assessor's affidavits of
+    # sale, one zipped file per sale year, rebuilt nightly. CSVClient reads
+    # this year's file and last year's.
+    csv_tucson_deeds_endpoint: str = Field(
+        default="https://www.asr.pima.gov/Downloads/Data/sales/{year}//SALE{year}.ZIP",
+        description="Pima County Assessor affidavit of sales file per sale year, SALE{year}.ZIP (Tucson deeds snapshot)",
+    )
 settings = Settings()

@@ -13,6 +13,18 @@ Pass ``zip_member='2026.csv'`` to read one named member out of a zip endpoint
 (St. Louis CSB ``csb.zip``), and ``columns`` to name the fields of a file with
 no header row (Pierce County's ``sale.txt``). The scheduler forwards both from
 the spec.
+
+An endpoint published once a year writes its year as ``{year}``, in the URL
+and in ``zip_member``: the client reads this year's file and last year's.
+Pima County keys its sales files by the year a sale closed, so the sales
+recorded in January to March sit mostly in the year before's file, and any
+rolling window that starts before New Year needs both. This year's file may
+not exist in the first days of January, answered as a 404 or, on Pima's
+site, as the site's own page with a 200; either passes it over, and any
+other failure to download either file fails the read. A ``point_col`` names
+a column that holds each row's point as one ``lat, lon`` value (the CSV
+export of an OpenDataSoft geo point, Long Beach's requests); the client adds
+its ``latitude`` and ``longitude``.
 """
 
 from __future__ import annotations
@@ -23,7 +35,7 @@ import io
 import re
 import zipfile
 from collections.abc import Generator, Iterable, Iterator
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from itertools import chain, islice
 from typing import Any
 
@@ -42,6 +54,8 @@ _CURRENT_DATE = re.compile(r"\bCURRENT_DATE\b", re.IGNORECASE)
 # splits them, so the csv module ends rows on any of the three (Milwaukee's
 # permits export uses bare \r).
 _LINE = re.compile(r"[^\r\n]*(?:\r\n|\r|\n)|[^\r\n]+")
+# The year an annual file's endpoint and member are written with.
+_YEAR = "{year}"
 
 
 def _lines(text: str) -> Iterator[str]:
@@ -68,6 +82,40 @@ def resolve_relative_dates(where_clause: str | None, today: Any = None) -> str |
 def _normalize_header(name: str) -> str:
     """Normalize municipal CSV headers to the producer field-map convention."""
     return re.sub(r"[^a-z0-9]+", "_", name.strip().lower()).strip("_")
+
+
+def yearly_files(
+    endpoint_url: str, zip_member: str | None = None, today: date | None = None
+) -> list[tuple[str, str | None]]:
+    """The URL and zip member of this year's file and last year's, for an
+    endpoint written with ``{year}``; the endpoint alone otherwise."""
+    if _YEAR not in endpoint_url:
+        return [(endpoint_url, zip_member)]
+    year = (today or datetime.now(UTC).date()).year
+    return [
+        (endpoint_url.replace(_YEAR, str(y)), zip_member.replace(_YEAR, str(y)) if zip_member else None)
+        for y in (year, year - 1)
+    ]
+
+
+def _is_web_page(response: httpx.Response) -> bool:
+    """Whether a download is a web page in place of the file asked for: an
+    HTML type and a body that opens with a tag. Pima County's site answers a
+    path it has no file for with its own page and a 200."""
+    content_type = response.headers.get("content-type", "").lower()
+    return content_type.startswith("text/html") and response.content.lstrip(b"\xef\xbb\xbf \t\r\n")[:1] == b"<"
+
+
+def _split_point(value: Any) -> dict[str, float]:
+    """``latitude`` and ``longitude`` from one ``lat, lon`` value; nothing
+    when it is blank, malformed or off the globe."""
+    try:
+        lat, lng = (float(part) for part in str(value).split(","))
+    except (TypeError, ValueError):
+        return {}
+    if not (-90 <= lat <= 90 and -180 <= lng <= 180):
+        return {}
+    return {"latitude": lat, "longitude": lng}
 
 
 def _nonblank_rows(lines: Iterable[str], delimiter: str) -> Iterator[list[str]]:
@@ -389,60 +437,54 @@ class CSVClient:
         Some ArcGIS Hub items expose both a download route and the underlying
         item-data route. Keep the primary URL first, but allow a registration
         to carry an explicitly verified fallback when the Hub proxy fails.
+        An endpoint written with ``{year}`` reads this year's file and last
+        year's, and this year's may not exist yet in the first days of
+        January (see the module notes).
         """
-        last_error: Exception | None = None
-        for candidate in [endpoint_url, *(fallback_endpoints or [])]:
-            try:
-                response = self.http.get(candidate)
-                response.raise_for_status()
-                break
-            except (httpx.HTTPError, OSError) as exc:
-                last_error = exc
-        else:
-            if last_error is not None:
-                raise last_error
-            raise RuntimeError("CSV endpoint list is empty")
-
-        zip_member = kwargs.get("zip_member")
         delimiter = kwargs.get("delimiter", ",")
         columns = kwargs.get("columns")
-        if zip_member:
-            lines = _zip_member_lines(response.content, zip_member)
-        else:
-            lines = _body_lines(response)
-        if columns:
-            # A file with no header row: every line is a row, named by the
-            # spec's columns, and there is no header for a preamble to hide.
-            fieldnames: list[str] | None = list(columns)
-        else:
-            lines, _ = _without_preamble(lines, delimiter=delimiter)
-            fieldnames = None
-        reader = csv.DictReader(lines, fieldnames=fieldnames, delimiter=delimiter)
-        # Municipal CSVs use title case, spaces, and punctuation inconsistently;
-        # normalize them so shared field maps apply uniformly.
-        if reader.fieldnames:
-            reader.fieldnames = [_normalize_header(name) for name in reader.fieldnames]
         selected_cols = (
             [_normalize_header(c) for c in select.split(",") if c.strip()] if select else None
         )
+        point_col = _normalize_header(kwargs.get("point_col") or "") or None
         watermark_col = _normalize_header(kwargs.get("watermark_col") or "") or None
         watermark_format = kwargs.get("watermark_format")
         watermark_exclude = kwargs.get("watermark_exclude") or []
         where_clause = resolve_relative_dates(where_clause)
 
         rows: list[dict[str, Any]] = []
-        for row in reader:
-            if not _row_matches(
-                where_clause,
-                row,
-                watermark_col=watermark_col,
-                watermark_format=watermark_format,
-                watermark_exclude=watermark_exclude,
-            ):
-                continue
-            if selected_cols:
-                row = {k: row[k] for k in selected_cols if k in row}
-            rows.append(row)
+        files = self._files(endpoint_url, fallback_endpoints, kwargs.get("zip_member"))
+        for response, zip_member in files:
+            if zip_member:
+                lines = _zip_member_lines(response.content, zip_member)
+            else:
+                lines = _body_lines(response)
+            if columns:
+                # A file with no header row: every line is a row, named by the
+                # spec's columns, and there is no header for a preamble to hide.
+                fieldnames: list[str] | None = list(columns)
+            else:
+                lines, _ = _without_preamble(lines, delimiter=delimiter)
+                fieldnames = None
+            reader = csv.DictReader(lines, fieldnames=fieldnames, delimiter=delimiter)
+            # Municipal CSVs use title case, spaces, and punctuation inconsistently;
+            # normalize them so shared field maps apply uniformly.
+            if reader.fieldnames:
+                reader.fieldnames = [_normalize_header(name) for name in reader.fieldnames]
+            for row in reader:
+                if not _row_matches(
+                    where_clause,
+                    row,
+                    watermark_col=watermark_col,
+                    watermark_format=watermark_format,
+                    watermark_exclude=watermark_exclude,
+                ):
+                    continue
+                if selected_cols:
+                    row = {k: row[k] for k in selected_cols if k in row}
+                if point_col:
+                    row.update(_split_point(row.get(point_col)))
+                rows.append(row)
 
         if order_by:
             m = re.match(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s+(ASC|DESC)?\s*$", order_by, re.IGNORECASE)
@@ -471,3 +513,41 @@ class CSVClient:
                 break
         if batch:
             yield batch
+
+    def _files(
+        self, endpoint_url: str, fallback_endpoints: list[str] | None, zip_member: str | None
+    ) -> Iterator[tuple[httpx.Response, str | None]]:
+        """Each file a poll reads, downloaded, with its zip member: the
+        endpoint or the first fallback that downloads, or for a ``{year}``
+        endpoint this year's file and then last year's."""
+        if _YEAR not in endpoint_url:
+            yield self._download([endpoint_url, *(fallback_endpoints or [])]), zip_member
+            return
+        for index, (url, member) in enumerate(yearly_files(endpoint_url, zip_member)):
+            # This year's file can be missing until its first rows are keyed
+            # in January; last year's must be there.
+            try:
+                response = self._download([url])
+            except httpx.HTTPStatusError as exc:
+                if index == 0 and exc.response.status_code == 404:
+                    continue
+                raise
+            if _is_web_page(response):
+                if index == 0:
+                    continue
+                raise FileNotFoundError(f"{url} answered with a web page, not the file")
+            yield response, member
+
+    def _download(self, candidates: list[str]) -> httpx.Response:
+        """The first of ``candidates`` that downloads; the last error if none do."""
+        last_error: Exception | None = None
+        for candidate in candidates:
+            try:
+                response = self.http.get(candidate)
+                response.raise_for_status()
+                return response
+            except (httpx.HTTPError, OSError) as exc:
+                last_error = exc
+        if last_error is not None:
+            raise last_error
+        raise RuntimeError("CSV endpoint list is empty")

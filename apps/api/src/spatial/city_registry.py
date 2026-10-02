@@ -302,6 +302,11 @@ class DatasetSpec:
     # order, and every line is read as a row (Pierce County's sales file,
     # Tacoma's deeds). Forwarded verbatim to CSVClient.paginate.
     columns: list[str] = field(default_factory=list)
+    # A file that writes each row's point as one ``lat, lon`` column (the
+    # CSV export of an OpenDataSoft geo point, Long Beach's requests) names
+    # it here, and CSVClient.paginate adds the row's ``latitude`` and
+    # ``longitude``.
+    point_col: str | None = None
     # Rows one scheduler poll may fetch; unset keeps JobConfig's default
     # (1000). A newest-first poll never reaches rows past its cap, so a feed
     # whose source lands more than that at once (Columbus 311's daily extract

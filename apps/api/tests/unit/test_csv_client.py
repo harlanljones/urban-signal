@@ -3,6 +3,7 @@
 import io
 import zipfile
 from datetime import date
+from functools import partial
 from itertools import cycle
 
 import httpx
@@ -15,9 +16,11 @@ from src.producers.csv_client import (
     _decode_csv_bytes,
     _lines,
     _read_zip_member,
+    _split_point,
     _strip_preamble,
     _zip_member_lines,
     resolve_relative_dates,
+    yearly_files,
 )
 
 
@@ -487,3 +490,195 @@ def test_a_plain_body_splits_lines_as_its_text_did():
     response = httpx.Response(200, content=text.encode())
 
     assert list(_body_lines(response)) == list(_lines(text))
+
+
+# Pima County's sales files, one per sale year, each zipped with a disclaimer.
+YEARLY = "https://example.test/sales/{year}//SALE{year}.ZIP"
+
+
+def _sales_zip(year: int, *rows: str) -> bytes:
+    header = "Parcel,SequenceNum,SaleDate,SalePrice,Deed,RecordingDate"
+    return _zip_bytes({
+        "disclaim.txt": "Not a legal record of sale.",
+        f"Sale{year}.csv": "\r\n".join([header, *rows]) + "\r\n",
+    })
+
+
+# What Pima's site answers, with a 200, for a path it has no file for.
+WEB_PAGE = "<!doctype html>\n<html lang=\"en\"><head><title>Assessor</title></head><body></body></html>"
+
+
+def _yearly_client(files: dict[int, bytes | int | str | tuple[bytes, str]], requested: list[str]) -> CSVClient:
+    """Serves each year's file; a status, a web page or a file with the
+    content type given in its place."""
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requested.append(request.url.path)
+        body = next(files[year] for year in files if str(year) in request.url.path)
+        if isinstance(body, int):
+            return httpx.Response(body, request=request)
+        if isinstance(body, str):
+            return httpx.Response(200, html=body, request=request)
+        if isinstance(body, tuple):
+            return httpx.Response(200, content=body[0], headers={"content-type": body[1]}, request=request)
+        return httpx.Response(200, content=body, request=request)
+
+    return CSVClient(httpx.Client(transport=httpx.MockTransport(handler)))
+
+
+def _read_window(client: CSVClient, since: str) -> list[dict]:
+    return [
+        row
+        for batch in client.paginate(
+            YEARLY,
+            where_clause=f"recordingdate >= '{since}'",
+            order_by="recordingdate DESC",
+            select="parcel,sequencenum,saleprice,recordingdate",
+            watermark_col="recordingdate",
+            zip_member="Sale{year}.csv",
+        )
+        for row in batch
+    ]
+
+
+def _on(day: date):
+    return partial(yearly_files, today=day)
+
+
+def test_a_yearly_endpoint_names_this_years_file_and_last_years():
+    assert yearly_files(YEARLY, "Sale{year}.csv", today=date(2026, 1, 5)) == [
+        ("https://example.test/sales/2026//SALE2026.ZIP", "Sale2026.csv"),
+        ("https://example.test/sales/2025//SALE2025.ZIP", "Sale2025.csv"),
+    ]
+    # A member named without the year is the same in both files.
+    assert yearly_files(YEARLY, "sales.csv", today=date(2026, 10, 2))[1] == (
+        "https://example.test/sales/2025//SALE2025.ZIP", "sales.csv",
+    )
+    # An endpoint without the year is the one file it names.
+    assert yearly_files("https://example.test/sale.zip", "sale.txt") == [("https://example.test/sale.zip", "sale.txt")]
+
+
+def test_a_yearly_endpoint_reads_this_years_file_and_last_years(monkeypatch):
+    """Pima County files a sale under the year it closed, whenever it was
+    recorded, so a window that reaches back past New Year needs both files:
+    in 2026 the 2025 file held 813 sales recorded in January."""
+    monkeypatch.setattr(csv_client, "yearly_files", _on(date(2026, 2, 10)))
+    requested: list[str] = []
+    client = _yearly_client({
+        2026: _sales_zip(2026, "199990001,20260370001,202602,310000,Warranty Deed,2026-02-06"),
+        2025: _sales_zip(
+            2025,
+            # Closed in December, recorded in January.
+            "199990002,20260140002,202512,275000,Warranty Deed,2026-01-14",
+            "199990003,20252730003,202509,190000,Quit Claim Deed,2025-09-30",
+        ),
+    }, requested)
+
+    rows = _read_window(client, "2025-11-12")
+
+    assert requested == ["/sales/2026//SALE2026.ZIP", "/sales/2025//SALE2025.ZIP"]
+    assert rows == [
+        {"parcel": "199990001", "sequencenum": "20260370001", "saleprice": "310000", "recordingdate": "2026-02-06"},
+        {"parcel": "199990002", "sequencenum": "20260140002", "saleprice": "275000", "recordingdate": "2026-01-14"},
+    ]
+
+
+@pytest.mark.parametrize("missing", [404, WEB_PAGE], ids=["404", "web-page"])
+def test_this_years_file_may_not_be_out_yet(monkeypatch, missing):
+    """On New Year's Day no sale of the year has been keyed and its file may
+    not exist, answered as a 404 or, on Pima's site, as the site's own page
+    with a 200; last year's file holds the whole window."""
+    monkeypatch.setattr(csv_client, "yearly_files", _on(date(2026, 1, 1)))
+    requested: list[str] = []
+    client = _yearly_client({
+        2026: missing,
+        2025: _sales_zip(2025, "199990002,20253640002,202512,275000,Warranty Deed,2025-12-30"),
+    }, requested)
+
+    rows = _read_window(client, "2025-10-03")
+
+    assert requested == ["/sales/2026//SALE2026.ZIP", "/sales/2025//SALE2025.ZIP"]
+    assert [row["parcel"] for row in rows] == ["199990002"]
+
+
+@pytest.mark.parametrize(
+    ("this_year", "last_year", "error"),
+    [
+        (500, None, httpx.HTTPStatusError),
+        (None, 404, httpx.HTTPStatusError),
+        (None, WEB_PAGE, FileNotFoundError),
+    ],
+    ids=["this-years-file-failing", "last-years-file-missing", "last-years-file-a-web-page"],
+)
+def test_any_other_failed_download_fails_the_poll(monkeypatch, this_year, last_year, error):
+    """Only this year's file may be missing: a poll that read one of the two
+    files would publish half its window as the whole."""
+    monkeypatch.setattr(csv_client, "yearly_files", _on(date(2026, 2, 10)))
+    client = _yearly_client({
+        2026: this_year or _sales_zip(2026, "199990001,20260370001,202602,310000,Warranty Deed,2026-02-06"),
+        2025: last_year or _sales_zip(2025, "199990002,20260140002,202512,275000,Warranty Deed,2026-01-14"),
+    }, [])
+
+    with pytest.raises(error):
+        _read_window(client, "2025-11-12")
+
+
+def test_a_file_served_as_html_is_still_read(monkeypatch):
+    """Only a body that opens with a tag reads as a web page: a file a server
+    labels ``text/html`` is still this year's file."""
+    monkeypatch.setattr(csv_client, "yearly_files", _on(date(2026, 2, 10)))
+    client = _yearly_client({
+        2026: (_sales_zip(2026, "199990001,20260370001,202602,310000,Warranty Deed,2026-02-06"), "text/html"),
+        2025: _sales_zip(2025, "199990002,20260140002,202512,275000,Warranty Deed,2026-01-14"),
+    }, [])
+
+    assert [row["parcel"] for row in _read_window(client, "2025-11-12")] == ["199990001", "199990002"]
+
+
+@pytest.mark.parametrize(
+    ("value", "point"),
+    [
+        ("33.7703059453627, -118.1865287460327", {"latitude": 33.7703059453627, "longitude": -118.1865287460327}),
+        ("33.7703,-118.1865", {"latitude": 33.7703, "longitude": -118.1865}),
+        ("", {}),
+        (None, {}),
+        ("33.7703", {}),
+        ("33.7703, -118.1865, 4.0", {}),
+        ("north, west", {}),
+        ("-118.1865, 33.7703", {}),
+        ("nan, nan", {}),
+    ],
+    ids=["lat-lon", "no-space", "blank", "none", "one-number", "three-numbers", "words", "lon-lat", "nan"],
+)
+def test_a_point_value_splits_into_latitude_and_longitude(value, point):
+    assert _split_point(value) == point
+
+
+def test_a_point_column_gives_each_row_its_latitude_and_longitude():
+    """Long Beach's request export writes each point as one quoted
+    ``lat, lon`` column; a request without one stays unplaced."""
+    payload = (
+        "casenumber,type,createddate,geolocation\r\n"
+        '00399001,Graffiti,2026-10-02T13:31:45+00:00,"33.7703059453627, -118.1865287460327"\r\n'
+        "00399002,Dumped Items,2026-10-02T12:05:10+00:00,\r\n"
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, text=payload, request=request)
+
+    client = CSVClient(httpx.Client(transport=httpx.MockTransport(handler)))
+    rows = [
+        row
+        for batch in client.paginate(
+            "https://example.test/service-requests.csv",
+            order_by="createddate DESC",
+            select="casenumber,type,createddate,geolocation",
+            point_col="GeoLocation",
+        )
+        for row in batch
+    ]
+
+    assert [row["casenumber"] for row in rows] == ["00399001", "00399002"]
+    assert (rows[0]["latitude"], rows[0]["longitude"]) == (33.7703059453627, -118.1865287460327)
+    assert rows[0]["geolocation"] == "33.7703059453627, -118.1865287460327"
+    assert "latitude" not in rows[1] and "longitude" not in rows[1]

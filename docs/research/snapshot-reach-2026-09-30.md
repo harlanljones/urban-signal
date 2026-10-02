@@ -213,6 +213,14 @@ clips skip 179, 22 and 274 rows outside the metro boxes, and 805, 496 and
 sales of the 90 days from 2026-04-19, the 735 from 2026-05-04 and the 1,329
 permits from 2025-08-17, the busiest windows found.
 
+Tucson `deeds` (4,319 rows, cap 10,000) joined the same day. It reads Pima
+County's affidavits of sale recorded in the 90 days before each poll, from
+this year's sales file and last year's (4,257 and 62 rows on 2026-10-02),
+once a day; the client filters and sorts the two files in memory. Each sale
+takes its parcel's centroid, the clip skips 2,592 elsewhere in the county,
+and 1,727 publish. The cap holds the 6,873 sales of the 90 days from
+2026-02-18, the busiest window in the two files.
+
 ## Newest-first windows
 
 | Feed | Order | Rows dated in last 30 / 90 days | Window after |

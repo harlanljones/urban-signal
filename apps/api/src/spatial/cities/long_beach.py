@@ -50,11 +50,12 @@ Provides neighborhood metadata, camera positioning, division catalog, and
 geographic bounding boxes for the City of Long Beach (Los Angeles County,
 California — independent incorporated city, ~466K population).
 
-Long Beach is a TWO-FEED PARTIAL metro: SLA (``BusinessLicenses_DailyUpdate``
+Long Beach is a THREE-FEED PARTIAL metro: SLA (``BusinessLicenses_DailyUpdate``
 on the city's hosted ArcGIS FeatureServer at ``services6.arcgis.com``
-org ``yCArG7wGXGyWLqav``, Tier 1, daily) and CRIME (LBPD ``CrimeData``,
-native coordinates — ADR-0004-satisfied). COMPLAINTS_311, PERMITS, and
-DEEDS stay unregistered (see probe verdicts below).
+org ``yCArG7wGXGyWLqav``, Tier 1, daily), CRIME (LBPD ``CrimeData``,
+native coordinates — ADR-0004-satisfied) and, since 2026-10-02,
+COMPLAINTS_311 (the Go Long Beach requests, which the corpus registers).
+PERMITS and DEEDS stay unregistered (see probe verdicts below).
 
 Live-probe caveats that define this leaf (all probed live 2026-08-28 UTC):
 
@@ -89,10 +90,18 @@ Live-probe caveats that define this leaf (all probed live 2026-08-28 UTC):
 * 311 — ``service-requests`` on ``data.longbeach.gov`` (OpenDataSoft/
   Huwise) is verified live (346,300 rows; ``createddate`` newest verbatim
   ``2026-08-28T17:50:01+00:00``, intraday-fresh; native ``geolocation``
-  geo_point_2d) but is NOT registrable at leaf: the repo has no
-  OpenDataSoft client, and the CSV export route is semicolon-delimited
-  (CSVClient is comma dialect) and full-file per pull. Spine follow-up:
-  an ODS client or a where-parameterized export path, then register.
+  geo_point_2d). The August probe held it: the repo has no OpenDataSoft
+  client, and the default CSV export is semicolon-delimited and
+  full-file per pull.
+
+  Registered 2026-10-02 (corpus): the export takes ``select``, ``where``,
+  ``delimiter`` and ``use_labels`` parameters, so the spec downloads the
+  requests created in the last seven days (1,314 on 2026-10-02),
+  comma-delimited, in seven named columns with no requester or
+  description fields. Each point is one ``geolocation`` column written
+  ``lat, lon``, which the spec names as its ``point_col`` and CSVClient
+  splits. The export was rebuilt at 14:00Z on 2026-10-02 and not again by
+  17:34Z, so the spec declares a two-day cadence.
 * PERMITS — no live permit register exists publicly. The RHNA
   ``Bldg_Permits_5th_Cycle_RHNA_2020`` FeatureServer is a compliance
   aggregate and ``Development_Projects_(Public)`` is a 61-row planning
@@ -450,9 +459,9 @@ LONG_BEACH_DIVISIONS: dict[str, BoroughMeta] = {
 # Feed specs (leaf-local; the spine copies these into REGISTRY).
 # Probed live 2026-08-28. Register ONLY the two verified feeds: SLA
 # (Business_Licenses_Public_View/0) and CRIME (Police_Crime_Mapping/0).
-# Do not register 311 (no ODS client in repo — data.longbeach.gov
-# service-requests is verified but blocked), the RHNA permits aggregate,
-# the Development_Projects planning snapshot, or the cannabis BL sub-slice.
+# 311 reads the data.longbeach.gov service-requests export, which the
+# corpus registers. Do not register the RHNA permits aggregate, the
+# Development_Projects planning snapshot, or the cannabis BL sub-slice.
 # ---------------------------------------------------------------------------
 LONG_BEACH_SLA_ENDPOINT = (
     "https://services6.arcgis.com/yCArG7wGXGyWLqav/arcgis/rest/services/"

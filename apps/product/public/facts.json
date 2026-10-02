@@ -2773,13 +2773,18 @@
       "submarket_count": 10,
       "feeds": [
         false,
-        false,
+        true,
         true,
         false
       ],
       "platforms": [
         null,
-        null,
+        {
+          "platform": "csv",
+          "watermark_col": "createddate",
+          "interval_seconds": 3600.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "MILESTONEDATE",
@@ -5470,7 +5475,7 @@
         true,
         false,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -5486,7 +5491,12 @@
           "interval_seconds": 600.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "csv",
+          "watermark_col": "recordingdate",
+          "interval_seconds": 86400.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 32.2226,

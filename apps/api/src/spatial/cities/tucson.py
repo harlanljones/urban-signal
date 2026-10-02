@@ -32,14 +32,16 @@ Provides neighborhood metadata, camera positioning, investment metrics,
 division catalog, and geographic bounding boxes for the City of Tucson
 (northeast-to-central Pima County, AZ).
 
-Tucson is a ONE-FEED PARTIAL metro like Albuquerque: SLA only — the BUSLIC
-business-license layer (``PublicMaps/OpenData_EconomicDevelopment/
-MapServer/3``, Tier 2, ~93k rows, native point geometry + ``FULLADDRESS``).
-PERMITS is Tier 3: ``PDSD_PERMITS_ALL`` L0/L2 is a row-frozen archive (max
+Tucson is a THREE-FEED PARTIAL metro: SLA — the BUSLIC business-license
+layer (``PublicMaps/OpenData_EconomicDevelopment/MapServer/3``, Tier 2,
+~93k rows, native point geometry + ``FULLADDRESS``) — and, since
+2026-10-02, PERMITS and DEEDS (below), which the corpus registers. The
+``PDSD_PERMITS_ALL`` L0/L2 permits archive is row-frozen (max
 ``DATEISSUED`` 2022-10-20, 0 rows since — the columns are registrable but
 the ETL is dead), so a ``where`` guard must prevent accidental registration.
-COMPLAINTS_311 and DEEDS are Tier 3 (no Hub dataset; Pima County recording
-has no anonymous bulk API) and stay unregistered.
+COMPLAINTS_311 is Tier 3 (no Hub dataset) and stays unregistered. Pima
+County recording has no anonymous bulk API, so the deeds come from the
+County Assessor's sales files.
 
 Live-probe caveats that define this leaf (re-probed 2026-08-28, US-328;
 original probe 2026-08-27):
@@ -91,6 +93,24 @@ fifth of the permits lie in the City's southern and south-eastern
 annexations, outside the metro box, and are clipped. The project name and
 the free-text description are never selected. The corpus registers this
 feed; the feed mirror below carries SLA only.
+
+DEEDS (2026-10-02): the Pima County Assessor's affidavits of sale, one zipped
+CSV per sale year (``SALE2026.ZIP``, member ``Sale2026.csv``), rebuilt
+nightly, 15 columns with no names or addresses. The 2026 file held 14,165
+sales recorded from 2026-01-02 to 2026-09-25. A file holds the sales that
+closed in its year, so a sale recorded after New Year sits in the year
+before's file (the 2025 file holds 813 sales recorded in January 2026, 438 in
+February and 651 in March): the spec writes the year as ``{year}`` and
+CSVClient reads this year's file and last year's. Until this year's file
+exists, the Assessor's site answers for it with its own page and a 200, which
+CSVClient passes over. The poll keeps the sales recorded in the 90 days before
+it (4,319 county-wide on 2026-10-02, 62 of them from the 2025 file) and places
+each on its parcel's centroid from the County's parcel centroid layer
+(``GISOpenData/LandRecords/MapServer/0``, asked for the parcel number alone;
+its mailing columns stay on the server). A sale is its affidavit's sequence
+number and its parcel, since one affidavit can convey several parcels. About
+three in five sales lie elsewhere in the county and are clipped. The corpus
+registers this feed too.
 """
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
@@ -350,8 +370,9 @@ TUCSON_DIVISIONS: dict[str, BoroughMeta] = {
 # ---------------------------------------------------------------------------
 # Feed specs (leaf-local; the spine copies these into REGISTRY).
 # Probed 2026-08-27, re-probed 2026-08-28. Do not register the frozen
-# PDSD_PERMITS_ALL archive (permits read PermitsCode/MapServer/85, which the
-# corpus registers), 311, deeds, or sibling MapServer layers.
+# PDSD_PERMITS_ALL archive (permits read PermitsCode/MapServer/85 and deeds
+# Pima County's sales files, which the corpus registers), 311, or sibling
+# MapServer layers.
 # ---------------------------------------------------------------------------
 TUCSON_SLA_ENDPOINT = (
     "https://gis.tucsonaz.gov/arcgis/rest/services/"

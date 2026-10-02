@@ -36,7 +36,7 @@ from src.producers.acquisition import (
 from src.producers.arcgis_client import ArcGISClient
 from src.producers.carto_client import CartoClient
 from src.producers.ckan_client import CkanClient
-from src.producers.csv_client import CSVClient
+from src.producers.csv_client import CSVClient, yearly_files
 from src.producers.socrata_client import SocrataClient
 from src.producers.watermarks import parse_watermark as parse_timestamp
 from src.producers.watermarks import typed_watermark_entry
@@ -133,8 +133,11 @@ def fetch_source_updated_at(
 ) -> datetime | None:
     """Fetch ``rowsUpdatedAt``/``lastEditDate`` or the csv ``Last-Modified`` header."""
     if spec.platform == "csv":
+        # An endpoint written with ``{year}`` names a file a year (Pima
+        # County's sales); this year's is the one being rebuilt.
+        url = yearly_files(spec.endpoint)[0][0]
         try:
-            response = request_json(spec.endpoint)
+            response = request_json(url)
         except Exception:  # noqa: BLE001  # a csv HEAD failure must not hide others
             return None
         header = response.headers.get("last-modified") if hasattr(response, "headers") else None

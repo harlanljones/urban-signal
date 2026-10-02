@@ -138,6 +138,11 @@ FULL_READ_ROWS = {
     # lie in the metro box. May to July 2026 held 6,441.
     ("tampa", "deeds"): 3_886,
     ("tempe", "deeds"): 783,
+    # Pima County affidavits of sale recorded in the spec's 90-day window,
+    # county-wide, across this year's file and last year's (4,257 and 62),
+    # newest 2026-09-25, read 2026-10-02; 1,727 place inside the metro box.
+    # The 90 days from 2026-02-18 held 6,873.
+    ("tucson", "deeds"): 4_319,
     # City of Tucson residential building permits issued in the spec's
     # 90-day window, newest 2026-10-02, read 2026-10-02; 1,016 of them lie in
     # the metro box. The 90 days from 2025-08-17 held 1,329.

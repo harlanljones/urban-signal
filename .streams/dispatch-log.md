@@ -1886,3 +1886,23 @@ Worth keeping:
 - **Count work classes with their values.** Tucson's "model permits" read as
   nothing in particular until their average value ($288,769) and size (2,331
   square feet) showed them to be new homes.
+
+### 2026-10-02 — Two held sources, through CSV client changes (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| held-sources | `.streams/held-sources.md` | `config.py` (the two sources), `city_registry.py` (`point_col`), `scheduler.py` (forwards it) | 2026-10-02 | done (Tucson deeds 4,319 read across two yearly files, 1,727 published; Long Beach `311` 1,275 read and published; each second poll published none) | the CSV client's `{year}` endpoints and `point_col`; a `deeds` spec for Tucson and a `311` spec for Long Beach; notes in `docs/research/one-family-depth-2026-10-02.md`; regenerated facts |
+
+Tucson moves from two signal families to three (three-family tier 43 to 44)
+and Long Beach from one to two (one-family tier 27 to 26).
+
+Worth keeping:
+
+- **Check which file holds a late record.** Pima's files are keyed by the
+  year of sale, not of recording; counting the 2025 file's rows by recording
+  month showed 1,902 recorded in the first quarter of 2026.
+- **Run the live check with the final cap.** Long Beach's first pair, under
+  the default cap, published only the newest 1,000 of the week's requests,
+  which held 1,275 when read whole 25 minutes later; the shortfall showed
+  only against the week's count.
+

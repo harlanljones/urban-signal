@@ -56,12 +56,19 @@ Long Beach's requests, Polk County's sales and Sonoma County's parcel sales
 are held; the other gaps have no public source, and Stanislaus and San
 Joaquin counties publish no sale prices.
 
-| Tier (families) | Before (with #106) | With the Texas and southern feeds (#107) | With the north-eastern and western feeds |
-|---|---|---|---|
-| 4 | 30 | 30 | **31** (Lincoln) |
-| 3 | 44 | 44 | 43 |
-| 2 | 48 | **54** (Midland, Longview, Charleston SC, Odessa, Waco, Lexington) | **56** (Manchester, Tucson) |
-| 1 | 35 | 29 | 27 |
+Two of the western holds came off the same afternoon, through two changes to
+the CSV client: an endpoint written with `{year}` reads this year's file and
+last year's, and a column that holds a point as `lat, lon` gives each row its
+latitude and longitude. Tucson's deeds register from Pima County's sales
+files, which gives Tucson three families, and Long Beach's `311` from the
+City's request export, which gives it two.
+
+| Tier (families) | Before (with #106) | With the Texas and southern feeds (#107) | With the north-eastern and western feeds (#108) | With two held sources |
+|---|---|---|---|---|
+| 4 | 30 | 30 | **31** (Lincoln) | 31 |
+| 3 | 44 | 44 | 43 | **44** (Tucson) |
+| 2 | 48 | **54** (Midland, Longview, Charleston SC, Odessa, Waco, Lexington) | **56** (Manchester, Tucson) | **56** (Long Beach in, Tucson up) |
+| 1 | 35 | 29 | 27 | 26 |
 
 ## Registered
 
@@ -461,6 +468,114 @@ Joaquin counties publish no sale prices.
   same rows in two requests and published nothing. Neither poll queried a
   geocoder.
 
+### Tucson, AZ — `deeds`
+
+- **Source:** the Pima County Assessor's "Affidavit of Sales" files, one
+  zipped CSV a sale year
+  (`www.asr.pima.gov/Downloads/Data/sales/2026//SALE2026.ZIP`, member
+  `Sale2026.csv` beside a disclaimer), listed by the Assessor site's download
+  API and rebuilt nightly (last modified 2026-10-02 07:20:45 GMT). The
+  County Recorder publishes no bulk feed.
+- **Shape:** 15 columns and no names or addresses: the parcel, the
+  affidavit's sequence number, the sale month (`YYYYMM`), the price, the
+  property type, intended use, deed type, financing, validation note,
+  buyer-seller relation, solar, personal property and partial interest flags,
+  the recording date (`YYYY-MM-DD`) and the parcel use. The 2026 file held
+  14,165 rows recorded from 2026-01-02 to 2026-09-25.
+- **Years:** a file holds the sales that closed in its year, whenever they
+  were recorded, so a sale closed in December and recorded in January sits in
+  the earlier file. The 2025 file holds 813 sales recorded in January 2026,
+  438 in February and 651 in March, and a few in each month since. The spec
+  writes the year as `{year}` in the URL and the member, and the CSV client
+  reads this year's file and then last year's. This year's file may not exist
+  in the first days of January, and the Assessor's site answers a file it
+  lacks with its own page and a 200 (asked for 2027's on 2026-10-02), so the
+  client passes over a 404 or a web page for this year's file alone; any
+  other failed download fails the poll.
+- **Window:** the sales recorded in the 90 days before each poll, closed at
+  the day: 4,319 rows county-wide on 2026-10-02, 4,257 from the 2026 file
+  and 62 from the 2025 file.
+- **Reach:** the 90 days from 2026-02-18 held 6,873 across the two files,
+  the most in their two years, so the cap is 10,000. The client reads both
+  files whole and filters and sorts them in memory.
+- **Ids:** an affidavit can convey several parcels (12,863 sequence numbers
+  cover the 14,165 rows of the 2026 file), so each event is the sequence
+  number with the parcel. No pair repeats, within a file or across the two.
+- **Freshness:** the newest recording was a week old on 2026-10-02, and the
+  last days arrive thin (recording-day counts are dense to 2026-09-16), so
+  `expected_cadence_days` is 10.
+- **Personal data:** the file holds none, and `select` keeps five columns.
+  The parcel join asks the centroid layer for the parcel number alone; its
+  mailing columns stay on the server.
+- **Mapping:** the sequence number as the document id, the recording date,
+  the price (zero when blank), the parcel number and the deed type.
+- **Placement:** each sale on its parcel's centroid from the County's parcel
+  centroid layer
+  (`gisdata.pima.gov/arcgis1/rest/services/GISOpenData/LandRecords/MapServer/0`),
+  asked for each page's parcels in bounded `IN` clauses. About three in five
+  sales lie elsewhere in the county, and the clip skips them. No geocoder is
+  asked.
+- **Poll:** once a day, the whole window as a snapshot, newest first by
+  `recordingdate DESC`.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live files and layer from 17:10Z to 17:16Z, Kafka
+  mocked. The first downloaded the two files (254,642 and 409,530 bytes),
+  read 4,319 rows, placed every one in 62 join requests and published 1,727
+  sales recorded from 2026-07-06 to 2026-09-25 (687 in July, 697 in August
+  and 343 in September), 1,684 of them priced and 1,716 by warranty deed.
+  It skipped 2,592 outside the box and dead-lettered none. The second read
+  the same rows in 61 join requests and published nothing. Neither poll
+  queried a geocoder.
+
+### Long Beach, CA — `311`
+
+- **Source:** the City's "Go Long Beach" service requests on its
+  OpenDataSoft portal (`data.longbeach.gov`, dataset `service-requests`),
+  through the portal's CSV export
+  (`/api/explore/v2.1/catalog/datasets/service-requests/exports/csv`).
+- **Shape:** 353,242 requests on 2026-10-02, the oldest created on
+  2020-09-21, each with its case number, type, status, created and closed
+  times, council district, ZIP code and point. The dataset has no requester,
+  address or description fields.
+- **Export:** the export takes the columns, a filter, the delimiter and the
+  header style as parameters, so the spec's URL asks for seven columns, the
+  requests created in the last seven days (`createddate >= now(days=-7)`),
+  commas and field names (the defaults are semicolons and labels). Each point
+  is one quoted `lat, lon` column (`geolocation`) that the server cannot
+  split; the spec names it as its `point_col`, and the CSV client gives each
+  row its latitude and longitude.
+- **Window:** the requests created in the seven days before each download,
+  1,314 at 14:46Z on 2026-10-02 (about 200 a weekday). The poll keeps the
+  ones newer than its watermark.
+- **Reach:** the cap is 2,000, so a first poll, or one after a missed week,
+  reads the whole export.
+- **Ids:** the case number keys each event; the 19,090 requests created in
+  the 90 days to 2026-10-02 each had their own.
+- **Freshness:** the export was rebuilt at 14:00:28Z on 2026-10-02, its
+  newest request created at 13:31:45Z, and not again by 17:34Z; the August
+  probe found requests created that afternoon. `expected_cadence_days` is 2.
+- **Personal data:** none in the dataset, and the URL names its seven
+  columns.
+- **Mapping:** the case number, the created and closed times, the type, the
+  status and the ZIP code.
+- **Placement:** each request at its point. 2 of the 19,090 in the 90 days
+  lay outside the metro box, and the clip skips such rows. No geocoder is
+  asked.
+- **Poll:** hourly, newest first by `createddate DESC`, incremental on
+  `createddate`. The watermark keeps whole seconds and drops the export's
+  `+00:00`, so the newest request reads as newer than it and comes back
+  once; the dedup drops it.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live export at 17:34Z, Kafka mocked. The first
+  downloaded the export once (141,217 bytes) and published 1,275 requests
+  created from 2026-09-25 17:35Z to 2026-10-02 13:31Z: 580 dumped items,
+  250 e-scooters, 159 graffiti and 68 tree maintenance; 358 in progress,
+  339 closed and 282 closed and referred. It clipped none and dead-lettered
+  none. The second downloaded the export again, re-read the newest request
+  and published nothing. Neither poll queried a geocoder. A pair at 17:09Z
+  under the default cap of 1,000 published only the newest 1,000 of the
+  week, which is why the spec declares 2,000.
+
 ## Held
 
 | Metro (missing) | Source | Why held | Re-check when |
@@ -471,8 +586,6 @@ Joaquin counties publish no sale prices.
 | Beaumont (`permits`) | The City's Cityworks server publishes the new residential and commercial permits still open, for its "Construction and SUP Map" (`cityworks.beaumonttexas.gov/CityworksNAD/gis/1/1/rest/services/qe/FeatureServer/8` and `/7`): 80 and 37 rows on 2026-10-02, 20 and 9 issued in 90 days, with times of day; a permit leaves when it closes, and the server rejects relative dates. | New construction only, and only while open. Registered as the metro's permits, they would mark Beaumont as covered while missing its trade, roofing and remodelling permits. | The City publishes all its permits. |
 | Texarkana (`permits`) | MyGov's daily "Permits Issued in the last month" workbook for the Texas city (`public.mygov.us/tx_texarkana`, report 370): 289 permits started in about a month, each with its number and address, 170 of them issued (2026-09-01 to 2026-10-02). Its dates are text (`MM/DD/YYYY`) and it has no coordinates; the five-year workbook beside it (14,142 rows) has no permit number and lists health inspections, restaurant permits, zoning and street cuts among its types. | The Excel client compares text dates as strings and drops the spec's date format, so it can neither window nor order the workbook, and nothing in the workbook separates building permits from the rest. | The Excel client reads text dates as dates. |
 | Abilene (`permits`) | MyGov's "TCADBuildingPermitsWithProjInfo" workbook for the City (`public.mygov.us/tx_abilene`, report 371): 652 permits, each with its number and coordinates, all issued in August 2026. It is generated once a month (last on 2026-09-28), each file replaces the last, and its times read "MM/DD/YYYY at H:MM AM". The City's other permit reports are PDFs, and its GIS server reset the connection twice. | Monthly and a month behind, and the permits producer cannot read its dates. | MyGov publishes a daily permits workbook, or a monthly feed is accepted and the producer reads the format. |
-| Tucson (`deeds`) | Pima County Assessor's yearly "Affidavit of Sales" files (`www.asr.pima.gov/Downloads/Data/sales/2026//SALE2026.ZIP`), rebuilt nightly, 15 columns with no names or addresses. The 2026 file held 14,165 sales recorded from 2026-01-02 to 2026-09-25, 4,257 in the 90 days to 2026-10-02, unique by sequence number and parcel; a join to Pima's parcel centroids placed 4,256 of them, 1,719 inside the metro box. The files are keyed by the year of sale, so a sale closed in one year and recorded in the next sits in the earlier file (the 2025 file holds 813 sales recorded in January 2026, 438 in February and 651 in March). | The CSV client reads one fixed file, and the scheduler's year map names zip members, not URLs: a spec would need its URL and member changed each January and would miss the previous year's late recordings through March. | The CSV client reads a year-templated URL with the previous year's file beside it. |
-| Long Beach (`311`) | The City's "Go Long Beach" requests on its OpenDataSoft portal (`data.longbeach.gov`, `service-requests`): 353,242 since 2020-09-21, about 200 a day, refreshed about hourly. The CSV export takes a filter and named columns (19,090 in 90 days, case numbers unique, no requester columns), but each request's point is one quoted `lat, lon` column. | The CSV client and the 311 producer cannot split a composite point, the server cannot split it for them, and the rows carry no address to place them by. | The CSV client splits a `lat, lon` column, or an OpenDataSoft client is built. |
 | Buffalo (`311`) | The City's Salesforce CRM mirrors public works' holes-in-road work orders to ArcGIS Online for its pothole tracker (`services8.arcgis.com/BMPgiPHUrkqJdtki`, `SF_Work_Order_Holes_In_Road_(view)/FeatureServer/1`): 5,420 since 2024-08-26, 873 in 90 days, unique work order numbers, each at its point. | One kind of request: potholes, cave-ins and other holes. Registered as the metro's `311`, it would mark Buffalo as covered while the CRM's other requests stay unpublished. | The City publishes its CRM requests as one layer with ids. |
 | Manchester, NH (`311`) | Public works' Maximo tickets on the City's server (`DPW/SRPOINTS/FeatureServer`): 4,025 open and 60,847 closed, each at its point, from missed pickups to potholes, cave-ins and tree pruning, internal and resident tickets mixed; the dates are text. | Resident ticket intake stopped: the newest report was filed on 2026-09-02, 30 days before, though work orders still arrive. Residents now report through "Manchester NH Connect", a SeeClickFix app. | Tickets arrive again, or SeeClickFix publishes a view for the City. |
 | Buffalo (`deeds`) | The City's 2026-27 assessment roll (`gis.buffalony.gov/server/rest/services/Tax/Parcels_20262027/FeatureServer/0`, 93,453 parcels) carries a sale price on 75,983 parcels, with deed book and page. | The deed date is empty on every row; the 2025-26 layer rejects queries on it, and Erie County's parcels carry no price. | The roll's deed dates load. |

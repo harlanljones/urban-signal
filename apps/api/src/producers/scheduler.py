@@ -63,14 +63,14 @@ logger = logging.getLogger(__name__)
 # Pagination kwargs each platform client's ``paginate`` accepts beyond the
 # shared endpoint/where/batch/max arguments: the US-185 adapter contract
 # (``acquisition.build_adapter_request``) plus the CSV client's zip,
-# delimiter and header-row options and the ArcGIS client's domain decoding,
-# which only the scheduler forwards. The socrata/arcgis/ckan/carto
+# delimiter, header-row and point-column options and the ArcGIS client's
+# domain decoding, which only the scheduler forwards. The socrata/arcgis/ckan/carto
 # signatures reject the watermark_* keys, so forwarding them raises
 # TypeError before the first request.
 _PAGINATE_KWARGS: dict[str, tuple[str, ...]] = {
     **_ADAPTER_REQUEST_KEYS,
     "arcgis": (*_ADAPTER_REQUEST_KEYS["arcgis"], "decode_domains"),
-    "csv": (*_ADAPTER_REQUEST_KEYS["csv"], "zip_member", "delimiter", "columns"),
+    "csv": (*_ADAPTER_REQUEST_KEYS["csv"], "zip_member", "delimiter", "columns", "point_col"),
     # Accela's public surface is an ArcGIS facade (AccelaClient); a workbook
     # is sorted and column-picked client-side like a CSV.
     "accela": _ADAPTER_REQUEST_KEYS["arcgis"],
@@ -374,6 +374,7 @@ class MunicipalIngestionScheduler:
                     "zip_member": zip_member,
                     "delimiter": ds.delimiter,
                     "columns": list(ds.columns or []),
+                    "point_col": ds.point_col,
                     "link_pattern": ds.link_pattern,
                     "decode_domains": ds.decode_domains,
                     # A table with no geometry (DC, Lynchburg and Roanoke

@@ -1,4 +1,5 @@
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
+from functools import partial
 from unittest.mock import MagicMock
 
 from scripts.feed_staleness_probe import (
@@ -316,3 +317,18 @@ def test_probe_registry_applies_per_feed_declared_thresholds():
     # because their columns are absent from the fixture rows.
     permits = next(result for result in results if result.feed == "permits")
     assert permits.stale is False and abs(permits.age_days - 8.0) < 1e-9
+
+
+def test_a_yearly_csv_endpoint_is_dated_by_this_years_file(monkeypatch):
+    """Pima County's sales endpoint is written with ``{year}``: the probe asks
+    for this year's file, never the template."""
+    import scripts.feed_staleness_probe as probe
+
+    from src.producers.csv_client import yearly_files
+
+    monkeypatch.setattr(probe, "yearly_files", partial(yearly_files, today=date(2026, 10, 2)))
+    request = MagicMock(return_value=MagicMock(headers={"last-modified": "Fri, 02 Oct 2026 07:20:45 GMT"}))
+    spec = DatasetSpec(endpoint="https://example.test/sales/{year}//SALE{year}.ZIP", platform="csv")
+
+    assert probe.fetch_source_updated_at(spec, request) == datetime(2026, 10, 2, 7, 20, 45, tzinfo=UTC)
+    request.assert_called_once_with("https://example.test/sales/2026//SALE2026.ZIP")
