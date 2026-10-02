@@ -68,7 +68,8 @@ The north-eastern and western groups follow with their registrations.
   businesses). Three of the names end in a space, and the filter spells them
   so. The window held 2,622 rows on 2026-10-02.
 - **Reach:** the 90 days from 2025-04-10 held 3,786, the most of eight
-  windows back to October 2024, so the cap is 5,000: three pages of 2,000.
+  windows back to October 2024, so the cap is 5,000, read in pages of
+  1,000.
 - **Ids:** the permit number keys each event; four repeated in the window on
   2026-10-02.
 - **Freshness:** the newest application, filed at 16:56:29Z on 2026-10-01,
@@ -162,7 +163,7 @@ The north-eastern and western groups follow with their registrations.
   once one of its permits carried a time. The server evaluates the window,
   and the cross-run dedup drops the permits already published.
 - **Reach:** the busiest of the five full 90-day windows the layer holds,
-  from 2025-07-09, held 2,445, so the cap is 5,000: one page.
+  from 2025-07-09, held 2,445, so the cap is 5,000, read in pages of 1,000.
 - **Ids:** the permit number keys each event; one permit was listed twice in
   the window.
 - **Freshness:** on Friday 2026-10-02 the newest permit had been issued at
