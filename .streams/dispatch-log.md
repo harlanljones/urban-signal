@@ -1723,3 +1723,20 @@ Worth keeping:
 - **A row query can fail silently where a count fails loudly.** On
   Albuquerque's layer, a window holding an unreadable row returns no rows and
   no error; only a count over it reports the failure.
+
+### 2026-10-02 — Yakima 311 and deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| yakima-311-deeds | `.streams/yakima-311-deeds.md` | `config.py` (the request and parcel layers) | 2026-10-02 | done (311: 1,000 read, 999 published, the one without a point dead-lettered; deeds: 453 read, 208 published inside the box; permits: the second poll, which failed with a 400, now reads; each second poll published none) | `311` and `deeds` specs for Yakima; the host in `ANSI_DATE_LITERAL_HOSTS`; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Yakima moves from two signal families to four (four-family tier 28 to 29).
+
+Worth keeping:
+
+- **A host that took ISO literals can stop.** Yakima's permits layer took
+  them on 2026-08-28 and answered 400 on 2026-10-02; only a second poll
+  shows it, so re-run two polls of a host's feeds when registering another.
+- **Try a server-side cast before a text-date watermark.** The parcels'
+  `M/D/YYYY` sale dates cast to dates on the server, which gives a rolling
+  window that catches late-filled days.

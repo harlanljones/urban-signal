@@ -2552,4 +2552,22 @@ class Settings(BaseSettings):
         ),
         description="Topeka KS Cityworks service requests view URL (City GIS)",
     )
+    # Yakima 311 (2026-10-02): the City's YakBack requests, one point per
+    # request, on the City GIS server that also serves Yakima's permits.
+    arcgis_yakima_311_url: str = Field(
+        default=(
+            "https://gis.yakimawa.gov/arcgis/rest/services/YakBack/"
+            "PublicRequest/MapServer/0"
+        ),
+        description="Yakima WA YakBack service requests layer URL (City GIS)",
+    )
+    # Yakima deeds (2026-10-02): the Yakima County Assessor's parcels, each
+    # with its latest sale, as the City GIS server publishes them.
+    arcgis_yakima_deeds_url: str = Field(
+        default=(
+            "https://gis.yakimawa.gov/arcgis/rest/services/Assessor/"
+            "AssessorParcels/MapServer/1"
+        ),
+        description="Yakima County Assessor parcels layer URL with latest sales (City GIS)",
+    )
 settings = Settings()

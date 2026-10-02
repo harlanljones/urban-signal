@@ -19,8 +19,9 @@ FIELD_MAP = {
 }
 
 DROPPED_PII_COLUMNS = (
-    # YakBack requestor/assignee block (311 follow-up guard). The permit
-    # layer itself publishes no owner/contractor columns.
+    # YakBack requestor/assignee block, address and free text: the 311 spec
+    # selects none of them. The permit layer itself publishes no
+    # owner/contractor columns.
     "name",
     "email",
     "phone",
@@ -28,6 +29,17 @@ DROPPED_PII_COLUMNS = (
     "closedBy",
     "assignedTo",
     "updatedBy",
+    "address",
+    "description",
+    "completedNotes",
+    # The Assessor parcels' owner and seller block: the deeds spec selects
+    # none of them.
+    "FIRST_NAME",
+    "MIDDLE_NAME",
+    "LAST_NAME",
+    "ORG_NAME",
+    "MAILING_ADDR",
+    "GRANTOR_NAME",
 )
 
 """Yakima, WA spatial registry and geometry.
@@ -36,21 +48,16 @@ Provides neighborhood metadata, camera positioning, investment metrics,
 division catalog, and geographic bounding boxes for the City of Yakima
 (south-central Washington, Yakima County).
 
-Yakima is a ONE-FEED PARTIAL metro: PERMITS (``BuildingPermits`` FeatureServer
-on the city's own ArcGIS open data platform at ``gis.yakimawa.gov``, Tier 1).
-COMPLAINTS_311 (the city's YakBack service-request system, ``YakBack/
-PublicRequest/MapServer/0``) is **live at the data layer but spine-blocked**:
-its ``status`` column is an integer (1=open/2=closed) and the shared
-``Complaints311Producer`` maps it straight into the typed
-``Complaint311Event.status: Optional[str]`` — pydantic v2 rejects the int and
-every row drops (verified live 2026-08-28). Registering it before a spine
-str-coercion would silently stream zero events, so it stays Tier 3. DEEDS
-(Yakima County assessor sales layers on ``services3.arcgis.com`` org
-``9Qz94N8Zml9hnG84``) are STALE STATIC EXTRACTS, not live feeds:
-``Res_Sales_History`` stops at SALE_DATE 2024-12-20 and ``Sales_History`` at
-DOCUMENT_D 2016 — not registered (Greenville SLA-snapshot precedent). YFD
-Calls for Service (fire/EMS dispatch, daily) and the YPD ``Crimes_public``
-layer (family-gated crime) are documented candidates, not registered feeds.
+Yakima's PERMITS come from the ``BuildingPermits`` FeatureServer on the
+city's own ArcGIS open data platform at ``gis.yakimawa.gov`` (Tier 1). The
+2026-08-28 probe left COMPLAINTS_311 at Tier 3 (the YakBack layer's integer
+``status`` dropped every row in the shared 311 producer) and DEEDS absent
+(the Yakima County assessor sales layers on ``services3.arcgis.com`` org
+``9Qz94N8Zml9hnG84`` are stale static extracts: ``Res_Sales_History`` stops
+at SALE_DATE 2024-12-20 and ``Sales_History`` at DOCUMENT_D 2016). The SLA,
+311 and DEEDS notes below record what has registered since. YFD Calls for
+Service (fire/EMS dispatch, daily) and the YPD ``Crimes_public`` layer
+(family-gated crime) are documented candidates, not registered feeds.
 
 Live-probe evidence (original probe 2026-08-28, ``opendata.yakimawa.gov``
 ArcGIS Hub + ``gis.yakimawa.gov`` REST):
@@ -65,15 +72,16 @@ ArcGIS Hub + ``gis.yakimawa.gov`` REST):
   ``ArcGISClient._flatten_feature`` lifts to ``latitude``/``longitude``.
   Row count 2,228; watermark ``IssuedOnDate`` newest 1787270400000 =
   2026-08-21T00:00:00+00:00; windows 7d=2 / 30d=87 / 60d=163 (client-side
-  where, which the host DOES accept with ISO date literals — not an
-  ANSI_DATE_LITERAL_HOSTS candidate). The layer holds a ~2022-10 -> now
+  where, which the host then accepted with ISO date literals; it no longer
+  does, see below). The layer holds a ~2022-10 -> now
   window (oldest SubmittedOnDate 2022-10-27), so ``min(date)`` is not
   staleness evidence. ``IssuedOnDate``/``SubmittedOnDate`` are esri dates and
   ISO-normalize in the ArcGIS client. No valuation/cost column exists.
   ``maxRecordCount`` 2000; OID is ``OBJECTID``.
 * The YakBack 311 layer carries point geometry + a composed ``address``
   ("1068-1098 S 48th Ave, Yakima, Washington, 98908"); its integer ``status``
-  is the registration blocker (see above).
+  was the registration blocker until coded values could be read as their
+  names (see the 311 note).
 * No Socrata domain exists (``data.yakimawa.gov`` does not resolve). City
   business licenses are a SmartGov document portal, not open data — no SLA
   feed.
@@ -81,6 +89,39 @@ ArcGIS Hub + ``gis.yakimawa.gov`` REST):
 SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
 stands in for the licence register the metro lacks. The corpus builds it
 with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
+
+Since 2026-10-02 the host answers 400 to ISO date strings (the permits
+layer took them on 2026-08-28) and takes ``timestamp '...'`` literals, so
+``gis.yakimawa.gov`` is in ``ANSI_DATE_LITERAL_HOSTS``; until then every
+permits poll after the first failed.
+
+311 (2026-10-02): the YakBack ``PublicRequest`` layer, one point per
+request over a rolling three years: 5,208 filed from 2025-10-01 to
+2026-10-02, about 14 a day, one day without any. ``type`` and ``status``
+are small-integer coded values, read as their names (``decode_domains``),
+so ``status`` reaches the event as ``Open`` or ``Closed``. ``requestId``
+follows ``dateOpened`` except for two ids from an older series and one
+request entered six days late, so the poll follows ``dateOpened``; one id
+appears twice (open and closed) and publishes once. The layer declares
+Pacific Standard Time without daylight saving, and literals are read in
+that fixed zone. Its times are local clock times, though, so from March to
+November they read an hour late and the newest requests up to an hour
+ahead; the future guard keeps the watermark off them until they are past,
+and the dedup drops the re-read. One request in the 1,000 of the live poll
+had no point and was dead-lettered. The requester's name, email and phone,
+the staff columns, the address and the free text are never selected. The
+corpus registers the feed; the mirror below carries PERMITS only.
+
+DEEDS (2026-10-02): the Yakima County Assessor's parcels as the City GIS
+server publishes them (``Assessor/AssessorParcels/MapServer/1``, 105,110
+polygons), each with its latest sale. ``SALE_DATE`` is text (``9/9/2026``),
+which does not compare as dates, but the server casts it, so the snapshot
+reads the sales of the last 90 days (453 county-wide on 2026-10-02, the
+newest dated 2026-09-23, about nine days behind) and keeps the 208 inside
+the metro box. Rows are keyed on parcel, date and excise number: a parcel
+repeats once per owner, and a sale can convey several parcels. Owner names,
+roles, mailing addresses and the seller are never selected. The corpus
+registers the feed; the mirror below carries PERMITS only.
 """
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
@@ -372,9 +413,10 @@ YAKIMA_DIVISIONS: dict[str, BoroughMeta] = {
 
 # ---------------------------------------------------------------------------
 # Feed specs (leaf-local; the spine copies these into REGISTRY).
-# Probed 2026-08-28. Do not register the YakBack 311 feed (integer status
-# column drops every row in Complaints311Producer until the spine str-coerces
-# it), the county sales layers (stale static extracts), YFD calls, or crime.
+# Probed 2026-08-28. PERMITS only here: 311 and deeds read the YakBack layer
+# and the Assessor's parcels on the City GIS server, which the corpus
+# registers. Do not register the county org's sales layers (stale static
+# extracts), YFD calls, or crime.
 # ---------------------------------------------------------------------------
 YAKIMA_PERMITS_ENDPOINT = (
     "https://gis.yakimawa.gov/arcgis/rest/services/Planning/"
@@ -402,8 +444,8 @@ YAKIMA_FEED_SPECS: dict[str, dict[str, object]] = {
                 "(city ArcGIS open data; native esriGeometryPoint, outSR=4326 "
                 "WGS84 on every row; ~2,228 rows in a ~2022-10 -> now window "
                 "so min(date) is not staleness; IssuedOnDate watermark newest "
-                "2026-08-21T00:00:00+00:00, where-clause queryable with ISO "
-                "date literals — NOT an ANSI_DATE_LITERAL_HOSTS candidate; "
+                "2026-08-21T00:00:00+00:00, where-clause queryable with ANSI "
+                "timestamp literals (ISO strings answer 400 since 2026-10-02); "
                 "no valuation/cost column — cost unmapped, producer defaults "
                 "0.0; SiteCity/SiteState fixed YAKIMA/WA unmapped; no "
                 "borough/parcel columns — division resolution is "

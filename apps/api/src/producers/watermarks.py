@@ -258,6 +258,12 @@ ANSI_DATE_LITERAL_HOSTS = (
     # works. Matched by its path: the host's permits view reads ISO strings
     # and answers 400 to ``date_issued > timestamp '2026-09-01 00:00:00'``.
     "maps.topeka.gov/arcgis/rest/services/CityworksViews/SCF_E311_Requests",
+    # Yakima, WA (ArcGIS Server 11.3): verified live 2026-10-02 — the permits
+    # layer, which took ISO strings on 2026-08-28, now answers 400 "Unable to
+    # complete operation" to ``IssuedOnDate > '2026-09-01T00:00:00'`` while
+    # ``IssuedOnDate > timestamp '2026-09-01 00:00:00'`` works, and the
+    # YakBack 311 layer answers the same way on ``dateOpened``.
+    "gis.yakimawa.gov",
 )
 
 

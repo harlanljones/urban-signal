@@ -120,6 +120,13 @@ way. Its metro is the whole county, so each sale takes its parcel's centroid
 anywhere the county's parcel layer has one, and the clip skips only the 115
 the layer cannot place: 2,317 publish.
 
+Yakima `deeds` (453 rows, default cap 1,000) joined on 2026-10-02. The County
+Assessor's parcels on the City GIS server hold a row per parcel and owner with
+the parcel's latest sale, dated in text, so the server casts the dates and the
+feed reads the 90 days before each poll county-wide, whole, each sale at its
+parcel's centroid. The clip skips the 244 outside the metro box, and 208
+publish (`two-family-depth-2026-09-30.md`).
+
 ## Newest-first windows
 
 | Feed | Order | Rows dated in last 30 / 90 days | Window after |

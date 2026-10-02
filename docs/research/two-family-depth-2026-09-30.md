@@ -66,12 +66,20 @@ and Topeka's `311` register, which gives each a third family; Missoula's
 drainage reports and Worcester's work orders and parcel sales are held, and
 the other gaps have no source.
 
-| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds (#94) | With Asheville's permits (#95) | With Allentown's permits (#96) | With Allentown's and New Haven's `311` (#97) | With Lincoln's `311` (#98) | With Albuquerque's and Topeka's `311` |
-|---|---|---|---|---|---|---|---|---|---|
-| 4 | 26 | 26 | **27** (Charlotte) | 27 | 27 | 27 | **28** (Allentown) | 28 | 28 |
-| 3 | 29 | **30** (Charlotte) | 29 | **30** (Toledo) | **31** (Asheville) | **32** (Allentown) | 32 (New Haven in, Allentown up) | **33** (Lincoln) | **35** (Albuquerque, Topeka) |
-| 2 | 68 | 67 | 67 | 66 | 65 | 64 | 63 | 62 | 60 |
-| 1 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 |
+The ten western metros (Anaheim, Aurora, Boulder, Fort Collins, Henderson,
+Inland Empire, Portland, Salem, Vancouver and Yakima) ran from 05:00Z to
+06:35Z under the same rules. Yakima's `311` and deeds register, which gives
+Yakima all four families. The same host had stopped taking ISO date strings
+since the 2026-08-28 probe, so every Yakima permits poll after the first was
+failing; that is repaired here too. Deeds sources for Aurora, Boulder, Fort
+Collins, Salem and Vancouver are checked separately.
+
+| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds (#94) | With Asheville's permits (#95) | With Allentown's permits (#96) | With Allentown's and New Haven's `311` (#97) | With Lincoln's `311` (#98) | With Albuquerque's and Topeka's `311` (#99) | With Yakima's `311` and deeds |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 4 | 26 | 26 | **27** (Charlotte) | 27 | 27 | 27 | **28** (Allentown) | 28 | 28 | **29** (Yakima) |
+| 3 | 29 | **30** (Charlotte) | 29 | **30** (Toledo) | **31** (Asheville) | **32** (Allentown) | 32 (New Haven in, Allentown up) | **33** (Lincoln) | **35** (Albuquerque, Topeka) | 35 |
+| 2 | 68 | 67 | 67 | 66 | 65 | 64 | 63 | 62 | 60 | 59 |
+| 1 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 |
 
 ## Registered
 
@@ -593,6 +601,93 @@ the other gaps have no source.
   closed, 319 open and 28 in progress. The second poll sent `datetimeinit >
   timestamp '2026-10-02 00:03:53'`, read the newest request again and
   published nothing. Neither poll queried a geocoder.
+
+### Yakima, WA — `311`
+
+- **Source:** the City's YakBack requests on the City GIS server that serves
+  Yakima's permits:
+  `gis.yakimawa.gov/arcgis/rest/services/YakBack/PublicRequest/MapServer/0`
+  (ArcGIS Server 11.3). The 2026-08-28 probe found it but left it
+  unregistered, because its `status` is an integer and the event takes text.
+- **Shape:** one point per request over a rolling three years: 16,177 rows
+  from 2023-10-01 on 2026-10-02, and 5,208 filed from 2025-10-01 to
+  2026-10-02. `type` (13 values) and `status` (open, closed) are coded
+  domains, which the spec reads as their names (`decode_domains`). One
+  request appears twice, open and closed, and publishes once.
+- **Freshness:** about 14 requests a day, with one day of that year without
+  any. The longest quiet spell was 1.49 days, so `expected_cadence_days` is
+  1.
+- **Watermark:** `dateOpened`. Request ids follow it over that year except
+  for two ids from an older series and one request entered six days late
+  (opened 2026-06-12, numbered among 2026-06-19's), which a
+  `dateOpened` watermark would pass over.
+- **Literals and zone:** the layer answers 400 to an ISO literal and takes
+  `timestamp '...'`. So does the permits layer on the host, which took ISO
+  strings on 2026-08-28: its second poll sent `IssuedOnDate >=
+  '2026-09-25T00:00:00'` and failed, as every permits poll after the first
+  had been failing. The host joins `ANSI_DATE_LITERAL_HOSTS`. The 311 layer
+  declares Pacific Standard Time without daylight saving, and literals are
+  read in that fixed zone. Its values are local clock times, though, so
+  from March to November they read an hour late: at 06:55Z on 2026-10-02
+  the newest request read 07:50:33Z. The future guard keeps the watermark
+  at the newest request already past, the next poll reads the newer one
+  again, and the dedup drops it.
+- **Personal data:** the requester's name, email and phone, the staff
+  columns, the address, the description and the completion notes stay on
+  the server; `select` names six columns.
+- **Placement:** 1,242 of the 1,243 requests filed in the 90 days to
+  2026-10-02 lie inside the metro box, and the other has no point, so it is
+  dead-lettered. The spec does not clip. No geocoder is asked.
+- **Poll:** every 30 minutes, newest first by `dateOpened DESC, requestId
+  DESC`, under the default cap of 1,000 rows, which reached back to
+  2026-07-22 on the first poll.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live layer, Kafka mocked. The first read 1,000
+  requests with the metadata and one page, published 999 filed from
+  2026-07-22 to 2026-10-02, and dead-lettered the one without a point. By
+  type, 261 are "Other", 205 parking, 120 blight or trash, 119 graffiti, 91
+  animal complaints and 57 parks or trees; 863 are closed and 136 open. The
+  watermark stayed at 05:49:39Z, and the second poll sent `dateOpened >
+  timestamp '2026-10-01 21:49:39'`, read the 07:50:33Z request again and
+  published nothing. The permits feed, polled twice the same way, read 1,000
+  permits and then the four issued on 2026-09-25 again, with `IssuedOnDate
+  >= timestamp '2026-09-25 00:00:00'`. No poll queried a geocoder.
+
+### Yakima, WA — `deeds`
+
+- **Source:** the Yakima County Assessor's parcels as the City GIS server
+  publishes them:
+  `gis.yakimawa.gov/arcgis/rest/services/Assessor/AssessorParcels/MapServer/1`
+  (ArcGIS Server 11.3, 105,110 polygons), each with its latest sale: excise
+  number, gross price, sale date and use code. The 2026-08-28 probe found
+  only the county's own sales layers, which stop in 2016 and 2024.
+- **Window:** `SALE_DATE` is text, month first and unpadded (`9/9/2026`). As
+  text, `9/9/2026` sorts above `9/23/2026`, so no comparison reads a window,
+  but the server casts the text (`CAST(SALE_DATE AS DATE)`) and answered the
+  cast over every row. The snapshot reads the sales of the last 90 days: 453
+  county-wide on 2026-10-02, dated 2026-07-06 to 2026-09-23. Sales reach the
+  layer about nine days after they close: 2026-09-22 and 2026-09-23 had
+  three each, and nothing later had arrived.
+- **Rows:** a parcel with several owners repeats once per owner (one repeat
+  in the window), and a sale can convey several parcels (the 208 sales
+  published carry 192 excise numbers), so a row is its parcel, date and
+  excise number. Every sale in the window has a price.
+- **Personal data:** owner names, roles and shares, mailing addresses and
+  the seller stay on the server; `select` names seven columns.
+- **Placement:** the client takes each parcel's centroid. 208 of the 452
+  distinct sales lie inside the metro box and the rest elsewhere in the
+  county, so the spec clips to the box. No geocoder is asked.
+- **Poll:** every six hours, by object id (the text dates cannot order the
+  rows), under the default cap of 1,000 rows; the busiest three months of
+  2026 held 594 sales county-wide.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live layer, Kafka mocked. The first read 453 rows
+  with the metadata and one page and published 208 sales dated 2026-07-06 to
+  2026-09-23: 149 single-unit homes, 27 undeveloped lots and 10 two-to-four
+  unit buildings among them. It dropped the repeat and the 244 sales outside
+  the box and dead-lettered none. The second read the same 453 rows and
+  published nothing. No event carried a party name, and neither poll queried
+  a geocoder.
 
 ## Held
 

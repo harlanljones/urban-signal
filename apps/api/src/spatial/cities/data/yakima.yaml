@@ -317,6 +317,34 @@ datasets:
     non_spatial: null
     zip_member: null
     delimiter: null
+  '311':
+    endpoint: https://gis.yakimawa.gov/arcgis/rest/services/YakBack/PublicRequest/MapServer/0
+    platform: arcgis
+    watermark_col: dateOpened
+    id_keys:
+    - requestId
+    topic: raw.municipal.311
+    interval_seconds: 1800.0
+    producer_key: '311'
+    order_by: dateOpened DESC, requestId DESC
+    select: OBJECTID,requestId,dateOpened,dateClosed,type,status
+    needs_geocode: false
+    field_map:
+      incident_id:
+      - requestId
+      created_date:
+      - dateOpened
+      closed_date:
+      - dateClosed
+      complaint_type:
+      - type
+      status:
+      - status
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    decode_domains: true
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis
@@ -374,6 +402,44 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+  deeds:
+    endpoint: https://gis.yakimawa.gov/arcgis/rest/services/Assessor/AssessorParcels/MapServer/1
+    platform: arcgis
+    watermark_col: SALE_DATE
+    id_keys:
+    - ASSESSOR_NO
+    - SALE_DATE
+    - EXCISE_NUMBER
+    topic: raw.municipal.deeds
+    interval_seconds: 21600.0
+    producer_key: deeds
+    watermark_type: text
+    watermark_format: '%m/%d/%Y'
+    order_by: OBJECTID
+    select: OBJECTID,ASSESSOR_NO,SALE_DATE,GROSS_SALE_PRICE,EXCISE_NUMBER,USE_CODE,SITUS_CITY
+    where: CAST(SALE_DATE AS DATE) >= CURRENT_DATE - INTERVAL '90' DAY AND CAST(SALE_DATE
+      AS DATE) <= CURRENT_DATE
+    needs_geocode: false
+    field_map:
+      doc_id:
+      - EXCISE_NUMBER
+      - ASSESSOR_NO
+      recorded_date:
+      - SALE_DATE
+      document_amount:
+      - GROSS_SALE_PRICE
+      bbl:
+      - ASSESSOR_NO
+      doc_type:
+      - USE_CODE
+      borough:
+      - SITUS_CITY
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    composite_id: true
+    metro_clip: true
 aliases:
 - yakima_wa
 - yakima-wa
