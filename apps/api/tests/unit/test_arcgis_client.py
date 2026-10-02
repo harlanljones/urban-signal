@@ -147,6 +147,59 @@ def test_layer_metadata_carries_the_time_zone_and_numeric_fields(monkeypatch):
     assert meta["numeric_fields"] == {"LRSN"}
 
 
+def test_layer_metadata_names_each_coded_value(monkeypatch):
+    """A Survey123 form stores its choices as codes and names them only in the
+    layer's coded-value domains, as Allentown's 311 requests do."""
+    client = ArcGISClient()
+    monkeypatch.setattr(
+        client,
+        "_request_json",
+        lambda url, params: {
+            "fields": [
+                {"name": "issue", "type": "esriFieldTypeString", "domain": {
+                    "type": "codedValue",
+                    "codedValues": [{"code": "130245", "name": "Report a Pothole"}, {"code": "Other", "name": "Other"}],
+                }},
+                {"name": "priority", "type": "esriFieldTypeSmallInteger", "domain": {
+                    "type": "codedValue", "codedValues": [{"code": 1, "name": "High"}],
+                }},
+                {"name": "depth", "type": "esriFieldTypeDouble", "domain": {"type": "range", "range": [0, 10]}},
+                {"name": "department", "type": "esriFieldTypeString"},
+            ],
+            "objectIdField": "objectid",
+        },
+    )
+
+    meta = client.get_layer_metadata(_LAYER)
+
+    assert meta["coded_values"] == {
+        "issue": {"130245": "Report a Pothole", "Other": "Other"},
+        "priority": {"1": "High"},
+    }
+
+
+def test_decode_domains_reads_each_code_as_its_name(monkeypatch):
+    client = _client_answering(monkeypatch, {"features": [
+        {"attributes": {"issue": "130245", "priority": 1, "department": "Streets"}},
+        # A value the domain does not list, and an empty one, are kept.
+        {"attributes": {"issue": "Overgrown Vegetation", "priority": None, "department": None}},
+    ]})
+    meta = {
+        "date_fields": set(), "oid_field": "OBJECTID", "max_record_count": 1000,
+        "coded_values": {"issue": {"130245": "Report a Pothole"}, "priority": {"1": "High"}},
+    }
+    monkeypatch.setattr(client, "get_layer_metadata", lambda url: meta)
+
+    decoded = list(client.paginate(endpoint_url=_LAYER, max_records=10, decode_domains=True))
+    stored = list(client.paginate(endpoint_url=_LAYER, max_records=10))
+
+    assert [(row["issue"], row["priority"], row["department"]) for row in decoded[0]] == [
+        ("Report a Pothole", "High", "Streets"), ("Overgrown Vegetation", None, None),
+    ]
+    # Without the flag a layer's codes arrive as stored.
+    assert [(row["issue"], row["priority"]) for row in stored[0]] == [("130245", 1), ("Overgrown Vegetation", None)]
+
+
 def test_a_query_too_long_for_a_url_is_posted(monkeypatch):
     """ArcGIS Online answers 404 to a GET past about 2,000 characters, which a
     text watermark's list of dates can pass; the query goes as a form POST."""

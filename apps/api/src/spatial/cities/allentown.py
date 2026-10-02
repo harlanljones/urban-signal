@@ -37,7 +37,15 @@ Feeds (probed 2026-09-30):
   ``ISSUEDATE``, which would push a watermark past the rest of its day. The
   site address is split across five columns, which
   ``compose_permit_address`` below joins.
-* 311 — not registered.
+* 311 (2026-10-02) — the requests residents file through the city's
+  Survey123 problem reporter, a public view on the same ArcGIS Online org
+  (``311_Submission_Dashboard_View``): one point per request since October
+  2025, a few a day. The form stores its choices as codes ("130245") named
+  only in the layer's field domains, so the spec sets ``decode_domains``.
+  The watermark is ``CreationDate``, the time a request reached the layer.
+  The address, cross street, staff notes and contact flag are never
+  selected; requests filed without a point sit at 0,0 and ``metro_clip``
+  skips them.
 
 SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
 stands in for the licence register the metro lacks. The corpus builds it
@@ -378,9 +386,9 @@ def get_allentown_dataset(feed: object) -> object:
     """Leaf-local mirror of ``city_registry.get_dataset``.
 
     Returns the spec for a registered Allentown feed, or raises ``KeyError``
-    naming the city and available feeds when the feed is absent (311 is not
-    registered for Allentown). The corpus registers PERMITS and SLA (the
-    shared SNAP slice) itself; this mirror carries deeds only.
+    naming the city and available feeds when the feed is absent. The corpus
+    registers PERMITS, 311 and SLA (the shared SNAP slice) itself; this
+    mirror carries deeds only.
     """
     from src.config import settings
     from src.spatial.city_registry import DatasetSpec

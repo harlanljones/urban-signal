@@ -263,6 +263,33 @@ datasets:
     max_record_count: 2000
     expected_cadence_days: 3
     batch_limit: 2000
+  '311':
+    endpoint: https://services1.arcgis.com/WUqVDRuvIiIiH2Pl/arcgis/rest/services/311_Submission_Dashboard_View/FeatureServer/0
+    platform: arcgis
+    watermark_col: CreationDate
+    id_keys:
+    - globalid
+    topic: raw.municipal.311
+    interval_seconds: 900.0
+    producer_key: '311'
+    order_by: CreationDate DESC, objectid DESC
+    select: objectid,globalid,issue,status,CreationDate
+    needs_geocode: false
+    field_map:
+      incident_id:
+      - globalid
+      created_date:
+      - CreationDate
+      complaint_type:
+      - issue
+      status:
+      - status
+    ingestion_mode: incremental
+    oid_field: objectid
+    max_record_count: 1000
+    expected_cadence_days: 3
+    metro_clip: true
+    decode_domains: true
   deeds:
     endpoint: https://services1.arcgis.com/WUqVDRuvIiIiH2Pl/arcgis/rest/services/Tax_Parcels_Assessed_2022/FeatureServer/0
     platform: arcgis

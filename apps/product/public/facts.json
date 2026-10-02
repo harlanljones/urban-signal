@@ -153,7 +153,7 @@
       "submarket_count": 8,
       "feeds": [
         true,
-        false,
+        true,
         true,
         true
       ],
@@ -164,7 +164,12 @@
           "interval_seconds": 21600.0,
           "topic": "raw.municipal.permits"
         },
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "CreationDate",
+          "interval_seconds": 900.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "",
@@ -3513,13 +3518,18 @@
       "submarket_count": 8,
       "feeds": [
         false,
-        false,
+        true,
         true,
         true
       ],
       "platforms": [
         null,
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "created_at",
+          "interval_seconds": 900.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "socrata",
           "watermark_col": "recordrefreshedon",

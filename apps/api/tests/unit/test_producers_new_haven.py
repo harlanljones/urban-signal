@@ -254,7 +254,9 @@ class TestNewHavenSpatial:
 
 
 class TestNewHavenFeedSpecs:
-    def test_feed_specs_are_exactly_sla_and_deeds(self):
+    def test_the_leaf_mirror_carries_sla_and_deeds_only(self):
+        # The registry also holds 311 from SeeClickFix's public view, which
+        # the corpus registers itself (test_new_haven_311.py).
         assert set(NEW_HAVEN_FEED_SPECS) == {"sla", "deeds"}
 
     def test_sla_spec_shape(self):

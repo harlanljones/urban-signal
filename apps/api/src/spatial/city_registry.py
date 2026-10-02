@@ -322,6 +322,11 @@ class DatasetSpec:
     # it: the client reads ``endpoint`` and downloads the newest link whose URL
     # matches this pattern (Richmond's monthly transfers workbook).
     link_pattern: str | None = None
+    # An ArcGIS layer can store coded values whose names live only in its
+    # field domains, as a Survey123 form's choice lists do: Allentown's 311
+    # requests store "130245" for "Report a Pothole". True reads each coded
+    # value as its name; a value the domain does not list is kept.
+    decode_domains: bool = False
 
 
 @dataclass

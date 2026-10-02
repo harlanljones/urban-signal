@@ -4,8 +4,9 @@ Provides neighborhood metadata, camera positioning, investment metrics,
 division catalog, and geographic bounding boxes for the City of New Haven
 (New Haven County, CT).
 
-New Haven is a TWO-FEED metro on Connecticut's statewide Socrata portal
-(``data.ct.gov``), reusing the SAME statewide feeds Hartford already carries:
+New Haven reads two feeds from Connecticut's statewide Socrata portal
+(``data.ct.gov``), reusing the SAME statewide feeds Hartford already carries,
+and its 311 requests from SeeClickFix:
 
 * SLA — State Licenses and Credentials (``ngch-56tr``), Tier 1. A broad
   statewide credentials feed (2.66M rows statewide); ``city='NEW HAVEN'`` is
@@ -21,6 +22,16 @@ New Haven is a TWO-FEED metro on Connecticut's statewide Socrata portal
   composite ``["serialnumber", "listyear"]``. ``geo_coordinates`` (a Socrata
   Point) is present on 32.5% of rows but is NOT read by the shared deeds
   producer's nested-loc fallback — see the geo note in the FEED_SPECS scope.
+* 311 (2026-10-02) — the City runs its 311 service on SeeClickFix, which
+  publishes the City's requests as a public view on its own ArcGIS Online org
+  (``Public_SCF_Requests_New_Haven_CT``): one point per request since 2007,
+  about forty a day. Watermark ``created_at``, keyed on SeeClickFix's request
+  ``id`` (not the view's object id, which a rebuild would reassign), filtered
+  to public requests; the summary, description, address, assignee and photo
+  links are never selected. A spatial filter on the view times out, so the
+  poll keeps to attribute filters. Requests on the Morris Cove shore lie
+  south of the metro box and are kept. The corpus registers this feed
+  itself; the feed mirror below carries SLA and DEEDS only.
 
 Live-probe caveats that define this leaf (probed 2026-08-30, US-419):
 

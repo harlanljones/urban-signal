@@ -174,6 +174,23 @@ def test_a_backfill_selects_the_columns_its_poll_selects():
     assert kwargs == {"select": "PARCELID,SALEDATE,SALEPRICE", "order_by": "SALEDATE DESC"}
 
 
+def test_a_backfill_reads_coded_values_as_their_names_as_its_poll_does():
+    # Allentown's 311 form stores "130245" for "Report a Pothole".
+    meta = _meta(
+        watermark_col="CreationDate",
+        platform="arcgis",
+        endpoint="https://services.example/arcgis/rest/services/Requests/FeatureServer/0",
+        select="objectid,globalid,issue,status,CreationDate",
+        decode_domains=True,
+    )
+    _, kwargs = build_query_shape(meta, datetime(2026, 5, 26, tzinfo=UTC))
+    assert kwargs == {
+        "select": "objectid,globalid,issue,status,CreationDate",
+        "decode_domains": True,
+        "order_by": "CreationDate DESC",
+    }
+
+
 def test_a_snapshot_backfill_keeps_its_own_order():
     meta = _meta(watermark_col="", platform="arcgis", order_by="SALE_DATE DESC, OBJECTID DESC")
     _, kwargs = build_query_shape(meta, None)

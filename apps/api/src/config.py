@@ -2506,4 +2506,23 @@ class Settings(BaseSettings):
         ),
         description="Allentown PA EnerGov building permits view URL (city-hosted)",
     )
+    # Allentown 311 (2026-09-30): the City's Survey123 problem reports, a
+    # public view on ArcGIS Online with one point per request since October
+    # 2025.
+    arcgis_allentown_311_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/WUqVDRuvIiIiH2Pl/arcgis/rest/services/"
+            "311_Submission_Dashboard_View/FeatureServer/0"
+        ),
+        description="Allentown PA Survey123 311 submissions view URL (city-hosted)",
+    )
+    # New Haven 311 (2026-09-30): SeeClickFix's public view of the City's
+    # requests on its own ArcGIS Online org, one point per request since 2007.
+    arcgis_new_haven_311_url: str = Field(
+        default=(
+            "https://services8.arcgis.com/fz3KpsKgK9InMjh8/arcgis/rest/services/"
+            "Public_SCF_Requests_New_Haven_CT/FeatureServer/0"
+        ),
+        description="New Haven CT SeeClickFix public requests view URL (SeeClickFix-hosted)",
+    )
 settings = Settings()

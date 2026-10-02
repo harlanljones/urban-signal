@@ -94,7 +94,8 @@ class ArcGISClient:
         self.max_retries = max_retries
         self.return_geometry = return_geometry
         # layer_url -> {"date_fields": set[str], "numeric_fields": set[str],
-        #               "oid_field": str, "max_record_count": int, "time_zone": str | None}
+        #               "coded_values": dict[str, dict[str, str]], "oid_field": str,
+        #               "max_record_count": int, "time_zone": str | None}
         self._layer_meta: Dict[str, Dict[str, Any]] = {}
 
     # ------------------------------------------------------------------ helpers
@@ -148,7 +149,8 @@ class ArcGISClient:
         return {}
 
     def get_layer_metadata(self, endpoint_url: str) -> Dict[str, Any]:
-        """Fetch and cache a layer's field types, OID field, page cap and time zone."""
+        """Fetch and cache a layer's field types, coded-value names, OID field,
+        page cap and time zone."""
         layer_url = self._normalize_layer_url(endpoint_url)
         if layer_url in self._layer_meta:
             return self._layer_meta[layer_url]
@@ -161,6 +163,16 @@ class ArcGISClient:
             },
             "numeric_fields": {
                 f["name"] for f in fields if f.get("type") in _NUMERIC_FIELD_TYPES
+            },
+            # Each coded field's names by code, as text: a form's choice
+            # list stores "130245" and names it "Report a Pothole".
+            "coded_values": {
+                f["name"]: {
+                    str(item.get("code")): item.get("name")
+                    for item in f["domain"].get("codedValues") or []
+                }
+                for f in fields
+                if (f.get("domain") or {}).get("type") == "codedValue"
             },
             "oid_field": payload.get("objectIdField") or "OBJECTID",
             "max_record_count": int(payload.get("maxRecordCount") or 1000),
@@ -180,14 +192,25 @@ class ArcGISClient:
             return value
 
     def _flatten_feature(
-        self, feature: Dict[str, Any], date_fields: set
+        self,
+        feature: Dict[str, Any],
+        date_fields: set,
+        coded_values: Optional[Dict[str, Dict[str, str]]] = None,
     ) -> Dict[str, Any]:
-        """Flatten one ArcGIS feature into a Socrata-shaped flat record."""
+        """Flatten one ArcGIS feature into a Socrata-shaped flat record.
+
+        ``coded_values`` (a layer's names by code, per field) replaces each
+        coded value with its name; a value the domain does not list is kept.
+        """
         record: Dict[str, Any] = dict(feature.get("attributes") or {})
 
         for name in date_fields:
             if name in record:
                 record[name] = self._epoch_ms_to_iso(record[name])
+
+        for name, names in (coded_values or {}).items():
+            if record.get(name) is not None:
+                record[name] = names.get(str(record[name]), record[name])
 
         lng, lat = self._geometry_to_lng_lat(feature.get("geometry") or {})
         if lng is not None and lat is not None:
@@ -479,6 +502,7 @@ class ArcGISClient:
         limit: int,
         offset: int,
         select: Optional[str] = None,
+        decode_domains: bool = False,
     ) -> tuple:
         """Fetch one page, returning ``(records, exceeded_transfer_limit)``."""
         layer_url = self._normalize_layer_url(endpoint_url)
@@ -508,7 +532,8 @@ class ArcGISClient:
                 f"ArcGIS query on {layer_url} returned no features{hint}; keys: {sorted(payload)}"
             )
         features = payload.get("features") or []
-        records = [self._flatten_feature(f, meta["date_fields"]) for f in features]
+        coded_values = meta.get("coded_values") if decode_domains else None
+        records = [self._flatten_feature(f, meta["date_fields"], coded_values) for f in features]
         return records, bool(payload.get("exceededTransferLimit"))
 
     def paginate(
@@ -519,12 +544,14 @@ class ArcGISClient:
         batch_size: int = 1000,
         max_records: Optional[int] = None,
         select: Optional[str] = None,
+        decode_domains: bool = False,
     ) -> Generator[List[Dict[str, Any]], None, None]:
         """Paginate an ArcGIS layer, yielding batches of flattened records.
 
         ``select`` is a comma-separated field list sent as ``outFields``, so a
         layer's owner and buyer columns can stay on the server; without it
-        every column is read.
+        every column is read. ``decode_domains`` reads each coded value as its
+        name from the layer's coded-value domains.
         """
         offset = 0
         total_fetched = 0
@@ -543,6 +570,7 @@ class ArcGISClient:
                 limit=fetch_limit,
                 offset=offset,
                 select=select,
+                decode_domains=decode_domains,
             )
 
             if not records:

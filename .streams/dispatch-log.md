@@ -1670,3 +1670,20 @@ Worth keeping:
 - **Search the org that already serves a registered feed.** Allentown's
   permits sit in the same ArcGIS Online org as its deeds layer, and a keyword
   search of that org found them after two passes had recorded none.
+
+### 2026-10-02 — Allentown and New Haven 311 (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| allentown-new-haven-311 | `.streams/allentown-new-haven-311.md` | `config.py` (the two request layers), `city_registry.py` and `scheduler.py` (`decode_domains`) | 2026-10-02 | done (Allentown: 713 requests read, 12 at 0,0 skipped, 701 published; New Haven: 1,000 read and published; none dead-lettered, and each second poll published none) | `311` specs for Allentown and New Haven; coded-value decoding in the ArcGIS client; held and not-now `311` notes for six metros in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Allentown moves from three signal families to four (four-family tier 27 to
+28), and New Haven from two to three.
+
+Worth keeping:
+
+- **Read a layer's domains before mapping a Survey123 form.** The form stores
+  each choice as a code, and only the layer's metadata names it.
+- **Look for a vendor's own ArcGIS org.** SeeClickFix publishes public views
+  of some clients' requests in its own ArcGIS Online org, which is how New
+  Haven's requests are readable without SeeClickFix's API.
