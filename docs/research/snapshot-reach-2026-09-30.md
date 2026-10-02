@@ -127,6 +127,13 @@ feed reads the 90 days before each poll county-wide, whole, each sale at its
 parcel's centroid. The clip skips the 244 outside the metro box, and 208
 publish (`two-family-depth-2026-09-30.md`).
 
+Cape Coral `deeds` (6,765 rows, cap 17,000) joined the same day. Lee County's
+parcel layer holds one row per parcel with its latest sale, so the feed reads
+the sales dated in the 90 days before each poll county-wide, whole, newest
+first, each at the parcel's own coordinates; the clip skips the 2,356 outside
+the metro box, and 4,409 publish. The cap holds the 11,253 sales of March to
+May 2026, the busiest window of the year so far.
+
 ## Newest-first windows
 
 | Feed | Order | Rows dated in last 30 / 90 days | Window after |

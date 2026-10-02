@@ -39,6 +39,10 @@ FULL_READ_ROWS = {
     # fall in the box).
     ("bend", "deeds"): 1_048,
     ("bend", "sla"): 5_981,
+    # Lee County parcels whose latest sale is dated in the spec's 90-day
+    # window, county-wide, newest 2026-09-25, read 2026-10-02; 4,409 lie in
+    # the metro box. March to May 2026 held 11,253.
+    ("cape_coral", "deeds"): 6_765,
     # Chandler, Glendale, Phoenix, Scottsdale and Tempe deeds (Maricopa
     # Assessor): the deeds dated in each spec's 90-day window inside its
     # JURISDICTION, read 2026-09-30.

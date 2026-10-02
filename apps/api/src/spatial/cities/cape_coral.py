@@ -21,6 +21,31 @@ This leaf declares:
 - a minimal divisions catalog with hand-authored bboxes
 - 8 illustrative submarkets (centers, camera presets)
 - a leaf-local DatasetSpec accessor for the verified public permits table
+
+311 (2026-10-02): the City's ``311 Issues NonSpatial`` table, table 4 of the
+``OpenData/OpenData`` MapServer whose layer 1 holds the permits. It keeps the
+City's own requests since 2020-12-17, one row per request with WGS84 ``X``/
+``Y`` columns and no geometry: 110,827 rows, 6,953 of them created in the 90
+days to 2026-10-02, every one inside the metro box. The table is loaded in
+one overnight cut; at 09:05Z on 10-02 its newest request was still the one
+created at 02:09 EDT on 10-01, so the cadence is set to two days. 435 of
+those 6,953 rows repeat a request exactly, so requests key on ``Issue_id``.
+Its dates are Eastern with daylight saving, and the host already takes ANSI
+literals for the permits. The poll reads the request's id, type, category,
+status, dates and point; the site address and its parts, the title and both
+free-text descriptions stay on the server. The ``311Issues`` point layer is
+a second copy that also names the requester, and is not read.
+
+DEEDS (2026-10-02): the Lee County Property Appraiser's parcels on the
+County's ArcGIS Online org (``Lee_County_Parcels``, 565,114 polygons, edited
+nightly), each with its latest sale (``S_1DATE``, ``S_1AMOUNT``, and the
+instrument number ``S_1OR_NUM``; the three older sales are never newer). The
+poll reads the sales dated in the 90 days before it, county-wide (6,765 on
+2026-10-02), at each parcel's own ``LATITUDE``/``LONGITUDE``, and the clip
+keeps those in the metro box (4,409). Sales reach the layer two to three
+weeks after their date, and the window re-reads them. An instrument can
+convey several parcels, so rows key on parcel, date and instrument. The
+owner block (``O_*``) and the legal description are never selected.
 """
 
 from typing import Any
@@ -286,6 +311,8 @@ CAPE_CORAL_DIVISIONS: dict[str, BoroughMeta] = {
 # Leaf-local feed registration ------------------------------------------------
 
 # Verified public permits table (address-only; ADR-0004 geocoding in registry).
+# PERMITS only here: 311 and deeds read the City's 311 issues table and the
+# Lee County parcels, which the corpus registers.
 CAPE_CORAL_PERMITS_ENDPOINT = "https://capeims.capecoral.gov/arcgis/rest/services/OpenData/OpenData/MapServer/1"
 
 CAPE_CORAL_FEED_SPECS: dict[str, dict[str, object]] = {

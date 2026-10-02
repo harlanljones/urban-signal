@@ -74,12 +74,25 @@ since the 2026-08-28 probe, so every Yakima permits poll after the first was
 failing; that is repaired here too. Deeds sources for Aurora, Boulder, Fort
 Collins, Salem and Vancouver are checked separately.
 
-| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds (#94) | With Asheville's permits (#95) | With Allentown's permits (#96) | With Allentown's and New Haven's `311` (#97) | With Lincoln's `311` (#98) | With Albuquerque's and Topeka's `311` (#99) | With Yakima's `311` and deeds |
-|---|---|---|---|---|---|---|---|---|---|---|
-| 4 | 26 | 26 | **27** (Charlotte) | 27 | 27 | 27 | **28** (Allentown) | 28 | 28 | **29** (Yakima) |
-| 3 | 29 | **30** (Charlotte) | 29 | **30** (Toledo) | **31** (Asheville) | **32** (Allentown) | 32 (New Haven in, Allentown up) | **33** (Lincoln) | **35** (Albuquerque, Topeka) | 35 |
-| 2 | 68 | 67 | 67 | 66 | 65 | 64 | 63 | 62 | 60 | 59 |
-| 1 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 |
+The eight Florida metros (Cape Coral, Gainesville, Lakeland, Melbourne,
+Ocala, Orlando, Port St. Lucie and Tampa) ran from 04:58Z to 06:56Z under the
+same rules. Cape Coral's `311` and deeds register, which gives Cape Coral all
+four families. The property appraisers' sales for Gainesville, Lakeland,
+Ocala and Tampa are registrable too and follow separately, as does a repair
+of Ocala's and Orlando's permits, which read the statewide cadastral layer
+under other counties' numbers. Tampa's requests need a token, Gainesville's
+stopped in 2023, and the other metros publish none. Nothing registrable
+turned up for deeds in Melbourne, Orlando or Port St. Lucie: Brevard's and
+St. Lucie's appraisers refused the probe (403), Orange County's server
+answered some queries with a filter page, and Port St. Lucie's parcel copy
+carries only the annual roll's sales.
+
+| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds (#94) | With Asheville's permits (#95) | With Allentown's permits (#96) | With Allentown's and New Haven's `311` (#97) | With Lincoln's `311` (#98) | With Albuquerque's and Topeka's `311` (#99) | With Yakima's `311` and deeds (#100) | With Cape Coral's `311` and deeds |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 4 | 26 | 26 | **27** (Charlotte) | 27 | 27 | 27 | **28** (Allentown) | 28 | 28 | **29** (Yakima) | **30** (Cape Coral) |
+| 3 | 29 | **30** (Charlotte) | 29 | **30** (Toledo) | **31** (Asheville) | **32** (Allentown) | 32 (New Haven in, Allentown up) | **33** (Lincoln) | **35** (Albuquerque, Topeka) | 35 | 35 |
+| 2 | 68 | 67 | 67 | 66 | 65 | 64 | 63 | 62 | 60 | 59 | 58 |
+| 1 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 |
 
 ## Registered
 
@@ -688,6 +701,78 @@ Collins, Salem and Vancouver are checked separately.
   the box and dead-lettered none. The second read the same 453 rows and
   published nothing. No event carried a party name, and neither poll queried
   a geocoder.
+
+### Cape Coral, FL — `311`
+
+- **Source:** the City's `311 Issues NonSpatial` table on the server that
+  serves Cape Coral's permits:
+  `capeims.capecoral.gov/arcgis/rest/services/OpenData/OpenData/MapServer/4`
+  (ArcGIS Server 11.5).
+- **Shape:** one row per request since 2020-12-17 (110,827 rows), with
+  WGS84 `X` and `Y` columns and no geometry. 6,953 were created in the 90
+  days to 2026-10-02, about 77 a day, every one inside the metro box: the
+  City's own requests, no Fort Myers or county rows. 435 of those rows
+  repeat a request in every column the poll reads, so requests key on
+  `Issue_id` and publish once.
+- **Freshness:** the table is loaded in one overnight cut. The 2026-10-01 cut
+  ended with a request created at 02:09 EDT, and at 09:05Z on 2026-10-02 no
+  newer cut had landed, so `expected_cadence_days` is 2.
+- **Watermark and zone:** `CreateDate`, real times of day. The table's dates
+  are Eastern with daylight saving, and the host already takes ANSI
+  literals for the permits, so the scheduler renders the watermark as an
+  Eastern `timestamp '...'` literal.
+- **Personal data:** the site address and its parts, the title and both
+  free-text descriptions stay on the server; `select` names nine columns.
+  The City's Hub item "311 Issues" points at a second copy, the
+  `311Issues` point layer, which also names the requester and is not read.
+- **Placement:** the table's own coordinates; the spec clips to the box,
+  which skipped nothing in the live check. No geocoder is asked.
+- **Poll:** every 30 minutes, newest first by `CreateDate DESC, OBJECTID
+  DESC`, under the default cap of 1,000 rows, which reached back to
+  2026-09-18 on the first poll.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live table, Kafka mocked. The first read 1,000 rows
+  with the metadata and one page, published 942 requests created from
+  2026-09-18 to 2026-10-01, and dropped 58 repeats; none was dead-lettered.
+  By type, 300 go to Waste Pro, the City's hauler, 94 are stormwater
+  maintenance, 63 code compliance questions, 59 swale drainage complaints
+  and 49 code violations; 648 are closed, 288 open and 6 cancelled. The
+  watermark stopped at 06:09:26Z, and the second poll sent `CreateDate >
+  timestamp '2026-10-01 02:09:26'`, read the newest request again (its time
+  runs past the second) and published nothing. No poll queried a geocoder.
+
+### Cape Coral, FL — `deeds`
+
+- **Source:** the Lee County Property Appraiser's parcels on the County's
+  ArcGIS Online org:
+  `services2.arcgis.com/LvWGAAhHwbCJ2GMP/arcgis/rest/services/Lee_County_Parcels/FeatureServer/0`
+  (565,114 polygons, edited nightly at about 08:50Z), each with its latest
+  sale: date, price, transaction code and instrument number. The three older
+  sales on a row are never newer than the first.
+- **Window:** the sales dated in the 90 days before each poll, county-wide:
+  6,765 on 2026-10-02, dated 2026-07-05 to 2026-09-25. Every date is midnight
+  Eastern. Sales reach the layer two to three weeks after their date, and
+  the window re-reads them when they do. March to May 2026 held 11,253, so
+  the cap is 17,000.
+- **Rows:** one per parcel. An instrument can convey several parcels (the
+  4,409 published carry 4,232 instrument numbers), so a row is its parcel,
+  date and instrument. Every sale published has a price, and 4,385 are
+  $10,000 or more.
+- **Personal data:** the owner block, the mailing address and the legal
+  description stay on the server; `select` names eight columns.
+- **Placement:** each parcel's own `LATITUDE` and `LONGITUDE`. The spec
+  clips to the metro box, which leaves out most of Lehigh Acres to the
+  east, Bonita Springs to the south and the outer islands to the west. No
+  geocoder is asked.
+- **Poll:** every six hours, newest first by `S_1DATE DESC, OBJECTID DESC`.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live layer, Kafka mocked. The first read 6,765 rows
+  with the metadata and seven pages and published 4,409 sales: 1,855 in
+  Cape Coral, 1,325 in Fort Myers, 428 in North Fort Myers, 224 in the part
+  of Lehigh Acres inside the box and 185 in Estero. It skipped 2,356 outside
+  the box and dead-lettered none. The second read the same 6,765 rows and
+  published nothing. No event carried a party name, and neither poll
+  queried a geocoder.
 
 ## Held
 

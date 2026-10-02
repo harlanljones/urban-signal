@@ -1740,3 +1740,20 @@ Worth keeping:
 - **Try a server-side cast before a text-date watermark.** The parcels'
   `M/D/YYYY` sale dates cast to dates on the server, which gives a rolling
   window that catches late-filled days.
+
+### 2026-10-02 — Cape Coral 311 and deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| cape-coral-311-deeds | `.streams/cape-coral-311-deeds.md` | `config.py` (the request table and the parcel layer) | 2026-10-02 | done (311: 1,000 read, 942 published, 58 repeats dropped; deeds: 6,765 read county-wide, 4,409 published inside the box; each second poll published none) | `311` and `deeds` specs for Cape Coral; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Cape Coral moves from two signal families to four (four-family tier 29 to 30).
+
+Worth keeping:
+
+- **A Hub item can name the copy with more personal data.** Cape Coral's
+  "311 Issues" item points at a point layer that names each requester; the
+  same server's non-spatial table carries the same overnight cut, with
+  coordinates and without the names.
+- **Size a sales window's cap on the busiest season.** Lee County's 90-day
+  window held 6,765 sales on 2026-10-02 and 11,253 from March to May.

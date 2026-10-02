@@ -2570,4 +2570,22 @@ class Settings(BaseSettings):
         ),
         description="Yakima County Assessor parcels layer URL with latest sales (City GIS)",
     )
+    # Cape Coral 311 (2026-10-02): the City's 311 issues table, loaded
+    # overnight, on the server that also serves Cape Coral's permits.
+    arcgis_cape_coral_311_url: str = Field(
+        default=(
+            "https://capeims.capecoral.gov/arcgis/rest/services/OpenData/"
+            "OpenData/MapServer/4"
+        ),
+        description="Cape Coral FL 311 issues table URL (City GIS, no geometry; X/Y columns)",
+    )
+    # Cape Coral deeds (2026-10-02): the Lee County Property Appraiser's
+    # parcels, each with its latest sale, on the County's ArcGIS Online org.
+    arcgis_cape_coral_deeds_url: str = Field(
+        default=(
+            "https://services2.arcgis.com/LvWGAAhHwbCJ2GMP/arcgis/rest/services/"
+            "Lee_County_Parcels/FeatureServer/0"
+        ),
+        description="Lee County FL parcels layer URL with latest sales (Lee County GIS)",
+    )
 settings = Settings()
