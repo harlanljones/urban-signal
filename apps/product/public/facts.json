@@ -1969,9 +1969,9 @@
       ],
       "platforms": [
         {
-          "platform": "socrata",
-          "watermark_col": "issue",
-          "interval_seconds": 600.0,
+          "platform": "arcgis",
+          "watermark_col": "IssueDate",
+          "interval_seconds": 21600.0,
           "topic": "raw.municipal.permits"
         },
         null,

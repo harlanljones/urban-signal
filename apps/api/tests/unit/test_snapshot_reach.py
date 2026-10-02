@@ -74,6 +74,10 @@ FULL_READ_ROWS = {
     # (the extract rebuilt 2026-10-02, newest 2026-09-30); 1,556 of them place
     # inside the metro box. The 90 days to 2025-08-26 held 3,484.
     ("gainesville", "deeds"): 2_486,
+    # Alachua County's building, trade, pool, demolition, fire and sign
+    # permits issued in the spec's 90-day window, newest 2026-10-01, read
+    # 2026-10-02; 1,549 of them place inside the metro box.
+    ("gainesville", "permits"): 1_992,
     ("glendale_az", "deeds"): 1_263,
     ("hartford", "deeds"): 353,
     ("inland_empire", "sla"): 10_585,

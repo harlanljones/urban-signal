@@ -24,6 +24,7 @@ Register Gainesville, FL as a new Urban Signal metro (`CityId.gainesville`) with
 - 2026-08-28 — CityId is free (`gainesville`); proceed with that id. Aliases: `gainesville`, `gainesville_fl`, `gainesville fl`.
 - 2026-08-28 — Field map: `job_id` ← `permit`, `issuance_date` ← `issue`, `address_street` ← `address`, `latitude`/`longitude` ← direct or `location_1.{latitude,longitude}`; `status` if present.
 - 2026-10-02 — Deeds registered from the Alachua County Property Appraiser's nightly extract (`Sales.txt`), placed through the Property Appraiser's parcel layer. The `311` dataset is still frozen at 2023-07-12. See `.streams/florida-deeds.md`.
+- 2026-10-02 — Permits now read Alachua County's `BuildingPermitsCS` layer: the Socrata set `p798-x3nx` holds nothing issued after 2023-02-28. The County's layer holds the County's own permits, not the City's. See `.streams/gainesville-permits.md`.
 
 ## Current step
 

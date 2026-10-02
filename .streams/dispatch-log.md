@@ -2002,3 +2002,15 @@ Worth keeping:
 - **Join a work type only where the class leaves it open.** Philadelphia's
   fire-suppression permits for a new building also say "New Construction";
   read with their class, every one would have counted as a new building.
+
+### 2026-10-02 — Gainesville permits from Alachua County (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| gainesville-permits | `.streams/gainesville-permits.md` | `config.py` (the source) | 2026-10-02 | done (1,992 read in each of two polls, 1,549 inside the metro box published, then none new; 267 of them new construction) | Gainesville's `permits` spec on Alachua County's layer; `compose_permit_type` in the Gainesville leaf; regenerated facts |
+
+Worth keeping:
+
+- **Check whose permits a county layer holds.** Three quarters of the
+  County's permits fall in the metro box, but only 33 of 2,441 inside the
+  City: a box test alone would have read it as the City's feed.

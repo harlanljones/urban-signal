@@ -1,10 +1,13 @@
 FIELD_MAP = {
-    "job_id": ["permit"],
-    "issuance_date": ["issue"],
-    "address_street": ["address"],
-    "latitude": ["latitude", "location_1.latitude"],
-    "longitude": ["longitude", "location_1.longitude"],
-    "status": ["status"],
+    "job_id": ["Permit"],
+    "issuance_date": ["IssueDate"],
+    "filing_date": ["ApplicationDate"],
+    # The type names the trade ("Mechanical Permit"); ``compose_permit_type``
+    # reads a building permit's sub-type with it.
+    "job_type": ["Permit_Type"],
+    "status": ["Status"],
+    "address_street": ["FULLADDR"],
+    "bbl": ["Parcel"],
 }
 
 GAINESVILLE_PERMITS_FIELD_MAP = FIELD_MAP
@@ -14,8 +17,20 @@ GAINESVILLE_PERMITS_FIELD_MAP = FIELD_MAP
 Provides neighborhood metadata, camera positioning, division catalog, and geographic
 bounding boxes for the City of Gainesville, FL (Alachua County seat).
 
-Feed coverage in this ticket: PERMITS via the verified public Socrata dataset
-`p798-x3nx` on `data.cityofgainesville.org` (native latitude/longitude + point field).
+PERMITS (2026-10-02): Alachua County Growth Management's building permits
+layer (``BuildingPermitsCS`` on ArcGIS Online), loaded twice a week. It holds
+the permits the County issues, so the City of Gainesville's own permits are
+not covered: of the County's 2,441 placed permits issued in the 90 days to
+2026-10-01, 33 lie inside the City's limits, and three quarters lie inside
+the metro box, which takes in the unincorporated fringe. The City's Socrata
+set (``p798-x3nx``), registered before, stopped on 2023-02-28, and its live
+system (PermitGNV, on Citizenserve) publishes no rows. Each poll re-reads the
+90 days before it, newest first, because a load adds permits issued days
+earlier, and keeps the building, trade, pool, demolition, fire and sign
+permits; the layer's right-of-way, irrigation, tree-removal, zoning, site and
+temporary-use records are not building work. Points come from each row's
+geometry. The applicant, contractor and owner columns and the work
+description are never requested.
 
 DEEDS (2026-10-02): the Alachua County Property Appraiser's nightly extract
 (``ACPA_CAMAData.zip``), whose ``Sales.txt`` lists every recorded sale in the
@@ -269,25 +284,79 @@ GNV_DIVISION_BBOXES = GAINESVILLE_DIVISION_BBOXES
 GNV_SUBMARKETS = GAINESVILLE_SUBMARKETS
 GNV_DIVISIONS = GAINESVILLE_DIVISIONS
 
+
+def compose_permit_type(row: dict) -> str | None:
+    """A building permit's type read with its sub-type ("Building Permit: New
+    Construction"), so a new house reads as new construction.
+
+    ``DOBPermitsProducer`` calls this for every Gainesville permit row. A
+    trade's permit names its trade in the type ("Mechanical Permit") and gets
+    None, so the field map reads the type alone. The County files a change of
+    occupancy under a type of its own, so a "Renovation/Conversion" building
+    permit reads as a renovation rather than a change of use.
+    """
+    from src.features.permit_taxonomy import building_permit_type
+
+    work = " ".join(str(row.get("Sub_Type") or "").split())
+    if work.upper() == "RENOVATION/CONVERSION":
+        work = "Renovation"
+    return building_permit_type(row.get("Permit_Type"), work)
+
+
 # -----------------------------------------------------------------------------
 # Feed specs (leaf-local; the spine copies these into REGISTRY).
-# Probed 2026-08-28 against data.cityofgainesville.org.
+# Read 2026-10-02 against Alachua County's layer.
 # -----------------------------------------------------------------------------
-GAINESVILLE_PERMITS_ENDPOINT = "https://data.cityofgainesville.org/resource/p798-x3nx.json"
+GAINESVILLE_PERMITS_ENDPOINT = (
+    "https://services1.arcgis.com/MiBZ4u97DWldovjI/arcgis/rest/services/"
+    "BuildingPermitsCS/FeatureServer/0"
+)
+# Building, trade, pool, demolition, fire and sign permits. "Construction
+# Permit" is site and subdivision work, and "Model Permit" (none issued) would
+# read as new homes.
+GAINESVILLE_PERMIT_TYPES: tuple[str, ...] = (
+    "Building Permit",
+    "Mechanical Permit",
+    "Roofing Permit",
+    "Electrical Permit",
+    "Plumbing Permit",
+    "Gas Permit",
+    "Pool/Spa Permit",
+    "Demolition Permit",
+    "Accessory Dwelling Unit",
+    "Fire Permit",
+    "Sign Permit",
+    "Change of Occupancy",
+    "Miscellaneous Permit",
+)
+GAINESVILLE_PERMITS_WHERE = (
+    "IssueDate >= CURRENT_DATE - INTERVAL '90' DAY AND IssueDate <= CURRENT_TIMESTAMP"
+    " AND Permit_Type IN (" + ", ".join(f"'{kind}'" for kind in GAINESVILLE_PERMIT_TYPES) + ")"
+)
 
 GAINESVILLE_FEED_SPECS: Dict[str, Dict[str, object]] = {
     "permits": {
         "endpoint": GAINESVILLE_PERMITS_ENDPOINT,
-        "platform": "socrata",
-        "watermark_col": "issue",
-        "id_keys": ["permit"],
+        "platform": "arcgis",
+        "watermark_col": "IssueDate",
+        "id_keys": ["Permit"],
         "topic_key": "topic_permits",
-        "interval_seconds": 600.0,
+        "interval_seconds": 21600.0,
         "producer_key": "permits",
         "extra": {
-            "order_by": "issue DESC",
+            "order_by": "IssueDate DESC, OBJECTID DESC",
+            "select": (
+                "OBJECTID,Permit,Permit_Type,Sub_Type,Status,Parcel,FULLADDR,IssueDate,ApplicationDate"
+            ),
+            "where": GAINESVILLE_PERMITS_WHERE,
+            "needs_geocode": False,
             "field_map": GAINESVILLE_PERMITS_FIELD_MAP,
-            # No geocode required for native point rows; fallback remains available in shared parser.
+            "ingestion_mode": "snapshot",
+            "oid_field": "OBJECTID",
+            "max_record_count": 1000,
+            "expected_cadence_days": 7,
+            "batch_limit": 4000,
+            "metro_clip": True,
         },
     },
 }

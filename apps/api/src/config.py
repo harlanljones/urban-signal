@@ -1638,10 +1638,15 @@ class Settings(BaseSettings):
         default="https://services5.arcgis.com/mMuoPCaIYD4wEgDl/arcgis/rest/services/Address_Point/FeatureServer/22",
         description="City of Orlando address points that place Orlando's permits (parcel join)",
     )
-    # Gainesville, FL (Socrata): native-point permits with latitude/longitude and location_1.
-    socrata_gainesville_permits_endpoint: str = Field(
-        default="https://data.cityofgainesville.org/resource/p798-x3nx.json",
-        description="Gainesville building permits Socrata endpoint",
+    # Gainesville, FL permits (2026-10-02): Alachua County's building permits
+    # layer on ArcGIS Online, loaded twice a week. It holds the permits the
+    # County issues; the City's Socrata set stopped on 2023-02-28.
+    arcgis_gainesville_permits_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/MiBZ4u97DWldovjI/arcgis/rest/services/"
+            "BuildingPermitsCS/FeatureServer/0"
+        ),
+        description="Alachua County building permits layer for the Gainesville FL metro (county-hosted)",
     )
 
     # Melbourne / Palm Bay / Titusville (Brevard County, FL) — US-296

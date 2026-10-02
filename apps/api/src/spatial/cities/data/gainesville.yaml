@@ -222,60 +222,42 @@ divisions:
     city_id: gainesville
 datasets:
   permits:
-    endpoint: https://data.cityofgainesville.org/resource/p798-x3nx.json
-    platform: socrata
-    watermark_col: issue
+    endpoint: https://services1.arcgis.com/MiBZ4u97DWldovjI/arcgis/rest/services/BuildingPermitsCS/FeatureServer/0
+    platform: arcgis
+    watermark_col: IssueDate
     id_keys:
-    - permit
+    - Permit
     topic: raw.municipal.permits
-    interval_seconds: 600.0
+    interval_seconds: 21600.0
     producer_key: permits
-    endpoint_by_year: {}
-    watermark_type: null
-    watermark_format: null
-    watermark_exclude: []
-    order_by: issue DESC
-    id_col: null
-    select: null
-    fallback_endpoints: []
-    where: null
+    order_by: IssueDate DESC, OBJECTID DESC
+    select: OBJECTID,Permit,Permit_Type,Sub_Type,Status,Parcel,FULLADDR,IssueDate,ApplicationDate
+    where: IssueDate >= CURRENT_DATE - INTERVAL '90' DAY AND IssueDate <= CURRENT_TIMESTAMP AND Permit_Type IN ('Building
+      Permit', 'Mechanical Permit', 'Roofing Permit', 'Electrical Permit', 'Plumbing Permit', 'Gas Permit', 'Pool/Spa Permit',
+      'Demolition Permit', 'Accessory Dwelling Unit', 'Fire Permit', 'Sign Permit', 'Change of Occupancy', 'Miscellaneous
+      Permit')
     needs_geocode: false
-    geocode_context: null
     field_map:
       job_id:
-      - permit
+      - Permit
       issuance_date:
-      - issue
-      address_street:
-      - address
-      latitude:
-      - latitude
-      - location_1.latitude
-      longitude:
-      - longitude
-      - location_1.longitude
+      - IssueDate
+      filing_date:
+      - ApplicationDate
+      job_type:
+      - Permit_Type
       status:
-      - status
-    ingestion_mode: incremental
-    oid_field: null
-    max_record_count: null
-    expected_cadence_days: 1
-    alarm_exempt: false
-    alarm_exempt_reason: null
-    annual_rotation: false
-    companion_endpoints: {}
-    proxy_for: null
-    retention_days: null
-    rolling_window_days: null
-    rollover: null
-    state_plane_crs: null
-    state_plane_units: null
-    state_plane_x_col: null
-    state_plane_y_col: null
-    parcel_join: {}
-    non_spatial: null
-    zip_member: null
-    delimiter: null
+      - Status
+      address_street:
+      - FULLADDR
+      bbl:
+      - Parcel
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 1000
+    expected_cadence_days: 7
+    batch_limit: 4000
+    metro_clip: true
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis
