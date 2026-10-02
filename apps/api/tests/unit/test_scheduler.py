@@ -537,7 +537,12 @@ class TestPlatformRouting:
         mock_scheduler.poll_job("permits_spokane", limit=10)
         _, kwargs = paginate.call_args
         assert kwargs["order_by"] == "issued_date ASC"
-        assert set(kwargs) == {"endpoint_url", "where_clause", "batch_size", "max_records", "order_by"}
+        # The workbook client compares its watermark column as a date only
+        # with a format (MyGov's text dates); Spokane's are date cells.
+        assert set(kwargs) == {
+            "endpoint_url", "where_clause", "batch_size", "max_records", "order_by", "watermark_col",
+        }
+        assert "watermark_format" not in kwargs
 
 
 class TestYearSliceEndpoints:
