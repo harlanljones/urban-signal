@@ -41,12 +41,25 @@ and New Haven a third; Burlington's and Rochester's request exports are held
 as frozen, and Bridgeport, Canton, Frederick and Providence publish no
 requests.
 
-| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds (#94) | With Asheville's permits (#95) | With Allentown's permits (#96) | With Allentown's and New Haven's `311` |
-|---|---|---|---|---|---|---|---|
-| 4 | 26 | 26 | **27** (Charlotte) | 27 | 27 | 27 | **28** (Allentown) |
-| 3 | 29 | **30** (Charlotte) | 29 | **30** (Toledo) | **31** (Asheville) | **32** (Allentown) | 32 (New Haven in, Allentown up) |
-| 2 | 68 | 67 | 67 | 66 | 65 | 64 | 63 |
-| 1 | 34 | 34 | 34 | 34 | 34 | 34 | 34 |
+New Haven's requests come from SeeClickFix's own ArcGIS Online org, whose
+service listing held 28 public views on 2026-10-02: request views for 22
+places, a sandbox copy and a Survey123 form. Besides New Haven's, one covers
+a registered metro that lacks requests: Lincoln's, a two-family metro with
+`permits` and `sla`, which registers and gives Lincoln a third family. The
+others cover metros that already have `311` (Tacoma's own, and suburbs in
+the Denver, Kansas City, Seattle and San Francisco boxes), places whose
+namesake metro is in another state (Salem, Massachusetts; Midland County,
+Michigan), cities outside the nearest registered box (St. Petersburg beside
+Tampa, Chapel Hill beside Durham, Fort Lauderdale beside Miami-Dade), and
+places with no registered metro (Birmingham, Provo, Tuscaloosa, Clayton
+County, Hilton Head Island, Jupiter and Moses Lake).
+
+| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds (#94) | With Asheville's permits (#95) | With Allentown's permits (#96) | With Allentown's and New Haven's `311` (#97) | With Lincoln's `311` |
+|---|---|---|---|---|---|---|---|---|
+| 4 | 26 | 26 | **27** (Charlotte) | 27 | 27 | 27 | **28** (Allentown) | 28 |
+| 3 | 29 | **30** (Charlotte) | 29 | **30** (Toledo) | **31** (Asheville) | **32** (Allentown) | 32 (New Haven in, Allentown up) | **33** (Lincoln) |
+| 2 | 68 | 67 | 67 | 66 | 65 | 64 | 63 | 62 |
+| 1 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 |
 
 ## Registered
 
@@ -431,6 +444,51 @@ requests.
   second poll sent `(private = '0') AND created_at > '2026-10-02T02:55:34'`,
   read nothing and published nothing. Neither poll queried a geocoder.
 
+### Lincoln, NE — `311`
+
+- **Source:** the City's requests reach SeeClickFix, which publishes them as
+  a public view in its own ArcGIS Online org, beside New Haven's:
+  `services8.arcgis.com/fz3KpsKgK9InMjh8/arcgis/rest/services/SCF_Requests_Public_Lincoln_NE/FeatureServer/0`.
+  It puts each request at a point. The 2026-08-30 probe found only the
+  City's request form.
+- **Shape:** 96,332 rows since 2011 on 2026-10-02, one per request: they
+  carry 96,331 distinct ids, and the 11,858 requests filed in the year to
+  2026-10-02 carry 11,858. Every request in the 90 days to 2026-10-02
+  (4,211) was public and named the City of Lincoln as its agency; two were
+  moderated. The spec filters on `private = '0'`, as New Haven's does.
+- **Personal data:** the address, assignee, photo links, page link and the
+  view's editing accounts stay on the server; `select` names seven columns.
+  The view has no summary or description column.
+- **Freshness:** forty to sixty requests a day from May to August and
+  fifteen to twenty-eight from November to February (4,211 in the 90 days to
+  2026-10-02). The longest quiet spell in the year to 2026-10-02 was 1.04
+  days, from 2025-12-13 to 2025-12-14, so `expected_cadence_days` is 1.
+- **Watermark:** `CreationDate`, the time the view received each request.
+  Among the 1,000 rows it received last, those times follow the object ids
+  without exception, while two rows arrived after a request filed 14 minutes
+  later than they were, which a watermark on the filing time `created_at`
+  could pass over. Half the requests reached the view within three seconds
+  of filing, and the slowest took 15 minutes. The stored watermark drops the
+  milliseconds, so each poll reads the newest request again and the dedup
+  drops it.
+- **Placement:** every request is a point. 977 of the 1,000 newest lie
+  inside the metro box; 19 lie just south of it (40.69 to 40.72 N), three
+  north-east of it (40.91 to 40.94 N) and one just east. They are all the
+  City's requests, so the spec does not clip. No geocoder is asked.
+- **Poll:** every 15 minutes, newest first by `CreationDate DESC, id DESC`,
+  under the default cap of 1,000 rows, which reached back to 2026-09-04 on
+  the first poll.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live layer, Kafka mocked. The first read and
+  published 1,000 requests filed from 2026-09-04 to 2026-10-02, 685 of them
+  closed, with the metadata and one page; none was dead-lettered and no
+  request repeated. By category, 218 are tall grass or weeds, 140 tree
+  issues, 82 "LTU General", 64 street issues other than potholes, 62
+  potholes and 52 sidewalk repairs. By status, 685 are closed, 251 accepted,
+  63 open and one in progress. The second poll sent `(private = '0') AND
+  CreationDate > '2026-10-02T02:46:02'`, read the newest request again and
+  published nothing. Neither poll queried a geocoder.
+
 ## Held
 
 | Metro (missing) | Source | Why held | Re-check when |
@@ -493,6 +551,6 @@ Tulsa's sit behind one-record-at-a-time or paid recorder searches. For
 `311`, SeeClickFix is the shared platform (Bridgeport, Canton, Frederick
 County and Peoria, and behind Burlington's frozen export), and its public API
 returns reporters and descriptions with no way to leave them out. The cheaper
-route is the one New Haven's feed takes: SeeClickFix publishes public
-ArcGIS views of some clients' requests in its own ArcGIS Online org, which
-the existing ArcGIS client reads.
+route is the one New Haven's and Lincoln's feeds take: SeeClickFix
+publishes public ArcGIS views of some clients' requests in its own ArcGIS
+Online org, which the existing ArcGIS client reads.

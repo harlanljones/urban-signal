@@ -1687,3 +1687,21 @@ Worth keeping:
 - **Look for a vendor's own ArcGIS org.** SeeClickFix publishes public views
   of some clients' requests in its own ArcGIS Online org, which is how New
   Haven's requests are readable without SeeClickFix's API.
+
+### 2026-10-02 — Lincoln 311 (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| lincoln-311 | `.streams/lincoln-311.md` | `config.py` (the request layer) | 2026-10-02 | done (1,000 requests read and published, none dead-lettered; the second poll published none) | `311` spec for Lincoln; the SeeClickFix org survey in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Lincoln moves from two signal families to three (three-family tier 32 to
+33).
+
+Worth keeping:
+
+- **Read a vendor org's whole listing once a feed is found there.**
+  SeeClickFix's org listed 28 views; one service listing matched them all
+  against the registry.
+- **Prefer an arrival stamp to a filing time when a view keeps one.** A
+  layer's editor-tracking `CreationDate` follows its object ids, so a poll on
+  it passes over no late arrival.

@@ -2525,4 +2525,13 @@ class Settings(BaseSettings):
         ),
         description="New Haven CT SeeClickFix public requests view URL (SeeClickFix-hosted)",
     )
+    # Lincoln 311 (2026-10-02): SeeClickFix's public view of the City's
+    # requests on its own ArcGIS Online org, one point per request since 2011.
+    arcgis_lincoln_311_url: str = Field(
+        default=(
+            "https://services8.arcgis.com/fz3KpsKgK9InMjh8/arcgis/rest/services/"
+            "SCF_Requests_Public_Lincoln_NE/FeatureServer/0"
+        ),
+        description="Lincoln NE SeeClickFix public requests view URL (SeeClickFix-hosted)",
+    )
 settings = Settings()

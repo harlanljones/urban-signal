@@ -2678,7 +2678,7 @@
       "submarket_count": 11,
       "feeds": [
         true,
-        false,
+        true,
         true,
         false
       ],
@@ -2689,7 +2689,12 @@
           "interval_seconds": 300.0,
           "topic": "raw.municipal.permits"
         },
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "CreationDate",
+          "interval_seconds": 900.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "",

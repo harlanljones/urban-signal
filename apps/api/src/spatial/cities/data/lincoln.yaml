@@ -354,6 +354,34 @@ datasets:
     non_spatial: null
     zip_member: null
     delimiter: null
+  '311':
+    endpoint: https://services8.arcgis.com/fz3KpsKgK9InMjh8/arcgis/rest/services/SCF_Requests_Public_Lincoln_NE/FeatureServer/0
+    platform: arcgis
+    watermark_col: CreationDate
+    id_keys:
+    - id
+    topic: raw.municipal.311
+    interval_seconds: 900.0
+    producer_key: '311'
+    order_by: CreationDate DESC, id DESC
+    select: OBJECTID,id,status,category,created_at,closed_at,CreationDate
+    where: private = '0'
+    needs_geocode: false
+    field_map:
+      incident_id:
+      - id
+      created_date:
+      - created_at
+      closed_date:
+      - closed_at
+      complaint_type:
+      - category
+      status:
+      - status
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis
