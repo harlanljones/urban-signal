@@ -75,8 +75,14 @@ class SocrataClient:
         order_by: str = ":id",
         batch_size: int = 1000,
         max_records: Optional[int] = None,
+        select: Optional[str] = None,
     ) -> Generator[List[Dict[str, Any]], None, None]:
-        """Paginates through Socrata datasets yielding batches of records."""
+        """Paginates through Socrata datasets yielding batches of records.
+
+        ``select`` names the columns each page returns (``$select``), so a
+        feed can leave columns it never reads, such as owners' and
+        contractors' names, on the server.
+        """
         offset = 0
         total_fetched = 0
 
@@ -91,6 +97,7 @@ class SocrataClient:
                 order_by=order_by,
                 limit=fetch_limit,
                 offset=offset,
+                select=select,
             )
 
             if not records:

@@ -1,8 +1,9 @@
 """Unit tests for the Orlando leaf (US-194): spatial module + SLA field maps.
 
 Orlando is a PARTIAL metro: Business Tax Receipts (primary SLA) and Short Term
-Rental Licenses (SLA companion). PERMITS ``ryhf-m453`` is live but out of
-ticket scope. Tests pass WITHOUT a spine registration (no CityId.ORLANDO).
+Rental Licenses (SLA companion). PERMITS ``ryhf-m453`` is registered in the
+corpus, not this leaf (``test_orlando_permits.py``). Tests pass WITHOUT a
+spine registration (no CityId.ORLANDO).
 
 Live fixtures captured 2026-08-27 from data.cityoforlando.net.
 """

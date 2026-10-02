@@ -3,6 +3,7 @@
 import json
 from unittest.mock import MagicMock, create_autospec
 
+import httpx
 import pytest
 
 from src.producers.scheduler import (
@@ -71,8 +72,18 @@ def test_exponential_backoff_tracker():
 
 from unittest.mock import MagicMock, patch
 
+def _refuse_live_request(self, request, *args, **kwargs):
+    raise httpx.ConnectError(f"unit test refused a live request to {request.url.host}", request=request)
+
+
 @pytest.fixture
-def mock_scheduler():
+def mock_scheduler(monkeypatch):
+    # Some national producers (SBA loans, the FMCSA feeds, NCES schools, Head
+    # Start) download through httpx directly rather than a `paginate` seam,
+    # so `poll_all()` read their live sources; on 2026-10-02 one of those
+    # downloads ran for more than 15 minutes. Their requests fail fast here.
+    monkeypatch.setattr(httpx.Client, "send", _refuse_live_request)
+    monkeypatch.setattr(httpx.AsyncClient, "send", _refuse_live_request)
     mock_dlq = MagicMock()
     with patch("src.producers.base_producer.BaseKafkaProducer"):
         scheduler = MunicipalIngestionScheduler(

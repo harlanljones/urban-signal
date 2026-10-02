@@ -42,6 +42,10 @@ pass, ruff is clean, and the spine has a copy-pasteable contract.
 - 2026-08-30 — Buncombe `party1_grantor` / `party2_grantee` both map to `Owner`
   (the current owner is the last grantee in a per-parcel last-sale roll).
   `is_arms_length` helper filters on `Instrument` / `Reason` codes.
+- 2026-10-02 — The FDOR codes run 11–77, not 01–67 (Alachua 11, Dade 23,
+  Marion 52, Orange 58): the old numbering registered Ocala at 42 (Jackson
+  County) and Orlando at 48 (Levy County). No metro registers the layer now;
+  see `.streams/wrong-place-permits.md`.
 
 ## Current step
 

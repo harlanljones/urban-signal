@@ -188,7 +188,6 @@ assessor's four-month posting lag (see the feed-health note).
 |---|---|---|
 | Kansas City `sla` | 28,245 | no date to window on; `valid_license_for` is a text licence year shared by thousands of rows |
 | Boston `deeds` | 184,552 | the configured id is the CKAN package, not a resource (404); the FY2026 resource has no coordinates and none of the mapped column names |
-| Ocala `permits`, Orlando `permits` | 283,399 / 488,959 | the Florida statewide cadastral polygon layer now answers 499 Token Required, and the county codes select Jackson (42) and Levy (48) counties instead of Marion (52) and Orange (58) |
 
 Henderson `sla` was on this list; the feed-repair change
 ([feed-health-2026-09-30.md](feed-health-2026-09-30.md)) fixed its field map
@@ -197,8 +196,12 @@ and made it a window. Reno `deeds` was too, since its only sale date is
 polls") names the dates since its watermark, and it now polls incrementally.
 Phoenix `deeds` was too, as a 61 MB zip of a 270 MB pipe-delimited file
 (903,301 rows) whose spec named no zip member or delimiter; it now reads the
-Assessor's parcel layer (above). Boston, Ocala and Orlando need more than a spec edit and
-are described there.
+Assessor's parcel layer (above). Ocala `permits` and Orlando `permits` were
+too: the statewide cadastral layer they read, under county codes 42 and 48,
+held Jackson and Levy counties' parcels. Since 2026-10-02 Ocala registers no
+permits and Orlando reads the City's own permit applications incrementally
+([two-family-depth-2026-09-30.md](two-family-depth-2026-09-30.md)). Boston
+needs more than a spec edit, as its row above says.
 
 ## Scheduler and backfill changes
 

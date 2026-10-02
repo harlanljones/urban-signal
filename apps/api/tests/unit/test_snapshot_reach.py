@@ -127,14 +127,6 @@ KNOWN_GAPS = {
         "the id is the CKAN package, not a resource (404); the FY2026 resource has "
         "no coordinates and none of the mapped column names"
     ),
-    ("ocala", "permits"): (
-        "the statewide cadastral polygon layer now requires a token (499), and "
-        "CO_NO 42 is Jackson County (FDOR numbers Marion 52)"
-    ),
-    ("orlando", "permits"): (
-        "the statewide cadastral polygon layer now requires a token (499), and "
-        "CO_NO 48 is Levy County (FDOR numbers Orange 58)"
-    ),
 }
 
 

@@ -1389,15 +1389,6 @@ class Settings(BaseSettings):
         description="Wake County parcel sales MapServer layer URL",
     )
 
-    # Macon-Bibb County, GA (ArcGIS): Building Permits (2010‑Present) polygon layer.
-    arcgis_macon_bibb_permits_url: str = Field(
-        default=(
-            "https://services6.arcgis.com/Yx1h0qHJ9wIpQWuU/arcgis/rest/services/"
-            "Building_Permits_Public/FeatureServer/0"
-        ),
-        description="Macon-Bibb County Building Permits (2010‑Present) ArcGIS FeatureServer layer URL",
-    )
-
     # San Antonio, TX (CKAN + ArcGIS, US-141): live building permits datastore
     # and point-based 311 service calls.
     ckan_san_antonio_permits_endpoint: str = Field(
@@ -1624,6 +1615,18 @@ class Settings(BaseSettings):
     socrata_orlando_str_endpoint: str = Field(
         default="https://data.cityoforlando.net/resource/ssrj-rbua.json",
         description="Orlando Short Term Rental Licenses Socrata endpoint (SLA companion)",
+    )
+    # 2026-10-02: the City's permit applications replace the statewide parcel
+    # layer, whose county code 48 read Levy County. Rows carry no point.
+    socrata_orlando_permits_endpoint: str = Field(
+        default="https://data.cityoforlando.net/resource/ryhf-m453.json",
+        description="Orlando permit applications Socrata endpoint (address-only; issued permits)",
+    )
+    # The City's address points place each permit by its address
+    # (``SitusAddress``); the geocoder takes the rest.
+    arcgis_orlando_address_points_url: str = Field(
+        default="https://services5.arcgis.com/mMuoPCaIYD4wEgDl/arcgis/rest/services/Address_Point/FeatureServer/22",
+        description="City of Orlando address points that place Orlando's permits (parcel join)",
     )
     # Gainesville, FL (Socrata): native-point permits with latitude/longitude and location_1.
     socrata_gainesville_permits_endpoint: str = Field(
@@ -2028,7 +2031,8 @@ class Settings(BaseSettings):
 
     # US-398: FL Statewide Cadastral — one national ArcGIS layer aggregating all
     # 67 FL counties' appraiser rolls; PERMITS new-supply proxy via year-built
-    # cohort. Annual assessment cadence.
+    # cohort. Annual assessment cadence. No metro registers it since
+    # 2026-10-02 (Ocala's and Orlando's county codes read other counties).
     arcgis_fl_cadastral_url: str = Field(
         default=(
             "https://services9.arcgis.com/Gh9awoU677aKree0/arcgis/rest/services/"

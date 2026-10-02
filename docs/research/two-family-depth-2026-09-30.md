@@ -87,12 +87,25 @@ St. Lucie's appraisers refused the probe (403), Orange County's server
 answered some queries with a filter page, and Port St. Lucie's parcel copy
 carries only the annual roll's sales.
 
-| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds (#94) | With Asheville's permits (#95) | With Allentown's permits (#96) | With Allentown's and New Haven's `311` (#97) | With Lincoln's `311` (#98) | With Albuquerque's and Topeka's `311` (#99) | With Yakima's `311` and deeds (#100) | With Cape Coral's `311` and deeds |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| 4 | 26 | 26 | **27** (Charlotte) | 27 | 27 | 27 | **28** (Allentown) | 28 | 28 | **29** (Yakima) | **30** (Cape Coral) |
-| 3 | 29 | **30** (Charlotte) | 29 | **30** (Toledo) | **31** (Asheville) | **32** (Allentown) | 32 (New Haven in, Allentown up) | **33** (Lincoln) | **35** (Albuquerque, Topeka) | 35 | 35 |
-| 2 | 68 | 67 | 67 | 66 | 65 | 64 | 63 | 62 | 60 | 59 | 58 |
-| 1 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 |
+The permits repair followed on 2026-10-02. The Department of Revenue
+numbers Florida's counties alphabetically from Alachua at 11, so the codes
+Ocala's and Orlando's specs sliced the statewide parcel layer by, 42 and 48,
+are Jackson and Levy counties; Marion is 52 and Orange 58. The specs also
+asked for the 2025 roll, which the layer no longer holds, and a year-built
+cohort of parcels is not a permit stream in any case. Orlando now reads the
+City's own permit applications, placed on the City's own address points,
+and Ocala's permits are retracted: the City publishes none. The probe of
+the nine south-eastern metros, written up with their registrations, found
+Macon-Bibb's registered permits layer drawing every polygon in St.
+Catharines, Ontario, so those permits are retracted too. Ocala and
+Macon-Bibb keep their SNAP retailers and drop to one family.
+
+| Tier (families) | Before (with #91) | With Charlotte's permits (#92) | With Charlotte's deeds (#93) | With Toledo's deeds (#94) | With Asheville's permits (#95) | With Allentown's permits (#96) | With Allentown's and New Haven's `311` (#97) | With Lincoln's `311` (#98) | With Albuquerque's and Topeka's `311` (#99) | With Yakima's `311` and deeds (#100) | With Cape Coral's `311` and deeds (#101) | With the wrong-place permits retracted |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 4 | 26 | 26 | **27** (Charlotte) | 27 | 27 | 27 | **28** (Allentown) | 28 | 28 | **29** (Yakima) | **30** (Cape Coral) | 30 |
+| 3 | 29 | **30** (Charlotte) | 29 | **30** (Toledo) | **31** (Asheville) | **32** (Allentown) | 32 (New Haven in, Allentown up) | **33** (Lincoln) | **35** (Albuquerque, Topeka) | 35 | 35 | 35 |
+| 2 | 68 | 67 | 67 | 66 | 65 | 64 | 63 | 62 | 60 | 59 | 58 | 56 |
+| 1 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | 34 | **36** (Ocala, Macon-Bibb) |
 
 ## Registered
 
@@ -773,6 +786,70 @@ carries only the annual roll's sales.
   the box and dead-lettered none. The second read the same 6,765 rows and
   published nothing. No event carried a party name, and neither poll
   queried a geocoder.
+
+### Orlando, FL — `permits` (repaired)
+
+- **Replaces:** the statewide cadastral layer under `ASMNT_YR = 2025 AND
+  CO_NO = 48`, read once a year as a year-built cohort: Levy County's
+  parcels, from a roll the layer no longer holds (it held only the 2026 roll
+  on 2026-10-02).
+- **Source:** the City's permit applications on its Socrata portal,
+  `data.cityoforlando.net/resource/ryhf-m453` (1,111,255 applications,
+  966,954 of them issued; rows updated 2026-10-01 19:30Z).
+- **Shape:** one row per application, each with its own permit number. 6,977
+  permits were issued in the 90 days to 2026-10-02, the newest on
+  2026-09-23: 2,143 building, 1,522 electrical, 1,100 mechanical, 840
+  plumbing, 682 engineering and 454 fire permits among them. Issue dates are
+  whole days.
+- **Freshness:** the newest issue date trailed the row update by eight days,
+  so `expected_cadence_days` is 7 and the staleness alarm waits 14. A week of
+  permits can therefore land at once; the seven working days to 2026-09-23
+  issued 1,000.
+- **Type:** the work type ahead of the application type ("New Building
+  Permit", "Roof Building Permit"), joined on the server, so new buildings
+  read as new construction and trade permits as trade work. The application
+  type stands in when the work type is empty.
+- **Personal data:** the property owner, parcel owner, contractor (name,
+  address and phone), private provider and project name columns stay on the
+  server; `select` names ten columns. The scheduler now forwards a Socrata
+  spec's `select` as `$select`; it had forwarded `select` to ArcGIS and CARTO
+  only.
+- **Placement:** the rows carry no point (one of the 6,977 has one). Each
+  permit takes the City's own address point for its address, from the
+  "Orlando Addresses" layer
+  (`services5.arcgis.com/mMuoPCaIYD4wEgDl/arcgis/rest/services/Address_Point/FeatureServer/22`,
+  120,252 points, edited 2026-09-27) matched on `SitusAddress`, which held one
+  point per matched address. The Census geocoder places the rest with
+  `Orlando, FL`. On its own the geocoder placed 683 of the newest 1,000
+  permits and missed whole new subdivisions: all 87 in Vista Park, all 38 in
+  Southeastern Oaks and 51 of 72 in Lake Nona South. Where both placed a
+  permit, the two points were a median 41 metres apart.
+- **Poll:** hourly, newest first by `issue_permit_date DESC, :id`, issued
+  permits only (`issue_permit_date IS NOT NULL`: Socrata sorts empty dates
+  first). A newest-first poll never reaches rows past its cap, so the cap is
+  3,000, three weeks of permits. The watermark is the issue date, compared
+  with `>=`, so each poll re-reads the newest day and drops it as seen.
+- **Live check:** two polls of the registered spec through the real
+  scheduler against the live table and address layer, Kafka mocked, with the
+  geocoder answering from one Census batch request. The first read 3,000
+  permits issued from 2026-08-20 to 2026-09-23 in three pages and published
+  2,912: the address points placed 2,860 (51 requests to the layer) and the
+  geocoder 52 of the 140 it was asked about. The 88 neither placed were
+  dead-lettered; in a check of the newest 1,000, 19 of the 27 unplaced were at
+  the airport. 121 of the 2,912 lie east of the metro box, in the City's
+  south-eastern neighbourhoods (Meridian Park, Southeastern Oaks, Storey Park
+  and Sunbridge). By type, 1,407 are trade permits, 1,307 minor alterations,
+  142 new buildings and 41 demolitions. The second poll sent
+  `issue_permit_date >= '2026-09-23T00:00:00'`, read that day's 166 permits
+  again with four requests to the address layer, and published nothing. No
+  event carried a name.
+
+## Retracted
+
+| Metro (feed) | What it read | Why retracted | Re-check when |
+|---|---|---|---|
+| Ocala (`permits`) | The statewide cadastral layer under `ASMNT_YR = 2025 AND CO_NO = 42`, read once a year as a year-built cohort (registered 2026-08-28). | 42 is Jackson County (Marion is 52, 286,275 parcels), the layer holds only the 2026 roll, and a parcel roll is not a permit stream. The only permit layer in the City GIS's public folder, "New Building Projects" (`gis.ocalafl.org`, `Public/GrowthManagement/FeatureServer/19`), holds 61 new commercial permits issued from 2025-09-04 to 2026-07-20. | The City or Marion County publishes its permits. |
+| Macon-Bibb (`permits`) | `services6.arcgis.com/Yx1h0qHJ9wIpQWuU/arcgis/rest/services/Building_Permits_Public/FeatureServer/0` (registered 2026-08-28). | Its 21,930 polygons lie between 43.11° and 43.23° N and 79.32° and 79.18° W: the City of St. Catharines, Ontario's permits, none inside Macon's box. The County's own `BuildingPermits` layer (org `zPFLSOZ5HzUzzTQb`) was last edited on 2021-01-04, and its newest print date is 2017-02-21. | The County publishes current permits. |
 
 ## Held
 

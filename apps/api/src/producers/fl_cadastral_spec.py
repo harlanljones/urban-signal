@@ -14,8 +14,9 @@ within 1–3 years of the assessment year is the defensible building-completion
 signal. County code (``CO_NO``) maps to metro via the FIPS crosswalk in
 ``src.spatial.geography_crosswalk`` (``city_for_county_fips``).
 
-Metros this supplies: Ocala, Orlando, Lakeland, Melbourne/Palm Bay, Port St.
-Lucie, Gainesville, Cape Coral, Tallahassee/Leon.
+No metro registers it (2026-10-02): Ocala and Orlando did, as permits, with
+county codes that read Jackson and Levy counties, and a parcel roll is not a
+permit stream. Orlando now reads the City's own permits.
 
 The spec is a per-county slice function (``fl_cadastral_spec(cono)``), following
 the TABC/childcare pattern so the spine can register each metro with its own
@@ -35,7 +36,7 @@ FL_CADASTRAL_ENDPOINT = (
 def fl_cadastral_spec(cono: int) -> dict:
     """FL Statewide Cadastral slice for one county (CO_NO = FDOR county code).
 
-    ``cono`` is the 2-digit FL DOR county code (01–67).  The spine resolves
+    ``cono`` is the 2-digit FL DOR county code (11–77).  The spine resolves
     county → FIPS via ``FL_COUNTY_CODE_TO_FIPS`` in the field map module, then
     → metro via ``geography_crosswalk.city_for_county_fips``.
     """
@@ -49,7 +50,8 @@ def fl_cadastral_spec(cono: int) -> dict:
         "producer_key": "permits",
         "expected_cadence_days": 365,
         "ingestion_mode": "snapshot",
-        "where": f"ASMNT_YR = 2025 AND CO_NO = {cono}",
+        # The layer holds only the current roll, so the slice names no year.
+        "where": f"CO_NO = {cono}",
         "oid_field": "OBJECTID",
         "max_record_count": 2000,
         "needs_geocode": False,

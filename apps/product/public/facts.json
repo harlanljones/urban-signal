@@ -2912,18 +2912,13 @@
       "division_count": 5,
       "submarket_count": 8,
       "feeds": [
-        true,
+        false,
         false,
         true,
         false
       ],
       "platforms": [
-        {
-          "platform": "arcgis",
-          "watermark_col": "ISSUEDATE",
-          "interval_seconds": 300.0,
-          "topic": "raw.municipal.permits"
-        },
+        null,
         null,
         {
           "platform": "arcgis",
@@ -3747,18 +3742,13 @@
       "division_count": 1,
       "submarket_count": 5,
       "feeds": [
-        true,
+        false,
         false,
         true,
         false
       ],
       "platforms": [
-        {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 86400.0,
-          "topic": "raw.municipal.permits"
-        },
+        null,
         null,
         {
           "platform": "arcgis",
@@ -3854,9 +3844,9 @@
       ],
       "platforms": [
         {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 86400.0,
+          "platform": "socrata",
+          "watermark_col": "issue_permit_date",
+          "interval_seconds": 3600.0,
           "topic": "raw.municipal.permits"
         },
         null,

@@ -1757,3 +1757,21 @@ Worth keeping:
   coordinates and without the names.
 - **Size a sales window's cap on the busiest season.** Lee County's 90-day
   window held 6,765 sales on 2026-10-02 and 11,253 from March to May.
+
+### 2026-10-02 — Wrong-place permits: Orlando repaired, Ocala and Macon-Bibb retracted (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| wrong-place-permits | `.streams/wrong-place-permits.md` | `config.py` (Orlando's permits and address points; Macon-Bibb's permits setting removed) | 2026-10-02 | done (Orlando: 3,000 read, 2,912 published, 2,860 of them on the City's address points, 88 dead-lettered; the second poll published none; Ocala and Macon-Bibb permits retracted) | Orlando `permits` from the City's permit applications with an address-point join; Socrata `$select`; county codes 11–77; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Ocala and Macon-Bibb drop from two signal families to one (two-family tier
+58 to 56, one-family tier 34 to 36).
+
+Worth keeping:
+
+- **Check where a layer's rows lie before registering it.** Macon-Bibb's
+  layer was another country's, and Ocala's and Orlando's county codes were
+  other counties'; a count inside the metro box would have caught all three.
+- **A city's own address points can place what the geocoder cannot.** The
+  Census geocoder missed whole new subdivisions in Orlando; the City's
+  address layer placed 95% of permits by exact address.
