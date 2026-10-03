@@ -390,57 +390,6 @@ divisions:
     - Amazon
     city_id: eugene
 datasets:
-  '311':
-    endpoint: https://services3.arcgis.com/F7NiRLGNbA2hh7gE/arcgis/rest/services/2020_2021CampingWorkOrders/FeatureServer/0
-    platform: arcgis
-    watermark_col: CreatedOn
-    id_keys:
-    - FID
-    - GlobalID
-    topic: raw.municipal.311
-    interval_seconds: 300.0
-    producer_key: '311'
-    endpoint_by_year: {}
-    watermark_type: null
-    watermark_format: null
-    watermark_exclude: []
-    order_by: CreatedOn DESC
-    id_col: null
-    select: null
-    fallback_endpoints: []
-    where: null
-    needs_geocode: false
-    geocode_context: null
-    field_map:
-      incident_id:
-      - FID
-      - GlobalID
-      complaint_type:
-      - Title
-      created_date:
-      - CreatedOn
-      status:
-      - StatusText
-    ingestion_mode: incremental
-    oid_field: FID
-    max_record_count: 2000
-    expected_cadence_days: 1
-    alarm_exempt: false
-    alarm_exempt_reason: null
-    annual_rotation: false
-    companion_endpoints: {}
-    proxy_for: null
-    retention_days: null
-    rolling_window_days: null
-    rollover: null
-    state_plane_crs: null
-    state_plane_units: null
-    state_plane_x_col: null
-    state_plane_y_col: null
-    parcel_join: {}
-    non_spatial: null
-    zip_member: null
-    delimiter: null
   sla:
     endpoint: https://services3.arcgis.com/F7NiRLGNbA2hh7gE/arcgis/rest/services/Food_Service_Establishments_Updated_VIEW_CBE/FeatureServer/0
     platform: arcgis
@@ -498,55 +447,6 @@ datasets:
     non_spatial: null
     zip_member: null
     batch_limit: 2000
-    delimiter: null
-  deeds:
-    endpoint: https://services3.arcgis.com/F7NiRLGNbA2hh7gE/arcgis/rest/services/CityLandDeeds/FeatureServer/0
-    platform: arcgis
-    watermark_col: DATE_
-    id_keys:
-    - CITYDEED
-    - OBJECTID_1
-    topic: raw.municipal.deeds
-    interval_seconds: 600.0
-    producer_key: deeds
-    endpoint_by_year: {}
-    watermark_type: null
-    watermark_format: null
-    watermark_exclude: []
-    order_by: DATE_ DESC
-    id_col: null
-    select: null
-    fallback_endpoints: []
-    where: null
-    needs_geocode: false
-    geocode_context: null
-    field_map:
-      doc_id:
-      - CITYDEED
-      - OBJECTID_1
-      recorded_date:
-      - DATE_
-      doc_type:
-      - ACQDIS
-    ingestion_mode: incremental
-    oid_field: OBJECTID_1
-    max_record_count: 2000
-    expected_cadence_days: 3
-    alarm_exempt: false
-    alarm_exempt_reason: null
-    annual_rotation: false
-    companion_endpoints: {}
-    proxy_for: null
-    retention_days: null
-    rolling_window_days: null
-    rollover: null
-    state_plane_crs: null
-    state_plane_units: null
-    state_plane_x_col: null
-    state_plane_y_col: null
-    parcel_join: {}
-    non_spatial: null
-    zip_member: null
     delimiter: null
 aliases:
 - eugene_or

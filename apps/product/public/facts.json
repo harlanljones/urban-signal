@@ -700,7 +700,7 @@
         true,
         true,
         true,
-        true
+        false
       ],
       "platforms": [
         {
@@ -721,12 +721,7 @@
           "interval_seconds": 600.0,
           "topic": "raw.municipal.sla"
         },
-        {
-          "platform": "ckan",
-          "watermark_col": "",
-          "interval_seconds": 1800.0,
-          "topic": "raw.municipal.deeds"
-        }
+        null
       ],
       "center": {
         "lat": 42.355,
@@ -1407,18 +1402,13 @@
       "division_count": 4,
       "submarket_count": 8,
       "feeds": [
-        true,
+        false,
         false,
         true,
         false
       ],
       "platforms": [
-        {
-          "platform": "arcgis",
-          "watermark_col": "Issued",
-          "interval_seconds": 300.0,
-          "topic": "raw.municipal.permits"
-        },
+        null,
         null,
         {
           "platform": "arcgis",
@@ -1743,30 +1733,20 @@
       "submarket_count": 15,
       "feeds": [
         false,
+        false,
         true,
-        true,
-        true
+        false
       ],
       "platforms": [
         null,
-        {
-          "platform": "arcgis",
-          "watermark_col": "CreatedOn",
-          "interval_seconds": 300.0,
-          "topic": "raw.municipal.311"
-        },
+        null,
         {
           "platform": "arcgis",
           "watermark_col": "",
           "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
-        {
-          "platform": "arcgis",
-          "watermark_col": "DATE_",
-          "interval_seconds": 600.0,
-          "topic": "raw.municipal.deeds"
-        }
+        null
       ],
       "center": {
         "lat": 44.051,
@@ -2735,8 +2715,8 @@
       "platforms": [
         {
           "platform": "arcgis",
-          "watermark_col": "Issued",
-          "interval_seconds": 300.0,
+          "watermark_col": "SD_APP_DD",
+          "interval_seconds": 21600.0,
           "topic": "raw.municipal.permits"
         },
         {
@@ -5056,9 +5036,9 @@
         },
         null,
         {
-          "platform": "socrata",
-          "watermark_col": "renewaldate",
-          "interval_seconds": 600.0,
+          "platform": "excel",
+          "watermark_col": "issue_date",
+          "interval_seconds": 21600.0,
           "topic": "raw.municipal.sla"
         },
         {

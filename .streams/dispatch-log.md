@@ -2069,3 +2069,21 @@ Worth keeping:
   string. Check that a second poll's filter can match a recent row.
 - **Read a "typed" alternative's distribution before switching to it.**
   `dobrundate` is typed and current, but a reload stamps nearly every row.
+
+### 2026-10-03 — Eight stopped feeds replaced or retired (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| replace-stopped-feeds | `.streams/replace-stopped-feeds.md` | `config.py` (settings move or go), `sla_licenses_producer.py` (Excel client, trimmed text) | 2026-10-03 | done (three feeds read live sources again: Montgomery and Lincoln permits, Spokane licences, each over two live polls; five retired with no current source: Tulsa crime, Columbus GA permits, Eugene 311 and deeds, Boston deeds) | new specs for the three; notes in seven city modules; regenerated facts |
+
+Worth keeping:
+
+- **Search the publisher's own servers before retiring a feed.** Montgomery's
+  and Lincoln's permits had live successors beside the stopped layers: the
+  City's own server for Montgomery, a sibling layer in the same MapServer
+  for Lincoln.
+- **Read what each column holds before reusing a field map.** On
+  Montgomery's new layer `Address` is an applicant's mailing address, not
+  the site, and Spokane's old licence spec took a person's name as each
+  premises' name.
+

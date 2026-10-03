@@ -16,6 +16,7 @@ exclusion. Close with interlock and focused contract evidence.
 ## Decisions
 
 - 2026-08-24 — Claimed HAR-23 after HAR-18 was confirmed completed and no open blocker remained.
+- 2026-10-03 — The deeds stand-in (the Property Assessment, registered by its CKAN package id, so every read failed) was retired. No current Boston sales source exists: Boston Assessing's FY26 sales file holds 2024 sales only, and MassGIS carries Boston's FY2023 roll (`.streams/replace-stopped-feeds.md`).
 
 ## Current step
 

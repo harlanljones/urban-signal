@@ -722,13 +722,6 @@ class Settings(BaseSettings):
         default="ckan://data.boston.gov/b973d8cb-eeb2-4e7e-99da-c92938efc9c0",
         description="Boston Crime Incident Reports CKAN resource",
     )
-    # US-209: Boston Property Assessment FY2026 (DEEDS proxy; snapshot). The registry
-    # wires this as a snapshot-mode DEEDS feed so the model has a price-bearing proxy
-    # where Boston lacks an open recorded-deeds endpoint.
-    ckan_boston_property_assessment_endpoint: str = Field(
-        default="ckan://data.boston.gov/e02c44d2-3c64-459c-8fe2-e1ce5f38a035",
-        description="Boston Property Assessment FY2026 CKAN resource (DEEDS proxy; snapshot)",
-    )
     # US-209: Boston Building & Property Violations (ISD code enforcement). Direct
     # lat/long columns; status_dttm watermark; case_no id. Resource id, not the
     # package id (705244a6-...) registered until 2026-09-30.
@@ -998,17 +991,6 @@ class Settings(BaseSettings):
         description="Franklin County (Columbus) Auditor deeds/sales FeatureServer layer URL",
     )
 
-    # Columbus, GA (ArcGIS): Building permit application locations — native
-    # point geometry (MapServer Feature Layer 0, Residential; see also 1=Commercial,
-    # 2=Pool/Sprinkler). Client requests outSR=4326 so coordinates parse to lat/lng.
-    arcgis_columbus_ga_permits_url: str = Field(
-        default=(
-            "https://ccggisprod.columbusga.org/server/rest/services/"
-            "BuildingPermits/MapServer/0"
-        ),
-        description="Columbus, GA building permits MapServer layer URL (Residential)",
-    )
-
     # Stark County (Canton, OH) Auditor Property Sales MapServer/0 (US-425):
     # live-verified 2026-09-02 — 300,909 records, WKID 3857 polygon geometry,
     # TRANSFER_DATE epoch-ms watermark. scgisa.starkcountyohio.gov on-prem
@@ -1045,15 +1027,16 @@ class Settings(BaseSettings):
         description="Huntsville, AL building permits MapServer layer URL (US-424)",
     )
 
-    # Montgomery, AL (AGOL hosted FeatureServer, services7 org xNUwUjOJqYE54USz):
-    # Construction Permits (All_Permit_viewlayer, IssuedDate date watermark,
-    # PermitNo string id) and 311 Service Requests (on-prem
-    # gis.montgomeryal.gov HostedDatasets Received_311_Service_Request layer,
-    # Create_Date date watermark, Request_ID integer id). US-424 registration.
+    # Montgomery, AL (the City's ArcGIS Server, gis.montgomeryal.gov
+    # HostedDatasets): Construction Permits (loaded weekly, IssuedDate
+    # date-only watermark, PermitNo string id) and 311 Service Requests
+    # (Received_311_Service_Request layer, Create_Date date watermark,
+    # Request_ID integer id). US-424 registration; the permits layer replaced
+    # the ArcGIS Online All_Permit_viewlayer, which stopped in 2024.
     arcgis_montgomery_al_permits_url: str = Field(
         default=(
-            "https://services7.arcgis.com/xNUwUjOJqYE54USz/arcgis/rest/services/"
-            "All_Permit_viewlayer/FeatureServer/0"
+            "https://gis.montgomeryal.gov/server/rest/services/"
+            "HostedDatasets/Construction_Permits/FeatureServer/0"
         ),
         description="Montgomery, AL construction permits FeatureServer layer URL (US-424)",
     )
@@ -1453,7 +1436,8 @@ class Settings(BaseSettings):
     )
 
     # Spokane / Spokane County, WA (US-160): annual county sales layers,
-    # ArcGIS-hosted XLS permits, and Washington LCB renewal snapshots.
+    # ArcGIS-hosted XLS permits, and the Washington LCB's weekly list of
+    # on-premise liquor licences.
     arcgis_spokane_deeds_url: str = Field(
         default="https://gismo.spokanecounty.org/arcgis/rest/services/OpenData/Property/MapServer/20",
         description="Spokane County 2026 parcel sales MapServer layer URL",
@@ -1462,9 +1446,9 @@ class Settings(BaseSettings):
         default="https://www.arcgis.com/sharing/rest/content/items/3fcb39ac614d41af9fd22b87af8ff245/data",
         description="Spokane County Building and Planning permits XLS download URL",
     )
-    socrata_wa_liquor_renewal_endpoint: str = Field(
-        default="https://data.wa.gov/resource/9dee-kzm5.json",
-        description="Washington LCB liquor renewal Socrata endpoint",
+    excel_wa_lcb_licensee_lists_url: str = Field(
+        default="https://lcb.wa.gov/records/frequently-requested-lists",
+        description="Washington LCB licensee lists page (links the weekly On-Premise workbook)",
     )
     socrata_wa_cannabis_renewal_endpoint: str = Field(
         default="https://data.wa.gov/resource/brpd-b6zd.json",
@@ -1955,10 +1939,6 @@ class Settings(BaseSettings):
         default="ckan://data.milwaukee.gov/bf2b508a-5bfa-49da-8846-d87ffeee020a",
         description="Milwaukee Call Center 311 CKAN resource",
     )
-    arcgis_tulsa_crime_url: str = Field(
-        default="https://services5.arcgis.com/cuQhNeNcUrgLmYGD/arcgis/rest/services/Tulsa_Crime_Time_Display/FeatureServer/0",
-        description="Tulsa crime ArcGIS FeatureServer",
-    )
     # Augusta, GA (US-287): CityView permits table (non-spatial; address-only).
     # Registered as PERMITS with ADR-0004 geocoding; 311 requires an API key and
     # is not registered. SLA uses SNAP GA slice.
@@ -2288,17 +2268,9 @@ class Settings(BaseSettings):
         default="https://services7.arcgis.com/p0Gk2nDbPs7KEqSZ/arcgis/rest/services/CRM_Report_A_Problem_New_Public/FeatureServer/0",
         description="Santa Fe CRM report-a-problem ArcGIS FeatureServer URL (311)",
     )
-    arcgis_eugene_311_url: str = Field(
-        default="https://services3.arcgis.com/F7NiRLGNbA2hh7gE/arcgis/rest/services/2020_2021CampingWorkOrders/FeatureServer/0",
-        description="Eugene camping work orders ArcGIS FeatureServer URL (311)",
-    )
     arcgis_eugene_sla_url: str = Field(
         default="https://services3.arcgis.com/F7NiRLGNbA2hh7gE/arcgis/rest/services/Food_Service_Establishments_Updated_VIEW_CBE/FeatureServer/0",
         description="Eugene food-service establishments ArcGIS FeatureServer URL (SLA)",
-    )
-    arcgis_eugene_deeds_url: str = Field(
-        default="https://services3.arcgis.com/F7NiRLGNbA2hh7gE/arcgis/rest/services/CityLandDeeds/FeatureServer/0",
-        description="Eugene city land deeds ArcGIS FeatureServer URL",
     )
     arcgis_glendale_az_311_url: str = Field(
         default="https://gismaps.glendaleaz.com/gisserver/rest/services/OpenData/GLENDALEONE_EXTERNAL_REQUESTS_PTS/MapServer/0",
@@ -2384,12 +2356,12 @@ class Settings(BaseSettings):
         description="Sioux Falls building permits ArcGIS MapServer URL",
     )
     arcgis_lincoln_permits_endpoint: str = Field(
-        default="https://gis.lincoln.ne.gov/public/rest/services/Planning/Residential_New_Construction_Permits/MapServer/4",
-        description="Lincoln residential new-construction permits ArcGIS MapServer URL (layer 4, previous 3 years)",
+        default="https://gis.lincoln.ne.gov/public/rest/services/Planning/Residential_New_Construction_Permits/MapServer/6",
+        description="Lincoln residential new-construction permits ArcGIS MapServer URL (layer 6, recent years)",
     )
     arcgis_lincoln_residential_permits_endpoint: str = Field(
-        default="https://gis.lincoln.ne.gov/public/rest/services/Planning/Residential_New_Construction_Permits/MapServer/4",
-        description="Lincoln residential new-construction permits ArcGIS MapServer URL (alias, layer 4)",
+        default="https://gis.lincoln.ne.gov/public/rest/services/Planning/Residential_New_Construction_Permits/MapServer/6",
+        description="Lincoln residential new-construction permits ArcGIS MapServer URL (alias, layer 6)",
     )
     arcgis_topeka_permits_endpoint: str = Field(
         default="https://maps.topeka.gov/arcgis/rest/services/CityworksViews/BuildingPermits/MapServer/0",

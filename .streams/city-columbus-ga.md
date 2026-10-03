@@ -21,6 +21,7 @@ Onboard Columbus, GA as a new Urban Signal metro (`CityId.columbus_ga`) with ver
 
 - 2026-08-28 — Public permits feed verified at `ccggisprod.columbusga.org` MapServer layer 0 (“Residential”) with `Issued` date, `OBJECTID` OID, native point geometry (WKID 2240; client outSR=4326 path). Using layer 0 as primary; scheduler does not poll companion_endpoints today.
 - 2026-08-28 — SLA via SNAP state slice for GA (`snap_sla_spec("GA")`).
+- 2026-10-03 — Permits retired: every BuildingPermits layer holds nothing issued after 2022-04-15, and the City's `Energov` folder holds reference layers only, so permits appear to have moved to Tyler EnerGov, which publishes no rows. The SNAP licences stay (`.streams/replace-stopped-feeds.md`).
 - 2026-08-28 — Additive rebase onto origin/main. First onto ACS tip `26237f0` (stripped leftover `<<<<<<< HEAD` markers main carried). Then again onto `361d265` after PR #31 merged Gainesville — kept Gainesville from main, re-applied Columbus GA only. Ocala already on main is preserved. Did not start Melbourne/Ocala follow-on work.
 
 ## Current step

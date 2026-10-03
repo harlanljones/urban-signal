@@ -1,4 +1,14 @@
-"""Boston metro spatial registry and dashboard geometry."""
+"""Boston metro spatial registry and dashboard geometry.
+
+DEEDS (retired 2026-10-03): Boston publishes no recorded sales. The corpus
+registered the annual Property Assessment as a stand-in, but its id was the
+CKAN package's, not a resource's, so every read answered 404, and the FY2026
+resource carries owner and mailing columns with no sale date or price. The
+nearest sales sources are annual too: Boston Assessing's "FY26 Sales" layer
+holds sales from 2024 only, and MassGIS's standardized assessor parcels
+(``L3_ASSESS``) carry Boston's FY2023 roll, newest sale 2022-10-28. A deeds
+feed registers when either carries recent sales.
+"""
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 

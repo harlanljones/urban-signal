@@ -1,12 +1,13 @@
-"""Unit tests for the Montgomery, AL leaf (US-424): spatial geometry containment.
+"""Unit tests for the Montgomery, AL leaf (US-424): geometry and permits.
 
-Montgomery registers with live-verified ArcGIS Construction Permits
-(All_Permit_viewlayer, services7.arcgis.com/xNUwUjOJqYE54USz, 87.7k rows,
-IssuedDate date watermark) and the 311 Service Requests layer
-(Received_311_Service_Request, gis.montgomeryal.gov, 228.6k rows,
-Create_Date date watermark). This test focuses on the spatial registration
-contract: metro bbox sanity, division containment, and submarket placement
-inside their declared division bbox.
+Montgomery registers Construction Permits from the City's own server
+(HostedDatasets/Construction_Permits, gis.montgomeryal.gov, 47.5k rows
+loaded weekly, IssuedDate date watermark), which on 2026-10-03 replaced the
+ArcGIS Online All_Permit_viewlayer that stopped in 2024, and the 311 Service
+Requests layer (Received_311_Service_Request, gis.montgomeryal.gov, 228.6k
+rows, Create_Date date watermark). The spatial tests cover metro bbox
+sanity, division containment, and submarket placement inside their declared
+division bbox.
 """
 
 from src.spatial.cities.montgomery_al import (
@@ -18,6 +19,7 @@ from src.spatial.cities.montgomery_al import (
     REGISTRATION,
     is_in_montgomery_al_metro,
 )
+from src.spatial.city_registry import CityId, FeedType, get_dataset
 
 
 class TestMontgomeryALSpatial:
@@ -51,3 +53,27 @@ class TestMontgomeryALSpatial:
         assert REGISTRATION.submarkets is MONTGOMERY_AL_SUBMARKETS
         assert 4 <= len(MONTGOMERY_AL_DIVISIONS) <= 8
         assert 6 <= len(MONTGOMERY_AL_SUBMARKETS) <= 10
+
+
+class TestMontgomeryALPermitsSpec:
+    def test_permits_read_the_city_server_layer_newest_first(self):
+        spec = get_dataset(CityId.MONTGOMERY_AL, FeedType.PERMITS)
+        assert spec.endpoint == (
+            "https://gis.montgomeryal.gov/server/rest/services/HostedDatasets/Construction_Permits/FeatureServer/0"
+        )
+        assert spec.watermark_col == "IssuedDate"
+        assert spec.order_by == "IssuedDate DESC, OBJECTID DESC"
+        # Two rows carry no PermitNo; they key on their OBJECTID.
+        assert spec.id_keys == ["PermitNo", "OBJECTID"]
+        assert spec.field_map["job_id"] == ["PermitNo", "OBJECTID"]
+        # About one row in six sits at 0,0, outside the box.
+        assert spec.metro_clip is True
+
+    def test_permits_never_read_owner_contractor_or_mailing_columns(self):
+        spec = get_dataset(CityId.MONTGOMERY_AL, FeedType.PERMITS)
+        selected = set(spec.select.split(","))
+        mapped = {column for columns in spec.field_map.values() for column in columns}
+        assert mapped <= selected
+        # ``Address`` is an applicant-style mailing address, not the site.
+        assert not selected & {"OwnerName", "OwnerAddress", "ContractorName", "Address"}
+        assert spec.field_map["address_street"] == ["PhysicalAddress"]

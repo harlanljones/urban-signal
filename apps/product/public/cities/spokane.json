@@ -91,9 +91,9 @@
     },
     "311": null,
     "sla": {
-      "platform": "socrata",
-      "watermark_col": "renewaldate",
-      "interval_seconds": 600.0,
+      "platform": "excel",
+      "watermark_col": "issue_date",
+      "interval_seconds": 21600.0,
       "topic": "raw.municipal.sla"
     },
     "deeds": {

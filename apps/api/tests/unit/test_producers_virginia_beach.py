@@ -587,7 +587,7 @@ class TestVirginiaBeachSlaParsing:
         assert event.city_id == "virginia_beach"
         assert event.license_id == "BEACON HEADLIGHT RESTORATION LLC"
         assert event.dba == "BEACON HEADLIGHT RESTORATION LLC"
-        assert event.premises_name == " BEACON HEADLIGHT RESTORATION LLC"
+        assert event.premises_name == "BEACON HEADLIGHT RESTORATION LLC"
         assert event.license_type == "Automobile Detailer"
         assert event.address == "749 WATERS DR"
         assert event.latitude == pytest.approx(SLA_GEOCODE_TOWN_CENTER[0])

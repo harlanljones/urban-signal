@@ -12,6 +12,7 @@ from src.producers.arcgis_client import ArcGISClient
 from src.producers.accela_client import AccelaClient
 from src.producers.carto_client import CartoClient
 from src.producers.csv_client import CSVClient
+from src.producers.excel_client import ExcelClient
 from src.producers.socrata_client import SocrataClient
 from src.producers.ckan_client import CkanClient
 from src.schemas.models import SLALicenseEvent
@@ -75,6 +76,13 @@ def _parse_datetime(val: Any) -> Optional[datetime]:
     return None
 
 
+def _trimmed(value: Any) -> Any:
+    """A text value without surrounding spaces, such as a fixed-width
+    export's padding (the Washington LCB's licensee workbooks pad trade
+    names, addresses, cities and privileges); any other value as given."""
+    return value.strip() if isinstance(value, str) else value
+
+
 class SLALicensesProducer:
     """Ingests NY SLA, Chicago, and San Francisco business/hospitality license filings and streams to Kafka."""
 
@@ -98,6 +106,7 @@ class SLALicensesProducer:
         self.ckan = CkanClient()
         self.carto = CartoClient()
         self.csv = CSVClient()
+        self.excel = ExcelClient()
         self.spatial_indexer = H3SpatialIndexer()
 
     def _client_for(self, platform: str):
@@ -113,6 +122,7 @@ class SLALicensesProducer:
             "carto": getattr(self, "carto", None),
             "ckan": getattr(self, "ckan", None),
             "csv": getattr(self, "csv", None),
+            "excel": getattr(self, "excel", None),
         }
         client = clients.get(platform)
         if client is None:
@@ -382,24 +392,24 @@ class SLALicensesProducer:
                 or row.get("supervisor_district")
                 or row.get("borough")
             )
-            source_neighborhood = str(borough_val) if borough_val is not None else None
+            source_neighborhood = (str(borough_val).strip() or None) if borough_val is not None else None
             from src.spatial.geo_utils import get_division_for_coordinate
             resolved_borough = get_division_for_coordinate(lat, lng, city_id=resolved_city) or source_neighborhood
 
             return SLALicenseEvent(
                 city_id=resolved_city,
                 license_id=license_id,
-                license_type=license_type,
-                premises_name=premises_name,
-                dba=dba,
-                address=address,
+                license_type=_trimmed(license_type),
+                premises_name=_trimmed(premises_name) or None,
+                dba=_trimmed(dba) or None,
+                address=_trimmed(address) or None,
                 borough=resolved_borough,
                 source_neighborhood=source_neighborhood,
                 latitude=lat,
                 longitude=lng,
                 effective_date=effective_dt,
                 expiration_date=expiration_dt,
-                license_status=status,
+                license_status=_trimmed(status),
                 h3_res7=h3_res["h3_res7"],
                 h3_res8=h3_res["h3_res8"],
                 h3_res9=h3_res["h3_res9"],

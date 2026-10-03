@@ -541,7 +541,7 @@ class TestLongBeachSlaParsing:
         assert event.premises_name == "Martin Logistics"
         assert event.license_type == "Business Office"
         assert event.license_status == "Active"
-        assert event.address == "2710 OREGON AVE "
+        assert event.address == "2710 OREGON AVE"
         assert event.effective_date is not None
         assert event.effective_date.isoformat() == SLA_ISSDTTM_ISO_343
         assert event.expiration_date is None
@@ -567,7 +567,7 @@ class TestLongBeachSlaParsing:
         assert event is not None
         assert event.license_id == "BU21700669"
         assert event.license_type == "Contracting – Building"
-        assert event.address == "228 EUCLID AVE "
+        assert event.address == "228 EUCLID AVE"
         assert event.latitude == pytest.approx(33.76487479004518)
         assert event.longitude == pytest.approx(-118.14885015726114)
         assert event.h3_res7 is not None

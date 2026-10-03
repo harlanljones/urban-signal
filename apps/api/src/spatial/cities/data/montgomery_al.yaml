@@ -205,7 +205,7 @@ divisions:
     city_id: montgomery_al
 datasets:
   permits:
-    endpoint: https://services7.arcgis.com/xNUwUjOJqYE54USz/arcgis/rest/services/All_Permit_viewlayer/FeatureServer/0
+    endpoint: https://gis.montgomeryal.gov/server/rest/services/HostedDatasets/Construction_Permits/FeatureServer/0
     platform: arcgis
     watermark_col: IssuedDate
     id_keys:
@@ -218,9 +218,9 @@ datasets:
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: IssuedDate DESC, OBJECTID DESC
     id_col: null
-    select: null
+    select: OBJECTID,PermitNo,IssuedDate,PermitStatus,PermitCode,ProjectType,EstimatedCost,DistrictCouncil,ParcelNo,PhysicalAddress
     fallback_endpoints: []
     where: null
     needs_geocode: false
@@ -228,10 +228,10 @@ datasets:
     field_map:
       job_id:
       - PermitNo
+      - OBJECTID
       issuance_date:
       - IssuedDate
       address_street:
-      - Address
       - PhysicalAddress
       job_type:
       - ProjectType
@@ -241,15 +241,14 @@ datasets:
       status:
       - PermitStatus
       borough:
-      - Council_District
-      owner_name:
-      - OwnerName
-      contractor_name:
-      - ContractorName
+      - DistrictCouncil
+      bbl:
+      - ParcelNo
     ingestion_mode: incremental
     oid_field: OBJECTID
     max_record_count: 2000
     expected_cadence_days: 7
+    metro_clip: true
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false

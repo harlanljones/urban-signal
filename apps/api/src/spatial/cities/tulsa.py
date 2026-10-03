@@ -22,6 +22,14 @@ The 311 DatasetSpec payload below is the exact data the spine ``city_registry.py
 copies into REGISTRY under ``CityId.TULSA``; it is declared here so the spine
 edit is a pure copy. ``extra["field_map"]`` wires the per-city spellings from
 ``field_maps_tulsa.FIELD_MAP``.
+
+CRIME (2026-10-03): the corpus registered ``Tulsa_Crime_Time_Display``
+(services5.arcgis.com/cuQhNeNcUrgLmYGD), an ArcGIS Online copy outside the
+City's own org whose newest incident is from 2019-01-24, so it is retired.
+No public row-level crime layer replaces it: the City's ArcGIS Server
+(maps.cityoftulsa.org) asks for a token on its ``Police`` and ``OpenData``
+folders, and the City's ArcGIS Online org and Hubs hold only police beat and
+division polygons.
 """
 
 from typing import Any, Dict

@@ -1,5 +1,7 @@
 """Contract tests for Spokane County DEEDS, permits, and WA LCB SLA feeds."""
 
+import re
+from datetime import date
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
@@ -20,6 +22,7 @@ from src.spatial.city_registry import (
     get_dataset,
     normalize_city,
 )
+from src.spatial.geocoder import GeoPoint
 
 SPOKANE_PERMITS_FIELD_MAP = {
     "job_id": ["permit_number"],
@@ -68,9 +71,51 @@ def test_spokane_registers_deeds_permits_and_sla():
     assert permits.field_map == SPOKANE_PERMITS_FIELD_MAP
 
     sla = get_dataset(city, FeedType.SLA)
-    assert sla.platform == "socrata"
-    assert sla.watermark_col == "renewaldate"
-    assert sla.where == "city = 'SPOKANE'"
+    assert sla.platform == "excel"
+    assert sla.endpoint == "https://lcb.wa.gov/records/frequently-requested-lists"
+    assert sla.watermark_col == "issue_date"
+    assert (sla.watermark_type, sla.watermark_format) == ("text", "%Y%m%d")
+    assert sla.where == "loc_city = 'SPOKANE'"
+    assert sla.needs_geocode is True
+    assert sla.composite_id is True
+
+
+def test_spokane_licences_read_only_premises_columns():
+    sla = get_dataset(CityId.SPOKANE, FeedType.SLA)
+    selected = set(sla.select.split(","))
+    # The workbook's phone, mailing and licensee columns are never read.
+    assert selected == {
+        "tradename",
+        "license_number",
+        "loc_address",
+        "loc_city",
+        "issue_date",
+        "expire_date",
+        "privilege",
+        "status",
+    }
+    assert {column for columns in sla.field_map.values() for column in columns} <= selected
+
+
+LCB_LISTS_PAGE = """
+<a href="https://lcb.wa.gov/sites/default/files/2026-09/Off%20Premise09292026.xlsx">Off Premise</a>
+<a href="https://lcb.wa.gov/sites/default/files/2026-09/On%20Premise09222026.xlsx">On Premise</a>
+<a href="https://lcb.wa.gov/sites/default/files/2026-09/On%20Premise09292026.xlsx">On Premise</a>
+<a href="/sites/default/files/2026-08/On%20Premise08252026.xlsx">On Premise</a>
+<a href="https://lcb.wa.gov/sites/default/files/2026-09/Liquor%20Violations%2009152026.xlsx">Violations</a>
+"""
+
+
+def test_spokane_licences_read_the_newest_on_premise_workbook():
+    sla = get_dataset(CityId.SPOKANE, FeedType.SLA)
+    page = MagicMock(text=LCB_LISTS_PAGE)
+    page.raise_for_status.return_value = None
+    http = MagicMock()
+    http.get.return_value = page
+    assert ExcelClient(http).resolve_link(sla.endpoint, sla.link_pattern) == (
+        "https://lcb.wa.gov/sites/default/files/2026-09/On%20Premise09292026.xlsx"
+    )
+    assert not re.search(sla.link_pattern, "https://lcb.wa.gov/sites/default/files/2026-09/Off%20Premise09292026.xlsx")
 
 
 def test_excel_client_normalizes_headers_filters_and_batches():
@@ -164,27 +209,34 @@ def test_spokane_xls_permit_row_uses_declared_geocoder(producers):
     assert event.longitude == pytest.approx(-117.419)
 
 
-def test_spokane_lcb_row_parses_native_point(producers):
+def test_spokane_lcb_workbook_row_geocodes_its_premises(producers):
     _, _, sla = producers
-    event = sla.parse_socrata_row(
-        {
-            "license": "426885",
-            "l_a_type": "Liquor Renewal",
-            "tradename": "LOCUST CIDER",
-            "designatedsignee": "CITY OF SPOKANE",
-            "streetaddress": "421 W MAIN AVE",
-            "cityname": "SPOKANE",
-            "renewaldate": "20260630",
-            "location": {"latitude": "47.65905", "longitude": "-117.419"},
-        },
-        city_id="spokane",
-    )
+    geocoder = MagicMock()
+    geocoder.geocode.return_value = GeoPoint(47.65905, -117.419, 1.0, "census:tiger")
+    with patch("src.spatial.geocoder.get_geocoder", return_value=geocoder):
+        event = sla.parse_socrata_row(
+            {
+                # The workbook pads its text columns to a fixed width.
+                "tradename": "EXAMPLE TAPHOUSE                    ",
+                "license_number": "400001",
+                "loc_address": "421 W MAIN AVE                      ",
+                "loc_city": "SPOKANE             ",
+                "issue_date": "20260526",
+                "expire_date": "20270331",
+                "privilege": "BEER/WINE REST - BEER/WINE         ",
+                "status": "ACTIVE (ISSUED)",
+            },
+            city_id="spokane",
+        )
+    geocoder.geocode.assert_called_once_with("421 W MAIN AVE, Spokane, WA")
     assert event is not None
-    assert event.license_id == "426885"
-    assert event.dba == "LOCUST CIDER"
-    assert event.license_type == "Liquor Renewal"
+    assert event.license_id == "400001"
+    assert event.premises_name == event.dba == "EXAMPLE TAPHOUSE"
+    assert event.license_type == "BEER/WINE REST - BEER/WINE"
+    assert event.license_status == "ACTIVE (ISSUED)"
     assert event.address == "421 W MAIN AVE"
-    assert event.expiration_date is not None
-    assert event.expiration_date.year == 2026
+    assert event.source_neighborhood == "SPOKANE"
+    assert event.effective_date.date() == date(2026, 5, 26)
+    assert event.expiration_date.date() == date(2027, 3, 31)
     assert event.latitude == pytest.approx(47.65905)
     assert event.longitude == pytest.approx(-117.419)

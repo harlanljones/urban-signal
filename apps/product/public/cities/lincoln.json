@@ -220,8 +220,8 @@
   "feeds": {
     "permits": {
       "platform": "arcgis",
-      "watermark_col": "Issued",
-      "interval_seconds": 300.0,
+      "watermark_col": "SD_APP_DD",
+      "interval_seconds": 21600.0,
       "topic": "raw.municipal.permits"
     },
     "311": {
