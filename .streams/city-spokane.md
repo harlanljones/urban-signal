@@ -7,3 +7,4 @@
 - **Intent:** Register Spokane County DEEDS, GISspokane building/planning permits, and Washington LCB Spokane renewals; leave 311 unregistered.
 - **Claim decision:** Claimed US-160 after re-reading the open, unassigned issue, its latest audit, and native relations. The issue has no relations.
 - **Current step:** Complete.
+- **Licences moved (2026-10-03):** the data.wa.gov renewal set (`9dee-kzm5`) was last updated 2026-04-04 and its spec took the designated signee, a person, as each premises' name. The feed now reads the LCB's weekly On-Premise workbook, City of Spokane rows only, geocoding each premises address (`.streams/replace-stopped-feeds.md`).

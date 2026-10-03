@@ -634,7 +634,7 @@ class TestLasCrucesSLAParsing:
         assert event.premises_name == "Sunny Acres RV Park, LLC"
         assert event.license_type == "COMMERCIAL BUSINESS"
         assert event.license_status == "Renewed"
-        assert event.address == "595 N VALLEY DR, #73, LAS CRUCES, NM "
+        assert event.address == "595 N VALLEY DR, #73, LAS CRUCES, NM"
         assert event.effective_date is not None
 
     def test_dulceria_fixture_parses_and_lands_in_metro(self, sla_producer, monkeypatch):

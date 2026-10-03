@@ -1,4 +1,19 @@
-"""Spokane / Spokane County spatial registry and geometry."""
+"""Spokane / Spokane County spatial registry and geometry.
+
+SLA (2026-10-03): licences come from the Washington State Liquor and
+Cannabis Board's weekly list of on-premise liquor licences, a workbook its
+"Frequently requested lists" page links under a new dated name each week
+(``On Premise09292026.xlsx``). It replaced data.wa.gov's liquor renewal set
+(``9dee-kzm5``), last updated 2026-04-04, which also named a person, the
+designated signee, as each premises. The poll keeps the City of Spokane's
+rows (``Loc City``): 455 licences, 29 of them issued in the 30 days before
+2026-10-03. It reads only the trade name, licence number, premises address,
+city, issue and expiry dates, privilege and status, so the workbook's phone,
+mailing and licensee columns never leave the client. Rows carry no
+coordinates, and each premises address is geocoded in Spokane. Spokane
+Valley and the county's other towns are on the list under their own
+``Loc City`` and would need their own geocoding context.
+"""
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 

@@ -28,6 +28,7 @@ Live-probe Eugene, OR official open-data feeds (ArcGIS Hub at mapping.eugene-or.
 - 2026-08-28 — All three feeds have native geometry (point or polygon → centroid); no needs_geocode needed for primary coordinate source. Address columns available as fallback.
 - 2026-08-28 — Leaf files built: eugene.py (8 divisions, 15 submarkets, 3 feed specs), field_maps_eugene.py (311/SLA/deeds field maps), test_producers_eugene.py (45 tests).
 - 2026-08-28 — Deed DATE_ watermark: fixtures captured newest DATE_=1767571200000 = 2026-01-05T00:00:00+00:00 (the max row stat 1782864000000 = 2026-06-30 belongs to a later row; the top-3 DESC fixtures share 2026-01-05).
+- 2026-10-03 — 311 and deeds retired. The camping work orders hold nothing after 2021-03-12, and no live resident-request layer exists on the City's servers. CityLandDeeds records only the City's own land (five in the past year); Lane County's sales layer holds nothing after 2024-12-06. Eugene keeps its licence feed (`.streams/replace-stopped-feeds.md`).
 
 ## Outcome
 

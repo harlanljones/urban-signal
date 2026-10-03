@@ -52,9 +52,9 @@ def test_unregistered_new_feeds_raise_readable_get_dataset_error():
 def test_only_cleared_signal_feeds_are_registered():
     """Signal-survey feeds are registered only where a verified live feed
     exists. CRIME grew across the signal waves (the four launch metros plus
-    boise, boston, las_vegas, louisville, milwaukee, san_jose, tampa, tulsa,
+    boise, boston, las_vegas, louisville, milwaukee, san_jose, tampa,
     later west/southeast metros, and Richmond from Chesterfield County's
-    offenses). STREET_CUT stays Chicago/Louisville/
+    offenses; Tulsa's, a copy that stopped in 2019, was retired). STREET_CUT stays Chicago/Louisville/
     Tampa (geocodable CDOT/closure feeds); EVICTIONS stays NYC-only;
     STR remains unregistered (US-92 closed not-worth-it)."""
     registered_for = {
@@ -70,7 +70,6 @@ def test_only_cleared_signal_feeds_are_registered():
             CityId.MILWAUKEE,
             CityId.SAN_JOSE,
             CityId.TAMPA,
-            CityId.TULSA,
             CityId.BEND,
             CityId.BOZEMAN,
             CityId.INLAND_EMPIRE,

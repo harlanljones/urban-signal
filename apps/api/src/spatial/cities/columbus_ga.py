@@ -5,6 +5,14 @@ This module declares the metro bounding box, a small divisions catalog,
 and submarket presets used by the dashboard. Containment tests assert
 every division box nests inside the metro box and every submarket's
 lat/lng sits inside its division box.
+
+PERMITS (2026-10-03): the corpus read the Consolidated Government's
+``BuildingPermits`` MapServer (ccggisprod.columbusga.org), whose three layers
+and internal copy hold nothing issued after 2022-04-15, so the feed is
+retired and the metro keeps its SNAP licences. The server's ``Energov``
+folders hold reference layers only (address points, parcels, zoning); the
+permits appear to have moved to Tyler EnerGov in 2022, which the corpus has
+no client for.
 """
 
 from typing import Dict

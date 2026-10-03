@@ -292,26 +292,28 @@ divisions:
     city_id: lincoln
 datasets:
   permits:
-    endpoint: https://gis.lincoln.ne.gov/public/rest/services/Planning/Residential_New_Construction_Permits/MapServer/4
+    endpoint: https://gis.lincoln.ne.gov/public/rest/services/Planning/Residential_New_Construction_Permits/MapServer/6
     platform: arcgis
-    watermark_col: Issued
+    watermark_col: SD_APP_DD
     id_keys:
     - PermNo
     - OBJECTID_1
     topic: raw.municipal.permits
-    interval_seconds: 300.0
+    interval_seconds: 21600.0
     producer_key: permits
     expected_cadence_days: 1
     needs_geocode: false
     oid_field: OBJECTID_1
     max_record_count: 2000
-    order_by: Issued DESC
+    order_by: SD_APP_DD DESC, OBJECTID_1 DESC
+    select: OBJECTID_1,PermNo,SD_APP_DD,Issued,Applied,CurrStatus,PermType,UseType,Units,Valuation_D,FullAddress,ZIP,ParcelNo
     field_map:
       job_id:
       - PermNo
       - OBJECTID_1
       issuance_date:
       - Issued
+      - SD_APP_DD
       filing_date:
       - Applied
       status:
@@ -319,25 +321,27 @@ datasets:
       job_type:
       - PermType
       - UseType
-      description:
-      - DescWork
+      cost:
+      - Valuation_D
+      proposed_units:
+      - Units
       address_street:
       - FullAddress
-      - Address
-      city:
-      - CITY
       zipcode:
       - ZIP
+      bbl:
+      - ParcelNo
     endpoint_by_year: {}
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
     id_col: null
-    select: null
     fallback_endpoints: []
     where: null
     geocode_context: null
-    ingestion_mode: incremental
+    ingestion_mode: snapshot
+    batch_limit: 2000
+    metro_clip: true
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false

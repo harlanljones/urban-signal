@@ -337,7 +337,7 @@ class TestStocktonSLAParsing:
         assert event.license_id == "670013"
         assert event.license_status == "ACTIVE"
         assert event.license_type == "20"
-        assert event.dba == " "  # byte-verbatim blank trade name
+        assert event.dba is None  # the source's trade name is a single space
         assert event.premises_name == "PLATINUM GAS AND MARKET 3"
         assert event.address == "950 W 11TH ST"
         assert event.latitude == pytest.approx(37.927051788717606)

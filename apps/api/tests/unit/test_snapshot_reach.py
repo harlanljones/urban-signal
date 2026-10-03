@@ -184,6 +184,8 @@ WINDOW_RECENT_ROWS = {
     ("frederick", "deeds"): 270,
     ("glendale_az", "sla"): 518,
     ("henderson", "sla"): 579,
+    # City of Lincoln residential permits by SD_APP_DD, read 2026-10-03.
+    ("lincoln", "permits"): 275,
     ("miami_dade", "sla"): 2_128,
     ("montgomery", "deeds"): 2_042,
     ("oxnard_ventura", "sla"): 3_839,
@@ -194,12 +196,17 @@ WINDOW_RECENT_ROWS = {
     ("tucson", "sla"): 2,
 }
 
+# Windows that reach back past 90 days on purpose: their date can precede
+# the day a row lands in the source by more than 90 days.
+LONG_WINDOWS = {
+    ("lincoln", "permits"): (
+        "SD_APP_DD trails the issue date by up to about 16 months on 2% of rows, "
+        "so the window holds the newest 2,000 rows, back to August 2024"
+    ),
+}
+
 KNOWN_GAPS = {
     ("kansas_city", "sla"): "28,245 rows and no date to window on (only a text licence year)",
-    ("boston", "deeds"): (
-        "the id is the CKAN package, not a resource (404); the FY2026 resource has "
-        "no coordinates and none of the mapped column names"
-    ),
 }
 
 
@@ -249,7 +256,14 @@ def test_window_reads_newest_first_and_holds_ninety_days(key):
         # The window runs on the date the feed already tracks.
         assert spec.order_by.split()[0] == spec.watermark_col
     assert (spec.batch_limit or DEFAULT_CAP) >= 1.5 * recent
-    assert (spec.batch_limit is None) == (1.5 * recent <= DEFAULT_CAP)
+    if key in LONG_WINDOWS:
+        assert spec.batch_limit is not None, LONG_WINDOWS[key]
+    else:
+        assert (spec.batch_limit is None) == (1.5 * recent <= DEFAULT_CAP)
+
+
+def test_long_windows_are_windows():
+    assert set(LONG_WINDOWS) <= set(WINDOW_RECENT_ROWS)
 
 
 @pytest.mark.parametrize("key", sorted(WINDOW_RECENT_ROWS), ids=_key_id)

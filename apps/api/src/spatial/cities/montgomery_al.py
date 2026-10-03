@@ -2,9 +2,8 @@
 
 Leaf module: geometry only. Feed specs live in the corpus YAML beside this
 leaf (data/montgomery_al.yaml) and are re-bound to this REGISTRATION by the
-registry derivation (US-429). US-424 onboarded Construction Permits
-(All_Permit_viewlayer) and 311 Citizen Reports from the City of Montgomery's
-ArcGIS Hub (services7.arcgis.com/xNUwUjOJqYE54USz).
+registry derivation (US-429). US-424 onboarded Construction Permits and 311
+Citizen Reports from the City of Montgomery.
 
 Geographic basis: Montgomery is the state capital and seat of Montgomery
 County, on the Alabama River. Downtown sits around (32.3792, -86.3077).
@@ -15,6 +14,17 @@ southwest gateway).
 SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
 stands in for the licence register the metro lacks. The corpus builds it
 with the shared ``snap_sla_spec``.
+
+PERMITS (2026-10-03): the City's own ArcGIS Server layer
+(gis.montgomeryal.gov ``HostedDatasets/Construction_Permits``) replaced the
+ArcGIS Online ``All_Permit_viewlayer``, which holds nothing issued after
+2024-03-01. The City loads a week of issued permits at a time (22 loads
+since May, 5-9 days apart), each holding only issue dates after the previous
+load's, so the poll reads incrementally on the date-only ``IssuedDate``.
+``PermitNo`` is the id (two re-loaded batches repeat it; the rare row
+without one falls back to ``OBJECTID``). About one permit in six sits at 0,0,
+and ``metro_clip`` skips those. The layer also holds owner and contractor
+names and a mailing address; the spec selects none of them.
 """
 
 from src.spatial.registration import SpatialRegistration

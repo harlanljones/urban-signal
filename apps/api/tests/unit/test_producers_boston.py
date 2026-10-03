@@ -33,7 +33,6 @@ def test_boston_registers_ckan_feeds_and_no_sales_feed():
         FeedType.PERMITS,
         FeedType.COMPLAINTS_311,
         FeedType.SLA,
-        FeedType.DEEDS,
         FeedType.CRIME,
         FeedType.INSPECTIONS,
         FeedType.VIOLATIONS,
@@ -50,7 +49,9 @@ def test_boston_registers_ckan_feeds_and_no_sales_feed():
     assert sla.id_keys == ["license_num", "_id"]
     assert sla.state_plane_crs == "EPSG:2249"
     assert sla.state_plane_units == "US survey feet"
-    # Boston uses Property Assessment as a proxy DEEDS snapshot
+    # The Property Assessment stand-in for sales was retired on 2026-10-03
+    # (src/spatial/cities/boston.py).
+    assert FeedType.DEEDS not in REGISTRY[city].datasets
 
 
 def test_boston_resources_and_field_maps_are_pinned():

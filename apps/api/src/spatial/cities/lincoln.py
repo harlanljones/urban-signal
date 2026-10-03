@@ -1,13 +1,14 @@
 PERMITS_FIELD_MAP = {
     "job_id": ["PermNo", "OBJECTID_1"],
-    "issuance_date": ["Issued"],
+    "issuance_date": ["Issued", "SD_APP_DD"],
     "filing_date": ["Applied"],
     "status": ["CurrStatus"],
     "job_type": ["PermType", "UseType"],
-    "description": ["DescWork"],
-    "address_street": ["FullAddress", "Address"],
-    "city": ["CITY"],
+    "cost": ["Valuation_D"],
+    "proposed_units": ["Units"],
+    "address_street": ["FullAddress"],
     "zipcode": ["ZIP"],
+    "bbl": ["ParcelNo"],
 }
 
 FIELD_MAP = {
@@ -26,7 +27,7 @@ division catalog, and geographic bounding boxes for the City of Lincoln
 
 Lincoln's PERMITS come from the Lincoln Open Data portal
 (``gis.lincoln.ne.gov``). The authoritative layer is the
-``Residential_New_Construction_Permits`` MapServer layer 4 (Previous 3 Years)
+``Residential_New_Construction_Permits`` MapServer layer 6 (Recent Years)
 on the city's public ArcGIS server. The 2026-08-30 probe left 311, SLA and
 DEEDS at Tier 3: it found only a request form for 311, the SLA is
 supplemented by the Nebraska SOS corporate registry, and deeds are recorded
@@ -35,20 +36,28 @@ feed. The SLA, 311 and DEEDS notes below record what has registered since.
 
 Live-probe caveats that define this leaf (2026-08-30, US-426):
 
-* PERMITS is ``Residential_New_Construction_Permits/MapServer/4`` (Previous
-  3 Years - Residential Building Permits, 2,622 rows live). The layer is a
-  rolling 3-year window so the watermark min(date) slides forward, but
-  ``Issued`` (epoch ms) is a stable max-date watermark. The companion
-  ``Commercial_New_Construction_Permits/MapServer/4`` (674 rows) is NOT
+* PERMITS is ``Residential_New_Construction_Permits/MapServer/6`` (Recent
+  Years - Residential Building Permits: 5,494 rows dated 2021-01-04 to
+  2026-10-01 when read on 2026-10-03, new ones every business day). Layer 4
+  (Previous 3 Years), read until 2026-10-03, is a calendar-year bucket that
+  ended with 2025. The layer's date column ``SD_APP_DD`` matches ``Issued`` on
+  98% of rows; on the rest ``Issued`` is later, by up to about 16 months, so
+  those permits enter the layer carrying an old ``SD_APP_DD`` that an
+  incremental watermark would skip. The poll therefore re-reads the newest
+  2,000 rows (``SD_APP_DD DESC``, back to August 2024) as a snapshot and takes
+  ``Issued`` (space-padded ``MM/DD/YYYY`` text) as the issue date. The companion
+  ``Commercial_New_Construction_Permits/MapServer/5`` (1,233 rows) is NOT
   registered as a separate endpoint (ADR-0007); the residential layer is the
-  primary permit stream.
+  primary permit stream. About a third of the permits sit outside the metro
+  box (south or east of it, or in the county), and ``metro_clip`` skips them.
 * Native point geometry (``outSR=4326`` lifts to WGS84), so
   ``needs_geocode=False``. Store SR is WKID 102704 (NAD83 Nebraska State
   Plane). ``X``/``Y`` attribute columns exist but are State Plane feet and
   never mapped.
 * ``PermNo`` is the unique permit number; ``CurrStatus`` is the status;
   ``PermType`` / ``UseType`` split the work class; ``FullAddress`` is the
-  preferred street address.
+  preferred street address. The spec names its columns and leaves out the
+  free-text ``DescWork``.
 
 SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
 stands in for the licence register the metro lacks. The corpus builds it
@@ -404,30 +413,38 @@ LINCOLN_DIVISIONS: dict[str, BoroughMeta] = {
 # ---------------------------------------------------------------------------
 LINCOLN_PERMITS_ENDPOINT = (
     "https://gis.lincoln.ne.gov/public/rest/services/Planning/"
-    "Residential_New_Construction_Permits/MapServer/4"
+    "Residential_New_Construction_Permits/MapServer/6"
 )
 
 LINCOLN_FEED_SPECS: dict[str, dict[str, object]] = {
     "permits": {
         "endpoint": LINCOLN_PERMITS_ENDPOINT,
         "platform": "arcgis",
-        "watermark_col": "Issued",
+        "watermark_col": "SD_APP_DD",
         "id_keys": ["PermNo", "OBJECTID_1"],
         "topic_key": "topic_permits",
-        "interval_seconds": 300.0,
+        "interval_seconds": 21600.0,
         "producer_key": "permits",
         "extra": {
             "expected_cadence_days": 1,
             "needs_geocode": False,
             "oid_field": "OBJECTID_1",
             "max_record_count": 2000,
-            "order_by": "Issued DESC",
+            "order_by": "SD_APP_DD DESC, OBJECTID_1 DESC",
+            "select": (
+                "OBJECTID_1,PermNo,SD_APP_DD,Issued,Applied,CurrStatus,PermType,"
+                "UseType,Units,Valuation_D,FullAddress,ZIP,ParcelNo"
+            ),
+            "ingestion_mode": "snapshot",
+            "batch_limit": 2000,
+            "metro_clip": True,
             "scope": (
-                "Residential_New_Construction_Permits MapServer/4 (Previous 3"
-                " Years - Residential Building Permits, 2,622 rows; rolling"
-                " 3-year window; native point geometry; Issued watermark;"
-                " PermNo / CurrStatus / PermType+UseType / FullAddress;"
-                " companion Commercial layer 674 rows not registered)"
+                "Residential_New_Construction_Permits MapServer/6 (Recent Years"
+                " - Residential Building Permits, 5,494 rows since 2021; newest"
+                " 2,000 re-read as a snapshot because Issued can trail"
+                " SD_APP_DD by months; native point geometry; PermNo /"
+                " CurrStatus / PermType+UseType / FullAddress; companion"
+                " Commercial layer 5 not registered)"
             ),
             "field_map": PERMITS_FIELD_MAP,
         },

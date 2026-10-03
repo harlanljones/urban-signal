@@ -1,10 +1,3 @@
-COMPLAINTS_311_FIELD_MAP = {
-    "incident_id": ["FID", "GlobalID"],
-    "complaint_type": ["Title"],
-    "created_date": ["CreatedOn"],
-    "status": ["StatusText"],
-}
-
 SLA_FIELD_MAP = {
     "license_id": ["UID", "GlobalID"],
     "dba": ["Name"],
@@ -13,16 +6,8 @@ SLA_FIELD_MAP = {
     "status": ["Active"],
 }
 
-DEEDS_FIELD_MAP = {
-    "doc_id": ["CITYDEED", "OBJECTID_1"],
-    "recorded_date": ["DATE_"],
-    "doc_type": ["ACQDIS"],
-}
-
 FIELD_MAP = {
-    "311": COMPLAINTS_311_FIELD_MAP,
     "sla": SLA_FIELD_MAP,
-    "deeds": DEEDS_FIELD_MAP,
 }
 
 GEOCODE_CONTEXT = "Eugene, OR"
@@ -33,21 +18,28 @@ Provides neighborhood metadata, camera positioning, investment metrics,
 division catalog, and geographic bounding boxes for the City of Eugene
 (western Oregon, Lane County).
 
-Eugene is a THREE-FEED PARTIAL metro:
+Eugene is a ONE-FEED PARTIAL metro:
 
-* DEEDS — ``CityLandDeeds`` (FeatureServer/0 on
-  ``services3.arcgis.com/F7NiRLGNbA2hh7gE``, Tier 1). City-owned property
-  records (acquisitions/dispositions) with polygon geometry, DATE_ watermark
-  live to 2026-06-30. Lane County's own deed/sales records are web-portal-only
-  (LMD-PRO / citizenserviceportal) — not reachable as a bulk feed.
-* COMPLAINTS_311 — ``2020_2021CampingWorkOrders`` (FeatureServer/0 on the
-  same server, Tier 1). Code-enforcement/encampment service requests from the
-  city's PDD (Planning & Development) camping work-order archive (last
-  updated 2021). Companion: ``HistoricalCampingWorkOrders`` (25,171 rows).
-* SLA — ``Food_Service_Establishments_Updated_VIEW_CBE`` (FeatureServer/0,
-  Tier 1). Food service establishment business licenses maintained by the
-  city's Code & Business Enforcement division. Snapshot with no date column
-  (hasStaticData: True, empty watermark_col, snapshot mode).
+* SLA — ``Food_Service_Establishments_Updated_VIEW_CBE`` (FeatureServer/0 on
+  ``services3.arcgis.com/F7NiRLGNbA2hh7gE``, Tier 1). Food service
+  establishment business licenses maintained by the city's Code & Business
+  Enforcement division. Snapshot with no date column (hasStaticData: True,
+  empty watermark_col, snapshot mode).
+
+Retired 2026-10-03, since neither source was live and no replacement was
+found:
+
+* COMPLAINTS_311 read ``2020_2021CampingWorkOrders`` on the same server, the
+  City's camping work-order archive, whose newest request is from 2021-03-12.
+  The City takes requests through a CivicPlus form with no export, its other
+  request-like layers are frozen or hold callers' contact details, and Lane
+  County's request layer accepts submissions only. SeeClickFix lists a Eugene
+  place, which would need a client.
+* DEEDS read ``CityLandDeeds`` on the same server: the City's own land
+  acquisitions and dispositions (five in the year to 2026-10-03), not market
+  sales. Lane County A&T's ``AddressParcelSales`` layer 1, "Sales (last 3
+  years)" on lcmaps.lanecounty.org, is the market-sales source, but it holds
+  nothing recorded after 2024-12-06; it registers the day it moves.
 
 Permits are NOT registered: the city's PDD ebuild permit system
 (pdd.eugene-or.gov/ebuild) is an Accela-style web portal with no public bulk
@@ -62,14 +54,9 @@ Live-probe caveats (original probe 2026-08-28, stream west-eugene):
   and ``services3.arcgis.com/F7NiRLGNbA2hh7gE`` (ArcGIS Server).
 * Oregon State Plane North (WKID 2914) is the store SR for most layers;
   ``ArcGISClient`` requests ``outSR=4326`` for server-side WGS84 reprojection.
-  Verified working on all three feeds.
 * Food_Service_Establishments stores SR 102100 (Web Mercator); same outSR=4326
   lift works. DisplayX/DisplayY attributes are native decimal-degree lat/lng
   but geometry lift is the sole coordinate source (Bend discipline).
-* CityLandDeeds is polygon geometry → centroid via ``ArcGISClient._geometry_to_lng_lat``.
-  CampingWorkOrders is point geometry.
-* No future-date sentinels found on CityLandDeeds DATE_ (max 2026-06-30).
-  No ANSI-date-only hosts — all ArcGIS FeatureServers with esriFieldTypeDate.
 * No mixed-CRS traps beyond the standard state-plane lift.
 """
 
@@ -487,52 +474,15 @@ EUGENE_DIVISIONS: dict[str, BoroughMeta] = {
 
 # ---------------------------------------------------------------------------
 # Feed specs (leaf-local; the spine copies these into REGISTRY).
-# Probed 2026-08-28. Lane County deeds not reachable as a bulk feed (web
-# portal only). Permits unregistered (ebuild Accela portal, no API).
+# Probed 2026-08-28; 311 and deeds retired 2026-10-03 (module docstring).
+# Permits unregistered (ebuild Accela portal, no API).
 # ---------------------------------------------------------------------------
-EUGENE_CAMPING_311_ENDPOINT = (
-    "https://services3.arcgis.com/F7NiRLGNbA2hh7gE/arcgis/rest/services/"
-    "2020_2021CampingWorkOrders/FeatureServer/0"
-)
-
 EUGENE_FOOD_SERVICE_SLA_ENDPOINT = (
     "https://services3.arcgis.com/F7NiRLGNbA2hh7gE/arcgis/rest/services/"
     "Food_Service_Establishments_Updated_VIEW_CBE/FeatureServer/0"
 )
 
-EUGENE_CITYLAND_DEEDS_ENDPOINT = (
-    "https://services3.arcgis.com/F7NiRLGNbA2hh7gE/arcgis/rest/services/"
-    "CityLandDeeds/FeatureServer/0"
-)
-
 EUGENE_FEED_SPECS: dict[str, dict[str, object]] = {
-    "311": {
-        "endpoint": EUGENE_CAMPING_311_ENDPOINT,
-        "platform": "arcgis",
-        "watermark_col": "CreatedOn",
-        "id_keys": ["FID", "GlobalID"],
-        "topic_key": "topic_311",
-        "interval_seconds": 300.0,
-        "producer_key": "311",
-        "extra": {
-            "expected_cadence_days": 1,
-            "needs_geocode": False,
-            "oid_field": "FID",
-            "max_record_count": 2000,
-            "order_by": "CreatedOn DESC",
-            "scope": (
-                "2020_2021CampingWorkOrders (FeatureServer/0 on the city's "
-                "ArcGIS Server — 10,287 rows, camping/encampment code-"
-                "enforcement work orders, the city's PDD service-request "
-                "archive. Point geometry native via outSR=4326. CreatedOn "
-                "watermark newest 2021-03-12. Companion HistoricalCampingWorkOrders "
-                "(25,171 rows). Lane County web-portal-only 311; no live "
-                "public 311 feed on the city server. Code enforcement "
-                "ServiceCod = PDD10, PFI10, SFS30, SWM30, PFI11"
-            ),
-            "field_map": COMPLAINTS_311_FIELD_MAP,
-        },
-    },
     "sla": {
         "endpoint": EUGENE_FOOD_SERVICE_SLA_ENDPOINT,
         "platform": "arcgis",
@@ -568,36 +518,6 @@ EUGENE_FEED_SPECS: dict[str, dict[str, object]] = {
                 "registries: Oregon OLCC (liquor) and CCB (contractors)."
             ),
             "field_map": SLA_FIELD_MAP,
-        },
-    },
-    "deeds": {
-        "endpoint": EUGENE_CITYLAND_DEEDS_ENDPOINT,
-        "platform": "arcgis",
-        "watermark_col": "DATE_",
-        "id_keys": ["CITYDEED", "OBJECTID_1"],
-        "topic_key": "topic_deeds",
-        "interval_seconds": 600.0,
-        "producer_key": "deeds",
-        "extra": {
-            "expected_cadence_days": 3,
-            "needs_geocode": False,
-            "oid_field": "OBJECTID_1",
-            "max_record_count": 2000,
-            "order_by": "DATE_ DESC",
-            "scope": (
-                "CityLandDeeds (FeatureServer/0 on the city's ArcGIS Server — "
-                "2,873 rows, city-owned property deed records (acquisitions/"
-                "dispositions). Polygon geometry → centroid via outSR=4326. "
-                "DATE_ watermark live to 2026-06-30. Native Oregon State Plane "
-                "North WKID 2914; server-side outSR=4326 reprojection. "
-                "Companion deed layers: EasementDeeds (7,340 rows, DATE_ to "
-                "2026-06-30), ROWDeeds (4,380 rows, DATE_ to 2026-01-04). "
-                "Lane County's property records are web-portal-only (LMD-PRO / "
-                "citizenserviceportal) — not bulk-accessible. City-generated "
-                "deed layers are the verifiable partial record per the city-"
-                "registration rule (partial without deeds is fine)."
-            ),
-            "field_map": DEEDS_FIELD_MAP,
         },
     },
 }
@@ -645,8 +565,6 @@ REGISTRATION = SpatialRegistration(
 )
 
 __all__ = [
-    "EUGENE_CAMPING_311_ENDPOINT",
-    "EUGENE_CITYLAND_DEEDS_ENDPOINT",
     "EUGENE_CITY_ID",
     "EUGENE_DIVISIONS",
     "EUGENE_DIVISION_BBOXES",
