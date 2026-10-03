@@ -1,0 +1,263 @@
+{
+  "schema_version": 2,
+  "id": "des_moines",
+  "name": "Des Moines, IA",
+  "state": "IA",
+  "center": {
+    "lat": 41.5887,
+    "lng": -93.6161
+  },
+  "metro_bbox": {
+    "min_lat": 41.44,
+    "max_lat": 41.81,
+    "min_lng": -93.9,
+    "max_lng": -93.42
+  },
+  "divisions": {
+    "CENTRAL_CORE": {
+      "name": "CENTRAL_CORE",
+      "center": {
+        "lat": 41.594,
+        "lng": -93.636
+      },
+      "bbox": {
+        "min_lat": 41.57,
+        "max_lat": 41.61,
+        "min_lng": -93.71,
+        "max_lng": -93.585
+      },
+      "submarkets": [
+        "Downtown / Sherman Hill",
+        "East Village / Capitol",
+        "Drake / Waveland Park"
+      ]
+    },
+    "NORTH_SIDE": {
+      "name": "NORTH_SIDE",
+      "center": {
+        "lat": 41.622,
+        "lng": -93.649
+      },
+      "bbox": {
+        "min_lat": 41.61,
+        "max_lat": 41.66,
+        "min_lng": -93.71,
+        "max_lng": -93.585
+      },
+      "submarkets": [
+        "Beaverdale / Merle Hay",
+        "Highland Park / Union Park"
+      ]
+    },
+    "SOUTH_SIDE": {
+      "name": "SOUTH_SIDE",
+      "center": {
+        "lat": 41.551,
+        "lng": -93.622
+      },
+      "bbox": {
+        "min_lat": 41.44,
+        "max_lat": 41.57,
+        "min_lng": -93.71,
+        "max_lng": -93.585
+      },
+      "submarkets": [
+        "Indianola Hills / Grays Lake",
+        "South Central / Watrous"
+      ]
+    },
+    "EAST_SIDE": {
+      "name": "EAST_SIDE",
+      "center": {
+        "lat": 41.593,
+        "lng": -93.546
+      },
+      "bbox": {
+        "min_lat": 41.44,
+        "max_lat": 41.66,
+        "min_lng": -93.585,
+        "max_lng": -93.42
+      },
+      "submarkets": [
+        "Fairground / Fairmont Park",
+        "Easter Lake / River Woods",
+        "Altoona / Pleasant Hill"
+      ]
+    },
+    "WEST_SUBURBS": {
+      "name": "WEST_SUBURBS",
+      "center": {
+        "lat": 41.587,
+        "lng": -93.786
+      },
+      "bbox": {
+        "min_lat": 41.44,
+        "max_lat": 41.66,
+        "min_lng": -93.9,
+        "max_lng": -93.71
+      },
+      "submarkets": [
+        "West Des Moines",
+        "Urbandale / Clive"
+      ]
+    },
+    "NORTH_SUBURBS": {
+      "name": "NORTH_SUBURBS",
+      "center": {
+        "lat": 41.713,
+        "lng": -93.662
+      },
+      "bbox": {
+        "min_lat": 41.66,
+        "max_lat": 41.81,
+        "min_lng": -93.9,
+        "max_lng": -93.42
+      },
+      "submarkets": [
+        "Ankeny",
+        "Johnston"
+      ]
+    }
+  },
+  "submarkets": {
+    "Downtown / Sherman Hill": {
+      "name": "Downtown / Sherman Hill",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 41.5862,
+        "lng": -93.635
+      },
+      "description": "Downtown Des Moines and Sherman Hill, with Woodland Heights, Good Park, Cheatom Park, King Irving and Greenwood Historic."
+    },
+    "East Village / Capitol": {
+      "name": "East Village / Capitol",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 41.5937,
+        "lng": -93.601
+      },
+      "description": "Historic East Village, Capitol Park, Capitol East and Martin Luther King Jr. Park."
+    },
+    "Drake / Waveland Park": {
+      "name": "Drake / Waveland Park",
+      "division": "CENTRAL_CORE",
+      "center": {
+        "lat": 41.602,
+        "lng": -93.6714
+      },
+      "description": "Drake, Waveland Park and North of Grand, out to the Waterbury and Westwood neighborhoods on the west side."
+    },
+    "Beaverdale / Merle Hay": {
+      "name": "Beaverdale / Merle Hay",
+      "division": "NORTH_SIDE",
+      "center": {
+        "lat": 41.6222,
+        "lng": -93.6853
+      },
+      "description": "Beaverdale, Merle Hay and Lower Beaver on the northwest side."
+    },
+    "Highland Park / Union Park": {
+      "name": "Highland Park / Union Park",
+      "division": "NORTH_SIDE",
+      "center": {
+        "lat": 41.6225,
+        "lng": -93.6123
+      },
+      "description": "Highland Park/Oak Park, Union Park, River Bend, Chautauqua Park and Mondamin Presidential on the north side."
+    },
+    "Indianola Hills / Grays Lake": {
+      "name": "Indianola Hills / Grays Lake",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 41.5624,
+        "lng": -93.6233
+      },
+      "description": "Indianola Hills, Grays Lake and McKinley School/Columbus Park south of downtown."
+    },
+    "South Central / Watrous": {
+      "name": "South Central / Watrous",
+      "division": "SOUTH_SIDE",
+      "center": {
+        "lat": 41.5392,
+        "lng": -93.6208
+      },
+      "description": "South Central DSM, Watrous Heights, Watrous South and Southwestern Hills on the south side."
+    },
+    "Fairground / Fairmont Park": {
+      "name": "Fairground / Fairmont Park",
+      "division": "EAST_SIDE",
+      "center": {
+        "lat": 41.607,
+        "lng": -93.5706
+      },
+      "description": "Fairground, Fairmont Park, ACCENT, Sheridan Gardens, Douglas Acres, Grays Woods and Valley High Manor on the east side."
+    },
+    "Easter Lake / River Woods": {
+      "name": "Easter Lake / River Woods",
+      "division": "EAST_SIDE",
+      "center": {
+        "lat": 41.547,
+        "lng": -93.5721
+      },
+      "description": "Easter Lake Area and River Woods on the southeast side."
+    },
+    "Altoona / Pleasant Hill": {
+      "name": "Altoona / Pleasant Hill",
+      "division": "EAST_SIDE",
+      "center": {
+        "lat": 41.6263,
+        "lng": -93.4939
+      },
+      "description": "Altoona and Pleasant Hill at the city's eastern edge; Brook Run is the nearest Des Moines neighborhood."
+    },
+    "West Des Moines": {
+      "name": "West Des Moines",
+      "division": "WEST_SUBURBS",
+      "center": {
+        "lat": 41.5499,
+        "lng": -93.7814
+      },
+      "description": "West Des Moines (Census place 1983910); outside the registered City of Des Moines rental license feed."
+    },
+    "Urbandale / Clive": {
+      "name": "Urbandale / Clive",
+      "division": "WEST_SUBURBS",
+      "center": {
+        "lat": 41.6244,
+        "lng": -93.7904
+      },
+      "description": "Urbandale and Clive (Census places 1979950 and 1914520); outside the registered City of Des Moines rental license feed."
+    },
+    "Ankeny": {
+      "name": "Ankeny",
+      "division": "NORTH_SUBURBS",
+      "center": {
+        "lat": 41.7336,
+        "lng": -93.5994
+      },
+      "description": "Ankeny (Census place 1902305); outside the registered City of Des Moines rental license feed."
+    },
+    "Johnston": {
+      "name": "Johnston",
+      "division": "NORTH_SUBURBS",
+      "center": {
+        "lat": 41.6919,
+        "lng": -93.7245
+      },
+      "description": "Johnston (Census place 1939765); outside the registered City of Des Moines rental license feed."
+    }
+  },
+  "feeds": {
+    "permits": null,
+    "311": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "IssuedDate",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": null
+  },
+  "evidence_path": "apps/api/src/spatial/cities/des_moines.py",
+  "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"
+}

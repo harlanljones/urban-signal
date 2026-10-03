@@ -297,7 +297,7 @@ datasets:
     ingestion_mode: incremental
     oid_field: OBJECTID
     max_record_count: 2000
-    expected_cadence_days: 7
+    expected_cadence_days: 21
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false

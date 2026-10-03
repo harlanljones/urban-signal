@@ -126,3 +126,29 @@ watermark `Permit_Issue_DateTime`, id_keys `["PermitID"]`,
 
 **Re-probe the watermark ≤72 h before the implementation wave; the
 register-now call stands only if rows resume.** Stamp: 2026-08-28.
+
+---
+
+## Re-probe — 2026-09-29 (cadence exception)
+
+Huntsville was registered on 2026-09-02 (US-424, commit `910b043`) with the
+default `expected_cadence_days: 7`, not the documented cadence exception this
+probe asked for. Row-level re-probe of `Permit_Issue_DateTime` on the same
+layer:
+
+- **Not stalled.** Total rows 18,448 → **18,773**. Newest row
+  **2026-09-18 18:08Z** (PermitID 698662, 28 Scenic Loop Rd SE, Addition).
+- **Lag-and-backfill updater.** On the 2026-08-27 probe the newest row was
+  2026-08-07; the layer now holds rows for every weekday Aug 10–Sep 18 except
+  Labor Day, so the gap was publication lag, not a halt. Weekly counts
+  (Mon-start weeks):
+  Jul 6 **51** · Jul 13 **59** · Jul 20 **53** · Jul 27 **45** · Aug 3 **38** ·
+  Aug 10 **88** · Aug 17 **51** · Aug 24 **61** · Aug 31 **69** · Sep 7 **22** ·
+  Sep 14 **34** · Sep 21 **0** · Sep 28 **0**.
+- **Observed lag:** 20 days at the first probe, 11 days today. A 7-day window
+  pages on a healthy feed for most of each cycle.
+
+**Action:** `datasets.permits.expected_cadence_days` 7 → **21** in
+`apps/api/src/spatial/cities/data/huntsville.yaml` (same window as the Austin
+and Anaheim batch feeds). If the newest row passes 21 days, treat it as the
+stall case above and drop to T3.

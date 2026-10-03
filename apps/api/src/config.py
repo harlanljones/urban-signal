@@ -1062,6 +1062,24 @@ class Settings(BaseSettings):
         description="Fort Collins, CO current building permits FeatureServer layer URL (US-421)",
     )
 
+    # Des Moines, IA (City of Des Moines ArcGIS Server 10.91, maps.dsm.city):
+    # External/EXTDynamicCodeCaseRentalLicense MapServer layer 1 "Rental
+    # License" — native point geometry (outSR=4326 lifts the Iowa State Plane
+    # South feet store SR to WGS84), IssuedDate date watermark, LicenseNumber
+    # string id; 15,475 contact rows / 9,866 licenses live-verified 2026-09-29.
+    # Registered as FeedType.SLA (Boulder rental-license precedent). The layer
+    # is a full reload (created_date identical on every row, 2026-09-27) and the
+    # server rejects ISO-string date literals in `where`, so maps.dsm.city is in
+    # ANSI_DATE_LITERAL_HOSTS. Contact columns carry natural-person names,
+    # addresses and emails and are deliberately not mapped.
+    arcgis_des_moines_rental_licenses_url: str = Field(
+        default=(
+            "https://maps.dsm.city/p2/rest/services/External/"
+            "EXTDynamicCodeCaseRentalLicense/MapServer/1"
+        ),
+        description="Des Moines, IA rental licenses MapServer layer URL (SLA)",
+    )
+
     # Pierce County, WA (ArcGIS): county applications and permits across six
     # departments (Building, Development Engineering, Environmental, Fire,
     # Land Use, Sewer). Point layer in WA State Plane; the client's outSR=4326

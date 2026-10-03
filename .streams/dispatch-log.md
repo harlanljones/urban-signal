@@ -1053,3 +1053,54 @@ Two things worth keeping from this round:
 - `addopts` now carries `-m 'not live'`, so a command-line `-m interlock` must
   still override it. Verified: 35 passed, 4954 deselected. A `-m` collision in
   `addopts` is a way to make a gate pass vacuously, and was worth the check.
+
+
+### 2026-09-29 — Des Moines, IA onboarding (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| city-des-moines | `.streams/city-des-moines.md` | `config.py`, `city_registry.py` | 2026-09-29 | done (registered, `sla` only; PR #66) | `cities/des_moines.py`, `cities/data/des_moines.yaml`, `test_producers_des_moines.py` (39 tests), `docs/research/probe-des_moines.md`, `maps.dsm.city` in `ANSI_DATE_LITERAL_HOSTS`, regenerated dashboard/facts/`cities/des_moines.json`, README/PRODUCT 156 -> 157 |
+
+Des Moines was named in the wave-3 extended list but never probed. The probe found
+one feed that qualifies and registered it: the City's Rental License layer
+(`maps.dsm.city` ArcGIS Server 10.91, native points on all 15,475 rows, `IssuedDate`
+newest 2026-09-25, 742 distinct licences issued since 2026-07-01) as `sla`, Tier 1,
+cadence 7. It is the first Iowa metro and the only feed on it. `pytest -m interlock`
+35 passed; the new leaf tests 39 passed; `verify_cicd_preflight.py` green on all six
+gates; G5 500/500 parsed with 100% point and 100% address on the newest 500 rows.
+
+What did not qualify, and why (row-level evidence and re-probe triggers are in the
+probe doc): permits are live (351 in 7 days, newest 2026-09-28) but Tyler EnerGov has
+no platform client; 311 (CitySourced / Tyler Portico) has no public row API; Polk
+County deeds are live (newest 2026-09-24) but the `Parcel` table has no geometry and
+`parcel_join` takes one key name for both sides while the county's point layer names
+it differently; the PSDP crime layer is 29 days old with unproven cadence; the Code
+Case layer is live but see the defect below.
+
+Things worth keeping:
+
+- **Pre-existing platform defect, not Des Moines.** `poll_job` calls
+  `parse_socrata_row` for every job, but `ViolationsProducer` and `InspectionsProducer`
+  (`enforcement_signals_producer.py`) only define `parse_row`, and `ViolationEvent`
+  has `status_date`, which is not among the watermark attributes the scheduler reads.
+  A mock `poll_job` run on `violations_boston` produced 0 events and one DLQ route.
+  Only that one mock was run; any registered `violations` / `inspections` feed should be
+  checked. Code Case was therefore left unregistered rather than registered into the
+  DLQ. Fix is a spine change (both producers plus the watermark attrs).
+- **`maps.dsm.city` rejects ISO string dates in `where`** (400) and accepts ANSI
+  `date 'YYYY-MM-DD'`, so it joined `ANSI_DATE_LITERAL_HOSTS` in
+  `producers/watermarks.py` (a shared module outside the spine manifest).
+- **The unmapped `license_type` default is "On-Premises Liquor"**, and the layer has no
+  licence-category column, so `license_type` reads `ContactType` and the feed filters
+  to `Property Owner`. Contact names, addresses and e-mails are never mapped and the
+  test fixtures redact them, but the ArcGIS client requests `outFields=*`, so those
+  columns would ride along in a DLQ payload for any row that failed to parse (0 of the
+  newest 500 did).
+- **Only `sla` is a measured seed** on the 14 submarkets (742 licences, nearest
+  anchor; 0 for the four suburban ones). `base_lims`, `capex`, `permit_vel` and
+  `shift_ratio` are one neutral value on every submarket because no permits, 311 or
+  scored feed is registered. The site-facts export already excludes those seeds.
+- The two Huntsville edits present when the stream began were committed as `7ccc900`
+  while the stream ran; neither file was touched here, and no other city's
+  registration changed. `docs/signal-roadmap.md` and
+  `docs/expansion-roadmap-wave-3.md` were not edited.
