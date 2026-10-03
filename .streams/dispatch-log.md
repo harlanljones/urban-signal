@@ -2087,3 +2087,11 @@ Worth keeping:
   the site, and Spokane's old licence spec took a person's name as each
   premises' name.
 
+
+## 2026-10-03 — dashboard hex-grid zoom repair
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| fix-hex-zoom | dashboard source, static export, regression tests, stream claim | none | current session | implemented; 4 regression tests pass; full preflight blocked by missing Bun after 25 interlock checks and cross-reference passed | source fix, synchronized static export, grid-zoom.test.js |
+
+Orchestrator inspects deployment read-only while the subagent owns implementation.

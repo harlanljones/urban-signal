@@ -1790,7 +1790,7 @@ __METRO_META__
     // ---- All-metros national view state ------------------------------------
     let snapshotManifest = null;
     let activeMetroChip = null;        // city_id or null (= all metros)
-    const fetchedTiles = new Set();    // res-5 parents already merged into source
+    const fetchedTiles = new Set();    // parents merged for the active LOD generation
     const tileFeatures = new Map();    // h3_index -> GeoJSON feature
     const pendingTileParents = [];     // queued parents awaiting fetch
     const tilesInFlight = new Set();
@@ -3031,11 +3031,22 @@ __METRO_META__
       }
       // Pick the LOD level for this zoom and fetch only that level's parents.
       const res = lodForZoom(z);
+      if (res !== activeLodRes) {
+        // Res 7 and 8 share parent indexes, but contain different cells.
+        // Retire both rendered cells and request bookkeeping on every LOD swap.
+        tileLoadGeneration += 1;
+        activeLodRes = res;
+        pendingTileParents.length = 0;
+        fetchedTiles.clear();
+        tileFeatures.clear();
+        gridDirty = true;
+        applyGridData();
+      }
       const tileIndexes = snapshotManifest.tile_indexes || {};
       const tileIndex = tileIndexes[String(res)] || snapshotManifest.tile_index || {};
       const candidates = parentsCoveringBounds(map.getBounds(), LOD_TO_PARENT_RES[res] || 5)
         .filter((parent) => Object.prototype.hasOwnProperty.call(tileIndex, parent))
-        .filter((parent) => !fetchedTiles.has(parent) && !tilesInFlight.has(parent));
+        .filter((parent) => !fetchedTiles.has(parent) && !tilesInFlight.has(`${tileLoadGeneration}:${parent}`));
 
       const center = map.getCenter();
       candidates.sort((a, b) => parentDistance(a, center) - parentDistance(b, center));
@@ -3054,7 +3065,7 @@ __METRO_META__
     function drainTileQueue() {
       while (tileFetchesActive < TILE_FETCH_CONCURRENCY && pendingTileParents.length) {
         const batch = pendingTileParents.splice(0, TILE_PARENTS_PER_REQUEST);
-        batch.forEach((parent) => tilesInFlight.add(parent));
+        batch.forEach((parent) => tilesInFlight.add(`${tileLoadGeneration}:${parent}`));
         tileFetchesActive += 1;
         fetchTileBatch(batch);
       }
@@ -3067,14 +3078,16 @@ __METRO_META__
         const resp = await fetch(`/api/v1/gridtiles?res=${res}&parents=${batch.join(',')}`);
         if (resp.ok) {
           const payload = await resp.json();
-          if (generation === tileLoadGeneration) mergeTilePayload(payload);
+          if (generation === tileLoadGeneration) {
+            mergeTilePayload(payload);
+            // Successful empty responses also settle absent-from-KV parents.
+            batch.forEach((parent) => fetchedTiles.add(parent));
+          }
         }
-        // Absent-from-KV parents will not appear later either — mark fetched.
-        batch.forEach((parent) => fetchedTiles.add(parent));
       } catch (e) {
         console.debug('Tile fetch error:', e);
       } finally {
-        batch.forEach((parent) => tilesInFlight.delete(parent));
+        batch.forEach((parent) => tilesInFlight.delete(`${generation}:${parent}`));
         tileFetchesActive -= 1;
         drainTileQueue();
         applyGridData();
