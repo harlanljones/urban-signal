@@ -79,6 +79,9 @@ jobs:
       - name: Check web packages
         run: bun run build && bun run typecheck && bun run lint
 
+      - name: Check dashboard zoom regressions
+        run: node --test apps/dashboard/tests/grid-zoom.test.js
+
   snapshot-push:
     if: always() && github.event_name != 'pull_request' && (needs.validate.result == 'success' || needs.validate.result == 'skipped')
     needs: validate
