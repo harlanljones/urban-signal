@@ -1,15 +1,17 @@
 """ONNX Runtime CUDA / CPU inference engine and multi-horizon model orchestrator."""
 
+import copy
 import logging
 import time
 from collections import OrderedDict
 from pathlib import Path
 from threading import RLock
-from typing import Any, Dict, List, Optional
-import copy
+from typing import Any
+
 import numpy as np
 import onnxruntime as ort
 import pandas as pd
+
 from src.config import settings
 from src.features.lims_calculator import LIMSCalculator
 from src.models.dcn_v2 import MultiScaleDCNv2
@@ -99,15 +101,15 @@ class MultiHorizonInferenceEngine:
 
     def __init__(
         self,
-        model_dir: Optional[str] = None,
+        model_dir: str | None = None,
         *,
         cache_predictions: bool = False,
         metrics: Any = None,
     ):
         self.cache_predictions = cache_predictions
         self.metrics = metrics
-        self._prediction_cache: OrderedDict[tuple[float, ...], Dict[str, float]] = OrderedDict()
-        self._explanation_cache: OrderedDict[tuple[float, ...], Dict[str, float]] = OrderedDict()
+        self._prediction_cache: OrderedDict[tuple[float, ...], dict[str, float]] = OrderedDict()
+        self._explanation_cache: OrderedDict[tuple[float, ...], dict[str, float]] = OrderedDict()
         self._prediction_cache_lock = RLock()
         self._explanation_cache_lock = RLock()
         self.model_dir = Path(model_dir or settings.onnx_model_dir)
@@ -118,8 +120,8 @@ class MultiHorizonInferenceEngine:
 
         # Models
         self.lgbm_predictor = LightGBMQuantilePredictor()
-        self.dcn_session: Optional[ort.InferenceSession] = None
-        self.st_gnn_session: Optional[ort.InferenceSession] = None
+        self.dcn_session: ort.InferenceSession | None = None
+        self.st_gnn_session: ort.InferenceSession | None = None
 
         self._init_models()
 
@@ -129,7 +131,7 @@ class MultiHorizonInferenceEngine:
             self.metrics.increment(name, count=1)
 
     @staticmethod
-    def _feature_key(feature_dict: Dict[str, Any]) -> tuple[float, ...]:
+    def _feature_key(feature_dict: dict[str, Any]) -> tuple[float, ...]:
         """Return the normalized, ordered serving vector used by all models."""
         vector = tuple(float(feature_dict.get(column, 0.0)) for column in FEATURE_COLUMNS)
         if not np.isfinite(vector).all():
@@ -143,7 +145,7 @@ class MultiHorizonInferenceEngine:
         with self._explanation_cache_lock:
             self._explanation_cache.clear()
 
-    def _predict_values(self, vector: tuple[float, ...]) -> Dict[str, float]:
+    def _predict_values(self, vector: tuple[float, ...]) -> dict[str, float]:
         """Return model-only outputs, reusing identical feature vectors when enabled."""
         if self.cache_predictions:
             with self._prediction_cache_lock:
@@ -159,7 +161,7 @@ class MultiHorizonInferenceEngine:
                 return copy.deepcopy(values)
         return self._compute_prediction_values(vector)
 
-    def _compute_prediction_values(self, vector: tuple[float, ...]) -> Dict[str, float]:
+    def _compute_prediction_values(self, vector: tuple[float, ...]) -> dict[str, float]:
         row = pd.Series(dict(zip(FEATURE_COLUMNS, vector)))
         df_input = pd.DataFrame([row])
         self._increment_metric("inference_calls")
@@ -190,7 +192,7 @@ class MultiHorizonInferenceEngine:
             "prob_18m_macro_outperformance": round(prob_18m, 4),
         }
 
-    def _explain_values(self, vector: tuple[float, ...]) -> Dict[str, float]:
+    def _explain_values(self, vector: tuple[float, ...]) -> dict[str, float]:
         """Return SHAP values for one vector with an independent bounded cache."""
         if self.cache_predictions:
             with self._explanation_cache_lock:
@@ -206,7 +208,7 @@ class MultiHorizonInferenceEngine:
                 return copy.deepcopy(values)
         return self._compute_explanation_values(vector)
 
-    def _compute_explanation_values(self, vector: tuple[float, ...]) -> Dict[str, float]:
+    def _compute_explanation_values(self, vector: tuple[float, ...]) -> dict[str, float]:
         self._increment_metric("shap_calls")
         row = pd.Series(dict(zip(FEATURE_COLUMNS, vector)))
         return copy.deepcopy(self.explainer.explain_instance(row))
@@ -240,9 +242,9 @@ class MultiHorizonInferenceEngine:
     def predict_cell_features(
         self,
         h3_index: str,
-        feature_dict: Dict[str, Any],
+        feature_dict: dict[str, Any],
         include_shap: bool = True,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Execute multi-horizon inference for a single H3 cell."""
         t0 = time.perf_counter()
 

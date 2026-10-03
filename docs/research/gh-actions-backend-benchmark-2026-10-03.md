@@ -25,7 +25,7 @@ The final measurement runs alone after test jobs finish. The environment is Linu
 
 The comparator walks every logical KV payload, preserves array order, and checks predictions, SHAP, features, ranks, source dates, H3/key coverage and metadata. Only `inference_latency_ms` and known manifest/cell-index/national-index generation clocks are excluded. Manifest key byte lengths are validated against the actual compact JSON payload on each side before excluding those derived lengths from cross-run equality; latency is repeated in grids and catalysts as well as cells. Invalid byte metadata still fails comparison.
 
-The benchmark records HEAD/tree and dirty status. Companion source SHA-256 evidence identifies the exact edited implementation. RSS is a Linux process-lifetime high-water mark from one reused process; its mode observations cannot support a claim about per-mode RAM savings. Cache misses for distinct vectors share a lock, so results apply to the present repeated-vector workload and should be remeasured if inputs become mostly unique.
+The benchmark records HEAD/tree and dirty status. Commit `a38bf9c` contains the exact measured implementation; its code-file hashes match the companion evidence. Subsequent engine cleanup changes imports and type annotations only, without changing inference or cache behavior. Companion source SHA-256 evidence identifies the exact edited implementation. RSS is a Linux process-lifetime high-water mark from one reused process; its mode observations cannot support a claim about per-mode RAM savings. Cache misses for distinct vectors share a lock, so results apply to the present repeated-vector workload and should be remeasured if inputs become mostly unique.
 
 ## Validation and limits
 
@@ -60,4 +60,3 @@ Prior production builders took 98.04 seconds / 1,434,812 KiB and 91.79 seconds /
 Removing the daily Worker deploy avoids its previously measured 53–59-second job (26.5–29.5 elapsed minutes over 30 refreshes). A code-only release avoids the previously measured 168–177-second snapshot job and 13,154 KV writes. Relevant releases now have two independent validation paths, so net release-runner savings need production measurements.
 
 Full daily publication remains approximately 394,620 KV writes for 30 refreshes, before manual runs. There is no daily KV-write or new storage saving in phase 1. No measured cost reason supports moving to GCP, AWS, Railway or Fly.io now. Stop at this bounded phase and remeasure with real durable ingestion before considering persistent models or incremental publication.
-
