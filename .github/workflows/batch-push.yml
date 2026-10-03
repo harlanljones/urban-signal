@@ -79,10 +79,14 @@ jobs:
       - name: Check web packages
         run: bun run build && bun run typecheck && bun run lint
 
+      - name: Check dashboard zoom regressions
+        run: node --test apps/dashboard/tests/grid-zoom.test.js
+
   snapshot-push:
     if: always() && github.event_name != 'pull_request' && (needs.validate.result == 'success' || needs.validate.result == 'skipped')
     needs: validate
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     permissions:
       contents: read
       actions: read # download the bay-area-context artifact
@@ -118,8 +122,49 @@ jobs:
 
       - name: Build snapshot artifacts
         run: |
+          mkdir -p build
           PYTHONPATH=apps/api .venv/bin/python scripts/export_dashboard.py
-          PYTHONPATH=apps/api .venv/bin/python -m src.export.snapshot_builder --out dist --context-dir build/context
+          /usr/bin/time -f 'elapsed_seconds=%e\npeak_rss_kib=%M' -o build/snapshot-resources.txt \
+            env PYTHONPATH=apps/api .venv/bin/python -m src.export.snapshot_builder --out dist --context-dir build/context
+
+      - name: Summarize snapshot usage
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          lines = ["## Daily snapshot usage", "", "| Measurement | Value |", "|---|---:|"]
+          resources = Path("build/snapshot-resources.txt")
+          if resources.exists():
+              values = dict(line.split("=", 1) for line in resources.read_text().splitlines() if "=" in line)
+              if "elapsed_seconds" in values:
+                  minutes = float(values["elapsed_seconds"]) / 60
+                  lines.append(f"| Snapshot build minutes | {minutes:.2f} |")
+                  lines.append(f"| Projected build minutes / 30 daily runs | {minutes * 30:.0f} |")
+              if "peak_rss_kib" in values:
+                  lines.append(f"| Peak resident memory (MiB) | {float(values['peak_rss_kib']) / 1024:.1f} |")
+          bulk = Path("dist/kv-bulk.json")
+          if bulk.exists():
+              entries = json.loads(bulk.read_text())
+              lines.append(f"| Planned KV writes per refresh | {len(entries):,} |")
+              lines.append(f"| Planned KV writes / 30 daily runs | {len(entries) * 30:,} |")
+              lines.append(f"| Upload payload (MiB) | {bulk.stat().st_size / 1024**2:.2f} |")
+          lines += ["", "Build projections exclude setup, validation, upload, deployment, retries, and other workflow runs.",
+                    "Planned writes and payload bytes do not confirm a successful upload."]
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:
+              summary.write("\n".join(lines) + "\n")
+          PY
+
+      - name: Preserve snapshot resource measurements
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: snapshot-resources
+          path: build/snapshot-resources.txt
+          if-no-files-found: ignore
+          retention-days: 7
 
       - uses: actions/upload-artifact@v4
         with:
