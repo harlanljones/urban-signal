@@ -2027,3 +2027,19 @@ Worth keeping:
   passed every poll and gate with nothing issued since 2022, and El Paso's
   spec called itself a frozen snapshot (alarm-exempt) yet counted as permits
   coverage. Read the newest issue date before counting a feed.
+
+### 2026-10-03 — Weekly feed staleness check finishes again (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| staleness-probe | `.streams/staleness-probe.md` | none | 2026-10-02 | done (a live census of all 443 feeds in 11 minutes, paced at one request per host every 2.2 seconds: 387 fresh, 43 stale, 7 stale but alarm-exempt, 6 not probed; a weekly run should take six to eight minutes against its 15-minute deadline) | `scripts/feed_staleness_probe.py` reworked; `docs/research/feed-freshness-2026-10-03.md` |
+
+Worth keeping:
+
+- **Check a monitor's runs, not just its tests.** The probe's tests passed
+  on every PR while each scheduled run since 2026-08-31 was cancelled at
+  its 20-minute limit before printing anything.
+- **Ids need not follow dates.** Worcester's newest permits hold its
+  lowest object ids, and Lincoln's newest permit is its 1,800th newest row:
+  read by its newest ids, a live feed looks frozen. A month-first text
+  column whose spec names its format is read by its dates instead.
