@@ -291,7 +291,7 @@ class Settings(BaseSettings):
 
     # Crime incident feeds (US-71): NIBRS-classified incident rows per metro.
     # LA stays out (mid-NIBRS-transition series break). NYC's YTD dataset
-    # publishes monthly (G11 cadence declaration in the registry spec).
+    # publishes complete quarters (G11 cadence declaration in the registry spec).
     socrata_nyc_crime_endpoint: str = Field(
         default="https://data.cityofnewyork.us/resource/5uac-w243.json",
         description="NYC crime current-year YTD incidents endpoint",

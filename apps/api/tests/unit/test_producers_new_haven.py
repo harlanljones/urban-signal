@@ -327,6 +327,7 @@ class TestNewHavenFeedSpecs:
         assert spec.needs_geocode is True
         assert spec.geocode_context == "New Haven, CT"
         assert spec.id_keys == ["serialnumber", "listyear"]
+        assert spec.expected_cadence_days == 365
 
     def test_get_new_haven_dataset_rejects_unregistered_feeds(self):
         class _Feed:

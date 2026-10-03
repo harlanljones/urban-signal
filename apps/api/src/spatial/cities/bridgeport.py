@@ -364,7 +364,10 @@ BRIDGEPORT_FEED_SPECS: dict[str, dict[str, object]] = {
         "interval_seconds": 3600.0,
         "producer_key": "deeds",
         "extra": {
-            "expected_cadence_days": 30,
+            # Published once a year (the portal says "Annually"): the
+            # 2026-08-12 update added the 2024 grand-list year, sales to
+            # 2025-09-30, so the newest sale is 10 to 23 months old.
+            "expected_cadence_days": 365,
             "needs_geocode": True,
             "geocode_context": "Bridgeport, CT",
             "where": "town = 'Bridgeport'",

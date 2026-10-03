@@ -287,6 +287,7 @@ class TestBridgeportFeedSpecs:
         assert spec.field_map == DEEDS_FIELD_MAP
         assert spec.id_keys == ["serialnumber", "listyear"]
         assert spec.needs_geocode is True
+        assert spec.expected_cadence_days == 365
 
     def test_get_bridgeport_dataset_rejects_unregistered_feeds(self):
         class _Feed:

@@ -2043,3 +2043,15 @@ Worth keeping:
   lowest object ids, and Lincoln's newest permit is its 1,800th newest row:
   read by its newest ids, a live feed looks frozen. A month-first text
   column whose spec names its format is read by its dates instead.
+
+### 2026-10-03 — Two sources' own cadences declared (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| census-cadences | `.streams/census-cadences.md` | `config.py` (a comment) | 2026-10-03 | done (Connecticut's yearly sales set and NYPD's quarterly complaints read fresh live under their declared cadences) | Bridgeport's and New Haven's `deeds` at 365 days, NYC `crime` at 92 |
+
+Worth keeping:
+
+- **Read the portal's own update frequency before declaring a cadence.**
+  Both specs declared 30 days for sets their publishers say are yearly and
+  quarterly, so the staleness check paged for feeds on schedule.

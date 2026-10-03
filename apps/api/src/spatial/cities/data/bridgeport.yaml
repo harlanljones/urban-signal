@@ -348,7 +348,7 @@ datasets:
     ingestion_mode: incremental
     oid_field: null
     max_record_count: null
-    expected_cadence_days: 30
+    expected_cadence_days: 365
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false
