@@ -303,7 +303,7 @@ datasets:
   sla:
     endpoint: ckan://data.boston.gov/04dc653b-1789-4374-9669-b07df7233344
     platform: ckan
-    watermark_col: expires
+    watermark_col: issued
     id_keys:
     - license_num
     - _id
@@ -311,14 +311,14 @@ datasets:
     interval_seconds: 600.0
     producer_key: sla
     endpoint_by_year: {}
-    watermark_type: null
-    watermark_format: null
+    watermark_type: text
+    watermark_format: '%Y-%m-%d'
     watermark_exclude: []
-    order_by: null
+    order_by: issued DESC
     id_col: null
     select: null
     fallback_endpoints: []
-    where: null
+    where: issued IS NOT NULL
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -363,7 +363,7 @@ datasets:
     non_spatial: null
     zip_member: null
   crime:
-    endpoint: ckan://data.boston.gov/6220d948-eae2-4e4b-8723-2dc8e67722a3
+    endpoint: ckan://data.boston.gov/b973d8cb-eeb2-4e7e-99da-c92938efc9c0
     platform: ckan
     watermark_col: OCCURRED_ON_DATE
     id_keys:
@@ -372,8 +372,8 @@ datasets:
     interval_seconds: 300.0
     producer_key: crime
     endpoint_by_year: {}
-    watermark_type: null
-    watermark_format: null
+    watermark_type: text
+    watermark_format: '%Y-%m-%d %H:%M:%S+00'
     watermark_exclude: []
     order_by: null
     id_col: null
@@ -489,8 +489,9 @@ datasets:
     alarm_exempt_reason: null
     annual_rotation: false
     companion_endpoints: {}
+    composite_id: true
     delimiter: null
-    endpoint: ckan://data.boston.gov/03693648-2c62-4a2c-a4ec-48de2ee14e18
+    endpoint: ckan://data.boston.gov/4582bec6-2b4f-4f9e-bc55-cbaa73117f4c
     endpoint_by_year: {}
     expected_cadence_days: 7
     fallback_endpoints: []
@@ -531,7 +532,7 @@ datasets:
     id_col: null
     id_keys:
     - licenseno
-    - _id
+    - resultdttm
     ingestion_mode: incremental
     interval_seconds: 600.0
     max_record_count: null
@@ -552,10 +553,10 @@ datasets:
     state_plane_x_col: null
     state_plane_y_col: null
     topic: raw.municipal.inspections
-    watermark_col: status_date
+    watermark_col: resultdttm
     watermark_exclude: []
-    watermark_format: null
-    watermark_type: null
+    watermark_format: '%Y-%m-%d %H:%M:%S+00'
+    watermark_type: text
     where: null
     zip_member: null
   violations:
@@ -564,7 +565,7 @@ datasets:
     annual_rotation: false
     companion_endpoints: {}
     delimiter: null
-    endpoint: ckan://data.boston.gov/705244a6-70a6-4ff8-ab8e-56441aff18e7
+    endpoint: ckan://data.boston.gov/800a2663-1d6a-46e7-9356-bedb70f5332c
     endpoint_by_year: {}
     expected_cadence_days: 7
     fallback_endpoints: []
@@ -620,8 +621,8 @@ datasets:
     topic: raw.municipal.violations
     watermark_col: status_dttm
     watermark_exclude: []
-    watermark_format: null
-    watermark_type: null
+    watermark_format: '%Y-%m-%d %H:%M:%S'
+    watermark_type: text
     where: null
     zip_member: null
 aliases:

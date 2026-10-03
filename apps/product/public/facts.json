@@ -27,13 +27,18 @@
       "division_count": 5,
       "submarket_count": 8,
       "feeds": [
-        false,
+        true,
         false,
         true,
         false
       ],
       "platforms": [
-        null,
+        {
+          "platform": "excel",
+          "watermark_col": "permit_issued_date_time",
+          "interval_seconds": 86400.0,
+          "topic": "raw.municipal.permits"
+        },
         null,
         {
           "platform": "socrata",
@@ -59,19 +64,19 @@
       "feeds": [
         false,
         false,
-        false,
-        true
+        true,
+        false
       ],
       "platforms": [
         null,
         null,
-        null,
         {
           "platform": "arcgis",
-          "watermark_col": "SALE_DATE",
-          "interval_seconds": 600.0,
-          "topic": "raw.municipal.deeds"
-        }
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
       ],
       "center": {
         "lat": 42.6526,
@@ -88,7 +93,7 @@
       "submarket_count": 18,
       "feeds": [
         true,
-        false,
+        true,
         true,
         false
       ],
@@ -99,7 +104,12 @@
           "interval_seconds": 1800.0,
           "topic": "raw.municipal.permits"
         },
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "CREATEDTIME",
+          "interval_seconds": 900.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "",
@@ -152,19 +162,34 @@
       "division_count": 5,
       "submarket_count": 8,
       "feeds": [
-        false,
-        false,
-        false,
+        true,
+        true,
+        true,
         true
       ],
       "platforms": [
-        null,
-        null,
-        null,
         {
           "platform": "arcgis",
-          "watermark_col": "SALE_DATE",
-          "interval_seconds": 600.0,
+          "watermark_col": "ISSUEDATE",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.permits"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "CreationDate",
+          "interval_seconds": 900.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.deeds"
         }
       ],
@@ -282,13 +307,18 @@
       "division_count": 6,
       "submarket_count": 9,
       "feeds": [
-        false,
+        true,
         false,
         true,
         true
       ],
       "platforms": [
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "date_opened",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.permits"
+        },
         null,
         {
           "platform": "arcgis",
@@ -318,7 +348,7 @@
       "submarket_count": 8,
       "feeds": [
         true,
-        false,
+        true,
         true,
         false
       ],
@@ -329,7 +359,12 @@
           "interval_seconds": 300.0,
           "topic": "raw.municipal.permits"
         },
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "DateTimeInit",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "",
@@ -454,7 +489,7 @@
         {
           "platform": "socrata",
           "watermark_col": "sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89",
-          "interval_seconds": 600.0,
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.deeds"
         }
       ],
@@ -545,7 +580,7 @@
         true,
         true,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -563,10 +598,15 @@
         {
           "platform": "arcgis",
           "watermark_col": "LicenseExpirationDate",
-          "interval_seconds": 600.0,
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "Sales_Date_1",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 44.0575,
@@ -584,7 +624,7 @@
       "feeds": [
         true,
         true,
-        false,
+        true,
         false
       ],
       "platforms": [
@@ -600,7 +640,12 @@
           "interval_seconds": 300.0,
           "topic": "raw.municipal.311"
         },
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
       "center": {
@@ -672,7 +717,7 @@
         },
         {
           "platform": "ckan",
-          "watermark_col": "expires",
+          "watermark_col": "issued",
           "interval_seconds": 600.0,
           "topic": "raw.municipal.sla"
         },
@@ -700,7 +745,7 @@
         true,
         false,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -716,7 +761,12 @@
           "interval_seconds": 600.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "csv",
+          "watermark_col": "tdate",
+          "interval_seconds": 86400.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 40.015,
@@ -734,7 +784,7 @@
       "feeds": [
         true,
         false,
-        false,
+        true,
         false
       ],
       "platforms": [
@@ -745,7 +795,12 @@
           "topic": "raw.municipal.permits"
         },
         null,
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
       "center": {
@@ -764,7 +819,7 @@
       "feeds": [
         true,
         false,
-        false,
+        true,
         false
       ],
       "platforms": [
@@ -775,7 +830,12 @@
           "topic": "raw.municipal.permits"
         },
         null,
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
       "center": {
@@ -859,17 +919,22 @@
       "feeds": [
         false,
         false,
-        false,
+        true,
         true
       ],
       "platforms": [
         null,
         null,
-        null,
         {
           "platform": "arcgis",
-          "watermark_col": "SALE_DATE",
-          "interval_seconds": 600.0,
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "postedDate",
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.deeds"
         }
       ],
@@ -923,9 +988,9 @@
       "submarket_count": 8,
       "feeds": [
         true,
-        false,
         true,
-        false
+        true,
+        true
       ],
       "platforms": [
         {
@@ -934,14 +999,24 @@
           "interval_seconds": 300.0,
           "topic": "raw.municipal.permits"
         },
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "CreateDate",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "",
           "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "S_1DATE",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 26.58,
@@ -959,8 +1034,8 @@
       "feeds": [
         true,
         false,
-        false,
-        false
+        true,
+        true
       ],
       "platforms": [
         {
@@ -970,8 +1045,18 @@
           "topic": "raw.municipal.permits"
         },
         null,
-        null,
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "DEED_DATE",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 33.306,
@@ -987,13 +1072,18 @@
       "division_count": 6,
       "submarket_count": 7,
       "feeds": [
-        false,
+        true,
         false,
         true,
         false
       ],
       "platforms": [
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "ISSUE_DATE",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.permits"
+        },
         null,
         {
           "platform": "arcgis",
@@ -1019,17 +1109,22 @@
       "feeds": [
         false,
         false,
-        false,
+        true,
         true
       ],
       "platforms": [
         null,
         null,
-        null,
         {
           "platform": "arcgis",
-          "watermark_col": "SALE_DATE",
-          "interval_seconds": 600.0,
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "Last_Sales_Date",
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.deeds"
         }
       ],
@@ -1047,13 +1142,18 @@
       "division_count": 1,
       "submarket_count": 5,
       "feeds": [
-        false,
         true,
         true,
-        false
+        true,
+        true
       ],
       "platforms": [
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "issue_date",
+          "interval_seconds": 3600.0,
+          "topic": "raw.municipal.permits"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "RECEIVED_DATE",
@@ -1066,7 +1166,12 @@
           "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "saledate",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 35.2271,
@@ -1193,7 +1298,7 @@
         },
         {
           "platform": "csv",
-          "watermark_col": "SaleDate",
+          "watermark_col": "",
           "interval_seconds": 1800.0,
           "topic": "raw.municipal.deeds"
         }
@@ -1258,7 +1363,7 @@
       "submarket_count": 5,
       "feeds": [
         true,
-        false,
+        true,
         true,
         true
       ],
@@ -1269,7 +1374,12 @@
           "interval_seconds": 300.0,
           "topic": "raw.municipal.permits"
         },
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "REPORTED_DATE",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "",
@@ -1410,7 +1520,7 @@
         true,
         true,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -1431,7 +1541,12 @@
           "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALE_DATE",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 39.7392,
@@ -1524,19 +1639,19 @@
       "feeds": [
         false,
         false,
-        false,
-        true
+        true,
+        false
       ],
       "platforms": [
         null,
         null,
-        null,
         {
           "platform": "arcgis",
-          "watermark_col": "SALEDATE",
-          "interval_seconds": 600.0,
-          "topic": "raw.municipal.deeds"
-        }
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
       ],
       "center": {
         "lat": 39.1582,
@@ -1592,18 +1707,13 @@
       "division_count": 1,
       "submarket_count": 5,
       "feeds": [
-        true,
+        false,
         true,
         true,
         false
       ],
       "platforms": [
-        {
-          "platform": "arcgis",
-          "watermark_col": "Issued_Dat",
-          "interval_seconds": 300.0,
-          "topic": "raw.municipal.permits"
-        },
+        null,
         {
           "platform": "arcgis",
           "watermark_col": "created_at",
@@ -1709,8 +1819,8 @@
       "feeds": [
         true,
         false,
-        false,
-        false
+        true,
+        true
       ],
       "platforms": [
         {
@@ -1720,8 +1830,18 @@
           "topic": "raw.municipal.permits"
         },
         null,
-        null,
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "csv",
+          "watermark_col": "saledate",
+          "interval_seconds": 86400.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 40.5853,
@@ -1804,17 +1924,22 @@
       "feeds": [
         false,
         false,
-        false,
+        true,
         true
       ],
       "platforms": [
         null,
         null,
-        null,
         {
           "platform": "arcgis",
-          "watermark_col": "SALE_DATE",
-          "interval_seconds": 600.0,
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "socrata",
+          "watermark_col": "sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89",
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.deeds"
         }
       ],
@@ -1835,13 +1960,13 @@
         true,
         false,
         true,
-        false
+        true
       ],
       "platforms": [
         {
-          "platform": "socrata",
-          "watermark_col": "issue",
-          "interval_seconds": 600.0,
+          "platform": "arcgis",
+          "watermark_col": "IssueDate",
+          "interval_seconds": 21600.0,
           "topic": "raw.municipal.permits"
         },
         null,
@@ -1851,7 +1976,12 @@
           "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "csv",
+          "watermark_col": "sale_date",
+          "interval_seconds": 86400.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 29.6516,
@@ -1870,7 +2000,7 @@
         false,
         true,
         true,
-        false
+        true
       ],
       "platforms": [
         null,
@@ -1886,7 +2016,12 @@
           "interval_seconds": 600.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "DEED_DATE",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 33.55,
@@ -1904,13 +2039,18 @@
       "feeds": [
         false,
         false,
-        false,
+        true,
         false
       ],
       "platforms": [
         null,
         null,
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
       "center": {
@@ -1964,19 +2104,19 @@
       "feeds": [
         false,
         false,
-        false,
-        true
+        true,
+        false
       ],
       "platforms": [
         null,
         null,
-        null,
         {
           "platform": "arcgis",
-          "watermark_col": "SALE_DATE",
-          "interval_seconds": 600.0,
-          "topic": "raw.municipal.deeds"
-        }
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
       ],
       "center": {
         "lat": 40.2732,
@@ -1995,7 +2135,7 @@
         true,
         true,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -2016,7 +2156,12 @@
           "interval_seconds": 3600.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "LastSaleDate",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 41.7637,
@@ -2047,7 +2192,7 @@
         null,
         {
           "platform": "csv",
-          "watermark_col": "Original Issue Date",
+          "watermark_col": "original_issue_date",
           "interval_seconds": 600.0,
           "topic": "raw.municipal.sla"
         },
@@ -2139,19 +2284,19 @@
       "feeds": [
         false,
         false,
-        false,
-        true
+        true,
+        false
       ],
       "platforms": [
         null,
         null,
-        null,
         {
           "platform": "arcgis",
-          "watermark_col": "SALE_DATE",
-          "interval_seconds": 600.0,
-          "topic": "raw.municipal.deeds"
-        }
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
       ],
       "center": {
         "lat": 38.4192,
@@ -2400,12 +2545,12 @@
         true,
         false,
         true,
-        false
+        true
       ],
       "platforms": [
         {
           "platform": "arcgis",
-          "watermark_col": "ISSUEDATE",
+          "watermark_col": "APPROVED",
           "interval_seconds": 300.0,
           "topic": "raw.municipal.permits"
         },
@@ -2416,7 +2561,12 @@
           "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "csv",
+          "watermark_col": "saledt",
+          "interval_seconds": 86400.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 28.0395,
@@ -2434,7 +2584,7 @@
       "feeds": [
         true,
         false,
-        false,
+        true,
         false
       ],
       "platforms": [
@@ -2445,7 +2595,12 @@
           "topic": "raw.municipal.permits"
         },
         null,
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
       "center": {
@@ -2518,7 +2673,7 @@
         },
         {
           "platform": "arcgis",
-          "watermark_col": "SALEDATE",
+          "watermark_col": "DOCDATE",
           "interval_seconds": 600.0,
           "topic": "raw.municipal.deeds"
         }
@@ -2538,17 +2693,22 @@
       "submarket_count": 11,
       "feeds": [
         false,
-        false,
+        true,
         true,
         false
       ],
       "platforms": [
         null,
-        null,
         {
           "platform": "arcgis",
-          "watermark_col": "IssueDate",
-          "interval_seconds": 600.0,
+          "watermark_col": "CreatedDate",
+          "interval_seconds": 900.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
         null
@@ -2568,9 +2728,9 @@
       "submarket_count": 11,
       "feeds": [
         true,
-        false,
-        false,
-        false
+        true,
+        true,
+        true
       ],
       "platforms": [
         {
@@ -2579,9 +2739,24 @@
           "interval_seconds": 300.0,
           "topic": "raw.municipal.permits"
         },
-        null,
-        null,
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "CreationDate",
+          "interval_seconds": 900.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "RecordedDate",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 40.81,
@@ -2598,13 +2773,18 @@
       "submarket_count": 10,
       "feeds": [
         false,
-        false,
+        true,
         true,
         false
       ],
       "platforms": [
         null,
-        null,
+        {
+          "platform": "csv",
+          "watermark_col": "createddate",
+          "interval_seconds": 3600.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "MILESTONEDATE",
@@ -2627,13 +2807,18 @@
       "division_count": 5,
       "submarket_count": 7,
       "feeds": [
-        false,
+        true,
         false,
         true,
         false
       ],
       "platforms": [
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "DATE_ISSUED",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.permits"
+        },
         null,
         {
           "platform": "socrata",
@@ -2777,18 +2962,13 @@
       "division_count": 5,
       "submarket_count": 8,
       "feeds": [
-        true,
+        false,
         false,
         true,
         false
       ],
       "platforms": [
-        {
-          "platform": "arcgis",
-          "watermark_col": "ISSUEDATE",
-          "interval_seconds": 300.0,
-          "topic": "raw.municipal.permits"
-        },
+        null,
         null,
         {
           "platform": "arcgis",
@@ -2812,20 +2992,20 @@
       "division_count": 1,
       "submarket_count": 5,
       "feeds": [
+        false,
+        false,
         true,
-        false,
-        false,
         false
       ],
       "platforms": [
+        null,
+        null,
         {
-          "platform": "accela",
-          "watermark_col": "IssuedDate",
-          "interval_seconds": 300.0,
-          "topic": "raw.municipal.permits"
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
         },
-        null,
-        null,
         null
       ],
       "center": {
@@ -2844,17 +3024,22 @@
       "feeds": [
         false,
         false,
-        false,
+        true,
         true
       ],
       "platforms": [
         null,
         null,
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "SaleDate",
-          "interval_seconds": 600.0,
+          "interval_seconds": 21600.0,
           "topic": "raw.municipal.deeds"
         }
       ],
@@ -2875,7 +3060,7 @@
         true,
         true,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -2896,7 +3081,12 @@
           "interval_seconds": 600.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "SalesDate",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 42.3266,
@@ -2912,18 +3102,13 @@
       "division_count": 5,
       "submarket_count": 13,
       "feeds": [
-        true,
+        false,
         false,
         true,
         false
       ],
       "platforms": [
-        {
-          "platform": "arcgis",
-          "watermark_col": "issueDate",
-          "interval_seconds": 300.0,
-          "topic": "raw.municipal.permits"
-        },
+        null,
         null,
         {
           "platform": "arcgis",
@@ -3003,7 +3188,7 @@
         {
           "platform": "arcgis",
           "watermark_col": "BUSSDATE",
-          "interval_seconds": 600.0,
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
         {
@@ -3027,13 +3212,18 @@
       "division_count": 5,
       "submarket_count": 9,
       "feeds": [
-        false,
+        true,
         false,
         true,
         false
       ],
       "platforms": [
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "ApplyDate",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.permits"
+        },
         null,
         {
           "platform": "socrata",
@@ -3066,7 +3256,7 @@
         {
           "platform": "csv",
           "watermark_col": "date_issued",
-          "interval_seconds": 300.0,
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.permits"
         },
         {
@@ -3078,7 +3268,7 @@
         {
           "platform": "arcgis",
           "watermark_col": "GIS_DATETIME",
-          "interval_seconds": 600.0,
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
         {
@@ -3144,7 +3334,7 @@
       "feeds": [
         true,
         false,
-        false,
+        true,
         false
       ],
       "platforms": [
@@ -3155,7 +3345,12 @@
           "topic": "raw.municipal.permits"
         },
         null,
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
       "center": {
@@ -3248,13 +3443,13 @@
         {
           "platform": "socrata",
           "watermark_col": "",
-          "interval_seconds": 900.0,
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
         {
           "platform": "socrata",
           "watermark_col": "sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89",
-          "interval_seconds": 600.0,
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.deeds"
         }
       ],
@@ -3274,7 +3469,7 @@
       "feeds": [
         true,
         true,
-        false,
+        true,
         false
       ],
       "platforms": [
@@ -3290,7 +3485,12 @@
           "interval_seconds": 300.0,
           "topic": "raw.municipal.311"
         },
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
       "center": {
@@ -3309,7 +3509,7 @@
       "feeds": [
         true,
         false,
-        false,
+        true,
         false
       ],
       "platforms": [
@@ -3320,7 +3520,12 @@
           "topic": "raw.municipal.permits"
         },
         null,
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
       "center": {
@@ -3340,7 +3545,7 @@
         true,
         true,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -3361,7 +3566,12 @@
           "interval_seconds": 600.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "OwnDate",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 36.1627,
@@ -3378,13 +3588,18 @@
       "submarket_count": 8,
       "feeds": [
         false,
-        false,
+        true,
         true,
         true
       ],
       "platforms": [
         null,
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "created_at",
+          "interval_seconds": 900.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "socrata",
           "watermark_col": "recordrefreshedon",
@@ -3582,18 +3797,13 @@
       "division_count": 1,
       "submarket_count": 5,
       "feeds": [
-        true,
+        false,
         false,
         true,
-        false
+        true
       ],
       "platforms": [
-        {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 86400.0,
-          "topic": "raw.municipal.permits"
-        },
+        null,
         null,
         {
           "platform": "arcgis",
@@ -3601,7 +3811,12 @@
           "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 29.1872,
@@ -3618,13 +3833,18 @@
       "submarket_count": 7,
       "feeds": [
         false,
-        false,
+        true,
         true,
         false
       ],
       "platforms": [
         null,
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "created_at",
+          "interval_seconds": 900.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "socrata",
           "watermark_col": "updated",
@@ -3689,9 +3909,9 @@
       ],
       "platforms": [
         {
-          "platform": "arcgis",
-          "watermark_col": "",
-          "interval_seconds": 86400.0,
+          "platform": "socrata",
+          "watermark_col": "issue_permit_date",
+          "interval_seconds": 3600.0,
           "topic": "raw.municipal.permits"
         },
         null,
@@ -3733,7 +3953,7 @@
         {
           "platform": "arcgis",
           "watermark_col": "DATEISSUE",
-          "interval_seconds": 300.0,
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
         null
@@ -3754,13 +3974,18 @@
       "feeds": [
         false,
         false,
-        false,
+        true,
         true
       ],
       "platforms": [
         null,
         null,
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "date_of_sale",
@@ -3847,9 +4072,9 @@
           "topic": "raw.municipal.sla"
         },
         {
-          "platform": "csv",
-          "watermark_col": "",
-          "interval_seconds": 86400.0,
+          "platform": "arcgis",
+          "watermark_col": "DEED_DATE",
+          "interval_seconds": 21600.0,
           "topic": "raw.municipal.deeds"
         }
       ],
@@ -3870,7 +4095,7 @@
         true,
         false,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -3886,7 +4111,12 @@
           "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "csv",
+          "watermark_col": "sale_date",
+          "interval_seconds": 86400.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 47.2529,
@@ -3998,7 +4228,7 @@
         {
           "platform": "socrata",
           "watermark_col": "",
-          "interval_seconds": 600.0,
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
         null
@@ -4019,19 +4249,19 @@
       "feeds": [
         false,
         false,
-        false,
-        true
+        true,
+        false
       ],
       "platforms": [
         null,
         null,
-        null,
         {
           "platform": "arcgis",
-          "watermark_col": "SALE_DATE",
-          "interval_seconds": 600.0,
-          "topic": "raw.municipal.deeds"
-        }
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
       ],
       "center": {
         "lat": 43.6591,
@@ -4069,7 +4299,7 @@
         {
           "platform": "socrata",
           "watermark_col": "sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89",
-          "interval_seconds": 600.0,
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.deeds"
         }
       ],
@@ -4089,17 +4319,22 @@
       "feeds": [
         false,
         false,
-        false,
+        true,
         true
       ],
       "platforms": [
         null,
         null,
-        null,
         {
           "platform": "arcgis",
-          "watermark_col": "SALE_DATE",
-          "interval_seconds": 600.0,
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "SaleDate",
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.deeds"
         }
       ],
@@ -4199,17 +4434,22 @@
       "feeds": [
         false,
         false,
-        false,
+        true,
         true
       ],
       "platforms": [
         null,
         null,
-        null,
         {
           "platform": "arcgis",
-          "watermark_col": "SALE_DATE",
-          "interval_seconds": 600.0,
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "excel",
+          "watermark_col": "transfer_date",
+          "interval_seconds": 86400.0,
           "topic": "raw.municipal.deeds"
         }
       ],
@@ -4229,16 +4469,21 @@
       "feeds": [
         false,
         false,
-        false,
+        true,
         true
       ],
       "platforms": [
         null,
         null,
-        null,
         {
           "platform": "arcgis",
-          "watermark_col": "SALE_DATE",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "pxfer_date",
           "interval_seconds": 600.0,
           "topic": "raw.municipal.deeds"
         }
@@ -4335,7 +4580,7 @@
         true,
         false,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -4351,7 +4596,12 @@
           "interval_seconds": 21600.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "csv",
+          "watermark_col": "sale_date",
+          "interval_seconds": 86400.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 44.9429,
@@ -4534,7 +4784,7 @@
       "feeds": [
         false,
         true,
-        false,
+        true,
         false
       ],
       "platforms": [
@@ -4545,7 +4795,12 @@
           "interval_seconds": 300.0,
           "topic": "raw.municipal.311"
         },
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
       "center": {
@@ -4594,7 +4849,7 @@
       "feeds": [
         true,
         false,
-        false,
+        true,
         false
       ],
       "platforms": [
@@ -4605,7 +4860,12 @@
           "topic": "raw.municipal.permits"
         },
         null,
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
       "center": {
@@ -4623,9 +4883,9 @@
       "submarket_count": 10,
       "feeds": [
         true,
-        false,
         true,
-        false
+        true,
+        true
       ],
       "platforms": [
         {
@@ -4634,14 +4894,24 @@
           "interval_seconds": 300.0,
           "topic": "raw.municipal.permits"
         },
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "ClosedDate",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "BusinessStartDate",
           "interval_seconds": 600.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "DEED_DATE",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 33.4942,
@@ -4676,9 +4946,9 @@
           "topic": "raw.municipal.311"
         },
         {
-          "platform": "socrata",
-          "watermark_col": "applicationdate",
-          "interval_seconds": 600.0,
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
         {
@@ -4704,7 +4974,7 @@
       "feeds": [
         true,
         false,
-        false,
+        true,
         false
       ],
       "platforms": [
@@ -4715,7 +4985,12 @@
           "topic": "raw.municipal.permits"
         },
         null,
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
       "center": {
@@ -4776,7 +5051,7 @@
         {
           "platform": "excel",
           "watermark_col": "issued_date",
-          "interval_seconds": 300.0,
+          "interval_seconds": 3600.0,
           "topic": "raw.municipal.permits"
         },
         null,
@@ -4858,7 +5133,7 @@
         {
           "platform": "arcgis",
           "watermark_col": "OriginalIssueDate",
-          "interval_seconds": 600.0,
+          "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
         null
@@ -4910,7 +5185,7 @@
         true,
         true,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -4931,7 +5206,12 @@
           "interval_seconds": 600.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "csv",
+          "watermark_col": "sale_date",
+          "interval_seconds": 86400.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 47.230000000000004,
@@ -4949,7 +5229,7 @@
       "feeds": [
         true,
         true,
-        false,
+        true,
         true
       ],
       "platforms": [
@@ -4965,7 +5245,12 @@
           "interval_seconds": 600.0,
           "topic": "raw.municipal.311"
         },
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "SALES_SALEDT",
@@ -4990,7 +5275,7 @@
         true,
         false,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -5006,7 +5291,12 @@
           "interval_seconds": 600.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "S_DATE",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 27.9506,
@@ -5024,8 +5314,8 @@
       "feeds": [
         true,
         true,
-        false,
-        false
+        true,
+        true
       ],
       "platforms": [
         {
@@ -5040,8 +5330,18 @@
           "interval_seconds": 180.0,
           "topic": "raw.municipal.311"
         },
-        null,
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "DEED_DATE",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 33.4267,
@@ -5057,13 +5357,18 @@
       "division_count": 5,
       "submarket_count": 8,
       "feeds": [
-        false,
+        true,
         false,
         true,
         false
       ],
       "platforms": [
-        null,
+        {
+          "platform": "excel",
+          "watermark_col": "date_started",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.permits"
+        },
         null,
         {
           "platform": "socrata",
@@ -5090,7 +5395,7 @@
         false,
         true,
         true,
-        false
+        true
       ],
       "platforms": [
         null,
@@ -5106,7 +5411,12 @@
           "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "RECORDDT",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 41.6528,
@@ -5123,19 +5433,29 @@
       "submarket_count": 9,
       "feeds": [
         true,
-        false,
-        false,
+        true,
+        true,
         false
       ],
       "platforms": [
         {
           "platform": "arcgis",
-          "watermark_col": "date_issued",
+          "watermark_col": "Date_Issued",
           "interval_seconds": 300.0,
           "topic": "raw.municipal.permits"
         },
-        null,
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "datetimeinit",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
         null
       ],
       "center": {
@@ -5152,13 +5472,18 @@
       "division_count": 5,
       "submarket_count": 8,
       "feeds": [
-        false,
+        true,
         false,
         true,
-        false
+        true
       ],
       "platforms": [
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "ISSUEDATE",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.permits"
+        },
         null,
         {
           "platform": "arcgis",
@@ -5166,7 +5491,12 @@
           "interval_seconds": 600.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "csv",
+          "watermark_col": "recordingdate",
+          "interval_seconds": 86400.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 32.2226,
@@ -5250,7 +5580,7 @@
         true,
         false,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -5266,7 +5596,12 @@
           "interval_seconds": 3600.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "SaleDate",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 45.6282,
@@ -5323,13 +5658,18 @@
       "submarket_count": 8,
       "feeds": [
         false,
-        false,
+        true,
         true,
         false
       ],
       "platforms": [
         null,
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "DateCreated",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "socrata",
           "watermark_col": "updated",
@@ -5434,19 +5774,19 @@
       "feeds": [
         false,
         false,
-        false,
-        true
+        true,
+        false
       ],
       "platforms": [
         null,
         null,
-        null,
         {
           "platform": "arcgis",
-          "watermark_col": "SALE_DATE",
-          "interval_seconds": 600.0,
-          "topic": "raw.municipal.deeds"
-        }
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        null
       ],
       "center": {
         "lat": 39.7447,
@@ -5465,7 +5805,7 @@
         true,
         false,
         true,
-        false
+        true
       ],
       "platforms": [
         {
@@ -5481,7 +5821,12 @@
           "interval_seconds": 1800.0,
           "topic": "raw.municipal.sla"
         },
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALE_DATE",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 34.235,
@@ -5498,7 +5843,7 @@
       "submarket_count": 9,
       "feeds": [
         true,
-        false,
+        true,
         true,
         false
       ],
@@ -5509,7 +5854,12 @@
           "interval_seconds": 600.0,
           "topic": "raw.municipal.permits"
         },
-        null,
+        {
+          "platform": "arcgis",
+          "watermark_col": "Date_Logged",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.311"
+        },
         {
           "platform": "arcgis",
           "watermark_col": "Issued_Date",
@@ -5533,9 +5883,9 @@
       "submarket_count": 9,
       "feeds": [
         true,
-        false,
-        false,
-        false
+        true,
+        true,
+        true
       ],
       "platforms": [
         {
@@ -5544,9 +5894,24 @@
           "interval_seconds": 300.0,
           "topic": "raw.municipal.permits"
         },
-        null,
-        null,
-        null
+        {
+          "platform": "arcgis",
+          "watermark_col": "dateOpened",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.311"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "",
+          "interval_seconds": 1800.0,
+          "topic": "raw.municipal.sla"
+        },
+        {
+          "platform": "arcgis",
+          "watermark_col": "SALE_DATE",
+          "interval_seconds": 21600.0,
+          "topic": "raw.municipal.deeds"
+        }
       ],
       "center": {
         "lat": 46.6021,

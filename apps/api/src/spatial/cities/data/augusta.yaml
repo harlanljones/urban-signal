@@ -223,9 +223,9 @@ datasets:
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: DATE_ISSUE DESC,PERMITNUMBER ASC,PARID ASC
     id_col: null
-    select: null
+    select: PERMITNUMBER,PERM_NUM,PERMYEAR,PARID,PERMCODE,PERM_TYPE,PERMIT_STATUS,DATE_ISSUE,DATE_ENTERED,JOBADDRESS,WORKCOST
     fallback_endpoints: []
     where: null
     needs_geocode: true
@@ -241,12 +241,15 @@ datasets:
       - DATE_ENTERED
       filing_date:
       - DATE_ENTERED
+      job_type:
+      - PERM_TYPE
+      - PERMCODE
       cost:
       - WORKCOST
       status:
       - PERMIT_STATUS
     ingestion_mode: incremental
-    oid_field: OBJECTID
+    oid_field: PERMITNUMBER
     max_record_count: 15000
     expected_cadence_days: 7
     alarm_exempt: false
@@ -265,6 +268,37 @@ datasets:
     non_spatial: null
     zip_member: null
     delimiter: null
+  '311':
+    endpoint: https://augcw.augustaga.gov/CityworksForms/gis/2/5799/rest/services/cw/FeatureServer/1
+    platform: arcgis
+    watermark_col: DateTimeInit
+    id_keys:
+    - REQUESTID
+    topic: raw.municipal.311
+    interval_seconds: 1800.0
+    producer_key: '311'
+    order_by: DateTimeInit DESC, REQUESTID DESC
+    select: REQUESTID,ProblemCode,Status,DateTimeInit,DateTimeClosed,ProbDistrict
+    where: ProblemCode NOT LIKE 'LOCATE UTILITIES%' AND ProblemCode <> 'Subpoenas' AND ProblemCode NOT LIKE 'C&M%'
+    needs_geocode: false
+    field_map:
+      incident_id:
+      - REQUESTID
+      created_date:
+      - DateTimeInit
+      closed_date:
+      - DateTimeClosed
+      complaint_type:
+      - ProblemCode
+      status:
+      - Status
+      borough:
+      - ProbDistrict
+    ingestion_mode: incremental
+    oid_field: REQUESTID
+    max_record_count: 30000
+    expected_cadence_days: 1
+    metro_clip: true
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis
@@ -283,7 +317,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'GA'
+    where: State = 'GA' AND Latitude BETWEEN 33.25 AND 33.65 AND Longitude BETWEEN -82.2 AND -81.85
     needs_geocode: false
     geocode_context: null
     field_map:

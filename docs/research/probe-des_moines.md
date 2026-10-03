@@ -7,17 +7,23 @@ Catalog, item and DCAT "modified" dates were ignored. Two layer-level
 `editingInfo` timestamps are quoted below, each labelled as a hint and never
 used as evidence of freshness.
 
-**Verdict: REGISTER (partial — one feed, `sla`).** The City's Rental License
-layer is registerable at Tier 1: native points on every row, a per-licence
-`IssuedDate` watermark that is 4 days old at the probe, weekday-continuous
-issuance. Everything else was probed to the row and did not qualify, for five
-different reasons (details and re-probe triggers below): permits are live but
-Tyler EnerGov has no platform client; 311 has no public row API; deeds are live
-but their geometry needs a parcel join the current `parcel_join` contract
-cannot express; crime is a 29-day-old batch of unproven cadence; code-enforcement
-cases are live but the `violations` feed type cannot ingest through the
-scheduler today (a pre-existing defect, not a Des Moines one). Des Moines is the
-first Iowa metro in the registry.
+**Verdict: REGISTER (partial — two feeds, `sla` and `violations`).** The City's
+Rental License layer is registerable at Tier 1: native points on every row, a
+per-licence `IssuedDate` watermark that is 4 days old at the probe,
+weekday-continuous issuance. The Code Case layer of the same map service is the
+second Tier 1 feed: it qualified on data at the first probe, was deferred only
+because the scheduler could not ingest the `violations` feed type, and was
+registered as `violations` in a same-day follow-up once that defect was fixed
+(see "Code cases"). Everything else was probed to the row and did not qualify,
+for four different reasons (details and re-probe triggers below): permits are
+live but Tyler EnerGov has no platform client; 311 has no public row API; deeds
+are live but their geometry needs a parcel join the current `parcel_join`
+contract cannot express; crime is a 29-day-old batch of unproven cadence. Des
+Moines is the first Iowa metro in the registry.
+
+The Code Case follow-up re-probe was read 22:20-22:50Z on 2026-09-29 (17:20-17:50
+CDT), after the scheduler fix (PR #67), with the same
+row-level rules: default curl User-Agent, 26 requests, no WAF response.
 
 Platform: **ArcGIS Server 10.91** at `https://maps.dsm.city/p2/rest/services`
 (City-run; resolves straight to an address record, no CDN CNAME), plus the City's AGOL org `HT7H9QGiZQoRJDpJ`
@@ -93,7 +99,7 @@ Limits:
 | **311** | CitySourced app / Tyler Portico: no public row API | n/a | n/a | n/a | **3** |
 | **DEEDS** | Polk County Auditor `Parcel` table `gis4.polkcountyiowa.gov/server/rest/services/Public/Polk_County_Parcels/FeatureServer/2` | `LastDeededDate` = **2026-09-24T19:38:24Z** | none on the table (parcel key only) | 7d **160**; 30d **1,390**; total **220,002** | live but **deferred** (`parcel_join` contract) |
 | Crime (extra) | `services.arcgis.com/HT7H9QGiZQoRJDpJ/arcgis/rest/services/PSDP_Crime_Layer_View/FeatureServer/0` | `reported_date` = **2026-08-31** | native anonymized points | 7d **0**; 30d **161**; 60d **2,836**; 90d **5,633**; total **122,243** | **3** as probed (29 d old, cadence unproven) |
-| Code cases (extra) | `.../EXTDynamicCodeCaseRentalLicense/MapServer/0` (Code Case) | `DateOpened` = **2026-09-25** (Fri) | native points | 7d **190**; 30d **795**; 60d **1,843**; total **33,061** | **1** by data; **deferred** (scheduler defect) |
+| **VIOLATIONS** (registered in the follow-up) | `maps.dsm.city/p2/rest/services/External/EXTDynamicCodeCaseRentalLicense/MapServer/0` (Code Case) | `DateOpened` = **2026-09-25** (Fri); 0 future-dated rows | native points on 33,061 of 33,061 rows (`outSR=4326`) + `Address` | 7d **190**; 30d **795**; 60d **1,843**; 90d **2,908**; total **33,061** | **1** |
 
 Windows are calendar windows through 2026-09-29 on the watermark column
 (7d = on or after 09-22, 30d = 08-30, 60d = 07-31, 90d = 06-30; EnerGov's 90d
@@ -291,26 +297,119 @@ unique per row: one case carries several offences), `reported_date`,
   `authentication_required` at both `/resource/<id>.json` and `/api/views/<id>.json`
   (the ninth is a non-tabular logo file). The Hub carries only 2023 summary tables.
 
-## Code cases (extra family) — Tier 1 by data, DEFERRED (scheduler defect)
+## Code cases — Tier 1 (REGISTERED as `violations`)
 
-Layer 0 `Code Case` of the same map service: 33,061 rows, native points,
-`DateOpened` newest **2026-09-25**, 0 future rows, 7d **190**, 30d **795**, 60d
-**1,843**, weekday-continuous. Columns: `CaseNumber`, `CaseType`, `ParcelNumber`,
-`DateOpened`, `DateClosed`, `Status`, `Address`, `Unit`, `Description`, `Vacant`,
-`FireDamage`, `FloodDamage`, `NuisanceStruc`, `Remark`, plus editor columns.
+Layer 0 `Code Case` of the same map service (`maxRecordCount` 2000; the layer name
+is served with a leading space, " Code Case"), registered on 2026-09-29 as
+`FeedType.VIOLATIONS`, the first ArcGIS `violations` feed in the registry (Austin
+is Socrata, Boston is CKAN). It was deferred at the first probe only because the
+scheduler could not ingest that feed type: `poll_job` called
+`producer.parse_socrata_row` on `ViolationsProducer`, which had none, and the
+`ViolationEvent` carries `status_date`, not one of the dates the scheduler read
+for its watermark. PR #67 gave the producer the hook and made `poll_job`
+advance the watermark from the raw watermark column for events that have none of
+the four date attributes; `TestPollJobIngestionContract` covers it. Code
+enforcement is not 311 (Lynchburg, Scottsdale and Wichita precedents in this
+repo); the `violations` family is a signal supplement and is never a LIMS input
+without its own ablation study (US-72).
 
-It would be the `violations` feed, and it is **not registered** because that feed
-type cannot ingest through the scheduler today (pre-existing, unrelated to Des
-Moines): `scheduler.py` `poll_job` calls `producer.parse_socrata_row(...)`
-(line 868) but `ViolationsProducer` and `InspectionsProducer`
-(`enforcement_signals_producer.py`, lines 79 and 221) only define `parse_row`, and
-`ViolationEvent` carries `status_date` while the scheduler reads only
-`issuance_date`, `created_date` or `effective_date` for its watermark (lines
-904–906). A mock `poll_job` run on `violations_boston` produced 0 events and one
-DLQ route ("'ViolationsProducer' object has no attribute 'parse_socrata_row'").
-Registering Code Case would only feed the DLQ. Fix (spine): give both producers a
-`parse_socrata_row` and add `status_date` to the watermark attributes. Code
-enforcement is also not 311 (Lynchburg, Scottsdale and Wichita precedents in this repo).
+**Re-probe, 2026-09-29 22:20-22:50Z.** Base `L` =
+`https://maps.dsm.city/p2/rest/services/External/EXTDynamicCodeCaseRentalLicense/MapServer/0`;
+every query below is `GET L/query?...&f=json`.
+
+| Measure | Result | Query |
+|---|---|---|
+| Rows | **33,061** (33,061 distinct `CaseNumber`; 0 null or blank; 0 null `DateOpened`); unchanged since the first probe | `where=1=1&returnCountOnly=true`; `returnDistinctValues=true&outFields=CaseNumber&returnCountOnly=true`; `where=CaseNumber IS NULL OR CaseNumber = '' OR DateOpened IS NULL&returnCountOnly=true` |
+| Newest non-future `DateOpened` | **2026-09-25** (Fri), 35 rows, 4 days old at the probe; oldest row 2023-01-03 | `where=1=1&outStatistics=[max/min DateOpened, count]`; `where=DateOpened = date '2026-09-25'&returnCountOnly=true` |
+| Future-dated rows | **0** (the maximum over all rows is 2026-09-25) | the same `outStatistics` over `where=1=1`; the daily group-by below has no day after 09-25 |
+| 7d | **190** (on or after 09-22) | `where=DateOpened >= date '2026-09-22'&returnCountOnly=true` |
+| 30d | **795** (on or after 08-30) | `where=DateOpened >= date '2026-08-30'&returnCountOnly=true` |
+| 60d / 90d | 1,843 / 2,908 (on or after 07-31 / 06-30), summed from the daily counts | `where=DateOpened >= date '2025-09-01'&groupByFieldsForStatistics=DateOpened&outStatistics=[count(OBJECTID)]&orderByFields=DateOpened` (275 groups, 10,164 rows) |
+| Longest gap, trailing 12 months | **5 days** (2025-11-26 to 2025-12-01, Thanksgiving; 2025-12-24 to 2025-12-29, Christmas). Next: four 4-day gaps, each spanning a federal holiday (05-22 to 05-26, 06-18 to 06-22, 07-02 to 07-06, 09-04 to 09-08); every other gap is an ordinary weekend or shorter | the daily group-by above; 256 distinct opened days between 2025-09-29 and 2026-09-25 |
+| ANSI literal with the registered ordering | works: `where=DateOpened > date '2026-09-18'&orderByFields=DateOpened DESC,OBJECTID DESC&outFields=OBJECTID,CaseNumber,DateOpened&returnGeometry=false&resultRecordCount=5` returned the five newest rows (all 2026-09-25, OBJECTID descending) | as shown |
+| ISO string (negative control) | `where=DateOpened > '2026-09-24T05:00:00'&returnCountOnly=true` returns `{"error":{"code":400,"message":"Unable to complete operation."}}` in an HTTP 200 body | as shown |
+| Day-boundary semantics | `> date '2026-09-25'` **0**, `>= date` **35**, `= date` **35**: `date '...'` is local midnight, so `>` excludes the whole day, as on the rental layer | `returnCountOnly=true` with each predicate |
+
+- **Columns.** `OBJECTID`, `CaseNumber`, `CaseType`, `ParcelNumber`, `DateOpened`,
+  `DateClosed`, `Status`, `Address`, `Unit`, `Description`, `Vacant`, `FireDamage`,
+  `FloodDamage`, `NuisanceStruc`, `Remark`, `DataOwner`, `PKID`, `created_date`,
+  `created_user`, `last_edited_date`, `last_edited_user`, `ExtID`, `GlobalID`,
+  `Shape` (point). Date-typed: `DateOpened`, `DateClosed`, `created_date`,
+  `last_edited_date`, all stored at local midnight or local time
+  (`dateFieldsTimeReference`: Central Standard Time, respects daylight saving), so a
+  feature query serves `T05:00:00Z` for a CDT midnight.
+- **Grain.** One row per case, `CaseNumber` unique (`XXXX-YYYY-NNNNNN`, a four-letter
+  type prefix: HLTH, WGCC, RNTC, RCOM, DFPR, EMER, ENCC, ENCR, NUIS). `OBJECTID`
+  does not follow `DateOpened` (a 2026-09-24 case has a higher `OBJECTID` than every
+  2026-09-25 case), so the watermark cannot be `OBJECTID`.
+- **`CaseType`** (9 values, category text): Health and Sanitation 13,463; Weeds and
+  Tall Grass 6,680; Rental Code Case 6,442; Rental Complaint 2,293; Deficient Property
+  1,292; Emergency Abatement 965; Encroachment Complaint 886; Public Nuisance 669;
+  Encroachment Clean-up 371. **`Status`** (18 values, workflow states): Closed -
+  Resolved 25,084; Closed - Unfounded 2,880; In Progress 2,697; On Hold - Assessment
+  1,109; Under Investigation 495; Fees Due 401; the other twelve are 184 or fewer.
+- **`Address`**: `NUMBER STREET ` on every one of the newest 500 rows, with a
+  trailing space that the shared parser keeps (`ViolationEvent.address` carries it);
+  `Unit` is a separate column (26 of the newest 500 non-blank).
+- **Weekday-continuous.** Opened days are Monday to Friday, apart from six
+  Sunday-dated days (19 rows) in the trailing 12 months and no Saturday. Last 14
+  opened days: 09-08 62 · 09-09 36 · 09-10 31 · 09-11 39 · 09-14 40 · 09-15 24 ·
+  09-16 35 · 09-17 33 · 09-18 33 · 09-21 41 · 09-22 36 · 09-23 41 · 09-24 78 ·
+  09-25 35.
+- **Geocoding.** Native points. All 33,061 rows intersect the registered metro bbox
+  (`geometry=-93.90,41.44,-93.42,41.81&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&returnCountOnly=true`
+  returns 33,061), so no row lacks a point. Extent (`returnExtentOnly=true&outSR=4326`)
+  lng -93.7085..-93.5015, lat 41.5016..41.6526: inside the four city divisions, none
+  in the suburban ones. No ADR 0004 dependency.
+- **Reload and cadence.** `created_date` is one value on every row (min = max) and
+  `last_edited_date` peaks at the same instant, 2026-09-27 06:00 CDT, the signature of a
+  full-table reload written by one service account (`created_user` and
+  `last_edited_user` have one distinct value each). The Mon 09-28 and Tue 09-29 06:00 CDT slots passed without a reload, so the
+  reload is not proven daily (same as the rental layer). Registered with
+  `expected_cadence_days: 7` (staleness alarm at 14 days): the data gap alone would
+  justify 3, but a weekly reload plus a holiday gap puts the newest opened day up to
+  about 10 days old (reload Sunday 06:00, last opened day the Wednesday before a
+  holiday weekend, next reload a week later), and 3 (alarm at 6 days) would
+  false-alarm. Same value and reason as `sla`. Re-read `created_date` after the next
+  Sunday: if it moves daily, 3 becomes defensible.
+- **Feed shape (opened-case stream).** `status_date` is `DateOpened`, and the watermark
+  is `DateOpened`, so each case is published once, when its opened day first appears.
+  A later status change (76% of all rows are `Closed - Resolved`, 382 of the newest 500
+  are `In Progress`) is not re-emitted, and `status` on a published event is the status
+  at first ingestion. Austin registers the same way (`opened_date`). The date-only
+  watermark with `>` also misses a row that lands late for an already-ingested day
+  (for example a case entered after its opened day was first loaded). That is a
+  property of every date-only watermark, as for `sla`; how often it happens here
+  is unmeasured.
+- **Registration.** `datasets.violations`, `platform: arcgis`, `watermark_col:
+  DateOpened`, `id_keys: [CaseNumber, OBJECTID]`, `order_by: DateOpened DESC, OBJECTID
+  DESC` (the tiebreak keeps paging total-ordered: a day's cases share one
+  timestamp), `where: null` (every `CaseType` is code enforcement), `oid_field:
+  OBJECTID`, `max_record_count: 2000`, `interval_seconds: 1800`,
+  `expected_cadence_days: 7`, `needs_geocode: false`, `ingestion_mode: incremental`,
+  topic `raw.municipal.violations`. Field map: `violation_id` <- `CaseNumber`, `code`
+  <- `CaseType`, `status` <- `Status`, `status_date` <- `DateOpened`, `address` <-
+  `Address`. Coordinates are not mapped: the ArcGIS client lifts point geometry to
+  `latitude` / `longitude`, which `ViolationsProducer.parse_row` reads by name.
+  Settings field `arcgis_des_moines_code_cases_url` in `config.py`; `maps.dsm.city` was
+  already in `ANSI_DATE_LITERAL_HOSTS`. `ViolationEvent.borough`, `zipcode` and
+  `description` are None (the layer has no such columns worth mapping).
+- **PII and free text.** `Description` is **not mapped**: it is free text, 14,568
+  distinct values on 33,061 rows (12,977 empty), with staff initials, names and
+  complaint notes in it, so it could name people; 294 of the newest 500 rows carry
+  text. `Remark` is
+  a free-text column that is empty on every row today (0 non-empty). Editor columns
+  (`created_user`, `last_edited_user`) are one service account today. None is
+  mapped and none is an id key. The shared parser also falls back to lower-case
+  `description` and `case_type` when a map is silent; these capitalized columns never
+  match, so `ViolationEvent.description` is None (500 of 500 newest verified). The
+  fixtures replace `Remark`, `Description` (where non-empty) and both editor columns
+  with `REDACTED`, and a test pins that none of them reaches an event. **But** the
+  ArcGIS client's `paginate` accepts no `select`/`outFields` (only `order_by`), so it
+  requests `outFields=*` and a raw row still carries `Description` and the editor
+  columns: it would be written to the DLQ payload if a row failed to parse (0 of the
+  newest 500 did; every row has a point and a `CaseNumber`). Platform-wide, not a Des
+  Moines decision; flagged for the owner, as for the rental contacts.
 
 ## Other layers read (not families, or not live)
 
@@ -369,8 +468,19 @@ field map: `license_id` ← `LicenseNumber`, `license_type` ← `ContactType`, `
 ← `Status`, `effective_date` ← `IssuedDate`, `expiration_date` ← `ExpDate`,
 `address_street` ← `RentalAddress`. Contact columns are never mapped. Settings field
 `arcgis_des_moines_rental_licenses_url` in `config.py`; `CityId.DES_MOINES`;
-`maps.dsm.city` added to `ANSI_DATE_LITERAL_HOSTS`. `permits`, `311`, `deeds` and
-`crime` are unregistered, so `get_dataset()` raises for them.
+`maps.dsm.city` added to `ANSI_DATE_LITERAL_HOSTS`.
+
+`datasets.violations` (added in the same-day follow-up): `platform: arcgis`, endpoint
+`https://maps.dsm.city/p2/rest/services/External/EXTDynamicCodeCaseRentalLicense/MapServer/0`,
+watermark `DateOpened`, `id_keys: [CaseNumber, OBJECTID]`, `order_by: DateOpened DESC,
+OBJECTID DESC`, no `where`, `oid_field: OBJECTID`, `max_record_count: 2000`,
+`interval_seconds: 1800`, `expected_cadence_days: 7`, `needs_geocode: false`,
+`ingestion_mode: incremental`, topic `raw.municipal.violations`, field map:
+`violation_id` ← `CaseNumber`, `code` ← `CaseType`, `status` ← `Status`, `status_date`
+← `DateOpened`, `address` ← `Address`. `Description`, `Remark` and the editor columns
+are never mapped. Settings field `arcgis_des_moines_code_cases_url` in `config.py`.
+`permits`, `311`, `deeds` and `crime` are unregistered, so `get_dataset()` raises for
+them.
 
 Geography (`cities/des_moines.py`): center City Hall (Census geocoder match for
 400 Robert D Ray Dr, 41.588722, −93.616145); metro bbox 41.44–41.81 N, −93.90…−93.42 E
@@ -397,6 +507,33 @@ future-dated row (`watermark_seen` 2026-12-05). Re-run in the production shape
 (spec `where` and `order_by`): 500 / 500 parsed, points 500 / 500, addresses 500 /
 500, 500 owner rows, oldest 2026-08-17.
 
+### Code Case (`violations`), same day
+
+`scripts/backfill_probe.py` cannot run this job as shipped: its `PRODUCERS` table has
+no `violations` entry, so `producer_for("violations")` raises `ValueError: No producer
+registered for key 'violations'` (Austin and Boston violations are affected the same
+way). The script was not edited. Its own `probe_feed` was run instead, with the
+producer supplied in-process (the way `test_backfill_probe.py` monkeypatches it) and the
+HTTP transport replaced by rows captured with curl (default User-Agent) in the query the
+ArcGIS client sends, flattened by the production `_flatten_feature`: newest 500 rows plus
+the `returnCountOnly` source count. Result: **500 / 500 parsed (100%), 0 dropped**,
+`drop_reasons` empty, source count 33,061, `watermark_seen` 2026-09-25T05:00:00+00:00
+(floor 99% for native points). Separate measurement on the same 500 rows: points
+**500 / 500 (100%)**, all 500 inside the metro bbox, addresses 500 / 500 (100%), division
+resolved 500 / 500, `status_date` 500 / 500, `description` set 0 / 500 (by design).
+The sample spans 2026-09-09 to 2026-09-25. The probe orders by `DateOpened DESC` and
+ignores the spec's `order_by`; the production shape (`DateOpened DESC, OBJECTID DESC`)
+returns a sample that differs by 2 of 500 rows at the tie boundary and gives the same
+numbers. Whole layer: all 33,061 rows have a point inside the metro bbox.
+
+Cross-check through the production path (2026-09-29, after the registration): the
+scheduler's own `poll_job` on `violations_des_moines`, against the live layer with the
+real ArcGIS client and only Kafka mocked, fetched and published **500 / 500** of the
+newest rows with 0 DLQ routes, 500 distinct `des_moines:<CaseNumber>` keys, points on
+500 / 500, `description` set on 0, and high watermark `2026-09-25T05:00:00`. The next
+poll sent `DateOpened > date '2026-09-25'` with `DateOpened DESC, OBJECTID DESC` and
+returned 0 rows with status SUCCESS.
+
 ## Re-probe triggers
 
 - **Permits**: an `energov` platform client lands (or the City publishes permits to
@@ -411,8 +548,11 @@ future-dated row (`watermark_seen` 2026-12-05). Re-run in the production shape
   September load within about five weeks of month end, on top of the Jun–Aug
   month-complete counts, is the second boundary event needed for a 30-day cadence; or
   the PD publishes a weekly or daily feed.
-- **Code cases**: after the `violations` scheduler fix above; the ANSI host and
-  ordering notes already apply to layer 0.
+- **Code cases** (registered): newest non-future `DateOpened` older than 14 days;
+  `created_date` moving daily (tighten the cadence to 3); a future-dated `DateOpened`
+  appearing (the US-111 guard keeps it off the watermark, but re-check the ANSI
+  comparison); or the City publishing a coded `Description` (it is free text today, so
+  it stays unmapped).
 - **SLA staleness**: newest non-future `IssuedDate` older than 14 days, or
   `created_date` moving daily (tighten the cadence).
 

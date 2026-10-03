@@ -12,6 +12,24 @@ Cache la Poudre River, home to Colorado State University. Downtown/Old Town
 is at roughly (40.585, -105.077). The metro bbox mirrors the live AGOL
 FeatureServer item extent ([-105.145, 40.481] to [-104.990, 40.638]) plus a
 small buffer.
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``.
+
+DEEDS (2026-10-02): the Larimer County Assessor's public sales table
+(``storage.googleapis.com/lc-public/asr/assessor-public-sales.csv``), rebuilt
+overnight, every sale in the county by account: 661,961 rows, 101 MB, which
+the CSV client decodes as it reads rather than holding the body again as
+text. The poll downloads it once a day and reads the sales dated in the 90
+days before it (2,597 on 2026-10-02; the 90 days from 2025-03-31 held 4,337)
+under a 6,000-row cap. Sales reach the table weeks after their date: the
+newest was 24 days old. Each sale takes its account's parcel centroid from
+the County's ``MapServices/Parcels`` layer, joined on the schedule number,
+and the 1,043 placed inside the box publish. Rows key on reception number and
+account. The grantor and grantee columns are never selected, and the join
+asks the layer for ``SCHEDNUM`` alone. The layer names no object-id field;
+the ArcGIS client pages it by ``OBJECTID_1``, the field it types as one.
 """
 
 from src.spatial.registration import SpatialRegistration

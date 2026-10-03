@@ -133,7 +133,6 @@ datasets:
     id_keys:
     - RecordID
     - OBJECTID
-    - id
     topic: raw.municipal.permits
     interval_seconds: 300.0
     producer_key: permits
@@ -143,7 +142,7 @@ datasets:
     watermark_exclude: []
     order_by: IssuedDate DESC
     id_col: null
-    select: null
+    select: OBJECTID,RecordID,IssuedDate,ReceiveDate,TypeOfWork,TypeOfPermit,RecordTypeAlias,PermitStatus,JobValue,PropertyAddress
     fallback_endpoints: []
     where: null
     needs_geocode: false
@@ -151,14 +150,20 @@ datasets:
     field_map:
       job_id:
       - RecordID
+      issuance_date:
+      - IssuedDate
+      filing_date:
+      - ReceiveDate
+      job_type:
+      - TypeOfWork
+      - TypeOfPermit
+      - RecordTypeAlias
+      status:
+      - PermitStatus
       cost:
       - JobValue
-      issued_date:
-      - IssuedDate
-      latitude:
-      - Y
-      longitude:
-      - X
+      address_street:
+      - PropertyAddress
     ingestion_mode: incremental
     oid_field: OBJECTID
     max_record_count: 2000
@@ -179,7 +184,7 @@ datasets:
     non_spatial: null
     zip_member: null
   crime:
-    endpoint: https://services1.arcgis.com/WHM6qC35aMtyAAlN/arcgis/rest/services/BPD_Crimes_Public/FeatureServer
+    endpoint: https://services1.arcgis.com/WHM6qC35aMtyAAlN/arcgis/rest/services/BPD_Crimes_Public/FeatureServer/0
     platform: arcgis
     watermark_col: OccurredDateTime
     id_keys:
@@ -250,7 +255,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'ID'
+    where: State = 'ID' AND Latitude BETWEEN 43.43 AND 43.74 AND Longitude BETWEEN -116.42 AND -116.03
     needs_geocode: false
     geocode_context: null
     field_map:

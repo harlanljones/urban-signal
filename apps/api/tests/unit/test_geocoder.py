@@ -75,6 +75,112 @@ class TestNormalization:
         assert normalize_address(None) == ""
 
 
+class TestNormalizationKeepsThePlace:
+    """v3: a unit or a floor never costs a query the city and state after it."""
+
+    def test_version_moved_past_the_frozen_v2_misses(self):
+        from src.spatial.geocoder import NORM_VERSION
+
+        assert NORM_VERSION == "v3"
+
+    def test_a_hash_unit_drops_only_its_value(self):
+        assert (
+            normalize_address("7000 Business Center Dr #2, Savannah, GA")
+            == "7000 BUSINESS CENTER DR SAVANNAH GA"
+        )
+        assert (
+            normalize_address("123 Main St Unit #4, Hartford, CT 06103")
+            == "123 MAIN ST HARTFORD CT 06103"
+        )
+        assert normalize_address("123 Main St # 4B, Hartford, CT") == "123 MAIN ST HARTFORD CT"
+
+    def test_fl_is_florida_where_it_ends_the_line_or_precedes_a_zip(self):
+        assert (
+            normalize_address("1234 SE 47th Ter, Cape Coral, FL 33904")
+            == "1234 SE 47TH TER CAPE CORAL FL 33904"
+        )
+        assert normalize_address("100 Main St, Tampa, FL") == "100 MAIN ST TAMPA FL"
+        assert normalize_address("100 Main St Tampa FL 33602") == "100 MAIN ST TAMPA FL 33602"
+        assert normalize_address("100 Main St, Orlando, FL, 32801") == "100 MAIN ST ORLANDO FL 32801"
+
+    def test_fl_is_a_floor_everywhere_else(self):
+        assert normalize_address("123 Main St Fl 2, Tampa, FL") == "123 MAIN ST TAMPA FL"
+        assert normalize_address("123 Main St, FL 2, Tampa, FL 33602") == "123 MAIN ST TAMPA FL 33602"
+        assert (
+            normalize_address("123 Main St, 2nd Fl, Orlando, FL 32801")
+            == "123 MAIN ST ORLANDO FL 32801"
+        )
+        assert normalize_address("123 Main St 3rd Floor, Austin, TX") == "123 MAIN ST AUSTIN TX"
+
+    def test_a_designator_with_no_value_never_takes_the_city(self):
+        assert normalize_address("10 Oak St Apt, Norfolk, VA") == "10 OAK ST NORFOLK VA"
+
+    def test_zip_plus_four_and_a_trailing_country_drop(self):
+        assert (
+            normalize_address("1234 H St NW, Washington, DC, 20001, USA")
+            == "1234 H ST NW WASHINGTON DC 20001"
+        )
+        assert (
+            normalize_address("1234 N 5th St, Milwaukee, WI, 53202-1234")
+            == "1234 N 5TH ST MILWAUKEE WI 53202"
+        )
+        assert (
+            normalize_address("1234 N 5th St, Milwaukee, WI 532021234")
+            == "1234 N 5TH ST MILWAUKEE WI 53202"
+        )
+
+
+class TestContextComposition:
+    """Which address lines receive their feed's ``geocode_context``."""
+
+    def test_street_words_that_spell_a_state_still_get_the_context(self):
+        from src.spatial.geocoder import compose_geocode_query
+
+        assert compose_geocode_query("296 Davis Hill Ct", "Henderson, NV") == "296 Davis Hill Ct, Henderson, NV"
+        assert compose_geocode_query("12345 NE 5th Ave", "Vancouver, WA") == "12345 NE 5th Ave, Vancouver, WA"
+        assert compose_geocode_query("1234 Main Wy", "Cincinnati, OH") == "1234 Main Wy, Cincinnati, OH"
+        assert compose_geocode_query("2633 Mt Victor Lane", "Bowling Green, KY") == (
+            "2633 Mt Victor Lane, Bowling Green, KY"
+        )
+
+    def test_a_line_that_names_its_place_is_sent_as_it_is(self):
+        from src.spatial.geocoder import compose_geocode_query
+
+        # US-74: premises outside the jurisdiction keep their own place.
+        for line in (
+            "123 Main St, Hyattsville, MD 20782",
+            "1512 Florence St Aurora CO 80010-2128",
+            "1234 H St NW, Washington, DC, 20001, USA",
+            "1234 N 5th St, Milwaukee, WI, 53202-1234",
+            "5438 International Dr, Orlando, FL",
+        ):
+            assert compose_geocode_query(line, "Washington, DC") == line
+        assert compose_geocode_query("123 Main St Tampa FL", "Tampa, FL") == "123 Main St Tampa FL"
+
+    def test_a_unit_number_is_not_a_zip(self):
+        from src.spatial.geocoder import compose_geocode_query
+
+        assert compose_geocode_query("1234 SE Main Rd #12345", "Portland, OR") == (
+            "1234 SE Main Rd #12345, Portland, OR"
+        )
+        assert compose_geocode_query("PO Box 12345", "Portland, OR") == "PO Box 12345, Portland, OR"
+
+    def test_the_hook_asks_for_the_street_with_its_city_and_state(self, monkeypatch):
+        from src.spatial import geocoder as module
+
+        queries = []
+
+        class _Recorder:
+            def geocode(self, query):
+                queries.append(query)
+                return GeoPoint(36.03, -114.98, 1.0, "census:tiger")
+
+        monkeypatch.setattr(module, "get_geocoder", lambda: _Recorder())
+        assert module.geocode_row_if_declared("henderson", "sla", "296 Davis Hill Ct #5") == (36.03, -114.98)
+        assert queries == ["296 Davis Hill Ct #5, Henderson, NV"]
+        assert normalize_address(queries[0]) == "296 DAVIS HILL CT HENDERSON NV"
+
+
 class TestCacheReplayGuarantee:
     def test_first_answer_is_frozen_forever(self, cache):
         backend = FakeBackend(

@@ -198,7 +198,12 @@
     }
   },
   "feeds": {
-    "permits": null,
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "date_opened",
+      "interval_seconds": 21600.0,
+      "topic": "raw.municipal.permits"
+    },
     "311": null,
     "sla": {
       "platform": "arcgis",

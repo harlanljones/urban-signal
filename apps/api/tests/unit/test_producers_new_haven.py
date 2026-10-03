@@ -14,17 +14,18 @@ parse events are coordinate-less pre-spine (the geocode hook is only reached
 once a registered spec declares ``needs_geocode``; the DEEDS ``geo_coordinates``
 Point is not yet read by the shared deeds producer's nested-loc fallback).
 
-Live fixtures captured byte-verbatim 2026-08-30 from
-data.ct.gov/resource/ngch-56tr.json ($where=city = 'NEW HAVEN',
-$order=recordrefreshedon DESC) and data.ct.gov/resource/5mzw-sjtu.json
-($where=town = 'New Haven', $order=daterecorded DESC) — newest rows by
-watermark (SLA watermark 2026-08-30; DEEDS watermark 2025-09-30).
+Live fixtures captured from data.ct.gov/resource/ngch-56tr.json (2026-09-30,
+under the liquor filter, $order=recordrefreshedon DESC; the permittee's own
+name replaced on the individually held permit) and
+data.ct.gov/resource/5mzw-sjtu.json (2026-08-30, $where=town = 'New Haven',
+$order=daterecorded DESC; DEEDS watermark 2025-09-30).
 """
 
 from unittest.mock import patch
 
 import pytest
 
+from src.producers.ct_liquor_specs import CT_LIQUOR_SLA_FIELD_MAP, ct_liquor_where
 from src.producers.field_maps import first_mapped
 from src.spatial.cities.new_haven import (
     DEEDS_FIELD_MAP,
@@ -48,75 +49,82 @@ from src.spatial.cities.new_haven import (
 )
 
 # ---------------------------------------------------------------------------
-# SLA fixtures — newest rows by recordrefreshedon (2026-08-30). The feed is a
-# broad statewide credentials slice: INDIVIDUAL, BUSINESS, and CORPORATION
-# holder types all appear. Note the INACTIVE statuses (expired >3y) and the
-# address-only shape (no native lat/lng columns).
+# SLA fixtures — liquor permits (2026-09-30). Individual, business and
+# corporation permittees all appear; the feed is address-only (no native
+# lat/lng columns).
 # ---------------------------------------------------------------------------
-_SLA_FIXTURE_MAISANO = {
-    "credentialid": "952",
-    "name": "PHILLIP MAISANO",
+# An individually held permit: ``name`` is the permittee, a person (replaced
+# here), there is no ``businessname``, and ``dba`` names the cafe.
+_SLA_FIXTURE_MOLIENDA = {
+    "credentialid": "910592",
+    "name": "PERMITTEE NAME REDACTED",
     "type": "INDIVIDUAL",
-    "fullcredentialcode": "RPR.0000929",
-    "credentialtype": "RPR",
-    "credentialnumber": "929",
-    "credential": "REPAIRER OF WEIGHING & MEASURING DEVICES",
-    "status": "INACTIVE",
-    "statusreason": "EXPIRED MORE THAN 3 YEARS - MUST REAPPLY",
-    "active": "0",
-    "effectivedate": "1995-01-01T00:00:00.000",
-    "expirationdate": "1995-12-31T00:00:00.000",
-    "address": "280 WATERFRONT ST",
+    "dba": "LA MOLIENDA CAFE",
+    "fullcredentialcode": "LCA.0007160",
+    "credentialtype": "LCA",
+    "credentialnumber": "7160",
+    "credential": "CAFE LIQUOR",
+    "status": "ACTIVE",
+    "statusreason": "CURRENT",
+    "active": "1",
+    "issuedate": "2010-03-11T00:00:00.000",
+    "effectivedate": "2026-07-11T00:00:00.000",
+    "expirationdate": "2027-07-10T00:00:00.000",
+    "address": "113 GRAND AVE",
     "city": "NEW HAVEN",
     "state": "CT",
-    "zip": "06512",
-    "recordrefreshedon": "2026-08-30T00:00:00.000",
+    "zip": "065133907",
+    "recordrefreshedon": "2026-07-20T00:00:00.000",
 }
 
-# BUSINESS row: businessname present, issuedate present, effectivedate is the
-# renewal (2021-11-01) vs the original issue (2010-07-15).
-_SLA_FIXTURE_AMITY = {
-    "credentialid": "942543",
-    "name": "AMITY MOBIL",
+# BUSINESS row: businessname is the holding company, dba the restaurant;
+# effectivedate is the current term (2026-09-12), issuedate the first permit
+# (2023-09-12).
+_SLA_FIXTURE_GIOIA = {
+    "credentialid": "2494984",
+    "name": "150 WOOSTER ST LLC",
     "type": "BUSINESS",
-    "businessname": "AMITY MOBIL",
-    "fullcredentialcode": "RGD.0003338",
-    "credentialtype": "RGD",
-    "credentialnumber": "3338",
-    "credential": "RETAIL GASOLINE DEALER",
-    "status": "INACTIVE",
-    "statusreason": "EXPIRED MORE THAN 3 YEARS - MUST REAPPLY",
-    "active": "0",
-    "issuedate": "2010-07-15T00:00:00.000",
-    "effectivedate": "2021-11-01T00:00:00.000",
-    "expirationdate": "2022-10-31T00:00:00.000",
-    "address": "1474 WHALLEY AVE",
+    "businessname": "150 WOOSTER ST LLC",
+    "dba": "GIOIA",
+    "fullcredentialcode": "LIR.0021164",
+    "credentialtype": "LIR",
+    "credentialnumber": "21164",
+    "credential": "RESTAURANT LIQUOR",
+    "status": "ACTIVE",
+    "statusreason": "CURRENT",
+    "active": "1",
+    "issuedate": "2023-09-12T00:00:00.000",
+    "effectivedate": "2026-09-12T00:00:00.000",
+    "expirationdate": "2027-09-11T00:00:00.000",
+    "address": "150 WOOSTER ST",
     "city": "NEW HAVEN",
     "state": "CT",
-    "zip": "065151100",
-    "recordrefreshedon": "2026-08-30T00:00:00.000",
+    "zip": "065115710",
+    "recordrefreshedon": "2026-09-25T00:00:00.000",
 }
 
-# CORPORATION row: no issuedate (only effectivedate), businessname present.
-_SLA_FIXTURE_LAKESIDE = {
-    "credentialid": "75735",
-    "name": "LAKESIDE EXXON SHOP",
+# CORPORATION row: a non-profit theater permit.
+_SLA_FIXTURE_MUSIC_HALL = {
+    "credentialid": "1273063",
+    "name": "NEW HAVEN CENTER FOR PERFORMING ARTS INC",
     "type": "CORPORATION",
-    "businessname": "LAKESIDE EXXON SHOP",
-    "fullcredentialcode": "RGD.0001437",
-    "credentialtype": "RGD",
-    "credentialnumber": "1437",
-    "credential": "RETAIL GASOLINE DEALER",
-    "status": "INACTIVE",
-    "statusreason": "EXPIRED MORE THAN 3 YEARS - MUST REAPPLY",
-    "active": "0",
-    "effectivedate": "1999-11-04T00:00:00.000",
-    "expirationdate": "2000-10-31T00:00:00.000",
-    "address": "1260 QUINNIPIAC AVE",
+    "businessname": "NEW HAVEN CENTER FOR PERFORMING ARTS INC",
+    "dba": "COLLEGE STREET MUSIC HALL",
+    "fullcredentialcode": "LTH.0000091",
+    "credentialtype": "LTH",
+    "credentialnumber": "91",
+    "credential": "NON PROFIT THEATER LIQUOR",
+    "status": "ACTIVE",
+    "statusreason": "CURRENT",
+    "active": "1",
+    "issuedate": "2015-05-04T00:00:00.000",
+    "effectivedate": "2026-09-04T00:00:00.000",
+    "expirationdate": "2027-09-03T00:00:00.000",
+    "address": "238 COLLEGE ST",
     "city": "NEW HAVEN",
     "state": "CT",
-    "zip": "06513",
-    "recordrefreshedon": "2026-08-30T00:00:00.000",
+    "zip": "065102404",
+    "recordrefreshedon": "2026-07-20T00:00:00.000",
 }
 
 # ---------------------------------------------------------------------------
@@ -246,7 +254,9 @@ class TestNewHavenSpatial:
 
 
 class TestNewHavenFeedSpecs:
-    def test_feed_specs_are_exactly_sla_and_deeds(self):
+    def test_the_leaf_mirror_carries_sla_and_deeds_only(self):
+        # The registry also holds 311 from SeeClickFix's public view, which
+        # the corpus registers itself (test_new_haven_311.py).
         assert set(NEW_HAVEN_FEED_SPECS) == {"sla", "deeds"}
 
     def test_sla_spec_shape(self):
@@ -272,7 +282,7 @@ class TestNewHavenFeedSpecs:
     def test_null_guards_orders_and_geocode_are_pinned(self):
         sla_extra = NEW_HAVEN_FEED_SPECS["sla"]["extra"]
         # recordrefreshedon has 0 nulls (no IS NOT NULL guard needed).
-        assert sla_extra["where"] == "city = 'NEW HAVEN'"
+        assert sla_extra["where"] == ct_liquor_where("NEW HAVEN")
         assert sla_extra["order_by"] == "recordrefreshedon DESC"
         assert sla_extra["needs_geocode"] is True
         assert sla_extra["geocode_context"] == "New Haven, CT"
@@ -298,7 +308,7 @@ class TestNewHavenFeedSpecs:
         assert spec.endpoint == NEW_HAVEN_SLA_ENDPOINT
         assert spec.platform == "socrata"
         assert spec.watermark_col == "recordrefreshedon"
-        assert spec.where == "city = 'NEW HAVEN'"
+        assert spec.where == ct_liquor_where("NEW HAVEN")
         assert spec.field_map == SLA_FIELD_MAP
         assert spec.needs_geocode is True
         assert spec.geocode_context == "New Haven, CT"
@@ -317,6 +327,7 @@ class TestNewHavenFeedSpecs:
         assert spec.needs_geocode is True
         assert spec.geocode_context == "New Haven, CT"
         assert spec.id_keys == ["serialnumber", "listyear"]
+        assert spec.expected_cadence_days == 365
 
     def test_get_new_haven_dataset_rejects_unregistered_feeds(self):
         class _Feed:
@@ -335,9 +346,10 @@ class TestNewHavenFieldMaps:
         assert SLA_FIELD_MAP["address_street"] == ["address"]
         assert SLA_FIELD_MAP["zipcode"] == ["zip"]
         assert SLA_FIELD_MAP["borough"] == ["city"]
-        assert SLA_FIELD_MAP["premises_name"] == ["businessname", "name"]
-        assert SLA_FIELD_MAP["dba"] == ["businessname", "name"]
+        assert SLA_FIELD_MAP["premises_name"] == ["businessname", "dba"]
+        assert SLA_FIELD_MAP["dba"] == ["dba", "businessname"]
         assert SLA_FIELD_MAP["status"] == ["status"]
+        assert SLA_FIELD_MAP is CT_LIQUOR_SLA_FIELD_MAP
 
     def test_deeds_map_reads_live_columns(self):
         assert DEEDS_FIELD_MAP["doc_id"] == ["serialnumber"]
@@ -348,13 +360,15 @@ class TestNewHavenFieldMaps:
         assert DEEDS_FIELD_MAP["doc_type"] == ["propertytype"]
 
     def test_city_column_maps_to_sla_borough_slot(self):
-        assert first_mapped(_SLA_FIXTURE_MAISANO, SLA_FIELD_MAP, "borough") == "NEW HAVEN"
+        assert first_mapped(_SLA_FIXTURE_MOLIENDA, SLA_FIELD_MAP, "borough") == "NEW HAVEN"
         assert first_mapped(_DEEDS_FIXTURE_HARRISON, DEEDS_FIELD_MAP, "borough") == "New Haven"
 
-    def test_sla_name_falls_through_to_businessname(self):
-        # INDIVIDUAL rows carry no businessname; name is the holder.
-        assert first_mapped(_SLA_FIXTURE_MAISANO, SLA_FIELD_MAP, "dba") == "PHILLIP MAISANO"
-        assert first_mapped(_SLA_FIXTURE_AMITY, SLA_FIELD_MAP, "dba") == "AMITY MOBIL"
+    def test_sla_names_come_from_businessname_and_dba(self):
+        # INDIVIDUAL rows carry no businessname and name the permittee, so the
+        # dba names the premises.
+        assert first_mapped(_SLA_FIXTURE_MOLIENDA, SLA_FIELD_MAP, "premises_name") == "LA MOLIENDA CAFE"
+        assert first_mapped(_SLA_FIXTURE_GIOIA, SLA_FIELD_MAP, "premises_name") == "150 WOOSTER ST LLC"
+        assert first_mapped(_SLA_FIXTURE_GIOIA, SLA_FIELD_MAP, "dba") == "GIOIA"
 
     def test_never_candidate_columns_are_never_map_candidates(self):
         for feed_map, never in (
@@ -367,7 +381,7 @@ class TestNewHavenFieldMaps:
 
     def test_never_candidate_columns_are_present_on_live_fixtures(self):
         for col in SLA_NEVER_CANDIDATE_COLUMNS:
-            assert col in _SLA_FIXTURE_AMITY, col
+            assert col in _SLA_FIXTURE_GIOIA, col
         # remarks is "some rows" on the live feed, so assert only the columns
         # every DEEDS fixture actually carries.
         for col in ("listyear", "assessedvalue", "salesratio", "residentialtype", "geo_coordinates"):
@@ -375,45 +389,48 @@ class TestNewHavenFieldMaps:
 
 
 class TestNewHavenSLAParsing:
-    def test_newest_fixture_parses_through_real_producer_path(self, sla, monkeypatch):
+    def test_individual_permit_parses_without_the_permittee(self, sla, monkeypatch):
         _patch_resolve(monkeypatch, "sla")
-        event = sla.parse_socrata_row(_SLA_FIXTURE_MAISANO, city_id="new_haven")
+        event = sla.parse_socrata_row(_SLA_FIXTURE_MOLIENDA, city_id="new_haven")
         assert event is not None
         assert event.city_id == "new_haven"
-        assert event.license_id == "952"
-        assert event.dba == "PHILLIP MAISANO"
-        assert event.premises_name == "PHILLIP MAISANO"
-        assert event.license_type == "REPAIRER OF WEIGHING & MEASURING DEVICES"
-        assert event.license_status == "INACTIVE"
-        assert event.address == "280 WATERFRONT ST"
+        assert event.license_id == "910592"
+        assert event.dba == "LA MOLIENDA CAFE"
+        assert event.premises_name == "LA MOLIENDA CAFE"
+        assert event.license_type == "CAFE LIQUOR"
+        assert event.license_status == "ACTIVE"
+        assert event.address == "113 GRAND AVE"
         assert event.source_neighborhood == "NEW HAVEN"
+        assert "PERMITTEE NAME REDACTED" not in event.model_dump_json()
 
     def test_business_fixture_reads_businessname_and_dates(self, sla, monkeypatch):
         _patch_resolve(monkeypatch, "sla")
-        event = sla.parse_socrata_row(_SLA_FIXTURE_AMITY, city_id="new_haven")
+        event = sla.parse_socrata_row(_SLA_FIXTURE_GIOIA, city_id="new_haven")
         assert event is not None
-        assert event.license_id == "942543"
-        assert event.dba == "AMITY MOBIL"
-        assert event.license_type == "RETAIL GASOLINE DEALER"
-        # effective_date is effectivedate (2021-11-01), NOT issuedate (2010-07-15).
-        assert str(event.effective_date).startswith("2021-11-01")
-        assert str(event.expiration_date).startswith("2022-10-31")
+        assert event.license_id == "2494984"
+        assert event.premises_name == "150 WOOSTER ST LLC"
+        assert event.dba == "GIOIA"
+        assert event.license_type == "RESTAURANT LIQUOR"
+        # effective_date is effectivedate (2026-09-12), NOT issuedate (2023-09-12).
+        assert str(event.effective_date).startswith("2026-09-12")
+        assert str(event.expiration_date).startswith("2027-09-11")
 
     def test_corporation_fixture_parses(self, sla, monkeypatch):
         _patch_resolve(monkeypatch, "sla")
-        event = sla.parse_socrata_row(_SLA_FIXTURE_LAKESIDE, city_id="new_haven")
+        event = sla.parse_socrata_row(_SLA_FIXTURE_MUSIC_HALL, city_id="new_haven")
         assert event is not None
-        assert event.license_id == "75735"
-        assert event.dba == "LAKESIDE EXXON SHOP"
-        assert event.address == "1260 QUINNIPIAC AVE"
+        assert event.license_id == "1273063"
+        assert event.dba == "COLLEGE STREET MUSIC HALL"
+        assert event.license_type == "NON PROFIT THEATER LIQUOR"
+        assert event.address == "238 COLLEGE ST"
 
     def test_license_id_falls_through_to_fullcredentialcode(self, sla, monkeypatch):
         _patch_resolve(monkeypatch, "sla")
-        row = dict(_SLA_FIXTURE_MAISANO)
+        row = dict(_SLA_FIXTURE_MOLIENDA)
         row["credentialid"] = ""
         event = sla.parse_socrata_row(row, city_id="new_haven")
         assert event is not None
-        assert event.license_id == "RPR.0000929"
+        assert event.license_id == "LCA.0007160"
 
 
 class TestNewHavenDeedsParsing:

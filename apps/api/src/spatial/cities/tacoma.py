@@ -49,14 +49,19 @@ Provides neighborhood metadata, camera positioning, investment metrics,
 division catalog, and geographic bounding boxes for the City of Tacoma
 (Pierce County, WA).
 
-Tacoma is a THREE-FEED PARTIAL metro on the City of Tacoma's ArcGIS Online
+Tacoma's first three feeds come from the City of Tacoma's ArcGIS Online
 org (``services3.arcgis.com/SCwJH1pD8WSn5T5y``, hosted under
 ``data.cityoftacoma.org``): PERMITS (``accela_permit_data`` FeatureServer/0,
 Tier 1, ~111k rows), SLA (``Business_Licenses`` FeatureServer/0, Tier 1,
 active business tax accounts), and 311 (``SeeClickFix_Requests``
-FeatureServer/0, Tier 1, SeeClickFix public stream). DEEDS stays unregistered:
-Pierce County publishes annual assessment rolls and an interactive auditor
-index, no bulk deed-sales stream (probe 2026-08-30).
+FeatureServer/0, Tier 1, SeeClickFix public stream). DEEDS come from Pierce
+County's weekly sales file (``sale.zip`` on the Assessor-Treasurer's data
+mart, a pipe-delimited ``sale.txt`` with no header row), registered
+2026-09-30 in ``data/tacoma.yaml`` and not mirrored here. Each sale takes its
+parcel's centroid from the county's ``Tax_Parcels`` layer, only for parcels
+in the city's seven tax code areas, and ``metro_clip`` skips the rest. The
+2026-08-30 probe found the annual rolls and the auditor's search and missed
+the weekly file.
 
 Live-probe caveats that define this leaf (2026-08-30, US-426):
 
@@ -387,7 +392,8 @@ TACOMA_DIVISIONS: dict[str, BoroughMeta] = {
 # Probed 2026-08-30 (US-426). Do not register the rolling 30-day permit
 # dashboard views (Permit_Issued_Last_30_Days / Permit_New_Applications),
 # Pierce County annual assessment rolls (not a deed stream), or the
-# rental-activity business-license variant.
+# rental-activity business-license variant. Deeds, from Pierce County's
+# weekly sales file, are registered in data/tacoma.yaml only (2026-09-30).
 # ---------------------------------------------------------------------------
 TACOMA_PERMITS_ENDPOINT = (
     "https://services3.arcgis.com/SCwJH1pD8WSn5T5y/arcgis/rest/services/"

@@ -7,14 +7,18 @@ PERMITS ISSUED.xlsx / bpod1e.csv, 91,198 rows back to 2022, watermark
 ``PERMIT ISS. DATE`` newest 2026-07-02T00:00:00, monthly bulk replace,
 address-only ``STREET NBR`` + ``STREET``, needs_geocode=true).
 
-Tests pass WITHOUT a spine registration (no CityId.laredo): the leaf-local
-field map is pinned via resolve_field_map patch when a producer test needs
-it, and coordinates are supplied by the ADR-0004 geocode mock for the
+The producer tests pin the leaf-local field map through a resolve_field_map
+patch, and coordinates come from the ADR-0004 geocode mock for the
 non-spatial CKAN source (Boulder Table precedent).
 
 Fixtures captured byte-verbatim 2026-08-30 from the live CKAN datastore
 (``ORDER BY "PERMIT ISS. DATE" DESC LIMIT 3``).
 """
+
+from datetime import datetime
+from unittest.mock import patch
+
+import pytest
 
 from src.producers.field_maps import first_mapped
 from src.spatial.cities.laredo import (
@@ -33,9 +37,10 @@ from src.spatial.cities.laredo import (
     LAREDO_SUBMARKETS,
     PERMITS_FIELD_MAP,
     REGISTRATION,
+    compose_permit_address,
+    compose_permit_type,
     is_in_greater_laredo_metro,
     is_in_laredo_metro,
-    normalize_laredo_row,
 )
 
 # ---------------------------------------------------------------------------
@@ -131,17 +136,6 @@ _PERMIT_SECRETARIA = {
 }
 
 _WATERMARK_ISO = "2026-07-02T00:00:00"
-
-
-def _laredo_address(row: dict) -> str:
-    """Reconstruct the probe-true address string for geocoding."""
-    nbr = (row.get("STREET NBR") or "").strip()
-    street = (row.get("STREET") or "").strip()
-    # Collapse internal whitespace (CKAN pads with spaces).
-    street = " ".join(street.split())
-    if nbr and street:
-        return f"{nbr} {street}, Laredo, TX"
-    return street or nbr
 
 
 # ======================================================================
@@ -281,26 +275,15 @@ class TestLaredoFeedSpec:
 
 class TestLaredoFieldMaps:
     def test_permits_map_reads_live_ckan_columns(self):
-        # Sanitized keys (dots/spaces → "_") — see normalize_laredo_row
-        assert PERMITS_FIELD_MAP["job_id"] == ["APP_NBR", "APP_YR", "_id"]
-        assert PERMITS_FIELD_MAP["issuance_date"] == ["PERMIT_ISS_DATE"]
-        assert PERMITS_FIELD_MAP["filing_date"] == ["PERMIT_ISS_DATE"]
-        assert PERMITS_FIELD_MAP["status"] == [
-            "PERMIT_STATUS_DESC",
-            "PERMIT_STATUS",
-            "APP_STAT_DESC",
-            "APP_STATUS",
-        ]
-        assert PERMITS_FIELD_MAP["job_type"] == [
-            "APP_TYPE_DESC",
-            "PERMIT_TYPE_DESC",
-            "Permit_Group_Type",
-            "Permit_Group_Tab",
-        ]
-        assert PERMITS_FIELD_MAP["cost"] == ["VALUATION", "TOTAL_FEE", "PERMIT_FEE"]
-        assert PERMITS_FIELD_MAP["address_street"] == ["STREET", "STREET_NBR"]
-        assert PERMITS_FIELD_MAP["street_number"] == ["STREET_NBR"]
-        assert PERMITS_FIELD_MAP["street_name"] == ["STREET"]
+        # The datastore's own column names, spaces and dots included.
+        assert PERMITS_FIELD_MAP == {
+            "job_id": ["_id"],
+            "issuance_date": ["PERMIT ISS. DATE"],
+            "status": ["PERMIT STATUS DESC", "APP STAT DESC"],
+            "job_type": ["Permit Group Type", "PERMIT TYPE DESC", "APP TYPE DESC"],
+            "cost": ["VALUATION"],
+            "address_street": ["address_street", "STREET"],
+        }
 
     def test_field_map_alias_and_geocode_context(self):
         assert FIELD_MAP["permits"] is PERMITS_FIELD_MAP
@@ -316,65 +299,163 @@ class TestLaredoFieldMaps:
 
     def test_contractor_name_is_dropped_pii(self):
         assert "CONTRACTOR NAME" in DROPPED_PII_COLUMNS
-        assert "CONTRACTOR NAME" not in PERMITS_FIELD_MAP.get("job_id", [])
-        # Ensure no field map candidate accidentally references contractor PII
         for candidates in PERMITS_FIELD_MAP.values():
             assert "CONTRACTOR NAME" not in candidates
 
-    def test_first_mapped_job_id(self):
-        assert first_mapped(normalize_laredo_row(_PERMIT_PALOMA), PERMITS_FIELD_MAP, "job_id") == 3696
-        assert first_mapped(normalize_laredo_row(_PERMIT_SECRETARIA), PERMITS_FIELD_MAP, "job_id") == 4329
+    def test_first_mapped_reads_the_raw_row(self):
+        """A dotted key names the column when the row has one: the old map's
+        sanitized keys ("PERMIT_ISS_DATE") matched nothing, so every permit
+        went out with no issue date."""
+        assert first_mapped(_PERMIT_PALOMA, PERMITS_FIELD_MAP, "job_id") == 88449
+        assert first_mapped(_PERMIT_PALOMA, PERMITS_FIELD_MAP, "issuance_date") == _WATERMARK_ISO
+        assert first_mapped(_PERMIT_PALOMA, PERMITS_FIELD_MAP, "status").strip() == "PERMIT PRINTED"
+        assert first_mapped(_PERMIT_SECRETARIA, PERMITS_FIELD_MAP, "job_type") == "Electrical"
 
-    def test_first_mapped_issuance_date(self):
-        assert first_mapped(normalize_laredo_row(_PERMIT_PALOMA), PERMITS_FIELD_MAP, "issuance_date") == _WATERMARK_ISO
-        assert first_mapped(normalize_laredo_row(_PERMIT_SECRETARIA), PERMITS_FIELD_MAP, "issuance_date") == _WATERMARK_ISO
-
-    def test_first_mapped_status(self):
-        assert first_mapped(normalize_laredo_row(_PERMIT_PALOMA), PERMITS_FIELD_MAP, "status").strip() == "PERMIT PRINTED"
-        assert first_mapped(normalize_laredo_row(_PERMIT_SECRETARIA), PERMITS_FIELD_MAP, "status").strip() == "PERMIT PRINTED"
-
-    def test_first_mapped_job_type(self):
-        # First candidate APP TYPE DESC is present
-        assert first_mapped(normalize_laredo_row(_PERMIT_PALOMA), PERMITS_FIELD_MAP, "job_type").strip() == "SOLAR PANEL"
-        assert first_mapped(normalize_laredo_row(_PERMIT_SECRETARIA), PERMITS_FIELD_MAP, "job_type").strip() == "SINGLE FAMILY HOUSE DETACHED"
-
-    def test_first_mapped_cost(self):
-        # VALUATION is 0 (falsy) → falls through to TOTAL_FEE per first_mapped semantics
-        assert first_mapped(normalize_laredo_row(_PERMIT_PALOMA), PERMITS_FIELD_MAP, "cost") == "200.000000"
-        assert first_mapped(normalize_laredo_row(_PERMIT_SECRETARIA), PERMITS_FIELD_MAP, "cost") == "153.500000"
-
-    def test_first_mapped_address_street(self):
-        # STREET is first candidate, contains padded value
-        assert "PALOMA" in first_mapped(normalize_laredo_row(_PERMIT_PALOMA), PERMITS_FIELD_MAP, "address_street")
-        assert "SECRETARIA" in first_mapped(normalize_laredo_row(_PERMIT_SECRETARIA), PERMITS_FIELD_MAP, "address_street")
-
-    def test_first_mapped_street_number_and_name(self):
-        assert first_mapped(normalize_laredo_row(_PERMIT_PALOMA), PERMITS_FIELD_MAP, "street_number").strip() == "801"
-        assert "PALOMA" in first_mapped(normalize_laredo_row(_PERMIT_PALOMA), PERMITS_FIELD_MAP, "street_name")
-
-    def test_permit_job_id_falls_back_to_oid(self):
-        row = normalize_laredo_row(dict(_PERMIT_PALOMA))
-        row.pop("APP_NBR")
-        row.pop("APP_YR")
-        # Raw keys still present but sanitized ones removed; first_mapped falls to _id
-        assert first_mapped(row, PERMITS_FIELD_MAP, "job_id") == 88449
-
-    def test_address_reconstruction_for_geocoding(self):
-        assert _laredo_address(_PERMIT_PALOMA) == "801 PALOMA CT, Laredo, TX"
-        assert _laredo_address(_PERMIT_SECRETARIA) == "1610 SECRETARIA LN, Laredo, TX"
-        # Lone Star Loop fixture has 5528 as number
-        assert _laredo_address(_PERMIT_PALOMA_EL) == "5528 LONE STAR LOOP, Laredo, TX"
-
-    def test_geocode_context_is_laredo_tx(self):
-        assert GEOCODE_CONTEXT == "Laredo, TX"
-        assert "Laredo" in _laredo_address(_PERMIT_PALOMA)
+    def test_zero_valuation_reads_as_no_cost(self):
+        # Fees are not a valuation, so a zero VALUATION leaves the cost unset.
+        assert first_mapped(_PERMIT_PALOMA, PERMITS_FIELD_MAP, "cost") is None
 
     def test_all_fixtures_share_the_watermark(self):
         for row in (_PERMIT_PALOMA, _PERMIT_PALOMA_EL, _PERMIT_SECRETARIA):
-            assert first_mapped(normalize_laredo_row(row), PERMITS_FIELD_MAP, "issuance_date") == _WATERMARK_ISO
+            assert first_mapped(row, PERMITS_FIELD_MAP, "issuance_date") == _WATERMARK_ISO
 
-    def test_permits_group_tab_present(self):
-        assert first_mapped(normalize_laredo_row(_PERMIT_PALOMA), PERMITS_FIELD_MAP, "borough") == "Other Permits"
+
+class TestLaredoAddress:
+    def test_number_and_street_join_without_padding(self):
+        assert compose_permit_address(_PERMIT_PALOMA) == "801 PALOMA CT"
+        assert compose_permit_address(_PERMIT_PALOMA_EL) == "5528 LONE STAR LOOP"
+        assert compose_permit_address(_PERMIT_SECRETARIA) == "1610 SECRETARIA LN"
+
+    def test_street_without_number_and_no_street(self):
+        assert compose_permit_address({**_PERMIT_PALOMA, "STREET NBR": "        "}) == "PALOMA CT"
+        assert compose_permit_address({**_PERMIT_PALOMA, "STREET": "      "}) is None
+        assert compose_permit_address({}) is None
+
+
+def _laredo_permit(group: str, tab: str, kind: str) -> dict:
+    """A fixture row with another group, report tab and kind, padded the way
+    the datastore pads ``PERMIT TYPE DESC``."""
+    return {**_PERMIT_SECRETARIA, "Permit Group Type": group, "Permit Group Tab": tab, "PERMIT TYPE DESC": f"{kind:<30}"}
+
+
+class TestLaredoPermitType:
+    """The group names a trade or a class; a year of permits (2025-10-01 to
+    2026-10-02, 17,925 rows) shows which groups need the kind as well."""
+
+    def test_new_homes_and_commercial_buildings_read_as_new_construction(self):
+        row = _laredo_permit("Residential", "New Construction", "SINGLE FAMILY DETACHED")
+        assert compose_permit_type(row) == "New construction: SINGLE FAMILY DETACHED"
+        row = _laredo_permit("Commercial Construction", "New Construction", "OFFICES, BANKS")
+        assert compose_permit_type(row) == "New construction: OFFICES, BANKS"
+
+    def test_a_mobile_home_installation_is_not_a_new_building(self):
+        for kind in ("INSTALLATION PERMIT", "INSTALLATION PERMIT/MH-PENALTY"):
+            assert compose_permit_type(_laredo_permit("Residential", "New Construction", kind)) is None
+
+    def test_an_alteration_names_its_kind(self):
+        # The group's own name says "Conversions", which read every reroof
+        # and fence as a change of use.
+        row = _laredo_permit("Additions, Alterations, and Conversions", "New Construction", "RES REROOF")
+        assert compose_permit_type(row) == "Alteration: RES REROOF"
+
+    def test_an_other_permit_is_its_kind(self):
+        assert compose_permit_type(_laredo_permit("Other", "Other Permits", "SIGN PERMIT")) == "SIGN PERMIT"
+
+    def test_trade_permits_read_their_group(self):
+        assert compose_permit_type(_PERMIT_SECRETARIA) is None
+        assert compose_permit_type({}) is None
+
+
+class TestLaredoRegisteredSpec:
+    @pytest.fixture
+    def spec(self):
+        from src.spatial.city_registry import CityId, FeedType, get_dataset
+
+        return get_dataset(CityId.LAREDO, FeedType.PERMITS)
+
+    def test_composite_id_keeps_each_trade_permit(self, spec):
+        """A house and its electrical, plumbing and mechanical permits share
+        APP NBR; keyed by it, 571 of 1,000 rows dropped as duplicates."""
+        assert spec.id_keys == ["APP YR", "APP NBR", "PERMIT SEQUENCE", "PERMIT TYPE"]
+        assert spec.composite_id is True
+        assert spec.field_map == PERMITS_FIELD_MAP
+
+    def test_filter_drops_groups_that_are_not_building_permits(self, spec):
+        for group in ("Vendor", "Internal use", "Business", "Fire Dept", "Right-of-Way/Utility", "NEZ and Pave/Parking"):
+            assert f"'{group}'" in spec.where
+        assert spec.where.startswith('"Permit Group Type" NOT IN (')
+
+    def test_select_leaves_the_contractor_and_description_out(self, spec):
+        selected = spec.select.split(",")
+        assert "CONTRACTOR NAME" not in selected
+        assert "APP DESC" not in selected
+        for candidates in PERMITS_FIELD_MAP.values():
+            for column in candidates:
+                assert column == "address_street" or column in selected
+        assert {"STREET NBR", "STREET"} <= set(selected)
+        # compose_permit_type reads the group's report tab.
+        assert "Permit Group Tab" in selected
+
+
+class TestLaredoPermitParsing:
+    @pytest.fixture
+    def permits(self):
+        with patch("src.producers.dob_permits_producer.BaseKafkaProducer"):
+            from src.producers.dob_permits_producer import DOBPermitsProducer
+
+            yield DOBPermitsProducer()
+
+    def test_row_geocodes_its_joined_address(self, permits):
+        from src.features.permit_taxonomy import NormalizedPermitType
+        from src.schemas.models import JobType
+
+        captured = []
+
+        def fake_geocode(city_id, feed_value, address, context=None):
+            captured.append(address)
+            return (27.532, -99.505)
+
+        with (
+            patch("src.producers.field_maps.resolve_field_map", return_value=PERMITS_FIELD_MAP),
+            patch("src.spatial.geocoder.geocode_row_if_declared", fake_geocode),
+        ):
+            event = permits.parse_socrata_row(dict(_PERMIT_PALOMA), city_id="laredo")
+        assert event is not None
+        assert captured == ["801 PALOMA CT"]
+        assert event.job_id == "88449"
+        assert event.issuance_date == datetime.fromisoformat(_WATERMARK_ISO)
+        assert event.address_street == "801 PALOMA CT"
+        assert event.estimated_cost == 0.0
+        # An electrical permit is a trade permit.
+        assert event.job_type is JobType.A2
+        assert event.normalized_permit_type == NormalizedPermitType.MECHANICAL_ELECTRICAL_PLUMBING.value
+
+    @pytest.mark.parametrize(
+        ("group", "tab", "kind", "job_type", "normalized"),
+        [
+            ("Residential", "New Construction", "SINGLE FAMILY DETACHED", "NB", "NEW_CONSTRUCTION"),
+            ("Commercial Construction", "New Construction", "5 OR MORE FAMILY BLDG", "NB", "NEW_CONSTRUCTION"),
+            ("Residential", "New Construction", "INSTALLATION PERMIT", "OT", "MINOR_ALTERATION"),
+            ("Additions, Alterations, and Conversions", "New Construction", "RES REROOF", "A2", "MINOR_ALTERATION"),
+            (
+                "Additions, Alterations, and Conversions",
+                "New Construction",
+                "RES REMODEL 1001 - 2000 SQFT",
+                "A2",
+                "MAJOR_RENOVATION",
+            ),
+            ("Other", "Other Permits", "SIGN PERMIT", "SG", "MINOR_ALTERATION"),
+            ("Plumbing", "Other Permits", "PL-RESIDENTIAL", "A2", "MECHANICAL_ELECTRICAL_PLUMBING"),
+        ],
+    )
+    def test_job_type_reads_group_tab_and_kind(self, permits, group, tab, kind, job_type, normalized):
+        with (
+            patch("src.producers.field_maps.resolve_field_map", return_value=PERMITS_FIELD_MAP),
+            patch("src.spatial.geocoder.geocode_row_if_declared", return_value=(27.570, -99.485)),
+        ):
+            event = permits.parse_socrata_row(_laredo_permit(group, tab, kind), city_id="laredo")
+        assert event is not None
+        assert (event.job_type.value, event.normalized_permit_type) == (job_type, normalized)
 
 
 # ======================================================================

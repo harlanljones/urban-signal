@@ -261,51 +261,39 @@ divisions:
     - Westover Hills
     city_id: richmond
 datasets:
-  deeds:
-    endpoint: https://data.rva.gov/server/rest/services/Property/RealEstateSales/FeatureServer/0
+  crime:
+    endpoint: https://services3.arcgis.com/TsynfzBSE6sXfoLq/ArcGIS/rest/services/PSDWIncidents_ProdA/FeatureServer/1
     platform: arcgis
-    watermark_col: SALE_DATE
+    watermark_col: RecordDate
     id_keys:
-    - PARCELID
-    - SALE_DATE
-    - OBJECTID
-    topic: raw.municipal.deeds
-    interval_seconds: 600.0
-    producer_key: deeds
+    - RMSIncidentID
+    topic: raw.municipal.crime
+    interval_seconds: 21600.0
+    producer_key: crime
     endpoint_by_year: {}
-    watermark_type: text
-    watermark_format: '%m/%d/%Y'
+    watermark_type: null
+    watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: RecordDate DESC, OBJECTID DESC
     id_col: null
-    select: null
+    select: RMSIncidentID,RecordDate,IncidentorOffenseGenCategory,MagisterialDistrictName,OBJECTID
     fallback_endpoints: []
-    where: null
+    where: RecordDate >= CURRENT_DATE - INTERVAL '120' DAY AND DimLocationLatitude BETWEEN 37.45 AND 37.7 AND DimLocationLongitude BETWEEN -77.65 AND -77.3
     needs_geocode: false
     geocode_context: null
     field_map:
-      doc_id:
-      - PARCELID
-      bbl:
-      - PARCELID
-      doc_type:
-      - DEED_TYPE
-      document_amount:
-      - SALE_PRICE
-      recorded_date:
-      - SALE_DATE
-      address_street:
-      - SITEADDRESS
-      incident_address:
-      - SITEADDRESS
+      incident_id:
+      - RMSIncidentID
+      offense_type:
+      - IncidentorOffenseGenCategory
+      occurred_date:
+      - RecordDate
       borough:
-      - CITY
-      zipcode:
-      - ZIP5
-    ingestion_mode: incremental
+      - MagisterialDistrictName
+    ingestion_mode: snapshot
     oid_field: OBJECTID
-    max_record_count: 100000
-    expected_cadence_days: 30
+    max_record_count: 2000
+    expected_cadence_days: 3
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false
@@ -320,6 +308,128 @@ datasets:
     state_plane_y_col: null
     parcel_join: {}
     non_spatial: false
+    zip_member: null
+    batch_limit: 2500
+  deeds:
+    endpoint: https://www.rva.gov/media/53946
+    platform: excel
+    watermark_col: transfer_date
+    id_keys:
+    - pin
+    - transfer_date
+    - deed_book
+    - deed_page
+    topic: raw.municipal.deeds
+    interval_seconds: 86400.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: transfer_date DESC
+    id_col: null
+    select: pin,transfer_date,consideration,deed_book,deed_page,deed_type,parcel_location
+    fallback_endpoints: []
+    where: transfer_date >= CURRENT_DATE - INTERVAL '365' DAY
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - pin
+      bbl:
+      - pin
+      doc_type:
+      - deed_type
+      document_amount:
+      - consideration
+      recorded_date:
+      - transfer_date
+      address_street:
+      - parcel_location
+      incident_address:
+      - parcel_location
+    ingestion_mode: snapshot
+    oid_field: null
+    max_record_count: null
+    expected_cadence_days: 45
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join:
+      parcel_layer: https://services1.arcgis.com/k3vhq11XkBNeeOfM/arcgis/rest/services/Parcels/FeatureServer/0
+      join_key: PIN
+      row_key: pin
+      geometry_source: centroid
+    non_spatial: false
+    zip_member: null
+    batch_limit: 12000
+    composite_id: true
+    link_pattern: Assessor_Transfers_[0-9-]+\.xlsx$
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'VA' AND Latitude BETWEEN 37.45 AND 37.7 AND Longitude BETWEEN -77.65 AND -77.3
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
     zip_member: null
 aliases:
 - richmond_va

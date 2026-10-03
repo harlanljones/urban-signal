@@ -227,52 +227,108 @@ divisions:
     - West End
     city_id: allentown
 datasets:
-  deeds:
-    endpoint: https://gis.allentownpa.gov/server/rest/services/Property/Parcels/FeatureServer/0
+  permits:
+    endpoint: https://services1.arcgis.com/WUqVDRuvIiIiH2Pl/arcgis/rest/services/EnerGov_Building_Permits_Current/FeatureServer/0
     platform: arcgis
-    watermark_col: SALE_DATE
+    watermark_col: ISSUEDATE
     id_keys:
-    - PARCELID
-    - PRINTKEY
-    - SALE_DATE
+    - PERMITNUMBER
+    topic: raw.municipal.permits
+    interval_seconds: 21600.0
+    producer_key: permits
+    order_by: ISSUEDATE DESC, PERMITNUMBER DESC
+    select: OBJECTID,PERMITNUMBER,WORKCLASS,APPLYDATE,ISSUEDATE,STATUSNAME,ADDRESSLINE1,PREDIRECTION,ADDRESSLINE2,STREETTYPE,POSTDIRECTION,POSTALCODE,PARCELNUMBER
+    where: ISSUEDATE >= CURRENT_DATE - INTERVAL '90' DAY AND ISSUEDATE <= CURRENT_TIMESTAMP
+    needs_geocode: false
+    field_map:
+      job_id:
+      - PERMITNUMBER
+      issuance_date:
+      - ISSUEDATE
+      filing_date:
+      - APPLYDATE
+      job_type:
+      - WORKCLASS
+      status:
+      - STATUSNAME
+      address_street:
+      - address_street
+      - ADDRESSLINE2
+      zipcode:
+      - POSTALCODE
+      bbl:
+      - PARCELNUMBER
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 3
+    batch_limit: 2000
+  '311':
+    endpoint: https://services1.arcgis.com/WUqVDRuvIiIiH2Pl/arcgis/rest/services/311_Submission_Dashboard_View/FeatureServer/0
+    platform: arcgis
+    watermark_col: CreationDate
+    id_keys:
+    - globalid
+    topic: raw.municipal.311
+    interval_seconds: 900.0
+    producer_key: '311'
+    order_by: CreationDate DESC, objectid DESC
+    select: objectid,globalid,issue,status,CreationDate
+    needs_geocode: false
+    field_map:
+      incident_id:
+      - globalid
+      created_date:
+      - CreationDate
+      complaint_type:
+      - issue
+      status:
+      - status
+    ingestion_mode: incremental
+    oid_field: objectid
+    max_record_count: 1000
+    expected_cadence_days: 3
+    metro_clip: true
+    decode_domains: true
+  deeds:
+    endpoint: https://services1.arcgis.com/WUqVDRuvIiIiH2Pl/arcgis/rest/services/Tax_Parcels_Assessed_2022/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - WARDACCTNO
+    - XINSTNUM
     topic: raw.municipal.deeds
-    interval_seconds: 600.0
+    interval_seconds: 1800.0
     producer_key: deeds
     endpoint_by_year: {}
-    watermark_type: text
-    watermark_format: '%m/%d/%Y'
+    watermark_type: null
+    watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: SYEAR DESC, SMON DESC, OBJECTID DESC
     id_col: null
-    select: null
+    select: OBJECTID,WARDACCTNO,PIN,PARNUM,XINSTNUM,SYEAR,SMON,SPRICE,PROPERTYADDR,ZIP
     fallback_endpoints: []
-    where: null
+    where: SYEAR >= 1900 AND SMON <> '00' AND SMON <> ''
     needs_geocode: false
     geocode_context: null
     field_map:
       doc_id:
-      - PARCELID
-      - PRINTKEY
+      - XINSTNUM
+      - WARDACCTNO
       bbl:
-      - PARCELID
-      doc_type:
-      - DEED_TYPE
+      - PIN
       document_amount:
-      - SALE_PRICE
-      recorded_date:
-      - SALE_DATE
+      - SPRICE
       address_street:
-      - SITEADDRESS
+      - PROPERTYADDR
       incident_address:
-      - SITEADDRESS
-      borough:
-      - CITY
+      - PROPERTYADDR
       zipcode:
-      - ZIP5
-    ingestion_mode: incremental
+      - ZIP
+    ingestion_mode: snapshot
     oid_field: OBJECTID
-    max_record_count: 100000
-    expected_cadence_days: 30
+    max_record_count: 2000
+    expected_cadence_days: 45
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false
@@ -287,6 +343,64 @@ datasets:
     state_plane_y_col: null
     parcel_join: {}
     non_spatial: false
+    zip_member: null
+    composite_id: true
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'PA' AND Latitude BETWEEN 40.45 AND 40.75 AND Longitude BETWEEN -75.75 AND -75.15
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
     zip_member: null
 aliases:
 - allentown_pa

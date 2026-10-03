@@ -73,6 +73,10 @@ Not registered:
 * DEEDS — Yellowstone County recorder reachability failed from the probe
   environment (``co.yellowstone.mt.us`` timeout, no official AGOL org found);
   partial without deeds is correct.
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
 """
 
 

@@ -6,27 +6,13 @@ DE (New Castle County seat on the Christina River, at the head of the
 Delaware Estuary — deliberately not overlapping the sibling Philadelphia
 leaf box to the north).
 
-Wilmington is a DEEDS-led partial metro: New Castle County publishes parcel
-sales through its open-data ArcGIS FeatureServer. The feed carries per-parcel
-``SALE_DATE``/``SALE_PRICE``/``PARCELID`` and native parcel polygons, so it
-maps cleanly onto the ACRIS-shape DEEDS signal:
-
-* DEEDS — ``Parcels/Real_Estate_Sales/FeatureServer/0``. Watermark
-  ``SALE_DATE`` is the recorded-sale date; native parcel polygons
-  (``outSR=4326`` rings -> centroid) supply every row's coordinates, so
-  ``needs_geocode`` stays False — no ADR-0004 hook. ``SALE_DATE`` is treated
-  as a TEXT date column (``%Y-%m-%d``) to keep ordering stable across the
-  county's lexical sort.
-* PERMITS — absent from the county open-data layer for city parcels; the
-  municipal permit extract is not publicly served as an ArcGIS FeatureServer
-  in the probed portal. Tier 3 — do not register.
-* SLA / COMPLAINTS_311 — absent from the probed portal for Wilmington.
-  Tier 3.
-
-This leaf pins the DEEDS feed only. The endpoint is a best-effort URL of the
-form ``https://gis.newcastlede.gov/server/rest/services/.../FeatureServer/0``
-documented in PR_DESCRIPTION (US-310); the gate does not check endpoint
-liveness. Re-probe the live layer within 72h of any spine change.
+Feeds: SLA reads the SNAP retailer slice (``snap_sla_spec``, Delaware stores
+inside the metro box). The DEEDS feed registered until 2026-09-30 named a host
+(gis.newcastlede.gov) that does not exist, and no verified public sale source
+exists. New Castle County's ``BaseMaps/PropertySales`` MapServer on
+gis.nccde.org could not be checked (the host answers HTTP 472 to automated
+clients), and its ArcGIS Online records describe per-year residential layers
+for 2013 to 2019 only. Permits and 311 remain unregistered.
 """
 
 
@@ -274,101 +260,6 @@ WILM_DE_DIVISION_BBOXES = WILMINGTON_DE_DIVISION_BBOXES
 WILM_DE_SUBMARKETS = WILMINGTON_DE_SUBMARKETS
 WILM_DE_DIVISIONS = WILMINGTON_DE_DIVISIONS
 
-# ---------------------------------------------------------------------------
-# Feed specs (leaf-local; the spine copies these into REGISTRY).
-# Wilmington DEEDS via New Castle County open-data ArcGIS FeatureServer.
-# Native parcel polygons supply coordinates, so ADR-0004 geocode is NOT
-# declared. Best-effort endpoint (US-310); re-probe the live layer within
-# 72h of any spine change.
-# ---------------------------------------------------------------------------
-WILMINGTON_DE_DEEDS_ENDPOINT = (
-    "https://gis.newcastlede.gov/server/rest/services/"
-    "Parcels/Real_Estate_Sales/FeatureServer/0"
-)
-
-WILMINGTON_DE_DEEDS_FIELD_MAP = {
-    "doc_id": ["PARCELID"],
-    "bbl": ["PARCELID"],
-    "doc_type": ["DEED_TYPE"],
-    "document_amount": ["SALE_PRICE"],
-    "recorded_date": ["SALE_DATE"],
-    "address_street": ["SITE_ADDRESS"],
-    "incident_address": ["SITE_ADDRESS"],
-    "borough": ["CITY"],
-    "zipcode": ["ZIP_CODE"],
-}
-
-FIELD_MAP: dict[str, dict[str, list[str]]] = {
-    "deeds": WILMINGTON_DE_DEEDS_FIELD_MAP,
-}
-
-WILMINGTON_DE_FEED_SPECS: dict[str, dict[str, object]] = {
-    "deeds": {
-        "endpoint": WILMINGTON_DE_DEEDS_ENDPOINT,
-        "platform": "arcgis",
-        "watermark_col": "SALE_DATE",
-        "id_keys": ["PARCELID", "OBJECTID"],
-        "topic_key": "topic_deeds",
-        "interval_seconds": 600.0,
-        "producer_key": "deeds",
-        "extra": {
-            # Native parcel polygons (outSR=4326 rings -> centroid) supply
-            # every row's coordinates; the ADR-0004 geocode hook is NOT
-            # declared.
-            "needs_geocode": False,
-            "watermark_type": "text",
-            "watermark_format": "%Y-%m-%d",
-            "oid_field": "OBJECTID",
-            "max_record_count": 100000,
-            "ingestion_mode": "incremental",
-            "expected_cadence_days": 30,
-            "non_spatial": False,
-            "scope": (
-                "Wilmington, DE DEEDS/sales via New Castle County open-data "
-                "parcel sales (native parcel polygons, NOT address-only). "
-                "Best-effort endpoint (US-310); re-probe the live layer within "
-                "72h of any spine change. SALE_DATE treated as TEXT "
-                "%Y-%m-%d; native polygons supply coordinates so no geocode "
-                "hook is declared. PARCELID/OBJECTID are the parcel keys; "
-                "SALE_PRICE is the consideration and DEED_TYPE the instrument."
-            ),
-            "field_map": WILMINGTON_DE_DEEDS_FIELD_MAP,
-        },
-    },
-}
-
-
-def get_wilmington_de_dataset(feed: object) -> object:
-    """Leaf-local mirror of ``city_registry.get_dataset``.
-
-    Returns the spec for a registered Wilmington, DE feed, or raises
-    ``KeyError`` naming the city and available feeds when the feed is absent
-    (permits/SLA/311 are absent from the probed portal).
-    """
-    from src.config import settings
-    from src.spatial.city_registry import DatasetSpec
-
-    feed_name = getattr(feed, "value", str(feed))
-    if feed_name not in WILMINGTON_DE_FEED_SPECS:
-        available = ", ".join(sorted(WILMINGTON_DE_FEED_SPECS))
-        raise KeyError(
-            f"'{WILMINGTON_DE_CITY_ID}' has no '{feed_name}' feed; available: {available}"
-        )
-    payload = WILMINGTON_DE_FEED_SPECS[feed_name]
-    extra_kwargs = {
-        k: v for k, v in payload.get("extra", {}).items() if k != "scope"
-    }
-    return DatasetSpec(
-        endpoint=payload["endpoint"],
-        platform=payload["platform"],
-        watermark_col=payload["watermark_col"],
-        id_keys=payload["id_keys"],
-        topic=getattr(settings, payload["topic_key"]),
-        interval_seconds=payload["interval_seconds"],
-        producer_key=payload["producer_key"],
-        **extra_kwargs,
-    )
-
 
 from src.spatial.registration import SpatialRegistration
 
@@ -381,20 +272,16 @@ REGISTRATION = SpatialRegistration(
 )
 
 __all__ = [
-    "FIELD_MAP",
     "REGISTRATION",
     "WILMINGTON_DE_CENTER",
     "WILMINGTON_DE_CITY_ID",
-    "WILMINGTON_DE_DEEDS_ENDPOINT",
     "WILMINGTON_DE_DIVISIONS",
     "WILMINGTON_DE_DIVISION_BBOXES",
-    "WILMINGTON_DE_FEED_SPECS",
     "WILMINGTON_DE_METRO_BBOX",
     "WILMINGTON_DE_SUBMARKETS",
     "WILM_DE_DIVISIONS",
     "WILM_DE_DIVISION_BBOXES",
     "WILM_DE_SUBMARKETS",
-    "get_wilmington_de_dataset",
     "is_in_wilmington_de",
     "is_in_wilmington_de_metro",
 ]

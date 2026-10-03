@@ -1150,8 +1150,8 @@ datasets:
     interval_seconds: 300.0
     producer_key: permits
     endpoint_by_year: {}
-    watermark_type: null
-    watermark_format: null
+    watermark_type: text
+    watermark_format: '%m/%d/%Y'
     watermark_exclude: []
     order_by: null
     id_col: null
@@ -1322,6 +1322,7 @@ datasets:
     watermark_type: null
     where: null
     zip_member: null
+    batch_limit: 5000
   deeds:
     endpoint: https://data.cityofnewyork.us/resource/bnx9-e6tj.json
     platform: socrata
@@ -1388,7 +1389,7 @@ datasets:
     ingestion_mode: incremental
     oid_field: null
     max_record_count: null
-    expected_cadence_days: 30
+    expected_cadence_days: 92
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false

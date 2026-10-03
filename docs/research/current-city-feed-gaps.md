@@ -77,7 +77,10 @@ Notes on the flagged rows:
   silently miss every post-2020 permit (`"08/21/2026"` sorts before
   `"2020-06-05"`). Same defect applies if a scheduler uses the registered
   `watermark_col` for incremental fetches. `dobrundate` is properly typed
-  calendar_date and current.
+  calendar_date and current. (2026-10-03: but it is the date of the set's
+  last reload, not of each row: 3,897,736 rows carry 2026-10-01, so it cannot
+  drive an incremental poll. The spec declares `issuance_date` as
+  `%m/%d/%Y` text instead, and the poll names the dates.)
 - **WA LCB `vgcw-qfjm`** is a notifications feed ("local authority letters"
   for pending applications), not a license registry — 23 rows total, posted
   dates current (2026-08-20). Healthy for what it is, but volume-dependent

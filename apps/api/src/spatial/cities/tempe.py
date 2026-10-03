@@ -137,6 +137,10 @@ rejecting downtown Phoenix (-112.07), Mesa downtown (-111.8287), Scottsdale
 (33.49+), Chandler (33.31-), and Gilbert. Guadalupe (33.366, -111.956) is
 scooped in (small town wedged between Tempe and Phoenix; division resolution
 stays coordinate-based).
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
 """
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta

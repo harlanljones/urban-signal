@@ -14,15 +14,17 @@ from src.spatial.cities.cleveland import (
 )
 from src.spatial.city_registry import CityId, FeedType
 
+# The layer renamed PERMIT_NUMBER, ADDRESS and STATUS (to PERMIT_ID,
+# PRIMARY_ADDRESS and CURRENT_TASK_STATUS) and dropped ZIP; every row went to
+# the DLQ for want of a permit id until the map followed (2026-09-30).
 CLEVELAND_PERMITS_FIELD_MAP = {
-    "job_id": ["PERMIT_NUMBER"],
+    "job_id": ["PERMIT_ID"],
     "issuance_date": ["ISSUE_DATE"],
     "filing_date": ["FILE_DATE"],
-    "job_type": ["PERMIT_TYPE", "PERMIT_SUBTYPE"],
+    "job_type": ["PERMIT_CATEGORY", "PERMIT_TYPE", "PERMIT_SUBTYPE"],
     "cost": ["JOB_VALUE"],
-    "status": ["STATUS", "PERMIT_STATUS"],
-    "address_street": ["ADDRESS"],
-    "zipcode": ["ZIP", "ZIP_CODE"],
+    "status": ["CURRENT_TASK_STATUS"],
+    "address_street": ["PRIMARY_ADDRESS"],
     "bbl": ["PARCEL_NUMBER"],
 }
 
@@ -44,8 +46,6 @@ CLEVELAND_DEEDS_FIELD_MAP = {
     "recorded_date": ["last_transfer_date"],
     "document_amount": ["sale_price", "transfer_amount"],
     "bbl": ["parcel_number", "PARCEL_NUMBER", "PARCEL_ID"],
-    "party1_grantor": ["grantor"],
-    "party2_grantee": ["grantee"],
     "doc_type": ["document_type", "deed_type"],
     "borough": ["ward", "neighborhood"],
 }
@@ -84,7 +84,7 @@ def test_cleveland_registers_three_verified_feeds_and_snap_sla():
     permits = get_dataset(city, FeedType.PERMITS)
     assert permits.platform == "arcgis"
     assert permits.watermark_col == "ISSUE_DATE"
-    assert permits.id_keys == ["PERMIT_NUMBER", "OBJECTID"]
+    assert permits.id_keys == ["PERMIT_ID", "OBJECTID"]
     assert permits.field_map == CLEVELAND_PERMITS_FIELD_MAP
 
     complaints = get_dataset(city, FeedType.COMPLAINTS_311)
@@ -96,19 +96,24 @@ def test_cleveland_registers_three_verified_feeds_and_snap_sla():
     deeds = get_dataset(city, FeedType.DEEDS)
     assert deeds.platform == "arcgis"
     assert deeds.watermark_col == "last_transfer_date"
-    assert deeds.id_keys == ["PARCEL_ID", "OBJECTID"]
+    # A row is its parcel plus its transfer date; a parcel's next sale is a
+    # new row.
+    assert deeds.id_keys == ["PARCEL_ID", "last_transfer_date"]
+    assert deeds.composite_id is True
     assert deeds.field_map == CLEVELAND_DEEDS_FIELD_MAP
 
 
 PERMIT_ROW = {
     "OBJECTID": 99123,
-    "PERMIT_NUMBER": "B2026-00123",
-    "ADDRESS": "123 EUCLID AVE",
+    "PERMIT_ID": "B2026-00123",
+    "PRIMARY_ADDRESS": "123 EUCLID AVE, CLEVELAND, OH, 44115",
     "FILE_DATE": "2026-08-14T00:00:00+00:00",
     "ISSUE_DATE": "2026-08-14T00:00:00+00:00",
-    "PERMIT_TYPE": "New Construction",
+    "PERMIT_CATEGORY": "New Construction",
+    "PERMIT_TYPE": "Construction Project",
+    "PERMIT_SUBTYPE": "Building Permits",
     "JOB_VALUE": 1250000,
-    "STATUS": "Issued",
+    "CURRENT_TASK_STATUS": "Inspection Pending",
     "PARCEL_NUMBER": "007-01-001",
     "latitude": 41.4993,
     "longitude": -81.6944,
@@ -164,6 +169,9 @@ def test_cleveland_permit_row_parses(producers):
     assert event is not None
     assert event.city_id == "cleveland"
     assert event.job_id == "B2026-00123"
+    assert event.address_street == "123 EUCLID AVE, CLEVELAND, OH, 44115"
+    assert event.status == "Inspection Pending"
+    assert event.normalized_permit_type == "NEW_CONSTRUCTION"
     assert event.estimated_cost == 1250000.0
     assert event.issuance_date == datetime.fromisoformat("2026-08-14T00:00:00+00:00")
     assert event.borough == "CLEVELAND_CORE"
@@ -190,8 +198,8 @@ def test_cleveland_deed_row_parses(producers):
     assert event.doc_id == "123-45-678"
     assert event.document_amount == 27200.0
     assert event.recorded_date == datetime.fromisoformat("2026-08-21T00:00:00+00:00")
-    assert event.party1_grantor == "DSV SPV3 LLC"
-    assert event.party2_grantee == "3S FUND I LLC"
+    assert event.party1_grantor is None
+    assert event.party2_grantee is None
     assert event.borough == "CLEVELAND_CORE"
 
 

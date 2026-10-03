@@ -147,18 +147,23 @@ class TestSeattleRegistration:
         assert get_job_name(FeedType.PERMITS, CityId.SEATTLE) == "permits_seattle"
         assert get_job_name(FeedType.DEEDS, CityId.SEATTLE) == "deeds_seattle"
 
-    def test_deeds_feed_is_arcgis_and_others_are_socrata(self):
+    def test_deeds_and_sla_read_arcgis_and_others_socrata(self):
         datasets = REGISTRY[CityId.SEATTLE].datasets
         assert datasets[FeedType.DEEDS].platform == "arcgis"
-        for feed in (FeedType.PERMITS, FeedType.COMPLAINTS_311, FeedType.SLA):
+        for feed in (FeedType.PERMITS, FeedType.COMPLAINTS_311):
             assert datasets[feed].platform == "socrata"
+        # SLA: the statewide WA LCB Socrata table (data.wa.gov vgcw-qfjm) is an
+        # empty letters log, so Seattle uses the SNAP retailer slice (snapshot).
+        sla = datasets[FeedType.SLA]
+        assert sla.platform == "arcgis"
+        assert sla.ingestion_mode == "snapshot"
 
     def test_watermark_columns_match_published_schemas(self):
         """Field names verified against the live dataset schemas."""
         datasets = REGISTRY[CityId.SEATTLE].datasets
         assert datasets[FeedType.PERMITS].watermark_col == "issueddate"
         assert datasets[FeedType.COMPLAINTS_311].watermark_col == "createddate"
-        assert datasets[FeedType.SLA].watermark_col == "applicationdate"
+        assert datasets[FeedType.SLA].watermark_col == ""  # snapshot feed: no watermark
         assert datasets[FeedType.DEEDS].watermark_col == "SaleDate"
 
     def test_311_field_map_covers_seattle_spellings(self):
@@ -386,8 +391,8 @@ class TestSeattleDeedParsing:
             "SaleDate": "2023-08-16T00:00:00+00:00",
             "SalePrice": 760000,
             "Property_Type": "Improved",
-            "Sellername": "GLEIBERMAN ZACKARY",
-            "buyername": "PRESTON HEATHER",
+            "Sellername": "REDACTED",
+            "buyername": "REDACTED",
             "latitude": 47.71521,
             "longitude": -122.30314,
         }
@@ -402,8 +407,8 @@ class TestSeattleDeedParsing:
         assert ev.bbl == "9904000063"          # PIN
         assert ev.document_amount == 760000.0  # SalePrice
         assert str(ev.recorded_date).startswith("2023-08-16")
-        assert ev.party1_grantor == "GLEIBERMAN ZACKARY"
-        assert ev.party2_grantee == "PRESTON HEATHER"
+        assert ev.party1_grantor is None
+        assert ev.party2_grantee is None
 
     def test_coordinates_produce_h3_indexes(self, producer, row):
         ev = producer.parse_socrata_row(row, city_id="seattle")

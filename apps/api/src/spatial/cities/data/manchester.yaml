@@ -245,52 +245,48 @@ divisions:
     - Queen City
     city_id: manchester
 datasets:
-  deeds:
-    endpoint: https://services1.arcgis.com/KlG08rx11MkfACQT/arcgis/rest/services/Manchester_NH_Property_Card/FeatureServer/0
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis
-    watermark_col: SaleDate
+    watermark_col: ''
     id_keys:
-    - ParcelID
-    - OBJECTID
-    - SaleDate
-    topic: raw.municipal.deeds
-    interval_seconds: 600.0
-    producer_key: deeds
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
     endpoint_by_year: {}
-    watermark_type: text
-    watermark_format: '%m/%d/%Y'
+    watermark_type: null
+    watermark_format: null
     watermark_exclude: []
     order_by: null
     id_col: null
     select: null
     fallback_endpoints: []
-    where: null
+    where: State = 'NH' AND Latitude BETWEEN 42.93 AND 43.06 AND Longitude BETWEEN -71.53 AND -71.4
     needs_geocode: false
     geocode_context: null
     field_map:
-      doc_id:
-      - ParcelID
-      - ParcelId
-      bbl:
-      - ParcelID
-      doc_type:
-      - DeedType
-      document_amount:
-      - SalePrice
-      recorded_date:
-      - SaleDate
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
       address_street:
-      - Location
-      incident_address:
-      - Location
+      - Store_Street_Address
       borough:
       - City
       zipcode:
-      - Zip
-    ingestion_mode: incremental
-    oid_field: OBJECTID
-    max_record_count: 100000
-    expected_cadence_days: 30
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false
@@ -304,8 +300,44 @@ datasets:
     state_plane_x_col: null
     state_plane_y_col: null
     parcel_join: {}
-    non_spatial: false
+    non_spatial: null
     zip_member: null
+  deeds:
+    endpoint: https://ags.manchesternh.gov/agsgis7/rest/services/Community/Parcels/MapServer/0
+    platform: arcgis
+    watermark_col: SaleDate
+    id_keys:
+    - ParcelID
+    - SaleDate
+    - SaleBookPage
+    topic: raw.municipal.deeds
+    interval_seconds: 21600.0
+    producer_key: deeds
+    watermark_type: text
+    watermark_format: '%m/%d/%Y'
+    order_by: OBJECTID
+    select: OBJECTID,ParcelID,SaleDate,SalePrice,SaleBookPage,LandUse
+    where: CAST(SaleDate AS DATE) >= CURRENT_DATE - INTERVAL '90' DAY AND CAST(SaleDate AS DATE) <= CURRENT_DATE
+      AND Suppress_Internet_Access <> 'Yes'
+    needs_geocode: false
+    field_map:
+      doc_id:
+      - SaleBookPage
+      - ParcelID
+      recorded_date:
+      - SaleDate
+      document_amount:
+      - SalePrice
+      bbl:
+      - ParcelID
+      doc_type:
+      - LandUse
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 21
+    composite_id: true
+    metro_clip: true
 aliases:
 - manchester_nh
 - manchester-nh

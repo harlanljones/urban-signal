@@ -37,11 +37,12 @@ Provides neighborhood metadata, camera positioning, investment metrics,
 division catalog, and geographic bounding boxes for the City of Albuquerque
 and inner Bernalillo County.
 
-Albuquerque is a ONE-FEED PARTIAL metro like Boise / Austin / LA: PERMITS
-only, from the daily UTF-8 CSV dump at data.cabq.gov. The dump is
-address-only and therefore declares ``needs_geocode`` (ADR 0004). 311 / SLA
-/ DEEDS are absent (CRM not queryable, business-registration dump frozen,
-no deed transaction stream).
+Albuquerque's PERMITS come from the daily UTF-8 CSV dump at data.cabq.gov.
+The dump is address-only and therefore declares ``needs_geocode`` (ADR
+0004). The 2026-08-27 probe left 311, SLA and DEEDS absent (the CRM layer's
+queries timed out, the business-registration dump is frozen, and New Mexico
+publishes no sale prices). The SLA and 311 notes below record what has
+registered since.
 
 Live-probe caveats that define this leaf (2026-08-27, US-205):
 
@@ -53,6 +54,24 @@ Live-probe caveats that define this leaf (2026-08-27, US-205):
   spine ``where`` is ``Status NOT IN ('Expired')``.
 * AGIS ``City_Building_Permits`` FeatureServer is frozen (max DateIssued
   2025-01-16) and must not be registered.
+
+SLA: the USDA SNAP retailer slice inside the metro box, which stands in for
+the licence register the metro lacks. The corpus builds it with the shared
+``snap_sla_spec``; the feed mirror below does not carry it.
+
+311 (2026-10-02): the City's ABQ311 requests, read from the CRM layer
+``CRM_Service_Requests_MIL1/MapServer/0`` on the City GIS server, one point
+per request and parcel: 288,000 rows in the year to 2026-10-02, about 790 a
+day. The 2026-08-27 timeouts came from unbounded queries, so the spec reads
+at most the last day (``CURRENT_TIMESTAMP - INTERVAL '1' DAY``, about 30
+hours, as the server's clock is local), which answers in seconds. One request
+filed on 2026-09-30 cannot be read: a count over a window that holds it
+fails, and a row query over such a window returns no rows at all, so a poll
+whose window holds a row like it reads nothing until that row is older than
+the day. It is the only such row in the year to 2026-10-02. A request joined
+to several parcels repeats with the same ``CRM_ID``, and the poll publishes
+it once. The address, free text and staff accounts are never selected. The
+corpus registers this feed; the feed mirror below carries PERMITS only.
 """
 
 from typing import Any, Dict, List
@@ -520,7 +539,8 @@ ABQ_DIVISIONS = ALBUQUERQUE_DIVISIONS
 
 # ---------------------------------------------------------------------------
 # Feed specs (leaf-local; the spine copies these into REGISTRY).
-# Probed 2026-08-27 against data.cabq.gov. PERMITS only.
+# Probed 2026-08-27 against data.cabq.gov. PERMITS only here: 311 reads the
+# City's CRM layer, which the corpus registers.
 # ---------------------------------------------------------------------------
 ALBUQUERQUE_PERMITS_ENDPOINT = (
     "https://data.cabq.gov/business/buildingpermits/BuildingPermitsCABQ-en-us.csv"

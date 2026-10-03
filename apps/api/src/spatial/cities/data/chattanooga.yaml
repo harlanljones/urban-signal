@@ -120,15 +120,15 @@ datasets:
     interval_seconds: 300.0
     producer_key: permits
     endpoint_by_year: {}
-    watermark_type: null
-    watermark_format: null
+    watermark_type: text
+    watermark_format: '%Y-%m-%d %H:%M:%S UTC'
     watermark_exclude: []
     order_by: issueddate DESC
     id_col: null
-    select: null
+    select: permitnum,issueddate,applieddate,permitclass,permittype,statuscurrent,originaladdress1,originalzip,latitude,longitude
     fallback_endpoints:
     - https://www.arcgis.com/sharing/rest/content/items/9937e99e93de467eae5f592061c2672c/data
-    where: null
+    where: permitclass NOT IN ('Utility Street Cut Permit', 'Street Cut Permit', 'City Employee Only Utility Street Cut', 'Meter Inspection / Tenant Change Application')
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -140,17 +140,12 @@ datasets:
       - applieddate
       job_type:
       - permitclass
-      cost:
-      - estprojectcostdec
       status:
-      - status
+      - statuscurrent
       address_street:
-      - address
+      - originaladdress1
       zipcode:
-      - zipcode
-      - zip
-      bbl:
-      - pin
+      - originalzip
     ingestion_mode: incremental
     oid_field: null
     max_record_count: null
@@ -175,8 +170,8 @@ datasets:
     platform: arcgis
     watermark_col: SALE1DATE
     id_keys:
-    - PIN
-    - OBJECTID
+    - GISLINK
+    - SALE1DATE
     topic: raw.municipal.deeds
     interval_seconds: 1800.0
     producer_key: deeds
@@ -184,7 +179,7 @@ datasets:
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: SALE1DATE DESC, OBJECTID DESC
     id_col: null
     select: null
     fallback_endpoints: []
@@ -201,10 +196,8 @@ datasets:
       document_amount:
       - SALE1CONSD
       bbl:
-      - PIN
-      - PARCELID
-      party2_grantee:
-      - OWNERNAME1
+      - TAX_MAP_NO
+      - GISLINK
       doc_type:
       - SALE1TYPE
       - DEEDTYPE
@@ -231,6 +224,8 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 3000
+    composite_id: true
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis
@@ -249,7 +244,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'TN'
+    where: State = 'TN' AND Latitude BETWEEN 34.98 AND 35.45 AND Longitude BETWEEN -85.5 AND -84.95
     needs_geocode: false
     geocode_context: null
     field_map:

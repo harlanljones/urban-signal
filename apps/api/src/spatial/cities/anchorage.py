@@ -2,7 +2,6 @@ DEEDS_FIELD_MAP = {
     "doc_id": ["Parcel_ID", "GIS_ParcelNum11", "OBJECTID", "id"],
     "recorded_date": ["Deed_Date"],
     "borough": ["GIS_Site_City", "Tax_District"],
-    "party2_grantee": ["Owner_Name"],
     "bbl": ["Parcel_ID", "GIS_ParcelNum11"],
     "address_street": ["Parcel_Address"],
     "zipcode": ["GIS_Site_Zipcode"],
@@ -373,8 +372,7 @@ ANCHORAGE_FEED_SPECS: Dict[str, Dict[str, object]] = {
                 "of defense. No sale-price/consideration column exists — "
                 "document_amount parses 0.0 by design; assessed values must "
                 "not masquerade as deed amounts (NOLA precedent). "
-                "party2_grantee=Owner_Name (snapshot grain: the current "
-                "owner is the last deed's GRANTEE). Date columns are epoch-ms "
+                "The owner (Owner_Name) is not mapped. Date columns are epoch-ms "
                 "stamped noon UTC on the wire — compare ISO strings, never "
                 "local-midnight AKST/AKDT. GIS_Site_City: Anchorage 74,625 / "
                 "Eagle River 9,653 / Chugiak 3,274 / Girdwood 1,613 parcels."

@@ -96,7 +96,7 @@ datasets:
     watermark_col: TRANSFER_DATE
     id_keys:
     - PARID
-    - OBJECTID
+    - INSTRUMENT_NUMBER
     topic: raw.municipal.deeds
     interval_seconds: 3600.0
     producer_key: deeds
@@ -104,7 +104,7 @@ datasets:
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: TRANSFER_DATE DESC, OBJECTID DESC
     id_col: null
     select: null
     fallback_endpoints: []
@@ -118,10 +118,6 @@ datasets:
       - TRANSFER_DATE
       document_amount:
       - SALE_PRICE
-      party1_grantor:
-      - FORMER_OWNER
-      party2_grantee:
-      - NEW_OWNER
       doc_type:
       - INSTR_TYPE_DESC
       bbl:
@@ -145,6 +141,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    composite_id: true
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis
@@ -163,7 +160,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'OH'
+    where: State = 'OH' AND Latitude BETWEEN 40.65 AND 40.95 AND Longitude BETWEEN -81.65 AND -81.2
     needs_geocode: false
     geocode_context: null
     field_map:

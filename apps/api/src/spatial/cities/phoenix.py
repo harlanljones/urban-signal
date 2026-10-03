@@ -38,8 +38,6 @@ MARICOPA_DEEDS_FIELD_MAP: dict[str, list[str]] = {
     "address_street": ["SITUSADDRESS"],
     "borough": ["SITUSCITY"],
     "zipcode": ["SITUSZIP"],
-    "party1_grantor": ["GRANTOROWNERNAME"],
-    "party2_grantee": ["GRANTEEOWNERNAME"],
     "status": ["DEEDSTATUS"],
 }
 
@@ -536,6 +534,9 @@ PHOENIX_FEED_SPECS: Dict[str, Dict[str, object]] = {
             "oid_field": "OBJECTID",
             "max_record_count": 2000,
             "order_by": "PER_ISSUE_DATE DESC",
+            # Unissued permits (no PER_ISSUE_DATE) sort first under DESC and
+            # never move the watermark.
+            "where": "PER_ISSUE_DATE IS NOT NULL",
             "needs_geocode": False,
             "companion_endpoints": {
                 "shapephx_issued": PHOENIX_SHAPEPHX_PERMITS_ENDPOINT,

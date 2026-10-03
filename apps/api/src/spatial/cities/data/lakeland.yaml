@@ -79,9 +79,9 @@ divisions:
     city_id: lakeland
 datasets:
   permits:
-    endpoint: https://gismims.lakelandgov.net/portal/rest/services/Public_CED/Lakeland_CED_Permits/MapServer/0
+    endpoint: https://services1.arcgis.com/mcbQY5xNGGGM1vBX/arcgis/rest/services/IMS_Projects_Permits/FeatureServer/6
     platform: arcgis
-    watermark_col: ISSUEDATE
+    watermark_col: APPROVED
     id_keys:
     - PERMIT_NO
     - OBJECTID
@@ -92,17 +92,32 @@ datasets:
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: APPROVED DESC,OBJECTID ASC
     id_col: null
     select: null
     fallback_endpoints: []
-    where: null
+    where: TYPE = 'Permit'
     needs_geocode: false
     geocode_context: null
-    field_map: {}
+    field_map:
+      job_id:
+      - PERMIT_NO
+      issuance_date:
+      - APPROVED
+      - ISSUED
+      filing_date:
+      - APPLIED
+      job_type:
+      - PERMITORPROJECTTYPE
+      cost:
+      - JOBVALUE
+      address_street:
+      - SITE_ADDR
+      zipcode:
+      - SITE_ZIP
     ingestion_mode: incremental
     oid_field: OBJECTID
-    max_record_count: 2000
+    max_record_count: 16000
     expected_cadence_days: 7
     alarm_exempt: false
     alarm_exempt_reason: null
@@ -138,7 +153,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'FL'
+    where: State = 'FL' AND Latitude BETWEEN 27.95 AND 28.13 AND Longitude BETWEEN -82.1 AND -81.8
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -178,6 +193,45 @@ datasets:
     non_spatial: null
     zip_member: null
     delimiter: null
+  deeds:
+    endpoint: https://www.polkflpa.gov/FTPPage/downloader.ashx?filename=ftp_sales.zip&dir=%5CAppraisalData%5C
+    platform: csv
+    watermark_col: saledt
+    id_keys:
+    - parcel_id
+    - saledt
+    - book
+    - page
+    topic: raw.municipal.deeds
+    interval_seconds: 86400.0
+    producer_key: deeds
+    watermark_format: '%m/%d/%Y'
+    order_by: saledt DESC
+    select: parcel_id,saledt,price,book,page,trns_dscr
+    where: parcel_id >= '23' AND parcel_id < '26' AND saledt >= CURRENT_DATE - INTERVAL '90' DAY AND saledt <= CURRENT_DATE
+    needs_geocode: false
+    field_map:
+      doc_id:
+      - parcel_id
+      recorded_date:
+      - saledt
+      document_amount:
+      - price
+      bbl:
+      - parcel_id
+      doc_type:
+      - trns_dscr
+    ingestion_mode: snapshot
+    expected_cadence_days: 14
+    parcel_join:
+      parcel_layer: https://arcgis.lakelandgov.net/maps/rest/services/LandBase/Parcels/MapServer/10
+      join_key: PARCELID
+      geometry_source: centroid
+      row_key: parcel_id
+    zip_member: ftp_sales.txt
+    batch_limit: 8000
+    composite_id: true
+    metro_clip: true
 aliases:
 - lakeland_fl
 - lakeland fl

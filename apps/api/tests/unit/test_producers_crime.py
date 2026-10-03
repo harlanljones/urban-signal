@@ -187,6 +187,13 @@ def test_classify_offense_class():
     assert classify_offense_class("Assault", "Simple Assault") == "PART2"
     assert classify_offense_class("Assault", "Battery") == "PART2"
     assert classify_offense_class("ALL OTHER", "False Pretenses") == "PART2"
+    # Simple assault written the other way round (Chesterfield County, Boston,
+    # Chicago's ASSAULT / SIMPLE) is Part-2 too; felonious assault is not.
+    assert classify_offense_class("Assault-Simple", None) == "PART2"
+    assert classify_offense_class("ASSAULT - SIMPLE", None) == "PART2"
+    assert classify_offense_class("ASSAULT", "SIMPLE") == "PART2"
+    assert classify_offense_class("Assault-Felonious", None) == "PART1"
+    assert classify_offense_class("ASSAULT", "AGGRAVATED - HANDGUN") == "PART1"
 
 
 def test_crime_registration_scope_and_job_names():
@@ -201,9 +208,11 @@ def test_crime_registration_scope_and_job_names():
     assert get_job_name(FeedType.CRIME, CityId.SEATTLE) == "crime_seattle"
 
 
-def test_nyc_crime_declares_monthly_cadence():
-    """G11: NYC's YTD crime set publishes monthly; alarm window is 60d."""
+def test_nyc_crime_declares_quarterly_cadence():
+    """G11: NYC's YTD crime set publishes complete quarters, about four weeks
+    after each ends (2026-07-27 for the quarter to 2026-06-30), so its newest
+    complaint runs up to about four months old; alarm window is 184d."""
     spec = get_dataset(CityId.NYC, FeedType.CRIME)
-    assert spec.expected_cadence_days == 30
+    assert spec.expected_cadence_days == 92
     assert spec.endpoint.endswith("5uac-w243.json")
     assert spec.topic == "raw.municipal.crime"

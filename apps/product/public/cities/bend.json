@@ -223,10 +223,15 @@
     "sla": {
       "platform": "arcgis",
       "watermark_col": "LicenseExpirationDate",
-      "interval_seconds": 600.0,
+      "interval_seconds": 1800.0,
       "topic": "raw.municipal.sla"
     },
-    "deeds": null
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "Sales_Date_1",
+      "interval_seconds": 21600.0,
+      "topic": "raw.municipal.deeds"
+    }
   },
   "evidence_path": "apps/api/src/spatial/cities/bend.py",
   "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"

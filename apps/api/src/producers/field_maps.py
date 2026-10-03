@@ -35,16 +35,18 @@ def first_mapped(
     *canonical: str,
 ) -> Any:
     """Return ``row[first candidate key present]`` for the first canonical
-    field with candidates, or None. Dotted keys index one nested container."""
+    field with candidates, or None. A dotted key names a column of that name
+    when the row has one (Laredo's CKAN columns read "PERMIT ISS. DATE"),
+    else it indexes one nested container."""
     for name in canonical:
         for key in field_map.get(name, []):
+            if row.get(key):
+                return row[key]
             if "." in key:
                 head, _, tail = key.partition(".")
                 container = row.get(head)
                 if isinstance(container, dict) and container.get(tail):
                     return container[tail]
-            elif row.get(key):
-                return row[key]
     return None
 
 

@@ -251,7 +251,12 @@
       "interval_seconds": 3600.0,
       "topic": "raw.municipal.sla"
     },
-    "deeds": null
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "SaleDate",
+      "interval_seconds": 21600.0,
+      "topic": "raw.municipal.deeds"
+    }
   },
   "evidence_path": "apps/api/src/spatial/cities/vancouver_wa.py",
   "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"

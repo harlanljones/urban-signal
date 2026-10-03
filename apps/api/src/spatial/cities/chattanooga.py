@@ -121,6 +121,19 @@ CHATTANOOGA_DIVISIONS: dict[str, BoroughMeta] = {
 }
 
 
+def compose_permit_type(row: dict) -> str | None:
+    """A building permit's class read with its work type, so a new house is a
+    "Residential Building Permit: New Construction" rather than minor work.
+
+    ``DOBPermitsProducer`` calls this for every Chattanooga permit row. For a
+    trade's or a site's permit it returns None, and the field map reads
+    ``permitclass`` alone ("Electrical Permit").
+    """
+    from src.features.permit_taxonomy import building_permit_type
+
+    return building_permit_type(row.get("permitclass"), row.get("permittype"))
+
+
 from src.spatial.registration import SpatialRegistration
 
 REGISTRATION = SpatialRegistration(

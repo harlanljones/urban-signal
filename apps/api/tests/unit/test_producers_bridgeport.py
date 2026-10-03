@@ -3,8 +3,8 @@
 
 Bridgeport is a TWO-FEED PARTIAL metro on Connecticut's statewide Socrata portal
 (``data.ct.gov``): SLA (State Licenses and Credentials, ``ngch-56tr``, filtered
-``city = 'BRIDGEPORT'``) and DEEDS (Real Estate Sales, ``5mzw-sjtu``, filtered
-``town = 'Bridgeport'``). Both are address-only — no native WGS84 lat/lng read
+to ``city = 'BRIDGEPORT'`` and liquor permit types) and DEEDS (Real Estate Sales,
+``5mzw-sjtu``, filtered ``town = 'Bridgeport'``). Both are address-only — no native WGS84 lat/lng read
 by the shared producers — so both declare ``needs_geocode=True``.
 
 Tests pass WITHOUT a spine registration (no CityId.BRIDGEPORT, no REGISTRY
@@ -12,16 +12,18 @@ assertions — "bridgeport" stays a plain string). Division/borough resolution
 and geocode-hook call counts are deliberately NOT asserted: both change when
 the spine lands.
 
-Live fixtures captured byte-verbatim 2026-08-30 from data.ct.gov
-($order=recordrefreshedon DESC / $order=daterecorded DESC) — newest rows by
-watermark. SLA watermark 2026-08-30; DEEDS watermark 2025-09-30 (listyear 2024,
-an annual grand-list publication).
+Live fixtures captured from data.ct.gov ($order=recordrefreshedon DESC /
+$order=daterecorded DESC). SLA rows 2026-09-30 under the liquor filter, with
+the permittee's own name replaced on the individually held permit; DEEDS rows
+2026-08-30, watermark 2025-09-30 (listyear 2024, an annual grand-list
+publication).
 """
 
 from unittest.mock import patch
 
 import pytest
 
+from src.producers.ct_liquor_specs import CT_LIQUOR_SLA_FIELD_MAP, ct_liquor_where
 from src.producers.field_maps import first_mapped
 from src.spatial.cities.bridgeport import (
     BRIDGEPORT_CITY_ID,
@@ -40,76 +42,75 @@ from src.spatial.cities.bridgeport import (
     is_in_bridgeport_metro,
 )
 
-# Newest SLA row (credentialid 923910, BUZZ'S MOBIL, 2394 E MAIN ST —
-# RETAIL GASOLINE DEALER, RGD.0003314). Broad statewide credentials feed;
-# watermark recordrefreshedon 2026-08-30.
-_SLA_FIXTURE_BUZZ = {
-    "credentialid": "923910",
-    "name": "BUZZ'S MOBIL",
-    "type": "CORPORATION",
-    "businessname": "BUZZ'S MOBIL",
-    "fullcredentialcode": "RGD.0003314",
-    "credentialtype": "RGD",
-    "credentialnumber": "3314",
-    "credential": "RETAIL GASOLINE DEALER",
-    "status": "INACTIVE",
-    "statusreason": "EXPIRED MORE THAN 3 YEARS - MUST REAPPLY",
-    "active": "0",
-    "issuedate": "2010-04-22T00:00:00.000",
-    "effectivedate": "2012-12-21T00:00:00.000",
-    "expirationdate": "2013-10-31T00:00:00.000",
-    "address": "2394 E MAIN ST",
+# Newest liquor permit (credentialid 2016279): a business permittee, so
+# ``businessname`` is the holding company and ``dba`` the bar's name.
+_SLA_FIXTURE_BERTOS = {
+    "credentialid": "2016279",
+    "name": "AYALA'S LLC",
+    "type": "BUSINESS",
+    "businessname": "AYALA'S LLC",
+    "dba": "BERTO\u2019S SPORTS BAR & GRILL",
+    "fullcredentialcode": "LIR.0020362",
+    "credentialtype": "LIR",
+    "credentialnumber": "20362",
+    "credential": "RESTAURANT LIQUOR",
+    "status": "ACTIVE UNDER REVIEW",
+    "statusreason": "DIVISION APPROVAL NEEDED",
+    "active": "1",
+    "issuedate": "2021-10-01T00:00:00.000",
+    "effectivedate": "2026-10-01T00:00:00.000",
+    "expirationdate": "2027-09-30T00:00:00.000",
+    "address": "709 BEECHWOOD AVE",
     "city": "BRIDGEPORT",
     "state": "CT",
-    "zip": "066101803",
-    "recordrefreshedon": "2026-08-30T00:00:00.000",
+    "zip": "066051606",
+    "recordrefreshedon": "2026-09-28T00:00:00.000",
 }
 
-# Second co-newest SLA row (credentialid 7634, ROBERT RUFF — INDIVIDUAL with a
-# ``dba`` column and NO ``businessname``/``issuedate``; exercises the
-# name/businessname and effectivedate/issuedate fallthroughs).
-_SLA_FIXTURE_RUFF = {
-    "credentialid": "7634",
-    "name": "ROBERT RUFF",
+# An individually held permit (credentialid 427231): ``name`` is the permittee,
+# a person (replaced here), there is no ``businessname``, and ``dba`` names the
+# store.
+_SLA_FIXTURE_DANNYS = {
+    "credentialid": "427231",
+    "name": "PERMITTEE NAME REDACTED",
     "type": "INDIVIDUAL",
-    "dba": "HOBART SALES AND SERVICE",
-    "fullcredentialcode": "RPR.0000972",
-    "credentialtype": "RPR",
-    "credentialnumber": "972",
-    "credential": "REPAIRER OF WEIGHING & MEASURING DEVICES",
+    "dba": "DANNY'S VARIETY",
+    "fullcredentialcode": "LGB.0014025",
+    "credentialtype": "LGB",
+    "credentialnumber": "14025",
+    "credential": "GROCERY BEER",
     "status": "INACTIVE",
-    "statusreason": "EXPIRED MORE THAN 3 YEARS - MUST REAPPLY",
     "active": "0",
-    "effectivedate": "1998-03-17T00:00:00.000",
-    "expirationdate": "1998-12-31T00:00:00.000",
-    "address": "HOBART SALES & SERVICE",
+    "issuedate": "2006-05-15T00:00:00.000",
+    "effectivedate": "2009-05-15T00:00:00.000",
+    "expirationdate": "2010-05-14T00:00:00.000",
+    "address": "856 FAIRFIELD AVE",
     "city": "BRIDGEPORT",
     "state": "CT",
-    "zip": "066053225",
-    "recordrefreshedon": "2026-08-30T00:00:00.000",
+    "zip": "06604",
+    "recordrefreshedon": "2026-03-27T00:00:00.000",
 }
 
-# Third co-newest SLA row (credentialid 76672, CAPITOL SUNOCO — no issuedate,
-# so effective_date resolves from effectivedate).
-_SLA_FIXTURE_SUNOCO = {
-    "credentialid": "76672",
-    "name": "CAPITOL SUNOCO",
+# A new application (credentialid 2951919): PENDING with no issue or effective
+# date yet, the earliest sign of a new store.
+_SLA_FIXTURE_MADERA = {
+    "credentialid": "2951919",
+    "name": "MADERA MARKET LLC",
     "type": "LIMITED LIABILITY COMPANY",
-    "businessname": "CAPITOL SUNOCO",
-    "fullcredentialcode": "RGD.0000075",
-    "credentialtype": "RGD",
-    "credentialnumber": "75",
-    "credential": "RETAIL GASOLINE DEALER",
-    "status": "INACTIVE",
-    "statusreason": "EXPIRED MORE THAN 3 YEARS - MUST REAPPLY",
+    "businessname": "MADERA MARKET LLC",
+    "dba": "MADERA MARKET",
+    "fullcredentialcode": "LGB.0016030.P-CW",
+    "credentialtype": "LGB",
+    "credentialnumber": "16030",
+    "credential": "GROCERY BEER",
+    "status": "PENDING",
+    "statusreason": "APPROVED FOR PROVISIONAL WITH REQUIREMENTS",
     "active": "0",
-    "effectivedate": "2011-11-01T00:00:00.000",
-    "expirationdate": "2012-10-31T00:00:00.000",
-    "address": "565 LINDLEY ST",
+    "address": "818 NOBLE AV",
     "city": "BRIDGEPORT",
     "state": "CT",
-    "zip": "066065451",
-    "recordrefreshedon": "2026-08-30T00:00:00.000",
+    "zip": "06608",
+    "recordrefreshedon": "2026-09-17T00:00:00.000",
 }
 
 # Newest DEEDS row (serialnumber 241376, 2370 NORTH AVE UNIT #05E — a Condo).
@@ -253,7 +254,7 @@ class TestBridgeportFeedSpecs:
     def test_where_order_and_geocode_are_pinned(self):
         sla_extra = BRIDGEPORT_FEED_SPECS["sla"]["extra"]
         deeds_extra = BRIDGEPORT_FEED_SPECS["deeds"]["extra"]
-        assert sla_extra["where"] == "city = 'BRIDGEPORT'"
+        assert sla_extra["where"] == ct_liquor_where("BRIDGEPORT")
         assert sla_extra["order_by"] == "recordrefreshedon DESC"
         assert sla_extra["needs_geocode"] is True
         assert sla_extra["geocode_context"] == "Bridgeport, CT"
@@ -270,7 +271,7 @@ class TestBridgeportFeedSpecs:
         assert spec.endpoint == BRIDGEPORT_SLA_ENDPOINT
         assert spec.platform == "socrata"
         assert spec.watermark_col == "recordrefreshedon"
-        assert spec.where == "city = 'BRIDGEPORT'"
+        assert spec.where == ct_liquor_where("BRIDGEPORT")
         assert spec.field_map == SLA_FIELD_MAP
         assert spec.needs_geocode is True
 
@@ -286,6 +287,7 @@ class TestBridgeportFeedSpecs:
         assert spec.field_map == DEEDS_FIELD_MAP
         assert spec.id_keys == ["serialnumber", "listyear"]
         assert spec.needs_geocode is True
+        assert spec.expected_cadence_days == 365
 
     def test_get_bridgeport_dataset_rejects_unregistered_feeds(self):
         class _Feed:
@@ -304,8 +306,9 @@ class TestBridgeportFieldMaps:
         assert SLA_FIELD_MAP["address_street"] == ["address"]
         assert SLA_FIELD_MAP["zipcode"] == ["zip"]
         assert SLA_FIELD_MAP["status"] == ["status"]
-        assert SLA_FIELD_MAP["premises_name"] == ["businessname", "name"]
-        assert SLA_FIELD_MAP["dba"] == ["businessname", "name"]
+        assert SLA_FIELD_MAP["premises_name"] == ["businessname", "dba"]
+        assert SLA_FIELD_MAP["dba"] == ["dba", "businessname"]
+        assert SLA_FIELD_MAP is CT_LIQUOR_SLA_FIELD_MAP
 
     def test_deeds_map_reads_live_columns(self):
         assert DEEDS_FIELD_MAP["doc_id"] == ["serialnumber"]
@@ -317,17 +320,18 @@ class TestBridgeportFieldMaps:
 
     def test_source_city_column_maps_to_borough_slot(self):
         assert SLA_FIELD_MAP["borough"] == ["city"]
-        assert first_mapped(_SLA_FIXTURE_BUZZ, SLA_FIELD_MAP, "borough") == "BRIDGEPORT"
+        assert first_mapped(_SLA_FIXTURE_BERTOS, SLA_FIELD_MAP, "borough") == "BRIDGEPORT"
         assert first_mapped(_DEEDS_FIXTURE_2370, DEEDS_FIELD_MAP, "borough") == "Bridgeport"
 
     def test_license_id_falls_through_to_fullcredentialcode(self):
-        row = dict(_SLA_FIXTURE_BUZZ)
+        row = dict(_SLA_FIXTURE_BERTOS)
         row.pop("credentialid")
-        assert first_mapped(row, SLA_FIELD_MAP, "license_id") == "RGD.0003314"
+        assert first_mapped(row, SLA_FIELD_MAP, "license_id") == "LIR.0020362"
 
-    def test_premises_name_falls_through_to_name(self):
-        row = dict(_SLA_FIXTURE_RUFF)
-        assert first_mapped(row, SLA_FIELD_MAP, "premises_name") == "ROBERT RUFF"
+    def test_individual_permit_is_named_by_its_dba_not_the_permittee(self):
+        row = dict(_SLA_FIXTURE_DANNYS)
+        assert first_mapped(row, SLA_FIELD_MAP, "premises_name") == "DANNY'S VARIETY"
+        assert first_mapped(row, SLA_FIELD_MAP, "dba") == "DANNY'S VARIETY"
 
     def test_no_coordinate_columns_are_candidates(self):
         """Both feeds are address-only: no latitude/longitude slots, and the
@@ -350,38 +354,44 @@ class TestBridgeportSLAParsing:
 
     def test_newest_fixture_parses_through_real_producer_path(self, sla, monkeypatch):
         _patch_resolve(monkeypatch)
-        event = sla.parse_socrata_row(_SLA_FIXTURE_BUZZ, city_id="bridgeport")
+        event = sla.parse_socrata_row(_SLA_FIXTURE_BERTOS, city_id="bridgeport")
         assert event is not None
         assert event.city_id == "bridgeport"
-        assert event.license_id == "923910"
-        assert event.license_type == "RETAIL GASOLINE DEALER"
-        assert event.premises_name == "BUZZ'S MOBIL"
-        assert event.dba == "BUZZ'S MOBIL"
-        assert event.license_status == "INACTIVE"
-        assert event.address == "2394 E MAIN ST"
+        assert event.license_id == "2016279"
+        assert event.license_type == "RESTAURANT LIQUOR"
+        assert event.premises_name == "AYALA'S LLC"
+        assert event.dba == "BERTO\u2019S SPORTS BAR & GRILL"
+        assert event.license_status == "ACTIVE UNDER REVIEW"
+        assert event.address == "709 BEECHWOOD AVE"
         assert event.source_neighborhood == "BRIDGEPORT"
 
     def test_effective_and_expiration_dates_parse(self, sla, monkeypatch):
+        """effective_date is the current term (effectivedate), not the first
+        issue in 2021."""
         _patch_resolve(monkeypatch)
-        event = sla.parse_socrata_row(_SLA_FIXTURE_BUZZ, city_id="bridgeport")
+        event = sla.parse_socrata_row(_SLA_FIXTURE_BERTOS, city_id="bridgeport")
         assert event is not None
-        assert str(event.effective_date).startswith("2012-12-21")
-        assert str(event.expiration_date).startswith("2013-10-31")
+        assert str(event.effective_date).startswith("2026-10-01")
+        assert str(event.expiration_date).startswith("2027-09-30")
 
-    def test_individual_credential_without_businessname_parses(self, sla, monkeypatch):
+    def test_individual_permit_never_publishes_the_permittee(self, sla, monkeypatch):
         _patch_resolve(monkeypatch)
-        event = sla.parse_socrata_row(_SLA_FIXTURE_RUFF, city_id="bridgeport")
+        event = sla.parse_socrata_row(_SLA_FIXTURE_DANNYS, city_id="bridgeport")
         assert event is not None
-        assert event.license_id == "7634"
-        assert event.license_type == "REPAIRER OF WEIGHING & MEASURING DEVICES"
-        assert event.premises_name == "ROBERT RUFF"
-        assert event.dba == "ROBERT RUFF"
+        assert event.license_id == "427231"
+        assert event.license_type == "GROCERY BEER"
+        assert event.premises_name == "DANNY'S VARIETY"
+        assert event.dba == "DANNY'S VARIETY"
+        assert "PERMITTEE NAME REDACTED" not in event.model_dump_json()
 
-    def test_effective_date_falls_back_from_issuedate_to_effectivedate(self, sla, monkeypatch):
+    def test_pending_application_without_dates_parses(self, sla, monkeypatch):
         _patch_resolve(monkeypatch)
-        event = sla.parse_socrata_row(_SLA_FIXTURE_SUNOCO, city_id="bridgeport")
+        event = sla.parse_socrata_row(_SLA_FIXTURE_MADERA, city_id="bridgeport")
         assert event is not None
-        assert str(event.effective_date).startswith("2011-11-01")
+        assert event.license_id == "2951919"
+        assert event.license_status == "PENDING"
+        assert event.effective_date is None
+        assert event.dba == "MADERA MARKET"
 
 
 class TestBridgeportDeedsParsing:

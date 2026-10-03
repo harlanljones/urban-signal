@@ -100,6 +100,10 @@ Live-probe caveats that define this leaf (2026-08-28, US-228):
   SPRINGFIELD, COOPER COMMONS, CIRCLE G AT RIGGS HOMESTEAD RANCH. The metro
   bbox is rounded from the live ``GOGov/COC_GOGov/MapServer/11`` city
   boundary envelope: lng[-111.9723,-111.7553] lat[33.2038,33.3613].
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
 """
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta

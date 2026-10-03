@@ -194,7 +194,7 @@ class TestPrinceGeorgesSdatDeeds:
         assert event.doc_id == "17125627082"
         assert event.bbl == "17125627082"
         assert event.document_amount == pytest.approx(10.0)
-        assert event.party1_grantor == "NH HAVEN APARTMENTS LLC"
+        assert event.party1_grantor is None
         assert event.latitude == pytest.approx(38.78358949000099)
         assert event.longitude == pytest.approx(-77.01234729604383)
 

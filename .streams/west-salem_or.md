@@ -26,6 +26,13 @@ Register Salem, OR metro area with 2-3 verified municipal data feeds (permits, S
 - 2026-08-28 — All 802 permits and 1,111 SLA rows carry native geometry (0 null-geometry rows). needs_geocode=False.
 - 2026-08-28 — SLA map refinement: OWNER (legal entity; person on short-term rows) is PII and dropped; COMPLEXNAME is the only dba/premises_name candidate; FOLDERNAME is the street address. Both maps declare no latitude/longitude candidates (State Plane trap).
 - 2026-08-28 — 6 divisions / 9 submarkets, evidence-based on the live NEIGHBORHOOD column (Northgate 121, South Gateway 120, West Salem 66, East Lancaster 63, Sunnyslope 50, SEMCA 41, SESNA 40, SCAN 40, NOLA 39, CAN-DO 37, Highland 33, NEN 33, etc.).
+- 2026-10-02 — Deeds registered from the Marion County Assessor's sales
+  file for the year (`2026SalesData.csv`, the 2027 file from 1 January): the
+  lines dated in the 90 days before each poll, closed at today, each placed
+  through the Assessor's `Parcels` layer on `TAXLOT` and clipped to the metro
+  box (666 sales published on the first live poll). The grantor and grantee
+  columns are never selected. Polk County's West Salem is not covered. See
+  `.streams/western-deeds.md`.
 
 ## Current step
 

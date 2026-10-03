@@ -1,5 +1,13 @@
 """Contract tests for Denver's ArcGIS permit, 311, and property-sales feeds.
 
+2026-09-30: DEEDS registers from the parcel layer's own last sale
+(``ODC_PROP_PARCELS_A`` layer 245 carries ``SALE_DATE``, ``SALE_PRICE``,
+``RECEPTION_NUM`` and ``ASAL_INSTR`` on each parcel polygon), which needs no
+join. The US-73 notes below concern the sales table, which stays unregistered:
+its numeric ``PARID`` loses the leading zeros of the parcel layer's 13-digit
+``SCHEDNUM``, so it matches no parcel as sent (0 of 200) and 198 of 200 once
+padded.
+
 US-73 (Wave G3) live research outcomes baked into these pins:
 
 * Real Property Sales and Transfers registers on FeedType.DEEDS behind the
@@ -54,6 +62,15 @@ from src.spatial.city_registry import (
     normalize_city,
 )
 
+# The parcel layer's owner and mailing columns are never mapped or requested.
+DENVER_DEEDS_FIELD_MAP = {
+    "doc_id": ["RECEPTION_NUM", "SCHEDNUM"],
+    "recorded_date": ["SALE_DATE"],
+    "document_amount": ["SALE_PRICE"],
+    "bbl": ["SCHEDNUM"],
+    "doc_type": ["ASAL_INSTR"],
+}
+
 DENVER_SALES_ENDPOINT = (
     "https://services1.arcgis.com/zdB7qR0BtYrg0Xpl/arcgis/rest/services/"
     "ODC_real_property_sales_and_transfers/FeatureServer/60"
@@ -69,8 +86,6 @@ DENVER_SALES_CANDIDATE_MAP = {
     "recorded_date": ["RECEPTION_DATE"],
     "doc_type": ["INSTRUMENT"],
     "borough": ["NBHD_1_CN"],
-    "party1_grantor": ["GRANTOR"],
-    "party2_grantee": ["GRANTEE"],
 }
 
 # Dirty RECEPTION_DATE values observed live 2026-08-24 (malformed year and
@@ -110,32 +125,29 @@ class TestDenverRegistration:
     def test_job_names_are_namespaced(self):
         assert get_job_name(FeedType.PERMITS, CityId.DENVER) == "permits_denver"
 
-    def test_sales_reverted_under_g8_prime(self):
+    def test_sales_table_stays_unregistered(self):
         """US-73 finding: the sales table (ODC_real_property_sales_and_transfers,
         309,548 rows) exposes ZERO address-like columns — verified over the
-        newest 500 real rows. Registering it would emit 100% null-H3 events
-        that the enrichment worker cannot place, violating the Wave-G gate
-        ("a feed registered because of Wave G that lands above 5% null-H3 is
-        reverted"). Parcel-join geocoding is explicitly out of scope per plan
-        D6, so the feed waits for either a parcel-join ADR or a raw-archive
-        rationale.
+        newest 500 real rows — so it registered nothing that could be placed.
+        Deeds now come from the parcel layer's last sale instead (2026-09-30).
 
-        The candidate registration recipe is preserved in the constants above
+        The sales table's candidate recipe is preserved in the constants above
         (DENVER_SALES_ENDPOINT / DENVER_SALES_WATERMARK_EXCLUDE /
         DENVER_SALES_CANDIDATE_MAP) — note the ADR 0005 text-watermark
         declaration is LOAD-BEARING there: RECEPTION_DATE is an integer
         yyyymmdd column and values like 50250305 (parses as year 5025) would
-        blind incremental polling without watermark_exclude."""
-        with pytest.raises(KeyError, match="no.*feed"):
-            get_dataset(CityId.DENVER, FeedType.DEEDS)
+        blind incremental polling without watermark_exclude. Its parcel join
+        would need PARID zero-padded to SCHEDNUM's 13 digits."""
+        spec = get_dataset(CityId.DENVER, FeedType.DEEDS)
+        assert spec.endpoint == settings.arcgis_denver_deeds_url
+        assert spec.endpoint != DENVER_SALES_ENDPOINT
 
     def test_sales_candidate_map_stays_unregistered(self):
-        """resolve_field_map degrades to {} for the unregistered feed and the
-        producer's doc_id chain finds nothing on arcgis-shaped rows, so every
-        sales row parses to None until a registration supplies the map."""
+        """The registered map reads the parcel layer, not the sales table."""
         from src.producers.field_maps import resolve_field_map
 
-        assert resolve_field_map("denver", FeedType.DEEDS) == {}
+        assert resolve_field_map("denver", FeedType.DEEDS) == DENVER_DEEDS_FIELD_MAP
+        assert resolve_field_map("denver", FeedType.DEEDS) != DENVER_SALES_CANDIDATE_MAP
 
     def test_licenses_descoped_sla_slot_history(self):
         """US-73 descope evidence: Denver's own Active Business Licenses
@@ -157,21 +169,82 @@ class TestDenverRegistration:
         assert spec.ingestion_mode == "snapshot"
         assert spec.watermark_col == ""
         assert spec.needs_geocode is False
-        assert spec.where == "State = 'CO'"
+        assert spec.where == (
+            "State = 'CO' AND Latitude BETWEEN 39.55 AND 39.95"
+            " AND Longitude BETWEEN -105.2 AND -104.5"
+        )
+        # 1,202 retailers in the bbox on 2026-09-30: more than the default cap.
+        assert spec.batch_limit == 2000
 
 
-def test_denver_is_now_a_three_feed_city():
+def test_denver_is_now_a_four_feed_city():
     city = CityId.DENVER
     assert normalize_city("denver") is city
     assert REGISTRY[city].job_suffix == "denver"
     # US-73 outcome: the Denver licenses source stayed descoped (no usable
     # watermark) and sales were reverted under G8' (zero address columns).
-    # US-364 added SNAP (national FNS feed, State='CO') as the SLA feed.
+    # US-364 added SNAP (national FNS feed, State='CO') as the SLA feed, and
+    # deeds came back from the parcel layer's last sale on 2026-09-30.
     assert set(REGISTRY[city].datasets) == {
         FeedType.PERMITS,
         FeedType.COMPLAINTS_311,
         FeedType.SLA,
+        FeedType.DEEDS,
     }
+
+
+def test_denver_deeds_read_each_parcels_last_sale():
+    """Each parcel polygon carries its last sale. Rows keep arriving four to six
+    weeks after the sale, so each poll re-reads the sales of the last 90 days
+    (2,445 on 2026-09-30) and publishes the ones it has not seen."""
+    spec = get_dataset(CityId.DENVER, FeedType.DEEDS)
+    assert spec.endpoint.endswith("/ODC_PROP_PARCELS_A/FeatureServer/245")
+    assert spec.platform == "arcgis"
+    assert spec.ingestion_mode == "snapshot"
+    assert spec.watermark_col == "SALE_DATE"
+    assert spec.where == "SALE_DATE >= CURRENT_DATE - INTERVAL '90' DAY AND SALE_DATE <= CURRENT_TIMESTAMP"
+    assert spec.order_by == "SALE_DATE DESC, OBJECTID DESC"
+    assert spec.id_keys == ["SCHEDNUM", "SALE_DATE", "RECEPTION_NUM"]
+    assert spec.composite_id is True
+    assert spec.select == "OBJECTID,SCHEDNUM,SALE_DATE,SALE_PRICE,RECEPTION_NUM,ASAL_INSTR"
+    assert spec.batch_limit == 4000
+    assert spec.interval_seconds == 21600.0
+    assert spec.needs_geocode is False
+    assert spec.parcel_join == {}
+    assert spec.field_map == DENVER_DEEDS_FIELD_MAP
+
+
+def test_denver_parcel_sale_is_a_deed_at_the_parcel_centroid():
+    """A synthetic parcel-layer feature through the production flattener: the
+    polygon's centroid places the sale."""
+    from src.producers.arcgis_client import ArcGISClient
+
+    with patch("src.producers.deeds_acris_producer.BaseKafkaProducer"):
+        from src.producers.deeds_acris_producer import DeedsACRISProducer
+
+        deeds = DeedsACRISProducer()
+    feature = {
+        "attributes": {
+            "OBJECTID": 90002,
+            "SCHEDNUM": "0999999999999",
+            "SALE_DATE": 1790208000000,  # 2026-09-24
+            "SALE_PRICE": 650000.0,
+            "RECEPTION_NUM": "2026099999",
+            "ASAL_INSTR": "WD: WARRANTY",
+        },
+        "geometry": {"rings": [[[-104.9905, 39.7401], [-104.9895, 39.7401], [-104.9895, 39.7409], [-104.9905, 39.7409], [-104.9905, 39.7401]]]},
+    }
+    row = ArcGISClient()._flatten_feature(feature, date_fields={"SALE_DATE"})
+
+    event = deeds.parse_socrata_row(row, city_id="denver")
+
+    assert event is not None
+    assert (event.doc_id, event.bbl, event.doc_type) == ("2026099999", "0999999999999", "WD: WARRANTY")
+    assert event.document_amount == 650000.0
+    assert event.recorded_date.date().isoformat() == "2026-09-24"
+    assert event.latitude == pytest.approx(39.7405)
+    assert event.longitude == pytest.approx(-104.99)
+    assert is_in_denver_metro(event.latitude, event.longitude)
 
 
 def test_denver_arcgis_specs_pin_date_and_coordinate_quirks():
@@ -234,13 +307,16 @@ def test_denver_live_shaped_311_row_parses_uppercase_coordinates():
 
 
 class TestDenverSalesRowParsing:
-    """Real sales rows (captured live 2026-08-24 from FeatureServer table 60)
-    through DeedsACRISProducer.parse_socrata_row under the candidate field
-    map. Pins run green before the spine lands the registration."""
+    """Sales rows (captured live 2026-08-24 from FeatureServer table 60, party
+    names redacted) through DeedsACRISProducer.parse_socrata_row under the
+    candidate field map. The sales table stays unregistered: Denver's deeds
+    spec reads the parcel layer, so the fixture hides it from these rows as
+    it would be hidden from any unregistered candidate."""
 
     @pytest.fixture
     def deeds(self, monkeypatch):
         import src.producers.field_maps as fm
+        import src.spatial.city_registry as registry
 
         monkeypatch.setattr(
             fm,
@@ -252,6 +328,14 @@ class TestDenverSalesRowParsing:
             ),
             raising=True,
         )
+        registered = registry.get_dataset
+
+        def sales_table_unregistered(city, feed):
+            if city is CityId.DENVER and feed is FeedType.DEEDS:
+                raise KeyError("denver has no deeds feed for the sales table")
+            return registered(city, feed)
+
+        monkeypatch.setattr(registry, "get_dataset", sales_table_unregistered)
         with patch("src.producers.deeds_acris_producer.BaseKafkaProducer"):
             from src.producers.deeds_acris_producer import DeedsACRISProducer
 
@@ -269,8 +353,8 @@ class TestDenverSalesRowParsing:
             "SALE_MONTHDAY": 811,
             "RECEPTION_DATE": 20260813,
             "SALE_PRICE": 900000,
-            "GRANTOR": "OSTROWSKI,GREGORY R",
-            "GRANTEE": "PSJ & ASSOCIATES II LLC",
+            "GRANTOR": "REDACTED",
+            "GRANTEE": "REDACTED",
             "CLASS": "R",
             "D_CLASS_N": "SFR Grade B",
             "NBHD_1_CN": "LOWRY",
@@ -289,8 +373,8 @@ class TestDenverSalesRowParsing:
             "SALE_MONTHDAY": 707,
             "RECEPTION_DATE": 50250305,
             "SALE_PRICE": 0,
-            "GRANTOR": "MARTINEZ,CLYDE A",
-            "GRANTEE": "MARTINEZ,CLYDE TRUST",
+            "GRANTOR": "REDACTED",
+            "GRANTEE": "REDACTED",
             "CLASS": "R",
             "MKT_CLUS": "9",
             "D_CLASS": "113",
@@ -312,8 +396,8 @@ class TestDenverSalesRowParsing:
             "SALE_MONTHDAY": 1230,
             "RECEPTION_DATE": 20261230,
             "SALE_PRICE": 580000,
-            "GRANTOR": "MASSA,MOLLY M",
-            "GRANTEE": "MEIGS,ANDREW PATRICK",
+            "GRANTOR": "REDACTED",
+            "GRANTEE": "REDACTED",
             "CLASS": "O",
             "D_CLASS": "101",
             "D_CLASS_N": "RESIDENTIAL-CONDOMINIUM",
@@ -321,7 +405,7 @@ class TestDenverSalesRowParsing:
             "NBHD_1_CN": "BALLPARK",
         }
 
-    def test_sane_sale_maps_business_key_parcel_price_and_parties(
+    def test_sane_sale_maps_business_key_parcel_and_price(
         self, deeds, sane_wd_row
     ):
         ev = deeds.parse_socrata_row(sane_wd_row, city_id="denver")
@@ -330,8 +414,8 @@ class TestDenverSalesRowParsing:
         assert ev.bbl == "604322005000"
         assert ev.document_amount == 900000.0
         assert ev.doc_type == "WD"
-        assert ev.party1_grantor == "OSTROWSKI,GREGORY R"
-        assert ev.party2_grantee == "PSJ & ASSOCIATES II LLC"
+        assert ev.party1_grantor is None
+        assert ev.party2_grantee is None
         assert ev.source_neighborhood == "LOWRY"
         assert ev.borough == "LOWRY"
 

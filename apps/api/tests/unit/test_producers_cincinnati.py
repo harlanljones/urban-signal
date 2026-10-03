@@ -47,7 +47,9 @@ def test_cincinnati_registers_four_verified_feeds():
     assert REGISTRY[city].datasets[FeedType.SLA].watermark_col == "entered_date"
     spec = get_dataset(city, FeedType.DEEDS)
     assert spec.platform == "csv"
-    assert spec.watermark_col == "SaleDate"
+    # The sale date is split across MonthSale/DaySale/YearSale: no column to
+    # filter on, so the snapshot names none and a backfill reads the file.
+    assert (spec.watermark_col, spec.ingestion_mode) == ("", "snapshot")
     assert spec.id_keys == ["conveyancenumber", "propertynumber"]
 
 
@@ -57,7 +59,7 @@ def test_cincinnati_registers_four_verified_feeds():
         (FeedType.PERMITS, "uhjb-xac9", "issueddate"),
         (FeedType.COMPLAINTS_311, "gcej-gmiw", "date_time_received"),
         (FeedType.SLA, "ehdi-ajku", "entered_date"),
-        (FeedType.DEEDS, "transfer_dailysales_new.csv", "SaleDate"),
+        (FeedType.DEEDS, "transfer_dailysales_new.csv", ""),
     ],
 )
 def test_cincinnati_specs_pin_researched_sources(feed, endpoint, watermark):
@@ -107,7 +109,7 @@ CINCINNATI_SALE_ROW = {
     "conveyancenumber": "415593",
     "deedtype": "WD",
     "appraisalarea": "ADDYSTON",
-    "previousowner": "DAVIS KRISTEN",
+    "previousowner": "REDACTED",
     "propertynumber": "571-0003-0150-00",
 }
 
@@ -127,8 +129,8 @@ def test_cincinnati_deed_row_parses_via_field_map(deeds):
     assert ev.doc_id == "415593"
     assert ev.bbl == "571-0003-0150-00"
     assert ev.document_amount == 27000.0
-    assert ev.party1_grantor == "DAVIS KRISTEN"
-    assert ev.party2_grantee == "GUTLACHT HOLDINGS LLC"
+    assert ev.party1_grantor is None
+    assert ev.party2_grantee is None
     assert ev.doc_type == "WD"
     assert ev.source_neighborhood == "ADDYSTON"
     assert ev.recorded_date == datetime.fromisoformat("2026-08-13")
@@ -173,9 +175,9 @@ def test_row_matches_strips_wrapping_parentheses():
 CINCINNATI_CSV_SAMPLE = (
     '"ConveyanceNumber","PropertyNumber","SaleAmount","Valid","PreviousOwner",'
     '"OwnerName1","MonthSale","DaySale","YearSale","DeedType","AppraisalArea"\n'
-    '"415593","571-0003-0150-00","27000","Y","DAVIS KRISTEN",'
+    '"415593","571-0003-0150-00","27000","Y","REDACTED",'
     '"GUTLACHT HOLDINGS LLC","8","13","2026","WD","ADDYSTON"\n'
-    '"415594","571-0003-0151-00","27000","N","DAVIS KRISTEN",'
+    '"415594","571-0003-0151-00","27000","N","REDACTED",'
     '"GUTLACHT HOLDINGS LLC","8","13","2026","WD","ADDYSTON"\n'
 )
 
@@ -183,6 +185,9 @@ CINCINNATI_CSV_SAMPLE = (
 class _FakeResponse:
     def __init__(self, text):
         self.text = text
+        # The CSV client reads the downloaded bytes in the response's encoding.
+        self.content = text.encode()
+        self.encoding = "utf-8"
 
     def raise_for_status(self):
         return None

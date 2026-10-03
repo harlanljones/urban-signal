@@ -317,7 +317,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'SC'
+    where: State = 'SC' AND Latitude BETWEEN 34.76 AND 34.93 AND Longitude BETWEEN -82.48 AND -82.31
     needs_geocode: false
     geocode_context: null
     field_map:

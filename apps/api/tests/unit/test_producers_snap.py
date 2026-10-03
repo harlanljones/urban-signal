@@ -2,10 +2,12 @@
 
 The SNAP registration reuses the existing SLALicenseEvent machinery — no new
 producer code. One national ArcGIS FeatureServer (usda-fns org, item
-8b260f9a10b0459aa441ad8588c2251c) is sliced per starter metro with a State
-where-clause, so every spec comes from the shared ``snap_sla_spec`` helper
-(six-metro starter set in 965b312, then extended to every remaining
-SLA-less registered metro in the US-364 follow-up).
+8b260f9a10b0459aa441ad8588c2251c) is sliced per metro with a where clause on
+its state and its metro bbox, so every spec comes from the shared
+``snap_sla_spec`` helper (six-metro starter set in 965b312, then extended to
+every remaining SLA-less registered metro in the US-364 follow-up). The bbox
+term arrived on 2026-09-30: a state-only slice handed every metro in a state
+the same first 1,000 retailers by ObjectId.
 
 Probed live 2026-08-27:
 
@@ -72,6 +74,103 @@ SNAP_EXTENDED_METROS = [
     ("san_jose", "CA"),
     ("tulsa", "OK"),
 ]
+
+# Every SNAP metro's state and the retailers inside its state and metro bbox,
+# counted live 2026-09-30 with the spec's own where clause (returnCountOnly).
+# A snapshot poll reads at most its job's batch_limit rows (1000 unless the
+# spec declares more), so each cap must clear its metro's count with room to
+# grow. docs/research/snap-metro-scope-2026-09-30.md has the statewide counts.
+SNAP_METRO_RETAILERS = {
+    "albany": ("NY", 133),
+    "albuquerque": ("NM", 412),
+    "alexandria": ("LA", 85),
+    "allentown": ("PA", 449),
+    "anchorage": ("AK", 111),
+    "asheville": ("NC", 175),
+    "augusta": ("GA", 305),
+    "billings": ("MT", 85),
+    "boise": ("ID", 231),
+    "bowling_green": ("KY", 135),
+    "bozeman": ("MT", 28),
+    "burlington": ("VT", 84),
+    "canton": ("OH", 248),
+    "cape_coral": ("FL", 429),
+    "chandler": ("AZ", 277),
+    "charleston_sc": ("SC", 433),
+    "charleston_wv": ("WV", 42),
+    "charlotte": ("NC", 1036),
+    "chattanooga": ("TN", 386),
+    "cleveland": ("OH", 948),
+    "columbus": ("OH", 1080),
+    "columbus_ga": ("GA", 193),
+    "dallas": ("TX", 1970),
+    "dayton": ("OH", 774),
+    "denver": ("CO", 1202),
+    "dover": ("DE", 67),
+    "durham": ("NC", 208),
+    "el_paso": ("TX", 600),
+    "evansville": ("IN", 188),
+    "fort_collins": ("CO", 102),
+    "fort_smith": ("AR", 114),
+    "fort_worth": ("TX", 1806),
+    "frederick": ("MD", 84),
+    "gainesville": ("FL", 149),
+    "grand_rapids": ("MI", 664),
+    "greenville": ("SC", 219),
+    "harrisburg": ("PA", 144),
+    "honolulu": ("HI", 505),
+    "houston": ("TX", 4205),
+    "huntington_wv": ("WV", 59),
+    "huntsville": ("AL", 261),
+    "indianapolis": ("IN", 946),
+    "jackson_ms": ("MS", 316),
+    "jonesboro": ("AR", 88),
+    "lake_charles": ("LA", 148),
+    "lakeland": ("FL", 210),
+    "laredo": ("TX", 199),
+    "las_vegas": ("NV", 1317),
+    "lexington": ("KY", 254),
+    "lincoln": ("NE", 173),
+    "macon_bibb": ("GA", 209),
+    "madison": ("WI", 303),
+    "manchester": ("NH", 124),
+    "melbourne": ("FL", 422),
+    "memphis": ("TN", 825),
+    "missoula": ("MT", 57),
+    "monroe": ("LA", 129),
+    "montgomery_al": ("AL", 303),
+    "nampa": ("ID", 73),
+    "ocala": ("FL", 310),
+    "omaha": ("NE", 387),
+    "peoria": ("IL", 297),
+    "pierce": ("WA", 896),
+    "pittsburgh": ("PA", 526),
+    "port_st_lucie": ("FL", 177),
+    "portland_maine": ("ME", 92),
+    "prince_georges": ("MD", 1078),
+    "providence": ("RI", 172),
+    "raleigh": ("NC", 1466),
+    "reno": ("NV", 316),
+    "richmond": ("VA", 566),
+    "roanoke": ("VA", 163),
+    "rochester": ("NY", 400),
+    "sacramento": ("CA", 1965),
+    "san_antonio": ("TX", 1536),
+    "san_jose": ("CA", 755),
+    "santa_fe": ("NM", 64),
+    "savannah": ("GA", 277),
+    "seattle": ("WA", 1103),
+    "sioux_falls": ("SD", 162),
+    "tallahassee": ("FL", 242),
+    "tempe": ("AZ", 361),
+    "toledo": ("OH", 439),
+    "topeka": ("KS", 111),
+    "tulsa": ("OK", 670),
+    "wichita": ("KS", 378),
+    "wilmington_de": ("DE", 144),
+    "wilmington_nc": ("NC", 262),
+    "yakima": ("WA", 118),
+}
 
 
 def _flatten_feature(attributes: dict, geometry: dict) -> dict:
@@ -164,7 +263,13 @@ def snap_producer():
 
 class TestSnapRegistrationShape:
     def test_starter_set_registers_sla_specs(self):
-        from src.spatial.city_registry import CityId, FeedType, get_dataset
+        from src.spatial.city_registry import (
+            REGISTRY,
+            CityId,
+            FeedType,
+            get_dataset,
+            snap_sla_where,
+        )
 
         expected = {
             CityId.COLUMBUS: "OH",
@@ -176,16 +281,28 @@ class TestSnapRegistrationShape:
             spec = get_dataset(city, FeedType.SLA)
             assert spec.platform == "arcgis"
             assert SNAP_ENDPOINT_FRAG in spec.endpoint, city
-            assert spec.where == f"State = '{state}'", city
+            assert spec.where == snap_sla_where(state, REGISTRY[city].metro_bbox), city
 
-    def test_starter_set_pinned_by_state_where_clauses(self):
+    def test_starter_set_pinned_by_state_and_bbox_where_clauses(self):
         from src.spatial.city_registry import CityId, FeedType, get_dataset
 
         expected = {
-            CityId.COLUMBUS: "State = 'OH'",
-            CityId.RALEIGH: "State = 'NC'",
-            CityId.BOISE: "State = 'ID'",
-            CityId.WICHITA: "State = 'KS'",
+            CityId.COLUMBUS: (
+                "State = 'OH' AND Latitude BETWEEN 39.75 AND 40.2"
+                " AND Longitude BETWEEN -83.3 AND -82.7"
+            ),
+            CityId.RALEIGH: (
+                "State = 'NC' AND Latitude BETWEEN 35.4 AND 36.15"
+                " AND Longitude BETWEEN -79.5 AND -78.0"
+            ),
+            CityId.BOISE: (
+                "State = 'ID' AND Latitude BETWEEN 43.43 AND 43.74"
+                " AND Longitude BETWEEN -116.42 AND -116.03"
+            ),
+            CityId.WICHITA: (
+                "State = 'KS' AND Latitude BETWEEN 37.4 AND 37.95"
+                " AND Longitude BETWEEN -97.85 AND -97.05"
+            ),
         }
         for city, where in expected.items():
             assert get_dataset(city, FeedType.SLA).where == where
@@ -237,14 +354,21 @@ class TestSnapRegistrationShape:
 
     def test_extended_set_registers_sla_specs(self):
         """The US-364 extension: every remaining SLA-less registered metro
-        gets its own SNAP spec with the same snapshot contract, sliced by
-        its state's two-letter code (verified live per state)."""
-        from src.spatial.city_registry import FeedType, get_dataset, normalize_city
+        gets its own SNAP spec with the same snapshot contract, sliced to its
+        state's two-letter code inside its metro bbox (verified live)."""
+        from src.spatial.city_registry import (
+            REGISTRY,
+            FeedType,
+            get_dataset,
+            normalize_city,
+            snap_sla_where,
+        )
 
         for city_value, state in SNAP_EXTENDED_METROS:
-            spec = get_dataset(normalize_city(city_value), FeedType.SLA)
+            city = normalize_city(city_value)
+            spec = get_dataset(city, FeedType.SLA)
             assert SNAP_ENDPOINT_FRAG in spec.endpoint, city_value
-            assert spec.where == f"State = '{state}'", city_value
+            assert spec.where == snap_sla_where(state, REGISTRY[city].metro_bbox), city_value
             assert spec.ingestion_mode == "snapshot"
             assert spec.watermark_col == ""
             assert spec.expected_cadence_days == 14
@@ -252,55 +376,64 @@ class TestSnapRegistrationShape:
             assert spec.needs_geocode is False
 
     def test_every_registered_metro_has_sla(self):
-        """The extension closed the set; later waves registered metros whose
-        probes found no SLA-grade feed (the 2026-09-06 mid-Atlantic wave
-        registered deeds-only), and grand_rapids is geometry-only.
-        Every other registered metro carries an SLA spec."""
+        """The extension closed the set, and later waves registered metros whose
+        probes found no SLA-grade feed. On 2026-09-30 the 25 left without one
+        (the mid-Atlantic wave's deeds-only cities among them, and Grand
+        Rapids, until then geometry-only) took their SNAP slice too, so every
+        registered metro now carries an SLA spec."""
         from src.spatial.city_registry import REGISTRY, FeedType, get_dataset
 
-        sla_less = {
-            "albany",
-            "allentown",
-            "billings",
-            "bowling_green",
-            "bozeman",
-            "burlington",
-            "chandler",
-            "charleston_wv",
-            "dover",
-            "fort_collins",
-            "frederick",
-            "grand_rapids",
-            "harrisburg",
-            "huntington_wv",
-            "laredo",
-            "lincoln",
-            "madison",
-            "manchester",
-            "missoula",
-            "montgomery_al",
-            "nampa",
-            "peoria",
-            "portland_maine",
-            "providence",
-            "richmond",
-            "roanoke",
-            "santa_fe",
-            "savannah",
-            "sioux_falls",
-            "tallahassee",
-            "tempe",
-            "topeka",
-            "wilmington_de",
-            "yakima",
-        }
         for city_id in REGISTRY:
-            if city_id.value in sla_less:
-                with pytest.raises(KeyError):
-                    get_dataset(city_id, FeedType.SLA)
-                continue
-            spec = get_dataset(city_id, FeedType.SLA)
-            assert spec is not None, city_id
+            assert get_dataset(city_id, FeedType.SLA) is not None, city_id
+
+
+def _snap_specs():
+    """Every registered SLA spec that reads the SNAP layer, by city."""
+    from src.spatial.city_registry import REGISTRY, FeedType
+
+    return {
+        city_id.value: reg.datasets[FeedType.SLA]
+        for city_id, reg in REGISTRY.items()
+        if FeedType.SLA in reg.datasets
+        and SNAP_ENDPOINT_FRAG in reg.datasets[FeedType.SLA].endpoint
+    }
+
+
+class TestSnapMetroScope:
+    """A statewide SNAP filter handed every metro in a state the same first
+    1,000 retailers by ObjectId (Tallahassee got 19 of its 242). Each spec is
+    now its state inside its metro bbox, with a cap that covers the bbox."""
+
+    def test_where_narrows_the_state_to_the_bbox(self):
+        from src.spatial.city_registry import snap_sla_where
+
+        bbox = {"min_lat": 30.29, "max_lat": 30.63, "min_lng": -84.7, "max_lng": -84.05}
+        assert snap_sla_where("FL", bbox) == (
+            "State = 'FL' AND Latitude BETWEEN 30.29 AND 30.63"
+            " AND Longitude BETWEEN -84.7 AND -84.05"
+        )
+
+    def test_every_snap_spec_is_the_helper_for_its_metro(self):
+        """Each corpus block is exactly what ``snap_sla_spec`` builds from the
+        metro's state and bbox, so no block drifts back to a statewide slice."""
+        from src.spatial.city_registry import REGISTRY, normalize_city, snap_sla_spec
+
+        specs = _snap_specs()
+        assert set(specs) == set(SNAP_METRO_RETAILERS)
+        for city_value, spec in specs.items():
+            state, _retailers = SNAP_METRO_RETAILERS[city_value]
+            bbox = REGISTRY[normalize_city(city_value)].metro_bbox
+            assert spec == snap_sla_spec(state, bbox, spec.batch_limit), city_value
+
+    def test_every_cap_covers_its_metro_with_room_to_grow(self):
+        """A snapshot poll that fills its cap never reads the rest, so each
+        metro's cap clears its measured retailers by half again."""
+        for city_value, spec in _snap_specs().items():
+            _state, retailers = SNAP_METRO_RETAILERS[city_value]
+            cap = spec.batch_limit or 1000
+            assert cap >= 1.5 * retailers, (city_value, retailers, cap)
+            # A cap is declared only where the default falls short.
+            assert spec.batch_limit is None or 1.5 * retailers > 1000, city_value
 
 
 @pytest.fixture

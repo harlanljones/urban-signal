@@ -289,9 +289,9 @@
   },
   "feeds": {
     "permits": {
-      "platform": "arcgis",
-      "watermark_col": "",
-      "interval_seconds": 86400.0,
+      "platform": "socrata",
+      "watermark_col": "issue_permit_date",
+      "interval_seconds": 3600.0,
       "topic": "raw.municipal.permits"
     },
     "311": null,

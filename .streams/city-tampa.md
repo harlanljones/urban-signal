@@ -17,6 +17,7 @@ Tampa registers as a partial city with full permits plus partial alcohol-beverag
 - 2026-08-26 — **Field maps use live ArcGIS names.** Permit fields map `RECORD_ID`, `LASTUPDATE`, `PROJECTSTATUS`, `RECORDTYPE`, `ADDRESS`, `ZIP`, and `NBROFUNITS`; SLA fields map `ORD_PERMIT`/`APP_NUM`, `ABSALETYPE`, `BUS_NAME`, `HISTORY_ACT_DT`, `HISTORY_ACTION`, `PERMIT_ADDR`, and `PERMIT_ZIP`. Coordinates come from ArcGIS point geometry flattened by `ArcGISClient`.
 - 2026-08-26 — **Endpoint literal vs settings:** TAMPA_DATASETS uses the literal ArcGIS URL so the leaf imports cleanly without the spine `config.py` change. The spine REGISTRY entry should reference a new `settings.arcgis_tampa_permits_url` (see report delta). `topic` uses the existing `settings.topic_permits`.
 - 2026-08-26 — Geography finalized: metro bbox 27.84–28.12 / -82.60–-82.22; 7 divisions, 19 submarkets; all nesting + exactly-one invariants asserted in-test and pass.
+- 2026-10-02 — Deeds registered in the corpus from the City's copy of the Hillsborough County parcels (`Parcels/TaxParcel`), each with its latest sale. 311 is still token-gated. See `.streams/florida-deeds.md`.
 
 ## Validation
 

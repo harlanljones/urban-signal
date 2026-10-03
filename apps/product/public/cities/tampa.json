@@ -326,7 +326,12 @@
       "interval_seconds": 600.0,
       "topic": "raw.municipal.sla"
     },
-    "deeds": null
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "S_DATE",
+      "interval_seconds": 21600.0,
+      "topic": "raw.municipal.deeds"
+    }
   },
   "evidence_path": "apps/api/src/spatial/cities/tampa.py",
   "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"

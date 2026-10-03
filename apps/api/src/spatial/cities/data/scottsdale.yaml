@@ -392,6 +392,123 @@ datasets:
     non_spatial: null
     zip_member: null
     delimiter: null
+  '311':
+    endpoint: https://maps.scottsdaleaz.gov/arcgis/rest/services/OpenData_Tabular/MapServer/28
+    platform: arcgis
+    watermark_col: ClosedDate
+    id_keys:
+    - Requests
+    topic: raw.municipal.311
+    interval_seconds: 21600.0
+    producer_key: '311'
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: ClosedDate DESC, Requests DESC
+    id_col: null
+    select: Requests,Workgroup,RequestType,RequestStatus,Address,Latitude,Longitude,CreatedDate,ClosedDate
+    fallback_endpoints: []
+    where: null
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      incident_id:
+      - Requests
+      created_date:
+      - CreatedDate
+      closed_date:
+      - ClosedDate
+      complaint_type:
+      - RequestType
+      - Workgroup
+      status:
+      - RequestStatus
+      incident_address:
+      - Address
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+    ingestion_mode: incremental
+    oid_field: Requests
+    max_record_count: 1000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+    batch_limit: 3000
+    metro_clip: true
+  deeds:
+    endpoint: https://gis.mcassessor.maricopa.gov/arcgis/rest/services/Parcels/MapServer/0
+    platform: arcgis
+    watermark_col: DEED_DATE
+    id_keys:
+    - APN
+    - DEED_DATE
+    - DEED_NUMBER
+    topic: raw.municipal.deeds
+    interval_seconds: 21600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: DEED_DATE DESC, OBJECTID DESC
+    id_col: null
+    select: OBJECTID,APN,DEED_NUMBER,DEED_DATE,SALE_PRICE,LATITUDE,LONGITUDE
+    fallback_endpoints: []
+    where: JURISDICTION = 'SCOTTSDALE' AND DEED_DATE >= CURRENT_DATE - INTERVAL '90' DAY AND DEED_DATE <= CURRENT_TIMESTAMP
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - DEED_NUMBER
+      - APN
+      recorded_date:
+      - DEED_DATE
+      document_amount:
+      - SALE_PRICE
+      bbl:
+      - APN
+      latitude:
+      - LATITUDE
+      longitude:
+      - LONGITUDE
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    batch_limit: 5000
+    composite_id: true
 aliases:
 - scottsdale_az
 - scottsdale-az

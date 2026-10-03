@@ -126,9 +126,9 @@ datasets:
     watermark_exclude: []
     order_by: null
     id_col: null
-    select: null
+    select: OBJECTID,RECORD_ID,DateIssued,DATE_OPENED,B1_APP_TYPE_ALIAS,RECORD_TYPE_TYPE,RECORD_STATUS,Total_Construction_Cost,PROPERTY_ADDRESS,Location,PROPERTY_ZIP,PARCEL_ID
     fallback_endpoints: []
-    where: null
+    where: RECORD_TYPE_TYPE NOT IN ('Miscellaneous Fees', 'Amendment')
     needs_geocode: true
     geocode_context: Hartford, CT
     field_map:
@@ -136,27 +136,22 @@ datasets:
       - RECORD_ID
       issuance_date:
       - DateIssued
+      filing_date:
+      - DATE_OPENED
       job_type:
-      - PermitType
-      - PERMIT_TYPE
-      - WorkDescription
+      - B1_APP_TYPE_ALIAS
+      - RECORD_TYPE_TYPE
       cost:
-      - EstimatedCost
-      - COST
-      - ProjectCost
+      - Total_Construction_Cost
       status:
-      - Status
-      - STATUS
+      - RECORD_STATUS
       address_street:
       - PROPERTY_ADDRESS
       - Location
       zipcode:
-      - ZIP
-      - ZipCode
-      - POSTAL_CODE
+      - PROPERTY_ZIP
       bbl:
       - PARCEL_ID
-      - ParcelID
     ingestion_mode: incremental
     oid_field: OBJECTID
     max_record_count: 2000
@@ -250,9 +245,7 @@ datasets:
     platform: socrata
     watermark_col: recordrefreshedon
     id_keys:
-    - license_number
-    - credential_number
-    - id
+    - credentialid
     topic: raw.municipal.sla
     interval_seconds: 3600.0
     producer_key: sla
@@ -264,43 +257,35 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: city = 'HARTFORD'
+    where: city = 'HARTFORD' AND credentialtype IN ('LIR', 'LRW', 'LRB', 'LCA', 'LCR', 'LCW', 'LIT', 'LIH', 'LIC', 'LPC', 'LGC', 'LBA', 'LBB', 'LRF', 'LRS', 'LCN', 'LCM', 'LCC', 'LAP', 'LCS', 'LFB', 'LFC', 'LFG', 'LFR', 'LOL', 'LSE', 'LTH', 'LPA', 'LIU', 'LUW', 'LUB', 'LAB', 'LAT', 'LAC', 'LMI', 'LIP', 'LGB', 'LID', 'LWG', 'LRE', 'LMB', 'LMP', 'LBP', 'LML', 'LMS', 'LMA', 'LMC', 'LMW', 'LFW', 'LBF', 'LDF', 'FWBC', 'CGAL', 'LFO')
     needs_geocode: true
     geocode_context: Hartford, CT
     field_map:
       license_id:
-      - license_number
-      - credential_number
-      - id
+      - credentialid
+      - fullcredentialcode
       license_type:
-      - credential_type
-      - credential_name
-      - license_type
+      - credential
+      - credentialtype
       effective_date:
-      - effective_date
-      - issue_date
+      - effectivedate
+      - issuedate
       expiration_date:
-      - expiration_date
-      - expiry_date
+      - expirationdate
       address_street:
       - address
-      - street_address
-      - address_line_1
       zipcode:
       - zip
-      - zipcode
-      - postal_code
       borough:
       - city
       premises_name:
-      - business_name
-      - name
+      - businessname
+      - dba
       dba:
-      - business_name
-      - name
+      - dba
+      - businessname
       status:
       - status
-      - license_status
     ingestion_mode: incremental
     oid_field: null
     max_record_count: null
@@ -320,6 +305,64 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+  deeds:
+    endpoint: https://utility.arcgis.com/usrsvcs/servers/d595ae995fb049d3ac54919ebf24b1ac/rest/services/HartfordOpenDataTables/FeatureServer/6
+    platform: arcgis
+    watermark_col: LastSaleDate
+    id_keys:
+    - ParcelNumber
+    - LastSaleDate
+    - LegalRef
+    topic: raw.municipal.deeds
+    interval_seconds: 21600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: LastSaleDate DESC, OBJECTID DESC
+    id_col: null
+    select: OBJECTID,ParcelNumber,LastSaleDate,LastSalePrice,LastSalecode,LegalRef
+    fallback_endpoints: []
+    where: LastSaleDate >= CURRENT_DATE - INTERVAL '90' DAY AND LastSaleDate <= CURRENT_TIMESTAMP
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - LegalRef
+      - ParcelNumber
+      recorded_date:
+      - LastSaleDate
+      document_amount:
+      - LastSalePrice
+      bbl:
+      - ParcelNumber
+      doc_type:
+      - LastSalecode
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join:
+      parcel_layer: https://utility.arcgis.com/usrsvcs/servers/6f9809e9fe754a879389ee0dfa1fcec5/rest/services/OpenData_Housing_Development/MapServer/11
+      join_key: PARCELNUMBER
+      geometry_source: centroid
+      row_key: ParcelNumber
+    non_spatial: null
+    zip_member: null
+    composite_id: true
 aliases:
 - hartford_ct
 - hartford ct

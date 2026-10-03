@@ -116,7 +116,7 @@ datasets:
     watermark_col: SALEDATE
     id_keys:
     - PIN
-    - OBJECTID
+    - SALEDATE
     topic: raw.municipal.deeds
     interval_seconds: 1800.0
     producer_key: deeds
@@ -126,7 +126,7 @@ datasets:
     watermark_exclude: []
     order_by: null
     id_col: null
-    select: null
+    select: PIN,SALEDATE,SALEPRICE,CITY,SUBNAME,OBJECTID
     fallback_endpoints: []
     where: null
     needs_geocode: false
@@ -144,7 +144,7 @@ datasets:
       borough:
       - CITY
       - SUBNAME
-    ingestion_mode: snapshot
+    ingestion_mode: incremental
     oid_field: OBJECTID
     max_record_count: 2000
     expected_cadence_days: 7
@@ -163,6 +163,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    composite_id: true
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis
@@ -181,7 +182,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'NV'
+    where: State = 'NV' AND Latitude BETWEEN 39.3 AND 40.0 AND Longitude BETWEEN -120.2 AND -119.4
     needs_geocode: false
     geocode_context: null
     field_map:

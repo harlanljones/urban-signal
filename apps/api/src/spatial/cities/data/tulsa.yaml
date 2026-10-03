@@ -232,7 +232,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'OK'
+    where: State = 'OK' AND Latitude BETWEEN 35.8 AND 36.45 AND Longitude BETWEEN -96.45 AND -95.45
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -271,6 +271,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 2000
 aliases:
 - tulsa_ok
 - tulsa ok

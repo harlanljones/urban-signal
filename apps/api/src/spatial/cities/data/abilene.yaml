@@ -279,6 +279,43 @@ datasets:
     non_spatial: null
     zip_member: null
     delimiter: null
+  permits:
+    endpoint: https://public.mygov.us/tx_abilene/downloadReport?moduleName=pi&id=371
+    platform: excel
+    watermark_col: permit_issued_date_time
+    id_keys:
+    - permit_number
+    topic: raw.municipal.permits
+    interval_seconds: 86400.0
+    producer_key: permits
+    watermark_type: text
+    watermark_format: '%m/%d/%Y at %I:%M %p'
+    order_by: permit_issued_date_time DESC
+    select: permit_number,template_name,status_project,date_time_started,permit_issued_date_time,project_valuation,project_address,zip,coordinates
+    where: template_name NOT IN ('Certificate of Occupancy Permit (C)', 'Itinerant
+      Business')
+    field_map:
+      job_id:
+      - permit_number
+      issuance_date:
+      - permit_issued_date_time
+      filing_date:
+      - date_time_started
+      job_type:
+      - template_name
+      status:
+      - status_project
+      cost:
+      - project_valuation
+      address_street:
+      - project_address
+      zipcode:
+      - zip
+    expected_cadence_days: 45
+    point_col: coordinates
+    point_lon_first: true
+    batch_limit: 2500
+    metro_clip: true
 aliases:
 - abilene_tx
 - abilene tx

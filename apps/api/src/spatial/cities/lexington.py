@@ -1,9 +1,22 @@
 """Lexington, KY — Urban Signal spatial registration (metro bbox, divisions, submarkets).
 
-Leaf module: geometry only. Feed specs live in the spine (city_registry). Initial
-registration will land SLA via the Kentucky ABC active-license ArcGIS layer
-filtered to Fayette County; permits remain unregistered pending a verifiable
-public feed on `data.lexingtonky.gov`.
+Leaf module: geometry only. Feed specs live in the spine (city_registry). SLA
+reads the SNAP retailer slice: the Kentucky ABC active-license layer first
+registered here is published by Louisville Metro and holds Jefferson County
+only (no Fayette rows, checked 2026-09-30), and no public Fayette licence layer
+was found. Permits remain unregistered pending a verifiable public feed on
+`data.lexingtonky.gov` (still so on 2026-10-02: they live in Accela Citizen
+Access).
+
+311 (2026-10-02): LFUCG's LexCall requests, from its Salesforce CRM, on its
+ArcGIS Online org (``CitizenRequests_public/FeatureServer/0``): a rolling 30
+days, 8,455 requests on 2026-10-02, refreshed about every 30 minutes.
+Lexington reads the requests newer than its watermark on ``CreatedDate``. The
+problem text gives the complaint type, then the problem code and then the
+division; 136 of the 1,000 newest requests carried none of the three and
+publish as Unknown. Requests routed to Code Enforcement (nuisances,
+sidewalks) are residents' requests, not code cases, and are kept. The layer
+has no status or closed date, and its address column is never requested.
 """
 
 from typing import Dict

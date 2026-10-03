@@ -1059,7 +1059,7 @@ Two things worth keeping from this round:
 
 | Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
 |---|---|---|---|---|---|
-| city-des-moines | `.streams/city-des-moines.md` | `config.py`, `city_registry.py` | 2026-09-29 | done (registered, `sla` only; PR #66) | `cities/des_moines.py`, `cities/data/des_moines.yaml`, `test_producers_des_moines.py` (39 tests), `docs/research/probe-des_moines.md`, `maps.dsm.city` in `ANSI_DATE_LITERAL_HOSTS`, regenerated dashboard/facts/`cities/des_moines.json`, README/PRODUCT 156 -> 157 |
+| city-des-moines | `.streams/city-des-moines.md` | `config.py`, `city_registry.py` (follow-up: `config.py` only) | 2026-09-29 | done (registered, `sla` in PR #66; follow-up registered `violations`, stacked on PR #67) | `cities/des_moines.py`, `cities/data/des_moines.yaml`, `test_producers_des_moines.py` (39 tests, 60 after the follow-up), `docs/research/probe-des_moines.md`, `maps.dsm.city` in `ANSI_DATE_LITERAL_HOSTS`, regenerated dashboard/facts/`cities/des_moines.json`, README/PRODUCT 156 -> 157; follow-up: `datasets.violations` (Code Case, layer 0) and `arcgis_des_moines_code_cases_url` |
 
 Des Moines was named in the wave-3 extended list but never probed. The probe found
 one feed that qualifies and registered it: the City's Rental License layer
@@ -1104,3 +1104,968 @@ Things worth keeping:
   while the stream ran; neither file was touched here, and no other city's
   registration changed. `docs/signal-roadmap.md` and
   `docs/expansion-roadmap-wave-3.md` were not edited.
+
+**Follow-up, same day and same stream: Code Case registered as `violations`.** The
+`poll_job` / `parse_socrata_row` fix (PR #67) removed the only blocker recorded
+above, so the layer left unregistered in the first pass is now the second Des Moines
+feed. Re-probe 2026-09-29 (26 requests, default curl User-Agent, no WAF response):
+33,061 rows, 33,061 distinct `CaseNumber`, every row a native point inside the metro
+bbox, `DateOpened` newest **2026-09-25** with 0 future-dated rows, 7d **190** / 30d
+**795** / 60d 1,843, longest gap between opened days over the trailing year **5 days**
+(Thanksgiving and Christmas weeks). `DateOpened > date '...'` with `orderByFields=
+DateOpened DESC,OBJECTID DESC` works on `maps.dsm.city`; the ISO string returns error
+400. Registered `arcgis`, watermark `DateOpened`, ids `CaseNumber` then `OBJECTID`,
+interval 1800, `expected_cadence_days: 7` (alarm at 14 days; the reload is not proven
+daily, same as `sla`), field map `violation_id`, `code`, `status`, `status_date`,
+`address` only. `Description` is deliberately not mapped (free text, 14,568 distinct
+values, staff initials and names); `Remark` and the editor columns are never
+mapped. Spine touched: `config.py` (one settings field) only. Gates: `pytest -m
+interlock` 35 passed, the leaf tests 60 passed, `test_scheduler.py` 25 passed,
+`test_producers_enforcement_signals.py` 11 passed, `verify_cicd_preflight.py` green on
+all six gates, `ruff check` clean. G5 on the newest 500 rows: 500/500 parsed, points
+500/500.
+
+Worth keeping from the follow-up:
+
+- **`scripts/backfill_probe.py` cannot probe a `violations` job as shipped**: its
+  `PRODUCERS` table has no `violations` entry (`producer_for` raises `ValueError`), so
+  Austin, Boston and now Des Moines report an error row for that feed. G5 was measured
+  by running the script's own `probe_feed` with the producer injected and curl-captured
+  rows as the transport. The script was not edited (outside the claimed files); adding
+  `violations` and `inspections` to `PRODUCERS` is the follow-up.
+- **The ArcGIS client cannot narrow `outFields`**, so the Code Case free-text and
+  editor columns travel in a raw row and would land in a DLQ payload if a row failed to
+  parse (0 of the newest 500 do). Same platform-wide note as the rental contacts.
+- **Opened-case stream.** `status_date` and the watermark are both `DateOpened`, so a
+  case is published once and later status changes are not re-emitted; `Address` is
+  served with a trailing space that the shared parser keeps.
+
+### 2026-09-30 — Four-family depth pass (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| depth-four-family | `.streams/depth-four-family.md` | `config.py`, `city_registry.py`, `scheduler.py` | 2026-09-29 | done (2 of 13 metros moved to four families) | `docs/research/four-family-depth-2026-09-30.md`, Columbus `datasets.'311'` + `arcgis_columbus_311_url`, Tallahassee `datasets.sla` (SNAP), `DatasetSpec.batch_limit`, `maps2.columbus.gov` in `ANSI_DATE_LITERAL_HOSTS`, regenerated facts |
+
+Thirteen of the 32 metros one family short were probed live by three read-only
+research workers. Columbus gains `311` from a City layer the open-data Hub does not
+list (`maps2.columbus.gov` ServiceRequests MapServer/1); Tallahassee gains `sla` from
+the statewide SNAP fallback after local sources came up empty and the state alcohol
+extract geocoded 88%. The other eleven stay, each with a re-check trigger in the
+research doc. Four-family metros go from 16 to 18.
+
+Worth keeping:
+
+- **Daily-extract feeds can outrun the poll cap.** Columbus loads its 311 layer once a
+  day; the filtered extract passed 1,000 rows on 22 of 64 weekdays in 90 days, and a
+  newest-first poll capped at 1,000 never reaches the oldest rows. `DatasetSpec` now
+  takes an opt-in `batch_limit` (the scheduler's per-poll cap); Columbus 311 sets 5,000.
+- **SNAP licences are a statewide sample (pre-existing, 54 metros).** Each SNAP job
+  filters by state only and snapshots at most 1,000 rows ordered by `ObjectId`, so it
+  sees the same 1,000 retailers every poll: 19 of Tallahassee's 242. Fix is a bbox in
+  each SNAP `where` plus `batch_limit` where needed; not done here.
+- **Geocoder drops context.** `FL` is a unit token in `normalize_address` (drops the
+  state and the ZIP after it) and a `#` unit cuts everything after it, including the
+  appended `geocode_context`. Affects address-only feeds; needs a `NORM_VERSION` bump.
+
+### 2026-09-30 — SNAP licences scoped to each metro (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| snap-metro-scope | `.streams/snap-metro-scope.md` | `city_registry.py` | 2026-09-30 | done (54 metros) | `docs/research/snap-metro-scope-2026-09-30.md`, `snap_sla_where`, bbox `where` in 54 SNAP blocks, `batch_limit` on 18 |
+
+Each SNAP `sla` spec now reads its state inside its metro bbox instead of the whole
+state, and the 18 metros whose bbox holds 667 or more retailers declare a higher
+cap (up to 7,000 for Houston). Across the 54 metros that takes the retailers each
+metro actually receives from 5,694 of 34,686 to all of them, and ends the 47,656
+out-of-metro rows a round of polls used to publish under metro city ids.
+
+Worth keeping:
+
+- **A snapshot is only as complete as its cap.** Snapshot feeds re-read the table
+  each poll and cap it at `batch_limit` (1,000 by default) in OID or file order, so
+  a table larger than the cap is truncated to the same first rows forever. This
+  applies to every snapshot feed, not only SNAP; the other 38 are the next check.
+
+### 2026-09-30 — Snapshot feeds reach their rows (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| snapshot-reach | `.streams/snapshot-reach.md` | `scheduler.py` | 2026-09-30 | done (31 of 38 feeds; 7 listed gaps) | `docs/research/snapshot-reach-2026-09-30.md`, `test_snapshot_reach.py`, per-job snapshot seen-sets, backfills keep `where` |
+
+The 38 non-SNAP snapshot feeds were measured live. 33 held more rows than their
+1,000-row cap and read in table order, so each poll saw the same slice. 15 now
+read their whole table (caps up to 16,000 for Inland Empire), 16 read newest
+first by the date they already track (12 of them new or resized), and 7 stay
+listed gaps with their reasons.
+
+Worth keeping:
+
+- **Pick a shape for every snapshot feed.** A snapshot table either fits its cap
+  with half again to spare or is read newest first with a window of 1.5 times
+  its last 90 days of rows. `test_snapshot_reach.py` fails a new snapshot feed
+  until it declares one, with a measured count.
+- **Check the sort on the live server.** Raleigh sorts nulls first under
+  `DESC`, and Cleveland's unbounded sort outlasts the client timeout; both
+  needed a filter that the paging check found.
+
+### 2026-09-30 — Feeds that fail or publish nothing (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| feed-repairs | `.streams/feed-repairs.md` | `config.py`, `scheduler.py`, `dob_permits_producer.py` | 2026-09-30 | done (27 feeds publishing again, Lexington and Seattle `sla` moved to SNAP, Madison `permits` retracted; the rest listed) | `docs/research/feed-health-2026-09-30.md`, `ct_liquor_specs.py`, `test_arcgis_client.py`, `test_ct_liquor_permits.py` |
+
+One poll of every registered job found 36 that failed outright, 8 that fetched
+nothing and 16 that fetched rows but published none. Every repair was re-polled
+live through `poll_job` before it landed. The mid-Atlantic `deeds` wave (14
+cities, none with a live source) is the next stacked change.
+
+Worth keeping:
+
+- **A registered endpoint is not a checked endpoint.** The interlock gate checks
+  a spec's shape. Five ArcGIS feeds sat at a service root, three CKAN feeds
+  named a package instead of a resource, and 14 deeds URLs never answered, all
+  green on the gate. `test_arcgis_client.py` now covers the service-root case;
+  a live one-row check before registration would cover the rest.
+- **Zero rows and SUCCESS is not healthy.** Eight feeds polled SUCCESS with
+  nothing fetched. The ArcGIS client now raises on a page with no
+  `features`, but an empty source (Tulsa `311`) still looks the same as a wrong
+  one to the scheduler.
+- **Read the credential table before filtering it.** State licence tables hold
+  every credential a state issues, most of them held by individuals; a city
+  filter alone publishes people's names as premises (`ct_liquor_specs.py`).
+
+### 2026-09-30 — Mid-Atlantic deeds repaired or retracted (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| midatlantic-deeds | `.streams/midatlantic-deeds.md` | `config.py`, `deeds_acris_producer.py` | 2026-09-30 | done (5 deeds feeds publishing, 7 retracted with SNAP `sla` instead, Roanoke and Richmond left failing) | `test_midatlantic_deeds.py`, ArcGIS `select` as `outFields`, the leaf `compose_deed_date` hook |
+
+The 14 mid-Atlantic `deeds` feeds registered on 2026-09-06 had never pointed at a
+live source. Frederick, Providence, Burlington, Allentown and Charleston WV now
+read published last-sale or transfer layers, each polled live through `poll_job`
+at its production cap (992 to 1,496 rows published per poll). Albany, Dover,
+Harrisburg, Huntington, Manchester, Portland ME and Wilmington DE publish no sale
+dates or prices anywhere public; their `deeds` feeds are retracted and each polls
+the SNAP retailer slice for its metro box (59 to 144 stores).
+
+Worth keeping:
+
+- **Look past the city's own portal.** Three of the five replacements are not
+  city data: Maryland's statewide assessment table, Vermont's property-transfer
+  returns, and a county assessor's ArcGIS server that the earlier probe missed.
+  The earlier probes checked the city's portal or the county's parcel layer and
+  stopped there.
+- **Keep party columns on the server.** Parcel and transfer layers carry owner,
+  seller and buyer names next to the sale. ArcGIS specs now name their columns in
+  `select`, which the client sends as `outFields`, so those names never reach a
+  row, an event or the DLQ.
+
+### 2026-09-30 — Incremental filters repaired (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| scheduler-semantics | `.streams/scheduler-semantics.md` | `scheduler.py`, `city_registry.py`, `config.py` | 2026-09-30 | done (32 feeds whose later polls failed now poll; zone-aware exact literals; date boundaries kept; composite sale ids; Lynchburg and Roanoke deeds publish through the parcel join) | `test_scheduler_boundaries.py`, `layer_time_zone`, `DatasetSpec.composite_id` |
+
+Every incremental ArcGIS feed was polled twice through `poll_job` on
+2026-09-30. On 32 feeds the second poll failed, because their hosts reject ISO
+date strings; 25 feeds declare a local zone that the stored UTC watermark was
+read in; date-only watermarks skipped the rest of their day; and sale feeds
+keyed by parcel alone dropped a parcel's next sale. 77 of the 78 feeds polled
+now succeed on both polls; Sioux Falls `permits` fails every query at the
+source.
+
+Worth keeping:
+
+- **Poll twice.** A single poll from no watermark never sends the incremental
+  filter, so a census of first polls cannot see the failures that start on the
+  second.
+- **Check a new id key against the layer's field list.** Chattanooga's and
+  Raleigh's composite keys first named a `PIN` column neither layer has, which
+  collapsed every sale on a date into one id; the second poll caught it.
+- **Read the layer's `dateFieldsTimeReference`.** A declared zone applies to
+  every literal, ISO or ANSI, not only to the dates the layer returns.
+
+### 2026-09-30 — Richmond deeds from the assessor's workbook (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| richmond-deeds | `.streams/richmond-deeds.md` | `scheduler.py`, `city_registry.py`, `config.py`, `deeds_acris_producer.py` | 2026-09-30 | done (6,650 sales from the last 365 days published live, 6,647 at a parcel centroid; the next poll got a 304) | `xlsx_reader.py`, `DatasetSpec.link_pattern`, `parcel_join.row_key` |
+
+Richmond's assessor publishes its transfers only as a monthly 72 MB Excel
+workbook under a new name each release. The Excel client now streams `.xlsx`,
+finds the current file from the page that links it, and skips an unchanged
+file with a conditional GET.
+
+Worth keeping:
+
+- **Measure the URL, not the value count.** Richmond's ArcGIS Online host
+  answered 404 to a 2,155-character query; a count limit alone does not bound a
+  text-keyed `IN` list.
+- **Keep names in the client.** A workbook has no `outFields`; the Excel
+  client applies `select` before it hands any row on, so buyer and seller
+  columns never reach the scheduler, an event or the DLQ.
+
+### 2026-09-30 — SNAP stores for the last 25 SLA-less metros (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| snap-wave | `.streams/snap-wave.md` | none | 2026-09-30 | done (25 metros poll their SNAP slice; each live poll published its full count, 5,046 stores in all, none dead-lettered) | `sla` blocks in 25 corpus files |
+
+Every registered metro now has an `sla` family. The blocks are the shared
+`snap_sla_spec` output, checked by `TestSnapMetroScope`.
+
+Worth keeping:
+
+- **Count before you cap.** A metro whose stores reach two thirds of the
+  default 1,000 needs a declared cap; none of these did.
+- **Check same-state overlaps.** Chandler's and Tempe's boxes share 113 stores,
+  which publish under both.
+
+
+### 2026-09-30 — Backfills read each feed the way its poll does (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| backfill-args | `.streams/backfill-args.md` | none | 2026-09-30 | done (49 changed backfills checked live against the old loader; three polls repaired: St. Louis, Laredo and San Antonio `permits`) | `scripts/backfill_loader.py`, CKAN and CSV client fixes |
+
+A backfill hands its client the poll's arguments, places parcel-joined sales,
+starts a text window in the column's format and filters client-side where the
+server cannot order the text.
+
+Worth keeping:
+
+- **Compare the two paths, not the specs.** A test polls and backfills every
+  job with a mocked client and diffs the arguments; that caught the zipped
+  CSVs, the workbook and the `select`s at once.
+- **Check a declared format against today's rows.** St. Louis's export
+  changed its date format after registration, and the CSV client then parsed
+  no row; the first poll still worked, so only a second poll showed it.
+- **Look for the column.** Cincinnati's watermark column never existed in its
+  file; a snapshot poll does not notice, a windowed backfill reads nothing.
+
+### 2026-09-30 — Text-dated polls read the rows since their watermark (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| text-windows | `.streams/text-windows.md` | none | 2026-09-30 | done (six feeds polled twice live from a set watermark; every row read inside the window) | `text_date_window` in `producers/watermarks.py`, ArcGIS POST for long queries, Reno `deeds` incremental |
+
+A filter on a text date that does not sort (`MM/DD/YYYY`, Honolulu's long
+dates) names the days since the watermark, with whole months and years as
+`LIKE` patterns, instead of comparing text. Backfills use the same window.
+
+Worth keeping:
+
+- **Measure padding before writing a pattern.** Reno writes `09/05/2026` and
+  Worcester `9/5/2026` under the same declared format; the window writes both.
+- **ArcGIS Online caps a GET near 2,000 characters.** A longer query is a 404
+  that looks like a missing layer; send it as a POST.
+- **A batch-refreshed layer holds its watermark for weeks.** Rochester's and
+  Virginia Beach's newest rows were six and four weeks old, so their windows
+  grow until the next batch lands.
+
+### 2026-09-30 — Richmond crime from Chesterfield County offenses (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| richmond-crime | `.streams/richmond-crime.md` | `config.py` | 2026-09-30 | done (1,249 offenses polled live and published on a 100 m grid; the second poll published none) | `CRIME_POINT_DECIMALS` leaf hook in the crime producer; simple assault read in either order |
+
+Richmond `crime` reads Chesterfield County's police offenses inside the metro
+box, re-reading the last 120 days each poll, with each point rounded to three
+decimal places before it is indexed.
+
+Worth keeping:
+
+- **Check a masked address against its point.** The county masks addresses to
+  the hundred block but not the coordinates; comparing distinct points per
+  block showed it.
+- **Look at the lateness before picking a watermark.** An occurrence date that
+  arrives up to 118 days late needs a window, not a watermark.
+- **Run a label fix across every feed.** The simple-assault fix for Richmond
+  also moved Boston's and Chicago's simple assaults, which the rule had missed.
+
+### 2026-09-30 — Party names out of deeds events (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| party-names | `.streams/party-names.md` | `deeds_acris_producer.py` | 2026-09-30 | done (Reno and DC `deeds` polled live: no owner column read, no event with a grantor or grantee) | `test_deeds_party_names.py` guard; `select` for Reno and DC `deeds` |
+
+The deeds producer reads no grantor or grantee, and no spec maps one; 16 specs,
+five leaf maps and Asheville's spec module dropped their entries.
+
+Worth keeping:
+
+- **Look past the field map.** The producer's fallback chain read party names
+  from any row that carried a matching column, mapped or not.
+- **Check a join layer's key shape.** DC's Parcel Lots layer keys `PAR`
+  parcels, not the square-and-lot SSLs its sales carry; the join matched 12
+  of 4,996.
+
+### 2026-09-30 — Las Vegas deeds on their parcels (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| lv-deeds | `.streams/lv-deeds.md` | none | 2026-09-30 | done (5,000 sales polled live, all placed on their parcels inside the metro box; no geocoder call; the second poll published none) | parcel join to `CLV_PARCELS_POLY`; a `select` without the owner block |
+
+Las Vegas `deeds` takes each sale's point from its parcel's polygon instead
+of geocoding the owner's mailing address.
+
+Worth keeping:
+
+- **Read a table's address columns before geocoding them.** `ADDRESS1` to
+  `ADDRESS5` follow `OWNER`; comparing their ZIP with the parcel's showed a
+  third of them elsewhere.
+- **Look for a polygon layer with the same row count.** The city publishes
+  its parcel polygons beside the table, one for each of its 302,279 rows.
+
+### 2026-09-30 — DC deeds on their lots (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| dc-deeds | `.streams/dc-deeds.md` | `scheduler.py`, `deeds_acris_producer.py` (pass `via` to the join) | 2026-09-30 | done (5,000 sales polled live: 4,374 of 4,996 placed, up from 12; the second poll published none) | Owner Polygons join; `via` hop through `CONDORELATE` |
+
+DC `deeds` joins the Owner Polygons layer, and a condominium unit takes its
+building's lot through `CONDORELATE`.
+
+Worth keeping:
+
+- **Sample the join key's shape on both sides.** Sales carry square-and-lot
+  SSLs; the old layer keyed `PAR` parcels, the owner polygons key both.
+- **Units live in a relate table.** Condominium units have no polygon of
+  their own; DC's `CONDORELATE` names each unit's lot.
+
+### 2026-09-30 — Licences at their premises (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| sla-premises | `.streams/sla-premises.md` | none | 2026-09-30 | done (Lynchburg: 2,037 of 2,210 licences placed on their parcels, no geocoder query; Tampa: same 3,062 published, 12 columns read instead of 94) | Lynchburg `parcel_join`; `select` for both; Tampa without the owner's mailing fallback |
+
+Lynchburg licences take their parcel's centroid instead of a geocoded
+mailing address, and Tampa's never publish or fetch the owner's details.
+
+Worth keeping:
+
+- **An address block named `Mail*` is not the premises.** Check the city and
+  state columns before geocoding one.
+- **A fallback in an address chain can reach a person.** Tampa's second
+  `address_street` candidate was the owner's mailing address.
+
+### 2026-09-30 — Addresses keep their place (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| geocode-context | `.streams/geocode-context.md` | none | 2026-09-30 | done (2,326 of 16,918 live geocoder queries from 55 feeds had lost their state under v2; none under v3; Census matched 28 of 30 sampled licence queries as v3 sends them, 8 as v2 sent them) | normalization `v3`; `compose_geocode_query` |
+
+Geocoder queries keep the city and state after a unit, a floor or a street
+word that spells a state code.
+
+Worth keeping:
+
+- **Two letters are not a state.** `CT`, `NE`, `WY`, `LA`, `DE` and `MT` are
+  street words far more often than states inside an address line; read a
+  state only at the line's end.
+- **A normalizer change needs the version bump.** The cache freezes misses,
+  so a query that lost its state stays unplaced until its hash changes.
+
+### 2026-09-30 — Deeds from parcel records (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| deeds-wave | `.streams/deeds-wave.md` | `config.py` (three deeds endpoints, Hartford's parcel layer) | 2026-09-30 | done (22 metros probed by two read-only research workers; 3 registered: Nashville 4,373, Hartford 353 and Denver 2,445 sales polled live, all placed in their metro box, the second polls published none) | `docs/research/deeds-probe-2026-09-30.md`; `deeds` specs for Nashville, Hartford and Denver; regenerated facts |
+
+Nashville, Hartford and Denver read each parcel's last sale and move to all
+four signal families (18 to 21). Tempe, Bend, Medford and Tacoma have
+sources that need client work first.
+
+Worth keeping:
+
+- **Look at the parcel layer, not only the catalog.** Nashville's and
+  Denver's parcel layers carry each parcel's last sale; a title search of
+  the Hub found no sales dataset.
+- **A numeric key loses its zeros.** Denver's sales table stores the parcel
+  id as a number, and the parcel layer keys a 13-digit string. Sample the
+  key's shape on both sides before planning a join.
+- **Check a recommended state set's cadence.** Connecticut's OPM sales set is
+  published once a year and ended on 2025-09-30.
+
+### 2026-09-30 — Maricopa deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| maricopa-deeds | `.streams/maricopa-deeds.md` | `config.py` (the Assessor parcel layer) | 2026-09-30 | done (5 cities registered from one layer: Phoenix 9,224, Scottsdale 2,507, Chandler 1,573, Glendale 1,263 and Tempe 783 deeds polled live, none dead-lettered, the second polls published none) | `deeds` specs for Tempe, Chandler, Scottsdale and Glendale, Phoenix's moved; notes in `docs/research/deeds-probe-2026-09-30.md`; regenerated facts |
+
+Tempe moves to all four signal families (21 to 22); Chandler, Scottsdale and
+Glendale move from two to three; Phoenix's deeds, which dead-lettered every
+row, now publish.
+
+Worth keeping:
+
+- **One county layer can serve several metros.** The Assessor's parcel layer
+  names each parcel's city, so one spec shape registers every Maricopa city.
+- **Let the server compute the window.** `CURRENT_DATE - INTERVAL '90' DAY`
+  works on hosts that reject ISO date literals, and a snapshot filter built
+  on it never goes stale.
+- **Bound the window above.** Parcel layers carry future-dated sentinels
+  (2044 to 2099 here); `<= CURRENT_TIMESTAMP` keeps them out.
+
+### 2026-09-30 — Bend deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| bend-deeds | `.streams/bend-deeds.md` | `city_registry.py` + `scheduler.py` (`metro_clip`), `config.py` (the sales table, the taxlot layer) | 2026-09-30 | done (1,048 county sales read on Bend's township-ranges, 1,019 placed inside the metro box and published, 29 skipped, none dead-lettered, the second poll published none) | `deeds` spec for Bend; `metro_clip` in poll_job and backfills; notes in `docs/research/deeds-probe-2026-09-30.md`; regenerated facts |
+
+Bend moves to all four signal families (22 to 23).
+
+Worth keeping:
+
+- **A postal city is not the city.** Deschutes County's account table says
+  "BEND" for rural addresses well outside the city; check a city column
+  against the map before filtering on it.
+- **A parcel id can carry its place.** Oregon taxlot ids start with the
+  township and range, so a prefix filter narrows a county table to the ground
+  under a metro box before any join.
+
+### 2026-09-30 — Medford deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| medford-deeds | `.streams/medford-deeds.md` | `config.py` (the sales layer) | 2026-09-30 | done (304 sales in the city read and published, none dead-lettered, the second poll published none) | `deeds` spec for Medford; `src/producers/tolerant_http.py` for hosts whose header lines break HTTP/1.1 syntax; notes in `docs/research/deeds-probe-2026-09-30.md`; regenerated facts |
+
+Medford moves to all four signal families (23 to 24).
+
+Worth keeping:
+
+- **A host httpx cannot read is not a dead host.** When h11 raises "illegal
+  header line", look at the raw headers with curl before ruling the source
+  out; the fix is a listed host in `tolerant_http`, not a new client.
+- **Look for the city in the city column's values.** Jackson County's
+  `SiteCity` says `MEDFORD` inside the city and `MEDFORD/COUNTY` outside it,
+  unlike Deschutes County's postal `City`.
+
+### 2026-09-30 — Tacoma deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| tacoma-deeds | `.streams/tacoma-deeds.md` | `city_registry.py` (`DatasetSpec.columns`), `scheduler.py` (forwards it; the parcel join's `where`), `config.py` (the sales file and the parcel layer) | 2026-09-30 | done (2,432 county sales read, 452 in the city published, none dead-lettered, the second poll published none) | `deeds` spec for Tacoma; header-less files in `CSVClient`; a filter on the parcel join; notes in `docs/research/deeds-probe-2026-09-30.md`; regenerated facts |
+
+Tacoma moves to all four signal families (24 to 25).
+
+Worth keeping:
+
+- **A parcel layer can know the city when the sales do not.** A tax code
+  area belongs to one city or none, so a join filtered to the city's codes
+  keeps a county-wide sales file to the city without a boundary polygon.
+- **Measure a big file's parse before registering it.** `io.StringIO` holds
+  four bytes a character, so an 89 MB file cost more than half a gigabyte
+  to read.
+
+### 2026-09-30 — Scottsdale 311 (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| scottsdale-311 | `.streams/scottsdale-311.md` | `config.py` (the request table) | 2026-09-30 | done (3,000 closed requests read, 2,838 published, 162 without a point skipped, none dead-lettered, the second poll published none) | `311` spec for Scottsdale; notes in `docs/research/four-family-depth-2026-09-30.md`; regenerated facts |
+
+Scottsdale moves to all four signal families (25 to 26).
+
+Worth keeping:
+
+- **A table that lists closed requests follows the close date.** When a
+  source publishes a row only once it closes, a watermark on the filing date
+  skips every slow request.
+- **A blocked probe is not a blocked feed.** The host that stopped a burst of
+  probe queries answered slow, plain requests an hour later; wait, then ask
+  only for what the spec will send.
+
+### 2026-09-30 — Pierce County deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| pierce-deeds | `.streams/pierce-deeds.md` | `config.py` (descriptions only: the sales file and the parcel layer serve both feeds) | 2026-09-30 | done (2,432 county sales read, 2,317 published, 115 the parcel layer could not place skipped, none dead-lettered, the second poll published none) | `deeds` spec for Pierce County; notes in `docs/research/deeds-probe-2026-09-30.md`; regenerated facts |
+
+Pierce County moves from two signal families to three (three-family tier 28
+to 29).
+
+Worth keeping:
+
+- **A county metro can reuse a city's county-wide source.** When the source
+  already covers the county, the county's feed is the city's without the
+  filter that kept it to the city.
+
+### 2026-09-30 — Charlotte permits (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| charlotte-permits | `.streams/charlotte-permits.md` | `config.py` (the county's permits layer) | 2026-09-30 | done (1,000 permit rows read, 997 permits published, 3 further parcels of published permits skipped, none dead-lettered, the second poll published none) | `permits` spec for Charlotte; the county host in `ANSI_DATE_LITERAL_HOSTS`; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Charlotte moves from two signal families to three (three-family tier 29 to
+30).
+
+Worth keeping:
+
+- **Look at the county's server when the city's has nothing.** Charlotte's
+  permits were recorded as absent after the City's server was read and a
+  guessed county path returned 404; the county's server, listed from its
+  root, republishes them nightly.
+- **Check where a server sorts nulls.** A newest-first order put the 4,006
+  unissued permits ahead of every issued one, which a first poll would have
+  read alone.
+
+### 2026-09-30 — Charlotte deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| charlotte-deeds | `.streams/charlotte-deeds.md` | `config.py` (the county's sales layer) | 2026-09-30 | done (8,925 sale rows read, 8,765 events published, one per transfer and parcel, 160 repeats of a transfer on a parcel's other property rows skipped, none dead-lettered, the second poll published none) | `deeds` spec for Charlotte; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Charlotte moves from three signal families to all four (four-family tier 26
+to 27).
+
+Worth keeping:
+
+- **When a county server answers one family, list its other services.** The
+  server that republishes Mecklenburg County's permits also keeps the
+  county's sales ledger, one row per transfer and parcel.
+
+### 2026-09-30 — Toledo deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| toledo-deeds | `.streams/toledo-deeds.md` | `config.py` (the Auditor's sales layer) | 2026-09-30 | done (2,296 county sale rows read, 142 outside the metro box skipped, 2,154 events published, one per sale and parcel, none dead-lettered, the second poll published none) | `deeds` spec for Toledo; held and not-now deeds notes for seven metros in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Toledo moves from two signal families to three (three-family tier 29 to 30).
+
+Worth keeping:
+
+- **Search a county office's ArcGIS Online org as well as its server.**
+  Toledo's sales were recorded as absent after the Auditor's own server was
+  read; the Auditor also publishes a hosted sales layer on ArcGIS Online.
+
+### 2026-09-30 — Asheville permits (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| asheville-permits | `.streams/asheville-permits.md` | `config.py` (the City's permits layer), `producers/watermarks.py` (ANSI literals) | 2026-09-30 | done (697 permits read from the 90-day window, 7 without a point skipped, 690 published, none dead-lettered, the second poll published none) | `permits` spec for Asheville; held and not-now permits and `311` notes for seven metros in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Asheville moves from two signal families to three (three-family tier 30 to
+31).
+
+Worth keeping:
+
+- **Walk a city's ArcGIS Server as well as its Hub.** Asheville's permits
+  were recorded as absent after the City's Hub was read; the City's own
+  server publishes them in a folder the Hub does not list.
+- **Look at the seconds of a date-only column before trusting a watermark on
+  it.** One row stored a second after midnight is enough to make the next
+  filter strict and pass over that day's later rows.
+
+### 2026-09-30 — Allentown permits (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| allentown-permits | `.streams/allentown-permits.md` | `config.py` (the City's permits layer) | 2026-09-30 | done (819 permits read from the 90-day window, 819 published, none dead-lettered, the second poll published none) | `permits` spec and address joiner for Allentown; held and not-now permits notes for seven metros in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Allentown moves from two signal families to three (three-family tier 31 to
+32).
+
+Worth keeping:
+
+- **Search the org that already serves a registered feed.** Allentown's
+  permits sit in the same ArcGIS Online org as its deeds layer, and a keyword
+  search of that org found them after two passes had recorded none.
+
+### 2026-10-02 — Allentown and New Haven 311 (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| allentown-new-haven-311 | `.streams/allentown-new-haven-311.md` | `config.py` (the two request layers), `city_registry.py` and `scheduler.py` (`decode_domains`) | 2026-10-02 | done (Allentown: 713 requests read, 12 at 0,0 skipped, 701 published; New Haven: 1,000 read and published; none dead-lettered, and each second poll published none) | `311` specs for Allentown and New Haven; coded-value decoding in the ArcGIS client; held and not-now `311` notes for six metros in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Allentown moves from three signal families to four (four-family tier 27 to
+28), and New Haven from two to three.
+
+Worth keeping:
+
+- **Read a layer's domains before mapping a Survey123 form.** The form stores
+  each choice as a code, and only the layer's metadata names it.
+- **Look for a vendor's own ArcGIS org.** SeeClickFix publishes public views
+  of some clients' requests in its own ArcGIS Online org, which is how New
+  Haven's requests are readable without SeeClickFix's API.
+
+### 2026-10-02 — Lincoln 311 (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| lincoln-311 | `.streams/lincoln-311.md` | `config.py` (the request layer) | 2026-10-02 | done (1,000 requests read and published, none dead-lettered; the second poll published none) | `311` spec for Lincoln; the SeeClickFix org survey in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Lincoln moves from two signal families to three (three-family tier 32 to
+33).
+
+Worth keeping:
+
+- **Read a vendor org's whole listing once a feed is found there.**
+  SeeClickFix's org listed 28 views; one service listing matched them all
+  against the registry.
+- **Prefer an arrival stamp to a filing time when a view keeps one.** A
+  layer's editor-tracking `CreationDate` follows its object ids, so a poll on
+  it passes over no late arrival.
+
+### 2026-10-02 — Albuquerque and Topeka 311 (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| albuquerque-topeka-311 | `.streams/albuquerque-topeka-311.md` | `config.py` (the two request layers) | 2026-10-02 | done (Albuquerque: 1,897 rows read, 73 repeats dropped, 1,824 published; Topeka: 1,000 read and published; none dead-lettered, and each second poll published none) | `311` specs for Albuquerque and Topeka; Topeka's request view in `ANSI_DATE_LITERAL_HOSTS`; held and not-now notes for the interior metros in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Albuquerque and Topeka move from two signal families to three (three-family
+tier 33 to 35).
+
+Worth keeping:
+
+- **Bound a slow layer by date before calling it unqueryable.** Albuquerque's
+  CRM layer looked dead to unbounded queries in August; a one-day window
+  answers in seconds.
+- **A row query can fail silently where a count fails loudly.** On
+  Albuquerque's layer, a window holding an unreadable row returns no rows and
+  no error; only a count over it reports the failure.
+
+### 2026-10-02 — Yakima 311 and deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| yakima-311-deeds | `.streams/yakima-311-deeds.md` | `config.py` (the request and parcel layers) | 2026-10-02 | done (311: 1,000 read, 999 published, the one without a point dead-lettered; deeds: 453 read, 208 published inside the box; permits: the second poll, which failed with a 400, now reads; each second poll published none) | `311` and `deeds` specs for Yakima; the host in `ANSI_DATE_LITERAL_HOSTS`; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Yakima moves from two signal families to four (four-family tier 28 to 29).
+
+Worth keeping:
+
+- **A host that took ISO literals can stop.** Yakima's permits layer took
+  them on 2026-08-28 and answered 400 on 2026-10-02; only a second poll
+  shows it, so re-run two polls of a host's feeds when registering another.
+- **Try a server-side cast before a text-date watermark.** The parcels'
+  `M/D/YYYY` sale dates cast to dates on the server, which gives a rolling
+  window that catches late-filled days.
+
+### 2026-10-02 — Cape Coral 311 and deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| cape-coral-311-deeds | `.streams/cape-coral-311-deeds.md` | `config.py` (the request table and the parcel layer) | 2026-10-02 | done (311: 1,000 read, 942 published, 58 repeats dropped; deeds: 6,765 read county-wide, 4,409 published inside the box; each second poll published none) | `311` and `deeds` specs for Cape Coral; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Cape Coral moves from two signal families to four (four-family tier 29 to 30).
+
+Worth keeping:
+
+- **A Hub item can name the copy with more personal data.** Cape Coral's
+  "311 Issues" item points at a point layer that names each requester; the
+  same server's non-spatial table carries the same overnight cut, with
+  coordinates and without the names.
+- **Size a sales window's cap on the busiest season.** Lee County's 90-day
+  window held 6,765 sales on 2026-10-02 and 11,253 from March to May.
+
+### 2026-10-02 — Wrong-place permits: Orlando repaired, Ocala and Macon-Bibb retracted (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| wrong-place-permits | `.streams/wrong-place-permits.md` | `config.py` (Orlando's permits and address points; Macon-Bibb's permits setting removed) | 2026-10-02 | done (Orlando: 3,000 read, 2,912 published, 2,860 of them on the City's address points, 88 dead-lettered; the second poll published none; Ocala and Macon-Bibb permits retracted) | Orlando `permits` from the City's permit applications with an address-point join; Socrata `$select`; county codes 11–77; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Ocala and Macon-Bibb drop from two signal families to one (two-family tier
+58 to 56, one-family tier 34 to 36).
+
+Worth keeping:
+
+- **Check where a layer's rows lie before registering it.** Macon-Bibb's
+  layer was another country's, and Ocala's and Orlando's county codes were
+  other counties'; a count inside the metro box would have caught all three.
+- **A city's own address points can place what the geocoder cannot.** The
+  Census geocoder missed whole new subdivisions in Orlando; the City's
+  address layer placed 95% of permits by exact address.
+
+### 2026-10-02 — Augusta 311 and Wilmington deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| augusta-311-wilmington-deeds | `.streams/augusta-311-wilmington-deeds.md` | `config.py` (the request layer and the parcel points) | 2026-10-02 | done (Augusta 311: one query a poll, 630 read, 628 published, 2 clipped; the second poll sent an Eastern watermark and published none; Wilmington deeds: 2,401 read, 2,401 published; the second poll published none) | `311` spec for Augusta and `deeds` spec for Wilmington, NC; the ArcGIS client's host zones and paging stop; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Augusta and Wilmington, NC move from two signal families to three (three-family
+tier 35 to 37, two-family tier 56 to 54).
+
+Worth keeping:
+
+- **Read a layer's paging support before trusting its truncation flag.**
+  Augusta's Cityworks server ignores `resultOffset` and flags every short
+  page, so the client asked for the same rows again until its cap.
+- **Test a host's literals against a known instant.** A zone-less literal one
+  server reads as UTC another reads as local time; counting the rows past one
+  request's timestamp in each form settles it in a handful of queries.
+
+### 2026-10-02 — Tampa, Gainesville and Ocala deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| florida-deeds | `.streams/florida-deeds.md` | `config.py` (the three sources), `deeds_acris_producer.py` (padded deed types) | 2026-10-02 | done (Tampa: 3,886 read, 2,468 published; Gainesville: 2,486 read, 1,556 published; Ocala: 7,472 read, 6,365 published; each second poll published none; Lakeland held for a streaming CSV read) | `deeds` specs for Tampa, Gainesville and Ocala; Ocala's `compose_deed_date`; the CSV client's bare `CURRENT_DATE` and two-row title check; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Tampa and Gainesville move from two signal families to three and Ocala from
+one to two (three-family tier 37 to 39, two-family tier 54 to 53, one-family
+tier 36 to 35).
+
+Worth keeping:
+
+- **Count the rows a poll would key as one another.** Ocala's first live
+  poll reported seven duplicates inside a single read: polygons without a
+  parcel number whose sales shared a placeholder book and page.
+- **Measure a file client on the real file.** Parsing every row of
+  Alachua's 510,529-line sales file to find a title line took eleven times the
+  memory the read itself needs.
+
+### 2026-10-02 — Lakeland deeds and a streaming CSV read (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| lakeland-deeds | `.streams/lakeland-deeds.md` | `config.py` (the source) | 2026-10-02 | done (3,464 read, 1,885 published; the second poll published none) | Lakeland's `deeds` spec; the CSV client's streaming zip read; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Lakeland moves from two signal families to three (three-family tier 39 to 40,
+two-family tier 53 to 52).
+
+Worth keeping:
+
+- **Stream a file a client cannot hold twice.** Read whole and then decoded,
+  Polk's 518 MB sales member took over a gigabyte; streamed, the same read
+  takes 6 MB, and the encoding still matches what the whole bytes chose.
+- **Ask a parcel number where it is before joining it.** Polk's numbers start
+  with range and township, so one string comparison drops the 59% of the
+  county's sales that no parcel in the box could place, and the join's
+  requests fall from 166 to 66.
+
+### 2026-10-02 — Western deeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| western-deeds | `.streams/western-deeds.md` | `config.py` (the four sources) | 2026-10-02 | done (Vancouver 1,637 read, 1,113 published; Boulder 1,806 and 715; Fort Collins 2,597 and 1,043; Salem 1,544 and 666; each second poll published none); Aurora held | `deeds` specs for Vancouver WA, Boulder, Fort Collins and Salem; the CSV client's streamed plain read; the ArcGIS client's object-id fallback; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Vancouver, Boulder, Fort Collins and Salem move from two signal families to
+three (three-family tier 40 to 44, two-family tier 52 to 48).
+
+Worth keeping:
+
+- **Read the parcel layer's columns before calling a county's deeds
+  missing.** Clark County's taxlots carried each parcel's latest sale all
+  along; the 2026-08-28 check looked for a recorder feed and missed them.
+- **A layer's object-id field is whatever it types as one.** Larimer's
+  parcels name none and call theirs `OBJECTID_1`; paging by `OBJECTID` failed
+  every join until the client asked the field types.
+
+### 2026-10-02 — Texas and southern one-family feeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| texas-south-feeds | `.streams/texas-south-feeds.md` | `config.py` (the six sources) | 2026-10-02 | done (Midland permits 2,622 read, 2,606 published; Longview 1,027 and 1,002; Charleston SC 2,363 and 2,310; Odessa `311` 1,000 and 863; Waco 1,000 and 1,000; Lexington 1,000 and 1,000; each second poll published none); Charleston deeds and `311`, and Tyler, Beaumont, Texarkana and Abilene permits held | `permits` specs for Midland, Longview and Charleston SC; `311` specs for Odessa, Waco and Lexington; notes in `docs/research/one-family-depth-2026-10-02.md`; regenerated facts |
+
+Midland, Longview, Charleston SC, Odessa, Waco and Lexington move from one
+signal family to two (two-family tier 48 to 54, one-family tier 35 to 29).
+
+Worth keeping:
+
+- **Count a layer's rows by month before trusting its dates.** Midland's
+  issue dates looked current but had stopped following the permits; the
+  monthly counts against applications showed it in one request.
+- **A table can repeat its subject by design.** Longview's permits repeat
+  once per review period; one `PERIOD_NUMBER` condition, found by counting
+  distinct permit numbers in a page, makes it one row per permit.
+
+### 2026-10-02 — North-eastern and western one-family feeds (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| northeast-west-feeds | `.streams/northeast-west-feeds.md` | `config.py` (the three sources) | 2026-10-02 | done (Lincoln deeds 986 read, 805 published; Manchester deeds 521 and 496; Tucson permits 1,290 and 1,016; each second poll published none); Tucson deeds, Long Beach, Buffalo and Manchester `311`, and Buffalo, Des Moines and Santa Rosa deeds held | `deeds` specs for Lincoln and Manchester NH; a `permits` spec for Tucson; notes in `docs/research/one-family-depth-2026-10-02.md`; regenerated facts |
+
+Lincoln moves to all four signal families (four-family tier 30 to 31), and
+Manchester and Tucson from one family to two (two-family tier 54 to 56,
+one-family tier 29 to 27).
+
+Worth keeping:
+
+- **Look for a suppression flag before reading a parcel layer.** Manchester's
+  parcels carry `Suppress_Internet_Access`; the 58 flagged parcels stay out
+  of the window even though none sold in it.
+- **Count work classes with their values.** Tucson's "model permits" read as
+  nothing in particular until their average value ($288,769) and size (2,331
+  square feet) showed them to be new homes.
+
+### 2026-10-02 — Two held sources, through CSV client changes (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| held-sources | `.streams/held-sources.md` | `config.py` (the two sources), `city_registry.py` (`point_col`), `scheduler.py` (forwards it) | 2026-10-02 | done (Tucson deeds 4,319 read across two yearly files, 1,727 published; Long Beach `311` 1,275 read and published; each second poll published none) | the CSV client's `{year}` endpoints and `point_col`; a `deeds` spec for Tucson and a `311` spec for Long Beach; notes in `docs/research/one-family-depth-2026-10-02.md`; regenerated facts |
+
+Tucson moves from two signal families to three (three-family tier 43 to 44)
+and Long Beach from one to two (one-family tier 27 to 26).
+
+Worth keeping:
+
+- **Check which file holds a late record.** Pima's files are keyed by the
+  year of sale, not of recording; counting the 2025 file's rows by recording
+  month showed 1,902 recorded in the first quarter of 2026.
+- **Run the live check with the final cap.** Long Beach's first pair, under
+  the default cap, published only the newest 1,000 of the week's requests,
+  which held 1,275 when read whole 25 minutes later; the shortfall showed
+  only against the week's count.
+
+
+### 2026-10-02 — Worcester `311`, through State Plane placement (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| worcester-311 | `.streams/worcester-311.md` | `config.py` (the source), `scheduler.py` (places rows from declared State Plane columns) | 2026-10-02 | done (10,000 read, converted and published; the second poll read the newest day's 200 again and published none) | the scheduler's State Plane step, used by backfills too; a `311` spec for Worcester; notes in `docs/research/two-family-depth-2026-09-30.md`; regenerated facts |
+
+Worcester moves from two signal families to three (three-family tier 44 to
+45, two-family tier 56 to 55).
+
+Worth keeping:
+
+- **Ask which requests are residents'.** A tenth of Worcester's requests are
+  utility mark-outs that arrive through SeeClickFix like any resident's
+  report; grouping the types by source and division showed them.
+- **Run a new placement step against every spec that already declares its
+  inputs.** Four specs named State Plane columns before the scheduler read them;
+  one live poll each showed which rows the step would change (only Boston's,
+  to the same points).
+
+
+### 2026-10-02 — Texarkana and Abilene permits, through MyGov workbooks (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| mygov-permits | `.streams/mygov-permits.md` | `config.py` (the sources), `city_registry.py` (`point_lon_first`), `scheduler.py` (passes the Excel client its watermark and point settings), `dob_permits_producer.py` (MyGov's times) | 2026-10-02 | done (Texarkana: 190 published, 11 unplaceable addresses dead-lettered, second poll none; Abilene: 598 published, 38 clipped, second poll none) | the Excel client's typed text dates and lon-lat points; whole quoted `NOT IN` values; `permits` specs for Texarkana and Abilene; notes in `docs/research/one-family-depth-2026-10-02.md`; regenerated facts |
+
+Texarkana and Abilene move from one signal family to two (two-family tier
+55 to 57, one-family tier 26 to 24).
+
+Worth keeping:
+
+- **Read a report's window before its name.** Texarkana's "Permits Issued
+  in the last month" lists the permits started in the previous calendar
+  month, whatever their status; the start dates, not the title, showed it.
+- **Test a filter with the values it will meet.** Abilene's occupancy
+  template holds a parenthesis, which kept the clients from recognising the
+  `NOT IN` list, so the filter passed every row without an error.
+- **Count the classes a new feed publishes.** Texarkana's trade permits
+  name "new construction" in their titles and Abilene's new homes do not;
+  only the job-type counts of the live poll showed either.
+
+
+### 2026-10-02 — Permit types: new homes and trade permits (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| permit-taxonomy | `.streams/permit-taxonomy.md` | `dob_permits_producer.py` (trade permits leave `NB`; new homes named another way leave `OT`) | 2026-10-02 | done (1,480 of 93,511 surveyed rows in 15 metros change class; no other row changes) | `names_new_building` and `is_trade_permit` in the shared taxonomy; whole-word `NB` |
+
+Worth keeping:
+
+- **Survey the vocabulary before writing a rule.** The old keywords read
+  "New Single Family Residence" as a minor alteration in 15 metros; the
+  survey of 98 feeds' type names showed every spelling, and each rule was
+  checked against all of them before it landed.
+
+
+### 2026-10-02 — Backfills on date-literal servers keep the spec's order (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| ansi-backfill-order | `.streams/ansi-backfill-order.md` | none | 2026-10-02 | done (Augusta permits backfill: 40 of 40 rows published in a capped live run, refused before; 60 of 62 ordered jobs on date-literal hosts answer the new shape, the other 2 fail the same way in the old one) | `build_query_shape` keeps the spec's order on date-literal hosts |
+
+### 2026-10-02 — Permits feeds map the columns their sources publish (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| permit-fields | `.streams/permit-fields.md` | `dob_permits_producer.py` (`_parse_datetime` reads `... UTC` and `YYYY/MM/DD`) | 2026-10-02 | done (11 feeds; in two live polls each, the events missing a mapped issue date, type, status or address fell from all of them to what the source leaves empty; Laredo publishes 1,000 of 1,000 rows, 429 before) | per-feed `select`, filters and field maps; CKAN filters with rich SQL; dotted column names in field maps |
+
+Worth keeping:
+
+- **Count the fields an event fills, not just the rows it publishes.** All
+  eleven feeds polled cleanly and published; their maps named columns the
+  sources do not have, so their events carried no dates, types or addresses.
+- **Check a date column's type before ordering by it.** Topeka's
+  `Date_Issued` is text (`9/4/2026`): its statistics put September 4 above
+  every October date.
+- **Key on what is unique.** Laredo's application number is shared by a
+  house and its trade permits; keyed on it, 571 of 1,000 rows were dropped
+  as duplicates without an error.
+
+### 2026-10-02 — Permit types read from two columns (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| permit-types | `.streams/permit-types.md` | `dob_permits_producer.py` (asks the city leaf for `compose_permit_type` before the field map) | 2026-10-02 | done (replayed on each source's own vocabulary: Laredo's new buildings 0 → 1,814 of 12,036 permits in a year, Philadelphia's 0 → 766 of 34,937 in 2026, Chattanooga's 0 → 49 of 708; Augusta's trade permits 9 → 492 of 1,000. Live, new construction 0 → 74 of Chattanooga's 998 and 0 → 186 of Laredo's 999) | `building_permit_type` in the shared taxonomy; `compose_permit_type` in the Chattanooga, Philadelphia, Laredo and Augusta leaves |
+
+Worth keeping:
+
+- **A type can need two columns.** A field map lists alternatives, not
+  parts: where a source names the class in one column and the work in
+  another ("Residential Building Permit" and "New Construction"), the city
+  leaf composes them, as it composes an address.
+- **Join a work type only where the class leaves it open.** Philadelphia's
+  fire-suppression permits for a new building also say "New Construction";
+  read with their class, every one would have counted as a new building.
+
+### 2026-10-02 — Gainesville permits from Alachua County (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| gainesville-permits | `.streams/gainesville-permits.md` | `config.py` (the source) | 2026-10-02 | done (1,992 read in each of two polls, 1,549 inside the metro box published, then none new; 267 of them new construction) | Gainesville's `permits` spec on Alachua County's layer; `compose_permit_type` in the Gainesville leaf; regenerated facts |
+
+Worth keeping:
+
+- **Check whose permits a county layer holds.** Three quarters of the
+  County's permits fall in the metro box, but only 33 of 2,441 inside the
+  City: a box test alone would have read it as the City's feed.
+
+### 2026-10-02 — El Paso and Melbourne permits retired (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| retire-frozen-permits | `.streams/retire-frozen-permits.md` | `config.py` (both sources' settings go) | 2026-10-02 | done (El Paso's newest permit 2021-07-30, Melbourne's 2022-05-31; both specs removed, both metros stay registered) | El Paso's and Melbourne's `permits` specs removed; notes in both city modules; regenerated facts |
+
+Worth keeping:
+
+- **Count a family only while its source is live.** Melbourne's feed
+  passed every poll and gate with nothing issued since 2022, and El Paso's
+  spec called itself a frozen snapshot (alarm-exempt) yet counted as permits
+  coverage. Read the newest issue date before counting a feed.
+
+### 2026-10-03 — Weekly feed staleness check finishes again (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| staleness-probe | `.streams/staleness-probe.md` | none | 2026-10-02 | done (a live census of all 443 feeds in 11 minutes, paced at one request per host every 2.2 seconds: 387 fresh, 43 stale, 7 stale but alarm-exempt, 6 not probed; a weekly run should take six to eight minutes against its 15-minute deadline) | `scripts/feed_staleness_probe.py` reworked; `docs/research/feed-freshness-2026-10-03.md` |
+
+Worth keeping:
+
+- **Check a monitor's runs, not just its tests.** The probe's tests passed
+  on every PR while each scheduled run since 2026-08-31 was cancelled at
+  its 20-minute limit before printing anything.
+- **Ids need not follow dates.** Worcester's newest permits hold its
+  lowest object ids, and Lincoln's newest permit is its 1,800th newest row:
+  read by its newest ids, a live feed looks frozen. A month-first text
+  column whose spec names its format is read by its dates instead.
+
+### 2026-10-03 — Two sources' own cadences declared (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| census-cadences | `.streams/census-cadences.md` | `config.py` (a comment) | 2026-10-03 | done (Connecticut's yearly sales set and NYPD's quarterly complaints read fresh live under their declared cadences) | Bridgeport's and New Haven's `deeds` at 365 days, NYC `crime` at 92 |
+
+Worth keeping:
+
+- **Read the portal's own update frequency before declaring a cadence.**
+  Both specs declared 30 days for sets their publishers say are yearly and
+  quarterly, so the staleness check paged for feeds on schedule.
+
+### 2026-10-03 — NYC permits poll reads new permits again (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| nyc-permits-poll | `.streams/nyc-permits-poll.md` | none | 2026-10-03 | done (the second live poll read nothing before; with the column declared month-first it names the dates and reads new permits) | `nyc.yaml` `permits` watermark declared `%m/%d/%Y` text |
+
+Worth keeping:
+
+- **A quiet second poll can be a stuck one.** NYC's permits passed every
+  poll with no error while comparing a mixed-format text column to an ISO
+  string. Check that a second poll's filter can match a recent row.
+- **Read a "typed" alternative's distribution before switching to it.**
+  `dobrundate` is typed and current, but a reload stamps nearly every row.

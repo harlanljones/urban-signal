@@ -120,33 +120,35 @@ _PERMITS_HVAC_FIXTURE = {
 }
 
 # Two co-newest Active Business Licenses rows (Original Issue Date
-# 2026-08-21, the live watermark on the 2026-08-28 re-probe).
+# 2026-08-21, the live watermark on the 2026-08-28 re-probe), keyed the way
+# CSVClient hands them over: headers normalized ("License Number" ->
+# "license_number"). The sole proprietor's own name is replaced.
 _SLA_FIXTURE_COTTAGE = {
-    "License Number": "2026336192",
-    "Entity Name": "Paige Wright",
-    "DBA": "Mommas 4 Little Jars",
-    "Business Location": "296 Davis Hill Ct",
-    "City": "Henderson",
-    "State": "Nevada",
-    "Zip Code": "89074",
-    "Original Issue Date": "08/21/2026",
-    "Expiration Date": "02/28/2027",
-    "License Type": "Gross Revenue",
-    "License Sub-Type": "Cottage Food Operation",
+    "license_number": "2026336192",
+    "entity_name": "SOLE PROPRIETOR NAME REDACTED",
+    "dba": "Mommas 4 Little Jars",
+    "business_location": "296 Davis Hill Ct",
+    "city": "Henderson",
+    "state": "Nevada",
+    "zip_code": "89074",
+    "original_issue_date": "08/21/2026",
+    "expiration_date": "02/28/2027",
+    "license_type": "Gross Revenue",
+    "license_sub_type": "Cottage Food Operation",
 }
 
 _SLA_FIXTURE_MEDICAL = {
-    "License Number": "2026336258",
-    "Entity Name": "DermaCore Wound Care. Professional Corporation",
-    "DBA": "DermaCore Wound Care. Professional Corporation",
-    "Business Location": "871 Coronado Center Dr",
-    "City": "Henderson",
-    "State": "Nevada",
-    "Zip Code": "89052",
-    "Original Issue Date": "08/21/2026",
-    "Expiration Date": "02/28/2027",
-    "License Type": "Medical Office",
-    "License Sub-Type": "Medical Office",
+    "license_number": "2026336258",
+    "entity_name": "DermaCore Wound Care. Professional Corporation",
+    "dba": "DermaCore Wound Care. Professional Corporation",
+    "business_location": "871 Coronado Center Dr",
+    "city": "Henderson",
+    "state": "Nevada",
+    "zip_code": "89052",
+    "original_issue_date": "08/21/2026",
+    "expiration_date": "02/28/2027",
+    "license_type": "Medical Office",
+    "license_sub_type": "Medical Office",
 }
 
 
@@ -230,8 +232,14 @@ class TestHendersonFieldMaps:
             assert abs(float(lat)) <= 90 and abs(float(lng)) <= 180
             assert 35.90 <= lat <= 36.10 and -115.15 <= lng <= -114.82
 
-    def test_sla_map_reads_csv_headers(self):
-        row = {"License Number": "2026336192", "DBA": "Mommas 4 Little Jars"}
+    def test_sla_map_reads_normalized_csv_headers(self):
+        """The published spellings ("License Number") never reach the
+        producer; the map names the normalized headers."""
+        from src.producers.csv_client import _normalize_header
+
+        for cols in SLA_FIELD_MAP.values():
+            assert all(col == _normalize_header(col) for col in cols), cols
+        row = {"license_number": "2026336192", "dba": "Mommas 4 Little Jars"}
         assert first_mapped(row, SLA_FIELD_MAP, "license_id") == "2026336192"
         assert first_mapped(row, SLA_FIELD_MAP, "dba") == "Mommas 4 Little Jars"
         assert first_mapped(_SLA_FIXTURE_COTTAGE, SLA_FIELD_MAP, "effective_date") == "08/21/2026"
@@ -337,13 +345,12 @@ class TestHendersonPermitParsing:
         assert event is not None
         assert event.estimated_cost == pytest.approx(2090.6)
 
-    def test_coordinate_less_row_geocode_fallback_passes_first_mapped_part(self, permits, monkeypatch):
-        """The ~11.8% GISX/GISY-null rows resolve through the ADR 0004
-        geocode supplement. Without the spine, the hook receives the first
-        mapped part (the street number) — the SPINE FALLBACK NOTE is to wire
-        ``compose_permit_address`` into dob_permits_producer alongside
-        albuquerque's branch so the hook receives the composed street
-        (pinned by TestComposePermitAddress)."""
+    def test_coordinate_less_row_geocodes_the_composed_address(self, permits, monkeypatch):
+        """The GISX/GISY-null rows (49,222 of 274,433 on 2026-09-30) resolve
+        through the ADR 0004 geocode supplement. The permits producer applies
+        the leaf's ``compose_permit_address``, so the hook receives the whole
+        parcel address; before 2026-09-30 it received the house number alone,
+        which the geocoder refuses, and the row was dropped."""
         _patch_resolve(monkeypatch, "permits")
         row = dict(_PERMITS_NO_GEO_FIXTURE)
         captured = []
@@ -358,7 +365,8 @@ class TestHendersonPermitParsing:
         assert event.latitude == pytest.approx(35.9869)
         assert event.longitude == pytest.approx(-115.1470)
         assert event.h3_res7 is not None
-        assert captured == [("henderson", "permits", "12300", None)]
+        assert captured == [("henderson", "permits", "12300 S LAS VEGAS BLVD, Henderson, NV", None)]
+        assert event.address_street == "12300 S LAS VEGAS BLVD, Henderson, NV"
 
     def test_geocode_failure_drops_coordinate_less_rows(self, permits, monkeypatch):
         _patch_resolve(monkeypatch, "permits")
@@ -414,7 +422,7 @@ class TestHendersonSlaParsing:
         assert event.city_id == "henderson"
         assert event.license_id == "2026336192"
         assert event.dba == "Mommas 4 Little Jars"
-        assert event.premises_name == "Paige Wright"
+        assert event.premises_name == "SOLE PROPRIETOR NAME REDACTED"
         assert event.license_type == "Gross Revenue"
         assert event.address == "296 Davis Hill Ct"
         # The hook receives the raw street line; the "Henderson, NV" suffix
@@ -470,16 +478,17 @@ class TestHendersonSlaParsing:
         spec = get_henderson_dataset(FeedType.SLA)
         assert spec.platform == "csv"
         assert spec.endpoint == HENDERSON_SLA_ENDPOINT
-        assert spec.watermark_col == "Original Issue Date"
+        assert spec.watermark_col == "original_issue_date"
         assert spec.watermark_type == "text"
         assert spec.watermark_format == "%m/%d/%Y"
-        assert spec.id_keys == ["License Number"]
+        assert spec.order_by == "original_issue_date DESC"
+        assert spec.id_keys == ["license_number"]
         assert spec.producer_key == "sla"
         assert spec.ingestion_mode == "snapshot"
         assert spec.needs_geocode is True
         assert spec.geocode_context == "Henderson, NV"
-        assert spec.field_map["license_id"] == ["License Number"]
-        assert spec.field_map["address_street"] == ["Business Location"]
+        assert spec.field_map["license_id"] == ["license_number"]
+        assert spec.field_map["address_street"] == ["business_location"]
         mjbl = spec.companion_endpoints["mjbl"]
         assert "6c470a95e83e4051a4d1222afa056ed6" in mjbl["endpoint"]
         assert mjbl["filter"] == "Jurisdiction='HENDERSON'"
@@ -488,28 +497,23 @@ class TestHendersonSlaParsing:
         """The composed geocode query for an SLA row is
         '{Business Location}, Henderson, NV' — pinned here so the spine's
         REGISTRY copy carries the same geocode_context."""
-        from src.spatial.geocoder import _STATE_RE
+        from src.spatial.geocoder import compose_geocode_query
 
         spec = get_henderson_dataset(FeedType.SLA)
+        assert compose_geocode_query("871 Coronado Center Dr", spec.geocode_context) == (
+            "871 Coronado Center Dr, Henderson, NV"
+        )
 
-        def compose(query: str) -> str:
-            suffix = spec.geocode_context
-            if suffix and suffix.upper() not in query.upper() and not _STATE_RE.search(query.upper()):
-                query = f"{query}, {suffix}"
-            return query
+    def test_sla_court_suffix_keeps_the_context(self):
+        """'Ct' (Court) spells a state code, and the geocoder used to take it
+        for one, so Court-suffixed streets geocoded on the bare street line.
+        A state now counts only after a comma or before a ZIP code (v3)."""
+        from src.spatial.geocoder import compose_geocode_query
 
-        assert compose("871 Coronado Center Dr") == "871 Coronado Center Dr, Henderson, NV"
-
-    def test_sla_court_suffix_trips_the_state_detector(self):
-        """Live quirk pinned: _STATE_RE matches two-letter codes with word
-        boundaries, and 'Ct' (Court) IS a state code — so Court-suffixed
-        streets skip the 'Henderson, NV' suffix and geocode on the bare
-        street line. Documented here so a future geocoder fix is deliberate;
-        the spec's geocode_context itself is unchanged."""
-        from src.spatial.geocoder import _STATE_RE
-
-        assert _STATE_RE.search("296 DAVIS HILL CT") is not None
-        assert _STATE_RE.search("871 CORONADO CENTER DR") is None
+        spec = get_henderson_dataset(FeedType.SLA)
+        assert compose_geocode_query("296 DAVIS HILL CT", spec.geocode_context) == (
+            "296 DAVIS HILL CT, Henderson, NV"
+        )
 
 
 class TestLeafFeedSpecContract:

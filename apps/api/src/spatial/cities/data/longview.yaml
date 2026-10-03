@@ -263,6 +263,42 @@ datasets:
     non_spatial: null
     zip_member: null
     delimiter: null
+  permits:
+    endpoint: https://cloud.longviewtexas.gov/arcgis/rest/services/AGOL/Building_Permit_Dashboard/MapServer/2
+    platform: arcgis
+    watermark_col: DATE_ISSUED
+    id_keys:
+    - PERMIT_NUMBER
+    topic: raw.municipal.permits
+    interval_seconds: 21600.0
+    producer_key: permits
+    order_by: DATE_ISSUED DESC, OBJECTID DESC
+    select: OBJECTID,PERMIT_NUMBER,PERMIT_TYPE,PRJ_TYPE,STATUS,DATE_CREATED,DATE_ISSUED,LOCATION,VALUATION,PERIOD_NUMBER
+    where: DATE_ISSUED >= CURRENT_DATE - INTERVAL '90' DAY AND DATE_ISSUED <= CURRENT_TIMESTAMP AND PERIOD_NUMBER <= 1 AND PERMIT_TYPE
+      NOT IN ('CONTREGIST', 'ROWCONST', 'PRESUBPRP#', 'BDGPLNREV#', 'SITREV#')
+    needs_geocode: false
+    field_map:
+      job_id:
+      - PERMIT_NUMBER
+      issuance_date:
+      - DATE_ISSUED
+      filing_date:
+      - DATE_CREATED
+      job_type:
+      - PRJ_TYPE
+      - PERMIT_TYPE
+      status:
+      - STATUS
+      cost:
+      - VALUATION
+      address_street:
+      - LOCATION
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 1000
+    expected_cadence_days: 3
+    batch_limit: 2500
+    metro_clip: true
 aliases:
 - longview_tx
 - longview tx

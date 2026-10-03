@@ -3,6 +3,20 @@
 Leaf module: geometry only. Feed specs live in the spine (city_registry) and
 are currently limited to SNAP Retailers (TX slice) pending a verifiable public
 city permits endpoint (EnerGov/PermitMidland has no open data API).
+(Superseded 2026-10-02: see PERMITS below.)
+
+PERMITS (2026-10-02): the City publishes its EnerGov permits as points on its
+ArcGIS Online org (``Permits``, ``services.arcgis.com/0H6bQdxd9223gQB5``), one
+row per application since 2000 (88,614 on 2026-10-02), with new rows added
+daily. Rows keep the issue date and status they had when they were added: the
+layer dates 10 residential building permits issued in September 2026, against
+73 to 101 a month from October 2025 to May 2026, while applications held at 89
+to 140 a month. So Midland reads the applications made in the 90 days before
+each poll, which every row dates, leaving out fifteen permit names that are
+not building work (driveways and sidewalks, franchise utility work, oil and
+gas, wells, water taps, rights of way, events, vendors and the like; three of
+the names end in a space). The layer has no cost column; its free-text
+description, phone and contact columns are never requested.
 """
 
 from typing import Dict

@@ -115,7 +115,7 @@ def test_deeds_field_map_resolves_spellings():
     assert first_mapped(row, DURHAM_FIELD_MAP["deeds"], "recorded_date") == "2026-07-15T00:00:00.000Z"
     assert first_mapped(row, DURHAM_FIELD_MAP["deeds"], "document_amount") == "450000"
     assert first_mapped(row, DURHAM_FIELD_MAP["deeds"], "borough") == "Trinity Park"
-    assert first_mapped(row, DURHAM_FIELD_MAP["deeds"], "party1_grantor") == "DEMO HOLDINGS LLC"
+    assert "party1_grantor" not in DURHAM_FIELD_MAP["deeds"]
 
 
 # --- Producer integration: permits -----------------------------------------

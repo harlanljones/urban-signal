@@ -14,11 +14,12 @@ import collections
 import json
 import logging
 import os
+import re
 import threading
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -43,11 +44,14 @@ from src.producers.nfip_producer import NfipProducer
 from src.producers.nrel_afdc_client import NrelAfdcClient
 from src.producers.poi_diff_producer import PoiDiffProducer
 from src.producers.childcare_producer import ChildcareLicensingProducer
-from src.producers.sla_licenses_producer import SLALicensesProducer
+from src.producers.sla_licenses_producer import SLALicensesProducer, _transform_state_plane
 from src.producers.sba_loan_producer import SbaLoanProducer
 from src.producers.fdic_bankbranch_producer import FdicBankBranchProducer
 from src.producers.street_cut_permits_producer import StreetCutPermitsProducer
+from src.producers.acquisition import _ADAPTER_REQUEST_KEYS
+from src.producers.arcgis_client import ArcGISClient
 from src.producers.watermarks import (
+    parse_watermark,
     typed_watermark_entry,
     watermark_comparison,
     watermark_exclude_clause,
@@ -55,6 +59,37 @@ from src.producers.watermarks import (
 from src.spatial.national_feeds import NATIONAL_FEEDS, NationalFeed, schedulable_feeds
 
 logger = logging.getLogger(__name__)
+
+# Pagination kwargs each platform client's ``paginate`` accepts beyond the
+# shared endpoint/where/batch/max arguments: the US-185 adapter contract
+# (``acquisition.build_adapter_request``) plus the CSV client's zip,
+# delimiter, header-row and point-column options and the ArcGIS client's
+# domain decoding, which only the scheduler forwards. The socrata/arcgis/ckan/carto
+# signatures reject the watermark_* keys, so forwarding them raises
+# TypeError before the first request.
+_PAGINATE_KWARGS: dict[str, tuple[str, ...]] = {
+    **_ADAPTER_REQUEST_KEYS,
+    "arcgis": (*_ADAPTER_REQUEST_KEYS["arcgis"], "decode_domains"),
+    "csv": (*_ADAPTER_REQUEST_KEYS["csv"], "zip_member", "delimiter", "columns", "point_col", "point_lon_first"),
+    # Accela's public surface is an ArcGIS facade (AccelaClient); a workbook
+    # is filtered, sorted and column-picked client-side like a CSV, its text
+    # dates compared as dates (MyGov's report workbooks).
+    "accela": _ADAPTER_REQUEST_KEYS["arcgis"],
+    "excel": (
+        "order_by",
+        "select",
+        "link_pattern",
+        "watermark_col",
+        "watermark_format",
+        "watermark_exclude",
+        "point_col",
+        "point_lon_first",
+    ),
+}
+
+# A snapshot whose order starts ``<col> DESC`` reads its newest rows first,
+# so its cap is a window on recent rows rather than a cut through the table.
+_NEWEST_FIRST = re.compile(r"\s*[^\s,]+\s+DESC\b", re.IGNORECASE)
 
 # Year-slice feed rollover events (US-70): a job switched from one calendar
 # year's layer/resource to the next. Scraped via the serving /metrics mount.
@@ -172,6 +207,10 @@ class JobMetrics:
     # layers at New Year and when the most recent switch happened.
     rollovers: int = 0
     last_rollover: str | None = None
+    # Set when a poll filled its cap without moving the watermark: the next
+    # filter would read the same rows, so it steps past the boundary until the
+    # watermark moves (see ``_watermark_predicate``).
+    boundary_stalled: bool = False
 
 
 def _is_future_watermark(value: Any, now_dt: datetime) -> bool:
@@ -218,6 +257,12 @@ class MunicipalIngestionScheduler:
         self.bootstrap_servers = bootstrap_servers or settings.kafka_bootstrap_servers
         self.rate_limit_delay = rate_limit_delay_seconds
         self.dedup = DeduplicationFilter(max_capacity=dedup_capacity)
+        # A snapshot job re-reads its table every poll and emits only ids it
+        # has not seen, so its seen-set is the feed's state, not an overlap
+        # window. Each snapshot job keeps its own, sized to its cap: in the
+        # shared window above, other feeds' new ids evict a snapshot's ids and
+        # its next poll re-emits unchanged rows as new.
+        self.snapshot_dedup: dict[str, DeduplicationFilter] = {}
         self._stop_event = threading.Event()
         # Injectable calendar clock (US-70): the rollover drill freezes this at
         # Jan 2 to prove the next-year layer is resolved at New Year.
@@ -309,6 +354,7 @@ class MunicipalIngestionScheduler:
                     "topic": ds.topic,
                     "watermark_col": ds.watermark_col,
                     "id_keys": ds.id_keys,
+                    "composite_id": ds.composite_id,
                     "city_id": city_id.value,
                     "producer_key": ds.producer_key or feed_type.value,
                     # Which registered feed this job ingests. Several feed
@@ -337,10 +383,32 @@ class MunicipalIngestionScheduler:
                     "base_where": ds.where,
                     "zip_member": zip_member,
                     "delimiter": ds.delimiter,
+                    "columns": list(ds.columns or []),
+                    "point_col": ds.point_col,
+                    "point_lon_first": ds.point_lon_first,
+                    "link_pattern": ds.link_pattern,
+                    "decode_domains": ds.decode_domains,
+                    # A table whose rows hold projected coordinates instead
+                    # of geometry (Worcester's work orders, in Massachusetts
+                    # State Plane feet) places each row from the declared
+                    # columns.
+                    "state_plane": (
+                        {"crs": ds.state_plane_crs, "x_col": ds.state_plane_x_col, "y_col": ds.state_plane_y_col}
+                        if ds.state_plane_crs and ds.state_plane_x_col and ds.state_plane_y_col
+                        else {}
+                    ),
+                    # A table with no geometry (DC, Lynchburg and Roanoke
+                    # sales) takes each row's coordinates from its parcel's
+                    # centroid.
+                    "parcel_join": dict(ds.parcel_join or {}),
+                    # A county-wide source keeps only the rows placed inside
+                    # the city's metro box (Bend's Deschutes County sales).
+                    "metro_clip": ds.metro_clip,
                 }
                 self.configs[job_name] = JobConfig(
                     name=job_name,
                     interval_seconds=ds.interval_seconds,
+                    batch_limit=ds.batch_limit or JobConfig.batch_limit,
                     # GBFS is wired as an explicit stream job below, but keep
                     # it opt-in until its per-city endpoint has been verified
                     # by the scheduler runtime. This also preserves the
@@ -590,10 +658,17 @@ class MunicipalIngestionScheduler:
 
             return f"{job_name}:{permit_composite_id(row)}"
         id_keys = meta["id_keys"]
-        for k in id_keys:
-            val = row.get(k)
-            if val is not None and str(val).strip():
-                return f"{job_name}:{str(val).strip()}"
+        if meta.get("composite_id"):
+            # Rows unique only as a combination (a sale keyed by parcel and
+            # instrument) join every key; a missing part stays empty.
+            parts = ["" if row.get(k) is None else str(row.get(k)).strip() for k in id_keys]
+            if any(parts):
+                return f"{job_name}:{'|'.join(parts)}"
+        else:
+            for k in id_keys:
+                val = row.get(k)
+                if val is not None and str(val).strip():
+                    return f"{job_name}:{str(val).strip()}"
         return f"{job_name}:hash_{hash(frozenset(row.items()))}"
 
     def _paginating_client_for(self, job_name: str):
@@ -610,9 +685,11 @@ class MunicipalIngestionScheduler:
         clients = {
             "socrata": getattr(producer_wrapper, "socrata", None),
             "arcgis": getattr(producer_wrapper, "arcgis", None),
+            "accela": getattr(producer_wrapper, "accela", None),
             "carto": getattr(producer_wrapper, "carto", None),
             "ckan": getattr(producer_wrapper, "ckan", None),
             "csv": getattr(producer_wrapper, "csv", None),
+            "excel": getattr(producer_wrapper, "excel", None),
         }
         platform = meta.get("platform", "socrata")
         client = clients.get(platform)
@@ -719,6 +796,162 @@ class MunicipalIngestionScheduler:
         )
         return True
 
+    def _dedup_for(self, job_name: str, fetch_limit: int) -> DeduplicationFilter:
+        """The seen-set a poll checks: the job's own for snapshots, else shared."""
+        if self.job_metadata[job_name].get("ingestion_mode") != "snapshot":
+            return self.dedup
+        capacity = 2 * max(fetch_limit, self.configs[job_name].batch_limit)
+        seen = self.snapshot_dedup.get(job_name)
+        if seen is None:
+            seen = self.snapshot_dedup[job_name] = DeduplicationFilter(max_capacity=capacity)
+        elif seen.max_capacity < capacity:
+            seen.max_capacity = capacity
+        return seen
+
+    def _watermark_predicate(self, job_name: str) -> str:
+        """The incremental filter on a job's watermark column.
+
+        A strict ``>`` suits a timestamp column. A date-only column stores one
+        time for every row of a day (UTC midnight, noon, or local midnight at
+        04:00 to 10:00 UTC across US zones), so rows published later that day
+        carry the watermark's own value and ``>`` never reads them. A watermark
+        on a whole hour therefore keeps its boundary with ``>=``, and the dedup
+        drops the rows already seen.
+
+        A poll that filled its cap without moving the watermark would read the
+        same rows again (``JobMetrics.boundary_stalled``). Until the watermark
+        moves, the filter steps past its boundary: a strict ``>`` on a whole
+        hour, and ``>=`` the next second on a timestamp, since a server can
+        hold a finer time than its JSON returns (Milwaukee's licence refresh
+        reads back as 01:23:59 but sorts after 01:23:59.999).
+        """
+        meta = self.job_metadata[job_name]
+        met = self.metrics[job_name]
+        value = met.high_watermark
+        text = meta.get("watermark_type") == "text"
+        if text:
+            entry = typed_watermark_entry(value, fmt=meta.get("watermark_format"))
+            parsed = entry[1] if entry else None
+        else:
+            parsed = parse_watermark(value)
+        whole_hour = parsed is not None and parsed.minute == parsed.second == parsed.microsecond == 0
+        op = ">=" if whole_hour and not met.boundary_stalled else ">"
+        if met.boundary_stalled and parsed is not None and not whole_hour and not text:
+            op, value = ">=", (parsed + timedelta(seconds=1)).strftime("%Y-%m-%dT%H:%M:%S")
+        return watermark_comparison(
+            meta["watermark_col"],
+            op,
+            value,
+            meta["endpoint"],
+            watermark_type=meta.get("watermark_type"),
+            watermark_format=meta.get("watermark_format"),
+            time_zone=self._layer_time_zone(job_name),
+        )
+
+    def _layer_time_zone(self, job_name: str) -> str | None:
+        """The zone an ArcGIS layer reads ``where`` literals in (None for UTC).
+
+        Read from the layer's metadata, which the client fetches once and
+        caches for its paging anyway.
+        """
+        meta = self.job_metadata[job_name]
+        if meta.get("platform") != "arcgis":
+            return None
+        client = self._paginating_client_for(job_name)
+        get_metadata = getattr(client, "get_layer_metadata", None)
+        if get_metadata is None:
+            return None
+        zone = get_metadata(meta["endpoint"]).get("time_zone")
+        return zone if isinstance(zone, str) else None
+
+    def _place_state_plane_rows(self, job_name: str, batch: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Give rows without coordinates the point their State Plane columns hold.
+
+        A spec can declare a projected CRS and the columns that hold each
+        row's x and y (``state_plane_*``): Worcester's work orders are a table
+        with no geometry whose coordinates are Massachusetts State Plane feet.
+        Each row the client left unplaced is converted to latitude and
+        longitude. A row whose columns are empty or do not convert stays
+        unplaced, and a row the client placed keeps its point.
+        """
+        plane = self.job_metadata[job_name]["state_plane"]
+        placed = []
+        for row in batch:
+            if row.get("latitude") is None or row.get("longitude") is None:
+                point = _transform_state_plane(row, plane["crs"], plane["x_col"], plane["y_col"])
+                if point is not None:
+                    row = {**row, "latitude": point[1], "longitude": point[0]}
+            placed.append(row)
+        return placed
+
+    def _join_parcel_centroids(self, job_name: str, batch: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Give rows without coordinates their parcel's centroid (``parcel_join``).
+
+        Sales tables with no geometry (Lynchburg, Roanoke, DC's CAMA sales)
+        name each row's parcel. Only this batch's parcels are read from the
+        spec's parcel layer, as the deeds producer's ``run_stream`` does.
+        The join's ``where`` limits the parcels that can place a row: Pierce
+        County's parcels place Tacoma's sales only in the city's tax code
+        areas, and a sale elsewhere in the county stays unplaced.
+        """
+        meta = self.job_metadata[job_name]
+        join = meta["parcel_join"]
+        key = join["join_key"]
+        # The row's own name for the key, where it differs from the parcel
+        # layer's (a workbook's headers arrive lower-cased).
+        row_key = join.get("row_key") or key
+
+        def unplaced(row: dict[str, Any]) -> bool:
+            return row.get("latitude") is None or row.get("longitude") is None
+
+        wanted = [row[row_key] for row in batch if unplaced(row) and row.get(row_key) not in (None, "")]
+        if not wanted:
+            return batch
+        client = getattr(self.producers[meta["producer_key"]], "arcgis", None) or ArcGISClient()
+        centroids = client.fetch_centroid_index(
+            endpoint_url=join["parcel_layer"],
+            join_key=key,
+            join_values=wanted,
+            via=join.get("via"),
+            where=join.get("where"),
+        )
+        joined = []
+        for row in batch:
+            centroid = centroids.get(ArcGISClient._normalize_join_value(row.get(row_key))) if unplaced(row) else None
+            joined.append({**row, "latitude": centroid[0], "longitude": centroid[1]} if centroid else row)
+        return joined
+
+    def _metro_clip(self, job_name: str) -> Callable[[dict[str, Any]], bool] | None:
+        """The test a ``metro_clip`` feed's rows pass: placed inside the metro box.
+
+        A row is placed by the columns its field map names for latitude and
+        longitude, else by ``latitude``/``longitude`` (the ArcGIS client's, a
+        parcel join's centroid, or its State Plane columns' point). Feeds
+        without the flag get None.
+        """
+        meta = self.job_metadata[job_name]
+        if not meta.get("metro_clip"):
+            return None
+        from src.producers.field_maps import first_mapped, resolve_field_map
+        from src.spatial.city_registry import REGISTRY, CityId, FeedType
+
+        box = REGISTRY[CityId(meta["city_id"])].metro_bbox
+        try:
+            field_map = resolve_field_map(meta["city_id"], FeedType(meta["feed_type"]))
+        except ValueError:
+            field_map = {}
+
+        def inside(row: dict[str, Any]) -> bool:
+            lat = first_mapped(row, field_map, "latitude") or row.get("latitude")
+            lng = first_mapped(row, field_map, "longitude") or row.get("longitude")
+            try:
+                lat, lng = float(lat), float(lng)
+            except (TypeError, ValueError):
+                return False
+            return box["min_lat"] <= lat <= box["max_lat"] and box["min_lng"] <= lng <= box["max_lng"]
+
+        return inside
+
     def poll_job(
         self,
         job_name: str,
@@ -749,46 +982,18 @@ class MunicipalIngestionScheduler:
         # reset baseline.
         self._rollover_check(job_name)
 
-        # Build dynamic where clause for incremental watermark. Snapshot-mode
-        # feeds (no watermark column — e.g. Baton Rouge's business registry)
-        # pull the full table every cycle; the cross-run dedup cache makes the
-        # re-poll a diff (only unseen ids are emitted), so mutations surface as
-        # new ids and are tracked by the row-parity acceptance gate instead.
-        where_parts = []
-        if meta.get("base_where"):
-            where_parts.append(f"({meta['base_where']})")
-        if cfg.where_clause:
-            where_parts.append(f"({cfg.where_clause})")
         is_snapshot = meta.get("ingestion_mode") == "snapshot"
-        if (
+        watermark_filtered = bool(
             cfg.incremental
             and not is_snapshot
             and met.high_watermark
             and meta["watermark_col"]
-        ):
-            where_parts.append(
-                watermark_comparison(
-                    meta["watermark_col"],
-                    ">",
-                    met.high_watermark,
-                    meta["endpoint"],
-                    watermark_type=meta.get("watermark_type"),
-                    watermark_format=meta.get("watermark_format"),
-                )
-            )
-        exclude_guard = (
-            watermark_exclude_clause(meta["watermark_col"], meta.get("watermark_exclude") or [])
-            if meta["watermark_col"]
-            else None
         )
-        if exclude_guard:
-            where_parts.append(exclude_guard)
-
-        active_where = " AND ".join(where_parts) if where_parts else None
 
         records_fetched = 0
         records_published = 0
         duplicates_skipped = 0
+        outside_metro = 0
         new_high_watermark = met.high_watermark
         # US-111 future-watermark guard: advance the high watermark only with
         # values at or before now (mirrors the staleness probe), so one
@@ -803,22 +1008,37 @@ class MunicipalIngestionScheduler:
             stored = typed_watermark_entry(new_high_watermark, fmt=meta.get("watermark_format"))
             new_hw_parsed = stored[1] if stored else None
 
+        dedup = self._dedup_for(job_name, fetch_limit)
         try:
+            # Build dynamic where clause for incremental watermark. Snapshot-mode
+            # feeds (no watermark column — e.g. Baton Rouge's business registry)
+            # pull the full table every cycle; the cross-run dedup cache makes the
+            # re-poll a diff (only unseen ids are emitted), so mutations surface as
+            # new ids and are tracked by the row-parity acceptance gate instead.
+            # Built inside the try: an ArcGIS layer's zone comes from its metadata.
+            where_parts = []
+            if meta.get("base_where"):
+                where_parts.append(f"({meta['base_where']})")
+            if cfg.where_clause:
+                where_parts.append(f"({cfg.where_clause})")
+            if watermark_filtered:
+                where_parts.append(self._watermark_predicate(job_name))
+            exclude_guard = (
+                watermark_exclude_clause(meta["watermark_col"], meta.get("watermark_exclude") or [])
+                if meta["watermark_col"]
+                else None
+            )
+            if exclude_guard:
+                where_parts.append(exclude_guard)
+
+            active_where = " AND ".join(where_parts) if where_parts else None
+
             client_kwargs = {
                 k: meta[k]
-                for k in (
-                    "order_by",
-                    "id_col",
-                    "select",
-                    "fallback_endpoints",
-                    "watermark_col",
-                    "watermark_format",
-                    "watermark_exclude",
-                    "zip_member",
-                    "delimiter",
-                )
+                for k in _PAGINATE_KWARGS.get(meta.get("platform", "socrata"), ())
                 if meta.get(k)
             }
+            clip = self._metro_clip(job_name)
             for batch in self._paginating_client_for(job_name).paginate(
                 endpoint_url=meta["endpoint"],
                 where_clause=active_where,
@@ -828,13 +1048,20 @@ class MunicipalIngestionScheduler:
             ):
                 if self._stop_event.is_set():
                     break
+                if meta.get("state_plane"):
+                    batch = self._place_state_plane_rows(job_name, batch)
+                if meta.get("parcel_join"):
+                    batch = self._join_parcel_centroids(job_name, batch)
 
                 for row in batch:
                     records_fetched += 1
+                    if clip is not None and not clip(row):
+                        outside_metro += 1
+                        continue
                     rec_id = self._extract_record_id(job_name, row)
 
                     # Deduplication check
-                    if self.dedup.check_and_add(rec_id):
+                    if dedup.check_and_add(rec_id):
                         duplicates_skipped += 1
                         continue
 
@@ -882,6 +1109,8 @@ class MunicipalIngestionScheduler:
                             or getattr(event, "incident_id", None)
                             or getattr(event, "license_id", None)
                             or getattr(event, "doc_id", None)
+                            or getattr(event, "violation_id", None)
+                            or getattr(event, "inspection_id", None)
                             or rec_id
                         )
                         resolved_city = getattr(event, "city_id", city_id)
@@ -897,15 +1126,24 @@ class MunicipalIngestionScheduler:
 
                         # Update high watermark. Text-typed feeds (ADR 0005)
                         # are tracked from the raw column before parsing, so
-                        # skip the event-attr path here.
+                        # skip this path. The rest advance from the watermark
+                        # column too, since the incremental filter compares
+                        # that column: an event's own date can come from
+                        # another column (Connecticut licences filter on the
+                        # refresh date but date the event by its effective
+                        # date). The event date stands in only when the
+                        # column is empty or unparseable.
                         wm_val: Any = None
                         if meta.get("watermark_type") != "text":
-                            wm_val = (
-                                getattr(event, "issuance_date", None)
-                                or getattr(event, "created_date", None)
-                                or getattr(event, "effective_date", None)
-                                or getattr(event, "recorded_date", None)
-                            )
+                            if meta["watermark_col"]:
+                                wm_val = parse_watermark(row.get(meta["watermark_col"]))
+                            if wm_val is None:
+                                wm_val = (
+                                    getattr(event, "issuance_date", None)
+                                    or getattr(event, "created_date", None)
+                                    or getattr(event, "effective_date", None)
+                                    or getattr(event, "recorded_date", None)
+                                )
                         if wm_val:
                             if _is_future_watermark(wm_val, now_dt):
                                 future_watermarks += 1
@@ -928,6 +1166,43 @@ class MunicipalIngestionScheduler:
                             error_msg=str(parse_err),
                         )
 
+            # A snapshot read in table order that fills its cap has rows it
+            # never reads: its source outgrew batch_limit (or its where clause
+            # lost its scope). A newest-first snapshot (order_by ... DESC) is a
+            # window on recent rows by design, so a full page is expected.
+            newest_first = bool(_NEWEST_FIRST.match(str(meta.get("order_by") or "")))
+            if is_snapshot and not newest_first and records_fetched >= fetch_limit:
+                logger.warning(
+                    "Job '%s': snapshot poll stopped at its %d-row cap; rows past "
+                    "it are never read (raise the feed's batch_limit or narrow "
+                    "its where clause)",
+                    job_name,
+                    fetch_limit,
+                )
+
+            # A filtered poll that filled its cap without moving the watermark
+            # read only rows at its boundary, and the same filter would read
+            # them again: step past the boundary until the watermark moves. A
+            # newest-first read would have met any newer row first, so a full
+            # page there holds no newer rows and stepping past skips nothing.
+            if new_high_watermark != met.high_watermark:
+                met.boundary_stalled = False
+            elif (
+                watermark_filtered
+                and not newest_first
+                and records_fetched >= fetch_limit
+                and not met.boundary_stalled
+            ):
+                met.boundary_stalled = True
+                logger.warning(
+                    "Job '%s': a full %d-row poll left the watermark at %s; the next "
+                    "poll steps past it and skips the rest of that boundary (raise the "
+                    "feed's batch_limit, or order it by its watermark column)",
+                    job_name,
+                    fetch_limit,
+                    new_high_watermark,
+                )
+
             # Flush producer buffers
             producer_wrapper.producer.flush()
             self.dlq_producer.flush()
@@ -949,6 +1224,8 @@ class MunicipalIngestionScheduler:
                 duplicates_skipped,
                 new_high_watermark,
             )
+            if outside_metro:
+                logger.info("Job '%s': skipped %d rows outside the metro box", job_name, outside_metro)
 
         except Exception as poll_err:
             met.errors_count += 1
@@ -975,6 +1252,7 @@ class MunicipalIngestionScheduler:
             "records_fetched": records_fetched,
             "records_published": records_published,
             "duplicates_skipped": duplicates_skipped,
+            "outside_metro": outside_metro,
             "high_watermark": met.high_watermark,
             "error": met.last_error,
         }
@@ -1067,6 +1345,7 @@ class MunicipalIngestionScheduler:
         """Returns snapshot of live telemetry metrics."""
         return {
             "dedup_cache_size": len(self.dedup),
+            "snapshot_dedup_size": sum(len(seen) for seen in self.snapshot_dedup.values()),
             "jobs": {
                 name: {
                     "total_runs": m.total_runs,

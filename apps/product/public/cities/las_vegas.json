@@ -268,7 +268,7 @@
     },
     "deeds": {
       "platform": "arcgis",
-      "watermark_col": "SALEDATE",
+      "watermark_col": "DOCDATE",
       "interval_seconds": 600.0,
       "topic": "raw.municipal.deeds"
     }

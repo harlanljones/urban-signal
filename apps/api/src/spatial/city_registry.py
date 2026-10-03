@@ -298,6 +298,43 @@ class DatasetSpec:
     # CSV feeds are not always comma-delimited (Maricopa sales affidavits are
     # pipe-delimited). Forwarded verbatim to CSVClient.paginate (US-392).
     delimiter: str | None = None
+    # A delimited file with no header row names its columns here, in file
+    # order, and every line is read as a row (Pierce County's sales file,
+    # Tacoma's deeds). Forwarded verbatim to CSVClient.paginate.
+    columns: list[str] = field(default_factory=list)
+    # A file that writes each row's point as one ``lat, lon`` column (the
+    # CSV export of an OpenDataSoft geo point, Long Beach's requests) names
+    # it here, and CSVClient.paginate adds the row's ``latitude`` and
+    # ``longitude``. The Excel client does the same for a workbook.
+    point_col: str | None = None
+    # True when that column writes ``lon, lat`` instead (MyGov's workbooks,
+    # Abilene's permits).
+    point_lon_first: bool = False
+    # Rows one scheduler poll may fetch; unset keeps JobConfig's default
+    # (1000). A newest-first poll never reaches rows past its cap, so a feed
+    # whose source lands more than that at once (Columbus 311's daily extract
+    # tops 1,000 rows on a third of weekdays) declares a higher cap.
+    batch_limit: int | None = None
+    # A poll names each row by its first id key with a value; later keys are
+    # fallbacks. True joins every key instead, for rows unique only as a
+    # combination: a sale keyed by parcel and instrument, where the parcel
+    # repeats on every sale of that parcel.
+    composite_id: bool = False
+    # A county-wide source keeps only the rows placed inside the city's
+    # metro box: a poll skips each row whose coordinates (its own, or its
+    # parcel's centroid from ``parcel_join``) are missing or outside, before
+    # dedup, and counts it. Deschutes County's sales table covers the whole
+    # county, and Bend keeps the sales inside its box.
+    metro_clip: bool = False
+    # A file renamed with each release is registered by the page that links
+    # it: the client reads ``endpoint`` and downloads the newest link whose URL
+    # matches this pattern (Richmond's monthly transfers workbook).
+    link_pattern: str | None = None
+    # An ArcGIS layer can store coded values whose names live only in its
+    # field domains, as a Survey123 form's choice lists do: Allentown's 311
+    # requests store "130245" for "Report a Pothole". True reads each coded
+    # value as its name; a value the domain does not list is kept.
+    decode_domains: bool = False
 
 
 @dataclass
@@ -327,9 +364,11 @@ def normalize_city(city_id: str | None) -> CityId | None:
 # US-364: USDA FNS SNAP Retailer Locator, registered as FeedType.SLA — the
 # food-retail authorization slice (say so in feature names). One national
 # FeatureServer covers every metro, so the registration is a single shared
-# spec parameterized by a State where-clause (state-level coarseness is
-# accepted for v1: rows outside the metro bbox still index global H3 cells —
-# H3SpatialIndexer has no bbox gate — and metro scoping stays downstream).
+# spec parameterized by the metro's state and bbox. The v1 slice (2026-08-27)
+# filtered by state only and left metro scoping downstream, but a snapshot
+# poll reads at most its batch_limit rows, so every metro in a state received
+# the same first 1,000 retailers; the bbox term (2026-09-30) makes each poll
+# the metro's own retailers.
 #
 # Verified live 2026-08-27: fields are Record_ID / Store_Name /
 # Store_Street_Address / Additonal_Address (sic) / City / State / Zip_Code /
@@ -353,8 +392,33 @@ SNAP_SLA_FIELD_MAP: dict[str, list[str]] = {
 }
 
 
-def snap_sla_spec(state: str) -> DatasetSpec:
-    """Build the SNAP SLA DatasetSpec for one metro's state slice."""
+def snap_sla_where(state: str, bbox: dict[str, float]) -> str:
+    """The SNAP layer filter for one metro: its state, narrowed to its bbox.
+
+    The state alone is not enough. A snapshot poll takes at most the job's
+    ``batch_limit`` rows ordered by ``ObjectId``, so a statewide filter hands
+    every metro in the state the same first rows (Tallahassee received 19 of
+    its 242 retailers among 1,000 from across Florida). The state term stays so
+    a bbox that crosses a state line keeps to the metro's own state.
+    """
+    return (
+        f"State = '{state}'"
+        f" AND Latitude BETWEEN {bbox['min_lat']!r} AND {bbox['max_lat']!r}"
+        f" AND Longitude BETWEEN {bbox['min_lng']!r} AND {bbox['max_lng']!r}"
+    )
+
+
+def snap_sla_spec(
+    state: str,
+    bbox: dict[str, float],
+    batch_limit: int | None = None,
+) -> DatasetSpec:
+    """Build the SNAP SLA DatasetSpec for one metro's slice of its state.
+
+    ``batch_limit`` must clear the retailers inside the bbox with room to grow,
+    or the snapshot never sees the rest; metros holding more than two thirds of
+    the default 1,000 set one.
+    """
     return DatasetSpec(
         endpoint=settings.arcgis_snap_retailers_url,
         platform="arcgis",
@@ -367,7 +431,8 @@ def snap_sla_spec(state: str) -> DatasetSpec:
         ingestion_mode="snapshot",
         oid_field="ObjectId",
         max_record_count=1000,
-        where=f"State = '{state}'",
+        where=snap_sla_where(state, bbox),
+        batch_limit=batch_limit,
         field_map=SNAP_SLA_FIELD_MAP,
     )
 

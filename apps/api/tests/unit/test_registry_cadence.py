@@ -6,7 +6,7 @@ that path empty so no future registration can page forever (or never page)
 because its publishing rhythm was never declared.
 """
 
-from src.spatial.city_registry import REGISTRY
+from src.spatial.city_registry import REGISTRY, CityId, FeedType
 
 
 def test_every_registered_feed_declares_expected_cadence():
@@ -33,3 +33,13 @@ def test_backfilled_feeds_keep_the_default_seven():
         if spec.expected_cadence_days is not None
     }
     assert 7 in values
+
+
+def test_connecticuts_yearly_sales_set_declares_a_yearly_cadence():
+    """data.ct.gov's sales set (``5mzw-sjtu``) is published once a year: the
+    2026-08-12 update added sales to 2025-09-30, so its newest sale runs 10 to
+    23 months old, and a 30-day declaration paged every weekly run."""
+    for city in (CityId.BRIDGEPORT, CityId.NEW_HAVEN):
+        spec = REGISTRY[city].datasets[FeedType.DEEDS]
+        assert spec.endpoint.endswith("5mzw-sjtu.json")
+        assert spec.expected_cadence_days == 365

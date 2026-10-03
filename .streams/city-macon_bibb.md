@@ -17,6 +17,8 @@ Register Macon-Bibb, GA as a new Urban Signal metro (`CityId.macon_bibb`). Deliv
   Fields include `INDATE` (filing), `ISSUEDATE` (issuance), address parts, and polygon geometry; max record count 1000; updated 2026-08-28.
 - 2026-08-28 — 311 uses SeeClickFix; no county-managed ArcGIS REST 311 feed found. Do not register COMPLAINTS_311.
 - 2026-08-28 — Register PERMITS (ArcGIS) + SLA (SNAP GA slice) in REGISTRY. Add `settings.arcgis_macon_bibb_permits_url`.
+- 2026-10-02 — PERMITS retracted and `settings.arcgis_macon_bibb_permits_url` removed: the layer is the City of
+  St. Catharines, Ontario's (21,930 polygons, none in Macon's box). See `.streams/wrong-place-permits.md`.
 
 ## Current step
 

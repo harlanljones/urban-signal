@@ -306,7 +306,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'PA'
+    where: State = 'PA' AND Latitude BETWEEN 40.35 AND 40.55 AND Longitude BETWEEN -80.1 AND -79.8
     needs_geocode: false
     geocode_context: null
     field_map:

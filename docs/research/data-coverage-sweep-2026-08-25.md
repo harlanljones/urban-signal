@@ -227,7 +227,7 @@ One spine-hold (shared schema + shared `parse_watermark` `%Y.%m.%d` format prere
 
 ## Confirm-skip findings (no issue; update README/research where verdict changed)
 
-- **Nashville deeds** — Hub catalog has only eBid surplus auctions + marriage records; no property deed sales. README accurate.
+- **Nashville deeds** — Hub catalog has only eBid surplus auctions + marriage records; no property deed sales. README accurate. *Superseded 2026-09-30: the Hub "Parcels" layer carries each parcel's last transfer, and Nashville `deeds` now reads it ([deeds-probe-2026-09-30.md](deeds-probe-2026-09-30.md)).*
 - **Kansas City deeds** — Zero AGOL property-sales results; city Socrata car-auction trap; county GIS not found. README accurate.
 - **Charlotte deeds** — `gis.charlottenc.gov/arcgis/rest/services/CountyData/Parcels` is cadastral-only (no sales attrs); POLARIS is interactive-only; AGOL "Property Sales" is a 2012 web map. **Update README cell "Mecklenburg Hub unverified" → "verified — no sales feed".**
 - **Baton Rouge deeds** — EBR Clerk of Court is paid-subscription (`clerkconnect.com`); EBR Assessor unreachable. LA-deeds-skip precedent. README accurate.

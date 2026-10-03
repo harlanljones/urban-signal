@@ -210,7 +210,7 @@ datasets:
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: topendate DESC, :id
     id_col: null
     select: null
     fallback_endpoints: []

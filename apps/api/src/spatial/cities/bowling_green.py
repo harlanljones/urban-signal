@@ -58,9 +58,10 @@ Host quirks (documented here; ``watermarks.py`` / ``geocoder.py`` NOT edited):
   is a true date, so no ADR-0005 text-watermark declaration is needed.
   Note in spine delta.
 * ``_STATE_RE`` false positive: street names such as "MT VICTOR LANE" carry a
-  ``M T`` token that ``_STATE_RE`` matches as the MT state token, so an
-  address context append is skipped for a Mt Victor geocode fallback. That
-  path is never taken here (native coords), documented only.
+  ``M T`` token that ``_STATE_RE`` matches as the MT state token, which
+  skipped the address context append for a Mt Victor geocode fallback until
+  geocoder v3 (a state now counts only after a comma or before a ZIP code).
+  That path is never taken here (native coords), documented only.
 
 OID/ordering contract: layer 5 publishes ``OBJECTID`` as its ``objectIdField``
 and honors ``orderByFields=OBJECTID``. ``maxRecordCount`` is 2000 (verified
@@ -71,6 +72,10 @@ Implementation re-probe (2026-08-28, live): newest ``created_date``
 2633 Mt Victor Lane, OBJECTID 113479), 7d=22, 60d=386, total=29,691. Feed
 extent (outSR=4326): lat 36.795-37.179, lng -86.661--86.125 — the metro box
 is padded to that extent.
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
 """
 
 from typing import Dict
@@ -393,7 +398,10 @@ BOWLING_GREEN_FEED_SPECS: Dict[str, Dict[str, object]] = {
         "extra": {
             "needs_geocode": True,
             "geocode_context": BOWLING_GREEN_GEOCODE_CONTEXT,
-            "order_by": "OBJECTID",
+            # Rows with no created_date read first in OID order and never
+            # move the watermark, so they are left out and the newest read first.
+            "where": "created_date IS NOT NULL",
+            "order_by": "created_date DESC, OBJECTID DESC",
             "oid_field": "OBJECTID",
             "max_record_count": 2000,
             "expected_cadence_days": 1,
@@ -420,7 +428,8 @@ def get_bowling_green_dataset(feed: object) -> object:
 
     Returns the spec for a registered Bowling Green feed, or raises
     ``KeyError`` naming the city and available feeds when the feed is absent
-    (311 / SLA / deeds have no viable live feed here).
+    (311 and deeds have no viable live feed here). SLA is the corpus's shared
+    SNAP slice, which this mirror does not carry.
     """
     from src.config import settings
     from src.spatial.city_registry import DatasetSpec

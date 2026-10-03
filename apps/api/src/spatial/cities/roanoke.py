@@ -1,13 +1,9 @@
 DEEDS_FIELD_MAP = {
-    "doc_id": ["PARCELID", "PRINTKEY"],
-    "bbl": ["PARCELID"],
-    "doc_type": ["DEED_TYPE"],
-    "document_amount": ["SALE_PRICE"],
-    "recorded_date": ["SALE_DATE"],
-    "address_street": ["SITEADDRESS"],
-    "incident_address": ["SITEADDRESS"],
-    "borough": ["CITY"],
-    "zipcode": ["ZIP5"],
+    "doc_id": ["DocNum", "ID"],
+    "bbl": ["parcel_id"],
+    "doc_type": ["deed_type"],
+    "document_amount": ["consideration"],
+    "recorded_date": ["pxfer_date"],
 }
 
 FIELD_MAP = {
@@ -15,11 +11,12 @@ FIELD_MAP = {
 }
 
 NON_CANDIDATE_METADATA_COLUMNS = (
-    "VALID",
-    "MultiSale",
-    "PARCEL_SOURCE",
-    "BOOK",
-    "PAGE",
+    "sxfer_date",
+    "TfrType",
+    "status",
+    "deed_book",
+    "deed_page",
+    "last_update",
 )
 
 """Roanoke Metro Submarket Registry and Spatial Layer for Urban Signal.
@@ -30,23 +27,28 @@ VA (the Star City of the Roanoke Valley, in the Blue Ridge foothills —
 deliberately nested inside the Roanoke metro box and not overlapping the
 sibling Lynchburg/Spartanburg leaf boxes).
 
-Feed scope (mid-Atlantic/Northeast onboarding, US-314; not yet live-probed):
-Roanoke publishes an open-data parcel layer on its municipal ArcGIS server
-(``gis.roanokeva.gov``). The best-effort endpoint below is the city parcel
-FeatureServer; the live watermark column and cadence are TBD at first probe
-(see PR_DESCRIPTION). The feed is modeled as a DEEDS-led partial metro:
+Feeds (probed 2026-09-30):
 
-* DEEDS — ``OpenData/Parcels/FeatureServer/0``. Native parcel polygons
-  (``outSR=4326`` rings -> centroid) are expected to supply every row's
-  coordinates, so ``needs_geocode`` is False pending confirmation. Watermark
-  ``SALE_DATE`` assumed TEXT ``MM/DD/YYYY`` (typed comparison required,
-  ADR-0005) until a live probe confirms the format.
-* PERMITS / SLA / COMPLAINTS_311 — not registered on this ticket; add via
-  their own tickets once the open-data portal's feeds are enumerated.
+* DEEDS — the city's Proval transfer history table on its own ArcGIS Server
+  (``RealEstate/Proval_Transfer_History/FeatureServer/3``; 259,083 rows,
+  newest transfer 2026-09-28). One row per parcel per instrument: an
+  instrument covering several parcels repeats ``DocNum``, so a row is named by
+  ``DocNum`` and ``lrsn`` together (``composite_id``). The table has no
+  geometry and no address; ``parcel_join`` takes each row's coordinates from
+  the centroid of its parcel in ``Hosted/City_Parcels`` (``lrsn``, an integer,
+  so the join's ``IN`` is numeric; 93% of recent transfers match a parcel).
+  44,962 rows carry a 1776-07-04 placeholder date, which the ``where`` drops.
+  The server takes only ``date 'YYYY-MM-DD'`` literals, so its host is in
+  ``ANSI_DATE_LITERAL_HOSTS``. Grantor and grantee names stay on the server:
+  ``select`` names only the columns the poll reads.
+* The ``gis.roanokeva.gov`` parcel layer registered before 2026-09-30 has no
+  ArcGIS Server behind it (the host redirects to a vendor viewer), and the
+  ``Hosted/Proval_Transfer_History_Copy`` table stopped at 2025-10-27.
+* PERMITS / SLA / COMPLAINTS_311 — not registered.
 
-Implementation note: the endpoint is a documented best-effort URL; confirm
-the live layer name and ``SALE_DATE`` watermark at the first probe and
-update both the Settings default and this leaf together.
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
 """
 
 
@@ -293,43 +295,39 @@ RNK_DIVISIONS = ROANOKE_DIVISIONS
 
 # ---------------------------------------------------------------------------
 # Feed specs (leaf-local; the spine copies these into REGISTRY).
-# Best-effort Roanoke open-data parcel layer; confirm the live endpoint and
-# SALE_DATE watermark at the first probe (see module docstring).
 # ---------------------------------------------------------------------------
 ROANOKE_DEEDS_ENDPOINT = (
-    "https://gis.roanokeva.gov/server/rest/services/OpenData/Parcels/FeatureServer/0"
+    "https://maps.roanokeva.gov/server/rest/services/RealEstate/"
+    "Proval_Transfer_History/FeatureServer/3"
+)
+ROANOKE_PARCEL_LAYER_ENDPOINT = (
+    "https://maps.roanokeva.gov/server/rest/services/Hosted/City_Parcels/FeatureServer/0"
 )
 
 ROANOKE_FEED_SPECS: dict[str, dict[str, object]] = {
     "deeds": {
         "endpoint": ROANOKE_DEEDS_ENDPOINT,
         "platform": "arcgis",
-        "watermark_col": "SALE_DATE",
-        "id_keys": ["PARCELID", "OBJECTID"],
+        "watermark_col": "pxfer_date",
+        "id_keys": ["DocNum", "lrsn"],
         "topic_key": "topic_deeds",
         "interval_seconds": 600.0,
         "producer_key": "deeds",
         "extra": {
             "needs_geocode": False,
-            "watermark_type": "text",
-            "watermark_format": "%m/%d/%Y",
-            "oid_field": "OBJECTID",
-            "max_record_count": 100000,
-            "expected_cadence_days": 30,
+            "order_by": "pxfer_date DESC, ID DESC",
+            "select": "ID,DocNum,lrsn,parcel_id,pxfer_date,consideration,deed_type",
+            "where": "pxfer_date >= date '1900-01-01'",
+            "oid_field": "ID",
+            "max_record_count": 2000,
+            "expected_cadence_days": 7,
             "non_spatial": False,
-            "scope": (
-                "Roanoke DEEDS/sales via the city open-data parcel layer "
-                "(best-effort endpoint; native parcel polygons expected to "
-                "supply coordinates, so the ADR-0004 geocode hook is NOT "
-                "declared pending confirmation). TEXT MM/DD/YYYY watermark "
-                "assumed (typed comparison required, ADR-0005). PERMITS/SLA/"
-                "311 are NOT enumerated on this ticket — add via their own "
-                "tickets once the open-data portal feeds are surveyed. "
-                "PARCELID/OBJECTID are the parcel keys; SALE_DATE is the "
-                "assumed watermark column. Confirm the live layer name and "
-                "watermark at the first probe and update Settings + this leaf "
-                "together."
-            ),
+            "composite_id": True,
+            "parcel_join": {
+                "parcel_layer": ROANOKE_PARCEL_LAYER_ENDPOINT,
+                "join_key": "lrsn",
+                "geometry_source": "centroid",
+            },
             "field_map": DEEDS_FIELD_MAP,
         },
     },
@@ -340,8 +338,9 @@ def get_roanoke_dataset(feed: object) -> object:
     """Leaf-local mirror of ``city_registry.get_dataset``.
 
     Returns the spec for a registered Roanoke feed, or raises ``KeyError``
-    naming the city and available feeds when the feed is absent (permits/SLA/
-    311 are not registered on this ticket).
+    naming the city and available feeds when the feed is absent (permits and
+    311 are not registered on this ticket). SLA is the corpus's shared SNAP
+    slice, which this mirror does not carry.
     """
     from src.config import settings
     from src.spatial.city_registry import DatasetSpec
@@ -392,6 +391,7 @@ __all__ = [
     "ROANOKE_DIVISION_BBOXES",
     "ROANOKE_FEED_SPECS",
     "ROANOKE_METRO_BBOX",
+    "ROANOKE_PARCEL_LAYER_ENDPOINT",
     "ROANOKE_SUBMARKETS",
     "get_roanoke_dataset",
     "is_in_roanoke",

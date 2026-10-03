@@ -165,8 +165,18 @@
       "topic": "raw.municipal.permits"
     },
     "311": null,
-    "sla": null,
-    "deeds": null
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": {
+      "platform": "csv",
+      "watermark_col": "saledate",
+      "interval_seconds": 86400.0,
+      "topic": "raw.municipal.deeds"
+    }
   },
   "evidence_path": "apps/api/src/spatial/cities/fort_collins.py",
   "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"

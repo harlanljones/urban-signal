@@ -3,6 +3,25 @@
 Leaf module: geometry only. Feed specs live in the spine (city_registry) and
 are initially limited to SNAP Retailers (SC slice) pending a verifiable public
 city permits endpoint via the ArcGIS Hub (US-284).
+(Superseded 2026-10-02: see PERMITS below.)
+
+PERMITS (2026-10-02): the City of Charleston's active permits, a rolling 18
+months on the City GIS server
+(``gis.charleston-sc.gov/arcgis2/rest/services/External/Applications/MapServer/20``,
+18,540 rows on 2026-10-02). Charleston reads the permits issued in the 90 days
+before each poll, leaving out engineering, operational (short-term rental
+renewals), rental registration, farmers market, kitchen exhaust cleaning,
+fireworks, tent, tree removal and construction noise permits. ``ISSUE_DATE``
+is midnight on most rows and carries a time of day on the rest, so the window
+runs on the server. The work class (New, Alteration, Addition) gives the job
+type; demolition and sign permits, whose work class names their scope, fall
+to the catch-all class. The layer covers the City of Charleston only, not
+North Charleston or Mount Pleasant.
+
+DEEDS stay unregistered: Charleston County's parcel layer carries each
+parcel's latest sale, but the County distributes parcel attributes only on
+request and its terms bar republishing them without written approval
+(checked 2026-10-02).
 """
 
 from typing import Dict

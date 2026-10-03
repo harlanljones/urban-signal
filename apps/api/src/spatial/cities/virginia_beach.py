@@ -5,6 +5,7 @@ PERMITS_FIELD_MAP = {
     "job_type": ["WorkType", "PermitType"],
     "issuance_date": ["IssueDate"],
     "filing_date": ["ApplicationDate"],
+    "status": ["Status"],
     "address_street": ["StreetAddress"],
     "bbl": ["GPIN"],
     "borough": ["City"],

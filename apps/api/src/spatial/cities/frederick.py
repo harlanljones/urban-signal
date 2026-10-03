@@ -1,26 +1,19 @@
 DEEDS_FIELD_MAP = {
-    "doc_id": ["PARCELID"],
-    "bbl": ["PARCELID"],
-    "doc_type": ["SALE_TYPE"],
-    "document_amount": ["SALE_PRICE"],
-    "recorded_date": ["SALE_DATE"],
-    "address_street": ["SITEADDRESS"],
-    "incident_address": ["SITEADDRESS"],
-    "borough": ["CITY"],
-    "zipcode": ["ZIPCODE"],
+    "doc_id": ["account_id_mdp_field_acctid"],
+    "bbl": ["account_id_mdp_field_acctid"],
+    "document_amount": ["sales_segment_1_consideration_mdp_field_considr1_sdat_field_90"],
+    "recorded_date": ["sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89"],
+    "address_street": ["mdp_street_address_mdp_field_address"],
+    "incident_address": ["mdp_street_address_mdp_field_address"],
+    "borough": ["mdp_street_address_city_mdp_field_city"],
+    "zipcode": ["mdp_street_address_zip_code_mdp_field_zipcode"],
+    "latitude": ["mdp_latitude_mdp_field_digycord_converted_to_wgs84"],
+    "longitude": ["mdp_longitude_mdp_field_digxcord_converted_to_wgs84"],
 }
 
 FIELD_MAP = {
     "deeds": DEEDS_FIELD_MAP,
 }
-
-NON_CANDIDATE_METADATA_COLUMNS = (
-    "VALID",
-    "MultiSale",
-    "PARCEL_SOURCE",
-    "BOOK",
-    "PAGE",
-)
 
 """Frederick Metro Submarket Registry and Spatial Layer for Urban Signal.
 
@@ -29,19 +22,22 @@ division catalog, and geographic bounding boxes for the City of Frederick,
 MD (county seat of Frederick County, at the foot of the Catoctin Mountains
 — deliberately not overlapping the sibling Baltimore/Washington leaf boxes).
 
-Feed scope (probed 2026-09-03; best-effort endpoint documented in
-PR_DESCRIPTION): Frederick County publishes its parcel roll as the
-``Frederick_Parcels`` FeatureServer (AGOL org X3lKekbdaBmNjCHu), a native
-polygon layer carrying per-parcel sale attributes. The deeds registration
-reuses the parcel layer's sale columns as the arms-length transfer signal —
-the closest ACRIS-shape feed Frederick has. The endpoint is a documented
-best-effort URL; liveness is not enforced by the interlock gate.
+Feeds (probed 2026-09-30):
 
-* DEEDS — ``Frederick_Parcels`` FeatureServer layer 3. Native parcel
-  polygons (``outSR=4326`` rings → centroid) supply every row's
-  coordinates, so ``needs_geocode`` stays False — no ADR-0004 hook.
+* DEEDS — Maryland SDAT real property assessments, Frederick County view
+  (``opendata.maryland.gov`` Socrata ``gx8c-a963``, the family the Baltimore,
+  Montgomery and Prince George's feeds read), filtered to the FREDERICK postal
+  city. One row per account carries its latest sale (the date as text
+  ``YYYY.MM.DD``, and the consideration); SDAT refreshes it monthly, about a
+  month behind. It is read as a snapshot, newest sale first. Grantor names are
+  never mapped. SDAT's own latitude and longitude supply coordinates. The
+  ``Frederick_Parcels`` layer registered until 2026-09-30 never existed.
 * PERMITS / SLA / 311 — absent from the public Frederick open-data surface;
   Tier 3, not registered.
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
 """
 
 
@@ -274,43 +270,35 @@ FRK_DIVISIONS = FREDERICK_DIVISIONS
 
 # ---------------------------------------------------------------------------
 # Feed specs (leaf-local; the spine copies these into REGISTRY).
-# Frederick deeds/sales via the Frederick County parcel FeatureServer (AGOL
-# org X3lKekbdaBmNjCHu, "Frederick_Parcels" layer 3). Native parcel polygons
-# supply coordinates; no ADR-0004 geocode hook. Best-effort endpoint pending
-# live probe (see PR_DESCRIPTION).
+# Frederick deeds: MD SDAT assessments (Socrata gx8c-a963), FREDERICK postal city.
 # ---------------------------------------------------------------------------
-FREDERICK_DEEDS_ENDPOINT = (
-    "https://services1.arcgis.com/X3lKekbdaBmNjCHu/ArcGIS/rest/services/"
-    "Frederick_Parcels/FeatureServer/3"
-)
+FREDERICK_DEEDS_ENDPOINT = "https://opendata.maryland.gov/resource/gx8c-a963.json"
 
 FREDERICK_FEED_SPECS: dict[str, dict[str, object]] = {
     "deeds": {
         "endpoint": FREDERICK_DEEDS_ENDPOINT,
-        "platform": "arcgis",
-        "watermark_col": "SALE_DATE",
-        "id_keys": ["PARCELID", "OBJECTID", "SALE_DATE"],
+        "platform": "socrata",
+        "watermark_col": "sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89",
+        "id_keys": [
+            "account_id_mdp_field_acctid",
+            "sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89",
+        ],
         "topic_key": "topic_deeds",
-        "interval_seconds": 600.0,
+        "interval_seconds": 1800.0,
         "producer_key": "deeds",
         "extra": {
-            "needs_geocode": False,
-            "watermark_type": "text",
-            "watermark_format": "%m/%d/%Y",
-            "oid_field": "OBJECTID",
-            "max_record_count": 100000,
+            "order_by": (
+                "sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89 DESC, :id"
+            ),
+            "where": "mdp_street_address_city_mdp_field_city = 'FREDERICK'",
+            "ingestion_mode": "snapshot",
             "expected_cadence_days": 30,
             "non_spatial": False,
+            "composite_id": True,
             "scope": (
-                "Frederick MD deeds/sales via the Frederick County parcel "
-                "FeatureServer (AGOL org X3lKekbdaBmNjCHu, 'Frederick_Parcels' "
-                "layer 3). Native parcel polygons supply coordinates; no "
-                "ADR-0004 geocode hook. SALE_DATE is TEXT MM/DD/YYYY (typed "
-                "comparison required, ADR-0005). Best-effort endpoint pending a "
-                "live probe — the interlock gate does not verify endpoint "
-                "liveness. $1 quitclaim transfers are KEPT at ingest; "
-                "market-sale filtering is analysis-side. PARTY fields stay None; "
-                "PARCELID/OBJECTID are the parcel keys."
+                "Frederick MD deeds from the SDAT real property assessments (Frederick "
+                "County view, gx8c-a963), FREDERICK postal city, newest sale first. "
+                "Grantor names are never mapped."
             ),
             "field_map": DEEDS_FIELD_MAP,
         },

@@ -1,6 +1,5 @@
 """Contract tests for the Madison, WI registration (US-356)."""
 
-from src.config import settings
 from src.producers.accela_client import AccelaClient
 from src.spatial.cities.madison import (
     MADISON_DIVISION_BBOXES,
@@ -8,7 +7,7 @@ from src.spatial.cities.madison import (
     MADISON_SUBMARKETS,
     is_in_madison_metro,
 )
-from src.spatial.city_registry import REGISTRY, CityId, FeedType, normalize_city
+from src.spatial.city_registry import REGISTRY, CityId, FeedType, normalize_city, snap_sla_spec
 
 
 def test_madison_geometry_is_nested_and_representative():
@@ -30,13 +29,13 @@ def test_madison_geometry_is_nested_and_representative():
     assert {meta.city_id for meta in MADISON_SUBMARKETS.values()} == {"madison"}
 
 
-def test_madison_is_partial_accela_permits_registration():
+def test_madison_reads_snap_retailers_and_no_permits():
+    """The Accela page registered as Madison's permits feed until 2026-09-30
+    answered every API call with a redirect to an HTML error page."""
     assert normalize_city("madison wi") is CityId.MADISON
-    spec = REGISTRY[CityId.MADISON].datasets[FeedType.PERMITS]
-    assert spec.platform == "accela"
-    assert spec.endpoint.startswith("https://")
-    assert spec.endpoint == settings.accela_madison_permits_endpoint
-    assert spec.producer_key == FeedType.PERMITS.value
+    datasets = REGISTRY[CityId.MADISON].datasets
+    assert FeedType.PERMITS not in datasets
+    assert datasets[FeedType.SLA] == snap_sla_spec("WI", MADISON_METRO_BBOX)
 
 
 def test_accela_client_reuses_arcgis_rest_contract():

@@ -58,6 +58,11 @@ METRO_META) reported back as paste-able code.
   block (I001). The remaining 17 UP006/UP035 `Dict`/`List` flags are the
   repo-wide pre-existing typing style (memphis.py / denver.py flag identically)
   and are left untouched per the "ruff net-new 0" policy.
+- 2026-10-02 — Deeds held. Arapahoe County's parcel layer, which covers most
+  of the city, carries sales about eight weeks after their date, and Adams
+  County's daily `Property_Sales` table covers only the city's Adams side
+  (18% of its sales fall in the metro box); no Douglas County source turned
+  up. See `.streams/western-deeds.md`.
 
 ## Current step
 

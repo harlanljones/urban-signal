@@ -6,6 +6,23 @@ the Augusta metropolitan area (Richmond County focus).
 This leaf declares only spatial structures; feed registrations live in the spine
 registry. The registry will register a verified permits dataset (ArcGIS table,
 address-geocoded) and a SNAP SLA state slice for Georgia.
+
+311 (2026-10-02): the City's open service requests as Cityworks publishes
+them (``augcw.augustaga.gov``, "All Open SRs"): one point per request, 12,471
+open on 2026-10-02, 2,855 of them created in the 90 days before. A request
+leaves the layer when it closes, so no closure reaches the feed. The poll
+leaves out the utility-locate tickets (about 29% of those 90 days), the
+subpoena queue and the crews' daily start entries, and reads each request's
+id, problem code, status, dates and district; the free text, the
+staff names and the problem address stay on the server. The server ignores
+``resultOffset``, takes the first ``resultRecordCount`` rows in the requested
+order before it applies the ``where``, and flags every short page as
+truncated, so each poll is one request for the newest 1,000 rows (23 days on
+2026-10-02). It reads a zone-less date literal as Eastern time without
+declaring a zone, and the client lends the layer the host's zone.
+
+Deeds are not registered: the County's sales table is keyed three to five
+months after a sale, so a 90-day window is empty.
 """
 
 from typing import Dict
@@ -222,6 +239,27 @@ AUGUSTA_DIVISIONS: Dict[str, BoroughMeta] = {
 # Verbose aliases for compatibility (mirrors other city modules).
 GREATER_AUGUSTA_METRO_BBOX = AUGUSTA_METRO_BBOX
 AUGUSTA_CENTER = {"lat": 33.476, "lng": -82.010}
+
+# PERMCODE names the trade that PERM_TYPE leaves out: a "Repair" is electrical
+# under PREL, plumbing under PRPL and mechanical under PRMH, where the HVAC
+# "Change Out"s fall.
+_TRADE_BY_PERMCODE: dict[str, str] = {"PREL": "Electrical", "PRMH": "Mechanical", "PRPL": "Plumbing"}
+
+
+def compose_permit_type(row: dict) -> str | None:
+    """A trade permit's type with its trade first ("Electrical: Service
+    Change"), so it reads as a trade's permit.
+
+    ``DOBPermitsProducer`` calls this for every Augusta permit row. For
+    building, demolition, pool and mobile-home permits it returns None, and
+    the field map reads ``PERM_TYPE`` alone.
+    """
+    trade = _TRADE_BY_PERMCODE.get(str(row.get("PERMCODE") or "").strip().upper())
+    if not trade:
+        return None
+    kind = " ".join(str(row.get("PERM_TYPE") or "").split())
+    return f"{trade}: {kind}" if kind else trade
+
 
 # Leaf-local spatial registration object (the spine references these dicts).
 REGISTRATION = SpatialRegistration(

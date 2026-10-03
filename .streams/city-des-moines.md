@@ -149,14 +149,140 @@ reads only; catalog `modified` dates ignored.
     4 res-5 grid tiles in the built manifest, in `facts.json` and
     `cities/des_moines.json`.
 
+## Follow-up claim: code cases as the `violations` feed (2026-09-29, same stream id)
+
+Second hold on this stream, opened after the `poll_job` / `parse_socrata_row` fix
+(PR #67) removed the only blocker recorded for Code Case. Work is on
+`claude/project-thread-ojmh0q-dsm-code-cases`, stacked on PR #67.
+
+- **Leaf files I will create/edit:**
+  `apps/api/src/spatial/cities/data/des_moines.yaml` (`datasets.violations`),
+  `apps/api/src/spatial/cities/des_moines.py` (docstring only),
+  `apps/api/tests/unit/test_producers_des_moines.py`,
+  `docs/research/probe-des_moines.md`, `.streams/city-des-moines.md` (this file),
+  `.streams/dispatch-log.md` (the Des Moines row).
+- **Spine files I expect to need (one hold, same as the yaml entry):**
+  `apps/api/src/config.py` (one settings field for the new endpoint). No
+  `city_registry.py`, `scheduler.py` or producer edit is expected: the `violations`
+  producer key, topic and `FeedType.VIOLATIONS` already exist.
+- **Generated surfaces to re-run:** `bun run facts:export` (apps/product) and
+  `python3 scripts/export_dashboard.py`; both compare against the registry.
+- **Explicitly NOT touched:** every other city, the scheduler and the two
+  enforcement producers, `watermarks.py` (`maps.dsm.city` is already an ANSI host).
+
+### Follow-up decisions and findings: code cases (2026-09-29, times UTC)
+
+- 22:20-22:50Z — Live re-probe of layer 0 (`maps.dsm.city` ArcGIS Server 10.91,
+  default curl User-Agent, 26 requests a few seconds apart, no WAF response; one of
+  them, a two-field distinct count, was rejected by the server for its shape). Rows **33,061** (unchanged; `created_date` still the single reload
+  stamp 2026-09-27 06:00 CDT, so no reload on Mon 09-28 or Tue 09-29). Newest
+  non-future `DateOpened` **2026-09-25** (35 rows), **0** future-dated rows (max
+  over all rows is 09-25). `>= date` windows: 7d (on/after 09-22) **190**, 30d
+  (08-30) **795**, 60d (07-31) 1,843, 90d (06-30) 2,908; the 7d and 30d were also
+  confirmed with server-side `returnCountOnly`. 275 distinct opened days since
+  2025-09-01; 256 in the trailing 12 months (2025-09-29..2026-09-25); **longest gap
+  between consecutive opened days = 5 days** (2025-11-26 to 12-01 and 2025-12-24 to
+  12-29, both holiday weeks; the next longest are 4 days). Weekday-continuous:
+  Mon-Fri only, apart from 6 Sunday-dated days (19 rows).
+- `DateOpened > date '2026-09-18'` with `orderByFields=DateOpened DESC,OBJECTID DESC`
+  works (5 newest rows returned in OBJECTID-descending order within the shared
+  day). The ISO string `DateOpened > '2026-09-24T05:00:00'` returns JSON error 400
+  "Unable to complete operation." (HTTP 200 body). `> date '2026-09-25'` 0,
+  `>= date` 35, `= date` 35, so `date '...'` is local midnight, like the rental
+  layer. `maps.dsm.city` was already an ANSI host.
+- `CaseNumber` is unique (33,061 distinct = rows, none blank), `DateOpened` never
+  null. All 33,061 rows have a point inside the registered metro bbox (envelope
+  count), layer extent lng -93.7085..-93.5015, lat 41.5016..41.6526 (four city
+  divisions only). `CaseType`: 9 category values; `Status`: 18 workflow values.
+- **`Description` is NOT mapped**: free text, 14,568 distinct values on 33,061 rows
+  (12,977 empty), with staff initials, names and complaint notes. `Remark` is
+  empty on all rows today (0 non-empty) but is a free-text column; editor columns
+  hold one service account (1 distinct value each). With no mapping the shared
+  producer's lower-case fallbacks (`description`, `case_type`) find nothing on
+  these capitalized columns, so the event `description` is None (verified on the
+  newest 500). Fixtures replace `Remark`, `Description` (where non-empty) and both
+  editor columns with `REDACTED`.
+- **Cadence 7** (alarm 14 days): the data gap alone justifies 3-4, but the reload is
+  not proven daily (same map service as the rental layer; one reload stamp, none on
+  09-28 or 09-29), and a weekly reload plus a holiday gap puts the newest opened
+  day up to about 10 days old; 3 would false-alarm. Same value and reason as `sla`.
+- `ArcGISClient.paginate` takes no `select`/`outFields`, so `outFields=*` cannot be
+  narrowed by the spec: the free-text and editor columns still travel in a raw
+  row, and would be written to the DLQ payload if a row failed to parse (0 of the
+  newest 500 do; every row has a point). Platform-wide, not a Des Moines
+  decision; flagged in the probe doc.
+- Data-quality: every `Address` is served with a trailing space (500 of 500 newest);
+  `parse_row` does not strip, so `ViolationEvent.address` keeps it. Not fixed here
+  (shared producer, spine-adjacent); pinned in the tests.
+- `scripts/backfill_probe.py` has no `violations` entry in `PRODUCERS`, so it cannot
+  run this job as shipped (it would raise "No producer registered for key
+  'violations'"; Austin and Boston violations are affected the same way).
+  Not edited here (outside the claimed files); G5 runs its own `probe_feed` with the
+  producer supplied by monkeypatch, the way `test_backfill_probe.py` does.
+
+- Registration edits (one hold, back to back, interlock run straight after): yaml
+  `datasets.violations` (arcgis, `DateOpened`, ids `CaseNumber` then `OBJECTID`,
+  `order_by DateOpened DESC, OBJECTID DESC`, interval 1800, cadence 7, no `where`,
+  field map `violation_id`/`code`/`status`/`status_date`/`address`) and
+  `config.py` `arcgis_des_moines_code_cases_url`. No scheduler, producer, registry
+  or `watermarks.py` edit. `des_moines.py` docstring only.
+- Tests (`test_producers_des_moines.py`, 39 -> 60): real rows redacted as above, spec
+  and field-map assertions, parse into `ViolationEvent`, and a `poll_job` test for
+  `violations_des_moines` (events under `des_moines:<CaseNumber>`, watermark
+  `2026-09-25T05:00:00` from `DateOpened`, next `where_clause` is
+  `DateOpened > date '2026-09-25'`). Mutation-checked: mapping `Description`, changing
+  the watermark column, dropping the OBJECTID tiebreak and pointing `status_date` at
+  `DateClosed` each make 2-5 of the new tests fail.
+- G5 (`scripts/backfill_probe.py`'s own `probe_feed`, producer supplied in-process,
+  transport replaced by curl-captured rows because the shipped `PRODUCERS` table has no
+  `violations`): newest 500 rows **500 / 500 parsed (1.0), 0 dropped**, source count
+  33,061, `watermark_seen` 2026-09-25T05:00:00+00:00; points 500/500, in metro bbox
+  500/500, addresses 500/500, division resolved 500/500, `description` set 0/500.
+  Production shape (spec `order_by`) identical. Floor 99% (native points).
+- Live cross-check through the real scheduler (orchestrator, after the agent pass):
+  `poll_job` on `violations_des_moines` with only Kafka mocked published 500 / 500
+  newest rows, 0 DLQ, watermark `2026-09-25T05:00:00`; the next poll sent
+  `DateOpened > date '2026-09-25'` with the registered ordering and returned 0 rows,
+  SUCCESS.
+- Staleness check on the replayed sample: threshold 14 days, newest watermark
+  2026-09-25, age 4.74 days at 22:50Z, not stale; the alarm would trip at about
+  2026-10-09 05:00Z (15.04 days at 2026-10-10 06:00Z) without a new reload.
+- Derived artifacts: `bun run facts:export` -> `SITE_FACTS_OK (157 metros)`, and
+  `python3 scripts/export_dashboard.py` rewrote `index.html`; both are byte-identical
+  to HEAD because `facts.json` covers only the permits/311/sla/deeds families and the
+  dashboard is built from the registry's metros. README and PRODUCT count metros
+  (157, unchanged) and not feeds, so neither changed.
+- Gates, final (times UTC, after the last code edit; docs and `.streams` are not gate
+  inputs):
+  - `cd apps/api && python -m pytest -m interlock -v`: `35 passed, 5022 deselected`
+  - `python -m pytest tests/unit/test_producers_des_moines.py -v`: `60 passed`
+  - `python -m pytest tests/unit/test_scheduler.py -v` (offline proxies): `25 passed`
+  - `python -m pytest tests/unit/test_producers_enforcement_signals.py -v`: `11 passed`
+  - `python3 scripts/verify_cicd_preflight.py` (exit 0): interlock gate, dashboard <->
+    product cross-ref, product facts:check, product lint, dashboard export and ruff
+    check all `OK`; `CI/CD pre-flight green - all gates pass`.
+  - `ruff check` on `config.py`, `des_moines.py`, `test_producers_des_moines.py`:
+    `All checks passed!` (baseline at HEAD also clean).
+  - Also green, one process each: `test_registry_cadence`, `test_derived_registry`,
+    `test_acquisition`, `test_backfill_probe`, `test_backfill_loader`,
+    `test_feed_staleness_probe`, `test_feedtype_taxonomy`, `test_field_maps`,
+    `test_watermarks`, `test_scheduler_watermark_state`, `test_export_snapshot`.
+- Raw captures (newest-500 pages, group-by and Description dumps) were kept in the
+  scratchpad only and deleted at the end; the fixtures in the test file are the only
+  copy, redacted.
+
 ## Current step
 
-Done: `des_moines` is registered with one feed (`sla`), committed on
-`claude/project-thread-ojmh0q` and up for review in PR #66.
+Follow-up done on `claude/project-thread-ojmh0q-dsm-code-cases` (stacked on PR #67):
+`des_moines` now registers two feeds, `sla` (PR #66) and `violations` (the Code Case
+layer). Gates green (see the follow-up decisions). Nothing is parked
+mid-edit: the yaml entry, the settings field and the tests landed together and the
+interlock ran clean afterwards.
 
 ## Next step
 
-Review and merge PR #66. Follow-ups
-(none started): the `violations` / `inspections` scheduler fix, an EnerGov platform
-client, a two-key `parcel_join`, and the re-probe triggers in
-`docs/research/probe-des_moines.md`.
+Open follow-ups (none started): make
+`scripts/backfill_probe.py` know the `violations` (and `inspections`) producers so G5
+runs without a harness, an EnerGov platform client, a two-key `parcel_join`, and the
+re-probe triggers in `docs/research/probe-des_moines.md` (code cases: re-read
+`created_date` after the next Sunday to see whether the reload is daily).

@@ -1,26 +1,15 @@
 DEEDS_FIELD_MAP = {
-    "doc_id": ["PARCELID", "OBJECTID"],
-    "bbl": ["PARCELID"],
-    "doc_type": ["DEED_TYPE"],
-    "document_amount": ["SALE_PRICE"],
-    "recorded_date": ["SALE_DATE"],
-    "address_street": ["SITEADDRESS"],
-    "incident_address": ["SITEADDRESS"],
-    "borough": ["CITY"],
-    "zipcode": ["ZIP5"],
+    "doc_id": ["PARID"],
+    "bbl": ["PARID"],
+    "document_amount": ["Sales_Price", "Sale_Price"],
+    "recorded_date": ["Last_Sales_Date"],
+    "address_street": ["Prop_Location"],
+    "incident_address": ["Prop_Location"],
 }
 
 FIELD_MAP = {
     "deeds": DEEDS_FIELD_MAP,
 }
-
-NON_CANDIDATE_METADATA_COLUMNS = (
-    "VALID",
-    "MultiSale",
-    "PARCEL_SOURCE",
-    "BOOK",
-    "PAGE",
-)
 
 """Charleston, WV Metro Submarket Registry and Spatial Layer for Urban Signal.
 
@@ -29,22 +18,24 @@ division catalog, and geographic bounding boxes for the City of Charleston,
 WV (Kanawha County seat on the Kanawha River — deliberately nested inside the
 Kanawha Valley corridor, not overlapping the sibling Charleston SC leaf box).
 
-Feed scope (best-effort, 2026-08-28; endpoint not live-probed): Charleston,
-WV publishes an open-data parcel FeatureServer (``Charleston_Parcels`` on the
-services8.arcgis.com AGOL org). The live attribute schema (sale-date /
-sale-price / deed-type columns, native parcel polygon availability) is not yet
-confirmed, so the DEEDS feed below mirrors the Rochester ACRIS-shape contract
-as the working hypothesis:
+Feeds (probed 2026-09-30):
 
-* DEEDS — ``Charleston_Parcels/FeatureServer/0``. Assumed TEXT ``SALE_DATE``
-  watermark and native parcel polygons (``needs_geocode=False``). The exact
-  watermark format and id keys should be re-probed against the live layer once
-  the producer is wired; the field map is a best-effort placeholder.
+* DEEDS — the Kanawha County Assessor's parcel layer
+  (``kanawhacountyassessorgis.com``, ``Parcel_Line_Layer/MapServer/1``, the
+  September 2026 vintage). Each parcel carries its last sale date and price.
+  The assessor posts sales about four months late and publishes a new vintage
+  a few times a year, so the expected cadence is 180 days. The layer has no
+  city column; tax districts 09 to 14 hold about 94% of the parcels inside the
+  metro box, so the feed reads those, as a snapshot, newest sale first,
+  selecting only non-owner columns. The host rejects ISO date literals
+  (``ANSI_DATE_LITERAL_HOSTS``). Parcel polygons supply coordinates. The
+  ``Charleston_Parcels`` layer registered until 2026-09-30 is Charleston,
+  South Carolina.
+* PERMITS / SLA / 311 — none published. Tier 3.
 
-NOTE: this is a DEEDS-led partial metro (no permits/SLA/311 datasets confirmed
-for the Charleston WV open-data portal at implementation time). Tier 3 feeds
-are intentionally omitted per the partial-registration rule. Re-probe the live
-layer before promoting any downstream consumer.
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
 """
 
 
@@ -279,47 +270,40 @@ CWV_DIVISIONS = CHARLESTON_WV_DIVISIONS
 
 # ---------------------------------------------------------------------------
 # Feed specs (leaf-local; the spine copies these into REGISTRY).
-# Best-effort DEEDS contract mirroring the Rochester ACRIS-shape pattern; the
-# live Charleston_Parcels attribute schema is not yet confirmed (see module
-# docstring). Endpoint is a real AGOL FeatureServer published by the City of
-# Charleston, WV. Re-probe before promoting downstream consumers.
+# Charleston WV deeds: Kanawha County Assessor parcels, tax districts 09-14.
 # ---------------------------------------------------------------------------
 CHARLESTON_WV_DEEDS_ENDPOINT = (
-    "https://services8.arcgis.com/0zSnoqwLCR3i1Yfw/arcgis/rest/services/"
-    "Charleston_Parcels/FeatureServer/0"
+    "https://kanawhacountyassessorgis.com/server/rest/services/Parcel_Line_Layer/MapServer/1"
 )
 
 CHARLESTON_WV_FEED_SPECS: dict[str, dict[str, object]] = {
     "deeds": {
         "endpoint": CHARLESTON_WV_DEEDS_ENDPOINT,
         "platform": "arcgis",
-        "watermark_col": "SALE_DATE",
-        "id_keys": ["PARCELID", "OBJECTID", "SALE_DATE"],
+        "watermark_col": "Last_Sales_Date",
+        "id_keys": ["PARID", "Last_Sales_Date"],
         "topic_key": "topic_deeds",
-        "interval_seconds": 600.0,
+        "interval_seconds": 1800.0,
         "producer_key": "deeds",
         "extra": {
-            # Native parcel polygons assumed to supply row coordinates; the
-            # ADR-0004 geocode hook is NOT declared until the live layer is
-            # confirmed to carry geometry. SALE_DATE assumed TEXT; the exact
-            # watermark format must be re-probed against the live layer.
-            "needs_geocode": False,
-            "watermark_type": "text",
-            "watermark_format": "%m/%d/%Y",
+            "order_by": "Last_Sales_Date DESC, OBJECTID DESC",
+            "select": (
+                "OBJECTID,PARID,DIST,Last_Sales_Date,Deed_Book,Deed_Page,Sales_Price,Sale_Price,"
+                "Prop_Location"
+            ),
+            "where": (
+                "Last_Sales_Date IS NOT NULL AND Last_Sales_Date <= CURRENT_TIMESTAMP AND DIST IN "
+                "('09','10','11','12','13','14')"
+            ),
+            "ingestion_mode": "snapshot",
             "oid_field": "OBJECTID",
-            "max_record_count": 100000,
-            "expected_cadence_days": 30,
+            "max_record_count": 2000,
+            "expected_cadence_days": 180,
             "non_spatial": False,
+            "composite_id": True,
             "scope": (
-                "Charleston WV DEEDS/sales via the City of Charleston, WV open-data "
-                "Charleston_Parcels FeatureServer (services8.arcgis.com AGOL org; "
-                "endpoint real, attribute schema UNCONFIRMED at implementation). "
-                "Mirrors the Rochester ACRIS-shape contract as a working hypothesis: "
-                "TEXT SALE_DATE watermark, native parcel polygons (no ADR-0004 "
-                "geocode hook declared yet), PARCELID/OBJECTID id keys. Re-probe the "
-                "live layer to confirm watermark format and field names before "
-                "promoting any downstream consumer. No permits/SLA/311 datasets are "
-                "confirmed for the Charleston WV open-data portal (Tier 3 omitted)."
+                "Charleston WV deeds from the Kanawha County Assessor parcel layer, tax districts "
+                "09-14, newest sale first; owner columns are never selected."
             ),
             "field_map": DEEDS_FIELD_MAP,
         },
@@ -331,8 +315,9 @@ def get_charleston_wv_dataset(feed: object) -> object:
     """Leaf-local mirror of ``city_registry.get_dataset``.
 
     Returns the spec for a registered Charleston WV feed, or raises ``KeyError``
-    naming the city and available feeds when the feed is absent (permits/SLA/
-    311 are not yet registered for Charleston WV).
+    naming the city and available feeds when the feed is absent (permits and
+    311 are not yet registered for Charleston WV). SLA is the corpus's
+    shared SNAP slice, which this mirror does not carry.
     """
     from src.config import settings
     from src.spatial.city_registry import DatasetSpec

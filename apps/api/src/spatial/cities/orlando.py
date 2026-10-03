@@ -52,8 +52,25 @@ feeds, no PERMITS / 311 / DEEDS in this ticket.
   do not invent a FeedType. The STR occupancy / investor-buyout reading is a
   later signal-family decision, not this leaf.
 
-Both endpoints were live-verified on 2026-08-27. Permits ``ryhf-m453`` is
-also live+geocoded and is deliberately **out of ticket scope**.
+Both endpoints were live-verified on 2026-08-27.
+
+PERMITS (2026-10-02): the corpus registers the City's permit applications,
+``ryhf-m453``, in place of the statewide parcel layer, whose county code 48
+read Levy County's parcels. The feed reads issued permits only, newest first
+by issue date (6,977 in the 90 days to 2026-10-02), up to 3,000 a poll: the
+newest issue date trailed the table's update by eight days, so a week of
+permits can land at once. Its ``geocoded_column`` is empty on new rows (1 of
+those 6,977), so each permit takes the City's own address point for its
+address (``Address_Point/22``, ``SitusAddress``, 120,252 points), and the
+geocoder places the rest with ``Orlando, FL``. Of the first poll's 3,000
+permits on 2026-10-02, the address points placed 2,860 and the geocoder 52
+more. The geocoder alone placed 683 of the newest 1,000 and missed whole new
+subdivisions (Vista Park, Southeastern Oaks, Meridian Park). ``select`` names
+the columns it reads and leaves the owner, contractor, private-provider and
+project names on the server. The permit type is the work type ahead of the
+application type (``New Building Permit``), so new buildings read as new
+construction and trade permits as trade work. This mirror still carries the
+SLA feeds only.
 """
 
 from typing import Dict

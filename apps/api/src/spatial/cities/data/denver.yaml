@@ -233,7 +233,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'CO'
+    where: State = 'CO' AND Latitude BETWEEN 39.55 AND 39.95 AND Longitude BETWEEN -105.2 AND -104.5
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -272,6 +272,62 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 2000
+  deeds:
+    endpoint: https://services1.arcgis.com/zdB7qR0BtYrg0Xpl/arcgis/rest/services/ODC_PROP_PARCELS_A/FeatureServer/245
+    platform: arcgis
+    watermark_col: SALE_DATE
+    id_keys:
+    - SCHEDNUM
+    - SALE_DATE
+    - RECEPTION_NUM
+    topic: raw.municipal.deeds
+    interval_seconds: 21600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: SALE_DATE DESC, OBJECTID DESC
+    id_col: null
+    select: OBJECTID,SCHEDNUM,SALE_DATE,SALE_PRICE,RECEPTION_NUM,ASAL_INSTR
+    fallback_endpoints: []
+    where: SALE_DATE >= CURRENT_DATE - INTERVAL '90' DAY AND SALE_DATE <= CURRENT_TIMESTAMP
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - RECEPTION_NUM
+      - SCHEDNUM
+      recorded_date:
+      - SALE_DATE
+      document_amount:
+      - SALE_PRICE
+      bbl:
+      - SCHEDNUM
+      doc_type:
+      - ASAL_INSTR
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    batch_limit: 4000
+    composite_id: true
 aliases:
 - denver_co
 - denver-co

@@ -34,9 +34,6 @@ FIELD_MAP = {
         "doc_type": ["LAND_CLASS", "PARCEL_TYPE"],
         # Borough resolves from the neighborhood string; township/city behind it.
         "borough": ["NEIGHBORHOOD", "TOWNSHIP", "CITY"],
-        # Assessor parcel table has no grantor/grantee split; owner is the
-        # best-effort grantor column. Grantee left unmapped.
-        "party1_grantor": ["PROPERTY_OWNER"],
         # Parcel identifier.
         "bbl": ["PIN", "REID", "PARCEL_PK"],
     },

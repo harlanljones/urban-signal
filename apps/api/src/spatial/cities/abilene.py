@@ -3,6 +3,20 @@
 Leaf module: geometry only. Feed specs live in the spine (city_registry) and
 are currently limited to SNAP Retailers (TX slice) pending a verifiable public
 city permits endpoint (US-278 — municipal verification required before permits).
+(Superseded 2026-10-02: see PERMITS below.)
+
+PERMITS (2026-10-02): the City's MyGov "TCADBuildingPermitsWithProjInfo"
+workbook (``public.mygov.us/tx_abilene``, report 371), built once a month,
+around the 28th, with the building permits issued in the previous calendar
+month (652 for August, built on 2026-09-28). Each row has its permit number,
+template, status, start and issue times written as ``MM/DD/YYYY at H:MM
+AM``, valuation, address, ZIP code and point, one ``lng, lat`` column, so
+permits reach the stream one to two months after they are issued.
+Occupancy certificates and itinerant businesses are left out. 35 of
+August's points lay in Houston, Flagstaff or western Colorado and 3 permits
+had none; the metro clip drops them. The workbook's 71 columns also name
+who a permit was issued to and by, who created and manages it, and its
+contacts; the request keeps nine.
 """
 
 from typing import Dict

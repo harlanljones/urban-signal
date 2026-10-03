@@ -25,12 +25,15 @@ Provides neighborhood metadata, camera positioning, investment metrics,
 division catalog, and geographic bounding boxes for the City of Toledo, OH
 and inner Lucas County (Ottawa Hills / Maumee edge / Sylvania Township edge).
 
-Toledo is a ONE-FEED PARTIAL metro: COMPLAINTS_311 (``Public/
-CityWorks_ServiceRequest_2022`` layer 0 on ``gis.toledo.oh.gov``). PERMITS
-(`permits.toledo.oh.gov` portal, 403 to anonymous probes, no Accela tenant),
-SLA (static Rental Registry shapefile export only) and DEEDS (For_Sale_Data
-is city-surplus parcels, no transfer stream) are Tier 3 and stay
-unregistered.
+Toledo's leaf spec here is COMPLAINTS_311 (``Public/
+CityWorks_ServiceRequest_2022`` layer 0 on ``gis.toledo.oh.gov``). The
+corpus file ``data/toledo.yaml`` also registers SLA from the SNAP retailers
+in the metro box and DEEDS (2026-09-30) from the Lucas County Auditor's
+ArcGIS Online ``Lucas_Sales`` layer, which puts each recorded sale in the
+county at a point; ``metro_clip`` keeps the ones inside the metro box.
+Earlier probes read the Auditor's own GIS server, whose public layers carry
+no sales. PERMITS (`permits.toledo.oh.gov` portal, 403 to anonymous probes,
+no Accela tenant) stays unregistered.
 
 Live-probe caveats that define this leaf (2026-08-28, US-359; re-probed
 2026-08-27 23:04 UTC, newest ``INIT_DATE`` 2026-08-27T23:04:37+00:00,

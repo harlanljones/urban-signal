@@ -460,7 +460,7 @@ datasets:
     watermark_exclude: []
     order_by: permitissuedate
     id_col: cartodb_id
-    select: '*, ST_Y(the_geom) AS latitude, ST_X(the_geom) AS longitude'
+    select: cartodb_id, permitnumber, permitissuedate, permitdescription, typeofwork, status, address, zip, council_district, ST_Y(the_geom) AS latitude, ST_X(the_geom) AS longitude
     fallback_endpoints: []
     where: null
     needs_geocode: false
@@ -470,6 +470,13 @@ datasets:
       - permitnumber
       issuance_date:
       - permitissuedate
+      job_type:
+      - permitdescription
+      - typeofwork
+      status:
+      - status
+      address_street:
+      - address
       borough:
       - council_district
       zipcode:
@@ -622,10 +629,6 @@ datasets:
       - total_consideration
       bbl:
       - opa_account_num
-      party1_grantor:
-      - grantors
-      party2_grantee:
-      - grantees
     ingestion_mode: incremental
     oid_field: null
     max_record_count: null

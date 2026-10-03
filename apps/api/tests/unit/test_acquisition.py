@@ -233,7 +233,7 @@ def test_where_ansi_host_literal():
         high_watermark="2026-01-01T00:00:00",
         endpoint=endpoint,
     )
-    assert got == "GIS_DATETIME > date '2026-01-01'"
+    assert got == "GIS_DATETIME > timestamp '2026-01-01 00:00:00'"
 
 
 def test_where_ckan_text_literal():
@@ -349,6 +349,9 @@ def test_event_watermark_skips_future():
 def test_event_watermark_tracking_matches_scheduler_poll():
     s = _scheduler()
     job_name = "permits"
+    # ISO rows take the untyped path; the registry's NYC permits name
+    # month-first text dates.
+    s.job_metadata[job_name].update(watermark_type=None, watermark_format=None)
     s.metrics[job_name].high_watermark = None
     rows = [
         {
@@ -400,9 +403,9 @@ def test_newest_valid_watermark_drops_future():
 
 
 # --------------------------------------------------------------------------- #
-# 5. Per-platform pagination-key translation matches what adapters receive    #
+# 5. Pagination-key translation: the legacy splat builder                     #
 # --------------------------------------------------------------------------- #
-def test_pagination_kwargs_match_scheduler_for_every_job():
+def test_pagination_kwargs_match_legacy_splat_for_every_job():
     s = _scheduler()
     for job_name, meta in s.job_metadata.items():
         spec = AcquisitionSpec(
@@ -458,8 +461,8 @@ def test_pagination_kwargs_includes_declared_keys_for_csv():
 
 
 def test_pagination_kwargs_uniform_across_platforms():
-    # The scheduler forwards the same dict to every platform today; the engine
-    # reproduces that (the latent per-platform bug is documented, not changed).
+    # The legacy splat is the same dict for every platform. poll_job no longer
+    # forwards it; see test_scheduler.py's real-signature poll test.
     spec = AcquisitionSpec.from_dataset_spec(
         DatasetSpec(
             endpoint="https://x/y.json",

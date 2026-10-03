@@ -61,7 +61,12 @@ def test_milwaukee_registers_sla_permits_and_deeds():
     # GIS_DATETIME is the layer-update timestamp (always current); expiry
     # dates are future-dated and would trip the future-watermark guard.
     assert sla.watermark_col == "GIS_DATETIME"
-    assert sla.interval_seconds == 600.0
+    # Every refresh restamps all 1,275 rows with one GIS_DATETIME, so a
+    # filter on it re-read the same slice: each poll reads the whole layer,
+    # two pages, at most every half hour.
+    assert sla.ingestion_mode == "snapshot"
+    assert sla.batch_limit == 2000
+    assert sla.interval_seconds == 1800.0
     assert sla.producer_key == "sla"
     assert sla.expected_cadence_days == 7
     assert sla.oid_field == "OBJECTID"

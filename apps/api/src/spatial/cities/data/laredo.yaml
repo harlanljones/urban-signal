@@ -142,11 +142,10 @@ datasets:
     platform: ckan
     watermark_col: PERMIT ISS. DATE
     id_keys:
-    - APP NBR
-    - APP_NBR
     - APP YR
-    - APP_YR
-    - _id
+    - APP NBR
+    - PERMIT SEQUENCE
+    - PERMIT TYPE
     topic: raw.municipal.permits
     interval_seconds: 3600.0
     producer_key: permits
@@ -156,59 +155,90 @@ datasets:
     watermark_exclude: []
     order_by: null
     id_col: null
-    select: null
+    select: _id,APP YR,APP NBR,PERMIT SEQUENCE,PERMIT TYPE,PERMIT TYPE DESC,APP TYPE DESC,Permit Group Type,Permit Group Tab,PERMIT STATUS DESC,APP STAT DESC,PERMIT ISS. DATE,VALUATION,STREET NBR,STREET
     fallback_endpoints: []
-    where: null
+    where: '"Permit Group Type" NOT IN (''Vendor'', ''Internal use'', ''Business'', ''Fire Dept'', ''Right-of-Way/Utility'', ''NEZ and Pave/Parking'')'
     needs_geocode: true
     geocode_context: Laredo, TX
     field_map:
       job_id:
-      - APP_NBR
-      - APP_YR
       - _id
       issuance_date:
-      - PERMIT_ISS_DATE
-      filing_date:
-      - PERMIT_ISS_DATE
+      - PERMIT ISS. DATE
       status:
-      - PERMIT_STATUS_DESC
-      - PERMIT_STATUS
-      - APP_STAT_DESC
-      - APP_STATUS
+      - PERMIT STATUS DESC
+      - APP STAT DESC
       job_type:
-      - APP_TYPE_DESC
-      - PERMIT_TYPE_DESC
-      - Permit_Group_Type
-      - Permit_Group_Tab
+      - Permit Group Type
+      - PERMIT TYPE DESC
+      - APP TYPE DESC
       cost:
       - VALUATION
-      - TOTAL_FEE
-      - PERMIT_FEE
-      valuation:
-      - VALUATION
-      total_fee:
-      - TOTAL_FEE
       address_street:
+      - address_street
       - STREET
-      - STREET_NBR
-      street_number:
-      - STREET_NBR
-      street_name:
-      - STREET
-      description:
-      - APP_DESC
-      - Permit_Group_Type
-      permit_type:
-      - PERMIT_TYPE
-      - APP_TYPE
-      permit_sequence:
-      - PERMIT_SEQUENCE
-      borough:
-      - Permit_Group_Tab
     ingestion_mode: incremental
     oid_field: null
     max_record_count: 1000
     expected_cadence_days: 30
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    composite_id: true
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'TX' AND Latitude BETWEEN 27.4 AND 27.75 AND Longitude BETWEEN -99.65 AND -99.3
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false

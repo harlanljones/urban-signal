@@ -13,8 +13,9 @@ ALIASES entry, no DatasetSpec in REGISTRY). They exercise the leaf directly:
 * the producer path by monkeypatching ``resolve_field_map`` and
   ``geocode_row_if_declared``.
 
-Partial city: PERMITS CSV only. Do not register AGIS City_Building_Permits,
-311 CRM, the frozen business-registration dump, or deeds.
+The leaf mirror carries the PERMITS CSV only; the corpus also registers 311
+from the City's CRM layer (test_albuquerque_311.py). Do not register AGIS
+City_Building_Permits, the frozen business-registration dump, or deeds.
 """
 
 from unittest.mock import patch
@@ -159,7 +160,9 @@ class TestFeedRegistration:
         "absent_feed",
         [FeedType.COMPLAINTS_311, FeedType.SLA, FeedType.DEEDS],
     )
-    def test_absent_feeds_raise_readable_errors(self, absent_feed):
+    def test_the_leaf_mirror_raises_readable_errors_for_other_feeds(self, absent_feed):
+        # The registry also holds 311 and the SNAP licences, which the corpus
+        # registers itself.
         with pytest.raises(KeyError, match=r"'albuquerque'.*available"):
             get_albuquerque_dataset(absent_feed)
 
@@ -251,6 +254,9 @@ CABQ_SAMPLE_CSV = (
 class _FakeResponse:
     def __init__(self, text):
         self.text = text
+        # The CSV client reads the downloaded bytes in the response's encoding.
+        self.content = text.encode()
+        self.encoding = "utf-8"
 
     def raise_for_status(self):
         return None

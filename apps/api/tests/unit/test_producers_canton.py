@@ -3,9 +3,10 @@
 Canton registers with the live-verified Stark County Auditor Property Sales
 layer (scgisa.starkcountyohio.gov Auditor/StarkCountySales/MapServer/0,
 300,909 rows, TRANSFER_DATE epoch-ms watermark, WKID 3857 polygon geometry)
-plus the USDA SNAP Retailer SLA slice for OH (snap_sla_spec("OH")). This test
-focuses on the spatial registration contract: metro bbox sanity, division
-containment, and submarket placement inside their declared division bbox.
+plus the USDA SNAP Retailer SLA slice for OH inside the metro bbox
+(snap_sla_spec). This test focuses on the spatial registration contract:
+metro bbox sanity, division containment, and submarket placement inside
+their declared division bbox.
 """
 
 from src.spatial.cities.canton import (

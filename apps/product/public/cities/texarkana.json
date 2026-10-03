@@ -173,7 +173,12 @@
     }
   },
   "feeds": {
-    "permits": null,
+    "permits": {
+      "platform": "excel",
+      "watermark_col": "date_started",
+      "interval_seconds": 21600.0,
+      "topic": "raw.municipal.permits"
+    },
     "311": null,
     "sla": {
       "platform": "socrata",

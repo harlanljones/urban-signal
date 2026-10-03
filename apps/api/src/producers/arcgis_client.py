@@ -9,20 +9,89 @@ Two things differ from Socrata and are handled here rather than by callers:
 * **Paging.** ArcGIS pages with ``resultOffset``/``resultRecordCount`` and reports
   more-pages-available via ``exceededTransferLimit`` rather than by a short page.
   Layers cap a page at ``maxRecordCount`` (1000 for King County parcel sales), so a
-  larger ``batch_size`` is silently truncated server-side.
+  larger ``batch_size`` is silently truncated server-side. A layer whose
+  ``advancedQueryCapabilities`` say it cannot page is read one page per call.
 * **Records.** A feature is ``{"attributes": {...}, "geometry": {...}}``. We flatten
   to the attributes dict so downstream row parsers see a Socrata-shaped record, and
   lift point geometry to ``latitude``/``longitude`` keys when present.
 
 Date fields come back as epoch **milliseconds**; we convert them to ISO 8601 UTC
 strings using the layer's own field metadata, which is fetched once and cached.
+A layer whose ``dateFieldsTimeReference`` names a zone reads ``where`` literals
+in that zone, so the metadata also carries it (``time_zone``). A server that
+reads literals in local time without naming a zone (Augusta's Cityworks) lends
+its layers a zone by host (``LITERAL_TIME_ZONE_BY_HOST``).
 """
 
+import math
 import time
 from datetime import datetime, timezone
 from typing import Any, Dict, Generator, List, Optional
+from urllib.parse import quote, urlsplit
 
 import httpx
+
+from src.producers.tolerant_http import http_client
+
+# Field types a ``where`` clause compares as numbers. A quoted literal against
+# one of them fails on some servers: Roanoke's parcel layer answers
+# ``lrsn IN ('1116')`` with "Invalid data type for expression".
+_NUMERIC_FIELD_TYPES = frozenset(
+    {
+        "esriFieldTypeOID",
+        "esriFieldTypeSmallInteger",
+        "esriFieldTypeInteger",
+        "esriFieldTypeBigInteger",
+        "esriFieldTypeSingle",
+        "esriFieldTypeDouble",
+    }
+)
+
+# Servers older than 11.x name a layer's zone in Windows terms only; each reads
+# with daylight saving or without it, as the reference says.
+_WINDOWS_TIME_ZONES = {
+    "Eastern Standard Time": ("America/New_York", "Etc/GMT+5"),
+    "Central Standard Time": ("America/Chicago", "Etc/GMT+6"),
+    "Mountain Standard Time": ("America/Denver", "Etc/GMT+7"),
+    "US Mountain Standard Time": ("America/Phoenix", "America/Phoenix"),
+    "Pacific Standard Time": ("America/Los_Angeles", "Etc/GMT+8"),
+    "Alaskan Standard Time": ("America/Anchorage", "Etc/GMT+9"),
+    "Hawaiian Standard Time": ("Pacific/Honolulu", "Pacific/Honolulu"),
+}
+_UTC_ZONE_NAMES = frozenset(
+    {"UTC", "Etc/UTC", "Coordinated Universal Time", "GMT", "Etc/GMT", "Greenwich Standard Time"}
+)
+
+
+def layer_time_zone(reference: Any) -> str | None:
+    """The IANA zone a layer's ``dateFieldsTimeReference`` reads literals in.
+
+    None means UTC: no reference, or a UTC one. DC's 311 layer declares
+    ``America/New_York`` and reads ``date '2026-09-29'`` as 04:00 UTC.
+    """
+    if not isinstance(reference, dict):
+        return None
+    zone = reference.get("timeZoneIANA")
+    if not zone:
+        name = reference.get("timeZone")
+        zones = _WINDOWS_TIME_ZONES.get(name)
+        if zones is None:
+            zone = name
+        else:
+            zone = zones[0] if reference.get("respectsDaylightSaving", True) else zones[1]
+    if not zone or zone in _UTC_ZONE_NAMES:
+        return None
+    return zone
+
+
+# Servers that read a zone-less date literal as local time without declaring
+# ``dateFieldsTimeReference``. Augusta's Cityworks layer stores UTC instants,
+# yet on 2026-10-02 ``DateTimeInit > '2026-10-01T20:04:15'`` matched 7 of the
+# 20 requests created after 20:04:15 UTC; the same instant written in Eastern
+# time, or with a ``Z``, matched all 20.
+LITERAL_TIME_ZONE_BY_HOST: dict[str, str] = {
+    "augcw.augustaga.gov": "America/New_York",
+}
 
 
 class ArcGISClient:
@@ -37,7 +106,10 @@ class ArcGISClient:
         self.timeout = timeout_seconds
         self.max_retries = max_retries
         self.return_geometry = return_geometry
-        # layer_url -> {"date_fields": set[str], "oid_field": str, "max_record_count": int}
+        # layer_url -> {"date_fields": set[str], "numeric_fields": set[str],
+        #               "coded_values": dict[str, dict[str, str]], "oid_field": str,
+        #               "max_record_count": int, "time_zone": str | None,
+        #               "paginates": bool}
         self._layer_meta: Dict[str, Dict[str, Any]] = {}
 
     # ------------------------------------------------------------------ helpers
@@ -47,13 +119,23 @@ class ArcGISClient:
         """Strip a trailing ``/query`` so callers may pass either form."""
         return endpoint_url.rstrip("/").removesuffix("/query")
 
+    # ArcGIS Online and other IIS-fronted servers answer 404 to a GET whose
+    # URL passes about 2,000 characters; Esri's own clients send such a query
+    # as a POST, which every query operation accepts.
+    _MAX_GET_URL = 2_000
+
     def _request_json(self, url: str, params: Dict[str, Any]) -> Dict[str, Any]:
-        """GET a JSON payload with exponential backoff, raising on ArcGIS error bodies."""
+        """GET a JSON payload with exponential backoff, raising on ArcGIS error bodies.
+
+        A query too long for a GET URL (a text watermark's list of dates) is
+        POSTed as a form instead.
+        """
+        long_query = len(str(httpx.URL(url, params=params))) > self._MAX_GET_URL
         backoff = 1.0
         for attempt in range(1, self.max_retries + 1):
             try:
-                with httpx.Client(timeout=self.timeout) as client:
-                    resp = client.get(url, params=params)
+                with http_client(url, timeout=self.timeout) as client:
+                    resp = client.post(url, data=params) if long_query else client.get(url, params=params)
                     if resp.status_code == 429:
                         time.sleep(backoff)
                         backoff *= 2.0
@@ -81,7 +163,8 @@ class ArcGISClient:
         return {}
 
     def get_layer_metadata(self, endpoint_url: str) -> Dict[str, Any]:
-        """Fetch and cache a layer's date fields, OID field, and server page cap."""
+        """Fetch and cache a layer's field types, coded-value names, OID field,
+        page cap and time zone."""
         layer_url = self._normalize_layer_url(endpoint_url)
         if layer_url in self._layer_meta:
             return self._layer_meta[layer_url]
@@ -92,8 +175,31 @@ class ArcGISClient:
             "date_fields": {
                 f["name"] for f in fields if f.get("type") == "esriFieldTypeDate"
             },
-            "oid_field": payload.get("objectIdField") or "OBJECTID",
+            "numeric_fields": {
+                f["name"] for f in fields if f.get("type") in _NUMERIC_FIELD_TYPES
+            },
+            # Each coded field's names by code, as text: a form's choice
+            # list stores "130245" and names it "Report a Pothole".
+            "coded_values": {
+                f["name"]: {
+                    str(item.get("code")): item.get("name")
+                    for item in f["domain"].get("codedValues") or []
+                }
+                for f in fields
+                if (f.get("domain") or {}).get("type") == "codedValue"
+            },
+            # A layer that does not name its object-id field still types it:
+            # Larimer County's parcels call theirs OBJECTID_1, and a page
+            # ordered by OBJECTID there answers 400.
+            "oid_field": payload.get("objectIdField")
+            or next((f["name"] for f in fields if f.get("type") == "esriFieldTypeOID"), "OBJECTID"),
             "max_record_count": int(payload.get("maxRecordCount") or 1000),
+            "time_zone": layer_time_zone(payload.get("dateFieldsTimeReference"))
+            or LITERAL_TIME_ZONE_BY_HOST.get(urlsplit(layer_url).hostname or ""),
+            # A server that says it cannot page ignores ``resultOffset``, so a
+            # second request returns the first page again (Augusta's 311).
+            "paginates": (payload.get("advancedQueryCapabilities") or {}).get("supportsPagination")
+            is not False,
         }
         self._layer_meta[layer_url] = meta
         return meta
@@ -109,14 +215,25 @@ class ArcGISClient:
             return value
 
     def _flatten_feature(
-        self, feature: Dict[str, Any], date_fields: set
+        self,
+        feature: Dict[str, Any],
+        date_fields: set,
+        coded_values: Optional[Dict[str, Dict[str, str]]] = None,
     ) -> Dict[str, Any]:
-        """Flatten one ArcGIS feature into a Socrata-shaped flat record."""
+        """Flatten one ArcGIS feature into a Socrata-shaped flat record.
+
+        ``coded_values`` (a layer's names by code, per field) replaces each
+        coded value with its name; a value the domain does not list is kept.
+        """
         record: Dict[str, Any] = dict(feature.get("attributes") or {})
 
         for name in date_fields:
             if name in record:
                 record[name] = self._epoch_ms_to_iso(record[name])
+
+        for name, names in (coded_values or {}).items():
+            if record.get(name) is not None:
+                record[name] = names.get(str(record[name]), record[name])
 
         lng, lat = self._geometry_to_lng_lat(feature.get("geometry") or {})
         if lng is not None and lat is not None:
@@ -187,7 +304,21 @@ class ArcGISClient:
     @staticmethod
     def _normalize_join_value(value: Any) -> str:
         """Normalize a parcel join key without changing its meaningful digits."""
+        if isinstance(value, float) and value.is_integer():
+            # A Double key column reads 1116.0 where an Integer one reads 1116.
+            value = int(value)
         return " ".join(str(value or "").split()).upper()
+
+    @staticmethod
+    def _numeric_literal(value: Any) -> str | None:
+        """A value as an unquoted number for a numeric ``IN``, or None if it is not one."""
+        try:
+            number = float(str(value).strip())
+        except (TypeError, ValueError):
+            return None
+        if not math.isfinite(number):
+            return None
+        return str(int(number)) if number.is_integer() else repr(number)
 
     def fetch_centroid_index(
         self,
@@ -196,6 +327,8 @@ class ArcGISClient:
         join_values: Optional[List[Any]] = None,
         batch_size: int = 1000,
         max_records: Optional[int] = None,
+        via: Optional[Dict[str, str]] = None,
+        where: Optional[str] = None,
     ) -> Dict[str, tuple[float, float]]:
         """Fetch parcel polygons and return a normalized key-to-centroid index.
 
@@ -206,6 +339,17 @@ class ArcGISClient:
         centroid coordinates before this method builds the lookup. Geometry is
         requested through ``returnGeometry``; it is not an attribute field in
         the ``outFields`` selection.
+
+        ``via`` names a table that relates a key the layer does not hold to
+        one it does, as ``{"table": url, "key": ..., "to": ...}``: DC's
+        ``CONDORELATE`` gives a condominium unit's SSL its building's lot
+        (``MAT_SSL``). Each requested value the layer does not match is
+        looked up there and takes its related parcel's centroid.
+
+        ``where`` limits the parcels that can match, joined to every request
+        with ``AND``: a value whose parcel fails it gets no centroid. Pierce
+        County's parcel layer places Tacoma's sales only in the city's tax
+        code areas.
         """
         layer_url = self._normalize_layer_url(endpoint_url)
         values = list(join_values) if join_values is not None else None
@@ -248,7 +392,7 @@ class ArcGISClient:
                     break
                 records, exceeded = self._fetch_page(
                     endpoint_url=layer_url,
-                    where_clause=None,
+                    where_clause=where,
                     order_by="",
                     limit=fetch_limit,
                     offset=offset,
@@ -267,12 +411,9 @@ class ArcGISClient:
                     break
             return index
 
-        # ArcGIS accepts a text-field IN clause. Keep each request small enough
-        # to stay well below URL/server query limits.
-        for start in range(0, len(values), 100):
-            chunk = values[start : start + 100]
-            escaped = ["'" + value.replace("'", "''") + "'" for value in chunk]
-            where = f"{join_key} IN ({','.join(escaped)})"
+        for clause in self._in_clauses(join_key, self._in_literals(layer_url, join_key, values)):
+            if where:
+                clause = f"({clause}) AND ({where})"
             offset = 0
             while True:
                 fetch_limit = batch_size
@@ -282,7 +423,7 @@ class ArcGISClient:
                     return index
                 records, exceeded = self._fetch_page(
                     endpoint_url=layer_url,
-                    where_clause=where,
+                    where_clause=clause,
                     order_by="",
                     limit=fetch_limit,
                     offset=offset,
@@ -296,7 +437,85 @@ class ArcGISClient:
                     return index
                 if not exceeded and len(records) < fetch_limit:
                     break
+        if via:
+            missing = [value for value in values if self._normalize_join_value(value) not in index]
+            index.update(self._centroids_via(layer_url, join_key, via, missing, batch_size, where))
         return index
+
+    def _in_literals(self, layer_url: str, key: str, values: List[str]) -> List[str]:
+        """``values`` as ``IN`` literals: a text key takes quoted literals and
+        a numeric key bare numbers."""
+        if key in self.get_layer_metadata(layer_url).get("numeric_fields", ()):
+            return [lit for lit in map(self._numeric_literal, values) if lit is not None]
+        return ["'" + value.replace("'", "''") + "'" for value in values]
+
+    def _centroids_via(
+        self,
+        layer_url: str,
+        join_key: str,
+        via: Dict[str, str],
+        values: List[str],
+        batch_size: int,
+        where: Optional[str] = None,
+    ) -> Dict[str, tuple[float, float]]:
+        """Centroids for ``values`` through the keys ``via``'s table relates them to."""
+        if not values:
+            return {}
+        table = self._normalize_layer_url(via["table"])
+        key, to = via["key"], via["to"]
+        related: Dict[str, Any] = {}
+        for clause in self._in_clauses(key, self._in_literals(table, key, values)):
+            offset = 0
+            while True:
+                records, exceeded = self._fetch_page(
+                    endpoint_url=table,
+                    where_clause=clause,
+                    order_by="",
+                    limit=batch_size,
+                    offset=offset,
+                    select=f"{key},{to}",
+                )
+                if not records:
+                    break
+                for record in records:
+                    source = self._normalize_join_value(record.get(key))
+                    if source and source not in related and record.get(to) not in (None, ""):
+                        related[source] = record[to]
+                offset += len(records)
+                if not exceeded and len(records) < batch_size:
+                    break
+        if not related:
+            return {}
+        targets = self.fetch_centroid_index(
+            layer_url, join_key, join_values=list(related.values()), batch_size=batch_size, where=where
+        )
+        index: Dict[str, tuple[float, float]] = {}
+        for source, target in related.items():
+            centroid = targets.get(self._normalize_join_value(target))
+            if centroid:
+                index[source] = centroid
+        return index
+
+    # Keep each IN request well below URL limits: Richmond's ArcGIS Online host
+    # answers 404 to a query URL past about 2,000 characters, which 100 quoted
+    # 11-character parcel ids exceed.
+    _IN_MAX_VALUES = 100
+    _IN_MAX_ENCODED = 1_400
+
+    @classmethod
+    def _in_clauses(cls, join_key: str, literals: List[str]) -> Generator[str, None, None]:
+        """``join_key IN (...)`` clauses over ``literals``, each within the limits."""
+        chunk: List[str] = []
+        size = len(quote(f"{join_key} IN ()"))
+        for literal in literals:
+            cost = len(quote(literal)) + 3  # the literal and its encoded comma
+            if chunk and (len(chunk) >= cls._IN_MAX_VALUES or size + cost > cls._IN_MAX_ENCODED):
+                yield f"{join_key} IN ({','.join(chunk)})"
+                chunk, size = [], len(quote(f"{join_key} IN ()"))
+            chunk.append(literal)
+            size += cost
+        if chunk:
+            yield f"{join_key} IN ({','.join(chunk)})"
 
     def _fetch_page(
         self,
@@ -306,6 +525,7 @@ class ArcGISClient:
         limit: int,
         offset: int,
         select: Optional[str] = None,
+        decode_domains: bool = False,
     ) -> tuple:
         """Fetch one page, returning ``(records, exceeded_transfer_limit)``."""
         layer_url = self._normalize_layer_url(endpoint_url)
@@ -326,8 +546,17 @@ class ArcGISClient:
         params["orderByFields"] = order_by or meta["oid_field"]
 
         payload = self._request_json(f"{layer_url}/query", params)
+        if "features" not in payload:
+            # A service root (``.../FeatureServer``) answers /query at HTTP 200
+            # with its own description, ``{"layers": [...]}``. Read as an empty
+            # page, that let five feeds report SUCCESS with zero rows.
+            hint = " (a service root: the endpoint needs a layer index)" if "layers" in payload else ""
+            raise RuntimeError(
+                f"ArcGIS query on {layer_url} returned no features{hint}; keys: {sorted(payload)}"
+            )
         features = payload.get("features") or []
-        records = [self._flatten_feature(f, meta["date_fields"]) for f in features]
+        coded_values = meta.get("coded_values") if decode_domains else None
+        records = [self._flatten_feature(f, meta["date_fields"], coded_values) for f in features]
         return records, bool(payload.get("exceededTransferLimit"))
 
     def paginate(
@@ -337,8 +566,16 @@ class ArcGISClient:
         order_by: str = "",
         batch_size: int = 1000,
         max_records: Optional[int] = None,
+        select: Optional[str] = None,
+        decode_domains: bool = False,
     ) -> Generator[List[Dict[str, Any]], None, None]:
-        """Paginate an ArcGIS layer, yielding batches of flattened records."""
+        """Paginate an ArcGIS layer, yielding batches of flattened records.
+
+        ``select`` is a comma-separated field list sent as ``outFields``, so a
+        layer's owner and buyer columns can stay on the server; without it
+        every column is read. ``decode_domains`` reads each coded value as its
+        name from the layer's coded-value domains.
+        """
         offset = 0
         total_fetched = 0
 
@@ -355,6 +592,8 @@ class ArcGISClient:
                 order_by=order_by,
                 limit=fetch_limit,
                 offset=offset,
+                select=select,
+                decode_domains=decode_domains,
             )
 
             if not records:
@@ -369,4 +608,9 @@ class ArcGISClient:
             # Unlike Socrata, a short page is not proof of exhaustion: the server
             # caps pages at maxRecordCount and flags the truncation instead.
             if not exceeded and len(records) < fetch_limit:
+                break
+            # A server that cannot page answers every offset with the first
+            # page, and Augusta's flags every short page as truncated, so a
+            # poll there is one request.
+            if not self.get_layer_metadata(endpoint_url).get("paginates", True):
                 break

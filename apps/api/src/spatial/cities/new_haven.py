@@ -4,17 +4,17 @@ Provides neighborhood metadata, camera positioning, investment metrics,
 division catalog, and geographic bounding boxes for the City of New Haven
 (New Haven County, CT).
 
-New Haven is a TWO-FEED metro on Connecticut's statewide Socrata portal
-(``data.ct.gov``), reusing the SAME statewide feeds Hartford already carries:
+New Haven reads two feeds from Connecticut's statewide Socrata portal
+(``data.ct.gov``), reusing the SAME statewide feeds Hartford already carries,
+and its 311 requests from SeeClickFix:
 
 * SLA — State Licenses and Credentials (``ngch-56tr``), Tier 1. A broad
   statewide credentials feed (2.66M rows statewide); ``city='NEW HAVEN'`` is
-  a large slice (47,001 rows incl. individual credentials). Watermark
-  ``recordrefreshedon`` (ISO datetime, 0 nulls at probe, daily refresh;
-  newest 2026-08-30). Consistent with the Hartford precedent — but Hartford's
-  inline SLA field_map is STALE (references ``license_number``/
-  ``credential_number`` that do not exist live); the CORRECT columns are
-  pinned in ``field_maps_new_haven.py``.
+  a large slice (47,001 rows incl. individual credentials). Since 2026-09-30
+  the feed also filters ``credentialtype`` to liquor permits (1,022 rows),
+  with the filter and field map shared with Hartford and Bridgeport in
+  ``src/producers/ct_liquor_specs.py``. Watermark ``recordrefreshedon`` (ISO
+  datetime, 0 nulls at probe; newest 2026-08-30).
 * DEEDS — Real Estate Conveyance Tax / property sales (``5mzw-sjtu``), Tier 1.
   Watermark ``daterecorded`` (ISO datetime, 0 nulls at probe). ``serialnumber``
   is NOT row-unique within ``town='New Haven'`` (25,907 distinct vs 25,909
@@ -22,6 +22,16 @@ New Haven is a TWO-FEED metro on Connecticut's statewide Socrata portal
   composite ``["serialnumber", "listyear"]``. ``geo_coordinates`` (a Socrata
   Point) is present on 32.5% of rows but is NOT read by the shared deeds
   producer's nested-loc fallback — see the geo note in the FEED_SPECS scope.
+* 311 (2026-10-02) — the City runs its 311 service on SeeClickFix, which
+  publishes the City's requests as a public view on its own ArcGIS Online org
+  (``Public_SCF_Requests_New_Haven_CT``): one point per request since 2007,
+  about forty a day. Watermark ``created_at``, keyed on SeeClickFix's request
+  ``id`` (not the view's object id, which a rebuild would reassign), filtered
+  to public requests; the summary, description, address, assignee and photo
+  links are never selected. A spatial filter on the view times out, so the
+  poll keeps to attribute filters. Requests on the Morris Cove shore lie
+  south of the metro box and are kept. The corpus registers this feed
+  itself; the feed mirror below carries SLA and DEEDS only.
 
 Live-probe caveats that define this leaf (probed 2026-08-30, US-419):
 
@@ -40,10 +50,12 @@ Live-probe caveats that define this leaf (probed 2026-08-30, US-419):
   is no deed-type column on this feed.
 * SLA ``type`` (INDIVIDUAL/BUSINESS/CORPORATION), ``active`` (0/1),
   ``statusreason``, and ``credentialnumber`` ride the wire but are never
-  field-map candidates; ``businessname`` exists only on BUSINESS/CORPORATION
-  rows so ``premises_name``/``dba`` read ``["businessname", "name"]``.
+  field-map candidates; ``businessname`` exists only on business rows, and
+  ``name`` is the permittee (a person on individually held permits), so
+  ``premises_name``/``dba`` read ``businessname`` and ``dba`` only.
 """
 
+from src.producers.ct_liquor_specs import CT_LIQUOR_SLA_FIELD_MAP, ct_liquor_where
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
 NEW_HAVEN_CITY_ID: str = "new_haven"
@@ -319,18 +331,9 @@ NEW_HAVEN_DIVISIONS: dict[str, BoroughMeta] = {
 NEW_HAVEN_SLA_ENDPOINT = "https://data.ct.gov/resource/ngch-56tr.json"
 NEW_HAVEN_DEEDS_ENDPOINT = "https://data.ct.gov/resource/5mzw-sjtu.json"
 
-SLA_FIELD_MAP: dict[str, list[str]] = {
-    "license_id": ["credentialid", "fullcredentialcode"],
-    "license_type": ["credential", "credentialtype"],
-    "effective_date": ["effectivedate", "issuedate"],
-    "expiration_date": ["expirationdate"],
-    "address_street": ["address"],
-    "zipcode": ["zip"],
-    "borough": ["city"],
-    "premises_name": ["businessname", "name"],
-    "dba": ["businessname", "name"],
-    "status": ["status"],
-}
+# Shared with Hartford and New Haven: liquor permits only, and never the
+# permittee's own ``name``.
+SLA_FIELD_MAP: dict[str, list[str]] = CT_LIQUOR_SLA_FIELD_MAP
 
 DEEDS_FIELD_MAP: dict[str, list[str]] = {
     "doc_id": ["serialnumber"],
@@ -385,18 +388,17 @@ NEW_HAVEN_FEED_SPECS: dict[str, dict[str, object]] = {
             "expected_cadence_days": 7,
             "needs_geocode": True,
             "geocode_context": "New Haven, CT",
-            "where": "city = 'NEW HAVEN'",
+            "where": ct_liquor_where("NEW HAVEN"),
             "order_by": "recordrefreshedon DESC",
             "scope": (
                 "CT State Licenses and Credentials statewide feed filtered to "
-                "city='NEW HAVEN' (47,001 rows incl. individual credentials; "
-                "broad credentials stream, Hartford precedent). Address-only — "
-                "no native lat/lng, needs_geocode=True. Watermark "
-                "recordrefreshedon is a daily refresh stamp with 0 nulls (no "
-                "IS NOT NULL guard); credentialid is row-unique; type/active/"
-                "statusreason/credentialnumber are never field-map candidates; "
-                "businessname exists only on BUSINESS/CORPORATION rows so "
-                "premises_name/dba read [businessname, name]."
+                "city='NEW HAVEN' and to liquor permit credential types (1,022 "
+                "of 47,001 rows on 2026-09-30). Address-only — no native "
+                "lat/lng, needs_geocode=True. Watermark recordrefreshedon has "
+                "0 nulls (no IS NOT NULL guard); credentialid is row-unique; "
+                "type/active/statusreason/credentialnumber are never field-map "
+                "candidates; premises_name/dba read [businessname, dba], never "
+                "the permittee's name."
             ),
             "field_map": SLA_FIELD_MAP,
         },
@@ -410,7 +412,10 @@ NEW_HAVEN_FEED_SPECS: dict[str, dict[str, object]] = {
         "interval_seconds": 3600.0,
         "producer_key": "deeds",
         "extra": {
-            "expected_cadence_days": 30,
+            # Published once a year (the portal says "Annually"): the
+            # 2026-08-12 update added the 2024 grand-list year, sales to
+            # 2025-09-30, so the newest sale is 10 to 23 months old.
+            "expected_cadence_days": 365,
             "needs_geocode": True,
             "geocode_context": "New Haven, CT",
             "where": "town = 'New Haven'",

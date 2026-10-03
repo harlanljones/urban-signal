@@ -128,7 +128,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'FL'
+    where: State = 'FL' AND Latitude BETWEEN 28.95 AND 29.45 AND Longitude BETWEEN -82.45 AND -81.95
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -168,61 +168,40 @@ datasets:
     non_spatial: null
     zip_member: null
     delimiter: null
-  permits:
-    endpoint: https://services9.arcgis.com/Gh9awoU677aKree0/arcgis/rest/services/Florida_Statewide_Cadastral/FeatureServer/0
+  deeds:
+    endpoint: https://gis.ocalafl.org/arcgis/rest/services/Public/Parcels/FeatureServer/0
     platform: arcgis
     watermark_col: ''
     id_keys:
-    - OBJECTID
-    - PARCEL_ID
-    topic: raw.municipal.permits
-    interval_seconds: 86400.0
-    producer_key: permits
-    endpoint_by_year: {}
-    watermark_type: null
-    watermark_format: null
-    watermark_exclude: []
-    order_by: null
-    id_col: null
-    select: null
-    fallback_endpoints: []
-    where: ASMNT_YR = 2025 AND CO_NO = 42
+    - parcel
+    - bk1
+    - pg1
+    topic: raw.municipal.deeds
+    interval_seconds: 21600.0
+    producer_key: deeds
+    order_by: yr1 DESC, mo1 DESC, OBJECTID DESC
+    select: OBJECTID,parcel,yr1,mo1,pr_1,bk1,pg1,INSIDE_X,INSIDE_Y
+    where: parcel <> '' AND yr1 * 12 + mo1 >= EXTRACT(YEAR FROM CURRENT_DATE) * 12 + EXTRACT(MONTH FROM CURRENT_DATE) - 3 AND yr1 * 12 + mo1 <= EXTRACT(YEAR FROM CURRENT_DATE) * 12 + EXTRACT(MONTH FROM CURRENT_DATE)
     needs_geocode: false
-    geocode_context: null
     field_map:
-      job_id:
+      doc_id:
+      - parcel
       - OBJECTID
-      - PARCEL_ID
-      issuance_date:
-      - EFF_YR_BLT
-      cost:
-      - NCONST_VAL
+      document_amount:
+      - pr_1
       bbl:
-      - PARCEL_ID
-      borough:
-      - CO_NO
-      status:
-      - JV_CHNG
+      - parcel
+      latitude:
+      - INSIDE_Y
+      longitude:
+      - INSIDE_X
     ingestion_mode: snapshot
     oid_field: OBJECTID
-    max_record_count: 2000
-    expected_cadence_days: 365
-    alarm_exempt: false
-    alarm_exempt_reason: null
-    annual_rotation: false
-    companion_endpoints: {}
-    proxy_for: null
-    retention_days: null
-    rolling_window_days: null
-    rollover: null
-    state_plane_crs: null
-    state_plane_units: null
-    state_plane_x_col: null
-    state_plane_y_col: null
-    parcel_join: {}
-    non_spatial: null
-    zip_member: null
-    delimiter: null
+    max_record_count: 250000
+    expected_cadence_days: 45
+    batch_limit: 15000
+    composite_id: true
+    metro_clip: true
 aliases:
 - ocala_fl
 - ocala fl

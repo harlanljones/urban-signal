@@ -173,13 +173,28 @@
     }
   },
   "feeds": {
-    "permits": null,
-    "311": null,
-    "sla": null,
+    "permits": {
+      "platform": "arcgis",
+      "watermark_col": "ISSUEDATE",
+      "interval_seconds": 21600.0,
+      "topic": "raw.municipal.permits"
+    },
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "CreationDate",
+      "interval_seconds": 900.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
     "deeds": {
       "platform": "arcgis",
-      "watermark_col": "SALE_DATE",
-      "interval_seconds": 600.0,
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
       "topic": "raw.municipal.deeds"
     }
   },

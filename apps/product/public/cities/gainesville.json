@@ -169,9 +169,9 @@
   },
   "feeds": {
     "permits": {
-      "platform": "socrata",
-      "watermark_col": "issue",
-      "interval_seconds": 600.0,
+      "platform": "arcgis",
+      "watermark_col": "IssueDate",
+      "interval_seconds": 21600.0,
       "topic": "raw.municipal.permits"
     },
     "311": null,
@@ -181,7 +181,12 @@
       "interval_seconds": 1800.0,
       "topic": "raw.municipal.sla"
     },
-    "deeds": null
+    "deeds": {
+      "platform": "csv",
+      "watermark_col": "sale_date",
+      "interval_seconds": 86400.0,
+      "topic": "raw.municipal.deeds"
+    }
   },
   "evidence_path": "apps/api/src/spatial/cities/gainesville.py",
   "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"

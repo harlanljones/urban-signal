@@ -40,6 +40,10 @@ Permits / SLA / Deeds deliberately unregistered.
   (`CityId.DURHAM`/ALIASES/`durham` city module exist, but no `REGISTRY`
   entry). All 5 interlock failures name `durham`, none name `el_paso`. El Paso
   itself is fully wired (in REGISTRY, `__init__`, `index.html`).
+- 2026-10-02 — Permits feed retired: `NewResi2018_19` holds nothing issued after
+  2021-07-30. The City's current new-construction layers sit on
+  `gis.elpasotexas.gov`, which answered every probe with Cloudflare's 403.
+  See `.streams/retire-frozen-permits.md`.
 
 ## Current step
 

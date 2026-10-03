@@ -1,10 +1,11 @@
 PERMITS_FIELD_MAP = {
-    "job_id": ["case_number", "OBJECTID"],
-    "issuance_date": ["date_issued"],
-    "filing_date": ["date_entered"],
-    "status": ["case_status"],
-    "job_type": ["case_type", "case_type_desc"],
-    "address_street": ["location"],
+    "job_id": ["Permit_Number", "OBJECTID"],
+    "issuance_date": ["Date_Issued"],
+    "filing_date": ["Date_Entered"],
+    "status": ["Permit_Status"],
+    # Permit_Name reads "Residential Building Permit", "Electrical Permit".
+    "job_type": ["Permit_Name", "Permit_Type"],
+    "address_street": ["Address_1"],
 }
 
 FIELD_MAP = {
@@ -21,14 +22,14 @@ Provides neighborhood metadata, camera positioning, investment metrics,
 division catalog, and geographic bounding boxes for the City of Topeka
 (Shawnee County, KS).
 
-Topeka is a ONE-FEED PARTIAL metro: PERMITS only, from the CityworksViews
-hosted service ``BuildingPermits/MapServer/0`` (Commercial Building Permit)
-on the City of Topeka's ArcGIS server (``maps.topeka.gov``). 311 / SLA /
-DEEDS stay Tier 3: Topeka operates through a Cityworks UI for 311, business
+Topeka's PERMITS come from the CityworksViews hosted service
+``BuildingPermits/MapServer/0`` (Commercial Building Permit) on the City of
+Topeka's ArcGIS server (``maps.topeka.gov``). The 2026-08-30 probe left 311,
+SLA and DEEDS at Tier 3: it found 311 only as a Cityworks UI, business
 licensing is handled by the Shawnee County clerks, and Kansas is a statutory
 non-disclosure state (K.S.A. 79-1437e) — Real Estate Sales Validation
-Questionnaires are confidential, so no deed-sales feed exists (probe
-2026-08-30).
+Questionnaires are confidential, so no deed-sales feed exists. The SLA and
+311 notes below record what has registered since.
 
 Live-probe caveats that define this leaf (2026-08-30, US-426):
 
@@ -36,16 +37,36 @@ Live-probe caveats that define this leaf (2026-08-30, US-426):
   ``CityworksViews/BuildingPermits/MapServer/0`` (4,180 rows live). A
   companion ``Residential Building Permit`` layer (MapServer/1, 7,052 rows)
   is NOT registered separately (ADR-0007) — the commercial layer is the
-  primary permit stream. ``date_issued`` is the watermark (epoch ms);
-  ``date_entered`` is the filing date.
+  primary permit stream.
 * Native point geometry (``outSR=4326`` lifts to WGS84), so
   ``needs_geocode=False``.
-* ``case_number`` is the unique permit id; ``case_status`` is the status;
-  ``case_type`` + ``case_type_desc`` split the work class; ``location`` is
-  the street address.
+* The layer renamed its columns since (2026-10-02: 816 rows, issued
+  2024-03-28 to 2026-09-04). ``Date_Issued`` is the watermark and
+  ``Date_Entered`` the filing date, both text written ``9/4/2026``, so the
+  poll names the days since its watermark (``text_date_window``).
+  ``Permit_Number`` is the permit; a permit spanning several parcels has a
+  row per parcel (57 such rows), and the id keeps one. ``Permit_Name``
+  ("Commercial Electrical", "Commercial Building New") is the work class,
+  ``Permit_Status`` the status and ``Address_1`` the street address.
 * No neighborhood/district column exists on the layer, so no ``borough``
   field-map candidate is declared: division resolution comes from coordinates
   at ingest.
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
+
+311 (2026-10-02): the same CityworksViews folder serves
+``SCF_E311_Requests``, the City's 311 requests as Cityworks holds them, one
+point per request since 2013: 8,825 in the year to 2026-10-02, about 24 a
+day, with no day missing. The poll follows ``datetimeinit``, which follows
+the view's object ids without exception over that year, keys events on
+``requestid``, and names its columns, so each request's description,
+details, address, initiator and Cityworks link stay on the server. The view
+rejects ISO date strings, so its path, not the host, is listed in
+``ANSI_DATE_LITERAL_HOSTS``: the permits view on the same host reads ISO
+strings. The corpus registers this feed; the feed mirror below carries
+PERMITS only.
 """
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
@@ -318,9 +339,9 @@ TOPEKA_DIVISIONS: dict[str, BoroughMeta] = {
 # ---------------------------------------------------------------------------
 # Feed specs (leaf-local; the spine copies these into REGISTRY).
 # Probed 2026-08-30 (US-426). Do not register the residential building-permit
-# layer (MapServer/1, 7,052 rows — ADR-0007 one-endpoint-per-feedtype), the
-# Cityworks 311 UI, or any Shawnee County deed feed (K.S.A. 79-1437e
-# non-disclosure).
+# layer (MapServer/1, 7,052 rows — ADR-0007 one-endpoint-per-feedtype) or any
+# Shawnee County deed feed (K.S.A. 79-1437e non-disclosure). 311 reads the
+# CityworksViews request view, which the corpus registers.
 # ---------------------------------------------------------------------------
 TOPEKA_PERMITS_ENDPOINT = (
     "https://maps.topeka.gov/arcgis/rest/services/CityworksViews/"
@@ -331,8 +352,8 @@ TOPEKA_FEED_SPECS: dict[str, dict[str, object]] = {
     "permits": {
         "endpoint": TOPEKA_PERMITS_ENDPOINT,
         "platform": "arcgis",
-        "watermark_col": "date_issued",
-        "id_keys": ["case_number", "OBJECTID"],
+        "watermark_col": "Date_Issued",
+        "id_keys": ["Permit_Number", "OBJECTID"],
         "topic_key": "topic_permits",
         "interval_seconds": 300.0,
         "producer_key": "permits",
@@ -341,10 +362,17 @@ TOPEKA_FEED_SPECS: dict[str, dict[str, object]] = {
             "needs_geocode": False,
             "oid_field": "OBJECTID",
             "max_record_count": 2000,
-            "order_by": "date_issued DESC",
+            # Date_Issued is text ("9/4/2026"): sorted, it reads as text.
+            "watermark_type": "text",
+            "watermark_format": "%m/%d/%Y",
+            "order_by": "OBJECTID DESC",
+            "select": (
+                "OBJECTID,Permit_Number,Date_Issued,Date_Entered,Permit_Name,"
+                "Permit_Type,Permit_Status,Address_1"
+            ),
             "scope": (
                 "Commercial Building Permit (MapServer/0, 4,180 rows; "
-                "native point geometry; date_issued watermark; companion "
+                "native point geometry; Date_Issued watermark; companion "
                 "Residential Building Permit layer MapServer/1 with 7,052 "
                 "rows not registered — ADR-0007)"
             ),

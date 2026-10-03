@@ -289,6 +289,79 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+  permits:
+    endpoint: https://gis.tucsonaz.gov/public/rest/services/PublicMaps/PermitsCode/MapServer/85
+    platform: arcgis
+    watermark_col: ISSUEDATE
+    id_keys:
+    - NUMBER
+    topic: raw.municipal.permits
+    interval_seconds: 21600.0
+    producer_key: permits
+    order_by: ISSUEDATE DESC, OBJECTID DESC
+    select: OBJECTID,NUMBER,ADDRESS,PARCEL,STATUS,TYPE,WORKCLASS,APPLYDATE,ISSUEDATE,VALUE
+    where: ISSUEDATE >= CURRENT_DATE - INTERVAL '90' DAY AND ISSUEDATE <= CURRENT_TIMESTAMP
+    needs_geocode: false
+    field_map:
+      job_id:
+      - NUMBER
+      issuance_date:
+      - ISSUEDATE
+      filing_date:
+      - APPLYDATE
+      job_type:
+      - WORKCLASS
+      - TYPE
+      status:
+      - STATUS
+      cost:
+      - VALUE
+      address_street:
+      - ADDRESS
+      bbl:
+      - PARCEL
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 3
+    batch_limit: 2500
+    metro_clip: true
+  deeds:
+    endpoint: https://www.asr.pima.gov/Downloads/Data/sales/{year}//SALE{year}.ZIP
+    platform: csv
+    watermark_col: recordingdate
+    id_keys:
+    - sequencenum
+    - parcel
+    topic: raw.municipal.deeds
+    interval_seconds: 86400.0
+    producer_key: deeds
+    order_by: recordingdate DESC
+    select: parcel,sequencenum,saleprice,deed,recordingdate
+    where: recordingdate >= CURRENT_DATE - INTERVAL '90' DAY AND recordingdate <= CURRENT_DATE
+    needs_geocode: false
+    field_map:
+      doc_id:
+      - sequencenum
+      recorded_date:
+      - recordingdate
+      document_amount:
+      - saleprice
+      bbl:
+      - parcel
+      doc_type:
+      - deed
+    ingestion_mode: snapshot
+    expected_cadence_days: 10
+    parcel_join:
+      parcel_layer: https://gisdata.pima.gov/arcgis1/rest/services/GISOpenData/LandRecords/MapServer/0
+      join_key: PARCEL
+      geometry_source: centroid
+      row_key: parcel
+    zip_member: Sale{year}.csv
+    batch_limit: 10000
+    composite_id: true
+    metro_clip: true
 aliases:
 - tucson_az
 - tucson-az

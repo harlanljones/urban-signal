@@ -189,7 +189,12 @@
   },
   "feeds": {
     "permits": null,
-    "311": null,
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "created_at",
+      "interval_seconds": 900.0,
+      "topic": "raw.municipal.311"
+    },
     "sla": {
       "platform": "socrata",
       "watermark_col": "recordrefreshedon",

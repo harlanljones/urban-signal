@@ -42,3 +42,15 @@ Jul 1 (survey said ~6,782 — consistent growth).
 
 Gates: interlock 20 passed; full suite 615 passed / 0 failed; ruff clean on
 new files; spine debt identical to HEAD (36 = 36).
+
+## Follow-up 2026-09-30 — `311` (four-family depth pass)
+
+Registered `datasets.'311'`: `maps2.columbus.gov` ServiceRequests MapServer/1
+(rolling three-year layer, one extract a day at about 05:00 ET), watermark
+`REPORTED_DATE`, ids `DATAHUB_ID` then `OBJECTID`, filter
+`LATITUDE IS NOT NULL AND REQUEST_CATEGORY <> 'City Staff Requests'`, newest
+first, cadence 3, `batch_limit: 5000` (a third of weekdays exceed 1,000 filtered
+rows). `maps2.columbus.gov` joined `ANSI_DATE_LITERAL_HOSTS`; `config.py` gained
+`arcgis_columbus_311_url`; `DatasetSpec.batch_limit` is new and the scheduler
+reads it. Five live rows back the parse and scheduler tests. Evidence in
+`docs/research/four-family-depth-2026-09-30.md`.

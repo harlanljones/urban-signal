@@ -10,25 +10,77 @@ the server-side watermark predicate the scheduler renders (``col > '<hw>'``) is
 evaluated locally against the ISO date strings in the downloaded rows.
 
 Pass ``zip_member='2026.csv'`` to read one named member out of a zip endpoint
-(St. Louis CSB ``csb.zip``). The scheduler does not yet forward that kwarg —
-wiring it is a later spine hold.
+(St. Louis CSB ``csb.zip``), and ``columns`` to name the fields of a file with
+no header row (Pierce County's ``sale.txt``). The scheduler forwards both from
+the spec.
+
+An endpoint published once a year writes its year as ``{year}``, in the URL
+and in ``zip_member``: the client reads this year's file and last year's.
+Pima County keys its sales files by the year a sale closed, so the sales
+recorded in January to March sit mostly in the year before's file, and any
+rolling window that starts before New Year needs both. This year's file may
+not exist in the first days of January, answered as a 404 or, on Pima's
+site, as the site's own page with a 200; either passes it over, and any
+other failure to download either file fails the read. A ``point_col`` names
+a column that holds each row's point as one ``lat, lon`` value (the CSV
+export of an OpenDataSoft geo point, Long Beach's requests); the client adds
+its ``latitude`` and ``longitude``. ``point_lon_first`` reads the column as
+``lon, lat`` instead, as MyGov's workbooks write it.
 """
 
 from __future__ import annotations
 
+import codecs
 import csv
 import io
 import re
 import zipfile
-from collections.abc import Generator
-from datetime import datetime
+from collections.abc import Generator, Iterable, Iterator
+from datetime import UTC, date, datetime, timedelta
+from itertools import chain, islice
 from typing import Any
 
 import httpx
 
 _CMP = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*(>=|<=|>|<|=|!=)\s*'([^']*)'\s*$")
 _IS_NULL = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s+is\s+not\s+null\s*$", re.IGNORECASE)
-_NOT_IN = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s+NOT\s+IN\s*\(([^)]*)\)\s*$", re.IGNORECASE)
+# The list runs to the last parenthesis: a quoted value can hold one
+# (Abilene's ``'Certificate of Occupancy Permit (C)'``).
+_NOT_IN = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s+NOT\s+IN\s*\((.*)\)\s*$", re.IGNORECASE)
+_QUOTED = re.compile(r"'((?:[^']|'')*)'")
+# The rolling window ArcGIS specs send server-side (``CURRENT_DATE - INTERVAL
+# '180' DAY``); a file feed resolves it to a date before filtering rows.
+_RELATIVE_DATE = re.compile(r"CURRENT_DATE\s*-\s*INTERVAL\s*'(\d+)'\s*DAY", re.IGNORECASE)
+# ``CURRENT_DATE`` alone bounds a window above, so a sale keyed in the future
+# (Alachua's Sales.txt holds one dated 2079) stays out of it.
+_CURRENT_DATE = re.compile(r"\bCURRENT_DATE\b", re.IGNORECASE)
+# One line with its ending: \r\n, \r or \n, as ``io.StringIO(text, newline="")``
+# splits them, so the csv module ends rows on any of the three (Milwaukee's
+# permits export uses bare \r).
+_LINE = re.compile(r"[^\r\n]*(?:\r\n|\r|\n)|[^\r\n]+")
+# The year an annual file's endpoint and member are written with.
+_YEAR = "{year}"
+
+
+def _lines(text: str) -> Iterator[str]:
+    """The lines of ``text`` without a copy of it.
+
+    StringIO holds four bytes a character: over 350 MB for Pierce County's
+    89 MB sales file, on top of the text itself.
+    """
+    return (match.group(0) for match in _LINE.finditer(text))
+
+
+def resolve_relative_dates(where_clause: str | None, today: Any = None) -> str | None:
+    """Replace ``CURRENT_DATE - INTERVAL 'N' DAY`` with that day's quoted ISO
+    date, and ``CURRENT_DATE`` alone with today's."""
+    if not where_clause:
+        return where_clause
+    day = today or datetime.now(UTC).date()
+    clause = _RELATIVE_DATE.sub(
+        lambda m: f"'{(day - timedelta(days=int(m.group(1)))).isoformat()}'", where_clause
+    )
+    return _CURRENT_DATE.sub(f"'{day.isoformat()}'", clause)
 
 
 def _normalize_header(name: str) -> str:
@@ -36,23 +88,94 @@ def _normalize_header(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "_", name.strip().lower()).strip("_")
 
 
-def _strip_preamble(text: str, delimiter: str = ",") -> str:
-    """Drop a leading single-field preamble line, if one exists.
+def yearly_files(
+    endpoint_url: str, zip_member: str | None = None, today: date | None = None
+) -> list[tuple[str, str | None]]:
+    """The URL and zip member of this year's file and last year's, for an
+    endpoint written with ``{year}``; the endpoint alone otherwise."""
+    if _YEAR not in endpoint_url:
+        return [(endpoint_url, zip_member)]
+    year = (today or datetime.now(UTC).date()).year
+    return [
+        (endpoint_url.replace(_YEAR, str(y)), zip_member.replace(_YEAR, str(y)) if zip_member else None)
+        for y in (year, year - 1)
+    ]
+
+
+def _is_web_page(response: httpx.Response) -> bool:
+    """Whether a download is a web page in place of the file asked for: an
+    HTML type and a body that opens with a tag. Pima County's site answers a
+    path it has no file for with its own page and a 200."""
+    content_type = response.headers.get("content-type", "").lower()
+    return content_type.startswith("text/html") and response.content.lstrip(b"\xef\xbb\xbf \t\r\n")[:1] == b"<"
+
+
+def _split_point(value: Any, lon_first: bool = False) -> dict[str, float]:
+    """``latitude`` and ``longitude`` from one ``lat, lon`` value, or ``lon,
+    lat`` with ``lon_first``; nothing when it is blank, malformed or off the
+    globe."""
+    try:
+        lat, lng = (float(part) for part in str(value).split(","))
+    except (TypeError, ValueError):
+        return {}
+    if lon_first:
+        lat, lng = lng, lat
+    if not (-90 <= lat <= 90 and -180 <= lng <= 180):
+        return {}
+    return {"latitude": lat, "longitude": lng}
+
+
+def _nonblank_rows(lines: Iterable[str], delimiter: str) -> Iterator[list[str]]:
+    """The parsed rows of ``lines`` that hold at least one non-blank cell."""
+    return (row for row in csv.reader(lines, delimiter=delimiter) if any(cell.strip() for cell in row))
+
+
+def _rows_as_lines(rows: Iterable[list[str]], delimiter: str) -> Iterator[str]:
+    """Each row written back as CSV, one physical line at a time."""
+    buffer = io.StringIO()
+    writer = csv.writer(buffer, delimiter=delimiter, lineterminator="\n")
+    for row in rows:
+        buffer.seek(0)
+        buffer.truncate()
+        writer.writerow(row)
+        yield from _lines(buffer.getvalue())
+
+
+def _without_preamble(lines: Iterator[str], delimiter: str = ",") -> tuple[Iterator[str], bool]:
+    """``lines`` without a leading single-field preamble line, and whether one
+    was dropped.
 
     Some CSV publishers (California ABC ``DailyExport-CSV.zip``) lead the real
     header with a metadata line that csv.DictReader would otherwise mistake for
     the field names: a one-field row whose next row carries multiple fields.
-    Returning the text unchanged when no preamble is detected keeps every
-    existing feed's parse identical.
+    Only the first two rows decide, so a file without one streams on
+    untouched; parsing every row of Alachua County's 510,000 sales into lists
+    took more memory than the file itself.
     """
-    reader = csv.reader(io.StringIO(text), delimiter=delimiter)
-    rows: list[list[str]] = [row for row in reader if any(cell.strip() for cell in row)]
-    if len(rows) >= 2 and len(rows[0]) == 1 and len(rows[1]) > 1:
-        buffer = io.StringIO()
-        writer = csv.writer(buffer, delimiter=delimiter, lineterminator="\n")
-        writer.writerows(rows[1:])
-        return buffer.getvalue()
-    return text
+    read: list[str] = []
+    deciding = True
+
+    def recorded() -> Iterator[str]:
+        for line in lines:
+            if deciding:
+                read.append(line)
+            yield line
+
+    rows = _nonblank_rows(recorded(), delimiter)
+    head = list(islice(rows, 2))
+    deciding = False
+    if len(head) == 2 and len(head[0]) == 1 and len(head[1]) > 1:
+        # The rest of the file is written back without its blank rows, as
+        # the whole text was before files were streamed.
+        return _rows_as_lines(chain(head[1:], rows), delimiter), True
+    return chain(read, lines), False
+
+
+def _strip_preamble(text: str, delimiter: str = ",") -> str:
+    """``text`` without a leading single-field preamble line, if one exists;
+    returned unchanged when there is none."""
+    lines, stripped = _without_preamble(_lines(text), delimiter)
+    return "".join(lines) if stripped else text
 
 
 def _decode_csv_bytes(raw: bytes) -> str:
@@ -65,11 +188,56 @@ def _decode_csv_bytes(raw: bytes) -> str:
     return raw.decode("utf-8", errors="replace")
 
 
-def _read_zip_member(payload: bytes, member: str) -> str:
-    """Extract one named CSV member from a zip (St. Louis CSB ``csb.zip`` / ``{year}.csv``).
+# How much of a zip member to decompress at a time.
+_CHUNK = 1 << 20
+
+
+def _member_name(archive: zipfile.ZipFile, name: str) -> str:
+    """The archive's own name for ``name``: the exact name, else the first
+    member with the same basename."""
+    names = archive.namelist()
+    if name in names:
+        return name
+    wanted = name.rsplit("/", 1)[-1].lower()
+    for candidate in names:
+        if candidate.rsplit("/", 1)[-1].lower() == wanted and not candidate.endswith("/"):
+            return candidate
+    raise FileNotFoundError(f"zip member {name!r} not in archive; members={names}")
+
+
+def _member_encoding(archive: zipfile.ZipFile, name: str) -> tuple[str, str]:
+    """The encoding ``_decode_csv_bytes`` would choose for a member, and its
+    error handler, found in one pass over the decompressed bytes without
+    holding them: UTF-8 when every byte decodes, else cp1252, else UTF-8 with
+    replacement characters."""
+    decoders = {"utf-8": codecs.getincrementaldecoder("utf-8")(), "cp1252": codecs.getincrementaldecoder("cp1252")()}
+    with archive.open(name) as raw:
+        while decoders and (chunk := raw.read(_CHUNK)):
+            for encoding, decoder in list(decoders.items()):
+                try:
+                    decoder.decode(chunk)
+                except UnicodeDecodeError:
+                    del decoders[encoding]
+    for encoding, decoder in list(decoders.items()):
+        try:
+            decoder.decode(b"", final=True)
+        except UnicodeDecodeError:
+            del decoders[encoding]
+    if "utf-8" in decoders:
+        return "utf-8-sig", "strict"
+    if "cp1252" in decoders:
+        return "cp1252", "strict"
+    return "utf-8", "replace"
+
+
+def _zip_member_lines(payload: bytes, member: str) -> Iterator[str]:
+    """The lines of one named CSV member of a zip (St. Louis CSB ``csb.zip`` /
+    ``{year}.csv``), decompressed and decoded as they are read.
 
     ``member`` is a filename such as ``2026.csv``. A basename match is accepted
-    when the archive nests the year file under a folder.
+    when the archive nests the year file under a folder. Polk County's sales
+    member unpacks to 518 MB: read whole and then decoded, it took twice that
+    on top of the download.
     """
     name = str(member).strip()
     if not name or name.lower() in {"true", "1", "yes"}:
@@ -80,22 +248,41 @@ def _read_zip_member(payload: bytes, member: str) -> str:
         archive = zipfile.ZipFile(io.BytesIO(payload))
     except zipfile.BadZipFile as exc:
         raise ValueError("CSV endpoint declared zip_member but the body is not a zip") from exc
-    with archive:
-        names = archive.namelist()
-        chosen = name if name in names else None
-        if chosen is None:
-            wanted = name.rsplit("/", 1)[-1].lower()
-            matches = [
-                n
-                for n in names
-                if n.rsplit("/", 1)[-1].lower() == wanted and not n.endswith("/")
-            ]
-            if not matches:
-                raise FileNotFoundError(
-                    f"zip member {name!r} not in archive; members={names}"
-                )
-            chosen = matches[0]
-        return _decode_csv_bytes(archive.read(chosen))
+    try:
+        chosen = _member_name(archive, name)
+        encoding, errors = _member_encoding(archive, chosen)
+    except BaseException:
+        archive.close()
+        raise
+    return _member_lines(archive, chosen, encoding, errors)
+
+
+def _member_lines(archive: zipfile.ZipFile, name: str, encoding: str, errors: str) -> Iterator[str]:
+    with archive, archive.open(name) as raw:
+        # newline="" ends lines on \r\n, \r or \n and keeps the endings, as
+        # ``_lines`` does.
+        yield from io.TextIOWrapper(raw, encoding=encoding, errors=errors, newline="")
+
+
+def _read_zip_member(payload: bytes, member: str) -> str:
+    """The text of one named CSV member of a zip; see ``_zip_member_lines``."""
+    return "".join(_zip_member_lines(payload, member))
+
+
+def _body_lines(response: httpx.Response) -> Iterator[str]:
+    """The lines of a downloaded CSV as ``_lines(response.text)`` gives them,
+    decoded as they are read.
+
+    The encoding and the replacement of bytes it cannot decode are httpx's
+    own. ``response.text`` holds the whole body again as text, twice while
+    httpx joins it: Larimer County's 101 MB sales file read that way added
+    385 MB to the peak.
+    """
+    # newline="" ends lines on \r\n, \r or \n and keeps the endings, as
+    # ``_lines`` does.
+    return io.TextIOWrapper(
+        io.BytesIO(response.content), encoding=response.encoding or "utf-8", errors="replace", newline=""
+    )
 
 
 def _typed_value(value: Any, fmt: str | None) -> datetime | None:
@@ -105,6 +292,30 @@ def _typed_value(value: Any, fmt: str | None) -> datetime | None:
         return datetime.strptime(str(value).strip(), fmt)
     except (TypeError, ValueError):
         return None
+
+
+def _iso_literal(literal: str) -> datetime | None:
+    """A filter literal written as ISO 8601 rather than in the column's format.
+
+    A feed that declares a format without the ``text`` type keeps its
+    watermark, and starts its backfill window, as ISO (St. Louis permits);
+    parsed only in the column's format, such a literal matched no row, so
+    every poll after the first read nothing.
+    """
+    try:
+        return datetime.fromisoformat(literal).replace(tzinfo=None)
+    except ValueError:
+        return None
+
+
+def _listed_values(items: str) -> set[str]:
+    """The values of an ``IN`` list: each quoted value whole, commas and
+    parentheses included, with ``''`` read as a quote; an unquoted list split
+    on its commas."""
+    quoted = _QUOTED.findall(items)
+    if quoted:
+        return {value.replace("''", "'").strip() for value in quoted}
+    return {item.strip() for item in items.split(",")}
 
 
 def _row_matches(
@@ -183,7 +394,7 @@ def _branch_matches(
                 if s in (watermark_exclude or []):
                     return False
                 parsed_value = _typed_value(s, watermark_format)
-                parsed_literal = _typed_value(literal, watermark_format)
+                parsed_literal = _typed_value(literal, watermark_format) or _iso_literal(literal)
                 if parsed_value is None or parsed_literal is None:
                     return False
                 left, right = parsed_value, parsed_literal
@@ -214,8 +425,7 @@ def _branch_matches(
             m3 = _NOT_IN.match(part)
             if m3:
                 col = _normalize_header(m3.group(1))
-                excluded = {item.strip().strip("'") for item in m3.group(2).split(",")}
-                if str(row.get(col, "")).strip() in excluded:
+                if str(row.get(col, "")).strip() in _listed_values(m3.group(2)):
                     return False
     return True
 
@@ -243,52 +453,55 @@ class CSVClient:
         Some ArcGIS Hub items expose both a download route and the underlying
         item-data route. Keep the primary URL first, but allow a registration
         to carry an explicitly verified fallback when the Hub proxy fails.
+        An endpoint written with ``{year}`` reads this year's file and last
+        year's, and this year's may not exist yet in the first days of
+        January (see the module notes).
         """
-        last_error: Exception | None = None
-        for candidate in [endpoint_url, *(fallback_endpoints or [])]:
-            try:
-                response = self.http.get(candidate)
-                response.raise_for_status()
-                break
-            except (httpx.HTTPError, OSError) as exc:
-                last_error = exc
-        else:
-            if last_error is not None:
-                raise last_error
-            raise RuntimeError("CSV endpoint list is empty")
-
-        zip_member = kwargs.get("zip_member")
         delimiter = kwargs.get("delimiter", ",")
-        if zip_member:
-            csv_text = _read_zip_member(response.content, zip_member)
-        else:
-            csv_text = response.text
-        csv_text = _strip_preamble(csv_text, delimiter=delimiter)
-        reader = csv.DictReader(io.StringIO(csv_text), delimiter=delimiter)
-        # Municipal CSVs use title case, spaces, and punctuation inconsistently;
-        # normalize them so shared field maps apply uniformly.
-        if reader.fieldnames:
-            reader.fieldnames = [_normalize_header(name) for name in reader.fieldnames]
+        columns = kwargs.get("columns")
         selected_cols = (
             [_normalize_header(c) for c in select.split(",") if c.strip()] if select else None
         )
+        point_col = _normalize_header(kwargs.get("point_col") or "") or None
+        point_lon_first = bool(kwargs.get("point_lon_first"))
         watermark_col = _normalize_header(kwargs.get("watermark_col") or "") or None
         watermark_format = kwargs.get("watermark_format")
         watermark_exclude = kwargs.get("watermark_exclude") or []
+        where_clause = resolve_relative_dates(where_clause)
 
         rows: list[dict[str, Any]] = []
-        for row in reader:
-            if not _row_matches(
-                where_clause,
-                row,
-                watermark_col=watermark_col,
-                watermark_format=watermark_format,
-                watermark_exclude=watermark_exclude,
-            ):
-                continue
-            if selected_cols:
-                row = {k: row[k] for k in selected_cols if k in row}
-            rows.append(row)
+        files = self._files(endpoint_url, fallback_endpoints, kwargs.get("zip_member"))
+        for response, zip_member in files:
+            if zip_member:
+                lines = _zip_member_lines(response.content, zip_member)
+            else:
+                lines = _body_lines(response)
+            if columns:
+                # A file with no header row: every line is a row, named by the
+                # spec's columns, and there is no header for a preamble to hide.
+                fieldnames: list[str] | None = list(columns)
+            else:
+                lines, _ = _without_preamble(lines, delimiter=delimiter)
+                fieldnames = None
+            reader = csv.DictReader(lines, fieldnames=fieldnames, delimiter=delimiter)
+            # Municipal CSVs use title case, spaces, and punctuation inconsistently;
+            # normalize them so shared field maps apply uniformly.
+            if reader.fieldnames:
+                reader.fieldnames = [_normalize_header(name) for name in reader.fieldnames]
+            for row in reader:
+                if not _row_matches(
+                    where_clause,
+                    row,
+                    watermark_col=watermark_col,
+                    watermark_format=watermark_format,
+                    watermark_exclude=watermark_exclude,
+                ):
+                    continue
+                if selected_cols:
+                    row = {k: row[k] for k in selected_cols if k in row}
+                if point_col:
+                    row.update(_split_point(row.get(point_col), point_lon_first))
+                rows.append(row)
 
         if order_by:
             m = re.match(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s+(ASC|DESC)?\s*$", order_by, re.IGNORECASE)
@@ -317,3 +530,41 @@ class CSVClient:
                 break
         if batch:
             yield batch
+
+    def _files(
+        self, endpoint_url: str, fallback_endpoints: list[str] | None, zip_member: str | None
+    ) -> Iterator[tuple[httpx.Response, str | None]]:
+        """Each file a poll reads, downloaded, with its zip member: the
+        endpoint or the first fallback that downloads, or for a ``{year}``
+        endpoint this year's file and then last year's."""
+        if _YEAR not in endpoint_url:
+            yield self._download([endpoint_url, *(fallback_endpoints or [])]), zip_member
+            return
+        for index, (url, member) in enumerate(yearly_files(endpoint_url, zip_member)):
+            # This year's file can be missing until its first rows are keyed
+            # in January; last year's must be there.
+            try:
+                response = self._download([url])
+            except httpx.HTTPStatusError as exc:
+                if index == 0 and exc.response.status_code == 404:
+                    continue
+                raise
+            if _is_web_page(response):
+                if index == 0:
+                    continue
+                raise FileNotFoundError(f"{url} answered with a web page, not the file")
+            yield response, member
+
+    def _download(self, candidates: list[str]) -> httpx.Response:
+        """The first of ``candidates`` that downloads; the last error if none do."""
+        last_error: Exception | None = None
+        for candidate in candidates:
+            try:
+                response = self.http.get(candidate)
+                response.raise_for_status()
+                return response
+            except (httpx.HTTPError, OSError) as exc:
+                last_error = exc
+        if last_error is not None:
+            raise last_error
+        raise RuntimeError("CSV endpoint list is empty")

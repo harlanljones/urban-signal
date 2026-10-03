@@ -18,16 +18,17 @@ FIELD_MAP = {
     },
     # ------------------------------------------------------------------
     # DEEDS — Clark County real-property parcel sales / recorded deeds
-    # (ArcGIS table, address-only -> ADR-0004 geocoded at enrichment)
+    # (ArcGIS table with no geometry; each sale takes its parcel's centroid
+    # from CLV_PARCELS_POLY). ADDRESS1-5 and ZIPCODE are the owner's
+    # mailing address, never the parcel's, so none is mapped.
     # ------------------------------------------------------------------
     "deeds": {
         "doc_id": ["DOCNO", "ObjectId"],
-        "bbl": ["PARCEL", "APN"],
+        "bbl": ["PARCEL"],
         "document_amount": ["SALEPRICE"],
-        "recorded_date": ["SALEDATE", "DOCDATE"],
+        "recorded_date": ["DOCDATE", "SALEDATE"],
         "borough": ["COMNAME", "WARD"],
-        "address_street": ["ADDRESS1", "ADDRESS2"],
-        "zipcode": ["ZIP", "ZIPCODE"],
+        "zipcode": ["ZIP"],
     },
 }
 
@@ -39,8 +40,9 @@ the greater Clark County metro (Summerlin, Henderson, North Las Vegas).
 
 Las Vegas registers as a TWO-FEED partial city like Los Angeles and Austin:
 PERMITS (Clark County Building Permits, address-only ArcGIS table) and DEEDS
-(Clark County real-property parcel sales, address-only -> geocoder-ready under
-ADR-0004). SLA / COMPLAINTS_311 are deliberately absent for this ticket — US-145
+(Clark County real-property parcel sales, a table with no geometry: each sale
+takes its parcel's centroid from the city's CLV_PARCELS_POLY layer, joined on
+PARCEL). SLA / COMPLAINTS_311 are deliberately absent for this ticket — US-145
 scopes only PERMITS + sales/deeds; the 311 and business-license layers are a
 separate registration and left for their own ticket so `get_dataset` raises a
 readable error for them.
@@ -441,6 +443,10 @@ LAS_VEGAS_DEEDS_ENDPOINT = (
     "https://services1.arcgis.com/F1v0ufATbBQScMtY/ArcGIS/rest/services/"
     "parcels/FeatureServer/0"
 )
+LAS_VEGAS_PARCEL_POLYGONS = (
+    "https://services1.arcgis.com/F1v0ufATbBQScMtY/ArcGIS/rest/services/"
+    "CLV_PARCELS_POLY/FeatureServer/7"
+)
 
 LAS_VEGAS_FEED_SPECS: Dict[str, Dict[str, object]] = {
     "permits": {
@@ -465,8 +471,8 @@ LAS_VEGAS_FEED_SPECS: Dict[str, Dict[str, object]] = {
     "deeds": {
         "endpoint": LAS_VEGAS_DEEDS_ENDPOINT,
         "platform": "arcgis",
-        "watermark_col": "SALEDATE",
-        "id_keys": ["PARCEL", "DOCNO", "ObjectId"],
+        "watermark_col": "DOCDATE",
+        "id_keys": ["PARCEL", "DOCNO"],
         "topic_key": "topic_deeds",
         "interval_seconds": 600.0,
         "producer_key": "deeds",
@@ -474,10 +480,24 @@ LAS_VEGAS_FEED_SPECS: Dict[str, Dict[str, object]] = {
             "expected_cadence_days": 7,
             "oid_field": "ObjectId",
             "max_record_count": 2000,
-            "order_by": "SALEDATE DESC",
-            "needs_geocode": True,
-            "geocode_context": "Las Vegas, NV",
-            "scope": "Clark County real-property parcel sales / recorded deeds (address-only ArcGIS table)",
+            # DOCDATE is the recording day as YYYYMMDD digits (99990909 marks
+            # an unknown day). SALEDATE holds YYYYMM01 digits, too coarse to
+            # poll by, and an ISO comparison on it returns 400.
+            "watermark_type": "text",
+            "watermark_format": "%Y%m%d",
+            "watermark_exclude": ["99990909"],
+            "order_by": "DOCDATE DESC, ObjectId DESC",
+            "composite_id": True,
+            # The table's own address columns are the owner's mailing
+            # address; the select leaves them, and the owner, on the server.
+            "select": "PARCEL,DOCNO,DOCDATE,SALEDATE,SALEPRICE,COMNAME,WARD,ZIP,ObjectId",
+            "parcel_join": {
+                "parcel_layer": LAS_VEGAS_PARCEL_POLYGONS,
+                "join_key": "PARCEL",
+                "geometry_source": "centroid",
+            },
+            "needs_geocode": False,
+            "scope": "Clark County real-property parcel sales / recorded deeds, placed at each parcel's centroid",
             "field_map": FIELD_MAP["deeds"],
         },
     },

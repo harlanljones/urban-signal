@@ -23,6 +23,7 @@ SLA correction recorded in the leaf module docstring: typed-2026 total is
 2,862, not the probe's "2026 YTD 77" (that was a newest-cohort window).
 """
 
+from datetime import UTC, datetime
 from unittest.mock import patch
 
 import pytest
@@ -514,13 +515,9 @@ class TestVirginiaBeachPermitParsing:
     def test_permit_geocode_sits_inside_metro(self):
         assert is_in_virginia_beach_metro(*PERMITS_GEOCODE_OCEANFRONT)
 
-    def test_text_yyyyslashmmdd_issue_date_does_not_parse_to_event_datetime(
-        self, permits, monkeypatch
-    ):
-        """Honest gap: the producer's date chain has no %Y/%m/%d format, so
-        the EVENT carries issuance_date=None while the WATERMARK machinery
-        (declared format, tested above) keeps ordering correct. If the spine
-        ever teaches the parser this format, tighten this assertion."""
+    def test_text_yyyyslashmmdd_dates_parse_to_event_datetimes(self, permits, monkeypatch):
+        """The table keeps its dates as text (2026/08/21). Unparsed, every
+        event carried no issue date and counted as issued when it arrived."""
         _patch_resolve(monkeypatch, "permits")
         monkeypatch.setattr(
             "src.spatial.geocoder.geocode_row_if_declared",
@@ -528,8 +525,9 @@ class TestVirginiaBeachPermitParsing:
         )
         event = permits.parse_socrata_row(PERMITS_ROW_HOOD_EXHAUST, city_id="virginia_beach")
         assert event is not None
-        assert event.issuance_date is None
-        assert event.filing_date is None
+        assert event.issuance_date == datetime(2026, 8, 21, tzinfo=UTC)
+        assert event.filing_date == datetime(2026, 4, 21, tzinfo=UTC)
+        assert event.status == "Active"
 
     def test_permit_without_address_is_dropped(self, permits, monkeypatch):
         _patch_resolve(monkeypatch, "permits")

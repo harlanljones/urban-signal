@@ -277,6 +277,47 @@ datasets:
     non_spatial: null
     zip_member: null
     delimiter: null
+  permits:
+    endpoint: https://public.mygov.us/tx_texarkana/downloadReport?moduleName=pi&id=370
+    platform: excel
+    watermark_col: date_started
+    id_keys:
+    - permit_number
+    topic: raw.municipal.permits
+    interval_seconds: 21600.0
+    producer_key: permits
+    watermark_type: text
+    watermark_format: '%m/%d/%Y'
+    order_by: date_started DESC
+    select: permit_number,permit_title,status_permit,date_started,permit_issued_date,project_valuation,project_address
+    where: permit_title NOT IN ('Health Inspection', 'Environmental Sanitation Inspection',
+      'Pool Inspection', 'Pool Permit and Inspection', 'Mobile Unit', 'Mobile Unit
+      3 Days or less', 'Occupancy', 'Occupancy - Re-Issue', 'Certificate of Occupancy',
+      'Zoning', 'Zoning Verification Letter', 'Specific Use Permit - Zoning', 'Request
+      Zoning Change', 'Variances', 'Platting - Replat', 'Platting - Amendment', 'Platting
+      - Minor', 'Platting -Preliminary and Final', 'Platting - Reapproval', 'Civil
+      Plan Review Only', 'Non-Residential Plan Re-Review', 'Floodplain Development
+      Application', 'Street Cut', 'Right of Way Permit', 'Special Event Permit', 'Banner
+      - 90 days', 'Banner - Monthly', 'Tent - Temporary', 'Seasonal Permit - NO Certificate
+      Required', 'Courtesy Inspection', 'Stop Work Notice')
+    needs_geocode: true
+    geocode_context: Texarkana, TX
+    field_map:
+      job_id:
+      - permit_number
+      issuance_date:
+      - permit_issued_date
+      filing_date:
+      - date_started
+      job_type:
+      - permit_title
+      status:
+      - status_permit
+      cost:
+      - project_valuation
+      address_street:
+      - project_address
+    expected_cadence_days: 35
 aliases:
 - texarkana_tx
 - texarkana tx

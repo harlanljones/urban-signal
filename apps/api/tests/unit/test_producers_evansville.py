@@ -3,9 +3,10 @@
 Evansville registers with the live-verified Building Commission Permits layer
 (maps.evansvillegis.com BC/BUILDING_COMMISSION_PERMITS/MapServer/0, 154,760
 rows, USER_Application_Recv_d epoch-ms watermark, WKID 102100 point geometry)
-plus the USDA SNAP Retailer SLA slice for IN (snap_sla_spec("IN")). This test
-focuses on the spatial registration contract: metro bbox sanity, division
-containment, and submarket placement inside their declared division bbox.
+plus the USDA SNAP Retailer SLA slice for IN inside the metro bbox
+(snap_sla_spec). This test focuses on the spatial registration contract:
+metro bbox sanity, division containment, and submarket placement inside
+their declared division bbox.
 """
 
 from src.spatial.cities.evansville import (

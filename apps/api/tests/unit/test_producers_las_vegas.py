@@ -2,9 +2,10 @@
 
 Las Vegas registers TWO feed types like Los Angeles and Austin — PERMITS
 (Clark County Building Permits, address-only ArcGIS table) and DEEDS (Clark
-County parcel sales, address-only -> ADR-0004 geocoder-ready). SLA / 311 are
-deliberately absent for this ticket, so `get_dataset` raises for them once the
-spine lands.
+County parcel sales, a table with no geometry: each sale takes its parcel's
+centroid from the city's parcel polygons; the table's address columns are the
+owner's mailing address and are never read). SLA / 311 are deliberately absent
+for this ticket, so `get_dataset` raises for them once the spine lands.
 
 Per the parallel-streams contract, this leaf test must pass WITHOUT the spine
 registry being edited. Registration-dependent assertions therefore skip when
@@ -23,6 +24,7 @@ from src.spatial.cities.las_vegas import (
     LAS_VEGAS_DIVISION_BBOXES,
     LAS_VEGAS_DIVISIONS,
     LAS_VEGAS_METRO_BBOX,
+    LAS_VEGAS_PARCEL_POLYGONS,
     LAS_VEGAS_SUBMARKETS,
     is_in_las_vegas_metro,
 )
@@ -31,6 +33,9 @@ from src.spatial.city_registry import CityId, FeedType
 # The spine adds CityId.LAS_VEGAS + REGISTRY entry; until then these tests skip
 # rather than fail (the leaf is importable and the rest of the suite is green).
 LV = getattr(CityId, "LAS_VEGAS", None)
+
+# The deeds table's owner and mailing-address block, never the parcel's.
+OWNER_COLUMNS = {"OWNER", "NAMETAG", "ADDRESS1", "ADDRESS2", "ADDRESS3", "ADDRESS4", "ADDRESS5", "ZIPCODE"}
 
 
 def _registry():
@@ -156,13 +161,20 @@ class TestFieldMaps:
             "DOCNO": 2016031102044,
             "SALEPRICE": 425000,
             "SALEDATE": 20260801,
-            "ADDRESS1": "5626 W LAKE MEAD BLVD",
+            "ZIP": 89108,
+            "ADDRESS1": "REDACTED",
+            "ZIPCODE": 913012345,
         }
         assert first_mapped(deed_row, fm, "doc_id") == 2016031102044
         assert first_mapped(deed_row, fm, "bbl") == 13824217021
         assert first_mapped(deed_row, fm, "document_amount") == 425000
         assert first_mapped(deed_row, fm, "recorded_date") == 20260801
-        assert first_mapped(deed_row, fm, "address_street") == "5626 W LAKE MEAD BLVD"
+        assert first_mapped(deed_row, fm, "zipcode") == 89108
+        assert first_mapped(deed_row, fm, "address_street") is None
+
+    def test_deeds_map_no_owner_or_mailing_column(self):
+        mapped = {column for candidates in FIELD_MAP["deeds"].values() for column in candidates}
+        assert not mapped & OWNER_COLUMNS
 
 
 class TestLasVegasRowParsing:
@@ -200,13 +212,16 @@ class TestLasVegasRowParsing:
 
     @pytest.fixture
     def deed_row(self):
+        # A sale as poll_job hands it over: the parcel join has added the
+        # centroid of PARCEL's polygon.
         return {
             "PARCEL": 13824217021,
             "DOCNO": 2016031102044,
             "SALEPRICE": 425000,
             "SALEDATE": 20260801,
-            "ADDRESS1": "5626 W LAKE MEAD BLVD",
             "ZIP": 89108,
+            "latitude": 36.1953,
+            "longitude": -115.2231,
         }
 
     def test_permit_parses_with_field_map(self, permits, permit_row, monkeypatch):
@@ -229,58 +244,57 @@ class TestLasVegasRowParsing:
         assert ev.estimated_cost == 4500.0
         assert ev.job_type == JobType.A2
 
-    def test_deed_parses_with_field_map(self, deeds, deed_row, monkeypatch):
+    @pytest.fixture
+    def no_geocoding(self, monkeypatch):
+        calls = []
         monkeypatch.setattr(
             "src.producers.field_maps.resolve_field_map",
             lambda city, feed: FIELD_MAP[feed.value],
         )
         monkeypatch.setattr(
             "src.spatial.geocoder.geocode_row_if_declared",
-            lambda *args: (36.1147, -115.1728),
+            lambda *args: calls.append(args) or (36.1147, -115.1728),
         )
+        return calls
+
+    def test_deed_parses_with_field_map(self, deeds, deed_row, no_geocoding):
         ev = deeds.parse_socrata_row(deed_row, city_id="las_vegas")
         assert ev is not None
         assert ev.doc_id == "2016031102044"
         assert ev.bbl == "13824217021"
         assert ev.document_amount == 425000.0
         assert str(ev.recorded_date).startswith("2026-08-01")
-        assert ev.latitude == pytest.approx(36.1147)
-        assert ev.longitude == pytest.approx(-115.1728)
 
-    def test_geocoder_readiness_for_address_only_deeds(self, monkeypatch):
-        """DEEDS ships a street address and no native geometry. ADR-0004 geocodes
-        at enrichment; this test pins that the feed is geocoder-ready (the
-        geocoder path resolves when the registry declares needs_geocode)."""
-        from src.spatial import geocoder as geocoder_mod
+    def test_deed_takes_its_parcel_centroid(self, deeds, deed_row, no_geocoding):
+        ev = deeds.parse_socrata_row({**deed_row, "ADDRESS1": "REDACTED", "ZIPCODE": 913012345}, city_id="las_vegas")
+        assert ev.latitude == pytest.approx(36.1953)
+        assert ev.longitude == pytest.approx(-115.2231)
+        assert ev.h3_res9 is not None
+        assert no_geocoding == []
 
-        assert hasattr(geocoder_mod, "geocode_row_if_declared")
-        assert hasattr(geocoder_mod, "normalize_address")
+    def test_a_sale_the_join_missed_is_never_geocoded(self, deeds, deed_row, no_geocoding):
+        """The table's address columns hold the owner's mailing address, so a
+        sale whose parcel has no polygon stays unplaced rather than landing
+        wherever its owner lives."""
+        unplaced = {k: v for k, v in deed_row.items() if k not in ("latitude", "longitude")}
+        ev = deeds.parse_socrata_row({**unplaced, "ADDRESS1": "REDACTED"}, city_id="las_vegas")
+        assert ev is not None
+        assert ev.latitude is None
+        assert ev.h3_res9 is None
+        assert no_geocoding == []
 
-        address_only = {
-            "PARCEL": 16220100010,
-            "DOCNO": 2026063000011,
-            "SALEPRICE": 310000,
-            "SALEDATE": 20260630,
-            "ADDRESS1": "789 MAIN ST LAS VEGAS",
+    def test_deeds_join_parcel_polygons_and_leave_the_owner_on_the_server(self):
+        _skip_if_no_spine()
+        from src.spatial.city_registry import get_dataset
+
+        spec = get_dataset(LV, FeedType.DEEDS)
+        assert not spec.needs_geocode
+        assert spec.parcel_join == {
+            "parcel_layer": LAS_VEGAS_PARCEL_POLYGONS,
+            "join_key": "PARCEL",
+            "geometry_source": "centroid",
         }
-        fm = FIELD_MAP["deeds"]
-        assert first_mapped(address_only, fm, "latitude") is None
-        assert first_mapped(address_only, fm, "longitude") is None
-        assert first_mapped(address_only, fm, "address_street") == "789 MAIN ST LAS VEGAS"
-
-    def test_deed_parser_uses_declared_geocoder(self, deeds, deed_row, monkeypatch):
-        monkeypatch.setattr(
-            "src.producers.field_maps.resolve_field_map",
-            lambda city, feed: FIELD_MAP[feed.value],
-        )
-        monkeypatch.setattr(
-            "src.spatial.geocoder.geocode_row_if_declared",
-            lambda *args: (36.1147, -115.1728),
-        )
-        event = deeds.parse_socrata_row(deed_row, city_id="las_vegas")
-        assert event is not None
-        assert event.latitude == pytest.approx(36.1147)
-        assert event.longitude == pytest.approx(-115.1728)
+        assert not set(spec.select.split(",")) & OWNER_COLUMNS
 
     def test_deed_live_fixture_is_inside_the_metro_bbox(self, deed_row):
-        assert is_in_las_vegas_metro(36.1147, -115.1728)
+        assert is_in_las_vegas_metro(deed_row["latitude"], deed_row["longitude"])

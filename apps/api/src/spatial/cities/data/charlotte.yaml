@@ -110,6 +110,43 @@ divisions:
     - Elizabeth & Dilworth
     city_id: charlotte
 datasets:
+  permits:
+    endpoint: https://meckgis.mecklenburgcountync.gov/server/rest/services/BuildingPermits_Accela/FeatureServer/0
+    platform: arcgis
+    watermark_col: issue_date
+    id_keys:
+    - permit_number
+    - objectid
+    topic: raw.municipal.permits
+    interval_seconds: 3600.0
+    producer_key: permits
+    order_by: issue_date DESC,permit_number ASC,cama_parcel_number ASC
+    select: objectid,permit_number,issue_date,type_of_work,permit_status,building_construction_cost_system,project_address,zip_code,tax_jurisdiction,cama_parcel_number
+    where: issue_date IS NOT NULL
+    needs_geocode: false
+    field_map:
+      job_id:
+      - permit_number
+      issuance_date:
+      - issue_date
+      job_type:
+      - type_of_work
+      cost:
+      - building_construction_cost_system
+      status:
+      - permit_status
+      address_street:
+      - project_address
+      zipcode:
+      - zip_code
+      bbl:
+      - cama_parcel_number
+      borough:
+      - tax_jurisdiction
+    ingestion_mode: incremental
+    oid_field: objectid
+    max_record_count: 2000
+    expected_cadence_days: 2
   '311':
     endpoint: https://gis.charlottenc.gov/arcgis/rest/services/ODP/ServiceRequests311/MapServer/0
     platform: arcgis
@@ -179,7 +216,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'NC'
+    where: State = 'NC' AND Latitude BETWEEN 34.98 AND 35.55 AND Longitude BETWEEN -81.1 AND -80.45
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -218,6 +255,39 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 2000
+  deeds:
+    endpoint: https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcelSales/FeatureServer/0
+    platform: arcgis
+    watermark_col: saledate
+    id_keys:
+    - transferid
+    - parcelid
+    topic: raw.municipal.deeds
+    interval_seconds: 21600.0
+    producer_key: deeds
+    order_by: saledate DESC, objectid DESC
+    select: objectid,parcelid,transferid,saleprice,saledate,deeddescription,legalreference
+    where: saledate >= CURRENT_DATE - INTERVAL '90' DAY AND saledate <= CURRENT_TIMESTAMP
+    needs_geocode: false
+    field_map:
+      doc_id:
+      - legalreference
+      - transferid
+      recorded_date:
+      - saledate
+      document_amount:
+      - saleprice
+      bbl:
+      - parcelid
+      doc_type:
+      - deeddescription
+    ingestion_mode: snapshot
+    oid_field: objectid
+    max_record_count: 2000
+    expected_cadence_days: 7
+    batch_limit: 15000
+    composite_id: true
 aliases:
 - charlotte_nc
 - charlotte_mecklenburg

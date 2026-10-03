@@ -175,10 +175,15 @@
   "feeds": {
     "permits": null,
     "311": null,
-    "sla": null,
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
     "deeds": {
       "platform": "arcgis",
-      "watermark_col": "SALE_DATE",
+      "watermark_col": "pxfer_date",
       "interval_seconds": 600.0,
       "topic": "raw.municipal.deeds"
     }

@@ -91,8 +91,8 @@ DEEDS_ROW = {
     "OBJECTID": 550012,
     "PRICE_1": 700100,
     "DOS_1": "20260817",
-    "GRANTOR_1": "RIVERA JOSE",
-    "GRANTEE_1": "CHEN WEI",
+    "GRANTOR_1": "REDACTED",
+    "GRANTEE_1": "REDACTED",
     "TRUE_SITE_ADDR": "1450 BRICKELL AVE",
     "TRUE_SITE_ZIP_CODE": "33131",
     "QU_FLG_1": "Q",
@@ -254,8 +254,8 @@ class TestMiamiDadeFieldMaps:
         assert first_mapped(row, DEEDS_FIELD_MAP, "bbl") == "0141390012340"
         assert first_mapped(row, DEEDS_FIELD_MAP, "document_amount") == 700100
         assert first_mapped(row, DEEDS_FIELD_MAP, "recorded_date") == "20260817"
-        assert first_mapped(row, DEEDS_FIELD_MAP, "party1_grantor") == "RIVERA JOSE"
-        assert first_mapped(row, DEEDS_FIELD_MAP, "party2_grantee") == "CHEN WEI"
+        assert "party1_grantor" not in DEEDS_FIELD_MAP
+        assert "party2_grantee" not in DEEDS_FIELD_MAP
         assert first_mapped(row, DEEDS_FIELD_MAP, "address_street") == "1450 BRICKELL AVE"
 
 
@@ -380,8 +380,8 @@ class TestMiamiDadeDeedsParsing:
         assert event.bbl == "0141390012340"
         assert event.document_amount == 700100.0
         assert str(event.recorded_date).startswith("2026-08-17")
-        assert event.party1_grantor == "RIVERA JOSE"
-        assert event.party2_grantee == "CHEN WEI"
+        assert event.party1_grantor is None
+        assert event.party2_grantee is None
         assert event.latitude == pytest.approx(25.7580)
         assert event.longitude == pytest.approx(-80.1915)
         assert event.h3_res7 is not None

@@ -13,8 +13,9 @@ https://services9.arcgis.com/Gh9awoU677aKree0/arcgis/rest/services/Florida_State
 
 - 2M+ polygon parcels, 121 fields, ``objectIdField: "OBJECTID"``,
   ``maxRecordCount: 2000``, ``geometryType: esriGeometryPolygon``.
-- ``ASMNT_YR`` = assessment year (2025). ``CO_NO`` = 2-digit FL DOR county
-  code. ``EFF_YR_BLT`` = effective year built (construction-year proxy).
+- ``ASMNT_YR`` = assessment year (the layer holds one roll: 2026 on
+  2026-10-02). ``CO_NO`` = 2-digit FL DOR county code (11–77).
+  ``EFF_YR_BLT`` = effective year built (construction-year proxy).
   ``NCONST_VAL`` = new-construction value (cost proxy). ``DEL_VAL`` =
   demolition value. ``JV_CHNG`` = just/market value change.
 
@@ -29,81 +30,84 @@ status, latitude, longitude. Keyed to ``FeedType.PERMITS`` semantics of
 """
 
 # FL DOR county code → 5-digit Census FIPS code.
-# CO_NO is the 2-digit FDOR county code (01–67), alphabetical over the 67 FL
-# counties. The FIPS codes are the standard Census codes and are NOT "12" +
-# the FDOR code — Dade (Miami-Dade) carries FIPS 12086 at FDOR 13, so the
-# mapping is spelled out in full rather than derived. Verified against the
-# Census County FIPS codes and the FDOR alphabetical county order.
+# CO_NO is the 2-digit FDOR county code: the alphabetical index of the 67 FL
+# counties plus 10, so Alachua is 11 and Washington 77 (Marion 52 and Orange
+# 58 hold 286,275 and 492,806 parcels on the layer, read 2026-10-02). The
+# FIPS codes are the standard Census codes and are NOT "12" + the FDOR code —
+# Dade (Miami-Dade) carries FIPS 12086 at FDOR 23, so the mapping is spelled
+# out in full rather than derived. The table numbered the counties 1–67
+# until 2026-10-02, which registered Jackson County's parcels as Ocala's
+# (42) and Levy County's as Orlando's (48).
 # Use this to resolve county → metro via
 # ``geography_crosswalk.city_for_county_fips(fips)``.
 FL_COUNTY_CODE_TO_FIPS: dict[int, str] = {
-    1: "12001",  # Alachua
-    2: "12003",  # Baker
-    3: "12005",  # Bay
-    4: "12007",  # Bradford
-    5: "12009",  # Brevard
-    6: "12011",  # Broward
-    7: "12013",  # Calhoun
-    8: "12015",  # Charlotte
-    9: "12017",  # Citrus
-    10: "12019",  # Clay
-    11: "12021",  # Collier
-    12: "12023",  # Columbia
-    13: "12086",  # Dade / Miami-Dade
-    14: "12027",  # DeSoto
-    15: "12029",  # Dixie
-    16: "12031",  # Duval
-    17: "12033",  # Escambia
-    18: "12035",  # Flagler
-    19: "12037",  # Franklin
-    20: "12039",  # Gadsden
-    21: "12041",  # Gilchrist
-    22: "12043",  # Glades
-    23: "12045",  # Gulf
-    24: "12047",  # Hamilton
-    25: "12049",  # Hardee
-    26: "12051",  # Hendry
-    27: "12053",  # Hernando
-    28: "12055",  # Highlands
-    29: "12057",  # Hillsborough
-    30: "12059",  # Holmes
-    31: "12061",  # Indian River
-    32: "12063",  # Jackson
-    33: "12065",  # Jefferson
-    34: "12067",  # Lafayette
-    35: "12069",  # Lake
-    36: "12071",  # Lee
-    37: "12073",  # Leon
-    38: "12075",  # Levy
-    39: "12077",  # Liberty
-    40: "12079",  # Madison
-    41: "12081",  # Manatee
-    42: "12083",  # Marion
-    43: "12085",  # Martin
-    44: "12087",  # Monroe
-    45: "12089",  # Nassau
-    46: "12091",  # Okaloosa
-    47: "12093",  # Okeechobee
-    48: "12095",  # Orange
-    49: "12097",  # Osceola
-    50: "12099",  # Palm Beach
-    51: "12101",  # Pasco
-    52: "12103",  # Pinellas
-    53: "12105",  # Polk
-    54: "12107",  # Putnam
-    55: "12109",  # St. Johns
-    56: "12111",  # St. Lucie
-    57: "12113",  # Santa Rosa
-    58: "12115",  # Sarasota
-    59: "12117",  # Seminole
-    60: "12119",  # Sumter
-    61: "12121",  # Suwannee
-    62: "12123",  # Taylor
-    63: "12125",  # Union
-    64: "12127",  # Volusia
-    65: "12129",  # Wakulla
-    66: "12131",  # Walton
-    67: "12133",  # Washington
+    11: "12001",  # Alachua
+    12: "12003",  # Baker
+    13: "12005",  # Bay
+    14: "12007",  # Bradford
+    15: "12009",  # Brevard
+    16: "12011",  # Broward
+    17: "12013",  # Calhoun
+    18: "12015",  # Charlotte
+    19: "12017",  # Citrus
+    20: "12019",  # Clay
+    21: "12021",  # Collier
+    22: "12023",  # Columbia
+    23: "12086",  # Dade / Miami-Dade
+    24: "12027",  # DeSoto
+    25: "12029",  # Dixie
+    26: "12031",  # Duval
+    27: "12033",  # Escambia
+    28: "12035",  # Flagler
+    29: "12037",  # Franklin
+    30: "12039",  # Gadsden
+    31: "12041",  # Gilchrist
+    32: "12043",  # Glades
+    33: "12045",  # Gulf
+    34: "12047",  # Hamilton
+    35: "12049",  # Hardee
+    36: "12051",  # Hendry
+    37: "12053",  # Hernando
+    38: "12055",  # Highlands
+    39: "12057",  # Hillsborough
+    40: "12059",  # Holmes
+    41: "12061",  # Indian River
+    42: "12063",  # Jackson
+    43: "12065",  # Jefferson
+    44: "12067",  # Lafayette
+    45: "12069",  # Lake
+    46: "12071",  # Lee
+    47: "12073",  # Leon
+    48: "12075",  # Levy
+    49: "12077",  # Liberty
+    50: "12079",  # Madison
+    51: "12081",  # Manatee
+    52: "12083",  # Marion
+    53: "12085",  # Martin
+    54: "12087",  # Monroe
+    55: "12089",  # Nassau
+    56: "12091",  # Okaloosa
+    57: "12093",  # Okeechobee
+    58: "12095",  # Orange
+    59: "12097",  # Osceola
+    60: "12099",  # Palm Beach
+    61: "12101",  # Pasco
+    62: "12103",  # Pinellas
+    63: "12105",  # Polk
+    64: "12107",  # Putnam
+    65: "12109",  # St. Johns
+    66: "12111",  # St. Lucie
+    67: "12113",  # Santa Rosa
+    68: "12115",  # Sarasota
+    69: "12117",  # Seminole
+    70: "12119",  # Sumter
+    71: "12121",  # Suwannee
+    72: "12123",  # Taylor
+    73: "12125",  # Union
+    74: "12127",  # Volusia
+    75: "12129",  # Wakulla
+    76: "12131",  # Walton
+    77: "12133",  # Washington
 }
 
 # Standalone field map — one entry per FL metro that will adopt this spec.

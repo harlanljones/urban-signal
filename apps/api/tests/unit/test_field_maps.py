@@ -53,6 +53,14 @@ class TestFirstMapped:
             is None
         )
 
+    def test_dotted_key_names_a_column_the_row_has(self):
+        # Laredo's CKAN columns carry dots ("PERMIT ISS. DATE"); a column of
+        # that exact name wins over the nested reading.
+        row = {"PERMIT ISS. DATE": "2026-07-02T00:00:00"}
+        assert first_mapped(row, {"d": ["PERMIT ISS. DATE"]}, "d") == "2026-07-02T00:00:00"
+        row = {"location_1.latitude": "1.5", "location_1": {"latitude": "2.5"}}
+        assert first_mapped(row, {"latitude": ["location_1.latitude"]}, "latitude") == "1.5"
+
     def test_multiple_canonicals_consulted_in_order(self):
         row = {"lat": "1.0"}
         assert first_mapped(row, {"longitude": ["lon"], "latitude": ["lat"]}, "longitude", "latitude") == "1.0"

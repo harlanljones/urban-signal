@@ -179,14 +179,24 @@
       "interval_seconds": 300.0,
       "topic": "raw.municipal.permits"
     },
-    "311": null,
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "CreateDate",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.311"
+    },
     "sla": {
       "platform": "arcgis",
       "watermark_col": "",
       "interval_seconds": 1800.0,
       "topic": "raw.municipal.sla"
     },
-    "deeds": null
+    "deeds": {
+      "platform": "arcgis",
+      "watermark_col": "S_1DATE",
+      "interval_seconds": 21600.0,
+      "topic": "raw.municipal.deeds"
+    }
   },
   "evidence_path": "apps/api/src/spatial/cities/cape_coral.py",
   "generated_from": "apps/api/src/spatial/city_registry.py REGISTRY"

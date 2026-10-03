@@ -6,12 +6,15 @@ constructs from these dicts) so the spine can copy them mechanically during
 the interlock hold; the per-city placement is documented in
 ``.streams/us372-state-licenses.md`` ("Spine delta").
 
-Three of the nine registries are ALREADY registered live: TABC active under
-Austin (``settings.socrata_austin_tabc_endpoint``), WA LCB under Seattle
-(``settings.socrata_seattle_licenses_endpoint``), OLCC under Portland
+Two of the nine registries are registered live: TABC active under Austin
+(``settings.socrata_austin_tabc_endpoint``) and OLCC under Portland
 (``settings.socrata_portland_olcc_applications_endpoint``). The corresponding
 specs here show the namespaced-mapping variant for those feeds — adopting
-them changes license_type values and is the spine's call.
+them changes license_type values and is the spine's call. WA LCB was
+registered under Seattle until 2026-09-30, when it was replaced by the SNAP
+retailer slice: the letters table is a statewide log of applications awaiting
+a local reply, it held 0 rows that day, and the spec never mapped a field
+(``docs/research/feed-health-2026-09-30.md``).
 
 license_type NAMESPACING rides the endpoint string: SoQL
 ``$select=*, '<ns>:' || <type_col> as license_type_ns`` — httpx merges the
@@ -52,8 +55,9 @@ the only AL ABC layer reachable (Huntsville's
 ``Licenses/AlcoholBeverageLicenses/MapServer/0``) is a 971-row,
 Huntsville-area mirror — city-scoped, not a statewide register. Per the
 never-fake-endpoints convention these are documented, not fabricated; SNAP
-retailer SLA (``snap_sla_spec("AL"/"GA")``) remains the live SLA coverage
-until a verifiable state registry endpoint surfaces.
+retailer SLA (``snap_sla_spec``, the AL/GA slice inside each metro bbox)
+remains the live SLA coverage until a verifiable state registry endpoint
+surfaces.
 """
 
 from src.config import settings

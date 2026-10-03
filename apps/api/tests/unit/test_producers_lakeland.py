@@ -1,8 +1,11 @@
 """Unit tests for the Lakeland registration (US-286) and its leaf wiring.
 
-Leaf-only: imports the lakeland module directly and never touches the spine
-REGISTRY. Ensures containment and a minimally-complete permits spec.
+Imports the lakeland module directly for containment, and reads the spine
+REGISTRY for the permits feed the scheduler actually polls.
 """
+
+from datetime import UTC, datetime
+from unittest.mock import patch
 
 from src.spatial.cities.lakeland import (
     LAKELAND_DIVISION_BBOXES,
@@ -12,7 +15,7 @@ from src.spatial.cities.lakeland import (
     get_lakeland_dataset,
     is_in_lakeland_metro,
 )
-from src.spatial.city_registry import FeedType
+from src.spatial.city_registry import REGISTRY, CityId, FeedType
 
 
 class TestLakelandRegistration:
@@ -55,3 +58,69 @@ class TestFeedRegistration:
         assert spec.oid_field is not None
         assert spec.interval_seconds > 0
 
+
+    def test_permits_read_the_hosted_ims_layer(self):
+        """The on-premises iMS MapServer reset every connection in September
+        2026, and its empty field map dead-lettered every row even when it
+        answered: ``PERMIT_NO`` is not in the producer's default id chain."""
+        spec = REGISTRY[CityId.LAKELAND].datasets[FeedType.PERMITS]
+        assert spec.endpoint == (
+            "https://services1.arcgis.com/mcbQY5xNGGGM1vBX/arcgis/rest/services/"
+            "IMS_Projects_Permits/FeatureServer/6"
+        )
+        # ISSUED stops at 2025-06-25; APPROVED carries every issuance since.
+        assert spec.watermark_col == "APPROVED"
+        assert spec.order_by == "APPROVED DESC,OBJECTID ASC"
+        # The layer also holds 1,916 planning "Project" rows.
+        assert spec.where == "TYPE = 'Permit'"
+        assert spec.field_map["job_id"] == ["PERMIT_NO"]
+        assert spec.field_map["issuance_date"] == ["APPROVED", "ISSUED"]
+
+    def test_leaf_mirror_matches_the_registry(self):
+        spec = REGISTRY[CityId.LAKELAND].datasets[FeedType.PERMITS]
+        leaf = get_lakeland_dataset(FeedType.PERMITS)
+        assert leaf.endpoint == spec.endpoint
+        assert leaf.watermark_col == spec.watermark_col
+        assert leaf.field_map == spec.field_map
+
+    def test_applicant_names_are_never_mapped(self):
+        spec = REGISTRY[CityId.LAKELAND].datasets[FeedType.PERMITS]
+        candidates = {c for cols in spec.field_map.values() for c in cols}
+        assert not candidates & {"APPLICANT_NAME", "CREATED_USER", "LAST_EDITED_USER"}
+
+
+# A live permit (2026-09-30, approved newest first). Dates as ArcGISClient
+# normalizes them; the applicant's name is replaced.
+_PERMIT_LADOGA_DR = {
+    "OBJECTID": 8484546,
+    "TYPE": "Permit",
+    "PERMIT_NO": "BLD26-05749",
+    "DESCRIPTION": "PP INSP - REROOF",
+    "SITE_ADDR": "2450 LADOGA DR",
+    "SITE_CITY": "LAKELAND",
+    "SITE_STATE": "FL",
+    "SITE_ZIP": "33805",
+    "PERMITORPROJECTTYPE": "Roof",
+    "APPLICANT_NAME": "APPLICANT NAME REDACTED",
+    "APPLIED": "2026-09-29T12:12:53+00:00",
+    "APPROVED": "2026-09-29T19:40:02+00:00",
+    "ISSUED": None,
+    "JOBVALUE": 14000,
+    "longitude": -81.91549865158234,
+    "latitude": 28.116803418380393,
+}
+
+
+def test_permit_parses_from_the_hosted_layer():
+    with patch("src.producers.dob_permits_producer.BaseKafkaProducer"):
+        from src.producers.dob_permits_producer import DOBPermitsProducer
+
+        event = DOBPermitsProducer().parse_socrata_row(_PERMIT_LADOGA_DR, city_id="lakeland")
+    assert event is not None
+    assert event.job_id == "BLD26-05749"
+    assert event.address_street == "2450 LADOGA DR"
+    assert event.zipcode == "33805"
+    assert event.estimated_cost == 14000
+    assert event.filing_date == datetime(2026, 9, 29, 12, 12, 53, tzinfo=UTC)
+    assert event.issuance_date == datetime(2026, 9, 29, 19, 40, 2, tzinfo=UTC)
+    assert "APPLICANT NAME REDACTED" not in event.model_dump_json()

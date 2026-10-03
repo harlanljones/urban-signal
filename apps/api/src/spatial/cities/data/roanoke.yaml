@@ -229,50 +229,103 @@ divisions:
     city_id: roanoke
 datasets:
   deeds:
-    endpoint: https://gis.roanokeva.gov/server/rest/services/OpenData/Parcels/FeatureServer/0
+    endpoint: https://maps.roanokeva.gov/server/rest/services/RealEstate/Proval_Transfer_History/FeatureServer/3
     platform: arcgis
-    watermark_col: SALE_DATE
+    watermark_col: pxfer_date
     id_keys:
-    - PARCELID
-    - OBJECTID
+    - DocNum
+    - lrsn
     topic: raw.municipal.deeds
     interval_seconds: 600.0
     producer_key: deeds
     endpoint_by_year: {}
-    watermark_type: text
-    watermark_format: '%m/%d/%Y'
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: pxfer_date DESC, ID DESC
+    id_col: null
+    select: ID,DocNum,lrsn,parcel_id,pxfer_date,consideration,deed_type
+    fallback_endpoints: []
+    where: pxfer_date >= date '1900-01-01'
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - DocNum
+      - ID
+      bbl:
+      - parcel_id
+      doc_type:
+      - deed_type
+      document_amount:
+      - consideration
+      recorded_date:
+      - pxfer_date
+    ingestion_mode: incremental
+    oid_field: ID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join:
+      parcel_layer: https://maps.roanokeva.gov/server/rest/services/Hosted/City_Parcels/FeatureServer/0
+      join_key: lrsn
+      geometry_source: centroid
+    non_spatial: false
+    zip_member: null
+    composite_id: true
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
     watermark_exclude: []
     order_by: null
     id_col: null
     select: null
     fallback_endpoints: []
-    where: null
+    where: State = 'VA' AND Latitude BETWEEN 37.2 AND 37.34 AND Longitude BETWEEN -80.02 AND -79.88
     needs_geocode: false
     geocode_context: null
     field_map:
-      doc_id:
-      - PARCELID
-      - PRINTKEY
-      bbl:
-      - PARCELID
-      doc_type:
-      - DEED_TYPE
-      document_amount:
-      - SALE_PRICE
-      recorded_date:
-      - SALE_DATE
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
       address_street:
-      - SITEADDRESS
-      incident_address:
-      - SITEADDRESS
+      - Store_Street_Address
       borough:
-      - CITY
+      - City
       zipcode:
-      - ZIP5
-    ingestion_mode: incremental
-    oid_field: OBJECTID
-    max_record_count: 100000
-    expected_cadence_days: 30
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false
@@ -286,7 +339,7 @@ datasets:
     state_plane_x_col: null
     state_plane_y_col: null
     parcel_join: {}
-    non_spatial: false
+    non_spatial: null
     zip_member: null
 aliases:
 - roanoke_va

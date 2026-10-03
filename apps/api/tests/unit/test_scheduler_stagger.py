@@ -59,7 +59,7 @@ def test_run_job_reschedules_at_its_own_interval(scheduler, monkeypatch):
 
 def test_registry_declares_per_feed_intervals(scheduler):
     assert scheduler.configs["311_baltimore"].interval_seconds == 180.0
-    assert scheduler.configs["sla_montgomery"].interval_seconds == 900.0
+    assert scheduler.configs["sla_montgomery"].interval_seconds == 1800.0
     assert scheduler.configs["permits"].interval_seconds == 300.0
     intervals = {cfg.interval_seconds for cfg in scheduler.configs.values()}
     assert len(intervals) > 1  # genuinely per-feed, not one global value

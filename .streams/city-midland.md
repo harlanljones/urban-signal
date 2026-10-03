@@ -23,6 +23,8 @@ Onboard Midland, TX as a new Urban Signal metro (South Central). Verify municipa
 
 - 2026-08-28 — Claimed stream for US-279 (Midland, TX). Will follow leaf-first then spine.
 
+- 2026-10-02 — Permits registered from the City's EnerGov permits layer on ArcGIS Online (`Permits/FeatureServer/0`), windowed on the application date (stream `texas-south-feeds`, `docs/research/one-family-depth-2026-10-02.md`). `311` runs on SeeClickFix with no public layer.
+
 ## Current step
 
 Exploring existing Texas city patterns and adding apps/api/src/spatial/cities/midland.py plus tests.

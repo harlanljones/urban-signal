@@ -176,23 +176,23 @@ class Settings(BaseSettings):
 
     # Socrata SODA OpenData APIs (San Francisco & Bay Area)
     socrata_sf_dob_endpoint: str = Field(
-        default="https://data.sfgov.org/resource/i98e-djp9.json",
+        default="https://data.sf.gov/resource/i98e-djp9.json",
         description="SF Building Permits endpoint",
     )
     socrata_sf_311_endpoint: str = Field(
-        default="https://data.sfgov.org/resource/vw6y-z8j6.json",
+        default="https://data.sf.gov/resource/vw6y-z8j6.json",
         description="SF 311 Service Requests endpoint",
     )
     socrata_sf_licenses_endpoint: str = Field(
-        default="https://data.sfgov.org/resource/g8m3-pdis.json",
+        default="https://data.sf.gov/resource/g8m3-pdis.json",
         description="SF Registered Business Locations endpoint",
     )
     socrata_sf_deeds_endpoint: str = Field(
-        default="https://data.sfgov.org/resource/wv5m-vpq2.json",
+        default="https://data.sf.gov/resource/wv5m-vpq2.json",
         description="SF Assessor Historical Secured Property endpoint",
     )
 
-    # Seattle / Puget Sound (Socrata + WA State LCB)
+    # Seattle / Puget Sound (Socrata)
     socrata_seattle_permits_endpoint: str = Field(
         default="https://data.seattle.gov/resource/76t5-zqzr.json",
         description="Seattle SDCI Building Permits endpoint (2005+)",
@@ -200,10 +200,6 @@ class Settings(BaseSettings):
     socrata_seattle_311_endpoint: str = Field(
         default="https://data.seattle.gov/resource/5ngg-rpne.json",
         description="Seattle Customer Service Requests (Find It Fix It) endpoint",
-    )
-    socrata_seattle_licenses_endpoint: str = Field(
-        default="https://data.wa.gov/resource/vgcw-qfjm.json",
-        description="WA State LCB Local Authority Letters - liquor license applications endpoint",
     )
 
     # ArcGIS Feature Services (King County)
@@ -295,7 +291,7 @@ class Settings(BaseSettings):
 
     # Crime incident feeds (US-71): NIBRS-classified incident rows per metro.
     # LA stays out (mid-NIBRS-transition series break). NYC's YTD dataset
-    # publishes monthly (G11 cadence declaration in the registry spec).
+    # publishes complete quarters (G11 cadence declaration in the registry spec).
     socrata_nyc_crime_endpoint: str = Field(
         default="https://data.cityofnewyork.us/resource/5uac-w243.json",
         description="NYC crime current-year YTD incidents endpoint",
@@ -318,7 +314,7 @@ class Settings(BaseSettings):
         description="Chicago crime incidents endpoint",
     )
     socrata_sf_crime_endpoint: str = Field(
-        default="https://data.sfgov.org/resource/wg3w-h783.json",
+        default="https://data.sf.gov/resource/wg3w-h783.json",
         description="SF crime incident reports endpoint",
     )
     socrata_seattle_crime_endpoint: str = Field(
@@ -717,11 +713,13 @@ class Settings(BaseSettings):
             "(gpsx/gpsy State Plane coordinates transformed via EPSG:2249)"
         ),
     )
-    # US-: Boston Crime Incident Reports (CKAN 6220d948-... odata v4). Source
-    # carries Lat/Long directly, so no geocode step required. Mirrors the other
-    # Boston CKAN feeds' `ckan://` scheme.
+    # US-: Boston Crime Incident Reports, the rolling "2023 to Present" resource
+    # (b973d8cb-...). Source carries Lat/Long directly, so no geocode step
+    # required. Mirrors the other Boston CKAN feeds' `ckan://` scheme. Until
+    # 2026-09-30 this named the package id (6220d948-...), which
+    # datastore_search answers with 404.
     ckan_boston_crime_endpoint: str = Field(
-        default="ckan://data.boston.gov/6220d948-eae2-4e4b-8723-2dc8e67722a3",
+        default="ckan://data.boston.gov/b973d8cb-eeb2-4e7e-99da-c92938efc9c0",
         description="Boston Crime Incident Reports CKAN resource",
     )
     # US-209: Boston Property Assessment FY2026 (DEEDS proxy; snapshot). The registry
@@ -732,15 +730,18 @@ class Settings(BaseSettings):
         description="Boston Property Assessment FY2026 CKAN resource (DEEDS proxy; snapshot)",
     )
     # US-209: Boston Building & Property Violations (ISD code enforcement). Direct
-    # lat/long columns; status_dttm watermark; case_no id.
+    # lat/long columns; status_dttm watermark; case_no id. Resource id, not the
+    # package id (705244a6-...) registered until 2026-09-30.
     ckan_boston_violations_endpoint: str = Field(
-        default="ckan://data.boston.gov/705244a6-70a6-4ff8-ab8e-56441aff18e7",
+        default="ckan://data.boston.gov/800a2663-1d6a-46e7-9356-bedb70f5332c",
         description="Boston Building and Property Violations CKAN resource (US-209)",
     )
     # US-209: Boston Food Establishment Inspections. `location` is a "(lat, lng)"
-    # string tuple; licenseno id; resultdttm / status_date watermark.
+    # string tuple; licenseno id; resultdttm watermark (status_date is null on
+    # most rows). Resource id, not the package id (03693648-...) registered
+    # until 2026-09-30.
     ckan_boston_inspections_endpoint: str = Field(
-        default="ckan://data.boston.gov/03693648-2c62-4a2c-a4ec-48de2ee14e18",
+        default="ckan://data.boston.gov/4582bec6-2b4f-4f9e-bc55-cbaa73117f4c",
         description="Boston Food Establishment Inspections CKAN resource (US-209)",
     )
 
@@ -776,8 +777,8 @@ class Settings(BaseSettings):
         description="Montgomery County MD SDAT real-property deeds snapshot endpoint",
     )
 
-    # Denver (ArcGIS Hub): construction permits and ODC 311 only. Licenses
-    # have no issue date and sales are ungeocoded, so both remain excluded.
+    # Denver (ArcGIS Hub): construction permits, ODC 311, and deeds from the
+    # parcel layer's last sale (2026-09-30). Licenses have no issue date.
     arcgis_denver_permits_url: str = Field(
         default=(
             "https://services1.arcgis.com/zdB7qR0BtYrg0Xpl/arcgis/rest/services/"
@@ -791,6 +792,13 @@ class Settings(BaseSettings):
             "ODC_service_requests_311/FeatureServer/66"
         ),
         description="Denver ODC 311 service requests FeatureServer table",
+    )
+    arcgis_denver_deeds_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/zdB7qR0BtYrg0Xpl/arcgis/rest/services/"
+            "ODC_PROP_PARCELS_A/FeatureServer/245"
+        ),
+        description="Denver parcel polygons with each parcel's last sale (deeds snapshot)",
     )
 
     # Baltimore (ArcGIS): permits, current-year 311, and narrow liquor
@@ -849,9 +857,12 @@ class Settings(BaseSettings):
     # Peoria, IL (US-260). The deeds feed is on **Peoria County's** own ArcGIS
     # server, not the city's — the ArcGIS Hub domain named in the ticket
     # (peoria.opendata.arcgis.com) does not exist. Residential sales are
-    # year-sliced MapServer layers under one service; `endpoint_by_year` in the
-    # registry resolves the current year and the US-70 rollover drill guards New
-    # Year. Point geometry in Web Mercator, lifted to WGS84 via outSR=4326.
+    # year-sliced MapServer layers under one service, and layer 5 is always
+    # "Current Year Sales". The county inserts a layer for the closing year each
+    # January, shifting every older layer's id, so the registry polls layer 5
+    # alone: the year map it carried until 2026-09-30 resolved to a layer that
+    # no longer existed (404). Point geometry in Web Mercator, lifted to WGS84
+    # via outSR=4326.
     arcgis_peoria_deeds_url: str = Field(
         default=(
             "https://gis.peoriacounty.gov/arcgis/rest/services/DP/"
@@ -959,10 +970,18 @@ class Settings(BaseSettings):
         description="Columbus Building Permits FeatureServer layer URL",
     )
 
-    # Madison, WI (US-356): public Accela permitting surface.
-    accela_madison_permits_endpoint: str = Field(
-        default="https://aca-prod.accela.com/MADISON/Cap/CapHome.aspx",
-        description="Madison Accela Citizen Access building-permit endpoint",
+    # Columbus, OH (ArcGIS Server 11.5): "All Service Requests - Last 3 Years",
+    # the layer behind the City's 311 map app. A rolling three-year window
+    # refreshed by one daily extract (~05:00 ET). The server rejects ISO date
+    # strings in `where` (400), hence its ANSI_DATE_LITERAL_HOSTS entry. The
+    # spec excludes the "City Staff Requests" category (call-centre notes) and
+    # rows without a point.
+    arcgis_columbus_311_url: str = Field(
+        default=(
+            "https://maps2.columbus.gov/arcgis/rest/services/Applications/"
+            "ServiceRequests/MapServer/1"
+        ),
+        description="Columbus, OH 311 service requests MapServer layer URL (rolling 3 years)",
     )
 
     # Columbus, OH (ArcGIS, US-127): Franklin County Auditor sales-dashboard
@@ -1080,6 +1099,26 @@ class Settings(BaseSettings):
         description="Des Moines, IA rental licenses MapServer layer URL (SLA)",
     )
 
+    # Des Moines, IA code enforcement: layer 0 "Code Case" of the same
+    # EXTDynamicCodeCaseRentalLicense MapServer (ArcGIS Server 10.91). Native
+    # point geometry on every row (outSR=4326 lifts the Iowa State Plane South
+    # feet store SR to WGS84), DateOpened date watermark stored at local
+    # midnight, CaseNumber unique string id; 33,061 rows live-verified
+    # 2026-09-29 (newest DateOpened 2026-09-25, 0 future-dated rows).
+    # Registered as FeedType.VIOLATIONS (Austin/Boston precedent); code
+    # enforcement is not 311. Same full-reload service as the rental layer, and
+    # the same ANSI-date-literal host (maps.dsm.city). Description is free text
+    # (14,568 distinct values, with staff initials and names in the notes),
+    # Remark is a free-text column (empty on every row today) and the editor
+    # columns are staff/service accounts: none of them is mapped.
+    arcgis_des_moines_code_cases_url: str = Field(
+        default=(
+            "https://maps.dsm.city/p2/rest/services/External/"
+            "EXTDynamicCodeCaseRentalLicense/MapServer/0"
+        ),
+        description="Des Moines, IA code enforcement cases MapServer layer URL (violations)",
+    )
+
     # Pierce County, WA (ArcGIS): county applications and permits across six
     # departments (Building, Development Engineering, Environmental, Fire,
     # Land Use, Sewer). Point layer in WA State Plane; the client's outSR=4326
@@ -1122,15 +1161,32 @@ class Settings(BaseSettings):
         description="Milwaukee 2025 property-sales CSV endpoint (US-138)",
     )
     # Charlotte, NC (ArcGIS): city 311 service requests with native
-    # LATITUDE/LONGITUDE + point geometry. Mecklenburg County permits/parcels
-    # live on an ArcGIS Hub surface with no quickly-verifiable bulk feed
-    # (US-88); the registration is 311-only.
+    # LATITUDE/LONGITUDE + point geometry. Building permits come from
+    # Mecklenburg County's own GIS server, which republishes the county's
+    # Accela permits nightly as points, one row per permit and parcel, for
+    # Charlotte and the county's six towns (2026-09-30). Deeds come from the
+    # same server's sales ledger, one row per transfer and parcel on the
+    # parcel's polygon.
     arcgis_charlotte_311_url: str = Field(
         default=(
             "https://gis.charlottenc.gov/arcgis/rest/services/"
             "ODP/ServiceRequests311/MapServer/0"
         ),
         description="Charlotte ODP 311 service requests layer URL",
+    )
+    arcgis_charlotte_permits_url: str = Field(
+        default=(
+            "https://meckgis.mecklenburgcountync.gov/server/rest/services/"
+            "BuildingPermits_Accela/FeatureServer/0"
+        ),
+        description="Mecklenburg County building permits (Accela) layer URL, Charlotte's permits",
+    )
+    arcgis_charlotte_deeds_url: str = Field(
+        default=(
+            "https://meckgis.mecklenburgcountync.gov/server/rest/services/"
+            "TaxParcelSales/FeatureServer/0"
+        ),
+        description="Mecklenburg County tax parcel sales layer URL, Charlotte's deeds",
     )
 
     # Houston, TX (ArcGIS, US-140): City of Houston mycity2 HOUSTON311_RECENT_SR_SNOW
@@ -1168,6 +1224,13 @@ class Settings(BaseSettings):
             "hubNashville_311_Service_Requests_Current_Year_view/FeatureServer/0"
         ),
         description="Nashville hubNashville 311 Service Requests Current Year FeatureServer layer URL",
+    )
+    arcgis_nashville_deeds_url: str = Field(
+        default=(
+            "https://services2.arcgis.com/HdTo6HJqh92wn4D8/arcgis/rest/services/"
+            "Parcels_view/FeatureServer/0"
+        ),
+        description="Nashville parcel polygons with each parcel's last transfer (deeds snapshot)",
     )
 
     # Kansas City, MO (Socrata): 311 Call Center Reported Issues. Corrects the
@@ -1245,6 +1308,22 @@ class Settings(BaseSettings):
         ),
         description="Hartford current-year 311 FeatureServer layer URL",
     )
+    arcgis_hartford_deeds_url: str = Field(
+        default=(
+            "https://utility.arcgis.com/usrsvcs/servers/"
+            "d595ae995fb049d3ac54919ebf24b1ac/rest/services/"
+            "HartfordOpenDataTables/FeatureServer/6"
+        ),
+        description="Hartford CAMA property table with each account's last sale (deeds snapshot)",
+    )
+    arcgis_hartford_parcel_layer_url: str = Field(
+        default=(
+            "https://utility.arcgis.com/usrsvcs/servers/"
+            "6f9809e9fe754a879389ee0dfa1fcec5/rest/services/"
+            "OpenData_Housing_Development/MapServer/11"
+        ),
+        description="Hartford parcel polygon layer URL (deeds geometry join on PARCELNUMBER)",
+    )
     socrata_hartford_sla_endpoint: str = Field(
         default="https://data.ct.gov/resource/ngch-56tr.json",
         description="Connecticut State Licenses and Credentials Socrata endpoint",
@@ -1288,6 +1367,16 @@ class Settings(BaseSettings):
         ),
         description="Worcester food establishment licenses FeatureServer table URL",
     )
+    # Worcester 311 (2026-10-02): the City's Customer Service Request System
+    # work orders from 2021, a table with no geometry whose coordinates are
+    # Massachusetts State Plane feet; the scheduler converts them.
+    arcgis_worcester_311_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/j8dqo2DJE7mVUBU1/arcgis/rest/services/"
+            "CsrsWorkOrders_TEST/FeatureServer/0"
+        ),
+        description="Worcester CSRS work orders FeatureServer table URL (311)",
+    )
 
     # Raleigh, NC / Wake County (ArcGIS, US-151): native point permits and
     # 311 plus polygon parcel sales for the deeds signal.
@@ -1308,15 +1397,6 @@ class Settings(BaseSettings):
     arcgis_wake_deeds_url: str = Field(
         default="https://maps.wake.gov/arcgis/rest/services/Property/Parcels/MapServer/0",
         description="Wake County parcel sales MapServer layer URL",
-    )
-
-    # Macon-Bibb County, GA (ArcGIS): Building Permits (2010‑Present) polygon layer.
-    arcgis_macon_bibb_permits_url: str = Field(
-        default=(
-            "https://services6.arcgis.com/Yx1h0qHJ9wIpQWuU/arcgis/rest/services/"
-            "Building_Permits_Public/FeatureServer/0"
-        ),
-        description="Macon-Bibb County Building Permits (2010‑Present) ArcGIS FeatureServer layer URL",
     )
 
     # San Antonio, TX (CKAN + ArcGIS, US-141): live building permits datastore
@@ -1546,16 +1626,27 @@ class Settings(BaseSettings):
         default="https://data.cityoforlando.net/resource/ssrj-rbua.json",
         description="Orlando Short Term Rental Licenses Socrata endpoint (SLA companion)",
     )
-    # Gainesville, FL (Socrata): native-point permits with latitude/longitude and location_1.
-    socrata_gainesville_permits_endpoint: str = Field(
-        default="https://data.cityofgainesville.org/resource/p798-x3nx.json",
-        description="Gainesville building permits Socrata endpoint",
+    # 2026-10-02: the City's permit applications replace the statewide parcel
+    # layer, whose county code 48 read Levy County. Rows carry no point.
+    socrata_orlando_permits_endpoint: str = Field(
+        default="https://data.cityoforlando.net/resource/ryhf-m453.json",
+        description="Orlando permit applications Socrata endpoint (address-only; issued permits)",
     )
-
-    # Melbourne / Palm Bay / Titusville (Brevard County, FL) — US-296
-    arcgis_brevard_permits_url: str = Field(
-        default="https://gis.palmbayflorida.org/arcgis/rest/services/GrowthManagement/BuildingPermits/FeatureServer/0",
-        description="Palm Bay (Brevard County) Building Permits ArcGIS FeatureServer layer URL",
+    # The City's address points place each permit by its address
+    # (``SitusAddress``); the geocoder takes the rest.
+    arcgis_orlando_address_points_url: str = Field(
+        default="https://services5.arcgis.com/mMuoPCaIYD4wEgDl/arcgis/rest/services/Address_Point/FeatureServer/22",
+        description="City of Orlando address points that place Orlando's permits (parcel join)",
+    )
+    # Gainesville, FL permits (2026-10-02): Alachua County's building permits
+    # layer on ArcGIS Online, loaded twice a week. It holds the permits the
+    # County issues; the City's Socrata set stopped on 2023-02-28.
+    arcgis_gainesville_permits_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/MiBZ4u97DWldovjI/arcgis/rest/services/"
+            "BuildingPermitsCS/FeatureServer/0"
+        ),
+        description="Alachua County building permits layer for the Gainesville FL metro (county-hosted)",
     )
 
     # Miami-Dade County (US-199): ArcGIS Hub permits table + LBT SLA snapshot
@@ -1614,9 +1705,18 @@ class Settings(BaseSettings):
     # ZIP, `Data/Sales_Affidavits.txt` pipe-delimited member). Probe 2026-08-28:
     # 912,806 rows, fresh (item modified 2026-08-03), no Last-Modified header on
     # the download — freshness via AGOL item metadata or alarm_exempt.
+    # Unregistered 2026-09-30: every row dead-lettered, and Phoenix deeds read
+    # the Assessor parcel layer below instead.
     csv_phoenix_deeds_endpoint: str = Field(
         default="https://www.arcgis.com/sharing/rest/content/items/f3484c72a938497286adc4e5de7e9963/data",
         description="Maricopa County Sales Affidavits CSV Collection download URL (US-392)",
+    )
+    # Maricopa County Assessor parcels (ArcGIS Server 11.5): each parcel's
+    # latest deed with native coordinates. Deeds for Phoenix, Tempe, Chandler,
+    # Scottsdale and Glendale filter it by JURISDICTION (2026-09-30).
+    arcgis_maricopa_parcels_url: str = Field(
+        default="https://gis.mcassessor.maricopa.gov/arcgis/rest/services/Parcels/MapServer/0",
+        description="Maricopa County Assessor parcel layer with each parcel's latest deed (deeds snapshot)",
     )
 
     # Aurora, CO (US-326): issued building permits MapServer 44 (full history,
@@ -1690,6 +1790,15 @@ class Settings(BaseSettings):
     arcgis_toledo_311_url: str = Field(
         default="https://gis.toledo.oh.gov/arcgis/rest/services/Public/CityWorks_ServiceRequest_2022/MapServer/0",
         description="Toledo Engage 311 Cityworks ArcGIS MapServer URL",
+    )
+    # Toledo deeds (2026-09-30): the Lucas County Auditor's ArcGIS Online
+    # sales layer, one point per recorded sale and parcel across the county.
+    arcgis_toledo_deeds_url: str = Field(
+        default=(
+            "https://services3.arcgis.com/T8dczfwPixv79EgZ/arcgis/rest/services/"
+            "Lucas_County_TaxParcels/FeatureServer/1"
+        ),
+        description="Lucas County Auditor sales layer URL, Toledo's deeds",
     )
 
     # Buffalo, NY (US-349): restaurant-license SLA (Socrata). Native WGS84
@@ -1796,10 +1905,14 @@ class Settings(BaseSettings):
         default="https://capeims.capecoral.gov/arcgis/rest/services/OpenData/OpenData/MapServer/1",
         description="Cape Coral–Fort Myers building permits ArcGIS MapServer table URL (address-only)",
     )
-    # Lakeland, FL (US-286): iMS Public CED permits MapServer layer (verified on GeoHub).
+    # Lakeland, FL (US-286): the city's hosted IMS projects-and-permits view on
+    # ArcGIS Online. The on-premises iMS Public CED MapServer it replaced
+    # (gismims.lakelandgov.net) reset every connection in September 2026 while
+    # the city's own site answered; the hosted layer is current (edited
+    # 2026-09-29).
     arcgis_lakeland_permits_url: str = Field(
-        default="https://gismims.lakelandgov.net/portal/rest/services/Public_CED/Lakeland_CED_Permits/MapServer/0",
-        description="Lakeland iMS Public CED permits ArcGIS MapServer layer URL",
+        default="https://services1.arcgis.com/mcbQY5xNGGGM1vBX/arcgis/rest/services/IMS_Projects_Permits/FeatureServer/6",
+        description="Lakeland IMS projects and permits ArcGIS FeatureServer layer URL",
     )
     # Port St. Lucie, FL (US-289): public Building Permits FeatureServer (weekly updates)
     arcgis_port_st_lucie_permits_url: str = Field(
@@ -1853,21 +1966,17 @@ class Settings(BaseSettings):
         default="https://gismap.augustaga.gov/arcgis/rest/services/EnterpriseApps/iasWorld_Permit/MapServer/1",
         description="Augusta CityView permits ArcGIS MapServer table URL (address-only, geocoded)",
     )
-    arcgis_el_paso_permits_url: str = Field(
-        default="https://services1.arcgis.com/hyTVSIhR7dHyDsJF/arcgis/rest/services/NewResi2018_19/FeatureServer/0",
-        description="El Paso residential building permits ArcGIS FeatureServer (frozen 2018-2021 snapshot)",
-    )
     arcgis_louisville_crime_url: str = Field(
-        default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/crime_data_2025/FeatureServer",
-        description="Louisville Metro crime ArcGIS FeatureServer (geocoded; no native coords)",
+        default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/crime_data_2026/FeatureServer/0",
+        description="Louisville Metro crime_data_<year> table 0 (geocoded; no native coords; rotates each January)",
     )
     arcgis_louisville_permits_url: str = Field(
-        default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/active_construction_permits/FeatureServer",
-        description="Louisville active construction permits ArcGIS FeatureServer",
+        default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/active_construction_permits/FeatureServer/0",
+        description="Louisville active construction permits ArcGIS FeatureServer layer 0",
     )
     arcgis_louisville_street_cut_url: str = Field(
-        default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/Louisville_KY_ROW_Construction_Permits_new/FeatureServer",
-        description="Louisville ROW construction permits ArcGIS FeatureServer",
+        default="https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/Louisville_KY_ROW_Construction_Permits_new/FeatureServer/0",
+        description="Louisville ROW construction permits ArcGIS FeatureServer layer 0",
     )
     arcgis_tampa_crime_url: str = Field(
         default="https://arcgis.tampagov.net/arcgis/rest/services/CallsforService/FirePoliceCalls/MapServer/1",
@@ -1878,12 +1987,12 @@ class Settings(BaseSettings):
         description="Tampa ROW permits ArcGIS FeatureServer",
     )
     arcgis_las_vegas_calls_for_service_url: str = Field(
-        default="https://services.arcgis.com/jjSk6t82vIntwDbs/arcgis/rest/services/LVMPD_Calls_For_Service_All/FeatureServer",
-        description="Las Vegas LVMPD Calls For Service ArcGIS FeatureServer",
+        default="https://services.arcgis.com/jjSk6t82vIntwDbs/arcgis/rest/services/LVMPD_Calls_For_Service_30_Days/FeatureServer/0",
+        description="Las Vegas LVMPD Calls For Service - Last 30 Days (daily view; the _All layer froze 2024-02-29)",
     )
     arcgis_boise_crime_url: str = Field(
-        default="https://services1.arcgis.com/WHM6qC35aMtyAAlN/arcgis/rest/services/BPD_Crimes_Public/FeatureServer",
-        description="Boise BPD crimes ArcGIS FeatureServer",
+        default="https://services1.arcgis.com/WHM6qC35aMtyAAlN/arcgis/rest/services/BPD_Crimes_Public/FeatureServer/0",
+        description="Boise BPD crimes ArcGIS FeatureServer layer 0",
     )
     ckan_san_jose_crime_endpoint: str = Field(
         default="ckan://data.sanjoseca.gov/dc0ec99c-0c6b-45fb-b1ec-faf072fe4833",
@@ -1927,7 +2036,8 @@ class Settings(BaseSettings):
 
     # US-398: FL Statewide Cadastral — one national ArcGIS layer aggregating all
     # 67 FL counties' appraiser rolls; PERMITS new-supply proxy via year-built
-    # cohort. Annual assessment cadence.
+    # cohort. Annual assessment cadence. No metro registers it since
+    # 2026-10-02 (Ocala's and Orlando's county codes read other counties).
     arcgis_fl_cadastral_url: str = Field(
         default=(
             "https://services9.arcgis.com/Gh9awoU677aKree0/arcgis/rest/services/"
@@ -1942,6 +2052,15 @@ class Settings(BaseSettings):
     arcgis_asheville_deeds_url: str = Field(
         default="https://gis.buncombecounty.org/arcgis/rest/services/opendata/FeatureServer/1",
         description="Buncombe County NC Property roll layer (Asheville DEEDS supplement)",
+    )
+    # Asheville, NC permits (2026-09-30): the City's Accela permits view on its
+    # own ArcGIS Server, one row per permit, nearly all with a point.
+    arcgis_asheville_permits_url: str = Field(
+        default=(
+            "https://gis.ashevillenc.gov/server/rest/services/"
+            "Permits/AccelaPermitsView/MapServer/2"
+        ),
+        description="City of Asheville Accela permits view layer URL (Asheville PERMITS)",
     )
 
     # US-404: MARTA station entrances/exits (Atlanta) — Socrata, weekly.
@@ -2067,6 +2186,17 @@ class Settings(BaseSettings):
         default="https://services5.arcgis.com/JisFYcK2mIVg9ueP/arcgis/rest/services/Public_Calls/FeatureServer/0",
         description="Bend public calls for service ArcGIS FeatureServer URL (crime)",
     )
+    # Deschutes County's sales table: each taxlot's two latest sales, no
+    # geometry, county-wide. Bend deeds place each sale on its taxlot polygon
+    # and keep those inside the metro box (2026-09-30).
+    arcgis_bend_deeds_url: str = Field(
+        default="https://services1.arcgis.com/znO8Hz1SuVVohYhZ/arcgis/rest/services/Taxlots/FeatureServer/8",
+        description="Deschutes County GIS_SALES table with each taxlot's latest sales (Bend deeds snapshot)",
+    )
+    arcgis_deschutes_taxlots_url: str = Field(
+        default="https://services1.arcgis.com/znO8Hz1SuVVohYhZ/arcgis/rest/services/Taxlots/FeatureServer/0",
+        description="Deschutes County taxlot polygons that place Bend's sales (parcel join)",
+    )
     arcgis_vancouver_wa_permits_url: str = Field(
         default="https://services.arcgis.com/oNvpY90qsPDizwkN/arcgis/rest/services/Permits_and_Code_Enforcement_Data_(public_view)/FeatureServer/0",
         description="Vancouver WA permits ArcGIS FeatureServer URL",
@@ -2122,6 +2252,13 @@ class Settings(BaseSettings):
     arcgis_medford_311_endpoint: str = Field(
         default="https://maps.medfordmaps.org/arcgis/rest/services/MLI2/MLI_TRAKiT_Service/FeatureServer/12",
         description="Medford TRAKiT code enforcement cases ArcGIS FeatureServer URL (311)",
+    )
+    # Jackson County's sales layer: each account's latest sale on its taxlot
+    # polygon, county-wide. Medford deeds read the sales whose SiteCity is
+    # MEDFORD, the city itself (2026-09-30).
+    arcgis_medford_deeds_endpoint: str = Field(
+        default="https://spatial.jacksoncountyor.gov/arcgis/rest/services/Demog/PropertySales/FeatureServer/0",
+        description="Jackson County PropertySales ArcGIS FeatureServer URL (Medford deeds snapshot)",
     )
     arcgis_tempe_permits_endpoint: str = Field(
         default="https://services.arcgis.com/lQySeXwbBg53XWDi/arcgis/rest/services/building_permits/FeatureServer/0",
@@ -2179,6 +2316,12 @@ class Settings(BaseSettings):
         default="https://maps.scottsdaleaz.gov/arcgis/rest/services/OpenData_Tabular/MapServer/6",
         description="Scottsdale business licenses ArcGIS MapServer table URL (SLA)",
     )
+    # ScottsdaleEZ, the city's customer service requests: each request once
+    # it closes, at its hundred block (2026-09-30).
+    scottsdale_311_endpoint: str = Field(
+        default="https://maps.scottsdaleaz.gov/arcgis/rest/services/OpenData_Tabular/MapServer/28",
+        description="Scottsdale EZ closed service requests ArcGIS MapServer table URL (311)",
+    )
     long_beach_sla_endpoint: str = Field(
         default="https://services6.arcgis.com/yCArG7wGXGyWLqav/arcgis/rest/services/Business_Licenses_Public_View/FeatureServer/0",
         description="Long Beach business licenses ArcGIS FeatureServer URL (SLA)",
@@ -2222,6 +2365,19 @@ class Settings(BaseSettings):
     arcgis_tacoma_311_endpoint: str = Field(
         default="https://services3.arcgis.com/SCwJH1pD8WSn5T5y/arcgis/rest/services/SeeClickFix_Requests/FeatureServer/0",
         description="Tacoma SeeClickFix 311 service requests ArcGIS FeatureServer URL (311)",
+    )
+    # Pierce County's weekly assessor extract: every sale since 1997, a line
+    # for each parcel of a sale, pipe-delimited with no header row. Tacoma
+    # deeds read the last 90 days and place each sale on its parcel, in the
+    # city's tax code areas only (2026-09-30). Pierce County deeds read the
+    # same lines and place them anywhere in the county.
+    csv_tacoma_deeds_endpoint: str = Field(
+        default="https://online.co.pierce.wa.us/datamart/sale.zip",
+        description="Pierce County Assessor-Treasurer weekly sales extract, zipped sale.txt (Tacoma and Pierce County deeds snapshots)",
+    )
+    arcgis_pierce_tax_parcels_url: str = Field(
+        default="https://services2.arcgis.com/1UvBaQ5y1ubjUPmd/arcgis/rest/services/Tax_Parcels/FeatureServer/0",
+        description="Pierce County tax parcel polygons that place Tacoma's and Pierce County's sales (parcel join)",
     )
     arcgis_sioux_falls_permits_endpoint: str = Field(
         default="https://gis.siouxfalls.gov/arcgis/rest/services/Data/Community/MapServer/3",
@@ -2287,93 +2443,315 @@ class Settings(BaseSettings):
                 )
         return self
 
-
-
-    arcgis_albany_deeds_url: str = Field(
-        default=(
-            "https://albanyny.gov/server/rest/services/Real_Property/"
-            "Tax_Parcels/FeatureServer/0"
-        ),
-        description="Albany NY deeds/sales ArcGIS FeatureServer URL (US-353)",
-    )
-
     arcgis_providence_deeds_url: str = Field(
-        default="https://providenceri.gov/server/rest/services/OpenData/Parcels/FeatureServer/0",
-        description="Providence, RI deeds/sales ArcGIS FeatureServer URL (US-350)",
-    )
-
-    arcgis_richmond_deeds_url: str = Field(
-        default="https://data.rva.gov/server/rest/services/Property/RealEstateSales/FeatureServer/0",
-        description="Richmond VA deeds/sales ArcGIS FeatureServer URL (US-348)",
-    )
-
-    arcgis_huntington_wv_deeds_url: str = Field(
         default=(
-            "https://huntingtonwv.gov/server/rest/services/"
-            "Parcels/Deeds/FeatureServer/0"
+            "https://services6.arcgis.com/wv9mHoqblhTsnqdG/arcgis/rest/services/"
+            "Parcel_Zoning_FL/FeatureServer/0"
         ),
-        description="Huntington WV deeds/sales ArcGIS FeatureServer URL (US-320)",
+        description="Providence, RI parcels with the assessor's last sale (city-hosted ArcGIS Online layer)",
+    )
+
+    excel_richmond_deeds_url: str = Field(
+        default="https://www.rva.gov/media/53946",
+        description=(
+            "Richmond, VA assessor's property transfers: the page linking the "
+            "current monthly .xlsx workbook"
+        ),
+    )
+
+    arcgis_richmond_crime_url: str = Field(
+        default=(
+            "https://services3.arcgis.com/TsynfzBSE6sXfoLq/ArcGIS/rest/services/"
+            "PSDWIncidents_ProdA/FeatureServer/1"
+        ),
+        description=(
+            "Chesterfield County, VA police offenses (ArcGIS Online), the crime "
+            "source inside the Richmond metro box"
+        ),
     )
 
     arcgis_charleston_wv_deeds_url: str = Field(
-        default="https://services8.arcgis.com/0zSnoqwLCR3i1Yfw/arcgis/rest/services/Charleston_Parcels/FeatureServer/0",
-        description="Charleston WV deeds/sales ArcGIS FeatureServer URL (US-319)",
-    )
-
-    arcgis_dover_deeds_url: str = Field(
         default=(
-            "https://gis.delaware.gov/arcgis/rest/services/Dover/Dover_Parcels/"
-            "FeatureServer/0"
+            "https://kanawhacountyassessorgis.com/server/rest/services/"
+            "Parcel_Line_Layer/MapServer/1"
         ),
-        description="Dover DE deeds/sales ArcGIS FeatureServer URL (US-317)",
+        description="Kanawha County Assessor tax parcels with the last sale (Charleston, WV)",
     )
 
     arcgis_burlington_deeds_url: str = Field(
-        default="https://data.burlingtonvt.gov/server/rest/services/Assessment_Parcels/FeatureServer/0",
-        description="Burlington VT deeds/sales ArcGIS FeatureServer URL (US-316)",
+        default=(
+            "https://services1.arcgis.com/BkFxaEFNwHqX3tAw/arcgis/rest/services/"
+            "FS_VCGI_OPENDATA_Cadastral_PTTR_point_WM_v1_view/FeatureServer/0"
+        ),
+        description="Vermont property-transfer returns (VCGI), filtered to Burlington's town code",
     )
 
-    arcgis_frederick_deeds_url: str = Field(
-        default="https://services1.arcgis.com/X3lKekbdaBmNjCHu/ArcGIS/rest/services/Frederick_Parcels/FeatureServer/3",
-        description="Frederick MD deeds/sales ArcGIS FeatureServer URL (US-315)",
+    socrata_frederick_deeds_endpoint: str = Field(
+        default="https://opendata.maryland.gov/resource/gx8c-a963.json",
+        description="Maryland SDAT real property assessments, Frederick County view (last sale per account)",
     )
 
     arcgis_roanoke_deeds_url: str = Field(
-        default="https://gis.roanokeva.gov/server/rest/services/OpenData/Parcels/FeatureServer/0",
-        description="Roanoke VA deeds/sales ArcGIS FeatureServer URL (US-314)",
-    )
-
-    arcgis_manchester_deeds_url: str = Field(
         default=(
-            "https://services1.arcgis.com/KlG08rx11MkfACQT/arcgis/rest/services/"
-            "Manchester_NH_Property_Card/FeatureServer/0"
+            "https://maps.roanokeva.gov/server/rest/services/RealEstate/"
+            "Proval_Transfer_History/FeatureServer/3"
         ),
-        description="Manchester NH deeds/sales ArcGIS FeatureServer URL (US-313)",
-    )
-
-    arcgis_portland_maine_deeds_url: str = Field(
-        default="https://gis.portlandmaine.gov/maps/rest/services/ParcelsWGS84/FeatureServer/0",
-        description="Portland Maine deeds/sales ArcGIS FeatureServer URL (US-312)",
-    )
-
-    arcgis_harrisburg_deeds_url: str = Field(
-        default="https://harrisburgpa.gov/server/rest/services/open_data/Property_Sales/FeatureServer/0",
-        description="Harrisburg PA deeds/sales ArcGIS FeatureServer URL (US-311)",
-    )
-
-    arcgis_wilmington_de_deeds_url: str = Field(
-        default=(
-            "https://gis.newcastlede.gov/server/rest/services/"
-            "Parcels/Real_Estate_Sales/FeatureServer/0"
-        ),
-        description="Wilmington, DE deeds/sales ArcGIS FeatureServer URL (US-310)",
+        description="Roanoke VA property transfer history table (city ArcGIS Server; no geometry, joined to parcels)",
     )
 
     arcgis_allentown_deeds_url: str = Field(
         default=(
-            "https://gis.allentownpa.gov/server/rest/services/"
-            "Property/Parcels/FeatureServer/0"
+            "https://services1.arcgis.com/WUqVDRuvIiIiH2Pl/arcgis/rest/services/"
+            "Tax_Parcels_Assessed_2022/FeatureServer/0"
         ),
-        description="Allentown PA deeds/sales ArcGIS FeatureServer URL (US-307)",
+        description="Allentown PA assessed tax parcels with sale year, month and price (city-hosted)",
+    )
+    # Allentown permits (2026-09-30): the City's EnerGov building permits view
+    # on ArcGIS Online, one point per permit issued since January 2025.
+    arcgis_allentown_permits_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/WUqVDRuvIiIiH2Pl/arcgis/rest/services/"
+            "EnerGov_Building_Permits_Current/FeatureServer/0"
+        ),
+        description="Allentown PA EnerGov building permits view URL (city-hosted)",
+    )
+    # Allentown 311 (2026-09-30): the City's Survey123 problem reports, a
+    # public view on ArcGIS Online with one point per request since October
+    # 2025.
+    arcgis_allentown_311_url: str = Field(
+        default=(
+            "https://services1.arcgis.com/WUqVDRuvIiIiH2Pl/arcgis/rest/services/"
+            "311_Submission_Dashboard_View/FeatureServer/0"
+        ),
+        description="Allentown PA Survey123 311 submissions view URL (city-hosted)",
+    )
+    # New Haven 311 (2026-09-30): SeeClickFix's public view of the City's
+    # requests on its own ArcGIS Online org, one point per request since 2007.
+    arcgis_new_haven_311_url: str = Field(
+        default=(
+            "https://services8.arcgis.com/fz3KpsKgK9InMjh8/arcgis/rest/services/"
+            "Public_SCF_Requests_New_Haven_CT/FeatureServer/0"
+        ),
+        description="New Haven CT SeeClickFix public requests view URL (SeeClickFix-hosted)",
+    )
+    # Lincoln 311 (2026-10-02): SeeClickFix's public view of the City's
+    # requests on its own ArcGIS Online org, one point per request since 2011.
+    arcgis_lincoln_311_url: str = Field(
+        default=(
+            "https://services8.arcgis.com/fz3KpsKgK9InMjh8/arcgis/rest/services/"
+            "SCF_Requests_Public_Lincoln_NE/FeatureServer/0"
+        ),
+        description="Lincoln NE SeeClickFix public requests view URL (SeeClickFix-hosted)",
+    )
+    # Albuquerque 311 (2026-10-02): the City's ABQ311 CRM requests, one point
+    # per request joined to its parcels, on the City GIS server.
+    arcgis_albuquerque_311_url: str = Field(
+        default=(
+            "https://coageo.cabq.gov/cabqgeo/rest/services/"
+            "CRM_Service_Requests_MIL1/MapServer/0"
+        ),
+        description="Albuquerque NM ABQ311 service requests layer URL (City GIS)",
+    )
+    # Topeka 311 (2026-10-02): the City's requests as Cityworks holds them, in
+    # the CityworksViews folder that also serves Topeka's permits.
+    arcgis_topeka_311_url: str = Field(
+        default=(
+            "https://maps.topeka.gov/arcgis/rest/services/CityworksViews/"
+            "SCF_E311_Requests/FeatureServer/0"
+        ),
+        description="Topeka KS Cityworks service requests view URL (City GIS)",
+    )
+    # Yakima 311 (2026-10-02): the City's YakBack requests, one point per
+    # request, on the City GIS server that also serves Yakima's permits.
+    arcgis_yakima_311_url: str = Field(
+        default=(
+            "https://gis.yakimawa.gov/arcgis/rest/services/YakBack/"
+            "PublicRequest/MapServer/0"
+        ),
+        description="Yakima WA YakBack service requests layer URL (City GIS)",
+    )
+    # Yakima deeds (2026-10-02): the Yakima County Assessor's parcels, each
+    # with its latest sale, as the City GIS server publishes them.
+    arcgis_yakima_deeds_url: str = Field(
+        default=(
+            "https://gis.yakimawa.gov/arcgis/rest/services/Assessor/"
+            "AssessorParcels/MapServer/1"
+        ),
+        description="Yakima County Assessor parcels layer URL with latest sales (City GIS)",
+    )
+    # Cape Coral 311 (2026-10-02): the City's 311 issues table, loaded
+    # overnight, on the server that also serves Cape Coral's permits.
+    arcgis_cape_coral_311_url: str = Field(
+        default=(
+            "https://capeims.capecoral.gov/arcgis/rest/services/OpenData/"
+            "OpenData/MapServer/4"
+        ),
+        description="Cape Coral FL 311 issues table URL (City GIS, no geometry; X/Y columns)",
+    )
+    # Cape Coral deeds (2026-10-02): the Lee County Property Appraiser's
+    # parcels, each with its latest sale, on the County's ArcGIS Online org.
+    arcgis_cape_coral_deeds_url: str = Field(
+        default=(
+            "https://services2.arcgis.com/LvWGAAhHwbCJ2GMP/arcgis/rest/services/"
+            "Lee_County_Parcels/FeatureServer/0"
+        ),
+        description="Lee County FL parcels layer URL with latest sales (Lee County GIS)",
+    )
+    # Augusta 311 (2026-10-02): the open requests in the City's Cityworks,
+    # one point per request, as Cityworks publishes them.
+    arcgis_augusta_311_url: str = Field(
+        default=(
+            "https://augcw.augustaga.gov/CityworksForms/gis/2/5799/rest/services/"
+            "cw/FeatureServer/1"
+        ),
+        description="Augusta GA open Cityworks service requests layer URL (City Cityworks)",
+    )
+    # Wilmington NC deeds (2026-10-02): New Hanover County's parcels, one
+    # point each with its latest sale, on the County GIS server that also
+    # serves Wilmington's permits.
+    arcgis_wilmington_nc_deeds_url: str = Field(
+        default=(
+            "https://gis.nhcgov.com/server/rest/services/Layers/"
+            "PropertyPoints4326/MapServer/0"
+        ),
+        description="New Hanover County NC parcel points URL with latest sales (County GIS)",
+    )
+    # Tampa deeds (2026-10-02): the City's copy of the Hillsborough County
+    # Property Appraiser's parcels, each with its latest sale.
+    arcgis_tampa_deeds_url: str = Field(
+        default="https://arcgis.tampagov.net/arcgis/rest/services/Parcels/TaxParcel/FeatureServer/0",
+        description="City of Tampa copy of the Hillsborough County parcels with latest sales (City GIS)",
+    )
+    # Gainesville deeds (2026-10-02): the Alachua County Property Appraiser's
+    # nightly extract, whose Sales.txt lists every recorded sale by parcel.
+    csv_gainesville_deeds_endpoint: str = Field(
+        default="https://s3.amazonaws.com/acpa.cama/ACPA_CAMAData.zip",
+        description="Alachua County Property Appraiser nightly CAMA extract, zipped Sales.txt (Gainesville deeds snapshot)",
+    )
+    # Ocala deeds (2026-10-02): the Marion County Property Appraiser's parcels
+    # on the City of Ocala's GIS server, each with its latest sale's year and
+    # month.
+    arcgis_ocala_deeds_url: str = Field(
+        default="https://gis.ocalafl.org/arcgis/rest/services/Public/Parcels/FeatureServer/0",
+        description="Marion County parcels with latest sale year and month (City of Ocala GIS)",
+    )
+    # Lakeland deeds (2026-10-02): the Polk County Property Appraiser's
+    # nightly sales extract, every recorded sale in the county by parcel.
+    csv_lakeland_deeds_endpoint: str = Field(
+        default="https://www.polkflpa.gov/FTPPage/downloader.ashx?filename=ftp_sales.zip&dir=%5CAppraisalData%5C",
+        description="Polk County Property Appraiser nightly sales extract, zipped ftp_sales.txt (Lakeland deeds snapshot)",
+    )
+    # Vancouver WA deeds (2026-10-02): Clark County's taxlots, each with its
+    # latest sale (the hosted copy that replaces the County's own MapServer).
+    arcgis_vancouver_wa_deeds_url: str = Field(
+        default="https://services2.arcgis.com/ylxwjFBdCPBzP16d/arcgis/rest/services/TaxlotsforPublicUse/FeatureServer/0",
+        description="Clark County WA Taxlots for Public Use, each taxlot with its latest sale (Vancouver WA deeds snapshot)",
+    )
+    # Boulder deeds (2026-10-02): the Boulder County Assessor's daily sales
+    # file, every sale by account, with no party columns.
+    csv_boulder_deeds_endpoint: str = Field(
+        default="https://assessor.boco.solutions/ASR_PublicDataFiles/Sales.csv",
+        description="Boulder County Assessor daily sales file, Sales.csv (Boulder deeds snapshot)",
+    )
+    # Fort Collins deeds (2026-10-02): the Larimer County Assessor's public
+    # sales table.
+    csv_fort_collins_deeds_endpoint: str = Field(
+        default="https://storage.googleapis.com/lc-public/asr/assessor-public-sales.csv",
+        description="Larimer County Assessor public sales table, assessor-public-sales.csv (Fort Collins deeds snapshot)",
+    )
+    # Salem OR deeds (2026-10-02): the Marion County Assessor's sales file for
+    # the year, rebuilt by an automated process.
+    csv_salem_or_deeds_endpoint: str = Field(
+        default="https://apps.co.marion.or.us/AO/PropertySalesData/2026SalesData.csv",
+        description="Marion County Assessor 2026 sales file, 2026SalesData.csv (Salem OR deeds snapshot)",
+    )
+    # Midland permits (2026-10-02): the City's EnerGov permits as points on
+    # ArcGIS Online, one per application since 2000, reloaded daily.
+    arcgis_midland_permits_url: str = Field(
+        default="https://services.arcgis.com/0H6bQdxd9223gQB5/arcgis/rest/services/Permits/FeatureServer/0",
+        description="Midland TX permits layer URL, one point per application (City-hosted)",
+    )
+    # Longview permits (2026-10-02): the City's Cityworks permits behind its
+    # building permit dashboard, on the City GIS server.
+    arcgis_longview_permits_url: str = Field(
+        default="https://cloud.longviewtexas.gov/arcgis/rest/services/AGOL/Building_Permit_Dashboard/MapServer/2",
+        description="Longview TX building permit dashboard layer URL (City GIS)",
+    )
+    # Charleston SC permits (2026-10-02): the City's active permits, a rolling
+    # 18 months, on the City GIS server.
+    arcgis_charleston_sc_permits_url: str = Field(
+        default="https://gis.charleston-sc.gov/arcgis2/rest/services/External/Applications/MapServer/20",
+        description="City of Charleston SC active permits layer URL (City GIS)",
+    )
+    # Odessa 311 (2026-10-02): the City's SeeClickFix requests, published to
+    # the City's ArcGIS Online org since June 2025.
+    arcgis_odessa_311_url: str = Field(
+        default=(
+            "https://utility.arcgis.com/usrsvcs/servers/d29bb427c9bc497fae24cbd89f5b8b6d/rest/services/"
+            "ServiceRequests_OdessaTX/FeatureServer/0"
+        ),
+        description="Odessa TX SeeClickFix service requests layer URL (City ArcGIS Online)",
+    )
+    # Waco 311 (2026-10-02): the City's MyWaco requests, synced nightly to the
+    # City's ArcGIS Online org.
+    arcgis_waco_311_url: str = Field(
+        default="https://services2.arcgis.com/oUXiR7ziAPAzGw6X/arcgis/rest/services/MyWacoRequests/FeatureServer/6",
+        description="Waco TX MyWaco service requests layer URL (City ArcGIS Online)",
+    )
+    # Lexington 311 (2026-10-02): LFUCG's LexCall requests, a rolling 30
+    # days on its ArcGIS Online org.
+    arcgis_lexington_311_url: str = Field(
+        default="https://services1.arcgis.com/Mg7DLdfYcSWIaDnu/arcgis/rest/services/CitizenRequests_public/FeatureServer/0",
+        description="Lexington KY LexCall citizen requests layer URL, rolling 30 days (LFUCG ArcGIS Online)",
+    )
+    # Lincoln deeds (2026-10-02): the Lancaster County Assessor's sales of
+    # the last 12 months, one point per sale, on the City-County GIS server.
+    arcgis_lincoln_deeds_url: str = Field(
+        default="https://gis.lincoln.ne.gov/public/rest/services/Assessor/PropertySales/FeatureServer/0",
+        description="Lancaster County Assessor property sales layer URL, last 12 months (Lincoln NE deeds snapshot)",
+    )
+    # Manchester NH deeds (2026-10-02): the City's parcels, each with its
+    # latest sale, refreshed daily on the City GIS server.
+    arcgis_manchester_deeds_url: str = Field(
+        default="https://ags.manchesternh.gov/agsgis7/rest/services/Community/Parcels/MapServer/0",
+        description="City of Manchester NH parcels layer URL, latest sale per parcel (Manchester deeds snapshot)",
+    )
+    # Tucson permits (2026-10-02): the City's residential building permits
+    # from EnerGov, one point per permit, on the City GIS server.
+    arcgis_tucson_permits_url: str = Field(
+        default="https://gis.tucsonaz.gov/public/rest/services/PublicMaps/PermitsCode/MapServer/85",
+        description="City of Tucson residential building permits layer URL (City GIS)",
+    )
+    # Long Beach 311 (2026-10-02): the City's Go Long Beach requests of the
+    # last seven days, exported as CSV by its OpenDataSoft portal, the point
+    # one "lat, lon" column.
+    csv_long_beach_311_endpoint: str = Field(
+        default=(
+            "https://data.longbeach.gov/api/explore/v2.1/catalog/datasets/service-requests/exports/csv"
+            "?select=casenumber,type,status,createddate,closeddate,zipcode_c,geolocation"
+            "&where=createddate%20%3E%3D%20now(days%3D-7)&delimiter=%2C&use_labels=false"
+        ),
+        description="Long Beach Go Long Beach service requests, last 7 days, OpenDataSoft CSV export (311)",
+    )
+    # Tucson deeds (2026-10-02): the Pima County Assessor's affidavits of
+    # sale, one zipped file per sale year, rebuilt nightly. CSVClient reads
+    # this year's file and last year's.
+    csv_tucson_deeds_endpoint: str = Field(
+        default="https://www.asr.pima.gov/Downloads/Data/sales/{year}//SALE{year}.ZIP",
+        description="Pima County Assessor affidavit of sales file per sale year, SALE{year}.ZIP (Tucson deeds snapshot)",
+    )
+    # Texarkana TX permits (2026-10-02): MyGov's workbook of the permits
+    # started in the previous calendar month, rebuilt each morning with their
+    # statuses; text dates and no coordinates.
+    excel_texarkana_permits_url: str = Field(
+        default="https://public.mygov.us/tx_texarkana/downloadReport?moduleName=pi&id=370",
+        description="Texarkana TX MyGov 'Permits Issued in the last month' workbook (previous calendar month's permits)",
+    )
+    # Abilene permits (2026-10-02): MyGov's workbook of the building permits
+    # issued in the previous calendar month, built once a month around the
+    # 28th; each point one "lng, lat" column.
+    excel_abilene_permits_url: str = Field(
+        default="https://public.mygov.us/tx_abilene/downloadReport?moduleName=pi&id=371",
+        description="Abilene TX MyGov 'TCADBuildingPermitsWithProjInfo' workbook (previous calendar month's building permits)",
     )
 settings = Settings()

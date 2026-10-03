@@ -1,8 +1,15 @@
 """Macon-Bibb County, GA — Urban Signal spatial registration (metro bbox, divisions, submarkets).
 
 Leaf module: geometry only. Feed specs live in the spine (city_registry).
-Permits are registered from a verified ArcGIS FeatureServer layer; SLA registers
-the Georgia slice of SNAP Retailers as a complementary signal.
+SLA registers the Georgia slice of SNAP Retailers.
+
+PERMITS (retracted 2026-10-02): the layer registered on 2026-08-28,
+``services6.arcgis.com/Yx1h0qHJ9wIpQWuU/.../Building_Permits_Public``, is the
+City of St. Catharines, Ontario's: its 21,930 polygons lie between 43.11 and
+43.23 N and 79.32 and 79.18 W, none inside Macon's box. The County's own
+``BuildingPermits`` layer (org ``zPFLSOZ5HzUzzTQb``) was last edited on
+2021-01-04 and its newest print date is 2017-02-21, so no permits feed
+replaces it.
 """
 
 from typing import Dict

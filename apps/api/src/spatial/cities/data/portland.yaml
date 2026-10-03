@@ -415,7 +415,7 @@ datasets:
     - license_number
     - related_key
     topic: raw.municipal.sla
-    interval_seconds: 600.0
+    interval_seconds: 1800.0
     producer_key: sla
     endpoint_by_year: {}
     watermark_type: null
@@ -462,6 +462,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 10000
 aliases:
 - portland_or
 - portland or

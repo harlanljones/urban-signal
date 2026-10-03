@@ -115,7 +115,7 @@ datasets:
     platform: arcgis
     watermark_col: ISSUE_DATE
     id_keys:
-    - PERMIT_NUMBER
+    - PERMIT_ID
     - OBJECTID
     topic: raw.municipal.permits
     interval_seconds: 300.0
@@ -133,24 +133,21 @@ datasets:
     geocode_context: null
     field_map:
       job_id:
-      - PERMIT_NUMBER
+      - PERMIT_ID
       issuance_date:
       - ISSUE_DATE
       filing_date:
       - FILE_DATE
       job_type:
+      - PERMIT_CATEGORY
       - PERMIT_TYPE
       - PERMIT_SUBTYPE
       cost:
       - JOB_VALUE
       status:
-      - STATUS
-      - PERMIT_STATUS
+      - CURRENT_TASK_STATUS
       address_street:
-      - ADDRESS
-      zipcode:
-      - ZIP
-      - ZIP_CODE
+      - PRIMARY_ADDRESS
       bbl:
       - PARCEL_NUMBER
     ingestion_mode: incremental
@@ -244,7 +241,7 @@ datasets:
     watermark_col: last_transfer_date
     id_keys:
     - PARCEL_ID
-    - OBJECTID
+    - last_transfer_date
     topic: raw.municipal.deeds
     interval_seconds: 1800.0
     producer_key: deeds
@@ -252,11 +249,11 @@ datasets:
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: last_transfer_date DESC, OBJECTID DESC
     id_col: null
     select: null
     fallback_endpoints: []
-    where: null
+    where: last_transfer_date >= CURRENT_DATE - INTERVAL '180' DAY
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -273,10 +270,6 @@ datasets:
       - parcel_number
       - PARCEL_NUMBER
       - PARCEL_ID
-      party1_grantor:
-      - grantor
-      party2_grantee:
-      - grantee
       doc_type:
       - document_type
       - deed_type
@@ -302,6 +295,8 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 6000
+    composite_id: true
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis
@@ -320,7 +315,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'OH'
+    where: State = 'OH' AND Latitude BETWEEN 41.3 AND 41.65 AND Longitude BETWEEN -81.95 AND -81.5
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -359,6 +354,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 2000
 aliases:
 - cleveland_oh
 - cleveland oh

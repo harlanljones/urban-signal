@@ -271,14 +271,14 @@ divisions:
     city_id: lexington
 datasets:
   sla:
-    endpoint: https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/ABC_State_ActiveLicenses/FeatureServer/0
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis
-    watermark_col: IssueDate
+    watermark_col: ''
     id_keys:
-    - LicenseNumber
+    - Record_ID
     - ObjectId
     topic: raw.municipal.sla
-    interval_seconds: 600.0
+    interval_seconds: 1800.0
     producer_key: sla
     endpoint_by_year: {}
     watermark_type: null
@@ -288,40 +288,30 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: County = 'Fayette'
+    where: State = 'KY' AND Latitude BETWEEN 37.9 AND 38.15 AND Longitude BETWEEN -84.65 AND -84.3
     needs_geocode: false
     geocode_context: null
     field_map:
       license_id:
-      - LicenseNumber
-      - ObjectId
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
       latitude:
       - Latitude
       longitude:
       - Longitude
-      effective_date:
-      - IssueDate
-      - EffectiveDate
-      expiration_date:
-      - ExpiryDate
-      license_type:
-      - LicenseType
-      premises_name:
-      - Licensee
-      dba:
-      - DBA
       address_street:
-      - PremisesStreet
-      - PremisesCityState
-      status:
-      - Status
+      - Store_Street_Address
       borough:
-      - County
       - City
-    ingestion_mode: incremental
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
     oid_field: ObjectId
-    max_record_count: 2000
-    expected_cadence_days: 7
+    max_record_count: 1000
+    expected_cadence_days: 14
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false
@@ -338,6 +328,41 @@ datasets:
     non_spatial: null
     zip_member: null
     delimiter: null
+  '311':
+    endpoint: https://services1.arcgis.com/Mg7DLdfYcSWIaDnu/arcgis/rest/services/CitizenRequests_public/FeatureServer/0
+    platform: arcgis
+    watermark_col: CreatedDate
+    id_keys:
+    - CaseNumber
+    topic: raw.municipal.311
+    interval_seconds: 900.0
+    producer_key: '311'
+    order_by: CreatedDate DESC, OBJECTID DESC
+    select: OBJECTID,CaseNumber,Problem_Code__c,Problem_text__c,Division__c,LOCATION__LATITUDE__S,LOCATION__LONGITUDE__S,CreatedDate,zip__c
+    where: CreatedDate <= CURRENT_TIMESTAMP
+    needs_geocode: false
+    field_map:
+      incident_id:
+      - CaseNumber
+      created_date:
+      - CreatedDate
+      complaint_type:
+      - Problem_text__c
+      - Problem_Code__c
+      - Division__c
+      latitude:
+      - LOCATION__LATITUDE__S
+      longitude:
+      - LOCATION__LONGITUDE__S
+      zipcode:
+      - zip__c
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
+    retention_days: 30
+    rolling_window_days: 30
+    metro_clip: true
 aliases:
 - lexington_ky
 - lexington ky

@@ -185,6 +185,8 @@ class TestFeedRegistration:
         assert spec.platform == "arcgis"
         assert spec.endpoint == PHOENIX_PERMITS_ENDPOINT
         assert spec.watermark_col == "PER_ISSUE_DATE"
+        # Unissued permits sort first under DESC and never move the watermark.
+        assert spec.where == "PER_ISSUE_DATE IS NOT NULL"
         assert spec.id_keys == ["PER_NUM", "PID", "OBJECTID"]
         assert spec.producer_key == "permits"
         assert spec.needs_geocode is False

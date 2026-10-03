@@ -445,7 +445,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'HI'
+    where: State = 'HI' AND Latitude BETWEEN 21.24 AND 21.73 AND Longitude BETWEEN -158.29 AND -157.64
     needs_geocode: false
     geocode_context: null
     field_map:

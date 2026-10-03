@@ -1,12 +1,12 @@
 """Unit tests for the Yakima, WA leaf (US-239): spatial module + field maps
 + permit parse wiring.
 
-Yakima is a ONE-FEED PARTIAL metro: Planning/BuildingPermits/FeatureServer/0
-on ``gis.yakimawa.gov`` (city ArcGIS open data, Tier 1, daily-ish, native
-outSR=4326 point geometry). YakBack 311 (verified live, native point, ~16,833
-rows) stays Tier 3 because its integer ``status`` column drops every row in the
-shared 311 producer (pydantic str reject, verified live 2026-08-28). County
-sales layers are stale static extracts. Only ``permits`` is registered.
+The leaf mirror carries Planning/BuildingPermits/FeatureServer/0 on
+``gis.yakimawa.gov`` (city ArcGIS open data, Tier 1, daily-ish, native
+outSR=4326 point geometry) only. The corpus also registers YakBack 311, whose
+coded ``type`` and ``status`` read as their names (test_yakima_311.py), and
+the County Assessor's latest sales on the City GIS server
+(test_yakima_deeds.py).
 
 Tests pass WITHOUT a spine registration (no CityId.YAKIMA, no REGISTRY
 assertions — "yakima" stays a plain string). Spine-stable per the wave-5 leaf
@@ -423,7 +423,9 @@ class TestYakimaFeedSpec:
         assert spec.field_map == PERMITS_FIELD_MAP
         assert spec.topic == "raw.municipal.permits"
 
-    def test_registered_feed_set_is_permits_only(self):
+    def test_the_leaf_mirror_carries_permits_only(self):
+        # The registry also holds 311, deeds and the SNAP licences, which the
+        # corpus registers itself.
         assert set(YAKIMA_FEED_SPECS) == {"permits"}
 
     def test_unknown_feed_raises_keyerror_naming_available(self):

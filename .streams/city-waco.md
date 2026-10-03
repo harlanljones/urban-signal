@@ -21,6 +21,8 @@ Register CityId.waco (Waco, TX) as a new Urban Signal metro. Deliver a verified 
 
 - 2026-08-28 — Start from latest main (Amarillo merged). Will register Waco with SNAP-only unless a verifiable permits API is confirmed.
 
+- 2026-10-02 — `311` registered from the City's MyWaco requests layer on ArcGIS Online, public requests only (stream `texas-south-feeds`, `docs/research/one-family-depth-2026-10-02.md`). Permits live in Tyler EnerGov, whose GIS layers are empty.
+
 ## Current step
 
 Scaffolding leaf module `waco.py` and containment/unit tests following the Amarillo pattern.

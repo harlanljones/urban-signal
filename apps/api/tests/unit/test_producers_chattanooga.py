@@ -1,6 +1,6 @@
 """Contract tests for Chattanooga's CSV permits and ArcGIS parcel feeds."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 from unittest.mock import patch
 
 import httpx
@@ -16,24 +16,22 @@ from src.spatial.cities.chattanooga import (
 )
 from src.spatial.city_registry import CityId, FeedType
 
+# The export's own columns (2026-10-02); it carries no valuation or parcel.
 CHATTANOOGA_PERMITS_FIELD_MAP = {
     "job_id": ["permitnum"],
     "issuance_date": ["issueddate"],
     "filing_date": ["applieddate"],
     "job_type": ["permitclass"],
-    "cost": ["estprojectcostdec"],
-    "status": ["status"],
-    "address_street": ["address"],
-    "zipcode": ["zipcode", "zip"],
-    "bbl": ["pin"],
+    "status": ["statuscurrent"],
+    "address_street": ["originaladdress1"],
+    "zipcode": ["originalzip"],
 }
 
 CHATTANOOGA_DEEDS_FIELD_MAP = {
     "doc_id": ["PIN", "PARCELID", "OBJECTID"],
     "recorded_date": ["SALE1DATE"],
     "document_amount": ["SALE1CONSD"],
-    "bbl": ["PIN", "PARCELID"],
-    "party2_grantee": ["OWNERNAME1"],
+    "bbl": ["TAX_MAP_NO", "GISLINK"],
     "doc_type": ["SALE1TYPE", "DEEDTYPE", "TYPE"],
     "borough": ["MUNICIPALITY", "CITY"],
 }
@@ -73,11 +71,26 @@ def test_chattanooga_registers_permits_deeds_and_snap_sla():
     assert permits.id_keys == ["permitnum"]
     assert permits.fallback_endpoints
     assert permits.field_map == CHATTANOOGA_PERMITS_FIELD_MAP
+    # Dates read "2026-10-01 00:00:00 UTC"; the text sorts as dates.
+    assert permits.watermark_type == "text"
+    assert permits.watermark_format == "%Y-%m-%d %H:%M:%S UTC"
+    # Street cuts and meter changes are not building permits.
+    assert "'Street Cut Permit'" in permits.where
+    assert permits.where.startswith("permitclass NOT IN (")
+    # Contractors and descriptions stay in the file.
+    selected = set(permits.select.split(","))
+    assert not selected & {
+        "contractoraddress1", "contractorcompanyname", "contractorphone", "contractorlicnum", "description",
+    }
+    assert set(CHATTANOOGA_PERMITS_FIELD_MAP["address_street"]) <= selected
 
     deeds = get_dataset(city, FeedType.DEEDS)
     assert deeds.platform == "arcgis"
     assert deeds.watermark_col == "SALE1DATE"
-    assert deeds.id_keys == ["PIN", "OBJECTID"]
+    # GISLINK is the parcel (PARCEL repeats across map groups); a parcel's
+    # next sale is a new row.
+    assert deeds.id_keys == ["GISLINK", "SALE1DATE"]
+    assert deeds.composite_id is True
     assert deeds.ingestion_mode == "snapshot"
     assert deeds.field_map == CHATTANOOGA_DEEDS_FIELD_MAP
 
@@ -87,24 +100,24 @@ def test_chattanooga_registers_permits_deeds_and_snap_sla():
 
 PERMIT_ROW = {
     "permitnum": "2026-00123",
-    "applieddate": "2026-08-23",
-    "issueddate": "2026-08-24",
+    "applieddate": "2026-08-23 00:00:00 UTC",
+    "issueddate": "2026-08-24 00:00:00 UTC",
     "permitclass": "NEW CONSTRUCTION",
-    "estprojectcostdec": "1250000",
-    "status": "ISSUED",
+    "statuscurrent": "Issued",
+    "originaladdress1": "100 MARKET ST",
+    "originalzip": "37402",
     "latitude": "35.0456",
     "longitude": "-85.3097",
-    "pin": "123456789",
 }
 
 DEED_ROW = {
     "OBJECTID": 42,
-    "PIN": "123456789",
+    "GISLINK": "033999A A 00100",
+    "TAX_MAP_NO": "999A A 001.00",
     "SALE1DATE": "2026-08-10T00:00:00+00:00",
     "SALE1CONSD": 475000,
     "SALE1TYPE": "WD",
     "OWNERNAME1": "CHATTANOOGA HOLDINGS LLC",
-    "MUNICIPALITY": "CHATTANOOGA",
     "latitude": 35.0456,
     "longitude": -85.3097,
 }
@@ -132,10 +145,49 @@ def test_chattanooga_permit_row_parses(producers):
     assert event is not None
     assert event.city_id == "chattanooga"
     assert event.job_id == "2026-00123"
-    assert event.estimated_cost == 1250000.0
-    assert event.issuance_date == datetime.fromisoformat("2026-08-24")
+    assert event.issuance_date == datetime(2026, 8, 24, tzinfo=UTC)
+    assert event.filing_date == datetime(2026, 8, 23, tzinfo=UTC)
+    assert event.status == "Issued"
+    assert event.address_street == "100 MARKET ST"
+    assert event.zipcode == "37402"
     assert event.latitude == pytest.approx(35.0456)
     assert event.borough == "CHATTANOOGA_CORE"
+
+
+@pytest.mark.parametrize(
+    ("permit_class", "permit_type", "job_type", "normalized"),
+    [
+        ("Residential Building Permit", "New Construction", "NB", "NEW_CONSTRUCTION"),
+        ("Residential Building Permit", "New Addition", "A2", "MAJOR_RENOVATION"),
+        ("Residential Building Permit", "Pool", "OT", "MINOR_ALTERATION"),
+        ("Electrical Permit", "Residential", "A2", "MECHANICAL_ELECTRICAL_PLUMBING"),
+        ("Commercial Building Permit", None, "OT", "MINOR_ALTERATION"),
+    ],
+)
+def test_chattanooga_building_permits_read_their_work_type(producers, permit_class, permit_type, job_type, normalized):
+    """A new house is a "Residential Building Permit" whose type is "New
+    Construction" (49 of the newest 1,000 rows on 2026-10-02); read alone,
+    the class counted it as minor work."""
+    from src.spatial.cities.chattanooga import compose_permit_type
+
+    permits, _ = producers
+    row = {**PERMIT_ROW, "permitclass": permit_class, "permittype": permit_type}
+    with patch(
+        "src.producers.field_maps.resolve_field_map",
+        return_value=CHATTANOOGA_PERMITS_FIELD_MAP,
+    ):
+        event = permits.parse_socrata_row(row, city_id="chattanooga")
+    assert event is not None
+    assert (event.job_type.value, event.normalized_permit_type) == (job_type, normalized)
+    if permit_class != "Residential Building Permit":
+        assert compose_permit_type(row) is None
+
+
+def test_chattanooga_selects_the_permit_type():
+    from src.spatial.city_registry import get_dataset
+
+    spec = get_dataset(CityId.CHATTANOOGA, FeedType.PERMITS)
+    assert {"permitclass", "permittype"} <= set(spec.select.split(","))
 
 
 def test_chattanooga_deed_polygon_row_parses(producers):
@@ -147,16 +199,20 @@ def test_chattanooga_deed_polygon_row_parses(producers):
         event = deeds.parse_socrata_row(dict(DEED_ROW), city_id="chattanooga")
     assert event is not None
     assert event.city_id == "chattanooga"
-    assert event.doc_id == "123456789"
+    assert event.doc_id == "42"
+    assert event.bbl == "999A A 001.00"
     assert event.document_amount == 475000.0
     assert event.recorded_date == datetime.fromisoformat("2026-08-10T00:00:00+00:00")
-    assert event.party2_grantee == "CHATTANOOGA HOLDINGS LLC"
+    assert event.party2_grantee is None
     assert event.borough == "CHATTANOOGA_CORE"
 
 
 class _Response:
     def __init__(self, text: str, status_code: int):
         self.text = text
+        # The CSV client reads the downloaded bytes in the response's encoding.
+        self.content = text.encode()
+        self.encoding = "utf-8"
         self.status_code = status_code
 
     def raise_for_status(self):

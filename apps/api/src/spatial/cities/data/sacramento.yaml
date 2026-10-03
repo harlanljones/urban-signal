@@ -254,7 +254,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'CA'
+    where: State = 'CA' AND Latitude BETWEEN 38.0 AND 38.8 AND Longitude BETWEEN -121.9 AND -121.0
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -293,6 +293,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 3000
 aliases:
 - sacramento_ca
 - sacramento ca

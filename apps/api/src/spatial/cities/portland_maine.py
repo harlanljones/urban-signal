@@ -1,27 +1,3 @@
-DEEDS_FIELD_MAP = {
-    "doc_id": ["PARCELID"],
-    "bbl": ["PARCELID"],
-    "doc_type": ["DEED_TYPE"],
-    "document_amount": ["SALE_PRICE"],
-    "recorded_date": ["SALE_DATE"],
-    "address_street": ["SITEADDR"],
-    "incident_address": ["SITEADDR"],
-    "borough": ["CITY"],
-    "zipcode": ["ZIP"],
-}
-
-FIELD_MAP = {
-    "deeds": DEEDS_FIELD_MAP,
-}
-
-NON_CANDIDATE_METADATA_COLUMNS = (
-    "VALID",
-    "MultiSale",
-    "PARCEL_SOURCE",
-    "BOOK",
-    "PAGE",
-)
-
 """Portland, Maine Metro Submarket Registry and Spatial Layer for Urban Signal.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -29,23 +5,13 @@ division catalog, and geographic bounding boxes for the City of Portland,
 Maine (Cumberland County seat on Casco Bay — a compact peninsula/back-cove
 metro that does not overlap the sibling Boston/Providence leaf boxes).
 
-Feed scope (best-effort, pending live verification 2026-09; noted in
-PR_DESCRIPTION). Portland publishes its cadastre on the municipal ArcGIS
-Server (``gis.portlandmaine.gov``) as ``ParcelsWGS84`` — native parcel
-polygons in WGS84. We treat that layer as the DEEDS/sales source: the layer
-carries the assessed/sale attributes the ACRIS-shape feed needs. Watermark
-``SALE_DATE`` is assumed TEXT ``MM/DD/YYYY`` until a live probe confirms the
-column and format (ADR-0005 text-watermark discipline). Native parcel
-polygons (outSR=4326 rings -> centroid) supply every row's coordinates, so
-``needs_geocode`` stays False — no ADR-0004 hook.
-
-* DEEDS — ``ParcelsWGS84/FeatureServer/0``. ``producer_key="deeds"`` resolves
-  uniquely via ``job_suffix="portland_maine"``.
-* PERMITS / SLA / 311 — not wired in this registration (out of scope for
-  US-312); the city may gain them in later tickets. Tier 3.
-
-Assumption: endpoint is a documented best-effort URL; verify the SALE_DATE
-watermark column against the live layer before enabling the ingest job.
+Feeds: SLA reads the SNAP retailer slice (``snap_sla_spec``, Maine stores inside
+the metro box). The DEEDS feed registered until 2026-09-30 read
+``ParcelsWGS84`` at a layer id that does not exist, and no public sale source
+exists: the city's parcel layers carry no sale fields, its one deed-dated
+layer holds seven dated rows (the newest from 2005), the assessor's sales tab
+is a per-parcel search, and Maine publishes no statewide transfer dataset.
+Permits and 311 remain unregistered.
 """
 
 
@@ -294,80 +260,6 @@ PMA_DIVISION_BBOXES = PORTLAND_MAINE_DIVISION_BBOXES
 PMA_SUBMARKETS = PORTLAND_MAINE_SUBMARKETS
 PMA_DIVISIONS = PORTLAND_MAINE_DIVISIONS
 
-# ---------------------------------------------------------------------------
-# Feed specs (leaf-local; the spine copies these into REGISTRY).
-# Best-effort: documented municipal cadastral endpoint; verify SALE_DATE
-# watermark column against the live layer before enabling ingest.
-# ---------------------------------------------------------------------------
-PORTLAND_MAINE_DEEDS_ENDPOINT = (
-    "https://gis.portlandmaine.gov/maps/rest/services/ParcelsWGS84/FeatureServer/0"
-)
-
-PORTLAND_MAINE_FEED_SPECS: dict[str, dict[str, object]] = {
-    "deeds": {
-        "endpoint": PORTLAND_MAINE_DEEDS_ENDPOINT,
-        "platform": "arcgis",
-        "watermark_col": "SALE_DATE",
-        "id_keys": ["PARCELID", "OBJECTID"],
-        "topic_key": "topic_deeds",
-        "interval_seconds": 600.0,
-        "producer_key": "deeds",
-        "extra": {
-            "needs_geocode": False,
-            "watermark_type": "text",
-            "watermark_format": "%m/%d/%Y",
-            "oid_field": "OBJECTID",
-            "max_record_count": 100000,
-            "expected_cadence_days": 30,
-            "non_spatial": False,
-            "scope": (
-                "Portland ME DEEDS/sales via the municipal cadastral layer "
-                "ParcelsWGS84 (native parcel polygons, NOT address-only). "
-                "TEXT MM/DD/YYYY watermark assumed for SALE_DATE — typed "
-                "comparison required (ADR-0005) pending live confirmation. "
-                "Native parcel polygons (outSR=4326 rings -> centroid) supply "
-                "every row's coordinates; the ADR-0004 geocode hook is NOT "
-                "declared. PARTIAL METRO: only the DEEDS feed is wired for "
-                "US-312; permits/SLA/311 are later tickets. Best-effort "
-                "endpoint — verify the SALE_DATE column against the live "
-                "layer before enabling the ingest job."
-            ),
-            "field_map": DEEDS_FIELD_MAP,
-        },
-    },
-}
-
-
-def get_portland_maine_dataset(feed: object) -> object:
-    """Leaf-local mirror of ``city_registry.get_dataset``.
-
-    Returns the spec for a registered Portland, ME feed, or raises
-    ``KeyError`` naming the city and available feeds when the feed is absent.
-    """
-    from src.config import settings
-    from src.spatial.city_registry import DatasetSpec
-
-    feed_name = getattr(feed, "value", str(feed))
-    if feed_name not in PORTLAND_MAINE_FEED_SPECS:
-        available = ", ".join(sorted(PORTLAND_MAINE_FEED_SPECS))
-        raise KeyError(
-            f"'{PORTLAND_MAINE_CITY_ID}' has no '{feed_name}' feed; available: {available}"
-        )
-    payload = PORTLAND_MAINE_FEED_SPECS[feed_name]
-    extra_kwargs = {
-        k: v for k, v in payload.get("extra", {}).items() if k != "scope"
-    }
-    return DatasetSpec(
-        endpoint=payload["endpoint"],
-        platform=payload["platform"],
-        watermark_col=payload["watermark_col"],
-        id_keys=payload["id_keys"],
-        topic=getattr(settings, payload["topic_key"]),
-        interval_seconds=payload["interval_seconds"],
-        producer_key=payload["producer_key"],
-        **extra_kwargs,
-    )
-
 
 from src.spatial.registration import SpatialRegistration
 
@@ -380,21 +272,16 @@ REGISTRATION = SpatialRegistration(
 )
 
 __all__ = [
-    "DEEDS_FIELD_MAP",
-    "FIELD_MAP",
     "PMA_DIVISIONS",
     "PMA_DIVISION_BBOXES",
     "PMA_SUBMARKETS",
     "PORTLAND_MAINE_CENTER",
     "PORTLAND_MAINE_CITY_ID",
-    "PORTLAND_MAINE_DEEDS_ENDPOINT",
     "PORTLAND_MAINE_DIVISIONS",
     "PORTLAND_MAINE_DIVISION_BBOXES",
-    "PORTLAND_MAINE_FEED_SPECS",
     "PORTLAND_MAINE_METRO_BBOX",
     "PORTLAND_MAINE_SUBMARKETS",
     "REGISTRATION",
-    "get_portland_maine_dataset",
     "is_in_portland_maine",
     "is_in_portland_maine_metro",
 ]

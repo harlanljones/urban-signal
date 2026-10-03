@@ -63,6 +63,10 @@ Feed rejections (live evidence, same probe):
   on AGOL. ``TaxAll`` (60,807 parcel polygons) is assessment parcels, not
   sales. The Clerk & Recorder recorded-documents are behind a search portal.
   Partial (permits only) is the honest shape.
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``; the feed mirror below does not carry it.
 """
 
 

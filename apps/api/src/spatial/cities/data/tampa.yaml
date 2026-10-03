@@ -515,7 +515,7 @@ datasets:
     watermark_exclude: []
     order_by: null
     id_col: null
-    select: null
+    select: OBJECTID,ORD_PERMIT,APP_NUM,ABSALETYPE,AB_CLASS_PREFIX,AB_CLASS_SUFFIX,BUS_NAME,HISTORY_ACT_DT,MTH24_END_DT,HISTORY_ACTION,PERMIT_ADDR,PERMIT_ZIP
     fallback_endpoints: []
     where: null
     needs_geocode: false
@@ -540,7 +540,6 @@ datasets:
       - HISTORY_ACTION
       address_street:
       - PERMIT_ADDR
-      - BUS_OWNER_MAIL_ADD
       zipcode:
       - PERMIT_ZIP
     ingestion_mode: incremental
@@ -631,14 +630,26 @@ datasets:
     needs_geocode: false
     geocode_context: null
     field_map:
-      job_id:
+      permit_id:
       - RECORDID
+      permit_type:
+      - APPTYPE
+      status:
+      - APPLICATIONSTATUS
+      address:
+      - LOCATION
       latitude:
       - LATITUDE
+      - latitude
       longitude:
       - LONGITUDE
+      - longitude
       issued_date:
       - ISSUEDDATE
+      start_date:
+      - STARTDATE
+      end_date:
+      - ENDDATE
     ingestion_mode: incremental
     oid_field: OBJECTID
     max_record_count: 1000
@@ -658,6 +669,37 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+  deeds:
+    endpoint: https://arcgis.tampagov.net/arcgis/rest/services/Parcels/TaxParcel/FeatureServer/0
+    platform: arcgis
+    watermark_col: S_DATE
+    id_keys:
+    - FOLIO
+    - S_DATE
+    topic: raw.municipal.deeds
+    interval_seconds: 21600.0
+    producer_key: deeds
+    order_by: S_DATE DESC, OBJECTID DESC
+    select: OBJECTID,FOLIO,S_DATE,AMT
+    where: S_DATE >= CURRENT_DATE - INTERVAL '90' DAY AND S_DATE <= CURRENT_TIMESTAMP
+    needs_geocode: false
+    field_map:
+      doc_id:
+      - FOLIO
+      - OBJECTID
+      recorded_date:
+      - S_DATE
+      document_amount:
+      - AMT
+      bbl:
+      - FOLIO
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 6000
+    expected_cadence_days: 30
+    batch_limit: 10000
+    composite_id: true
+    metro_clip: true
 aliases:
 - tampa_fl
 - tampa fl

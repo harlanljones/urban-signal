@@ -7,7 +7,9 @@ signal ever reaches LIMS (ablation rule: nothing here feeds the LIMS score).
 """
 
 import argparse
+import importlib
 import logging
+import re
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -41,6 +43,11 @@ PART1_KEYWORDS = (
     "ASSAULT",
 )
 
+# Simple assault written either way round: "Simple Assault" (SF, NIBRS), or
+# "Assault-Simple" (Chesterfield County, Richmond), "ASSAULT - SIMPLE"
+# (Boston) and ASSAULT with the description SIMPLE (Chicago).
+_SIMPLE_ASSAULT = re.compile(r"SIMPLE\s+ASSAULT|ASSAULT\W*SIMPLE")
+
 
 def _parse_datetime(val: Any) -> datetime | None:
     """Parse various ISO and common municipal date formats into a timezone-aware datetime."""
@@ -73,11 +80,26 @@ def _parse_datetime(val: Any) -> datetime | None:
 def classify_offense_class(offense_type: str, description: Any = None) -> str:
     """Best-effort UCR Part-1 vs Part-2 classification over offense text."""
     text = f"{offense_type or ''} {description or ''}".upper()
-    if "SIMPLE ASSAULT" in text or "BATTERY" in text:
+    if _SIMPLE_ASSAULT.search(text) or "BATTERY" in text:
         return "PART2"
     if any(keyword in text for keyword in PART1_KEYWORDS):
         return "PART1"
     return "PART2"
+
+
+def _point_decimals(city_id: str) -> int | None:
+    """The city leaf's ``CRIME_POINT_DECIMALS``, when it defines one.
+
+    Chesterfield County masks each offense's address to its hundred block but
+    publishes the point unsnapped, often within 30 m of a house (Richmond). The
+    leaf names how many decimal places a point keeps: three put every offense
+    on a grid of about 100 m before it is indexed or published.
+    """
+    try:
+        leaf = importlib.import_module(f"src.spatial.cities.{city_id}")
+    except ImportError:
+        return None
+    return getattr(leaf, "CRIME_POINT_DECIMALS", None)
 
 
 class CrimeIncidentsProducer:
@@ -207,6 +229,9 @@ class CrimeIncidentsProducer:
             lng = float(lng_raw)
             if lat == 0.0 and lng == 0.0:
                 return None
+            decimals = _point_decimals(resolved_city)
+            if decimals is not None:
+                lat, lng = round(lat, decimals), round(lng, decimals)
 
             h3_res = self.spatial_indexer.get_multi_res_hierarchy(lat, lng)
 

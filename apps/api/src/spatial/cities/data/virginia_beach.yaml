@@ -354,7 +354,7 @@ datasets:
     watermark_exclude: []
     order_by: null
     id_col: null
-    select: null
+    select: OBJECTID,PermitNumber,IssueDate,ApplicationDate,WorkType,PermitType,Status,StreetAddress,City,Zip,GPIN
     fallback_endpoints: []
     where: null
     needs_geocode: true
@@ -370,6 +370,8 @@ datasets:
       - IssueDate
       filing_date:
       - ApplicationDate
+      status:
+      - Status
       address_street:
       - StreetAddress
       bbl:

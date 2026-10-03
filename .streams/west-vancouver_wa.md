@@ -60,6 +60,12 @@ REJECT with evidence — never use a stale mirror.
   only. Divisions (6) from official NeighborhoodsCoV polygon centroids.
   Submarkets (13) from official neighborhood names + CMI Neighborhood
   evidence. Felida excluded (unincorporated, 1 permit row north of 45.70).
+- 2026-10-02 — Deeds registered after all: Clark County's taxlots carry
+  each parcel's latest sale, which the 2026-08-28 check missed. The County's
+  hosted `TaxlotsforPublicUse` layer replaces the `TaxlotsPublic` MapServer
+  (marked for deletion on 2026-10-12); the feed reads the sales dated in the
+  90 days before each poll and clips to the metro box (1,113 published on the
+  first live poll). See `.streams/western-deeds.md`.
 
 ## Current step
 

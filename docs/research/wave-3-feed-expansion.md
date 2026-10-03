@@ -368,6 +368,14 @@ DatasetSpec(
 
 None until a PARID→parcel-centroid ADR exists.
 
+**2026-09-30:** Denver `deeds` is registered from the parcel layer
+(`ODC_PROP_PARCELS_A/FeatureServer/245`), whose own `SALE_DATE`, `SALE_PRICE`
+and `RECEPTION_NUM` need no join
+([deeds-probe-2026-09-30.md](deeds-probe-2026-09-30.md)). The sales table
+above stays a candidate: its `PARID` matches the layer's `SCHEDNUM` only
+once padded to 13 digits, and its `GRANTOR` and `GRANTEE` columns are not to
+be mapped.
+
 ---
 
 ## 8 · Chicago street-cut `pubx-yq2d`  **GO**

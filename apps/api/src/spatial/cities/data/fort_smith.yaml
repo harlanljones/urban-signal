@@ -128,7 +128,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'AR'
+    where: State = 'AR' AND Latitude BETWEEN 35.28 AND 35.45 AND Longitude BETWEEN -94.49 AND -94.25
     needs_geocode: false
     geocode_context: null
     field_map:

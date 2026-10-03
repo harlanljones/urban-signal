@@ -3,12 +3,23 @@
 Leaf-only module (US-286). Declares:
 - metro/division bounding boxes
 - submarket metadata
-- a verified ArcGIS permits feed spec (iMS Public CED)
+- a verified ArcGIS permits feed spec (hosted IMS projects and permits view)
 
-SLA falls back to statewide SNAP (declared in the spine via snap_sla_spec('FL')).
+SLA falls back to SNAP, Florida inside the metro bbox (declared in the spine;
+``snap_sla_spec`` builds it).
+
+DEEDS (2026-10-02): the Polk County Property Appraiser's nightly extract
+(``ftp_sales.zip``), whose ``ftp_sales.txt`` lists every recorded sale in the
+county by parcel: 3,034,532 lines, 518 MB unpacked, which the CSV client
+streams out of the zip. The poll downloads it once a day and reads the sales
+dated in the 90 days before it on parcels numbered 23 to 25, the only
+numbers among the City's parcels inside the metro box (3,464 on 2026-10-02;
+the 90 days from 2025-02-17 held 5,272) under an 8,000-row cap. Each sale
+takes its parcel's centroid from the City's ``LandBase/Parcels`` layer,
+joined on ``parcel_id``, and the 1,885 placed inside the box publish. Rows
+key on parcel, date, book and page. The grantor and grantee columns are
+never selected, and the join asks the City's layer for ``PARCELID`` alone.
 """
-
-from typing import Dict
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
@@ -17,7 +28,7 @@ LAKELAND_CITY_ID: str = "lakeland"
 
 # Lakeland city extent — permissive enough to contain all divisions/submarkets.
 # Downtown Lakeland approx: 28.0395, -81.9498
-LAKELAND_METRO_BBOX: Dict[str, float] = {
+LAKELAND_METRO_BBOX: dict[str, float] = {
     "min_lat": 27.95,
     "max_lat": 28.13,
     "min_lng": -82.10,
@@ -25,7 +36,7 @@ LAKELAND_METRO_BBOX: Dict[str, float] = {
 }
 
 # Single-division layout to start (high fit, can expand later if needed).
-LAKELAND_DIVISION_BBOXES: Dict[str, Dict[str, float]] = {
+LAKELAND_DIVISION_BBOXES: dict[str, dict[str, float]] = {
     "LAKELAND_CORE": {"min_lat": 28.00, "max_lat": 28.08, "min_lng": -82.01, "max_lng": -81.90},
 }
 
@@ -41,7 +52,7 @@ def is_in_lakeland_metro(lat: float, lng: float) -> bool:
 
 
 # Minimal submarket slate (3) — centers verified against the bbox above.
-LAKELAND_SUBMARKETS: Dict[str, SubmarketMeta] = {
+LAKELAND_SUBMARKETS: dict[str, SubmarketMeta] = {
     "Downtown Lakeland": SubmarketMeta(
         name="Downtown Lakeland",
         borough="LAKELAND_CORE",
@@ -89,7 +100,7 @@ LAKELAND_SUBMARKETS: Dict[str, SubmarketMeta] = {
     ),
 }
 
-LAKELAND_DIVISIONS: Dict[str, BoroughMeta] = {
+LAKELAND_DIVISIONS: dict[str, BoroughMeta] = {
     "LAKELAND_CORE": BoroughMeta(
         name="LAKELAND_CORE",
         center_lat=28.041,
@@ -114,13 +125,16 @@ LAKELAND_BOROUGHS = LAKELAND_DIVISIONS
 # Endpoint declared in Settings as arcgis_lakeland_permits_url; the leaf stays
 # self-contained/testable with its own spec mirror like other cities.
 
-LAKELAND_FEED_SPECS: Dict[str, Dict[str, object]] = {
+LAKELAND_FEED_SPECS: dict[str, dict[str, object]] = {
     "permits": {
         # Keep literal in leaf for unit parity; spine will reference settings field.
-        "endpoint": "https://gismims.lakelandgov.net/portal/rest/services/Public_CED/Lakeland_CED_Permits/MapServer/0",
+        # The hosted IMS view replaced the on-premises iMS MapServer, which
+        # reset every connection in September 2026.
+        "endpoint": "https://services1.arcgis.com/mcbQY5xNGGGM1vBX/arcgis/rest/services/IMS_Projects_Permits/FeatureServer/6",
         "platform": "arcgis",
-        # Conservatively use an edit/issue style watermark — adjust when field-audited
-        "watermark_col": "ISSUEDATE",
+        # APPROVED is the live issuance date: ISSUED stops at 2025-06-25, and
+        # every permit approved since carries a null ISSUED.
+        "watermark_col": "APPROVED",
         "id_keys": ["PERMIT_NO", "OBJECTID"],
         "topic_key": "topic_permits",
         "interval_seconds": 300.0,
@@ -128,9 +142,22 @@ LAKELAND_FEED_SPECS: Dict[str, Dict[str, object]] = {
         "extra": {
             "expected_cadence_days": 7,
             "oid_field": "OBJECTID",
-            "max_record_count": 2000,
-            # No city-specific field map yet — defaults cover common shapes
-            "field_map": {},
+            "max_record_count": 16000,
+            "order_by": "APPROVED DESC,OBJECTID ASC",
+            # The layer also holds 1,916 planning "Project" rows.
+            "where": "TYPE = 'Permit'",
+            # PERMIT_NO is not in the producer's default id chain, so an empty
+            # map dead-lettered every row. APPLICANT_NAME is a person and is
+            # never mapped.
+            "field_map": {
+                "job_id": ["PERMIT_NO"],
+                "issuance_date": ["APPROVED", "ISSUED"],
+                "filing_date": ["APPLIED"],
+                "job_type": ["PERMITORPROJECTTYPE"],
+                "cost": ["JOBVALUE"],
+                "address_street": ["SITE_ADDR"],
+                "zipcode": ["SITE_ZIP"],
+            },
         },
     },
 }
@@ -138,8 +165,8 @@ LAKELAND_FEED_SPECS: Dict[str, Dict[str, object]] = {
 
 def get_lakeland_dataset(feed: object) -> object:
     """Leaf-local mirror of ``city_registry.get_dataset`` for Lakeland."""
-    from src.spatial.city_registry import DatasetSpec
     from src.config import settings
+    from src.spatial.city_registry import DatasetSpec
 
     feed_name = getattr(feed, "value", str(feed))
     if feed_name not in LAKELAND_FEED_SPECS:
@@ -150,7 +177,7 @@ def get_lakeland_dataset(feed: object) -> object:
     extra_kwargs = {k: v for k, v in payload.get("extra", {}).items() if k != "scope"}
     # Promote to typed DatasetSpec
     return DatasetSpec(
-        endpoint=getattr(settings, "arcgis_lakeland_permits_url"),
+        endpoint=settings.arcgis_lakeland_permits_url,
         platform=payload["platform"],
         watermark_col=payload["watermark_col"],
         id_keys=payload["id_keys"],

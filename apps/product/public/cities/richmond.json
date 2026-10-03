@@ -200,11 +200,16 @@
   "feeds": {
     "permits": null,
     "311": null,
-    "sla": null,
-    "deeds": {
+    "sla": {
       "platform": "arcgis",
-      "watermark_col": "SALE_DATE",
-      "interval_seconds": 600.0,
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
+    "deeds": {
+      "platform": "excel",
+      "watermark_col": "transfer_date",
+      "interval_seconds": 86400.0,
       "topic": "raw.municipal.deeds"
     }
   },

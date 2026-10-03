@@ -211,51 +211,44 @@ divisions:
     city_id: charleston_wv
 datasets:
   deeds:
-    endpoint: https://services8.arcgis.com/0zSnoqwLCR3i1Yfw/arcgis/rest/services/Charleston_Parcels/FeatureServer/0
+    endpoint: https://kanawhacountyassessorgis.com/server/rest/services/Parcel_Line_Layer/MapServer/1
     platform: arcgis
-    watermark_col: SALE_DATE
+    watermark_col: Last_Sales_Date
     id_keys:
-    - PARCELID
-    - OBJECTID
-    - SALE_DATE
+    - PARID
+    - Last_Sales_Date
     topic: raw.municipal.deeds
-    interval_seconds: 600.0
+    interval_seconds: 1800.0
     producer_key: deeds
     endpoint_by_year: {}
-    watermark_type: text
-    watermark_format: '%m/%d/%Y'
+    watermark_type: null
+    watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: Last_Sales_Date DESC, OBJECTID DESC
     id_col: null
-    select: null
+    select: OBJECTID,PARID,DIST,Last_Sales_Date,Deed_Book,Deed_Page,Sales_Price,Sale_Price,Prop_Location
     fallback_endpoints: []
-    where: null
+    where: Last_Sales_Date IS NOT NULL AND Last_Sales_Date <= CURRENT_TIMESTAMP AND DIST IN ('09','10','11','12','13','14')
     needs_geocode: false
     geocode_context: null
     field_map:
       doc_id:
-      - PARCELID
-      - OBJECTID
+      - PARID
       bbl:
-      - PARCELID
-      doc_type:
-      - DEED_TYPE
+      - PARID
       document_amount:
-      - SALE_PRICE
+      - Sales_Price
+      - Sale_Price
       recorded_date:
-      - SALE_DATE
+      - Last_Sales_Date
       address_street:
-      - SITEADDRESS
+      - Prop_Location
       incident_address:
-      - SITEADDRESS
-      borough:
-      - CITY
-      zipcode:
-      - ZIP5
-    ingestion_mode: incremental
+      - Prop_Location
+    ingestion_mode: snapshot
     oid_field: OBJECTID
-    max_record_count: 100000
-    expected_cadence_days: 30
+    max_record_count: 2000
+    expected_cadence_days: 180
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false
@@ -270,6 +263,64 @@ datasets:
     state_plane_y_col: null
     parcel_join: {}
     non_spatial: false
+    zip_member: null
+    composite_id: true
+  sla:
+    endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
+    platform: arcgis
+    watermark_col: ''
+    id_keys:
+    - Record_ID
+    - ObjectId
+    topic: raw.municipal.sla
+    interval_seconds: 1800.0
+    producer_key: sla
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: null
+    id_col: null
+    select: null
+    fallback_endpoints: []
+    where: State = 'WV' AND Latitude BETWEEN 38.32 AND 38.38 AND Longitude BETWEEN -81.68 AND -81.58
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      license_id:
+      - Record_ID
+      license_type:
+      - Store_Type
+      dba:
+      - Store_Name
+      latitude:
+      - Latitude
+      longitude:
+      - Longitude
+      address_street:
+      - Store_Street_Address
+      borough:
+      - City
+      zipcode:
+      - Zip_Code
+    ingestion_mode: snapshot
+    oid_field: ObjectId
+    max_record_count: 1000
+    expected_cadence_days: 14
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
     zip_member: null
 aliases:
 - charleston_wv_wv

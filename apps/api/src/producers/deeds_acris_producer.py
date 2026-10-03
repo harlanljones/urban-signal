@@ -1,8 +1,9 @@
-"""NYC ACRIS, Cook County/Chicago, San Francisco, Denver, Cincinnati, Columbus, Pittsburgh & MD SDAT (Baltimore/Montgomery/Prince George's) Deeds Ingestion Stream Producer."""
+"""NYC ACRIS, Cook County/Chicago, San Francisco, Denver, Cincinnati, Columbus, Pittsburgh & MD SDAT (Baltimore/Montgomery/Prince George's/Frederick) Deeds Ingestion Stream Producer."""
 
 import argparse
+import importlib
 import logging
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
 from src.config import settings
@@ -12,6 +13,7 @@ from src.producers.accela_client import AccelaClient
 from src.producers.carto_client import CartoClient
 from src.producers.ckan_client import CkanClient
 from src.producers.csv_client import CSVClient
+from src.producers.excel_client import ExcelClient
 from src.producers.socrata_client import SocrataClient
 from src.schemas.models import DeedEvent
 from src.spatial.h3_indexer import H3SpatialIndexer
@@ -68,33 +70,20 @@ def _parse_datetime(val: Any, spec: Any = None) -> Optional[datetime]:
     return None
 
 
-def _to_int(val: Any) -> int | None:
-    """Coerce a CSV cell into an int, tolerating float-like and blank values."""
-    if val is None or str(val).strip() == "":
-        return None
-    try:
-        return int(float(str(val)))
-    except (ValueError, TypeError):
-        return None
+def _compose_deed_date(city_id: str, row: dict[str, Any]) -> str | None:
+    """The city leaf's ``compose_deed_date(row)``, when it defines one.
 
-
-def _compose_hamilton_sale_date(row: dict[str, Any]) -> str | None:
-    """Compose ``YYYY-MM-DD`` from Hamilton County's split sale-date columns.
-
-    The Auditor CSV ships ``MonthSale``/``DaySale``/``YearSale`` as separate
-    integer cells with no single sale-date column (US-126). Returns ``None``
-    so the production chain falls through to its existing date handling when
-    any of the three is missing or unparseable.
+    Some sources split the sale date across columns: Hamilton County's auditor
+    CSV (year, month and day; US-126) and Allentown's parcel layer (year and
+    month). The leaf joins the parts into ``YYYY-MM-DD`` and returns ``None``
+    when one is missing or bad, so the generic date chain runs as before.
     """
-    year = _to_int(row.get("yearsale"))
-    month = _to_int(row.get("monthsale"))
-    day = _to_int(row.get("daysale"))
-    if not (year and month and day and 1900 <= year <= 2100):
-        return None
     try:
-        return date(year, month, day).strftime("%Y-%m-%d")
-    except ValueError:
+        leaf = importlib.import_module(f"src.spatial.cities.{city_id}")
+    except ImportError:
         return None
+    composer = getattr(leaf, "compose_deed_date", None)
+    return composer(row) if composer else None
 
 
 def _parse_wkt_point(value: Any) -> tuple[float | None, float | None]:
@@ -143,6 +132,7 @@ class DeedsACRISProducer:
         self.carto = CartoClient()
         self.ckan = CkanClient()
         self.csv = CSVClient()
+        self.excel = ExcelClient()
         self.spatial_indexer = H3SpatialIndexer()
 
     def _client_for(self, platform: str):
@@ -158,6 +148,7 @@ class DeedsACRISProducer:
             "carto": getattr(self, "carto", None),
             "ckan": getattr(self, "ckan", None),
             "csv": getattr(self, "csv", None),
+            "excel": getattr(self, "excel", None),
         }
         client = clients.get(platform)
         if client is None:
@@ -211,14 +202,16 @@ class DeedsACRISProducer:
                 resolved_city = "pittsburgh"
             elif "account_id_mdp_field_acctid" in row:
                 # MD SDAT real-property assessment snapshot (US-128) shared by
-                # Baltimore/Montgomery/Prince George's. All three counties carry
-                # the identical schema; autodetect distinguishes them by the
-                # county_name column (defaulting to baltimore when absent).
+                # Baltimore/Montgomery/Prince George's/Frederick. Every county
+                # carries the identical schema; autodetect distinguishes them by
+                # the county_name column (defaulting to baltimore when absent).
                 county = str(row.get("county_name_mdp_field_cntyname", "")).lower()
                 if "montgomery" in county:
                     resolved_city = "montgomery"
                 elif "prince" in county or "george" in county:
                     resolved_city = "prince_georges"
+                elif "frederick" in county:
+                    resolved_city = "frederick"
                 else:
                     resolved_city = "baltimore"
             else:
@@ -325,7 +318,8 @@ class DeedsACRISProducer:
             if lat is not None and lng is not None:
                 h3_res = self.spatial_indexer.get_multi_res_hierarchy(lat, lng)
 
-            doc_type = (
+            # Fixed-width extracts pad their codes (Alachua's ``WD        ``).
+            doc_type = str(
                 first_mapped(row, field_map, "doc_type")
                 or row.get("property_class_code_definition")
                 or row.get("doc_type")
@@ -334,7 +328,7 @@ class DeedsACRISProducer:
                 or row.get("deed_type")
                 or row.get("Property_Type")
                 or "DEED"
-            ).upper()
+            ).strip().upper() or "DEED"
 
             def _parse_val(val: Any) -> float:
                 if not val:
@@ -368,11 +362,10 @@ class DeedsACRISProducer:
             )
 
             recorded_str = first_mapped(row, field_map, "recorded_date")
-            if not recorded_str and resolved_city == "cincinnati":
-                # US-126: Hamilton County Auditor splits the sale date across
-                # three int columns (YearSale/MonthSale/DaySale) with no single
-                # sale-date column, so compose it before the generic chains.
-                recorded_str = _compose_hamilton_sale_date(row)
+            if not recorded_str:
+                # A sale date split across columns (Cincinnati, Allentown) is
+                # composed by the city leaf before the generic chains.
+                recorded_str = _compose_deed_date(resolved_city, row)
             recorded_str = recorded_str or (
                 row.get("recording_date")
                 or row.get("transfer_date")
@@ -420,33 +413,13 @@ class DeedsACRISProducer:
                 or row.get("municipality")
                 or row.get("city")
             )
-            party1 = (
-                first_mapped(row, field_map, "party1_grantor")
-                or row.get("owner_name")
-                or row.get("party1_grantor")
-                or row.get("party1_type")
-                or row.get("grantor")
-                or row.get("seller")
-                or row.get("seller_name")
-                or row.get("Sellername")
-                or row.get("OWNERNME1")
-            )
-            party2 = (
-                first_mapped(row, field_map, "party2_grantee")
-                or row.get("buyer")
-                or row.get("buyername")
-                or row.get("buyer_name")
-                or row.get("party2_grantee")
-                or row.get("party2_type")
-                or row.get("grantee")
-                or row.get("OWN1")
-                or row.get("OWN2")
-            )
-
             source_neighborhood = str(borough_val) if borough_val is not None else None
             from src.spatial.geo_utils import get_division_for_coordinate
             resolved_borough = get_division_for_coordinate(lat, lng, city_id=resolved_city) or source_neighborhood
 
+            # No grantor or grantee reaches an event, whatever the row or its
+            # field map holds: sellers and buyers are often private people,
+            # and nothing downstream reads their names.
             return DeedEvent(
                 city_id=resolved_city,
                 doc_id=doc_id,
@@ -458,8 +431,6 @@ class DeedsACRISProducer:
                 lot=lot_val,
                 document_amount=doc_amount,
                 recorded_date=recorded_dt,
-                party1_grantor=party1,
-                party2_grantee=party2,
                 latitude=lat,
                 longitude=lng,
                 h3_res7=h3_res["h3_res7"],
@@ -502,6 +473,7 @@ class DeedsACRISProducer:
                         endpoint_url=parcel_join["parcel_layer"],
                         join_key=join_key,
                         join_values=join_values,
+                        via=parcel_join.get("via"),
                     )
                 )
             for row in batch:

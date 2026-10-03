@@ -44,8 +44,7 @@ RALEIGH_DEEDS_FIELD_MAP = {
     "doc_id": ["OBJECTID", "PIN", "PARCELID"],
     "recorded_date": ["SALE_DATE"],
     "document_amount": ["TOTSALPRICE", "SALE_PRICE"],
-    "bbl": ["PIN", "PARCELID"],
-    "party2_grantee": ["OWNER_NAME", "OWNERNAME"],
+    "bbl": ["PIN_NUM"],
     "doc_type": ["DEED_TYPE", "SALE_TYPE"],
     "borough": ["MUNICIPALITY", "CITY"],
 }
@@ -157,7 +156,7 @@ def test_raleigh_deed_row_parses(producers):
     _, _, deeds = producers
     row = {
         "OBJECTID": 3003,
-        "PIN": "0794567890",
+        "PIN_NUM": "0794567890",
         "SALE_DATE": "2026-08-10T00:00:00+00:00",
         "TOTSALPRICE": 475000,
         "OWNER_NAME": "RALEIGH HOLDINGS LLC",
@@ -170,6 +169,7 @@ def test_raleigh_deed_row_parses(producers):
     assert event is not None
     assert event.city_id == "raleigh"
     assert event.doc_id == "3003"
+    assert event.bbl == "0794567890"
     assert event.document_amount == 475000.0
     assert event.recorded_date == datetime.fromisoformat("2026-08-10T00:00:00+00:00")
-    assert event.party2_grantee == "RALEIGH HOLDINGS LLC"
+    assert event.party2_grantee is None

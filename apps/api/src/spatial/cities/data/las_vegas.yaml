@@ -423,46 +423,41 @@ datasets:
   deeds:
     endpoint: https://services1.arcgis.com/F1v0ufATbBQScMtY/ArcGIS/rest/services/parcels/FeatureServer/0
     platform: arcgis
-    watermark_col: SALEDATE
+    watermark_col: DOCDATE
     id_keys:
     - PARCEL
     - DOCNO
-    - ObjectId
     topic: raw.municipal.deeds
     interval_seconds: 600.0
     producer_key: deeds
     endpoint_by_year: {}
-    watermark_type: null
-    watermark_format: null
-    watermark_exclude: []
-    order_by: SALEDATE DESC
+    watermark_type: text
+    watermark_format: '%Y%m%d'
+    watermark_exclude:
+    - '99990909'
+    order_by: DOCDATE DESC, ObjectId DESC
     id_col: null
-    select: null
+    select: PARCEL,DOCNO,DOCDATE,SALEDATE,SALEPRICE,COMNAME,WARD,ZIP,ObjectId
     fallback_endpoints: []
     where: null
-    needs_geocode: true
-    geocode_context: Las Vegas, NV
+    needs_geocode: false
+    geocode_context: null
     field_map:
       doc_id:
       - DOCNO
       - ObjectId
       bbl:
       - PARCEL
-      - APN
       document_amount:
       - SALEPRICE
       recorded_date:
-      - SALEDATE
       - DOCDATE
+      - SALEDATE
       borough:
       - COMNAME
       - WARD
-      address_street:
-      - ADDRESS1
-      - ADDRESS2
       zipcode:
       - ZIP
-      - ZIPCODE
     ingestion_mode: incremental
     oid_field: ObjectId
     max_record_count: 2000
@@ -479,16 +474,20 @@ datasets:
     state_plane_units: null
     state_plane_x_col: null
     state_plane_y_col: null
-    parcel_join: {}
+    parcel_join:
+      parcel_layer: https://services1.arcgis.com/F1v0ufATbBQScMtY/ArcGIS/rest/services/CLV_PARCELS_POLY/FeatureServer/7
+      join_key: PARCEL
+      geometry_source: centroid
     non_spatial: null
     zip_member: null
+    composite_id: true
   crime:
-    endpoint: https://services.arcgis.com/jjSk6t82vIntwDbs/arcgis/rest/services/LVMPD_Calls_For_Service_All/FeatureServer
+    endpoint: https://services.arcgis.com/jjSk6t82vIntwDbs/arcgis/rest/services/LVMPD_Calls_For_Service_30_Days/FeatureServer/0
     platform: arcgis
-    watermark_col: incidentdate
+    watermark_col: IncidentDate
     id_keys:
     - OBJECTID
-    - incidentnumber
+    - IncidentNumber
     topic: raw.municipal.crime
     interval_seconds: 300.0
     producer_key: crime
@@ -496,7 +495,7 @@ datasets:
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: IncidentDate DESC
     id_col: null
     select: null
     fallback_endpoints: []
@@ -505,18 +504,18 @@ datasets:
     geocode_context: null
     field_map:
       incident_id:
-      - incidentnumber
+      - IncidentNumber
       - OBJECTID
       offense_type:
-      - incidenttypedescription
+      - IncidentTypeDescription
       occurred_date:
-      - incidentdate
+      - IncidentDate
       latitude:
       - latitude
       longitude:
       - longitude
       address:
-      - location
+      - Address
     ingestion_mode: incremental
     oid_field: OBJECTID
     max_record_count: 1000
@@ -536,6 +535,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 4000
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis
@@ -554,7 +554,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'NV'
+    where: State = 'NV' AND Latitude BETWEEN 35.9 AND 36.34 AND Longitude BETWEEN -115.5 AND -114.9
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -593,6 +593,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 2000
 aliases:
 - las-vegas
 - las vegas

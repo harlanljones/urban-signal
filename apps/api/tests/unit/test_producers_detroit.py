@@ -496,15 +496,12 @@ class TestDetroitWithProposedFieldMap(DetroitParsingBase):
         assert ev.h3_res8 is not None
         assert ev.h3_res9 is not None
 
-    def test_deed_parties_read_lowercase_keys_not_kc_pascalcases(
-        self, deeds, deed_row
-    ):
-        """Detroit attrs are lowercase (grantor/grantee), not KC's
-        Sellername/Buyername PascalCase — party chains match directly, no
-        map entry needed."""
+    def test_deed_parties_stay_out_of_the_event(self, deeds, deed_row):
+        """Detroit's rows carry grantor and grantee columns; neither reaches
+        the event."""
         ev = deeds.parse_socrata_row(deed_row, city_id="detroit")
-        assert ev.party1_grantor == "CONERSTONE FUND TWO LLC"
-        assert ev.party2_grantee == "GROVE OWNER 1 LLC"
+        assert ev.party1_grantor is None
+        assert ev.party2_grantee is None
 
     def test_deed_recorded_date_is_a_dateonly_string_that_parses(
         self, deeds, deed_row

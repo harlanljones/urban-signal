@@ -5,7 +5,10 @@ PERMITS_FIELD_MAP = {
     "status": ["PermitStatus"],
     "job_type": ["PermitType", "WorkClass", "Category"],
     "cost": ["ValuationTotal"],
+    # ``address_street`` is the composed parcel address (compose_permit_address,
+    # applied by the permits producer); the parts alone start with the number.
     "address_street": [
+        "address_street",
         "ParcelAddressNumber",
         "ParcelAddressPreDirection",
         "ParcelAddressStreet",
@@ -17,14 +20,17 @@ PERMITS_FIELD_MAP = {
     "longitude": ["GISX"],
 }
 
+# CSVClient hands rows over with normalized headers ("License Number" ->
+# "license_number"), so the map names them that way; the published spellings
+# matched nothing and the feed published no row before 2026-09-30.
 SLA_FIELD_MAP = {
-    "license_id": ["License Number"],
-    "dba": ["DBA", "Entity Name"],
-    "premises_name": ["Entity Name"],
-    "license_type": ["License Type", "License Sub-Type"],
-    "effective_date": ["Original Issue Date"],
-    "expiration_date": ["Expiration Date"],
-    "address_street": ["Business Location"],
+    "license_id": ["license_number"],
+    "dba": ["dba", "entity_name"],
+    "premises_name": ["entity_name"],
+    "license_type": ["license_type", "license_sub_type"],
+    "effective_date": ["original_issue_date"],
+    "expiration_date": ["expiration_date"],
+    "address_street": ["business_location"],
 }
 
 FIELD_MAP = {
@@ -434,8 +440,8 @@ HENDERSON_FEED_SPECS: dict[str, dict[str, object]] = {
     "sla": {
         "endpoint": HENDERSON_SLA_ENDPOINT,
         "platform": "csv",
-        "watermark_col": "Original Issue Date",
-        "id_keys": ["License Number"],
+        "watermark_col": "original_issue_date",
+        "id_keys": ["license_number"],
         "topic_key": "topic_sla",
         "interval_seconds": 600.0,
         "producer_key": "sla",
@@ -443,6 +449,9 @@ HENDERSON_FEED_SPECS: dict[str, dict[str, object]] = {
             "expected_cadence_days": 1,
             "watermark_type": "text",
             "watermark_format": "%m/%d/%Y",
+            # A newest-first window: 579 of 12,938 licences were issued in
+            # the 90 days before 2026-09-30, well inside the 1,000-row cap.
+            "order_by": "original_issue_date DESC",
             "ingestion_mode": "snapshot",
             "needs_geocode": True,
             "geocode_context": HENDERSON_GEOCODE_CONTEXT,

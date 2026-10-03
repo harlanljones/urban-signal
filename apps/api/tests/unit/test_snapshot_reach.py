@@ -1,0 +1,300 @@
+"""Every snapshot feed reads the rows it exists for (2026-09-30).
+
+A snapshot poll re-reads its source and stops at the job's ``batch_limit``
+(1,000 unless the spec declares more). Read in table order, a source larger
+than its cap hands every poll the same slice and never the rows past it. A
+feed avoids that in one of two ways:
+
+- **Full read:** the cap clears the whole filtered table by half again, so
+  every poll reads every row.
+- **Newest-first window:** the order starts with a ``DESC`` date term, so the
+  cap is a window on recent rows. The window holds half again the rows dated
+  in the last 90 days, so batch updates and late recordings land inside it.
+
+Every other snapshot feed is a known gap with its reason. The counts are live
+measurements from 2026-09-30 (``docs/research/snapshot-reach-2026-09-30.md``);
+a new snapshot feed has to bring its own. SNAP retailer feeds are checked by
+``test_producers_snap.py::TestSnapMetroScope``, and GBFS feeds stream rather
+than poll, so neither is in scope here.
+"""
+
+import pytest
+
+from src.producers.scheduler import _NEWEST_FIRST, JobConfig
+from src.spatial.city_registry import REGISTRY, CityId, FeedType, settings
+
+DEFAULT_CAP = JobConfig.batch_limit
+
+# Rows in the filtered source table, for feeds read in full.
+FULL_READ_ROWS = {
+    # City of Allentown building permits issued in the spec's 90-day window,
+    # newest 2026-09-29, read 2026-09-30.
+    ("allentown", "permits"): 819,
+    # City of Asheville permits opened in the spec's 90-day window, less the
+    # right-of-way, event, vendor, over-the-counter and home-business
+    # records, newest 2026-09-29, read 2026-09-30; 7 carry no point.
+    ("asheville", "permits"): 697,
+    # Deschutes County sales on the four township-ranges under Bend's metro
+    # box, dated in the spec's 90-day window, read 2026-09-30 (1,019 of them
+    # fall in the box).
+    ("bend", "deeds"): 1_048,
+    ("bend", "sla"): 5_981,
+    # Boulder County sales dated in the spec's 90-day window, county-wide
+    # (the file rebuilt 2026-10-02, newest 2026-09-28), read 2026-10-02; 715
+    # of them place inside the metro box. The 90 days from 2025-02-24 held
+    # 4,334.
+    ("boulder", "deeds"): 1_806,
+    # Lee County parcels whose latest sale is dated in the spec's 90-day
+    # window, county-wide, newest 2026-09-25, read 2026-10-02; 4,409 lie in
+    # the metro box. March to May 2026 held 11,253.
+    ("cape_coral", "deeds"): 6_765,
+    # Chandler, Glendale, Phoenix, Scottsdale and Tempe deeds (Maricopa
+    # Assessor): the deeds dated in each spec's 90-day window inside its
+    # JURISDICTION, read 2026-09-30.
+    ("chandler", "deeds"): 1_573,
+    # City of Charleston permits issued in the spec's 90-day window, less the
+    # permits that are not building work, newest 2026-09-30, read 2026-10-02;
+    # 52 carry no point. The busiest 90 days the layer holds, from 2025-07-09,
+    # held 2,445.
+    ("charleston_sc", "permits"): 2_363,
+    # Mecklenburg County transfers dated in the spec's 90-day window, newest
+    # 2026-09-22, read 2026-09-30.
+    ("charlotte", "deeds"): 8_925,
+    ("cincinnati", "deeds"): 1_078,
+    # Denver, Hartford and Nashville deeds: the transfers dated in each
+    # spec's own 90-day window, read 2026-09-30.
+    ("denver", "deeds"): 2_445,
+    ("eugene", "sla"): 752,
+    # Larimer County sales dated in the spec's 90-day window, county-wide,
+    # newest 2026-09-08, read 2026-10-02; 1,043 of them place inside the
+    # metro box. The 90 days from 2025-03-31 held 4,337.
+    ("fort_collins", "deeds"): 2_597,
+    ("fort_collins", "permits"): 2_183,
+    # Alachua County sales dated in the spec's 90-day window, county-wide
+    # (the extract rebuilt 2026-10-02, newest 2026-09-30); 1,556 of them place
+    # inside the metro box. The 90 days to 2025-08-26 held 3,484.
+    ("gainesville", "deeds"): 2_486,
+    # Alachua County's building, trade, pool, demolition, fire and sign
+    # permits issued in the spec's 90-day window, newest 2026-10-01, read
+    # 2026-10-02; 1,549 of them place inside the metro box.
+    ("gainesville", "permits"): 1_992,
+    ("glendale_az", "deeds"): 1_263,
+    ("hartford", "deeds"): 353,
+    ("inland_empire", "sla"): 10_585,
+    # Lancaster County sales recorded in the spec's 90-day window,
+    # county-wide, newest 2026-09-28, read 2026-10-02; 807 of them lie in the
+    # metro box. The 90 days from 2026-04-19 held 1,371.
+    ("lincoln", "deeds"): 986,
+    # Polk County sales on parcels numbered 23 to 25, dated in the spec's
+    # 90-day window, read 2026-10-02 (the extract rebuilt that night, newest
+    # 2026-09-24); 1,885 of them place inside the metro box. The 90 days from
+    # 2025-02-17 held 5,272.
+    ("lakeland", "deeds"): 3_464,
+    # City of Longview permits issued in the spec's 90-day window, first
+    # review period only, less contractor registrations, right-of-way work and
+    # reviews, newest 2026-10-01, read 2026-10-02. The 90 days from 2024-10-12
+    # held 1,136.
+    ("longview", "permits"): 1_027,
+    # City of Manchester parcels whose latest sale falls in the spec's
+    # 90-day cast window, newest 2026-09-17, read 2026-10-02; 499 of them lie
+    # in the metro box. The 90 days from 2026-05-04 held 735.
+    ("manchester", "deeds"): 521,
+    # Jackson County sales whose SiteCity is MEDFORD, dated in the spec's
+    # 90-day window, read 2026-09-30.
+    ("medford", "deeds"): 304,
+    # City of Midland permit applications made in the spec's 90-day window,
+    # less the names that are not building work, newest 2026-10-01, read
+    # 2026-10-02; 10 carry no point. The 90 days from 2025-04-10 held 3,786.
+    ("midland", "permits"): 2_622,
+    ("milwaukee", "deeds"): 5_685,
+    ("milwaukee", "sla"): 1_275,
+    ("modesto", "sla"): 4_574,
+    ("montgomery", "sla"): 1_084,
+    ("nashville", "deeds"): 4_373,
+    ("nyc", "childcare"): 2_752,
+    ("oakland", "sla"): 5_103,
+    # Marion County parcels whose latest sale falls in the current month or
+    # the three before it, county-wide, read 2026-10-02; 6,365 lie in the
+    # metro box. April to June 2026 held 9,946.
+    ("ocala", "deeds"): 7_472,
+    ("phoenix", "deeds"): 9_224,
+    # The same Pierce County sales as Tacoma's, placed anywhere in the county
+    # (2,317 of them on 2026-09-30).
+    ("pierce", "deeds"): 2_432,
+    ("portland", "sla"): 6_079,
+    # Chesterfield County offenses in the metro box over the last 120 days.
+    ("richmond", "crime"): 1_249,
+    # The transfers since the same day a year before (Excel, 2026-09-23 workbook).
+    ("richmond", "deeds"): 6_650,
+    # Marion County (Oregon) sale lines dated in the spec's 90-day window,
+    # county-wide, read 2026-10-02; 811 of them place inside the metro box,
+    # 666 sales once each. The 90 days from 2026-04-20 held 3,092.
+    ("salem_or", "deeds"): 1_544,
+    ("santa_rosa", "sla"): 4_979,
+    ("scottsdale", "deeds"): 2_507,
+    ("st_louis", "sla"): 1_799,
+    ("stockton", "sla"): 1_369,
+    # Pierce County sales dated in the spec's 90-day window, county-wide
+    # (2026-09-25 extract, read 2026-09-30); 452 of them place in Tacoma.
+    ("tacoma", "deeds"): 2_432,
+    # Hillsborough County parcels whose latest sale falls in the spec's
+    # 90-day window, county-wide, newest 2026-09-18, read 2026-10-02; 2,468
+    # lie in the metro box. May to July 2026 held 6,441.
+    ("tampa", "deeds"): 3_886,
+    ("tempe", "deeds"): 783,
+    # Pima County affidavits of sale recorded in the spec's 90-day window,
+    # county-wide, across this year's file and last year's (4,257 and 62),
+    # newest 2026-09-25, read 2026-10-02; 1,727 place inside the metro box.
+    # The 90 days from 2026-02-18 held 6,873.
+    ("tucson", "deeds"): 4_319,
+    # City of Tucson residential building permits issued in the spec's
+    # 90-day window, newest 2026-10-02, read 2026-10-02; 1,016 of them lie in
+    # the metro box. The 90 days from 2025-08-17 held 1,329.
+    ("tucson", "permits"): 1_290,
+    # Clark County taxlots whose latest sale is dated in the spec's 90-day
+    # window, county-wide, newest 2026-09-11, read 2026-10-02; 1,113 lie in
+    # the metro box. The 90 days from 2026-04-01 held 4,221.
+    ("vancouver_wa", "deeds"): 1_637,
+    # Lucas County sales recorded in the spec's 90-day window, county-wide,
+    # newest 2026-09-25, read 2026-09-30; 2,154 of them lie in the metro box.
+    ("toledo", "deeds"): 2_296,
+    ("washington_dc", "childcare"): 452,
+    # New Hanover County parcel points whose latest sale falls in the spec's
+    # 90-day cast window, newest 2026-09-23, read 2026-10-02, all in the
+    # metro box. April to June 2026 held 2,898.
+    ("wilmington_nc", "deeds"): 2_401,
+    # Yakima County Assessor parcel rows whose sale falls in the spec's
+    # 90-day cast window, county-wide, newest 2026-09-23, read 2026-10-02;
+    # 208 of those sales lie in the metro box. April to June held 594.
+    ("yakima", "deeds"): 453,
+}
+
+# Rows dated in the 90 days before 2026-09-30, for newest-first windows.
+WINDOW_RECENT_ROWS = {
+    ("allentown", "deeds"): 304,
+    ("anaheim", "sla"): 322,
+    ("asheville", "deeds"): 2_653,
+    ("aurora", "sla"): 238,
+    ("baltimore", "deeds"): 2_459,
+    ("baton_rouge", "sla"): 344,
+    ("charleston_wv", "deeds"): 3,
+    ("chattanooga", "deeds"): 1_661,
+    ("cleveland", "deeds"): 3_509,
+    ("durham", "deeds"): 574,
+    ("frederick", "deeds"): 270,
+    ("glendale_az", "sla"): 518,
+    ("henderson", "sla"): 579,
+    ("miami_dade", "sla"): 2_128,
+    ("montgomery", "deeds"): 2_042,
+    ("oxnard_ventura", "sla"): 3_839,
+    ("prince_georges", "deeds"): 1_231,
+    ("providence", "deeds"): 791,
+    ("raleigh", "deeds"): 3_240,
+    ("san_diego", "sla"): 2_275,
+    ("tucson", "sla"): 2,
+}
+
+KNOWN_GAPS = {
+    ("kansas_city", "sla"): "28,245 rows and no date to window on (only a text licence year)",
+    ("boston", "deeds"): (
+        "the id is the CKAN package, not a resource (404); the FY2026 resource has "
+        "no coordinates and none of the mapped column names"
+    ),
+}
+
+
+def _key_id(key):
+    return ":".join(key)
+
+
+def _spec(key):
+    city, feed = key
+    return REGISTRY[CityId(city)].datasets[FeedType(feed)]
+
+
+def _polled_snapshots():
+    """Every snapshot spec the scheduler polls, SNAP retailers aside."""
+    return {
+        (city_id.value, feed.value)
+        for city_id, reg in REGISTRY.items()
+        for feed, ds in reg.datasets.items()
+        if ds.ingestion_mode == "snapshot"
+        and ds.platform != "gbfs"
+        and ds.endpoint != settings.arcgis_snap_retailers_url
+    }
+
+
+def test_every_snapshot_feed_is_classified():
+    """A new snapshot feed has to say how it reaches its rows, with a count."""
+    groups = (set(FULL_READ_ROWS), set(WINDOW_RECENT_ROWS), set(KNOWN_GAPS))
+    assert not (groups[0] & groups[1] or groups[0] & groups[2] or groups[1] & groups[2])
+    assert _polled_snapshots() == groups[0] | groups[1] | groups[2]
+
+
+@pytest.mark.parametrize("key", sorted(FULL_READ_ROWS), ids=_key_id)
+def test_full_read_cap_clears_the_table(key):
+    rows = FULL_READ_ROWS[key]
+    spec = _spec(key)
+    assert (spec.batch_limit or DEFAULT_CAP) >= 1.5 * rows
+    # A cap is declared only where the default falls short.
+    assert (spec.batch_limit is None) == (1.5 * rows <= DEFAULT_CAP)
+
+
+@pytest.mark.parametrize("key", sorted(WINDOW_RECENT_ROWS), ids=_key_id)
+def test_window_reads_newest_first_and_holds_ninety_days(key):
+    recent = WINDOW_RECENT_ROWS[key]
+    spec = _spec(key)
+    assert _NEWEST_FIRST.match(spec.order_by or ""), spec.order_by
+    if spec.watermark_col:
+        # The window runs on the date the feed already tracks.
+        assert spec.order_by.split()[0] == spec.watermark_col
+    assert (spec.batch_limit or DEFAULT_CAP) >= 1.5 * recent
+    assert (spec.batch_limit is None) == (1.5 * recent <= DEFAULT_CAP)
+
+
+@pytest.mark.parametrize("key", sorted(WINDOW_RECENT_ROWS), ids=_key_id)
+def test_window_that_spans_pages_breaks_ties(key):
+    """Paging a date sort is only stable with a unique second term; many rows
+    share a sale or issue date. CSV sources sort in memory, so they are exempt."""
+    spec = _spec(key)
+    if (spec.batch_limit or DEFAULT_CAP) <= DEFAULT_CAP or spec.platform == "csv":
+        return
+    terms = [term.strip() for term in spec.order_by.split(",")]
+    assert len(terms) == 2, spec.order_by
+    tiebreak = terms[1].split()[0]
+    assert tiebreak == (":id" if spec.platform == "socrata" else spec.oid_field)
+
+
+@pytest.mark.parametrize("key", sorted({**FULL_READ_ROWS, **WINDOW_RECENT_ROWS}), ids=_key_id)
+def test_multi_page_poll_runs_at_most_every_half_hour(key):
+    """A poll that reads more than one page runs at most every 30 minutes, so
+    the extra pages do not multiply the load on the source (every one of these
+    sources updates daily at the most). A CSV source is one download a poll."""
+    spec = _spec(key)
+    cap = spec.batch_limit or DEFAULT_CAP
+    rows_read = min(cap, FULL_READ_ROWS[key]) if key in FULL_READ_ROWS else cap
+    if spec.platform == "csv" or rows_read <= DEFAULT_CAP:
+        return
+    assert spec.interval_seconds >= 1800.0
+
+
+def test_raleigh_window_skips_parcels_without_a_sale():
+    """Wake County sorts null sale dates first under DESC; without the guard
+    the window fills with parcels that never sold."""
+    assert _spec(("raleigh", "deeds")).where == "SALE_DATE IS NOT NULL"
+
+
+def test_cleveland_window_is_bounded_to_recent_transfers():
+    """Sorting all 162,874 Cuyahoga parcels by transfer date outlasts the
+    client's 30-second timeout; bounding the sort to 180 days answers in
+    seconds and still holds more than the window."""
+    spec = _spec(("cleveland", "deeds"))
+    assert spec.where == "last_transfer_date >= CURRENT_DATE - INTERVAL '180' DAY"
+
+
+@pytest.mark.parametrize("key", sorted(KNOWN_GAPS), ids=_key_id)
+def test_known_gap_is_still_unfixed(key):
+    """A gap that gains a window or a cap moves to its table with a count."""
+    spec = _spec(key)
+    assert spec.batch_limit is None, KNOWN_GAPS[key]
+    assert not _NEWEST_FIRST.match(spec.order_by or ""), KNOWN_GAPS[key]

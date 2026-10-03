@@ -48,8 +48,11 @@ division catalog, and geographic bounding boxes for the City of Scottsdale
 (northeast Maricopa County, AZ — its own CityId, distinct from the
 registered Phoenix / Maricopa County neighbor).
 
-Scottsdale is a TWO-FEED PARTIAL metro: PERMITS and SLA on the city ArcGIS
-Server 10.6 (``maps.scottsdaleaz.gov``). ``data.scottsdaleaz.gov`` — the
+Scottsdale's PERMITS and SLA come from the city ArcGIS Server 10.6
+(``maps.scottsdaleaz.gov``) and are mirrored below. DEEDS (the Maricopa
+County Assessor's parcel layer) and 311 (the city's ScottsdaleEZ table, on
+the same server) were registered on 2026-09-30 in ``data/scottsdale.yaml``
+and are not mirrored here. ``data.scottsdaleaz.gov`` — the
 portal the US-227 ticket names as Socrata — is actually an ArcGIS Hub
 Open Data site (``/api/catalog/v1`` 404s; the homepage serves
 hubcdn.arcgis.com assets); the queryable data host is the REST server.
@@ -87,14 +90,22 @@ Live-probe evidence that defines this leaf (probed 2026-08-28, US-227):
   Reported OID field ``ESRI_OID`` is per-query unstable (OBJECTID 19901
   returned ESRI_OID 27 and 1 across two probes) — the attribute
   ``OBJECTID`` column is the stable row key and pagination default.
-* **311-family REJECTED** per repo discipline: the only complaint feeds are
-  code-enforcement layers (``OpenData_Events/MapServer/1`` Code Violations,
-  18,470 rows, fresh 2026-08-21; layer 2 Graffiti, 907 rows) — code
-  enforcement is NOT COMPLAINTS_311 (Lynchburg TRAKiT / Wichita MABCD
-  precedent), and the city publishes no true 311 service-request dataset
-  (``My_Services`` is trash/recycling schedule geography).
-* **DEEDS REJECTED**: recorder.maricopa.gov (and /recdocdata) return 403 to
-  anonymous probes — no bulk API; the registration ships without deeds.
+* **311** — ``OpenData_Tabular/MapServer/28`` "Scottsdale EZ" (standalone
+  table, 240,985 rows since 2019, tagged 311 on the city's Hub), which this
+  probe missed: it read only the code-enforcement layers
+  (``OpenData_Events/MapServer/1`` Code Violations, layer 2 Graffiti), and
+  code enforcement is not COMPLAINTS_311 (Lynchburg TRAKiT / Wichita MABCD
+  precedent), so those stay unregistered. The table lists each customer
+  service request once it closes, at its hundred block and street
+  centreline, with no requester column, so the feed follows ``ClosedDate``.
+  Its dates are Arizona wall-clock times stamped UTC (requests peak between
+  08:00 and 15:00 "UTC"), as the repo stamps Socrata's floating timestamps;
+  the watermark round-trips because the server compares literals the same
+  way. About one row in twenty has no location ("Data Not Available") and
+  ``metro_clip`` skips it (probed 2026-09-30).
+* **DEEDS**: recorder.maricopa.gov (and /recdocdata) return 403 to anonymous
+  probes. The deeds registered on 2026-09-30 come from the Maricopa County
+  Assessor's parcel layer instead (``docs/research/deeds-probe-2026-09-30.md``).
 * **ANSI-date host NOT required**: maps.scottsdaleaz.gov accepts ISO
   string date literals with real date math (``IssueDate > '2026-08-01'``
   → 51 rows live, time-of-day respected) — the host is deliberately NOT
@@ -409,7 +420,8 @@ SCOTTSDALE_DIVISIONS: dict[str, BoroughMeta] = {
 # Feed specs (leaf-local; the spine copies these into REGISTRY).
 # Probed live 2026-08-28 (US-227). Register the TABLE endpoints — the
 # OpenData_Events mapped twins either add nothing (permits) or carry the
-# NaN-geometry trap; 311-family and deeds are rejected (see docstring).
+# NaN-geometry trap. 311 and deeds are registered in data/scottsdale.yaml
+# only (see docstring).
 # ---------------------------------------------------------------------------
 SCOTTSDALE_PERMITS_ENDPOINT = (
     "https://maps.scottsdaleaz.gov/arcgis/rest/services/"
@@ -453,8 +465,8 @@ SCOTTSDALE_FEED_SPECS: dict[str, dict[str, object]] = {
                 "null-shape features which the client would lift as "
                 "coordinates; IssueDate bursty-steady at 56/30d-124/60d "
                 "hence cadence 14; host accepts ISO date literals - no "
-                "ANSI_DATE_LITERAL_HOSTS entry; 311-family and deeds "
-                "rejected)"
+                "ANSI_DATE_LITERAL_HOSTS entry; 311 and deeds are "
+                "registered in data/scottsdale.yaml only)"
             ),
             "field_map": PERMITS_FIELD_MAP,
         },

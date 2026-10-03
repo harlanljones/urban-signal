@@ -93,8 +93,6 @@ ASHEVILLE_DEEDS_FIELD_MAP: dict[str, list[str]] = {
     "bbl": ["PIN"],
     "document_amount": ["Stamps"],
     "recorded_date": ["DeedDate"],
-    "party1_grantor": ["Owner"],
-    "party2_grantee": ["Owner"],
     "doc_type": ["Instrument"],
     "borough": ["County", "City"],
 }

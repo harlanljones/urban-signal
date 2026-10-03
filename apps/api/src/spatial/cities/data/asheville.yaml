@@ -258,6 +258,43 @@ divisions:
     - South Asheville & Arden
     city_id: asheville
 datasets:
+  permits:
+    endpoint: https://gis.ashevillenc.gov/server/rest/services/Permits/AccelaPermitsView/MapServer/2
+    platform: arcgis
+    watermark_col: date_opened
+    id_keys:
+    - record_id
+    topic: raw.municipal.permits
+    interval_seconds: 21600.0
+    producer_key: permits
+    order_by: date_opened DESC, objectid DESC
+    select: objectid,record_id,date_opened,record_type,record_type_subtype,record_status,address,apn
+    where: date_opened >= CURRENT_DATE - INTERVAL '90' DAY AND date_opened <= CURRENT_TIMESTAMP AND record_type_type
+      NOT IN ('Right of Way', 'Event-Temporary Use', 'Outdoor Vendor', 'Over The Counter') AND record_type_subtype
+      NOT IN ('Home Occupation', 'Occupational')
+    needs_geocode: false
+    field_map:
+      job_id:
+      - record_id
+      issuance_date:
+      - date_opened
+      filing_date:
+      - date_opened
+      job_type:
+      - record_type_subtype
+      - record_type
+      status:
+      - record_status
+      address_street:
+      - address
+      bbl:
+      - apn
+    ingestion_mode: snapshot
+    oid_field: objectid
+    max_record_count: 2000
+    expected_cadence_days: 3
+    batch_limit: 1500
+    metro_clip: true
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis
@@ -276,7 +313,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'NC'
+    where: State = 'NC' AND Latitude BETWEEN 35.43 AND 35.76 AND Longitude BETWEEN -82.72 AND -82.35
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -322,7 +359,7 @@ datasets:
     watermark_col: DeedDate
     id_keys:
     - PIN
-    - objectid
+    - DeedDate
     topic: raw.municipal.deeds
     interval_seconds: 86400.0
     producer_key: deeds
@@ -330,7 +367,7 @@ datasets:
     watermark_type: text
     watermark_format: '%Y%m%d'
     watermark_exclude: []
-    order_by: null
+    order_by: DeedDate DESC, objectid DESC
     id_col: null
     select: null
     fallback_endpoints: []
@@ -347,10 +384,6 @@ datasets:
       - Stamps
       recorded_date:
       - DeedDate
-      party1_grantor:
-      - Owner
-      party2_grantee:
-      - Owner
       doc_type:
       - Instrument
       borough:
@@ -375,7 +408,9 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 4000
     delimiter: null
+    composite_id: true
 aliases:
 - asheville_nc
 - asheville nc

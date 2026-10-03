@@ -154,6 +154,9 @@ SAMPLE_CSV = (
 class _FakeResponse:
     def __init__(self, text):
         self.text = text
+        # The CSV client reads the downloaded bytes in the response's encoding.
+        self.content = text.encode()
+        self.encoding = "utf-8"
 
     def raise_for_status(self):
         return None

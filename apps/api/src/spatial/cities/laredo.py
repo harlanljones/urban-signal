@@ -9,6 +9,10 @@ Center: Santa Maria & Matamoros vicinity (27.5306, -99.4803). Bboxes are
 hand-authored to tightly contain the urbanized Webb County core while keeping
 divisions as strict subsets of the metro envelope, consistent with the
 south-central wave-4 leaf pattern (Beaumont / Waco / Amarillo).
+
+SLA (2026-09-30): the USDA SNAP retailer slice inside the metro box, which
+stands in for the licence register the metro lacks. The corpus builds it
+with the shared ``snap_sla_spec``.
 """
 
 
@@ -242,25 +246,21 @@ __all__ = [
 ]
 
 PERMITS_FIELD_MAP: dict[str, list[str]] = {
-    # APP NBR (numeric) + APP YR composite key; _id is the CKAN row OID fallback.
-    "job_id": ["APP_NBR", "APP_YR", "_id"],
-    # Watermark column is timestamp; maps to both issuance and filing.
-    "issuance_date": ["PERMIT_ISS_DATE"],
-    "filing_date": ["PERMIT_ISS_DATE"],
-    "status": ["PERMIT_STATUS_DESC", "PERMIT_STATUS", "APP_STAT_DESC", "APP_STATUS"],
-    "job_type": ["APP_TYPE_DESC", "PERMIT_TYPE_DESC", "Permit_Group_Type", "Permit_Group_Tab"],
-    "cost": ["VALUATION", "TOTAL_FEE", "PERMIT_FEE"],
-    "valuation": ["VALUATION"],
-    "total_fee": ["TOTAL_FEE"],
-    # Split address — first_mapped picks the first truthy; the producer
-    # concatenates STREET NBR + STREET when both present.
-    "address_street": ["STREET", "STREET_NBR"],
-    "street_number": ["STREET_NBR"],
-    "street_name": ["STREET"],
-    "description": ["APP_DESC", "Permit_Group_Type"],
-    "permit_type": ["PERMIT_TYPE", "APP_TYPE"],
-    "permit_sequence": ["PERMIT_SEQUENCE"],
-    "borough": ["Permit_Group_Tab"],
+    # CKAN's row id: the only column unique per row. An application number
+    # carries several permits (a house and its electrical, plumbing and
+    # mechanical permits share APP NBR and PERMIT SEQUENCE), so the spec's
+    # composite id joins APP YR, APP NBR, PERMIT SEQUENCE and PERMIT TYPE.
+    "job_id": ["_id"],
+    # The datastore keeps no application date, only the issue date.
+    "issuance_date": ["PERMIT ISS. DATE"],
+    "status": ["PERMIT STATUS DESC", "APP STAT DESC"],
+    # The permit's group names its trade ("Electrical", "Plumbing",
+    # "Mechanical", "Demolition"); the type description is the fallback.
+    # ``compose_permit_type`` reads the kind where the group needs it.
+    "job_type": ["Permit Group Type", "PERMIT TYPE DESC", "APP TYPE DESC"],
+    "cost": ["VALUATION"],
+    # ``compose_permit_address`` joins STREET NBR and STREET.
+    "address_street": ["address_street", "STREET"],
 }
 
 FIELD_MAP: dict[str, dict[str, list[str]]] = {
@@ -274,23 +274,49 @@ DROPPED_PII_COLUMNS: tuple[str, ...] = (
 )
 
 
-def normalize_laredo_row(row: dict) -> dict:
-    """Normalize a raw CKAN datastore row so its keys match PERMITS_FIELD_MAP.
+def compose_permit_address(row: dict) -> str | None:
+    """The permit's site address, joined from the datastore's parts.
 
-    CKAN field ids contain dots and spaces (e.g. "PERMIT ISS. DATE"). The
-    spine ``first_mapped`` treats dots as nesting, so the leaf normalizes
-    by replacing dots/spaces with "_" and upper-casing to the map's
-    sanitized keys. Both the original and normalized keys are kept so
-    existing callers that pass raw rows keep working after the spine patch.
+    ``STREET NBR`` holds the house number and ``STREET`` the street, both
+    padded with spaces. ``DOBPermitsProducer`` calls this for every Laredo
+    permit row and geocodes the result. Returns None without a street.
     """
-    out: dict = dict(row)
-    for k, v in list(row.items()):
-        sanitized = k.replace(".", "").replace(" ", "_").replace("-", "_")
-        while "__" in sanitized:
-            sanitized = sanitized.replace("__", "_")
-        sanitized = sanitized.strip("_")
-        if sanitized != k:
-            out[sanitized] = v
-            out[sanitized.upper()] = v
-    return out
+    street = " ".join(str(row.get("STREET") or "").split())
+    if not street:
+        return None
+    number = str(row.get("STREET NBR") or "").strip()
+    return f"{number} {street}" if number else street
 
+
+# Groups whose permits under the "New Construction" tab are new buildings: the
+# Census Bureau's categories for new homes ("SINGLE FAMILY DETACHED", "2 FAMILY
+# BLDG DUPLEX") and new commercial buildings ("OFFICES, BANKS", "5 OR MORE
+# FAMILY BLDG"). The tab alone does not say so: the additions, alterations and
+# conversions group sits under it too.
+_NEW_BUILDING_GROUPS: frozenset[str] = frozenset({"Residential", "Commercial Construction"})
+
+
+def compose_permit_type(row: dict) -> str | None:
+    """The permit's type, read from its group, report tab and kind.
+
+    ``Permit Group Type`` names a trade ("Electrical") or a class, and the
+    field map reads it alone for most permits. Three groups need the kind
+    (``PERMIT TYPE DESC``) too. A residential or commercial construction permit
+    under the "New Construction" tab is a new building, except a mobile home's
+    installation permit. An addition, alteration or conversion is an
+    alteration of the kind it names ("RES REROOF", "RES PORCH, CARPORT &
+    ADDITION"), not a change of use. An "Other" permit is its kind ("SIGN
+    PERMIT"). ``DOBPermitsProducer`` calls this for every Laredo permit row.
+    """
+    group = " ".join(str(row.get("Permit Group Type") or "").split())
+    tab = " ".join(str(row.get("Permit Group Tab") or "").split())
+    kind = " ".join(str(row.get("PERMIT TYPE DESC") or "").split())
+    if group in _NEW_BUILDING_GROUPS and tab == "New Construction":
+        if kind.upper().startswith("INSTALLATION PERMIT"):
+            return None
+        return f"New construction: {kind}" if kind else "New construction"
+    if group == "Additions, Alterations, and Conversions" and kind:
+        return f"Alteration: {kind}"
+    if group == "Other" and kind:
+        return kind
+    return None

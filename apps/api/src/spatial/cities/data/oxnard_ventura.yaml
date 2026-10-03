@@ -365,13 +365,13 @@ datasets:
     - GlobalID
     - OBJECTID
     topic: raw.municipal.sla
-    interval_seconds: 300.0
+    interval_seconds: 1800.0
     producer_key: sla
     endpoint_by_year: {}
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: DATEISSUE DESC
+    order_by: DATEISSUE DESC, OBJECTID DESC
     id_col: null
     select: null
     fallback_endpoints: []
@@ -417,6 +417,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 6000
     delimiter: null
   '311':
     endpoint: https://services.arcgis.com/dBVj4EXO3IdRPOqb/arcgis/rest/services/Graffiti_Responses_Read_Only/FeatureServer/0

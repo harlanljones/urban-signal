@@ -159,6 +159,10 @@ class ViolationsProducer:
             logger.warning("Error parsing violation row: %s", e)
             return None
 
+    def parse_socrata_row(self, row: dict[str, Any], city_id: str | None = None) -> ViolationEvent | None:
+        """The row hook the scheduler's ``poll_job`` and the backfill loader call."""
+        return self.parse_row(row, city_id=city_id)
+
     def run_stream(self, city_id: str = "boston", limit: int = 5000, where_clause: str | None = None):
         from src.spatial.city_registry import CityId, FeedType, get_dataset, normalize_city
         from src.producers.acquisition import AcquisitionSpec, build_adapter_request
@@ -305,6 +309,10 @@ class InspectionsProducer:
         except Exception as e:
             logger.warning("Error parsing inspection row: %s", e)
             return None
+
+    def parse_socrata_row(self, row: dict[str, Any], city_id: str | None = None) -> InspectionEvent | None:
+        """The row hook the scheduler's ``poll_job`` and the backfill loader call."""
+        return self.parse_row(row, city_id=city_id)
 
     def run_stream(self, city_id: str = "boston", limit: int = 5000, where_clause: str | None = None):
         from src.spatial.city_registry import CityId, FeedType, get_dataset, normalize_city

@@ -1,27 +1,3 @@
-DEEDS_FIELD_MAP = {
-    "doc_id": ["ParcelID", "ParcelId"],
-    "bbl": ["ParcelID"],
-    "doc_type": ["DeedType"],
-    "document_amount": ["SalePrice"],
-    "recorded_date": ["SaleDate"],
-    "address_street": ["Location"],
-    "incident_address": ["Location"],
-    "borough": ["City"],
-    "zipcode": ["Zip"],
-}
-
-FIELD_MAP = {
-    "deeds": DEEDS_FIELD_MAP,
-}
-
-NON_CANDIDATE_METADATA_COLUMNS = (
-    "Valid",
-    "MultiSale",
-    "ParcelSource",
-    "Book",
-    "Page",
-)
-
 """Manchester Metro Submarket Registry and Spatial Layer for Urban Signal.
 
 Provides neighborhood metadata, camera positioning, investment metrics,
@@ -30,22 +6,25 @@ NH (Hillsborough County seat, the largest city in the state and the economic
 hub of southern New Hampshire — deliberately not overlapping the sibling
 Boston/Worcester leaf boxes).
 
-Feed scope (best-effort, US-313 onboarding). Manchester publishes an ArcGIS
-Open Data Hub (services1.arcgis.com) with a property/parcel layer carrying
-per-parcel sale attributes (``SaleDate``/``SalePrice``/``DeedType``/``Book``/
-``Page``). The endpoint below is a best-effort URL of the Manchester NH
-property-card FeatureServer form; the gate does NOT check endpoint liveness,
-and the exact layer ID should be confirmed against the live Hub on first
-ingest. The feed is an ArcGIS polygon service served by the existing
-``ArcGISClient``:
+Feeds: SLA reads the SNAP retailer slice (``snap_sla_spec``, New Hampshire
+stores inside the metro box). The DEEDS feed registered until 2026-09-30 named
+an ArcGIS Online organisation that does not exist; the probe that retracted it
+found the assessor's per-property Vision site, NH GRANIT parcels without sale
+fields and the state's PA-34 sales going to municipalities only. Permits
+(CentralSquare TRAKiT, no permit rows on the City's server) and 311
+(SeeClickFix; the DPW ticket layer's resident intake stopped after
+2026-09-02) remain unregistered.
 
-* DEEDS — Manchester NH property deeds/sales FeatureServer. Watermark
-  ``SaleDate`` is TEXT. With no confirmed live probe at onboarding, the
-  text-watermark assumption is provisional (ADR-0005 applies if the column
-  sorts lexically). Native parcel polygons supply each row's coordinates, so
-  ``needs_geocode`` stays False.
-* PERMITS / SLA / COMPLAINTS_311 — not registered at onboarding; revisit when
-  a confirmed municipal feed is identified. Tier 3 until then.
+DEEDS (2026-10-02): the City's own GIS server publishes its parcels
+(``Community/Parcels/MapServer/0``, 33,997 polygons, refreshed daily), each
+with its latest sale: book and page, price, and the sale date as unpadded
+``M/D/YYYY`` text. The server casts the text, so the poll reads the sales of
+the 90 days before each poll (521 on 2026-10-02) and drops the ones it has
+already published; a watermark on the sale date would skip the sales the
+assessor posts two to four weeks after they close. A row is its parcel, sale
+date and book and page, since one deed can convey several parcels. Owners and
+their mailing addresses are never selected, and the 58 parcels the City keeps
+off its internet maps stay out of the window. The corpus registers this feed.
 """
 
 
@@ -304,84 +283,6 @@ MHT_DIVISION_BBOXES = MANCHESTER_DIVISION_BBOXES
 MHT_SUBMARKETS = MANCHESTER_SUBMARKETS
 MHT_DIVISIONS = MANCHESTER_DIVISIONS
 
-# ---------------------------------------------------------------------------
-# Feed specs (leaf-local; the spine copies these into REGISTRY).
-# Best-effort Manchester NH ArcGIS Open Data property-card endpoint (US-313);
-# layer ID to be confirmed against the live Hub on first ingest.
-# ---------------------------------------------------------------------------
-MANCHESTER_DEEDS_ENDPOINT = (
-    "https://services1.arcgis.com/KlG08rx11MkfACQT/arcgis/rest/services/"
-    "Manchester_NH_Property_Card/FeatureServer/0"
-)
-
-MANCHESTER_FEED_SPECS: dict[str, dict[str, object]] = {
-    "deeds": {
-        "endpoint": MANCHESTER_DEEDS_ENDPOINT,
-        "platform": "arcgis",
-        "watermark_col": "SaleDate",
-        "id_keys": ["ParcelID", "OBJECTID", "SaleDate"],
-        "topic_key": "topic_deeds",
-        "interval_seconds": 600.0,
-        "producer_key": "deeds",
-        "extra": {
-            "needs_geocode": False,
-            "watermark_type": "text",
-            "watermark_format": "%m/%d/%Y",
-            "oid_field": "OBJECTID",
-            "max_record_count": 100000,
-            "expected_cadence_days": 30,
-            "non_spatial": False,
-            "scope": (
-                "Manchester NH DEEDS/sales via the city ArcGIS Open Data "
-                "property-card layer (native parcel polygons, NOT "
-                "address-only). TEXT watermark assumption is provisional "
-                "(ADR-0005) pending a live probe confirming the SaleDate "
-                "format and sort behavior; re-probe on first ingest and "
-                "correct the watermark_format / watermark_type if the column "
-                "is DATE-typed. Native parcel polygons (outSR=4326 rings -> "
-                "centroid) supply every row's coordinates; the ADR-0004 "
-                "geocode hook is NOT declared. $1 quitclaim transfers are "
-                "KEPT at ingest (no per-city where; market-sale filtering is "
-                "analysis-side). ParcelID/OBJECTID are the parcel keys; "
-                "Book/Page ride id_keys as the recorded-deed references."
-            ),
-            "field_map": DEEDS_FIELD_MAP,
-        },
-    },
-}
-
-
-def get_manchester_dataset(feed: object) -> object:
-    """Leaf-local mirror of ``city_registry.get_dataset``.
-
-    Returns the spec for a registered Manchester feed, or raises ``KeyError``
-    naming the city and available feeds when the feed is absent (permits/SLA/
-    311 are not registered at onboarding).
-    """
-    from src.config import settings
-    from src.spatial.city_registry import DatasetSpec
-
-    feed_name = getattr(feed, "value", str(feed))
-    if feed_name not in MANCHESTER_FEED_SPECS:
-        available = ", ".join(sorted(MANCHESTER_FEED_SPECS))
-        raise KeyError(
-            f"'{MANCHESTER_CITY_ID}' has no '{feed_name}' feed; available: {available}"
-        )
-    payload = MANCHESTER_FEED_SPECS[feed_name]
-    extra_kwargs = {
-        k: v for k, v in payload.get("extra", {}).items() if k != "scope"
-    }
-    return DatasetSpec(
-        endpoint=payload["endpoint"],
-        platform=payload["platform"],
-        watermark_col=payload["watermark_col"],
-        id_keys=payload["id_keys"],
-        topic=getattr(settings, payload["topic_key"]),
-        interval_seconds=payload["interval_seconds"],
-        producer_key=payload["producer_key"],
-        **extra_kwargs,
-    )
-
 
 from src.spatial.registration import SpatialRegistration
 
@@ -394,21 +295,16 @@ REGISTRATION = SpatialRegistration(
 )
 
 __all__ = [
-    "DEEDS_FIELD_MAP",
-    "FIELD_MAP",
     "MANCHESTER_CENTER",
     "MANCHESTER_CITY_ID",
-    "MANCHESTER_DEEDS_ENDPOINT",
     "MANCHESTER_DIVISIONS",
     "MANCHESTER_DIVISION_BBOXES",
-    "MANCHESTER_FEED_SPECS",
     "MANCHESTER_METRO_BBOX",
     "MANCHESTER_SUBMARKETS",
     "MHT_DIVISIONS",
     "MHT_DIVISION_BBOXES",
     "MHT_SUBMARKETS",
     "REGISTRATION",
-    "get_manchester_dataset",
     "is_in_manchester",
     "is_in_manchester_metro",
 ]

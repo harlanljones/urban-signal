@@ -118,7 +118,7 @@ datasets:
     - LICENSE_ID
     - OBJECTID
     topic: raw.municipal.sla
-    interval_seconds: 600.0
+    interval_seconds: 1800.0
     producer_key: sla
     endpoint_by_year: {}
     watermark_type: null
@@ -141,7 +141,7 @@ datasets:
       license_type:
       - LIC_TYPE_ABBR
       - PROFESSION_FULL_NAME
-    ingestion_mode: incremental
+    ingestion_mode: snapshot
     oid_field: OBJECTID
     max_record_count: 2000
     expected_cadence_days: 7
@@ -160,6 +160,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 2000
   permits:
     endpoint: https://data.milwaukee.gov/dataset/9bada2e0-fad5-4545-8674-1b2c8c4e9f2f/resource/828e9630-d7cb-42e4-960e-964eae916397/download/buildingpermits.csv
     platform: csv
@@ -167,7 +168,7 @@ datasets:
     id_keys:
     - record_id
     topic: raw.municipal.permits
-    interval_seconds: 300.0
+    interval_seconds: 1800.0
     producer_key: permits
     endpoint_by_year: {}
     watermark_type: null
@@ -269,6 +270,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 9000
   crime:
     endpoint: ckan://data.milwaukee.gov/87843297-a6fa-46d4-ba5d-cb342fb2d3bb
     platform: ckan

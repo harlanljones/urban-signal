@@ -237,8 +237,10 @@ def build_where(
     """Build the incremental/backfill WHERE clause for a polling pass.
 
     Faithful reimplementation of the clause assembly in
-    ``MunicipalIngestionScheduler.poll_job`` (plus the ``">="`` op the backfill
-    loader uses).  Composition, in order:
+    ``MunicipalIngestionScheduler.poll_job``. The comparison op is the
+    caller's: the scheduler picks ``>`` or ``>=`` per poll
+    (``_watermark_predicate``) and the backfill loader uses ``">="``.
+    Composition, in order:
 
     1. ``(base_where)`` when a registry ``where`` filter is declared.
     2. ``(override_where)`` when a runtime override is supplied.
@@ -374,7 +376,9 @@ def advance_event_watermark(
     the watermark is the ISO ``strftime`` of the newest non-future value, and a
     future/sentinel value is skipped (US-111).  Feed callers extract the
     candidate via the same ``issuance_date`` / ``created_date`` /
-    ``effective_date`` / ``recorded_date`` priority chain the scheduler uses.
+    ``effective_date`` / ``recorded_date`` priority chain the scheduler uses,
+    falling back to the row's raw watermark column when the event has none of
+    those attributes.
     """
     if not candidate_value:
         return current_high
@@ -413,18 +417,19 @@ def newest_valid_watermark(
 # positional contract (``endpoint_url``, ``where_clause``, ``batch_size``,
 # ``max_records``).  ``where`` is intentionally absent: callers forward it as
 # the explicit ``where_clause`` argument, never a splatted kwarg.  CARTO takes
-# ``id_col``/``select``; CSV additionally swallows the watermark_* kwargs via
-# ``**kwargs`` (and ``fallback_endpoints``); the other three accept only
-# ``order_by``.  US-185: this is the adapter-facing contract that replaces the
+# ``id_col``/``select``; ArcGIS takes ``select`` as ``outFields`` and Socrata
+# as ``$select``; CSV additionally swallows the watermark_* kwargs via
+# ``**kwargs`` (and ``fallback_endpoints``); CKAN takes ``order_by``/``select``.
+# US-185: this is the adapter-facing contract that replaces the
 # prior 7-key truthy splat, which forwarded ``watermark_col`` /
 # ``watermark_format`` / ``watermark_exclude`` (and ``id_col``/``select`` for
 # non-CARTO platforms) to signatures that reject them — the latent
 # ``TypeError`` crash reported against US-183's scheduler.
 _ADAPTER_REQUEST_KEYS: Dict[str, Tuple[str, ...]] = {
-    "socrata": ("order_by",),
-    "arcgis": ("order_by",),
+    "socrata": ("order_by", "select"),
+    "arcgis": ("order_by", "select"),
     "carto": ("order_by", "id_col", "select"),
-    "ckan": ("order_by",),
+    "ckan": ("order_by", "select"),
     "csv": (
         "order_by",
         "id_col",
@@ -461,22 +466,17 @@ def build_adapter_request(platform: str, spec: AcquisitionSpec) -> Dict[str, Any
 
 
 def build_pagination_kwargs(platform: str, spec: AcquisitionSpec) -> Dict[str, Any]:
-    """Return the pagination kwargs forwarded to a platform client.
+    """Return the legacy seven-key pagination splat, filtered to truthy values.
 
-    Behavior-preserving reimplementation of the ``client_kwargs`` assembly in
-    ``MunicipalIngestionScheduler.poll_job``: the same seven keys, filtered to
-    truthy values, are forwarded to every platform's ``paginate`` call.  This
-    matches exactly what the adapters currently receive.
-
-    Note (latent upstream bug, out of scope for US-182): the scheduler forwards
-    this identical dict to *every* platform even though socrata/arcgis/ckan/
-    carto do not accept ``watermark_col`` / ``watermark_format`` /
-    ``watermark_exclude`` on their ``paginate`` signatures (only csv swallows
-    them via ``**kwargs``), so those platforms would raise ``TypeError`` at poll
-    time.  The engine reproduces that exact output today; per-adapter signature
-    correction is a follow-up routing change.  ``platform`` is accepted so the
-    consolidated translation can branch per adapter in that follow-up without a
-    signature change here.
+    This is the dict ``MunicipalIngestionScheduler.poll_job`` used to forward
+    to every platform's ``paginate`` call, kept for US-184's oracles.
+    socrata/arcgis/ckan/carto do not accept ``watermark_col`` /
+    ``watermark_format`` / ``watermark_exclude`` on their ``paginate``
+    signatures (only csv swallows them via ``**kwargs``), so that splat raised
+    ``TypeError`` on every poll of a watermarked feed on those platforms.
+    ``poll_job`` now forwards only the per-platform keys of
+    ``build_adapter_request``'s contract.  ``platform`` is unused; it keeps the
+    signature parallel to ``build_adapter_request``.
     """
     candidate = {
         "order_by": spec.order_by,

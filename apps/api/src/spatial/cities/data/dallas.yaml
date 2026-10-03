@@ -549,7 +549,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'TX'
+    where: State = 'TX' AND Latitude BETWEEN 32.6 AND 33.1 AND Longitude BETWEEN -97.05 AND -96.55
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -588,6 +588,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 3000
   childcare:
     alarm_exempt: false
     alarm_exempt_reason: null

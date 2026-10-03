@@ -63,7 +63,37 @@ def test_boston_registers_violations_and_inspections():
     assert v_spec.platform == "ckan"
     assert v_spec.watermark_col == "status_dttm"
     assert i_spec.platform == "ckan"
-    assert i_spec.watermark_col == "status_date"
+    # status_date is null on 55% of inspections since 2026-08-01, and the
+    # incremental filter never returns a null.
+    assert i_spec.watermark_col == "resultdttm"
+
+
+def test_boston_ckan_feeds_name_resources_not_packages():
+    """Until 2026-09-30 crime, violations and inspections named CKAN package
+    ids, which ``datastore_search`` answers with 404."""
+    assert get_dataset(CityId.BOSTON, FeedType.CRIME).endpoint == (
+        "ckan://data.boston.gov/b973d8cb-eeb2-4e7e-99da-c92938efc9c0"
+    )
+    assert get_dataset(CityId.BOSTON, FeedType.VIOLATIONS).endpoint == (
+        "ckan://data.boston.gov/800a2663-1d6a-46e7-9356-bedb70f5332c"
+    )
+    assert get_dataset(CityId.BOSTON, FeedType.INSPECTIONS).endpoint == (
+        "ckan://data.boston.gov/4582bec6-2b4f-4f9e-bc55-cbaa73117f4c"
+    )
+
+
+def test_boston_ckan_timestamps_keep_their_own_text_format():
+    """The columns are text (``2026-09-27 01:40:00+00``). Stored as ISO, a
+    watermark's ``T`` sorts after the space, so later rows from the
+    watermark's own day compared lower and were never read."""
+    formats = {
+        FeedType.CRIME: "%Y-%m-%d %H:%M:%S+00",
+        FeedType.INSPECTIONS: "%Y-%m-%d %H:%M:%S+00",
+        FeedType.VIOLATIONS: "%Y-%m-%d %H:%M:%S",
+    }
+    for feed, fmt in formats.items():
+        spec = get_dataset(CityId.BOSTON, feed)
+        assert (spec.watermark_type, spec.watermark_format) == ("text", fmt), feed
 
 
 def test_violations_producer_parses_row():
@@ -219,18 +249,19 @@ def test_austin_violation_drops_missing_coords():
 # Maricopa County Sales Affidavits (US-392) — pipe-delimited CSV, DEEDS
 # ---------------------------------------------------------------------------
 
-def test_phoenix_registers_deeds_csv():
+def test_phoenix_deeds_moved_to_the_assessor_parcel_layer():
+    """The affidavits file dead-lettered every row. Since 2026-09-30 Phoenix
+    deeds read the Assessor's parcel layer (see test_maricopa_deeds.py); the
+    file's field map stays as a candidate."""
     from src.spatial.city_registry import REGISTRY, CityId, FeedType, get_dataset
 
     reg = REGISTRY[CityId.PHOENIX]
     assert FeedType.DEEDS in reg.datasets
     spec = get_dataset(CityId.PHOENIX, FeedType.DEEDS)
-    assert spec.platform == "csv"
-    assert spec.delimiter == "|"
-    assert spec.zip_member == "Sales_Affidavits.txt"
+    assert spec.platform == "arcgis"
+    assert (spec.zip_member, spec.delimiter) == (None, None)
     assert spec.ingestion_mode == "snapshot"
-    assert spec.watermark_col == ""
-    assert spec.id_keys == ["PARCELNUMBER", "DEEDNUMBER"]
+    assert spec.id_keys == ["APN", "DEED_DATE", "DEED_NUMBER"]
 
 
 def test_maricopa_field_map_targets():

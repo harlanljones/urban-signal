@@ -512,6 +512,61 @@ datasets:
     non_spatial: null
     zip_member: null
     delimiter: null
+  deeds:
+    endpoint: https://spatial.jacksoncountyor.gov/arcgis/rest/services/Demog/PropertySales/FeatureServer/0
+    platform: arcgis
+    watermark_col: SalesDate
+    id_keys:
+    - AccountId
+    - SalesDate
+    - DocumentNumber
+    topic: raw.municipal.deeds
+    interval_seconds: 21600.0
+    producer_key: deeds
+    endpoint_by_year: {}
+    watermark_type: null
+    watermark_format: null
+    watermark_exclude: []
+    order_by: SalesDate DESC, OBJECTID DESC
+    id_col: null
+    select: OBJECTID,AccountId,maptaxlot,SalesDate,SalesPrice,DocumentNumber,DocumentTypeDescription
+    fallback_endpoints: []
+    where: SiteCity = 'MEDFORD' AND SalesDate >= CURRENT_DATE - INTERVAL '90' DAY AND SalesDate <= CURRENT_TIMESTAMP
+    needs_geocode: false
+    geocode_context: null
+    field_map:
+      doc_id:
+      - DocumentNumber
+      - maptaxlot
+      recorded_date:
+      - SalesDate
+      document_amount:
+      - SalesPrice
+      bbl:
+      - maptaxlot
+      doc_type:
+      - DocumentTypeDescription
+    ingestion_mode: snapshot
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 7
+    alarm_exempt: false
+    alarm_exempt_reason: null
+    annual_rotation: false
+    companion_endpoints: {}
+    proxy_for: null
+    retention_days: null
+    rolling_window_days: null
+    rollover: null
+    state_plane_crs: null
+    state_plane_units: null
+    state_plane_x_col: null
+    state_plane_y_col: null
+    parcel_join: {}
+    non_spatial: null
+    zip_member: null
+    delimiter: null
+    composite_id: true
 aliases:
 - medford_or
 - medford-or

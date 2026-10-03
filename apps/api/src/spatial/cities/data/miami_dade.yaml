@@ -481,13 +481,13 @@ datasets:
     - RECEIPTNO
     - OBJECTID
     topic: raw.municipal.sla
-    interval_seconds: 600.0
+    interval_seconds: 1800.0
     producer_key: sla
     endpoint_by_year: {}
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: BUSSDATE DESC, OBJECTID DESC
     id_col: null
     select: null
     fallback_endpoints: []
@@ -541,6 +541,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 4000
   deeds:
     endpoint: https://gisweb.miamidade.gov/ArcGIS/rest/services/MD_ComparableSales/MapServer/5
     platform: arcgis
@@ -576,10 +577,6 @@ datasets:
       - PRICE_1
       recorded_date:
       - DOS_1
-      party1_grantor:
-      - GRANTOR_1
-      party2_grantee:
-      - GRANTEE_1
       address_street:
       - TRUE_SITE_ADDR
       incident_address:

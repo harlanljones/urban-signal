@@ -243,7 +243,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'LA'
+    where: State = 'LA' AND Latitude BETWEEN 31.2 AND 31.43 AND Longitude BETWEEN -92.6 AND -92.27
     needs_geocode: false
     geocode_context: null
     field_map:

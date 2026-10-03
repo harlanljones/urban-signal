@@ -18,7 +18,9 @@ SLA_FIELD_MAP = {
     "effective_date": ["HISTORY_ACT_DT"],
     "expiration_date": ["MTH24_END_DT"],
     "status": ["HISTORY_ACTION"],
-    "address_street": ["PERMIT_ADDR", "BUS_OWNER_MAIL_ADD"],
+    # Never BUS_OWNER_MAIL_ADD: a permit without an address would publish
+    # its owner's mailing address as the premises.
+    "address_street": ["PERMIT_ADDR"],
     "zipcode": ["PERMIT_ZIP"],
 }
 
@@ -32,9 +34,20 @@ Tampa registers as a PARTIAL city like Austin/Los Angeles. Live ArcGIS
 verification found a full permits layer and an alcohol-beverage action-history
 layer that supports a partial SLA signal. Both are point feeds with date
 watermarks; the permits watermark is an edit stamp rather than an issuance date.
-311 remains token-gated and no usable deeds feed was found, so those families
-are deliberately absent; ``get_tampa_dataset()`` raises a readable error for
-them, exactly like the shared ``get_dataset()`` contract.
+311 remains token-gated, so that family is deliberately absent.
+``get_tampa_dataset()`` covers the feeds authored here and raises a readable
+error for 311 and deeds, exactly like the shared ``get_dataset()`` contract.
+
+DEEDS (2026-10-02, registered in the corpus, ``data/tampa.yaml``): the City's
+GIS server publishes the Hillsborough County Property Appraiser's parcels
+(``Parcels/TaxParcel``, 531,613 polygons), each with its latest sale's date
+and price. The poll reads the parcels whose sale falls in the 90 days before
+it (3,886 on 2026-10-02; May to July 2026 held 6,441) under a 10,000-row cap,
+places each on its polygon's centroid and keeps the 2,468 inside the metro
+box. Rows key on folio and sale date. The layer carries no refresh stamp; on
+2026-10-02 its newest sale was 14 days old, so the cadence is 30 days. The
+owner, the mailing address, the trade name and the legal description are
+never selected.
 """
 
 from typing import Dict
@@ -507,6 +520,12 @@ TAMPA_FEED_SPECS: Dict[str, Dict[str, object]] = {
             "expected_cadence_days": 7,
             "oid_field": "OBJECTID",
             "max_record_count": 2000,
+            # The owner's name, mailing address, phone and email, staff
+            # comments and editor names stay on the server.
+            "select": (
+                "OBJECTID,ORD_PERMIT,APP_NUM,ABSALETYPE,AB_CLASS_PREFIX,AB_CLASS_SUFFIX,"
+                "BUS_NAME,HISTORY_ACT_DT,MTH24_END_DT,HISTORY_ACTION,PERMIT_ADDR,PERMIT_ZIP"
+            ),
             "scope": "Tampa alcohol-beverage sale locations and action history (partial SLA)",
             "field_map": SLA_FIELD_MAP,
         },

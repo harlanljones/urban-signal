@@ -8,13 +8,16 @@ avro client), so PostGIS parity measured after a load is real streaming parity.
 Design notes:
 
 * Reuses ``MunicipalIngestionScheduler`` for job metadata, platform clients,
-  producers, dedup filter, and DLQ routing — one source of truth for the
-  ingestion contract, no duplicated field maps.
+  client arguments, parcel joins, producers, dedup filter, and DLQ routing —
+  one source of truth for the ingestion contract, no duplicated field maps.
 * Platform-aware default page sizes; every portal accepts smaller.
 * Windowed parity is the default (``--since-days 90``) per the adjudicated G6
   reading; ``--full`` loads complete history.
-* Snapshot feeds (no watermark column) load their table head under
-  ``--max-rows-per-feed``.
+* Snapshot feeds (no watermark column) load their table head, in the spec's
+  own order, under ``--max-rows-per-feed``.
+* A text-typed watermark whose format does not sort (``MM/DD/YYYY``) is
+  windowed by its dates, as ``poll_job`` windows it, and read in the spec's
+  own order, so a cap counts rows in that order rather than newest first.
 * The per-feed report's ``max_watermark_seen`` is the seed value for the
   durable watermark store (US-106).
 
@@ -47,8 +50,12 @@ from src.producers.acquisition import (
     advance_event_watermark,
     build_where,
 )
-from src.producers.scheduler import MunicipalIngestionScheduler
-from src.producers.watermarks import ANSI_DATE_LITERAL_HOSTS
+from src.producers.scheduler import _PAGINATE_KWARGS, MunicipalIngestionScheduler
+from src.producers.watermarks import (
+    ANSI_DATE_LITERAL_HOSTS,
+    parse_watermark,
+    text_sorts_as_dates,
+)
 from src.spatial.city_registry import DatasetSpec
 
 logger = logging.getLogger(__name__)
@@ -113,50 +120,92 @@ def build_query_shape(
 ) -> tuple[str | None, dict[str, Any]]:
     """Return ``(where_clause, client_kwargs)`` for a backfill pass.
 
-    Snapshot feeds carry no watermark column: no where, no order — the load is
-    a table-head sweep bounded by ``max_records``. Watermarked feeds filter to
-    the window (plus the declared sentinel guard, ADR 0005) and page
-    newest-first so a capped run keeps the freshest slice.
+    Every pass keeps the registry's own ``where`` (``base_where``), as
+    ``poll_job`` does: on a shared layer it is what scopes the rows to the
+    metro (a SNAP state and bbox, a county code, a CA ABC county), so a
+    backfill without it would load other places' rows under this city.
+    The client gets the arguments ``poll_job`` hands it (``_PAGINATE_KWARGS``):
+    a ``select`` that keeps owner and party names out of the rows, a
+    workbook's ``link_pattern``, a zipped CSV's member and delimiter, a CSV's
+    typed watermark column, a Carto keyset column.
+    Snapshot feeds carry no watermark column: no window, and the spec's own
+    order — the load is a table-head sweep bounded by ``max_records``.
+    Watermarked feeds add the window (plus the declared sentinel guard, ADR
+    0005) and page newest-first so a capped run keeps the freshest slice,
+    except on a server that reads only date literals, which keeps the
+    spec's own order as ``poll_job`` does.
 
-    The window predicate and sentinel guard are produced by the
-    ``AcquisitionEngine`` WHERE builder (US-182), keeping the emitted SQL
-    byte-for-byte identical to the prior inline path. The backfill has always
-    ignored ``watermark_type``/``watermark_format`` for the window predicate, so
-    they are suppressed here to preserve that exact shape.
+    The clause comes from the ``AcquisitionEngine`` WHERE builder (US-182).
+    A text-typed column (ADR 0005) compares as the text its format writes, so
+    its window starts in that format, as ``poll_job``'s stored watermark does:
+    an ISO literal read every ``YYYYMMDD`` date from the first of January. A
+    format that does not sort gets the window's dates instead
+    (``text_date_window``).
     """
+    base_where = meta.get("base_where")
     wm = meta.get("watermark_col")
+    client_kwargs: dict[str, Any] = {
+        key: meta[key]
+        for key in _PAGINATE_KWARGS.get(meta.get("platform", "socrata"), ())
+        if meta.get(key)
+    }
     if not wm:
-        return None, {}
+        where = build_where(
+            base_where=base_where,
+            watermark_col="",
+            high_watermark=None,
+            endpoint=str(meta.get("endpoint", "")),
+            snapshot=True,
+        )
+        return where, client_kwargs
 
     spec = _spec_from_meta(meta)
+    text_format = meta.get("watermark_format") if meta.get("watermark_type") == "text" else None
     high_watermark = (
-        since_dt.strftime("%Y-%m-%dT%H:%M:%S") if since_dt is not None else None
+        since_dt.strftime(text_format or "%Y-%m-%dT%H:%M:%S") if since_dt is not None else None
     )
     where = build_where(
-        base_where=None,
+        base_where=base_where,
         watermark_col=wm,
         high_watermark=high_watermark,
         endpoint=str(meta.get("endpoint", "")),
         watermark_op=">=",
         watermark_exclude=spec.watermark_exclude,
-        watermark_type=None,
-        watermark_format=None,
+        watermark_type="text" if text_format else None,
+        watermark_format=text_format,
     )
 
-    client_kwargs: dict[str, Any] = {}
-    if not _is_ansi_date_literal_server(meta):
+    # A server that reads only date literals keeps the spec's own order, as
+    # poll_job sends it: Augusta's permits table has no object-id field, so
+    # a page ordered by none was refused.
+    if not _is_ansi_date_literal_server(meta) and _sorts_as_dates(meta):
         client_kwargs["order_by"] = f"{wm} DESC"
+    # Otherwise the column has no newest-first order; the spec's own stands.
     return where, client_kwargs
+
+
+def _sorts_as_dates(meta: dict[str, Any]) -> bool:
+    """Whether the watermark column, ordered where it is read, is in date order.
+
+    A text-typed column (ADR 0005) sorts as text, which is date order only
+    when its format is year first. A CSV or a workbook sorts in the declared
+    format client-side.
+    """
+    fmt = meta.get("watermark_format")
+    if meta.get("watermark_type") != "text" or not fmt or meta.get("platform") in ("csv", "excel"):
+        return True
+    return text_sorts_as_dates(fmt)
 
 
 def _is_ansi_date_literal_server(meta: dict[str, Any]) -> bool:
     """Whether the feed's server rejects ISO-string date comparisons.
 
     The DC (``maps2.dcgis.dc.gov``) and Milwaukee (``milwaukeemaps.
-    milwaukee.gov``) ArcGIS servers reject ISO-string date comparisons in
-    ``where`` AND the ``where + orderByFields`` combination (US-109 / US-87).
-    Their working shape is ``where <col> >= date 'YYYY-MM-DD'`` with no
-    orderByFields (OID paging) — the shape ``watermark_comparison`` emits.
+    milwaukee.gov``) ArcGIS servers were the first found (US-109 / US-87);
+    ``ANSI_DATE_LITERAL_HOSTS`` lists every one since. Their working shape is
+    the one ``poll_job`` sends: a ``date`` or ``timestamp`` literal
+    (``watermark_comparison``) and the spec's own order, which pages by
+    object id when the spec names none.
     """
     return any(host in str(meta.get("endpoint", "")) for host in ANSI_DATE_LITERAL_HOSTS)
 
@@ -175,7 +224,7 @@ def backfill_job(
     platform = meta.get("platform", "socrata")
     city_id = meta["city_id"]
 
-    fetched = published = duplicates = drops = 0
+    fetched = published = duplicates = drops = outside_metro = 0
     max_watermark_seen: str | None = None
     error: str | None = None
     # US-111 future-watermark guard (mirrors the scheduler): a future/sentinel
@@ -193,6 +242,7 @@ def backfill_job(
         producer_wrapper = scheduler.producers[meta["producer_key"]]
         where_clause, client_kwargs = build_query_shape(meta, since_dt)
         effective_page = page_size or PLATFORM_PAGE_SIZE.get(platform, 1000)
+        clip = scheduler._metro_clip(job_name)
         for batch in client.paginate(
             endpoint_url=meta["endpoint"],
             where_clause=where_clause,
@@ -200,6 +250,13 @@ def backfill_job(
             max_records=max_rows,
             **client_kwargs,
         ):
+            # A table without geometry takes each row's point from its State
+            # Plane columns, or its parcel's centroid, as poll_job places it.
+            if meta.get("state_plane") and batch:
+                batch = scheduler._place_state_plane_rows(job_name, batch)
+            if meta.get("parcel_join") and batch:
+                batch = scheduler._join_parcel_centroids(job_name, batch)
+
             # Text-typed feeds (ADR 0005) track the raw declared-format string
             # from the column before parsing; the engine skips future rows.
             if spec.watermark_type == "text":
@@ -211,6 +268,11 @@ def backfill_job(
 
             for row in batch:
                 fetched += 1
+                # A county-wide source keeps only its metro's rows, as
+                # poll_job does.
+                if clip is not None and not clip(row):
+                    outside_metro += 1
+                    continue
                 rec_id = scheduler._extract_record_id(job_name, row)
 
                 if scheduler.dedup.check_and_add(rec_id):
@@ -234,6 +296,8 @@ def backfill_job(
                         or getattr(event, "incident_id", None)
                         or getattr(event, "license_id", None)
                         or getattr(event, "doc_id", None)
+                        or getattr(event, "violation_id", None)
+                        or getattr(event, "inspection_id", None)
                         or rec_id
                     )
                     resolved_city = getattr(event, "city_id", city_id)
@@ -245,8 +309,12 @@ def backfill_job(
                     published += 1
 
                     if spec.watermark_type != "text":
-                        for attr in WM_ATTRS:
-                            wm_val = getattr(event, attr, None)
+                        # Mirrors poll_job: events without a WM_ATTRS date
+                        # fall back to the raw watermark column.
+                        wm_candidates = [getattr(event, attr, None) for attr in WM_ATTRS]
+                        if not any(wm_candidates) and spec.watermark_col:
+                            wm_candidates = [parse_watermark(row.get(spec.watermark_col))]
+                        for wm_val in wm_candidates:
                             if wm_val:
                                 if wm_val.tzinfo is None:
                                     wm_val = wm_val.replace(tzinfo=timezone.utc)
@@ -292,6 +360,7 @@ def backfill_job(
         "published": published,
         "duplicates": duplicates,
         "parse_drops": drops,
+        "outside_metro": outside_metro,
         "max_watermark_seen": max_watermark_seen,
         "error": error,
     }

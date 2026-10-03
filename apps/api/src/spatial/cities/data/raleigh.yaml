@@ -254,8 +254,8 @@ datasets:
     platform: arcgis
     watermark_col: SALE_DATE
     id_keys:
-    - OBJECTID
-    - PIN
+    - PIN_NUM
+    - SALE_DATE
     topic: raw.municipal.deeds
     interval_seconds: 1800.0
     producer_key: deeds
@@ -263,11 +263,11 @@ datasets:
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: SALE_DATE DESC, OBJECTID DESC
     id_col: null
     select: null
     fallback_endpoints: []
-    where: null
+    where: SALE_DATE IS NOT NULL
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -281,11 +281,7 @@ datasets:
       - TOTSALPRICE
       - SALE_PRICE
       bbl:
-      - PIN
-      - PARCELID
-      party2_grantee:
-      - OWNER_NAME
-      - OWNERNAME
+      - PIN_NUM
       doc_type:
       - DEED_TYPE
       - SALE_TYPE
@@ -311,6 +307,8 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 5000
+    composite_id: true
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis
@@ -329,7 +327,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'NC'
+    where: State = 'NC' AND Latitude BETWEEN 35.4 AND 36.15 AND Longitude BETWEEN -79.5 AND -78.0
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -368,6 +366,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 3000
 aliases:
 - raleigh_nc
 - raleigh nc

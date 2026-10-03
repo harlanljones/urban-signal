@@ -151,13 +151,13 @@ datasets:
     - account_id_mdp_field_acctid
     - sales_segment_1_transfer_number_mdp_field_transno1_sdat_field_79
     topic: raw.municipal.deeds
-    interval_seconds: 600.0
+    interval_seconds: 1800.0
     producer_key: deeds
     endpoint_by_year: {}
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89 DESC, :id
     id_col: null
     select: null
     fallback_endpoints: []
@@ -173,8 +173,6 @@ datasets:
       - sales_segment_1_consideration_mdp_field_considr1_sdat_field_90
       recorded_date:
       - sales_segment_1_transfer_date_yyyy_mm_dd_mdp_field_tradate_sdat_field_89
-      party1_grantor:
-      - sales_segment_1_grantor_name_mdp_field_grntnam1_sdat_field_80
       latitude:
       - mdp_latitude_mdp_field_digycord_converted_to_wgs84
       longitude:
@@ -198,6 +196,8 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 2000
+    composite_id: true
   sla:
     endpoint: https://services1.arcgis.com/RLQu0rK7h4kbsBq5/arcgis/rest/services/snap_retailer_location_data/FeatureServer/0
     platform: arcgis
@@ -216,7 +216,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'MD'
+    where: State = 'MD' AND Latitude BETWEEN 38.55 AND 39.22 AND Longitude BETWEEN -77.12 AND -76.62
     needs_geocode: false
     geocode_context: null
     field_map:
@@ -255,6 +255,7 @@ datasets:
     parcel_join: {}
     non_spatial: null
     zip_member: null
+    batch_limit: 2000
 aliases:
 - prince georges
 - prince_georges_county

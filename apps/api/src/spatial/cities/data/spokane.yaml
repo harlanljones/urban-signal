@@ -181,13 +181,13 @@ datasets:
     id_keys:
     - permit_number
     topic: raw.municipal.permits
-    interval_seconds: 300.0
+    interval_seconds: 3600.0
     producer_key: permits
     endpoint_by_year: {}
     watermark_type: null
     watermark_format: null
     watermark_exclude: []
-    order_by: null
+    order_by: issued_date ASC
     id_col: null
     select: null
     fallback_endpoints: []

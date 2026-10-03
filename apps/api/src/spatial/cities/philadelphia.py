@@ -441,6 +441,20 @@ PHILADELPHIA_SUBMARKETS = PHL_SUBMARKETS
 PHILADELPHIA_DIVISIONS = PHL_DIVISIONS
 
 
+def compose_permit_type(row: dict) -> str | None:
+    """A building permit's description read with its type of work, so a new
+    house is a "Residential Building Permit: New Construction" rather than
+    minor work.
+
+    ``DOBPermitsProducer`` calls this for every Philadelphia permit row. For
+    the other permits (trades, zoning, fire suppression, demolition) it returns
+    None, and the field map reads ``permitdescription`` alone.
+    """
+    from src.features.permit_taxonomy import building_permit_type
+
+    return building_permit_type(row.get("permitdescription"), row.get("typeofwork"))
+
+
 from src.spatial.registration import SpatialRegistration
 
 REGISTRATION = SpatialRegistration(

@@ -261,7 +261,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: city = 'NEW HAVEN'
+    where: city = 'NEW HAVEN' AND credentialtype IN ('LIR', 'LRW', 'LRB', 'LCA', 'LCR', 'LCW', 'LIT', 'LIH', 'LIC', 'LPC', 'LGC', 'LBA', 'LBB', 'LRF', 'LRS', 'LCN', 'LCM', 'LCC', 'LAP', 'LCS', 'LFB', 'LFC', 'LFG', 'LFR', 'LOL', 'LSE', 'LTH', 'LPA', 'LIU', 'LUW', 'LUB', 'LAB', 'LAT', 'LAC', 'LMI', 'LIP', 'LGB', 'LID', 'LWG', 'LRE', 'LMB', 'LMP', 'LBP', 'LML', 'LMS', 'LMA', 'LMC', 'LMW', 'LFW', 'LBF', 'LDF', 'FWBC', 'CGAL', 'LFO')
     needs_geocode: true
     geocode_context: New Haven, CT
     field_map:
@@ -284,10 +284,10 @@ datasets:
       - city
       premises_name:
       - businessname
-      - name
+      - dba
       dba:
+      - dba
       - businessname
-      - name
       status:
       - status
     ingestion_mode: incremental
@@ -310,6 +310,34 @@ datasets:
     non_spatial: null
     zip_member: null
     delimiter: null
+  '311':
+    endpoint: https://services8.arcgis.com/fz3KpsKgK9InMjh8/arcgis/rest/services/Public_SCF_Requests_New_Haven_CT/FeatureServer/0
+    platform: arcgis
+    watermark_col: created_at
+    id_keys:
+    - id
+    topic: raw.municipal.311
+    interval_seconds: 900.0
+    producer_key: '311'
+    order_by: created_at DESC, id DESC
+    select: OBJECTID,id,status,category,created_at,closed_at
+    where: private = '0'
+    needs_geocode: false
+    field_map:
+      incident_id:
+      - id
+      created_date:
+      - created_at
+      closed_date:
+      - closed_at
+      complaint_type:
+      - category
+      status:
+      - status
+    ingestion_mode: incremental
+    oid_field: OBJECTID
+    max_record_count: 2000
+    expected_cadence_days: 1
   deeds:
     endpoint: https://data.ct.gov/resource/5mzw-sjtu.json
     platform: socrata
@@ -347,7 +375,7 @@ datasets:
     ingestion_mode: incremental
     oid_field: null
     max_record_count: null
-    expected_cadence_days: 30
+    expected_cadence_days: 365
     alarm_exempt: false
     alarm_exempt_reason: null
     annual_rotation: false

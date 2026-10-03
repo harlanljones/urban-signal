@@ -185,12 +185,22 @@
   "feeds": {
     "permits": {
       "platform": "arcgis",
-      "watermark_col": "date_issued",
+      "watermark_col": "Date_Issued",
       "interval_seconds": 300.0,
       "topic": "raw.municipal.permits"
     },
-    "311": null,
-    "sla": null,
+    "311": {
+      "platform": "arcgis",
+      "watermark_col": "datetimeinit",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.311"
+    },
+    "sla": {
+      "platform": "arcgis",
+      "watermark_col": "",
+      "interval_seconds": 1800.0,
+      "topic": "raw.municipal.sla"
+    },
     "deeds": null
   },
   "evidence_path": "apps/api/src/spatial/cities/topeka.py",

@@ -187,7 +187,7 @@ datasets:
     id_col: null
     select: null
     fallback_endpoints: []
-    where: State = 'KS'
+    where: State = 'KS' AND Latitude BETWEEN 37.4 AND 37.95 AND Longitude BETWEEN -97.85 AND -97.05
     needs_geocode: false
     geocode_context: null
     field_map:
