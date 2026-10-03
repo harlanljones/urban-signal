@@ -2,6 +2,8 @@
 
 Date: 2026-10-03. Status: proposed shadow pilot; source and storage gates outstanding. Companion: [evidence-backed inventory](../../research/daily-ingestion-inventory.md). This specification is not authorization to provision storage, switch dashboard inputs or retire streaming services.
 
+Detailed milestone specifications and dependencies: [backend milestone index](2026-10-03-backend-milestones.md). This document remains the shared pilot durability and replay contract.
+
 ## Goal and scope
 
 Acquire one enabled NYC permit feed daily with replayable history, explicit source freshness and crash-safe checkpoints. Use GitHub Actions for execution and retain Cloudflare web apps. Start with permit counts/velocity and provenance; do not advertise capex, trained predictions or complete LIMS from this source. Its schema lacks estimated cost, and the other feature-relevant feeds are outside this first pilot.
