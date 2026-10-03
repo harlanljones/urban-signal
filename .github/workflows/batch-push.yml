@@ -1,30 +1,37 @@
 name: batch-push-deploy
 
-# Run-based/batch deployment: each run recomputes the full snapshot (grid,
-# catalysts, submarkets, cell predictions) and pushes it to Workers KV, then
-# deploys the edge worker. Data freshness is decoupled from code releases.
-
+# This workflow retains the branch-protection check name. Pushes and PRs run
+# validation only; production KV writes happen on the daily schedule or an
+# explicit refresh on main.
 on:
   push:
     branches: [main]
     paths:
       - "apps/api/**"
       - "apps/dashboard/**"
-      - "scripts/export_dashboard.py"
       - "scripts/**"
       - "src/**"
+      - "packages/**"
+      - "package.json"
+      - "bun.lock*"
+      - "turbo.json"
       - ".github/workflows/batch-push.yml"
+      - ".github/workflows/dashboard-deploy.yml"
   pull_request:
     paths:
       - "apps/api/**"
       - "apps/dashboard/**"
-      - "scripts/export_dashboard.py"
       - "scripts/**"
       - "src/**"
+      - "packages/**"
+      - "package.json"
+      - "bun.lock*"
+      - "turbo.json"
       - ".github/workflows/batch-push.yml"
+      - ".github/workflows/dashboard-deploy.yml"
   workflow_dispatch:
   schedule:
-    - cron: "0 6 * * *" # nightly 06:00 UTC
+    - cron: "0 6 * * *" # daily at 06:00 UTC
 
 permissions:
   contents: read
@@ -33,20 +40,10 @@ concurrency:
   group: batch-push-deploy
   cancel-in-progress: false
 
-env:
-  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-  WRANGLER_SEND_METRICS: "false"
-
 jobs:
   validate:
-    if: >-
-      github.event_name == 'pull_request' ||
-      github.event_name == 'push' ||
-      github.event_name == 'schedule' ||
-      github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
@@ -61,35 +58,48 @@ jobs:
           uv venv .venv --python 3.12
           uv pip install -e "apps/api[dev]"
 
-      - name: Generate dashboard static copy
-        run: PYTHONPATH=apps/api .venv/bin/python scripts/export_dashboard.py
+      - name: Check snapshot and interlock invariants
+        run: |
+          PYTHONPATH=apps/api .venv/bin/python scripts/export_dashboard.py
+          PYTHONPATH=apps/api .venv/bin/python -m pytest -q -m interlock apps/api/tests/unit/test_interlock_gate.py
+          PYTHONPATH=apps/api .venv/bin/python -m pytest -q apps/api/tests/unit/test_export_snapshot.py apps/api/tests/unit/test_snapshot_metrics.py apps/api/tests/unit/test_engine_prediction_cache.py apps/api/tests/unit/test_engine_quantile_calibration.py apps/api/tests/unit/test_workflow_routing.py
 
-      - name: Check Python quality
+      - name: Check Python quality and feed behavior
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
         run: |
           .venv/bin/ruff check scripts/feed_staleness_probe.py apps/api/src/producers/watermarks.py apps/api/tests/unit/test_feed_staleness_probe.py
           PYTHONPATH=apps/api .venv/bin/python -m pytest -q apps/api/tests/unit/test_feed_staleness_probe.py
-          PYTHONPATH=apps/api .venv/bin/python -m pytest -q -m interlock apps/api/tests/unit/test_interlock_gate.py
           PYTHONPATH=apps/api .venv/bin/python -m pytest -q apps/api/tests/unit/test_bay_area_context.py
 
       - uses: oven-sh/setup-bun@v2
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
 
       - name: Install JavaScript dependencies
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
         run: bun install --frozen-lockfile
 
       - name: Check web packages
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
         run: bun run build && bun run typecheck && bun run lint
 
       - name: Check dashboard zoom regressions
-        run: node --test apps/dashboard/tests/grid-zoom.test.js
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
+        run: bun run --cwd apps/dashboard test && node --test apps/dashboard/tests/grid-zoom.test.js
 
   snapshot-push:
-    if: always() && github.event_name != 'pull_request' && (needs.validate.result == 'success' || needs.validate.result == 'skipped')
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 120
     permissions:
       contents: read
       actions: read # download the bay-area-context artifact
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      WRANGLER_SEND_METRICS: "false"
     steps:
       - uses: actions/checkout@v4
 
@@ -104,69 +114,55 @@ jobs:
           uv venv .venv --python 3.12
           uv pip install -e apps/api
 
-      # Newest weekly Bay Area context table (bay-area-context.yml). Optional:
-      # without it the snapshot publishes unchanged and the dashboard simply
-      # offers no Bay Area layers.
+      # The weekly context artifact is optional. Record absence or its source
+      # run time so a successful refresh summary makes the fallback explicit.
       - name: Fetch Bay Area context table
+        id: bay-area-context
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          run_id=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow bay-area-context.yml \
-            --branch main --status success --limit 1 --json databaseId --jq '.[0].databaseId')
-          if [ -n "$run_id" ]; then
-            gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name bay-area-context --dir build/context
+          mkdir -p build/context
+          result=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow bay-area-context.yml \
+            --branch main --status success --limit 1 --json databaseId,createdAt \
+            --jq '.[0] | [.databaseId, .createdAt] | @tsv')
+          run_id=$(printf '%s' "$result" | cut -f1)
+          created_at=$(printf '%s' "$result" | cut -f2)
+          if [ -z "$run_id" ] || [ "$run_id" = "null" ]; then
+            echo "No successful bay-area-context run found; continuing without optional context layers."
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "created_at=" >> "$GITHUB_OUTPUT"
+          elif gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name bay-area-context --dir build/context; then
+            echo "Downloaded context artifact from run $run_id created at $created_at."
+            echo "available=true" >> "$GITHUB_OUTPUT"
+            echo "created_at=$created_at" >> "$GITHUB_OUTPUT"
           else
-            echo "No successful bay-area-context run yet; publishing without context layers"
+            echo "Context artifact from run $run_id could not be downloaded; continuing without optional context layers."
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "created_at=$created_at" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Build snapshot artifacts
+      - name: Build snapshot artifacts and metrics
         run: |
           mkdir -p build
           PYTHONPATH=apps/api .venv/bin/python scripts/export_dashboard.py
           /usr/bin/time -f 'elapsed_seconds=%e\npeak_rss_kib=%M' -o build/snapshot-resources.txt \
-            env PYTHONPATH=apps/api .venv/bin/python -m src.export.snapshot_builder --out dist --context-dir build/context
+            env PYTHONPATH=apps/api .venv/bin/python -m src.export.snapshot_builder \
+              --out dist --context-dir build/context --metrics-out build/snapshot-metrics.json
 
-      - name: Summarize snapshot usage
-        if: always()
-        run: |
-          python - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-
-          lines = ["## Daily snapshot usage", "", "| Measurement | Value |", "|---|---:|"]
-          resources = Path("build/snapshot-resources.txt")
-          if resources.exists():
-              values = dict(line.split("=", 1) for line in resources.read_text().splitlines() if "=" in line)
-              if "elapsed_seconds" in values:
-                  minutes = float(values["elapsed_seconds"]) / 60
-                  lines.append(f"| Snapshot build minutes | {minutes:.2f} |")
-                  lines.append(f"| Projected build minutes / 30 daily runs | {minutes * 30:.0f} |")
-              if "peak_rss_kib" in values:
-                  lines.append(f"| Peak resident memory (MiB) | {float(values['peak_rss_kib']) / 1024:.1f} |")
-          bulk = Path("dist/kv-bulk.json")
-          if bulk.exists():
-              entries = json.loads(bulk.read_text())
-              lines.append(f"| Planned KV writes per refresh | {len(entries):,} |")
-              lines.append(f"| Planned KV writes / 30 daily runs | {len(entries) * 30:,} |")
-              lines.append(f"| Upload payload (MiB) | {bulk.stat().st_size / 1024**2:.2f} |")
-          lines += ["", "Build projections exclude setup, validation, upload, deployment, retries, and other workflow runs.",
-                    "Planned writes and payload bytes do not confirm a successful upload."]
-          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:
-              summary.write("\n".join(lines) + "\n")
-          PY
-
-      - name: Preserve snapshot resource measurements
+      - name: Preserve snapshot metrics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: snapshot-resources
-          path: build/snapshot-resources.txt
+          name: snapshot-metrics
+          path: |
+            build/snapshot-metrics.json
+            build/snapshot-resources.txt
           if-no-files-found: ignore
-          retention-days: 7
+          retention-days: 30
 
-      - uses: actions/upload-artifact@v4
+      - name: Preserve snapshot bundle
+        uses: actions/upload-artifact@v4
         with:
           name: snapshot
           path: dist/
@@ -181,35 +177,58 @@ jobs:
         working-directory: apps/dashboard
         run: bunx wrangler kv bulk put ../../dist/kv-bulk.json --binding SNAPSHOT --remote
 
-  deploy-dashboard:
-    # Snapshot-push already gates on validate's result (incl. skipped), so gate
-    # on it alone; always() is required to escape transitive skip from validate.
-    if: >-
-      always() &&
-      github.event_name != 'pull_request' &&
-      needs.snapshot-push.result == 'success'
-    needs: snapshot-push
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - uses: astral-sh/setup-uv@v5
-
-      - name: Export dashboard HTML into static assets
+      - name: Summarize successful snapshot publication
+        if: success()
+        env:
+          BAY_AREA_CONTEXT_AVAILABLE: ${{ steps.bay-area-context.outputs.available }}
+          BAY_AREA_CONTEXT_CREATED_AT: ${{ steps.bay-area-context.outputs.created_at }}
         run: |
-          uv venv .venv --python 3.12
-          uv pip install -e apps/api
-          PYTHONPATH=apps/api .venv/bin/python scripts/export_dashboard.py
+          python - <<'PY'
+          import json
+          import os
+          from datetime import datetime, timezone
+          from pathlib import Path
 
-      - uses: oven-sh/setup-bun@v2
-
-      - name: Install JS dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Deploy dashboard Worker
-        working-directory: apps/dashboard
-        run: bun run deploy
+          bulk_path = Path("dist/kv-bulk.json")
+          planned = len(json.loads(bulk_path.read_text()))
+          lines = [
+              "## Daily snapshot publication",
+              "",
+              "| Measurement | Value |",
+              "|---|---:|",
+              f"| Planned KV writes | {planned:,} |",
+              f"| Successful KV writes | {planned:,} |",
+              f"| Upload payload (MiB) | {bulk_path.stat().st_size / 1024**2:.2f} |",
+          ]
+          created_at = os.environ.get("BAY_AREA_CONTEXT_CREATED_AT", "")
+          if os.environ.get("BAY_AREA_CONTEXT_AVAILABLE") == "true":
+              source_time = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+              age_hours = (datetime.now(timezone.utc) - source_time).total_seconds() / 3600
+              lines.append(f"| Optional Bay Area context artifact age | {age_hours:.1f} hours |")
+          elif created_at:
+              lines.append("| Optional Bay Area context | Artifact unavailable; snapshot has no optional context layers |")
+          else:
+              lines.append("| Optional Bay Area context | No successful context run found; snapshot has no optional context layers |")
+          resources = Path("build/snapshot-resources.txt")
+          if resources.exists():
+              values = dict(line.split("=", 1) for line in resources.read_text().splitlines() if "=" in line)
+              if "elapsed_seconds" in values:
+                  minutes = float(values["elapsed_seconds"]) / 60
+                  lines.extend([
+                      f"| Snapshot build minutes | {minutes:.2f} |",
+                      f"| Projected build minutes / 30 daily runs | {minutes * 30:.0f} |",
+                  ])
+              if "peak_rss_kib" in values:
+                  lines.append(f"| Peak resident memory (MiB) | {float(values['peak_rss_kib']) / 1024:.1f} |")
+          metrics = Path("build/snapshot-metrics.json")
+          if metrics.exists():
+              data = json.loads(metrics.read_text())
+              lines.append(f"| Snapshot metrics schema | {data.get('schema_version', 'unknown')} |")
+          lines.extend([
+              "",
+              "Build projections exclude setup, validation, upload, deployment, retries, and other workflow runs.",
+              "Successful write count is reported only after Wrangler exits successfully.",
+          ])
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:
+              summary.write("\n".join(lines) + "\n")
+          PY

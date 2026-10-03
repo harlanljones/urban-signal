@@ -1,0 +1,93 @@
+name: dashboard-deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/dashboard/**"
+      - "apps/api/src/serving/dashboard.py"
+      - "apps/api/src/spatial/**"
+      - "scripts/export_dashboard.py"
+      - "packages/**"
+      - "package.json"
+      - "bun.lock*"
+      - "turbo.json"
+      - ".github/workflows/batch-push.yml"
+      - ".github/workflows/dashboard-deploy.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dashboard-deploy
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install API dependencies
+        run: |
+          uv venv .venv --python 3.12
+          uv pip install -e "apps/api[dev]"
+
+      - name: Check dashboard export and API interlock
+        run: |
+          PYTHONPATH=apps/api .venv/bin/python scripts/export_dashboard.py
+          PYTHONPATH=apps/api .venv/bin/python -m pytest -q -m interlock apps/api/tests/unit/test_interlock_gate.py
+          PYTHONPATH=apps/api .venv/bin/python -m pytest -q apps/api/tests/unit/test_export_snapshot.py apps/api/tests/unit/test_snapshot_metrics.py apps/api/tests/unit/test_engine_prediction_cache.py apps/api/tests/unit/test_engine_quantile_calibration.py apps/api/tests/unit/test_workflow_routing.py
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install JavaScript dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Check web packages
+        run: bun run build && bun run typecheck && bun run lint
+
+      - name: Check dashboard zoom regressions
+        run: bun run --cwd apps/dashboard test && node --test apps/dashboard/tests/grid-zoom.test.js
+
+  deploy-dashboard:
+    needs: validate
+    if: github.ref == 'refs/heads/main' && needs.validate.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      WRANGLER_SEND_METRICS: "false"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Export dashboard HTML into static assets
+        run: |
+          uv venv .venv --python 3.12
+          uv pip install -e apps/api
+          PYTHONPATH=apps/api .venv/bin/python scripts/export_dashboard.py
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install JavaScript dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Deploy dashboard Worker
+        working-directory: apps/dashboard
+        run: bun run deploy

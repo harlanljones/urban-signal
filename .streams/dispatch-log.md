@@ -2095,3 +2095,26 @@ Worth keeping:
 | fix-hex-zoom | dashboard source, static export, regression tests, stream claim | none | current session | implemented; 4 regression tests pass; full preflight blocked by missing Bun after 25 interlock checks and cross-reference passed | source fix, synchronized static export, grid-zoom.test.js |
 
 Orchestrator inspects deployment read-only while the subagent owns implementation.
+
+## 2026-10-03 — daily GitHub Actions backend implementation planning
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| astra-backend-plan | daily-backend design, implementation plan, stream claim | none | current session, gpt-6-astra | complete; design and staged plan reviewed; fresh production snapshot and deployment successful; local preflight blocked by missing Bun | docs/superpowers/specs/2026-10-03-gh-actions-backend-design.md; docs/superpowers/plans/2026-10-03-gh-actions-backend.md |
+
+Orchestrator triggers and monitors the production snapshot; Astra owns planning documents only.
+
+## 2026-10-03 — phase-one daily backend implementation (parallel Luna)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| luna-metrics | snapshot metrics/builder/benchmark and tests | none | current session; resumed after interruption | complete; focused tests and Ruff pass | metrics module, instrumented builder, benchmark and regressions |
+| luna-cache | serving engine and cache tests | none | current session; resumed after interruption | complete; 18 cache/calibration tests pass | bounded vector caches and concurrency/isolation regressions |
+| luna-workflows | batch/deploy workflows and routing tests | none | current session; resumed after interruption | complete; 7 routing tests and zoom tests pass | separate snapshot publication and dashboard release workflows |
+| luna-verification | read-only review and verification evidence | none | current session; resumed as luna-review | complete; no unresolved correctness findings; root owns broad tests and benchmark | independent review report; cache lock and lifetime-RSS limits documented |
+
+User selected Luna parallel build/test. Root owns shared-interface integration and commits; agents never modify each other's files. Execution ledger: /workspace/backend-phase1/progress.md. Optional plan Tasks 5–9 are out of scope.
+
+Root restored temporary storage after pytest filled /tmp, moved large fixtures to /workspace/test-tmp, and integrated new regressions into both CI validation paths. Root broad snapshot/context tests and full CI/CD preflight passed. Timing runs execute alone after test jobs finish.
+
+Final root validation: full exporter/context, cache/calibration/reach, metrics, routing, dashboard91, zoom, web build/typecheck/lint and CI/CD preflight passed. Nine standalone benchmark builds passed six semantic comparisons; cold median10.400s vs53.761s (80.7% improvement), unchanged coverage. Evidence: docs/research/gh-actions-backend-benchmark-2026-10-03.md. Optional context download was blocked at artifact storage; fallback plus context regression tests documented. Implementation commit b945892; subsequent cleanup changes engine imports/annotations only. No production writes.

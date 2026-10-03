@@ -58,6 +58,7 @@ def asyncio_run_build(
     national_dir: Path | None = None,
     require_national: bool = False,
     context_dir: Path | None = None,
+    metrics=None,
 ) -> dict[str, Any]:
     import asyncio
 
@@ -70,6 +71,7 @@ def asyncio_run_build(
             national_dir=national_dir,
             require_national=require_national,
             context_dir=context_dir,
+            metrics=metrics,
         )
     )
 
@@ -748,3 +750,49 @@ def test_context_dir_without_table_publishes_unchanged(tmp_path: Path):
 
 def test_no_context_block_by_default(snapshot: dict[str, Any]):
     assert "context_layers" not in snapshot
+
+
+def test_metrics_cover_stages_without_kv_keys(tmp_path: Path):
+    from src.export.snapshot_metrics import SnapshotMetrics
+
+    metrics = SnapshotMetrics()
+    manifest = asyncio_run_build(tmp_path, cities=["nyc"], metrics=metrics)
+
+    snapshot = metrics.snapshot()
+    required = {
+        "model_initialization",
+        "city_inference",
+        "cell_inference_shap",
+        "ranking_lod",
+        "serialization",
+        "total",
+    }
+    assert required <= set(snapshot["durations_seconds"])
+    assert "snapshot-metrics" not in manifest["keys"]
+    kv_bulk = json.loads((tmp_path / "dist" / "kv-bulk.json").read_text())
+    assert all("metrics" not in entry["key"] for entry in kv_bulk)
+    assert snapshot["artifacts"]["key_count"] == len(kv_bulk)
+
+
+def test_failed_build_writes_incomplete_metrics_summary(tmp_path: Path):
+    from src.export.snapshot_metrics import SnapshotMetrics
+
+    class FailingEngine(StubEngine):
+        def predict_cell_features(self, *args, **kwargs):
+            raise RuntimeError("synthetic failure")
+
+    import asyncio
+
+    metrics = SnapshotMetrics()
+    with pytest.raises(RuntimeError, match="synthetic failure"):
+        asyncio.run(
+            build_snapshot(
+                tmp_path / "failed",
+                engine=FailingEngine(),
+                cities=["nyc"],
+                metrics=metrics,
+            )
+        )
+    summary = metrics.snapshot()
+    assert summary["artifacts"]["status"] == "incomplete"
+    assert summary["artifacts"]["failure"]["type"] == "RuntimeError"
