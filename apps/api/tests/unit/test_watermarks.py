@@ -29,6 +29,30 @@ def test_mixed_nyc_formats_compare_by_calendar_value():
     assert newest_watermark(NYC_MIXED_WATERMARKS) == datetime(2026, 8, 21, tzinfo=UTC)
 
 
+def test_nyc_permits_poll_names_its_month_first_dates():
+    """NYC's ``issuance_date`` is text, ISO through 2020-06-05 and MM/DD/YYYY
+    since, so ``issuance_date >= '2023-03-13T00:00:00'`` compared it as text
+    and read nothing after a feed's first poll. Declared month-first, the poll
+    names the dates, from a raw watermark or the ISO one the old spec stored.
+    (``dobrundate`` cannot drive it: a reload stamps nearly every row.)"""
+    from src.spatial.city_registry import CityId, FeedType, get_dataset
+
+    spec = get_dataset(CityId.NYC, FeedType.PERMITS)
+    assert (spec.watermark_col, spec.watermark_type, spec.watermark_format) == (
+        "issuance_date",
+        "text",
+        "%m/%d/%Y",
+    )
+    kw = {
+        "watermark_type": spec.watermark_type,
+        "watermark_format": spec.watermark_format,
+        "today": date(2026, 10, 2),
+    }
+    window = "issuance_date IN ('10/01/2026', '10/1/2026', '10/02/2026', '10/2/2026')"
+    assert watermark_comparison("issuance_date", ">=", "10/01/2026", spec.endpoint, **kw) == window
+    assert watermark_comparison("issuance_date", ">", "2026-09-30T00:00:00", spec.endpoint, **kw) == window
+
+
 def test_sort_preserves_raw_values_but_uses_typed_order():
     assert sort_watermarks(NYC_MIXED_WATERMARKS) == [
         "2020-06-05",

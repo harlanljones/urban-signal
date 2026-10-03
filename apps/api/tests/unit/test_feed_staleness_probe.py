@@ -309,7 +309,8 @@ def test_probe_registry_applies_per_feed_declared_thresholds():
     from scripts.feed_staleness_probe import probe_registry
 
     client = MagicMock()
-    client.paginate.return_value = [[{"issuance_date": "2026-08-15"}]]
+    # Month first, as NYC writes its permits' issue dates.
+    client.paginate.return_value = [[{"issuance_date": "08/15/2026"}]]
     results = probe_registry(
         now=datetime(2026, 8, 23, tzinfo=UTC),
         city_ids={"nyc"},

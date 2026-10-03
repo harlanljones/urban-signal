@@ -178,8 +178,11 @@ Each its own change.
   source checked. Boston's inspections, for one, have nothing newer than
   2026-05-11 in a table of 904,046 rows.
 - **NYC permits.** The probe dates the feed by row id (2026-09-30), but the
-  poll compares the mixed-format `issuance_date` text with `>`
-  (`current-city-feed-gaps.md`); `dobrundate` is typed.
+  poll compared the mixed-format `issuance_date` text with `>=`
+  (`current-city-feed-gaps.md`), so after its first poll it read nothing.
+  `dobrundate` cannot drive it: 3,897,736 rows carry 2026-10-01, the day the
+  set was last reloaded. Declared month-first, the column is read by its
+  dates, as Worcester's are.
 - **Unreadable.** Denver's `311` layer 66 is gone, Phoenix's short-term
   rentals answered 500, Tulsa's `311` layer returns no rows, and Riverside
   County answered 403 from this network (the weekly job's own network may

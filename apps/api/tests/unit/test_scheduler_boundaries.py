@@ -28,6 +28,10 @@ def scheduler():
     for producer in sched.producers.values():
         producer.producer = MagicMock()
     sched.state_file = None
+    # The boundary and watermark-source tests drive NYC's permits job with
+    # ISO timestamps; the registry's spec names month-first text dates, read
+    # by whole days (tests/unit/test_watermarks.py).
+    sched.job_metadata["permits"].update(watermark_type=None, watermark_format=None)
     return sched
 
 

@@ -349,6 +349,9 @@ def test_event_watermark_skips_future():
 def test_event_watermark_tracking_matches_scheduler_poll():
     s = _scheduler()
     job_name = "permits"
+    # ISO rows take the untyped path; the registry's NYC permits name
+    # month-first text dates.
+    s.job_metadata[job_name].update(watermark_type=None, watermark_format=None)
     s.metrics[job_name].high_watermark = None
     rows = [
         {

@@ -397,6 +397,9 @@ def test_future_dated_row_does_not_advance_high_watermark(mock_scheduler):
     sla_sf was poisoned by a 2028 row, filtering `> '2028-...'` until 2028."""
     job_name = "permits"
     mock_producer = mock_scheduler.producers[job_name]
+    # ISO rows take the untyped path; the registry's NYC permits name
+    # month-first text dates.
+    mock_scheduler.job_metadata[job_name].update(watermark_type=None, watermark_format=None)
     mock_rows = [
         {
             "job__": "M001",
@@ -453,7 +456,10 @@ def test_load_state_skips_future_watermark(mock_scheduler, tmp_path):
     state.write_text(
         json.dumps(
             {
-                "permits": {"high_watermark": "2028-02-26T00:00:00"},
+                # NYC's permits store their month-first text as read
+                # (ADR 0005); the other jobs store ISO.
+                "permits": {"high_watermark": "02/26/2028"},
+                "311": {"high_watermark": "2028-02-26T00:00:00"},
                 "sla": {"high_watermark": "2026-08-01T00:00:00"},
             }
         ),
@@ -463,6 +469,7 @@ def test_load_state_skips_future_watermark(mock_scheduler, tmp_path):
     mock_scheduler._load_state()
 
     assert mock_scheduler.metrics["permits"].high_watermark is None  # future ignored
+    assert mock_scheduler.metrics["311"].high_watermark is None
     assert mock_scheduler.metrics["sla"].high_watermark == "2026-08-01T00:00:00"
 
 

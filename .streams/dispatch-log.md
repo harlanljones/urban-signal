@@ -2055,3 +2055,17 @@ Worth keeping:
 - **Read the portal's own update frequency before declaring a cadence.**
   Both specs declared 30 days for sets their publishers say are yearly and
   quarterly, so the staleness check paged for feeds on schedule.
+
+### 2026-10-03 — NYC permits poll reads new permits again (single stream, Claude project thread)
+
+| Stream id | Leaf claim | Spine needed | Dispatched | Outcome | Yielded artifact |
+|---|---|---|---|---|---|
+| nyc-permits-poll | `.streams/nyc-permits-poll.md` | none | 2026-10-03 | done (the second live poll read nothing before; with the column declared month-first it names the dates and reads new permits) | `nyc.yaml` `permits` watermark declared `%m/%d/%Y` text |
+
+Worth keeping:
+
+- **A quiet second poll can be a stuck one.** NYC's permits passed every
+  poll with no error while comparing a mixed-format text column to an ISO
+  string. Check that a second poll's filter can match a recent row.
+- **Read a "typed" alternative's distribution before switching to it.**
+  `dobrundate` is typed and current, but a reload stamps nearly every row.

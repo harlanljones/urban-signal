@@ -1150,8 +1150,8 @@ datasets:
     interval_seconds: 300.0
     producer_key: permits
     endpoint_by_year: {}
-    watermark_type: null
-    watermark_format: null
+    watermark_type: text
+    watermark_format: '%m/%d/%Y'
     watermark_exclude: []
     order_by: null
     id_col: null
