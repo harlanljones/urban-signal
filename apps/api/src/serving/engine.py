@@ -2,8 +2,11 @@
 
 import logging
 import time
+from collections import OrderedDict
 from pathlib import Path
+from threading import RLock
 from typing import Any, Dict, List, Optional
+import copy
 import numpy as np
 import onnxruntime as ort
 import pandas as pd
@@ -38,6 +41,7 @@ logger = logging.getLogger(__name__)
 # percentage rather than a three-digit number.
 SYNTHETIC_TRAINING_ROWS = 4000
 SYNTHETIC_SEED = 42
+PREDICTION_CACHE_MAXSIZE = 16_384
 
 # Feature ranges taken from the submarket registry (src/spatial/submarkets.py).
 _LIMS_RANGE = (55.0, 97.0)
@@ -93,7 +97,19 @@ def build_synthetic_baseline(
 class MultiHorizonInferenceEngine:
     """Orchestrates real-time multi-horizon predictions across LightGBM, ST-GNN, and DCN-v2 models."""
 
-    def __init__(self, model_dir: Optional[str] = None):
+    def __init__(
+        self,
+        model_dir: Optional[str] = None,
+        *,
+        cache_predictions: bool = False,
+        metrics: Any = None,
+    ):
+        self.cache_predictions = cache_predictions
+        self.metrics = metrics
+        self._prediction_cache: OrderedDict[tuple[float, ...], Dict[str, float]] = OrderedDict()
+        self._explanation_cache: OrderedDict[tuple[float, ...], Dict[str, float]] = OrderedDict()
+        self._prediction_cache_lock = RLock()
+        self._explanation_cache_lock = RLock()
         self.model_dir = Path(model_dir or settings.onnx_model_dir)
         self.model_dir.mkdir(parents=True, exist_ok=True)
         self.indexer = H3SpatialIndexer()
@@ -106,6 +122,94 @@ class MultiHorizonInferenceEngine:
         self.st_gnn_session: Optional[ort.InferenceSession] = None
 
         self._init_models()
+
+    def _increment_metric(self, name: str) -> None:
+        """Increment an optional snapshot counter without importing its module."""
+        if self.metrics is not None:
+            self.metrics.increment(name, count=1)
+
+    @staticmethod
+    def _feature_key(feature_dict: Dict[str, Any]) -> tuple[float, ...]:
+        """Return the normalized, ordered serving vector used by all models."""
+        vector = tuple(float(feature_dict.get(column, 0.0)) for column in FEATURE_COLUMNS)
+        if not np.isfinite(vector).all():
+            raise ValueError("feature inputs must be finite")
+        return vector
+
+    def clear_prediction_caches(self) -> None:
+        """Drop cached model values while keeping this engine's weights intact."""
+        with self._prediction_cache_lock:
+            self._prediction_cache.clear()
+        with self._explanation_cache_lock:
+            self._explanation_cache.clear()
+
+    def _predict_values(self, vector: tuple[float, ...]) -> Dict[str, float]:
+        """Return model-only outputs, reusing identical feature vectors when enabled."""
+        if self.cache_predictions:
+            with self._prediction_cache_lock:
+                cached = self._prediction_cache.get(vector)
+                if cached is not None:
+                    self._prediction_cache.move_to_end(vector)
+                    self._increment_metric("prediction_cache_hits")
+                    return copy.deepcopy(cached)
+                values = self._compute_prediction_values(vector)
+                self._prediction_cache[vector] = copy.deepcopy(values)
+                if len(self._prediction_cache) > PREDICTION_CACHE_MAXSIZE:
+                    self._prediction_cache.popitem(last=False)
+                return copy.deepcopy(values)
+        return self._compute_prediction_values(vector)
+
+    def _compute_prediction_values(self, vector: tuple[float, ...]) -> Dict[str, float]:
+        row = pd.Series(dict(zip(FEATURE_COLUMNS, vector)))
+        df_input = pd.DataFrame([row])
+        self._increment_metric("inference_calls")
+
+        lgbm_preds = self.lgbm_predictor.predict(df_input)
+        delta_p10 = float(lgbm_preds.get("p10", [0.0])[0])
+        delta_p50 = float(lgbm_preds.get("p50", [0.0])[0])
+        delta_p90 = float(lgbm_preds.get("p90", [0.0])[0])
+
+        feat_arr = df_input.to_numpy(dtype=np.float32)
+        dcn_out = self.dcn_session.run(None, {"features": feat_arr})[0]
+        prob_18m = float(dcn_out[0][0])
+
+        seq_input = np.repeat(feat_arr[np.newaxis, :, :], 4, axis=0)
+        adj_input = np.eye(1, dtype=np.float32)
+        h_input = np.zeros((1, 64), dtype=np.float32)
+        gnn_out = self.st_gnn_session.run(None, {
+            "x_seq": seq_input,
+            "norm_adj": adj_input,
+            "h_prev": h_input,
+        })[0]
+        delta_12m = float(gnn_out[0][0])
+        return {
+            "delta_6m_p10": round(delta_p10, 4),
+            "delta_6m_p50": round(delta_p50, 4),
+            "delta_6m_p90": round(delta_p90, 4),
+            "delta_12m_spillover": round(delta_12m, 4),
+            "prob_18m_macro_outperformance": round(prob_18m, 4),
+        }
+
+    def _explain_values(self, vector: tuple[float, ...]) -> Dict[str, float]:
+        """Return SHAP values for one vector with an independent bounded cache."""
+        if self.cache_predictions:
+            with self._explanation_cache_lock:
+                cached = self._explanation_cache.get(vector)
+                if cached is not None:
+                    self._explanation_cache.move_to_end(vector)
+                    self._increment_metric("shap_cache_hits")
+                    return copy.deepcopy(cached)
+                values = self._compute_explanation_values(vector)
+                self._explanation_cache[vector] = copy.deepcopy(values)
+                if len(self._explanation_cache) > PREDICTION_CACHE_MAXSIZE:
+                    self._explanation_cache.popitem(last=False)
+                return copy.deepcopy(values)
+        return self._compute_explanation_values(vector)
+
+    def _compute_explanation_values(self, vector: tuple[float, ...]) -> Dict[str, float]:
+        self._increment_metric("shap_calls")
+        row = pd.Series(dict(zip(FEATURE_COLUMNS, vector)))
+        return copy.deepcopy(self.explainer.explain_instance(row))
 
     def _init_models(self):
         """Initialize or train default synthetic weights for immediate serving."""
@@ -142,31 +246,8 @@ class MultiHorizonInferenceEngine:
         """Execute multi-horizon inference for a single H3 cell."""
         t0 = time.perf_counter()
 
-        # Build feature vector
-        row = pd.Series({col: float(feature_dict.get(col, 0.0)) for col in FEATURE_COLUMNS})
-        df_input = pd.DataFrame([row])
-
-        # 1. 6-Month LightGBM Quantile Forecast
-        lgbm_preds = self.lgbm_predictor.predict(df_input)
-        delta_p10 = float(lgbm_preds.get("p10", [0.0])[0])
-        delta_p50 = float(lgbm_preds.get("p50", [0.0])[0])
-        delta_p90 = float(lgbm_preds.get("p90", [0.0])[0])
-
-        # 2. 18-Month DCN-v2 Macro Outperformance Probability
-        feat_arr = df_input.to_numpy(dtype=np.float32)
-        dcn_out = self.dcn_session.run(None, {"features": feat_arr})[0]
-        prob_18m = float(dcn_out[0][0])
-
-        # 3. 12-Month ST-GNN Spatial Spillover Forecast
-        seq_input = np.repeat(feat_arr[np.newaxis, :, :], 4, axis=0)  # [4, 1, in_features]
-        adj_input = np.eye(1, dtype=np.float32)
-        h_input = np.zeros((1, 64), dtype=np.float32)
-        gnn_out = self.st_gnn_session.run(None, {
-            "x_seq": seq_input,
-            "norm_adj": adj_input,
-            "h_prev": h_input,
-        })[0]
-        delta_12m = float(gnn_out[0][0])
+        vector = self._feature_key(feature_dict)
+        model_values = self._predict_values(vector)
 
         # 4. LIMS Score & Catalyst Flag
         lims_val = float(feature_dict.get("lims_score", 0.0))
@@ -183,7 +264,7 @@ class MultiHorizonInferenceEngine:
         # 5. SHAP Attributions
         shap_vals = None
         if include_shap:
-            shap_vals = self.explainer.explain_instance(row)
+            shap_vals = self._explain_values(vector)
 
         lat, lng = self.indexer.h3_to_latlng(h3_index)
         latency_ms = (time.perf_counter() - t0) * 1000.0
@@ -194,11 +275,7 @@ class MultiHorizonInferenceEngine:
             "centroid_lat": lat,
             "centroid_lng": lng,
             "lims_score": lims_val,
-            "delta_6m_p10": round(delta_p10, 4),
-            "delta_6m_p50": round(delta_p50, 4),
-            "delta_6m_p90": round(delta_p90, 4),
-            "delta_12m_spillover": round(delta_12m, 4),
-            "prob_18m_macro_outperformance": round(prob_18m, 4),
+            **model_values,
             "is_catalyst": is_catalyst,
             "shap_attributions": shap_vals,
             "inference_latency_ms": round(latency_ms, 2),

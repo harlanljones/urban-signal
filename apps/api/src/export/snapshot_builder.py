@@ -43,6 +43,7 @@ import math
 import os
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import nullcontext
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -51,6 +52,8 @@ import h3
 import polars as pl
 
 from src.export.bay_area_context import CONTEXT_METRIC_KEYS, load_context
+from src.export.snapshot_metrics import SnapshotMetrics
+from src.models.quantile_lgbm import FEATURE_COLUMNS
 from src.serving import router as api_router
 from src.serving.engine import MultiHorizonInferenceEngine
 from src.spatial import coverage
@@ -577,6 +580,65 @@ async def build_snapshot(
     dense_metro: bool = False,
     require_national: bool = False,
     context_dir: Path | None = None,
+    metrics: SnapshotMetrics | None = None,
+    cache_predictions: bool = True,
+) -> dict[str, Any]:
+    """Build one snapshot, optionally collecting timings outside the KV payload."""
+    total = metrics.stage("total") if metrics is not None else nullcontext()
+    with total:
+        try:
+            if engine is None:
+                initialization = (
+                    metrics.stage("model_initialization") if metrics is not None else nullcontext()
+                )
+                with initialization:
+                    engine = MultiHorizonInferenceEngine(
+                        metrics=metrics,
+                        cache_predictions=cache_predictions,
+                    )
+            elif metrics is not None:
+                with metrics.stage("model_initialization"):
+                    pass
+                # Instrument engines supplied by callers as well as the CLI's
+                # default engine. Preserve and restore a caller's prior value.
+                previous_metrics = getattr(engine, "metrics", None)
+                engine.metrics = metrics
+            else:
+                previous_metrics = None
+            manifest = await _build_snapshot(
+                out_dir,
+                engine=engine,
+                cities=cities,
+                include_legacy_cells=include_legacy_cells,
+                national_dir=national_dir,
+                dense_metro=dense_metro,
+                require_national=require_national,
+                context_dir=context_dir,
+                metrics=metrics,
+            )
+            if metrics is not None:
+                metrics.set_artifact("status", "complete")
+            return manifest
+        except BaseException as exc:
+            if metrics is not None:
+                metrics.set_artifact("status", "incomplete")
+                metrics.set_artifact("failure", {"type": type(exc).__name__, "message": str(exc)})
+            raise
+        finally:
+            if metrics is not None and engine is not None and "previous_metrics" in locals():
+                engine.metrics = previous_metrics
+
+
+async def _build_snapshot(
+    out_dir: Path,
+    engine: MultiHorizonInferenceEngine,
+    cities: list[str] | None = None,
+    include_legacy_cells: bool = True,
+    national_dir: Path | None = None,
+    dense_metro: bool = False,
+    require_national: bool = False,
+    context_dir: Path | None = None,
+    metrics: SnapshotMetrics | None = None,
 ) -> dict[str, Any]:
     """Build all snapshot artifacts into out_dir and return the manifest dict.
 
@@ -610,15 +672,14 @@ async def build_snapshot(
     out_dir.mkdir(parents=True, exist_ok=True)
     cities = list(cities or SUPPORTED_CITIES)
 
-    if engine is None:
-        engine = MultiHorizonInferenceEngine()
-
     kv_entries: list[dict[str, str]] = []
     keys_index: dict[str, dict[str, Any]] = {}
     counts: dict[str, Any] = {}
 
     def register(key: str, path: Path, payload: Any) -> int:
-        size = _write_json(path, payload)
+        serialization = metrics.stage("serialization") if metrics is not None else nullcontext()
+        with serialization:
+            size = _write_json(path, payload)
         if size > MAX_KV_VALUE_BYTES:
             raise ValueError(
                 f"KV value '{key}' is {size:,} bytes, over the {MAX_KV_VALUE_BYTES:,}-byte "
@@ -626,37 +687,53 @@ async def build_snapshot(
             )
         keys_index[key] = {"bytes": size}
         kv_entries.append({"key": key, "value": json.dumps(payload, separators=(",", ":"))})
+        if metrics is not None:
+            family = key.split("/", 1)[0]
+            metrics.increment(f"keys.{family}")
+            metrics.increment(f"value_bytes.{family}", size)
         return size
 
     grids: dict[str, dict[str, Any]] = {}
     catalysts_by_city: dict[str, dict[str, Any]] = {}
     submarkets_by_city: dict[str, dict[str, Any]] = {}
 
-    for city in cities:
-        logger.info("Building snapshot artifacts for city '%s'", city)
-        if dense_metro:
-            grids[city] = _dense_metro_grid(city, engine)
-        else:
-            grids[city] = await api_router.get_grid_geojson(
+    city_timer = metrics.stage("city_inference") if metrics is not None else nullcontext()
+    with city_timer:
+        for city in cities:
+            logger.info("Building snapshot artifacts for city '%s'", city)
+            if dense_metro:
+                grids[city] = _dense_metro_grid(city, engine)
+            else:
+                grids[city] = await api_router.get_grid_geojson(
+                    city_id=city,
+                    resolution=DEFAULT_RESOLUTION,
+                    k_ring=DEFAULT_K_RING,
+                    borough=None,
+                    submarket=None,
+                    include_shap=False,
+                    engine=engine,
+                )
+            catalysts_by_city[city] = await api_router.get_active_catalysts(
                 city_id=city,
+                min_lims=CATALYST_THRESHOLD,
                 resolution=DEFAULT_RESOLUTION,
-                k_ring=DEFAULT_K_RING,
                 borough=None,
-                submarket=None,
-                include_shap=False,
+                limit=CATALYST_LIMIT,
                 engine=engine,
             )
-        catalysts_by_city[city] = await api_router.get_active_catalysts(
-            city_id=city,
-            min_lims=CATALYST_THRESHOLD,
-            resolution=DEFAULT_RESOLUTION,
-            borough=None,
-            limit=CATALYST_LIMIT,
-            engine=engine,
-        )
-        submarkets_by_city[city] = await api_router.list_submarkets(city_id=city, borough=None)
+            submarkets_by_city[city] = await api_router.list_submarkets(city_id=city, borough=None)
 
-    context = load_context(context_dir) if context_dir is not None else None
+    try:
+        context = load_context(context_dir) if context_dir is not None else None
+    except Exception as exc:
+        if metrics is not None:
+            metrics.set_context_availability(False, f"load_failed: {type(exc).__name__}: {exc}")
+        raise
+    if metrics is not None and context_dir is not None:
+        metrics.set_context_availability(
+            context is not None,
+            None if context is not None else "context_inputs_unavailable",
+        )
     context_keys: tuple[str, ...] = ()
     if context is not None:
         _apply_context_layers(grids, context[0])
@@ -668,17 +745,19 @@ async def build_snapshot(
     # res-9 is its own national rank space (unchanged); each LOD aggregate
     # level is ranked against ITS complete publish (US-415 method A — average
     # raw, then rank per level, never average child percentiles).
-    _apply_percentile_normalization(grids)
-    _apply_context_percentiles(grids, context_keys)
-    grids_by_res: dict[int, dict[str, dict[str, Any]]] = {DEFAULT_RESOLUTION: grids}
-    for res in (8, 7):
-        lod_grids = {
-            city: _aggregate_grid_to_res(grids[city], city, res, extra_keys=context_keys)
-            for city in cities
-        }
-        _apply_percentile_normalization(lod_grids)
-        _apply_context_percentiles(lod_grids, context_keys)
-        grids_by_res[res] = lod_grids
+    ranking_timer = metrics.stage("ranking_lod") if metrics is not None else nullcontext()
+    with ranking_timer:
+        _apply_percentile_normalization(grids)
+        _apply_context_percentiles(grids, context_keys)
+        grids_by_res: dict[int, dict[str, dict[str, Any]]] = {DEFAULT_RESOLUTION: grids}
+        for res in (8, 7):
+            lod_grids = {
+                city: _aggregate_grid_to_res(grids[city], city, res, extra_keys=context_keys)
+                for city in cities
+            }
+            _apply_percentile_normalization(lod_grids)
+            _apply_context_percentiles(lod_grids, context_keys)
+            grids_by_res[res] = lod_grids
 
     cells_requests: list[tuple[str, dict[str, Any]]] = []
     seen_cells: set[str] = set()
@@ -713,7 +792,13 @@ async def build_snapshot(
         h3_cell, feats = request
         return engine.predict_cell_features(h3_index=h3_cell, feature_dict=feats, include_shap=True)
 
-    with ThreadPoolExecutor(max_workers=CELL_INFERENCE_WORKERS) as pool:
+    cell_timer = metrics.stage("cell_inference_shap") if metrics is not None else nullcontext()
+    if metrics is not None:
+        metrics.increment(
+            "unique_normalized_vectors",
+            len({tuple(float(feats.get(key, 0.0)) for key in FEATURE_COLUMNS) for _, feats in cells_requests}),
+        )
+    with cell_timer, ThreadPoolExecutor(max_workers=CELL_INFERENCE_WORKERS) as pool:
         predictions = list(pool.map(_predict, cells_requests))
     cells_by_index = {request[0]: pred for request, pred in zip(cells_requests, predictions)}
 
@@ -812,6 +897,14 @@ async def build_snapshot(
 
     bulk_path = out_dir / "kv-bulk.json"
     bulk_path.write_text(json.dumps(kv_entries), encoding="utf-8")
+    if metrics is not None:
+        metrics.set_artifact(
+            "key_count",
+            len(kv_entries),
+        )
+        metrics.set_artifact("bulk_bytes", bulk_path.stat().st_size)
+        metrics.set_artifact("unique_cells", len(cells_by_index))
+        metrics.set_artifact("cities", list(cities))
     if bulk_path.stat().st_size > MAX_BULK_BYTES:
         raise ValueError(
             f"kv-bulk.json is {bulk_path.stat().st_size:,} bytes, over the "
@@ -883,18 +976,36 @@ def main() -> None:
         action="store_true",
         help="Use bounded k_ring=3 coverage (coverage.metro_cells) for continuous urban hexes",
     )
-    args = parser.parse_args()
-    asyncio.run(
-        build_snapshot(
-            Path(args.out),
-            cities=args.cities,
-            include_legacy_cells=not args.skip_legacy_cells,
-            national_dir=Path(args.national_dir) if args.national_dir else None,
-            dense_metro=args.dense_metro,
-            require_national=args.require_national,
-            context_dir=Path(args.context_dir) if args.context_dir else None,
-        )
+    parser.add_argument(
+        "--metrics-out",
+        default=None,
+        help="Write schema-1 builder metrics JSON outside the KV payload",
     )
+    parser.add_argument(
+        "--no-prediction-cache",
+        action="store_true",
+        help="Disable bounded model prediction and SHAP caches for this build",
+    )
+    args = parser.parse_args()
+    context_dir = Path(args.context_dir) if args.context_dir else None
+    metrics = SnapshotMetrics(context_dir=context_dir) if args.metrics_out else None
+    try:
+        asyncio.run(
+            build_snapshot(
+                Path(args.out),
+                cities=args.cities,
+                include_legacy_cells=not args.skip_legacy_cells,
+                national_dir=Path(args.national_dir) if args.national_dir else None,
+                dense_metro=args.dense_metro,
+                require_national=args.require_national,
+                context_dir=context_dir,
+                metrics=metrics,
+                cache_predictions=not args.no_prediction_cache,
+            )
+        )
+    finally:
+        if metrics is not None:
+            metrics.write(Path(args.metrics_out))
 
 
 if __name__ == "__main__":
