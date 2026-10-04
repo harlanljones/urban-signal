@@ -2131,3 +2131,14 @@ Final root validation: full exporter/context, cache/calibration/reach, metrics, 
 Root owns CLI, workflow/tool integration, shared git index and final verification. User selected a dedicated R2 bucket; runtime reports no configured credentials. Live scheduling, production feature promotion and retirement remain evidence-gated. Plan: docs/superpowers/plans/2026-10-03-durable-shadow-ingestion.md.
 
 Root final focused suites82 + routing7 pass; mandatory preflight and Ruff pass. Full API suite has five remaining unchanged FEMA crosswalk network-guard failures after environment-aware rerun. Details: docs/research/shadow-ingestion-validation-2026-10-03.md. No live acquisition, R2 provisioning, production publication or retirement.
+
+## Dashboard UI polish — 2026-10-04
+- Launched luna_dashboard_fixes: dashboard UI/map improvements and regressions; owns dashboard.py and dashboard tests, root owns generated export.
+- Launched luna_fema_tests: deterministic offline FEMA crosswalk test fixtures; owns test_gbfs_and_national_feeds.py.
+- Root owns integration, generated export, full CI/CD preflight and final review. No production release in this stream.
+- luna_fema_tests completed: 37 offline feed tests pass, followed by read-only grid lifecycle/test-risk review.
+- luna_dashboard_fixes interrupted by model usage limit after partial UI implementation. Root resumed from saved leaf edits, completed staged LOD/polygon motion, selection continuity, mobile layout and integration.
+- Root additionally owns apps/api/tests/unit/test_serving.py: narrow percentile-paint assertion to paints, permitting the accepted raw-score threshold filter. No spine changes.
+- Launched luna_final_review after the earlier quota reset: independent read-only final correctness review; owns only .streams/ui-final-review.md.
+- luna_final_review completed: no blocking defects; reviewed follow-up mobile padding queue and forecast ranges. Focused Node grid tests passed.
+- Root final verification: full API 6138 passed/2 skipped/7 live deselected; latest UI-only additions covered by 100 targeted API tests, 95 dashboard tests, typecheck, Worker dry-run build, production-origin candidate browser controls/direct mobile navigation, and mandatory CI/CD preflight. All final commands exited successfully. Production unchanged.
