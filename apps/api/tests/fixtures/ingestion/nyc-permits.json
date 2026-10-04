@@ -1,0 +1,47 @@
+{
+  "dataset_id": "ipu4-2q9a",
+  "evidence_type": "separate_bounded_queries_not_a_single_source_page",
+  "observed_projected_sample": [
+    {
+      ":id": "row-c5f6_ycr6.syte",
+      ":updated_at": "2026-05-28T17:36:21.141Z",
+      "permit_si_no": "3765466",
+      "job__": "340733647",
+      "issuance_date": "06/17/2020",
+      "dobrundate": "2020-06-18T00:00:00.000"
+    },
+    {
+      ":id": "row-iyjg-m5f3~equk",
+      ":updated_at": "2026-05-28T17:36:21.141Z",
+      "permit_si_no": "3765467",
+      "job__": "421538731",
+      "issuance_date": "06/17/2020",
+      "dobrundate": "2020-06-18T00:00:00.000"
+    },
+    {
+      ":id": "row-gyn5-zqjy.yhcc",
+      ":updated_at": "2026-05-28T17:36:21.141Z",
+      "permit_si_no": "3765795",
+      "job__": "510113501",
+      "issuance_date": "06/17/2020",
+      "dobrundate": "2020-06-18T00:00:00.000"
+    }
+  ],
+  "observed_ambiguous_job_identity": [
+    {
+      "permit_si_no": "3765466",
+      "job__": "340733647",
+      "permit_sequence__": "01",
+      "job_doc___": "01",
+      "permit_type": "EW"
+    },
+    {
+      "permit_si_no": "3763757",
+      "job__": "340733647",
+      "permit_sequence__": "01",
+      "job_doc___": "01",
+      "permit_type": "EW"
+    }
+  ],
+  "limitations": "Identity evidence came from a separate job-scoped query and is intentionally not composed with the sample rows into a fabricated source page. GIS coordinates were not present in the bounded projected samples."
+}

@@ -71,6 +71,12 @@ jobs:
           PYTHONPATH=apps/api .venv/bin/python -m pytest -q apps/api/tests/unit/test_feed_staleness_probe.py
           PYTHONPATH=apps/api .venv/bin/python -m pytest -q apps/api/tests/unit/test_bay_area_context.py
 
+      - name: Check durable shadow ingestion
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
+        run: |
+          .venv/bin/ruff check apps/api/src/ingestion scripts/run_shadow_ingestion.py scripts/probe_ingestion_store.py scripts/validate_shadow_cycles.py apps/api/tests/unit/test_ingestion_*.py apps/api/tests/unit/test_shadow_*.py
+          PYTHONPATH=apps/api .venv/bin/python -m pytest -q apps/api/tests/unit/test_ingestion_*.py apps/api/tests/unit/test_shadow_*.py
+
       - uses: oven-sh/setup-bun@v2
         if: github.event_name == 'push' || github.event_name == 'pull_request'
 

@@ -2118,3 +2118,16 @@ User selected Luna parallel build/test. Root owns shared-interface integration a
 Root restored temporary storage after pytest filled /tmp, moved large fixtures to /workspace/test-tmp, and integrated new regressions into both CI validation paths. Root broad snapshot/context tests and full CI/CD preflight passed. Timing runs execute alone after test jobs finish.
 
 Final root validation: full exporter/context, cache/calibration/reach, metrics, routing, dashboard91, zoom, web build/typecheck/lint and CI/CD preflight passed. Nine standalone benchmark builds passed six semantic comparisons; cold median10.400s vs53.761s (80.7% improvement), unchanged coverage. Evidence: docs/research/gh-actions-backend-benchmark-2026-10-03.md. Optional context download was blocked at artifact storage; fallback plus context regression tests documented. Implementation commit b945892; subsequent cleanup changes engine imports/annotations only. No production writes.
+
+## 2026-10-03 — durable shadow ingestion (Luna)
+
+| Stream | Leaf ownership | Spine | Outcome |
+| --- | --- | --- | --- |
+| luna-ingestion-source | ingestion/source.py, source tests/fixtures/contract evidence | none | complete locally; live source/storage gates pending |
+| luna-ingestion-store | ingestion/store.py, store tests/readiness evidence | none | complete locally; live source/storage gates pending |
+| luna-ingestion-runner | ingestion/runner.py and runner tests | none | Luna interrupted by usage limit; root integrated and tested |
+| luna-ingestion-gate-review | read-only plan/gate review | none | complete locally; live source/storage gates pending |
+
+Root owns CLI, workflow/tool integration, shared git index and final verification. User selected a dedicated R2 bucket; runtime reports no configured credentials. Live scheduling, production feature promotion and retirement remain evidence-gated. Plan: docs/superpowers/plans/2026-10-03-durable-shadow-ingestion.md.
+
+Root final focused suites82 + routing7 pass; mandatory preflight and Ruff pass. Full API suite has five remaining unchanged FEMA crosswalk network-guard failures after environment-aware rerun. Details: docs/research/shadow-ingestion-validation-2026-10-03.md. No live acquisition, R2 provisioning, production publication or retirement.
