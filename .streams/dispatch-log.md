@@ -2142,3 +2142,12 @@ Root final focused suites82 + routing7 pass; mandatory preflight and Ruff pass. 
 - Launched luna_final_review after the earlier quota reset: independent read-only final correctness review; owns only .streams/ui-final-review.md.
 - luna_final_review completed: no blocking defects; reviewed follow-up mobile padding queue and forecast ranges. Focused Node grid tests passed.
 - Root final verification: full API 6138 passed/2 skipped/7 live deselected; latest UI-only additions covered by 100 targeted API tests, 95 dashboard tests, typecheck, Worker dry-run build, production-origin candidate browser controls/direct mobile navigation, and mandatory CI/CD preflight. All final commands exited successfully. Production unchanged.
+
+## Dashboard selection and tile recovery — 2026-10-04
+- Launched luna_selection_fixes: exact selected-state globals and selection/inspection functions in dashboard.py; new selection-race.test.js. Uses narrow patches, no export/commits.
+- Launched luna_tile_recovery: exact tile-state and loader/status/retry functions in dashboard.py; grid-zoom.test.js. Uses narrow patches, no export/commits.
+- Root owns integration, generated dashboard HTML, production-origin browser regression, preflight, docs and commit. No production deployment in this stream.
+- Selection stream additionally owns searchCoordinateOrHex and narrow mobile-inspector dismissal invalidation in closeMobilePanels, to cover all asynchronous selection entrypoints.
+- Tile stream additionally owns dedicated #tile-loader-status HTML/CSS; no other UI regions.
+- Launched luna_recovery_review: independent read-only review of final selection/retry changes; owns only .streams/dashboard-recovery-review.md.
+- Completed both Luna implementation streams and independent Luna review. Root exported the HTML and verified 110 dashboard tests, 38 API serving tests, typecheck/build, full preflight and production-origin candidate browser recovery including mobile manual Retry. No deployment.

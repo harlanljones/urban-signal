@@ -679,6 +679,39 @@ def get_dashboard_html() -> str:
       overflow: hidden;
       border: 1px solid var(--neutral-tint-soft);
     }
+    .tile-loader-status {
+      position: absolute;
+      left: 50%;
+      bottom: 72px;
+      transform: translateX(-50%);
+      z-index: 105;
+      max-width: min(90%, 460px);
+      padding: 9px 12px;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      background: rgba(8, 12, 20, 0.94);
+      color: var(--text-main);
+      font-size: 12px;
+      text-align: center;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.32);
+    }
+    .tile-loader-status[hidden] { display: none; }
+    .tile-loader-status button {
+      margin-left: 8px;
+      padding: 3px 8px;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      cursor: pointer;
+    }
+    @media (max-width: 860px) {
+      .tile-loader-status {
+        top: max(58px, env(safe-area-inset-top));
+        bottom: auto;
+        z-index: 105;
+      }
+    }
     .map-container::after {
       content: '';
       position: absolute;
@@ -1726,6 +1759,10 @@ def get_dashboard_html() -> str:
     <main class="map-container">
       <div id="map"></div>
       <div class="zoom-hint" id="zoom-hint" hidden>Zoom in to load cell-level data</div>
+      <div class="tile-loader-status" id="tile-loader-status" role="status" aria-live="polite" hidden>
+        <span id="tile-loader-message"></span>
+        <button id="tile-loader-retry" type="button" onclick="retryExhaustedTiles()" hidden>Retry</button>
+      </div>
 
       <!-- Floating Quick Tools -->
       <div class="map-controls-group">
@@ -1825,6 +1862,7 @@ __METRO_META__
     let selectedH3Index = null;
     let selectedLocationH3Index = null;
     let selectedGeoAnchor = null;
+    let selectionGeneration = 0;
     let hoveredH3Index = null;
     let catalystAlerts = [];
 
@@ -1832,11 +1870,15 @@ __METRO_META__
     let snapshotManifest = null;
     let activeMetroChip = null;        // city_id or null (= all metros)
     const fetchedTiles = new Set();    // parents merged for the active LOD generation
+    const tileRetryCounts = new Map(); // automatic retries per parent, per LOD generation
+    const tileRetryTimers = new Map(); // parent -> timeout id
+    const exhaustedTileRetries = new Set();
     const tileFeatures = new Map();    // h3_index -> GeoJSON feature
     const pendingTileParents = [];     // queued parents awaiting fetch
     const tilesInFlight = new Set();
     let tileFetchesActive = 0;
     let tileLoadGeneration = 0;
+    let tileLoadingPaused = false;
     let activeLodRes = 7; // LOD level whose parents are currently being fetched
     let gridDirty = false;
     let renderedLodRes = null;
@@ -1847,6 +1889,8 @@ __METRO_META__
     let nationalDebounceTimer = 0;
     const TILE_PARENTS_PER_REQUEST = 32;
     const TILE_FETCH_CONCURRENCY = 2;
+    const MAX_TILE_RETRIES = 3;
+    const TILE_RETRY_BACKOFF_MS = [500, 1500, 4000];
     const ZOOM_FLOOR = 6; // below this: national layer only (LODES)
     // Metro LOD pyramid (US-411/413): select the display resolution based on
     // zoom level so the map never shows a dead zone between national and metro.
@@ -2199,6 +2243,7 @@ __METRO_META__
     }
 
     async function inspectH3CellWithNationalFallback(h3Index, lat, lng, natProps) {
+      const generation = ++selectionGeneration;
       try {
         const resp = await fetch('/api/v1/predict', {
           method: 'POST',
@@ -2207,12 +2252,14 @@ __METRO_META__
         });
         if (resp.ok) {
           const pred = await resp.json();
+          if (generation !== selectionGeneration) return;
           handleHexSelection({ ...natProps, ...pred, h3_index: h3Index, centroid_lat: lat, centroid_lng: lng });
           return;
         }
       } catch (e) {
         /* fall through to national-only inspector */
       }
+      if (generation !== selectionGeneration) return;
       // Honest no-data: show a minimal card with any *_national_pct properties present
       const props = Object.assign({}, natProps, { h3_index: h3Index, centroid_lat: lat, centroid_lng: lng });
       handleHexSelection(props);
@@ -2765,6 +2812,7 @@ __METRO_META__
     }
 
     function closeMobilePanels() {
+      if (document.body.classList.contains('drawer-right-open')) selectionGeneration++;
       const wasOpen = document.body.classList.contains('drawer-left-open')
         || document.body.classList.contains('drawer-right-open')
         || document.body.classList.contains('search-open');
@@ -3147,10 +3195,21 @@ __METRO_META__
       const hint = document.getElementById('zoom-hint');
       if (hint) hint.hidden = true; // dead-zone hint retired; LOD pyramid covers country view
       if (z < ZOOM_FLOOR) {
+        if (!tileLoadingPaused) {
+          tileLoadingPaused = true;
+          tileLoadGeneration += 1;
+          tileRetryTimers.forEach(timer => clearTimeout(timer));
+          tileRetryTimers.clear();
+          tileRetryCounts.clear();
+          exhaustedTileRetries.clear();
+          pendingTileParents.length = 0;
+        }
+        setTileLoaderStatus('');
         cancelGridHandoff();
         setHexLayersVisible(false);
         return; // below metro band: do not fetch metro tiles
       }
+      tileLoadingPaused = false;
       // Pick the LOD level for this zoom and fetch only that level's parents.
       const res = lodForZoom(z);
       if (res !== activeLodRes) {
@@ -3159,6 +3218,10 @@ __METRO_META__
         lodSwapPending = true;
         tileLoadGeneration += 1;
         activeLodRes = res;
+        tileRetryTimers.forEach(timer => clearTimeout(timer));
+        tileRetryTimers.clear();
+        tileRetryCounts.clear();
+        exhaustedTileRetries.clear();
         pendingTileParents.length = 0;
         fetchedTiles.clear();
         tileFeatures.clear();
@@ -3168,7 +3231,7 @@ __METRO_META__
       const tileIndex = tileIndexes[String(res)] || snapshotManifest.tile_index || {};
       lodRequiredParents = parentsCoveringBounds(map.getBounds(), LOD_TO_PARENT_RES[res] || 5)
         .filter((parent) => Object.prototype.hasOwnProperty.call(tileIndex, parent));
-      const candidates = lodRequiredParents.filter((parent) => !fetchedTiles.has(parent) && !tilesInFlight.has(`${tileLoadGeneration}:${parent}`));
+      const candidates = lodRequiredParents.filter((parent) => !fetchedTiles.has(parent) && !tilesInFlight.has(`${tileLoadGeneration}:${parent}`) && !tileRetryTimers.has(parent) && !exhaustedTileRetries.has(parent));
 
       const center = map.getCenter();
       candidates.sort((a, b) => parentDistance(a, center) - parentDistance(b, center));
@@ -3176,6 +3239,7 @@ __METRO_META__
       pendingTileParents.length = 0;
       pendingTileParents.push(...candidates);
       activeLodRes = res;
+      if (candidates.length || tileFetchesActive) setTileLoaderStatus('Loading grid tiles…');
       drainTileQueue();
       applyGridData();
     }
@@ -3194,31 +3258,89 @@ __METRO_META__
       }
     }
 
+    function setTileLoaderStatus(message, retryAvailable = false) {
+      const region = document.getElementById('tile-loader-status');
+      const text = document.getElementById('tile-loader-message');
+      const retry = document.getElementById('tile-loader-retry');
+      if (text) text.textContent = message;
+      if (retry) retry.hidden = !retryAvailable;
+      if (region) region.hidden = !message;
+    }
+
+    function scheduleTileRetry(parent, generation, res) {
+      const attempts = (tileRetryCounts.get(parent) || 0) + 1;
+      tileRetryCounts.set(parent, attempts);
+      if (attempts > MAX_TILE_RETRIES) {
+        exhaustedTileRetries.add(parent);
+        return;
+      }
+      const delay = TILE_RETRY_BACKOFF_MS[attempts - 1];
+      setTileLoaderStatus(`Tile request failed. Retrying ${attempts}/${MAX_TILE_RETRIES} in ${Math.ceil(delay / 1000)}s…`);
+      const timer = setTimeout(() => {
+        tileRetryTimers.delete(parent);
+        if (generation !== tileLoadGeneration || exhaustedTileRetries.has(parent) || fetchedTiles.has(parent)) return;
+        if (!pendingTileParents.includes(parent)) pendingTileParents.push(parent);
+      setTileLoaderStatus('Retrying grid tiles…');
+        drainTileQueue();
+      }, delay);
+      tileRetryTimers.set(parent, timer);
+    }
+
+    function retryExhaustedTiles() {
+      const parents = lodRequiredParents.filter(parent => exhaustedTileRetries.has(parent));
+      if (!parents.length) return;
+      parents.forEach(parent => {
+        exhaustedTileRetries.delete(parent);
+        tileRetryCounts.delete(parent);
+        if (!pendingTileParents.includes(parent)) pendingTileParents.push(parent);
+      });
+      setTileLoaderStatus(`Retrying ${parents.length} failed grid tile${parents.length === 1 ? '' : 's'}…`);
+      drainTileQueue();
+    }
+
+    function settleTileLoaderStatus() {
+      const pending = lodRequiredParents.filter(parent => !fetchedTiles.has(parent));
+      if (pending.length && pending.every(parent => exhaustedTileRetries.has(parent))) {
+        setTileLoaderStatus(`${pending.length} grid tile${pending.length === 1 ? '' : 's'} could not load.`, true);
+      } else if (!pending.length && tileFetchesActive === 0 && pendingTileParents.length === 0 && tileRetryTimers.size === 0) {
+        const coverage = document.getElementById('coverage-status');
+        if (tileFeatures.size) setTileLoaderStatus('');
+        else setTileLoaderStatus(coverage ? coverage.textContent : 'No published cells in this view');
+      }
+    }
+
     async function fetchTileBatch(batch) {
       const generation = tileLoadGeneration;
       const res = activeLodRes || 9;
       try {
         const resp = await fetch(`/api/v1/gridtiles?res=${res}&parents=${batch.join(',')}`);
-        if (resp.ok) {
-          const payload = await resp.json();
-          if (generation === tileLoadGeneration) {
-            mergeTilePayload(payload);
-            // Successful empty responses also settle absent-from-KV parents.
-            batch.forEach((parent) => fetchedTiles.add(parent));
-          }
+        if (!resp.ok) throw new Error(`HTTP ${resp.status || 'request failed'}`);
+        const payload = await resp.json();
+        if (generation === tileLoadGeneration) {
+          mergeTilePayload(payload);
+          // A successful empty response settles missing-from-KV parents too.
+          batch.forEach((parent) => {
+            fetchedTiles.add(parent);
+            tileRetryCounts.delete(parent);
+            exhaustedTileRetries.delete(parent);
+          });
+          // Empty payloads still need to complete an LOD swap and announce coverage.
+          gridDirty = true;
         }
       } catch (e) {
-        console.debug('Tile fetch error:', e);
+        if (generation === tileLoadGeneration) batch.forEach(parent => scheduleTileRetry(parent, generation, res));
       } finally {
         batch.forEach((parent) => tilesInFlight.delete(`${generation}:${parent}`));
         tileFetchesActive -= 1;
         drainTileQueue();
         applyGridData();
+        settleTileLoaderStatus();
       }
     }
 
     function mergeTilePayload(payload) {
-      const features = payload && payload.features ? payload.features : [];
+      if (!payload || !Array.isArray(payload.features)) throw new Error('Malformed grid tile payload');
+      const features = payload.features;
       for (const feature of features) {
         const cell = feature.properties && feature.properties.h3_index;
         if (!cell) continue;
@@ -3340,6 +3462,7 @@ __METRO_META__
       const coverage = document.getElementById('coverage-status');
       if (coverage) coverage.textContent = tileFeatures.size ? 'Published grid coverage · source age unknown' : 'No published cells in this view';
       map.triggerRepaint();
+      settleTileLoaderStatus();
     }
 
     function evictDistantGridFeatures(maxCount = 120000) {
@@ -3759,6 +3882,7 @@ __METRO_META__
 
     function zoomToHex(h3Index, lat, lng) {
       selectedH3Index = h3Index;
+      const generation = ++selectionGeneration;
       if (map) {
         map.flyTo({
           center: [lng, lat],
@@ -3774,11 +3898,10 @@ __METRO_META__
         }
       }
 
-      renderCatalystFeed();
-      inspectH3Cell(h3Index, lat, lng);
+      inspectH3Cell(h3Index, lat, lng, generation);
     }
 
-    async function inspectH3Cell(h3Index, lat, lng) {
+    async function inspectH3Cell(h3Index, lat, lng, generation = ++selectionGeneration) {
       let props = null;
       if (gridGeoJSON && gridGeoJSON.features) {
         const f = gridGeoJSON.features.find(item => item.properties && item.properties.h3_index === h3Index);
@@ -3794,6 +3917,7 @@ __METRO_META__
           });
           if (resp.ok) {
             props = await resp.json();
+            if (generation !== selectionGeneration) return;
             const subInfo = getSubmarketInfoByCoords(lat, lng);
             props.submarket = subInfo ? subInfo.name : 'Target Micro-Parcel';
             props.borough = normalizeBorough(subInfo ? subInfo.meta.borough : getBoroughNameByCoords(lat, lng));
@@ -3822,6 +3946,7 @@ __METRO_META__
         };
       }
 
+      if (generation !== selectionGeneration) return;
       handleHexSelection(props);
     }
 
@@ -3830,6 +3955,7 @@ __METRO_META__
     // Desktop keeps the inspector collapsed until something is selected, so
     // the map gets the width; the body class drives that (CSS, >860px only).
     function clearSelection() {
+      selectionGeneration++;
       selectedH3Index = null;
       selectedLocationH3Index = null;
       selectedGeoAnchor = null;
@@ -3847,8 +3973,10 @@ __METRO_META__
 
     function handleHexSelection(props, preserveAnchor = false) {
       if (!props) return;
+      selectionGeneration++;
       selectedH3Index = props.h3_index;
       selectedLocationH3Index = props.h3_index;
+      renderCatalystFeed();
       const anchorLat = Number(props.centroid_lat), anchorLng = Number(props.centroid_lng);
       if (!preserveAnchor) {
         if (props.centroid_lat != null && props.centroid_lng != null && Number.isFinite(anchorLat) && Number.isFinite(anchorLng)) selectedGeoAnchor = { lat: anchorLat, lng: anchorLng };
@@ -4153,6 +4281,7 @@ __METRO_META__
     }
 
     async function searchCoordinateOrHex(input) {
+      const generation = ++selectionGeneration;
       let lat, lng, h3Index;
       const hasH3 = typeof h3 !== 'undefined';
 
@@ -4204,9 +4333,13 @@ __METRO_META__
               include_shap: true
             })
           });
-          if (resp.ok) predData = await resp.json();
+          if (resp.ok) {
+            predData = await resp.json();
+            if (generation !== selectionGeneration) return;
+          }
         } catch (e) {}
 
+        if (generation !== selectionGeneration) return;
         if (!predData) {
           predData = {
             h3_index: h3Index || 'custom_hex',
