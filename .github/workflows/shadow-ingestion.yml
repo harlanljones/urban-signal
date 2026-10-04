@@ -1,0 +1,103 @@
+name: shadow-ingestion
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: "Fixture replay, isolated R2 verification, or gated live acquisition"
+        type: choice
+        options: [fixture-replay, verify-storage, acquire]
+        default: fixture-replay
+      as_of:
+        description: "Explicit UTC as-of (blank uses current UTC)"
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: shadow-ingestion-main
+  cancel-in-progress: false
+
+jobs:
+  fixture:
+    if: github.ref == 'refs/heads/main' && inputs.operation == 'fixture-replay'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Install API and test dependencies
+        run: |
+          uv venv .venv --python 3.12
+          uv pip install -e "apps/api[dev,ingestion]" --python .venv/bin/python
+      - name: Test ingestion boundaries
+        env:
+          PYTHONPATH: apps/api
+          OMP_NUM_THREADS: "2"
+          OPENBLAS_NUM_THREADS: "2"
+        run: |
+          .venv/bin/python -m pytest -q apps/api/tests/unit/test_ingestion_source.py apps/api/tests/unit/test_ingestion_store.py apps/api/tests/unit/test_ingestion_runner.py apps/api/tests/unit/test_shadow_ingestion_cli.py apps/api/tests/unit/test_shadow_cycles.py apps/api/tests/unit/test_shadow_workflow.py
+      - name: Commit and replay local fixture
+        env:
+          SHADOW_AS_OF: ${{ inputs.as_of }}
+          PYTHONPATH: apps/api
+        run: |
+          mkdir -p dist/shadow
+          as_of="${SHADOW_AS_OF:-$(date -u +%Y-%m-%dT%H:%M:%SZ)}"
+          .venv/bin/python scripts/run_shadow_ingestion.py --mode bootstrap --as-of "$as_of" --local-root "$RUNNER_TEMP/shadow-store" --fixture apps/api/tests/fixtures/ingestion/shadow-permits.json > dist/shadow/fixture-run.json
+          .venv/bin/python scripts/run_shadow_ingestion.py --mode replay --as-of "$as_of" --local-root "$RUNNER_TEMP/shadow-store" > dist/shadow/fixture-replay.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shadow-fixture-evidence
+          path: dist/shadow/
+          retention-days: 14
+
+  remote:
+    if: github.ref == 'refs/heads/main' && inputs.operation != 'fixture-replay'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      INGESTION_R2_ACCESS_KEY_ID: ${{ secrets.INGESTION_R2_ACCESS_KEY_ID }}
+      INGESTION_R2_SECRET_ACCESS_KEY: ${{ secrets.INGESTION_R2_SECRET_ACCESS_KEY }}
+      INGESTION_R2_ENDPOINT: ${{ vars.INGESTION_R2_ENDPOINT }}
+      INGESTION_R2_BUCKET: ${{ vars.INGESTION_R2_BUCKET || 'urban-signal-ingestion-shadow' }}
+      PYTHONPATH: apps/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Install ingestion dependencies
+        run: |
+          uv venv .venv --python 3.12
+          uv pip install -e "apps/api[ingestion]" --python .venv/bin/python
+      - name: Reject unverified source before live acquisition
+        if: inputs.operation == 'acquire'
+        run: |
+          .venv/bin/python - <<'PY'
+          import json
+          from src.ingestion.source import SourceContract
+          with open("docs/research/nyc-permit-source-contract.json") as stream:
+              SourceContract.from_dict(json.load(stream)).assert_ready()
+          PY
+      - name: Verify configured R2 conditional writes
+        run: |
+          mkdir -p dist/shadow
+          test -n "$INGESTION_R2_ENDPOINT"
+          test -n "$INGESTION_R2_ACCESS_KEY_ID"
+          test -n "$INGESTION_R2_SECRET_ACCESS_KEY"
+          .venv/bin/python scripts/probe_ingestion_store.py --bucket "$INGESTION_R2_BUCKET" --endpoint "$INGESTION_R2_ENDPOINT" --prefix ingestion/v1/nyc/permits/ipu4-2q9a/shadow/ --receipt-output dist/shadow/provider-receipt.json
+      - name: Acquire isolated shadow data
+        if: inputs.operation == 'acquire'
+        env:
+          SHADOW_AS_OF: ${{ inputs.as_of }}
+        run: |
+          as_of="${SHADOW_AS_OF:-$(date -u +%Y-%m-%dT%H:%M:%SZ)}"
+          .venv/bin/python scripts/run_shadow_ingestion.py --mode bootstrap --as-of "$as_of" --bucket "$INGESTION_R2_BUCKET" --endpoint "$INGESTION_R2_ENDPOINT" --prefix ingestion/v1/nyc/permits/ipu4-2q9a/shadow/ --provider-receipt dist/shadow/provider-receipt.json --record-cap 5000 > dist/shadow/run.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shadow-storage-evidence
+          path: dist/shadow/
+          retention-days: 14

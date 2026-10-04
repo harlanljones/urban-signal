@@ -4,6 +4,8 @@ Fixtures are trimmed from live payloads captured 2026-08-28. Network-free.
 """
 
 from datetime import UTC, datetime
+import io
+import zipfile
 from unittest.mock import MagicMock
 
 import pytest
@@ -330,10 +332,60 @@ class TestNationalFeeds:
 
 
 class TestCrosswalkForFema:
-    @pytest.fixture(scope="class")
-    @classmethod
-    def crosswalk(cls):
-        return GeographyCrosswalk()
+    @pytest.fixture
+    def crosswalk(self, monkeypatch):
+        """Use representative Gazetteer fixtures while exercising the real parser."""
+        from src.spatial.geography_crosswalk import (
+            COUNTY_GAZETTEER_URL,
+            TRACT_GAZETTEER_URL,
+        )
+
+        def gazetteer_zip(headers, rows):
+            payload = io.BytesIO()
+            with zipfile.ZipFile(payload, "w") as archive:
+                archive.writestr(
+                    "fixture.txt",
+                    "\t".join(headers)
+                    + "\n"
+                    + "\n".join("\t".join(row) for row in rows)
+                    + "\n",
+                )
+            return payload.getvalue()
+
+        # Use the registered metro centers so these records remain inside the
+        # intended metro bboxes; these are synthetic test coordinates.
+        nyc = REGISTRY[CityId.NYC].center
+        chicago = REGISTRY[CityId.CHICAGO].center
+        tract_payload = gazetteer_zip(
+            ["GEOID", "INTPTLAT", "INTPTLONG"],
+            [
+                ["36047019300", str(nyc["lat"]), str(nyc["lng"])],
+                # The 2010 Harris tract is absent; its two 2020 children
+                # exercise deterministic split-tract fallback.
+                ["48201222701", "29.935", "-95.305"],
+                ["48201222702", "29.945", "-95.315"],
+            ],
+        )
+        county_payload = gazetteer_zip(
+            ["GEOID", "NAME", "INTPTLAT", "INTPTLONG"],
+            [
+                ["36061", "New York County, New York", str(nyc["lat"]), str(nyc["lng"])],
+                ["17031", "Cook County, Illinois", str(chicago["lat"]), str(chicago["lng"])],
+                ["02240", "Southeast Fairbanks Census Area, Alaska", "63.9", "-146.2"],
+            ],
+        )
+        payloads = {
+            "2024_Gaz_tracts_national.zip": tract_payload,
+            "2024_Gaz_counties_national.zip": county_payload,
+        }
+        crosswalk = GeographyCrosswalk(offline=True)
+
+        def fixture_payload(url, filename):
+            assert url in {TRACT_GAZETTEER_URL, COUNTY_GAZETTEER_URL}
+            return payloads[filename]
+
+        monkeypatch.setattr(crosswalk, "_payload", fixture_payload)
+        return crosswalk
 
     def test_block_group_geoid_resolves_to_its_tract(self, crosswalk):
         # FEMA publishes a 12-character block-group id; the tract is the first

@@ -554,8 +554,14 @@ def test_dashboard_html_normalizes_cross_metro_metrics():
     assert "lims_score_national_pct" in html
     assert "National percentile" in html
     assert "Metro percentile" in html
-    # Raw-only ramps are gone from layer paints.
-    assert "['get', 'lims_score']" not in html
+    # Raw scores may filter cells, but color/height paints use comparable ranks.
+    grid_layers = html.split("    function setupGridLayers() {", 1)[1].split(
+        "    function updateMetricVisuals() {", 1
+    )[0]
+    metric_paints = html.split("    function updateMetricVisuals() {", 1)[1].split(
+        "    // Legend truth", 1
+    )[0]
+    assert "['get', 'lims_score']" not in grid_layers + metric_paints
 
 
 def test_unknown_city_rejection_400():

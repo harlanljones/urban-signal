@@ -1,0 +1,23 @@
+{
+  "evidence_type": "synthetic_local_test_fixture",
+  "records": [
+    {
+      ":id": "fixture-row-1",
+      ":updated_at": "2026-09-28T12:00:00.000Z",
+      "permit_si_no": "fixture-permit-1",
+      "job__": "shared-fixture-job",
+      "issuance_date": "09/01/2026",
+      "gis_latitude": "40.7128",
+      "gis_longitude": "-74.0060"
+    },
+    {
+      ":id": "fixture-row-2",
+      ":updated_at": "2026-09-28T12:00:00.000Z",
+      "permit_si_no": "fixture-permit-2",
+      "job__": "shared-fixture-job",
+      "issuance_date": "06/01/2026",
+      "gis_latitude": "40.7128",
+      "gis_longitude": "-74.0060"
+    }
+  ]
+}

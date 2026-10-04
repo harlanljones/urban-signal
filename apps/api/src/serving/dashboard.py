@@ -48,12 +48,12 @@ def get_dashboard_html() -> str:
   <title>Urban Signal — Real-Time Geospatial Intelligence & Catalyst Forecaster</title>
   __FAVICON_LINK__
   <link rel="ai-catalog" href="/.well-known/ai-catalog.json">
-  
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  
+
   <!-- Third-party libraries are pinned by version AND by Subresource Integrity
        hash (sha384 of the published npm file), so a compromised or tampered CDN
        response is refused by the browser instead of executing. Bumping a version
@@ -62,11 +62,11 @@ def get_dashboard_html() -> str:
   <!-- MapLibre GL JS -->
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" integrity="sha384-p5cy4wHtKSqjnLUNjQ+8ffCwUp0vlLS+6lg1lc3qqXax2E1EmVCMCAimU+R0MOZH" crossorigin="anonymous" />
   <script defer src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js" integrity="sha384-3WUbXI7T+/GIrWP/5MDMjhzLyHQ+0utF3PnJ7ozD7UeN1/bbZ96Hk+Vvd024VYfW" crossorigin="anonymous"></script>
-  
+
   <!-- Chart.js (chart.umd.js ships minified; the .min.js name is a jsDelivr
        on-the-fly minification whose bytes are not stable enough to hash) -->
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js" integrity="sha384-dug+JxfBvklEQdJ4AYuBBAIScUz0bVN73xpy273gcAwHjb3qI0fXmuYNaNfdyYJG" crossorigin="anonymous"></script>
-  
+
   <!-- H3 JS -->
   <script defer src="https://unpkg.com/h3-js@4.1.0/dist/h3-js.umd.js" integrity="sha384-nKUDlg+fT0U/eEt4KWP9n034kLe/eVj6k7CVjbu6qfRhJdEyinlGajS9+9AU+UZ5" crossorigin="anonymous"></script>
 
@@ -76,11 +76,11 @@ def get_dashboard_html() -> str:
       --bg-surface: #0d1626;
       --bg-surface-elevated: #17253a;
       --bg-glass: rgba(13, 22, 38, 0.92);
-      
+
       --border-subtle: rgba(148, 163, 184, 0.14);
       --border-focus: rgba(56, 189, 248, 0.65);
       --border-active: rgba(56, 189, 248, 0.42);
-      
+
       --accent-primary: #38bdf8;
       --accent-primary-dim: rgba(56, 189, 248, 0.12);
       --accent-success: #34d399;
@@ -96,13 +96,13 @@ def get_dashboard_html() -> str:
       /* Top stop of the map ramp: "high signal" is an opportunity, not an error. */
       --signal-high: #e8a050;
       --accent-crimson: #f43f5e;
-      
+
       --borough-manhattan: #38bdf8;
       --borough-brooklyn: #34d399;
       --borough-queens: #fbbf24;
       --borough-bronx: #f43f5e;
       --borough-staten: #c084fc;
-      
+
       --division-sf-core: #38bdf8;
       --division-east-bay: #34d399;
       --division-peninsula: #fbbf24;
@@ -111,14 +111,14 @@ def get_dashboard_html() -> str:
       --division-wine-country: #e879f9;
       --division-solano: #22d3ee;
       --division-outer-contra-costa: #fb923c;
-      
+
       --text-main: #f8fafc;
       --text-secondary: #a7b5c9;
       --text-muted: #8190a6;
-      
+
       --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-mono: 'IBM Plex Mono', monospace;
-      
+
       --glass-blur: blur(12px);
       --radius-sm: 5px;
       --radius-md: 7px;
@@ -169,7 +169,7 @@ def get_dashboard_html() -> str:
       background: var(--accent-primary-dim);
       color: var(--accent-primary);
     }
-    
+
     :focus-visible {
       outline: 2px solid var(--accent-primary);
       outline-offset: 2px;
@@ -321,6 +321,30 @@ def get_dashboard_html() -> str:
       gap: 11px;
       min-width: 0;
     }
+
+    [hidden] { display: none !important; }
+    .height-control, .threshold-control { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 12px; color: var(--text-secondary); }
+    .height-control input, .threshold-control input { flex: 1; width: 60px; accent-color: var(--accent-primary); }
+    #threshold-reset, #inspector-expand { font: inherit; color: var(--text-secondary); background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: 5px; padding: 6px 8px; cursor: pointer; }
+    .source-status { font-size: 12px; line-height: 1.6; color: var(--text-secondary); margin: 8px 0 12px; }
+    .compare-card { color: var(--text-secondary); font-size: 12px; line-height: 1.6; }
+    .compare-row { padding: 9px 0; border-top: 1px solid var(--border-subtle); }
+    .city-picker-list > div { display: flex; align-items: center; gap: 4px; }
+    .city-picker-list .city-option { flex: 1; }
+    .city-favorite { min-height: 32px; min-width: 32px; }
+    #mobile-perspective, #inspector-expand { display: none; }
+    button:focus-visible, input:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 3px; }
+    .city-picker { position: relative; flex: 0 1 250px; min-width: 150px; }
+    .city-picker-toggle { width: 100%; min-height: 36px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 11px; color: var(--text-main); background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); cursor: pointer; font: 600 12px var(--font-sans); text-align: left; }
+    .city-picker-toggle::after { content: '⌄'; color: var(--text-muted); }
+    .city-picker-menu { display: none; position: absolute; top: calc(100% + 6px); left: 0; width: min(320px, 88vw); max-height: 340px; overflow: auto; z-index: 150; padding: 8px; background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); box-shadow: var(--shadow-dropdown); }
+    .city-picker.open .city-picker-menu { display: block; }
+    .city-picker-menu input { width: 100%; padding: 9px; color: var(--text-main); background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); }
+    .city-picker-list { display: grid; gap: 3px; margin-top: 6px; }
+    .city-option { width: 100%; padding: 8px; display: flex; justify-content: space-between; gap: 8px; color: var(--text-secondary); background: transparent; border: 0; border-radius: 4px; text-align: left; cursor: pointer; }
+    .city-option:hover, .city-option[aria-current="true"] { color: var(--text-main); background: var(--overlay-soft); }
+    .city-favorite { color: var(--text-muted); border: 0; background: transparent; cursor: pointer; }
+    .city-picker-note { padding: 7px 4px 2px; color: var(--text-muted); font-size: 11px; }
 
     .brand-icon {
       width: 30px;
@@ -1295,6 +1319,7 @@ def get_dashboard_html() -> str:
       height: 160px;
       width: 100%;
     }
+    .chart-block:has(.shap-empty) { height: auto; }
 
     /* Feature Data Table */
     .telemetry-table {
@@ -1459,7 +1484,7 @@ def get_dashboard_html() -> str:
     @keyframes scrimIn { from { opacity: 0; } to { opacity: 1; } }
 
     @media (max-width: 860px) {
-      /* Header: two rows — brand + city + stream above, division chips below */
+      /* Keep the active city pinned beside the brand on narrow screens. */
       header {
         height: auto;
         flex-wrap: wrap;
@@ -1470,21 +1495,8 @@ def get_dashboard_html() -> str:
       .brand-icon { width: 28px; height: 28px; flex-shrink: 0; }
       .brand-title { font-size: 12px; }
       .brand-badge { display: none; }
-      .borough-nav {
-        flex: 1 1 100%;
-        order: 5;
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        background: transparent;
-        border: none; border-radius: 0;
-        border-top: 1px solid var(--border-subtle);
-        padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
-        gap: 6px;
-      }
-      .borough-nav::-webkit-scrollbar { display: none; }
-      .borough-btn { padding: 8px 12px; min-height: 40px; font-size: 12px; flex-shrink: 0; }
+      .borough-nav { display: none; }
+      .city-picker { flex: 1 1 140px; min-width: 0; }
       .header-actions { flex: 0 0 auto; gap: 8px; }
       .telemetry-indicator { padding: 5px 7px; font-size: 11px; }
       .telemetry-indicator #stream-status-text { display: none; }
@@ -1503,12 +1515,20 @@ def get_dashboard_html() -> str:
       }
       .sidebar-left { left: 0; overflow: hidden; }
       .sidebar-right {
-        right: 0;
-        width: min(344px, 92vw);
-        transform: translateX(100%);
+        left: 0; right: 0; top: auto; bottom: calc(78px + env(safe-area-inset-bottom));
+        width: 100%; max-height: min(48vh, 420px);
+        transform: translateY(100%);
+        border: 1px solid var(--border-subtle); border-radius: 16px 16px 0 0;
+        padding-bottom: 12px;
       }
       body.drawer-left-open .sidebar-left { transform: translateX(0); }
-      body.drawer-right-open .sidebar-right { transform: translateX(0); }
+      body.drawer-right-open .sidebar-right { transform: translateY(0); }
+      body.inspector-expanded .sidebar-right { max-height: 76vh; }
+      body.drawer-right-open .map-legend-card { display: none; }
+      body.drawer-right-open .drawer-scrim { background: rgba(4, 8, 16, 0.12); backdrop-filter: none; }
+      #mobile-perspective, #inspector-expand { display: block; }
+      #mobile-perspective { position: relative; z-index: 96; font-size: 12px; font-weight: 600; }
+      .map-controls-group { z-index: 96; }
       .drawer-grip { display: flex; }
       #inspector-content { height: auto !important; flex: 1 1 auto; min-height: 0 !important; }
       .mobile-toolbar { display: flex; }
@@ -1551,6 +1571,10 @@ def get_dashboard_html() -> str:
         padding: 8px 12px;
       }
       .map-legend-card .legend-bar { margin-bottom: 6px; }
+      .map-legend-card:not(.expanded) .legend-ticks,
+      .map-legend-card:not(.expanded) .legend-note,
+      .map-legend-card:not(.expanded) .legend-bar { display: none; }
+      .map-legend-card:not(.expanded) { bottom: calc(max(12px, env(safe-area-inset-bottom)) + 70px); width: auto; padding: 8px 10px; }
 
       /* Phones pinch to zoom, so drop the +/- buttons; lift the required map
          credit above the thumb toolbar instead of under it. */
@@ -1602,11 +1626,15 @@ def get_dashboard_html() -> str:
       </div>
     </div>
 
-    <!-- Metro Chips: navigation only. All metros' data renders together; a
-         chip flies the camera to its metro and scopes the catalyst feed. -->
-    <nav class="borough-nav" id="metro-chips" role="navigation" aria-label="Metro navigation">
-      <!-- Populated dynamically from the snapshot manifest -->
-    </nav>
+    <!-- Pinned, searchable active-city navigation. -->
+    <div class="city-picker" id="city-picker">
+      <button class="city-picker-toggle" id="city-picker-toggle" type="button" aria-expanded="false" aria-haspopup="dialog">All Metros</button>
+      <div class="city-picker-menu" role="dialog" aria-label="Choose a city">
+        <input id="city-picker-search" type="search" placeholder="Search cities" aria-label="Search cities">
+        <div class="city-picker-note">Recent and starred cities stay at the top.</div>
+        <div class="city-picker-list" id="metro-chips"></div>
+      </div>
+    </div>
 
     <!-- Header Actions & Search -->
     <div class="header-actions">
@@ -1622,9 +1650,9 @@ def get_dashboard_html() -> str:
       </div>
 
       <!-- Live Stream Status -->
-      <div class="telemetry-indicator" id="stream-status-pill" title="Streaming real-time municipal telemetries">
-        <span class="pulse-dot" id="stream-pulse-dot"></span>
-        <span id="stream-status-text">Live</span>
+      <div class="telemetry-indicator snapshot" id="stream-status-pill" title="Published snapshot; freshness shown when available">
+        <span class="pulse-dot static" id="stream-pulse-dot"></span>
+        <span id="stream-status-text">Snapshot</span>
       </div>
     </div>
   </header>
@@ -1673,6 +1701,13 @@ def get_dashboard_html() -> str:
             <option value="prob_18m_macro_outperformance">18M Macro Outperformance</option>
           </select>
         </div>
+        <label class="height-control">3D height <input id="height-strength" type="range" min="0" max="2" step="0.1" value="1" aria-label="3D height strength"><span id="height-strength-value">1.0×</span></label>
+        <div class="threshold-control"><label for="score-threshold">Minimum score</label> <input id="score-threshold" type="range" min="0" max="100" step="1" value="0" aria-label="Minimum catalyst score"><span id="score-threshold-value">Any</span><button type="button" id="threshold-reset">Reset</button></div>
+      </div>
+
+      <div class="panel-section" id="comparison-section">
+        <div class="panel-header-row"><span class="section-title">Compare locations</span><button type="button" id="comparison-clear" class="city-favorite" aria-label="Clear comparison">Clear</button></div>
+        <div class="compare-card" id="comparison-list">Pin up to three selected locations from Inspect.</div>
       </div>
 
       <!-- Real-Time Catalyst Feed -->
@@ -1694,8 +1729,7 @@ def get_dashboard_html() -> str:
 
       <!-- Floating Quick Tools -->
       <div class="map-controls-group">
-        <!-- 3D/2D lives in the sidebar's segmented control, which shows the
-             current mode; one control, not two. -->
+        <button id="mobile-perspective" class="map-tool-btn" type="button" aria-label="Switch map to 2D" onclick="setPerspective(currentPerspective === '3D' ? '2D' : '3D')">2D</button>
         <button class="map-tool-btn" type="button" title="Reset view (all metros)" aria-label="Reset view to all metros" onclick="selectMetro(null)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
         </button>
@@ -1713,6 +1747,7 @@ def get_dashboard_html() -> str:
         <div class="legend-note">
           <span class="legend-key-row">Height &prop; value (3D view) &middot; percentile 0&ndash;100</span>
           <span class="legend-key-row"><span class="legend-key-swatch baseline"></span><span>Registry baseline &mdash; no precomputed snapshot</span></span>
+          <span class="legend-key-row" id="coverage-status">Coverage follows published tiles; blank cells have no published value.</span>
           <span class="legend-key-row" id="legend-no-data" hidden><span class="legend-key-swatch no-data"></span><span>No data &mdash; outside this layer&rsquo;s coverage</span></span>
           <span class="legend-attribution" id="legend-attribution" hidden></span>
         </div>
@@ -1733,6 +1768,7 @@ def get_dashboard_html() -> str:
       <!-- Mobile drawer header (desktop-inert) -->
       <div class="drawer-grip">
         <span class="drawer-grip-title">Parcel Inspector</span>
+        <button id="inspector-expand" type="button" aria-expanded="false">Expand</button>
         <button class="drawer-close" type="button" data-close aria-label="Close inspector">&times;</button>
       </div>
       <div id="inspector-content" style="height: 100%;">
@@ -1778,12 +1814,17 @@ __METRO_META__
     let shapChart = null;
     let currentPerspective = '3D';
     let currentMetric = 'lims_score';
+    let heightStrength = 1;
+    let minimumCatalystScore = 0;
+    const comparisonPins = [];
     // Bay Area context layers (US-439..443) published by the snapshot's
     // manifest.context_layers block: key -> {label, layer, unit, attribution}.
     // Empty when the snapshot carries no context table, so no dead options.
     let CONTEXT_METRICS = {};
     const NO_DATA_FILL = 'rgba(113, 129, 152, 0.18)';
     let selectedH3Index = null;
+    let selectedLocationH3Index = null;
+    let selectedGeoAnchor = null;
     let hoveredH3Index = null;
     let catalystAlerts = [];
 
@@ -1796,8 +1837,12 @@ __METRO_META__
     const tilesInFlight = new Set();
     let tileFetchesActive = 0;
     let tileLoadGeneration = 0;
-    let activeLodRes = 9; // LOD level whose parents are currently being fetched
+    let activeLodRes = 7; // LOD level whose parents are currently being fetched
     let gridDirty = false;
+    let renderedLodRes = null;
+    let lodSwapPending = false;
+    let lodRequiredParents = [];
+    let gridHandoff = null;
     let viewportDebounceTimer = 0;
     let nationalDebounceTimer = 0;
     const TILE_PARENTS_PER_REQUEST = 32;
@@ -1810,9 +1855,11 @@ __METRO_META__
     const LOD_PARENT_STEP = { 7: 0.45, 8: 0.45, 9: 0.14 };
     const LOD_PARENT_SAMPLES = { 7: 800, 8: 800, 9: 4000 };
     function lodForZoom(z) {
-      if (z >= 11) return 9;
-      if (z >= 9) return 8;
-      return 7;
+      if (z >= 11.1) return 9;
+      if (z < 8.9) return 7;
+      if (activeLodRes === 9 && z >= 10.9) return 9;
+      if (activeLodRes === 7 && z < 9.1) return 7;
+      return 8;
     }
 
     // National overlay cache: per-resolution res-3-parent -> features[]
@@ -1852,14 +1899,14 @@ __METRO_META__
     function showToast(message, type = 'error', actionLabel = null, actionFn = null) {
       const container = document.getElementById('status-toast-container');
       if (!container) return;
-      
+
       const toast = document.createElement('div');
       toast.className = `toast-banner ${type}`;
       toast.innerHTML = `
         <span>${escapeHtml(message)}</span>
         ${actionLabel ? `<button class="toast-btn" id="toast-action-btn">${escapeHtml(actionLabel)}</button>` : ''}
       `;
-      
+
       if (actionLabel && actionFn) {
         const btn = toast.querySelector('#toast-action-btn');
         if (btn) {
@@ -1869,7 +1916,7 @@ __METRO_META__
           };
         }
       }
-      
+
       container.appendChild(toast);
       setTimeout(() => {
         if (toast.parentNode) {
@@ -2101,7 +2148,7 @@ __METRO_META__
       return [
         '*',
         ['max', 0, ['-', ['coalesce', ['get', `${currentMetric}_national_pct`], ['get', 'jobs_pct'], ['get', 'workers_pct']], 40]],
-        factor
+        factor * heightStrength
       ];
     }
 
@@ -2130,9 +2177,12 @@ __METRO_META__
     function updateNationalLayerPaint() {
       if (!map) return;
       if (map.getLayer('national-h3-fill')) {
+        map.setPaintProperty('national-h3-fill', 'fill-color-transition', { duration: REDUCED_MOTION ? 0 : 380 });
         map.setPaintProperty('national-h3-fill', 'fill-color', nationalColorExpression());
       }
       if (map.getLayer('national-h3-extrusion')) {
+        map.setPaintProperty('national-h3-extrusion', 'fill-extrusion-color-transition', { duration: REDUCED_MOTION ? 0 : 380 });
+        map.setPaintProperty('national-h3-extrusion', 'fill-extrusion-height-transition', { duration: REDUCED_MOTION ? 0 : 380 });
         map.setPaintProperty('national-h3-extrusion', 'fill-extrusion-color', nationalColorExpression());
         map.setPaintProperty('national-h3-extrusion', 'fill-extrusion-height', nationalHeightExpression());
       }
@@ -2410,23 +2460,71 @@ __METRO_META__
 
     function renderMetroChips() {
       const nav = document.getElementById('metro-chips');
+      const toggle = document.getElementById('city-picker-toggle');
       if (!nav) return;
       const metros = (snapshotManifest && snapshotManifest.metro_index)
         ? [...snapshotManifest.metro_index]
         : Object.keys(METRO_META).map((cityId) => ({ city_id: cityId, name: cityDisplayName(cityId) }));
       metros.sort((a, b) => String(a.name).localeCompare(String(b.name)));
-      const chips = [{ id: null, label: 'All Metros' }]
-        .concat(metros.map((m) => ({ id: m.city_id, label: m.name || cityDisplayName(m.city_id) })));
-      nav.replaceChildren(...chips.map((chip) => {
-        const isActive = (chip.id === null && activeMetroChip === null) || (chip.id !== null && activeMetroChip === chip.id);
-        const btn = document.createElement('button');
-        btn.className = `borough-btn ${isActive ? 'active' : ''}`;
-        btn.dataset.metro = chip.id || '';
-        btn.setAttribute('aria-pressed', String(isActive));
-        btn.textContent = chip.label;
-        btn.addEventListener('click', () => selectMetro(chip.id));
-        return btn;
+      const activeName = activeMetroChip ? cityDisplayName(activeMetroChip) : 'All Metros';
+      if (toggle) toggle.textContent = activeName;
+      let recent = [], favorites = [];
+      try { recent = JSON.parse(localStorage.getItem('us-recent-cities') || '[]'); favorites = JSON.parse(localStorage.getItem('us-favorite-cities') || '[]'); } catch (_) {}
+      if (!Array.isArray(recent)) recent = []; if (!Array.isArray(favorites)) favorites = [];
+      const query = (document.getElementById('city-picker-search')?.value || '').trim().toLowerCase();
+      const byId = new Map(metros.map((m) => [m.city_id, { id: m.city_id, label: m.name || cityDisplayName(m.city_id) }]));
+      const entries = [{ id: null, label: 'All Metros' }, ...favorites.map((id) => byId.get(id)).filter(Boolean), ...recent.map((id) => byId.get(id)).filter(Boolean), ...metros.map((m) => ({ id: m.city_id, label: m.name || cityDisplayName(m.city_id) }))];
+      const seen = new Set();
+      const options = entries.filter((item) => { const key = item.id || ''; if (seen.has(key)) return false; seen.add(key); return !query || item.label.toLowerCase().includes(query); });
+      nav.replaceChildren(...options.map((item) => {
+        const row = document.createElement('div');
+        const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'city-option';
+        btn.setAttribute('aria-current', String((item.id || null) === activeMetroChip)); btn.textContent = item.label;
+        btn.addEventListener('click', () => { selectMetro(item.id); document.getElementById('city-picker').classList.remove('open'); document.getElementById('city-picker-toggle').setAttribute('aria-expanded', 'false'); document.getElementById('city-picker-toggle').focus(); });
+        row.appendChild(btn);
+        if (item.id) {
+          const star = document.createElement('button'); star.type = 'button'; star.className = 'city-favorite'; star.setAttribute('aria-label', `${favorites.includes(item.id) ? 'Unstar' : 'Star'} ${item.label}`); star.textContent = favorites.includes(item.id) ? '★' : '☆';
+          star.addEventListener('click', (e) => { e.stopPropagation(); const next = favorites.includes(item.id) ? favorites.filter((id) => id !== item.id) : [...favorites, item.id]; try { localStorage.setItem('us-favorite-cities', JSON.stringify(next)); } catch (_) {} renderMetroChips(); }); row.appendChild(star);
+        }
+        return row;
       }));
+    }
+
+    function wireCityPicker() {
+      const picker = document.getElementById('city-picker'), toggle = document.getElementById('city-picker-toggle'), search = document.getElementById('city-picker-search');
+      toggle?.addEventListener('click', () => { const open = picker.classList.toggle('open'); toggle.setAttribute('aria-expanded', String(open)); if (open) search.focus(); });
+      search?.addEventListener('input', renderMetroChips);
+      document.addEventListener('keydown', e => { if (e.key === 'Escape' && picker?.classList.contains('open')) { picker.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); toggle.focus(); } });
+      document.addEventListener('click', (e) => { if (picker && !picker.contains(e.target)) { picker.classList.remove('open'); toggle?.setAttribute('aria-expanded', 'false'); } });
+    }
+
+    function wireDashboardControls() {
+      document.getElementById('inspector-expand')?.addEventListener('click', e => {
+        const expanded = document.body.classList.toggle('inspector-expanded');
+        e.currentTarget.setAttribute('aria-expanded', String(expanded));
+        e.currentTarget.textContent = expanded ? 'Collapse' : 'Expand';
+        syncMobileMapPadding();
+      });
+      const strength = document.getElementById('height-strength');
+      strength?.addEventListener('input', () => { heightStrength = Number(strength.value); document.getElementById('height-strength-value').textContent = heightStrength.toFixed(1) + '×'; updateMetricVisuals(); updateNationalLayerPaint(); });
+      const threshold = document.getElementById('score-threshold');
+      threshold?.addEventListener('input', () => { minimumCatalystScore = Number(threshold.value); document.getElementById('score-threshold-value').textContent = minimumCatalystScore === 0 ? 'Any' : minimumCatalystScore.toFixed(0); renderCatalystFeed(); applyScoreThreshold(); });
+      document.getElementById('threshold-reset')?.addEventListener('click', () => { if (threshold) { threshold.value = '0'; threshold.dispatchEvent(new Event('input', { bubbles: true })); } });
+      document.getElementById('comparison-clear')?.addEventListener('click', () => { comparisonPins.length = 0; renderComparisonPins(); const pin = document.getElementById('pin-comparison'); if (pin) { pin.textContent = '＋ Compare'; pin.setAttribute('aria-pressed', 'false'); } });
+      document.querySelector('.map-legend-card')?.addEventListener('click', (e) => { if (isMobileLayout() && e.target.closest('.legend-header')) e.currentTarget.classList.toggle('expanded'); });
+    }
+
+    function applyScoreThreshold() {
+      if (!map) return;
+      cancelGridHandoff();
+      ['h3-hex-fill', 'h3-hex-extrusion', 'h3-hex-line'].forEach((id) => { if (map.getLayer(id)) map.setFilter(id, minimumCatalystScore > 0 ? ['>=', ['coalesce', ['get', 'lims_score'], 0], minimumCatalystScore] : null); });
+    }
+
+    function renderComparisonPins() {
+      const el = document.getElementById('comparison-list');
+      if (!el) return;
+      if (!comparisonPins.length) { el.textContent = 'Pin up to three selected locations from Inspect.'; return; }
+      el.replaceChildren(...comparisonPins.map((pin) => { const row = document.createElement('div'); row.className = 'compare-row'; row.textContent = `${pin.name} · ${pin.score} · 6M ${pin.forecast} (${pin.range}) · ${pin.source} · Drivers ${pin.drivers} · Source age unknown${pin.published ? ' · Snapshot ' + pin.published : ''}`; return row; }));
     }
 
     // Metro chips are navigation, not data scoping: every metro's tiles stay
@@ -2434,6 +2532,7 @@ __METRO_META__
     // scopes only the catalyst feed list.
     function selectMetro(cityId) {
       activeMetroChip = cityId || null;
+      if (cityId) { try { const recent = JSON.parse(localStorage.getItem('us-recent-cities') || '[]').filter((id) => id !== cityId); localStorage.setItem('us-recent-cities', JSON.stringify([cityId, ...recent].slice(0, 5))); } catch (_) {} }
       renderMetroChips();
       renderCatalystFeed();
       if (!map) return;
@@ -2567,12 +2666,14 @@ __METRO_META__
       const inspector = document.getElementById('inspector-content');
       if (inspector) INSPECTOR_EMPTY_HTML = inspector.innerHTML;
       wireMobileChrome();
+      wireDashboardControls();
 
       const linked = deepLinkedCity();
       initMap();
 
       await fetchManifest();
       renderMetroChips();
+      wireCityPicker();
       if (linked) {
         selectMetro(linked);
       } else {
@@ -2612,6 +2713,7 @@ __METRO_META__
       if (map) map.resize();
       if (!isMobileLayout()) closeMobilePanels();
       syncMobileChrome();
+      syncMobileMapPadding();
     });
 
     // ----- Mobile drawer / search-sheet orchestration -----
@@ -2643,13 +2745,32 @@ __METRO_META__
       });
     }
 
+    let mobilePaddingQueued = false;
+    function syncMobileMapPadding() {
+      if (!map) return;
+      // Do not interrupt catalyst/search flights when their inspector opens.
+      if (map.isMoving()) {
+        if (!mobilePaddingQueued) {
+          mobilePaddingQueued = true;
+          map.once('moveend', () => { mobilePaddingQueued = false; syncMobileMapPadding(); });
+        }
+        return;
+      }
+      const sheet = document.querySelector('.sidebar-right');
+      const visible = isMobileLayout() && document.body.classList.contains('drawer-right-open');
+      const bottom = visible && sheet ? Math.min(map.getContainer().clientHeight * 0.85,
+        sheet.offsetHeight + (parseFloat(getComputedStyle(sheet).bottom) || 0)) : 0;
+      if (Math.abs(map.getPadding().bottom - bottom) < 0.5) return;
+      map.easeTo({ padding: { top: 0, right: 0, bottom, left: 0 }, duration: REDUCED_MOTION ? 0 : 220 });
+    }
+
     function closeMobilePanels() {
       const wasOpen = document.body.classList.contains('drawer-left-open')
         || document.body.classList.contains('drawer-right-open')
         || document.body.classList.contains('search-open');
       document.body.classList.remove('drawer-left-open', 'drawer-right-open', 'search-open');
       syncToolbarActive();
-      if (wasOpen && map) map.resize();
+      if (wasOpen && map) { map.resize(); syncMobileMapPadding(); }
     }
 
     function openMobilePanel(which) {
@@ -2661,7 +2782,7 @@ __METRO_META__
       if (!cls) return;
       document.body.classList.add(cls);
       syncToolbarActive();
-      if (map) requestAnimationFrame(() => map.resize());
+      if (map) requestAnimationFrame(() => { map.resize(); syncMobileMapPadding(); });
       if (which === 'search') {
         const input = document.getElementById('global-search-input');
         if (input) setTimeout(() => input.focus(), 60);
@@ -2716,7 +2837,7 @@ __METRO_META__
       }
 
       const matches = Object.entries(SUBMARKETS).filter(([name, meta]) => {
-        return name.toLowerCase().includes(q) || 
+        return name.toLowerCase().includes(q) ||
                normalizeBorough(meta.borough).toLowerCase().includes(q) ||
                (meta.description && meta.description.toLowerCase().includes(q));
       }).slice(0, 8);
@@ -3026,27 +3147,28 @@ __METRO_META__
       const hint = document.getElementById('zoom-hint');
       if (hint) hint.hidden = true; // dead-zone hint retired; LOD pyramid covers country view
       if (z < ZOOM_FLOOR) {
+        cancelGridHandoff();
         setHexLayersVisible(false);
         return; // below metro band: do not fetch metro tiles
       }
       // Pick the LOD level for this zoom and fetch only that level's parents.
       const res = lodForZoom(z);
       if (res !== activeLodRes) {
-        // Res 7 and 8 share parent indexes, but contain different cells.
-        // Retire both rendered cells and request bookkeeping on every LOD swap.
+        // Stage the incoming generation without blanking the outgoing grid.
+        cancelGridHandoff();
+        lodSwapPending = true;
         tileLoadGeneration += 1;
         activeLodRes = res;
         pendingTileParents.length = 0;
         fetchedTiles.clear();
         tileFeatures.clear();
         gridDirty = true;
-        applyGridData();
       }
       const tileIndexes = snapshotManifest.tile_indexes || {};
       const tileIndex = tileIndexes[String(res)] || snapshotManifest.tile_index || {};
-      const candidates = parentsCoveringBounds(map.getBounds(), LOD_TO_PARENT_RES[res] || 5)
-        .filter((parent) => Object.prototype.hasOwnProperty.call(tileIndex, parent))
-        .filter((parent) => !fetchedTiles.has(parent) && !tilesInFlight.has(`${tileLoadGeneration}:${parent}`));
+      lodRequiredParents = parentsCoveringBounds(map.getBounds(), LOD_TO_PARENT_RES[res] || 5)
+        .filter((parent) => Object.prototype.hasOwnProperty.call(tileIndex, parent));
+      const candidates = lodRequiredParents.filter((parent) => !fetchedTiles.has(parent) && !tilesInFlight.has(`${tileLoadGeneration}:${parent}`));
 
       const center = map.getCenter();
       candidates.sort((a, b) => parentDistance(a, center) - parentDistance(b, center));
@@ -3055,6 +3177,7 @@ __METRO_META__
       pendingTileParents.push(...candidates);
       activeLodRes = res;
       drainTileQueue();
+      applyGridData();
     }
 
     function parentDistance(parent, center) {
@@ -3104,15 +3227,118 @@ __METRO_META__
       if (features.length) gridDirty = true;
     }
 
+    // Interpolate only actual H3 polygons; properties and final geography stay intact.
+    function handoffGeometry(feature, progress, fromRes, toRes, outgoing = false) {
+      if (!feature.geometry || feature.geometry.type !== 'Polygon') return feature;
+      try {
+        const cell = feature.properties.h3_index;
+        const [lat, lng] = h3.cellToLatLng(cell);
+        let origin = [lng, lat];
+        let scale = outgoing ? 1 - progress * 0.35 : 0.65 + progress * 0.35;
+        if (toRes > fromRes && !outgoing) {
+          const [parentLat, parentLng] = h3.cellToLatLng(h3.cellToParent(cell, fromRes));
+          origin = [parentLng, parentLat];
+        } else if (toRes < fromRes && outgoing) {
+          const [parentLat, parentLng] = h3.cellToLatLng(h3.cellToParent(cell, toRes));
+          origin = [parentLng, parentLat];
+        }
+        const t = outgoing ? 1 - progress : progress;
+        const center = [origin[0] + (lng - origin[0]) * t, origin[1] + (lat - origin[1]) * t];
+        return { ...feature, geometry: { ...feature.geometry, coordinates: feature.geometry.coordinates.map(ring => ring.map(([x, y]) => [center[0] + (x - lng) * scale, center[1] + (y - lat) * scale])) } };
+      } catch (_) { return feature; }
+    }
+
+    function cancelGridHandoff() {
+      if (!gridHandoff) return;
+      cancelAnimationFrame(gridHandoff.frame);
+      for (const entry of gridHandoff.layers) {
+        if (map.getLayer(entry.id)) {
+          map.setPaintProperty(entry.id, entry.property, entry.opacity);
+          map.setPaintProperty(entry.id, entry.property + '-transition', entry.transition || {});
+        }
+        if (map.getLayer(entry.ghost)) map.removeLayer(entry.ghost);
+      }
+      if (map.getSource('h3-outgoing-source')) map.removeSource('h3-outgoing-source');
+      gridHandoff = null;
+      if (gridGeoJSON && map.getSource('h3-grid-source')) map.getSource('h3-grid-source').setData(gridGeoJSON);
+    }
+
+    function renderGridHandoff(previous, next, fromRes, toRes) {
+      cancelGridHandoff();
+      if (REDUCED_MOTION || !previous?.features.length || !next.features.length || fromRes === toRes) {
+        map.getSource('h3-grid-source').setData(next);
+        return;
+      }
+      const layers = [];
+      map.addSource('h3-outgoing-source', { type: 'geojson', data: previous });
+      for (const [id, property] of [['h3-hex-fill', 'fill-opacity'], ['h3-hex-extrusion', 'fill-extrusion-opacity'], ['h3-hex-line', 'line-opacity']]) {
+        const spec = map.getStyle().layers.find(layer => layer.id === id);
+        if (!spec) continue;
+        const ghost = id + '-outgoing';
+        const opacity = map.getPaintProperty(id, property) ?? 1;
+        const copy = JSON.parse(JSON.stringify(spec));
+        copy.id = ghost; copy.source = 'h3-outgoing-source';
+        map.addLayer(copy, id);
+        const transition = map.getPaintProperty(id, property + '-transition');
+        map.setPaintProperty(id, property + '-transition', { duration: 0 });
+        map.setPaintProperty(ghost, property + '-transition', { duration: 0 });
+        layers.push({ id, ghost, property, opacity, transition });
+      }
+      const generation = tileLoadGeneration;
+      let started = null;
+      const morph = previous.features.length + next.features.length <= 2500;
+      gridHandoff = { frame: 0, layers };
+      const tick = now => {
+        if (!gridHandoff || generation !== tileLoadGeneration) return;
+        const t = Math.min(1, (now - started) / 260);
+        const eased = t * t * (3 - 2 * t);
+        for (const entry of layers) {
+          const opacityAt = weight => Array.isArray(entry.opacity) ? ['*', entry.opacity, weight] : entry.opacity * weight;
+          map.setPaintProperty(entry.id, entry.property, opacityAt(eased));
+          map.setPaintProperty(entry.ghost, entry.property, opacityAt(1 - eased));
+        }
+        if (morph || t === 0 || t === 1) map.getSource('h3-grid-source').setData(morph && t < 1 ? { type: 'FeatureCollection', features: next.features.map(f => handoffGeometry(f, eased, fromRes, toRes)) } : next);
+        if (morph) map.getSource('h3-outgoing-source').setData({ type: 'FeatureCollection', features: previous.features.map(f => handoffGeometry(f, eased, fromRes, toRes, true)) });
+        if (t < 1) gridHandoff.frame = requestAnimationFrame(tick);
+        else cancelGridHandoff();
+      };
+      const begin = now => {
+        if (!gridHandoff || generation !== tileLoadGeneration) return;
+        // Index the outgoing clone before changing the still-visible source.
+        if (!map.isSourceLoaded('h3-outgoing-source')) { gridHandoff.frame = requestAnimationFrame(begin); return; }
+        started = now;
+        tick(now);
+      };
+      gridHandoff.frame = requestAnimationFrame(begin);
+    }
+
     function applyGridData() {
       if (!gridDirty || !map || !map.getSource('h3-grid-source')) return;
+      // A failed partial batch must be retried before retiring the visible LOD.
+      if (lodSwapPending && lodRequiredParents.some(parent => !fetchedTiles.has(parent))) return;
       gridDirty = false;
-      // LRU-by-distance eviction to cap memory and avoid frame spikes
       evictDistantGridFeatures();
+      const previous = gridGeoJSON;
+      const previousRes = renderedLodRes;
       gridGeoJSON = { type: 'FeatureCollection', features: [...tileFeatures.values()] };
-      map.getSource('h3-grid-source').setData(gridGeoJSON);
-      // Programmatic camera jumps can leave the repaint cycle suppressed;
-      // nudge it so freshly merged tiles index immediately.
+      if (lodSwapPending) renderGridHandoff(previous, gridGeoJSON, previousRes, activeLodRes);
+      else { cancelGridHandoff(); map.getSource('h3-grid-source').setData(gridGeoJSON); }
+      lodSwapPending = false;
+      renderedLodRes = activeLodRes;
+      if (selectedGeoAnchor && selectedH3Index && typeof h3 !== 'undefined' && h3.latLngToCell) {
+        const nextIndex = h3.latLngToCell(selectedGeoAnchor.lat, selectedGeoAnchor.lng, activeLodRes);
+        const match = tileFeatures.get(nextIndex);
+        if (match && nextIndex !== selectedH3Index) {
+          // Only the map outline follows display LOD; inspector and comparison
+          // keep the originally selected record, never a different forecast.
+          selectedH3Index = nextIndex;
+          ['h3-hex-selected', 'h3-hex-selected-fill'].forEach(id => {
+            if (map.getLayer(id)) map.setFilter(id, ['==', ['get', 'h3_index'], nextIndex]);
+          });
+        }
+      }
+      const coverage = document.getElementById('coverage-status');
+      if (coverage) coverage.textContent = tileFeatures.size ? 'Published grid coverage · source age unknown' : 'No published cells in this view';
       map.triggerRepaint();
     }
 
@@ -3245,6 +3471,7 @@ __METRO_META__
 
     function updateMetricVisuals() {
       if (!map) return;
+      cancelGridHandoff();
       const metricEl = document.getElementById('metric-select');
       if (!metricEl) return;
       currentMetric = metricEl.value;
@@ -3281,12 +3508,13 @@ __METRO_META__
         92, 0.88
       ];
       const opacityExpr = contextMetric ? ['case', ['has', pctProp], valueOpacity, 1] : valueOpacity;
-      const heightFactor = {
+      const heightBase = {
         lims_score: ['*', ['max', 0, ['-', ['coalesce', ['get', pctProp], 50], 40]], 18],
         delta_6m_p50: ['*', ['max', 0, ['coalesce', ['get', pctProp], 50]], 40],
         delta_12m_spillover: ['*', ['max', 0, ['coalesce', ['get', pctProp], 50]], 45],
         prob_18m_macro_outperformance: ['*', ['max', 0, ['coalesce', ['get', pctProp], 50]], 9]
       }[currentMetric] || ['*', ['coalesce', ['get', pctProp], 0], 12];
+      const heightFactor = ['*', heightBase, heightStrength];
 
       if (map.getLayer('h3-hex-fill')) {
         map.setPaintProperty('h3-hex-fill', 'fill-color', colorExpr);
@@ -3294,10 +3522,14 @@ __METRO_META__
       }
       if (map.getLayer('h3-hex-extrusion')) {
         map.setPaintProperty('h3-hex-extrusion', 'fill-extrusion-color', colorExpr);
+        map.setPaintProperty('h3-hex-extrusion', 'fill-extrusion-color-transition', { duration: REDUCED_MOTION ? 0 : 380 });
+        map.setPaintProperty('h3-hex-extrusion', 'fill-extrusion-height-transition', { duration: REDUCED_MOTION ? 0 : 380 });
         map.setPaintProperty('h3-hex-extrusion', 'fill-extrusion-height', heightFactor);
       }
+      if (map.getLayer('h3-hex-fill')) map.setPaintProperty('h3-hex-fill', 'fill-color-transition', { duration: REDUCED_MOTION ? 0 : 380 });
       // Reflect metric change on the national LOD overlay
       updateNationalLayerPaint();
+      applyScoreThreshold();
     }
 
     // Legend truth (US-431): the gradient bar and its stop ticks are
@@ -3352,6 +3584,9 @@ __METRO_META__
       }
     }
     function setPerspective(mode) {
+      cancelGridHandoff();
+      const quick = document.getElementById('mobile-perspective');
+      if (quick) { quick.textContent = mode === '3D' ? '2D' : '3D'; quick.setAttribute('aria-label', 'Switch map to ' + quick.textContent); }
       currentPerspective = mode;
       const btn3d = document.getElementById('btn-3d');
       const btn2d = document.getElementById('btn-2d');
@@ -3447,7 +3682,7 @@ __METRO_META__
       if (!container) return;
 
       const filtered = catalystAlerts.filter(c => (
-        !activeMetroChip || c.city_id === activeMetroChip
+        (!activeMetroChip || c.city_id === activeMetroChip) && safeNumber(c.lims_score, 0) >= minimumCatalystScore
       ));
 
 
@@ -3469,7 +3704,7 @@ __METRO_META__
         const bClass = getBoroughClass(rawBorough);
         const lat = c.centroid_lat != null ? c.centroid_lat : (subInfo ? subInfo.meta.lat : null);
         const lng = c.centroid_lng != null ? c.centroid_lng : (subInfo ? subInfo.meta.lng : null);
-        const isSelected = selectedH3Index === c.h3_index;
+        const isSelected = selectedLocationH3Index === c.h3_index;
 
         // A real button: focusable, and Enter/Space activate it for free.
         const item = document.createElement('button');
@@ -3596,6 +3831,8 @@ __METRO_META__
     // the map gets the width; the body class drives that (CSS, >860px only).
     function clearSelection() {
       selectedH3Index = null;
+      selectedLocationH3Index = null;
+      selectedGeoAnchor = null;
       if (map) {
         ['h3-hex-selected', 'h3-hex-selected-fill'].forEach((id) => {
           if (map.getLayer(id)) map.setFilter(id, ['==', ['get', 'h3_index'], '']);
@@ -3608,9 +3845,15 @@ __METRO_META__
       renderCatalystFeed();
     }
 
-    function handleHexSelection(props) {
+    function handleHexSelection(props, preserveAnchor = false) {
       if (!props) return;
       selectedH3Index = props.h3_index;
+      selectedLocationH3Index = props.h3_index;
+      const anchorLat = Number(props.centroid_lat), anchorLng = Number(props.centroid_lng);
+      if (!preserveAnchor) {
+        if (props.centroid_lat != null && props.centroid_lng != null && Number.isFinite(anchorLat) && Number.isFinite(anchorLng)) selectedGeoAnchor = { lat: anchorLat, lng: anchorLng };
+        else if (props.h3_index && typeof h3 !== 'undefined') { const [lat, lng] = h3.cellToLatLng(props.h3_index); selectedGeoAnchor = { lat, lng }; }
+      }
       document.body.classList.remove('inspector-empty');
       // Mobile: the inspector is an off-canvas drawer, so surface it on every
       // selection (map click, catalyst item, or search) — otherwise the user
@@ -3660,6 +3903,7 @@ __METRO_META__
           <div class="parcel-header">
             <div class="parcel-title-row">
               <div class="parcel-name">${esc(submarketName)}</div>
+              <button class="city-favorite" type="button" id="pin-comparison">＋ Compare</button>
               ${boroughName ? `<span class="borough-tag ${esc(bClass)}">${esc(boroughName)}</span>` : ''}
             </div>
             <div class="parcel-meta-sub">
@@ -3674,7 +3918,7 @@ __METRO_META__
             <div class="score-hero-left">
               <span class="score-hero-label">${baselineOnly ? 'Registry Baseline Momentum' : 'LIMS Momentum Score'}</span>
               <span class="score-status-pill ${baselineOnly ? 'baseline' : isCatalyst ? 'catalyst' : ''}">
-                ${baselineOnly ? '○ Baseline — no model snapshot' : isCatalyst ? '● Catalyst' : '● Active signal'}
+                ${baselineOnly ? '○ Registry-derived estimate' : '○ Estimate · source status unknown'}
               </span>
             </div>
             <div class="score-hero-val ${baselineOnly ? 'baseline' : isCatalyst ? 'catalyst' : ''}">
@@ -3686,7 +3930,7 @@ __METRO_META__
               ? `
           <div>
             <div class="forecast-section-title">Multi-Horizon Projections</div>
-            <div class="shap-empty">No precomputed model snapshot covers this cell yet. Fly to a rendered hexagon (or open a catalyst alert) for the full 6/12/18-month forecast with SHAP attribution.</div>
+            <div class="shap-empty">No precomputed model snapshot covers this cell yet. Fly to a rendered hexagon (or open a catalyst alert) for the published estimates. Attribution is available only when supplied.</div>
           </div>
 
           <div>
@@ -3713,6 +3957,7 @@ __METRO_META__
               : `
           <div>
             <div class="forecast-section-title">Multi-Horizon Projections</div>
+            <div class="source-status">Registry-derived estimate · input source status unknown; inputs are not verified live.${snapshotManifest && snapshotManifest.generated_at ? ` Snapshot published ${esc(snapshotManifest.generated_at.slice(0, 16).replace('T', ' ') + ' UTC')}.` : ''}</div>
             <div class="quantiles-card">
               <div class="quantiles-header">
                 <span>6-Month Forecast Quantiles</span>
@@ -3759,6 +4004,28 @@ __METRO_META__
       `;
 
       renderShapChart(shapObj);
+      const pin = document.getElementById('pin-comparison');
+      pin?.addEventListener('click', () => {
+        const existing = comparisonPins.findIndex((item) => item.h3 === props.h3_index);
+        if (existing >= 0) comparisonPins.splice(existing, 1);
+        else if (comparisonPins.length < 3) comparisonPins.push({
+          h3: props.h3_index, name: submarketName, score: limsKnown ? lims.toFixed(1) : '—',
+          forecast: formatSignedPct(props.delta_6m_p50),
+          range: formatSignedPct(props.delta_6m_p10) + ' to ' + formatSignedPct(props.delta_6m_p90),
+          source: baselineOnly ? 'registry estimate' : 'model estimate; source unknown',
+          drivers: shapObj && Object.keys(shapObj).length ? Object.keys(shapObj).slice(0, 2).join(', ') : 'unavailable',
+          published: snapshotManifest?.generated_at?.slice(0, 10) || null
+        });
+        renderComparisonPins();
+        const isPinned = comparisonPins.some(item => item.h3 === props.h3_index);
+        pin.setAttribute('aria-pressed', String(isPinned));
+        pin.textContent = isPinned ? '− Unpin' : comparisonPins.length >= 3 ? 'Compare full (3)' : '＋ Compare';
+      });
+      if (pin) {
+        const isPinned = comparisonPins.some(item => item.h3 === props.h3_index);
+        pin.setAttribute('aria-pressed', String(isPinned));
+        pin.textContent = isPinned ? '− Unpin' : '＋ Compare';
+      }
     }
 
     // Leading indicators the snapshot actually carries for this cell; rows
@@ -3824,7 +4091,7 @@ __METRO_META__
       const hasData = shap && typeof shap === 'object' && Object.keys(shap).length > 0;
       if (!hasData) {
         const block = ctx.closest('.chart-block');
-        if (block) block.innerHTML = '<div class="shap-empty">No SHAP attribution published for this cell.</div>';
+        if (block) block.innerHTML = '<div class="shap-empty">Drivers unavailable: no SHAP attribution was published for this cell.</div>';
         return;
       }
       const data = shap;

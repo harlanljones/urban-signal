@@ -167,3 +167,5 @@ ehthumbs.db
 /wt/
 /ft/
 
+# Per-plan agent ledgers and review scratch artifacts
+/.superpowers/

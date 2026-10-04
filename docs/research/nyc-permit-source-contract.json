@@ -1,0 +1,33 @@
+{
+  "source_id": "nyc/permits",
+  "endpoint": "https://data.cityofnewyork.us/resource/ipu4-2q9a.json",
+  "dataset_id": "ipu4-2q9a",
+  "version": "1.0.0",
+  "fields": [
+    ":id", ":updated_at", "permit_si_no", "job__", "permit_sequence__",
+    "job_doc___", "permit_type", "issuance_date", "borough", "gis_latitude", "gis_longitude"
+  ],
+  "identity_fields": ["permit_si_no"],
+  "source_row_id_field": ":id",
+  "event_time_field": "issuance_date",
+  "update_time_field": ":updated_at",
+  "page_size_max": 1000,
+  "query_contract": {
+    "pagination": "keyset",
+    "ordering_fields": [":updated_at", ":id"],
+    "timestamp_precision": "millisecond",
+    "upper_bound_inclusive": true,
+    "status": "unverified",
+    "note": "Adapter implementation supports this strategy; publisher behavior and stable snapshot semantics are unverified."
+  },
+  "guarantees": {
+    "identity_unique_nonnull": {"status": "unverified", "evidence": "Only bounded sample rows inspected; no complete validated extraction or publisher uniqueness guarantee."},
+    "row_id_persistent": {"status": "unverified", "evidence": "Socrata :id observed in samples; persistence across dataset replacement is unverified."},
+    "update_timestamp_semantics": {"status": "unverified", "evidence": "Projected :updated_at values differ from issuance dates; which changes advance it and precision behavior are not verified."},
+    "deterministic_keyset_pagination": {"status": "unverified", "evidence": "Ordered update-time query timed out; equal-timestamp continuation has not been verified against publisher."},
+    "bounded_snapshot_consistency": {"status": "unverified", "evidence": "Concurrent mutation behavior while paging has not been established."},
+    "complete_reconciliation": {"status": "unverified", "evidence": "No complete extraction/reconciliation or consistent snapshot/export strategy verified."},
+    "replacement_detection": {"status": "unverified", "evidence": "Publisher replacement and deletion visibility have not been established."},
+    "request_limits_known": {"status": "unverified", "evidence": "Supported request/page limits, app-token requirements and quotas are unknown; no estimated cost is available."}
+  }
+}
