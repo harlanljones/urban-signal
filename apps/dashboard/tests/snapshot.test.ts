@@ -92,6 +92,42 @@ test("queryCatalysts borough filter + normalization matches HTTP", async () => {
   }
 });
 
+test("query borough filters normalize stored and requested display labels consistently", async () => {
+  const label = "Central / Downtown";
+  const boroughEnv = {
+    SNAPSHOT: {
+      async get(key: string) {
+        if (key === "manifest") {
+          return JSON.stringify({ cities: ["chicago"], catalyst_threshold: 85 });
+        }
+        if (key === "catalysts/chicago") {
+          return JSON.stringify({
+            city_id: "chicago",
+            threshold: 85,
+            catalysts: [{ h3_index: "892830bbfffffff", lims_score: 90, borough: label }],
+          });
+        }
+        if (key === "submarkets/chicago") {
+          return JSON.stringify({
+            city_id: "chicago",
+            submarkets: { CORE: { borough: label } },
+          });
+        }
+        return null;
+      },
+    },
+  } as any;
+
+  const catalysts = await queryCatalysts(boroughEnv, { city: "chicago", borough: "central / downtown" });
+  const submarkets = await querySubmarkets(boroughEnv, { city: "chicago", borough: "central / downtown" });
+
+  expect("error" in catalysts).toBe(false);
+  expect("error" in submarkets).toBe(false);
+  if ("error" in catalysts || "error" in submarkets) return;
+  expect(catalysts.catalysts).toHaveLength(1);
+  expect(Object.keys(submarkets.submarkets)).toEqual(["CORE"]);
+});
+
 // ---------------------------------------------------------------------------
 // querySubmarkets — faithful to GET /api/v1/submarkets
 // ---------------------------------------------------------------------------

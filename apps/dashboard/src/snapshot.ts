@@ -99,7 +99,7 @@ export async function queryCatalysts(
   if (boroughRaw) {
     boroughNorm = normalizeBorough(boroughRaw);
     catalysts = catalysts.filter(
-      (c) => String(c.borough).toUpperCase() === boroughNorm
+      (c) => normalizeBorough(String(c.borough)) === boroughNorm
     );
   }
 
@@ -146,7 +146,7 @@ export async function querySubmarkets(
     const norm = normalizeBorough(boroughRaw);
     submarkets = Object.fromEntries(
       Object.entries(submarkets).filter(
-        ([, meta]) => String(meta.borough).toUpperCase() === norm
+        ([, meta]) => normalizeBorough(String(meta.borough)) === norm
       )
     );
   }
