@@ -2151,3 +2151,14 @@ Root final focused suites82 + routing7 pass; mandatory preflight and Ruff pass. 
 - Tile stream additionally owns dedicated #tile-loader-status HTML/CSS; no other UI regions.
 - Launched luna_recovery_review: independent read-only review of final selection/retry changes; owns only .streams/dashboard-recovery-review.md.
 - Completed both Luna implementation streams and independent Luna review. Root exported the HTML and verified 110 dashboard tests, 38 API serving tests, typecheck/build, full preflight and production-origin candidate browser recovery including mobile manual Retry. No deployment.
+
+## Luna bug sweep — 2026-10-05
+- Launched luna_map_sweep: read-only tile/LOD/national map investigation, owns .streams/luna-map-sweep.md.
+- Launched luna_interaction_sweep: read-only selection/search/mobile/city/control investigation, owns .streams/luna-interaction-sweep.md.
+- Launched luna_backend_sweep: read-only Worker/snapshot contract investigation, owns .streams/luna-backend-sweep.md.
+- Implementation ownership assigned only after confirmed reproduction. Root owns exported HTML, integration, validation and commit.
+- Assigned luna_interaction_sweep implementation: searchCoordinateOrHex and coordinate metadata guards in dashboard.py; selection-race.test.js. Narrow patches only; root owns static export. Confirmed zero-axis search suppression on production; validate malformed inputs before any additional fix.
+- Assigned luna_backend_sweep conditional implementation after failing repro: normalizeBorough/queryCatalysts/querySubmarkets in apps/dashboard/src/snapshot.ts and existing Worker/query tests. No registry or serving HTML changes.
+- Assigned luna_map_sweep implementation: nationalRowsToFeatures only in dashboard.py and new tests/national-overlay.test.js; confirmed null-only ranks incorrectly accepted by extracted actual helper. Preserve legitimate zero ranks. No speculative national-race fix.
+- Launched luna_sweep_review: independent read-only correctness review; owns .streams/luna-sweep-review.md. Finalizes only after selection implementation completes.
+- Completed three Luna implementation streams and independent Luna review. Root synchronized static HTML; 116 dashboard tests, 38 serving tests, typecheck/build, Node zoom command and full preflight passed. Candidate browser at production URL verified coordinate/H3 validation and null percentile handling with no page errors. No deployment.

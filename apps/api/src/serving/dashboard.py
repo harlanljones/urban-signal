@@ -2094,9 +2094,9 @@ __METRO_META__
         if (!cell || typeof h3 === 'undefined') continue;
         // Honesty rule: skip hexes with no percentile data so the overlay never
         // invents a color for a null row.
-        const jobsPct = Number(props.jobs_pct);
-        const workersPct = Number(props.workers_pct);
-        if (!Number.isFinite(jobsPct) && !Number.isFinite(workersPct)) continue;
+        const hasJobsPct = props.jobs_pct !== null && props.jobs_pct !== undefined && Number.isFinite(Number(props.jobs_pct));
+        const hasWorkersPct = props.workers_pct !== null && props.workers_pct !== undefined && Number.isFinite(Number(props.workers_pct));
+        if (!hasJobsPct && !hasWorkersPct) continue;
         let boundary;
         try {
           boundary = h3.cellToBoundary(cell);
@@ -4281,32 +4281,51 @@ __METRO_META__
     }
 
     async function searchCoordinateOrHex(input) {
-      const generation = ++selectionGeneration;
       let lat, lng, h3Index;
       const hasH3 = typeof h3 !== 'undefined';
 
       if (input.includes(',')) {
-        const parts = input.split(',').map(s => parseFloat(s.trim()));
-        lat = parts[0];
-        lng = parts[1];
-        if (hasH3) h3Index = h3.latLngToCell(lat, lng, 9);
-      } else if (hasH3 && h3.isValidCell && h3.isValidCell(input)) {
-        h3Index = input;
-        const coords = h3.cellToLatLng(h3Index);
-        lat = coords[0];
-        lng = coords[1];
-      } else if (input.startsWith('8')) {
-        h3Index = input;
+        const parts = input.split(',');
+        if (parts.length !== 2 || parts.some(part => !part.trim())) {
+          showToast('Enter a valid latitude, longitude, or H3 cell.');
+          return;
+        }
+        lat = Number(parts[0].trim());
+        lng = Number(parts[1].trim());
+        if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+          showToast('Enter a valid latitude, longitude, or H3 cell.');
+          return;
+        }
         if (hasH3) {
           try {
-            const coords = h3.cellToLatLng(h3Index);
-            lat = coords[0];
-            lng = coords[1];
-          } catch(e) {}
+            h3Index = h3.latLngToCell(lat, lng, 9);
+          } catch (e) {
+            showToast('Enter a valid latitude, longitude, or H3 cell.');
+            return;
+          }
         }
+      } else if (hasH3 && h3.isValidCell && h3.isValidCell(input)) {
+        h3Index = input;
+        let coords;
+        try {
+          coords = h3.cellToLatLng(h3Index);
+        } catch (e) {
+          showToast('Enter a valid latitude, longitude, or H3 cell.');
+          return;
+        }
+        lat = coords[0];
+        lng = coords[1];
+        if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+          showToast('Enter a valid latitude, longitude, or H3 cell.');
+          return;
+        }
+      } else {
+        showToast('Enter a valid latitude, longitude, or H3 cell.');
+        return;
       }
 
-      if (lat && lng) {
+      const generation = ++selectionGeneration;
+      if (Number.isFinite(lat) && Number.isFinite(lng)) {
         if (map) {
           map.flyTo({
             center: [lng, lat],
@@ -4362,7 +4381,7 @@ __METRO_META__
     }
 
     function getSubmarketInfoByCoords(lat, lng) {
-      if (!lat || !lng) return null;
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
       let closestName = null;
       let closestMeta = null;
       let minDst = Infinity;
@@ -4381,6 +4400,7 @@ __METRO_META__
       // Mirrors server-side get_division_for_coordinate: snap to the nearest
       // submarket within 25 km and return its division. Falls back to null so
       // the static bbox chains below apply.
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
       const subs = SUBMARKETS || {};
       const keys = Object.keys(subs);
       if (!keys.length) return null;
@@ -4396,7 +4416,7 @@ __METRO_META__
     }
 
     function getBoroughNameByCoords(lat, lng) {
-      if (!lat || !lng) return '';
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return '';
       // Server grid properties carry borough; this fallback snaps to the
       // nearest submarket (any metro) within 25 km, else reports unknown.
       return resolveDivisionByNearestSubmarket(lat, lng) || '';

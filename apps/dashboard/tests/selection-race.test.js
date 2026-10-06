@@ -36,9 +36,12 @@ function extractFunction(name) {
 const functions = [
   'inspectH3CellWithNationalFallback', 'inspectH3Cell', 'clearSelection', 'handleHexSelection', 'searchCoordinateOrHex', 'closeMobilePanels', 'openMobilePanel'
 ].map(extractFunction).join('\n');
+const coordinateHelpers = [
+  'haversineDistance', 'getSubmarketInfoByCoords', 'resolveDivisionByNearestSubmarket', 'getBoroughNameByCoords'
+].map(extractFunction).join('\n');
 
 function harness(fetchImpl) {
-  const state = { rendered: [], selected: null, clears: 0 };
+  const state = { rendered: [], selected: null, clears: 0, toasts: [], flights: [] };
   const bodyClasses = new Set();
   const context = {
     selectionGeneration: 0,
@@ -51,6 +54,7 @@ function harness(fetchImpl) {
     INSPECTOR_EMPTY_HTML: null,
     fetch: fetchImpl,
     renderCatalystFeed() { state.rendered.push(context.selectedLocationH3Index); },
+    showToast(message) { state.toasts.push(message); },
     isMobileLayout: () => true,
     document: {
       body: { classList: {
@@ -68,7 +72,17 @@ function harness(fetchImpl) {
     getSubmarketInfoByCoords: () => null,
     getBoroughNameByCoords: () => '',
     normalizeBorough: value => value,
-    h3: { cellToLatLng: () => [0, 0], latLngToCell: () => 'search-cell' },
+    h3: {
+      isValidCell: cell => cell === 'valid-cell',
+      cellToLatLng: cell => {
+        if (cell !== 'valid-cell') throw new Error('Invalid H3 cell');
+        return [40, -73];
+      },
+      latLngToCell: (lat, lng) => {
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) throw new Error('Invalid latitude or longitude');
+        return 'search-cell';
+      }
+    },
     FOCUS_ZOOM: 12,
     FOCUS_PITCH: 40,
     currentPerspective: '2D',
@@ -86,7 +100,95 @@ function deferred() {
 
 const response = payload => ({ ok: true, json: async () => payload });
 
+function coordinateHelperHarness() {
+  const context = {
+    SUBMARKETS: {
+      Equator: { lat: 0, lng: 0, borough: 'Equator Borough' },
+      Meridian: { lat: 40, lng: 0, borough: 'Meridian Borough' }
+    }
+  };
+  vm.runInNewContext(coordinateHelpers, context);
+  return context;
+}
+
 describe('selection request races', () => {
+  it('searches valid coordinates on the equator or prime meridian', async () => {
+    for (const input of ['0,-75', '40,0', '0,0']) {
+      const requests = [];
+      const ctx = harness(async (_url, init) => {
+        requests.push(JSON.parse(init.body));
+        return { ok: false };
+      });
+      ctx.map = {
+        flyTo(options) { ctx.state.flights.push(options); },
+        getLayer: () => false
+      };
+
+      await ctx.searchCoordinateOrHex(input);
+
+      expect(requests).toHaveLength(1);
+      expect(requests[0]).toMatchObject({
+        latitude: Number(input.split(',')[0]),
+        longitude: Number(input.split(',')[1]),
+        h3_index: 'search-cell'
+      });
+      expect(ctx.selectedLocationH3Index).toBe('search-cell');
+    }
+  });
+
+  it('rejects malformed, partial, out-of-range, and invalid H3 searches without changing selection', async () => {
+    for (const input of ['north,-73', '40oops,-75', '40,', '1,2,3', '91,-73', '40,181', '8not-a-cell']) {
+      const requests = [];
+      const ctx = harness(async (...args) => {
+        requests.push(args);
+        return { ok: false };
+      });
+      ctx.handleHexSelection({ h3_index: 'accepted', centroid_lat: 2, centroid_lng: 2 });
+      ctx.map = {
+        flyTo(options) {
+          ctx.state.flights.push(options);
+          if (Math.abs(options.center[1]) > 90 || Math.abs(options.center[0]) > 180) {
+            throw new Error('Invalid LngLat coordinate');
+          }
+        },
+        getLayer: () => false
+      };
+      ctx.state.rendered.length = 0;
+      ctx.state.flights.length = 0;
+      ctx.state.toasts.length = 0;
+
+      await ctx.searchCoordinateOrHex(input);
+
+      expect(requests).toHaveLength(0);
+      expect(ctx.state.flights).toHaveLength(0);
+      expect(ctx.state.toasts).toHaveLength(1);
+      expect(ctx.selectedLocationH3Index).toBe('accepted');
+      expect(ctx.state.rendered).toEqual([]);
+    }
+  });
+
+  it('keeps zero-axis coordinates available to submarket and division lookup', () => {
+    const ctx = coordinateHelperHarness();
+
+    expect(ctx.getSubmarketInfoByCoords(0, 0).name).toBe('Equator');
+    expect(ctx.getSubmarketInfoByCoords(40, 0).name).toBe('Meridian');
+    expect(ctx.getBoroughNameByCoords(0, 0)).toBe('Equator Borough');
+    expect(ctx.getBoroughNameByCoords(40, 0)).toBe('Meridian Borough');
+  });
+
+  it('does not cancel a pending valid search when a malformed search is entered', async () => {
+    const d = deferred();
+    const ctx = harness(() => d.promise);
+    ctx.map = { flyTo() {}, getLayer: () => false };
+
+    const pending = ctx.searchCoordinateOrHex('40,-73');
+    await expect(ctx.searchCoordinateOrHex('north,-73')).resolves.toBeUndefined();
+    d.resolve(response({ h3_index: 'search-cell', centroid_lat: 40, centroid_lng: -73 }));
+    await pending;
+
+    expect(ctx.selectedLocationH3Index).toBe('search-cell');
+  });
+
   it('keeps the newer successful selection when responses resolve out of order', async () => {
     const requests = [];
     const ctx = harness(() => { const d = deferred(); requests.push(d); return d.promise; });
