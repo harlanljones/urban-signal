@@ -1,12 +1,15 @@
 """Unit tests for the Cloudflare KV snapshot builder (src/export/snapshot_builder.py)."""
 
 import json
+import re
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 import h3
 import pytest
 
+from src.export import snapshot_builder
 from src.export.snapshot_builder import (
     CATALYST_THRESHOLD,
     DEFAULT_K_RING,
@@ -265,9 +268,12 @@ def test_national_layers_published_from_national_dir(tmp_path: Path):
     assert res6["parents"] == [parent_data]
     assert res6["count"] == 2
     assert res6["chunks"][parent_data]["rows"] == 2
-    assert res6["chunks"][parent_data]["sha256"] == hashlib.sha256(
-        (tmp_path / "dist" / "national" / "6" / f"{parent_data}.json").read_bytes()
-    ).hexdigest()
+    assert (
+        res6["chunks"][parent_data]["sha256"]
+        == hashlib.sha256(
+            (tmp_path / "dist" / "national" / "6" / f"{parent_data}.json").read_bytes()
+        ).hexdigest()
+    )
     assert res6["byte_size"] == res6["chunks"][parent_data]["bytes"]
 
 
@@ -403,8 +409,9 @@ def test_subset_city_export(tmp_path: Path):
         for res in LOD_RESOLUTIONS
         for parent in manifest["tile_indexes"][str(res)]
     }
-    # No keys from unselected cities may leak; cell shards are exactly nyc's cells.
-    assert bulk_keys == {
+    # Release-qualified twins + snapshot/current pointer are additive; the
+    # logical set is unchanged and no unselected-city keys leak.
+    logical = {
         "manifest",
         "cells/index",
         "cells/index_meta",
@@ -416,6 +423,8 @@ def test_subset_city_export(tmp_path: Path):
         *lod_keys,
         *cell_shards,
     }
+    release_keys = {f"releases/{manifest['snapshot_id']}/{key}" for key in logical}
+    assert bulk_keys == logical | release_keys | {"snapshot/current"}
 
 
 NORMALIZED_METRICS = (
@@ -458,7 +467,10 @@ def test_percentiles_are_monotone_in_raw_value(snapshot: dict[str, Any], tmp_pat
 def test_percentile_endpoints_and_tie_handling(snapshot: dict[str, Any], tmp_path: Path):
     features = next(iter(_all_grid_features(tmp_path, ["nyc"]).values()))
     lims_values = [float(f["properties"]["lims_score"]) for f in features]
-    pcts = {float(f["properties"]["lims_score"]): float(f["properties"]["lims_score_metro_pct"]) for f in features}
+    pcts = {
+        float(f["properties"]["lims_score"]): float(f["properties"]["lims_score_metro_pct"])
+        for f in features
+    }
     # Endpoints hit 0/100 exactly only when the extreme value is unique.
     if lims_values.count(min(lims_values)) == 1:
         assert pcts[min(lims_values)] == 0.0
@@ -480,7 +492,10 @@ def test_national_percentile_differs_from_metro_across_metros(
     seen_difference = False
     for features in _all_grid_features(tmp_path, snapshot["cities"]).values():
         for feature in features:
-            if feature["properties"]["lims_score_metro_pct"] != feature["properties"]["lims_score_national_pct"]:
+            if (
+                feature["properties"]["lims_score_metro_pct"]
+                != feature["properties"]["lims_score_national_pct"]
+            ):
                 seen_difference = True
                 break
         if seen_difference:
@@ -546,6 +561,315 @@ def test_metro_index_matches_registry(snapshot: dict[str, Any]):
 
 
 # ---------------------------------------------------------------------------
+# snapshot_id + coverage block (hex-coverage Stage A)
+# ---------------------------------------------------------------------------
+
+SNAPSHOT_ID_RE = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
+
+
+def test_snapshot_id_format(snapshot: dict[str, Any]):
+    sid = snapshot["snapshot_id"]
+    assert SNAPSHOT_ID_RE.fullmatch(sid), sid
+    assert sid.startswith("r-")
+    assert re.fullmatch(r"\d{8}", sid.split("-")[1]), sid
+    assert re.fullmatch(r"[0-9a-f]{8}", sid.split("-")[2]), sid
+
+
+def test_snapshot_id_deterministic_and_content_sensitive():
+    from src.export.snapshot_builder import _manifest_snapshot_id
+
+    manifest_a = {"generated_at": "2026-10-07T00:00:00+00:00", "cells": 10, "cities": ["nyc"]}
+    manifest_b = {"generated_at": "2026-10-07T00:00:00+00:00", "cells": 11, "cities": ["nyc"]}
+    id_a1 = _manifest_snapshot_id(manifest_a)
+    id_a2 = _manifest_snapshot_id(manifest_a)
+    assert id_a1 == id_a2
+    assert id_a1 != _manifest_snapshot_id(manifest_b)
+    # re-running on an id-bearing manifest is a no-op (id excluded from the hash)
+    assert _manifest_snapshot_id({**manifest_a, "snapshot_id": id_a1}) == id_a1
+
+
+def test_snapshot_id_recomputable_from_serialized_manifest(
+    snapshot: dict[str, Any], tmp_path: Path
+):
+    """The published id must be derivable from the manifest it was stamped on."""
+    from src.export.snapshot_builder import _manifest_snapshot_id
+
+    sid = snapshot["snapshot_id"]
+    assert _manifest_snapshot_id(snapshot) == sid
+    # and stable across a byte-identical rebuild of the same content
+    rebuilt = json.loads(json.dumps({k: v for k, v in snapshot.items()}, separators=(",", ":")))
+    assert _manifest_snapshot_id(rebuilt) == sid
+
+
+def test_coverage_block_defaults(snapshot: dict[str, Any]):
+    coverage = snapshot["coverage"]
+    assert coverage["schema_version"] == 1
+    assert coverage["metro"]["mode"] == "sparse_registry"
+    assert coverage["national"]["status"] == "unavailable"
+    assert "index_key" not in coverage["national"]
+    assert "resolutions" not in coverage["national"]
+
+
+def test_coverage_national_available_with_data(tmp_path: Path):
+    national_dir = tmp_path / "national-out"
+    _write_national_fixture(national_dir)
+    manifest = asyncio_run_build(tmp_path, cities=["nyc"], national_dir=national_dir)
+    coverage = manifest["coverage"]["national"]
+    assert coverage["status"] == "available"
+    assert coverage["index_key"] == "national/index"
+    assert coverage["resolutions"] == manifest["national"]["resolutions"]
+
+
+def test_coverage_national_unavailable_when_all_chunks_empty(tmp_path: Path):
+    """A national dir whose every chunk is null publishes no national block
+    (matching _publish_national_layers) and must read unavailable."""
+    cell_la = h3.latlng_to_cell(34.0522, -118.2437, 6)
+    parent_null = h3.cell_to_parent(cell_la, 3)
+    res6_dir = tmp_path / "national-out" / "national" / "res6"
+    res6_dir.mkdir(parents=True)
+    _national_fixture_frame(
+        [
+            {
+                "h3_index": cell_la,
+                "jobs_c000": None,
+                "workers_c000": None,
+                "jobs_c000_national_pct": None,
+                "workers_c000_national_pct": None,
+                "year": 2023,
+                "signal_source": "census_lehd_lodes8",
+            }
+        ]
+    ).write_parquet(res6_dir / f"{parent_null}.parquet")
+
+    manifest = asyncio_run_build(tmp_path, cities=["nyc"], national_dir=tmp_path / "national-out")
+    assert "national" not in manifest
+    assert manifest["coverage"]["national"]["status"] == "unavailable"
+
+
+def test_coverage_national_available_under_require_national(tmp_path: Path):
+    """require_national's fail-closed checks are the availability source of
+    truth: when they pass, the coverage block reads available."""
+    national_dir = tmp_path / "national-out"
+    _write_national_fixture(national_dir)
+    _write_national_res5_chunk(national_dir)
+    manifest = asyncio_run_build(
+        tmp_path, cities=["nyc"], national_dir=national_dir, require_national=True
+    )
+    assert manifest["coverage"]["national"]["status"] == "available"
+
+
+def test_metrics_out_written_when_flag_passed(tmp_path: Path):
+    metrics_path = tmp_path / "metrics.json"
+    national_dir = tmp_path / "national-out"
+    _write_national_fixture(national_dir)
+    asyncio_run_build(
+        tmp_path,
+        cities=["nyc"],
+        national_dir=national_dir,
+        metrics_out=metrics_path,
+    )
+    report = json.loads(metrics_path.read_text())
+    assert report["build_seconds"] >= 0
+    assert report["cells"] > 0
+    assert report["national"]["resolutions"]["6"]["chunks"] == 1
+    assert report["national"]["seconds"] >= 0
+
+
+def test_metrics_out_absent_writes_nothing(tmp_path: Path):
+    asyncio_run_build(tmp_path, cities=["nyc"])
+    assert not (tmp_path / "metrics.json").exists()
+    assert not (tmp_path / "dist" / "metrics.json").exists()
+
+
+# ---------------------------------------------------------------------------
+# Release-qualified publication + snapshot/current pointer (Stage B)
+# ---------------------------------------------------------------------------
+
+RELEASE_PREFIX = "releases/"
+POINTER_KEY = "snapshot/current"
+
+
+def _bulk_entries(tmp_path: Path) -> list[dict[str, Any]]:
+    return json.loads((tmp_path / "dist" / "kv-bulk.json").read_text())
+
+
+def _bulk_map(tmp_path: Path) -> dict[str, str]:
+    return {e["key"]: e["value"] for e in _bulk_entries(tmp_path)}
+
+
+def _pointer(bulk: dict[str, str] | list[dict[str, str]]) -> dict[str, Any]:
+    if isinstance(bulk, list):
+        bulk = {e["key"]: e["value"] for e in bulk}
+    return json.loads(bulk[POINTER_KEY])
+
+
+def test_release_duplicates_every_logical_key(snapshot: dict[str, Any], tmp_path: Path):
+    """Every legacy bulk key gains a byte-identical releases/{id}/ twin."""
+    bulk = _bulk_map(tmp_path)
+    sid = snapshot["snapshot_id"]
+    logical = {
+        k: v for k, v in bulk.items() if not k.startswith(RELEASE_PREFIX) and k != POINTER_KEY
+    }
+    assert logical, "bulk must contain legacy keys"
+    for key, value in logical.items():
+        release_key = f"{RELEASE_PREFIX}{sid}/{key}"
+        assert release_key in bulk, f"missing release twin for {key}"
+        assert bulk[release_key] == value, f"release twin content mismatch for {key}"
+    # release entries never leak under a different snapshot id
+    stray = [
+        k
+        for k in bulk
+        if k.startswith(RELEASE_PREFIX) and not k.startswith(f"{RELEASE_PREFIX}{sid}/")
+    ]
+    assert stray == []
+
+
+def test_pointer_format_and_current_id(snapshot: dict[str, Any], tmp_path: Path):
+    bulk = _bulk_map(tmp_path)
+    assert POINTER_KEY in bulk
+    pointer = _pointer(bulk)
+    assert set(pointer) == {"current", "previous", "promoted_at"}
+    assert pointer["current"] == snapshot["snapshot_id"]
+    promoted_at = datetime.fromisoformat(pointer["promoted_at"])
+    assert promoted_at.tzinfo == UTC
+
+
+def test_pointer_previous_null_without_prior(snapshot: dict[str, Any], tmp_path: Path):
+    pointer = _pointer(_bulk_map(tmp_path))
+    assert pointer["previous"] is None
+
+
+def test_over_budget_build_fails_closed_and_keeps_old_bulk(
+    snapshot: dict[str, Any], tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    # Fail-closed ordering: the MAX_BULK_BYTES check must run BEFORE the bulk
+    # write, so an over-budget build leaves kv-bulk.json (and its
+    # snapshot/current pointer) holding the PREVIOUS generation's bytes.
+    bulk_path = tmp_path / "dist" / "kv-bulk.json"
+    old_bytes = bulk_path.read_bytes()
+    old_pointer = _pointer(json.loads(old_bytes))
+
+    def rebuild() -> None:
+        import asyncio
+
+        asyncio.run(
+            build_snapshot(
+                tmp_path / "dist",
+                engine=StubEngine(),
+                include_legacy_cells=True,
+            )
+        )
+
+    monkeypatch.setattr(snapshot_builder, "MAX_BULK_BYTES", 1)
+    with pytest.raises(ValueError, match="byte build budget"):
+        rebuild()
+
+    # The failed build must not have replaced the bulk or promoted the pointer.
+    assert bulk_path.read_bytes() == old_bytes
+    assert _pointer(json.loads(bulk_path.read_bytes()))["current"] == old_pointer["current"]
+
+
+def test_pointer_rollback_simulation(tmp_path: Path, monkeypatch):
+    """A → B on changed content; identical rebuild keeps B coherent."""
+    from src.export import snapshot_builder as sb
+
+    # Freeze generated_at so identical content hashes to the same snapshot_id.
+    fixed_dt = datetime(2026, 10, 7, 12, 0, 0, tzinfo=UTC)
+
+    class FrozenDatetime(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return fixed_dt
+
+    monkeypatch.setattr(sb, "datetime", FrozenDatetime)
+
+    first = asyncio_run_build(tmp_path, cities=["nyc"])
+    pointer_a = _pointer(_bulk_map(tmp_path))
+    assert pointer_a["current"] == first["snapshot_id"]
+
+    second = asyncio_run_build(tmp_path, cities=["nyc", "chicago"])
+    pointer_b = _pointer(_bulk_map(tmp_path))
+    assert pointer_b["current"] == second["snapshot_id"]
+    assert pointer_b["current"] != pointer_a["current"]
+    assert pointer_b["previous"] == pointer_a["current"]
+
+    # unchanged rebuild: same id, previous stays A, pointer not re-promoted
+    third = asyncio_run_build(tmp_path, cities=["nyc", "chicago"])
+    pointer_c = _pointer(_bulk_map(tmp_path))
+    assert pointer_c["current"] == third["snapshot_id"] == pointer_b["current"]
+    assert pointer_c["previous"] == pointer_a["current"]
+    assert pointer_c["promoted_at"] == pointer_b["promoted_at"]
+
+
+def test_pointer_promotion_fail_closed_missing_release(tmp_path: Path, monkeypatch):
+    """A missing release twin must refuse promotion and leave the old bulk intact."""
+    from src.export import snapshot_builder as sb
+
+    asyncio_run_build(tmp_path, cities=["nyc"])
+    before = (tmp_path / "dist" / "kv-bulk.json").read_text()
+    pointer_before = _pointer(json.loads(before))
+
+    original = sb._release_entries
+
+    def crippled(kv_entries, snapshot_id):
+        entries = original(kv_entries, snapshot_id)
+        return entries[1:]  # drop the first release twin
+
+    monkeypatch.setattr(sb, "_release_entries", crippled)
+    with pytest.raises(ValueError, match="release"):
+        asyncio_run_build(tmp_path, cities=["nyc", "chicago"])
+    # old pointer survived untouched
+    assert json.loads((tmp_path / "dist" / "kv-bulk.json").read_text()) == json.loads(before)
+    assert _pointer(json.loads(before))["current"] == pointer_before["current"]
+
+
+def test_national_smoke_passes_when_available(tmp_path: Path):
+    national_dir = tmp_path / "national-out"
+    _write_national_fixture(national_dir)
+    manifest = asyncio_run_build(tmp_path, cities=["nyc"], national_dir=national_dir)
+    assert manifest["coverage"]["national"]["status"] == "available"
+    bulk = _bulk_map(tmp_path)
+    sid = manifest["snapshot_id"]
+    national_releases = [k for k in bulk if k.startswith(f"{RELEASE_PREFIX}{sid}/national/")]
+    assert f"{RELEASE_PREFIX}{sid}/national/index" in national_releases
+    # at least one nonempty chunk in the release set
+    chunks = [
+        json.loads(bulk[k])
+        for k in national_releases
+        if k != f"{RELEASE_PREFIX}{sid}/national/index"
+    ]
+    assert any(chunk["rows"] for chunk in chunks)
+
+
+def test_national_smoke_fails_when_index_missing(tmp_path: Path, monkeypatch):
+    from src.export import snapshot_builder as sb
+
+    national_dir = tmp_path / "national-out"
+    _write_national_fixture(national_dir)
+    asyncio_run_build(tmp_path, cities=["nyc"])
+
+    original = sb._release_entries
+
+    def no_index(kv_entries, snapshot_id):
+        return [
+            e for e in original(kv_entries, snapshot_id) if not e["key"].endswith("/national/index")
+        ]
+
+    monkeypatch.setattr(sb, "_release_entries", no_index)
+    with pytest.raises(ValueError, match="national"):
+        asyncio_run_build(tmp_path, cities=["nyc"], national_dir=national_dir)
+
+
+def test_promotion_smoke_skipped_when_national_unavailable(
+    snapshot: dict[str, Any], tmp_path: Path
+):
+    """Metro-only builds promote without national artifacts."""
+    assert snapshot["coverage"]["national"]["status"] == "unavailable"
+    pointer = _pointer(_bulk_map(tmp_path))
+    assert pointer["current"] == snapshot["snapshot_id"]
+
+
+# ---------------------------------------------------------------------------
 # LOD pyramid (US-411)
 # ---------------------------------------------------------------------------
 
@@ -582,6 +906,7 @@ def test_lod_tiles_recompute_to_stated_parents(snapshot: dict[str, Any], tmp_pat
 
 def test_lod_coarser_has_fewer_cells(snapshot: dict[str, Any]):
     """res-7 tiles hold fewer cells than res-8, which holds fewer than res-9."""
+
     def total(res: int) -> int:
         return sum(meta["count"] for meta in snapshot["tile_indexes"][str(res)].values())
 
@@ -675,9 +1000,7 @@ def test_context_layers_join_matching_cells_only(tmp_path: Path):
     sf_cells = _sf_cells(tmp_path)
     covered = sf_cells[: len(sf_cells) // 2]
     context_dir = _write_context_for_cells(tmp_path, covered)
-    manifest = asyncio_run_build(
-        tmp_path, cities=["nyc", "san_francisco"], context_dir=context_dir
-    )
+    manifest = asyncio_run_build(tmp_path, cities=["nyc", "san_francisco"], context_dir=context_dir)
 
     features = _all_grid_features(tmp_path, ["nyc", "san_francisco"])
     for feature in features["nyc"]:

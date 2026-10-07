@@ -114,6 +114,7 @@ retraining_report_*.json
 # ==============================================================================
 .turbo/
 node_modules/
+.hermes/
 apps/dashboard/.wrangler/
 .wrangler/
 

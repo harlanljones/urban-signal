@@ -41,6 +41,7 @@ import json
 import logging
 import math
 import os
+import time
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import nullcontext
@@ -76,11 +77,15 @@ LOD_RESOLUTIONS = coverage.METRO_LOD_RESOLUTIONS  # (7, 8, 9)
 # Tile parent resolution per LOD level: coarse LOD needs coarser parents so a
 # metro spans only a handful of chunks and each stays under the 5 MiB budget.
 LOD_TILE_PARENT_RES = {7: 4, 8: 4, 9: TILE_RESOLUTION}
+
+
 # LOD aggregate features carry the averaged raw metric values (US-415 method A:
 # average raw, THEN rank). These are the averaged CELL_FEATURE_KEYS +
 # NORMALIZED_METRICS, deduped — built lazily below once both tuples exist.
 def _lod_aggregate_keys() -> tuple[str, ...]:
     return tuple(dict.fromkeys((*CELL_FEATURE_KEYS, *NORMALIZED_METRICS)))
+
+
 # Size budgets (US-385): a publish that would exceed Workers KV limits must fail
 # the build here, not inside `wrangler kv bulk put` at 2 AM.
 MAX_KV_VALUE_BYTES = 20 * 1024 * 1024  # KV hard cap is 25 MiB per value
@@ -571,6 +576,186 @@ def _require_national_block(
         )
 
 
+def _coverage_block(national_block: dict[str, Any] | None) -> dict[str, Any]:
+    """Build the manifest ``coverage`` block (hex-coverage Stage A).
+
+    ``status`` derives solely from the published national block: a block is
+    present only when ``_publish_national_layers`` actually published at least
+    one nonempty chunk for every declared resolution (empty chunks are skipped
+    there), and ``_require_national_block`` fails the build before publication
+    when require-national mode sees an absent or incomplete input. So
+    ``available`` is never derivable from a stale/empty chunk set.
+    """
+    national: dict[str, Any] = {"status": "unavailable"}
+    if national_block is not None:
+        resolutions = national_block.get("resolutions", {})
+        if resolutions and all(meta.get("chunks", 0) >= 1 for meta in resolutions.values()):
+            national = {
+                "status": "available",
+                "index_key": "national/index",
+                "resolutions": resolutions,
+            }
+    return {
+        "schema_version": 1,
+        "national": national,
+        "metro": {"mode": "sparse_registry"},
+    }
+
+
+def _manifest_snapshot_id(manifest: dict[str, Any]) -> str:
+    """Deterministic content id: ``r-YYYYMMDD-<first 8 hex of sha256>``.
+
+    Canonicalization (exact, do not change without a migration): the manifest
+    dict minus the ``snapshot_id`` field itself AND minus the self-referential
+    ``keys["manifest"]`` size entry (that entry is the manifest's own byte size
+    and is circular with the id; it is only present in the in-memory dict after
+    registration — the published manifest.json never contains it) is serialized
+    with ``json.dumps(..., sort_keys=True, separators=(",", ":"),
+    ensure_ascii=False)`` and hashed UTF-8 with sha256; the id date is the
+    first 10 chars of ``generated_at`` (ISO) with dashes stripped. Same
+    manifest content → same id; the id is bounded (<~18 chars) and matches the
+    path-safe ``^[A-Za-z0-9._-]{1,64}$`` adapter regex.
+    """
+    payload = {k: v for k, v in manifest.items() if k != "snapshot_id"}
+    if isinstance(payload.get("keys"), dict) and "manifest" in payload["keys"]:
+        payload["keys"] = {k: v for k, v in payload["keys"].items() if k != "manifest"}
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    digest = hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:8]
+    date = str(manifest.get("generated_at", ""))[:10].replace("-", "")
+    return f"r-{date}-{digest}"
+
+
+RELEASES_PREFIX = "releases/"
+SNAPSHOT_POINTER_KEY = "snapshot/current"
+
+
+def _release_entries(kv_entries: list[dict[str, str]], snapshot_id: str) -> list[dict[str, str]]:
+    """Release-qualified twins: ``releases/{snapshot_id}/{logical_key}``.
+
+    Purely additive — the legacy logical keys stay in the bulk exactly as
+    before, so old readers never break. The twins duplicate the same values so
+    a whole generation can be addressed/fetched by snapshot id.
+    """
+    prefix = f"{RELEASES_PREFIX}{snapshot_id}/"
+    return [{"key": f"{prefix}{e['key']}", "value": e["value"]} for e in kv_entries]
+
+
+def _read_previous_pointer(bulk_path: Path) -> dict[str, Any] | None:
+    """Read the ``snapshot/current`` pointer from the bulk being superseded."""
+    try:
+        existing = json.loads(bulk_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    for entry in existing:
+        if not isinstance(entry, dict):
+            continue
+        if entry.get("key") == SNAPSHOT_POINTER_KEY:
+            try:
+                pointer = json.loads(entry.get("value", ""))
+            except ValueError:
+                return None
+            if isinstance(pointer, dict) and "current" in pointer:
+                return pointer
+            return None
+    return None
+
+
+def _national_smoke_required(national_block: dict[str, Any] | None) -> bool:
+    """True when the build declares national coverage ``available``."""
+    if national_block is None:
+        return False
+    return _coverage_block(national_block)["national"]["status"] == "available"
+
+
+def _verify_release_integrity(
+    release_entries: list[dict[str, str]],
+    kv_entries: list[dict[str, str]],
+    snapshot_id: str,
+    national_block: dict[str, Any] | None,
+) -> None:
+    """Fail-closed promotion check (hex-coverage Stage B).
+
+    Before the ``snapshot/current`` pointer may enter the bulk: every logical
+    key must have a release twin under ``releases/{snapshot_id}/`` with
+    byte-identical content, and — when national coverage is declared
+    ``available`` — the release set must contain ``national/index`` plus at
+    least one nonempty national chunk (smoke query). Mirrors the fail-closed
+    conventions of ``_require_national_block``: raise in the build, never
+    publish a broken pointer.
+    """
+    prefix = f"{RELEASES_PREFIX}{snapshot_id}/"
+    legacy: dict[str, str] = {e["key"]: e["value"] for e in kv_entries}
+    release: dict[str, str] = {}
+    for entry in release_entries:
+        key = entry["key"]
+        if not key.startswith(prefix):
+            raise ValueError(
+                f"snapshot promotion: release key {key!r} is not under {prefix}; "
+                "refusing to promote the pointer"
+            )
+        release[key[len(prefix) :]] = entry["value"]
+    missing = sorted(set(legacy) - set(release))
+    if missing:
+        raise ValueError(
+            f"snapshot promotion: missing release entries for {missing[:5]} "
+            f"({len(missing)} total); refusing to promote the pointer"
+        )
+    mismatched = sorted(k for k in legacy if legacy[k] != release[k])
+    if mismatched:
+        raise ValueError(
+            f"snapshot promotion: release twins differ from legacy content for "
+            f"{mismatched[:5]}; refusing to promote the pointer"
+        )
+    if _national_smoke_required(national_block):
+        if "national/index" not in release:
+            raise ValueError(
+                "snapshot promotion: national smoke check failed — "
+                f"{prefix}national/index missing; refusing to promote the pointer"
+            )
+        nonempty = [
+            k
+            for k in release
+            if k.startswith("national/")
+            and k != "national/index"
+            and bool((json.loads(release[k]) or {}).get("rows"))
+        ]
+        if not nonempty:
+            raise ValueError(
+                "snapshot promotion: national smoke check failed — no nonempty "
+                "national chunk in the release set; refusing to promote the pointer"
+            )
+
+
+def _promote_snapshot_pointer(
+    kv_entries: list[dict[str, str]],
+    release_entries: list[dict[str, str]],
+    snapshot_id: str,
+    national_block: dict[str, Any] | None,
+    previous_pointer: dict[str, Any] | None,
+    promoted_at: str,
+) -> dict[str, Any]:
+    """Build the ``snapshot/current`` pointer or refuse (fail closed).
+
+    Verifies the full release set first (integrity + national smoke); only
+    then is the pointer handed back for the bulk. Rebuilding identical content
+    is idempotent: the pointer keeps its original ``promoted_at`` and its
+    ``previous`` generation — ``previous`` advances only on genuinely new
+    content.
+    """
+    _verify_release_integrity(release_entries, kv_entries, snapshot_id, national_block)
+    if previous_pointer is not None and previous_pointer.get("current") == snapshot_id:
+        return {
+            "current": snapshot_id,
+            "previous": previous_pointer.get("previous"),
+            "promoted_at": previous_pointer.get("promoted_at"),
+        }
+    return {
+        "current": snapshot_id,
+        "previous": None if previous_pointer is None else previous_pointer.get("current"),
+        "promoted_at": promoted_at,
+    }
+
+
 async def build_snapshot(
     out_dir: Path,
     engine: MultiHorizonInferenceEngine | None = None,
@@ -669,6 +854,7 @@ async def _build_snapshot(
     manifest's ``context_layers`` block; when omitted the grid is unchanged.
     """
     out_dir = Path(out_dir)
+    build_start = time.perf_counter()
     out_dir.mkdir(parents=True, exist_ok=True)
     cities = list(cities or SUPPORTED_CITIES)
 
@@ -858,8 +1044,11 @@ async def _build_snapshot(
     )
 
     national_block: dict[str, Any] | None = None
+    national_seconds: float | None = None
     if national_dir is not None:
+        national_start = time.perf_counter()
         national_block = _publish_national_layers(out_dir, national_dir, register)
+        national_seconds = time.perf_counter() - national_start
     if require_national:
         _require_national_block(national_block, national_dir)
 
@@ -887,6 +1076,10 @@ async def _build_snapshot(
         manifest["national"] = national_block
     if context is not None:
         manifest["context_layers"] = _context_manifest_block(grids, context[1])
+    # Additive Stage A fields (hex-coverage): appended after the existing
+    # fields; no existing key is reordered or altered.
+    manifest["coverage"] = _coverage_block(national_block)
+    manifest["snapshot_id"] = _manifest_snapshot_id(manifest)
     manifest_size = _write_json(out_dir / "manifest.json", manifest)
     if manifest_size > MAX_MANIFEST_BYTES:
         raise ValueError(
@@ -894,6 +1087,24 @@ async def _build_snapshot(
             f"budget. Slim it (split tile_indexes into their own key) before publishing."
         )
     register("manifest", out_dir / "manifest.json", manifest)
+
+    if metrics_out is not None:
+        # Build report: timing + per-resolution counts from the published
+        # national summary (present only when chunks actually shipped).
+        report = {
+            "generated_at": manifest["generated_at"],
+            "snapshot_id": manifest["snapshot_id"],
+            "build_seconds": time.perf_counter() - build_start,
+            "cells": len(cells_by_index),
+            "national": None
+            if national_block is None
+            else {
+                "seconds": national_seconds,
+                "resolutions": national_block["resolutions"],
+            },
+        }
+        metrics_out.parent.mkdir(parents=True, exist_ok=True)
+        metrics_out.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
 
     bulk_path = out_dir / "kv-bulk.json"
     bulk_path.write_text(json.dumps(kv_entries), encoding="utf-8")
@@ -907,9 +1118,10 @@ async def _build_snapshot(
         metrics.set_artifact("cities", list(cities))
     if bulk_path.stat().st_size > MAX_BULK_BYTES:
         raise ValueError(
-            f"kv-bulk.json is {bulk_path.stat().st_size:,} bytes, over the "
+            f"kv-bulk.json would be {len(bulk_bytes.encode('utf-8')):,} bytes, over the "
             f"{MAX_BULK_BYTES:,}-byte build budget. Chunk the bulk put."
         )
+    bulk_path.write_text(bulk_bytes, encoding="utf-8")
 
     logger.info(
         "Snapshot complete: %d KV keys (%d grid tiles, %d cells) -> %s (%d bytes bulk)",

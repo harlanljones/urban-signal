@@ -1,0 +1,255 @@
+#!/usr/bin/env bash
+# dev — repo-local Hermes entrypoint for Urban Signal.
+# Usage: ./dev [Hermes arguments], ./dev setup, ./dev doctor
+# Use ./dev -z "prompt" for a one-shot session.
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROFILE="urban-signal"
+HERMES_HOME="${HERMES_HOME:-$HOME/.hermes}"
+HOOKS_DIR="$HERMES_HOME/agent-hooks"
+cd "$REPO_ROOT"
+
+if ! command -v hermes >/dev/null 2>&1; then
+  echo "error: hermes not on PATH (install: https://hermes-agent.nousresearch.com/docs)" >&2
+  exit 1
+fi
+
+profile_exists() {
+  [ -d "$HERMES_HOME/profiles/$PROFILE" ] && return 0
+  local profiles
+  profiles="$(hermes profile list 2>/dev/null || true)"
+  while IFS= read -r line; do
+    [[ "$line" =~ ^[[:space:]]+${PROFILE}[[:space:]] ]] && return 0
+  done <<< "$profiles"
+  return 1
+}
+
+# Keep the catalog focused; this one-line JSON list is the reproducible source
+# of truth for fresh machines. Names match `hermes -p urban-signal skills list`.
+build_disabled_list() {
+  cat <<'JSON'
+["1password","SQLite","airtable","archify","architecture-diagram","arxiv","ascii-video","baoyu-infographic","blocked-page-recovery","box","chezmoi-dotfiles","claude-code","claude-design","codex","company-brain-demo","competitor-news-monitor","computer-use","design-md","docker-nextjs","document-to-action-items","docx","email-inbox-triage","gif-search","google-workspace","grounded-citations","hermes-agent-skill-authoring","hermes-repo-profiles","himalaya","humanizer","inspecting-hermes-desktop-dom","llm-wiki","manim-video","maps","market-competitor-research","meeting-action-items","nextjs-docker-env","node-inspect-debugger","notion","obsidian","omarchy-app","omarchy-hyprland-config","omarchy-plugins","opencode","p5js","pdf","popular-web-designs","powerpoint","product-price-monitor","ratatui-tui","repo-scaffold","rust","scrollcraft","sdlc-review","songsee","songwriting-and-ai-music","teams-meeting-pipeline","vercel-env-secrets","weekly-review-planning","xlsx","xurl","youtube-content"]
+JSON
+}
+
+build_enabled_list() {
+  cat <<'JSON'
+["codebase-inspection","dogfood","dockerize-web-app","github","grill-me","hermes-agent","hermes-repo-devsetup","impeccable","python-debugpy","requesting-code-review","shell-portability","simplify-code","spike","subagent-driven-development","systematic-debugging","test-driven-development","unlazy"]
+JSON
+}
+
+ensure_profile() {
+  if profile_exists; then return 0; fi
+  echo "[dev] creating '$PROFILE' profile (cloned from default)..."
+  hermes profile create "$PROFILE" --clone \
+    --description "Urban Signal development: Python API and Bun/Turborepo apps"
+}
+
+read_disabled_names() {
+  hermes -p "$PROFILE" config get skills.disabled 2>/dev/null \
+    | while IFS= read -r line; do
+        [[ "$line" =~ ^[[:space:]]*-[[:space:]] ]] && printf '%s\n' "${line#*- }"
+      done | sort
+}
+
+ensure_skill_prune() {
+  local desired current
+  desired="$(build_disabled_list | jq -r '.[]' | sort)"
+  current="$(read_disabled_names || true)"
+  if [ "$current" != "$desired" ]; then
+    echo "[dev] setting the '$PROFILE' skill allow-set..."
+    hermes -p "$PROFILE" config set skills.disabled "$(build_disabled_list)" --force >/dev/null
+  fi
+  current="$(read_disabled_names || true)"
+  [ "$current" = "$desired" ] || { echo "error: skills.disabled did not persist" >&2; return 1; }
+}
+
+ensure_profile_skills() {
+  local skill category source link
+  local -a mappings=(
+    "codebase-inspection:software-development"
+    "dogfood:software-development"
+    "github:software-development"
+    "grill-me:software-development"
+    "python-debugpy:software-development"
+    "requesting-code-review:software-development"
+    "shell-portability:software-development"
+    "simplify-code:software-development"
+    "spike:software-development"
+    "subagent-driven-development:software-development"
+    "systematic-debugging:software-development"
+    "test-driven-development:software-development"
+    "dockerize-web-app:devops"
+    "hermes-repo-devsetup:devops"
+    "hermes-agent:autonomous-ai-agents"
+    "impeccable:creative"
+    "unlazy:"
+  )
+  mkdir -p "$REPO_ROOT/.hermes/skills"
+  for mapping in "${mappings[@]}"; do
+    skill="${mapping%%:*}"
+    category="${mapping#*:}"
+    if [ -n "$category" ]; then
+      source="$HERMES_HOME/skills/$category/$skill"
+    else
+      source="$HERMES_HOME/skills/$skill"
+    fi
+    if [ ! -f "$source/SKILL.md" ]; then
+      source="$(find "$HERMES_HOME/skills" -maxdepth 2 -type d -name "$skill" -print -quit 2>/dev/null || true)"
+      if [ -z "$source" ]; then
+        for candidate in "$HERMES_HOME"/skills/*/"$skill" "$HERMES_HOME/skills/$skill"; do
+          if [ -f "$candidate/SKILL.md" ]; then source="$candidate"; break; fi
+        done
+      fi
+    fi
+    if [ -z "$source" ] || [ ! -f "$source/SKILL.md" ]; then
+      echo "error: required project skill '$skill' is not installed" >&2
+      return 1
+    fi
+    link="$REPO_ROOT/.hermes/skills/$skill"
+    if [ ! -L "$link" ] || [ "$(readlink "$link" 2>/dev/null || true)" != "$source" ]; then
+      ln -sfn "$source" "$link"
+    fi
+  done
+}
+
+install_hook_scripts() {
+  mkdir -p "$HOOKS_DIR"
+  local script
+  for script in urban-git-guard.sh urban-formatter.sh urban-evidence.sh urban-inject-git-status.sh; do
+    if ! cmp -s "$REPO_ROOT/agent-hooks/$script" "$HOOKS_DIR/$script"; then
+      install -m 755 "$REPO_ROOT/agent-hooks/$script" "$HOOKS_DIR/$script"
+    elif [ ! -x "$HOOKS_DIR/$script" ]; then
+      chmod +x "$HOOKS_DIR/$script"
+    fi
+  done
+}
+
+ensure_hooks() {
+  local pre post inject guard_command formatter_command evidence_command inject_command
+  guard_command="$(hook_command urban-git-guard.sh)"
+  formatter_command="$(hook_command urban-formatter.sh)"
+  evidence_command="$(hook_command urban-evidence.sh)"
+  inject_command="$(hook_command urban-inject-git-status.sh)"
+  pre="$(hermes -p "$PROFILE" config get hooks.pre_tool_call 2>/dev/null || true)"
+  post="$(hermes -p "$PROFILE" config get hooks.post_tool_call 2>/dev/null || true)"
+  inject="$(hermes -p "$PROFILE" config get hooks.pre_llm_call 2>/dev/null || true)"
+  if [[ "$pre" == *"$guard_command"* && "$pre" == *"fail_closed: true"* \
+     && "$post" == *"$formatter_command"* && "$post" == *"$evidence_command"* \
+     && "$inject" == *"$inject_command"* ]]; then
+    return 0
+  fi
+  echo "[dev] registering shell hooks in '$PROFILE'..."
+  hermes -p "$PROFILE" config set hooks.pre_tool_call \
+    "$(jq -cn --arg command "$guard_command" '[{matcher:"terminal|execute_code",command:$command,timeout:10,fail_closed:true}]')" --force >/dev/null
+  hermes -p "$PROFILE" config set hooks.post_tool_call \
+    "$(jq -cn --arg formatter "$formatter_command" --arg evidence "$evidence_command" '[{matcher:"write_file|patch",command:$formatter,timeout:15},{matcher:"terminal",command:$evidence,timeout:10}]')" --force >/dev/null
+  hermes -p "$PROFILE" config set hooks.pre_llm_call \
+    "$(jq -cn --arg command "$inject_command" '[{command:$command,timeout:5}]')" --force >/dev/null
+}
+
+hook_command() {
+  local script="$1"
+  printf '%q' "$HOOKS_DIR/$script"
+}
+
+ensure_trust() {
+  local result
+  result="$(hermes -p "$PROFILE" skills trust "$REPO_ROOT" 2>&1 || true)"
+  if [[ "$result" == *"Already trusted"* ]]; then return 0; fi
+  printf '%s\n' "$result"
+}
+
+doctor() {
+  local fail=0 expected_disabled actual_disabled expected_enabled actual_enabled
+  local script link_count=0
+  if profile_exists; then echo "ok: profile '$PROFILE' exists"; else echo "MISSING: profile '$PROFILE'"; fail=1; fi
+
+  expected_disabled="$(build_disabled_list | jq -r '.[]' | sort)"
+  actual_disabled="$(read_disabled_names || true)"
+  if [ "$actual_disabled" = "$expected_disabled" ]; then
+    echo "ok: skills.disabled matches ($(printf '%s\n' "$expected_disabled" | wc -l | tr -d ' ') entries)"
+  else
+    echo "MISMATCH: skills.disabled; run ./dev setup"; fail=1
+  fi
+
+  expected_enabled="$(build_enabled_list | jq -r '.[]' | sort)"
+  actual_enabled="$(COLUMNS=180 hermes -p "$PROFILE" skills list --enabled-only 2>/dev/null \
+    | python3 -c 'import sys; print("\n".join(x.split("│")[1].strip() for x in sys.stdin if x.startswith("│") and x.count("│") >= 5))' \
+    | sort)"
+  if [ "$actual_enabled" = "$expected_enabled" ]; then
+    echo "ok: enabled skill set matches project allow-set"
+  else
+    echo "MISMATCH: enabled skills differ from project allow-set"; fail=1
+    printf '  actual: %s\n' "${actual_enabled//$'\n'/, }"
+  fi
+
+  if [ -d "$REPO_ROOT/.hermes/skills" ]; then
+    for link in "$REPO_ROOT"/.hermes/skills/*; do
+      [ -e "$link/SKILL.md" ] || { echo "BROKEN: $link"; fail=1; }
+      link_count=$((link_count + 1))
+    done
+    if [ "$link_count" -eq 17 ]; then
+      echo "ok: $link_count project skill links resolve"
+    else
+      echo "MISMATCH: expected 17 project skill links, found $link_count"; fail=1
+    fi
+  else
+    echo "MISSING: .hermes/skills"; fail=1
+  fi
+
+  local hooks_config
+  hooks_config="$(hermes -p "$PROFILE" config get hooks 2>/dev/null || true)"
+  for script in urban-git-guard.sh urban-formatter.sh urban-evidence.sh urban-inject-git-status.sh; do
+    if [ -x "$HOOKS_DIR/$script" ] && cmp -s "$REPO_ROOT/agent-hooks/$script" "$HOOKS_DIR/$script"; then
+      echo "ok: hook $script installed and executable"
+    else
+      echo "MISSING/STALE: $HOOKS_DIR/$script"; fail=1
+    fi
+  done
+  if [[ "$hooks_config" == *"urban-git-guard.sh"* && "$hooks_config" == *"urban-formatter.sh"* \
+     && "$hooks_config" == *"urban-evidence.sh"* && "$hooks_config" == *"urban-inject-git-status.sh"* ]]; then
+    echo "ok: all hook events configured"
+  else
+    echo "MISSING: hook configuration"; fail=1
+  fi
+  local hooks_health
+  hooks_health="$(hermes -p "$PROFILE" hooks doctor 2>&1 || true)"
+  printf '%s\n' "$hooks_health"
+  local hooks_status
+  hooks_status="$(hermes -p "$PROFILE" hooks list 2>&1 || true)"
+  if [[ "$hooks_status" == *pending* || "$hooks_health" == *"modified since approval"* \
+     || "$hooks_health" == *"not allowlisted"* ]]; then
+    echo "hint: review and approve the repo hooks for this profile at first session start, or launch with --accept-hooks"
+  fi
+
+  if command -v bun >/dev/null 2>&1; then echo "ok: bun ($(bun --version))"; else echo "MISSING: bun"; fail=1; fi
+  if command -v ruff >/dev/null 2>&1; then echo "ok: ruff ($(ruff --version))"; else echo "hint: ruff is optional until editing Python"; fi
+  [ -d "$REPO_ROOT/node_modules" ] && echo "ok: root node_modules present" || echo "hint: run 'bun install'"
+  return "$fail"
+}
+
+case "${1:-}" in
+  setup)
+    ensure_profile
+    ensure_skill_prune
+    ensure_profile_skills
+    install_hook_scripts
+    ensure_hooks
+    ensure_trust
+    echo "[dev] setup complete"
+    ;;
+  doctor)
+    doctor
+    ;;
+  *)
+    ensure_profile
+    ensure_skill_prune
+    ensure_profile_skills
+    install_hook_scripts
+    ensure_hooks
+    ensure_trust
+    exec hermes -p "$PROFILE" "$@"
+    ;;
+esac
