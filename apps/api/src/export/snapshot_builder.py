@@ -766,8 +766,8 @@ async def build_snapshot(
     require_national: bool = False,
     context_dir: Path | None = None,
     metrics: SnapshotMetrics | None = None,
-    metrics_out: Path | None = None,
     cache_predictions: bool = True,
+    metrics_out: Path | None = None,
 ) -> dict[str, Any]:
     """Build one snapshot, optionally collecting timings outside the KV payload."""
     total = metrics.stage("total") if metrics is not None else nullcontext()
