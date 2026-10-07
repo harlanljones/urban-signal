@@ -766,6 +766,7 @@ async def build_snapshot(
     require_national: bool = False,
     context_dir: Path | None = None,
     metrics: SnapshotMetrics | None = None,
+    metrics_out: Path | None = None,
     cache_predictions: bool = True,
 ) -> dict[str, Any]:
     """Build one snapshot, optionally collecting timings outside the KV payload."""
@@ -800,6 +801,7 @@ async def build_snapshot(
                 require_national=require_national,
                 context_dir=context_dir,
                 metrics=metrics,
+                metrics_out=metrics_out,
             )
             if metrics is not None:
                 metrics.set_artifact("status", "complete")
@@ -824,6 +826,7 @@ async def _build_snapshot(
     require_national: bool = False,
     context_dir: Path | None = None,
     metrics: SnapshotMetrics | None = None,
+    metrics_out: Path | None = None,
 ) -> dict[str, Any]:
     """Build all snapshot artifacts into out_dir and return the manifest dict.
 
