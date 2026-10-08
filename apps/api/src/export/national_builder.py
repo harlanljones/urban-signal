@@ -33,7 +33,12 @@ Parquet columns: ``h3_index``, ``res5_parent``, ``res4_parent``, ``jobs_c000``,
 ``workers_c000``, ``blocks_wac``, ``blocks_rac``, ``jobs_national_pct``,
 ``workers_national_pct``, ``year``, ``signal_source``. Chunks are partitioned by
 the res-3 parent of every cell so a publish step can shard them under the KV
-25 MiB value cap without re-reading the whole set.
+25 MiB value cap without re-reading the whole set. ``resN_parent`` is the H3
+ancestor at resolution N when the cell is finer than N, the cell itself when it
+is already at N, and null when the cell is coarser than N. H3 has no unique
+finer parent, and ``cell_to_parent`` raises ``H3ResMismatchError`` for those
+cases — the national pyramid includes res 4 and res 5, so those columns must
+stay defined instead of crashing the build.
 
 Percentile ranks reuse the average-rank implementation from the snapshot builder
 and are computed over non-null values only; null hexes carry null ranks. LODES
@@ -402,6 +407,22 @@ def _attach_ranks(frame: pl.DataFrame) -> pl.DataFrame:
     )
 
 
+def _ancestor_at(h3_index: str, parent_resolution: int) -> str | None:
+    """Ancestor of ``h3_index`` at ``parent_resolution``, or None if none exists.
+
+    H3 parents exist only at a strictly coarser resolution. A cell already at
+    ``parent_resolution`` is its own bucket. A coarser cell has seven children
+    at the next finer resolution, not one parent, so the column stays null
+    rather than raising ``H3ResMismatchError``.
+    """
+    cell_resolution = h3.get_resolution(h3_index)
+    if parent_resolution > cell_resolution:
+        return None
+    if parent_resolution == cell_resolution:
+        return h3_index
+    return parent_at(h3_index, parent_resolution)
+
+
 def _build_resolution(
     resolution: int,
     year: int,
@@ -463,10 +484,10 @@ def _build_resolution(
             .replace_strict(res3_parents, return_dtype=pl.String)
             .alias("res3_parent"),
             pl.col("h3_index")
-            .map_elements(lambda c: parent_at(c, 5), return_dtype=pl.String)
+            .map_elements(lambda c: _ancestor_at(c, 5), return_dtype=pl.String)
             .alias("res5_parent"),
             pl.col("h3_index")
-            .map_elements(lambda c: parent_at(c, 4), return_dtype=pl.String)
+            .map_elements(lambda c: _ancestor_at(c, 4), return_dtype=pl.String)
             .alias("res4_parent"),
         )
     )
