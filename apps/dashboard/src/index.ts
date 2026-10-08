@@ -36,6 +36,8 @@ import {
   fetchNationalIndex,
   fetchNationalRows,
   fetchGridTiles,
+  fetchSnapshotPointer,
+  type SnapshotQueryError,
   METRO_LOD_RESOLUTIONS,
   MAX_NATIONAL_PARENTS_PER_REQUEST,
   CATALYST_DEFAULT_LIMIT,
@@ -85,17 +87,24 @@ const CITY_ALIASES: Record<string, string> = {
   dc: "washington_dc",
 };
 
-let manifestCache: { value: Manifest | null; etag: string | null; expires: number } = {
+let manifestCache: {
+  value: Manifest | null;
+  etag: string | null;
+  expires: number;
+  /** Release id the cached manifest was resolved from (hex-coverage Stage B). */
+  snapshotId: string | null;
+} = {
   value: null,
   etag: null,
   expires: 0,
+  snapshotId: null,
 };
 
 /** Clears the in-isolate snapshot caches (KV values + manifest). Used by the
  *  test suite to keep module-level cache state from leaking between cases. */
 export function clearSnapshotCaches(): void {
   kvJsonCache = new Map();
-  manifestCache = { value: null, etag: null, expires: 0 };
+  manifestCache = { value: null, etag: null, expires: 0, snapshotId: null };
 }
 
 export interface Manifest {
@@ -112,6 +121,15 @@ export interface Manifest {
   metro_index?: MetroMeta[];
   /** Bay Area context layers joined onto grid cells (present only when published). */
   context_layers?: ContextLayersBlock;
+  /** Release-qualified publication id (hex-coverage Stage B); legacy manifests omit it. */
+  snapshot_id?: string;
+  /** Coverage contract block (hex-coverage Stage A); absent on legacy manifests. */
+  coverage?: {
+    schema_version?: number;
+    national?: { status?: string; index_key?: string; resolutions?: Record<string, unknown> };
+    metro?: { mode?: string };
+    [key: string]: unknown;
+  };
 }
 
 interface ContextLayersBlock {
@@ -172,13 +190,14 @@ export interface CatalystPayload {
 // Small helpers
 // ---------------------------------------------------------------------------
 
-function jsonError(status: number, detail: string): Response {
+function jsonError(status: number, detail: string, extra?: Record<string, string>): Response {
   return new Response(JSON.stringify({ detail }), {
     status,
     headers: {
       "content-type": "application/json",
       "x-content-type-options": "nosniff",
       "cache-control": "no-store",
+      ...extra,
     },
   });
 }
@@ -301,19 +320,97 @@ function notModified(baseHeaders: Record<string, string>, etag: string): Respons
   });
 }
 
+/** Coverage schema version this worker implements (hex-coverage Stage A). */
+export const SUPPORTED_COVERAGE_SCHEMA_VERSION = 1;
+/** Path-safe release id accepted on `?snapshot_id=` (matches the builder's id). */
+const SNAPSHOT_ID_PATTERN = /^[A-Za-z0-9._-]{1,64}$/;
+
+/**
+ * Resolve the current manifest through the `snapshot/current` pointer.
+ *
+ * When the pointer exists, the release-qualified `releases/{current}/manifest`
+ * is authoritative; otherwise the legacy `manifest` key is read (explicit
+ * backward-compatible path). Missing values keep the last known-good manifest
+ * (stale beats a spurious 404) and malformed publishes never overwrite it.
+ */
 export async function getManifest(env: Env): Promise<Manifest | null> {
   const now = Date.now();
   if (manifestCache.value && now < manifestCache.expires) return manifestCache.value;
   try {
-    const raw = await env.SNAPSHOT.get("manifest");
+    const pointer = await fetchSnapshotPointer(env);
+    const pointerId = pointer?.current ?? null;
+    const raw = await env.SNAPSHOT.get(pointerId ? `releases/${pointerId}/manifest` : "manifest");
     if (raw === null) return manifestCache.value; // stale beats a spurious 404
     const value = JSON.parse(raw) as Manifest;
     const etag = `"${(await sha256Hex(raw)).slice(0, 32)}"`;
-    manifestCache = { value, etag, expires: now + MANIFEST_TTL_MS };
+    manifestCache = {
+      value,
+      etag,
+      expires: now + MANIFEST_TTL_MS,
+      snapshotId: typeof value.snapshot_id === "string" ? value.snapshot_id : pointerId,
+    };
     return value;
   } catch {
     return manifestCache.value; // malformed publish: keep last known-good
   }
+}
+
+export type SnapshotReadOutcome =
+  | { ok: true; entry: { value: unknown; etag: string } | null }
+  | { ok: false; status: number; detail: string; headers?: Record<string, string> };
+
+/**
+ * Resolve one KV logical key for a snapshot data route (hex-coverage Stage B).
+ *
+ * With a `snapshotId`, reads the release-qualified key
+ * `releases/{id}/{logicalKey}` and NEVER falls back to another generation: a
+ * missing release value is a 503 with a bounded retry hint because the
+ * generation may not be visible yet. Without an id the legacy logical key is
+ * read exactly as before (backward compatible).
+ *
+ * Also enforces the coverage schema contract: a resolved manifest declaring a
+ * `coverage.schema_version` newer than this worker implements fails the read
+ * (500) rather than serving mismatched data. A missing/legacy coverage block is
+ * fine.
+ */
+export async function readSnapshotValue(
+  env: Env,
+  logicalKey: string,
+  snapshotId: string | null
+): Promise<SnapshotReadOutcome> {
+  const manifest = await getManifest(env);
+  const version = manifest?.coverage?.schema_version;
+  if (typeof version === "number" && version > SUPPORTED_COVERAGE_SCHEMA_VERSION) {
+    return { ok: false, status: 500, detail: `Unsupported snapshot schema version ${version}.` };
+  }
+  const key = snapshotId ? `releases/${snapshotId}/${logicalKey}` : logicalKey;
+  const entry = await kvJson(env, key);
+  if (entry) return { ok: true, entry };
+  if (snapshotId) {
+    return {
+      ok: false,
+      status: 503,
+      detail: `Snapshot generation '${snapshotId}' is not available.`,
+      headers: { "retry-after": "5" },
+    };
+  }
+  return { ok: true, entry: null };
+}
+
+/** Parse `?snapshot_id=`; absent is fine, anything outside the path-safe
+ *  format is a 400. */
+function parseSnapshotId(url: URL): { id: string | null } | { error: Response } {
+  const raw = url.searchParams.get("snapshot_id");
+  if (raw === null) return { id: null };
+  if (!SNAPSHOT_ID_PATTERN.test(raw)) {
+    return {
+      error: jsonError(
+        400,
+        "Malformed 'snapshot_id': expected 1-64 characters of [A-Za-z0-9._-]."
+      ),
+    };
+  }
+  return { id: raw };
 }
 
 // ---------------------------------------------------------------------------
@@ -1457,8 +1554,10 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
         );
       }
 
-      // GET /api/v1/submarkets?city_id=
+      // GET /api/v1/submarkets?city_id=[&snapshot_id=]
       if (url.pathname === "/api/v1/submarkets") {
+        const parsed = parseSnapshotId(url);
+        if ("error" in parsed) return parsed.error;
         const city = normalizeCity(url.searchParams.get("city_id"), manifest);
         if (!city) {
           return jsonError(
@@ -1466,7 +1565,9 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
             `Unsupported city_id '${safeEcho(url.searchParams.get("city_id"))}'. Supported cities: ${supportedCities}.`
           );
         }
-        const entry = await kvJson(env, `submarkets/${city}`);
+        const read = await readSnapshotValue(env, `submarkets/${city}`, parsed.id);
+        if (!read.ok) return jsonError(read.status, read.detail, read.headers);
+        const entry = read.entry;
         if (!entry) return jsonError(404, `No snapshot for city '${city}'.`);
         if (etagMatches(request, entry.etag)) return notModified(baseHeaders, entry.etag);
 
@@ -1476,8 +1577,9 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
         const result = await querySubmarkets(env, {
           city,
           borough: url.searchParams.get("borough") ?? undefined,
+          snapshotId: parsed.id,
         });
-        if ("error" in result) return jsonError(404, result.error);
+        if ("error" in result) return jsonError(result.status ?? 404, result.error, result.headers);
         // entry.value is the isolate-wide cached object that every later
         // request reads, so build a fresh payload instead of mutating it: a
         // borough-filtered request must not shrink the next caller's data.
@@ -1493,8 +1595,10 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
         });
       }
 
-      // GET /api/v1/grid?city_id=
+      // GET /api/v1/grid?city_id=[&snapshot_id=]
       if (url.pathname === "/api/v1/grid") {
+        const parsed = parseSnapshotId(url);
+        if ("error" in parsed) return parsed.error;
         const city = normalizeCity(url.searchParams.get("city_id"), manifest);
         if (!city) {
           return jsonError(
@@ -1502,7 +1606,9 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
             `Unsupported city_id '${safeEcho(url.searchParams.get("city_id"))}'. Supported cities: ${supportedCities}.`
           );
         }
-        const entry = await kvJson(env, `grid/${city}`);
+        const read = await readSnapshotValue(env, `grid/${city}`, parsed.id);
+        if (!read.ok) return jsonError(read.status, read.detail, read.headers);
+        const entry = read.entry;
         if (!entry) return jsonError(404, `No grid snapshot for city '${city}'.`);
         if (etagMatches(request, entry.etag)) return notModified(baseHeaders, entry.etag);
         return withHeaders(JSON.stringify(entry.value), 200, {
@@ -1511,8 +1617,10 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
         });
       }
 
-      // GET /api/v1/catalysts?city_id=&min_lims=&limit=&borough=&resolution=
+      // GET /api/v1/catalysts?city_id=&min_lims=&limit=&borough=[&snapshot_id=]
       if (url.pathname === "/api/v1/catalysts") {
+        const parsed = parseSnapshotId(url);
+        if ("error" in parsed) return parsed.error;
         const city = normalizeCity(url.searchParams.get("city_id"), manifest);
         if (!city) {
           return jsonError(
@@ -1523,7 +1631,9 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
         // Transport parsing only. The min_lims/limit/borough policy, default
         // source, bounding, and filter/slice all live in snapshot.ts (PRODUCT
         // DECISION US-190); the adapter keeps the 422/404 envelope + wording.
-        const entry = await kvJson(env, `catalysts/${city}`);
+        const read = await readSnapshotValue(env, `catalysts/${city}`, parsed.id);
+        if (!read.ok) return jsonError(read.status, read.detail, read.headers);
+        const entry = read.entry;
         if (!entry) return jsonError(404, `No catalyst snapshot for city '${city}'.`);
         if (etagMatches(request, entry.etag)) return notModified(baseHeaders, entry.etag);
 
@@ -1541,8 +1651,9 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
           minLims,
           limit,
           borough: url.searchParams.get("borough") ?? undefined,
+          snapshotId: parsed.id,
         });
-        if ("error" in result) return jsonError(422, result.error);
+        if ("error" in result) return jsonError(result.status ?? 422, result.error, result.headers);
         const payload: CatalystPayload = {
           city_id: result.city_id,
           count: result.catalysts.length,
@@ -1562,12 +1673,14 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
         let etag = manifestCache.etag;
         if (!etag || manifestCache.value !== manifest) {
           etag = `"${(await sha256Hex(JSON.stringify(manifest))).slice(0, 32)}"`;
-          manifestCache = { value: manifest, etag, expires: manifestCache.expires };
+          manifestCache = { ...manifestCache, value: manifest, etag };
         }
         if (etagMatches(request, etag)) return notModified(baseHeaders, etag);
+        const snapshotId = manifest.snapshot_id ?? manifestCache.snapshotId;
         return withHeaders(JSON.stringify(manifest), 200, {
           ...baseHeaders,
           etag,
+          ...(snapshotId ? { "x-snapshot-id": snapshotId } : {}),
         });
       }
 
@@ -1576,6 +1689,8 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
       // `res` selects the metro LOD level (defaults to 9 for the legacy
       // `gridtiles/{parent}` shim). res-aware keys are gridtiles_res{res}/{parent}.
       if (url.pathname === "/api/v1/gridtiles") {
+        const parsed = parseSnapshotId(url);
+        if ("error" in parsed) return parsed.error;
         const rawParents = url.searchParams.get("parents");
         if (!rawParents || !rawParents.trim()) {
           return jsonError(400, "Query parameter 'parents' is required (comma-separated H3 parent indexes).");
@@ -1596,12 +1711,17 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
 
         let body: string;
         if (res === 9 && !resRaw) {
-          // Legacy shim path: reads the plain gridtiles/{parent} keys (unchanged).
-          const entries = await Promise.all(parents.map((parent) => kvJson(env, `gridtiles/${parent}`)));
+          // Legacy shim path: reads the plain gridtiles/{parent} keys (unchanged
+          // without a snapshot_id; release-qualified when one is given).
+          const reads = await Promise.all(
+            parents.map((parent) => readSnapshotValue(env, `gridtiles/${parent}`, parsed.id))
+          );
           const features: Record<string, unknown>[] = [];
           const missing: string[] = [];
           for (let i = 0; i < parents.length; i += 1) {
-            const entry = entries[i];
+            const read = reads[i];
+            if (!read.ok) return jsonError(read.status, read.detail, read.headers);
+            const entry = read.entry;
             if (!entry) {
               missing.push(parents[i]);
               continue;
@@ -1617,8 +1737,8 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
             features,
           });
         } else {
-          const result = await fetchGridTiles(env, { res, parents });
-          if ("error" in result) return jsonError(400, result.error);
+          const result = await fetchGridTiles(env, { res, parents, snapshotId: parsed.id });
+          if ("error" in result) return jsonError(result.status ?? 400, result.error, result.headers);
           body = JSON.stringify({
             count: result.count,
             requested: parents.length,
@@ -1635,8 +1755,10 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
 
       // GET /api/v1/national — national hex layer index (per-res chunk inventories)
       if (url.pathname === "/api/v1/national") {
-        const result = await fetchNationalIndex(env);
-        if ("error" in result) return jsonError(404, result.error);
+        const parsed = parseSnapshotId(url);
+        if ("error" in parsed) return parsed.error;
+        const result = await fetchNationalIndex(env, { snapshotId: parsed.id });
+        if ("error" in result) return jsonError(result.status ?? 404, result.error, result.headers);
         const body = JSON.stringify(result);
         const etag = `"${(await sha256Hex(body)).slice(0, 32)}"`;
         if (etagMatches(request, etag)) return notModified(baseHeaders, etag);
@@ -1648,6 +1770,8 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
       // from the national-builder output tree (US-383).
       const nationalMatch = url.pathname.match(/^\/api\/v1\/national\/(\d+)$/);
       if (nationalMatch) {
+        const parsed = parseSnapshotId(url);
+        if ("error" in parsed) return parsed.error;
         const rawParents = url.searchParams.get("parents");
         if (!rawParents || !rawParents.trim()) {
           return jsonError(400, "Query parameter 'parents' is required (comma-separated res-3 H3 parent indexes).");
@@ -1659,8 +1783,12 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
         if (parents.length > MAX_NATIONAL_PARENTS_PER_REQUEST) {
           return jsonError(400, `Too many parents requested (${parents.length}); max ${MAX_NATIONAL_PARENTS_PER_REQUEST} per call.`);
         }
-        const result = await fetchNationalRows(env, { res: Number(nationalMatch[1]), parents });
-        if ("error" in result) return jsonError(400, result.error);
+        const result = await fetchNationalRows(env, {
+          res: Number(nationalMatch[1]),
+          parents,
+          snapshotId: parsed.id,
+        });
+        if ("error" in result) return jsonError(result.status ?? 400, result.error, result.headers);
         const body = JSON.stringify(result);
         const etag = `"${(await sha256Hex(body)).slice(0, 32)}"`;
         if (etagMatches(request, etag)) return notModified(baseHeaders, etag);
@@ -1669,7 +1797,11 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
 
       // GET /api/v1/catalysts/all — every metro's catalysts, attributed and ranked
       if (url.pathname === "/api/v1/catalysts/all") {
-        const entry = await kvJson(env, "catalysts/index");
+        const parsed = parseSnapshotId(url);
+        if ("error" in parsed) return parsed.error;
+        const read = await readSnapshotValue(env, "catalysts/index", parsed.id);
+        if (!read.ok) return jsonError(read.status, read.detail, read.headers);
+        const entry = read.entry;
         if (!entry) return jsonError(404, "No combined catalyst snapshot published.");
         if (etagMatches(request, entry.etag)) return notModified(baseHeaders, entry.etag);
         return withHeaders(JSON.stringify(entry.value), 200, {
@@ -1683,6 +1815,8 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
         if (request.method !== "POST") {
           return jsonError(405, "Method Not Allowed");
         }
+        const parsed = parseSnapshotId(url);
+        if ("error" in parsed) return parsed.error;
         const contentType = request.headers.get("content-type") ?? "";
         if (!contentType.toLowerCase().includes("application/json")) {
           return jsonError(415, "Expected 'content-type: application/json'.");
@@ -1717,8 +1851,14 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
         const result = await lookupPrediction(env, {
           h3Index,
           includeShap: body.include_shap === false ? false : undefined,
+          snapshotId: parsed.id,
         });
-        if ("error" in result) return jsonError(404, String((result as Record<string, unknown>).error));
+        if ("error" in result) {
+          // `PredictionOutcome` includes a loose record shape, so `in` does not
+          // narrow; treat it as the structured failure explicitly.
+          const failure = result as SnapshotQueryError;
+          return jsonError(failure.status ?? 404, String(failure.error), failure.headers);
+        }
         return withHeaders(JSON.stringify(result), 200, baseHeaders);
       }
 

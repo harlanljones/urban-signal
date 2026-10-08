@@ -62,7 +62,7 @@ jobs:
         run: |
           PYTHONPATH=apps/api .venv/bin/python scripts/export_dashboard.py
           PYTHONPATH=apps/api .venv/bin/python -m pytest -q -m interlock apps/api/tests/unit/test_interlock_gate.py
-          PYTHONPATH=apps/api .venv/bin/python -m pytest -q apps/api/tests/unit/test_export_snapshot.py apps/api/tests/unit/test_snapshot_metrics.py apps/api/tests/unit/test_engine_prediction_cache.py apps/api/tests/unit/test_engine_quantile_calibration.py apps/api/tests/unit/test_workflow_routing.py
+          PYTHONPATH=apps/api .venv/bin/python -m pytest -q apps/api/tests/unit/test_export_snapshot.py apps/api/tests/unit/test_snapshot_metrics.py apps/api/tests/unit/test_engine_prediction_cache.py apps/api/tests/unit/test_engine_quantile_calibration.py apps/api/tests/unit/test_workflow_routing.py apps/api/tests/unit/test_validate_national_artifact.py apps/api/tests/unit/test_prune_snapshot_releases.py
 
       - name: Check Python quality and feed behavior
         if: github.event_name == 'push' || github.event_name == 'pull_request'
@@ -101,7 +101,7 @@ jobs:
     timeout-minutes: 120
     permissions:
       contents: read
-      actions: read # download the bay-area-context artifact
+      actions: read # download the bay-area-context and national artifacts
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -148,13 +148,45 @@ jobs:
             echo "created_at=$created_at" >> "$GITHUB_OUTPUT"
           fi
 
+      # The national LODES context artifact is required in production mode
+      # (US-435 §24). It is built monthly by national-publish.yml; the daily path
+      # never downloads raw LODES. A missing artifact fails the daily build
+      # instead of silently regressing to metro-only coverage.
+      - name: Fetch national context artifact
+        id: national-artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/national
+          result=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow national-publish.yml \
+            --branch main --status success --limit 1 --json databaseId,createdAt \
+            --jq '.[0] | [.databaseId, .createdAt] | @tsv')
+          run_id=$(printf '%s' "$result" | cut -f1)
+          created_at=$(printf '%s' "$result" | cut -f2)
+          if [ -z "$run_id" ] || [ "$run_id" = "null" ]; then
+            echo "No successful national-publish run found; require-national production mode cannot proceed." >&2
+            exit 1
+          fi
+          gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name national-artifact --dir build/national
+          echo "Downloaded national artifact from run $run_id created at $created_at."
+          echo "created_at=$created_at" >> "$GITHUB_OUTPUT"
+
+      - name: Validate national context artifact
+        run: |
+          PYTHONPATH=apps/api .venv/bin/python scripts/validate_national_artifact.py \
+            --dir build/national
+
       - name: Build snapshot artifacts and metrics
         run: |
           mkdir -p build
           PYTHONPATH=apps/api .venv/bin/python scripts/export_dashboard.py
+          # Dense metro hex (US-408: bounded k_ring=3 + 1.5 km) and require-national
+          # production mode (US-435 §24). national-dir's parent carries the
+          # national/ tree the fetch step downloaded.
           /usr/bin/time -f 'elapsed_seconds=%e\npeak_rss_kib=%M' -o build/snapshot-resources.txt \
             env PYTHONPATH=apps/api .venv/bin/python -m src.export.snapshot_builder \
-              --out dist --context-dir build/context --metrics-out build/snapshot-metrics.json
+              --out dist --context-dir build/context --metrics-out build/snapshot-metrics.json \
+              --dense-metro --national-dir build --require-national
 
       - name: Preserve snapshot metrics
         if: always()
@@ -183,11 +215,24 @@ jobs:
         working-directory: apps/dashboard
         run: bunx wrangler kv bulk put ../../dist/kv-bulk.json --binding SNAPSHOT --remote
 
+      # Stage B publishes a release-qualified twin of every key. Keep only the
+      # generations the reader can address (the new current + its previous
+      # rollback) so the namespace does not grow by a full snapshot every day.
+      - name: Prune stale snapshot generations
+        env:
+          SNAPSHOT_NAMESPACE_ID: ${{ vars.SNAPSHOT_NAMESPACE_ID || 'cea91d937ff344bf9ae70f62734f5ae5' }}
+        run: |
+          PYTHONPATH=apps/api .venv/bin/python scripts/prune_snapshot_releases.py \
+            --account-id "$CLOUDFLARE_ACCOUNT_ID" \
+            --namespace-id "$SNAPSHOT_NAMESPACE_ID" \
+            --pointer dist/kv-bulk.json
+
       - name: Summarize successful snapshot publication
         if: success()
         env:
           BAY_AREA_CONTEXT_AVAILABLE: ${{ steps.bay-area-context.outputs.available }}
           BAY_AREA_CONTEXT_CREATED_AT: ${{ steps.bay-area-context.outputs.created_at }}
+          NATIONAL_ARTIFACT_CREATED_AT: ${{ steps.national-artifact.outputs.created_at }}
         run: |
           python - <<'PY'
           import json
@@ -215,6 +260,13 @@ jobs:
               lines.append("| Optional Bay Area context | Artifact unavailable; snapshot has no optional context layers |")
           else:
               lines.append("| Optional Bay Area context | No successful context run found; snapshot has no optional context layers |")
+          national_created = os.environ.get("NATIONAL_ARTIFACT_CREATED_AT", "")
+          if national_created:
+              national_time = datetime.fromisoformat(national_created.replace("Z", "+00:00"))
+              national_age = (datetime.now(timezone.utc) - national_time).total_seconds() / 3600
+              lines.append(f"| National LODES artifact age | {national_age:.1f} hours |")
+          else:
+              lines.append("| National LODES artifact | Consumed in require-national mode (age not recorded) |")
           resources = Path("build/snapshot-resources.txt")
           if resources.exists():
               values = dict(line.split("=", 1) for line in resources.read_text().splitlines() if "=" in line)

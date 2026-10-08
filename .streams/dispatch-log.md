@@ -2162,3 +2162,24 @@ Root final focused suites82 + routing7 pass; mandatory preflight and Ruff pass. 
 - Assigned luna_map_sweep implementation: nationalRowsToFeatures only in dashboard.py and new tests/national-overlay.test.js; confirmed null-only ranks incorrectly accepted by extracted actual helper. Preserve legitimate zero ranks. No speculative national-race fix.
 - Launched luna_sweep_review: independent read-only correctness review; owns .streams/luna-sweep-review.md. Finalizes only after selection implementation completes.
 - Completed three Luna implementation streams and independent Luna review. Root synchronized static HTML; 116 dashboard tests, 38 serving tests, typecheck/build, Node zoom command and full preflight passed. Candidate browser at production URL verified coordinate/H3 validation and null percentile handling with no page errors. No deployment.
+
+## Enable expanded coverage — 2026-10-07
+- Directive (user): enable the coverage the specs shipped but never enabled, and finish the
+  deferred hex-coverage Stage A/B reader. Decisions: national artifact = GitHub Actions
+  long-retention artifact (pilot); dense metro = enabled globally.
+- Stream `enable-expanded-coverage` (claim `.streams/enable-expanded-coverage.md`).
+- Task A (leaf, root): `--dense-metro` + national fetch/validate/require in `batch-push.yml`;
+  new `national-publish.yml`; new `scripts/validate_national_artifact.py` + 11 unit tests.
+  Ruff clean; workflow-routing tests green.
+- Task C1 (background subagent): worker `snapshot/current` resolution + `?snapshot_id=`
+  release-qualified reads + schema-version guard.
+- Task C2 (background subagent): client coverage-state machine, availability gating,
+  snapshot pinning, generation guard/dedupe/retry, truthful legends; byte-synced export.
+- Root owns integration, byte-sync, full CI/CD preflight and evidence. No deployment.
+- Result: A (dense + national publish/validate/require), C1 (worker release reader), C2 (client
+  coverage states), P (bounded release-key retention) all landed. Full preflight green; worker
+  144 tests, node 22, interlock 25, new/related python 82. Byte-sync exact. No commit, no deployment.
+- Flagged + fixed the Stage B storage risk: release twins accumulated a full generation per daily
+  publish (snapshot_id hashes generated_at). Added `scripts/prune_snapshot_releases.py` (keep
+  {current, previous}) wired after the KV push; raised MAX_BULK_BYTES 512 MiB -> 1 GiB so the
+  dense + twin bulk (~566 MiB measured extrapolation) builds.

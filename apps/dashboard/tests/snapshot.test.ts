@@ -1,5 +1,5 @@
 import { expect, test, beforeEach } from "bun:test";
-import worker, { clearSnapshotCaches } from "../src/index";
+import worker, { clearSnapshotCaches, readSnapshotValue } from "../src/index";
 import { testEnv } from "./index.test";
 import {
   queryCatalysts,
@@ -9,6 +9,7 @@ import {
   fetchNationalIndex,
   fetchNationalRows,
   fetchGridTiles,
+  fetchSnapshotPointer,
 } from "../src/snapshot";
 
 beforeEach(() => clearSnapshotCaches());
@@ -288,4 +289,139 @@ test("fetchGridTiles errors on an invalid res value", async () => {
   expect("error" in result).toBe(true);
   const result2 = await fetchGridTiles(testEnv() as any, { res: 6, parents: ["842830fffffffff"] });
   expect("error" in result2).toBe(true);
+});
+
+// ---------------------------------------------------------------------------
+// Hex-coverage Stage B: pointer resolution + release-qualified reads
+// ---------------------------------------------------------------------------
+
+const LEGACY_MANIFEST = { cities: ["nyc"], catalyst_threshold: 85 };
+
+/** KV env backed by an explicit key -> JSON value map. */
+function kvEnv(values: Record<string, unknown>) {
+  return {
+    SNAPSHOT: {
+      async get(key: string) {
+        return key in values ? JSON.stringify(values[key]) : null;
+      },
+    },
+  } as any;
+}
+
+test("fetchSnapshotPointer returns null when no pointer is published", async () => {
+  expect(await fetchSnapshotPointer(testEnv() as any)).toBeNull();
+});
+
+test("fetchSnapshotPointer returns the promoted release when present", async () => {
+  const env = kvEnv({
+    "snapshot/current": { current: "r-x", previous: "r-y", promoted_at: "2026-10-07T00:00:00Z" },
+  });
+  expect(await fetchSnapshotPointer(env)).toEqual({
+    current: "r-x",
+    previous: "r-y",
+    promoted_at: "2026-10-07T00:00:00Z",
+  });
+});
+
+test("fetchSnapshotPointer treats a malformed pointer as absent", async () => {
+  expect(await fetchSnapshotPointer(kvEnv({ "snapshot/current": { previous: null } }))).toBeNull();
+});
+
+test("readSnapshotValue reads the release-qualified key for a snapshot id", async () => {
+  const env = kvEnv({
+    manifest: LEGACY_MANIFEST,
+    "grid/nyc": { marker: "legacy" },
+    "releases/r-1/grid/nyc": { marker: "release" },
+  });
+  const result = await readSnapshotValue(env, "grid/nyc", "r-1");
+  expect(result.ok).toBe(true);
+  if (result.ok) expect((result.entry!.value as { marker: string }).marker).toBe("release");
+});
+
+test("readSnapshotValue returns a 503 failure for a missing release key (no fallback)", async () => {
+  const env = kvEnv({ manifest: LEGACY_MANIFEST, "grid/nyc": { marker: "legacy" } });
+  const result = await readSnapshotValue(env, "grid/nyc", "r-missing");
+  expect(result.ok).toBe(false);
+  if (!result.ok) {
+    expect(result.status).toBe(503);
+    expect(result.detail).toBe("Snapshot generation 'r-missing' is not available.");
+    expect(result.headers?.["retry-after"]).toBe("5");
+  }
+});
+
+test("readSnapshotValue fails closed on an unsupported coverage schema version", async () => {
+  const env = kvEnv({ manifest: { ...LEGACY_MANIFEST, coverage: { schema_version: 2 } }, "grid/nyc": {} });
+  const result = await readSnapshotValue(env, "grid/nyc", null);
+  expect(result.ok).toBe(false);
+  if (!result.ok) {
+    expect(result.status).toBe(500);
+    expect(result.detail).toBe("Unsupported snapshot schema version 2.");
+  }
+});
+
+test("lookupPrediction reads the release-qualified cell shard for a snapshot id", async () => {
+  const env = kvEnv({
+    manifest: LEGACY_MANIFEST,
+    "cells/892a10708b7ffff": { h3_index: "892a10708b7ffff", lims_score: 97.5, source: "legacy" },
+    "releases/r-1/cells/892a10708b7ffff": { h3_index: "892a10708b7ffff", lims_score: 42, source: "release" },
+  });
+  const result = (await lookupPrediction(env, {
+    h3Index: "892a10708b7ffff",
+    snapshotId: "r-1",
+  })) as any;
+  expect(result.source).toBe("release");
+});
+
+test("lookupPrediction surfaces the 503 when a release shard is missing", async () => {
+  const env = kvEnv({
+    manifest: LEGACY_MANIFEST,
+    "cells/892a10708b7ffff": { h3_index: "892a10708b7ffff", lims_score: 97.5 },
+  });
+  const result = await lookupPrediction(env, { h3Index: "892a10708b7ffff", snapshotId: "r-missing" });
+  expect("error" in result).toBe(true);
+  expect((result as any).status).toBe(503);
+  expect((result as any).headers?.["retry-after"]).toBe("5");
+});
+
+test("queryCatalysts reads the release-qualified payload for a snapshot id", async () => {
+  const env = kvEnv({
+    manifest: LEGACY_MANIFEST,
+    "catalysts/nyc": { city_id: "nyc", threshold: 85, catalysts: [{ h3_index: "a", lims_score: 90 }] },
+    "releases/r-1/catalysts/nyc": {
+      city_id: "nyc",
+      threshold: 85,
+      catalysts: [{ h3_index: "b", lims_score: 80 }],
+    },
+  });
+  const result = (await queryCatalysts(env, { city: "nyc", snapshotId: "r-1" })) as any;
+  expect(result.catalysts[0].h3_index).toBe("b");
+});
+
+test("fetchNationalIndex reads the release-qualified index for a snapshot id", async () => {
+  const env = kvEnv({
+    manifest: LEGACY_MANIFEST,
+    "national/index": { generated_at: "legacy", resolutions: {} },
+    "releases/r-1/national/index": {
+      generated_at: "release",
+      resolutions: { "6": { count: 1, byte_size: 1, sha256: "a", parents: ["p"], generated_at: "release" } },
+    },
+  });
+  const result = (await fetchNationalIndex(env, { snapshotId: "r-1" })) as any;
+  expect(result.generated_at).toBe("release");
+});
+
+test("fetchGridTiles reads the release-qualified tiles for a snapshot id", async () => {
+  const env = kvEnv({
+    manifest: LEGACY_MANIFEST,
+    "gridtiles_res7/842830fffffffff": { features: [{ properties: { h3_index: "legacy" } }] },
+    "releases/r-1/gridtiles_res7/842830fffffffff": {
+      features: [{ properties: { h3_index: "release" } }],
+    },
+  });
+  const result = (await fetchGridTiles(env, {
+    res: 7,
+    parents: ["842830fffffffff"],
+    snapshotId: "r-1",
+  })) as any;
+  expect(result.features[0].properties.h3_index).toBe("release");
 });

@@ -1155,3 +1155,205 @@ test("dashboard CSP allows only the pinned CDN packages", async () => {
   expect(csp).not.toMatch(/https:\/\/cdn\.jsdelivr\.net[ ;]/);
   expect(response.headers.get("x-frame-options")).toBe("SAMEORIGIN");
 });
+
+// ---------------------------------------------------------------------------
+// Hex-coverage Stage B: snapshot/current pointer + ?snapshot_id= serving
+// ---------------------------------------------------------------------------
+
+const SNAPSHOT_ID = "r-20261007-abcdef12";
+
+const LEGACY_MANIFEST = {
+  generated_at: "2026-08-24T00:00:00Z",
+  app_version: "2.0.0",
+  cities: ["nyc"],
+  resolution: 9,
+  k_ring: 1,
+  catalyst_threshold: 85,
+  tile_resolution: 5,
+  tile_indexes: {
+    "9": { "852830bbfffffff": { count: 1, cities: ["nyc"], bbox: null } },
+  },
+};
+
+const RELEASE_MANIFEST = {
+  ...LEGACY_MANIFEST,
+  generated_at: "2026-10-07T00:00:00Z",
+  snapshot_id: SNAPSHOT_ID,
+  coverage: { schema_version: 1, national: { status: "unavailable" }, metro: { mode: "sparse_registry" } },
+};
+
+/** Minimal KV env backed by an explicit key -> JSON value map. */
+function kvValuesEnv(values: Record<string, unknown>) {
+  return {
+    SNAPSHOT: {
+      async get(key: string) {
+        return key in values ? JSON.stringify(values[key]) : null;
+      },
+    },
+    ASSETS: {
+      fetch: async () =>
+        new Response("<!DOCTYPE html><html><body>dashboard</body></html>", {
+          status: 200,
+          headers: { "content-type": "text/html; charset=utf-8" },
+        }),
+    },
+  };
+}
+
+function gridPayload(marker: string) {
+  return {
+    type: "FeatureCollection",
+    city_id: "nyc",
+    features: [
+      {
+        type: "Feature",
+        id: marker,
+        geometry: { type: "Polygon", coordinates: [] },
+        properties: { h3_index: marker, marker },
+      },
+    ],
+  };
+}
+
+test("manifest resolves through snapshot/current and sets x-snapshot-id", async () => {
+  clearSnapshotCaches();
+  const env = kvValuesEnv({
+    "snapshot/current": { current: SNAPSHOT_ID, previous: null, promoted_at: "2026-10-07T00:00:00Z" },
+    manifest: LEGACY_MANIFEST,
+    [`releases/${SNAPSHOT_ID}/manifest`]: RELEASE_MANIFEST,
+  }) as never;
+
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/manifest`), env);
+
+  expect(response.status).toBe(200);
+  const body = (await response.json()) as { generated_at: string; snapshot_id?: string };
+  expect(body.generated_at).toBe("2026-10-07T00:00:00Z");
+  expect(body.snapshot_id).toBe(SNAPSHOT_ID);
+  expect(response.headers.get("x-snapshot-id")).toBe(SNAPSHOT_ID);
+});
+
+test("manifest falls back to the legacy key when no snapshot pointer exists", async () => {
+  clearSnapshotCaches();
+  const env = kvValuesEnv({ manifest: LEGACY_MANIFEST }) as never;
+
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/manifest`), env);
+
+  expect(response.status).toBe(200);
+  const body = (await response.json()) as { generated_at: string };
+  expect(body.generated_at).toBe("2026-08-24T00:00:00Z");
+  expect(response.headers.get("x-snapshot-id")).toBeNull();
+});
+
+test("a valid snapshot_id reads the release-qualified key", async () => {
+  clearSnapshotCaches();
+  const env = kvValuesEnv({
+    manifest: LEGACY_MANIFEST,
+    "grid/nyc": gridPayload("legacy"),
+    [`releases/${SNAPSHOT_ID}/grid/nyc`]: gridPayload("release"),
+  }) as never;
+
+  const response = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/grid?city_id=nyc&snapshot_id=${SNAPSHOT_ID}`),
+    env,
+  );
+
+  expect(response.status).toBe(200);
+  const body = (await response.json()) as { features: { properties: { marker: string } }[] };
+  expect(body.features[0].properties.marker).toBe("release");
+});
+
+test("without snapshot_id the legacy logical key is still served", async () => {
+  clearSnapshotCaches();
+  const env = kvValuesEnv({
+    manifest: LEGACY_MANIFEST,
+    "grid/nyc": gridPayload("legacy"),
+    [`releases/${SNAPSHOT_ID}/grid/nyc`]: gridPayload("release"),
+  }) as never;
+
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/grid?city_id=nyc`), env);
+
+  expect(response.status).toBe(200);
+  const body = (await response.json()) as { features: { properties: { marker: string } }[] };
+  expect(body.features[0].properties.marker).toBe("legacy");
+});
+
+test("release-qualified reads keep ETag revalidation working", async () => {
+  clearSnapshotCaches();
+  const env = kvValuesEnv({
+    manifest: LEGACY_MANIFEST,
+    [`releases/${SNAPSHOT_ID}/grid/nyc`]: gridPayload("release"),
+  }) as never;
+
+  const first = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/grid?city_id=nyc&snapshot_id=${SNAPSHOT_ID}`),
+    env,
+  );
+  expect(first.status).toBe(200);
+  const etag = first.headers.get("etag") ?? "";
+  expect(etag).toBeTruthy();
+
+  const revalidated = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/grid?city_id=nyc&snapshot_id=${SNAPSHOT_ID}`, {
+      headers: { "if-none-match": etag },
+    }),
+    env,
+  );
+  expect(revalidated.status).toBe(304);
+});
+
+test("an invalid snapshot_id is rejected with 400", async () => {
+  clearSnapshotCaches();
+  const env = kvValuesEnv({ manifest: LEGACY_MANIFEST, "grid/nyc": gridPayload("legacy") }) as never;
+
+  const response = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/grid?city_id=nyc&snapshot_id=${encodeURIComponent("bad id!")}`),
+    env,
+  );
+
+  expect(response.status).toBe(400);
+  const body = (await response.json()) as { detail: string };
+  expect(body.detail).toContain("snapshot_id");
+});
+
+test("a missing release key is a 503 with a retry hint and never falls back", async () => {
+  clearSnapshotCaches();
+  const env = kvValuesEnv({
+    manifest: LEGACY_MANIFEST,
+    // Legacy key exists, but the requested generation does not: no fallback.
+    "grid/nyc": gridPayload("legacy"),
+  }) as never;
+
+  const response = await worker.fetch(
+    new Request(`${ORIGIN}/api/v1/grid?city_id=nyc&snapshot_id=r-20261007-deadbeef`),
+    env,
+  );
+
+  expect(response.status).toBe(503);
+  expect(response.headers.get("retry-after")).toBe("5");
+  const body = (await response.json()) as { detail: string };
+  expect(body.detail).toBe("Snapshot generation 'r-20261007-deadbeef' is not available.");
+});
+
+test("a newer coverage schema_version fails snapshot reads with an integrity error", async () => {
+  clearSnapshotCaches();
+  const env = kvValuesEnv({
+    manifest: { ...LEGACY_MANIFEST, coverage: { schema_version: 2 } },
+    "grid/nyc": gridPayload("legacy"),
+  }) as never;
+
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/grid?city_id=nyc`), env);
+
+  expect(response.status).toBe(500);
+  const body = (await response.json()) as { detail: string };
+  expect(body.detail).toBe("Unsupported snapshot schema version 2.");
+});
+
+test("the manifest stays readable when the coverage schema is newer (client sees the mismatch)", async () => {
+  clearSnapshotCaches();
+  const env = kvValuesEnv({
+    manifest: { ...LEGACY_MANIFEST, coverage: { schema_version: 2 } },
+  }) as never;
+
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/manifest`), env);
+  expect(response.status).toBe(200);
+});

@@ -90,7 +90,14 @@ def _lod_aggregate_keys() -> tuple[str, ...]:
 # the build here, not inside `wrangler kv bulk put` at 2 AM.
 MAX_KV_VALUE_BYTES = 20 * 1024 * 1024  # KV hard cap is 25 MiB per value
 MAX_MANIFEST_BYTES = 10 * 1024 * 1024  # boot manifest fetched by every visitor
-MAX_BULK_BYTES = 512 * 1024 * 1024
+# Runaway bound on the whole bulk file. The KV bulk API caps each *request* at
+# 10,000 pairs / 100 MB (not the file), and `wrangler kv bulk put` segments the
+# file into batches under that cap, so this guards against a pathological
+# publish rather than a hard transport limit. Raised 512 MiB -> 1 GiB when the
+# dense metro hex (US-408) plus the Stage B release twins were enabled: measured
+# extrapolation from the 2026-10-07 prod snapshot (64 MiB logical / 69 MiB bulk,
+# 13,154 keys) is ~566 MiB once both are on.
+MAX_BULK_BYTES = 1024 * 1024 * 1024
 # National chunks (US-383): ticket budget per key — tighter than the KV cap by
 # design so a res-6 shard (~254 KB measured) can never silently creep toward it.
 NATIONAL_MAX_CHUNK_BYTES = 5 * 1024 * 1024

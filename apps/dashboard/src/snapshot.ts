@@ -25,11 +25,52 @@ import {
   kvJson,
   getManifest,
   normalizeCity,
+  readSnapshotValue,
   H3_PARENT_PATTERN,
 } from "./index";
 
 function normalizeBorough(raw: string): string {
   return raw.trim().toUpperCase().replace(/[\s-]/g, "_");
+}
+
+/**
+ * A snapshot query rejection that needs a transport status beyond the adapter's
+ * default: release-generation reads can fail 400/503/500 (hex-coverage Stage B).
+ * Adapters use `status`/`headers` when present and their historical default
+ * otherwise, so existing behaviour is unchanged when they are absent.
+ */
+export interface SnapshotQueryError {
+  error: string;
+  status?: number;
+  headers?: Record<string, string>;
+}
+
+// ---------------------------------------------------------------------------
+// Snapshot pointer (hex-coverage Stage B)
+// ---------------------------------------------------------------------------
+
+/** `snapshot/current` KV pointer written by the snapshot builder on promotion. */
+export interface SnapshotPointer {
+  current: string;
+  previous: string | null;
+  promoted_at: string;
+}
+
+/**
+ * Read the current release pointer, or null when no release has been promoted.
+ * Cached through `kvJson` (60 s, same TTL as the manifest), so the pointer is
+ * re-read at most once per manifest-cache window.
+ */
+export async function fetchSnapshotPointer(env: Env): Promise<SnapshotPointer | null> {
+  const entry = await kvJson(env, "snapshot/current");
+  if (!entry) return null;
+  const value = entry.value as Partial<SnapshotPointer> | null;
+  if (!value || typeof value.current !== "string" || value.current === "") return null;
+  return {
+    current: value.current,
+    previous: typeof value.previous === "string" ? value.previous : null,
+    promoted_at: typeof value.promoted_at === "string" ? value.promoted_at : "",
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -68,17 +109,19 @@ export interface CatalystQueryResult {
 }
 
 /** Success carries the four documented fields; rejections carry `{ error }`. */
-export type CatalystQueryOutcome = CatalystQueryResult | { error: string };
+export type CatalystQueryOutcome = CatalystQueryResult | SnapshotQueryError;
 
 export async function queryCatalysts(
   env: Env,
-  opts: { city: string; minLims?: number; limit?: number; borough?: string }
+  opts: { city: string; minLims?: number; limit?: number; borough?: string; snapshotId?: string | null }
 ): Promise<CatalystQueryOutcome> {
   const manifest = await getManifest(env);
   const city = normalizeCity(opts.city, manifest);
   if (!city) return { error: `Unsupported city_id '${opts.city}'.` };
 
-  const entry = await kvJson(env, `catalysts/${city}`);
+  const read = await readSnapshotValue(env, `catalysts/${city}`, opts.snapshotId ?? null);
+  if (!read.ok) return { error: read.detail, status: read.status, headers: read.headers };
+  const entry = read.entry;
   if (!entry) return { error: `No catalyst snapshot for city '${city}'.` };
 
   const stored = entry.value as CatalystPayload;
@@ -122,17 +165,19 @@ export interface SubmarketQueryResult {
   submarkets: Record<string, Record<string, unknown>>;
 }
 
-export type SubmarketQueryOutcome = SubmarketQueryResult | { error: string };
+export type SubmarketQueryOutcome = SubmarketQueryResult | SnapshotQueryError;
 
 export async function querySubmarkets(
   env: Env,
-  opts: { city: string; borough?: string }
+  opts: { city: string; borough?: string; snapshotId?: string | null }
 ): Promise<SubmarketQueryOutcome> {
   const manifest = await getManifest(env);
   const city = normalizeCity(opts.city, manifest);
   if (!city) return { error: `Unsupported city_id '${opts.city}'.` };
 
-  const entry = await kvJson(env, `submarkets/${city}`);
+  const read = await readSnapshotValue(env, `submarkets/${city}`, opts.snapshotId ?? null);
+  if (!read.ok) return { error: read.detail, status: read.status, headers: read.headers };
+  const entry = read.entry;
   if (!entry) return { error: `No snapshot for city '${city}'.` };
 
   const payload = entry.value as {
@@ -167,11 +212,11 @@ export async function querySubmarkets(
  * request instead of parsing the monolithic `cells/index` value) and falls back
  * to the legacy single key while the compat window is open.
  */
-export type PredictionOutcome = Record<string, unknown> | { error: string };
+export type PredictionOutcome = Record<string, unknown> | SnapshotQueryError;
 
 export async function lookupPrediction(
   env: Env,
-  opts: { h3Index: string; includeShap?: boolean }
+  opts: { h3Index: string; includeShap?: boolean; snapshotId?: string | null }
 ): Promise<PredictionOutcome> {
   const h3Index = opts.h3Index?.trim().toLowerCase();
   if (!h3Index) return { error: "'h3_index' is required." };
@@ -179,15 +224,18 @@ export async function lookupPrediction(
     return { error: "Malformed 'h3_index': expected a 15-char hex H3 cell index." };
   }
 
+  const snapshotId = opts.snapshotId ?? null;
   let pred: Record<string, unknown> | undefined;
 
-  const shard = await kvJson(env, `cells/${h3Index}`);
-  if (shard) pred = shard.value as Record<string, unknown>;
+  const shard = await readSnapshotValue(env, `cells/${h3Index}`, snapshotId);
+  if (!shard.ok) return { error: shard.detail, status: shard.status, headers: shard.headers };
+  if (shard.entry) pred = shard.entry.value as Record<string, unknown>;
 
   if (!pred) {
-    const entry = await kvJson(env, "cells/index");
-    if (entry) {
-      const cells = entry.value as Record<string, Record<string, unknown>>;
+    const entry = await readSnapshotValue(env, "cells/index", snapshotId);
+    if (!entry.ok) return { error: entry.detail, status: entry.status, headers: entry.headers };
+    if (entry.entry) {
+      const cells = entry.entry.value as Record<string, Record<string, unknown>>;
       pred = cells[h3Index];
     }
   }
@@ -217,9 +265,19 @@ export interface NationalIndexDocument {
   >;
 }
 
-export type NationalIndexOutcome = NationalIndexDocument | { error: string };
+export type NationalIndexOutcome = NationalIndexDocument | SnapshotQueryError;
 
-export async function fetchNationalIndex(env: Env): Promise<NationalIndexOutcome> {
+export async function fetchNationalIndex(
+  env: Env,
+  opts: { snapshotId?: string | null } = {}
+): Promise<NationalIndexOutcome> {
+  const snapshotId = opts.snapshotId ?? null;
+  if (snapshotId) {
+    const read = await readSnapshotValue(env, "national/index", snapshotId);
+    if (!read.ok) return { error: read.detail, status: read.status, headers: read.headers };
+    if (!read.entry) return { error: "No national layer snapshot published." };
+    return read.entry.value as NationalIndexDocument;
+  }
   const entry = await kvJson(env, "national/index");
   if (!entry) return { error: "No national layer snapshot published." };
   return entry.value as NationalIndexDocument;
@@ -233,18 +291,24 @@ export interface NationalRowsResult {
   missing: string[];
 }
 
-export type NationalRowsOutcome = NationalRowsResult | { error: string };
+export type NationalRowsOutcome = NationalRowsResult | SnapshotQueryError;
 
 export async function fetchNationalRows(
   env: Env,
-  opts: { res: number; parents: string[] }
+  opts: { res: number; parents: string[]; snapshotId?: string | null }
 ): Promise<NationalRowsOutcome> {
   if (!(NATIONAL_RESOLUTIONS as readonly number[]).includes(opts.res)) {
     return { error: `'res' must be one of ${NATIONAL_RESOLUTIONS.join(", ")}.` };
   }
-  const entries = await Promise.all(
-    opts.parents.map((parent) => kvJson(env, `national/${opts.res}/${parent}`))
+  const snapshotId = opts.snapshotId ?? null;
+  const reads = await Promise.all(
+    opts.parents.map((parent) => readSnapshotValue(env, `national/${opts.res}/${parent}`, snapshotId))
   );
+  const entries: ({ value: unknown; etag: string } | null)[] = [];
+  for (const read of reads) {
+    if (!read.ok) return { error: read.detail, status: read.status, headers: read.headers };
+    entries.push(read.entry);
+  }
   const rows: unknown[][] = [];
   const missing: string[] = [];
   let cols: string[] | null = null;
@@ -277,7 +341,7 @@ export interface GridTilesResult {
   missing: string[];
 }
 
-export type GridTilesOutcome = GridTilesResult | { error: string };
+export type GridTilesOutcome = GridTilesResult | SnapshotQueryError;
 
 /** Transport-free res-aware viewport tile fetch.
  *
@@ -288,14 +352,22 @@ export type GridTilesOutcome = GridTilesResult | { error: string };
  */
 export async function fetchGridTiles(
   env: Env,
-  opts: { res: number; parents: string[] }
+  opts: { res: number; parents: string[]; snapshotId?: string | null }
 ): Promise<GridTilesOutcome> {
   if (!(METRO_LOD_RESOLUTIONS as readonly number[]).includes(opts.res)) {
     return { error: `'res' must be one of ${METRO_LOD_RESOLUTIONS.join(", ")}.` };
   }
-  const entries = await Promise.all(
-    opts.parents.map((parent) => kvJson(env, `gridtiles_res${opts.res}/${parent}`))
+  const snapshotId = opts.snapshotId ?? null;
+  const reads = await Promise.all(
+    opts.parents.map((parent) =>
+      readSnapshotValue(env, `gridtiles_res${opts.res}/${parent}`, snapshotId)
+    )
   );
+  const entries: ({ value: unknown; etag: string } | null)[] = [];
+  for (const read of reads) {
+    if (!read.ok) return { error: read.detail, status: read.status, headers: read.headers };
+    entries.push(read.entry);
+  }
   const features: Record<string, unknown>[] = [];
   const missing: string[] = [];
   for (let i = 0; i < opts.parents.length; i += 1) {

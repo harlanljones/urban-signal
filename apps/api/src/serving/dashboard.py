@@ -1216,6 +1216,13 @@ def get_dashboard_html() -> str:
       line-height: 1.4;
     }
 
+    .parcel-coverage-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin-top: 2px;
+    }
+
     /* Hero Score Summary */
     .score-hero-block {
       background: var(--bg-base);
@@ -1868,6 +1875,7 @@ __METRO_META__
 
     // ---- All-metros national view state ------------------------------------
     let snapshotManifest = null;
+    let SNAPSHOT_ID = null;            // published generation id, from the manifest
     let activeMetroChip = null;        // city_id or null (= all metros)
     const fetchedTiles = new Set();    // parents merged for the active LOD generation
     const tileRetryCounts = new Map(); // automatic retries per parent, per LOD generation
@@ -1891,6 +1899,7 @@ __METRO_META__
     const TILE_FETCH_CONCURRENCY = 2;
     const MAX_TILE_RETRIES = 3;
     const TILE_RETRY_BACKOFF_MS = [500, 1500, 4000];
+    const NATIONAL_MAX_RETRIES = 3;
     const ZOOM_FLOOR = 6; // below this: national layer only (LODES)
     // Metro LOD pyramid (US-411/413): select the display resolution based on
     // zoom level so the map never shows a dead zone between national and metro.
@@ -1919,6 +1928,23 @@ __METRO_META__
       6: [],
     };
     let nationalActiveRes = null;
+
+    // ---- Coverage state machine (hex-coverage Stage A) ---------------------
+    // The publication state of each layer, resolved from the manifest coverage
+    // block plus read outcomes. `unavailable` means the manifest declares no
+    // publication (so we never fetch); `stale` means an older generation is
+    // being served; `failed` means a read exhausted retries or the payload
+    // schema is unsupported; `empty`/`ready` describe a successful read.
+    const coverageState = { national: 'loading', metro: 'loading' };
+    // Generation guard for the national path (mirrors tileLoadGeneration): a
+    // read whose captured generation no longer matches is discarded.
+    let nationalLoadGeneration = 0;
+    // Dedupe in-flight national chunk requests by snapshot|res|parent.
+    const nationalInFlight = new Map();
+    // Parents whose read succeeded (including an empty answer) this generation,
+    // so a no-data region is not refetched on every pan.
+    const nationalFetched = { 4: new Set(), 5: new Set(), 6: new Set() };
+    let nationalFailureGeneration = -1; // toast at most once per generation
 
     function cityDisplayName(cityId) {
       return (METRO_META[cityId] || {}).name || String(cityId).replace(/_/g, ' ');
@@ -1994,6 +2020,57 @@ __METRO_META__
       return 6;
     }
 
+    // ---- Coverage publication helpers (hex-coverage Stage A) ---------------
+    // Pure, string-extractable helpers. The coverage-states test slices each
+    // function out of this source and runs it in a bare vm context, so keep
+    // them free of DOM/map/manifest-global references.
+    function nationalCoverageStatus(manifest) {
+      const national = manifest && manifest.coverage && manifest.coverage.national;
+      if (!national) return 'unavailable';
+      const status = national.status;
+      if (status === 'available' || status === 'stale') return status;
+      return 'unavailable';
+    }
+
+    function coverageSchemaSupported(manifest) {
+      const coverage = manifest && manifest.coverage;
+      if (!coverage || typeof coverage.schema_version !== 'number') return true;
+      return coverage.schema_version <= 1;
+    }
+
+    function appendSnapshotId(url, snapshotId) {
+      if (!snapshotId) return url;
+      const sep = url.indexOf('?') === -1 ? '?' : '&';
+      return `${url}${sep}snapshot_id=${encodeURIComponent(snapshotId)}`;
+    }
+
+    function nationalCacheKey(snapshotId, res, parent) {
+      return `${snapshotId || 'current'}|${res}|${parent}`;
+    }
+
+    function backoffDelay(attempt, retryAfterSeconds) {
+      const delays = [500, 1500, 4000];
+      const index = Math.max(0, Math.min(Number(attempt) || 0, delays.length - 1));
+      const base = delays[index];
+      const retryAfterMs = Number(retryAfterSeconds);
+      if (Number.isFinite(retryAfterMs) && retryAfterMs > 0) {
+        return Math.max(base, retryAfterMs * 1000);
+      }
+      return base;
+    }
+
+    function sleep(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    function invalidateNationalCaches() {
+      [4, 5, 6].forEach((res) => {
+        nationalCache[res].clear();
+        nationalFetched[res].clear();
+      });
+      nationalInFlight.clear();
+    }
+
     function res3ParentsCoveringBounds(bounds) {
       if (typeof h3 === 'undefined' || !bounds) return [];
       const west = bounds.getWest();
@@ -2028,7 +2105,42 @@ __METRO_META__
       if (hint) hint.hidden = true;
       // Show/hide overlay by zoom; the LODES overlay owns zooms below ZOOM_FLOOR
       updateNationalLayerVisibilities();
-      if (z >= ZOOM_FLOOR) return; // metro LOD owns every zoom at/above the floor
+      if (z >= ZOOM_FLOOR) {
+        // Above the floor the metro LOD owns the view: cancel any queued
+        // national work so a stale read cannot paint over the metro grid.
+        nationalLoadGeneration += 1;
+        return;
+      }
+
+      // Behavior 8: a manifest the client cannot interpret fails the read
+      // rather than rendering a layer whose columns we do not understand.
+      if (!coverageSchemaSupported(snapshotManifest)) {
+        coverageState.national = 'failed';
+        clearNationalOverlay();
+        updateCoverageLegend();
+        return;
+      }
+
+      // Before the manifest resolves we cannot know whether national context is
+      // published: stay loading rather than claiming it is unavailable.
+      if (!snapshotManifest) {
+        coverageState.national = 'loading';
+        updateCoverageLegend();
+        return;
+      }
+
+      // Behavior 1: resolve the manifest before layer reads. When the coverage
+      // block declares no national publication (or the block is absent, i.e.
+      // legacy manifests), schedule zero national chunk requests and show a
+      // neutral explanation — never a synthesized color.
+      const availability = nationalCoverageStatus(snapshotManifest);
+      if (availability === 'unavailable') {
+        coverageState.national = 'unavailable';
+        clearNationalOverlay();
+        updateCoverageLegend();
+        return;
+      }
+      coverageState.national = availability === 'stale' ? 'stale' : 'loading';
 
       const res = nationalResForZoom(z);
       nationalActiveRes = res;
@@ -2037,38 +2149,30 @@ __METRO_META__
       nationalActive[5] = [];
       nationalActive[6] = [];
 
-      // Determine res-3 parents to request for this viewport
+      // Determine res-3 parents to request for this viewport. A parent whose
+      // read already succeeded this generation is not refetched; one already
+      // in flight is joined rather than duplicated.
       const parents = res3ParentsCoveringBounds(map.getBounds());
-      const missing = parents.filter((p) => !nationalCache[res].has(p));
-      // Batch-fetch missing parents; API mirrors gridtiles shape
-      if (missing.length) {
+      const generation = nationalLoadGeneration;
+      const missing = parents.filter((p) =>
+        !nationalFetched[res].has(p) &&
+        !nationalInFlight.has(nationalCacheKey(SNAPSHOT_ID, res, p)));
+      const joined = [];
+      parents.forEach((p) => {
+        const pending = nationalInFlight.get(nationalCacheKey(SNAPSHOT_ID, res, p));
+        if (pending && !joined.includes(pending)) joined.push(pending);
+      });
+      if (missing.length || joined.length) {
         const batches = [];
         const BATCH = 24;
         for (let i = 0; i < missing.length; i += BATCH) {
           batches.push(missing.slice(i, i + BATCH));
         }
-        await Promise.all(
-          batches.map(async (chunk) => {
-            const url = `/api/v1/national/${res}?parents=${chunk.join(',')}`;
-            try {
-              const resp = await fetch(url);
-              if (!resp.ok) return;
-              const payload = await resp.json();
-              const feats = nationalRowsToFeatures(payload);
-              // Cache by the reported parent when present; otherwise group by computed res-3 parent
-              for (const feature of feats) {
-                const cell = feature?.properties?.h3_index;
-                if (!cell) continue;
-                const p = (typeof h3 !== 'undefined' && h3.cellToParent) ? h3.cellToParent(cell, 3) : null;
-                const key = (p && chunk.includes(p)) ? p : (p || chunk[0]);
-                if (!nationalCache[res].has(key)) nationalCache[res].set(key, []);
-                nationalCache[res].get(key).push(feature);
-              }
-            } catch (e) {
-              console.debug('national fetch error:', e);
-            }
-          })
-        );
+        await Promise.all([
+          ...batches.map((chunk) => loadNationalBatch(res, chunk, generation)),
+          ...joined,
+        ]);
+        if (generation !== nationalLoadGeneration) return; // a newer generation owns the overlay
       }
 
       // Assemble active features for the overlay from the cached parents in view
@@ -2078,7 +2182,98 @@ __METRO_META__
         if (arr && arr.length) feats = feats.concat(arr);
       }
       nationalActive[res] = feats;
+      if (coverageState.national !== 'failed') {
+        coverageState.national = feats.length ? 'ready' : 'empty';
+      }
+      updateCoverageLegend();
       applyNationalData();
+    }
+
+    function clearNationalOverlay() {
+      nationalActive[4] = [];
+      nationalActive[5] = [];
+      nationalActive[6] = [];
+      applyNationalData();
+    }
+
+    // One national chunk request, deduped across batches/overlay passes by
+    // snapshot|res|parent. Resolves when the shared request settles.
+    async function loadNationalBatch(res, chunk, generation) {
+      const keys = chunk.map((p) => nationalCacheKey(SNAPSHOT_ID, res, p));
+      const promise = fetchNationalChunk(res, chunk, generation);
+      keys.forEach((key) => nationalInFlight.set(key, promise));
+      try {
+        await promise;
+      } finally {
+        keys.forEach((key) => nationalInFlight.delete(key));
+      }
+    }
+
+    async function fetchNationalChunk(res, chunk, generation) {
+      let attempt = 0;
+      for (;;) {
+        try {
+          const url = appendSnapshotId(`/api/v1/national/${res}?parents=${chunk.join(',')}`, SNAPSHOT_ID);
+          const resp = await fetch(url);
+          if (resp.ok) {
+            const payload = await resp.json();
+            if (generation !== nationalLoadGeneration) return true; // stale result discarded
+            mergeNationalPayload(res, chunk, payload);
+            return true;
+          }
+          // Retry only transient failures; a 4xx is a permanent request error.
+          if (resp.status !== 500 && resp.status !== 503) {
+            if (generation === nationalLoadGeneration) markNationalFailed();
+            return false;
+          }
+          if (attempt >= NATIONAL_MAX_RETRIES) {
+            if (generation === nationalLoadGeneration) markNationalFailed();
+            return false;
+          }
+          const retryAfter = resp.headers && resp.headers.get ? resp.headers.get('retry-after') : null;
+          await sleep(backoffDelay(attempt, retryAfter));
+          attempt += 1;
+        } catch (e) {
+          if (attempt >= NATIONAL_MAX_RETRIES) {
+            if (generation === nationalLoadGeneration) markNationalFailed();
+            return false;
+          }
+          await sleep(backoffDelay(attempt, null));
+          attempt += 1;
+        }
+      }
+    }
+
+    function mergeNationalPayload(res, chunk, payload) {
+      const feats = nationalRowsToFeatures(payload);
+      // Cache by the reported parent when present; otherwise group by computed res-3 parent
+      for (const feature of feats) {
+        const cell = feature?.properties?.h3_index;
+        if (!cell) continue;
+        const p = (typeof h3 !== 'undefined' && h3.cellToParent) ? h3.cellToParent(cell, 3) : null;
+        const key = (p && chunk.includes(p)) ? p : (p || chunk[0]);
+        if (!nationalCache[res].has(key)) nationalCache[res].set(key, []);
+        nationalCache[res].get(key).push(feature);
+      }
+      // Mark fetched only after a successful response — including an empty one —
+      // so a no-data region is not refetched on every pan.
+      chunk.forEach((parent) => {
+        nationalFetched[res].add(parent);
+        if (!nationalCache[res].has(parent)) nationalCache[res].set(parent, []);
+      });
+    }
+
+    function markNationalFailed() {
+      coverageState.national = 'failed';
+      updateCoverageLegend();
+      if (nationalFailureGeneration === nationalLoadGeneration) return;
+      nationalFailureGeneration = nationalLoadGeneration;
+      showToast('National context failed to load.', 'error', 'Retry', () => {
+        nationalLoadGeneration += 1;
+        invalidateNationalCaches();
+        coverageState.national = 'loading';
+        updateNationalOverlay();
+      });
     }
 
     // The national API serves rows-of-arrays chunks ({cols, rows}), so the
@@ -2546,6 +2741,20 @@ __METRO_META__
     }
 
     function wireDashboardControls() {
+      // Explicit manifest refresh (behavior 7): the snapshot status pill is the
+      // affordance; the same refresh runs on a 5-minute visible-tab interval.
+      const pill = document.getElementById('stream-status-pill');
+      if (pill) {
+        pill.style.cursor = 'pointer';
+        pill.setAttribute('role', 'button');
+        pill.setAttribute('tabindex', '0');
+        pill.setAttribute('aria-label', 'Refresh snapshot manifest');
+        const refreshManifest = () => { fetchManifest(); };
+        pill.addEventListener('click', refreshManifest);
+        pill.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); refreshManifest(); }
+        });
+      }
       document.getElementById('inspector-expand')?.addEventListener('click', e => {
         const expanded = document.body.classList.toggle('inspector-expanded');
         e.currentTarget.setAttribute('aria-expanded', String(expanded));
@@ -2571,7 +2780,7 @@ __METRO_META__
       const el = document.getElementById('comparison-list');
       if (!el) return;
       if (!comparisonPins.length) { el.textContent = 'Pin up to three selected locations from Inspect.'; return; }
-      el.replaceChildren(...comparisonPins.map((pin) => { const row = document.createElement('div'); row.className = 'compare-row'; row.textContent = `${pin.name} · ${pin.score} · 6M ${pin.forecast} (${pin.range}) · ${pin.source} · Drivers ${pin.drivers} · Source age unknown${pin.published ? ' · Snapshot ' + pin.published : ''}`; return row; }));
+      el.replaceChildren(...comparisonPins.map((pin) => { const row = document.createElement('div'); row.className = 'compare-row'; row.textContent = `${pin.name} · ${pin.score} · 6M ${pin.forecast} (${pin.range}) · ${pin.source} · Drivers ${pin.drivers} · Source age unknown${pin.kind ? ' · ' + pin.kind : ''}${pin.published ? ' · Snapshot ' + pin.published : ''}`; return row; }));
     }
 
     // Metro chips are navigation, not data scoping: every metro's tiles stay
@@ -2646,11 +2855,83 @@ __METRO_META__
       return Math.round(num).toLocaleString();
     }
 
+    // Compact, truthful coverage/source strip beside the legend. Reuses the
+    // existing #coverage-status row and names kind/source/reference year/snapshot
+    // time when context is visible; a neutral explanation when unavailable.
+    function coverageLegendText() {
+      if (!snapshotManifest) return 'Coverage resolves once the snapshot manifest loads.';
+      if (!coverageSchemaSupported(snapshotManifest)) {
+        return 'Snapshot format not supported by this client — no layers loaded.';
+      }
+      const stamp = snapshotManifest && snapshotManifest.generated_at;
+      const stampText = stamp ? 'snapshot ' + stamp.slice(0, 16).replace('T', ' ') + ' UTC' : 'snapshot time unknown';
+      const contextMetric = CONTEXT_METRICS[currentMetric];
+      if (contextMetric) {
+        const parts = ['Context only — no LIMS output at this scale', contextMetric.label];
+        if (contextMetric.attribution) parts.push('source: ' + contextMetric.attribution);
+        const year = contextMetric.year || contextMetric.reference_year;
+        if (year) parts.push('ref ' + year);
+        parts.push(stampText);
+        return parts.join(' · ');
+      }
+      if (nationalCoverageStatus(snapshotManifest) === 'unavailable') {
+        return 'National context not published.';
+      }
+      if (coverageState.national === 'failed' || coverageState.metro === 'failed') {
+        return 'Coverage failed to load — retry available.';
+      }
+      if (coverageState.national === 'stale') {
+        return 'National context served from an older snapshot · ' + stampText;
+      }
+      if (tileFeatures.size) {
+        return 'Published grid coverage · ' + stampText;
+      }
+      return 'No published cells in this view · ' + stampText;
+    }
+
+    function updateCoverageLegend() {
+      const el = document.getElementById('coverage-status');
+      if (el) el.textContent = coverageLegendText();
+    }
+
+    // Minimal, text-only source disclosure for the inspector/compare cards.
+    function cellCoverageDisclosure() {
+      const kind = nationalCoverageStatus(snapshotManifest) === 'unavailable'
+        ? 'Metro snapshot only'
+        : 'National + metro context';
+      const stamp = snapshotManifest && snapshotManifest.generated_at;
+      const when = stamp ? 'snapshot ' + stamp.slice(0, 16).replace('T', ' ') + ' UTC' : 'snapshot time unknown';
+      return kind + ' · ' + when;
+    }
+
+    // A changed snapshot id invalidates every generation-local cache and
+    // restarts reads. Outgoing metro geometry is deliberately kept until the
+    // replacement tiles land (fetchedTiles/retry state is cleared, features are
+    // not) so a refresh never blanks a supported view.
+    function onSnapshotChanged() {
+      nationalLoadGeneration += 1;
+      invalidateNationalCaches();
+      tileLoadGeneration += 1;
+      fetchedTiles.clear();
+      tileRetryCounts.clear();
+      exhaustedTileRetries.clear();
+      pendingTileParents.length = 0;
+      coverageState.metro = 'loading';
+      if (map) {
+        scheduleViewportLoad();
+        scheduleNationalLoad();
+      }
+      updateCoverageLegend();
+    }
+
     async function fetchManifest() {
       try {
         const resp = await fetch('/api/v1/manifest');
         if (resp.ok) {
-          snapshotManifest = await resp.json();
+          const manifest = await resp.json();
+          const previousId = SNAPSHOT_ID;
+          snapshotManifest = manifest;
+          SNAPSHOT_ID = (manifest && manifest.snapshot_id) || null;
           populateContextMetrics(snapshotManifest && snapshotManifest.context_layers);
           const stamp = snapshotManifest && snapshotManifest.generated_at;
           const pillText = document.getElementById('stream-status-text');
@@ -2664,6 +2945,8 @@ __METRO_META__
               pill.title = 'Precomputed snapshot published ' + stamp.slice(0, 10) + ' ' + stamp.slice(11, 16) + ' UTC';
             }
           }
+          if (SNAPSHOT_ID !== previousId) onSnapshotChanged();
+          else updateCoverageLegend();
           return true;
         }
       } catch (e) {
@@ -2673,6 +2956,15 @@ __METRO_META__
       return false;
     }
 
+    // Behavior 7: refresh the manifest on an explicit action and on a 5-minute
+    // interval while the tab is visible, so a new publication is picked up
+    // without a reload.
+    function startManifestRefresh() {
+      setInterval(() => {
+        if (document.visibilityState === 'visible') fetchManifest();
+      }, 5 * 60 * 1000);
+    }
+
     async function loadAllSubmarkets() {
       SUBMARKETS = {};
       const queue = (snapshotManifest && snapshotManifest.cities) ? [...snapshotManifest.cities] : [];
@@ -2680,7 +2972,7 @@ __METRO_META__
         while (queue.length) {
           const city = queue.shift();
           try {
-            const resp = await fetch(`/api/v1/submarkets?city_id=${city}`);
+            const resp = await fetch(appendSnapshotId(`/api/v1/submarkets?city_id=${city}`, SNAPSHOT_ID));
             if (!resp.ok) continue;
             const data = await resp.json();
             const subs = data.submarkets || {};
@@ -2714,6 +3006,7 @@ __METRO_META__
       if (inspector) INSPECTOR_EMPTY_HTML = inspector.innerHTML;
       wireMobileChrome();
       wireDashboardControls();
+      startManifestRefresh();
 
       const linked = deepLinkedCity();
       initMap();
@@ -3191,6 +3484,13 @@ __METRO_META__
 
     function updateViewportTiles() {
       if (!map || !snapshotManifest) return;
+      // Behavior 8: never read metro tiles against an unsupported schema.
+      if (!coverageSchemaSupported(snapshotManifest)) {
+        coverageState.metro = 'failed';
+        updateCoverageLegend();
+        setTileLoaderStatus('Grid data uses an unsupported snapshot schema.');
+        return;
+      }
       const z = map.getZoom();
       const hint = document.getElementById('zoom-hint');
       if (hint) hint.hidden = true; // dead-zone hint retired; LOD pyramid covers country view
@@ -3303,9 +3603,8 @@ __METRO_META__
       if (pending.length && pending.every(parent => exhaustedTileRetries.has(parent))) {
         setTileLoaderStatus(`${pending.length} grid tile${pending.length === 1 ? '' : 's'} could not load.`, true);
       } else if (!pending.length && tileFetchesActive === 0 && pendingTileParents.length === 0 && tileRetryTimers.size === 0) {
-        const coverage = document.getElementById('coverage-status');
         if (tileFeatures.size) setTileLoaderStatus('');
-        else setTileLoaderStatus(coverage ? coverage.textContent : 'No published cells in this view');
+        else setTileLoaderStatus(coverageLegendText());
       }
     }
 
@@ -3313,7 +3612,7 @@ __METRO_META__
       const generation = tileLoadGeneration;
       const res = activeLodRes || 9;
       try {
-        const resp = await fetch(`/api/v1/gridtiles?res=${res}&parents=${batch.join(',')}`);
+        const resp = await fetch(appendSnapshotId(`/api/v1/gridtiles?res=${res}&parents=${batch.join(',')}`, SNAPSHOT_ID));
         if (!resp.ok) throw new Error(`HTTP ${resp.status || 'request failed'}`);
         const payload = await resp.json();
         if (generation === tileLoadGeneration) {
@@ -3459,8 +3758,8 @@ __METRO_META__
           });
         }
       }
-      const coverage = document.getElementById('coverage-status');
-      if (coverage) coverage.textContent = tileFeatures.size ? 'Published grid coverage · source age unknown' : 'No published cells in this view';
+      coverageState.metro = tileFeatures.size ? 'ready' : 'empty';
+      updateCoverageLegend();
       map.triggerRepaint();
       settleTileLoaderStatus();
     }
@@ -3597,6 +3896,7 @@ __METRO_META__
       cancelGridHandoff();
       const metricEl = document.getElementById('metric-select');
       if (!metricEl) return;
+      const metricChanged = metricEl.value !== currentMetric;
       currentMetric = metricEl.value;
       const pctProp = `${currentMetric}_national_pct`;
       const legendTitle = document.getElementById('legend-metric-title');
@@ -3653,6 +3953,14 @@ __METRO_META__
       // Reflect metric change on the national LOD overlay
       updateNationalLayerPaint();
       applyScoreThreshold();
+      // A metric change is a new national read generation: discard in-flight
+      // results and restart the overlay with the new metric's percentile ramp.
+      if (metricChanged) {
+        nationalLoadGeneration += 1;
+        invalidateNationalCaches();
+        updateCoverageLegend();
+        scheduleNationalLoad();
+      }
     }
 
     // Legend truth (US-431): the gradient bar and its stop ticks are
@@ -4039,6 +4347,7 @@ __METRO_META__
               ${hasCoords ? `<span>${lat.toFixed(4)}, ${lng.toFixed(4)}</span><span>•</span>` : ''}
               <span>H3 ${esc(props.h3_index || '—')}</span>
             </div>
+            <div class="parcel-coverage-note">${esc(cellCoverageDisclosure())}</div>
             ${description ? `<div class="parcel-description">${esc(description)}</div>` : ''}
           </div>
 
@@ -4142,6 +4451,7 @@ __METRO_META__
           range: formatSignedPct(props.delta_6m_p10) + ' to ' + formatSignedPct(props.delta_6m_p90),
           source: baselineOnly ? 'registry estimate' : 'model estimate; source unknown',
           drivers: shapObj && Object.keys(shapObj).length ? Object.keys(shapObj).slice(0, 2).join(', ') : 'unavailable',
+          kind: nationalCoverageStatus(snapshotManifest) === 'unavailable' ? 'Metro snapshot only' : 'National + metro context',
           published: snapshotManifest?.generated_at?.slice(0, 10) || null
         });
         renderComparisonPins();

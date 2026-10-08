@@ -21,6 +21,13 @@ function dashboard(parents = null) {
     document: { getElementById: id => id === 'tile-loader-status' || id === 'tile-loader-message' ? status : id === 'tile-loader-retry' ? retryButton : null },
     parentsCoveringBounds: () => parents || [parent],
     setHexLayersVisible() {}, haversineDistance: () => 0,
+    // Hex-coverage Stage A globals referenced by the sliced loader.
+    SNAPSHOT_ID: null,
+    coverageState: { national: 'loading', metro: 'loading' },
+    coverageSchemaSupported: () => true,
+    updateCoverageLegend() {},
+    coverageLegendText: () => 'No published cells in this view',
+    appendSnapshotId: (url, id) => (id ? url + (url.includes('?') ? '&' : '?') + 'snapshot_id=' + encodeURIComponent(id) : url),
     h3: { cellToLatLng: () => [0, 0] },
     map: { getZoom: () => zoom, getBounds: () => ({}), getCenter: () => ({ lat: 0, lng: 0 }),
       getSource: () => ({ setData: data => renders.push(Array.from(data.features, f => f.properties.h3_index)) }), triggerRepaint() {}, getLayer: () => null },

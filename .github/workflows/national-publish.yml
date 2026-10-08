@@ -1,0 +1,71 @@
+name: national-publish
+
+# Build the nationwide LODES context artifact (H3 res 4/5/6) that the daily
+# snapshot consumes in require-national production mode (US-435). The daily path
+# never downloads raw LODES; it downloads this verified artifact. LODES is
+# annual, so this runs monthly and on demand. Merging a change here also builds
+# once so the daily snapshot has an artifact to consume.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/api/src/export/national_builder.py"
+      - "apps/api/src/spatial/national_grid.py"
+      - "scripts/validate_national_artifact.py"
+      - ".github/workflows/national-publish.yml"
+  schedule:
+    - cron: "0 4 1 * *" # monthly, 04:00 UTC on the 1st
+  workflow_dispatch:
+    inputs:
+      year:
+        description: "LODES vintage (year) to build"
+        required: false
+        default: "2023"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: national-publish
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      LODES_YEAR: ${{ github.event.inputs.year || '2023' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install project
+        run: |
+          uv venv .venv --python 3.12
+          uv pip install -e apps/api
+
+      - name: Build national LODES artifact
+        run: |
+          env PYTHONPATH=apps/api .venv/bin/python -m src.export.national_builder \
+            --out dist --year "$LODES_YEAR"
+
+      - name: Validate the artifact before publishing it
+        run: |
+          PYTHONPATH=apps/api .venv/bin/python scripts/validate_national_artifact.py \
+            --dir dist/national --expected-year "$LODES_YEAR"
+
+      - name: Publish the artifact for the daily snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: national-artifact
+          path: dist/national
+          if-no-files-found: error
+          # 90 days is the maximum retention for a public repository; the
+          # monthly cadence keeps a fresh artifact well inside that window.
+          retention-days: 90
