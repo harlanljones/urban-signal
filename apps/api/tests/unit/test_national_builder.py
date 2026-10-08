@@ -230,6 +230,35 @@ def test_build_national_end_to_end(state_fixtures, tmp_path, monkeypatch):
     assert null_rows[RANK_COLS[0]].is_null().all()
 
 
+def test_build_national_per_resolution_cells_leave_finer_parents_null(
+    state_fixtures, tmp_path, monkeypatch
+):
+    """Each resolution gets its own cells; a res-4 cell has no res-5 parent."""
+    monkeypatch.setattr(nb, "LODES_STATES", frozenset({"de"}))
+    report = build_national(
+        out_dir=tmp_path,
+        year=2023,
+        states=["de"],
+        cache_dir=state_fixtures["cache"],
+        fetcher=state_fixtures["fetcher"],
+        cells_provider=lambda res: tuple(sorted(_expected_cells(res))),
+        promote=False,
+    )
+
+    for res in nb.DEFAULT_RESOLUTIONS:
+        assert report["artifacts"][str(res)]["total_jobs"] == 205
+        res_dir = tmp_path / "national" / f"res{res}"
+        full = pl.concat(
+            [pl.read_parquet(path) for path in sorted(res_dir.glob("*.parquet"))],
+            how="vertical",
+        )
+        for cell, res5, res4 in full.select(
+            "h3_index", "res5_parent", "res4_parent"
+        ).rows():
+            assert res4 == h3.cell_to_parent(cell, 4)
+            assert res5 == (h3.cell_to_parent(cell, 5) if res >= 5 else None)
+
+
 def test_build_national_reports_no_data_state(state_fixtures, tmp_path, monkeypatch):
     monkeypatch.setattr(nb, "LODES_STATES", frozenset({"de", "zz"}))
 
