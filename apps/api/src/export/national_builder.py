@@ -402,6 +402,19 @@ def _attach_ranks(frame: pl.DataFrame) -> pl.DataFrame:
     )
 
 
+def _parent_column(resolution: int, parent_resolution: int) -> pl.Expr:
+    """``h3_index``'s parent at ``parent_resolution``, or null when none exists.
+
+    A cell has no parent at a finer resolution (res-4 cells have no res-5
+    parent), so that column stays null instead of raising in H3.
+    """
+    if parent_resolution > resolution:
+        return pl.lit(None, dtype=pl.String)
+    return pl.col("h3_index").map_elements(
+        lambda c: parent_at(c, parent_resolution), return_dtype=pl.String
+    )
+
+
 def _build_resolution(
     resolution: int,
     year: int,
@@ -462,12 +475,8 @@ def _build_resolution(
             pl.col("h3_index")
             .replace_strict(res3_parents, return_dtype=pl.String)
             .alias("res3_parent"),
-            pl.col("h3_index")
-            .map_elements(lambda c: parent_at(c, 5), return_dtype=pl.String)
-            .alias("res5_parent"),
-            pl.col("h3_index")
-            .map_elements(lambda c: parent_at(c, 4), return_dtype=pl.String)
-            .alias("res4_parent"),
+            _parent_column(resolution, 5).alias("res5_parent"),
+            _parent_column(resolution, 4).alias("res4_parent"),
         )
     )
     full = _attach_ranks(full)
