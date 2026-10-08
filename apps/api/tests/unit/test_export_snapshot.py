@@ -62,6 +62,7 @@ def asyncio_run_build(
     require_national: bool = False,
     context_dir: Path | None = None,
     metrics=None,
+    metrics_out: Path | None = None,
 ) -> dict[str, Any]:
     import asyncio
 
@@ -75,6 +76,7 @@ def asyncio_run_build(
             require_national=require_national,
             context_dir=context_dir,
             metrics=metrics,
+            metrics_out=metrics_out,
         )
     )
 

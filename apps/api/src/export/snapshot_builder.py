@@ -767,6 +767,7 @@ async def build_snapshot(
     context_dir: Path | None = None,
     metrics: SnapshotMetrics | None = None,
     cache_predictions: bool = True,
+    metrics_out: Path | None = None,
 ) -> dict[str, Any]:
     """Build one snapshot, optionally collecting timings outside the KV payload."""
     total = metrics.stage("total") if metrics is not None else nullcontext()
@@ -800,6 +801,7 @@ async def build_snapshot(
                 require_national=require_national,
                 context_dir=context_dir,
                 metrics=metrics,
+                metrics_out=metrics_out,
             )
             if metrics is not None:
                 metrics.set_artifact("status", "complete")
@@ -824,6 +826,7 @@ async def _build_snapshot(
     require_national: bool = False,
     context_dir: Path | None = None,
     metrics: SnapshotMetrics | None = None,
+    metrics_out: Path | None = None,
 ) -> dict[str, Any]:
     """Build all snapshot artifacts into out_dir and return the manifest dict.
 
@@ -1103,33 +1106,51 @@ async def _build_snapshot(
                 "resolutions": national_block["resolutions"],
             },
         }
+        metrics_out = Path(metrics_out)
         metrics_out.parent.mkdir(parents=True, exist_ok=True)
         metrics_out.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
 
     bulk_path = out_dir / "kv-bulk.json"
-    bulk_path.write_text(json.dumps(kv_entries), encoding="utf-8")
+    # Stage B: release-qualified twins plus the snapshot/current pointer. The
+    # pointer is only built after the full release set verifies (fail closed),
+    # and the size budget is checked BEFORE the write so a failed build leaves
+    # the previous kv-bulk.json (and its pointer) untouched.
+    snapshot_id = manifest["snapshot_id"]
+    release_entries = _release_entries(kv_entries, snapshot_id)
+    pointer = _promote_snapshot_pointer(
+        kv_entries,
+        release_entries,
+        snapshot_id,
+        national_block,
+        _read_previous_pointer(bulk_path),
+        datetime.now(UTC).isoformat(),
+    )
+    bulk_entries = [
+        *kv_entries,
+        *release_entries,
+        {"key": SNAPSHOT_POINTER_KEY, "value": json.dumps(pointer, separators=(",", ":"))},
+    ]
+    bulk_bytes = json.dumps(bulk_entries)
+    bulk_size = len(bulk_bytes.encode("utf-8"))
     if metrics is not None:
-        metrics.set_artifact(
-            "key_count",
-            len(kv_entries),
-        )
-        metrics.set_artifact("bulk_bytes", bulk_path.stat().st_size)
+        metrics.set_artifact("key_count", len(bulk_entries))
+        metrics.set_artifact("bulk_bytes", bulk_size)
         metrics.set_artifact("unique_cells", len(cells_by_index))
         metrics.set_artifact("cities", list(cities))
-    if bulk_path.stat().st_size > MAX_BULK_BYTES:
+    if bulk_size > MAX_BULK_BYTES:
         raise ValueError(
-            f"kv-bulk.json would be {len(bulk_bytes.encode('utf-8')):,} bytes, over the "
+            f"kv-bulk.json would be {bulk_size:,} bytes, over the "
             f"{MAX_BULK_BYTES:,}-byte build budget. Chunk the bulk put."
         )
     bulk_path.write_text(bulk_bytes, encoding="utf-8")
 
     logger.info(
         "Snapshot complete: %d KV keys (%d grid tiles, %d cells) -> %s (%d bytes bulk)",
-        len(kv_entries),
+        len(bulk_entries),
         len(tile_index),
         len(cells_by_index),
         bulk_path,
-        bulk_path.stat().st_size,
+        bulk_size,
     )
     return manifest
 
