@@ -17,6 +17,7 @@ from src.export.national_builder import (
     JOBS_COL,
     RANK_COLS,
     WORKERS_COL,
+    _ancestor_at,
     _attach_ranks,
     _expected_sha,
     _read_gzip_csv,
@@ -187,6 +188,55 @@ def test_attach_ranks_orders_and_preserves_nulls():
     assert jobs_rank["a"] < jobs_rank["d"] < jobs_rank["c"]
     workers_rank = dict(zip(ranked["h3_index"].to_list(), ranked[RANK_COLS[1]].to_list()))
     assert all(v is None for v in workers_rank.values())
+
+
+def test_ancestor_at_is_defined_for_coarse_national_cells():
+    """Res 4/5 cells have no finer H3 parent; those columns must stay null."""
+    res4 = h3.latlng_to_cell(40.75, -73.99, 4)
+    res5 = h3.cell_to_children(res4, 5)[0]
+    res6 = h3.cell_to_children(res5, 6)[0]
+
+    assert _ancestor_at(res4, 4) == res4
+    assert _ancestor_at(res4, 5) is None
+    assert _ancestor_at(res5, 5) == res5
+    assert _ancestor_at(res5, 4) == res4
+    assert _ancestor_at(res6, 5) == h3.cell_to_parent(res6, 5)
+    assert _ancestor_at(res6, 4) == res4
+
+
+def test_build_national_coarse_resolutions_write_parent_columns(tmp_path):
+    """The monthly workflow builds res 4 then 5 then 6; res 4 must not crash."""
+    res4 = h3.latlng_to_cell(40.75, -73.99, 4)
+    res5 = h3.cell_to_children(res4, 5)[0]
+    res6 = h3.cell_to_children(res5, 6)[0]
+    cells = {4: (res4,), 5: (res5,), 6: (res6,)}
+
+    build_national(
+        out_dir=tmp_path,
+        year=2023,
+        resolutions=(4, 5, 6),
+        states=[],
+        cache_dir=tmp_path / "cache",
+        cells_provider=lambda res: cells[res],
+        promote=False,
+    )
+
+    def read(resolution: int) -> pl.DataFrame:
+        paths = sorted((tmp_path / "national" / f"res{resolution}").glob("*.parquet"))
+        return pl.concat([pl.read_parquet(path) for path in paths], how="vertical")
+
+    coarse = read(4)
+    assert coarse["h3_index"][0] == res4
+    assert coarse["res4_parent"][0] == res4
+    assert coarse["res5_parent"][0] is None
+
+    mid = read(5)
+    assert mid["res4_parent"][0] == res4
+    assert mid["res5_parent"][0] == res5
+
+    fine = read(6)
+    assert fine["res4_parent"][0] == res4
+    assert fine["res5_parent"][0] == h3.cell_to_parent(res6, 5)
 
 
 def test_build_national_end_to_end(state_fixtures, tmp_path, monkeypatch):
