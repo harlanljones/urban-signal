@@ -9,7 +9,7 @@ import json
 import os
 import re
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -32,14 +32,14 @@ _DIGEST = re.compile(r"^[0-9a-f]{64}$")
 
 def parse_as_of(value: str) -> datetime:
     try:
-        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        parsed = datetime.fromisoformat(value)
     except ValueError as exc:
         raise ValueError("as-of must be an explicit UTC ISO-8601 timestamp") from exc
     if parsed.tzinfo is None or parsed.utcoffset() != timedelta(0):
         raise ValueError(
             "as-of must be an explicit UTC timestamp ending in Z or +00:00"
         )
-    return parsed.astimezone(timezone.utc)
+    return parsed.astimezone(UTC)
 
 
 def load_source_contract(
@@ -111,7 +111,7 @@ def validate_provider_receipt(
         or not receipt.get("checkpoint_key")
     ):
         raise ValueError("provider receipt probe keys are missing")
-    now_dt = parse_as_of(now) if isinstance(now, str) else now.astimezone(timezone.utc)
+    now_dt = parse_as_of(now) if isinstance(now, str) else now.astimezone(UTC)
     created = parse_as_of(str(receipt.get("created_at", "")))
     age = now_dt - created
     if age < timedelta(0) or age > max_age:
@@ -132,7 +132,7 @@ def _verify_provider_receipt(
         bucket=bucket,
         endpoint=endpoint,
         run_prefix=prefix + "data/",
-        now=now or datetime.now(timezone.utc),
+        now=now or datetime.now(UTC),
     )
     proof_store = S3ObjectStore(client, bucket, receipt["probe_prefix"].rstrip("/"))
     proof_store.get_verified(receipt["object_key"], receipt["object_sha256"])
@@ -252,7 +252,7 @@ def main(argv: list[str] | None = None) -> int:
                     bucket=args.bucket,
                     endpoint=args.endpoint,
                     prefix=prefix,
-                    now=datetime.now(timezone.utc),
+                    now=datetime.now(UTC),
                 )
                 store = S3ObjectStore(client, args.bucket, prefix + "data")
             output = replay_committed(store, contract, as_of)
@@ -309,7 +309,7 @@ def main(argv: list[str] | None = None) -> int:
                 bucket=args.bucket,
                 endpoint=args.endpoint,
                 prefix=prefix,
-                now=datetime.now(timezone.utc),
+                now=datetime.now(UTC),
             )
             store = S3ObjectStore(client, args.bucket, prefix + "data")
             source = SocrataPermitSource(contract)

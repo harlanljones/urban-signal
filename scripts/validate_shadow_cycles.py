@@ -9,7 +9,7 @@ import math
 import re
 import sys
 from collections.abc import Iterable
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -36,14 +36,14 @@ def _timestamp(value: Any, field: str, failures: list[str]) -> datetime | None:
         failures.append(f"{field} missing")
         return None
     try:
-        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        parsed = datetime.fromisoformat(value)
     except ValueError:
         failures.append(f"{field} invalid")
         return None
     if parsed.tzinfo is None or parsed.utcoffset() != timedelta(0):
         failures.append(f"{field} must be UTC")
         return None
-    return parsed.astimezone(timezone.utc)
+    return parsed.astimezone(UTC)
 
 
 def _hash(value: Any) -> bool:
@@ -173,7 +173,7 @@ def validate_cycles(
         scheduled.append((at, failures))
 
     scheduled.sort(
-        key=lambda item: item[0] or datetime.min.replace(tzinfo=timezone.utc)
+        key=lambda item: item[0] or datetime.min.replace(tzinfo=UTC)
     )
     all_failures = list(input_failures)
     by_date: dict[str, int] = {}
