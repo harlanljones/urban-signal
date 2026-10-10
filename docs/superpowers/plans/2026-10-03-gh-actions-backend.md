@@ -10,9 +10,9 @@
 
 **Spec:** `docs/superpowers/specs/2026-10-03-gh-actions-backend-design.md`
 
-## Execution status — 2026-10-03
+## Execution status — 2026-10-10
 
-Tasks 1–4 were authorized and implemented with parallel Luna agents. Root integrated interfaces, ran broad tests and preflight, and compared three uncached, three cold-cache and three warm-cache builds with the same weights. All six comparisons passed. See [results and limits](../../research/gh-actions-backend-benchmark-2026-10-03.md). Optional Tasks 5–9 remain outside this release. No production publication or deployment occurred. Root serializes final commits instead of committing each parallel task separately.
+Tasks 1–4 were implemented and measured on 2026-10-03. See [results and limits](../../research/gh-actions-backend-benchmark-2026-10-03.md). Tasks 5–8 (deterministic bundles, report-only publication plans, version-pinned reads, and pointer-last publication) are now implemented. Task 9 remains the separate ingestion pilot in `docs/superpowers/specs/daily-ingestion-pilot.md`. The seeded bundle is a synthetic baseline revision and is not a trained model.
 
 ## Global Constraints
 

@@ -43,8 +43,13 @@ class LightGBMQuantilePredictor:
         y_val: Optional[pd.Series] = None,
         n_estimators: int = 150,
         learning_rate: float = 0.05,
+        seed: int | None = None,
     ) -> Dict[float, float]:
-        """Train LightGBM regressors for each quantile alpha."""
+        """Train LightGBM regressors for each quantile alpha.
+
+        ``seed`` pins one booster construction. When it is omitted the existing
+        unseeded serving baseline is unchanged.
+        """
         features = [col for col in self.feature_names if col in X_train.columns]
         val_losses = {}
 
@@ -60,8 +65,12 @@ class LightGBMQuantilePredictor:
                 "num_leaves": 31,
                 "min_data_in_leaf": 10,
                 "verbosity": -1,
-                "n_jobs": 4,
+                "n_jobs": 1 if seed is not None else 4,
             }
+            if seed is not None:
+                params["seed"] = seed
+                params["deterministic"] = True
+                params["force_col_wise"] = True
 
             valid_sets = [train_data]
             if val_data:

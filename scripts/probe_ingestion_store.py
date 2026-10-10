@@ -11,7 +11,7 @@ import json
 import os
 import sys
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -155,7 +155,7 @@ def probe(
         "base_prefix": base + "/",
         "probe_prefix": probe_prefix,
         "probe_id": probe_id,
-        "created_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "created_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
         "object_key": object_key,
         "object_sha256": object_hash,
         "checkpoint_key": checkpoint_key,

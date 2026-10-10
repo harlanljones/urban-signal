@@ -1,0 +1,8 @@
+# CPU inference pins resolved from the API environment on 2026-10-10.
+# bundle_fingerprint() refuses a restored bundle whose installed versions differ.
+lightgbm==4.7.0
+torch==2.14.0
+onnx==1.23.0
+onnxruntime==1.30.0
+numpy==2.5.3
+shap==0.52.0

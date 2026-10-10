@@ -176,17 +176,26 @@ jobs:
           PYTHONPATH=apps/api .venv/bin/python scripts/validate_national_artifact.py \
             --dir build/national
 
+      - name: Restore deterministic model bundle
+        uses: actions/cache@v4
+        with:
+          path: build/model-bundles
+          key: snapshot-model-${{ runner.os }}-${{ runner.arch }}-py3.12-${{ hashFiles('apps/api/constraints/snapshot-models.txt', 'apps/api/src/models/bundle.py', 'apps/api/src/models/dcn_v2.py', 'apps/api/src/models/st_gnn.py', 'apps/api/src/models/quantile_lgbm.py', 'apps/api/src/models/export_onnx.py', 'apps/api/src/serving/engine.py') }}
+
       - name: Build snapshot artifacts and metrics
         run: |
           mkdir -p build
           PYTHONPATH=apps/api .venv/bin/python scripts/export_dashboard.py
+          bundle=$(PYTHONPATH=apps/api .venv/bin/python -c "from pathlib import Path; from src.models.bundle import ensure_synthetic_bundle; print(ensure_synthetic_bundle(Path('build/model-bundles')))")
           # Dense metro hex (US-408: bounded k_ring=3 + 1.5 km) and require-national
           # production mode (US-435 §24). national-dir's parent carries the
-          # national/ tree the fetch step downloaded.
+          # national/ tree the fetch step downloaded. The bundle is the seeded
+          # synthetic baseline; --no-prediction-cache remains the inference rollback.
           /usr/bin/time -f 'elapsed_seconds=%e\npeak_rss_kib=%M' -o build/snapshot-resources.txt \
             env PYTHONPATH=apps/api .venv/bin/python -m src.export.snapshot_builder \
               --out dist --context-dir build/context --metrics-out build/snapshot-metrics.json \
-              --dense-metro --national-dir build --require-national
+              --dense-metro --national-dir build --require-national \
+              --model-bundle "$bundle"
 
       - name: Preserve snapshot metrics
         if: always()
@@ -214,6 +223,19 @@ jobs:
       - name: Push snapshot to Workers KV
         working-directory: apps/dashboard
         run: bunx wrangler kv bulk put ../../dist/kv-bulk.json --binding SNAPSHOT --remote
+
+      # Compatible reader ships in dashboard-deploy before this scheduled job
+      # switches snapshot/current to the content-addressed release. Legacy
+      # logical keys and stage-B twins stay in kv-bulk.json for rollback.
+      - name: Publish content-addressed snapshot objects
+        working-directory: apps/dashboard
+        run: |
+          PYTHONPATH=../.. ../../.venv/bin/python ../../scripts/publish_snapshot.py \
+            --plan ../../dist/publication-plan.json \
+            --bulk ../../dist/kv-bulk.json \
+            --publish \
+            --out ../../dist/kv-versioned.json
+          bunx wrangler kv bulk put ../../dist/kv-versioned.json --binding SNAPSHOT --remote
 
       # Stage B publishes a release-qualified twin of every key. Keep only the
       # generations the reader can address (the new current + its previous
