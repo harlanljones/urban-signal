@@ -1,6 +1,21 @@
 # Daily GitHub Actions backend: staged design
 
-Date: 2026-10-03. Status: proposed; planning only. Daily dashboard freshness is approved. Cloudflare web applications and Worker HTTP/MCP read APIs remain the serving tier.
+Date: 2026-10-03. Status: phases 1 and 2 implemented. Daily dashboard freshness is approved. Cloudflare web applications and Worker HTTP/MCP read APIs remain the serving tier.
+
+## Implementation status
+
+Phase 1 is in production code and was measured on 2026-10-03 (`docs/research/gh-actions-backend-benchmark-2026-10-03.md`). Cold-cache builder time in that environment fell from 53.761 seconds to 10.400 seconds with equal semantic output. Daily publication still wrote every logical key. Roll back inference with `--no-prediction-cache`. Roll back the workflow split by restoring the combined schedule/release pipeline.
+
+Phase 2 is implemented beside that path:
+
+- `src.models.bundle` builds and loads a seed-42 synthetic bundle (three LightGBM text models, both ONNX files, checksum manifest). The snapshot workflow restores it from an Actions cache keyed by OS, architecture, Python, and the pinned model sources, then passes `--model-bundle`. A cache hit still revalidates hashes. Loading does not train or export. A requested trained bundle never falls back to synthetic weights. Seeded neural initialization is a synthetic baseline revision: it is not comparable to the unseeded phase-1 engine, and it is not a trained model.
+- `src.export.publication` writes `dist/publication-plan.json` in report-only form. Versioned payloads pin `inference_latency_ms` at `0.0`. The legacy `kv-bulk.json` bytes are unchanged.
+- `scripts/publish_snapshot.py --publish` materializes `objects/<sha256>`, `releases/<snapshot_id>`, and a versioned `snapshot/current` pointer. The scheduled job bulk-puts that file after the legacy bulk. Workers KV is still not a multi-key transaction. There is no object garbage collection in this release.
+- The Worker resolves one content-addressed release per request, caches objects by hash, retries an unpinned miss against the previous release once, and returns 503 for a pinned miss. `snapshot` and `snapshot_id` select a release. MCP tools accept `snapshot`. Stage-B `releases/<id>/<logical>` twins remain the path when no content-addressed manifest exists, so a pointer that still names a stage-B id keeps the current reader behavior.
+
+Phase 3 stays a separate pilot. Its contract is `daily-ingestion-pilot.md` and the M1–M6 milestone specs. This design does not authorize live acquisition, alert traffic, or service retirement.
+
+Registry or schema changes still ship in this order: compatible reader, then a manual main snapshot refresh, then coverage verification. The content-addressed pointer is written only by the scheduled or manual main snapshot job, after dashboard-deploy has published the reader.
 
 ## Recommendation
 
@@ -45,7 +60,7 @@ The approximately 110-second interval between logged build-step timestamps inclu
 - Keep the complete res-9/res-8/res-7 ranking pass over the full selected city population.
 - Synthetic/default model outputs must remain identified as synthetic/default; optimization is not a model-quality upgrade.
 - Do not retire streaming alerts or infrastructure until dependencies, ownership, retained data, and replacement behavior are verified.
-- No implementation, production publication, deployment, infrastructure deletion, or commit is authorized by this planning deliverable alone.
+- Phases 1 and 2 are implemented as described in the status section. Phase 3 still authorizes no live acquisition, production publication of municipal features, deployment change, or infrastructure deletion by itself.
 
 ## Phase 1: bounded, measurable changes
 

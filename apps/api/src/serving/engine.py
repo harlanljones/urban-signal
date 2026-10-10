@@ -56,6 +56,8 @@ _SLA_RANGE = (5.0, 95.0)
 def build_synthetic_baseline(
     n_rows: int = SYNTHETIC_TRAINING_ROWS,
     seed: int = SYNTHETIC_SEED,
+    n_estimators: int = 200,
+    lgb_seed: int | None = None,
 ) -> LightGBMQuantilePredictor:
     """Fit the boot-time quantile baseline on serving-shaped synthetic rows.
 
@@ -92,7 +94,7 @@ def build_synthetic_baseline(
     )
 
     predictor = LightGBMQuantilePredictor()
-    predictor.train(frame, pd.Series(target), n_estimators=200)
+    predictor.train(frame, pd.Series(target), n_estimators=n_estimators, seed=lgb_seed)
     return predictor
 
 
@@ -105,9 +107,12 @@ class MultiHorizonInferenceEngine:
         *,
         cache_predictions: bool = False,
         metrics: Any = None,
+        model_bundle: str | Path | None = None,
     ):
         self.cache_predictions = cache_predictions
         self.metrics = metrics
+        self.model_bundle_id: str | None = None
+        self.model_provenance = "synthetic-default"
         self._prediction_cache: OrderedDict[tuple[float, ...], dict[str, float]] = OrderedDict()
         self._explanation_cache: OrderedDict[tuple[float, ...], dict[str, float]] = OrderedDict()
         self._prediction_cache_lock = RLock()
@@ -123,7 +128,14 @@ class MultiHorizonInferenceEngine:
         self.dcn_session: ort.InferenceSession | None = None
         self.st_gnn_session: ort.InferenceSession | None = None
 
-        self._init_models()
+        if model_bundle is not None:
+            # bundle.py imports this module's synthetic baseline, so the import
+            # stays inside the method to avoid a cycle at module load.
+            from src.models.bundle import load_bundle
+
+            self._init_from_bundle(load_bundle(Path(model_bundle), expected_provenance="synthetic"))
+        else:
+            self._init_models()
 
     def _increment_metric(self, name: str) -> None:
         """Increment an optional snapshot counter without importing its module."""
@@ -238,6 +250,26 @@ class MultiHorizonInferenceEngine:
         self.st_gnn_session = ort.InferenceSession(str(gnn_onnx_path), providers=avail)
 
         logger.info("Inference engine initialized with ONNX provider: %s", avail[0])
+
+    def _init_from_bundle(self, bundle: Any) -> None:
+        """Load a verified synthetic bundle. Does not train or export ONNX."""
+        self.lgbm_predictor = LightGBMQuantilePredictor()
+        self.lgbm_predictor.models = dict(bundle.quantiles)
+        self.explainer.fit_explainer(self.lgbm_predictor.models[0.5])
+        self.model_bundle_id = bundle.model_id
+        self.model_provenance = bundle.provenance
+        providers = [settings.onnx_execution_provider, "CPUExecutionProvider"]
+        avail = [p for p in providers if p in ort.get_available_providers()]
+        if not avail:
+            avail = ["CPUExecutionProvider"]
+        self.dcn_session = ort.InferenceSession(str(bundle.dcn_path), providers=avail)
+        self.st_gnn_session = ort.InferenceSession(str(bundle.gnn_path), providers=avail)
+        logger.info(
+            "Inference engine loaded bundle %s (%s) via %s",
+            bundle.model_id,
+            bundle.provenance,
+            avail[0],
+        )
 
     def predict_cell_features(
         self,

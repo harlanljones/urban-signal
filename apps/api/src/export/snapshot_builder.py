@@ -53,6 +53,7 @@ import h3
 import polars as pl
 
 from src.export.bay_area_context import CONTEXT_METRIC_KEYS, load_context
+from src.export.publication import FEATURE_SCHEMA_VERSION, plan_publication
 from src.export.snapshot_metrics import SnapshotMetrics
 from src.models.quantile_lgbm import FEATURE_COLUMNS
 from src.serving import router as api_router
@@ -775,6 +776,7 @@ async def build_snapshot(
     metrics: SnapshotMetrics | None = None,
     cache_predictions: bool = True,
     metrics_out: Path | None = None,
+    model_bundle: Path | None = None,
 ) -> dict[str, Any]:
     """Build one snapshot, optionally collecting timings outside the KV payload."""
     total = metrics.stage("total") if metrics is not None else nullcontext()
@@ -788,6 +790,7 @@ async def build_snapshot(
                     engine = MultiHorizonInferenceEngine(
                         metrics=metrics,
                         cache_predictions=cache_predictions,
+                        model_bundle=model_bundle,
                     )
             elif metrics is not None:
                 with metrics.stage("model_initialization"):
@@ -1159,7 +1162,41 @@ async def _build_snapshot(
         bulk_path,
         bulk_size,
     )
+    _write_publication_plan(out_dir, kv_entries, manifest, engine)
     return manifest
+
+
+def _write_publication_plan(
+    out_dir: Path,
+    kv_entries: list[dict[str, str]],
+    manifest: dict[str, Any],
+    engine: MultiHorizonInferenceEngine,
+) -> None:
+    """Write a report-only content-addressed plan next to the legacy bulk file."""
+    model_id = getattr(engine, "model_bundle_id", None) or getattr(
+        engine, "model_provenance", "synthetic-default"
+    )
+    metadata = {
+        "as_of": str(manifest.get("generated_at", ""))[:10],
+        "feature_schema_version": FEATURE_SCHEMA_VERSION,
+        "model_id": model_id,
+        "source_revisions": {
+            "app_version": manifest.get("app_version"),
+            "product_snapshot_id": manifest.get("snapshot_id"),
+        },
+    }
+    plan = plan_publication(kv_entries, None, metadata)
+    payload = {
+        "metadata": metadata,
+        "object_bytes": sum(len(value) for value in plan.objects.values()),
+        "object_count": len(plan.objects),
+        "reuse_candidates": list(plan.reuse_candidates),
+        "snapshot_id": plan.snapshot_id,
+    }
+    (out_dir / "publication-plan.json").write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
 
 
 def _app_version() -> str:
@@ -1226,6 +1263,11 @@ def main() -> None:
         action="store_true",
         help="Disable bounded model prediction and SHAP caches for this build",
     )
+    parser.add_argument(
+        "--model-bundle",
+        default=None,
+        help="Verified synthetic bundle directory (manifest.json plus model artifacts)",
+    )
     args = parser.parse_args()
     context_dir = Path(args.context_dir) if args.context_dir else None
     metrics = SnapshotMetrics(context_dir=context_dir) if args.metrics_out else None
@@ -1241,6 +1283,7 @@ def main() -> None:
                 context_dir=context_dir,
                 metrics=metrics,
                 cache_predictions=not args.no_prediction_cache,
+                model_bundle=Path(args.model_bundle) if args.model_bundle else None,
             )
         )
     finally:

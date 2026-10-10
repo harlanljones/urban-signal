@@ -43,6 +43,15 @@ import {
   CATALYST_DEFAULT_LIMIT,
   CATALYST_MAX_LIMIT,
 } from "./snapshot";
+import {
+  MissingLogicalKey,
+  ReleaseUnavailable,
+  clearReleaseCache,
+  currentRelease,
+  loadRelease,
+  readReleaseEntry,
+  withRelease,
+} from "./release";
 
 export interface Env {
   SNAPSHOT: KVNamespace;
@@ -104,6 +113,7 @@ let manifestCache: {
  *  test suite to keep module-level cache state from leaking between cases. */
 export function clearSnapshotCaches(): void {
   kvJsonCache = new Map();
+  clearReleaseCache();
   manifestCache = { value: null, etag: null, expires: 0, snapshotId: null };
 }
 
@@ -335,6 +345,30 @@ const SNAPSHOT_ID_PATTERN = /^[A-Za-z0-9._-]{1,64}$/;
  */
 export async function getManifest(env: Env): Promise<Manifest | null> {
   const now = Date.now();
+  const release = currentRelease();
+  if (release) {
+    if (
+      manifestCache.value &&
+      manifestCache.snapshotId === release.snapshotId &&
+      now < manifestCache.expires
+    ) {
+      return manifestCache.value;
+    }
+    try {
+      const entry = await readReleaseEntry(env, release, "manifest");
+      const value = entry.value as Manifest;
+      manifestCache = {
+        value,
+        etag: `"${(await sha256Hex(entry.raw)).slice(0, 32)}"`,
+        expires: now + MANIFEST_TTL_MS,
+        snapshotId: release.snapshotId,
+      };
+      return value;
+    } catch (error) {
+      if (error instanceof MissingLogicalKey) return null;
+      throw error;
+    }
+  }
   if (manifestCache.value && now < manifestCache.expires) return manifestCache.value;
   try {
     const pointer = await fetchSnapshotPointer(env);
@@ -383,6 +417,36 @@ export async function readSnapshotValue(
   if (typeof version === "number" && version > SUPPORTED_COVERAGE_SCHEMA_VERSION) {
     return { ok: false, status: 500, detail: `Unsupported snapshot schema version ${version}.` };
   }
+  const release = currentRelease();
+  if (release && (snapshotId === null || snapshotId === release.snapshotId)) {
+    try {
+      const entry = await readReleaseEntry(env, release, logicalKey);
+      return { ok: true, entry: { value: entry.value, etag: `"${(await sha256Hex(entry.raw)).slice(0, 32)}"` } };
+    } catch (error) {
+      if (error instanceof MissingLogicalKey) return { ok: true, entry: null };
+      throw error;
+    }
+  }
+  if (snapshotId) {
+    const addressed = await loadRelease(env, snapshotId);
+    if (addressed) {
+      try {
+        const entry = await readReleaseEntry(env, addressed, logicalKey);
+        return { ok: true, entry: { value: entry.value, etag: `"${(await sha256Hex(entry.raw)).slice(0, 32)}"` } };
+      } catch (error) {
+        if (error instanceof MissingLogicalKey) return { ok: true, entry: null };
+        if (error instanceof ReleaseUnavailable) {
+          return {
+            ok: false,
+            status: 503,
+            detail: error.message,
+            headers: { "retry-after": "5" },
+          };
+        }
+        throw error;
+      }
+    }
+  }
   const key = snapshotId ? `releases/${snapshotId}/${logicalKey}` : logicalKey;
   const entry = await kvJson(env, key);
   if (entry) return { ok: true, entry };
@@ -400,7 +464,12 @@ export async function readSnapshotValue(
 /** Parse `?snapshot_id=`; absent is fine, anything outside the path-safe
  *  format is a 400. */
 function parseSnapshotId(url: URL): { id: string | null } | { error: Response } {
-  const raw = url.searchParams.get("snapshot_id");
+  const byId = url.searchParams.get("snapshot_id");
+  const byAlias = url.searchParams.get("snapshot");
+  if (byId !== null && byAlias !== null && byId !== byAlias) {
+    return { error: jsonError(400, "Query parameters 'snapshot' and 'snapshot_id' disagree.") };
+  }
+  const raw = byId ?? byAlias;
   if (raw === null) return { id: null };
   if (!SNAPSHOT_ID_PATTERN.test(raw)) {
     return {
@@ -584,6 +653,7 @@ const MCP_TOOLS: McpToolDefinition[] = [
       properties: {
         city_id: { type: "string", description: "City identifier from list_cities (aliases like 'sf' or 'dc' are accepted)." },
         borough: { type: "string", description: "Optional borough/division filter (case-insensitive; honors the same normalization as the HTTP API)." },
+        snapshot: { type: "string", description: "Optional snapshot id. A pinned release does not fall back to another version." },
       },
       required: ["city_id"],
       additionalProperties: false,
@@ -602,6 +672,7 @@ const MCP_TOOLS: McpToolDefinition[] = [
         // default 50, hard max 500. Keep these in sync with snapshot.ts.
         limit: { type: "integer", minimum: 1, maximum: CATALYST_MAX_LIMIT, description: `Maximum cells returned (default ${CATALYST_DEFAULT_LIMIT}).` },
         borough: { type: "string", description: "Optional borough/division filter." },
+        snapshot: { type: "string", description: "Optional snapshot id. A pinned release does not fall back to another version." },
       },
       required: ["city_id"],
       additionalProperties: false,
@@ -616,6 +687,7 @@ const MCP_TOOLS: McpToolDefinition[] = [
       properties: {
         h3_index: { type: "string", description: "Resolution-9 H3 cell index." },
         include_shap: { type: "boolean", description: "Include SHAP attributions (default true)." },
+        snapshot: { type: "string", description: "Optional snapshot id. A pinned release does not fall back to another version." },
       },
       required: ["h3_index"],
       additionalProperties: false,
@@ -703,6 +775,7 @@ async function callTool(
       const result = await querySubmarkets(env, {
         city,
         borough: strParam(args, "borough") ?? undefined,
+        snapshotId: strParam(args, "snapshot"),
       });
       if ("error" in result) {
         return { content: [{ type: "text", text: result.error }], isError: true };
@@ -732,6 +805,7 @@ async function callTool(
         minLims: numParam(args, "min_lims") ?? undefined,
         limit: numParam(args, "limit") ?? undefined,
         borough: strParam(args, "borough") ?? undefined,
+        snapshotId: strParam(args, "snapshot"),
       });
       if ("error" in result) {
         // Reachable error here is the out-of-range min_lims message, which
@@ -764,8 +838,9 @@ async function callTool(
       // include_shap is explicitly false.
       const result = await lookupPrediction(env, {
         h3Index,
-          includeShap: boolParam(args, "include_shap", true) ? undefined : false,
-        });
+        includeShap: boolParam(args, "include_shap", true) ? undefined : false,
+        snapshotId: strParam(args, "snapshot"),
+      });
         if ("error" in result) {
           return { content: [{ type: "text", text: String((result as Record<string, unknown>).error) }], isError: true };
         }
@@ -844,6 +919,7 @@ async function mcpEndpoint(request: Request, env: Env): Promise<Response> {
         return rpcError(message.id, -32601, `Method not found: ${safeEcho(message.method, 64)}`);
     }
   } catch (err) {
+    if (err instanceof ReleaseUnavailable) throw err;
     console.error("mcp internal error:", err);
     return rpcError(message.id, -32603, "Internal error");
   }
@@ -1505,9 +1581,20 @@ async function serveSite(request: Request, env: Env, url: URL): Promise<Response
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
+    const url = new URL(request.url);
+    let requestedId: string | undefined;
+    if (url.pathname.startsWith("/api/")) {
+      const parsed = parseSnapshotId(url);
+      if ("error" in parsed) return parsed.error;
+      requestedId = parsed.id ?? undefined;
+    }
     try {
-      return await handleRequest(request, env);
+      const outcome = await withRelease(env, requestedId, () => handleRequest(request, env));
+      return outcome.value;
     } catch (err) {
+      if (err instanceof ReleaseUnavailable) {
+        return jsonError(503, err.message, { "retry-after": "5" });
+      }
       console.error("unhandled worker error:", err);
       return jsonError(500, "Edge error: snapshot data temporarily unavailable.");
     }
@@ -1542,6 +1629,8 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
       "cache-control": CACHE_CONTROL,
       "x-snapshot-created": manifest?.generated_at ?? "",
     };
+    const releaseId = currentRelease()?.snapshotId;
+    if (releaseId) baseHeaders["x-snapshot-id"] = releaseId;
 
     try {
       // GET /api/v1/cities
@@ -1676,7 +1765,7 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
           manifestCache = { ...manifestCache, value: manifest, etag };
         }
         if (etagMatches(request, etag)) return notModified(baseHeaders, etag);
-        const snapshotId = manifest.snapshot_id ?? manifestCache.snapshotId;
+        const snapshotId = currentRelease()?.snapshotId ?? manifest.snapshot_id ?? manifestCache.snapshotId;
         return withHeaders(JSON.stringify(manifest), 200, {
           ...baseHeaders,
           etag,
@@ -1864,6 +1953,7 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
 
       return jsonError(404, "Not Found");
     } catch (err) {
+      if (err instanceof ReleaseUnavailable) throw err;
       console.error("edge error:", err);
       return jsonError(500, "Edge error: snapshot data temporarily unavailable.");
     }
