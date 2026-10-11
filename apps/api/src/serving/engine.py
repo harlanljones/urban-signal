@@ -1,6 +1,5 @@
 """ONNX Runtime CUDA / CPU inference engine and multi-horizon model orchestrator."""
 
-import copy
 import logging
 import time
 from collections import OrderedDict
@@ -165,12 +164,12 @@ class MultiHorizonInferenceEngine:
                 if cached is not None:
                     self._prediction_cache.move_to_end(vector)
                     self._increment_metric("prediction_cache_hits")
-                    return copy.deepcopy(cached)
+                    return cached.copy()
                 values = self._compute_prediction_values(vector)
-                self._prediction_cache[vector] = copy.deepcopy(values)
+                self._prediction_cache[vector] = values.copy()
                 if len(self._prediction_cache) > PREDICTION_CACHE_MAXSIZE:
                     self._prediction_cache.popitem(last=False)
-                return copy.deepcopy(values)
+                return values.copy()
         return self._compute_prediction_values(vector)
 
     def _compute_prediction_values(self, vector: tuple[float, ...]) -> dict[str, float]:
@@ -212,18 +211,18 @@ class MultiHorizonInferenceEngine:
                 if cached is not None:
                     self._explanation_cache.move_to_end(vector)
                     self._increment_metric("shap_cache_hits")
-                    return copy.deepcopy(cached)
+                    return cached.copy()
                 values = self._compute_explanation_values(vector)
-                self._explanation_cache[vector] = copy.deepcopy(values)
+                self._explanation_cache[vector] = values.copy()
                 if len(self._explanation_cache) > PREDICTION_CACHE_MAXSIZE:
                     self._explanation_cache.popitem(last=False)
-                return copy.deepcopy(values)
+                return values.copy()
         return self._compute_explanation_values(vector)
 
     def _compute_explanation_values(self, vector: tuple[float, ...]) -> dict[str, float]:
         self._increment_metric("shap_calls")
         row = pd.Series(dict(zip(FEATURE_COLUMNS, vector)))
-        return copy.deepcopy(self.explainer.explain_instance(row))
+        return self.explainer.explain_instance(row).copy()
 
     def _init_models(self):
         """Initialize or train default synthetic weights for immediate serving."""
