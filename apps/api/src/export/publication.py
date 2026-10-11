@@ -46,19 +46,19 @@ def canonical_bytes(payload: Any) -> bytes:
     return encoded.encode("utf-8")
 
 
-
-
 def _zero_latency(payload: Any) -> None:
     """Versioned payloads keep the latency field and pin it at the documented sentinel."""
     if isinstance(payload, dict):
         if "inference_latency_ms" in payload:
             payload["inference_latency_ms"] = 0.0
         for value in payload.values():
-            _zero_latency(value)
+            if isinstance(value, (dict, list)):
+                _zero_latency(value)
         return
     if isinstance(payload, list):
         for value in payload:
-            _zero_latency(value)
+            if isinstance(value, (dict, list)):
+                _zero_latency(value)
 
 
 def _planned_payload(raw: str) -> Any:
