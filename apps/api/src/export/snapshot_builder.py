@@ -878,14 +878,18 @@ async def _build_snapshot(
     def register(key: str, path: Path, payload: Any) -> int:
         serialization = metrics.stage("serialization") if metrics is not None else nullcontext()
         with serialization:
-            size = _write_json(path, payload)
+            data = json.dumps(payload, separators=(",", ":"))
+            encoded = data.encode("utf-8")
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(encoded)
+            size = len(encoded)
         if size > MAX_KV_VALUE_BYTES:
             raise ValueError(
                 f"KV value '{key}' is {size:,} bytes, over the {MAX_KV_VALUE_BYTES:,}-byte "
                 f"build budget (KV hard cap 25 MiB). Shard the key before publishing."
             )
         keys_index[key] = {"bytes": size}
-        kv_entries.append({"key": key, "value": json.dumps(payload, separators=(",", ":"))})
+        kv_entries.append({"key": key, "value": data})
         if metrics is not None:
             family = key.split("/", 1)[0]
             metrics.increment(f"keys.{family}")
