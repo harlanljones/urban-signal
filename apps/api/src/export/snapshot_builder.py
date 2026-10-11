@@ -40,10 +40,8 @@ import hashlib
 import json
 import logging
 import math
-import os
 import time
 from collections.abc import Callable
-from concurrent.futures import ThreadPoolExecutor
 from contextlib import nullcontext
 from datetime import UTC, datetime
 from pathlib import Path
@@ -103,10 +101,6 @@ MAX_BULK_BYTES = 1024 * 1024 * 1024
 # design so a res-6 shard (~254 KB measured) can never silently creep toward it.
 NATIONAL_MAX_CHUNK_BYTES = 5 * 1024 * 1024
 NATIONAL_COLS = ("h3", "jobs", "workers", "jobs_pct", "workers_pct")
-# Cells inference is the dominant build cost; ONNX sessions are thread-safe for
-# concurrent run() calls, and pool.map preserves submission order so the publish
-# stays deterministic.
-CELL_INFERENCE_WORKERS = min(8, os.cpu_count() or 4)
 NORMALIZED_METRICS = (
     "lims_score",
     "delta_6m_p50",
@@ -989,8 +983,7 @@ async def _build_snapshot(
             feats = {k: props[k] for k in CELL_FEATURE_KEYS if k in props}
             cells_requests.append((h3_cell, feats))
 
-    # Inference runs on a thread pool (ONNX sessions are thread-safe); results
-    # are consumed in submission order so the publish is deterministic.
+    # Repeated vectors reuse locked caches; submit in order without per-cell futures.
     def _predict(request: tuple[str, dict[str, Any]]) -> dict[str, Any]:
         h3_cell, feats = request
         return engine.predict_cell_features(h3_index=h3_cell, feature_dict=feats, include_shap=True)
@@ -1001,8 +994,8 @@ async def _build_snapshot(
             "unique_normalized_vectors",
             len({tuple(float(feats.get(key, 0.0)) for key in FEATURE_COLUMNS) for _, feats in cells_requests}),
         )
-    with cell_timer, ThreadPoolExecutor(max_workers=CELL_INFERENCE_WORKERS) as pool:
-        predictions = list(pool.map(_predict, cells_requests))
+    with cell_timer:
+        predictions = list(map(_predict, cells_requests))
     cells_by_index = {request[0]: pred for request, pred in zip(cells_requests, predictions)}
 
     for h3_cell, pred in cells_by_index.items():
