@@ -60,3 +60,31 @@ Prior production builders took 98.04 seconds / 1,434,812 KiB and 91.79 seconds /
 Removing the daily Worker deploy avoids its previously measured 53–59-second job (26.5–29.5 elapsed minutes over 30 refreshes). A code-only release avoids the previously measured 168–177-second snapshot job and 13,154 KV writes. Relevant releases now have two independent validation paths, so net release-runner savings need production measurements.
 
 Full daily publication remains approximately 394,620 KV writes for 30 refreshes, before manual runs. There is no daily KV-write or new storage saving in phase 1. No measured cost reason supports moving to GCP, AWS, Railway or Fly.io now. Stop at this bounded phase and remeasure with real durable ingestion before considering persistent models or incremental publication.
+
+## Dense-metro autoresearch harness — 2026-10-11
+
+Run `bash autoresearch.sh` from the repository root. This separate workload
+pins all 157 registered metros and their 53,799 unique bounded res-9 cells in
+`scripts/autoresearch_coverage.json`. It performs three full dense snapshots
+with cold prediction caches, real seeded synthetic models in a temporary
+directory, res-7/8/9 LOD publication, per-cell shards and release twins. It
+omits the optional legacy monolithic cell key, national input and Bay Area
+context. It does not ingest municipal feeds or publish to Cloudflare.
+
+The primary metric, `snapshot_ms`, is median build time excluding model
+initialization and correctness verification. Secondary metrics report model
+initialization, process-lifetime peak RSS, bulk/manifest/res-9 tile bytes,
+metro/cell counts, and `client_parse_merge_ms`: Bun CPU time for parsing the
+exported tiles and executing the shipped dashboard's `mergeTilePayload`.
+The client benchmark includes repeated tile loads and validates deduplication;
+it is not browser rendering, network latency, or a Core Web Vitals measurement.
+
+Network connections are rejected in the Python workload; random seeds,
+thread settings, CPU inference provider and publication metadata clock are
+fixed. Coverage, cell shards, percentile bounds and all LOD indexes are checked.
+Logical predictions, SHAP, geometry, tiles, catalogs and catalysts must match
+across trials and the pinned `scripts/autoresearch_semantic.sha256`, excluding
+only measured inference latency. Bulk byte counts retain latency-width noise.
+Harness and pinned fixtures are immutable during optimization; coverage or
+schema changes require an explicit new baseline. The historical measurements
+above use a different workload and are not directly comparable.
