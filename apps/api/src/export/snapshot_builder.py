@@ -358,14 +358,18 @@ def _dense_metro_grid(
     """
     cells = coverage.metro_cells(city, res=9, max_ring=max_ring, max_dist_km=max_dist_km)
     features: list[dict[str, Any]] = []
+    metadata_by_submarket: dict[str, dict[str, Any]] = {}
     for cell in cells:
         assignment = coverage.assign_cell(cell, city, max_dist_km=max_dist_km)
         if assignment is None:
             continue
-        meta = coverage.submarket_meta(city, assignment.submarket)
-        if meta is None:
-            continue
-        meta_dict = api_router._submarket_to_dict(meta)
+        meta_dict = metadata_by_submarket.get(assignment.submarket)
+        if meta_dict is None:
+            meta = coverage.submarket_meta(city, assignment.submarket)
+            if meta is None:
+                continue
+            meta_dict = api_router._submarket_to_dict(meta)
+            metadata_by_submarket[assignment.submarket] = meta_dict
         synthetic_feats = {
             "capex_density_decayed": meta_dict["capex"],
             "permit_velocity": (
