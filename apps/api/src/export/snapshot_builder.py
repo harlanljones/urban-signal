@@ -1141,7 +1141,7 @@ async def _build_snapshot(
         *release_entries,
         {"key": SNAPSHOT_POINTER_KEY, "value": json.dumps(pointer, separators=(",", ":"))},
     ]
-    bulk_bytes = json.dumps(bulk_entries)
+    bulk_bytes = json.dumps(bulk_entries, separators=(",", ":"))
     bulk_size = len(bulk_bytes.encode("utf-8"))
     if metrics is not None:
         metrics.set_artifact("key_count", len(bulk_entries))
