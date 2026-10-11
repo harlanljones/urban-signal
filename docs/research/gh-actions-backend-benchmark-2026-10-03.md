@@ -88,3 +88,42 @@ only measured inference latency. Bulk byte counts retain latency-width noise.
 Harness and pinned fixtures are immutable during optimization; coverage or
 schema changes require an explicit new baseline. The historical measurements
 above use a different workload and are not directly comparable.
+
+### Optimization results
+
+The 20-run segment retained changes in `snapshot_builder.py`, `publication.py`
+and `serving/engine.py`; dashboard source and the benchmark workload remain
+unchanged. Each registered artifact is serialized once for both disk and KV.
+Publication latency is normalized during JSON decoding, and the canonical
+encoder rejects non-finite values without a separate recursive traversal.
+Identical raw publication values share canonicalization and hashing.
+Float-only prediction/SHAP caches return detached dictionary copies, and scalar
+feature validation avoids NumPy allocations. Dense-grid metadata is normalized
+once per submarket per build. Ordered cell inference avoids per-cell futures
+and contention on the caches. Bulk staging is released before planning objects;
+compact bulk separators remove exactly 447,371 transport whitespace bytes at
+this fixed key count without changing the embedded logical payload strings.
+
+| Metric | Official baseline, run 1 | Final verification, run 20 |
+|---|---:|---:|
+| Snapshot median, ms | 18,400.440 | 12,606.354 |
+| Client parse/merge median, ms | 58.564 | 82.694 |
+| Process-lifetime peak RSS, MiB | 2,976.652 | 2,983.828 |
+
+The final verification is 31.5% faster for the snapshot workload. The best
+retained observation was 11,957.576 ms in run 17; another unchanged-code
+replication measured 12,165.995 ms in run 19. All benchmark runs matched the
+pinned semantic fingerprint and retained 157 metros, 53,799 cells and all
+three metro LOD levels. No new city was registered and nothing was deployed.
+
+Client timing was worse in the final observation despite unchanged dashboard
+code; no web-rendering or client-speed improvement is established. Peak RSS
+did not improve. These measurements do not establish live ingestion throughput,
+cloud billing savings, production latency or model quality. Serial inference
+is beneficial for this repeated-vector workload; mostly-unique production
+vectors require a separate measurement before generalizing the result.
+
+The targeted engine-cache, publication, publisher, snapshot export, metrics,
+reach and client contract suites passed. The harness exercised full real-model
+publication repeatedly; report-only publication IDs, legacy-cell compatibility,
+national inputs and optional context remain covered by the contract suites.
