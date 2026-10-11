@@ -87,12 +87,19 @@ def plan_publication(
     """
     objects: dict[str, bytes] = {}
     keys: dict[str, dict[str, Any]] = {}
+    canonical_by_value: dict[str, tuple[str, bytes]] = {}
     for entry in entries:
         logical = entry["key"]
-        payload = _planned_payload(entry["value"])
-        raw = canonical_bytes(payload)
-        digest = hashlib.sha256(raw).hexdigest()
-        objects[digest] = raw
+        value = entry["value"]
+        cached = canonical_by_value.get(value)
+        if cached is None:
+            payload = _planned_payload(value)
+            raw = canonical_bytes(payload)
+            digest = hashlib.sha256(raw).hexdigest()
+            objects[digest] = raw
+            canonical_by_value[value] = (digest, raw)
+        else:
+            digest, raw = cached
         keys[logical] = {"sha256": digest, "bytes": len(raw)}
 
     body = {
