@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import math
 from dataclasses import dataclass
 from typing import Any
 
@@ -34,7 +33,6 @@ class PublicationPlan:
 
 def canonical_bytes(payload: Any) -> bytes:
     """Sorted-key compact JSON. Array order is preserved. Non-finite numbers fail."""
-    _reject_non_finite(payload)
     try:
         encoded = json.dumps(
             payload,
@@ -48,18 +46,6 @@ def canonical_bytes(payload: Any) -> bytes:
     return encoded.encode("utf-8")
 
 
-def _reject_non_finite(payload: Any) -> None:
-    if isinstance(payload, float):
-        if not math.isfinite(payload):
-            raise NonFiniteNumber("canonical JSON rejected a non-finite number")
-        return
-    if isinstance(payload, dict):
-        for value in payload.values():
-            _reject_non_finite(value)
-        return
-    if isinstance(payload, list):
-        for value in payload:
-            _reject_non_finite(value)
 
 
 def _zero_latency(payload: Any) -> None:
