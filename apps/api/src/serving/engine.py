@@ -1,6 +1,7 @@
 """ONNX Runtime CUDA / CPU inference engine and multi-horizon model orchestrator."""
 
 import logging
+import math
 import time
 from collections import OrderedDict
 from pathlib import Path
@@ -145,7 +146,7 @@ class MultiHorizonInferenceEngine:
     def _feature_key(feature_dict: dict[str, Any]) -> tuple[float, ...]:
         """Return the normalized, ordered serving vector used by all models."""
         vector = tuple(float(feature_dict.get(column, 0.0)) for column in FEATURE_COLUMNS)
-        if not np.isfinite(vector).all():
+        if not all(map(math.isfinite, vector)):
             raise ValueError("feature inputs must be finite")
         return vector
 
