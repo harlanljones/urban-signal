@@ -46,27 +46,18 @@ def canonical_bytes(payload: Any) -> bytes:
     return encoded.encode("utf-8")
 
 
-def _zero_latency(payload: Any) -> None:
-    """Versioned payloads keep the latency field and pin it at the documented sentinel."""
-    if isinstance(payload, dict):
-        if "inference_latency_ms" in payload:
-            payload["inference_latency_ms"] = 0.0
-        for value in payload.values():
-            if isinstance(value, (dict, list)):
-                _zero_latency(value)
-        return
-    if isinstance(payload, list):
-        for value in payload:
-            if isinstance(value, (dict, list)):
-                _zero_latency(value)
+def _zero_latency(payload: dict[str, Any]) -> dict[str, Any]:
+    """Decode hook: pin latency as each JSON object is materialized."""
+    if "inference_latency_ms" in payload:
+        payload["inference_latency_ms"] = 0.0
+    return payload
 
 
 def _planned_payload(raw: str) -> Any:
     try:
-        payload = json.loads(raw)
+        payload = json.loads(raw, object_hook=_zero_latency)
     except ValueError as exc:
         raise ValueError("publication entry is not JSON") from exc
-    _zero_latency(payload)
     return payload
 
 
