@@ -102,11 +102,14 @@ let manifestCache: {
   expires: number;
   /** Release id the cached manifest was resolved from (hex-coverage Stage B). */
   snapshotId: string | null;
+  /** True when the cached document came from a content-addressed release. */
+  addressed: boolean;
 } = {
   value: null,
   etag: null,
   expires: 0,
   snapshotId: null,
+  addressed: false,
 };
 
 /** Clears the in-isolate snapshot caches (KV values + manifest). Used by the
@@ -114,7 +117,7 @@ let manifestCache: {
 export function clearSnapshotCaches(): void {
   kvJsonCache = new Map();
   clearReleaseCache();
-  manifestCache = { value: null, etag: null, expires: 0, snapshotId: null };
+  manifestCache = { value: null, etag: null, expires: 0, snapshotId: null, addressed: false };
 }
 
 export interface Manifest {
@@ -362,6 +365,7 @@ export async function getManifest(env: Env): Promise<Manifest | null> {
         etag: `"${(await sha256Hex(entry.raw)).slice(0, 32)}"`,
         expires: now + MANIFEST_TTL_MS,
         snapshotId: release.snapshotId,
+        addressed: true,
       };
       return value;
     } catch (error) {
@@ -369,7 +373,9 @@ export async function getManifest(env: Env): Promise<Manifest | null> {
       throw error;
     }
   }
-  if (manifestCache.value && now < manifestCache.expires) return manifestCache.value;
+  if (manifestCache.value && !manifestCache.addressed && now < manifestCache.expires) {
+    return manifestCache.value;
+  }
   try {
     const pointer = await fetchSnapshotPointer(env);
     const pointerId = pointer?.current ?? null;
@@ -382,6 +388,7 @@ export async function getManifest(env: Env): Promise<Manifest | null> {
       etag,
       expires: now + MANIFEST_TTL_MS,
       snapshotId: typeof value.snapshot_id === "string" ? value.snapshot_id : pointerId,
+      addressed: false,
     };
     return value;
   } catch {

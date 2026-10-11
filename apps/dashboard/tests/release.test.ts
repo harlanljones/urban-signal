@@ -201,3 +201,53 @@ test("the worker serves one content-addressed release and accepts the snapshot a
   const body = (await response.json()) as { features: { properties: { marker: string } }[] };
   expect(body.features[0].properties.marker).toBe("addressed");
 });
+
+test("a content-addressed manifest does not stick for the next legacy request", async () => {
+  const product = {
+    generated_at: "2026-10-10T00:00:00Z",
+    app_version: "2.0.0",
+    cities: ["nyc"],
+    resolution: 9,
+    k_ring: 1,
+    catalyst_threshold: 85,
+    snapshot_id: CURRENT,
+  };
+  const current = await addressedRelease(CURRENT, { manifest: product }, null);
+  const addressedEnv = {
+    SNAPSHOT: {
+      async get(key: string) {
+        const values = {
+          ...current.stored,
+          "snapshot/current": canonical({ schema_version: 1, current: CURRENT, previous: null }),
+        };
+        return key in values ? values[key] : null;
+      },
+    },
+    ASSETS: { fetch: async () => new Response("ok") },
+  };
+  const first = await worker.fetch(new Request("https://urban-signal.test/api/v1/manifest"), addressedEnv as never);
+  expect(first.status).toBe(200);
+  expect(((await first.json()) as { generated_at: string }).generated_at).toBe("2026-10-10T00:00:00Z");
+
+  const legacyEnv = {
+    SNAPSHOT: {
+      async get(key: string) {
+        if (key === "manifest") {
+          return JSON.stringify({
+            generated_at: "2026-08-24T00:00:00Z",
+            app_version: "2.0.0",
+            cities: ["nyc"],
+            resolution: 9,
+            k_ring: 1,
+            catalyst_threshold: 85,
+          });
+        }
+        return null;
+      },
+    },
+    ASSETS: { fetch: async () => new Response("ok") },
+  };
+  const second = await worker.fetch(new Request("https://urban-signal.test/api/v1/manifest"), legacyEnv as never);
+  expect(second.status).toBe(200);
+  expect(((await second.json()) as { generated_at: string }).generated_at).toBe("2026-08-24T00:00:00Z");
+});
