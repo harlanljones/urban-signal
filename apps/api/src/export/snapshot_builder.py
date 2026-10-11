@@ -1163,6 +1163,8 @@ async def _build_snapshot(
         bulk_path,
         bulk_size,
     )
+    # Release bulk staging before allocating the content-addressed object plan.
+    del bulk_bytes, bulk_entries, release_entries
     _write_publication_plan(out_dir, kv_entries, manifest, engine)
     return manifest
 
