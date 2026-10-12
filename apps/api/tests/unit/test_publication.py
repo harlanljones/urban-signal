@@ -107,3 +107,32 @@ def test_time_decay_is_not_hidden_by_a_stable_record_hash():
 
 def test_canonical_bytes_sort_keys_and_keep_array_order():
     assert canonical_bytes({"b": 1, "a": [2, 1]}) == b'{"a":[2,1],"b":1}'
+
+
+def test_plan_publication_with_regions_emits_region_manifests_and_pointers():
+    entries = [_entry("grid/nyc", {"lims": 1})]
+    region_manifest = {
+        "region_id": "metro/nyc",
+        "generation": "gen-nyc-abc",
+        "golden_count": 50,
+        "chunks": {"grid/nyc": {"sha256": "abc", "bytes": 10}},
+    }
+    plan = plan_publication(entries, None, _meta(regions={"metro/nyc": region_manifest}))
+    assert plan.regions == {"metro/nyc": "gen-nyc-abc"}
+    assert "regions/metro/nyc/gen/gen-nyc-abc" in plan.region_manifests
+    assert "regions/metro/nyc/current" in plan.region_pointers
+    pointer = plan.region_pointers["regions/metro/nyc/current"]
+    assert pointer["current"] == "gen-nyc-abc"
+    assert pointer["golden_count"] == 50
+    assert plan.manifest["regions"] == {"metro/nyc": "gen-nyc-abc"}
+
+
+def test_plan_publication_overflowing_8mib_moves_region_index_to_object():
+    entries = [_entry("grid/nyc", {"lims": 1})]
+    # Create an oversized regions map (>8 MiB)
+    large_regions = {f"metro/city_{i:06d}": f"gen_{'x' * 64}_{i:06d}" for i in range(100000)}
+    plan = plan_publication(entries, None, _meta(regions=large_regions))
+    assert "region_index_key" in plan.manifest
+    assert plan.manifest["region_index_key"] == "manifest/regions"
+    assert "manifest/regions" in plan.manifest["keys"]
+    assert "regions" not in plan.manifest

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from src.models.quantile_lgbm import FEATURE_COLUMNS
@@ -29,6 +29,9 @@ class PublicationPlan:
     manifest: dict[str, Any]
     objects: dict[str, bytes]
     reuse_candidates: tuple[str, ...]
+    regions: dict[str, str] = field(default_factory=dict)
+    region_manifests: dict[str, dict[str, Any]] = field(default_factory=dict)
+    region_pointers: dict[str, dict[str, Any]] = field(default_factory=dict)
 
 
 def canonical_bytes(payload: Any) -> bytes:
@@ -102,6 +105,27 @@ def plan_publication(
             digest, raw = cached
         keys[logical] = {"sha256": digest, "bytes": len(raw)}
 
+    regions_map: dict[str, str] = {}
+    region_manifests: dict[str, dict[str, Any]] = {}
+    region_pointers: dict[str, dict[str, Any]] = {}
+    raw_regions = metadata.get("regions")
+    if isinstance(raw_regions, dict):
+        for rid, rdata in sorted(raw_regions.items()):
+            if isinstance(rdata, str):
+                regions_map[rid] = rdata
+            elif isinstance(rdata, dict):
+                gen = rdata.get("generation")
+                if isinstance(gen, str):
+                    regions_map[rid] = gen
+                    region_manifests[f"regions/{rid}/gen/{gen}"] = rdata
+                    prev_gen = rdata.get("previous_generation")
+                    region_pointers[f"regions/{rid}/current"] = {
+                        "current": gen,
+                        "previous": prev_gen,
+                        "golden_count": rdata.get("golden_count", 0),
+                        "promoted_at": rdata.get("built_at", metadata.get("as_of", "")),
+                    }
+
     body = {
         "as_of": metadata["as_of"],
         "feature_schema_version": metadata.get("feature_schema_version", FEATURE_SCHEMA_VERSION),
@@ -111,6 +135,17 @@ def plan_publication(
         "schema_version": 1,
         "source_revisions": metadata.get("source_revisions", {}),
     }
+    if regions_map:
+        projected = canonical_bytes({**body, "regions": regions_map})
+        if len(projected) > 8 * 1024 * 1024:
+            region_index_raw = canonical_bytes(regions_map)
+            region_index_digest = hashlib.sha256(region_index_raw).hexdigest()
+            objects[region_index_digest] = region_index_raw
+            keys["manifest/regions"] = {"sha256": region_index_digest, "bytes": len(region_index_raw)}
+            body["region_index_key"] = "manifest/regions"
+        else:
+            body["regions"] = regions_map
+
     snapshot_id = hashlib.sha256(canonical_bytes(body)).hexdigest()
     manifest = {"snapshot_id": snapshot_id, **body}
     previous_hashes = _object_hashes(previous)
@@ -120,4 +155,7 @@ def plan_publication(
         manifest=manifest,
         objects=objects,
         reuse_candidates=reuse,
+        regions=regions_map,
+        region_manifests=region_manifests,
+        region_pointers=region_pointers,
     )

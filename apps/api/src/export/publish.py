@@ -170,6 +170,11 @@ def publish(
         object_writes += _put_many_retry(store, chunk)
         object_bytes += sum(len(value) for _, value in chunk)
 
+    for rkey, rval in sorted(plan.region_manifests.items()):
+        _put_retry(store, rkey, json.dumps(rval, sort_keys=True, separators=(",", ":")).encode("utf-8"))
+    for rkey, rval in sorted(plan.region_pointers.items()):
+        _put_retry(store, rkey, json.dumps(rval, sort_keys=True, separators=(",", ":")).encode("utf-8"))
+
     manifest_bytes = json.dumps(plan.manifest, sort_keys=True, separators=(",", ":")).encode("utf-8")
     _put_retry(store, f"releases/{plan.snapshot_id}", manifest_bytes)
     previous = remote_current if _is_versioned(remote_current) else None
@@ -196,6 +201,10 @@ def bulk_entries(plan: PublicationPlan, *, previous: str | None = None) -> list[
         {"key": f"objects/{digest}", "value": payload.decode("utf-8")}
         for digest, payload in sorted(plan.objects.items())
     ]
+    for key, manifest_data in sorted(plan.region_manifests.items()):
+        rows.append({"key": key, "value": json.dumps(manifest_data, sort_keys=True, separators=(",", ":"))})
+    for key, pointer_data in sorted(plan.region_pointers.items()):
+        rows.append({"key": key, "value": json.dumps(pointer_data, sort_keys=True, separators=(",", ":"))})
     rows.append(
         {
             "key": f"releases/{plan.snapshot_id}",

@@ -178,3 +178,23 @@ def test_stage_b_pointer_can_be_replaced_by_the_first_versioned_release():
         f"releases/{plan.snapshot_id}",
         POINTER_KEY,
     }
+
+
+def test_publish_and_bulk_entries_include_region_pointers_and_manifests():
+    region_manifest = {
+        "region_id": "metro/nyc",
+        "generation": "gen-nyc-1",
+        "golden_count": 42,
+        "chunks": {},
+    }
+    plan = _plan([_entry("grid/nyc", {"lims": 1})], regions={"metro/nyc": region_manifest})
+    store = MemoryStore()
+    receipt = publish(plan, store, expected_current=None)
+    assert receipt.manifest_writes == 1
+    assert "regions/metro/nyc/gen/gen-nyc-1" in store.data
+    assert "regions/metro/nyc/current" in store.data
+    rows = bulk_entries(plan)
+    keys = [row["key"] for row in rows]
+    assert "regions/metro/nyc/gen/gen-nyc-1" in keys
+    assert "regions/metro/nyc/current" in keys
+    assert keys[-1] == POINTER_KEY  # global pointer promoted last
