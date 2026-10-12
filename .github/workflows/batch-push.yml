@@ -191,10 +191,12 @@ jobs:
           # production mode (US-435 §24). national-dir's parent carries the
           # national/ tree the fetch step downloaded. The bundle is the seeded
           # synthetic baseline; --no-prediction-cache remains the inference rollback.
+          # The reader uses per-cell shards; the dense monolithic cell key exceeds
+          # the KV value limit and is no longer published.
           /usr/bin/time -f 'elapsed_seconds=%e\npeak_rss_kib=%M' -o build/snapshot-resources.txt \
             env PYTHONPATH=apps/api .venv/bin/python -m src.export.snapshot_builder \
               --out dist --context-dir build/context --metrics-out build/snapshot-metrics.json \
-              --dense-metro --national-dir build --require-national \
+              --dense-metro --skip-legacy-cells --national-dir build --require-national \
               --model-bundle "$bundle"
 
       - name: Preserve snapshot metrics

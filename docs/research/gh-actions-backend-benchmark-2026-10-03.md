@@ -127,3 +127,12 @@ The targeted engine-cache, publication, publisher, snapshot export, metrics,
 reach and client contract suites passed. The harness exercised full real-model
 publication repeatedly; report-only publication IDs, legacy-cell compatibility,
 national inputs and optional context remain covered by the contract suites.
+
+### Production publication cutover
+
+The 2026-10-11 scheduled refresh failed before uploading because its legacy
+`cells/index` value was 36,446,037 bytes, above both the 20 MiB build budget and
+the 25 MiB KV hard limit. The production workflow now passes
+`--skip-legacy-cells`: every `cells/{h3}` shard and its release twin remains,
+but the obsolete monolithic value is omitted. The deployed reader checks the
+per-cell shard first. Size guards and required national coverage are unchanged.
