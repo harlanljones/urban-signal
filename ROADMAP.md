@@ -28,7 +28,7 @@ always written with the `HX-` prefix to avoid collision.
 | A | **Shipped** (`1bdc17b`, deployed, browser-verified) | 2,645 anchors; res-6 underlay; `coverage.tiers`; registry field + gate; benchmark median 151.0 ms vs 147.6 baseline; production worker pin bug found and fixed |
 | B | **Shipped** (`d53b717`, published `r-20261012-2d3b28fa`, browser-verified live) | CoveragePlan, golden counts, labels, ownership, provenance UI; 157 metros / 53,799 cells unchanged; NYC viewport 49 measured / 1,362 interpolated; full API unit suite green. HX-B6 not needed (worker types are permissive); HX-B8 deferred (see below) |
 | C | **Built & verified** (HX-C1..C7 complete) | HX-C1 promotion gate (`regions.py`); HX-C2 per-region pointers in publication plan; HX-C3 region builder, rank epochs, `--previous-regions` incremental skip (`regions_rebuilt == 0`), metrics; HX-C4 worker reads chunks via region pointers; HX-C5 workflow incremental mode & DG-5 per-region prune; HX-C6 failure-domain drill script; HX-C7 client schema v2 reader & regional cache retention. |
-| D | Not started | |
+| D | **In progress**: HX-D1 feasibility verified | A2 confirmed (LODES aggregation at res 7–9 works with cell_filter); total metro-less cell budget measured at 233,306 cells (combined 287,105 cells nationwide, within ADR 0.5M–1.5M envelope); DG-6 ordered list documented in `docs/research/hex-coverage-stage-d-feasibility.md`; `CoveragePlan` emits anchor regions with null LIMS and measured LODES. |
 
 Stage B deviations from the original plan, each driven by measurement (spec §3.0):
 the k-ring set stays authoritative instead of being clipped to anchors (clipping

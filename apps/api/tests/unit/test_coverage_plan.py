@@ -103,3 +103,27 @@ def test_region_lookup_and_roll_up(plans):
         plan_region("metro/not_a_city")
     with pytest.raises(KeyError):
         plan_region("anchor/00000")
+
+
+def test_metro_less_anchors_returns_dg6_ordered_candidates():
+    uncovered = coverage_plan.metro_less_anchors()
+    assert len(uncovered) > 2000
+    # Top anchor by land area in DG-6 ranking is Atlanta, GA
+    assert uncovered[0].anchor_id == "03817"
+    assert "Atlanta" in uncovered[0].name
+
+
+def test_plan_anchor_region_emits_lodes_measured_and_null_lims():
+    plan = coverage_plan.plan_anchor_region("03817")
+    assert plan.region_id == "anchor/03817"
+    assert plan.authority == "anchor"
+    assert plan.detail_res == 9
+    assert plan.golden_count == len(plan.cells)
+    assert plan.golden_count > 60_000
+    # US-408 honesty rule: no fabricated LIMS momentum owner outside metros
+    assert all(c.owner is None for c in plan.cells)
+    assert all(c.distance_km is None for c in plan.cells)
+    assert all(c.label == "measured" for c in plan.cells)
+    assert all(c.in_anchor is True for c in plan.cells)
+    assert all(c.owned is True for c in plan.cells)
+    assert coverage_plan.plan_region("anchor/03817") == plan

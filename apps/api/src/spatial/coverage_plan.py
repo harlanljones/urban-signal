@@ -27,9 +27,17 @@ from typing import Literal
 import h3
 
 from src.spatial import coverage
-from src.spatial.urban_anchors import ANCHOR_ASSET, _base_cells, anchors_intersecting
+from src.spatial.urban_anchors import (
+    ANCHOR_ASSET,
+    UrbanAnchor,
+    _base_cells,
+    anchor_cells,
+    anchors_intersecting,
+    detail_resolution,
+    load_anchors,
+)
 
-Authority = Literal["k_ring"]
+Authority = Literal["k_ring", "anchor"]
 Label = Literal["measured", "interpolated"]
 
 DETAIL_RESOLUTION = 9  # Stage B detail cells are res 9; adaptive resolution arrives with Stage D
@@ -39,12 +47,12 @@ INTERPOLATION_BOUND_KM = coverage.DEFAULT_MAX_DIST_KM  # 1.5 km, today's dense-g
 @dataclass(frozen=True)
 class PlannedCell:
     cell: str
-    owner: str  # submarket name that supplies the cell's LIMS baseline
-    distance_km: float  # to that submarket's center; 0.0 for the center cell itself
-    label: Label  # measured = the submarket's own center cell; interpolated otherwise
+    owner: str | None  # submarket name that supplies the cell's LIMS baseline; None for anchor regions
+    distance_km: float | None  # to that submarket's center; None for anchor regions
+    label: Label  # measured = the submarket's own center cell (LIMS) or LODES measured; interpolated otherwise
     in_anchor: bool  # the cell lies inside one of the metro's Urban Anchors
-    owned: bool  # this metro is the cell's single owning region (INV-9)
-    borough: str
+    owned: bool  # this metro/anchor is the cell's single owning region (INV-9)
+    borough: str = ""
 
 
 @dataclass(frozen=True)
@@ -171,13 +179,78 @@ def plan_all(
     return plans
 
 
+def metro_less_anchors() -> tuple[UrbanAnchor, ...]:
+    """All Census Urban Areas that do not intersect any registered metro bbox, sorted per DG-6."""
+    from src.spatial.city_registry import REGISTRY
+
+    all_anchors = load_anchors()
+    metro_anchor_set: set[str] = set()
+    for cid in REGISTRY:
+        reg = REGISTRY[cid]
+        metro_anchor_set.update(anchors_intersecting(reg.metro_bbox))
+
+    uncovered = [a for aid, a in all_anchors.items() if aid not in metro_anchor_set]
+    return tuple(sorted(uncovered, key=lambda a: (a.population or 0, a.land_km2), reverse=True))
+
+
+@lru_cache(maxsize=512)
+def plan_anchor_region(anchor_id: str) -> CoveragePlan:
+    """CoveragePlan for an anchor detail region without a metro (ADR-0010 Stage D, HX-D1).
+
+    LIMS is null (owner=None, distance_km=None) per honesty rule (US-408 / INV-1);
+    LODES is measured at the anchor's adaptive detail resolution (7, 8, or 9).
+    """
+    all_anchors = load_anchors()
+    if anchor_id not in all_anchors:
+        raise KeyError(f"unknown urban anchor {anchor_id!r}")
+    anchor = all_anchors[anchor_id]
+    res = detail_resolution(anchor)
+    c_indices = anchor_cells(anchor_id, res)
+    cells = tuple(
+        PlannedCell(
+            cell=c,
+            owner=None,
+            distance_km=None,
+            label="measured",
+            in_anchor=True,
+            owned=True,
+            borough="",
+        )
+        for c in c_indices
+    )
+    raw_hash = {
+        "authority": "anchor",
+        "anchor_id": anchor_id,
+        "detail_res": res,
+        "cells": [c.cell for c in cells],
+    }
+    plan_hash = hashlib.sha256(json.dumps(raw_hash, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    return CoveragePlan(
+        region_id=f"anchor/{anchor_id}",
+        city_id="",
+        authority="anchor",
+        anchor_ids=(anchor_id,),
+        detail_res=res,
+        cells=cells,
+        golden_count=len(cells),
+        owned_count=len(cells),
+        measured_count=len(cells),
+        in_anchor_count=len(cells),
+        plan_hash=plan_hash,
+    )
+
+
 def plan_region(region_id: str, **kwargs: float) -> CoveragePlan:
-    """The plan for ``metro/{city_id}``."""
-    kind, _, city = region_id.partition("/")
-    plans = plan_all(**kwargs)
-    if kind != "metro" or city not in plans:
-        raise KeyError(f"unknown coverage region {region_id!r}")
-    return plans[city]
+    """The plan for ``metro/{city_id}`` or ``anchor/{anchor_id}``."""
+    kind, _, identifier = region_id.partition("/")
+    if kind == "metro":
+        plans = plan_all(**kwargs)
+        if identifier not in plans:
+            raise KeyError(f"unknown coverage region {region_id!r}")
+        return plans[identifier]
+    if kind == "anchor":
+        return plan_anchor_region(identifier)
+    raise KeyError(f"unknown coverage region {region_id!r}")
 
 
 def roll_up(plan: CoveragePlan, to_res: int) -> tuple[str, ...]:
