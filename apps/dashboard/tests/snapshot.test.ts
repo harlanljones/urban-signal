@@ -1,5 +1,6 @@
 import { expect, test, beforeEach } from "bun:test";
-import worker, { clearSnapshotCaches, readSnapshotValue } from "../src/index";
+import { createHash } from "node:crypto";
+import worker, { clearSnapshotCaches, readSnapshotValue, resolveLogicalKeyRegion } from "../src/index";
 import { testEnv } from "./index.test";
 import {
   queryCatalysts,
@@ -367,6 +368,67 @@ test("readSnapshotValue accepts schema v2 without changing the pinned generation
   });
   const result = await readSnapshotValue(env, "grid/nyc", "r-v2");
   expect(result.ok && result.entry?.value).toEqual({ lims_score: 42 });
+});
+
+test("resolveLogicalKeyRegion maps logical keys to region identities", () => {
+  const manifest: any = {
+    ...LEGACY_MANIFEST,
+    tile_indexes: {
+      "9": { "parent-1": { cities: ["nyc"], count: 1, bbox: null } },
+    },
+  };
+  expect(resolveLogicalKeyRegion("national/4/832830fffffffff", manifest)).toBe("national/4/832830fffffffff");
+  expect(resolveLogicalKeyRegion("gridtiles_res9/parent-1", manifest)).toBe("metro/nyc");
+  expect(resolveLogicalKeyRegion("grid/nyc", manifest)).toBe("metro/nyc");
+  expect(resolveLogicalKeyRegion("unknown/key", manifest)).toBeNull();
+});
+
+test("readSnapshotValue resolves chunks through regional manifest pointers", async () => {
+  const chunkText = JSON.stringify({ type: "FeatureCollection", features: [{ properties: { h3_index: "892a10708b7ffff" } }] });
+  const chunkSha = createHash("sha256").update(chunkText).digest("hex");
+  const env = kvEnv({
+    manifest: {
+      ...LEGACY_MANIFEST,
+      regions: { "metro/nyc": "gen-nyc-100" },
+      tile_indexes: { "9": { "parent-nyc": { cities: ["nyc"], count: 1, bbox: null } } },
+    },
+    "regions/metro/nyc/gen/gen-nyc-100": {
+      region_id: "metro/nyc",
+      generation: "gen-nyc-100",
+      chunks: {
+        "gridtiles_res9/parent-nyc": { sha256: chunkSha, bytes: Buffer.byteLength(chunkText) },
+      },
+    },
+    [`objects/${chunkSha}`]: JSON.parse(chunkText),
+  });
+  const result = await readSnapshotValue(env, "gridtiles_res9/parent-nyc", null);
+  expect(result.ok).toBe(true);
+  if (result.ok) {
+    expect((result.entry?.value as any).type).toBe("FeatureCollection");
+  }
+});
+
+test("readSnapshotValue returns 503 when a regional chunk object is missing", async () => {
+  const env = kvEnv({
+    manifest: {
+      ...LEGACY_MANIFEST,
+      regions: { "metro/nyc": "gen-nyc-100" },
+      tile_indexes: { "9": { "parent-nyc": { cities: ["nyc"], count: 1, bbox: null } } },
+    },
+    "regions/metro/nyc/gen/gen-nyc-100": {
+      region_id: "metro/nyc",
+      generation: "gen-nyc-100",
+      chunks: {
+        "gridtiles_res9/parent-nyc": { sha256: "deadbeef".repeat(8), bytes: 123 },
+      },
+    },
+  });
+  const result = await readSnapshotValue(env, "gridtiles_res9/parent-nyc", null);
+  expect(result.ok).toBe(false);
+  if (!result.ok) {
+    expect(result.status).toBe(503);
+    expect(result.headers?.["retry-after"]).toBe("5");
+  }
 });
 
 test("lookupPrediction reads the release-qualified cell shard for a snapshot id", async () => {

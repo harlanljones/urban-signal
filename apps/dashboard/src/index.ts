@@ -49,7 +49,9 @@ import {
   clearReleaseCache,
   currentRelease,
   loadRelease,
+  loadRegionManifest,
   readReleaseEntry,
+  readObjectEntry,
   withRelease,
 } from "./release";
 
@@ -136,6 +138,10 @@ export interface Manifest {
   context_layers?: ContextLayersBlock;
   /** Release-qualified publication id (hex-coverage Stage B); legacy manifests omit it. */
   snapshot_id?: string;
+  /** Regional generations map (ADR-0010 Stage C); absent on older manifests. */
+  regions?: Record<string, string>;
+  rank_epoch?: string;
+  rank_epoch_at?: string;
   /** Coverage contract block (hex-coverage Stage A); absent on legacy manifests. */
   coverage?: {
     schema_version?: number;
@@ -405,6 +411,28 @@ export type SnapshotReadOutcome =
   | { ok: true; entry: { value: unknown; etag: string } | null }
   | { ok: false; status: number; detail: string; headers?: Record<string, string> };
 
+export function resolveLogicalKeyRegion(logicalKey: string, manifest: Manifest | null): string | null {
+  if (!manifest) return null;
+  if (logicalKey.startsWith("national/")) {
+    return logicalKey;
+  }
+  const matchMetro = logicalKey.match(/^(grid|catalysts|submarkets)\/([^/]+)$/);
+  if (matchMetro) {
+    return `metro/${matchMetro[2]}`;
+  }
+  const matchTile = logicalKey.match(/^gridtiles_res(\d+)\/([^/]+)$/);
+  if (matchTile) {
+    const res = matchTile[1];
+    const parent = matchTile[2];
+    const index = manifest.tile_indexes?.[res] || (res === "9" ? manifest.tile_index : undefined);
+    const tile = index?.[parent];
+    if (tile && tile.cities && tile.cities.length > 0) {
+      return `metro/${tile.cities[0]}`;
+    }
+  }
+  return null;
+}
+
 /**
  * Resolve one KV logical key for a snapshot data route (hex-coverage Stage B).
  *
@@ -466,6 +494,29 @@ export async function readSnapshotValue(
     }
   }
   const key = snapshotId ? `releases/${snapshotId}/${logicalKey}` : logicalKey;
+  if (manifest && manifest.regions && typeof manifest.regions === "object") {
+    const regionId = resolveLogicalKeyRegion(logicalKey, manifest);
+    if (regionId && manifest.regions[regionId]) {
+      const generation = manifest.regions[regionId];
+      const regionDoc = await loadRegionManifest(env, regionId, generation);
+      if (regionDoc && regionDoc.chunks[logicalKey]) {
+        try {
+          const entry = await readObjectEntry(env, regionDoc.chunks[logicalKey]);
+          return { ok: true, entry: { value: entry.value, etag: `"${(await sha256Hex(entry.raw)).slice(0, 32)}"` } };
+        } catch (error) {
+          if (error instanceof ReleaseUnavailable) {
+            return {
+              ok: false,
+              status: 503,
+              detail: error.message,
+              headers: { "retry-after": "5" },
+            };
+          }
+          throw error;
+        }
+      }
+    }
+  }
   const entry = await kvJson(env, key);
   if (entry) return { ok: true, entry };
   if (snapshotId) {

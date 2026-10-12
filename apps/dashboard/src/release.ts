@@ -55,6 +55,13 @@ export class MissingLogicalKey extends Error {
 
 const releaseStore = new AsyncLocalStorage<ReleaseContext | null>();
 const objectCache = new Map<string, { raw: string; value: unknown }>();
+const regionManifestCache = new Map<string, RegionManifestDoc>();
+
+export interface RegionManifestDoc {
+  region_id: string;
+  generation: string;
+  chunks: Record<string, ObjectPointer>;
+}
 
 export function currentRelease(): ReleaseContext | null | undefined {
   return releaseStore.getStore();
@@ -62,6 +69,7 @@ export function currentRelease(): ReleaseContext | null | undefined {
 
 export function clearReleaseCache(): void {
   objectCache.clear();
+  regionManifestCache.clear();
 }
 
 export async function sha256Hex(text: string): Promise<string> {
@@ -137,13 +145,10 @@ export async function resolveRelease(env: ReleaseEnv, requestedId?: string): Pro
   throw new ReleaseUnavailable(`snapshot ${snapshotId} is not readable`);
 }
 
-export async function readReleaseEntry(
+export async function readObjectEntry(
   env: ReleaseEnv,
-  release: ReleaseContext,
-  key: string,
+  pointer: ObjectPointer,
 ): Promise<{ value: unknown; raw: string }> {
-  const pointer = release.keys[key];
-  if (!pointer) throw new MissingLogicalKey(key);
   const cached = objectCache.get(pointer.sha256);
   if (cached) return cached;
   const raw = await env.SNAPSHOT.get(`objects/${pointer.sha256}`);
@@ -161,6 +166,46 @@ export async function readReleaseEntry(
   const entry = { raw, value };
   objectCache.set(pointer.sha256, entry);
   return entry;
+}
+
+export async function readReleaseEntry(
+  env: ReleaseEnv,
+  release: ReleaseContext,
+  key: string,
+): Promise<{ value: unknown; raw: string }> {
+  const pointer = release.keys[key];
+  if (!pointer) throw new MissingLogicalKey(key);
+  return readObjectEntry(env, pointer);
+}
+
+export async function loadRegionManifest(
+  env: ReleaseEnv,
+  regionId: string,
+  generation: string,
+): Promise<RegionManifestDoc | null> {
+  const cacheKey = `${regionId}:${generation}`;
+  const cached = regionManifestCache.get(cacheKey);
+  if (cached) return cached;
+  const raw = await env.SNAPSHOT.get(`regions/${regionId}/gen/${generation}`);
+  if (raw === null) return null;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    throw new ReleaseUnavailable(`region manifest for ${regionId}@${generation} is not JSON`);
+  }
+  if (!parsed || typeof parsed !== "object") return null;
+  const doc = parsed as Partial<RegionManifestDoc>;
+  if (typeof doc.region_id !== "string" || typeof doc.generation !== "string" || !doc.chunks) {
+    return null;
+  }
+  const manifestDoc: RegionManifestDoc = {
+    region_id: doc.region_id,
+    generation: doc.generation,
+    chunks: doc.chunks as Record<string, ObjectPointer>,
+  };
+  regionManifestCache.set(cacheKey, manifestDoc);
+  return manifestDoc;
 }
 
 export async function readReleaseJson(env: ReleaseEnv, release: ReleaseContext, key: string): Promise<unknown> {
