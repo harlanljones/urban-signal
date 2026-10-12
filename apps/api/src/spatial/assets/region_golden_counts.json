@@ -1,0 +1,947 @@
+{
+ "regions": {
+  "metro/abilene": {
+   "golden": 264,
+   "in_anchor": 187,
+   "measured": 8,
+   "owned": 264
+  },
+  "metro/albany": {
+   "golden": 206,
+   "in_anchor": 206,
+   "measured": 8,
+   "owned": 206
+  },
+  "metro/albuquerque": {
+   "golden": 640,
+   "in_anchor": 585,
+   "measured": 18,
+   "owned": 640
+  },
+  "metro/alexandria": {
+   "golden": 256,
+   "in_anchor": 218,
+   "measured": 8,
+   "owned": 256
+  },
+  "metro/allentown": {
+   "golden": 284,
+   "in_anchor": 284,
+   "measured": 8,
+   "owned": 284
+  },
+  "metro/amarillo": {
+   "golden": 266,
+   "in_anchor": 233,
+   "measured": 8,
+   "owned": 266
+  },
+  "metro/anaheim": {
+   "golden": 339,
+   "in_anchor": 339,
+   "measured": 10,
+   "owned": 339
+  },
+  "metro/anchorage": {
+   "golden": 293,
+   "in_anchor": 291,
+   "measured": 8,
+   "owned": 293
+  },
+  "metro/asheville": {
+   "golden": 301,
+   "in_anchor": 293,
+   "measured": 9,
+   "owned": 301
+  },
+  "metro/augusta": {
+   "golden": 278,
+   "in_anchor": 243,
+   "measured": 8,
+   "owned": 278
+  },
+  "metro/aurora": {
+   "golden": 370,
+   "in_anchor": 362,
+   "measured": 10,
+   "owned": 370
+  },
+  "metro/austin": {
+   "golden": 496,
+   "in_anchor": 480,
+   "measured": 16,
+   "owned": 496
+  },
+  "metro/baltimore": {
+   "golden": 148,
+   "in_anchor": 148,
+   "measured": 4,
+   "owned": 148
+  },
+  "metro/baton_rouge": {
+   "golden": 111,
+   "in_anchor": 111,
+   "measured": 3,
+   "owned": 111
+  },
+  "metro/beaumont": {
+   "golden": 185,
+   "in_anchor": 174,
+   "measured": 5,
+   "owned": 185
+  },
+  "metro/bend": {
+   "golden": 296,
+   "in_anchor": 258,
+   "measured": 10,
+   "owned": 296
+  },
+  "metro/billings": {
+   "golden": 344,
+   "in_anchor": 291,
+   "measured": 10,
+   "owned": 344
+  },
+  "metro/boise": {
+   "golden": 204,
+   "in_anchor": 167,
+   "measured": 6,
+   "owned": 204
+  },
+  "metro/boston": {
+   "golden": 222,
+   "in_anchor": 222,
+   "measured": 6,
+   "owned": 222
+  },
+  "metro/boulder": {
+   "golden": 329,
+   "in_anchor": 251,
+   "measured": 11,
+   "owned": 329
+  },
+  "metro/bowling_green": {
+   "golden": 365,
+   "in_anchor": 107,
+   "measured": 10,
+   "owned": 365
+  },
+  "metro/bozeman": {
+   "golden": 240,
+   "in_anchor": 162,
+   "measured": 10,
+   "owned": 240
+  },
+  "metro/bridgeport": {
+   "golden": 208,
+   "in_anchor": 186,
+   "measured": 8,
+   "owned": 208
+  },
+  "metro/buffalo": {
+   "golden": 271,
+   "in_anchor": 211,
+   "measured": 8,
+   "owned": 271
+  },
+  "metro/burlington": {
+   "golden": 250,
+   "in_anchor": 204,
+   "measured": 8,
+   "owned": 250
+  },
+  "metro/canton": {
+   "golden": 148,
+   "in_anchor": 148,
+   "measured": 4,
+   "owned": 148
+  },
+  "metro/cape_coral": {
+   "golden": 278,
+   "in_anchor": 237,
+   "measured": 8,
+   "owned": 278
+  },
+  "metro/chandler": {
+   "golden": 356,
+   "in_anchor": 337,
+   "measured": 10,
+   "owned": 356
+  },
+  "metro/charleston_sc": {
+   "golden": 253,
+   "in_anchor": 234,
+   "measured": 7,
+   "owned": 253
+  },
+  "metro/charleston_wv": {
+   "golden": 222,
+   "in_anchor": 217,
+   "measured": 7,
+   "owned": 222
+  },
+  "metro/charlotte": {
+   "golden": 178,
+   "in_anchor": 178,
+   "measured": 5,
+   "owned": 178
+  },
+  "metro/chattanooga": {
+   "golden": 185,
+   "in_anchor": 185,
+   "measured": 5,
+   "owned": 185
+  },
+  "metro/chicago": {
+   "golden": 1096,
+   "in_anchor": 1034,
+   "measured": 35,
+   "owned": 1096
+  },
+  "metro/cincinnati": {
+   "golden": 110,
+   "in_anchor": 110,
+   "measured": 3,
+   "owned": 110
+  },
+  "metro/cleveland": {
+   "golden": 183,
+   "in_anchor": 183,
+   "measured": 5,
+   "owned": 183
+  },
+  "metro/columbus": {
+   "golden": 185,
+   "in_anchor": 185,
+   "measured": 5,
+   "owned": 185
+  },
+  "metro/columbus_ga": {
+   "golden": 284,
+   "in_anchor": 196,
+   "measured": 8,
+   "owned": 284
+  },
+  "metro/dallas": {
+   "golden": 539,
+   "in_anchor": 539,
+   "measured": 18,
+   "owned": 539
+  },
+  "metro/dayton": {
+   "golden": 185,
+   "in_anchor": 185,
+   "measured": 5,
+   "owned": 185
+  },
+  "metro/denver": {
+   "golden": 148,
+   "in_anchor": 148,
+   "measured": 4,
+   "owned": 148
+  },
+  "metro/des_moines": {
+   "golden": 518,
+   "in_anchor": 476,
+   "measured": 14,
+   "owned": 518
+  },
+  "metro/detroit": {
+   "golden": 561,
+   "in_anchor": 494,
+   "measured": 16,
+   "owned": 561
+  },
+  "metro/dover": {
+   "golden": 217,
+   "in_anchor": 176,
+   "measured": 7,
+   "owned": 217
+  },
+  "metro/durham": {
+   "golden": 546,
+   "in_anchor": 484,
+   "measured": 16,
+   "owned": 546
+  },
+  "metro/el_paso": {
+   "golden": 185,
+   "in_anchor": 161,
+   "measured": 5,
+   "owned": 185
+  },
+  "metro/eugene": {
+   "golden": 438,
+   "in_anchor": 395,
+   "measured": 15,
+   "owned": 438
+  },
+  "metro/evansville": {
+   "golden": 148,
+   "in_anchor": 111,
+   "measured": 4,
+   "owned": 148
+  },
+  "metro/fort_collins": {
+   "golden": 295,
+   "in_anchor": 188,
+   "measured": 8,
+   "owned": 295
+  },
+  "metro/fort_smith": {
+   "golden": 173,
+   "in_anchor": 125,
+   "measured": 5,
+   "owned": 173
+  },
+  "metro/fort_worth": {
+   "golden": 222,
+   "in_anchor": 222,
+   "measured": 6,
+   "owned": 222
+  },
+  "metro/frederick": {
+   "golden": 219,
+   "in_anchor": 219,
+   "measured": 7,
+   "owned": 219
+  },
+  "metro/gainesville": {
+   "golden": 292,
+   "in_anchor": 258,
+   "measured": 9,
+   "owned": 292
+  },
+  "metro/glendale_az": {
+   "golden": 333,
+   "in_anchor": 333,
+   "measured": 9,
+   "owned": 333
+  },
+  "metro/grand_rapids": {
+   "golden": 169,
+   "in_anchor": 165,
+   "measured": 5,
+   "owned": 169
+  },
+  "metro/greenville": {
+   "golden": 273,
+   "in_anchor": 273,
+   "measured": 8,
+   "owned": 273
+  },
+  "metro/harrisburg": {
+   "golden": 222,
+   "in_anchor": 222,
+   "measured": 7,
+   "owned": 222
+  },
+  "metro/hartford": {
+   "golden": 185,
+   "in_anchor": 185,
+   "measured": 5,
+   "owned": 185
+  },
+  "metro/henderson": {
+   "golden": 288,
+   "in_anchor": 215,
+   "measured": 8,
+   "owned": 270
+  },
+  "metro/honolulu": {
+   "golden": 550,
+   "in_anchor": 333,
+   "measured": 16,
+   "owned": 550
+  },
+  "metro/houston": {
+   "golden": 209,
+   "in_anchor": 209,
+   "measured": 6,
+   "owned": 209
+  },
+  "metro/huntington_wv": {
+   "golden": 230,
+   "in_anchor": 125,
+   "measured": 7,
+   "owned": 230
+  },
+  "metro/huntsville": {
+   "golden": 347,
+   "in_anchor": 151,
+   "measured": 10,
+   "owned": 347
+  },
+  "metro/indianapolis": {
+   "golden": 172,
+   "in_anchor": 172,
+   "measured": 5,
+   "owned": 172
+  },
+  "metro/inland_empire": {
+   "golden": 518,
+   "in_anchor": 439,
+   "measured": 14,
+   "owned": 518
+  },
+  "metro/jackson_ms": {
+   "golden": 333,
+   "in_anchor": 321,
+   "measured": 9,
+   "owned": 333
+  },
+  "metro/jonesboro": {
+   "golden": 247,
+   "in_anchor": 156,
+   "measured": 7,
+   "owned": 247
+  },
+  "metro/kansas_city": {
+   "golden": 185,
+   "in_anchor": 185,
+   "measured": 5,
+   "owned": 185
+  },
+  "metro/lake_charles": {
+   "golden": 111,
+   "in_anchor": 98,
+   "measured": 3,
+   "owned": 111
+  },
+  "metro/lakeland": {
+   "golden": 111,
+   "in_anchor": 111,
+   "measured": 3,
+   "owned": 111
+  },
+  "metro/laredo": {
+   "golden": 221,
+   "in_anchor": 121,
+   "measured": 6,
+   "owned": 221
+  },
+  "metro/las_cruces": {
+   "golden": 279,
+   "in_anchor": 205,
+   "measured": 9,
+   "owned": 279
+  },
+  "metro/las_vegas": {
+   "golden": 564,
+   "in_anchor": 490,
+   "measured": 16,
+   "owned": 545
+  },
+  "metro/lexington": {
+   "golden": 393,
+   "in_anchor": 314,
+   "measured": 11,
+   "owned": 393
+  },
+  "metro/lincoln": {
+   "golden": 346,
+   "in_anchor": 345,
+   "measured": 11,
+   "owned": 346
+  },
+  "metro/long_beach": {
+   "golden": 298,
+   "in_anchor": 250,
+   "measured": 10,
+   "owned": 284
+  },
+  "metro/longview": {
+   "golden": 259,
+   "in_anchor": 211,
+   "measured": 7,
+   "owned": 259
+  },
+  "metro/los_angeles": {
+   "golden": 1172,
+   "in_anchor": 1158,
+   "measured": 32,
+   "owned": 1149
+  },
+  "metro/louisville": {
+   "golden": 582,
+   "in_anchor": 582,
+   "measured": 18,
+   "owned": 582
+  },
+  "metro/lynchburg": {
+   "golden": 224,
+   "in_anchor": 214,
+   "measured": 7,
+   "owned": 224
+  },
+  "metro/macon_bibb": {
+   "golden": 270,
+   "in_anchor": 188,
+   "measured": 8,
+   "owned": 270
+  },
+  "metro/madison": {
+   "golden": 185,
+   "in_anchor": 173,
+   "measured": 5,
+   "owned": 185
+  },
+  "metro/manchester": {
+   "golden": 250,
+   "in_anchor": 250,
+   "measured": 8,
+   "owned": 250
+  },
+  "metro/medford": {
+   "golden": 358,
+   "in_anchor": 300,
+   "measured": 11,
+   "owned": 358
+  },
+  "metro/melbourne": {
+   "golden": 481,
+   "in_anchor": 440,
+   "measured": 13,
+   "owned": 481
+  },
+  "metro/memphis": {
+   "golden": 499,
+   "in_anchor": 460,
+   "measured": 14,
+   "owned": 499
+  },
+  "metro/miami_dade": {
+   "golden": 636,
+   "in_anchor": 608,
+   "measured": 18,
+   "owned": 636
+  },
+  "metro/midland": {
+   "golden": 303,
+   "in_anchor": 112,
+   "measured": 9,
+   "owned": 303
+  },
+  "metro/milwaukee": {
+   "golden": 184,
+   "in_anchor": 184,
+   "measured": 5,
+   "owned": 184
+  },
+  "metro/minneapolis": {
+   "golden": 409,
+   "in_anchor": 409,
+   "measured": 13,
+   "owned": 409
+  },
+  "metro/missoula": {
+   "golden": 579,
+   "in_anchor": 433,
+   "measured": 20,
+   "owned": 579
+  },
+  "metro/modesto": {
+   "golden": 319,
+   "in_anchor": 317,
+   "measured": 13,
+   "owned": 319
+  },
+  "metro/monroe": {
+   "golden": 296,
+   "in_anchor": 245,
+   "measured": 8,
+   "owned": 296
+  },
+  "metro/montgomery": {
+   "golden": 148,
+   "in_anchor": 122,
+   "measured": 4,
+   "owned": 148
+  },
+  "metro/montgomery_al": {
+   "golden": 247,
+   "in_anchor": 143,
+   "measured": 7,
+   "owned": 247
+  },
+  "metro/nampa": {
+   "golden": 240,
+   "in_anchor": 172,
+   "measured": 8,
+   "owned": 240
+  },
+  "metro/nashville": {
+   "golden": 185,
+   "in_anchor": 185,
+   "measured": 5,
+   "owned": 185
+  },
+  "metro/new_haven": {
+   "golden": 252,
+   "in_anchor": 215,
+   "measured": 8,
+   "owned": 252
+  },
+  "metro/new_orleans": {
+   "golden": 730,
+   "in_anchor": 676,
+   "measured": 21,
+   "owned": 730
+  },
+  "metro/norfolk": {
+   "golden": 386,
+   "in_anchor": 341,
+   "measured": 13,
+   "owned": 386
+  },
+  "metro/nyc": {
+   "golden": 1846,
+   "in_anchor": 1774,
+   "measured": 64,
+   "owned": 1846
+  },
+  "metro/oakland": {
+   "golden": 420,
+   "in_anchor": 413,
+   "measured": 13,
+   "owned": 351
+  },
+  "metro/ocala": {
+   "golden": 185,
+   "in_anchor": 185,
+   "measured": 5,
+   "owned": 185
+  },
+  "metro/odessa": {
+   "golden": 255,
+   "in_anchor": 176,
+   "measured": 7,
+   "owned": 255
+  },
+  "metro/omaha": {
+   "golden": 302,
+   "in_anchor": 302,
+   "measured": 9,
+   "owned": 302
+  },
+  "metro/orlando": {
+   "golden": 602,
+   "in_anchor": 586,
+   "measured": 18,
+   "owned": 602
+  },
+  "metro/oxnard_ventura": {
+   "golden": 471,
+   "in_anchor": 324,
+   "measured": 14,
+   "owned": 471
+  },
+  "metro/peoria": {
+   "golden": 259,
+   "in_anchor": 256,
+   "measured": 7,
+   "owned": 259
+  },
+  "metro/philadelphia": {
+   "golden": 566,
+   "in_anchor": 566,
+   "measured": 18,
+   "owned": 566
+  },
+  "metro/phoenix": {
+   "golden": 666,
+   "in_anchor": 612,
+   "measured": 18,
+   "owned": 666
+  },
+  "metro/pierce": {
+   "golden": 222,
+   "in_anchor": 221,
+   "measured": 6,
+   "owned": 200
+  },
+  "metro/pittsburgh": {
+   "golden": 176,
+   "in_anchor": 176,
+   "measured": 5,
+   "owned": 176
+  },
+  "metro/port_st_lucie": {
+   "golden": 222,
+   "in_anchor": 222,
+   "measured": 6,
+   "owned": 222
+  },
+  "metro/portland": {
+   "golden": 461,
+   "in_anchor": 461,
+   "measured": 14,
+   "owned": 461
+  },
+  "metro/portland_maine": {
+   "golden": 201,
+   "in_anchor": 201,
+   "measured": 9,
+   "owned": 201
+  },
+  "metro/prince_georges": {
+   "golden": 148,
+   "in_anchor": 146,
+   "measured": 4,
+   "owned": 148
+  },
+  "metro/providence": {
+   "golden": 227,
+   "in_anchor": 227,
+   "measured": 10,
+   "owned": 227
+  },
+  "metro/raleigh": {
+   "golden": 185,
+   "in_anchor": 185,
+   "measured": 5,
+   "owned": 185
+  },
+  "metro/reno": {
+   "golden": 185,
+   "in_anchor": 148,
+   "measured": 5,
+   "owned": 185
+  },
+  "metro/richmond": {
+   "golden": 289,
+   "in_anchor": 289,
+   "measured": 9,
+   "owned": 289
+  },
+  "metro/roanoke": {
+   "golden": 274,
+   "in_anchor": 274,
+   "measured": 8,
+   "owned": 274
+  },
+  "metro/rochester": {
+   "golden": 246,
+   "in_anchor": 218,
+   "measured": 8,
+   "owned": 246
+  },
+  "metro/sacramento": {
+   "golden": 185,
+   "in_anchor": 185,
+   "measured": 5,
+   "owned": 185
+  },
+  "metro/salem_or": {
+   "golden": 322,
+   "in_anchor": 316,
+   "measured": 9,
+   "owned": 322
+  },
+  "metro/san_antonio": {
+   "golden": 177,
+   "in_anchor": 177,
+   "measured": 5,
+   "owned": 177
+  },
+  "metro/san_diego": {
+   "golden": 431,
+   "in_anchor": 368,
+   "measured": 12,
+   "owned": 431
+  },
+  "metro/san_francisco": {
+   "golden": 2829,
+   "in_anchor": 2604,
+   "measured": 83,
+   "owned": 2721
+  },
+  "metro/san_jose": {
+   "golden": 554,
+   "in_anchor": 486,
+   "measured": 16,
+   "owned": 526
+  },
+  "metro/santa_fe": {
+   "golden": 225,
+   "in_anchor": 199,
+   "measured": 10,
+   "owned": 225
+  },
+  "metro/santa_rosa": {
+   "golden": 367,
+   "in_anchor": 279,
+   "measured": 12,
+   "owned": 355
+  },
+  "metro/savannah": {
+   "golden": 368,
+   "in_anchor": 298,
+   "measured": 10,
+   "owned": 368
+  },
+  "metro/scottsdale": {
+   "golden": 304,
+   "in_anchor": 277,
+   "measured": 10,
+   "owned": 300
+  },
+  "metro/seattle": {
+   "golden": 695,
+   "in_anchor": 681,
+   "measured": 20,
+   "owned": 695
+  },
+  "metro/sioux_falls": {
+   "golden": 294,
+   "in_anchor": 294,
+   "measured": 9,
+   "owned": 294
+  },
+  "metro/spartanburg": {
+   "golden": 357,
+   "in_anchor": 239,
+   "measured": 10,
+   "owned": 357
+  },
+  "metro/spokane": {
+   "golden": 185,
+   "in_anchor": 170,
+   "measured": 5,
+   "owned": 185
+  },
+  "metro/st_louis": {
+   "golden": 222,
+   "in_anchor": 222,
+   "measured": 6,
+   "owned": 222
+  },
+  "metro/stockton": {
+   "golden": 427,
+   "in_anchor": 417,
+   "measured": 14,
+   "owned": 427
+  },
+  "metro/syracuse": {
+   "golden": 230,
+   "in_anchor": 230,
+   "measured": 8,
+   "owned": 230
+  },
+  "metro/tacoma": {
+   "golden": 288,
+   "in_anchor": 229,
+   "measured": 10,
+   "owned": 273
+  },
+  "metro/tallahassee": {
+   "golden": 367,
+   "in_anchor": 280,
+   "measured": 10,
+   "owned": 367
+  },
+  "metro/tampa": {
+   "golden": 608,
+   "in_anchor": 496,
+   "measured": 19,
+   "owned": 608
+  },
+  "metro/tempe": {
+   "golden": 401,
+   "in_anchor": 400,
+   "measured": 13,
+   "owned": 360
+  },
+  "metro/texarkana": {
+   "golden": 269,
+   "in_anchor": 164,
+   "measured": 8,
+   "owned": 269
+  },
+  "metro/toledo": {
+   "golden": 530,
+   "in_anchor": 530,
+   "measured": 17,
+   "owned": 530
+  },
+  "metro/topeka": {
+   "golden": 301,
+   "in_anchor": 291,
+   "measured": 9,
+   "owned": 301
+  },
+  "metro/tucson": {
+   "golden": 218,
+   "in_anchor": 218,
+   "measured": 8,
+   "owned": 218
+  },
+  "metro/tulsa": {
+   "golden": 185,
+   "in_anchor": 185,
+   "measured": 5,
+   "owned": 185
+  },
+  "metro/tyler": {
+   "golden": 240,
+   "in_anchor": 237,
+   "measured": 7,
+   "owned": 240
+  },
+  "metro/vancouver_wa": {
+   "golden": 442,
+   "in_anchor": 386,
+   "measured": 13,
+   "owned": 442
+  },
+  "metro/virginia_beach": {
+   "golden": 551,
+   "in_anchor": 410,
+   "measured": 15,
+   "owned": 551
+  },
+  "metro/waco": {
+   "golden": 256,
+   "in_anchor": 224,
+   "measured": 8,
+   "owned": 256
+  },
+  "metro/washington_dc": {
+   "golden": 501,
+   "in_anchor": 501,
+   "measured": 18,
+   "owned": 501
+  },
+  "metro/wichita": {
+   "golden": 179,
+   "in_anchor": 179,
+   "measured": 5,
+   "owned": 179
+  },
+  "metro/wilmington_de": {
+   "golden": 216,
+   "in_anchor": 216,
+   "measured": 7,
+   "owned": 216
+  },
+  "metro/wilmington_nc": {
+   "golden": 389,
+   "in_anchor": 208,
+   "measured": 11,
+   "owned": 389
+  },
+  "metro/worcester": {
+   "golden": 243,
+   "in_anchor": 243,
+   "measured": 9,
+   "owned": 243
+  },
+  "metro/yakima": {
+   "golden": 300,
+   "in_anchor": 229,
+   "measured": 9,
+   "owned": 300
+  }
+ },
+ "total_owned": 53799
+}
