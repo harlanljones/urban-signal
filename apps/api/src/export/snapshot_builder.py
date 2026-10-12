@@ -1243,7 +1243,7 @@ async def _build_snapshot(
             model_id=getattr(engine, "model_id", "default"),
             builder_revision=BUILDER_REVISION,
             feed_watermarks=watermarks,
-            context_sha=context[2] if context else None,
+            context_sha=context[1].get("sha256") if context and isinstance(context[1], dict) else None,
             national_sha=national_block.get("checksum") if national_block else None,
         )
 
