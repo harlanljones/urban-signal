@@ -108,3 +108,48 @@ def test_comparator_validates_derived_bytes_for_grid_and_catalyst_latency():
     assert compare_snapshot_outputs(baseline, candidate)["equal"]
     candidate["manifest"]["keys"]["grid/nyc"]["bytes"] += 1
     assert not compare_snapshot_outputs(baseline, candidate)["equal"]
+
+
+def test_snapshot_builder_tracks_regions_rebuilt_and_skipped(tmp_path: Path):
+    import asyncio
+
+    from src.export.snapshot_builder import build_snapshot
+    from tests.unit.test_export_snapshot import StubEngine
+
+    out_1 = tmp_path / "snap-1"
+    metrics_1 = tmp_path / "metrics-1.json"
+    manifest_1 = asyncio.run(
+        build_snapshot(
+            out_1,
+            engine=StubEngine(),
+            cities=["nyc", "chicago"],
+            dense_metro=True,
+            include_legacy_cells=False,
+            metrics_out=metrics_1,
+        )
+    )
+    report_1 = json.loads(metrics_1.read_text())
+    assert report_1["regions_rebuilt"] == 2
+    assert report_1["regions_skipped"] == 0
+    assert report_1["regions_failed"] == 0
+    assert "regions" in manifest_1
+    assert "rank_epoch" in manifest_1
+
+    out_2 = tmp_path / "snap-2"
+    metrics_2 = tmp_path / "metrics-2.json"
+    manifest_2 = asyncio.run(
+        build_snapshot(
+            out_2,
+            engine=StubEngine(),
+            cities=["nyc", "chicago"],
+            dense_metro=True,
+            include_legacy_cells=False,
+            metrics_out=metrics_2,
+            previous_regions=out_1,
+        )
+    )
+    report_2 = json.loads(metrics_2.read_text())
+    assert report_2["regions_rebuilt"] == 0
+    assert report_2["regions_skipped"] == 2
+    assert report_2["regions_failed"] == 0
+    assert manifest_2["regions"] == manifest_1["regions"]

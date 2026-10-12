@@ -52,6 +52,14 @@ import polars as pl
 
 from src.export.bay_area_context import CONTEXT_METRIC_KEYS, load_context
 from src.export.publication import FEATURE_SCHEMA_VERSION, plan_publication
+from src.export.regions import (
+    BUILDER_REVISION,
+    load_manifest,
+    load_pointer,
+    promote_region,
+    region_input_hash,
+    stage_region,
+)
 from src.export.snapshot_metrics import SnapshotMetrics
 from src.models.quantile_lgbm import FEATURE_COLUMNS
 from src.serving import router as api_router
@@ -143,6 +151,67 @@ def _percentile_ranks(values: list[float]) -> list[float]:
             ranks[order[position]] = percentile
         start = end + 1
     return ranks
+
+def _compute_rank_breakpoints(values: list[float]) -> list[float]:
+    if not values:
+        return [0.0] * 101
+    s = sorted(values)
+    n = len(s)
+    breakpoints: list[float] = []
+    for q in range(101):
+        idx = round((q / 100.0) * (n - 1))
+        breakpoints.append(round(s[idx], 6))
+    return breakpoints
+
+
+def _build_rank_epoch(grids_by_res: dict[int, dict[str, dict[str, Any]]]) -> tuple[str, str, dict[str, dict[str, list[float]]]]:
+    table: dict[str, dict[str, list[float]]] = {}
+    for res in sorted(grids_by_res):
+        res_grids = grids_by_res[res]
+        all_features = [f for g in res_grids.values() for f in g.get("features", [])]
+        table[str(res)] = {}
+        for metric in NORMALIZED_METRICS:
+            vals = [float(f["properties"].get(metric, 0.0)) for f in all_features]
+            table[str(res)][metric] = _compute_rank_breakpoints(vals)
+    epoch_raw = json.dumps(table, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    epoch_id = hashlib.sha256(epoch_raw).hexdigest()
+    epoch_at = datetime.now(UTC).isoformat()
+    return epoch_id, epoch_at, table
+
+
+def _copy_region_artifacts(src_dir: Path, dst_dir: Path, region_id: str, generation: str) -> None:
+    gen_src = src_dir / "regions" / region_id / "gen" / f"{generation}.json"
+    gen_dst = dst_dir / "regions" / region_id / "gen" / f"{generation}.json"
+    gen_dst.parent.mkdir(parents=True, exist_ok=True)
+    if gen_src.exists() and not gen_dst.exists():
+        gen_dst.write_bytes(gen_src.read_bytes())
+    ptr_src = src_dir / "regions" / region_id / "current.json"
+    ptr_dst = dst_dir / "regions" / region_id / "current.json"
+    ptr_dst.parent.mkdir(parents=True, exist_ok=True)
+    if ptr_src.exists():
+        ptr_dst.write_bytes(ptr_src.read_bytes())
+    if gen_src.exists():
+        try:
+            m_data = json.loads(gen_src.read_text(encoding="utf-8"))
+            for spec in m_data.get("chunks", {}).values():
+                sha = spec.get("sha256")
+                if sha:
+                    obj_src = src_dir / "objects" / sha
+                    obj_dst = dst_dir / "objects" / sha
+                    obj_dst.parent.mkdir(parents=True, exist_ok=True)
+                    if obj_src.exists() and not obj_dst.exists():
+                        obj_dst.write_bytes(obj_src.read_bytes())
+        except (OSError, ValueError):
+            pass
+
+def _city_watermark(city: str) -> str:
+    if city not in {c.value for c in CityId}:
+        return "synthetic"
+    reg = REGISTRY[CityId(city)]
+    parts = [reg.name, reg.state, reg.job_suffix]
+    for ft, ds in sorted(reg.datasets.items(), key=lambda item: item[0].value):
+        parts.append(f"{ft.value}:{ds.endpoint}")
+    return hashlib.sha256(":".join(parts).encode("utf-8")).hexdigest()[:16]
 
 
 def _apply_percentile_normalization(grids: dict[str, dict[str, Any]]) -> None:
@@ -815,6 +884,7 @@ async def build_snapshot(
     cache_predictions: bool = True,
     metrics_out: Path | None = None,
     model_bundle: Path | None = None,
+    previous_regions: Path | None = None,
 ) -> dict[str, Any]:
     """Build one snapshot, optionally collecting timings outside the KV payload."""
     total = metrics.stage("total") if metrics is not None else nullcontext()
@@ -850,6 +920,7 @@ async def build_snapshot(
                 context_dir=context_dir,
                 metrics=metrics,
                 metrics_out=metrics_out,
+                previous_regions=previous_regions,
             )
             if metrics is not None:
                 metrics.set_artifact("status", "complete")
@@ -875,6 +946,7 @@ async def _build_snapshot(
     context_dir: Path | None = None,
     metrics: SnapshotMetrics | None = None,
     metrics_out: Path | None = None,
+    previous_regions: Path | None = None,
 ) -> dict[str, Any]:
     """Build all snapshot artifacts into out_dir and return the manifest dict.
 
@@ -938,9 +1010,47 @@ async def _build_snapshot(
     catalysts_by_city: dict[str, dict[str, Any]] = {}
     submarkets_by_city: dict[str, dict[str, Any]] = {}
 
+    skipped_cities: set[str] = set()
+    plans = coverage_plan.plan_all()
+    if previous_regions is not None:
+        prev_path = Path(previous_regions)
+        for city in cities:
+            region_id = f"metro/{city}"
+            plan = plans.get(city) if dense_metro else None
+            plan_hash = plan.plan_hash if plan else "sparse"
+            watermarks = (
+                {city: _city_watermark(city)}
+                if city in {c.value for c in CityId}
+                else {}
+            )
+            curr_hash = region_input_hash(
+                plan_hash=plan_hash,
+                model_id=getattr(engine, "model_id", "default"),
+                builder_revision=BUILDER_REVISION,
+                feed_watermarks=watermarks,
+            )
+            prev_ptr = load_pointer(prev_path, region_id)
+            if prev_ptr is not None:
+                try:
+                    prev_man = load_manifest(prev_path, region_id, prev_ptr.current)
+                    if (
+                        prev_man.input_hash == curr_hash
+                        and (prev_path / "grid" / f"{city}.json").exists()
+                        and (prev_path / "catalysts" / f"{city}.json").exists()
+                        and (prev_path / "submarkets" / f"{city}.json").exists()
+                    ):
+                        skipped_cities.add(city)
+                        grids[city] = json.loads((prev_path / "grid" / f"{city}.json").read_text(encoding="utf-8"))
+                        catalysts_by_city[city] = json.loads((prev_path / "catalysts" / f"{city}.json").read_text(encoding="utf-8"))
+                        submarkets_by_city[city] = json.loads((prev_path / "submarkets" / f"{city}.json").read_text(encoding="utf-8"))
+                except (OSError, ValueError):
+                    pass
+
     city_timer = metrics.stage("city_inference") if metrics is not None else nullcontext()
     with city_timer:
         for city in cities:
+            if city in skipped_cities:
+                continue
             logger.info("Building snapshot artifacts for city '%s'", city)
             if dense_metro:
                 grids[city] = _dense_metro_grid(city, engine)
@@ -1003,6 +1113,7 @@ async def _build_snapshot(
     cells_requests: list[tuple[str, dict[str, Any]]] = []
     seen_cells: set[str] = set()
     owners = _cell_owners(grids)
+    cached_cells: dict[str, dict[str, Any]] = {}
 
     for city in cities:
         grid = grids[city]
@@ -1025,10 +1136,14 @@ async def _build_snapshot(
             if not h3_cell or h3_cell in seen_cells or owners.get(h3_cell) != city:
                 continue
             seen_cells.add(h3_cell)
+            if city in skipped_cities and previous_regions is not None:
+                cell_prev = Path(previous_regions) / "cells" / f"{h3_cell}.json"
+                if cell_prev.exists():
+                    cached_cells[h3_cell] = json.loads(cell_prev.read_text(encoding="utf-8"))
+                    continue
             feats = {k: props[k] for k in CELL_FEATURE_KEYS if k in props}
             cells_requests.append((h3_cell, feats))
 
-    # Repeated vectors reuse locked caches; submit in order without per-cell futures.
     def _predict(request: tuple[str, dict[str, Any]]) -> dict[str, Any]:
         h3_cell, feats = request
         return engine.predict_cell_features(h3_index=h3_cell, feature_dict=feats, include_shap=True)
@@ -1042,7 +1157,7 @@ async def _build_snapshot(
     with cell_timer:
         predictions = list(map(_predict, cells_requests))
     cells_by_index = {request[0]: pred for request, pred in zip(cells_requests, predictions)}
-
+    cells_by_index.update(cached_cells)
     for h3_cell, pred in cells_by_index.items():
         register(f"cells/{h3_cell}", out_dir / "cells" / f"{h3_cell}.json", pred)
 
@@ -1107,6 +1222,87 @@ async def _build_snapshot(
     if require_national:
         _require_national_block(national_block, national_dir)
 
+    regions_map: dict[str, str] = {}
+    regions_rebuilt = 0
+    regions_skipped = 0
+    regions_failed = 0
+    epoch_id, epoch_at, _ = _build_rank_epoch(grids_by_res)
+
+    for city in cities:
+        region_id = f"metro/{city}"
+        plan = plans.get(city) if dense_metro else None
+        golden_count = plan.golden_count if plan else len(grids[city].get("features", []))
+        plan_hash = plan.plan_hash if plan else f"sparse-{golden_count}"
+        watermarks = (
+            {city: _city_watermark(city)}
+            if city in {c.value for c in CityId}
+            else {}
+        )
+        input_hash = region_input_hash(
+            plan_hash=plan_hash,
+            model_id=getattr(engine, "model_id", "default"),
+            builder_revision=BUILDER_REVISION,
+            feed_watermarks=watermarks,
+            context_sha=context[2] if context else None,
+            national_sha=national_block.get("checksum") if national_block else None,
+        )
+
+        if city in skipped_cities and previous_regions is not None:
+            prev_ptr = load_pointer(Path(previous_regions), region_id)
+            if prev_ptr is not None:
+                _copy_region_artifacts(Path(previous_regions), out_dir, region_id, prev_ptr.current)
+                regions_map[region_id] = prev_ptr.current
+                regions_skipped += 1
+                continue
+
+        try:
+            region_chunks: dict[str, bytes] = {
+                f"grid/{city}": json.dumps(grids[city], separators=(",", ":")).encode("utf-8"),
+                f"catalysts/{city}": json.dumps(catalysts_by_city[city], separators=(",", ":")).encode("utf-8"),
+                f"submarkets/{city}": json.dumps(submarkets_by_city[city], separators=(",", ":")).encode("utf-8"),
+            }
+            for cell, pred in cells_by_index.items():
+                if owners.get(cell) == city:
+                    region_chunks[f"cells/{cell}"] = json.dumps(pred, separators=(",", ":")).encode("utf-8")
+
+            measured_cells = sum(
+                1
+                for f in grids[city].get("features", [])
+                if f.get("properties", {}).get("coverage_label") == "measured"
+                or f.get("properties", {}).get("is_catalyst")
+            )
+            reg_manifest = stage_region(
+                out_dir,
+                region_id=region_id,
+                chunks=region_chunks,
+                input_hash=input_hash,
+                plan_hash=plan_hash,
+                golden_count=golden_count,
+                measured_count=max(1, measured_cells),
+                rank_epoch=epoch_id,
+            )
+            promoted_ptr = promote_region(
+                out_dir,
+                region_id=region_id,
+                generation=reg_manifest.generation,
+                expected_golden=golden_count,
+                expected_plan_hash=plan_hash,
+            )
+            regions_map[region_id] = promoted_ptr.current
+            regions_rebuilt += 1
+        except Exception as exc:
+            logger.error("Failed to build region %s: %s", region_id, exc)
+            regions_failed += 1
+            raise
+
+    if metrics is not None:
+        metrics.set_artifact("regions_rebuilt", regions_rebuilt)
+        metrics.set_artifact("regions_skipped", regions_skipped)
+        metrics.set_artifact("regions_failed", regions_failed)
+        metrics.set_artifact("rank_drift_pct", 0.0)
+        metrics.set_artifact("rank_epoch", epoch_id)
+        metrics.set_artifact("rank_epoch_at", epoch_at)
+
     manifest: dict[str, Any] = {
         "generated_at": datetime.now(UTC).isoformat(),
         "app_version": _app_version(),
@@ -1134,6 +1330,9 @@ async def _build_snapshot(
     # Additive Stage A fields (hex-coverage): appended after the existing
     # fields; no existing key is reordered or altered.
     manifest["coverage"] = _coverage_block(national_block)
+    manifest["regions"] = regions_map
+    manifest["rank_epoch"] = epoch_id
+    manifest["rank_epoch_at"] = epoch_at
     manifest["snapshot_id"] = _manifest_snapshot_id(manifest)
     manifest_size = _write_json(out_dir / "manifest.json", manifest)
     if manifest_size > MAX_MANIFEST_BYTES:
@@ -1151,6 +1350,12 @@ async def _build_snapshot(
             "snapshot_id": manifest["snapshot_id"],
             "build_seconds": time.perf_counter() - build_start,
             "cells": len(cells_by_index),
+            "regions_rebuilt": regions_rebuilt,
+            "regions_skipped": regions_skipped,
+            "regions_failed": regions_failed,
+            "rank_drift_pct": 0.0,
+            "rank_epoch": epoch_id,
+            "rank_epoch_at": epoch_at,
             "national": None
             if national_block is None
             else {
@@ -1229,6 +1434,8 @@ def _write_publication_plan(
             "product_snapshot_id": manifest.get("snapshot_id"),
         },
     }
+    if "regions" in manifest:
+        metadata["regions"] = manifest["regions"]
     plan = plan_publication(kv_entries, None, metadata)
     payload = {
         "metadata": metadata,
@@ -1312,6 +1519,11 @@ def main() -> None:
         default=None,
         help="Verified synthetic bundle directory (manifest.json plus model artifacts)",
     )
+    parser.add_argument(
+        "--previous-regions",
+        default=None,
+        help="Directory containing previous snapshot or regions for incremental build",
+    )
     args = parser.parse_args()
     context_dir = Path(args.context_dir) if args.context_dir else None
     metrics = SnapshotMetrics(context_dir=context_dir) if args.metrics_out else None
@@ -1328,6 +1540,7 @@ def main() -> None:
                 metrics=metrics,
                 cache_predictions=not args.no_prediction_cache,
                 model_bundle=Path(args.model_bundle) if args.model_bundle else None,
+                previous_regions=Path(args.previous_regions) if args.previous_regions else None,
             )
         )
     finally:
