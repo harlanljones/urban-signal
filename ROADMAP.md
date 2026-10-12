@@ -27,7 +27,7 @@ always written with the `HX-` prefix to avoid collision.
 |---|---|---|
 | A | **Shipped** (`1bdc17b`, deployed, browser-verified) | 2,645 anchors; res-6 underlay; `coverage.tiers`; registry field + gate; benchmark median 151.0 ms vs 147.6 baseline; production worker pin bug found and fixed |
 | B | **Shipped** (`d53b717`, published `r-20261012-2d3b28fa`, browser-verified live) | CoveragePlan, golden counts, labels, ownership, provenance UI; 157 metros / 53,799 cells unchanged; NYC viewport 49 measured / 1,362 interpolated; full API unit suite green. HX-B6 not needed (worker types are permissive); HX-B8 deferred (see below) |
-| C | **Started**: HX-C1 built (`regions.py`, 18 tests) | `promote_region` with real chunk re-hashing, exact golden count, measured floor, rebaseline rule, atomic pointer. Not wired into any build or read path |
+| C | **In progress**: HX-C1, C2, C4, C6, C7 built & tested | HX-C1 promotion gate (`regions.py`); HX-C2 per-region pointers in publication plan; HX-C4 worker reads chunks through region pointers; HX-C6 failure-domain drill script; HX-C7 client schema v2 reader & regional cache retention. All preflight gates pass. |
 | D | Not started | |
 
 Stage B deviations from the original plan, each driven by measurement (spec §3.0):
