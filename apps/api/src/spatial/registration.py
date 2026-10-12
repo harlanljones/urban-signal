@@ -7,7 +7,7 @@ instead of the other way around. The registry remains the source of truth for
 now; this object only references (never copies) the module's constants.
 """
 
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Tuple
 
 from src.spatial.submarkets import BoroughMeta, SubmarketMeta
 
@@ -25,6 +25,7 @@ class SpatialRegistration:
         "submarkets",
         "divisions",
         "contains",
+        "urban_anchors",
     )
 
     def __init__(
@@ -34,9 +35,13 @@ class SpatialRegistration:
         submarkets: Dict[str, SubmarketMeta],
         divisions: Dict[str, BoroughMeta],
         contains: Callable[[float, float], bool],
+        urban_anchors: Tuple[str, ...] = (),
     ) -> None:
         self.metro_bbox = metro_bbox
         self.division_bboxes = division_bboxes
         self.submarkets = submarkets
         self.divisions = divisions
         self.contains = contains
+        # Census urban-area ids (UACE20) that bound this metro's detail
+        # coverage. () means "k-ring stays the coverage authority" (ADR-0010).
+        self.urban_anchors = tuple(urban_anchors)

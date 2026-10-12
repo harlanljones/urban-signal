@@ -186,6 +186,7 @@ def build_registration(
         divisions=divisions,
         datasets=datasets,
         job_suffix=str(data["job_suffix"]),
+        urban_anchors=tuple(str(a) for a in data.get("urban_anchors", ())),
     )
 
 

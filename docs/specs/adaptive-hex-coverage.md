@@ -35,8 +35,11 @@ same pattern as `national_grid.OUTLINE_ASSET`).
   — the vendoring task records which)*.
 - Simplification tolerance and coordinate rounding: *(proposed, calibrate;
   HX-A1)* start at the outline's 0.004° / 5 decimals; the acceptance test is
-  that polyfill cell counts at res 7 differ from the unsimplified geometry by
-  ≤ 0.5 % per anchor.
+  that **aggregate** res-7 polyfill cell count differs from the unsimplified
+  geometry by ≤ 0.5 %. *(Measured at HX-A1: a per-anchor ≤ 0.5 % bound is
+  unachievable at any practical size — a ±1-cell flip on a 20-cell anchor is
+  5 % — so the criterion is aggregate. At 0.004° the asset is 4.29 MB and net
+  drift is +0.024 %, with boundary cells flipping both ways.)*
 - The feature count of the vendored asset becomes `ANCHOR_GOLDEN_COUNT`
   *(TBD; pinned by HX-A1)*. Puerto Rico and Island Area anchors are retained in
   the asset but are not eligible for the detail tier until a feed exists

@@ -350,6 +350,10 @@ class CityRegistration:
     divisions: dict[str, BoroughMeta]
     datasets: dict[FeedType, DatasetSpec]
     job_suffix: str = ""
+    # Registered Census urban-area ids bounding detail coverage (ADR-0010).
+    # () keeps the k-ring set as the coverage authority; the geometry-derived
+    # candidate set is urban_anchors.anchors_intersecting(metro_bbox).
+    urban_anchors: tuple[str, ...] = ()
 
 
 # Canonical alias lookup mapping all known alias strings to CityId

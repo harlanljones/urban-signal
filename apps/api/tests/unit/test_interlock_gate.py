@@ -83,6 +83,7 @@ SPINE_INVARIANTS = {
         "dataset specs complete",
         "job names unique",
         "get_dataset readable errors",
+        "urban anchors resolve and contain a submarket",
     ],
     "apps/api/src/spatial/cities/__init__.py": ["package exports match registry"],
     "apps/api/src/spatial/geo_utils.py": ["division bboxes nest inside metro", "submarkets inside own division"],
@@ -339,6 +340,44 @@ class TestSpineCoverage:
     def test_every_spine_file_has_invariant_coverage(self):
         uncovered = sorted(set(_manifest_paths()) - set(SPINE_INVARIANTS))
         assert not uncovered, f"spine files with no invariant guarding them: {uncovered}"
+
+
+@pytest.mark.interlock
+class TestUrbanAnchorWiring:
+    """ADR-0010: a registered Urban Anchor must exist, touch its metro, and hold a
+    submarket. Anchors are derived from geometry, never hand-curated per metro."""
+
+    def test_registered_anchor_ids_resolve_and_belong_to_their_metro(self):
+        from shapely.geometry import Point, shape
+
+        from src.spatial.urban_anchors import anchors_intersecting, load_anchors
+
+        anchors = load_anchors()
+        for cid, reg in REGISTRY.items():
+            assert isinstance(reg.urban_anchors, tuple), cid.value
+            if not reg.urban_anchors:
+                continue  # k-ring stays the coverage authority for this metro
+            unknown = [a for a in reg.urban_anchors if a not in anchors]
+            assert not unknown, f"{cid.value}: unknown urban anchors {unknown}"
+            assert set(reg.urban_anchors) <= set(anchors_intersecting(reg.metro_bbox)), cid.value
+            union = [shape(anchors[a].geometry) for a in reg.urban_anchors]
+            assert any(
+                g.contains(Point(m.lng, m.lat)) for m in reg.submarkets.values() for g in union
+            ), f"{cid.value}: no submarket lies inside its registered urban anchors"
+
+    def test_every_metro_has_a_derivable_anchor_holding_a_submarket(self):
+        """Measured at HX-A1: derivation places a submarket in an anchor for all 157 metros."""
+        from shapely.geometry import Point, shape
+
+        from src.spatial.urban_anchors import anchors_intersecting, load_anchors
+
+        anchors = load_anchors()
+        uncovered = []
+        for cid, reg in REGISTRY.items():
+            geoms = [shape(anchors[a].geometry) for a in anchors_intersecting(reg.metro_bbox)]
+            if not any(g.contains(Point(m.lng, m.lat)) for m in reg.submarkets.values() for g in geoms):
+                uncovered.append(cid.value)
+        assert not uncovered, f"metros with no submarket inside any intersecting urban anchor: {uncovered}"
 
 
 def _manifest_paths() -> list[str]:
