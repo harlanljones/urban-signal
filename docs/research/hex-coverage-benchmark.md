@@ -29,3 +29,18 @@ runs; only CPU time and `bulk_bytes` (inference-latency digit width) vary.
 - The fixture (`scripts/autoresearch_coverage.json`,
   `scripts/autoresearch_semantic.sha256`) may change only in HX-B7, with the
   old fixture on new code and the new fixture on new code both recorded below.
+
+## Stage A delta (HX-A1..A6 + worker pin fix; three runs)
+
+| Run | tile_load_cpu_ms | tile_requests | tile_response_bytes | manifest_bytes |
+|---:|---:|---:|---:|---:|
+| 1 | 136.978 | 472 | 99,686,392 | 2,479,896 |
+| 2 | 150.997 | 472 | 99,686,392 | 2,479,896 |
+| 3 | 157.754 | 472 | 99,686,392 | 2,479,896 |
+| **median** | **150.997** | 472 | 99,686,392 | 2,479,896 |
+
+Median +2.3 % vs baseline 147.565 (threshold 10.5 %). Requests, bytes, the tile
+workload SHA-256 and the publication semantic SHA-256 are unchanged, so k-ring
+coverage is byte-identical (INV-6). `manifest_bytes` +161 is the additive
+`coverage.tiers` block. The bridge band's res-6 requests are outside this
+offline fixture, which replays metro tiles only.

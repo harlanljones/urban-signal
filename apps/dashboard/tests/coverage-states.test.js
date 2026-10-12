@@ -123,6 +123,7 @@ function overlayContext(manifest) {
     CONTEXT_METRICS: {},
     tileFeatures: new Map(),
     ZOOM_FLOOR: 6,
+    NATIONAL_UNDERLAY_MAX_ZOOM: 8.9,
     fetch: () => {
       calls.fetch += 1;
       return Promise.resolve({ ok: false, status: 500, headers: { get: () => null } });

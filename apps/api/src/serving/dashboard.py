@@ -2018,9 +2018,16 @@ __METRO_META__
     // `_national_pct` ramp with the metro res-9 layers; flat fill in 2D,
     // fill-extrusion in 3D. (Deck.gl was removed — US-391: the UMD bundles
     // clobbered the global `deck` namespace and the overlay never rendered.)
+    // The national grid owns z < ZOOM_FLOOR outright, and from ZOOM_FLOOR up to
+    // NATIONAL_UNDERLAY_MAX_ZOOM it stays as a flat, faint res-6 underlay beneath
+    // the metro LOD (ADR-0010 bridge band, DG-4 shape b): nothing is blank between
+    // metros. Res 6 was previously unreachable because the loader returned early.
+    const NATIONAL_UNDERLAY_MAX_ZOOM = 8.9; // where lodForZoom leaves res 7
+    const NATIONAL_UNDERLAY_OPACITY = 0.35;
+    const NATIONAL_PRIMARY_OPACITY = 0.7;
     function nationalResForZoom(z) {
       if (z < 5) return 4;
-      if (z < 8) return 5;
+      if (z < ZOOM_FLOOR) return 5;
       return 6;
     }
 
@@ -2108,9 +2115,10 @@ __METRO_META__
       // Retire the "Zoom in..." dead-zone message
       if (hint) hint.hidden = true;
       // Show/hide overlay by zoom; the LODES overlay owns zooms below ZOOM_FLOOR
+      // and underlays the metro LOD up to NATIONAL_UNDERLAY_MAX_ZOOM.
       updateNationalLayerVisibilities();
-      if (z >= ZOOM_FLOOR) {
-        // Above the floor the metro LOD owns the view: cancel any queued
+      if (z >= NATIONAL_UNDERLAY_MAX_ZOOM) {
+        // Above the underlay band the metro LOD owns the view: cancel any queued
         // national work so a stale read cannot paint over the metro grid.
         nationalLoadGeneration += 1;
         return;
@@ -2335,6 +2343,8 @@ __METRO_META__
         type: 'geojson',
         data: { type: 'FeatureCollection', features: [] }
       });
+      // Inserted beneath the metro grid so the z6-8.9 underlay never covers it.
+      const beneathMetro = map.getLayer('h3-hex-fill') ? 'h3-hex-fill' : undefined;
       map.addLayer({
         id: 'national-h3-fill',
         type: 'fill',
@@ -2344,7 +2354,7 @@ __METRO_META__
           'fill-color': nationalColorExpression(),
           'fill-opacity': 0.7
         }
-      });
+      }, beneathMetro);
       map.addLayer({
         id: 'national-h3-line',
         type: 'line',
@@ -2355,7 +2365,7 @@ __METRO_META__
           'line-color': 'rgba(148, 163, 184, 0.22)',
           'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.4, 6, 0.7]
         }
-      });
+      }, beneathMetro);
       map.addLayer({
         id: 'national-h3-extrusion',
         type: 'fill-extrusion',
@@ -2367,7 +2377,7 @@ __METRO_META__
           'fill-extrusion-base': 0,
           'fill-extrusion-opacity': 0.85
         }
-      });
+      }, beneathMetro);
       map.on('click', 'national-h3-fill', onNationalHexClick);
       map.on('click', 'national-h3-extrusion', onNationalHexClick);
       updateNationalLayerVisibilities();
@@ -2398,23 +2408,23 @@ __METRO_META__
     function updateNationalLayerVisibilities() {
       if (!map) return;
       const z = map.getZoom();
-      // The national overlay and the metro LOD pyramid occupy DISJOINT zoom
-      // bands (US-422). The overlay previously stayed up until z12 while the
-      // metro pyramid already started at ZOOM_FLOOR, so six zoom levels drew
-      // both at once: the coarse res-6 national cells (~3km across, extruded
-      // in 3D) covered the metro hexes, and because that grid is a uniform
-      // country-wide tiling with no land mask it spilled over rivers, bays and
-      // airports. lodForZoom() covers every zoom >= ZOOM_FLOOR, so the blend
-      // is redundant — hand off cleanly at the floor instead.
-      const overlayVisible = z < ZOOM_FLOOR;
+      // Primary band (z < ZOOM_FLOOR): fill/line, or extrusion in 3D. Underlay band
+      // (ZOOM_FLOOR <= z < NATIONAL_UNDERLAY_MAX_ZOOM): flat faint fill only, never
+      // extruded, so the US-422 double-draw of tall national hexes over metro hexes
+      // cannot recur. Above that the metro LOD owns the view.
+      const primary = z < ZOOM_FLOOR;
+      const underlay = !primary && z < NATIONAL_UNDERLAY_MAX_ZOOM;
       const setVis = (id, visible) => {
         if (map.getLayer(id)) {
           map.setLayoutProperty(id, 'visibility', visible ? 'visible' : 'none');
         }
       };
-      setVis('national-h3-fill', overlayVisible && currentPerspective === '2D');
-      setVis('national-h3-line', overlayVisible);
-      setVis('national-h3-extrusion', overlayVisible && currentPerspective === '3D');
+      setVis('national-h3-fill', underlay || (primary && currentPerspective === '2D'));
+      setVis('national-h3-line', primary);
+      setVis('national-h3-extrusion', primary && currentPerspective === '3D');
+      if (map.getLayer('national-h3-fill')) {
+        map.setPaintProperty('national-h3-fill', 'fill-opacity', underlay ? NATIONAL_UNDERLAY_OPACITY : NATIONAL_PRIMARY_OPACITY);
+      }
     }
 
     function updateNationalLayerPaint() {

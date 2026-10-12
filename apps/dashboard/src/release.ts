@@ -167,6 +167,20 @@ export async function readReleaseJson(env: ReleaseEnv, release: ReleaseContext, 
   return (await readReleaseEntry(env, release, key)).value;
 }
 
+/**
+ * True when the release's own manifest object declares `logicalId` as its
+ * `snapshot_id`. Content-addressed releases are keyed by sha, but the manifest a
+ * client boots from carries the builder's logical id, and that is what it pins.
+ */
+async function releaseDeclaresId(env: ReleaseEnv, release: ReleaseContext, logicalId: string): Promise<boolean> {
+  try {
+    const manifest = (await readReleaseJson(env, release, "manifest")) as { snapshot_id?: unknown };
+    return manifest.snapshot_id === logicalId;
+  } catch {
+    return false;
+  }
+}
+
 export async function withRelease<T>(
   env: ReleaseEnv,
   requestedId: string | undefined,
@@ -178,7 +192,11 @@ export async function withRelease<T>(
     const value = await releaseStore.run(null, () => query(null));
     return { value, snapshotId: null };
   }
-  const release = await loadRelease(env, snapshotId);
+  let release = await loadRelease(env, snapshotId);
+  if (!release && requestedId && pointer && requestedId !== pointer.current) {
+    const current = await loadRelease(env, pointer.current);
+    if (current && (await releaseDeclaresId(env, current, requestedId))) release = current;
+  }
   if (!release) {
     if (requestedId) {
       const value = await releaseStore.run(null, () => query(null));

@@ -141,6 +141,11 @@ export interface Manifest {
     schema_version?: number;
     national?: { status?: string; index_key?: string; resolutions?: Record<string, unknown> };
     metro?: { mode?: string };
+    /** ADR-0010 coverage tiers (additive; absent on older manifests). */
+    tiers?: {
+      national?: { resolutions?: number[]; signal?: string; status?: string };
+      urban_detail?: { resolutions?: number[]; signal?: string; authority?: string };
+    };
     [key: string]: unknown;
   };
 }
@@ -425,7 +430,13 @@ export async function readSnapshotValue(
     return { ok: false, status: 500, detail: `Unsupported snapshot schema version ${version}.` };
   }
   const release = currentRelease();
-  if (release && (snapshotId === null || snapshotId === release.snapshotId)) {
+  // A pin equal to the current manifest's own `snapshot_id` names the publication
+  // the client just booted from. Under content-addressed releases that id is the
+  // builder's logical id, not the release's sha, so it must still resolve to the
+  // current release: otherwise a chunk that was legitimately never published
+  // (empty parents publish nothing) reads as a missing twin and 503s.
+  const pinsCurrent = snapshotId !== null && snapshotId === manifest?.snapshot_id;
+  if (release && (snapshotId === null || snapshotId === release.snapshotId || pinsCurrent)) {
     try {
       const entry = await readReleaseEntry(env, release, logicalKey);
       return { ok: true, entry: { value: entry.value, etag: `"${(await sha256Hex(entry.raw)).slice(0, 32)}"` } };

@@ -251,3 +251,47 @@ test("a content-addressed manifest does not stick for the next legacy request", 
   expect(second.status).toBe(200);
   expect(((await second.json()) as { generated_at: string }).generated_at).toBe("2026-08-24T00:00:00Z");
 });
+
+test("pinning the manifest's own logical id reads the current release, so empty national parents are missing rather than a 503", async () => {
+  const LOGICAL = "r-20261012-a9725ad8";
+  const product = {
+    generated_at: "2026-10-12T00:00:00Z",
+    app_version: "2.0.0",
+    cities: ["nyc"],
+    resolution: 9,
+    k_ring: 1,
+    catalyst_threshold: 85,
+    snapshot_id: LOGICAL,
+    coverage: { schema_version: 1, national: { status: "available" } },
+  };
+  const chunk = { cols: ["h3", "jobs"], rows: [["862a10007ffffff", 5]] };
+  // The release is addressed by CURRENT (a sha); the manifest declares LOGICAL.
+  // `national/6/832a1efffffffff` was never published: empty parents publish nothing.
+  const current = await addressedRelease(CURRENT, { manifest: product, "national/6/832aa8fffffffff": chunk }, null);
+  const env = {
+    SNAPSHOT: {
+      async get(key: string) {
+        const values = {
+          ...current.stored,
+          "snapshot/current": canonical({ schema_version: 1, current: CURRENT, previous: null }),
+        };
+        return key in values ? values[key] : null;
+      },
+    },
+    ASSETS: { fetch: async () => new Response("ok") },
+  };
+  const call = (query: string) =>
+    worker.fetch(new Request(`https://urban-signal.test/api/v1/national/6?${query}`), env as never);
+
+  const pinned = await call(`parents=832aa8fffffffff,832a1efffffffff&snapshot_id=${LOGICAL}`);
+  expect(pinned.status).toBe(200);
+  const body = (await pinned.json()) as { count: number; missing: string[] };
+  expect(body.count).toBe(1);
+  expect(body.missing).toEqual(["832a1efffffffff"]);
+
+  // An unrelated stale id must still never be silently served from another release.
+  clearSnapshotCaches();
+  clearReleaseCache();
+  const stale = await call(`parents=832aa8fffffffff&snapshot_id=r-20250101-deadbeef`);
+  expect(stale.status).toBe(503);
+});

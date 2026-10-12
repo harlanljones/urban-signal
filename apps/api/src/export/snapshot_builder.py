@@ -591,6 +591,11 @@ def _coverage_block(national_block: dict[str, Any] | None) -> dict[str, Any]:
     there), and ``_require_national_block`` fails the build before publication
     when require-national mode sees an absent or incomplete input. So
     ``available`` is never derivable from a stale/empty chunk set.
+
+    ``tiers`` (ADR-0010, additive) names the two Coverage tiers of the one
+    Display ladder; ``urban_detail.authority`` stays ``k_ring`` until the
+    Stage B authority flip. ``metro.mode`` is a documented constant and stays
+    so; it is not derivable from build inputs.
     """
     national: dict[str, Any] = {"status": "unavailable"}
     if national_block is not None:
@@ -605,6 +610,18 @@ def _coverage_block(national_block: dict[str, Any] | None) -> dict[str, Any]:
         "schema_version": 1,
         "national": national,
         "metro": {"mode": "sparse_registry"},
+        "tiers": {
+            "national": {
+                "resolutions": list(NATIONAL_RESOLUTIONS),
+                "signal": "lodes",
+                "status": national["status"],
+            },
+            "urban_detail": {
+                "resolutions": list(LOD_RESOLUTIONS),
+                "signal": "lims",
+                "authority": "k_ring",
+            },
+        },
     }
 
 

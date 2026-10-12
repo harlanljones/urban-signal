@@ -612,6 +612,65 @@ def test_coverage_block_defaults(snapshot: dict[str, Any]):
     assert "resolutions" not in coverage["national"]
 
 
+
+def test_coverage_tiers_exact_shape_without_national(snapshot: dict[str, Any]):
+    coverage = snapshot["coverage"]
+    assert coverage["tiers"] == {
+        "national": {"resolutions": [4, 5, 6], "signal": "lodes", "status": "unavailable"},
+        "urban_detail": {"resolutions": [7, 8, 9], "signal": "lims", "authority": "k_ring"},
+    }
+    # Additive: legacy keys keep their relative order, tiers is appended.
+    assert list(coverage) == ["schema_version", "national", "metro", "tiers"]
+    assert coverage["schema_version"] == 1
+
+
+def test_coverage_tiers_national_status_mirrors_available(tmp_path: Path):
+    national_dir = tmp_path / "national-out"
+    _write_national_fixture(national_dir)
+    manifest = asyncio_run_build(tmp_path, cities=["nyc"], national_dir=national_dir)
+    coverage = manifest["coverage"]
+    assert coverage["national"]["status"] == "available"
+    assert coverage["tiers"]["national"] == {
+        "resolutions": [4, 5, 6],
+        "signal": "lodes",
+        "status": "available",
+    }
+    assert coverage["tiers"]["urban_detail"]["authority"] == "k_ring"
+    assert coverage["schema_version"] == 1
+    assert list(coverage) == ["schema_version", "national", "metro", "tiers"]
+
+
+def test_coverage_tiers_national_status_mirrors_unavailable_for_empty_chunks(tmp_path: Path):
+    """A national dir that publishes nothing must read unavailable in tiers too."""
+    cell_la = h3.latlng_to_cell(34.0522, -118.2437, 6)
+    parent_null = h3.cell_to_parent(cell_la, 3)
+    res6_dir = tmp_path / "national-out" / "national" / "res6"
+    res6_dir.mkdir(parents=True)
+    _national_fixture_frame(
+        [
+            {
+                "h3_index": cell_la,
+                "jobs_c000": None,
+                "workers_c000": None,
+                "jobs_c000_national_pct": None,
+                "workers_c000_national_pct": None,
+                "year": 2023,
+                "signal_source": "census_lehd_lodes8",
+            }
+        ]
+    ).write_parquet(res6_dir / f"{parent_null}.parquet")
+
+    manifest = asyncio_run_build(tmp_path, cities=["nyc"], national_dir=tmp_path / "national-out")
+    coverage = manifest["coverage"]
+    assert coverage["national"]["status"] == "unavailable"
+    assert coverage["tiers"]["national"]["status"] == "unavailable"
+
+
+def test_coverage_tiers_urban_detail_matches_published_lod_resolutions(snapshot: dict[str, Any]):
+    """The declared urban-detail ladder must be what the manifest actually serves."""
+    declared = snapshot["coverage"]["tiers"]["urban_detail"]["resolutions"]
+    assert [str(res) for res in declared] == sorted(snapshot["tile_indexes"], key=int)
+
 def test_coverage_national_available_with_data(tmp_path: Path):
     national_dir = tmp_path / "national-out"
     _write_national_fixture(national_dir)

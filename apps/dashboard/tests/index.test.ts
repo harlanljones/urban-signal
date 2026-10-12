@@ -1357,3 +1357,26 @@ test("the manifest stays readable when the coverage schema is newer (client sees
   const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/manifest`), env);
   expect(response.status).toBe(200);
 });
+
+test("the manifest serves coverage.tiers unchanged and still serves manifests without it", async () => {
+  const tiers = {
+    national: { resolutions: [4, 5, 6], signal: "lodes", status: "available" },
+    urban_detail: { resolutions: [7, 8, 9], signal: "lims", authority: "k_ring" },
+  };
+  clearSnapshotCaches();
+  const withTiers = kvValuesEnv({
+    manifest: { ...LEGACY_MANIFEST, coverage: { schema_version: 1, tiers } },
+  }) as never;
+  const served = await worker.fetch(new Request(`${ORIGIN}/api/v1/manifest`), withTiers);
+  expect(served.status).toBe(200);
+  const body = (await served.json()) as { coverage?: { schema_version?: number; tiers?: unknown } };
+  expect(body.coverage?.schema_version).toBe(1);
+  expect(body.coverage?.tiers).toEqual(tiers);
+
+  clearSnapshotCaches();
+  const without = kvValuesEnv({ manifest: LEGACY_MANIFEST }) as never;
+  const legacy = await worker.fetch(new Request(`${ORIGIN}/api/v1/manifest`), without);
+  expect(legacy.status).toBe(200);
+  const legacyBody = (await legacy.json()) as { coverage?: { tiers?: unknown } };
+  expect(legacyBody.coverage?.tiers).toBeUndefined();
+});
