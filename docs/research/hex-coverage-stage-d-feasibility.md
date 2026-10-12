@@ -90,3 +90,26 @@ Per DG-6, metro-less anchors are ordered by population descending (secondary sor
 - `src.spatial.coverage_plan.metro_less_anchors()` returns the complete DG-6 ranked list of candidates.
 - `src.export.regions` handles atomic promotion and integrity verification for `anchor/{anchor_id}` regions.
 - Worker routes (`apps/dashboard/src/index.ts`) and client tile cache (`apps/api/src/serving/dashboard.py`) support arbitrary region generations without requiring whole-snapshot flushes.
+
+---
+
+## 5. Decision Gate DG-7 & MVT Decision (HX-D3, HX-D4)
+
+### Payload Measurement (DG-7 Evidence Table):
+
+| Layer / Resolution | Chunk Partitioning | Measured Median Chunk | Measured Max Chunk | KV Budget Limit | Headroom Factor |
+|:---|:---|---:|---:|---:|---:|
+| National Base (Res 4) | Res-3 parent | ~18 KB | ~45 KB | 20 MiB (20.97 MB) | >400x |
+| National Base (Res 5) | Res-3 parent | ~72 KB | ~180 KB | 20 MiB (20.97 MB) | >110x |
+| National Base (Res 6) | Res-3 parent | ~254 KB | ~680 KB | 20 MiB (20.97 MB) | >30x |
+| Metro Detail (Res 7) | Res-4 parent | ~120 KB | ~450 KB | 20 MiB (20.97 MB) | >45x |
+| Metro Detail (Res 8) | Res-4 parent | ~85 KB | ~520 KB | 20 MiB (20.97 MB) | >40x |
+| Metro Detail (Res 9) | Res-5 parent | ~95 KB | 847.7 KB (0.81 MiB) | 20 MiB (20.97 MB) | 24.7x |
+
+### Decision Recorded (2026-10-12):
+Per Decision Gate DG-7 (*"MVT only if any detail chunk cannot be kept under MAX_KV_VALUE_BYTES (20 MiB) or the client CPU threshold"*), Mapbox Vector Tiles (MVT) are **declined**.
+
+**Justification:**
+1. The largest dense detail tile chunk across all registered metros (NYC core at res 9) measures **0.81 MiB**, utilizing less than 4.1 % of the 20 MiB Workers KV value cap.
+2. Shipped client tile loading CPU is well under threshold (median ~182–198 ms vs 218 ms baseline).
+3. Plain JSON chunks remain transport-free, inspectable, and avoid binary protobuf decoding overhead and dual-runtime (Python/TypeScript) schema synchronization bugs.

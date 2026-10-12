@@ -56,6 +56,7 @@ import logging
 from collections.abc import Callable, Iterable
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 import h3
 import polars as pl
@@ -696,6 +697,121 @@ def _build_manifest(
     )
     return manifest
 
+
+def build_anchor_detail_region(
+    anchor_id: str,
+    year: int,
+    state_list: list[str],
+    cache_dir: Path,
+    out_dir: Path,
+    fetcher: Callable[[str, Path], Path] = download_to_cache,
+    verify_checksums: bool = True,
+    rank_epoch: str | None = None,
+):
+    """Build a LODES-only detail region for an Urban Anchor (ADR-0010 Stage D, HX-D2).
+
+    Honesty rule: LIMS fields remain null; LODES jobs/workers are measured from WAC/RAC
+    at the anchor's adaptive detail resolution (7, 8, or 9).
+    """
+    from src.export.regions import promote_region, stage_region
+    from src.spatial.coverage_plan import plan_anchor_region
+    from src.spatial.h3_indexer import H3SpatialIndexer
+
+    plan = plan_anchor_region(anchor_id)
+    res = plan.detail_res
+    allowed = {c.cell for c in plan.cells}
+
+    state_frames: list[pl.DataFrame] = []
+    for state in state_list:
+        try:
+            frame, _ = aggregate_state(
+                state, year, res, cache_dir, fetcher, allowed, verify_checksums
+            )
+            state_frames.append(frame)
+        except (OSError, ValueError) as exc:
+            logger.warning("State %s skipped for anchor %s: %s", state, anchor_id, exc)
+            continue
+
+    if state_frames:
+        combined = _sum_frames(state_frames)
+    else:
+        combined = pl.DataFrame(
+            schema={
+                "h3_index": pl.String,
+                JOBS_COL: pl.Int64,
+                WORKERS_COL: pl.Int64,
+                "blocks_wac": pl.Int64,
+                "blocks_rac": pl.Int64,
+            }
+        )
+
+    full = (
+        pl.DataFrame({"h3_index": list(allowed)}, schema={"h3_index": pl.String})
+        .join(combined, on="h3_index", how="left")
+    )
+    full = _attach_ranks(full)
+
+    tile_parent_res = 4 if res in (7, 8) else 5
+    by_parent: dict[str, list[dict[str, Any]]] = {}
+    rows = full.to_dicts()
+    for row in rows:
+        cell = row["h3_index"]
+        parent = parent_at(cell, tile_parent_res)
+        centroid = h3.cell_to_latlng(cell)
+        boundary = H3SpatialIndexer.h3_to_boundary(cell, geojson_format=True)
+        if boundary and boundary[0] != boundary[-1]:
+            boundary.append(boundary[0])
+        feature = {
+            "type": "Feature",
+            "id": cell,
+            "geometry": {"type": "Polygon", "coordinates": [boundary]},
+            "properties": {
+                "h3_index": cell,
+                "resolution": res,
+                "city_id": f"anchor_{anchor_id}",
+                "coverage_label": "measured",
+                "coverage_source": "measured",
+                "in_anchor": True,
+                "jobs": row.get(JOBS_COL),
+                "workers": row.get(WORKERS_COL),
+                "jobs_national_pct": row.get(RANK_COLS[0]),
+                "workers_national_pct": row.get(RANK_COLS[1]),
+                "centroid_lat": centroid[0],
+                "centroid_lng": centroid[1],
+            },
+        }
+        by_parent.setdefault(parent, []).append(feature)
+
+    chunks: dict[str, bytes] = {}
+    for parent, feats in sorted(by_parent.items()):
+        payload = {
+            "type": "FeatureCollection",
+            "tile_parent": parent,
+            "tile_resolution": tile_parent_res,
+            "lod_resolution": res,
+            "features": feats,
+        }
+        chunks[f"gridtiles_res{res}/{parent}"] = json.dumps(payload, separators=(",", ":")).encode()
+
+    input_hash = hashlib.sha256(f"{plan.plan_hash}:{year}:{sorted(state_list)}".encode()).hexdigest()
+    manifest = stage_region(
+        out_dir,
+        region_id=f"anchor/{anchor_id}",
+        chunks=chunks,
+        input_hash=input_hash,
+        plan_hash=plan.plan_hash,
+        golden_count=plan.golden_count,
+        measured_count=max(1, len(rows)),
+        rank_epoch=rank_epoch,
+    )
+    promote_region(
+        out_dir,
+        region_id=f"anchor/{anchor_id}",
+        generation=manifest.generation,
+        expected_golden=plan.golden_count,
+        expected_plan_hash=plan.plan_hash,
+    )
+    return manifest
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s %(message)s")

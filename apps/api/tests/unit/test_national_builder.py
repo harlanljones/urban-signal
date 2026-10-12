@@ -389,3 +389,24 @@ def test_build_national_manifest_sha256(state_fixtures, tmp_path, monkeypatch):
     assert loaded["resolutions"] == list(nb.DEFAULT_RESOLUTIONS)
     assert loaded["checksum_verified"] is True
     assert loaded["lodes_version"] == "v8"
+
+
+def test_build_anchor_detail_region_emits_lodes_and_promotes(state_fixtures, tmp_path):
+    from src.export.national_builder import build_anchor_detail_region
+    from src.spatial.coverage_plan import plan_anchor_region
+
+    anchor_id = "05167"
+    plan = plan_anchor_region(anchor_id)
+    manifest = build_anchor_detail_region(
+        anchor_id=anchor_id,
+        year=2023,
+        state_list=["de"],
+        cache_dir=state_fixtures["cache"],
+        out_dir=tmp_path,
+        fetcher=state_fixtures["fetcher"],
+        verify_checksums=False,
+    )
+    assert manifest.region_id == f"anchor/{anchor_id}"
+    assert manifest.golden_count == plan.golden_count
+    assert (tmp_path / "regions" / f"anchor/{anchor_id}" / "current.json").exists()
+    assert (tmp_path / "regions" / f"anchor/{anchor_id}" / "gen" / f"{manifest.generation}.json").exists()
