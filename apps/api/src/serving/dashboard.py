@@ -3640,7 +3640,8 @@ __METRO_META__
     function mergeTilePayload(payload) {
       if (!payload || !Array.isArray(payload.features)) throw new Error('Malformed grid tile payload');
       const features = payload.features;
-      for (const feature of features) {
+      for (let i = 0; i < features.length; i++) {
+        const feature = features[i];
         const cell = feature.properties && feature.properties.h3_index;
         if (!cell) continue;
         tileFeatures.set(cell, feature);
