@@ -3674,7 +3674,14 @@ __METRO_META__
       const candidates = lodRequiredParents.filter((parent) => !fetchedTiles.has(parent) && !tilesInFlight.has(`${tileLoadGeneration}:${parent}`) && !tileRetryTimers.has(parent) && !exhaustedTileRetries.has(parent));
 
       const center = map.getCenter();
-      candidates.sort((a, b) => parentDistance(a, center) - parentDistance(b, center));
+      if (candidates.length > 1) {
+        const dists = new Map();
+        for (let i = 0; i < candidates.length; i++) {
+          const p = candidates[i];
+          dists.set(p, parentDistance(p, center));
+        }
+        candidates.sort((a, b) => dists.get(a) - dists.get(b));
+      }
 
       pendingTileParents.length = 0;
       pendingTileParents.push(...candidates);
@@ -3703,7 +3710,12 @@ __METRO_META__
       if (!cached) return;
       lodTileCache.delete(res);
       for (const parent of cached.fetched) fetchedTiles.add(parent);
-      for (const feature of cached.features) tileFeatures.set(feature.properties.h3_index, feature);
+      const feats = cached.features;
+      const len = feats.length;
+      for (let i = 0; i < len; i++) {
+        const feature = feats[i];
+        tileFeatures.set(feature.properties.h3_index, feature);
+      }
     }
 
     function parentDistance(parent, center) {
@@ -3807,13 +3819,13 @@ __METRO_META__
     function mergeTilePayload(payload) {
       if (!payload || !Array.isArray(payload.features)) throw new Error('Malformed grid tile payload');
       const features = payload.features;
-      for (let i = 0; i < features.length; i++) {
+      const len = features.length;
+      for (let i = 0; i < len; i++) {
         const feature = features[i];
-        const cell = feature.properties && feature.properties.h3_index;
-        if (!cell) continue;
-        tileFeatures.set(cell, feature);
+        const cell = feature && feature.properties && feature.properties.h3_index;
+        if (cell) tileFeatures.set(cell, feature);
       }
-      if (features.length) gridDirty = true;
+      if (len) gridDirty = true;
     }
 
     // Interpolate only actual H3 polygons; properties and final geography stay intact.
@@ -3909,7 +3921,7 @@ __METRO_META__
       evictDistantGridFeatures();
       const previous = gridGeoJSON;
       const previousRes = renderedLodRes;
-      gridGeoJSON = { type: 'FeatureCollection', features: [...tileFeatures.values()] };
+      gridGeoJSON = { type: 'FeatureCollection', features: Array.from(tileFeatures.values()) };
       if (lodSwapPending) renderGridHandoff(previous, gridGeoJSON, previousRes, activeLodRes);
       else { cancelGridHandoff(); map.getSource('h3-grid-source').setData(gridGeoJSON); }
       lodSwapPending = false;
