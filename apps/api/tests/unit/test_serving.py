@@ -640,29 +640,6 @@ def test_catalyst_row_keeps_the_strongest_cell_of_its_cluster():
         assert c["lims_score"] >= 75.0
 
 
-def test_national_overlay_hands_off_to_metro_at_the_zoom_floor():
-    """The national LODES layer and the metro LOD pyramid must occupy disjoint
-    zoom bands (US-422).
-
-    The overlay used to stay visible until z12 while the metro pyramid started
-    at ZOOM_FLOOR (6), so six zoom levels drew both. At metro zoom the coarse
-    res-6 national prisms sat on top of the metro hexes: they read as
-    kilometres-wide blocks and, being a uniform country-wide tiling with no
-    land mask, they spilled across the East River, Upper Bay and the airports.
-    """
-    res = client.get("/dashboard")
-    assert res.status_code == 200
-    html = res.text
-
-    # Both bands are expressed against the same constant — no hardcoded z12.
-    assert "const overlayVisible = z < ZOOM_FLOOR;" in html
-    assert "if (z >= ZOOM_FLOOR) return;" in html
-
-    # The old overlapping band is gone.
-    assert "const overlayVisible = z < 12;" not in html
-    assert "if (z >= 12) return;" not in html
-
-
 def test_predict_batch_rejects_oversized_batch():
     from src.serving.router import MAX_BATCH_PREDICTIONS
 

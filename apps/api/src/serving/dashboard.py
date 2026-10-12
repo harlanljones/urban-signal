@@ -1082,6 +1082,11 @@ def get_dashboard_html() -> str:
       border: 1px solid var(--baseline-hatch);
     }
 
+    .legend-key-swatch.measured {
+      background: transparent;
+      border: 1.5px solid #facc15;
+    }
+
     /* Map orientation readout: scale bar + zoom/coordinate telemetry */
     .map-readout {
       position: absolute;
@@ -1791,6 +1796,7 @@ def get_dashboard_html() -> str:
         <div class="legend-note">
           <span class="legend-key-row">Height &prop; value (3D view) &middot; percentile 0&ndash;100</span>
           <span class="legend-key-row"><span class="legend-key-swatch baseline"></span><span>Registry baseline &mdash; no precomputed snapshot</span></span>
+          <span class="legend-key-row"><span class="legend-key-swatch measured"></span><span>Measured &mdash; a submarket&rsquo;s own hex</span></span>
           <span class="legend-key-row" id="coverage-status">Coverage follows published tiles; blank cells have no published value.</span>
           <span class="legend-key-row" id="legend-no-data" hidden><span class="legend-key-swatch no-data"></span><span>No data &mdash; outside this layer&rsquo;s coverage</span></span>
           <span class="legend-attribution" id="legend-attribution" hidden></span>
@@ -2903,6 +2909,24 @@ __METRO_META__
       return 'No published cells in this view · ' + stampText;
     }
 
+    // How a published cell got its values, for the popup and inspector. Reads the
+    // unified `coverage_label` (ADR-0010) and falls back to the legacy
+    // `coverage_source` strings for one release. Pure: no DOM or map references.
+    function coverageProvenance(props) {
+      if (!props) return '';
+      const label = props.coverage_label
+        || (props.coverage_source === 'center' ? 'measured' : props.coverage_source === 'bounded' ? 'interpolated' : null)
+        || (props.source === 'lod_aggregate' ? 'aggregate' : null);
+      if (label === 'measured') return 'Measured: this is the submarket\u2019s own cell';
+      if (label === 'interpolated') {
+        const km = Number(props.coverage_distance_km);
+        const from = props.submarket ? ` from ${props.submarket}` : '';
+        return Number.isFinite(km) ? `Interpolated${from}, ${km.toFixed(1)} km away` : `Interpolated${from}`;
+      }
+      if (label === 'aggregate') return 'Aggregate of finer cells';
+      return '';
+    }
+
     function updateCoverageLegend() {
       const el = document.getElementById('coverage-status');
       if (el) el.textContent = coverageLegendText();
@@ -3380,6 +3404,7 @@ __METRO_META__
                   ${popupRow('National percentile', fmtNum(props.lims_score_national_pct, 0))}
                   ${popupRow('Metro percentile', fmtNum(props.lims_score_metro_pct, 0))}
                   ${popupRow('6M return', formatSignedPct(props.delta_6m_p50), deltaClass(props.delta_6m_p50))}${contextRow}
+                  ${coverageProvenance(props) ? `<div class="popup-city">${escapeHtml(coverageProvenance(props))}</div>` : ''}
                 </div>
               `)
               .addTo(map);
@@ -3882,6 +3907,19 @@ __METRO_META__
             14, 'rgba(148, 163, 184, 0.35)'
           ],
           'line-width': ['interpolate', ['linear'], ['zoom'], 7, 0.3, 10, 0.6, 14, 1.0]
+        }
+      });
+
+      // Measured cells (a submarket's own hex, ~3% of the detail grid) get a bright
+      // outline; the other ~97% are interpolated and keep the quiet default line.
+      map.addLayer({
+        id: 'h3-hex-measured-line',
+        type: 'line',
+        source: 'h3-grid-source',
+        filter: ['==', ['get', 'coverage_label'], 'measured'],
+        paint: {
+          'line-color': 'rgba(250, 204, 21, 0.9)',
+          'line-width': ['interpolate', ['linear'], ['zoom'], 7, 0.8, 10, 1.2, 14, 1.8]
         }
       });
 
@@ -4398,6 +4436,7 @@ __METRO_META__
               <span>H3 ${esc(props.h3_index || '—')}</span>
             </div>
             <div class="parcel-coverage-note">${esc(cellCoverageDisclosure())}</div>
+            ${coverageProvenance(props) ? `<div class="parcel-coverage-note" id="parcel-provenance">${esc(coverageProvenance(props))}</div>` : ''}
             ${description ? `<div class="parcel-description">${esc(description)}</div>` : ''}
           </div>
 

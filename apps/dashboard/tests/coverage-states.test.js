@@ -182,3 +182,41 @@ test('an unsupported schema_version fails the read without fetching', async () =
   assert.equal(context.coverageState.national, 'failed');
   assert.equal(calls.fetch, 0);
 });
+
+// ---- Cell provenance (ADR-0010 honesty labels) ----
+
+function provenance(props) {
+  const context = createContext({});
+  runInContext(sliceFunction(SOURCE, 'coverageProvenance'), context);
+  context.props = props;
+  return runInContext('coverageProvenance(props)', context);
+}
+
+test('measured cells say they are the submarket\u2019s own cell', () => {
+  assert.match(provenance({ coverage_label: 'measured', submarket: 'SoHo' }), /^Measured/);
+});
+
+test('interpolated cells name their source submarket and distance', () => {
+  const text = provenance({ coverage_label: 'interpolated', submarket: 'SoHo', coverage_distance_km: 0.84 });
+  assert.equal(text, 'Interpolated from SoHo, 0.8 km away');
+});
+
+test('an interpolated cell with no usable distance still states its provenance, never a fake number', () => {
+  assert.equal(provenance({ coverage_label: 'interpolated', submarket: 'SoHo' }), 'Interpolated from SoHo');
+  assert.equal(provenance({ coverage_label: 'interpolated', coverage_distance_km: 'n/a' }), 'Interpolated');
+});
+
+test('legacy coverage_source strings and LOD aggregates still resolve for one release', () => {
+  assert.match(provenance({ coverage_source: 'center' }), /^Measured/);
+  assert.match(provenance({ coverage_source: 'bounded', coverage_distance_km: 1 }), /^Interpolated/);
+  assert.equal(provenance({ source: 'lod_aggregate' }), 'Aggregate of finer cells');
+});
+
+test('the explicit label wins over a contradicting legacy source', () => {
+  assert.match(provenance({ coverage_label: 'interpolated', coverage_source: 'center' }), /^Interpolated/);
+});
+
+test('cells with no provenance information render no provenance line', () => {
+  assert.equal(provenance({}), '');
+  assert.equal(provenance(null), '');
+});

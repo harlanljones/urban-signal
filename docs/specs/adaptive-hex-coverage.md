@@ -139,6 +139,28 @@ The region is the plan's unit, not the metro: a shared anchor is **one**
 registers it, which is what keeps DC / Montgomery / Prince George's from
 producing three overlapping detail sets.
 
+### 3.0 Stage B finding: k-ring stays the LIMS authority (measured, HX-B1)
+
+Clipping today's k-ring cells to their derived Urban Anchors would drop
+**5,948 of 54,172 published cells (11 %)**, up to 71 % in a small metro
+(Bowling Green keeps 29 %, Midland 37 %, Honolulu 61 %). Those cells lie within
+1.5 km of a real submarket and are honestly labeled; losing them is a visible
+regression for no gain. Stage B therefore **does not clip**. The `anchor`
+authority in §3.1 describes the Stage D shape (k-ring LIMS cells ∪ LODES-only
+anchor remainder); what ships in Stage B is:
+
+- `authority = "k_ring"` for every metro, cell sets byte-identical (INV-6);
+- `in_anchor` per cell (89.0 % of published cells; 48,224 of 54,172);
+- a single **owning region** per cell (INV-9, amended): a metro still publishes
+  every cell it claims in its own grid, so its view is unchanged, but exactly one
+  metro *owns* each cell — the nearest submarket, ties by city id. This replaces
+  first-city-wins in tile bucketing and cell shards. Today 181 of the 373
+  contested cells change owner, all to an equal-or-nearer submarket;
+- honesty: **1,631 measured cells vs 52,541 interpolated (3 % / 97 %)**. Since
+  the interpolated majority is the norm, the client marks the rare *measured*
+  cell (outline + legend row) rather than dimming interpolated ones, and states
+  provenance in the popup and inspector.
+
 ### 3.1 Cell selection
 
 - `authority="k_ring"`: `cells = coverage.metro_cells(city_id, res=9, k=3, 1.5 km)`;

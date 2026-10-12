@@ -21,6 +21,19 @@ always written with the `HX-` prefix to avoid collision.
 
 ---
 
+## Build status
+
+| Stage | Status | Evidence |
+|---|---|---|
+| A | **Shipped** (`1bdc17b`, deployed, browser-verified) | 2,645 anchors; res-6 underlay; `coverage.tiers`; registry field + gate; benchmark median 151.0 ms vs 147.6 baseline; production worker pin bug found and fixed |
+| B | **In progress** | HX-B1/B2/B3/B4/B5/B7 built (see below); HX-B6, HX-B8 open |
+| C, D | Not started | |
+
+Stage B deviations from the original plan, each driven by measurement (spec §3.0):
+the k-ring set stays authoritative instead of being clipped to anchors (clipping
+drops 11 % of published cells); ownership is a flag, not a removal; honesty styling
+marks the 3 % measured cells rather than dimming the 97 % interpolated ones.
+
 ## 1. Current state (measured facts)
 
 | # | Fact | Source |
