@@ -26,8 +26,9 @@ always written with the `HX-` prefix to avoid collision.
 | Stage | Status | Evidence |
 |---|---|---|
 | A | **Shipped** (`1bdc17b`, deployed, browser-verified) | 2,645 anchors; res-6 underlay; `coverage.tiers`; registry field + gate; benchmark median 151.0 ms vs 147.6 baseline; production worker pin bug found and fixed |
-| B | **In progress** | HX-B1/B2/B3/B4/B5/B7 built (see below); HX-B6, HX-B8 open |
-| C, D | Not started | |
+| B | **Shipped** (`d53b717`, published `r-20261012-2d3b28fa`, browser-verified live) | CoveragePlan, golden counts, labels, ownership, provenance UI; 157 metros / 53,799 cells unchanged; NYC viewport 49 measured / 1,362 interpolated; full API unit suite green. HX-B6 not needed (worker types are permissive); HX-B8 deferred (see below) |
+| C | **Started**: HX-C1 built (`regions.py`, 18 tests) | `promote_region` with real chunk re-hashing, exact golden count, measured floor, rebaseline rule, atomic pointer. Not wired into any build or read path |
+| D | Not started | |
 
 Stage B deviations from the original plan, each driven by measurement (spec §3.0):
 the k-ring set stays authoritative instead of being clipped to anchors (clipping
@@ -379,3 +380,17 @@ Each dispatched item claims `.streams/hx-<id>.md` first (parallel-streams phase 
 - Targeted API suites: `cd apps/api && pytest -q tests/unit/<file>` for the files named per item (existing: `test_coverage.py`, `test_national_grid.py`, `test_national_builder.py`, `test_export_snapshot.py`, `test_snapshot_metrics.py`, `test_publication.py`, `test_publish_snapshot.py`, `test_prune_snapshot_releases.py`, `test_upload_snapshot_bulk.py`; new files are introduced by the item that owns them).
 
 Commits: Conventional Commits, scope = subsystem (`feat(spatial): …`, `feat(export): …`, `feat(dashboard): …`, `ci(batch-push): …`, `docs(adr): …`), one work item per commit series, stream log committed with the work.
+
+
+## Why the build stops at HX-C1
+
+HX-C2 onward changes the **production read path**: per-region pointers need a new
+KV schema, the worker must compose N generations per request, the client cache must
+key on region generations, and prune must understand regions. Each is individually
+testable, but together they replace how every visitor reads data, and a mistake is
+a production outage rather than a failed test. That warrants an explicit go-ahead and
+a staged cutover (reader before writer, per spec §4.5), not a continuation of this
+build. HX-B8 (single `displayResForZoom`) is deferred because DG-4 shape (b) already
+removes the tier seam it was meant to smooth, and detail resolution is fixed at 9
+until Stage D, so there is nothing for the clamp to clamp yet. HX-D1 needs a LODES
+download at res 7-9 to answer assumption A2; that is a measurement, not yet run.
