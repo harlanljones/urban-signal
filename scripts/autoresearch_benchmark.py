@@ -8,6 +8,7 @@ mergeTilePayload, but excludes GPU rendering and network transfer.
 """
 from __future__ import annotations
 
+import argparse
 import asyncio
 import hashlib
 import json
@@ -54,6 +55,9 @@ def canonical(value):
 
 
 async def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--tile-loading", action="store_true", help="Measure the shipped client loader after one verified snapshot build")
+    tile_loading = parser.parse_args().tile_loading
     socket.socket.connect = deny_network
     socket.create_connection = deny_network
     random.seed(42)
@@ -79,7 +83,7 @@ async def main():
         init_start = time.perf_counter()
         engine = MultiHorizonInferenceEngine(model_dir=str(root / "models"), cache_predictions=True)
         init_ms = (time.perf_counter() - init_start) * 1000
-        for trial in range(3):
+        for trial in range(1 if tile_loading else 3):
             engine.clear_prediction_caches()
             output = root / f"snapshot-{trial}"
             started = time.perf_counter()
@@ -118,7 +122,15 @@ async def main():
                     raise ValueError(f"Missing LOD resolution {res}")
             signatures.append(digest.hexdigest())
             if trial == 0:
-                subprocess.run(["bun", str(ROOT / "scripts/autoresearch_client.ts"), str(output)], cwd=ROOT, check=True)
+                client = "scripts/autoresearch_client.ts"
+                if tile_loading:
+                    from h3 import cell_to_latlng
+                    parents = {parent for index in manifest["tile_indexes"].values() for parent in index}
+                    (output / "benchmark-parent-centers.json").write_text(
+                        json.dumps({parent: cell_to_latlng(parent) for parent in sorted(parents)})
+                    )
+                    client = "scripts/autoresearch_tile_loader.ts"
+                await asyncio.to_thread(subprocess.run, ["bun", str(ROOT / client), str(output)], cwd=ROOT, check=True)
                 bulk_bytes = (output / "kv-bulk.json").stat().st_size
                 manifest_bytes = (output / "manifest.json").stat().st_size
                 tile_bytes = sum(path.stat().st_size for path in (output / "gridtiles").glob("*.json"))

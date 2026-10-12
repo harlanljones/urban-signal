@@ -63,9 +63,11 @@ Full daily publication remains approximately 394,620 KV writes for 30 refreshes,
 
 ## Dense-metro autoresearch harness — 2026-10-11
 
-Run `bash autoresearch.sh` from the repository root. This separate workload
-pins all 157 registered metros and their 53,799 unique bounded res-9 cells in
-`scripts/autoresearch_coverage.json`. It performs three full dense snapshots
+The previous `bash autoresearch.sh` entrypoint measured dense publication;
+the current entrypoint selects the tile-loader workload documented below.
+The Python harness's default mode retains that original workload, pinning all
+157 metros and 53,799 bounded res-9 cells in
+`scripts/autoresearch_coverage.json` and performing three full dense snapshots
 with cold prediction caches, real seeded synthetic models in a temporary
 directory, res-7/8/9 LOD publication, per-cell shards and release twins. It
 omits the optional legacy monolithic cell key, national input and Bay Area
@@ -92,7 +94,7 @@ above use a different workload and are not directly comparable.
 ### Optimization results
 
 The 20-run segment retained changes in `snapshot_builder.py`, `publication.py`
-and `serving/engine.py`; dashboard source and the benchmark workload remain
+and `serving/engine.py`; during that segment, dashboard source and benchmark workload remained
 unchanged. Each registered artifact is serialized once for both disk and KV.
 Publication latency is normalized during JSON decoding, and the canonical
 encoder rejects non-finite values without a separate recursive traversal.
@@ -145,3 +147,37 @@ KV upload. Both legacy/release-twin and content-addressed uploads now use
 file and is never uploaded after a data-batch failure. `--dry-run` stages and
 validates the same batches without remote writes. The builder and upload guards
 remain enabled; no payload, metro, or required national layer is dropped.
+
+## Tile loading autoresearch harness — 2026-10-11
+
+`bash autoresearch.sh` now selects `--tile-loading` on the existing offline
+snapshot harness. It prepares one fixed, semantically verified 157-metro dense
+snapshot outside the primary timer; running the Python harness without this
+flag retains the three-build backend workload.
+
+`scripts/autoresearch_tile_loader.ts` executes the shipped dashboard's queue,
+JSON parsing, H3 merge, LOD staging, and GeoJSON source preparation. Each metro
+gets a fresh loader and a fixed sequence of resolutions 7, 8, 9, 9, 7: initial
+load, refinement, a cached repeat view, and a return to the coarse view. Parent
+inventories come from the published manifest, and distance sorting uses real
+H3 centroids and metro camera centers. Every final source submission must retain
+all expected cells, properties, and geometry. Unexpected retries fail the run.
+
+The primary `tile_load_cpu_ms` is the median of five complete 785-step
+traversals after one warmup. VM construction, file reads, model initialization,
+snapshot generation, and semantic verification are excluded from this timer.
+Request count, response bytes, and source-submission count are secondary
+metrics. HTTP responses are replayed from the generated snapshot without live
+network access; the MapLibre boundary captures source data rather than invoking
+a GPU. Animations are disabled using the shipped reduced-motion path. This is
+a client CPU benchmark, not browser paint, network latency, or Core Web Vitals.
+
+The replay freezes each feature's measured `inference_latency_ms` telemetry
+to zero before response serialization. Prediction values and geometry are
+unchanged; this removes build-speed-dependent digit widths from the timed JSON
+workload. Raw snapshot preparation byte metrics may still vary with telemetry.
+
+Two consecutive invocations exited successfully with identical replay bytes
+(104,923,069), requests (629), source submissions (628), and tile workload
+SHA-256 `d8052e4a05b73106987293093087d2666a02bb04e54ab2b7fe4855c8b9be7fc9`.
+The harness pins this checksum and rejects input drift before timing.
