@@ -3669,9 +3669,22 @@ __METRO_META__
       }
       const tileIndexes = snapshotManifest.tile_indexes || {};
       const tileIndex = tileIndexes[String(res)] || snapshotManifest.tile_index || {};
-      lodRequiredParents = parentsCoveringBounds(map.getBounds(), LOD_TO_PARENT_RES[res] || 5)
-        .filter((parent) => Object.prototype.hasOwnProperty.call(tileIndex, parent));
-      const candidates = lodRequiredParents.filter((parent) => !fetchedTiles.has(parent) && !tilesInFlight.has(`${tileLoadGeneration}:${parent}`) && !tileRetryTimers.has(parent) && !exhaustedTileRetries.has(parent));
+      const rawParents = parentsCoveringBounds(map.getBounds(), LOD_TO_PARENT_RES[res] || 5);
+      lodRequiredParents = [];
+      for (let i = 0; i < rawParents.length; i++) {
+        const p = rawParents[i];
+        if (tileIndex[p] !== undefined) lodRequiredParents.push(p);
+      }
+      const prefix = tileLoadGeneration + ':';
+      const hasRetries = tileRetryTimers.size > 0;
+      const hasExhausted = exhaustedTileRetries.size > 0;
+      const candidates = [];
+      for (let i = 0; i < lodRequiredParents.length; i++) {
+        const p = lodRequiredParents[i];
+        if (!fetchedTiles.has(p) && !tilesInFlight.has(prefix + p) && (!hasRetries || !tileRetryTimers.has(p)) && (!hasExhausted || !exhaustedTileRetries.has(p))) {
+          candidates.push(p);
+        }
+      }
 
       const center = map.getCenter();
       if (candidates.length > 1) {
@@ -3684,7 +3697,7 @@ __METRO_META__
       }
 
       pendingTileParents.length = 0;
-      pendingTileParents.push(...candidates);
+      for (let i = 0; i < candidates.length; i++) pendingTileParents.push(candidates[i]);
       activeLodRes = res;
       if (candidates.length || tileFetchesActive) setTileLoaderStatus('Loading grid tiles…');
       drainTileQueue();
