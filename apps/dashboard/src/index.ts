@@ -339,7 +339,7 @@ function notModified(baseHeaders: Record<string, string>, etag: string): Respons
 }
 
 /** Coverage schema version this worker implements (hex-coverage Stage A). */
-export const SUPPORTED_COVERAGE_SCHEMA_VERSION = 1;
+export const SUPPORTED_COVERAGE_SCHEMA_VERSION = 2;
 /** Path-safe release id accepted on `?snapshot_id=` (matches the builder's id). */
 const SNAPSHOT_ID_PATTERN = /^[A-Za-z0-9._-]{1,64}$/;
 

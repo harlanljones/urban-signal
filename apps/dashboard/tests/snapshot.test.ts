@@ -350,13 +350,23 @@ test("readSnapshotValue returns a 503 failure for a missing release key (no fall
 });
 
 test("readSnapshotValue fails closed on an unsupported coverage schema version", async () => {
-  const env = kvEnv({ manifest: { ...LEGACY_MANIFEST, coverage: { schema_version: 2 } }, "grid/nyc": {} });
+  const env = kvEnv({ manifest: { ...LEGACY_MANIFEST, coverage: { schema_version: 3 } }, "grid/nyc": {} });
   const result = await readSnapshotValue(env, "grid/nyc", null);
   expect(result.ok).toBe(false);
   if (!result.ok) {
     expect(result.status).toBe(500);
-    expect(result.detail).toBe("Unsupported snapshot schema version 2.");
+    expect(result.detail).toBe("Unsupported snapshot schema version 3.");
   }
+});
+
+test("readSnapshotValue accepts schema v2 without changing the pinned generation", async () => {
+  const env = kvEnv({
+    manifest: { ...LEGACY_MANIFEST, coverage: { schema_version: 2 } },
+    "grid/nyc": { lims_score: 99 },
+    "releases/r-v2/grid/nyc": { lims_score: 42 },
+  });
+  const result = await readSnapshotValue(env, "grid/nyc", "r-v2");
+  expect(result.ok && result.entry?.value).toEqual({ lims_score: 42 });
 });
 
 test("lookupPrediction reads the release-qualified cell shard for a snapshot id", async () => {

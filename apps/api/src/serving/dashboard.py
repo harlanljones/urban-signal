@@ -2052,7 +2052,7 @@ __METRO_META__
     function coverageSchemaSupported(manifest) {
       const coverage = manifest && manifest.coverage;
       if (!coverage || typeof coverage.schema_version !== 'number') return true;
-      return coverage.schema_version <= 1;
+      return coverage.schema_version <= 2;
     }
 
     function appendSnapshotId(url, snapshotId) {
@@ -2061,8 +2061,43 @@ __METRO_META__
       return `${url}${sep}snapshot_id=${encodeURIComponent(snapshotId)}`;
     }
 
-    function nationalCacheKey(snapshotId, res, parent) {
-      return `${snapshotId || 'current'}|${res}|${parent}`;
+    function regionGeneration(manifest, regionId, fallbackId = null) {
+      const regions = manifest && manifest.regions;
+      if (regions && typeof regions === 'object' && typeof regions[regionId] === 'string') {
+        return regions[regionId];
+      }
+      return fallbackId || (manifest && manifest.snapshot_id) || null;
+    }
+
+    function changedRegionIds(prevManifest, nextManifest) {
+      if (!prevManifest || !nextManifest) return null;
+      const prevRegions = prevManifest.regions;
+      const nextRegions = nextManifest.regions;
+      if (!prevRegions || typeof prevRegions !== 'object' || !nextRegions || typeof nextRegions !== 'object') {
+        return null;
+      }
+      const changed = [];
+      const allKeys = new Set([...Object.keys(prevRegions), ...Object.keys(nextRegions)]);
+      for (const key of allKeys) {
+        if (prevRegions[key] !== nextRegions[key]) {
+          changed.push(key);
+        }
+      }
+      return changed;
+    }
+
+    function shouldEvictFeature(feature, changedRegionsSet) {
+      if (!feature || !feature.properties || !changedRegionsSet) return false;
+      const p = feature.properties;
+      const regionId = p.region_id || (p.city_id ? ('metro/' + p.city_id) : null);
+      return Boolean(regionId && changedRegionsSet.has(regionId));
+    }
+
+    function nationalCacheKey(snapshotId, res, parent, manifest = null) {
+      const gen = (manifest && manifest.regions && manifest.regions['national/' + res + '/' + parent])
+        || snapshotId
+        || 'current';
+      return `${gen}|${res}|${parent}`;
     }
 
     function backoffDelay(attempt, retryAfterSeconds) {
@@ -2174,10 +2209,10 @@ __METRO_META__
       const generation = nationalLoadGeneration;
       const missing = parents.filter((p) =>
         !nationalFetched[res].has(p) &&
-        !nationalInFlight.has(nationalCacheKey(SNAPSHOT_ID, res, p)));
+        !nationalInFlight.has(nationalCacheKey(SNAPSHOT_ID, res, p, snapshotManifest)));
       const joined = [];
       parents.forEach((p) => {
-        const pending = nationalInFlight.get(nationalCacheKey(SNAPSHOT_ID, res, p));
+        const pending = nationalInFlight.get(nationalCacheKey(SNAPSHOT_ID, res, p, snapshotManifest));
         if (pending && !joined.includes(pending)) joined.push(pending);
       });
       if (missing.length || joined.length) {
@@ -2217,7 +2252,7 @@ __METRO_META__
     // One national chunk request, deduped across batches/overlay passes by
     // snapshot|res|parent. Resolves when the shared request settles.
     async function loadNationalBatch(res, chunk, generation) {
-      const keys = chunk.map((p) => nationalCacheKey(SNAPSHOT_ID, res, p));
+      const keys = chunk.map((p) => nationalCacheKey(SNAPSHOT_ID, res, p, snapshotManifest));
       const promise = fetchNationalChunk(res, chunk, generation);
       keys.forEach((key) => nationalInFlight.set(key, promise));
       try {
@@ -2884,7 +2919,14 @@ __METRO_META__
         return 'Snapshot format not supported by this client — no layers loaded.';
       }
       const stamp = snapshotManifest && snapshotManifest.generated_at;
-      const stampText = stamp ? 'snapshot ' + stamp.slice(0, 16).replace('T', ' ') + ' UTC' : 'snapshot time unknown';
+      let stampText = stamp ? 'snapshot ' + stamp.slice(0, 16).replace('T', ' ') + ' UTC' : 'snapshot time unknown';
+      if (snapshotManifest && snapshotManifest.rank_epoch_at && stamp) {
+        const epochDate = String(snapshotManifest.rank_epoch_at).slice(0, 10);
+        const snapshotDate = String(stamp).slice(0, 10);
+        if (epochDate < snapshotDate) {
+          stampText += ' · ranks ' + epochDate;
+        }
+      }
       const contextMetric = CONTEXT_METRICS[currentMetric];
       if (contextMetric) {
         const parts = ['Context only — no LIMS output at this scale', contextMetric.label];
@@ -2947,20 +2989,71 @@ __METRO_META__
     // replacement tiles land. gridGeoJSON stays visible, but incoming feature
     // and parent caches are cleared so old predictions cannot enter a new LOD.
     function onSnapshotChanged() {
-      nationalLoadGeneration += 1;
-      invalidateNationalCaches();
-      tileLoadGeneration += 1;
-      fetchedTiles.clear();
-      tileFeatures.clear();
-      lodTileCache.clear();
-      tileParentCenters.clear();
-      lodSwapPending = true;
-      tileRetryTimers.forEach(timer => clearTimeout(timer));
-      tileRetryTimers.clear();
-      tileRetryCounts.clear();
-      exhaustedTileRetries.clear();
-      pendingTileParents.length = 0;
-      coverageState.metro = 'loading';
+      const prev = arguments[0] || null;
+      const next = arguments[1] || snapshotManifest;
+      const changed = typeof changedRegionIds === 'function' ? changedRegionIds(prev, next) : null;
+      if (changed === null) {
+        nationalLoadGeneration += 1;
+        invalidateNationalCaches();
+        tileLoadGeneration += 1;
+        fetchedTiles.clear();
+        tileFeatures.clear();
+        lodTileCache.clear();
+        tileParentCenters.clear();
+        lodSwapPending = true;
+        tileRetryTimers.forEach(timer => clearTimeout(timer));
+        tileRetryTimers.clear();
+        tileRetryCounts.clear();
+        exhaustedTileRetries.clear();
+        pendingTileParents.length = 0;
+        coverageState.metro = 'loading';
+      } else if (changed.length > 0) {
+        const changedSet = new Set(changed);
+        nationalLoadGeneration += 1;
+        [4, 5, 6].forEach((res) => {
+          for (const parent of [...nationalCache[res].keys()]) {
+            if (changedSet.has('national/' + res + '/' + parent)) {
+              nationalCache[res].delete(parent);
+              nationalFetched[res].delete(parent);
+            }
+          }
+        });
+        tileLoadGeneration += 1;
+        let activeChanged = false;
+        for (const [cell, feature] of [...tileFeatures.entries()]) {
+          const evict = typeof shouldEvictFeature === 'function' ? shouldEvictFeature(feature, changedSet) : true;
+          if (evict) {
+            tileFeatures.delete(cell);
+            activeChanged = true;
+          }
+        }
+        if (activeChanged) gridDirty = true;
+        const tileIndexes = (next && next.tile_indexes) || {};
+        for (const [res, cached] of [...lodTileCache.entries()]) {
+          const indexForRes = tileIndexes[String(res)] || (next && next.tile_index) || {};
+          cached.features = cached.features.filter(f => (typeof shouldEvictFeature === 'function' ? !shouldEvictFeature(f, changedSet) : false));
+          for (const parent of [...cached.fetched]) {
+            const entry = indexForRes[parent];
+            const cities = (entry && entry.cities) || [];
+            if (cities.some(c => changedSet.has('metro/' + c))) {
+              cached.fetched.delete(parent);
+            }
+          }
+        }
+        const activeIndex = tileIndexes[String(activeLodRes)] || (next && next.tile_index) || {};
+        for (const parent of [...fetchedTiles]) {
+          const entry = activeIndex[parent];
+          const cities = (entry && entry.cities) || [];
+          if (cities.some(c => changedSet.has('metro/' + c))) {
+            fetchedTiles.delete(parent);
+          }
+        }
+        tileRetryTimers.forEach(timer => clearTimeout(timer));
+        tileRetryTimers.clear();
+        tileRetryCounts.clear();
+        exhaustedTileRetries.clear();
+        pendingTileParents.length = 0;
+      }
       if (map) {
         scheduleViewportLoad();
         scheduleNationalLoad();
@@ -2989,7 +3082,7 @@ __METRO_META__
               pill.title = 'Precomputed snapshot published ' + stamp.slice(0, 10) + ' ' + stamp.slice(11, 16) + ' UTC';
             }
           }
-          if (SNAPSHOT_ID !== previousId) onSnapshotChanged();
+          if (SNAPSHOT_ID !== previousId) onSnapshotChanged(previousManifest, manifest);
           else updateCoverageLegend();
           return true;
         }

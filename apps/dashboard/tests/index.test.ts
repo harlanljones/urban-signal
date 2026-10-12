@@ -1337,7 +1337,7 @@ test("a missing release key is a 503 with a retry hint and never falls back", as
 test("a newer coverage schema_version fails snapshot reads with an integrity error", async () => {
   clearSnapshotCaches();
   const env = kvValuesEnv({
-    manifest: { ...LEGACY_MANIFEST, coverage: { schema_version: 2 } },
+    manifest: { ...LEGACY_MANIFEST, coverage: { schema_version: 3 } },
     "grid/nyc": gridPayload("legacy"),
   }) as never;
 
@@ -1345,13 +1345,24 @@ test("a newer coverage schema_version fails snapshot reads with an integrity err
 
   expect(response.status).toBe(500);
   const body = (await response.json()) as { detail: string };
-  expect(body.detail).toBe("Unsupported snapshot schema version 2.");
+  expect(body.detail).toBe("Unsupported snapshot schema version 3.");
+});
+
+test("coverage schema_version 2 is accepted by snapshot reads", async () => {
+  clearSnapshotCaches();
+  const env = kvValuesEnv({
+    manifest: { ...LEGACY_MANIFEST, coverage: { schema_version: 2 } },
+    "grid/nyc": gridPayload("v2-payload"),
+  }) as never;
+
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/grid?city_id=nyc`), env);
+  expect(response.status).toBe(200);
 });
 
 test("the manifest stays readable when the coverage schema is newer (client sees the mismatch)", async () => {
   clearSnapshotCaches();
   const env = kvValuesEnv({
-    manifest: { ...LEGACY_MANIFEST, coverage: { schema_version: 2 } },
+    manifest: { ...LEGACY_MANIFEST, coverage: { schema_version: 3 } },
   }) as never;
 
   const response = await worker.fetch(new Request(`${ORIGIN}/api/v1/manifest`), env);

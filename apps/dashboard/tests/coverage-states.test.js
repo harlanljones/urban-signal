@@ -72,7 +72,8 @@ test('coverageSchemaSupported rejects a newer schema and passes legacy', () => {
   const ctx = pureContext(['coverageSchemaSupported']);
   assert.equal(call(ctx, 'coverageSchemaSupported({})'), true);
   assert.equal(call(ctx, 'coverageSchemaSupported({coverage:{schema_version:1}})'), true);
-  assert.equal(call(ctx, 'coverageSchemaSupported({coverage:{schema_version:2}})'), false);
+  assert.equal(call(ctx, 'coverageSchemaSupported({coverage:{schema_version:2}})'), true);
+  assert.equal(call(ctx, 'coverageSchemaSupported({coverage:{schema_version:3}})'), false);
 });
 
 test('appendSnapshotId appends with the right separator and omits when unset', () => {
@@ -93,6 +94,54 @@ test('nationalCacheKey includes the snapshot id', () => {
   assert.equal(call(ctx, "nationalCacheKey('r-1', 5, 'p')"), 'r-1|5|p');
   assert.equal(call(ctx, "nationalCacheKey(null, 5, 'p')"), 'current|5|p');
 });
+test('regionGeneration resolves from manifest.regions or falls back to snapshot id', () => {
+  const ctx = pureContext(['regionGeneration']);
+  assert.equal(call(ctx, "regionGeneration(null, 'metro/nyc', 'snap-1')"), 'snap-1');
+  assert.equal(call(ctx, "regionGeneration({}, 'metro/nyc', 'snap-1')"), 'snap-1');
+  assert.equal(
+    call(ctx, "regionGeneration({ regions: { 'metro/nyc': 'gen-nyc-42' } }, 'metro/nyc', 'snap-1')"),
+    'gen-nyc-42',
+  );
+  assert.equal(
+    call(ctx, "regionGeneration({ regions: { 'metro/sf': 'gen-sf-1' } }, 'metro/nyc', 'snap-1')"),
+    'snap-1',
+  );
+});
+
+test('changedRegionIds compares previous and next manifest region generations', () => {
+  const ctx = pureContext(['changedRegionIds']);
+  assert.equal(call(ctx, 'changedRegionIds(null, null)'), null);
+  assert.equal(call(ctx, 'changedRegionIds({}, {})'), null);
+  assert.deepEqual(
+    Array.from(call(ctx, "changedRegionIds({ regions: { 'metro/nyc': 'g1' } }, { regions: { 'metro/nyc': 'g1' } })")),
+    [],
+  );
+  assert.deepEqual(
+    Array.from(call(ctx, "changedRegionIds({ regions: { 'metro/nyc': 'g1', 'metro/sf': 'g1' } }, { regions: { 'metro/nyc': 'g1', 'metro/sf': 'g2' } })")),
+    ['metro/sf'],
+  );
+  assert.deepEqual(
+    Array.from(call(ctx, "changedRegionIds({ regions: { 'metro/nyc': 'g1' } }, { regions: { 'metro/nyc': 'g1', 'metro/sf': 'g1' } })")),
+    ['metro/sf'],
+  );
+});
+
+test('shouldEvictFeature matches features by region_id or city_id', () => {
+  const ctx = pureContext(['shouldEvictFeature']);
+  assert.equal(
+    call(ctx, "shouldEvictFeature({ properties: { city_id: 'nyc' } }, new Set(['metro/nyc']))"),
+    true,
+  );
+  assert.equal(
+    call(ctx, "shouldEvictFeature({ properties: { city_id: 'sf' } }, new Set(['metro/nyc']))"),
+    false,
+  );
+  assert.equal(
+    call(ctx, "shouldEvictFeature({ properties: { region_id: 'anchor/12345' } }, new Set(['anchor/12345']))"),
+    true,
+  );
+});
+
 
 test('backoffDelay uses the retry ladder and honors retry-after', () => {
   const ctx = pureContext(['backoffDelay']);
@@ -176,7 +225,7 @@ test('declared-unavailable national status issues zero national fetches', async 
 
 test('an unsupported schema_version fails the read without fetching', async () => {
   const { context, calls } = overlayContext({
-    coverage: { schema_version: 2, national: { status: 'available' } },
+    coverage: { schema_version: 3, national: { status: 'available' } },
   });
   await runInContext('updateNationalOverlay()', context);
   assert.equal(context.coverageState.national, 'failed');
@@ -219,4 +268,90 @@ test('the explicit label wins over a contradicting legacy source', () => {
 test('cells with no provenance information render no provenance line', () => {
   assert.equal(provenance({}), '');
   assert.equal(provenance(null), '');
+});
+
+test('coverageLegendText shows rank epoch age when older than the snapshot (DG-10)', () => {
+  const context = createContext({
+    snapshotManifest: {
+      generated_at: '2026-10-12T19:05:00Z',
+      rank_epoch_at: '2026-10-05T00:00:00Z',
+      coverage: { schema_version: 2 },
+    },
+    coverageSchemaSupported: () => true,
+    CONTEXT_METRICS: {},
+    currentMetric: 'lims_score',
+    nationalCoverageStatus: () => 'available',
+    coverageState: { national: 'ready', metro: 'ready' },
+    tileFeatures: new Map([['c1', {}]]),
+  });
+  runInContext(sliceFunction(SOURCE, 'coverageLegendText'), context);
+  const text = runInContext('coverageLegendText()', context);
+  assert.match(text, /ranks 2026-10-05/);
+});
+
+test('a manifest with one changed region generation keeps other regions cached features', () => {
+  const context = createContext({
+    snapshotManifest: {
+      snapshot_id: 'snap-2',
+      regions: { 'metro/nyc': 'g1', 'metro/sf': 'g2' },
+      tile_indexes: { '9': { 'p-nyc': { cities: ['nyc'] }, 'p-sf': { cities: ['sf'] } } },
+    },
+    nationalLoadGeneration: 0,
+    tileLoadGeneration: 0,
+    nationalCache: { 4: new Map(), 5: new Map(), 6: new Map() },
+    nationalFetched: { 4: new Set(), 5: new Set(), 6: new Set() },
+    tileFeatures: new Map([
+      ['cell-nyc', { properties: { h3_index: 'cell-nyc', city_id: 'nyc' } }],
+      ['cell-sf', { properties: { h3_index: 'cell-sf', city_id: 'sf' } }],
+    ]),
+    lodTileCache: new Map([
+      [9, {
+        features: [
+          { properties: { h3_index: 'cell-nyc', city_id: 'nyc' } },
+          { properties: { h3_index: 'cell-sf', city_id: 'sf' } },
+        ],
+        fetched: new Set(['p-nyc', 'p-sf']),
+      }],
+    ]),
+    fetchedTiles: new Set(['p-nyc', 'p-sf']),
+    tileParentCenters: new Map(),
+    lodSwapPending: false,
+    tileRetryTimers: new Map(),
+    tileRetryCounts: new Map(),
+    exhaustedTileRetries: new Set(),
+    pendingTileParents: [],
+    coverageState: { metro: 'ready' },
+    activeLodRes: 9,
+    gridDirty: false,
+    map: null,
+    invalidateNationalCaches: () => {},
+    updateCoverageLegend: () => {},
+  });
+  const code = [
+    sliceFunction(SOURCE, 'changedRegionIds'),
+    sliceFunction(SOURCE, 'shouldEvictFeature'),
+    sliceFunction(SOURCE, 'onSnapshotChanged'),
+  ].join('\n');
+  runInContext(code, context);
+
+  const prevManifest = {
+    snapshot_id: 'snap-1',
+    regions: { 'metro/nyc': 'g1', 'metro/sf': 'g1' },
+  };
+  const nextManifest = {
+    snapshot_id: 'snap-2',
+    regions: { 'metro/nyc': 'g1', 'metro/sf': 'g2' },
+    tile_indexes: { '9': { 'p-nyc': { cities: ['nyc'] }, 'p-sf': { cities: ['sf'] } } },
+  };
+
+  runInContext('onSnapshotChanged(prevManifest, nextManifest)', Object.assign(context, { prevManifest, nextManifest }));
+
+  assert.equal(context.tileFeatures.has('cell-nyc'), true);
+  assert.equal(context.tileFeatures.has('cell-sf'), false);
+  assert.equal(context.fetchedTiles.has('p-nyc'), true);
+  assert.equal(context.fetchedTiles.has('p-sf'), false);
+  const cached = context.lodTileCache.get(9);
+  assert.deepEqual(cached.features.map(f => f.properties.city_id), ['nyc']);
+  assert.equal(cached.fetched.has('p-nyc'), true);
+  assert.equal(cached.fetched.has('p-sf'), false);
 });
