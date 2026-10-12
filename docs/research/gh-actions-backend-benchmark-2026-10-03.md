@@ -181,3 +181,45 @@ Two consecutive invocations exited successfully with identical replay bytes
 (104,923,069), requests (629), source submissions (628), and tile workload
 SHA-256 `d8052e4a05b73106987293093087d2666a02bb04e54ab2b7fe4855c8b9be7fc9`.
 The harness pins this checksum and rejects input drift before timing.
+
+### Tile loading optimization results
+
+The retained client uses indexed feature merging, memoized H3 parent centroids,
+and a bounded cache of completed inactive LODs. Cached GeoJSON features are
+reused without copying geometry or predictions. The cache holds at most
+40,000 inactive features in total and 2,048 fetched parents per entry; oversized
+LODs are refetched. Snapshot changes invalidate both LOD and centroid caches,
+cancel obsolete retry timers, and clear incoming feature state while keeping
+the previously submitted geometry visible until the replacement is complete.
+
+| Fixed 785-step workload | Original | Retained |
+|---|---:|---:|
+| Tile requests | 629 | 472 |
+| Replayed JSON bytes | 104,923,069 | 99,686,392 |
+| GeoJSON source submissions | 628 | 628 |
+| Metros / unique res-9 cells | 157 / 53,799 | 157 / 53,799 |
+
+The cache avoids 157 requests (25.0%) and 5,236,677 replay bytes (5.0%), with
+identical cell properties and geometry. Official first-baseline CPU time was
+213.386 ms; the best retained run was 148.714 ms and later unchanged
+replications measured 151.330 and 150.266 ms. However, a contemporaneous
+original-code control measured 153.523 ms, and a cache-disabled control measured
+166.477 ms. Timing drift therefore prevents attributing the apparent 30%
+headline gain entirely to these changes. The request reduction is deterministic;
+this CPU-only workload does not establish network latency, browser paint, or
+GPU gains.
+
+Actual Chromium smoke checks served the modified HTML against the production
+snapshot. Coarse/fine revisits preserved complete feature properties and
+geometry and made zero additional tile requests in both normal-motion and
+reduced-motion modes. The NYC view retained 195 coarse and 1,846 fine cells.
+A refresh cleared input caches, kept outgoing geometry visible, and refetched
+the real fine-grid data. No page JavaScript errors were observed; the final map
+rendered correctly. Managed smoke tabs were closed.
+
+The dashboard suite covers cached-resolution revisits, snapshot isolation,
+single-entry and combined cache budgets, stale generations, retry exhaustion,
+partial incoming failures, and LOD handoff. It passed all 154 tests. The full
+CI/CD pre-flight also passed. Non-improving array materialization, status-scan,
+optional-chain, temporary distance-score, restoration-loop, in-flight Map, and
+batch-loop variants were discarded rather than retained as complexity.
