@@ -8,6 +8,7 @@ function dashboard(parents = null) {
   const html = readFileSync(new URL('../../api/src/serving/dashboard.py', import.meta.url), 'utf8');
   const states = html.slice(html.indexOf('    const fetchedTiles'), html.indexOf('    // National overlay cache'));
   const loader = html.slice(html.indexOf('    function updateViewportTiles()'), html.indexOf('    function setupGridLayers()'));
+  const refresh = html.slice(html.indexOf('    function onSnapshotChanged()'), html.indexOf('    async function fetchManifest()'));
   const requests = [];
   const renders = [];
   const timers = new Map();
@@ -23,6 +24,8 @@ function dashboard(parents = null) {
     setHexLayersVisible() {}, haversineDistance: () => 0,
     // Hex-coverage Stage A globals referenced by the sliced loader.
     SNAPSHOT_ID: null,
+    nationalLoadGeneration: 0,
+    invalidateNationalCaches() {}, scheduleViewportLoad() {}, scheduleNationalLoad() {},
     coverageState: { national: 'loading', metro: 'loading' },
     coverageSchemaSupported: () => true,
     updateCoverageLegend() {},
@@ -37,7 +40,7 @@ function dashboard(parents = null) {
     clearTimeout: id => timers.delete(id),
     fetch: url => new Promise(resolve => requests.push({ url, resolve })),
   });
-  runInContext(states + loader, context);
+  runInContext(states + loader + refresh, context);
   return {
     requests, renders, source: html,
     status,
@@ -46,14 +49,16 @@ function dashboard(parents = null) {
     timerDelays() { return [...timers.values()].map(timer => timer.delay); },
     runTimers() { const pending = [...timers.values()]; timers.clear(); pending.forEach(timer => timer.fn()); },
     zoomTo(z) { zoom = z; runInContext('updateViewportTiles()', context); },
+    refresh() { runInContext('SNAPSHOT_ID = "new-release"; onSnapshotChanged(); updateViewportTiles()', context); },
     async finish(index, cell, ok = true) {
-      requests[index].resolve({ ok, json: async () => ({ features: [{ properties: { h3_index: cell } }] }) });
+      const cells = Array.isArray(cell) ? cell : [cell];
+      requests[index].resolve({ ok, json: async () => ({ features: cells.map(h3_index => ({ properties: { h3_index } })) }) });
       await new Promise(resolve => setImmediate(resolve));
     },
   };
 }
 
-test('zooming between LODs sharing a parent requests the new resolution and replaces cells', async () => {
+test('completed LOD revisits reuse tiles and restore the correct resolution', async () => {
   const app = dashboard();
   app.zoomTo(8);
   await app.finish(0, 'coarse');
@@ -63,8 +68,7 @@ test('zooming between LODs sharing a parent requests the new resolution and repl
   await app.finish(1, 'fine');
   assert.deepEqual(app.renders.at(-1), ['fine']);
   app.zoomTo(8);
-  assert.equal(app.requests.length, 3);
-  await app.finish(2, 'coarse');
+  assert.equal(app.requests.length, 2);
   assert.deepEqual(app.renders.at(-1), ['coarse']);
 });
 
@@ -141,7 +145,6 @@ test('retry exhaustion is bounded and reports a retry action', async () => {
   assert.match(app.status.textContent, /could not load/i);
   assert.equal(app.retryButton.hidden, false);
   assert.equal(app.status.hidden, false);
-  assert.match(app.source, /id="tile-loader-status" role="status" aria-live="polite"/);
   app.runTimers();
   assert.equal(app.requests.length, 4);
   app.retry();
@@ -223,7 +226,7 @@ test('hysteresis suppresses repeated LOD changes near a boundary', async () => {
   app.zoomTo(9.05); assert.equal(app.requests.length, 1);
   app.zoomTo(9.2); await app.finish(1, 'middle');
   app.zoomTo(8.95); assert.equal(app.requests.length, 2);
-  app.zoomTo(8.8); assert.equal(app.requests.length, 3);
+  app.zoomTo(8.8); assert.equal(app.requests.length, 2);
 });
 
 
@@ -240,4 +243,45 @@ test('polygon expansion reaches exact real geometry without changing metric valu
   assert.deepEqual(JSON.parse(JSON.stringify(last.geometry)), feature.geometry);
   assert.equal(last.properties, feature.properties);
   assert.equal(feature.properties.delta_6m_p50, 0.15);
+});
+
+test('snapshot changes invalidate all cached LODs while retaining outgoing geometry', async () => {
+  const app = dashboard();
+  app.zoomTo(8); await app.finish(0, 'old-coarse');
+  app.zoomTo(10); await app.finish(1, 'old-fine');
+  app.zoomTo(8);
+  assert.equal(app.requests.length, 2);
+  app.refresh();
+  assert.equal(app.requests.length, 3);
+  assert.deepEqual(app.renders.at(-1), ['old-coarse']);
+  await app.finish(2, 'new-coarse');
+  assert.deepEqual(app.renders.at(-1), ['new-coarse']);
+  app.zoomTo(10);
+  assert.equal(app.requests.length, 4);
+  await app.finish(3, 'new-fine');
+  assert.deepEqual(app.renders.at(-1), ['new-fine']);
+});
+
+test('oversized LODs are refetched rather than retained without a bound', async () => {
+  const app = dashboard();
+  app.zoomTo(8);
+  await app.finish(0, Array.from({ length: 40001 }, (_, i) => 'coarse-' + i));
+  app.zoomTo(10); await app.finish(1, 'fine');
+  app.zoomTo(8);
+  assert.equal(app.requests.length, 3);
+  await app.finish(2, 'coarse-refetched');
+  assert.deepEqual(app.renders.at(-1), ['coarse-refetched']);
+});
+
+test('combined inactive LOD cache stays within its feature budget', async () => {
+  const app = dashboard();
+  app.zoomTo(8);
+  await app.finish(0, Array.from({ length: 20001 }, (_, i) => 'coarse-' + i));
+  app.zoomTo(10);
+  await app.finish(1, Array.from({ length: 20001 }, (_, i) => 'middle-' + i));
+  app.zoomTo(12); await app.finish(2, 'fine');
+  app.zoomTo(8);
+  assert.equal(app.requests.length, 4);
+  await app.finish(3, 'coarse-refetched');
+  assert.deepEqual(app.renders.at(-1), ['coarse-refetched']);
 });

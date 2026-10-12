@@ -1882,6 +1882,9 @@ __METRO_META__
     const tileRetryTimers = new Map(); // parent -> timeout id
     const exhaustedTileRetries = new Set();
     const tileFeatures = new Map();    // h3_index -> GeoJSON feature
+    const lodTileCache = new Map();    // inactive completed LODs for this snapshot
+    const MAX_CACHED_LOD_FEATURES = 40000;
+    const MAX_CACHED_LOD_PARENTS = 2048;
     const pendingTileParents = [];     // queued parents awaiting fetch
     const tilesInFlight = new Set();
     let tileFetchesActive = 0;
@@ -2906,13 +2909,18 @@ __METRO_META__
 
     // A changed snapshot id invalidates every generation-local cache and
     // restarts reads. Outgoing metro geometry is deliberately kept until the
-    // replacement tiles land (fetchedTiles/retry state is cleared, features are
-    // not) so a refresh never blanks a supported view.
+    // replacement tiles land. gridGeoJSON stays visible, but incoming feature
+    // and parent caches are cleared so old predictions cannot enter a new LOD.
     function onSnapshotChanged() {
       nationalLoadGeneration += 1;
       invalidateNationalCaches();
       tileLoadGeneration += 1;
       fetchedTiles.clear();
+      tileFeatures.clear();
+      lodTileCache.clear();
+      lodSwapPending = true;
+      tileRetryTimers.forEach(timer => clearTimeout(timer));
+      tileRetryTimers.clear();
       tileRetryCounts.clear();
       exhaustedTileRetries.clear();
       pendingTileParents.length = 0;
@@ -3514,6 +3522,7 @@ __METRO_META__
       const res = lodForZoom(z);
       if (res !== activeLodRes) {
         // Stage the incoming generation without blanking the outgoing grid.
+        cacheCurrentLod();
         cancelGridHandoff();
         lodSwapPending = true;
         tileLoadGeneration += 1;
@@ -3525,6 +3534,7 @@ __METRO_META__
         pendingTileParents.length = 0;
         fetchedTiles.clear();
         tileFeatures.clear();
+        restoreCachedLod(res);
         gridDirty = true;
       }
       const tileIndexes = snapshotManifest.tile_indexes || {};
@@ -3542,6 +3552,28 @@ __METRO_META__
       if (candidates.length || tileFetchesActive) setTileLoaderStatus('Loading grid tiles…');
       drainTileQueue();
       applyGridData();
+    }
+
+    function cacheCurrentLod() {
+      if (lodSwapPending || renderedLodRes !== activeLodRes || !gridGeoJSON || !fetchedTiles.size) return;
+      const features = gridGeoJSON.features;
+      if (features.length > MAX_CACHED_LOD_FEATURES || fetchedTiles.size > MAX_CACHED_LOD_PARENTS) return;
+      let count = features.length;
+      for (const cached of lodTileCache.values()) count += cached.features.length;
+      while (count > MAX_CACHED_LOD_FEATURES) {
+        const oldest = lodTileCache.keys().next().value;
+        count -= lodTileCache.get(oldest).features.length;
+        lodTileCache.delete(oldest);
+      }
+      lodTileCache.set(activeLodRes, { features, fetched: new Set(fetchedTiles) });
+    }
+
+    function restoreCachedLod(res) {
+      const cached = lodTileCache.get(res);
+      if (!cached) return;
+      lodTileCache.delete(res);
+      for (const parent of cached.fetched) fetchedTiles.add(parent);
+      for (const feature of cached.features) tileFeatures.set(feature.properties.h3_index, feature);
     }
 
     function parentDistance(parent, center) {
