@@ -18,6 +18,17 @@ The five canonical triage roles, each label string equal to its name (`needs-tri
 
 Single-context: one `CONTEXT.md` at the repo root, one `docs/adr/` for all decisions
 (ADR 0001 — Agent Interlock — is the first). See `docs/agents/domain.md`.
+In-flight hex-coverage work (Urban Anchors, coverage tiers, regional backfill) is
+governed by `docs/adr/0010-adaptive-hex-coverage-tiers-and-regional-backfill.md`;
+its executable plan, work-item IDs (`HX-*`), and decision gates (`DG-*`) live in
+`ROADMAP.md`. Until a stage lands, the code as shipped is authoritative over the ADR.
+
+### Domain vocabulary
+
+Use the terms defined in `CONTEXT.md` (Metro, Submarket, Urban Anchor, Coverage
+tier, Display ladder, LOD, Honesty labels, Snapshot, Release, Region, Backfill,
+Golden count) in code, tests, docs, and commit messages, and avoid the listed
+alternatives. Add a term to `CONTEXT.md` before using a new one.
 
 ### Parallel agent streams
 

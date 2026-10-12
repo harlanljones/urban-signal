@@ -24,15 +24,26 @@ Measured facts about today's system:
   monthly) and the metro LOD tier at res 7/8/9 (157 metros, 53,799 unique
   res-9 cells; LIMS signal; published daily). The client hard-cuts between
   them at `ZOOM_FLOOR=6`: national res-6 chunks are built, published, and
-  fetched, but never displayed — a dead band — and any hex outside a
-  registered metro carries only LODES at every zoom.
+  servable, but the client's national loader returns before requesting them
+  at z ≥ 6, so they are never displayed — a dead band — and any hex outside
+  a registered metro carries only LODES at every zoom.
 - Every refresh rebuilds all 157 metros from scratch: 111,843 KV keys,
   ~571 MB bulk per run, in ~12–15 s. Publication is content-addressed and
   atomic (release twins, pointer promoted last, prune keeps two
   generations), but the build is all-or-nothing: a failed region of the
-  snapshot has no per-region previous generation to keep, unlike the
-  national builder, which already gates pointer promotion on checksums and
-  a minimum measured-hex count (`national_builder.promote_national`).
+  snapshot has no per-region previous generation to keep. The national
+  builder's `promote_national` is the closest pattern, but it is weaker
+  than it looks: it checks a `checksum_verified` flag the builder hard-codes
+  to `True`, requires ≥ 1 measured hex, and compares nothing against the
+  golden counts (those are asserted only in unit tests).
+- Percentile ranks (`<metric>_national_pct`, the only field the client
+  paints from) are computed over the complete publish before any key is
+  written; rebuilding one metro changes the correct rank of every other
+  cell.
+- 31 of 157 registered metro bboxes overlap another's, and the pinned
+  coverage fixture already holds 373 res-9 cells with two owners across 8
+  metro pairs (Oakland/SF 123, SF/San Jose 62, …), resolved today by
+  first-city-wins in `_bucket_grid_tiles`.
 - The client already morphs between metro LODs (≤2,500 features: polygon
   interpolation from parent centroid, 260 ms cross-fade; completed LODs are
   cached and restored without refetching).
@@ -81,22 +92,32 @@ and region-granular content-addressed backfill.**
    resolution is assigned by size/density class (large → 9, mid → 8, small
    → 7) and revisited only when the Census republishes urban areas. The
    tier keeps a total cell budget from the envelope above (~0.5–1.5 M cells
-   nationwide) instead of a uniform res-9 nation. The client already morphs
-   between arbitrary adjacent resolutions, so per-anchor resolution costs
-   no new client mechanism.
+   nationwide) instead of a uniform res-9 nation. A viewport can span
+   anchors of different detail resolution, and the loader has one active
+   resolution; so each anchor's terminal cells are also published into
+   every finer LOD tile set (a res-7 anchor's cells appear in the res-8 and
+   res-9 tiles under their parents). The client keeps one active resolution
+   and the existing morph; the only client change is paint that follows the
+   feature's own resolution, not the requested one.
 
 4. **Backfill is regional and content-addressed, never a full rebuild.** The
-   build and promotion unit becomes the **region** — an Urban Anchor's
-   detail set, or a national res-3 parent group. Each region build carries a
-   checksum, a golden-count invariant, and a minimum-measured-hex invariant
-   (the `promote_national` pattern), and swaps a per-region generation
-   pointer atomically. A failed or partially-failed region keeps its
-   previous generation, shrinking the failure domain from the whole snapshot
-   to one region. A refresh rebuilds only regions whose inputs changed
-   (per-region input hash), so daily cost scales with change, not with
-   nation size. Historical backfill falls out for free: content-addressed
-   region generations are immutable, so a time-series join reads past
-   generations by content key instead of re-deriving them.
+   build and promotion unit becomes the **region** — one Urban Anchor's
+   detail set (several registered metros may contribute to it), or a
+   national res-3 parent group. Each region build carries real per-chunk
+   checksums, a golden-count invariant, and a minimum-measured-hex
+   invariant — a `promote_region` gate that verifies what `promote_national`
+   only asserts today — and swaps a per-region generation pointer
+   atomically. A failed or partially-failed region keeps its previous
+   generation, shrinking the failure domain from the whole snapshot to one
+   region. A refresh rebuilds only regions whose inputs changed (per-region
+   input hash), so daily cost scales with change, not with nation size.
+   Ranks survive this because they stop being recomputed per publish: a
+   full build publishes a **rank epoch** (per-metric breakpoints per LOD)
+   that incremental region builds rank against, and the manifest names the
+   epoch so staleness is bounded and visible. Historical backfill becomes
+   structurally possible — generations are immutable and content-addressed —
+   but retaining more than `current` + `previous` is a separate storage and
+   cost decision, not a free consequence.
 
 5. **The coverage seam stays transport-free; MVT is the escape hatch.** The
    coverage planning interface (`metro_cells`/`aggregate_values` today, a
@@ -130,28 +151,38 @@ backfill builder. The client keeps two small interfaces:
   the opposite of backfill.
 - **Backfill unmeasured geography with synthesized values.** Rejected:
   violates US-408's honesty rule, which this ADR extends rather than
-  reverses — outside an anchor, cells are null, and inside an anchor they
-  are labeled `interpolated` with their distance.
+  reverses — outside an anchor, cells are null; inside an anchor, LIMS
+  fields are `interpolated` only within the existing bounded distance of a
+  submarket (the bound is a calibration gate, not a license), and what
+  fills the rest of the anchor is measured LODES at the anchor's detail
+  resolution, with LIMS null.
 - **Adopt vector tiles now.** Rejected as premature: at adaptive resolution
   the JSON chunk math holds, and the transport-free seam means MVT can be
   adopted later without a coverage change.
 
 ## Consequences
 
-- The registry gains a `ua_id` per metro — a spine change
-  (`city_registry.py`), so it must extend the interlock gate in the same
-  spine hold per the parallel-streams rules; a metro without an anchor keeps
-  its k-ring set as a fallback authority, so the rollout never parks a torn
-  write.
+- The registry gains `urban_anchors: tuple[str, ...]` per metro (plural:
+  a metro can span several urban areas and one urban area can span several
+  ADR-0007 jurisdictions) — a spine change across `registration.py`
+  (`__slots__`), `city_registry.py`, and `city_data.py` (its definition
+  validator rejects unknown fields), so it must extend the interlock gate
+  in the same spine hold per the parallel-streams rules; a metro with an
+  empty tuple keeps its k-ring set as the fallback authority, so the
+  rollout never parks a torn write.
+- Cell ownership becomes a stated invariant: a cell belongs to exactly one
+  region. The 373 cells that two metros publish today are the seed fixture
+  for the gate that enforces it.
 - Golden counts generalize: the national tier keeps its closure counts, and
   each region gains its own golden-count invariant, so registry edits can no
   longer silently shrink a metro's coverage (the k-ring era had no such
   invariant).
-- The res-6 national band becomes load-bearing (the bridge band), so its
-  fetch path — currently dead client-side — must be wired before the tier
-  seam ships.
+- The res-6 national band becomes load-bearing (the bridge band). Its
+  request path is dead client-side today, and its features live in a
+  different map source than the metro grid, so wiring it is a loader change
+  (one feature map across all six resolutions), not just a fetch.
 - Rollout is staged and each stage leaves production green: (A) vendor UA
-  geometry + registry `ua_id` + gate extension, k-rings still authoritative;
+  geometry + registry `urban_anchors` + gate extension, k-rings still authoritative;
   (B) `CoveragePlan` takes over coverage with anchors, per-region golden
   counts; (C) region-granular builds, promotion, and incremental refresh;
   (D) detail backfill beyond registered metros, then property slimming or
