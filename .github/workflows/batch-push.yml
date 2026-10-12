@@ -224,7 +224,7 @@ jobs:
 
       - name: Push snapshot to Workers KV
         working-directory: apps/dashboard
-        run: bunx wrangler kv bulk put ../../dist/kv-bulk.json --binding SNAPSHOT --remote
+        run: ../../.venv/bin/python ../../scripts/upload_snapshot_bulk.py --bulk ../../dist/kv-bulk.json --binding SNAPSHOT
 
       # Compatible reader ships in dashboard-deploy before this scheduled job
       # switches snapshot/current to the content-addressed release. Legacy
@@ -237,7 +237,7 @@ jobs:
             --bulk ../../dist/kv-bulk.json \
             --publish \
             --out ../../dist/kv-versioned.json
-          bunx wrangler kv bulk put ../../dist/kv-versioned.json --binding SNAPSHOT --remote
+          ../../.venv/bin/python ../../scripts/upload_snapshot_bulk.py --bulk ../../dist/kv-versioned.json --binding SNAPSHOT
 
       # Stage B publishes a release-qualified twin of every key. Keep only the
       # generations the reader can address (the new current + its previous

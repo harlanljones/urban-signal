@@ -136,3 +136,12 @@ the 25 MiB KV hard limit. The production workflow now passes
 `--skip-legacy-cells`: every `cells/{h3}` shard and its release twin remains,
 but the obsolete monolithic value is omitted. The deployed reader checks the
 per-cell shard first. Size guards and required national coverage are unchanged.
+
+The first corrected refresh built successfully but Wrangler could not read the
+whole bulk file: Node rejected strings above `0x1fffffe8` characters before any
+KV upload. Both legacy/release-twin and content-addressed uploads now use
+`scripts/upload_snapshot_bulk.py`, staging files capped at 10,000 entries and
+50 MiB before invoking Wrangler. The promotion pointer is isolated in the final
+file and is never uploaded after a data-batch failure. `--dry-run` stages and
+validates the same batches without remote writes. The builder and upload guards
+remain enabled; no payload, metro, or required national layer is dropped.
