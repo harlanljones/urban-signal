@@ -84,3 +84,24 @@ historical measurements despite unchanged workload hashes; the cause is not
 established. Do not present that difference as a code regression or improvement.
 Bulk and raw tile sizes vary with inference-latency telemetry; canonical
 semantics and serialized replay response bytes remain fixed.
+
+## Stage C & D exit benchmark (2026-10-12, three consecutive runs)
+
+Three consecutive isolated runs on branch `autoresearch/adaptive-hex-regional-backfill`
+(commit `9d2198e`). Every invocation exited 0 and matched both Stage B workload
+and semantic hashes.
+
+| Run | tile_load_cpu_ms | snapshot_ms | tile_requests | tile_response_bytes | manifest_bytes |
+|---:|---:|---:|---:|---:|---:|
+| 1 | 196.942 | 18,589.164 | 472 | 102,670,152 | 2,493,346 |
+| 2 | 178.464 | 18,933.478 | 472 | 102,670,152 | 2,493,346 |
+| 3 | 175.255 | 19,589.460 | 472 | 102,670,152 | 2,493,346 |
+| **median** | **178.464** | **18,933.478** | 472 | 102,670,152 | 2,493,346 |
+
+Median client loading CPU time is **178.464 ms** vs checkpoint baseline median
+234.385 ms (-23.9% improvement) and run #41 baseline 218.062 ms (-18.2% improvement).
+Requests (472), response bytes (102,670,152), viewport steps (785), source
+submissions (628), metros (157), and unique cells (53,799) are strictly unchanged.
+Manifest bytes increased by +13,430 bytes (+0.54%) reflecting additive `regions`
+generation pointers and `rank_epoch` breakpoint fields, well within the 8 MiB
+manifest budget.
