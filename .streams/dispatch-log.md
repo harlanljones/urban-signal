@@ -2183,3 +2183,18 @@ Root final focused suites82 + routing7 pass; mandatory preflight and Ruff pass. 
   publish (snapshot_id hashes generated_at). Added `scripts/prune_snapshot_releases.py` (keep
   {current, previous}) wired after the KV push; raised MAX_BULK_BYTES 512 MiB -> 1 GiB so the
   dense + twin bulk (~566 MiB measured extrapolation) builds.
+
+## Adaptive hex coverage Stage C & D — 2026-10-12
+- Stream `hx-c` (claim `.streams/hx-c.md`, ADR-0010 Stage C):
+  - HX-C1: `regions.py` promotion gate with real chunk sha256 verification, golden counts, measured cell floor ratio (0.8), atomic pointer swap.
+  - HX-C2: Publication plan per-region pointers; overflow to `manifest/regions` object (>8 MiB).
+  - HX-C3: Region builder, rank epochs breakpoints (101 quantiles), `--previous-regions` incremental skip (`regions_rebuilt == 0` on unchanged inputs).
+  - HX-C4: Worker regional reads via `regions/{region_id}/gen/{generation}` and content-addressed objects; 503 retry hint on missing chunk.
+  - HX-C5: Workflow incremental mode, DG-5 per-region prune, and summary reporting.
+  - HX-C6: Region failure-domain drill script (`scripts/region_failure_drill.py`) and unit tests.
+  - HX-C7: Client schema v2 reader and regional cache retention across manifest refresh; legend rank epoch age (DG-10).
+- Stream `hx-d` (claim `.streams/hx-d.md`, ADR-0010 Stage D):
+  - HX-D1: LODES-at-detail feasibility confirmed (Assumption A2 holds); total detail cell budget across all 2,319 metro-less anchors measured at 233,306 cells (combined 287,105 cells nationwide, within ADR 0.5M–1.5M envelope); DG-6 candidate list documented; `CoveragePlan` emits anchor regions with null LIMS and measured LODES.
+  - HX-D2: Anchor-backfill adapter `build_anchor_detail_region` implemented and unit tested.
+  - HX-D3: DG-7 payload table measured: largest chunk is 0.81 MiB (NYC core res 9), 24.7x below 20 MiB KV limit.
+  - HX-D4: Mapbox Vector Tiles (MVT) declined per DG-7; transport-free JSON chunking maintained.
