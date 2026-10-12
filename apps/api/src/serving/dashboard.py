@@ -1883,6 +1883,7 @@ __METRO_META__
     const exhaustedTileRetries = new Set();
     const tileFeatures = new Map();    // h3_index -> GeoJSON feature
     const lodTileCache = new Map();    // inactive completed LODs for this snapshot
+    const tileParentCenters = new Map(); // manifest-filtered H3 parents only
     const MAX_CACHED_LOD_FEATURES = 40000;
     const MAX_CACHED_LOD_PARENTS = 2048;
     const pendingTileParents = [];     // queued parents awaiting fetch
@@ -2918,6 +2919,7 @@ __METRO_META__
       fetchedTiles.clear();
       tileFeatures.clear();
       lodTileCache.clear();
+      tileParentCenters.clear();
       lodSwapPending = true;
       tileRetryTimers.forEach(timer => clearTimeout(timer));
       tileRetryTimers.clear();
@@ -3577,7 +3579,12 @@ __METRO_META__
     }
 
     function parentDistance(parent, center) {
-      const [lat, lng] = h3.cellToLatLng(parent);
+      let centroid = tileParentCenters.get(parent);
+      if (!centroid) {
+        centroid = h3.cellToLatLng(parent);
+        tileParentCenters.set(parent, centroid);
+      }
+      const [lat, lng] = centroid;
       return Math.abs(lat - center.lat) + Math.abs(lng - center.lng);
     }
 
