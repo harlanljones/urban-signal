@@ -94,7 +94,7 @@ for (const [key, doc] of [...documents.entries()].sort(([a], [b]) => a.localeCom
   workloadHash.update(key + "\0" + signature(doc.features));
 }
 const workloadIdentity = workloadHash.digest("hex");
-assert.equal(workloadIdentity, "d8052e4a05b73106987293093087d2666a02bb04e54ab2b7fe4855c8b9be7fc9",
+assert.equal(workloadIdentity, "e089578aa13d884f220904269783c721e6442cfbe06d10dda6c85852b5c86fb6",
   "Pinned tile workload changed; an explicit rebaseline is required");
 
 function makeClient(city: string) {

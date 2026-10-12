@@ -141,7 +141,7 @@ async def main():
         raise ValueError("Fixed workload produced different semantic outputs across trials")
     baseline_signature = (ROOT / "scripts/autoresearch_semantic.sha256").read_text().strip()
     if signatures[0] != baseline_signature:
-        raise ValueError("Publication semantics differ from the pinned baseline")
+        raise ValueError(f"Publication semantics differ from the pinned baseline: got {signatures[0]}")
     print(f"METRIC snapshot_ms={statistics.median(timings):.3f}")
     print(f"METRIC model_init_ms={init_ms:.3f}")
     print(f"METRIC peak_rss_mib={resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024:.3f}")

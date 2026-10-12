@@ -1180,3 +1180,43 @@ def test_failed_build_writes_incomplete_metrics_summary(tmp_path: Path):
     summary = metrics.snapshot()
     assert summary["artifacts"]["status"] == "incomplete"
     assert summary["artifacts"]["failure"]["type"] == "RuntimeError"
+
+
+def _owner_grid(city: str, cells: dict[str, float | None]) -> dict[str, Any]:
+    return {
+        "features": [
+            {"properties": {"h3_index": cell, "city_id": city, **({} if d is None else {"coverage_distance_km": d})}}
+            for cell, d in cells.items()
+        ]
+    }
+
+
+def test_contested_cell_goes_to_the_nearest_submarket_regardless_of_build_order():
+    from src.export.snapshot_builder import _cell_owners
+
+    near_b = {"a": _owner_grid("a", {"shared": 1.2, "a_only": 0.1}), "b": _owner_grid("b", {"shared": 0.4})}
+    assert _cell_owners(near_b) == {"shared": "b", "a_only": "a"}
+    # Same data, reversed iteration order: ownership must not depend on it.
+    reversed_order = {"b": near_b["b"], "a": near_b["a"]}
+    assert _cell_owners(reversed_order) == _cell_owners(near_b)
+
+
+def test_equal_distance_ties_break_by_city_id():
+    from src.export.snapshot_builder import _cell_owners
+
+    grids = {"zeta": _owner_grid("zeta", {"c": 0.5}), "alpha": _owner_grid("alpha", {"c": 0.5})}
+    assert _cell_owners(grids)["c"] == "alpha"
+
+
+def test_partial_build_never_orphans_a_cell_whose_rival_was_not_built():
+    from src.export.snapshot_builder import _cell_owners
+
+    only_loser = {"loser": _owner_grid("loser", {"shared": 1.4})}
+    assert _cell_owners(only_loser) == {"shared": "loser"}
+
+
+def test_cells_without_distance_still_get_exactly_one_owner():
+    from src.export.snapshot_builder import _cell_owners
+
+    grids = {"b": _owner_grid("b", {"x": None}), "a": _owner_grid("a", {"x": None})}
+    assert _cell_owners(grids) == {"x": "a"}

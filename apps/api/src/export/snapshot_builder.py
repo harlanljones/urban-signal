@@ -56,7 +56,7 @@ from src.export.snapshot_metrics import SnapshotMetrics
 from src.models.quantile_lgbm import FEATURE_COLUMNS
 from src.serving import router as api_router
 from src.serving.engine import MultiHorizonInferenceEngine
-from src.spatial import coverage
+from src.spatial import coverage, coverage_plan
 from src.spatial.city_registry import REGISTRY, CityId
 from src.spatial.h3_indexer import H3SpatialIndexer
 from src.spatial.national_grid import NATIONAL_RESOLUTIONS
@@ -251,6 +251,28 @@ def _features_bbox(features: list[dict[str, Any]]) -> dict[str, float] | None:
     return {"min_lat": min_lat, "max_lat": max_lat, "min_lng": min_lng, "max_lng": max_lng}
 
 
+def _cell_owners(grids: dict[str, dict[str, Any]]) -> dict[str, str]:
+    """The single owning metro of every published cell (INV-9).
+
+    Nearest submarket wins (``coverage_distance_km``), ties broken by city id, the
+    same rule ``coverage_plan`` applies. Replaces first-city-wins so a contested
+    cell no longer depends on iteration order. Computed over the grids being
+    built, so a partial build never orphans a cell whose rival was not built.
+    """
+    best: dict[str, tuple[float, str]] = {}
+    for city, grid in grids.items():
+        for feature in grid.get("features", []):
+            props = feature.get("properties", {})
+            cell = props.get("h3_index")
+            if not cell:
+                continue
+            distance = props.get("coverage_distance_km")
+            candidate = (float(distance) if distance is not None else float("inf"), city)
+            if cell not in best or candidate < best[cell]:
+                best[cell] = candidate
+    return {cell: city for cell, (_, city) in best.items()}
+
+
 def _bucket_grid_tiles(
     grids: dict[str, dict[str, Any]], tile_res: int = TILE_RESOLUTION
 ) -> dict[str, list[dict[str, Any]]]:
@@ -261,12 +283,13 @@ def _bucket_grid_tiles(
     """
     tiles: dict[str, list[dict[str, Any]]] = {}
     seen_cells: set[str] = set()
+    owners = _cell_owners(grids)
     for city, grid in grids.items():
         city_name = REGISTRY[CityId(city)].name
         for feature in grid.get("features", []):
             props = feature.setdefault("properties", {})
             cell = props.get("h3_index")
-            if not cell or cell in seen_cells:
+            if not cell or cell in seen_cells or owners.get(cell) != city:
                 continue
             seen_cells.add(cell)
             props.setdefault("city_id", city)
@@ -356,20 +379,18 @@ def _dense_metro_grid(
     synthetic features mirror ``router.get_grid_geojson``. Cells outside any
     submarket's ``max_dist_km`` bound are omitted (honesty rule).
     """
-    cells = coverage.metro_cells(city, res=9, max_ring=max_ring, max_dist_km=max_dist_km)
+    plan = coverage_plan.plan_all(max_ring, max_dist_km)[city]
     features: list[dict[str, Any]] = []
     metadata_by_submarket: dict[str, dict[str, Any]] = {}
-    for cell in cells:
-        assignment = coverage.assign_cell(cell, city, max_dist_km=max_dist_km)
-        if assignment is None:
-            continue
-        meta_dict = metadata_by_submarket.get(assignment.submarket)
+    for planned in plan.cells:
+        cell = planned.cell
+        meta_dict = metadata_by_submarket.get(planned.owner)
         if meta_dict is None:
-            meta = coverage.submarket_meta(city, assignment.submarket)
+            meta = coverage.submarket_meta(city, planned.owner)
             if meta is None:
                 continue
             meta_dict = api_router._submarket_to_dict(meta)
-            metadata_by_submarket[assignment.submarket] = meta_dict
+            metadata_by_submarket[planned.owner] = meta_dict
         synthetic_feats = {
             "capex_density_decayed": meta_dict["capex"],
             "permit_velocity": (
@@ -394,8 +415,10 @@ def _dense_metro_grid(
                     "submarket": meta_dict["name"],
                     "borough": meta_dict["borough"],
                     "city_id": city,
-                    "coverage_source": assignment.source,
-                    "coverage_distance_km": assignment.distance_km,
+                    "coverage_source": "center" if planned.label == "measured" else "bounded",
+                    "coverage_label": planned.label,
+                    "in_anchor": planned.in_anchor,
+                    "coverage_distance_km": planned.distance_km,
                     **synthetic_feats,
                     **pred,
                 },
@@ -979,6 +1002,7 @@ async def _build_snapshot(
 
     cells_requests: list[tuple[str, dict[str, Any]]] = []
     seen_cells: set[str] = set()
+    owners = _cell_owners(grids)
 
     for city in cities:
         grid = grids[city]
@@ -998,7 +1022,7 @@ async def _build_snapshot(
         for feature in grid.get("features", []):
             props = feature.get("properties", {})
             h3_cell = props.get("h3_index")
-            if not h3_cell or h3_cell in seen_cells:
+            if not h3_cell or h3_cell in seen_cells or owners.get(h3_cell) != city:
                 continue
             seen_cells.add(h3_cell)
             feats = {k: props[k] for k in CELL_FEATURE_KEYS if k in props}
