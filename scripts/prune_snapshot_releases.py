@@ -33,6 +33,7 @@ import httpx
 
 CF_API_BASE = "https://api.cloudflare.com/client/v4"
 RELEASES_PREFIX = "releases/"
+REGIONS_PREFIX = "regions/"
 DELETE_BATCH = 10_000
 LIST_LIMIT = 1_000
 
@@ -101,6 +102,61 @@ def stale_release_keys(keys: Iterable[str], keep: set[str]) -> list[str]:
     return stale
 
 
+def read_region_pointers_from_bulk(bulk_path: Path) -> dict[str, set[str]]:
+    """Return {region_id: {current, previous}} for each region pointer in kv-bulk.json."""
+    raw = Path(bulk_path).read_text(encoding="utf-8")
+    try:
+        entries = json.loads(raw)
+    except ValueError as exc:
+        raise PruneError(f"malformed bulk JSON at {bulk_path}") from exc
+    if not isinstance(entries, list):
+        raise PruneError(f"bulk payload at {bulk_path} is not an array")
+    region_keep: dict[str, set[str]] = {}
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        key = entry.get("key")
+        if isinstance(key, str) and key.startswith(REGIONS_PREFIX) and key.endswith("/current"):
+            region_id = key[len(REGIONS_PREFIX) : -len("/current")]
+            try:
+                val = json.loads(entry.get("value", "{}"))
+                keep = set()
+                if val.get("current"):
+                    keep.add(str(val["current"]))
+                if val.get("previous"):
+                    keep.add(str(val["previous"]))
+                if keep:
+                    region_keep[region_id] = keep
+            except ValueError:
+                pass
+    return region_keep
+
+
+def region_gen_info(key: str) -> tuple[str, str] | None:
+    """Return (region_id, generation) for `regions/{region_id}/gen/{generation}`, else None."""
+    if not key.startswith(REGIONS_PREFIX):
+        return None
+    rest = key[len(REGIONS_PREFIX) :]
+    if "/gen/" not in rest:
+        return None
+    region_id, _, generation = rest.partition("/gen/")
+    if region_id and generation and "/" not in generation:
+        return region_id, generation
+    return None
+
+
+def stale_region_keys(keys: Iterable[str], region_keep: dict[str, set[str]]) -> list[str]:
+    """Keys under `regions/*/gen/*` whose generation is outside DG-5 {current, previous}."""
+    stale: list[str] = []
+    for key in keys:
+        info = region_gen_info(key)
+        if info is not None:
+            region_id, gen = info
+            allowed = region_keep.get(region_id)
+            if allowed is not None and gen not in allowed:
+                stale.append(key)
+    return stale
+
 def list_release_keys(
     client: httpx.Client,
     account_id: str,
@@ -162,11 +218,14 @@ def prune(
     namespace_id: str,
     keep: set[str],
     *,
+    region_keep: dict[str, set[str]] | None = None,
     dry_run: bool = False,
 ) -> dict:
-    """Delete every release generation outside ``keep``."""
+    """Delete every release generation outside ``keep`` and region generation outside ``region_keep``."""
     keys = list_release_keys(client, account_id, namespace_id)
     stale = stale_release_keys(keys, keep)
+    if region_keep:
+        stale.extend(stale_region_keys(keys, region_keep))
     summary = {
         "scanned": len(keys),
         "kept": len(keys) - len(stale),
@@ -203,6 +262,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         pointer = read_pointer_from_bulk(Path(args.pointer))
         keep = keep_ids(pointer)
+        region_keep = read_region_pointers_from_bulk(Path(args.pointer))
     except PruneError as exc:
         print(f"PRUNE_ERROR: {exc}", file=sys.stderr)
         return 1
@@ -210,7 +270,7 @@ def main(argv: list[str] | None = None) -> int:
     headers = {"Authorization": f"Bearer {token}"}
     with httpx.Client(headers=headers, timeout=60.0) as client:
         try:
-            summary = prune(client, args.account_id, args.namespace_id, keep, dry_run=args.dry_run)
+            summary = prune(client, args.account_id, args.namespace_id, keep, region_keep=region_keep, dry_run=args.dry_run)
         except (httpx.HTTPError, PruneError) as exc:
             print(f"PRUNE_ERROR: {exc}", file=sys.stderr)
             return 1

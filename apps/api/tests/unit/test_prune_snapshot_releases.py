@@ -14,7 +14,10 @@ from scripts.prune_snapshot_releases import (
     main,
     prune,
     read_pointer_from_bulk,
+    read_region_pointers_from_bulk,
+    region_gen_info,
     release_id,
+    stale_region_keys,
     stale_release_keys,
 )
 
@@ -143,3 +146,64 @@ def test_main_without_token_fails(tmp_path, monkeypatch):
         ["--account-id", "acct", "--namespace-id", "ns", "--pointer", str(bulk)]
     )
     assert code == 1
+
+
+def test_read_region_pointers_from_bulk(tmp_path):
+    bulk = tmp_path / "kv-bulk.json"
+    bulk.write_text(
+        json.dumps(
+            [
+                {"key": "snapshot/current", "value": json.dumps({"current": "r-1"})},
+                {
+                    "key": "regions/metro/nyc/current",
+                    "value": json.dumps({"current": "g-nyc-2", "previous": "g-nyc-1"}),
+                },
+                {
+                    "key": "regions/metro/sf/current",
+                    "value": json.dumps({"current": "g-sf-1"}),
+                },
+            ]
+        )
+    )
+    region_keep = read_region_pointers_from_bulk(bulk)
+    assert region_keep == {
+        "metro/nyc": {"g-nyc-2", "g-nyc-1"},
+        "metro/sf": {"g-sf-1"},
+    }
+
+
+def test_region_gen_info_and_stale_region_keys():
+    assert region_gen_info("regions/metro/nyc/gen/g-1") == ("metro/nyc", "g-1")
+    assert region_gen_info("regions/metro/nyc/current") is None
+    assert region_gen_info("releases/r-1/grid/nyc") is None
+
+    region_keep = {"metro/nyc": {"g-nyc-current", "g-nyc-prev"}}
+    keys = [
+        "regions/metro/nyc/gen/g-nyc-current",
+        "regions/metro/nyc/gen/g-nyc-prev",
+        "regions/metro/nyc/gen/g-nyc-stale",
+        "regions/metro/nyc/current",
+    ]
+    stale = stale_region_keys(keys, region_keep)
+    assert stale == ["regions/metro/nyc/gen/g-nyc-stale"]
+
+
+def test_prune_deletes_both_stale_release_and_region_keys():
+    keys = [
+        f"releases/{STALE}/grid/nyc",
+        "regions/metro/nyc/gen/g-nyc-old",
+        "regions/metro/nyc/gen/g-nyc-curr",
+        "regions/metro/nyc/current",
+    ]
+    posts: list[list[str]] = []
+    client = _client(keys, posts)
+    summary = prune(
+        client,
+        "acct",
+        "ns",
+        KEEP,
+        region_keep={"metro/nyc": {"g-nyc-curr"}},
+    )
+    assert summary["stale"] == 2
+    assert summary["deleted"] == 2
+    assert set(posts[0]) == {f"releases/{STALE}/grid/nyc", "regions/metro/nyc/gen/g-nyc-old"}
