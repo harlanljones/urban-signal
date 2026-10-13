@@ -179,6 +179,23 @@ def plan_all(
     return plans
 
 
+def max_detail_res(plan: CoveragePlan) -> int:
+    """Finest LOD this region publishes, for the client's display clamp (§3.2, HX-B8).
+
+    A metro's ceiling is the finest of its anchors' adaptive resolutions; a metro
+    with no anchors keeps its own detail resolution (9 today). Published as
+    ``metro_index[].max_detail_res`` so the client never requests a resolution no
+    region in view publishes.
+    """
+    anchors = load_anchors()
+    res = plan.detail_res
+    for anchor_id in plan.anchor_ids:
+        anchor = anchors.get(anchor_id)
+        if anchor is not None:
+            res = max(res, detail_resolution(anchor))
+    return res
+
+
 def metro_less_anchors() -> tuple[UrbanAnchor, ...]:
     """All Census Urban Areas that do not intersect any registered metro bbox, sorted per DG-6."""
     from src.spatial.city_registry import REGISTRY

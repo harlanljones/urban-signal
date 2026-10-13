@@ -11,3 +11,40 @@
 - **HX-C5 (Workflow Incremental & DG-5 Prune):** `.github/workflows/batch-push.yml` fetches previous snapshot artifacts before build and passes `--previous-regions`. `scripts/prune_snapshot_releases.py` prunes stale regional generations outside DG-5 `{current, previous}` while retaining active pointers.
 - **HX-C6 (Failure-Domain Drill):** `scripts/region_failure_drill.py` and `test_region_failure_drill.py` verify that corrupted chunks or dropped measured cells trigger `PromotionRefused` while keeping the pointer on the previous valid generation.
 - **HX-C7 (Client Schema v2 & Regional Retention):** `apps/api/src/serving/dashboard.py` accepts `coverage.schema_version <= 2`. `changedRegionIds()` updates only changed regions on manifest refresh; unchanged regions are retained in active and inactive LOD caches. Legend displays rank epoch date when older than snapshot (DG-10).
+
+## Defects found 2026-10-13 — the regional read path is inert in production
+
+Measured on a real `build_snapshot` (`cities=["nyc"]`, `--dense-metro`), not inferred. These are
+why Stage C is "built and tested" but not "live"; each needs its own change and cannot be fixed
+by enabling anything alone.
+
+1. **No `regions/*` key is ever published.** `kv-bulk.json` contains **0** keys under `regions/`
+   while `manifest.regions` names 157 generations. Cause: `_write_publication_plan` passes
+   `manifest["regions"]` (a `region_id -> generation` **string** map) as `metadata["regions"]`, and
+   `plan_publication`'s string branch only fills `regions_map` — the dict branch that emits
+   `regions/{id}/gen/{gen}` and `regions/{id}/current` never runs. The generation manifests and
+   pointers are staged to disk by `promote_region` and then dropped. Consequence: the worker's
+   `loadRegionManifest` always misses and every read falls back to the release path; the DG-5 prune
+   has no region keys to prune; `manifest.regions` is client-only metadata.
+2. **Region chunk shas do not match the published objects.** For `grid/nyc` the region manifest
+   records `062bc6f3…` (1,926,716 B) while the uploaded content-addressed object is `48cb80e6…`
+   (1,875,028 B). Two independent causes: (a) `stage_region` hashes
+   `json.dumps(payload, separators=(",",":"))` (unsorted) while `plan_publication` hashes
+   `canonical_bytes` (sorted keys); (b) `_bucket_grid_tiles` mutates the grid features in place
+   (`props["city_name"] = …`) *after* `register("grid/{city}", …)` has already serialized them, so
+   the region chunk serializes different content for the same logical key. Enabling region pointers
+   before fixing this would return 503s from `readObjectEntry` (object missing) and would serve two
+   different `grid/{city}` payloads depending on path.
+3. **The region chunk set does not match what the reader resolves.** A metro region manifest holds
+   `grid/`, `catalysts/`, `submarkets/` plus **1,846 `cells/*` entries**, and **no `gridtiles_*`
+   keys at all**. `resolveLogicalKeyRegion` returns `null` for `cells/` (no cell→owner map exists)
+   and the reader never looks up tiles through a region, so ~1,846 of the 1,849 entries per metro
+   (~5 MB across the registry) are published and never read, while the dominant read path (tiles —
+   all 472 benchmark requests) never touches a region pointer. Spec §4.1's shared-parent ownership
+   rule ("the region contributing more cells owns the parent, the other lists `shared_parents`") is
+   not implemented; `_bucket_grid_tiles` merges across cities before any region split.
+
+Fix order (each verifiable on its own): align the chunk encoding and capture the registered payload
+at `register()` time → emit region manifests/pointers via `bulk_entries` → implement §4.1 parent
+ownership so tiles resolve per region → then drop or map the `cells/*` region entries.
+

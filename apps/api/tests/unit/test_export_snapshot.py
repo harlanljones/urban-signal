@@ -605,7 +605,7 @@ def test_snapshot_id_recomputable_from_serialized_manifest(
 
 def test_coverage_block_defaults(snapshot: dict[str, Any]):
     coverage = snapshot["coverage"]
-    assert coverage["schema_version"] == 1
+    assert coverage["schema_version"] == 2
     assert coverage["metro"]["mode"] == "sparse_registry"
     assert coverage["national"]["status"] == "unavailable"
     assert "index_key" not in coverage["national"]
@@ -621,7 +621,7 @@ def test_coverage_tiers_exact_shape_without_national(snapshot: dict[str, Any]):
     }
     # Additive: legacy keys keep their relative order, tiers is appended.
     assert list(coverage) == ["schema_version", "national", "metro", "tiers"]
-    assert coverage["schema_version"] == 1
+    assert coverage["schema_version"] == 2
 
 
 def test_coverage_tiers_national_status_mirrors_available(tmp_path: Path):
@@ -636,7 +636,7 @@ def test_coverage_tiers_national_status_mirrors_available(tmp_path: Path):
         "status": "available",
     }
     assert coverage["tiers"]["urban_detail"]["authority"] == "k_ring"
-    assert coverage["schema_version"] == 1
+    assert coverage["schema_version"] == 2
     assert list(coverage) == ["schema_version", "national", "metro", "tiers"]
 
 

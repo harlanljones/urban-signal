@@ -184,6 +184,10 @@ interface MetroMeta {
   name: string;
   bbox: { min_lat: number; max_lat: number; min_lng: number; max_lng: number };
   center: { lat: number; lng: number };
+  /** Finest detail resolution this metro publishes (ADR-0010 §3.2, HX-B8); the
+   *  client clamps its LOD request to it. Absent on manifests published before
+   *  the field landed. */
+  max_detail_res?: number;
 }
 
 const MAX_TILE_PARENTS_PER_REQUEST = 32;

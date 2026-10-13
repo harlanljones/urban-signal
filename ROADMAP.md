@@ -27,13 +27,27 @@ always written with the `HX-` prefix to avoid collision.
 |---|---|---|
 | A | **Shipped** (`1bdc17b`, deployed, browser-verified) | 2,645 anchors; res-6 underlay; `coverage.tiers`; registry field + gate; benchmark median 151.0 ms vs 147.6 baseline; production worker pin bug found and fixed |
 | B | **Shipped** (`d53b717`, published `r-20261012-2d3b28fa`, browser-verified live) | CoveragePlan, golden counts, labels, ownership, provenance UI; 157 metros / 53,799 cells unchanged; NYC viewport 49 measured / 1,362 interpolated; full API unit suite green. HX-B6 not needed (worker types are permissive); HX-B8 deferred (see below) |
-| C | **Shipped & deployed** (`dc8e1de`, published `r-20261012-45f8f537`, browser-verified live) | All 157 regions published with immutable generations; rank epoch active; HX-C1 promotion gate; HX-C2 per-region pointers; HX-C3 builder with `--previous-regions`; HX-C4 worker regional reads; HX-C5 workflow incremental mode & DG-5 prune; HX-C6 failure drill; HX-C7 client v2 & regional cache retention. |
+| C | **Partially shipped**: C1/C3/C6/C7 live; **C2/C4/C5 code-complete but inert** | Live and verified: the promotion gate runs at build time (`regions.py`), `manifest.regions` + `rank_epoch` publish, the client keys caches by region generation, `--previous-regions` and the workflow wiring exist, the failure drill passes. **But no `regions/*` key reaches KV** (0 in `kv-bulk.json`), region chunk shas do not match the published objects, and the region chunk set holds ~1,846 unreadable `cells/*` entries and no tiles — so the worker never resolves a read through a region pointer and DG-5 prune has nothing to prune. See `.streams/hx-c.md` "Defects found 2026-10-13" for the measured evidence and the fix order. |
 | D | **Built & verified** (HX-D1..D4 complete) | HX-D1 A2 confirmed & DG-6 candidate list; HX-D2 anchor-backfill adapter `build_anchor_detail_region` tested; HX-D3 payload report (largest chunk 0.81 MiB, < 20 MiB budget); HX-D4 MVT declined per DG-7 in `docs/research/hex-coverage-stage-d-feasibility.md`. |
 
 Stage B deviations from the original plan, each driven by measurement (spec §3.0):
 the k-ring set stays authoritative instead of being clipped to anchors (clipping
 drops 11 % of published cells); ownership is a flag, not a removal; honesty styling
 marks the 3 % measured cells rather than dimming the 97 % interpolated ones.
+
+### Landed 2026-10-13
+
+- **HX-B8 (clamp half):** `displayResForZoom(zoom, ceiling)` replaces `lodForZoom`; the ceiling is
+  `metro_index[].max_detail_res`, newly published by `_build_metro_index` (via
+  `coverage_plan.max_detail_res`). One LOD request serves a viewport, so the ceiling is the max over
+  metros intersecting it; a full-registry view is byte-identical to the previous ladder, which the
+  pinned benchmark confirms (472 requests, unchanged workload and semantic hashes).
+  **The unification half of B8 is declined**: collapsing `nationalResForZoom` into one res 4–9
+  function would remove the res-6 underlay that DG-4 shape (b) chose and that is live-verified, so
+  the national ladder stays separate.
+- **`coverage.schema_version` is now 2** (spec §4.5): the `regions` map and `rank_epoch` had
+  already landed while the writer still declared 1. The accepting reader shipped one release earlier
+  (HX-C7), and both the client and worker guard on `> 2`.
 
 ## 1. Current state (measured facts)
 

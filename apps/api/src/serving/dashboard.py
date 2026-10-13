@@ -1918,12 +1918,42 @@ __METRO_META__
     const LOD_TO_PARENT_RES = { 7: 4, 8: 4, 9: 5 };
     const LOD_PARENT_STEP = { 7: 0.45, 8: 0.45, 9: 0.14 };
     const LOD_PARENT_SAMPLES = { 7: 800, 8: 800, 9: 4000 };
-    function lodForZoom(z) {
-      if (z >= 11.1) return 9;
-      if (z < 8.9) return 7;
-      if (activeLodRes === 9 && z >= 10.9) return 9;
-      if (activeLodRes === 7 && z < 9.1) return 7;
-      return 8;
+    const DEFAULT_DETAIL_CEILING = 9;
+    // The finest detail resolution any region in view publishes (ADR-0010
+    // §3.2, HX-B8). One LOD request serves the whole viewport, so the ceiling
+    // is the max over the metros whose bbox intersects it — a viewport holding
+    // only a coarse region must not ask for hexes nothing publishes. 9 when the
+    // view has no metro, the manifest predates max_detail_res, or bounds are
+    // unavailable (the offline loader passes an empty bounds object).
+    function viewDetailCeiling(bounds) {
+      const metros = (snapshotManifest && snapshotManifest.metro_index) || [];
+      if (!bounds || typeof bounds.getWest !== 'function') return DEFAULT_DETAIL_CEILING;
+      const west = bounds.getWest();
+      const east = bounds.getEast();
+      const south = bounds.getSouth();
+      const north = bounds.getNorth();
+      if (![west, east, south, north].every((v) => Number.isFinite(v))) return DEFAULT_DETAIL_CEILING;
+      let ceiling = 0;
+      for (let i = 0; i < metros.length; i++) {
+        const b = metros[i].bbox;
+        if (!b) continue;
+        if (b.max_lng < west || b.min_lng > east || b.max_lat < south || b.min_lat > north) continue;
+        const r = Number(metros[i].max_detail_res);
+        if (Number.isFinite(r) && r > ceiling) ceiling = r;
+      }
+      return ceiling > 0 ? ceiling : DEFAULT_DETAIL_CEILING;
+    }
+    // The zoom ladder keeps its hysteresis; `ceiling` only ever lowers the
+    // result, so a full-registry view is byte-for-byte today's behaviour.
+    function displayResForZoom(z, ceiling) {
+      let res;
+      if (z >= 11.1) res = 9;
+      else if (z < 8.9) res = 7;
+      else if (activeLodRes === 9 && z >= 10.9) res = 9;
+      else if (activeLodRes === 7 && z < 9.1) res = 7;
+      else res = 8;
+      const cap = Number.isFinite(ceiling) && ceiling >= 4 ? ceiling : DEFAULT_DETAIL_CEILING;
+      return Math.min(res, cap);
     }
 
     // National overlay cache: per-resolution res-3-parent -> features[]
@@ -2029,7 +2059,7 @@ __METRO_META__
     // NATIONAL_UNDERLAY_MAX_ZOOM it stays as a flat, faint res-6 underlay beneath
     // the metro LOD (ADR-0010 bridge band, DG-4 shape b): nothing is blank between
     // metros. Res 6 was previously unreachable because the loader returned early.
-    const NATIONAL_UNDERLAY_MAX_ZOOM = 8.9; // where lodForZoom leaves res 7
+    const NATIONAL_UNDERLAY_MAX_ZOOM = 8.9; // where displayResForZoom leaves res 7
     const NATIONAL_UNDERLAY_OPACITY = 0.35;
     const NATIONAL_PRIMARY_OPACITY = 0.7;
     function nationalResForZoom(z) {
@@ -3690,8 +3720,9 @@ __METRO_META__
         return; // below metro band: do not fetch metro tiles
       }
       tileLoadingPaused = false;
-      // Pick the LOD level for this zoom and fetch only that level's parents.
-      const res = lodForZoom(z);
+      // Pick the LOD level for this zoom, clamped to what the regions in view
+      // actually publish, and fetch only that level's parents.
+      const res = displayResForZoom(z, viewDetailCeiling(map.getBounds()));
       if (res !== activeLodRes) {
         // Stage the incoming generation without blanking the outgoing grid.
         cacheCurrentLod();

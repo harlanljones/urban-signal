@@ -127,3 +127,27 @@ def test_plan_anchor_region_emits_lodes_measured_and_null_lims():
     assert all(c.in_anchor is True for c in plan.cells)
     assert all(c.owned is True for c in plan.cells)
     assert coverage_plan.plan_region("anchor/03817") == plan
+
+
+def test_max_detail_res_is_the_metros_own_resolution_without_anchors(plans):
+    """Every registered metro has no anchors yet, so the ceiling is its detail res."""
+    for plan in plans.values():
+        assert coverage_plan.max_detail_res(plan) == plan.detail_res == 9
+
+
+def test_max_detail_res_takes_the_finest_anchor_resolution():
+    from dataclasses import replace
+
+    from src.spatial.urban_anchors import detail_resolution, load_anchors
+
+    anchors = load_anchors()
+    coarse = next(a for a in anchors.values() if detail_resolution(a) == 7)
+    fine = next(a for a in anchors.values() if detail_resolution(a) == 9)
+    base = coverage_plan.plan_all()["nyc"]
+    with_coarse = replace(base, anchor_ids=(coarse.anchor_id,), detail_res=7)
+    with_both = replace(base, anchor_ids=(coarse.anchor_id, fine.anchor_id), detail_res=7)
+
+    assert coverage_plan.max_detail_res(with_coarse) == 7
+    assert coverage_plan.max_detail_res(with_both) == 9, "the finer anchor raises the ceiling"
+    # An anchor region reports its own adaptive resolution (HX-D1).
+    assert coverage_plan.max_detail_res(coverage_plan.plan_anchor_region(fine.anchor_id)) == 9

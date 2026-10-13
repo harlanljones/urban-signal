@@ -496,8 +496,12 @@ def _dense_metro_grid(
     return {"type": "FeatureCollection", "city_id": city, "features": features}
 
 
-def _build_metro_index(grids: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
+def _build_metro_index(
+    grids: dict[str, dict[str, Any]],
+    plans: dict[str, Any] | None = None,
+) -> list[dict[str, Any]]:
     """Per-metro camera metadata derived from the registry and actual geometry."""
+    plans = plans or {}
     index: list[dict[str, Any]] = []
     for city, grid in grids.items():
         registration = REGISTRY[CityId(city)]
@@ -508,6 +512,10 @@ def _build_metro_index(grids: dict[str, dict[str, Any]]) -> list[dict[str, Any]]
             "min_lng": registration.metro_bbox["min_lng"],
             "max_lng": registration.metro_bbox["max_lng"],
         }
+        plan = plans.get(city)
+        # The client's display clamp (HX-B8) reads this so it never requests a
+        # resolution no region in view publishes (ADR-0010 §3.2).
+        max_detail = coverage_plan.max_detail_res(plan) if plan is not None else DEFAULT_RESOLUTION
         index.append(
             {
                 "city_id": city,
@@ -517,6 +525,7 @@ def _build_metro_index(grids: dict[str, dict[str, Any]]) -> list[dict[str, Any]]
                     "lat": float(registration.center["lat"]),
                     "lng": float(registration.center["lng"]),
                 },
+                "max_detail_res": max_detail,
             }
         )
     return index
@@ -699,7 +708,10 @@ def _coverage_block(national_block: dict[str, Any] | None) -> dict[str, Any]:
                 "resolutions": resolutions,
             }
     return {
-        "schema_version": 1,
+        # 2 when the per-region `regions` map and `rank_epoch` land (spec §4.5,
+        # HX-C2). The reader accepted 2 one release earlier (HX-C7), so the
+        # writer can catch up; both the client and the worker guard on `> 2`.
+        "schema_version": 2,
         "national": national,
         "metro": {"mode": "sparse_registry"},
         "tiers": {
@@ -1328,7 +1340,7 @@ async def _build_snapshot(
             "resolutions": list(LOD_RESOLUTIONS),
             "tile_parent_res": {str(r): LOD_TILE_PARENT_RES[r] for r in LOD_RESOLUTIONS},
         },
-        "metro_index": _build_metro_index(grids),
+        "metro_index": _build_metro_index(grids, plans),
     }
     if national_block is not None:
         manifest["national"] = national_block
