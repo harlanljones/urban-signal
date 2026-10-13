@@ -78,4 +78,35 @@ ownership (`shared_parents`, "the region contributing more cells owns it"). Unti
 resolve through the release manifest as before — which is why no read behaviour changed, and why the
 Client benchmark's request profile is untouched.
 
+### Also fixed 2026-10-13 — the incremental path could not see change (`b503776`, `50d0500`)
+
+Wiring the pointers exposed that `regions_skipped` was structurally guaranteed to be 0 in production.
+Four independent causes, each measured:
+
+1. **Wrong engine attribute.** The hash read `getattr(engine, "model_id", "default")`, but the engine
+   exposes `model_bundle_id` — so the model was pinned to the literal `"default"` and a retrain would
+   have rebuilt nothing. Now reads `model_bundle_id`, falling back to `model_provenance`.
+2. **A national key that never exists.** `national_block.get("checksum")` — `_publish_national_layers`
+   returns `{generated_at, resolutions}`, so the national input was always `None`. Now fingerprints
+   the national artifact's own manifest `sha256`, read early from `national_dir`.
+3. **Detection hashed differently from recording.** Skip detection ran without `context_sha`/
+   `national_sha` and used `plan_hash="sparse"` where staging recorded `"sparse-{golden_count}"`, so a
+   non-dense build could never skip and a dense build could skip a region whose context had changed.
+   Both sites now call one `region_hash()`; a sparse build rebuilds rather than skipping on a hash
+   that could never match.
+4. **CI restored nothing.** `batch-push` runs validation on every push and *succeeds* without
+   artifacts, so "the latest successful run" routinely had no `snapshot` artifact to download.
+   `gh run download` failed instantly behind `continue-on-error`, `build/previous-snapshot/regions`
+   never existed, `--previous-regions` was never passed, and the run reported `157 rebuilt / 0
+   skipped`. Now selects the newest run that actually has a `snapshot` artifact, and logs which
+   refresh mode the build is in.
+
+The old test for this could not fail — a Region generation is a hash over chunk content, so a rebuild
+of identical content reuses the same id. The tests now assert the `regions_rebuilt`/`regions_skipped`
+counters, which discriminate: unchanged inputs skip 157, a changed `model_bundle_id` rebuilds 157.
+
+Note the first publish after any input-hash formula change is necessarily a full rebuild, because the
+previous generation recorded a digest computed the old way. Steady-state skipping is one run later.
+
+
 
