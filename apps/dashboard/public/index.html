@@ -2025,6 +2025,7 @@
     const MAX_TILE_RETRIES = 3;
     const TILE_RETRY_BACKOFF_MS = [500, 1500, 4000];
     const NATIONAL_MAX_RETRIES = 3;
+    const MANIFEST_MAX_RETRIES = 3;
     const ZOOM_FLOOR = 6; // below this: national layer only (LODES)
     // Metro LOD pyramid (US-411/413): select the display resolution based on
     // zoom level so the map never shows a dead zone between national and metro.
@@ -3176,35 +3177,48 @@
       updateCoverageLegend();
     }
 
-    async function fetchManifest() {
-      try {
-        const resp = await fetch('/api/v1/manifest');
-        if (resp.ok) {
-          const manifest = await resp.json();
-          const previousId = SNAPSHOT_ID;
-          snapshotManifest = manifest;
-          SNAPSHOT_ID = (manifest && manifest.snapshot_id) || null;
-          populateContextMetrics(snapshotManifest && snapshotManifest.context_layers);
-          const stamp = snapshotManifest && snapshotManifest.generated_at;
-          const pillText = document.getElementById('stream-status-text');
-          const pillDot = document.getElementById('stream-pulse-dot');
-          if (pillText && stamp && stamp.length >= 16) {
-            pillText.textContent = 'Snapshot ' + stamp.slice(11, 16) + ' UTC';
-            if (pillDot) pillDot.classList.add('static');
-            const pill = document.getElementById('stream-status-pill');
-            if (pill) {
-              pill.classList.add('snapshot');
-              pill.title = 'Precomputed snapshot published ' + stamp.slice(0, 10) + ' ' + stamp.slice(11, 16) + ' UTC';
-            }
-          }
-          if (SNAPSHOT_ID !== previousId) onSnapshotChanged(previousManifest, manifest);
-          else updateCoverageLegend();
-          return true;
+    async function fetchManifestOnce() {
+      const resp = await fetch('/api/v1/manifest');
+      if (!resp.ok) throw new Error(`HTTP ${resp.status || 'request failed'}`);
+      const manifest = await resp.json();
+      // Capture the outgoing manifest before overwriting it: onSnapshotChanged
+      // diffs region generations against it, and a first load has none.
+      const previousManifest = snapshotManifest;
+      const previousId = SNAPSHOT_ID;
+      snapshotManifest = manifest;
+      SNAPSHOT_ID = (manifest && manifest.snapshot_id) || null;
+      populateContextMetrics(snapshotManifest && snapshotManifest.context_layers);
+      const stamp = snapshotManifest && snapshotManifest.generated_at;
+      const pillText = document.getElementById('stream-status-text');
+      const pillDot = document.getElementById('stream-pulse-dot');
+      if (pillText && stamp && stamp.length >= 16) {
+        pillText.textContent = 'Snapshot ' + stamp.slice(11, 16) + ' UTC';
+        if (pillDot) pillDot.classList.add('static');
+        const pill = document.getElementById('stream-status-pill');
+        if (pill) {
+          pill.classList.add('snapshot');
+          pill.title = 'Precomputed snapshot published ' + stamp.slice(0, 10) + ' ' + stamp.slice(11, 16) + ' UTC';
         }
-      } catch (e) {
-        console.debug('Manifest fetch error:', e);
       }
-      showToast('Snapshot manifest unavailable — cell-level data cannot load.', 'error');
+      if (SNAPSHOT_ID !== previousId) onSnapshotChanged(previousManifest, manifest);
+      else updateCoverageLegend();
+    }
+
+    // A first-load manifest miss used to leave the map dark until the 5-minute
+    // refresh; a transient fetch error (e.g. a publish propagating through the
+    // edge cache) now retries with the same bounded ladder as tile reads.
+    async function fetchManifest() {
+      for (let attempt = 0; ; attempt++) {
+        try {
+          await fetchManifestOnce();
+          return true;
+        } catch (e) {
+          console.debug('Manifest fetch error:', e);
+          if (attempt >= MANIFEST_MAX_RETRIES) break;
+          await sleep(backoffDelay(attempt, null));
+        }
+      }
+      showToast('Snapshot manifest unavailable.', 'error', 'Retry', () => fetchManifest());
       return false;
     }
 
@@ -4243,21 +4257,26 @@
       // without a percentile render as flat "no data", never as a low value.
       const rampExpr = hexRampExpr(['get', pctProp]);
       const colorExpr = contextMetric ? ['case', ['has', pctProp], rampExpr, NO_DATA_FILL] : rampExpr;
+      // A published cell is present coverage whether or not it scores high:
+      // the floor keeps sparse k-ring districts reading as solid area instead
+      // of isolated dots, while the upper stops preserve the value gradient.
       const valueOpacity = [
         'interpolate', ['linear'],
         ['coalesce', ['get', pctProp], 0],
-0, 0.25,
-        40, 0.45,
-        80, 0.7,
-        92, 0.88
+0, 0.45,
+        40, 0.58,
+        80, 0.74,
+        92, 0.9
       ];
       const opacityExpr = contextMetric ? ['case', ['has', pctProp], valueOpacity, 1] : valueOpacity;
+      // A gentle profile floor (8% of this metric's scale) keeps every
+      // published cell as a visible plate in 3D; the ramp still dominates.
       const heightBase = {
-        lims_score: ['*', ['max', 0, ['-', ['coalesce', ['get', pctProp], 50], 40]], 18],
-        delta_6m_p50: ['*', ['max', 0, ['coalesce', ['get', pctProp], 50]], 40],
-        delta_12m_spillover: ['*', ['max', 0, ['coalesce', ['get', pctProp], 50]], 45],
-        prob_18m_macro_outperformance: ['*', ['max', 0, ['coalesce', ['get', pctProp], 50]], 9]
-      }[currentMetric] || ['*', ['coalesce', ['get', pctProp], 0], 12];
+        lims_score: ['*', ['max', 8, ['-', ['coalesce', ['get', pctProp], 50], 40]], 18],
+        delta_6m_p50: ['*', ['max', 8, ['coalesce', ['get', pctProp], 50]], 40],
+        delta_12m_spillover: ['*', ['max', 8, ['coalesce', ['get', pctProp], 50]], 45],
+        prob_18m_macro_outperformance: ['*', ['max', 8, ['coalesce', ['get', pctProp], 50]], 9]
+      }[currentMetric] || ['*', ['max', 8, ['coalesce', ['get', pctProp], 0]], 12];
       const heightFactor = ['*', heightBase, heightStrength];
 
       if (map.getLayer('h3-hex-fill')) {
