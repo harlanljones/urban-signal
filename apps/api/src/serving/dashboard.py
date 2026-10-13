@@ -2598,6 +2598,34 @@ __METRO_META__
       return out;
     }
 
+    // Opacity and extrusion height are the other two thirds of the hex paint.
+    // A published cell is present coverage whether or not it scores high, so
+    // both floors keep sparse k-ring districts reading as area; the ramp
+    // still carries the value. One definition each: setupGridLayers paints
+    // the boot state and updateMetricVisuals repaints on a metric change, and
+    // they must never disagree.
+    function hexOpacityExpr(pctProp) {
+      return [
+        'interpolate', ['linear'],
+        ['coalesce', ['get', pctProp], 0],
+0, 0.45,
+        40, 0.58,
+        80, 0.74,
+        92, 0.9
+      ];
+    }
+
+    // A gentle profile floor (8% of the metric's scale) keeps every published
+    // cell a visible plate in 3D; the ramp dominates the rest.
+    function hexHeightExpr(pctProp, metric) {
+      return {
+        lims_score: ['*', ['max', 8, ['-', ['coalesce', ['get', pctProp], 50], 40]], 18],
+        delta_6m_p50: ['*', ['max', 8, ['coalesce', ['get', pctProp], 50]], 40],
+        delta_12m_spillover: ['*', ['max', 8, ['coalesce', ['get', pctProp], 50]], 45],
+        prob_18m_macro_outperformance: ['*', ['max', 8, ['coalesce', ['get', pctProp], 50]], 9]
+      }[metric] || ['*', ['max', 8, ['coalesce', ['get', pctProp], 0]], 12];
+    }
+
     function normalizeBorough(b) {
       if (!b) return '';
       const clean = b.toString().trim();
@@ -4002,9 +4030,8 @@ __METRO_META__
       });
 
       // 2D Fill Layer — value-aware opacity so high-percentile cells read as
-      // emphasis instead of every cell sitting at one flat alpha. Low-value
-      // cells fade into the background, reducing visual noise at dense metro
-      // zoom levels.
+      // emphasis. The boot paint mirrors updateMetricVisuals via the shared
+      // hexOpacityExpr / hexHeightExpr helpers.
       map.addLayer({
         id: 'h3-hex-fill',
         type: 'fill',
@@ -4012,14 +4039,7 @@ __METRO_META__
         layout: { visibility: currentPerspective === '2D' ? 'visible' : 'none' },
         paint: {
           'fill-color': hexRampExpr(['get', 'lims_score_national_pct']),
-          'fill-opacity': [
-            'interpolate', ['linear'],
-            ['coalesce', ['get', 'lims_score_national_pct'], 0],
-0, 0.25,
-            40, 0.45,
-            80, 0.7,
-            92, 0.88
-          ]
+          'fill-opacity': hexOpacityExpr('lims_score_national_pct')
         }
       });
 
@@ -4063,11 +4083,7 @@ __METRO_META__
         layout: { visibility: currentPerspective === '3D' ? 'visible' : 'none' },
         paint: {
           'fill-extrusion-color': hexRampExpr(['get', 'lims_score_national_pct']),
-          'fill-extrusion-height': [
-            '*',
-            ['max', 0, ['-', ['coalesce', ['get', 'lims_score_national_pct'], 50], 40]],
-            18
-          ],
+          'fill-extrusion-height': hexHeightExpr('lims_score_national_pct', 'lims_score'),
           'fill-extrusion-base': 0,
           'fill-extrusion-opacity': 0.92
         }
@@ -4142,27 +4158,11 @@ __METRO_META__
       // without a percentile render as flat "no data", never as a low value.
       const rampExpr = hexRampExpr(['get', pctProp]);
       const colorExpr = contextMetric ? ['case', ['has', pctProp], rampExpr, NO_DATA_FILL] : rampExpr;
-      // A published cell is present coverage whether or not it scores high:
-      // the floor keeps sparse k-ring districts reading as solid area instead
-      // of isolated dots, while the upper stops preserve the value gradient.
-      const valueOpacity = [
-        'interpolate', ['linear'],
-        ['coalesce', ['get', pctProp], 0],
-0, 0.45,
-        40, 0.58,
-        80, 0.74,
-        92, 0.9
-      ];
+      // Floors and gradient come from the shared helpers so the boot paint and
+      // this repaint cannot drift apart.
+      const valueOpacity = hexOpacityExpr(pctProp);
       const opacityExpr = contextMetric ? ['case', ['has', pctProp], valueOpacity, 1] : valueOpacity;
-      // A gentle profile floor (8% of this metric's scale) keeps every
-      // published cell as a visible plate in 3D; the ramp still dominates.
-      const heightBase = {
-        lims_score: ['*', ['max', 8, ['-', ['coalesce', ['get', pctProp], 50], 40]], 18],
-        delta_6m_p50: ['*', ['max', 8, ['coalesce', ['get', pctProp], 50]], 40],
-        delta_12m_spillover: ['*', ['max', 8, ['coalesce', ['get', pctProp], 50]], 45],
-        prob_18m_macro_outperformance: ['*', ['max', 8, ['coalesce', ['get', pctProp], 50]], 9]
-      }[currentMetric] || ['*', ['max', 8, ['coalesce', ['get', pctProp], 0]], 12];
-      const heightFactor = ['*', heightBase, heightStrength];
+      const heightFactor = ['*', hexHeightExpr(pctProp, currentMetric), heightStrength];
 
       if (map.getLayer('h3-hex-fill')) {
         map.setPaintProperty('h3-hex-fill', 'fill-color', colorExpr);
