@@ -19,6 +19,7 @@ from src.export.snapshot_builder import (
     TILE_RESOLUTION,
     build_snapshot,
 )
+from src.export.snapshot_metrics import SnapshotMetrics
 from src.spatial.city_registry import CityId
 
 
@@ -64,13 +65,15 @@ def asyncio_run_build(
     metrics=None,
     metrics_out: Path | None = None,
     previous_regions: Path | None = None,
+    engine=None,
+    dense_metro: bool = False,
 ) -> dict[str, Any]:
     import asyncio
 
     return asyncio.run(
         build_snapshot(
             tmp_path / "dist",
-            engine=StubEngine(),
+            engine=engine if engine is not None else StubEngine(),
             cities=cities,
             include_legacy_cells=include_legacy_cells,
             national_dir=national_dir,
@@ -79,6 +82,7 @@ def asyncio_run_build(
             metrics=metrics,
             metrics_out=metrics_out,
             previous_regions=previous_regions,
+            dense_metro=dense_metro,
         )
     )
 
@@ -1307,10 +1311,52 @@ def test_region_pointer_promotes_last_and_carries_the_generation(tmp_path: Path)
     assert plan["region_pointers"] == len(manifest["cities"])
 
 
-def test_unchanged_inputs_reuse_the_published_region_generations(tmp_path: Path):
-    """Incremental refresh has to reach the payload: a second build over the
-    same inputs must not mint new generations."""
-    first = asyncio_run_build(tmp_path)
-    second = asyncio_run_build(tmp_path / "second", previous_regions=tmp_path / "dist")
+class _BundleEngine(StubEngine):
+    """A StubEngine that declares a model bundle identity, like the real engine."""
 
-    assert second["regions"] == first["regions"]
+    def __init__(self, bundle_id: str) -> None:
+        super().__init__()
+        self.model_bundle_id = bundle_id
+
+
+def _region_counters(metrics) -> dict[str, Any]:
+    artifacts = metrics.snapshot()["artifacts"]
+    return {
+        "rebuilt": artifacts["regions_rebuilt"],
+        "skipped": artifacts["regions_skipped"],
+        "failed": artifacts["regions_failed"],
+    }
+
+
+def test_unchanged_inputs_are_skipped_not_rebuilt(tmp_path: Path):
+    """Incremental refresh is observable only in the counters: the generation is a
+    hash over chunk content, so a rebuild of identical content reuses the same
+    generation and the id cannot tell the two apart."""
+    first = asyncio_run_build(tmp_path, engine=_BundleEngine("bundle-a"), dense_metro=True)
+    metrics = SnapshotMetrics()
+    asyncio_run_build(
+        tmp_path / "second",
+        engine=_BundleEngine("bundle-a"),
+        previous_regions=tmp_path / "dist",
+        metrics=metrics,
+        dense_metro=True,
+    )
+
+    assert _region_counters(metrics) == {"rebuilt": 0, "skipped": len(first["cities"]), "failed": 0}
+
+
+def test_a_new_model_bundle_forces_a_rebuild(tmp_path: Path):
+    """`engine.model_bundle_id` is what a Region's predictions depend on, so a
+    retrain must break the skip. Reading the non-existent `engine.model_id` had
+    pinned every hash to "default", and a retrain would have skipped everything."""
+    first = asyncio_run_build(tmp_path, engine=_BundleEngine("bundle-a"), dense_metro=True)
+    metrics = SnapshotMetrics()
+    asyncio_run_build(
+        tmp_path / "second",
+        engine=_BundleEngine("bundle-b"),
+        previous_regions=tmp_path / "dist",
+        metrics=metrics,
+        dense_metro=True,
+    )
+
+    assert _region_counters(metrics) == {"rebuilt": len(first["cities"]), "skipped": 0, "failed": 0}

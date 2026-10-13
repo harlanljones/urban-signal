@@ -51,7 +51,12 @@ from typing import Any
 import h3
 import polars as pl
 
-from src.export.bay_area_context import CONTEXT_METRIC_KEYS, CONTEXT_TABLE, load_context
+from src.export.bay_area_context import (
+    CONTEXT_META,
+    CONTEXT_METRIC_KEYS,
+    CONTEXT_TABLE,
+    load_context,
+)
 from src.export.publication import (
     FEATURE_SCHEMA_VERSION,
     build_manifest,
@@ -345,6 +350,50 @@ def _cell_owners(grids: dict[str, dict[str, Any]]) -> dict[str, str]:
             if cell not in best or candidate < best[cell]:
                 best[cell] = candidate
     return {cell: city for cell, (_, city) in best.items()}
+
+
+def _model_identity(engine: object) -> str:
+    """The model bundle identity a Region's output depends on.
+
+    The engine exposes `model_bundle_id`, not `model_id` — reading the wrong
+    attribute silently pinned every Region hash to the literal "default", so a
+    retrained model would not have rebuilt a single Region.
+    """
+    return str(
+        getattr(engine, "model_bundle_id", None)
+        or getattr(engine, "model_provenance", None)
+        or "default"
+    )
+
+
+def _context_input_sha(context_dir: Path | None) -> str | None:
+    """Content identity of the context table + meta, or None when absent."""
+    if context_dir is None:
+        return None
+    table = Path(context_dir) / CONTEXT_TABLE
+    meta_path = Path(context_dir) / CONTEXT_META
+    if not table.is_file() or not meta_path.is_file():
+        return None
+    meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    return hashlib.sha256(
+        table.read_bytes() + json.dumps(meta, sort_keys=True, default=str).encode()
+    ).hexdigest()
+
+
+def _national_input_sha(national_dir: Path | None) -> str | None:
+    """Content identity of the national artifact this build consumed."""
+    if national_dir is None:
+        return None
+    manifest_path = Path(national_dir) / "national" / "manifest.json"
+    if not manifest_path.is_file():
+        return None
+    raw = manifest_path.read_bytes()
+    try:
+        document = json.loads(raw)
+    except ValueError:
+        return hashlib.sha256(raw).hexdigest()
+    # The national builder's own aggregate sha over every resolution's chunks.
+    return document.get("sha256") or hashlib.sha256(raw).hexdigest()
 
 
 def _bucket_grid_tiles(
@@ -1029,23 +1078,37 @@ async def _build_snapshot(
 
     skipped_cities: set[str] = set()
     plans = coverage_plan.plan_all()
+    # A Region's input identity, computed once and used by both skip detection and
+    # staging. Detection used to omit context_sha/national_sha and read a
+    # non-existent `engine.model_id`, so it could skip a Region whose inputs had
+    # actually changed.
+    context_input_sha = _context_input_sha(context_dir)
+    national_input_sha = _national_input_sha(national_dir)
+
+    def region_hash(city: str, plan_hash: str) -> str:
+        watermarks = (
+            {city: _city_watermark(city)} if city in {c.value for c in CityId} else {}
+        )
+        return region_input_hash(
+            plan_hash=plan_hash,
+            model_id=_model_identity(engine),
+            builder_revision=BUILDER_REVISION,
+            feed_watermarks=watermarks,
+            context_sha=context_input_sha,
+            national_sha=national_input_sha,
+        )
+
     if previous_regions is not None:
         prev_path = Path(previous_regions)
         for city in cities:
             region_id = f"metro/{city}"
             plan = plans.get(city) if dense_metro else None
-            plan_hash = plan.plan_hash if plan else "sparse"
-            watermarks = (
-                {city: _city_watermark(city)}
-                if city in {c.value for c in CityId}
-                else {}
-            )
-            curr_hash = region_input_hash(
-                plan_hash=plan_hash,
-                model_id=getattr(engine, "model_id", "default"),
-                builder_revision=BUILDER_REVISION,
-                feed_watermarks=watermarks,
-            )
+            if plan is None:
+                # A sparse build's plan hash includes its cell count, which is not
+                # known before inference, so the identity cannot be computed here.
+                # Rebuild rather than skip on a hash that would never match.
+                continue
+            curr_hash = region_hash(city, plan.plan_hash)
             prev_ptr = load_pointer(prev_path, region_id)
             if prev_ptr is not None:
                 try:
@@ -1103,16 +1166,9 @@ async def _build_snapshot(
             None if context is not None else "context_inputs_unavailable",
         )
     context_keys: tuple[str, ...] = ()
-    context_sha: str | None = None
     if context is not None:
         _apply_context_layers(grids, context[0])
         context_keys = CONTEXT_METRIC_KEYS
-        # load_context returns (values, meta); fingerprint the table + meta so a
-        # rebuilt context invalidates region input hashes.
-        context_sha = hashlib.sha256(
-            (Path(context_dir) / CONTEXT_TABLE).read_bytes()
-            + json.dumps(context[1], sort_keys=True, default=str).encode()
-        ).hexdigest()
     elif context_dir is not None:
         logger.warning("No context table at %s; publishing without context layers", context_dir)
 
@@ -1271,19 +1327,7 @@ async def _build_snapshot(
         plan = plans.get(city) if dense_metro else None
         golden_count = plan.golden_count if plan else len(grids[city].get("features", []))
         plan_hash = plan.plan_hash if plan else f"sparse-{golden_count}"
-        watermarks = (
-            {city: _city_watermark(city)}
-            if city in {c.value for c in CityId}
-            else {}
-        )
-        input_hash = region_input_hash(
-            plan_hash=plan_hash,
-            model_id=getattr(engine, "model_id", "default"),
-            builder_revision=BUILDER_REVISION,
-            feed_watermarks=watermarks,
-            context_sha=context_sha,
-            national_sha=national_block.get("checksum") if national_block else None,
-        )
+        input_hash = region_hash(city, plan_hash)
 
         if city in skipped_cities and previous_regions_dir is not None and prev_ptr is not None:
             _copy_region_artifacts(previous_regions_dir, out_dir, region_id, prev_ptr.current)
