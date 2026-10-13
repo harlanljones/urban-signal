@@ -50,7 +50,7 @@ from typing import Any
 import h3
 import polars as pl
 
-from src.export.bay_area_context import CONTEXT_METRIC_KEYS, load_context
+from src.export.bay_area_context import CONTEXT_METRIC_KEYS, CONTEXT_TABLE, load_context
 from src.export.publication import FEATURE_SCHEMA_VERSION, plan_publication
 from src.export.regions import (
     BUILDER_REVISION,
@@ -1086,9 +1086,16 @@ async def _build_snapshot(
             None if context is not None else "context_inputs_unavailable",
         )
     context_keys: tuple[str, ...] = ()
+    context_sha: str | None = None
     if context is not None:
         _apply_context_layers(grids, context[0])
         context_keys = CONTEXT_METRIC_KEYS
+        # load_context returns (values, meta); fingerprint the table + meta so a
+        # rebuilt context invalidates region input hashes.
+        context_sha = hashlib.sha256(
+            (Path(context_dir) / CONTEXT_TABLE).read_bytes()
+            + json.dumps(context[1], sort_keys=True, default=str).encode()
+        ).hexdigest()
     elif context_dir is not None:
         logger.warning("No context table at %s; publishing without context layers", context_dir)
 
@@ -1243,7 +1250,7 @@ async def _build_snapshot(
             model_id=getattr(engine, "model_id", "default"),
             builder_revision=BUILDER_REVISION,
             feed_watermarks=watermarks,
-            context_sha=context[1].get("sha256") if context and isinstance(context[1], dict) else None,
+            context_sha=context_sha,
             national_sha=national_block.get("checksum") if national_block else None,
         )
 
