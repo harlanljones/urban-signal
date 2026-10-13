@@ -63,6 +63,7 @@ def asyncio_run_build(
     context_dir: Path | None = None,
     metrics=None,
     metrics_out: Path | None = None,
+    previous_regions: Path | None = None,
 ) -> dict[str, Any]:
     import asyncio
 
@@ -77,6 +78,7 @@ def asyncio_run_build(
             context_dir=context_dir,
             metrics=metrics,
             metrics_out=metrics_out,
+            previous_regions=previous_regions,
         )
     )
 
@@ -1220,3 +1222,95 @@ def test_cells_without_distance_still_get_exactly_one_owner():
 
     grids = {"b": _owner_grid("b", {"x": None}), "a": _owner_grid("a", {"x": None})}
     assert _cell_owners(grids) == {"x": "a"}
+
+
+# ---------------------------------------------------------------------------
+# Region pointers (ADR-0010 Stage C: HX-C2 pointers, HX-C4 regional reads)
+#
+# The builder stages Region generations and promotes them locally, but the
+# pointer only becomes real when the publish actually carries
+# `regions/<id>/gen/<generation>` and `regions/<id>/current`, and when every
+# chunk those manifests list resolves to an uploaded `objects/<sha>`. Both were
+# false before 2026-10-13 (see .streams/hx-c.md), and either one alone is worse
+# than neither: a region pointer to a missing object turns a read into a 503.
+# ---------------------------------------------------------------------------
+
+
+def test_region_pointers_and_generations_are_published(tmp_path: Path):
+    manifest = asyncio_run_build(tmp_path)
+    sidecar = json.loads((tmp_path / "dist" / "publication-plan.json").read_text())
+    cities = manifest["cities"]
+
+    assert sidecar["region_manifests"] == len(cities)
+    assert sidecar["region_pointers"] == len(cities)
+    for city in cities:
+        generation = manifest["regions"][f"metro/{city}"]
+        assert (tmp_path / "dist" / "regions" / "metro" / city / "gen" / f"{generation}.json").exists()
+        assert (tmp_path / "dist" / "regions" / "metro" / city / "current.json").exists()
+
+
+def test_every_region_chunk_resolves_to_a_published_object(tmp_path: Path):
+    from src.export.publication import plan_publication
+
+    manifest = asyncio_run_build(tmp_path)
+    dist = tmp_path / "dist"
+    sidecar = json.loads((dist / "publication-plan.json").read_text())
+    bulk = json.loads((dist / "kv-bulk.json").read_text())
+    logical = [
+        entry
+        for entry in bulk
+        if not entry["key"].startswith(RELEASE_PREFIX) and entry["key"] != POINTER_KEY
+    ]
+    plan = plan_publication(logical, None, sidecar["metadata"])
+
+    assert plan.snapshot_id == sidecar["snapshot_id"], "the plan must match the build's own plan"
+    assert len(plan.region_manifests) == len(manifest["cities"])
+    for region_key, region in plan.region_manifests.items():
+        for chunk_key, spec in region["chunks"].items():
+            assert spec["sha256"] in plan.objects, f"{region_key} chunk {chunk_key} has no object"
+
+
+def test_region_manifests_list_only_keys_the_region_exclusively_owns(tmp_path: Path):
+    """Tiles are shared between metros (spec §4.1) and cell shards have no
+    resolvable owner, so neither may be advertised under a region pointer."""
+    from src.export.publication import plan_publication
+
+    asyncio_run_build(tmp_path)
+    dist = tmp_path / "dist"
+    sidecar = json.loads((dist / "publication-plan.json").read_text())
+    bulk = json.loads((dist / "kv-bulk.json").read_text())
+    logical = [
+        entry
+        for entry in bulk
+        if not entry["key"].startswith(RELEASE_PREFIX) and entry["key"] != POINTER_KEY
+    ]
+    plan = plan_publication(logical, None, sidecar["metadata"])
+
+    assert plan.region_manifests
+    for region_key, region in plan.region_manifests.items():
+        city = region["region_id"].split("/", 1)[1]
+        assert set(region["chunks"]) == {
+            f"grid/{city}",
+            f"catalysts/{city}",
+            f"submarkets/{city}",
+        }, region_key
+
+
+def test_region_pointer_promotes_last_and_carries_the_generation(tmp_path: Path):
+    manifest = asyncio_run_build(tmp_path)
+    plan = json.loads((tmp_path / "dist" / "publication-plan.json").read_text())
+    city = manifest["cities"][0]
+    pointer = json.loads((tmp_path / "dist" / "regions" / "metro" / city / "current.json").read_text())
+
+    assert pointer["current"] == manifest["regions"][f"metro/{city}"]
+    assert pointer["golden_count"] > 0
+    assert plan["region_pointers"] == len(manifest["cities"])
+
+
+def test_unchanged_inputs_reuse_the_published_region_generations(tmp_path: Path):
+    """Incremental refresh has to reach the payload: a second build over the
+    same inputs must not mint new generations."""
+    first = asyncio_run_build(tmp_path)
+    second = asyncio_run_build(tmp_path / "second", previous_regions=tmp_path / "dist")
+
+    assert second["regions"] == first["regions"]

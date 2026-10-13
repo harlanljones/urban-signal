@@ -77,16 +77,12 @@ def _object_hashes(manifest: dict[str, Any] | None) -> set[str]:
     return found
 
 
-def plan_publication(
-    entries: list[dict[str, str]],
-    previous: dict[str, Any] | None,
-    metadata: dict[str, Any],
-) -> PublicationPlan:
-    """Hash logical payloads into a release manifest.
+def hash_entries(entries: list[dict[str, str]]) -> tuple[dict[str, bytes], dict[str, dict[str, Any]]]:
+    """Objects (sha256 -> canonical bytes) and the logical key index for a publish.
 
-    The publication manifest is not one of its own ``keys``. Product objects,
-    including the product ``manifest`` entry, are. ``inference_latency_ms`` is
-    forced to ``0.0`` only in this plan; callers keep their original strings.
+    Canonical bytes are what ``objects/<sha>`` holds, so any other producer of the
+    same logical key (a Region chunk map, say) must reference these shas rather
+    than re-serializing the payload and hoping the encodings agree.
     """
     objects: dict[str, bytes] = {}
     keys: dict[str, dict[str, Any]] = {}
@@ -104,7 +100,20 @@ def plan_publication(
         else:
             digest, raw = cached
         keys[logical] = {"sha256": digest, "bytes": len(raw)}
+    return objects, keys
 
+
+def build_manifest(
+    objects: dict[str, bytes],
+    keys: dict[str, dict[str, Any]],
+    previous: dict[str, Any] | None,
+    metadata: dict[str, Any],
+) -> PublicationPlan:
+    """Assemble the release manifest from a hashed publish (``hash_entries``).
+
+    The publication manifest is not one of its own ``keys``. Product objects,
+    including the product ``manifest`` entry, are.
+    """
     regions_map: dict[str, str] = {}
     region_manifests: dict[str, dict[str, Any]] = {}
     region_pointers: dict[str, dict[str, Any]] = {}
@@ -159,3 +168,17 @@ def plan_publication(
         region_manifests=region_manifests,
         region_pointers=region_pointers,
     )
+
+
+def plan_publication(
+    entries: list[dict[str, str]],
+    previous: dict[str, Any] | None,
+    metadata: dict[str, Any],
+) -> PublicationPlan:
+    """Hash logical payloads into a release manifest.
+
+    ``inference_latency_ms`` is forced to ``0.0`` only in this plan; callers keep
+    their original strings.
+    """
+    objects, keys = hash_entries(entries)
+    return build_manifest(objects, keys, previous, metadata)

@@ -136,3 +136,47 @@ def test_plan_publication_overflowing_8mib_moves_region_index_to_object():
     assert plan.manifest["region_index_key"] == "manifest/regions"
     assert "manifest/regions" in plan.manifest["keys"]
     assert "regions" not in plan.manifest
+
+
+def test_hash_entries_plus_build_manifest_matches_plan_publication():
+    """The split must be a refactor, not a fork: the builder reuses the hashing
+    pass to build Region chunk maps from the same `objects/<sha>` bytes."""
+    from src.export.publication import build_manifest, hash_entries
+
+    entries = [
+        _entry("grid/nyc", {"lims": 1, "inference_latency_ms": 4.5}),
+        _entry("manifest", {"generated_at": "2026-10-10T00:00:00+00:00", "cities": ["nyc"]}),
+    ]
+    metadata = _meta(regions={"metro/nyc": {"generation": "g1", "golden_count": 2}})
+    composed = plan_publication(entries, None, metadata)
+    objects, keys = hash_entries(entries)
+    split = build_manifest(objects, keys, None, metadata)
+
+    assert split.snapshot_id == composed.snapshot_id
+    assert split.objects == composed.objects
+    assert split.manifest == composed.manifest
+    assert split.region_manifests == composed.region_manifests
+    assert split.region_pointers == composed.region_pointers
+
+
+def test_a_region_dict_emits_a_generation_key_and_a_pointer():
+    entries = [_entry("grid/nyc", {"lims": 1})]
+    plan = plan_publication(
+        entries,
+        None,
+        _meta(regions={"metro/nyc": {"generation": "g-nyc-7", "golden_count": 42}}),
+    )
+    assert "regions/metro/nyc/gen/g-nyc-7" in plan.region_manifests
+    pointer = plan.region_pointers["regions/metro/nyc/current"]
+    assert pointer["current"] == "g-nyc-7"
+    assert pointer["golden_count"] == 42
+    assert plan.manifest["regions"] == {"metro/nyc": "g-nyc-7"}
+
+
+def test_a_bare_generation_string_emits_no_generation_key():
+    """A string region value is the pre-HX-C2 shape: the map is carried in the
+    manifest but nothing else is published, so no pointer can dangle."""
+    plan = plan_publication([_entry("grid/nyc", {"lims": 1})], None, _meta(regions={"metro/nyc": "g1"}))
+    assert plan.manifest["regions"] == {"metro/nyc": "g1"}
+    assert plan.region_manifests == {}
+    assert plan.region_pointers == {}

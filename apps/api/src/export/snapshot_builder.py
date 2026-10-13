@@ -43,6 +43,7 @@ import math
 import time
 from collections.abc import Callable
 from contextlib import nullcontext
+from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -51,7 +52,11 @@ import h3
 import polars as pl
 
 from src.export.bay_area_context import CONTEXT_METRIC_KEYS, CONTEXT_TABLE, load_context
-from src.export.publication import FEATURE_SCHEMA_VERSION, plan_publication
+from src.export.publication import (
+    FEATURE_SCHEMA_VERSION,
+    build_manifest,
+    hash_entries,
+)
 from src.export.regions import (
     BUILDER_REVISION,
     load_manifest,
@@ -1241,14 +1246,28 @@ async def _build_snapshot(
     if require_national:
         _require_national_block(national_block, national_dir)
 
-    regions_map: dict[str, str] = {}
+    # The publication hashing pass runs before Region staging so a Region chunk
+    # map can reference the exact `objects/<sha>` bytes the release publishes
+    # rather than re-serializing the same payload and hoping the two encodings
+    # agree — they did not, and a Region chunk whose sha is absent from
+    # `objects/` turns every region-addressed read into a 503 (see
+    # .streams/hx-c.md "Defects found 2026-10-13").
+    objects, keys_by_logical = hash_entries(kv_entries)
+
+    region_meta: dict[str, dict[str, Any]] = {}
     regions_rebuilt = 0
     regions_skipped = 0
     regions_failed = 0
     epoch_id, epoch_at, _ = _build_rank_epoch(grids_by_res)
+    previous_regions_dir = Path(previous_regions) if previous_regions is not None else None
 
     for city in cities:
         region_id = f"metro/{city}"
+        prev_ptr = (
+            load_pointer(previous_regions_dir, region_id)
+            if previous_regions_dir is not None
+            else None
+        )
         plan = plans.get(city) if dense_metro else None
         golden_count = plan.golden_count if plan else len(grids[city].get("features", []))
         plan_hash = plan.plan_hash if plan else f"sparse-{golden_count}"
@@ -1266,23 +1285,30 @@ async def _build_snapshot(
             national_sha=national_block.get("checksum") if national_block else None,
         )
 
-        if city in skipped_cities and previous_regions is not None:
-            prev_ptr = load_pointer(Path(previous_regions), region_id)
-            if prev_ptr is not None:
-                _copy_region_artifacts(Path(previous_regions), out_dir, region_id, prev_ptr.current)
-                regions_map[region_id] = prev_ptr.current
-                regions_skipped += 1
-                continue
+        if city in skipped_cities and previous_regions_dir is not None and prev_ptr is not None:
+            _copy_region_artifacts(previous_regions_dir, out_dir, region_id, prev_ptr.current)
+            # Publish the previous generation's manifest verbatim: the input hash
+            # matched, so the content keys hashed to the same objects and the
+            # chunks still resolve.
+            region_meta[region_id] = {
+                **asdict(load_manifest(previous_regions_dir, region_id, prev_ptr.current)),
+                "previous_generation": prev_ptr.previous,
+            }
+            regions_skipped += 1
+            continue
 
         try:
-            region_chunks: dict[str, bytes] = {
-                f"grid/{city}": json.dumps(grids[city], separators=(",", ":")).encode("utf-8"),
-                f"catalysts/{city}": json.dumps(catalysts_by_city[city], separators=(",", ":")).encode("utf-8"),
-                f"submarkets/{city}": json.dumps(submarkets_by_city[city], separators=(",", ":")).encode("utf-8"),
-            }
-            for cell, pred in cells_by_index.items():
-                if owners.get(cell) == city:
-                    region_chunks[f"cells/{cell}"] = json.dumps(pred, separators=(",", ":")).encode("utf-8")
+            # Only keys this region exclusively owns: one grid, one catalyst set
+            # and one submarket set per metro. A detail-tile parent is shared
+            # between metros (spec §4.1 puts it under the region contributing
+            # more cells, with `shared_parents` on the other), and per-cell
+            # shards have no resolvable owner, so both stay on the release path
+            # rather than being advertised under a pointer that cannot serve them.
+            region_chunks: dict[str, bytes] = {}
+            for logical in (f"grid/{city}", f"catalysts/{city}", f"submarkets/{city}"):
+                spec = keys_by_logical.get(logical)
+                if spec is not None:
+                    region_chunks[logical] = objects[spec["sha256"]]
 
             measured_cells = sum(
                 1
@@ -1300,14 +1326,20 @@ async def _build_snapshot(
                 measured_count=max(1, measured_cells),
                 rank_epoch=epoch_id,
             )
-            promoted_ptr = promote_region(
+            # The promotion gate verifies every chunk's bytes and the golden
+            # count before the pointer moves; the manifest it promoted is what
+            # gets published.
+            promote_region(
                 out_dir,
                 region_id=region_id,
                 generation=reg_manifest.generation,
                 expected_golden=golden_count,
                 expected_plan_hash=plan_hash,
             )
-            regions_map[region_id] = promoted_ptr.current
+            region_meta[region_id] = {
+                **asdict(reg_manifest),
+                "previous_generation": prev_ptr.current if prev_ptr is not None else None,
+            }
             regions_rebuilt += 1
         except Exception as exc:
             logger.error("Failed to build region %s: %s", region_id, exc)
@@ -1349,7 +1381,7 @@ async def _build_snapshot(
     # Additive Stage A fields (hex-coverage): appended after the existing
     # fields; no existing key is reordered or altered.
     manifest["coverage"] = _coverage_block(national_block)
-    manifest["regions"] = regions_map
+    manifest["regions"] = {rid: meta["generation"] for rid, meta in region_meta.items()}
     manifest["rank_epoch"] = epoch_id
     manifest["rank_epoch_at"] = epoch_at
     manifest["snapshot_id"] = _manifest_snapshot_id(manifest)
@@ -1360,6 +1392,17 @@ async def _build_snapshot(
             f"budget. Slim it (split tile_indexes into their own key) before publishing."
         )
     register("manifest", out_dir / "manifest.json", manifest)
+    # The manifest entry is registered after the hashing pass above (it depends on
+    # the region generations that pass produced), so fold its *registered* value
+    # into the same object table the release manifest is assembled from. Re-serialize
+    # `manifest` instead and you hash the post-registration dict, which now carries
+    # its own `keys["manifest"]` size entry — 28 bytes the published value never has.
+    manifest_entry = kv_entries[-1]
+    if manifest_entry.get("key") != "manifest":
+        raise AssertionError("manifest entry is not the last registered key")
+    manifest_objects, manifest_keys = hash_entries([manifest_entry])
+    objects.update(manifest_objects)
+    keys_by_logical.update(manifest_keys)
 
     if metrics_out is not None:
         # Build report: timing + per-resolution counts from the published
@@ -1430,17 +1473,24 @@ async def _build_snapshot(
     )
     # Release bulk staging before allocating the content-addressed object plan.
     del bulk_bytes, bulk_entries, release_entries
-    _write_publication_plan(out_dir, kv_entries, manifest, engine)
+    _write_publication_plan(out_dir, objects, keys_by_logical, manifest, engine, region_meta)
     return manifest
 
 
 def _write_publication_plan(
     out_dir: Path,
-    kv_entries: list[dict[str, str]],
+    objects: dict[str, bytes],
+    keys_by_logical: dict[str, dict[str, Any]],
     manifest: dict[str, Any],
     engine: MultiHorizonInferenceEngine,
+    region_meta: dict[str, dict[str, Any]],
 ) -> None:
-    """Write a report-only content-addressed plan next to the legacy bulk file."""
+    """Write the content-addressed plan next to the legacy bulk file.
+
+    The object table is reused from the caller's hashing pass rather than
+    recomputed here, so the plan's ``objects/<sha>`` bytes are the same ones the
+    Region chunk maps were built from.
+    """
     model_id = getattr(engine, "model_bundle_id", None) or getattr(
         engine, "model_provenance", "synthetic-default"
     )
@@ -1452,19 +1502,37 @@ def _write_publication_plan(
             "app_version": manifest.get("app_version"),
             "product_snapshot_id": manifest.get("snapshot_id"),
         },
+        # Region dicts (not the bare generation map) so the plan emits
+        # `regions/<id>/gen/<generation>` and `regions/<id>/current` alongside
+        # the manifest's `regions` map.
+        "regions": region_meta,
     }
-    if "regions" in manifest:
-        metadata["regions"] = manifest["regions"]
-    plan = plan_publication(kv_entries, None, metadata)
+    plan = build_manifest(objects, keys_by_logical, None, metadata)
     payload = {
         "metadata": metadata,
         "object_bytes": sum(len(value) for value in plan.objects.values()),
         "object_count": len(plan.objects),
         "reuse_candidates": list(plan.reuse_candidates),
+        "region_manifests": len(plan.region_manifests),
+        "region_pointers": len(plan.region_pointers),
         "snapshot_id": plan.snapshot_id,
     }
     (out_dir / "publication-plan.json").write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    # Compact DG-5 keep-set for the prune step. The pointers themselves live in
+    # the versioned bulk, but that file is ~570 MB and the prune only needs the
+    # {current, previous} pair per region.
+    pointers = {
+        region_id: {
+            "current": meta.get("generation"),
+            "previous": meta.get("previous_generation"),
+        }
+        for region_id, meta in region_meta.items()
+    }
+    (out_dir / "region-pointers.json").write_text(
+        json.dumps(pointers, indent=1, sort_keys=True) + "\n",
         encoding="utf-8",
     )
 

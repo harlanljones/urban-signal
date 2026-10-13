@@ -266,7 +266,8 @@ jobs:
           PYTHONPATH=apps/api .venv/bin/python scripts/prune_snapshot_releases.py \
             --account-id "$CLOUDFLARE_ACCOUNT_ID" \
             --namespace-id "$SNAPSHOT_NAMESPACE_ID" \
-            --pointer dist/kv-bulk.json
+            --pointer dist/kv-bulk.json \
+            --region-pointers dist/region-pointers.json
 
       - name: Summarize successful snapshot publication
         if: success()

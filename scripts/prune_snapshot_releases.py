@@ -102,33 +102,26 @@ def stale_release_keys(keys: Iterable[str], keep: set[str]) -> list[str]:
     return stale
 
 
-def read_region_pointers_from_bulk(bulk_path: Path) -> dict[str, set[str]]:
-    """Return {region_id: {current, previous}} for each region pointer in kv-bulk.json."""
-    raw = Path(bulk_path).read_text(encoding="utf-8")
+def read_region_pointers(path: Path) -> dict[str, set[str]]:
+    """Region keep-set from the builder's compact ``region-pointers.json``.
+
+    Shape: ``{region_id: {"current": gen, "previous": gen|None}}``. The pointers
+    themselves ride in the versioned bulk, which is far too large to load here.
+    """
+    raw = Path(path).read_text(encoding="utf-8")
     try:
-        entries = json.loads(raw)
+        document = json.loads(raw)
     except ValueError as exc:
-        raise PruneError(f"malformed bulk JSON at {bulk_path}") from exc
-    if not isinstance(entries, list):
-        raise PruneError(f"bulk payload at {bulk_path} is not an array")
+        raise PruneError(f"malformed region pointers at {path}") from exc
+    if not isinstance(document, dict):
+        raise PruneError(f"region pointers at {path} are not an object")
     region_keep: dict[str, set[str]] = {}
-    for entry in entries:
+    for region_id, entry in document.items():
         if not isinstance(entry, dict):
             continue
-        key = entry.get("key")
-        if isinstance(key, str) and key.startswith(REGIONS_PREFIX) and key.endswith("/current"):
-            region_id = key[len(REGIONS_PREFIX) : -len("/current")]
-            try:
-                val = json.loads(entry.get("value", "{}"))
-                keep = set()
-                if val.get("current"):
-                    keep.add(str(val["current"]))
-                if val.get("previous"):
-                    keep.add(str(val["previous"]))
-                if keep:
-                    region_keep[region_id] = keep
-            except ValueError:
-                pass
+        keep = {str(entry[k]) for k in ("current", "previous") if entry.get(k)}
+        if keep:
+            region_keep[str(region_id)] = keep
     return region_keep
 
 
@@ -224,11 +217,16 @@ def prune(
     """Delete every release generation outside ``keep`` and region generation outside ``region_keep``."""
     keys = list_release_keys(client, account_id, namespace_id)
     stale = stale_release_keys(keys, keep)
+    region_keys: list[str] = []
     if region_keep:
-        stale.extend(stale_region_keys(keys, region_keep))
+        # Region generations live under their own prefix, so they have to be
+        # listed separately before they can be judged stale.
+        region_keys = list_release_keys(client, account_id, namespace_id, prefix=REGIONS_PREFIX)
+        stale.extend(stale_region_keys(region_keys, region_keep))
+    scanned = len(keys) + len(region_keys)
     summary = {
-        "scanned": len(keys),
-        "kept": len(keys) - len(stale),
+        "scanned": scanned,
+        "kept": scanned - len(stale),
         "stale": len(stale),
         "deleted": 0,
         "dry_run": dry_run,
@@ -248,6 +246,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--account-id", required=True)
     parser.add_argument("--namespace-id", required=True)
     parser.add_argument("--pointer", required=True, help="Path to the built kv-bulk.json")
+    parser.add_argument(
+        "--region-pointers",
+        default=None,
+        help=(
+            "Path to the builder's region-pointers.json. Without it the region "
+            "generations are never pruned, because the pointers themselves live "
+            "in the versioned bulk rather than kv-bulk.json."
+        ),
+    )
     parser.add_argument("--token", default=None, help="Defaults to CLOUDFLARE_API_TOKEN")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args(argv)
@@ -262,7 +269,10 @@ def main(argv: list[str] | None = None) -> int:
     try:
         pointer = read_pointer_from_bulk(Path(args.pointer))
         keep = keep_ids(pointer)
-        region_keep = read_region_pointers_from_bulk(Path(args.pointer))
+        region_keep: dict[str, set[str]] = {}
+        if args.region_pointers:
+            sidecar = Path(args.region_pointers)
+            region_keep = read_region_pointers(sidecar) if sidecar.is_file() else {}
     except PruneError as exc:
         print(f"PRUNE_ERROR: {exc}", file=sys.stderr)
         return 1
@@ -277,8 +287,8 @@ def main(argv: list[str] | None = None) -> int:
 
     print(
         "PRUNE_OK "
-        f"keep={sorted(keep)} scanned={summary['scanned']} stale={summary['stale']} "
-        f"deleted={summary['deleted']} dry_run={summary['dry_run']}"
+        f"keep={sorted(keep)} regions={len(region_keep)} scanned={summary['scanned']} "
+        f"stale={summary['stale']} deleted={summary['deleted']} dry_run={summary['dry_run']}"
     )
     unsuccessful = summary.get("unsuccessful") or []
     if unsuccessful:

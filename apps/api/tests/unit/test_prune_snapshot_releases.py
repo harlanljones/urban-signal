@@ -14,7 +14,7 @@ from scripts.prune_snapshot_releases import (
     main,
     prune,
     read_pointer_from_bulk,
-    read_region_pointers_from_bulk,
+    read_region_pointers,
     region_gen_info,
     release_id,
     stale_region_keys,
@@ -30,9 +30,12 @@ def _client(keys: list[str], posts: list[list[str]]) -> httpx.Client:
 
     def handler(request: httpx.Request) -> httpx.Response:
         if request.method == "GET":
-            cursor = int(dict(request.url.params).get("cursor", "0") or 0)
-            page = keys[cursor : cursor + 2]
-            next_cursor = str(cursor + 2) if cursor + 2 < len(keys) else ""
+            params = dict(request.url.params)
+            cursor = int(params.get("cursor", "0") or 0)
+            prefix = params.get("prefix", "")
+            matching = [key for key in keys if key.startswith(prefix)]
+            page = matching[cursor : cursor + 2]
+            next_cursor = str(cursor + 2) if cursor + 2 < len(matching) else ""
             return httpx.Response(
                 200,
                 json={
@@ -148,28 +151,28 @@ def test_main_without_token_fails(tmp_path, monkeypatch):
     assert code == 1
 
 
-def test_read_region_pointers_from_bulk(tmp_path):
-    bulk = tmp_path / "kv-bulk.json"
-    bulk.write_text(
+def test_read_region_pointers_reads_the_builders_sidecar(tmp_path):
+    sidecar = tmp_path / "region-pointers.json"
+    sidecar.write_text(
         json.dumps(
-            [
-                {"key": "snapshot/current", "value": json.dumps({"current": "r-1"})},
-                {
-                    "key": "regions/metro/nyc/current",
-                    "value": json.dumps({"current": "g-nyc-2", "previous": "g-nyc-1"}),
-                },
-                {
-                    "key": "regions/metro/sf/current",
-                    "value": json.dumps({"current": "g-sf-1"}),
-                },
-            ]
+            {
+                "metro/nyc": {"current": "g-nyc-2", "previous": "g-nyc-1"},
+                "metro/sf": {"current": "g-sf-1", "previous": None},
+                "metro/empty": {"current": None, "previous": None},
+            }
         )
     )
-    region_keep = read_region_pointers_from_bulk(bulk)
-    assert region_keep == {
+    assert read_region_pointers(sidecar) == {
         "metro/nyc": {"g-nyc-2", "g-nyc-1"},
         "metro/sf": {"g-sf-1"},
     }
+
+
+def test_read_region_pointers_rejects_a_non_object(tmp_path):
+    sidecar = tmp_path / "region-pointers.json"
+    sidecar.write_text("[1, 2]")
+    with pytest.raises(PruneError):
+        read_region_pointers(sidecar)
 
 
 def test_region_gen_info_and_stale_region_keys():
@@ -206,4 +209,18 @@ def test_prune_deletes_both_stale_release_and_region_keys():
     )
     assert summary["stale"] == 2
     assert summary["deleted"] == 2
+    assert summary["scanned"] == len(keys), "each prefix is listed once"
     assert set(posts[0]) == {f"releases/{STALE}/grid/nyc", "regions/metro/nyc/gen/g-nyc-old"}
+
+
+def test_prune_ignores_region_keys_without_a_region_keep_set():
+    """No sidecar means no region listing and therefore no region deletions."""
+    keys = [
+        f"releases/{STALE}/grid/nyc",
+        "regions/metro/nyc/gen/g-nyc-old",
+    ]
+    posts: list[list[str]] = []
+    summary = prune(_client(keys, posts), "acct", "ns", KEEP)
+    assert summary["scanned"] == 1, "only the releases prefix is scanned"
+    assert summary["stale"] == 1
+    assert set(posts[0]) == {f"releases/{STALE}/grid/nyc"}
