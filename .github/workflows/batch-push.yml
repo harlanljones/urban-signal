@@ -188,11 +188,23 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p build/previous-snapshot
-          result=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow batch-push.yml \
-            --branch main --status success --limit 1 --json databaseId \
-            --jq '.[0].databaseId // empty')
-          if [ -n "$result" ]; then
-            gh run download "$result" --repo "$GITHUB_REPOSITORY" --name snapshot --dir build/previous-snapshot || true
+          # Every push runs this workflow's validation and *succeeds* while
+          # producing no artifacts, so "the latest successful run" is routinely a
+          # run with nothing to download — which silently disabled incremental
+          # refresh (regions_skipped stayed 0). Ask the artifacts API for the
+          # newest `snapshot` artifact instead.
+          run_id=$(gh api "/repos/$GITHUB_REPOSITORY/actions/artifacts?name=snapshot&per_page=1" \
+            --jq '.artifacts[0].workflow_run.id // empty')
+          if [ -z "$run_id" ]; then
+            echo "No previous snapshot artifact published; every region will be rebuilt."
+            exit 0
+          fi
+          echo "Restoring the previous snapshot from run $run_id"
+          gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name snapshot --dir build/previous-snapshot
+          if [ -d build/previous-snapshot/regions ]; then
+            echo "Previous snapshot carries region generations."
+          else
+            echo "Previous snapshot has no regions/ directory; every region will be rebuilt."
           fi
 
       - name: Build snapshot artifacts and metrics
@@ -209,6 +221,9 @@ jobs:
           PREV_FLAG=""
           if [ -d "build/previous-snapshot/regions" ]; then
             PREV_FLAG="--previous-regions build/previous-snapshot"
+            echo "Incremental refresh: regions whose input hash is unchanged will be reused."
+          else
+            echo "Full rebuild: no previous regions available."
           fi
           /usr/bin/time -f 'elapsed_seconds=%e\npeak_rss_kib=%M' -o build/snapshot-resources.txt \
             env PYTHONPATH=apps/api .venv/bin/python -m src.export.snapshot_builder \

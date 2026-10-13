@@ -105,3 +105,16 @@ submissions (628), metros (157), and unique cells (53,799) are strictly unchange
 Manifest bytes increased by +13,430 bytes (+0.54%) reflecting additive `regions`
 generation pointers and `rank_epoch` breakpoint fields, well within the 8 MiB
 manifest budget.
+
+## Region-pointer cutover (2026-10-13, `693b688`)
+
+Same fixture, one run after Region chunk maps began deriving their shas from the
+publish's own object table: `tile_load_cpu_ms` 140.458, `tile_requests` 472,
+`tile_response_bytes` 102,670,152, `manifest_bytes` 2,496,329, and both pinned
+hashes unchanged — the change is build-side only, so the replayed client
+workload is untouched.
+
+`peak_rss_mib` rose 2,890 → 3,068 (+178 MiB): the object table is now
+materialized before Region staging (it has to be, so Region chunks can reference
+published objects) instead of at the end of the build. `snapshot_ms` is
+unchanged; the build still canonicalizes each payload once.

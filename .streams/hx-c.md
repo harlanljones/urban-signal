@@ -48,3 +48,34 @@ Fix order (each verifiable on its own): align the chunk encoding and capture the
 at `register()` time → emit region manifests/pointers via `bulk_entries` → implement §4.1 parent
 ownership so tiles resolve per region → then drop or map the `cells/*` region entries.
 
+### Fixed 2026-10-13 (`693b688`)
+
+All three, in the order above, with the tile half deliberately deferred:
+
+- **One hashing pass.** `plan_publication` split into `hash_entries` (objects + logical key index)
+  and `build_manifest`; `plan_publication` is their composition, so existing callers are unchanged.
+  The builder hashes once, before Region staging, and builds each Region chunk map from
+  `objects[keys[logical]["sha256"]]` — the same bytes the release publishes. Chunk shas now resolve
+  by construction, and there is no second canonicalization pass: the build stays cost-neutral
+  (measured: `snapshot_ms` unchanged, `peak_rss_mib` +178 MB because the object table is now
+  materialized before Region staging instead of at the very end).
+- **Real manifests, real pointers.** The published `regions/<id>/gen/<generation>` value is the
+  staged `RegionManifest` (with `chunks`), not the ad-hoc meta dict that preceded it — the worker
+  requires `region_id` and `chunks` and would have rejected the dict. `regions/<id>/current` carries
+  `{current, previous, golden_count, promoted_at}`. The registered manifest *entry* is hashed rather
+  than the live dict, because `register()` appends `keys["manifest"]` after serializing.
+- **Only exclusively-owned keys.** A Region manifest lists `grid/`, `catalysts/` and `submarkets/`
+  for its metro. Tile parents are shared between metros (§4.1) and cell shards have no resolvable
+  owner, so both stay on the release path; this also removed ~1,846 unreadable `cells/*` entries per
+  metro.
+- **Prune.** `prune_snapshot_releases.py` now lists the `regions/` prefix (it only ever listed
+  `releases/`, so no region generation was ever judged stale) and reads the builder's compact
+  `dist/region-pointers.json` sidecar rather than the ~570 MB versioned bulk. `read_region_pointers_from_bulk`
+  is deleted with its test.
+
+Still open, and now the only thing between this and per-region tile addressing: §4.1 parent
+ownership (`shared_parents`, "the region contributing more cells owns it"). Until that lands, tiles
+resolve through the release manifest as before — which is why no read behaviour changed, and why the
+Client benchmark's request profile is untouched.
+
+
