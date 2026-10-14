@@ -48,6 +48,12 @@ marks the 3 % measured cells rather than dimming the 97 % interpolated ones.
 - **`coverage.schema_version` is now 2** (spec §4.5): the `regions` map and `rank_epoch` had
   already landed while the writer still declared 1. The accepting reader shipped one release earlier
   (HX-C7), and both the client and worker guard on `> 2`.
+- **Rank epochs are real** (spec §4.6, DG-10): `ranks/{rank_epoch}` publishes a 101-quantile
+  breakpoint table that re-hashes to its own key, `rank_against_epoch` ranks a value from the epoch
+  alone (average-rank tie semantics), `rank_drift_pct` reports the live epoch's drift, and an
+  unchanged epoch is carried forward so `rank_epoch` / `rank_epoch_at` stay stable. The remaining
+  half — an incremental build ranking *against* the epoch instead of re-ranking everything — is
+  needed by §4.7 and recorded in the spec's §4.6 status note.
 
 ## 1. Current state (measured facts)
 

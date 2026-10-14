@@ -375,6 +375,22 @@ not recomputed per publish:
   legend never shows them on one ramp (resolves the Pending item in
   `docs/research/map-blended-lod-honesty.md` before Stage D).
 
+**Status 2026-10-13.** Landed: the breakpoint table publishes as
+`ranks/{rank_epoch}` with `rank_epoch = sha256(canonical_bytes(table))`, so the
+value re-hashes to its own key; `rank_against_epoch` ranks one value from the
+epoch alone (ties take the midpoint of the quantile run they span and values
+interpolate between breakpoints, matching the average-rank definition the epoch
+was built from); `rank_drift_pct` is computed and published in the build report
+as the **previous** epoch's drift, which is the number DG-10 watches; and a
+previous epoch is carried forward when its drift is under the 2 % threshold, so
+`rank_epoch` and `rank_epoch_at` stay stable across publishes that do not move
+the ranks. Not yet: an incremental build ranking its raw values *against* the
+epoch — ranking is still publish-wide, which is coherent only because every
+current publish rebuilds every Region. Epoch ranking becomes load-bearing with
+§4.7 (an anchor added without re-ranking the world), and a calendar re-rank
+cadence is deliberately unimplemented in favour of the drift trigger, which
+cannot silently defer a re-rank (DG-10 remains open on that choice).
+
 ### 4.7 LODES at detail resolution (Stage D, and the `owner=None` remainder)
 
 `national_builder.aggregate_state` takes a resolution parameter; whether it
