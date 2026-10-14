@@ -41,6 +41,7 @@ import json
 import logging
 import math
 import time
+from bisect import bisect_left, bisect_right
 from collections.abc import Callable
 from contextlib import nullcontext
 from dataclasses import asdict
@@ -60,6 +61,7 @@ from src.export.bay_area_context import (
 from src.export.publication import (
     FEATURE_SCHEMA_VERSION,
     build_manifest,
+    canonical_bytes,
     hash_entries,
 )
 from src.export.regions import (
@@ -106,6 +108,13 @@ def _lod_aggregate_keys() -> tuple[str, ...]:
 # Size budgets (US-385): a publish that would exceed Workers KV limits must fail
 # the build here, not inside `wrangler kv bulk put` at 2 AM.
 MAX_KV_VALUE_BYTES = 20 * 1024 * 1024  # KV hard cap is 25 MiB per value
+
+# Rank epochs (spec §4.6, DG-10). A cell counts as drifted when its rank against
+# the live epoch differs from a fresh publish-wide rank by more than
+# RANK_EPOCH_DRIFT_POINTS; the epoch is re-minted when any metric's drifted share
+# exceeds RANK_EPOCH_DRIFT_THRESHOLD_PCT.
+RANK_EPOCH_DRIFT_POINTS = 5.0
+RANK_EPOCH_DRIFT_THRESHOLD_PCT = 2.0
 MAX_MANIFEST_BYTES = 10 * 1024 * 1024  # boot manifest fetched by every visitor
 # Runaway bound on the whole bulk file. The KV bulk API caps each *request* at
 # 10,000 pairs / 100 MB (not the file), and `wrangler kv bulk put` segments the
@@ -174,19 +183,148 @@ def _compute_rank_breakpoints(values: list[float]) -> list[float]:
     return breakpoints
 
 
-def _build_rank_epoch(grids_by_res: dict[int, dict[str, dict[str, Any]]]) -> tuple[str, str, dict[str, dict[str, list[float]]]]:
+def _rank_epoch_table(
+    grids_by_res: dict[int, dict[str, dict[str, Any]]],
+) -> dict[str, dict[str, list[float]]]:
+    """101-quantile breakpoints per resolution then metric (spec §4.6).
+
+    Keys are inserted sorted, so the bytes ``register`` serializes are exactly
+    ``canonical_bytes(table)`` — which is what ``rank_epoch`` hashes. That makes
+    the published artifact self-verifying: re-hashing the value a reader fetches
+    reproduces its own key.
+    """
     table: dict[str, dict[str, list[float]]] = {}
     for res in sorted(grids_by_res):
-        res_grids = grids_by_res[res]
-        all_features = [f for g in res_grids.values() for f in g.get("features", [])]
-        table[str(res)] = {}
-        for metric in NORMALIZED_METRICS:
-            vals = [float(f["properties"].get(metric, 0.0)) for f in all_features]
-            table[str(res)][metric] = _compute_rank_breakpoints(vals)
-    epoch_raw = json.dumps(table, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    epoch_id = hashlib.sha256(epoch_raw).hexdigest()
-    epoch_at = datetime.now(UTC).isoformat()
+        features = [
+            feature
+            for grid in grids_by_res[res].values()
+            for feature in grid.get("features", [])
+        ]
+        table[str(res)] = {
+            metric: _compute_rank_breakpoints(
+                [float(feature["properties"].get(metric, 0.0)) for feature in features]
+            )
+            for metric in sorted(NORMALIZED_METRICS)
+        }
+    return table
+
+
+def _rank_epoch_id(table: dict[str, dict[str, list[float]]]) -> str:
+    return hashlib.sha256(canonical_bytes(table)).hexdigest()
+
+
+def rank_against_epoch(value: float, breakpoints: list[float]) -> float:
+    """Percentile of ``value`` within an epoch's breakpoints (spec §4.6).
+
+    Ranked from the epoch alone, with no view of the rest of the publish: that is
+    the point of an epoch, since an incrementally rebuilt Region must not need
+    other Regions re-ranked (§4.6, INV-10).
+
+    Ties take the midpoint of the run of quantiles they span, and a value between
+    two breakpoints interpolates between them — both matching the average-rank
+    definition the epoch was built from. A naive "largest quantile reached" step
+    function returns 100 for a population where every value is equal, where the
+    average rank is 50, which reads as total drift on an unchanged rebuild.
+    """
+    if not breakpoints:
+        return 0.0
+    last = len(breakpoints) - 1
+    low = bisect_left(breakpoints, value)
+    high = bisect_right(breakpoints, value) - 1
+    if low <= high:
+        return float((low + high) / 2.0)
+    if low == 0:
+        return 0.0
+    if low > last:
+        return float(last)
+    lower, upper = breakpoints[low - 1], breakpoints[low]
+    if upper == lower:
+        return float(low)
+    return float(low - 1 + (value - lower) / (upper - lower))
+
+
+def rank_drift_pct(
+    epoch_table: dict[str, dict[str, list[float]]],
+    grids_by_res: dict[int, dict[str, dict[str, Any]]],
+    *,
+    point_threshold: float = RANK_EPOCH_DRIFT_POINTS,
+) -> float:
+    """Worst metric's share of cells ranking >``point_threshold`` away from ``epoch_table``.
+
+    DG-10's re-rank trigger. The fresh rank is the publish-wide percentile already
+    stamped on every feature; the epoch rank is what an incremental build would
+    have produced from the epoch's breakpoints alone. A full rebuild against its
+    own epoch lands near zero, because both are percentile ranks over the same
+    population.
+    """
+    worst = 0.0
+    for res in sorted(grids_by_res):
+        by_metric = epoch_table.get(str(res))
+        if not by_metric:
+            continue
+        features = [
+            feature
+            for grid in grids_by_res[res].values()
+            for feature in grid.get("features", [])
+        ]
+        if not features:
+            continue
+        for metric, breakpoints in sorted(by_metric.items()):
+            fresh_key = f"{metric}_national_pct"
+            drifted = 0
+            ranked = 0
+            for feature in features:
+                props = feature["properties"]
+                fresh = props.get(fresh_key)
+                if fresh is None:
+                    continue
+                ranked += 1
+                epoch_rank = rank_against_epoch(float(props.get(metric, 0.0)), breakpoints)
+                if abs(float(fresh) - epoch_rank) > point_threshold:
+                    drifted += 1
+            if ranked:
+                worst = max(worst, 100.0 * drifted / ranked)
+    return round(worst, 4)
+
+
+def _previous_rank_epoch(
+    previous_regions_dir: Path | None,
+) -> tuple[str, str, dict[str, dict[str, list[float]]]] | None:
+    """The epoch the previous snapshot published, if its artifact carries it."""
+    if previous_regions_dir is None:
+        return None
+    manifest_path = previous_regions_dir / "manifest.json"
+    if not manifest_path.is_file():
+        return None
+    try:
+        epoch_id = json.loads(manifest_path.read_text(encoding="utf-8")).get("rank_epoch")
+    except (OSError, ValueError):
+        return None
+    if not isinstance(epoch_id, str) or not epoch_id:
+        return None
+    table_path = previous_regions_dir / "ranks" / f"{epoch_id}.json"
+    if not table_path.is_file():
+        return None
+    try:
+        table = json.loads(table_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    if not isinstance(table, dict) or _rank_epoch_id(table) != epoch_id:
+        return None
+    epoch_at = ""
+    try:
+        epoch_at = str(json.loads(manifest_path.read_text(encoding="utf-8")).get("rank_epoch_at") or "")
+    except (OSError, ValueError):
+        epoch_at = ""
     return epoch_id, epoch_at, table
+
+
+def _build_rank_epoch(
+    grids_by_res: dict[int, dict[str, dict[str, Any]]],
+) -> tuple[str, str, dict[str, dict[str, list[float]]]]:
+    """A fresh epoch from this publish's own distributions."""
+    table = _rank_epoch_table(grids_by_res)
+    return _rank_epoch_id(table), datetime.now(UTC).isoformat(), table
 
 
 def _copy_region_artifacts(src_dir: Path, dst_dir: Path, region_id: str, generation: str) -> None:
@@ -1302,6 +1440,27 @@ async def _build_snapshot(
     if require_national:
         _require_national_block(national_block, national_dir)
 
+    # Rank epochs (spec §4.6). A full build mints an epoch from its own
+    # distributions; if the previous snapshot's epoch still describes this data
+    # within the DG-10 drift threshold, it is carried forward instead, so
+    # `rank_epoch` (and the region generations that record it, INV-10) stay stable
+    # across publishes that do not materially move the ranks. The table publishes
+    # under the epoch's own hash, so a reader can verify what it fetched.
+    previous_regions_dir = Path(previous_regions) if previous_regions is not None else None
+    epoch_id, epoch_at, epoch_table = _build_rank_epoch(grids_by_res)
+    # DG-10 watches how far the *live* epoch has moved from this publish's ranks,
+    # so the reported number is the previous epoch's drift: small means it was
+    # carried forward, large means it was rejected and re-minted. A fresh epoch
+    # from this same data would report ~0 in both cases and say nothing.
+    epoch_drift = rank_drift_pct(epoch_table, grids_by_res)
+    previous_epoch = _previous_rank_epoch(previous_regions_dir)
+    if previous_epoch is not None:
+        previous_drift = rank_drift_pct(previous_epoch[2], grids_by_res)
+        epoch_drift = previous_drift
+        if previous_drift <= RANK_EPOCH_DRIFT_THRESHOLD_PCT:
+            epoch_id, epoch_at, epoch_table = previous_epoch
+    register(f"ranks/{epoch_id}", out_dir / "ranks" / f"{epoch_id}.json", epoch_table)
+
     # The publication hashing pass runs before Region staging so a Region chunk
     # map can reference the exact `objects/<sha>` bytes the release publishes
     # rather than re-serializing the same payload and hoping the two encodings
@@ -1314,8 +1473,6 @@ async def _build_snapshot(
     regions_rebuilt = 0
     regions_skipped = 0
     regions_failed = 0
-    epoch_id, epoch_at, _ = _build_rank_epoch(grids_by_res)
-    previous_regions_dir = Path(previous_regions) if previous_regions is not None else None
 
     for city in cities:
         region_id = f"metro/{city}"
@@ -1394,7 +1551,7 @@ async def _build_snapshot(
         metrics.set_artifact("regions_rebuilt", regions_rebuilt)
         metrics.set_artifact("regions_skipped", regions_skipped)
         metrics.set_artifact("regions_failed", regions_failed)
-        metrics.set_artifact("rank_drift_pct", 0.0)
+        metrics.set_artifact("rank_drift_pct", epoch_drift)
         metrics.set_artifact("rank_epoch", epoch_id)
         metrics.set_artifact("rank_epoch_at", epoch_at)
 
@@ -1459,7 +1616,7 @@ async def _build_snapshot(
             "regions_rebuilt": regions_rebuilt,
             "regions_skipped": regions_skipped,
             "regions_failed": regions_failed,
-            "rank_drift_pct": 0.0,
+            "rank_drift_pct": epoch_drift,
             "rank_epoch": epoch_id,
             "rank_epoch_at": epoch_at,
             "national": None

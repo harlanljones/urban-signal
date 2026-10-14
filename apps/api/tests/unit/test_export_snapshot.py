@@ -95,6 +95,8 @@ def test_manifest_shape(snapshot: dict[str, Any]):
     assert snapshot["generated_at"].endswith("+00:00") or "T" in snapshot["generated_at"]
     assert snapshot["cells_sharded"] is True
     expected_keys = {"manifest", "cells/index", "cells/index_meta", "catalysts/index"}
+    # The rank epoch is published under its own hash (spec §4.6).
+    expected_keys.add(f"ranks/{snapshot['rank_epoch']}")
     for city in snapshot["cities"]:
         expected_keys |= {f"grid/{city}", f"catalysts/{city}", f"submarkets/{city}"}
     for parent in snapshot["tile_index"]:
@@ -424,6 +426,7 @@ def test_subset_city_export(tmp_path: Path):
         "cells/index",
         "cells/index_meta",
         "catalysts/index",
+        f"ranks/{manifest['rank_epoch']}",
         "grid/nyc",
         "catalysts/nyc",
         "submarkets/nyc",
@@ -1360,3 +1363,109 @@ def test_a_new_model_bundle_forces_a_rebuild(tmp_path: Path):
     )
 
     assert _region_counters(metrics) == {"rebuilt": len(first["cities"]), "skipped": 0, "failed": 0}
+
+
+# ---------------------------------------------------------------------------
+# Rank epochs (ADR-0010 §4.6, DG-10, INV-10)
+#
+# An epoch is the breakpoint table an incremental build ranks against, so a
+# Region can be rebuilt without re-ranking the world. There was a `rank_epoch`
+# in the manifest before this, but the table behind it was discarded and
+# `rank_drift_pct` was hard-coded 0.0.
+# ---------------------------------------------------------------------------
+
+
+def test_rank_against_epoch_matches_average_rank_semantics():
+    from src.export.snapshot_builder import rank_against_epoch
+
+    ramp = [float(i) for i in range(101)]
+    assert rank_against_epoch(-5.0, ramp) == 0.0, "below the first breakpoint"
+    assert rank_against_epoch(1000.0, ramp) == 100.0, "above the last breakpoint"
+    assert rank_against_epoch(50.0, ramp) == 50.0, "on a breakpoint"
+    assert rank_against_epoch(50.5, ramp) == 50.5, "interpolates between breakpoints"
+    assert rank_against_epoch(7.0, []) == 0.0, "no breakpoints ranks at zero"
+
+    # The degenerate population: every value equal. A step function answers 100
+    # here while the average-rank definition answers 50, which reads as total
+    # drift on an unchanged rebuild.
+    flat = [42.0] * 101
+    assert rank_against_epoch(42.0, flat) == 50.0
+
+
+def test_rank_drift_is_zero_for_its_own_table_and_high_for_a_foreign_one():
+    from src.export.snapshot_builder import (
+        _rank_epoch_table,
+        rank_drift_pct,
+    )
+
+    def grids(values: list[float]) -> dict[int, dict[str, dict[str, Any]]]:
+        features = [
+            {"properties": {"lims_score": value, "lims_score_national_pct": pct}}
+            for value, pct in zip(values, [100.0 * i / (len(values) - 1) for i in range(len(values))])
+        ]
+        return {9: {"nyc": {"features": features}}}
+
+    values = [float(i) for i in range(50)]
+    table = _rank_epoch_table(grids(values))
+    assert rank_drift_pct(table, grids(values)) == 0.0
+
+    # The same table applied to a shifted population moves the ranks a long way.
+    assert rank_drift_pct(table, grids([1000.0 + i for i in range(50)])) > 90.0
+
+
+def test_ranks_key_is_published_and_hashes_to_its_own_name(tmp_path: Path):
+    import hashlib
+
+    manifest = asyncio_run_build(tmp_path)
+    epoch_id = manifest["rank_epoch"]
+    bulk = _bulk_map(tmp_path)
+    entry = bulk[f"ranks/{epoch_id}"]
+    assert hashlib.sha256(entry.encode("utf-8")).hexdigest() == epoch_id
+
+
+def test_every_region_generation_records_the_snapshot_epoch(tmp_path: Path):
+    """INV-10: a region generation never mixes epochs."""
+    manifest = asyncio_run_build(tmp_path)
+    dist = tmp_path / "dist"
+    epoch = manifest["rank_epoch"]
+    for city in manifest["cities"]:
+        generation = manifest["regions"][f"metro/{city}"]
+        region = json.loads((dist / "regions" / "metro" / city / "gen" / f"{generation}.json").read_text())
+        assert region["rank_epoch"] == epoch, city
+
+
+def test_an_unchanged_publish_carries_the_epoch_forward(tmp_path: Path):
+    """A stable epoch is what lets a region generation stay valid across
+    publishes, so the epoch date must not move when the ranks do not."""
+    first = asyncio_run_build(tmp_path, engine=_BundleEngine("bundle-a"), dense_metro=True)
+    second = asyncio_run_build(
+        tmp_path / "second",
+        engine=_BundleEngine("bundle-a"),
+        previous_regions=tmp_path / "dist",
+        dense_metro=True,
+    )
+    assert second["rank_epoch"] == first["rank_epoch"]
+    assert second["rank_epoch_at"] == first["rank_epoch_at"]
+
+
+def test_a_moved_distribution_mints_a_new_epoch(tmp_path: Path):
+    class _ShiftedEngine(_BundleEngine):
+        def predict_cell_features(self, h3_index, feature_dict, include_shap=True):
+            return {
+                "h3_index": h3_index,
+                "lims_score": 5.0 if h3_index.endswith("f") else 95.0,
+                "is_catalyst": False,
+            }
+
+    first = asyncio_run_build(tmp_path, engine=_BundleEngine("bundle-a"), dense_metro=True)
+    metrics = SnapshotMetrics()
+    second = asyncio_run_build(
+        tmp_path / "second",
+        engine=_ShiftedEngine("bundle-b"),
+        previous_regions=tmp_path / "dist",
+        dense_metro=True,
+        metrics=metrics,
+    )
+
+    assert second["rank_epoch"] != first["rank_epoch"], "a moved distribution must re-rank"
+    assert metrics.snapshot()["artifacts"]["rank_drift_pct"] > 2.0, "the drift report names why"
